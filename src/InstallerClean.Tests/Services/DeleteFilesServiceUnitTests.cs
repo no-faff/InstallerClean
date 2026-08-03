@@ -433,6 +433,85 @@ public class DeleteFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task The_under_lease_re_read_runs_inside_the_hold_and_before_any_file_is_touched()
+    {
+        // The property the whole check rests on. A re-read taken after the lease
+        // was released, or before it was taken, would satisfy every other
+        // assertion in this file and be worth nothing: the window it exists to
+        // close is exactly the one outside the hold.
+        var fs = new MockFileSystem();
+        var a = AddFile(fs, "a.msi");
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
+        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex);
+        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
+
+        await svc.DeleteFilesAsync(new[] { a });
+
+        Assert.Equal(1, reverifier.LeasesHeldWhenCalled);
+        Assert.Equal(0, reverifier.LeasesReleasedWhenCalled);
+    }
+
+    [Fact]
+    public async Task A_path_reclaimed_under_the_lease_is_kept_back_and_the_rest_go()
+    {
+        var fs = new MockFileSystem();
+        var keep = AddFile(fs, "reclaimed.msp");
+        var go = AddFile(fs, "orphan.msi");
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
+        var svc = new DeleteFilesService(fs, mutex, null,
+            new FakeReclaimingReverifier(new[] { keep }));
+
+        var result = await svc.DeleteFilesAsync(new[] { keep, go });
+
+        Assert.Equal(1, result.DeletedCount);
+        Assert.Equal(new[] { keep }, result.HeldBack);
+        // Held back is not failed: nothing went wrong with this file, a program
+        // simply wants it again, so it is not in the per-file error list.
+        Assert.Empty(result.Errors);
+        Assert.True(fs.File.Exists(keep));
+        Assert.False(fs.File.Exists(go));
+    }
+
+    [Fact]
+    public async Task A_batch_the_re_read_empties_reports_what_it_kept_back()
+    {
+        var fs = new MockFileSystem();
+        var only = AddFile(fs, "reclaimed.msp");
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
+        var svc = new DeleteFilesService(fs, mutex, null,
+            new FakeReclaimingReverifier(new[] { only }));
+
+        var result = await svc.DeleteFilesAsync(new[] { only });
+
+        Assert.Equal(0, result.DeletedCount);
+        Assert.Empty(result.Errors);
+        Assert.Equal(new[] { only }, result.HeldBack);
+        Assert.True(fs.File.Exists(only));
+        // The lease is still released on the short-circuit: the batch ended, and
+        // an unreleased machine-wide installer mutex would outlive it.
+        Assert.Equal(1, mutex.Released);
+    }
+
+    [Fact]
+    public async Task The_claims_are_handed_to_the_re_read_untouched()
+    {
+        var fs = new MockFileSystem();
+        var a = AddFile(fs, "a.msp");
+        var claims = new[]
+        {
+            new PatchClaim(a, "{AAAA0000-0000-0000-0000-000000000001}",
+                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
+        };
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
+        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex);
+        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
+
+        await svc.DeleteFilesAsync(new[] { a }, patchClaims: claims);
+
+        Assert.Equal(claims, reverifier.ClaimsSeen);
+    }
+
+    [Fact]
     public async Task Zero_files_returns_an_empty_result_without_taking_the_mutex()
     {
         var fs = new MockFileSystem();

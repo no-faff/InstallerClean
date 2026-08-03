@@ -138,6 +138,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // an already-claimed path does.
         var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
 
+        // One entry per CLAIM, deliberately not per path, and it is the merge
+        // above that makes the difference load-bearing rather than a stylistic
+        // one: MergeClaim keeps a single row per path, so the product code that
+        // survives it is whichever product was reached first. Asking that one
+        // product about the patch later asks about one of several and cannot see
+        // what the others say, which is the exact hazard the act-time re-verify's
+        // own remarks describe. Collected here because this loop is the only
+        // place all of them exist at once.
+        var patchClaims = new List<PatchClaim>();
+
         progress?.Report(new ScanProgressUpdate(Strings.Status_EnumeratingProducts));
 
         var (products, unreadableRows) = EnumerateProducts(ct);
@@ -219,7 +229,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             {
                 ct.ThrowIfCancellationRequested();
 
-                var patchPath = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.LocalPackage);
+                var patchPath = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.LocalPackage);
 
                 // The patch-side half of the same loss: this product holds the
                 // patch, the row naming it came back, and the path it claims
@@ -233,8 +243,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 }
                 else if (patchPath.Value.Length > 0)
                 {
-                    var stateStr = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State).Value;
-                    var uninstallableStr = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable).Value;
+                    var stateStr = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State).Value;
+                    var uninstallableStr = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable).Value;
 
                     // Unparseable State leaves patchState at 0 (not-a-patch),
                     // so isSuperseded is false and the row is kept: the zero
@@ -242,18 +252,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // a positively read Superseded (2) or Obsoleted (4) makes a
                     // patch a removal candidate.
                     int.TryParse(stateStr, out var patchState);
-                    var isSuperseded = patchState is 2 or 4;
-                    // Fail safe on Uninstallable: only a positively read "0"
-                    // (the patch cannot be uninstalled, so its cached .msp is
-                    // dead weight) makes it removable. An unreadable value ("")
-                    // must NOT lean removable, because a still-uninstallable
-                    // superseded patch needs its .msp to roll back.
-                    var isUninstallable = uninstallableStr != "0";
-                    var isRemovable = isSuperseded && !isUninstallable;
+                    var isRemovable = IsRemovablePatch(stateStr, uninstallableStr);
 
+                    var claimedPath = NormaliseLocalPackagePath(patchPath.Value);
                     MergeClaim(claimed,
-                        new RegisteredPackage(NormaliseLocalPackagePath(patchPath.Value), productName, productCode, patchState, isRemovable),
+                        new RegisteredPackage(claimedPath, productName, productCode, patchState, isRemovable),
                         ClaimSource.InstallerApi);
+                    // Recorded whatever the verdict was. A claim that is Applied
+                    // today is exactly the one that proves a path is still needed
+                    // if a later re-read finds it, so filtering to the removable
+                    // ones here would throw away the answers worth having.
+                    patchClaims.Add(new PatchClaim(
+                        claimedPath, patchCode, productCode, patchUserSid, (int)patchContext));
                 }
             }
 
@@ -406,7 +416,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 if (packages[i].IsRemovable)
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
 
-        return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts);
+        return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts, patchClaims.AsReadOnly());
         }
         finally
         {
@@ -1151,7 +1161,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// call site cannot skip the row on the second the way it safely skips it on
     /// the first unless the outcome travels with the value.
     /// </summary>
-    private readonly record struct PropertyRead(string Value, bool Unreadable);
+    internal readonly record struct PropertyRead(string Value, bool Unreadable);
 
     /// <summary>
     /// The benign returns of an Msi*GetInfoEx property read, as an ALLOWLIST.
@@ -1174,6 +1184,29 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// it closes: the failure nobody has seen yet would read as an absence and
     /// silently delete a product's claim on a file it still needs.
     /// </summary>
+    /// <summary>
+    /// Whether a patch's State and Uninstallable values, exactly as
+    /// <c>MsiGetPatchInfoEx</c> returned them, make its cached .msp removable.
+    ///
+    /// One copy on purpose. The scan reads these two properties and so does the
+    /// act-time re-read that runs under the installer mutex, and a rule that
+    /// drifted between them would put the two halves of one safety check in
+    /// disagreement, with the act-time half winning because it runs last.
+    ///
+    /// Both directions fail safe, and neither is an accident. An unparseable
+    /// State leaves the parsed value at 0 (not a patch), so only a positively
+    /// read Superseded (2) or Obsoleted (4) can make a patch a candidate. And
+    /// only a positively read "0" for Uninstallable (the patch cannot be
+    /// uninstalled, so its cached .msp is dead weight) clears the second half:
+    /// an unreadable value must not lean removable, because a superseded patch
+    /// that CAN still be uninstalled needs its .msp to roll back.
+    /// </summary>
+    internal static bool IsRemovablePatch(string stateValue, string uninstallableValue)
+    {
+        int.TryParse(stateValue, out var patchState);
+        return patchState is 2 or 4 && uninstallableValue == "0";
+    }
+
     private static bool IsBenignPropertyRead(uint error) =>
         error is MsiError.Success or MsiError.MoreData or MsiError.UnknownProperty;
 
@@ -1236,7 +1269,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// reporting whether an empty result is an absence or a failed read (see
     /// <see cref="PropertyRead"/>).
     /// </summary>
-    private PropertyRead GetPatchProperty(
+    internal static PropertyRead GetPatchProperty(
+        IMsiApi msi,
         string patchCode,
         string productCode,
         string? userSid,
@@ -1245,7 +1279,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         uint bufferLen = 0;
 
-        var error = _msi.GetPatchInfo(
+        var error = msi.GetPatchInfo(
             patchCode: patchCode,
             productCode: productCode,
             userSid: userSid,
@@ -1263,7 +1297,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         bufferLen++; // space for null terminator
         var buffer = new char[bufferLen];
 
-        error = _msi.GetPatchInfo(
+        error = msi.GetPatchInfo(
             patchCode: patchCode,
             productCode: productCode,
             userSid: userSid,

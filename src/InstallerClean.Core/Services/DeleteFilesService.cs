@@ -9,6 +9,13 @@ public sealed class DeleteFilesService : IDeleteFilesService
     private readonly IMutexProbe _mutex;
 
     /// <summary>
+    /// Re-reads the batch's patch claims once the installer mutex is held. Held
+    /// by the service rather than called by the caller because the hold is taken
+    /// here: a check that has to happen inside it cannot live outside it.
+    /// </summary>
+    private readonly IRemovableReverifier _reverifier;
+
+    /// <summary>
     /// Test-only real-folder override for the containment guard's cache root
     /// (null in production). See the matching field on <c>MoveFilesService</c>:
     /// it lets the real-filesystem integration tests treat a %TEMP% sandbox as
@@ -23,25 +30,28 @@ public sealed class DeleteFilesService : IDeleteFilesService
     /// production; the mutex is held for the batch so a msiexec starting
     /// mid-delete waits instead of racing the cache.
     /// </summary>
-    public DeleteFilesService(IFileSystem fileSystem, IMutexProbe mutex)
-        : this(fileSystem, mutex, null) { }
+    public DeleteFilesService(IFileSystem fileSystem, IMutexProbe mutex, IRemovableReverifier reverifier)
+        : this(fileSystem, mutex, null, reverifier) { }
 
-    /// <summary>Test constructor. No mutex hold (the hold is exercised via the seam constructor below).</summary>
+    /// <summary>Test constructor. No mutex hold and no under-lease re-read (both are exercised via the seam constructor below).</summary>
     internal DeleteFilesService(IFileSystem fileSystem)
-        : this(fileSystem, NullMutexProbe.Instance, null) { }
+        : this(fileSystem, NullMutexProbe.Instance, null, NullRemovableReverifier.Instance) { }
 
     /// <summary>Seam constructor: an injected <see cref="IMutexProbe"/> (real or fake) plus the sandbox override.</summary>
-    internal DeleteFilesService(IFileSystem fileSystem, IMutexProbe mutex, string? installerFolderOverride)
+    internal DeleteFilesService(IFileSystem fileSystem, IMutexProbe mutex, string? installerFolderOverride,
+        IRemovableReverifier? reverifier = null)
     {
         _fs = fileSystem;
         _mutex = mutex;
         _installerFolderOverride = installerFolderOverride;
+        _reverifier = reverifier ?? NullRemovableReverifier.Instance;
     }
 
     public Task<DeleteResult> DeleteFilesAsync(
         IEnumerable<string> filePaths,
         IProgress<OperationProgress>? progress = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        IReadOnlyList<PatchClaim>? patchClaims = null)
     {
         return Task.Run(() =>
         {
@@ -104,6 +114,39 @@ public sealed class DeleteFilesService : IDeleteFilesService
 
             try
             {
+            // The act-time re-read, and the reason it is HERE and not at the
+            // caller. The caller's full re-verify runs before this method is
+            // entered, so the mutex is taken after it and the batch acts on an
+            // answer read outside the hold, across the whole of that
+            // enumeration's duration rather than the instant after it. Windows
+            // writes a patch's registration while it processes the install
+            // script, which is the phase this mutex covers, so a transaction
+            // committing in that window moves a verdict already read.
+            //
+            // Only the claims, never the enumeration. Re-walking the whole
+            // registered set here would put an API enumeration inside a
+            // machine-wide installer lock on every run, which the note above
+            // asks in as many words that nobody do, and it would buy little: with
+            // the mutex held no orphan can acquire a NEW claim, because acquiring
+            // one takes a Windows Installer transaction and a transaction takes
+            // this mutex. What can still have moved is a verdict on a claim that
+            // already existed, and those carry an identity to ask about.
+            //
+            // Synchronous on the acquiring thread by necessity, not by taste: the
+            // lease is released by the thread that took it, so nothing between
+            // the acquire and the release may await.
+            var recheck = _reverifier.RecheckUnderLease(
+                patchClaims ?? Array.Empty<PatchClaim>());
+            var heldBack = recheck.HeldBack;
+            if (heldBack.Count > 0)
+            {
+                var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
+                pathList = pathList.Where(p => !reclaimed.Contains(p)).ToList();
+                total = pathList.Count;
+                if (total == 0)
+                    return new DeleteResult(0, Array.Empty<FileOperationError>(), HeldBack: heldBack, HeldBackRecordsIncomplete: recheck.RecordsIncomplete);
+            }
+
             int deleted = 0;
             var errors = new List<FileOperationError>();
             var failureLog = new PerItemFailureLog("Delete",
@@ -287,7 +330,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // CancellationToken.None: best-effort cleanup. See the
             // matching comment in MoveFilesService for the rationale.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
-            return new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled);
+            return new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled, HeldBack: heldBack, HeldBackRecordsIncomplete: recheck.RecordsIncomplete);
             }
             finally
             {

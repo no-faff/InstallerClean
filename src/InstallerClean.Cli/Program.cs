@@ -309,6 +309,32 @@ internal static class Program
     /// already written this run's Application-log entry, and a throw from a dead
     /// stdout would reach <see cref="Main"/>'s catch-all and produce a second.
     /// </summary>
+    /// <summary>
+    /// Prints what an action service's under-lease re-read kept back, in the
+    /// operator's language, using the same sentence the pre-act re-verify's own
+    /// held-back line uses. One condition, one wording: a program claims the file
+    /// again, and which side of the installer mutex that was read on is a fact
+    /// about the check rather than about the file.
+    ///
+    /// Deliberately not a machine-read line, exactly as the pre-act one is not.
+    /// The Application-channel summary already carries what the run did in
+    /// English, and an RMM reads that.
+    /// </summary>
+    private static void ReportHeldBack(IReadOnlyList<string> heldBack, bool recordsIncomplete)
+    {
+        if (heldBack.Count == 0) return;
+        // Which of the two sentences, decided the same way the pre-act line above
+        // decides it: a re-read that could not read the records has kept files
+        // back without any program having reclaimed them, and saying one where the
+        // other is true names a cause that was never shown.
+        var (flat, key) = recordsIncomplete
+            ? (Strings.Completion_ReverifyIncomplete, "Completion.ReverifyIncomplete")
+            : (Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped");
+        Console.WriteLine(string.Format(
+            DisplayHelpers.Pluralise(heldBack.Count, flat, key),
+            heldBack.Count, DisplayHelpers.PluraliseFile(heldBack.Count)));
+    }
+
     private static void NoteEventLogUnavailable()
     {
         if (!EventLogWriter.EventLogUnavailable) return;
@@ -517,7 +543,8 @@ internal static class Program
                 var result = filePaths.Count == 0
                     ? new DeleteResult(0, Array.Empty<FileOperationError>())
                     : await deleteService.DeleteFilesAsync(
-                        filePaths, progress: progress, cancellationToken: token);
+                        filePaths, progress: progress, cancellationToken: token,
+                        patchClaims: reverify.SurvivingPatchClaims);
 
                 // A Windows Installer transaction grabbed Global\_MSIExecute in the
                 // race after the gate check passed, so the service refused and
@@ -551,6 +578,27 @@ internal static class Program
                 {
                     committedCount = result.DeletedCount;
                     token.ThrowIfCancellationRequested();
+                }
+
+                // Reported after the batch rather than beside the pre-act
+                // re-verify's own line above, because it happened after that line
+                // was printed: the service takes the installer mutex and re-reads
+                // the batch's patch claims inside it, and anything reclaimed in
+                // between is kept back there. Same condition and therefore the
+                // same sentence; what differs is only when it was read.
+                //
+                // Ahead of the "deleted N" line, so the run reads in the order it
+                // happened: what was intended, what was kept back, what was done.
+                ReportHeldBack(result.HeldBack, result.HeldBackRecordsIncomplete);
+                // Held-back files were never touched, so they leave the tally the
+                // same way the errors below do. Without this they would be counted
+                // as freed bytes, the byte sum discounting errors alone.
+                if (result.HeldBack.Count > 0)
+                {
+                    var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
+                    survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
+                    count = survivingFiles.Count;
+                    totalBytes = survivingFiles.Sum(f => f.SizeBytes);
                 }
 
                 Console.WriteLine(string.Format(
@@ -631,7 +679,8 @@ internal static class Program
             {
                 moveResult = filePaths.Count == 0
                     ? new MoveResult(0, Array.Empty<FileOperationError>())
-                    : await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
+                    : await moveService.MoveFilesAsync(filePaths, moveDest, progress, token,
+                        reverify.SurvivingPatchClaims);
             }
             catch (MoveAbortedException ex)
             {
@@ -655,6 +704,17 @@ internal static class Program
             {
                 committedCount = moveResult.MovedCount;
                 token.ThrowIfCancellationRequested();
+            }
+
+            // See the /d branch for why this is reported here and not beside the
+            // pre-act re-verify's line.
+            ReportHeldBack(moveResult.HeldBack, moveResult.HeldBackRecordsIncomplete);
+            if (moveResult.HeldBack.Count > 0)
+            {
+                var movedReclaimed = new HashSet<string>(moveResult.HeldBack, StringComparer.OrdinalIgnoreCase);
+                survivingFiles = survivingFiles.Where(f => !movedReclaimed.Contains(f.FullPath)).ToList();
+                count = survivingFiles.Count;
+                totalBytes = survivingFiles.Sum(f => f.SizeBytes);
             }
 
             Console.WriteLine(string.Format(

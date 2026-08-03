@@ -256,7 +256,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.HeldByAnother);
 
-        var svc = new MoveFilesService(fs, mutex);
+        var svc = new MoveFilesService(fs, mutex, null);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
 
         Assert.True(result.InstallerBusy);
@@ -274,7 +274,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
 
-        var svc = new MoveFilesService(fs, mutex);
+        var svc = new MoveFilesService(fs, mutex, null);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
 
         Assert.False(result.InstallerBusy);
@@ -292,7 +292,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.FallBack);
 
-        var svc = new MoveFilesService(fs, mutex);
+        var svc = new MoveFilesService(fs, mutex, null);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
 
         Assert.False(result.InstallerBusy);
@@ -305,6 +305,53 @@ public class MoveFilesServiceUnitTests
         // leaves them a file they can put back, and refusing would cost them the
         // one route to their disk space that never needed the lock in the first
         // place.
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_re_reads_inside_the_hold_and_before_the_destination_is_made()
+    {
+        // Two properties at once. Inside the hold, which is the only place the
+        // re-read is worth taking; and ahead of the destination work, so a batch
+        // it empties does not leave a folder the user never asked for.
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
+        var reverifier = new Helpers.FakeReclaimingReverifier(new[] { source }, mutex);
+        var svc = new MoveFilesService(fs, mutex, null, reverifier);
+
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        Assert.Equal(1, reverifier.LeasesHeldWhenCalled);
+        Assert.Equal(0, reverifier.LeasesReleasedWhenCalled);
+        Assert.Equal(new[] { source }, result.HeldBack);
+        Assert.Equal(0, result.MovedCount);
+        Assert.True(fs.File.Exists(source));
+        Assert.False(fs.Directory.Exists(DestDir));
+        Assert.Equal(1, mutex.Released);
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_keeps_back_a_reclaimed_path_and_moves_the_rest()
+    {
+        var fs = new MockFileSystem();
+        var keep = $@"{SourceDir}\reclaimed.msp";
+        var go = $@"{SourceDir}\orphan.msi";
+        fs.AddFile(keep, new MockFileData("a"));
+        fs.AddFile(go, new MockFileData("b"));
+        fs.AddDirectory(DestDir);
+        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
+        var svc = new MoveFilesService(fs, mutex, null,
+            new Helpers.FakeReclaimingReverifier(new[] { keep }));
+
+        var result = await svc.MoveFilesAsync(new[] { keep, go }, DestDir);
+
+        Assert.Equal(1, result.MovedCount);
+        Assert.Equal(new[] { keep }, result.HeldBack);
+        // Held back is not failed, so it is not in the per-file error list.
+        Assert.Empty(result.Errors);
+        Assert.True(fs.File.Exists(keep));
+        Assert.True(fs.File.Exists($@"{DestDir}\orphan.msi"));
     }
 
     [Fact]

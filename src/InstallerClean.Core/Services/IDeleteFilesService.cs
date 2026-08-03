@@ -21,10 +21,25 @@ public interface IDeleteFilesService
     /// set (a cancellation before the worker starts still surfaces as
     /// <see cref="OperationCanceledException"/>).
     /// </summary>
+    /// <param name="patchClaims">
+    /// The claims naming the paths in <paramref name="filePaths"/>, from the
+    /// caller's pre-act re-verify
+    /// (<see cref="ReverifyResult.SurvivingPatchClaims"/>). Re-read once the
+    /// installer mutex is held and before any file is touched, so a verdict that
+    /// moved while the caller's enumeration was running is caught inside the hold
+    /// rather than outside it; the paths it condemns come back in
+    /// <see cref="DeleteResult.HeldBack"/>. Null or empty means nothing to
+    /// re-read, which is the ordinary case: a true orphan carries no claim.
+    ///
+    /// Last in the parameter list rather than beside
+    /// <paramref name="filePaths"/>, where it belongs by meaning, because every
+    /// existing caller passes the two after it positionally or by name.
+    /// </param>
     Task<DeleteResult> DeleteFilesAsync(
         IEnumerable<string> filePaths,
         IProgress<OperationProgress>? progress = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        IReadOnlyList<PatchClaim>? patchClaims = null);
 }
 
 /// <summary>
@@ -51,9 +66,33 @@ public interface IDeleteFilesService
 /// mutex, so a re-run of the gate comes back clean and the caller would report a
 /// refusal it could not account for. This flag carries its own sentence instead.
 /// </param>
+/// <param name="HeldBack">
+/// Paths dropped from the batch by the re-read taken under the installer mutex,
+/// and therefore never touched. They are the same two conditions the caller's
+/// pre-act re-verify reports and are meant to be folded into it: a program claims
+/// the file again, or the records could not be read and nothing has shown that it
+/// does not. <see cref="HeldBackRecordsIncomplete"/> says which.
+/// They are NOT errors and NOT failures, so they are not in
+/// <see cref="Errors"/>, and a caller summing input against
+/// <see cref="DeletedCount"/> + <see cref="Errors"/> must subtract them.
+/// </param>
+/// <param name="HeldBackRecordsIncomplete">
+/// At least one of the <see cref="HeldBack"/> paths is held back because a
+/// property read failed rather than because a program reclaimed it. Carried
+/// through so the caller folds it into
+/// <see cref="ReverifyResult.RecordsIncomplete"/> and the user is shown the
+/// sentence that is true: the two causes have different copy and the app has
+/// always distinguished them.
+/// </param>
 public record DeleteResult(
     int DeletedCount,
     IReadOnlyList<FileOperationError> Errors,
     bool Cancelled = false,
     bool InstallerBusy = false,
-    bool InstallerLockUnavailable = false);
+    bool InstallerLockUnavailable = false,
+    IReadOnlyList<string>? HeldBack = null,
+    bool HeldBackRecordsIncomplete = false)
+{
+    /// <summary>Never null: an absent list reads as nothing held back.</summary>
+    public IReadOnlyList<string> HeldBack { get; init; } = HeldBack ?? Array.Empty<string>();
+}

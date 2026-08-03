@@ -10,6 +10,13 @@ public sealed class MoveFilesService : IMoveFilesService
     private readonly IMutexProbe _mutex;
 
     /// <summary>
+    /// Re-reads the batch's patch claims once the installer mutex is held. Held
+    /// by the service rather than called by the caller because the hold is taken
+    /// here: a check that has to happen inside it cannot live outside it.
+    /// </summary>
+    private readonly IRemovableReverifier _reverifier;
+
+    /// <summary>
     /// Test-only real-folder override for the containment guard's cache root
     /// (null in production, which uses the real <c>C:\Windows\Installer</c>).
     /// Lets the real-filesystem integration tests treat a %TEMP% sandbox as the
@@ -25,28 +32,33 @@ public sealed class MoveFilesService : IMoveFilesService
     /// production; the mutex is held for the batch so a msiexec starting
     /// mid-move waits instead of racing the cache.
     /// </summary>
-    public MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex) : this(fileSystem, mutex, null) { }
+    public MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex, IRemovableReverifier reverifier)
+        : this(fileSystem, mutex, null, reverifier) { }
 
-    /// <summary>Test constructor. No mutex hold (the hold is exercised via the seam constructor below).</summary>
-    internal MoveFilesService(IFileSystem fileSystem) : this(fileSystem, NullMutexProbe.Instance, null) { }
+    /// <summary>Test constructor. No mutex hold and no under-lease re-read (both are exercised via the seam constructor below).</summary>
+    internal MoveFilesService(IFileSystem fileSystem)
+        : this(fileSystem, NullMutexProbe.Instance, null, NullRemovableReverifier.Instance) { }
 
     /// <summary>Test constructor. Points the source containment guard at a real sandbox folder; no mutex hold.</summary>
     internal MoveFilesService(IFileSystem fileSystem, string? installerFolderOverride)
-        : this(fileSystem, NullMutexProbe.Instance, installerFolderOverride) { }
+        : this(fileSystem, NullMutexProbe.Instance, installerFolderOverride, NullRemovableReverifier.Instance) { }
 
     /// <summary>Seam constructor: an injected <see cref="IMutexProbe"/> (real or fake) plus the sandbox override.</summary>
-    internal MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex, string? installerFolderOverride)
+    internal MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex, string? installerFolderOverride,
+        IRemovableReverifier? reverifier = null)
     {
         _fs = fileSystem;
         _mutex = mutex;
         _installerFolderOverride = installerFolderOverride;
+        _reverifier = reverifier ?? NullRemovableReverifier.Instance;
     }
 
     public Task<MoveResult> MoveFilesAsync(
         IEnumerable<string> filePaths,
         string destinationFolder,
         IProgress<OperationProgress>? progress = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        IReadOnlyList<PatchClaim>? patchClaims = null)
     {
         return Task.Run(() =>
         {
@@ -116,6 +128,46 @@ public sealed class MoveFilesService : IMoveFilesService
 
             try
             {
+            // The act-time re-read, before any destination work so a batch it
+            // empties leaves no folder behind. It is HERE and not at the caller
+            // because the caller's full re-verify runs before this method is
+            // entered: the mutex is taken after it, so the batch acts on an
+            // answer read outside the hold, across the whole of that
+            // enumeration's duration rather than the instant after it. Windows
+            // writes a patch's registration while it processes the install
+            // script, which is the phase this mutex covers, so a transaction
+            // committing in that window moves a verdict already read.
+            //
+            // Only the claims, never the enumeration. Re-walking the whole
+            // registered set here would put an API enumeration inside a
+            // machine-wide installer lock on every run, which the note above asks
+            // in as many words that nobody do, and it would buy little: with the
+            // mutex held no orphan can acquire a NEW claim, because acquiring one
+            // takes a Windows Installer transaction and a transaction takes this
+            // mutex. What can still have moved is a verdict on a claim that
+            // already existed, and those carry an identity to ask about.
+            //
+            // Move reaches this line without the hold on the fall-back path,
+            // where Delete now refuses instead, so here the re-read is a narrower
+            // thing than it is there: still worth taking, because a verdict that
+            // has already moved is found either way, and not a guarantee, because
+            // nothing is stopping another one moving underneath it. The asymmetry
+            // is the one recorded at the acquire.
+            var recheck = _reverifier.RecheckUnderLease(
+                patchClaims ?? Array.Empty<PatchClaim>());
+            var heldBack = recheck.HeldBack;
+            var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
+            if (heldBack.Count > 0)
+            {
+                var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
+                pathList = pathList.Where(p => !reclaimed.Contains(p)).ToList();
+                // Only when the re-read is what emptied it. An empty batch handed
+                // in still falls through and creates the destination, which the
+                // command line relies on not changing.
+                if (pathList.Count == 0)
+                    return new MoveResult(0, Array.Empty<FileOperationError>(), HeldBack: heldBack, HeldBackRecordsIncomplete: recheck.RecordsIncomplete);
+            }
+
             CreateDestinationFolder(destinationFolder);
 
             // Re-check after CreateDirectory closes the TOCTOU window
@@ -160,7 +212,6 @@ public sealed class MoveFilesService : IMoveFilesService
             // canonicalDestination above, which guards the other end and is
             // re-resolved per iteration for a reason of its own.
             var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
-            var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
             bool cancelled = false;
             bool destinationChanged = false;
@@ -339,7 +390,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // the run as "Move cancelled" even though every file moved.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
 
-            var result = new MoveResult(moved, errors.AsReadOnly(), cancelled);
+            var result = new MoveResult(moved, errors.AsReadOnly(), cancelled, HeldBack: heldBack, HeldBackRecordsIncomplete: recheck.RecordsIncomplete);
 
             // A guard that trips mid-flight throws, like this service's other
             // guards and unlike a cancel, which is the user's own choice. What it

@@ -677,7 +677,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             MoveResult result;
             try
             {
-                result = await _moveService.MoveFilesAsync(survivingPaths, dest, progress, _operationCts!.Token);
+                result = await _moveService.MoveFilesAsync(survivingPaths, dest, progress, _operationCts!.Token,
+                    reverify.SurvivingPatchClaims);
             }
             catch (MoveAbortedException ex)
             {
@@ -688,11 +689,19 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // over the summary carries the reason. No result-log entry, for
                 // the reason recorded on the cancel arm below.
                 await _scan.RefreshAsync();
+                // Same fold as the main path: a batch the destination swap stopped
+                // still owes an account of anything the under-lease re-read took
+                // back before it started.
+                var abortReclaimed = new HashSet<string>(ex.Partial.HeldBack, StringComparer.OrdinalIgnoreCase);
+                var abortSurviving = ex.Partial.HeldBack.Count == 0
+                    ? survivingFiles
+                    : survivingFiles.Where(f => !abortReclaimed.Contains(f.FullPath)).ToList();
                 if (ex.Partial.MovedCount > 0 || ex.Partial.Errors.Count > 0)
                 {
                     _completion.ShowMoveSummary(ex.Partial.MovedCount,
-                        CompletedBytes(survivingFiles, ex.Partial.MovedCount, ex.Partial.Errors),
-                        dest, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind), reverify);
+                        CompletedBytes(abortSurviving, ex.Partial.MovedCount, ex.Partial.Errors),
+                        dest, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind),
+                        FoldHeldBack(reverify, ex.Partial.HeldBack, ex.Partial.HeldBackRecordsIncomplete));
                 }
                 _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
                 OperationProgress = string.Empty;
@@ -713,6 +722,20 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // CreateDestinationFolder, so nothing was placed.
                 if (createdDestination) await RemoveCreatedDestinationAsync(dest);
                 return;
+            }
+
+            if (result.HeldBack.Count > 0)
+            {
+                // The service's own re-read, taken under the installer mutex, took
+                // these back. Nothing touched them, so they leave the batch's
+                // account of itself entirely: the file list and the byte total
+                // both shrink, and the re-verify's kept-back tally grows by the
+                // same files. Ahead of every arm below, because each of them
+                // reports one or both.
+                var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
+                survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
+                survivingBytes = survivingFiles.Sum(f => f.SizeBytes);
+                reverify = FoldHeldBack(reverify, result.HeldBack, result.HeldBackRecordsIncomplete);
             }
 
             if (result.Cancelled)
@@ -956,7 +979,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
             var result = await _deleteService.DeleteFilesAsync(
-                survivingPaths, progress, _operationCts.Token);
+                survivingPaths, progress, _operationCts.Token, reverify.SurvivingPatchClaims);
 
             if (result.InstallerBusy)
             {
@@ -982,6 +1005,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     Strings.Error_InstallerLockUnavailable, Strings.Error_DeleteFailedTitle);
                 OperationProgress = string.Empty;
                 return;
+            }
+
+            if (result.HeldBack.Count > 0)
+            {
+                // The service's own re-read, taken under the installer mutex, took
+                // these back. Nothing touched them, so they leave the batch's
+                // account of itself entirely, exactly as on the Move path.
+                var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
+                survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
+                survivingBytes = survivingFiles.Sum(f => f.SizeBytes);
+                reverify = FoldHeldBack(reverify, result.HeldBack, result.HeldBackRecordsIncomplete);
             }
 
             if (result.Cancelled)
@@ -1072,6 +1106,39 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // cancel paths and the next operation reports per-file progress.
             IsOperationProgressIndeterminate = false;
         }
+    }
+
+    /// <summary>
+    /// Folds the paths an action service held back under the installer mutex into
+    /// the pre-act re-verify's own account of what it kept back, so the user is
+    /// shown one number for one condition.
+    ///
+    /// They are the same condition: a program claims the file again. The only
+    /// difference is which side of the mutex the claim was read on, and that is
+    /// a fact about how the check is built rather than about what happened to the
+    /// file, so it earns no separate line on the completion screen and no wording
+    /// of its own.
+    ///
+    /// <c>RecordsIncomplete</c> is OR-ed rather than carried through, because both
+    /// halves of the check can meet the same condition: the pre-act enumeration
+    /// may fail to read a product, and the under-lease re-read may fail to read a
+    /// property. Either one means at least one file is kept back because nothing
+    /// could be established about it rather than because a program wants it, and
+    /// the completion copy has a separate sentence for exactly that. It is a
+    /// whole-result flag on both sides already, so OR-ing keeps the one behaviour
+    /// the app has always had here.
+    /// </summary>
+    private static ReverifyResult FoldHeldBack(
+        ReverifyResult reverify, IReadOnlyList<string> heldBack, bool recordsIncomplete)
+    {
+        if (heldBack.Count == 0) return reverify;
+
+        var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
+        return new ReverifyResult(
+            reverify.Surviving.Where(p => !reclaimed.Contains(p)).ToList().AsReadOnly(),
+            reverify.Dropped.Concat(heldBack).ToList().AsReadOnly(),
+            reverify.RecordsIncomplete || recordsIncomplete,
+            reverify.SurvivingPatchClaims);
     }
 
     /// <summary>

@@ -23,10 +23,22 @@ namespace InstallerClean.Models;
 /// of them counts once. Surfaced to the user as the scan summary's kept-patches
 /// notice.
 /// </param>
+/// <param name="PatchClaims">
+/// Every product-to-patch claim this enumeration read, one entry per claim
+/// rather than per path. <see cref="Packages"/> answers what a path's verdict is;
+/// this answers who to ask about it, which the merge behind
+/// <see cref="Packages"/> cannot keep (see <see cref="PatchClaim"/>). Empty on a
+/// machine with no registered patches, and empty on a result built by anything
+/// that does not enumerate patches.
+/// </param>
 public record InstallerQueryResult(
     IReadOnlyList<RegisteredPackage> Packages,
-    int UnreadableProductCount = 0)
+    int UnreadableProductCount = 0,
+    IReadOnlyList<PatchClaim>? PatchClaims = null)
 {
+    /// <summary>Never null: an absent list reads as no claims rather than as a fault.</summary>
+    public IReadOnlyList<PatchClaim> PatchClaims { get; init; } = PatchClaims ?? Array.Empty<PatchClaim>();
+
     /// <summary>
     /// The enumeration lost at least one product's records, so it cannot say of
     /// any patch that no installed product still needs it. Every consumer of a

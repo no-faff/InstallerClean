@@ -189,7 +189,7 @@ public class ScanMoveCompletionTests
         // enumeration the scan did, so the two orphans (unclaimed by the API) stay
         // removable and nothing is dropped, exercising the act-time re-verify
         // end to end.
-        var reverifier = new RemovableReverifier(queryService);
+        var reverifier = new RemovableReverifier(queryService, Substitute.For<InstallerClean.Interop.IMsiApi>());
         var msiInfoService = Substitute.For<IMsiFileInfoService>();
         var dialogService = Substitute.For<IDialogService>();
         var confirmationService = Substitute.For<IConfirmationService>();

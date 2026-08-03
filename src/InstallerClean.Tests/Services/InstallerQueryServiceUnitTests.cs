@@ -115,6 +115,48 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
+    public async Task Every_product_claiming_a_shared_patch_keeps_its_own_identity()
+    {
+        // The merge above keeps ONE row per path and therefore one product code.
+        // The claims are what the act-time re-read asks with, so they must keep
+        // both products: asking only the one the merge happened to retain asks
+        // about one of two, and the other is exactly where a verdict can move.
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{ONE}");
+        msi.AddProduct("{TWO}");
+        msi.AddPatch("{ONE}", "{P}", localPackage: shared, state: "2", uninstallable: "0");
+        msi.AddPatch("{TWO}", "{P}", localPackage: shared, state: "2", uninstallable: "0");
+
+        var result = await Run(msi);
+
+        Assert.Single(result.Packages, r => r.LocalPackagePath == shared);
+        var claims = result.PatchClaims.Where(c => c.LocalPackagePath == shared).ToList();
+        Assert.Equal(2, claims.Count);
+        Assert.Equal(new[] { "{ONE}", "{TWO}" }, claims.Select(c => c.ProductCode).Order().ToArray());
+        Assert.All(claims, c => Assert.Equal("{P}", c.PatchCode));
+    }
+
+    [Fact]
+    public async Task A_claim_is_recorded_whatever_the_patch_state_says()
+    {
+        // Not filtered to the removable ones. A claim that is Applied today is
+        // the one that proves a path is still needed if a later re-read finds it,
+        // so keeping only the removable claims would discard the answers worth
+        // having.
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{SUP}");
+        msi.AddProduct("{APP}");
+        msi.AddPatch("{SUP}", "{P}", localPackage: shared, state: "2", uninstallable: "0");
+        msi.AddPatch("{APP}", "{P}", localPackage: shared, state: "1", uninstallable: "1");
+
+        var result = await Run(msi);
+
+        Assert.Equal(2, result.PatchClaims.Count(c => c.LocalPackagePath == shared));
+    }
+
+    [Fact]
     public async Task A_product_row_downgrades_a_corrupt_patch_claim_on_its_own_package()
     {
         // The in-cache variant of the corrupt-record threat CandidateGuard covers
@@ -454,7 +496,7 @@ public class InstallerQueryServiceUnitTests
         msi.SetProductProperty("{DL}", "LocalPackage", @"C:\Windows\Installer\displaylink.msi");
         msi.PatchEnumResult["{DL}"] = InvalidParameter; // the collapse that degrades the query
 
-        var reverifier = new RemovableReverifier(new InstallerQueryService(msi, NoFallback));
+        var reverifier = new RemovableReverifier(new InstallerQueryService(msi, NoFallback), msi);
         var result = await reverifier.ReverifyAsync(new[] { superseded });
 
         Assert.Empty(result.Surviving);

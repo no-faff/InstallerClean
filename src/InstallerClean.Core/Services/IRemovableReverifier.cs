@@ -1,3 +1,5 @@
+using InstallerClean.Models;
+
 namespace InstallerClean.Services;
 
 /// <summary>
@@ -37,7 +39,63 @@ public interface IRemovableReverifier
     Task<ReverifyResult> ReverifyAsync(
         IReadOnlyList<string> candidatePaths,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Re-reads the given patch claims and returns the paths that are no longer
+    /// removable, for the action services to call ONCE THEY HOLD
+    /// <c>Global\_MSIExecute</c> and before they touch a file.
+    ///
+    /// It exists because <see cref="ReverifyAsync"/> cannot be the last word. The
+    /// hold is taken inside the action service, so every caller runs the full
+    /// re-verify before it, and the window the batch acts across is that
+    /// enumeration's whole duration rather than the instant after it. Windows
+    /// writes a patch's registration during the execute sequence, which is the
+    /// phase the mutex covers, so a transaction that commits in that window moves
+    /// a verdict the batch has already read.
+    ///
+    /// Synchronous, and that is a requirement rather than a convenience: the
+    /// lease must be released by the thread that took it, so the whole hold is one
+    /// unbroken synchronous body with no await in it to hop threads.
+    ///
+    /// WHAT IT COVERS, stated narrowly because the difference matters. It re-asks
+    /// about claims that already existed, so it catches a verdict changing on one
+    /// of them, which is the reverting superseded patch the full re-verify is for.
+    /// It cannot see a claim from a product that held none when the claims were
+    /// collected: there is nothing to re-ask about, and only re-walking the whole
+    /// registered set would find it. That case is covered up to the full
+    /// re-verify's own enumeration and no further. Closing it as well would mean
+    /// running that enumeration inside a machine-wide installer lock on every run,
+    /// which is a worse trade than the sliver it buys.
+    /// </summary>
+    /// <param name="claims">
+    /// Every claim naming a path still in the batch, from the
+    /// <see cref="ReverifyResult.SurvivingPatchClaims"/> the pre-lease pass
+    /// returned. Empty short-circuits without touching the API, which is the
+    /// ordinary case: most batches are true orphans, which carry no claim to
+    /// re-read.
+    /// </param>
+    UnderLeaseRecheck RecheckUnderLease(IReadOnlyList<PatchClaim> claims);
 }
+
+/// <summary>
+/// What one under-lease re-read found.
+/// </summary>
+/// <param name="HeldBack">
+/// The paths to drop, for either of the two reasons below.
+/// </param>
+/// <param name="RecordsIncomplete">
+/// At least one property read failed, so at least one path is held back on those
+/// grounds rather than on a program having reclaimed it. It says which of the two
+/// happened, for exactly the reason
+/// <see cref="ReverifyResult.RecordsIncomplete"/> does: the report the user reads
+/// names a cause, the app has two causes here, and only one of them is true of
+/// any given run. A read that could not be made has not shown the file to be
+/// removable, so it is held back either way; what it has not shown is that a
+/// program wants it back.
+/// </param>
+public record UnderLeaseRecheck(
+    IReadOnlyList<string> HeldBack,
+    bool RecordsIncomplete = false);
 
 /// <summary>
 /// Result of a re-verify. <see cref="Surviving"/> + <see cref="Dropped"/> partition
@@ -51,7 +109,20 @@ public interface IRemovableReverifier
 /// because the report the user reads names a cause and only one of the two causes
 /// is true.
 /// </param>
+/// <param name="SurvivingPatchClaims">
+/// Every claim naming a path in <see cref="Surviving"/>, for the action service
+/// to re-read once it holds the installer mutex
+/// (<see cref="IRemovableReverifier.FindReclaimedUnderLease"/>). One entry per
+/// claim, not per path, because a patch applied to several products is claimed
+/// by each of them and any one of those verdicts can move on its own.
+/// </param>
 public record ReverifyResult(
     IReadOnlyList<string> Surviving,
     IReadOnlyList<string> Dropped,
-    bool RecordsIncomplete = false);
+    bool RecordsIncomplete = false,
+    IReadOnlyList<PatchClaim>? SurvivingPatchClaims = null)
+{
+    /// <summary>Never null: an absent list reads as nothing to re-read rather than as a fault.</summary>
+    public IReadOnlyList<PatchClaim> SurvivingPatchClaims { get; init; }
+        = SurvivingPatchClaims ?? Array.Empty<PatchClaim>();
+}
