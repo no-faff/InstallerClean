@@ -191,7 +191,14 @@
         "type": "Project",
         "dependencies": {
           "CommunityToolkit.Mvvm": "[8.4.2, )",
-          "InstallerClean.Core": "[2.1.0, )",
+          "InstallerClean.Core": "[2.3.0, )",
+          "Microsoft.Extensions.DependencyInjection": "[10.0.7, )"
+        }
+      },
+      "installerclean-cli": {
+        "type": "Project",
+        "dependencies": {
+          "InstallerClean.Core": "[2.3.0, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.7, )"
         }
       },

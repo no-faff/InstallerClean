@@ -313,7 +313,7 @@ internal static class Program
     /// The Application-channel summary already carries what the run did in
     /// English, and an RMM reads that.
     /// </summary>
-    private static void ReportHeldBack(IReadOnlyList<string> heldBack, bool recordsIncomplete)
+    internal static void ReportHeldBack(IReadOnlyList<string> heldBack, bool recordsIncomplete)
     {
         if (heldBack.Count == 0) return;
         // Which of the two sentences, decided the same way the pre-act line above
@@ -590,8 +590,7 @@ internal static class Program
                 // batch that included files the run never intended to reach.
                 if (result.HeldBack.Count > 0)
                 {
-                    var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
-                    survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
+                    survivingFiles = FoldHeldBack(survivingFiles, result.HeldBack);
                     count = survivingFiles.Count;
                     totalBytes = survivingFiles.Sum(f => f.SizeBytes);
                     totalToProcess = count;
@@ -709,8 +708,7 @@ internal static class Program
                 ReportHeldBack(ex.Partial.HeldBack, ex.Partial.HeldBackRecordsIncomplete);
                 if (ex.Partial.HeldBack.Count > 0)
                 {
-                    var abortReclaimed = new HashSet<string>(ex.Partial.HeldBack, StringComparer.OrdinalIgnoreCase);
-                    survivingFiles = survivingFiles.Where(f => !abortReclaimed.Contains(f.FullPath)).ToList();
+                    survivingFiles = FoldHeldBack(survivingFiles, ex.Partial.HeldBack);
                     count = survivingFiles.Count;
                 }
                 return ReportAbortedMove(arg, ex, moveDest, count, survivingFiles);
@@ -727,8 +725,7 @@ internal static class Program
             ReportHeldBack(moveResult.HeldBack, moveResult.HeldBackRecordsIncomplete);
             if (moveResult.HeldBack.Count > 0)
             {
-                var movedReclaimed = new HashSet<string>(moveResult.HeldBack, StringComparer.OrdinalIgnoreCase);
-                survivingFiles = survivingFiles.Where(f => !movedReclaimed.Contains(f.FullPath)).ToList();
+                survivingFiles = FoldHeldBack(survivingFiles, moveResult.HeldBack);
                 count = survivingFiles.Count;
                 totalBytes = survivingFiles.Sum(f => f.SizeBytes);
                 totalToProcess = count;
@@ -971,7 +968,31 @@ internal static class Program
     /// Matches CleanupViewModel's own CompletedBytes so a fleet of GUI and CLI
     /// machines produces telemetry on the same axis.
     /// </summary>
-    private static long CompletedBytes(
+    /// <summary>
+    /// Drops the paths an action service held back from this run's own list of
+    /// the files it meant to act on. They were never touched, so they leave the
+    /// count, the byte total and every figure taken from the list.
+    ///
+    /// One helper for the three places that need it rather than the same three
+    /// lines written out at each, because the three are not equally obvious and
+    /// the least obvious one was missed. The completed and cancelled paths use
+    /// the list for sums; the aborted path feeds it to
+    /// <see cref="CompletedBytes"/>, which reads it POSITIONALLY, so a held-back
+    /// entry left in it is not an inflated total but the wrong rows entirely.
+    /// </summary>
+    internal static List<OrphanedFile> FoldHeldBack(
+        IReadOnlyList<OrphanedFile> files, IReadOnlyList<string> heldBack)
+    {
+        if (heldBack.Count == 0) return files.ToList();
+
+        // The same case-insensitive comparison the scan matches paths on: a claim's
+        // package path is normalised the way the registered rows are, so a held-back
+        // path differing only in case still names the file it names.
+        var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
+        return files.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
+    }
+
+    internal static long CompletedBytes(
         IReadOnlyList<OrphanedFile> files, int completedCount,
         IReadOnlyList<FileOperationError> errors)
     {

@@ -35,6 +35,13 @@
          explicit; otherwise Core would only flow in transitively. -->
     <ProjectReference Include="..\InstallerClean.Core\InstallerClean.Core.csproj" />
     <ProjectReference Include="..\InstallerClean\InstallerClean.csproj" />
+    <!-- And the command-line host, whose own helpers decide what a stopped or
+         held-back /d or /m reports to the Application log a monitoring tool
+         reads. Without this reference nothing in the suite could see that
+         surface, so a defect in it could only be found by hand. It has a second
+         effect worth having: a change that breaks the CLI now fails a build of
+         this project instead of surviving to CI. -->
+    <ProjectReference Include="..\InstallerClean.Cli\InstallerClean.Cli.csproj" />
   </ItemGroup>
 
   <ItemGroup>
