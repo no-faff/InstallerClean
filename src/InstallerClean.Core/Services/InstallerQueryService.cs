@@ -1160,8 +1160,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// just gone missing from the scan. Both reach the call site as "", so the
     /// call site cannot skip the row on the second the way it safely skips it on
     /// the first unless the outcome travels with the value.
+    ///
+    /// <paramref name="NotRegistered"/> NARROWS <paramref name="Unreadable"/>
+    /// rather than replacing it, and the pairing is deliberate: the read produced
+    /// no value, so every caller that only asks "did I get an answer" keeps the
+    /// behaviour it has, and the one caller that has to NAME a cause can ask the
+    /// narrower question. It is set only for a code documented as meaning the
+    /// record itself is not there, which is a positive answer about the machine
+    /// and not a failure to read one.
     /// </summary>
-    internal readonly record struct PropertyRead(string Value, bool Unreadable);
+    internal readonly record struct PropertyRead(string Value, bool Unreadable, bool NotRegistered = false);
 
     /// <summary>
     /// Whether a patch's State and Uninstallable values, exactly as
@@ -1211,6 +1219,27 @@ public sealed class InstallerQueryService : IInstallerQueryService
         error is MsiError.Success or MsiError.MoreData or MsiError.UnknownProperty;
 
     /// <summary>
+    /// The returns that positively establish there is no such record, as a second
+    /// ALLOWLIST and for the same reason the first one is one: only a code
+    /// documented to mean the record is absent may be read as absence, and
+    /// everything unlisted stays on the unreadable side and withholds. Inverting
+    /// this would let an unseen failure pass as "the registration has gone",
+    /// which is the direction that costs a file.
+    ///
+    /// The membership is exactly what <c>MsiGetPatchInfoEx</c> documents for a
+    /// pairing it cannot find, and nothing wider. ERROR_PRODUCT_UNINSTALLED
+    /// (1614) reads as though it belongs and is deliberately absent: it is not
+    /// among that function's documented returns, and a code added here on how its
+    /// name sounds is a guess with a file on the end of it.
+    ///
+    /// Only the under-lease re-read asks this. The scan's own consumers of
+    /// <see cref="PropertyRead"/> read <c>Unreadable</c>, which is still set, so
+    /// the direction they fail in is unchanged.
+    /// </summary>
+    private static bool IsRecordAbsent(uint error) =>
+        error is MsiError.UnknownProduct or MsiError.UnknownPatch;
+
+    /// <summary>
     /// Retrieves a product property using the double-call buffer pattern,
     /// reporting whether an empty result is an absence or a failed read (see
     /// <see cref="PropertyRead"/>).
@@ -1232,7 +1261,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             valueLength: ref bufferLen);
 
         if (error != MsiError.Success && error != MsiError.MoreData)
-            return new PropertyRead(string.Empty, Unreadable: !IsBenignPropertyRead(error));
+            return new PropertyRead(string.Empty, Unreadable: !IsBenignPropertyRead(error),
+                NotRegistered: IsRecordAbsent(error));
 
         if (bufferLen == 0)
             return new PropertyRead(string.Empty, Unreadable: false);
@@ -1289,7 +1319,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             valueLength: ref bufferLen);
 
         if (error != MsiError.Success && error != MsiError.MoreData)
-            return new PropertyRead(string.Empty, Unreadable: !IsBenignPropertyRead(error));
+            return new PropertyRead(string.Empty, Unreadable: !IsBenignPropertyRead(error),
+                NotRegistered: IsRecordAbsent(error));
 
         if (bufferLen == 0)
             return new PropertyRead(string.Empty, Unreadable: false);

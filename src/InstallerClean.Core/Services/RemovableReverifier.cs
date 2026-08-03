@@ -110,6 +110,29 @@ public sealed class RemovableReverifier : IRemovableReverifier
                 _msi, claim.PatchCode, claim.ProductCode, claim.UserSid, context,
                 Interop.MsiInstallProperty.Uninstallable);
 
+            // A pairing the records positively no longer hold is not a pairing
+            // that reclaims anything, and it is the one answer here that must not
+            // be folded into either of the other two. A claim says "patch P,
+            // applied to product Q, holds this file". If the API answers that Q is
+            // not installed or that P is not applied to it, the claim itself has
+            // gone; it cannot have reverted to Applied, because there is no
+            // registration left to be in any state at all. So it condemns nothing
+            // and the path's fate rests on its other claims, which is exactly what
+            // the pre-lease pass would have concluded, that enumeration listing no
+            // product to claim the path in the first place. Folding it into
+            // "unreadable" told the user the records could not be read when they
+            // were read perfectly, and folding it into "a program wants it again"
+            // would name the opposite of what happened.
+            //
+            // Fail closed on a mixed answer: only a pairing where nothing failed
+            // AND something positively said the record is absent takes this route.
+            // The two reads are of one pairing an instant apart, so a mix is a
+            // race, and a race resolves to the cautious side.
+            var notRegistered = state.NotRegistered || uninstallable.NotRegistered;
+            var unreadable = (state.Unreadable && !state.NotRegistered)
+                || (uninstallable.Unreadable && !uninstallable.NotRegistered);
+            if (notRegistered && !unreadable) continue;
+
             // A read that failed is not an answer. It has not shown the file to be
             // removable, this is the last check standing in front of a permanent
             // delete, and the scan's own rule fails the same way for the same
@@ -117,7 +140,6 @@ public sealed class RemovableReverifier : IRemovableReverifier
             // inconsistency: that one inherits a whole enumeration's withholding
             // and reports it, where this one is judging a single named pairing and
             // a failure here is about that pairing alone.
-            var unreadable = state.Unreadable || uninstallable.Unreadable;
             if (unreadable ||
                 !InstallerQueryService.IsRemovablePatch(state.Value, uninstallable.Value))
             {

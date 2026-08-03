@@ -20,6 +20,25 @@ public static class MsiError
     /// <c>InstallerQueryService.IsBenignPropertyRead</c>.
     /// </summary>
     public const uint UnknownProperty = 1608;
+
+    /// <summary>
+    /// The product named is not installed ("This action is only valid for
+    /// products that are currently installed", Microsoft's Windows Installer
+    /// error-code table). Distinct from <see cref="UnknownProperty"/>, which is a
+    /// record that exists and does not carry the property asked for; this is no
+    /// record to ask. Observed live on the owner's machine through this project's
+    /// own property reads, so it is a code this code path really meets rather
+    /// than one taken out of a table.
+    /// </summary>
+    public const uint UnknownProduct = 1605;
+
+    /// <summary>
+    /// The patch named is not applied to the product named ("The patch isn't
+    /// applied to this product", same table). The patch half of
+    /// <see cref="UnknownProduct"/>: the pairing a claim describes does not
+    /// exist, rather than existing and failing to be read.
+    /// </summary>
+    public const uint UnknownPatch = 1647;
 }
 
 /// <summary>
