@@ -442,13 +442,49 @@ public class DeleteFilesServiceUnitTests
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex);
+        bool? sourcePresentAtRecheck = null;
+        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex,
+            atRecheck: () => sourcePresentAtRecheck = fs.File.Exists(a));
         var svc = new DeleteFilesService(fs, mutex, null, reverifier);
 
-        await svc.DeleteFilesAsync(new[] { a });
+        var result = await svc.DeleteFilesAsync(new[] { a });
 
         Assert.Equal(1, reverifier.LeasesHeldWhenCalled);
         Assert.Equal(0, reverifier.LeasesReleasedWhenCalled);
+        // The other half of the name, and it needs a real observation rather than
+        // a lease count: a re-read taken after the first delete holds the lease
+        // just as truthfully. The Move twin makes it on the destination folder;
+        // here the batch's own file is what a delete would have taken.
+        Assert.True(sourcePresentAtRecheck);
+        // Without these the assertion above passes on a batch that deleted
+        // nothing at all, which is the shape of vacuous pass this file exists to
+        // keep out.
+        Assert.Equal(1, result.DeletedCount);
+        Assert.False(fs.File.Exists(a));
+    }
+
+    [Fact]
+    public async Task A_re_read_that_throws_still_releases_the_installer_mutex()
+    {
+        // The lease is released by a finally that encloses the re-read, so this
+        // holds today. Nothing exercised it, and the identity work is about to
+        // build in this exact region: a refactor narrowing that try would leave
+        // the machine-wide installer mutex held until the process exits, every
+        // installer on the machine failing 1618 behind it, with the suite green.
+        var fs = new MockFileSystem();
+        var a = AddFile(fs, "a.msi");
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
+        var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex,
+            atRecheck: () => throw new InvalidOperationException("the re-read failed"));
+        var svc = new DeleteFilesService(fs, mutex, null, reverifier);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => svc.DeleteFilesAsync(new[] { a }));
+
+        Assert.Equal(1, mutex.Acquired);
+        Assert.Equal(1, mutex.Released);
+        // A re-read that could not answer is not permission to act.
+        Assert.True(fs.File.Exists(a));
     }
 
     [Fact]

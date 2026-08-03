@@ -18,13 +18,23 @@ internal sealed class FakeReclaimingReverifier : IRemovableReverifier
     private readonly IReadOnlyList<string> _reclaim;
     private readonly bool _recordsIncomplete;
     private readonly FakeMutexProbe? _watching;
+    private readonly Action? _atRecheck;
 
+    /// <param name="atRecheck">
+    /// Runs at the instant the re-read is entered, and exists because the lease
+    /// counters alone cannot pin the other half of what the re-read promises: not
+    /// only that it runs inside the hold, but that it runs before a single file
+    /// has been touched. A test observes the filesystem through this, or throws
+    /// from it to drive the failure path and pin that the lease is released
+    /// anyway.
+    /// </param>
     public FakeReclaimingReverifier(IReadOnlyList<string> reclaim, FakeMutexProbe? watching = null,
-        bool recordsIncomplete = false)
+        bool recordsIncomplete = false, Action? atRecheck = null)
     {
         _reclaim = reclaim;
         _watching = watching;
         _recordsIncomplete = recordsIncomplete;
+        _atRecheck = atRecheck;
     }
 
     /// <summary>Claims the service handed over, so a test can pin what it passed on.</summary>
@@ -46,6 +56,7 @@ internal sealed class FakeReclaimingReverifier : IRemovableReverifier
         ClaimsSeen = claims;
         LeasesHeldWhenCalled = _watching?.Acquired;
         LeasesReleasedWhenCalled = _watching?.Released;
+        _atRecheck?.Invoke();
         return new UnderLeaseRecheck(_reclaim, _recordsIncomplete);
     }
 }

@@ -332,6 +332,31 @@ public class MoveFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task A_re_read_that_throws_still_releases_the_installer_mutex()
+    {
+        // See the delete twin. The lease is released by a finally enclosing the
+        // re-read, nothing exercised that, and a narrowed try would leave the
+        // machine-wide installer mutex held until the process exits.
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
+        var reverifier = new Helpers.FakeReclaimingReverifier(Array.Empty<string>(), mutex,
+            atRecheck: () => throw new InvalidOperationException("the re-read failed"));
+        var svc = new MoveFilesService(fs, mutex, null, reverifier);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => svc.MoveFilesAsync(new[] { source }, DestDir));
+
+        Assert.Equal(1, mutex.Acquired);
+        Assert.Equal(1, mutex.Released);
+        Assert.True(fs.File.Exists(source));
+        // The re-read runs ahead of the destination work, so a throw from it
+        // leaves no folder behind either.
+        Assert.False(fs.Directory.Exists(DestDir));
+    }
+
+    [Fact]
     public async Task MoveFilesAsync_keeps_back_a_reclaimed_path_and_moves_the_rest()
     {
         var fs = new MockFileSystem();
