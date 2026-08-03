@@ -13,8 +13,16 @@ namespace InstallerClean.Services;
 /// shared-patch verdict merge a patch can revert to Applied for a DIFFERENT
 /// product than the one whose code survived the merge; re-enumerating is correct
 /// across every product for nothing but a few seconds spent before a rare,
-/// destructive batch. True orphans (files the API never claimed) are never
-/// dropped: they cannot reappear in the registered set.
+/// destructive batch.
+///
+/// A true orphan can be dropped here too, and that is the second reason the
+/// enumeration is full rather than per candidate. A file the API never claimed is
+/// not a file it can never claim: an install that wrote its package into the
+/// cache before the folder walk reached it, and registered that package after the
+/// query had already passed, leaves a file that is an orphan by every measurement
+/// the scan made and is claimed by the time the user clicks. Only re-walking the
+/// whole registered set finds it, and finding it is the last thing between that
+/// file and a permanent delete.
 /// </summary>
 public interface IRemovableReverifier
 {

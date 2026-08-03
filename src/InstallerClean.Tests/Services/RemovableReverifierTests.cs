@@ -60,6 +60,24 @@ public class RemovableReverifierTests
     }
 
     [Fact]
+    public async Task Drops_a_scan_time_orphan_a_new_registration_has_since_claimed()
+    {
+        // Same drop mechanism as the reverted-patch test above, pinned separately
+        // because it stands for a different producer and the interface's contract
+        // now names it. An install that cached its package before the folder walk
+        // reached it and registered it after the query had passed leaves a file
+        // the scan measured as an orphan and a program owns by action time. The
+        // re-verify catching it is what keeps it out of a permanent delete.
+        const string newlyClaimed = @"C:\Windows\Installer\just-installed.msi";
+        var svc = new RemovableReverifier(Query(NonRemovable(newlyClaimed)));
+
+        var result = await svc.ReverifyAsync(new[] { newlyClaimed });
+
+        Assert.Empty(result.Surviving);
+        Assert.Equal(new[] { newlyClaimed }, result.Dropped);
+    }
+
+    [Fact]
     public async Task Keeps_a_true_orphan_not_in_the_registered_set()
     {
         const string orphan = @"C:\Windows\Installer\orphan.msi";
