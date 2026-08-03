@@ -248,20 +248,53 @@ internal static class InstallerCacheHelpers
     }
 
     /// <summary>
-    /// Strips the <c>\\?\</c> long-path prefix the kernel adds. Keeps
-    /// the path comparable to user-typed paths and to the value of
-    /// <see cref="InstallerFolder"/>.
+    /// Takes off the four-character prefix that puts an otherwise ordinary path
+    /// outside the spelling the rest of the app compares against. Two forms, one
+    /// rule: the <c>\\?\</c> long-path prefix the kernel adds, and the NT
+    /// object-manager <c>\??\</c> that reaches this code from a registered
+    /// <c>LocalPackage</c> value rather than from the kernel.
+    /// <see cref="PendingRebootService"/> strips the same pair off the queued
+    /// rename entries, for the same reason.
+    ///
+    /// A bare prefix comes off ONLY where a drive letter and colon follow, and
+    /// the UNC form only where <c>UNC\</c> does. Those are the two remainders
+    /// that are still rooted. Taking it off blind turned
+    /// <c>\\?\Volume{...}\Windows\Installer\9f05cba.msi</c> into a path with no
+    /// root at all, which <see cref="Path.GetFullPath(string)"/> then resolved
+    /// against the process working directory: one registration, and the GUI and
+    /// the command line answered differently for it. Left whole, a volume-GUID
+    /// path is still a path Win32 accepts, so it names its file, answers true to
+    /// <c>File.Exists</c>, and reads the same from either host. It does not match
+    /// the folder walk's spelling, which no lexical rule can settle; see
+    /// <c>InstallerQueryService.NormaliseLocalPackagePath</c> for the open
+    /// question there.
     /// </summary>
     internal static string StripLongPathPrefix(string path)
     {
-        const string uncPrefix = @"\\?\UNC\";
-        const string longPrefix = @"\\?\";
-        if (path.StartsWith(uncPrefix, StringComparison.Ordinal))
-            return @"\\" + path.Substring(uncPrefix.Length);
-        if (path.StartsWith(longPrefix, StringComparison.Ordinal))
-            return path.Substring(longPrefix.Length);
-        return path;
+        const int prefixLength = 4;
+        const string uncTail = @"UNC\";
+
+        if (!path.StartsWith(@"\\?\", StringComparison.Ordinal)
+            && !path.StartsWith(@"\??\", StringComparison.Ordinal))
+            return path;
+
+        var rest = path.AsSpan(prefixLength);
+        if (rest.StartsWith(uncTail, StringComparison.Ordinal))
+            return @"\\" + path.Substring(prefixLength + uncTail.Length);
+
+        return HasDriveRoot(rest) ? path.Substring(prefixLength) : path;
     }
+
+    /// <summary>
+    /// True where the span opens with a drive letter and a colon. Deliberately
+    /// narrower than <see cref="Path.IsPathRooted(string)"/>, which counts a bare
+    /// leading separator as rooted: <c>\Windows\Installer\9f05cba.msi</c> is
+    /// rooted on whichever drive the process happens to be running from, and an
+    /// answer that moves with the process is the one thing the caller above is
+    /// there to refuse.
+    /// </summary>
+    private static bool HasDriveRoot(ReadOnlySpan<char> path) =>
+        path.Length >= 2 && char.IsAsciiLetter(path[0]) && path[1] == ':';
 
     /// <summary>
     /// Deletes empty subdirectories inside C:\Windows\Installer. Sorted

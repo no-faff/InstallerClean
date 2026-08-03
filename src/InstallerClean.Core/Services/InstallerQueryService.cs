@@ -360,34 +360,53 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// one file into two answers: registered-and-present on this side, and
     /// unclaimed-therefore-orphaned on the other. Doubled separators, forward
     /// slashes, a relative segment, a trailing space or dot, and the <c>\\?\</c>
-    /// prefix are all such spellings, and all of them survive into the registry
-    /// because nothing writing there is obliged to canonicalise. GetFullPath
-    /// settles every one; the prefix is stripped first because GetFullPath
-    /// deliberately leaves a <c>\\?\</c> path alone, that being the point of the
-    /// prefix.
+    /// and <c>\??\</c> prefixes over a drive letter are all such spellings, and
+    /// all of them survive into the registry because nothing writing there is
+    /// obliged to canonicalise. GetFullPath settles every one; the prefix comes
+    /// off first because GetFullPath deliberately leaves a <c>\\?\</c> path
+    /// alone, that being the point of the prefix, and reads the <c>\??\</c>
+    /// form's leading separator as rooted on whatever drive the process is
+    /// running from. Which prefixes come off, and why one is left on, is
+    /// <see cref="InstallerCacheHelpers.StripLongPathPrefix"/>'s.
     ///
     /// This is also the string a removable candidate is later moved or deleted
     /// by (FileSystemScanService builds the candidate straight off it), which is
     /// the right direction: the normalised form names the same file and names it
     /// the way the rest of the app spells it.
     ///
-    /// 8.3 short names are the one spelling GetFullPath does not settle, and they
-    /// are deliberately not handled, on the strength of where these paths come
-    /// from rather than on a cost argument. Windows Installer names the files it
-    /// caches itself, as short hex (<c>9f05cba.msi</c>, <c>1e4a2f.msp</c>), so a
-    /// path this method receives is 8.3-clean by construction and its short and
-    /// long forms cannot differ. The hazard case, a registration holding
-    /// <c>ABCDEF~1.MSI</c> against a walk that produced the long name, needs a
-    /// long-named file in the cache root, and a long-named file in the cache root
-    /// is one Windows Installer did not put there, so nothing registered names
-    /// it and orphaned is the correct verdict for it.
+    /// TWO SPELLINGS ARE NOT SETTLED HERE. A volume-GUID path keeps its prefix
+    /// (see the method above), and an 8.3 short name is not expanded. Both leave
+    /// a claim that names its file and does not match the walk, so the cached
+    /// file is offered as an orphan while the claim is counted against the
+    /// missing-from-disk alarm.
     ///
-    /// Should that ever be revisited, the expansion needs
+    /// The 8.3 argument that stood here was wrong rather than incomplete, and it
+    /// is worth saying which half. Windows Installer does name the files it
+    /// caches itself, as short hex (<c>9f05cba.msi</c>, <c>1e4a2f.msp</c>), so
+    /// the FILENAME cannot have a short form that differs. The path also carries
+    /// the folder, and <c>Installer</c> is nine characters, so on a volume still
+    /// creating 8dot3 aliases it has a short form of its own:
+    /// <c>C:\Windows\INSTAL~1\1a2b3c.msi</c> names an ordinary file a product
+    /// still needs, and GetFullPath does not expand it. Nothing downstream sees
+    /// it either, which is what makes it worse than the volume-GUID case: the
+    /// short-formed value answers true to File.Exists, so it counts as a
+    /// registered file found on disk and the scan's correlation gate reads a
+    /// healthy machine.
+    ///
+    /// Whether to handle either is open. Expanding a spelling needs
     /// GetFinalPathNameByHandle per registered path, an open handle per
-    /// registration on every scan. The cheap form is a lexical <c>~</c>-plus-digit
-    /// pre-filter deciding which registrations are worth a handle, so the
-    /// per-path cost is paid only where the hazard could exist, which on a
-    /// healthy machine is nowhere.
+    /// registration on every scan; the cheap form is a lexical pre-filter (a
+    /// <c>~</c> followed by a digit anywhere in the path, or a prefix the strip
+    /// above left on) deciding which registrations are worth a handle, which on
+    /// a healthy machine is none of them. That is the cheap form of a lexical
+    /// comparison, and whether the comparison stays lexical at all is the larger
+    /// question underneath it.
+    ///
+    /// Measured on one elevated machine (Windows 10.0.26200, 2026-08-03): 138
+    /// registered paths, every one an ordinary drive path, no tilde-and-digit
+    /// anywhere in any of them, and the cache folder had no short name on that
+    /// volume. That says how exposed one machine was, and nothing about whether
+    /// another holds one.
     /// </summary>
     private static string NormaliseLocalPackagePath(string value)
     {

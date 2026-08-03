@@ -1088,6 +1088,10 @@ public class InstallerQueryServiceUnitTests
     [InlineData(@"C:\Windows\Temp\..\Installer\normalised.msi")]
     // The long-path prefix, which GetFullPath deliberately leaves alone.
     [InlineData(@"\\?\C:\Windows\Installer\normalised.msi")]
+    // The NT object form. GetFullPath reads that leading separator as rooted on
+    // whichever drive the process is running from, so unstripped the claim named
+    // a file nowhere and the cached one was offered as an orphan.
+    [InlineData(@"\??\C:\Windows\Installer\normalised.msi")]
     public async Task A_claim_is_normalised_to_the_spelling_the_folder_walk_produces(string registeredAs)
     {
         // Orphanhood is string equality against the walked paths while existence
@@ -1119,6 +1123,32 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         Assert.Equal(walked, Assert.Single(result.Packages).LocalPackagePath);
+    }
+
+    [Theory]
+    // A volume-GUID value and the device forms beside it. None has a drive
+    // letter behind the prefix, so none can have it taken off: what was left
+    // had no root at all, and GetFullPath completed it from the process working
+    // directory, which is a different answer from the GUI and from the command
+    // line for the same registration.
+    [InlineData(@"\\?\Volume{9c3a1d2e-0000-0000-0000-100000000000}\Windows\Installer\vol.msi")]
+    [InlineData(@"\??\Volume{9c3a1d2e-0000-0000-0000-100000000000}\Windows\Installer\vol.msi")]
+    [InlineData(@"\\?\GLOBALROOT\Device\HarddiskVolume3\Windows\Installer\vol.msi")]
+    public async Task A_value_with_no_drive_letter_behind_its_prefix_keeps_the_prefix(string registeredAs)
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", registeredAs);
+
+        var claimed = Assert.Single((await Run(msi)).Packages).LocalPackagePath;
+
+        // Asserted at the two ends rather than as equality with the input: what
+        // matters is that the value still names a volume and still names the
+        // file, not that GetFullPath left every character of an extended path
+        // alone. Keeping the prefix is what rules out the old answer, which
+        // began at whatever drive and folder the process was started from.
+        Assert.StartsWith(registeredAs.Substring(0, 4), claimed, StringComparison.Ordinal);
+        Assert.EndsWith(@"\vol.msi", claimed, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
