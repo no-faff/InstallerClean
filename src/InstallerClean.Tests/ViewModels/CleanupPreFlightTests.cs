@@ -523,6 +523,32 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
+    public async Task A_batch_the_under_lease_re_read_empties_removes_the_folder_too()
+    {
+        // The service is careful to return before creating its destination, so a
+        // batch its own re-read empties leaves no folder behind, and its own test
+        // pins that. The folder that survives is the PRE-FLIGHT's, made before the
+        // confirmation, and only this layer can remove it. Nothing was ever placed
+        // in it: the service came straight back out.
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(true);
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
+                HeldBack: new[] { @"C:\Windows\Installer\a.msi" }));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.Received(1).Delete(_destination);
+    }
+
+    [Fact]
     public async Task A_re_verify_that_fails_removes_the_folder_the_pre_flight_created()
     {
         // The re-verify runs between the confirmation and the batch, so a throw

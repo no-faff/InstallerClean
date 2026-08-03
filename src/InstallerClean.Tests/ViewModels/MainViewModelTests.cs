@@ -1268,6 +1268,284 @@ public class MainViewModelTests
             Arg.Is<IReadOnlyList<PatchClaim>?>(c => c != null && c.SequenceEqual(claims)));
     }
 
+    // The block below pins the other direction of that wire: what the window does
+    // with the paths an action service hands BACK. The production of both signals
+    // was tested and the consumption of neither, and three defects landed inside
+    // that gap. Every one of these stages a result with HeldBack non-empty, which
+    // is the shape a batch takes when the re-read under the installer mutex found
+    // a claim had moved.
+
+    [Fact]
+    public async Task DeleteAllAsync_a_path_held_back_leaves_the_batchs_account_of_itself()
+    {
+        // The ordinary fold. The held-back file was never touched, so it leaves
+        // the count, the byte total and the freed figure that reaches the result
+        // log, and joins the kept-back tally instead.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, true, false, Superseded),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new DeleteResult(2, Array.Empty<FileOperationError>(),
+                HeldBack: new[] { @"C:\Windows\Installer\c.msp" }));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        // The pre-act re-verify dropped nothing, so the one kept-back file on
+        // screen is the service's, folded into the same tally and the same
+        // sentence.
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Skipped);
+        // 3.0 MB, not 7.0: the held-back file's 4 MB is not freed space.
+        Assert.Equal(
+            string.Format(Strings.Completion_Freed, DisplayHelpers.FormatSize(3_145_728)),
+            vm.Completion.Heading);
+        await _resultLogService.Received(1).WriteAsync(
+            Arg.Is<ResultLogEntry>(e => e != null && e.Operation.BytesFreed == 3_145_728),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_a_batch_the_service_empties_reports_all_clean_and_logs_nothing()
+    {
+        // One condition, one screen, one record. The re-read taking the whole
+        // batch back is the same machine state as the pre-act re-verify taking it
+        // back, so it gets that arm's screen: the all-clean heading with the
+        // kept-back sentence as its summary, and no result-log entry. Falling
+        // through instead reported a completed delete of zero and wrote a run that
+        // freed nothing into the public reports.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
+                HeldBack: new[] { @"C:\Windows\Installer\a.msp" }));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal(Strings.Completion_AllClean, vm.Completion.Heading);
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Summary);
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_a_batch_the_service_empties_reports_all_clean_and_logs_nothing()
+    {
+        // The Move twin, which had two more things wrong with it: the summary read
+        // "0 files moved to: <folder>" and the restore line told the user how to
+        // put back files that never left.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
+                HeldBack: new[] { @"C:\Windows\Installer\a.msp" }));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-heldback-all-move");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal(Strings.Completion_AllClean, vm.Completion.Heading);
+        Assert.Equal(string.Empty, vm.Completion.Restore);
+        Assert.Equal(string.Empty, vm.Completion.SummaryDestination);
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_a_cancel_after_a_hold_back_still_reports_the_hold_back()
+    {
+        // Cancelled AND held back is the ordinary shape of that combination, not a
+        // corner: the re-read runs before the loop and the cancel happens inside
+        // it. The cancelled summary carries the kept-back tally, and the byte
+        // figure is taken from the list the hold-back has already left.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, true, false, Superseded),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true,
+                HeldBack: new[] { @"C:\Windows\Installer\c.msp" }));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Skipped);
+        // One file deleted out of the TWO the batch still had, and its 1 MB is the
+        // freed figure. The held-back file is neither in the total nor in the sum.
+        Assert.Equal(
+            string.Format(Strings.Completion_Freed, DisplayHelpers.FormatSize(1_048_576)),
+            vm.Completion.Heading);
+        // A cancelled run writes no result-log entry whatever else it did.
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_an_abort_after_a_hold_back_counts_only_what_the_batch_reached()
+    {
+        // The abort arm's own fold, on the one path where files have already left
+        // the Installer folder. The byte figure is positional over the surviving
+        // list, so a held-back file left in that list would have its bytes counted
+        // as moved and push a file that really moved off the end.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msp", 4_194_304, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\b.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\c.msi", 2_097_152, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns<MoveResult>(_ => throw new MoveAbortedException(
+                "swapped",
+                new MoveResult(1, Array.Empty<FileOperationError>(),
+                    HeldBack: new[] { @"C:\Windows\Installer\a.msp" })));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-heldback-abort");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Skipped);
+        // b.msi's 1 MB, the first file of the folded list. Held back is a.msp at
+        // 4 MB, which is first in the unfolded one, so a fold that did not happen
+        // shows here as 4 MB.
+        Assert.Contains(DisplayHelpers.FormatSize(1_048_576), vm.Completion.Heading);
+        _dialogService.Received(1).ShowWarning(
+            Arg.Any<string>(), Strings.Error_InvalidDestinationTitle);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_a_hold_back_the_records_could_not_read_names_that_reason()
+    {
+        // The flag is OR-ed across the two halves of the check, because either can
+        // fail to read a record, and the two causes have different copy. Here the
+        // pre-act re-verify was healthy and the under-lease re-read was not, which
+        // is the direction the OR exists for.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, true, false, Superseded),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
+                HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
+                HeldBackRecordsIncomplete: true));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Skipped);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_lock_unavailable_result_shows_the_dialog_and_leaves_the_gate_alone()
+    {
+        // The twin of the installer-busy test above, and the difference between
+        // them is the whole reason this is a second flag rather than a second
+        // cause behind the first. Busy re-runs the pending-reboot gate, which now
+        // meets the held mutex and paints its banner. This one must NOT: nothing
+        // holds the mutex, so the gate would come back clean and paint nothing,
+        // leaving the user refused with no reason on screen. The dialog carries it
+        // instead, and the title is pinned as well as the body because this arm
+        // borrowed the crash arm's title once.
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
+                InstallerLockUnavailable: true));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            Strings.Error_InstallerLockUnavailable, Strings.Error_InstallerLockUnavailableTitle);
+        // Twice and no more: once for the scan, once for the act-time gate. A
+        // third would be the busy arm's re-check, which this arm must not run.
+        _rebootService.Received(2).Check();
+        Assert.False(vm.Scan.HasPendingReboot);
+        Assert.False(vm.Completion.IsComplete);
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public async Task OpenOrphanedDetails_after_scan_invokes_window_service_with_scanned_files()
     {
