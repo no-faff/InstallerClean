@@ -98,9 +98,17 @@ internal sealed class MutexProbe : IMutexProbe
         }
         catch (UnauthorizedAccessException)
         {
-            // The object exists but its DACL refuses us create/open rights.
-            // Proceed without the hold rather than refusing: the object has not
-            // been shown to be held.
+            // The object exists but its DACL refuses us create/open rights. The
+            // probe reports and the callers decide, which is why this returns a
+            // null lease with heldByAnother left false rather than choosing for
+            // them: nothing has been shown to hold the object, and that fact
+            // alone does not settle whether an act should run without the hold.
+            //
+            // The two callers answer it differently and the split is deliberate.
+            // Move runs on, because a rename into a folder the user chose leaves
+            // them a file they can put back. Delete refuses, because a permanent
+            // delete leaves nothing to put back. Each states its own reasoning at
+            // its own acquire; neither belongs here.
             return null;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
