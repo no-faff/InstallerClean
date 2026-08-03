@@ -468,9 +468,9 @@ public sealed class MoveFilesService : IMoveFilesService
     /// ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION as HRESULTs: another
     /// program holds the file open, which is the one IO failure here with a
     /// cause the user can act on and the one that is not a fault. The Delete
-    /// path discriminates the same two codes off the shell's HRESULT
-    /// (FileOperationError.RecycleFailed), so both halves of the app name the
-    /// same condition the same way.
+    /// path discriminates the same two codes off the HRESULT of the IOException
+    /// its own File.Delete raises, so both halves of the app name the same
+    /// condition the same way.
     /// </summary>
     private static FileOperationError Categorise(Exception ex, string sourcePath) => ex switch
     {
