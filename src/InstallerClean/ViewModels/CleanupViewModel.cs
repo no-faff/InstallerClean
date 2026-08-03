@@ -1127,6 +1127,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// the completion copy has a separate sentence for exactly that. It is a
     /// whole-result flag on both sides already, so OR-ing keeps the one behaviour
     /// the app has always had here.
+    ///
+    /// The claims move with the paths, because the three collections describe one
+    /// set of files and have to agree: a path leaving <c>Surviving</c> for
+    /// <c>Dropped</c> takes every claim naming it, a patch held by several
+    /// products carrying one per product. A claim left behind would make
+    /// <c>SurvivingPatchClaims</c> name a file the same result has just declared
+    /// held back. <see cref="PatchClaim.LocalPackagePath"/> is normalised the way
+    /// the registered rows are, so the one case-insensitive set answers for both.
     /// </summary>
     private static ReverifyResult FoldHeldBack(
         ReverifyResult reverify, IReadOnlyList<string> heldBack, bool recordsIncomplete)
@@ -1138,7 +1146,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             reverify.Surviving.Where(p => !reclaimed.Contains(p)).ToList().AsReadOnly(),
             reverify.Dropped.Concat(heldBack).ToList().AsReadOnly(),
             reverify.RecordsIncomplete || recordsIncomplete,
-            reverify.SurvivingPatchClaims);
+            reverify.SurvivingPatchClaims
+                .Where(c => !reclaimed.Contains(c.LocalPackagePath)).ToList().AsReadOnly());
     }
 
     /// <summary>
