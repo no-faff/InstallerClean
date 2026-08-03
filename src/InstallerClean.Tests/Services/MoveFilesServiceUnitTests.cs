@@ -298,6 +298,13 @@ public class MoveFilesServiceUnitTests
         Assert.False(result.InstallerBusy);
         Assert.Equal(1, result.MovedCount); // proceeded without the hold
         Assert.Equal(0, mutex.Released);
+        // Deliberately NOT what Delete does with the same answer, and pinned here
+        // so the difference cannot be tidied away as an inconsistency. Delete
+        // refuses, because a file it removes on a stale verdict is gone. This is a
+        // rename into a folder the user chose, so the same mid-batch registration
+        // leaves them a file they can put back, and refusing would cost them the
+        // one route to their disk space that never needed the lock in the first
+        // place.
     }
 
     [Fact]

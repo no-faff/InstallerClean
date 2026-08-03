@@ -488,6 +488,8 @@ const MAP = {
   'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
   'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
   'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
+  'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
+  'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

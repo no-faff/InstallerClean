@@ -416,6 +416,8 @@ const MAP = {
   'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
   'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
   'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
+  'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
+  'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
@@ -423,8 +425,14 @@ let text = readFileSync(BASE, 'utf8');
 // The stripped keys, by name (see the header). Everything else, coolvitto's
 // machine Cli values included, stays and is translated from MAP. A named set
 // rather than a predicate, because no predicate can separate these from the
-// nineteen that stay: the difference is who wrote them, which is not a property
-// of the key.
+// ones that stay: the difference is who wrote them, which is not a property of
+// the key.
+//
+// That rule is what puts a machine key added later in here rather than in the
+// MAP. Nobody wrote a Japanese line for it, and nobody should: MachineContract
+// forces en-GB at every Cli.EventLog* emit site, so a translated value is never
+// reached, and stripping the key leaves the lookup falling through to the
+// neutral, which is the English the Application channel is grepped for anyway.
 const STRIPPED = new Set([
   'Cli.EventLogDeleteSummary',
   'Cli.EventLogScanNoOrphans',
@@ -432,6 +440,7 @@ const STRIPPED = new Set([
   'Cli.EventLogMissingFromDisk',
   'Cli.EventLogMoveNotEnoughSpace',
   'Cli.EventLogMoveAborted',
+  'Cli.EventLogInstallerLockUnavailable',
 ]);
 let stripped = 0;
 text = text.replace(/[^\S\n]*<data name="(Cli\.[^"]*)"[\s\S]*?<\/data>\n?/g,

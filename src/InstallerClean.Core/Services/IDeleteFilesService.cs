@@ -28,19 +28,32 @@ public interface IDeleteFilesService
 }
 
 /// <summary>
-/// Outcome of a Delete. When <see cref="Cancelled"/> and
-/// <see cref="InstallerBusy"/> are both <c>false</c>,
+/// Outcome of a Delete. When <see cref="Cancelled"/>, <see cref="InstallerBusy"/>
+/// and <see cref="InstallerLockUnavailable"/> are all <c>false</c>,
 /// <see cref="DeletedCount"/> + <see cref="Errors"/>.Count sum to the input
 /// count: every file was deleted or recorded as an error. When
 /// <see cref="Cancelled"/> is <c>true</c> the batch was stopped mid-way, so the
 /// count and errors reflect the files reached before the cancel and the rest of
-/// the input was never touched. When <see cref="InstallerBusy"/> is <c>true</c>
-/// the batch was refused before it started because a Windows Installer
-/// transaction held <c>Global\_MSIExecute</c>: nothing was touched. The caller
-/// re-checks the pending-reboot gate and shows its banner.
+/// the input was never touched.
 /// </summary>
+/// <param name="InstallerBusy">
+/// The batch was refused before it started because a Windows Installer
+/// transaction held <c>Global\_MSIExecute</c>: nothing was touched. The caller
+/// re-checks the pending-reboot gate and shows its banner, which now reports the
+/// held mutex.
+/// </param>
+/// <param name="InstallerLockUnavailable">
+/// The batch was refused before it started because <c>Global\_MSIExecute</c>
+/// could not be acquired AND nothing else was holding it: nothing was touched.
+/// Kept separate from <see cref="InstallerBusy"/> because the two need different
+/// answers, not different wording. The pending-reboot gate is what reports the
+/// busy case, and it can say nothing at all about this one: no process holds the
+/// mutex, so a re-run of the gate comes back clean and the caller would report a
+/// refusal it could not account for. This flag carries its own sentence instead.
+/// </param>
 public record DeleteResult(
     int DeletedCount,
     IReadOnlyList<FileOperationError> Errors,
     bool Cancelled = false,
-    bool InstallerBusy = false);
+    bool InstallerBusy = false,
+    bool InstallerLockUnavailable = false);

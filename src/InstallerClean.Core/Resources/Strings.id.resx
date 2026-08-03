@@ -738,6 +738,18 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
   <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
+  <!-- Shown when a Delete could not take Global\_MSIExecute and nothing else
+       was holding it (a DACL that refuses the object, or any other non-fatal
+       failure to acquire). Without that hold nothing stops a program
+       registering a package part-way through the batch, so the proof the
+       act-time re-verify produced can go stale under the delete, and Delete
+       refuses rather than proceed. Move is deliberately not refused and has no
+       string here: it is a rename the user can undo, so the same condition
+       degrades to something recoverable. Written to the shape of
+       Error.ScanCacheRootUnresolved above, which supplies the middle step of
+       its own causal chain: what the app could not do, what followed from it,
+       and that nothing has been removed. No placeholders. -->
+  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Tujuan tidak valid</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Tidak bisa menulis ke tujuan</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Pemindahan gagal</value></data>
@@ -1064,6 +1076,12 @@ Log kerusakan tidak bisa ditulis.</value></data>
        button names, "blocked" rather than "paused" to match them, and no Re-scan,
        there being nothing to re-scan on a command line. -->
   <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
+  <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
+       string rather than a shared one because this whole family is: all four
+       Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
+       it, which is the console's shape and not the window's. Same condition,
+       same refusal, /d only. No placeholders. -->
+  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1072,6 +1090,12 @@ Log kerusakan tidak bisa ditulis.</value></data>
        grep can match a known string regardless of OS UI culture. -->
   <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
        2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+  <!-- 0 = arg ("/d"). The audit twin of Cli.InstallerLockUnavailable, and it
+       cannot share Cli.EventLogPendingRebootBlocked: that line names a reason
+       from Cli.EventLogReason.*, and every one of those asserts something is in
+       progress, which is exactly what this condition is not. Machine-read like
+       every Cli.EventLog* line, so it is forced English at the emit site and
+       states the condition rather than the advice. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} unneeded {1} to {2}...</value></data>

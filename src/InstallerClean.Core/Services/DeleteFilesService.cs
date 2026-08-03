@@ -56,10 +56,26 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // msiexec starting mid-delete waits on the mutex instead of racing the
             // cache. Acquired here and released in the finally on the SAME thread
             // (Win32 owner-thread rule); the body is synchronous, so no await hops
-            // threads between acquire and release. Held by a live transaction =>
-            // refuse and touch nothing (the caller re-checks the pending-reboot
-            // gate and shows its banner). A DACL-refused acquire proceeds without
-            // the hold rather than refusing.
+            // threads between acquire and release.
+            //
+            // Neither way of missing the hold proceeds, and the two are reported
+            // separately because the caller can only account for one of them. Held
+            // by a live transaction => the pending-reboot gate the caller re-runs
+            // meets the same mutex and paints its banner. Refused with nobody
+            // holding it (a DACL on the object, or any other non-fatal failure) =>
+            // that gate comes back clean, so the result has to carry its own
+            // sentence or the user is refused with no reason given.
+            //
+            // Refusing the second case is younger than the hold itself, and what
+            // changed the sum was the delete becoming permanent rather than
+            // anything about the mutex. Running on unserialised used to risk, at
+            // worst, a file that had just become needed going to the Recycle Bin,
+            // where the user could fetch it back; there is no bin to fetch it from.
+            // Move deliberately does NOT match this and still runs on: it is a
+            // rename into a folder the user chose, so the same mid-batch
+            // registration leaves them a file they can put back, and a refusal
+            // there would cost them the one route to their disk space that never
+            // depended on getting the installer's lock at all.
             //
             // What the hold costs, so nobody widens it and nobody removes it:
             // _MSIExecute is the machine-wide Windows Installer serialisation
@@ -74,6 +90,17 @@ public sealed class DeleteFilesService : IDeleteFilesService
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
             if (lease is null && heldByAnother)
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
+            if (lease is null)
+            {
+                // Recorded as well as refused. The refusal is what the user is
+                // told; the crash log is the only place the machine's own
+                // condition is written down, and an operator seeing this on every
+                // run is looking at a DACL on the object rather than at a passing
+                // race. Once per batch, so it costs nothing at any file count.
+                Helpers.CrashLog.TryWrite(new InvalidOperationException(
+                    "Delete refused: the Windows Installer mutex could not be acquired and was not held by another process."));
+                return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true);
+            }
 
             try
             {
@@ -81,17 +108,6 @@ public sealed class DeleteFilesService : IDeleteFilesService
             var errors = new List<FileOperationError>();
             var failureLog = new PerItemFailureLog("Delete",
                 "The per-file list is on the completion screen.");
-            // A skipped hold is not a refusal: TryAcquire returns null with
-            // heldByAnother false on a DACL refusal or any other non-fatal
-            // failure, and running on is the right call. It is recorded because
-            // the hold is the only thing stopping a msiexec registering a package
-            // mid-batch, so a run without it is the one window in which the
-            // act-time re-verify's proof can go stale under the batch, and a
-            // report of a needed file being removed could never be attributed to
-            // it. Once per batch, so it costs nothing at any file count.
-            if (lease is null)
-                Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                    "Delete ran without the Windows Installer mutex: it could not be acquired and was not held by another process."));
             // Resolved once for the batch; the guard resolves each SOURCE per
             // file against it (see InstallerCacheRoot).
             var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
@@ -275,9 +291,11 @@ public sealed class DeleteFilesService : IDeleteFilesService
             }
             finally
             {
-                // Release on this same worker thread (Win32 owner-thread rule);
-                // no-op when the acquire fell back (lease null).
-                lease?.Dispose();
+                // Release on this same worker thread (Win32 owner-thread rule).
+                // Non-null by the time this try is entered: both ways of failing
+                // to acquire return above, so a batch that reaches here holds the
+                // mutex and a batch that does not never started.
+                lease.Dispose();
             }
         }, cancellationToken);
     }

@@ -969,6 +969,21 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return;
             }
 
+            if (result.InstallerLockUnavailable)
+            {
+                // The service could not take Global\_MSIExecute and nothing was
+                // holding it, so it refused and touched nothing. No gate re-check
+                // here, unlike the arm above, and that is the whole reason this is
+                // a separate flag rather than a second cause behind the same one:
+                // no process holds the mutex, so the gate would come back clean
+                // and paint nothing, leaving a refusal the user could not account
+                // for. A dialog carries the reason instead.
+                _dialogService.ShowWarning(
+                    Strings.Error_InstallerLockUnavailable, Strings.Error_DeleteFailedTitle);
+                OperationProgress = string.Empty;
+                return;
+            }
+
             if (result.Cancelled)
             {
                 // Cancelled mid-batch: report the partial on the completion

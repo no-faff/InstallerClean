@@ -161,6 +161,7 @@ public static class Strings
     public static string Cli_EventLogDeleteSummary => Get("Cli.EventLogDeleteSummary");
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
     public static string Cli_EventLogHardError_NoLog => Get("Cli.EventLogHardError.NoLog");
+    public static string Cli_EventLogInstallerLockUnavailable => Get("Cli.EventLogInstallerLockUnavailable");
     public static string Cli_EventLogMissingFromDisk => Get("Cli.EventLogMissingFromDisk");
     public static string Cli_EventLogMoveAborted => Get("Cli.EventLogMoveAborted");
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
@@ -202,6 +203,7 @@ public static class Strings
     public static string Cli_Help_Summary => Get("Cli.Help.Summary");
     public static string Cli_Help_Usage => Get("Cli.Help.Usage");
     public static string Cli_Help_Version => Get("Cli.Help.Version");
+    public static string Cli_InstallerLockUnavailable => Get("Cli.InstallerLockUnavailable");
     public static string Cli_MissingFromDisk_Plural => Get("Cli.MissingFromDisk.Plural");
     public static string Cli_MissingFromDisk_Singular => Get("Cli.MissingFromDisk.Singular");
     public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
@@ -281,6 +283,7 @@ public static class Strings
     public static string Error_FileInUse_Singular => Get("Error.FileInUse.Singular");
     public static string Error_InstallerDbEmpty => Get("Error.InstallerDbEmpty");
     public static string Error_InstallerDbUnavailableTitle => Get("Error.InstallerDbUnavailableTitle");
+    public static string Error_InstallerLockUnavailable => Get("Error.InstallerLockUnavailable");
     public static string Error_InvalidDestinationTitle => Get("Error.InvalidDestinationTitle");
     public static string Error_IOFailure_Plural => Get("Error.IOFailure.Plural");
     public static string Error_IOFailure_Singular => Get("Error.IOFailure.Singular");

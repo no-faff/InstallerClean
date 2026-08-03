@@ -429,6 +429,7 @@ const MAP = {
   'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
   'Automation.Scroll.ProductDetails': `Product details`,
   'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
+  'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -543,6 +544,7 @@ const CLI = {
   'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
   'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
   'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
+  'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

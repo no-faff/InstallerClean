@@ -525,6 +525,22 @@ internal static class Program
                 if (result.InstallerBusy)
                     return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
 
+                // The service could not take Global\_MSIExecute and nothing was
+                // holding it, so it refused and touched nothing. Not routed through
+                // EmitPendingRebootBlocked: every PendingRebootReason it can name
+                // asserts something is in progress, and the defining fact here is
+                // that nothing is. Transient and TransientSkip all the same, on the
+                // same reasoning its sibling carries: the condition can clear on
+                // its own, so a scheduler should come back rather than treat the
+                // machine as broken.
+                if (result.InstallerLockUnavailable)
+                {
+                    Console.WriteLine(Strings.Cli_InstallerLockUnavailable);
+                    MachineContract.WriteEventLog(CliEventClass.TransientSkip,
+                        () => string.Format(Strings.Cli_EventLogInstallerLockUnavailable, arg));
+                    return ExitTransient;
+                }
+
                 // The service returns its partial result on a mid-batch cancel
                 // rather than throwing, so re-enter the OCE catch by hand: a
                 // cancelled run gets one cancelled-run event-log entry and a

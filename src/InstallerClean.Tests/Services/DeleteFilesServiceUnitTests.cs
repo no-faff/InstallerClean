@@ -393,6 +393,30 @@ public class DeleteFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task Refuses_when_the_installer_mutex_cannot_be_acquired_and_nobody_holds_it()
+    {
+        var fs = new MockFileSystem();
+        var a = AddFile(fs, "a.msi");
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.FallBack);
+        var svc = new DeleteFilesService(fs, mutex, null);
+
+        var result = await svc.DeleteFilesAsync(new[] { a });
+
+        // A delete without the hold has nothing stopping a program registering a
+        // package part-way through it, and no bin to fetch a wrongly-removed file
+        // back from, so the batch does not run.
+        Assert.True(result.InstallerLockUnavailable);
+        Assert.Equal(0, result.DeletedCount);
+        Assert.Empty(result.Errors);
+        Assert.True(fs.File.Exists(a));
+        // Distinguishable from the held case, because the caller answers them
+        // differently: the pending-reboot gate can explain that one and can say
+        // nothing at all about this one.
+        Assert.False(result.InstallerBusy);
+        Assert.Equal(0, mutex.Released);
+    }
+
+    [Fact]
     public async Task Holds_and_releases_the_installer_mutex_when_acquired()
     {
         var fs = new MockFileSystem();
