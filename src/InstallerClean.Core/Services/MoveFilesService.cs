@@ -116,12 +116,12 @@ public sealed class MoveFilesService : IMoveFilesService
             // cache in the middle of a move, which costs a needed file rather
             // than a wait.
             //
-            // Delete runs its volume probe before its acquire, and this does NOT
-            // match it: everything between here and the loop is the destination
-            // work, and running it before the acquire would create the
-            // destination folder even on the runs the busy check above refuses.
-            // A refusal that has touched nothing is worth more than a shorter
-            // hold.
+            // Delete acquires immediately, having nothing to set up first, and
+            // this cannot: everything between here and the loop is the
+            // destination work, and running it before the acquire would create
+            // the destination folder even on the runs the busy check above
+            // refuses. A refusal that has touched nothing is worth more than a
+            // shorter hold.
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
             if (lease is null && heldByAnother)
                 return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
