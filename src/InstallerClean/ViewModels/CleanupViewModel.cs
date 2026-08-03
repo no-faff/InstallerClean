@@ -1005,7 +1005,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // and paint nothing, leaving a refusal the user could not account
                 // for. A dialog carries the reason instead.
                 _dialogService.ShowWarning(
-                    Strings.Error_InstallerLockUnavailable, Strings.Error_DeleteFailedTitle);
+                    Strings.Error_InstallerLockUnavailable, Strings.Error_InstallerLockUnavailableTitle);
                 OperationProgress = string.Empty;
                 return;
             }

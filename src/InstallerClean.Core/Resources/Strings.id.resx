@@ -738,6 +738,16 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
   <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
+  <!-- The heading over Error.InstallerLockUnavailable below. It is the first
+       thing a screen reader announces when that dialog opens and the first
+       thing a glancing eye takes, so it carries the outcome rather than the
+       condition: the delete was refused before it reached a file, and nothing
+       was attempted. A translation that reads as a failure part-way through, or
+       as a delete that went wrong, says the opposite of what happened. The same
+       sentence as Completion.NothingDeleted, which the completion overlay puts
+       over a delete that reached no file, so a language carries one wording for
+       the two rather than two wordings for one thing. No placeholders. -->
+  <data name="Error.InstallerLockUnavailableTitle" xml:space="preserve"><value>Tidak ada yang dihapus</value></data>
   <!-- Shown when a Delete could not take Global\_MSIExecute and nothing else
        was holding it (a DACL that refuses the object, or any other non-fatal
        failure to acquire). Without that hold nothing stops a program

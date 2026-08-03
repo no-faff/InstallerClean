@@ -284,6 +284,7 @@ public static class Strings
     public static string Error_InstallerDbEmpty => Get("Error.InstallerDbEmpty");
     public static string Error_InstallerDbUnavailableTitle => Get("Error.InstallerDbUnavailableTitle");
     public static string Error_InstallerLockUnavailable => Get("Error.InstallerLockUnavailable");
+    public static string Error_InstallerLockUnavailableTitle => Get("Error.InstallerLockUnavailableTitle");
     public static string Error_InvalidDestinationTitle => Get("Error.InvalidDestinationTitle");
     public static string Error_IOFailure_Plural => Get("Error.IOFailure.Plural");
     public static string Error_IOFailure_Singular => Get("Error.IOFailure.Singular");
