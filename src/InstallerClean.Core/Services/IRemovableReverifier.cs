@@ -112,7 +112,7 @@ public record UnderLeaseRecheck(
 /// <param name="SurvivingPatchClaims">
 /// Every claim naming a path in <see cref="Surviving"/>, for the action service
 /// to re-read once it holds the installer mutex
-/// (<see cref="IRemovableReverifier.FindReclaimedUnderLease"/>). One entry per
+/// (<see cref="IRemovableReverifier.RecheckUnderLease"/>). One entry per
 /// claim, not per path, because a patch applied to several products is claimed
 /// by each of them and any one of those verdicts can move on its own.
 /// </param>
