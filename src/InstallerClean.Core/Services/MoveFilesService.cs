@@ -208,8 +208,12 @@ public sealed class MoveFilesService : IMoveFilesService
             // pre-loop IsInstallerFolderOrChild check covers the
             // CreateDirectory point; the loop-body check covers each
             // per-file move.
-            var canonicalDestination = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
-                .TrimEnd(Path.DirectorySeparatorChar);
+            // The bool is kept, not discarded: it says whether the kernel really
+            // expanded this path, and the per-iteration check below compares
+            // proof states as well as strings.
+            var canonicalProven = InstallerCacheHelpers.TryResolveFinalPath(
+                destinationFolder, out var canonicalRaw);
+            var canonicalDestination = canonicalRaw.TrimEnd(Path.DirectorySeparatorChar);
 
             ProbeDestinationWriteable(destinationFolder);
 
@@ -258,17 +262,32 @@ public sealed class MoveFilesService : IMoveFilesService
                     progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
 
                     // Re-resolve and compare to the canonical capture, AFTER the
-                    // report and not before it. The order is the whole guarantee:
-                    // this is a time-of-check-to-time-of-use guard, and the report
-                    // hands control to a consumer that can run for as long as it
-                    // likes, so a check taken before it leaves that consumer's whole
-                    // duration between the check and the move. On the last file of a
-                    // batch there is no next iteration to catch the swap at all.
+                    // report and not before it. The order is what the guard rests
+                    // on: this is a time-of-check-to-time-of-use guard, and the
+                    // report hands control to a consumer that can run for as long as
+                    // it likes, so a check taken before it leaves that consumer's
+                    // whole duration between the check and the move. On the last
+                    // file of a batch there is no next iteration to catch the swap
+                    // at all.
                     // Every statement between here and File.Move is this service's
                     // own, and the check is now as late as it can be made.
-                    var currentResolved = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
-                        .TrimEnd(Path.DirectorySeparatorChar);
-                    if (!currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
+                    //
+                    // The ordering is not the reach, and the reach has a hole worth
+                    // naming rather than a guarantee. A resolve that DEGRADED is
+                    // exactly a path whose reparse points went UNexpanded, which is
+                    // the one thing a containment check exists to see through, so a
+                    // re-resolve that has lost the proof the capture had counts as a
+                    // change rather than being compared as a string. What it still
+                    // cannot see is a leaf missing at this instant: resolution then
+                    // runs on the nearest existing ancestor and reattaches the leaf
+                    // name as text, so a leaf deleted and replaced inside the window
+                    // compares equal. That hole is open, and it is named here rather
+                    // than described as closed.
+                    var resolveProven = InstallerCacheHelpers.TryResolveFinalPath(
+                        destinationFolder, out var currentRaw);
+                    var currentResolved = currentRaw.TrimEnd(Path.DirectorySeparatorChar);
+                    if ((canonicalProven && !resolveProven) ||
+                        !currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
                     {
                         // Out through the one exit below rather than straight up the
                         // stack: everything a stopped batch still owes is under this
