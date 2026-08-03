@@ -155,13 +155,20 @@ public class DeleteFilesServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteFilesAsync_records_a_batch_that_ran_without_the_installer_mutex()
+    public async Task DeleteFilesAsync_refuses_and_records_a_batch_it_could_not_hold_the_mutex_for()
     {
-        // A skipped hold is not a refusal and the batch is right to carry on,
-        // but it is the one window in which the act-time re-verify's proof can
-        // go stale underneath the batch, so a report of a needed file going
-        // could never otherwise be attributed to it. Real filesystem because the
-        // record is a real crash-log write, which is the behaviour under test.
+        // A hold that could not be taken, with nobody else holding it, stops the
+        // batch. Without the hold nothing prevents a program registering a package
+        // part-way through, so the act-time proof can go stale underneath a delete
+        // that no longer has a Recycle Bin to take the mistake back out of.
+        //
+        // Its Move twin asserts the opposite outcome on the same input, and the
+        // pair is where the asymmetry is pinned: a move is a rename the user can
+        // undo, so it degrades to something recoverable and carries on.
+        //
+        // Real filesystem because the record is a real crash-log write, which is
+        // half the behaviour under test: the user is told the run refused, and the
+        // log is the only place the machine's own condition is written down.
         var logPath = CrashLog.Write(
             new InvalidOperationException("baseline for the mutex fall-back record"));
         var baseline = new FileInfo(logPath).Length;
@@ -171,10 +178,15 @@ public class DeleteFilesServiceTests : IDisposable
         fs.AddFile(source, new MockFileData("payload"));
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.FallBack);
 
-        var result = await new DeleteFilesService(fs, mutex, null).DeleteFilesAsync(new[] { source });
+        var result = await new DeleteFilesService(fs, mutex, installerFolderOverride: null).DeleteFilesAsync(new[] { source });
 
-        // The fall-back proceeds rather than refusing, and takes no lease.
+        // Refused, and distinguishably so: nothing held the mutex, so the
+        // pending-reboot gate the busy case is answered by would report nothing.
+        Assert.True(result.InstallerLockUnavailable);
         Assert.False(result.InstallerBusy);
+        Assert.Equal(0, result.DeletedCount);
+        Assert.Empty(result.Errors);
+        Assert.True(fs.File.Exists(source), "A refused batch touches nothing");
         Assert.Equal(1, mutex.AcquireAttempts);
         Assert.Equal(0, mutex.Acquired);
 
@@ -185,7 +197,8 @@ public class DeleteFilesServiceTests : IDisposable
         using var reader = new StreamReader(stream);
         var written = await reader.ReadToEndAsync();
         var appended = written.Length >= baseline ? written[(int)baseline..] : written;
-        Assert.Contains("without the Windows Installer mutex", appended);
+        Assert.Contains("Delete refused", appended);
+        Assert.Contains("could not be acquired and was not held by another process", appended);
     }
 
     public void Dispose()

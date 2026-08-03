@@ -382,7 +382,7 @@ public class DeleteFilesServiceUnitTests
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.HeldByAnother);
-        var svc = new DeleteFilesService(fs, mutex, null);
+        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
         var result = await svc.DeleteFilesAsync(new[] { a });
 
@@ -398,7 +398,7 @@ public class DeleteFilesServiceUnitTests
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.FallBack);
-        var svc = new DeleteFilesService(fs, mutex, null);
+        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
         var result = await svc.DeleteFilesAsync(new[] { a });
 
@@ -422,7 +422,7 @@ public class DeleteFilesServiceUnitTests
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, null);
+        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
         var result = await svc.DeleteFilesAsync(new[] { a });
 
@@ -516,7 +516,7 @@ public class DeleteFilesServiceUnitTests
     {
         var fs = new MockFileSystem();
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
-        var svc = new DeleteFilesService(fs, mutex, null);
+        var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
         var result = await svc.DeleteFilesAsync(Array.Empty<string>());
 

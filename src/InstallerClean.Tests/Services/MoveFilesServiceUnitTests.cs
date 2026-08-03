@@ -256,7 +256,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.HeldByAnother);
 
-        var svc = new MoveFilesService(fs, mutex, null);
+        var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
 
         Assert.True(result.InstallerBusy);
@@ -274,7 +274,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
 
-        var svc = new MoveFilesService(fs, mutex, null);
+        var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
 
         Assert.False(result.InstallerBusy);
@@ -292,7 +292,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.FallBack);
 
-        var svc = new MoveFilesService(fs, mutex, null);
+        var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
 
         Assert.False(result.InstallerBusy);

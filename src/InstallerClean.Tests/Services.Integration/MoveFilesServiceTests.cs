@@ -148,7 +148,7 @@ public class MoveFilesServiceTests : IDisposable
         fs.AddDirectory(_destDir);
         var mutex = new Tests.Helpers.FakeMutexProbe(Tests.Helpers.FakeMutexProbe.Mode.FallBack);
 
-        var result = await new MoveFilesService(fs, mutex, null)
+        var result = await new MoveFilesService(fs, mutex, installerFolderOverride: null)
             .MoveFilesAsync(new[] { source }, _destDir);
 
         // The fall-back proceeds rather than refusing, and takes no lease.
