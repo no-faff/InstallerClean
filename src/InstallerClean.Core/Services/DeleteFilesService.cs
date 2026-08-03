@@ -130,8 +130,16 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // answer read outside the hold, across the whole of that
             // enumeration's duration rather than the instant after it. Windows
             // writes a patch's registration while it processes the install
-            // script, which is the phase this mutex covers, so a transaction
-            // committing in that window moves a verdict already read.
+            // script, and _MSIExecute is documented as set only while the
+            // execute-sequence tables are being processed, so the write falls
+            // inside the phase this mutex covers.
+            //
+            // What is NOT established, and must not be written here as though it
+            // were: whether an info API can return a registration its own
+            // transaction has written and not yet committed. That answer decides
+            // how WIDE the window this closes really was; it does not decide
+            // whether the re-read is worth taking, which is why this was built
+            // without it.
             //
             // Only the claims, never the enumeration. Re-walking the whole
             // registered set here would put an API enumeration inside a

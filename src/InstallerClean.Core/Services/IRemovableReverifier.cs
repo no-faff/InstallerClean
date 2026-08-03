@@ -49,9 +49,16 @@ public interface IRemovableReverifier
     /// hold is taken inside the action service, so every caller runs the full
     /// re-verify before it, and the window the batch acts across is that
     /// enumeration's whole duration rather than the instant after it. Windows
-    /// writes a patch's registration during the execute sequence, which is the
-    /// phase the mutex covers, so a transaction that commits in that window moves
-    /// a verdict the batch has already read.
+    /// writes a patch's registration during the execute sequence, and
+    /// <c>_MSIExecute</c> is documented as set only while the execute-sequence
+    /// tables are being processed, so the write falls inside the phase the mutex
+    /// covers.
+    ///
+    /// What is NOT established, and must not be written here as though it were:
+    /// whether an info API can return a registration its own transaction has
+    /// written and not yet committed. That answer decides how WIDE the window
+    /// this closes really was; it does not decide whether the re-read is worth
+    /// taking, which is why this was built without it.
     ///
     /// Synchronous, and that is a requirement rather than a convenience: the
     /// lease must be released by the thread that took it, so the whole hold is one
