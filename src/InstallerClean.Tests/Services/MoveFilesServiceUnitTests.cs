@@ -355,6 +355,31 @@ public class MoveFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task The_claims_are_handed_to_the_re_read_untouched()
+    {
+        // The re-read can only re-ask about what it is given, and a service that
+        // dropped, merged or reordered the claims on the way in would still pass
+        // every held-back assertion above, because the fake decides what to
+        // reclaim without looking at them. Its Delete twin pins the same thing.
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msp";
+        fs.AddFile(source, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+        var claims = new[]
+        {
+            new PatchClaim(source, "{AAAA0000-0000-0000-0000-000000000001}",
+                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
+        };
+        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
+        var reverifier = new Helpers.FakeReclaimingReverifier(Array.Empty<string>(), mutex);
+        var svc = new MoveFilesService(fs, mutex, null, reverifier);
+
+        await svc.MoveFilesAsync(new[] { source }, DestDir, patchClaims: claims);
+
+        Assert.Equal(claims, reverifier.ClaimsSeen);
+    }
+
+    [Fact]
     public async Task MoveFilesAsync_zero_files_returns_empty_result()
     {
         var fs = new MockFileSystem();

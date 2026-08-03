@@ -19,6 +19,10 @@ namespace InstallerClean.Tests.EndToEnd;
 /// </summary>
 public class ScanMoveCompletionTests
 {
+    // The action-service stubs below name the trailing patchClaims argument: it
+    // is optional on the interface and never omitted in practice, so a stub that
+    // leaves it out matches nothing the view-model actually calls and hands back
+    // a null result instead of the canned one.
     private readonly IFileSystemScanService _scanService = Substitute.For<IFileSystemScanService>();
     private readonly IMoveFilesService _moveService = Substitute.For<IMoveFilesService>();
     private readonly IDeleteFilesService _deleteService = Substitute.For<IDeleteFilesService>();
@@ -63,7 +67,8 @@ public class ScanMoveCompletionTests
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
 
         var vm = CreateMain();
@@ -117,7 +122,8 @@ public class ScanMoveCompletionTests
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
 
         var vm = CreateMain();
@@ -257,7 +263,8 @@ public class ScanMoveCompletionTests
         };
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns(new MoveResult(1, errors));
 
         var vm = CreateMain();
