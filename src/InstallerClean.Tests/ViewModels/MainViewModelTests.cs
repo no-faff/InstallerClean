@@ -606,6 +606,37 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task DeleteAllAsync_crash_rescans_the_counts_it_can_no_longer_vouch_for()
+    {
+        // A crash says nothing about how far the batch got, so the counts behind
+        // the dialog may be naming files that have already gone permanently, and
+        // the window would offer to delete them again. The second scan result is
+        // what the folder really holds; without the rescan the first one stands.
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(3), ScanResultWithOrphans(1));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .ThrowsAsync(new IOException("boom"));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        Assert.Equal(3, vm.Scan.OrphanedFileCount);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, vm.Scan.OrphanedFileCount);
+        await _scanService.Received(2).ScanAsync(
+            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
+        // The rescan runs behind the overlay and hands the screen back to the
+        // caller's own clear, so the heading it set is not the one left showing.
+        Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
+        Assert.False(vm.Cleanup.IsOperationProgressIndeterminate);
+    }
+
+    [Fact]
     public async Task DeleteAllAsync_confirmation_cancelled_does_not_invoke_service()
     {
         var vm = CreateViewModel();
