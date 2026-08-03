@@ -245,17 +245,40 @@ public sealed class MoveFilesService : IMoveFilesService
                     // CandidateOutsideCache says so; an Unproven one is a path
                     // that could not be resolved at all, which is the same
                     // refusal without the same claim.
+                    // Inverted, so the move below is reached only by an answer that
+                    // positively said Safe, and the reason is switched on inside.
+                    // Two positive equality tests naming Refused and Unproven fell
+                    // through to File.Move for anything they did not name, which
+                    // made any RemovalSafety member added later a move out of the
+                    // cache until somebody remembered to come back here. The enum
+                    // grew once already, splitting one refusal into Refused and
+                    // Unproven, so that is a thing that happens rather than a thing
+                    // that might. Matches the Delete path's own guard site.
+                    //
+                    // The default arm files the same UnknownError as Unproven but
+                    // will not borrow its sentence, because a member nobody has
+                    // written yet has not been shown to be a path that could not be
+                    // resolved, and CandidateGuard's contract is that a caller must
+                    // not name a cause it has not shown.
                     var safety = CandidateGuard.CheckSafeToRemove(sourcePath, cacheRoot);
-                    if (safety == CandidateGuard.RemovalSafety.Refused)
+                    if (safety != CandidateGuard.RemovalSafety.Safe)
                     {
-                        errors.Add(new CandidateOutsideCache(sourcePath));
-                        continue;
-                    }
-                    if (safety == CandidateGuard.RemovalSafety.Unproven)
-                    {
-                        failureLog.Record(new InvalidOperationException(
-                            $"Move refused: {sourcePath} could not be resolved, so it could not be shown to be inside the Installer cache."));
-                        errors.Add(new UnknownError(sourcePath));
+                        switch (safety)
+                        {
+                            case CandidateGuard.RemovalSafety.Refused:
+                                errors.Add(new CandidateOutsideCache(sourcePath));
+                                break;
+                            case CandidateGuard.RemovalSafety.Unproven:
+                                failureLog.Record(new InvalidOperationException(
+                                    $"Move refused: {sourcePath} could not be resolved, so it could not be shown to be inside the Installer cache."));
+                                errors.Add(new UnknownError(sourcePath));
+                                break;
+                            default:
+                                failureLog.Record(new InvalidOperationException(
+                                    $"Move refused: the containment guard answered {safety} for {sourcePath}, which this service has no handling for."));
+                                errors.Add(new UnknownError(sourcePath));
+                                break;
+                        }
                         continue;
                     }
 

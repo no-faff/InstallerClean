@@ -151,17 +151,40 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     // refused the same way and reported without the
                     // out-of-bounds claim; see the matching block in
                     // MoveFilesService.
+                    // Inverted, so the delete below is reached only by an answer
+                    // that positively said Safe, and the reason is switched on
+                    // inside. Two positive equality tests naming Refused and
+                    // Unproven fell through to File.Delete for anything they did
+                    // not name, which made any RemovalSafety member added later a
+                    // deletion until somebody remembered to come back here. The
+                    // enum grew once already, splitting one refusal into Refused
+                    // and Unproven, so that is a thing that happens rather than a
+                    // thing that might.
+                    //
+                    // The default arm files the same UnknownError as Unproven but
+                    // will not borrow its sentence, because a member nobody has
+                    // written yet has not been shown to be a path that could not
+                    // be resolved, and CandidateGuard's contract is that a caller
+                    // must not name a cause it has not shown.
                     var safety = CandidateGuard.CheckSafeToRemove(filePath, cacheRoot);
-                    if (safety == CandidateGuard.RemovalSafety.Refused)
+                    if (safety != CandidateGuard.RemovalSafety.Safe)
                     {
-                        errors.Add(new CandidateOutsideCache(filePath));
-                        continue;
-                    }
-                    if (safety == CandidateGuard.RemovalSafety.Unproven)
-                    {
-                        failureLog.Record(new InvalidOperationException(
-                            $"Delete refused: {filePath} could not be resolved, so it could not be shown to be inside the Installer cache."));
-                        errors.Add(new UnknownError(filePath));
+                        switch (safety)
+                        {
+                            case CandidateGuard.RemovalSafety.Refused:
+                                errors.Add(new CandidateOutsideCache(filePath));
+                                break;
+                            case CandidateGuard.RemovalSafety.Unproven:
+                                failureLog.Record(new InvalidOperationException(
+                                    $"Delete refused: {filePath} could not be resolved, so it could not be shown to be inside the Installer cache."));
+                                errors.Add(new UnknownError(filePath));
+                                break;
+                            default:
+                                failureLog.Record(new InvalidOperationException(
+                                    $"Delete refused: the containment guard answered {safety} for {filePath}, which this service has no handling for."));
+                                errors.Add(new UnknownError(filePath));
+                                break;
+                        }
                         continue;
                     }
 
