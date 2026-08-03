@@ -172,11 +172,6 @@ public sealed class MoveFilesService : IMoveFilesService
                 cancellationToken.ThrowIfCancellationRequested();
                 var sourcePath = pathList[i];
 
-                // Report progress before the skip checks so the
-                // visible counter advances on missing / reparse-point
-                // entries instead of jumping over them.
-                progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
-
                 // Re-resolve and compare to the canonical capture.
                 var currentResolved = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
                     .TrimEnd(Path.DirectorySeparatorChar);
@@ -194,6 +189,23 @@ public sealed class MoveFilesService : IMoveFilesService
 
                 try
                 {
+                    // First statement inside the per-file try, and both halves of
+                    // that are load-bearing. Before the skip checks below, so the
+                    // visible counter advances on missing and reparse-point
+                    // entries instead of jumping over them. Inside the try, so a
+                    // progress consumer that throws costs this one file a
+                    // categorised error instead of costing the batch: from outside
+                    // the try the throw leaves the loop altogether, and the files
+                    // already moved are never reported, the result and the failure
+                    // log's closing entry both being built past the loop.
+                    //
+                    // That places it after the destination re-resolve above, so a
+                    // batch stopped by a destination swap does not report the file
+                    // it stopped on. Nothing is lost: the break is an abort, that
+                    // file is not moved either, and the report would name a file
+                    // the batch never acted on.
+                    progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
+
                     if (!_fs.File.Exists(sourcePath))
                     {
                         errors.Add(new MissingSourceFile(sourcePath));

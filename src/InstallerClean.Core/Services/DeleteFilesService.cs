@@ -104,12 +104,19 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 cancellationToken.ThrowIfCancellationRequested();
                 var filePath = pathList[i];
 
-                // Report progress before the skip check so a missing file
-                // still advances the visible counter, matching MoveFilesService.
-                progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(filePath)));
-
                 try
                 {
+                    // First statement inside the per-file try, and both halves of
+                    // that are load-bearing. Before the skip check below, so a
+                    // missing file still advances the visible counter, matching
+                    // MoveFilesService. Inside the try, so a progress consumer
+                    // that throws costs this one file an UnknownError instead of
+                    // costing the batch: from outside the try the throw leaves the
+                    // loop altogether, and the files already deleted are never
+                    // reported, the result and the failure log's closing entry
+                    // both being built past the loop.
+                    progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(filePath)));
+
                     if (!_fs.File.Exists(filePath))
                     {
                         errors.Add(new MissingSourceFile(filePath));

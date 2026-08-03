@@ -143,6 +143,59 @@ public class MoveFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task MoveFilesAsync_progress_handler_that_throws_costs_one_file_and_not_the_batch()
+    {
+        var fs = new MockFileSystem();
+        var sources = new[] { "a.msi", "b.msi", "c.msi" }
+            .Select(n => $@"{SourceDir}\{n}").ToArray();
+        foreach (var s in sources) fs.AddFile(s, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+
+        var progress = new Helpers.SyncProgress<OperationProgress>(p =>
+        {
+            if (p.CurrentFile == 2) throw new InvalidOperationException("stdout closed");
+        });
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(sources, DestDir, progress);
+
+        // The report is inside the per-file try, so a consumer that throws is
+        // categorised like any other per-file failure and the batch carries on.
+        // From outside the try the same throw left the loop, and the files
+        // already moved went unreported with it.
+        Assert.Equal(2, result.MovedCount);
+        var err = Assert.Single(result.Errors);
+        Assert.IsType<UnknownError>(err);
+        Assert.Equal(sources[1], err.FilePath);
+        Assert.True(fs.File.Exists($@"{DestDir}\a.msi"));
+        Assert.True(fs.File.Exists(sources[1]));
+        Assert.True(fs.File.Exists($@"{DestDir}\c.msi"));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_missing_source_still_advances_the_progress_counter()
+    {
+        var fs = new MockFileSystem();
+        var present = $@"{SourceDir}\a.msi";
+        var ghost = $@"{SourceDir}\ghost.msi";
+        fs.AddFile(present, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+
+        var reports = new List<OperationProgress>();
+        var progress = new Helpers.SyncProgress<OperationProgress>(reports.Add);
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { present, ghost }, DestDir, progress);
+
+        // Pins the half of the report's placement that moving it inside the try
+        // had to preserve: it runs ahead of the skip checks, so a file the batch
+        // cannot act on does not make the visible counter jump.
+        Assert.Equal(2, reports.Count);
+        Assert.Equal("ghost.msi", reports[1].CurrentFileName);
+        Assert.IsType<MissingSourceFile>(Assert.Single(result.Errors));
+    }
+
+    [Fact]
     public async Task MoveFilesAsync_returns_the_partial_result_when_cancelled_mid_batch()
     {
         var fs = new MockFileSystem();

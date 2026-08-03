@@ -470,8 +470,32 @@ internal static class Program
             // print after the post-await summary ("Deleted N files."),
             // breaking the stdout line order an RMM scrapes.
             totalToProcess = count;
+            // Guarded like every other console write in this host, and with a
+            // sharper reason than the rest: the action services report from inside
+            // their per-file try, so a throw out of this handler is filed as a
+            // per-file error against a file that is perfectly fine. A dead stdout
+            // is a fact about the console and never about the file being deleted.
+            //
+            // One crash-log entry per run rather than one per file. Whatever stops
+            // stdout accepting a line stops it for every remaining report, so an
+            // entry each would spend crash.log's rotation budget on copies of a
+            // cause already recorded and evict the history behind them, which is
+            // the failure PerItemFailureLog exists to prevent on the service side
+            // of the same batch.
+            var progressWriteFailed = false;
             var progress = new SynchronousProgress<OperationProgress>(p =>
-                Console.WriteLine($"  [{p.CurrentFile}/{p.TotalFiles}] {p.CurrentFileName}"));
+            {
+                try
+                {
+                    Console.WriteLine($"  [{p.CurrentFile}/{p.TotalFiles}] {p.CurrentFileName}");
+                }
+                catch (Exception ex)
+                {
+                    if (progressWriteFailed) return;
+                    progressWriteFailed = true;
+                    Helpers.CrashLog.TryWrite(ex);
+                }
+            });
 
             if (arg == "/d")
             {

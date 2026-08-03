@@ -92,6 +92,52 @@ public class DeleteFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task A_progress_handler_that_throws_costs_one_file_and_not_the_batch()
+    {
+        var fs = new MockFileSystem();
+        var files = new[] { "a.msi", "b.msi", "c.msi" }.Select(n => AddFile(fs, n)).ToArray();
+        var progress = new SyncProgress<OperationProgress>(p =>
+        {
+            if (p.CurrentFile == 2) throw new InvalidOperationException("stdout closed");
+        });
+        var svc = new DeleteFilesService(fs);
+
+        var result = await svc.DeleteFilesAsync(files, progress: progress);
+
+        // The report is inside the per-file try, so a consumer that throws is
+        // categorised like any other per-file failure and the batch carries on.
+        // From outside the try the same throw left the loop, and the files
+        // already deleted went unreported with it.
+        Assert.Equal(2, result.DeletedCount);
+        var err = Assert.Single(result.Errors);
+        Assert.IsType<UnknownError>(err);
+        Assert.Equal(files[1], err.FilePath);
+        Assert.False(fs.File.Exists(files[0]));
+        Assert.True(fs.File.Exists(files[1]));
+        Assert.False(fs.File.Exists(files[2]));
+    }
+
+    [Fact]
+    public async Task A_missing_file_still_advances_the_progress_counter()
+    {
+        var fs = new MockFileSystem();
+        var present = AddFile(fs, "a.msi");
+        var ghost = $@"{Dir}\ghost.msi";
+        var reports = new List<OperationProgress>();
+        var progress = new SyncProgress<OperationProgress>(reports.Add);
+        var svc = new DeleteFilesService(fs);
+
+        var result = await svc.DeleteFilesAsync(new[] { present, ghost }, progress: progress);
+
+        // Pins the half of the report's placement that moving it inside the try
+        // had to preserve: it runs ahead of the File.Exists skip, so a file the
+        // batch cannot act on does not make the visible counter jump.
+        Assert.Equal(2, reports.Count);
+        Assert.Equal("ghost.msi", reports[1].CurrentFileName);
+        Assert.IsType<MissingSourceFile>(Assert.Single(result.Errors));
+    }
+
+    [Fact]
     public async Task Returns_the_partial_result_when_cancelled_mid_batch()
     {
         var fs = new MockFileSystem();
