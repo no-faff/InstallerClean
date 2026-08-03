@@ -70,10 +70,24 @@ public class InstallerQueryServiceUnitTests
     /// <summary>
     /// Runs with a healthy fallback that names <paramref name="registryProducts"/>
     /// product keys, which is the count the enumeration cross-check weighs the
-    /// API's own against.
+    /// API's own against, and reports
+    /// <paramref name="unclaimedProductFiles"/> / <paramref name="unclaimedPatchFiles"/>
+    /// registry entries naming a cached file that is on disk and that the API's
+    /// own loop never claimed.
+    ///
+    /// The two unclaimed counts arrive here finished, because the real reader
+    /// answers both halves itself: it holds the paths, and it asks the live
+    /// filesystem about them. Nothing downstream can recompute either (the merge
+    /// keeps one row per path and does not record which source reached it first),
+    /// so what a test can drive is the observation, not the disk behind it.
     /// </summary>
-    private static async Task<InstallerQueryResult> RunAgainstRegistry(FakeMsiApi msi, int registryProducts) =>
-        await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(0, registryProducts))
+    private static async Task<InstallerQueryResult> RunAgainstRegistry(
+        FakeMsiApi msi,
+        int registryProducts,
+        int unclaimedProductFiles = 0,
+        int unclaimedPatchFiles = 0) =>
+        await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(
+                0, registryProducts, unclaimedProductFiles, unclaimedPatchFiles))
             .GetRegisteredPackagesAsync();
 
     // ---- Shared-patch verdict merge ----
@@ -192,6 +206,59 @@ public class InstallerQueryServiceUnitTests
             InstallerQueryService.ClaimSource.InstallerApi);
 
         Assert.False(claimed[shared].IsRemovable);
+    }
+
+    // ---- ...and says whether it added the path ----
+    //
+    // The whole of the fallback's second job rests on this bool being exact: it
+    // is what separates "no product the API loop reached ever named this file"
+    // from "the API named it first". A merge that reported an add for a path it
+    // had only downgraded would withhold the removable class on every machine
+    // with a shared patch; one that reported none would withhold on none.
+
+    [Fact]
+    public void A_fallback_claim_reports_the_add_only_the_first_time()
+    {
+        const string path = @"C:\Windows\Installer\registry-only.msi";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+
+        Assert.True(InstallerQueryService.MergeClaim(claimed, new RegisteredPackage(path, "", ""),
+            InstallerQueryService.ClaimSource.RegistryFallback));
+        Assert.False(InstallerQueryService.MergeClaim(claimed, new RegisteredPackage(path, "", ""),
+            InstallerQueryService.ClaimSource.RegistryFallback));
+    }
+
+    [Fact]
+    public void A_fallback_claim_on_a_path_the_api_already_claimed_reports_no_add()
+    {
+        // The ordinary case on a healthy machine, and the one the count must read
+        // as zero: the fallback re-reads the same UserData key the API did.
+        const string path = @"C:\Windows\Installer\shared.msi";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+        InstallerQueryService.MergeClaim(claimed, new RegisteredPackage(path, "Product", "{A}"),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        Assert.False(InstallerQueryService.MergeClaim(claimed, new RegisteredPackage(path, "", ""),
+            InstallerQueryService.ClaimSource.RegistryFallback));
+    }
+
+    [Fact]
+    public void An_api_claim_reports_an_add_for_a_new_path_and_not_for_a_downgrade()
+    {
+        // A downgrade rewrites the row and adds no path, so it is not an add.
+        // Nothing counts API adds today; the bool means the same thing on both
+        // arms so that a caller which starts to cannot be handed a second rule.
+        const string path = @"C:\Windows\Installer\shared.msp";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+
+        Assert.True(InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(path, "Superseded", "{A}", PatchState: 2, IsRemovable: true),
+            InstallerQueryService.ClaimSource.InstallerApi));
+
+        Assert.False(InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(path, "Applied", "{B}", PatchState: 1),
+            InstallerQueryService.ClaimSource.InstallerApi));
+        Assert.False(claimed[path].IsRemovable);
     }
 
     [Fact]
@@ -540,6 +607,107 @@ public class InstallerQueryServiceUnitTests
 
         Assert.Equal(16, result.UnreadableProductCount);
         Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+    }
+
+    // ---- ...and seen directly, in a path only the registry ever claimed ----
+    //
+    // The headcount above infers a loss from two totals that differ for innocent
+    // reasons, so it has to tolerate a band. The fallback reads the same UserData
+    // keys the API read and runs after the whole API loop, so a path it is the
+    // first to claim is one no product the loop reached ever named: that is the
+    // loss itself rather than a difference of totals, and the band does not
+    // apply to it.
+
+    [Fact]
+    public async Task A_path_only_the_registry_claimed_withholds_the_removable_class()
+    {
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+
+        // The registry names exactly as many products as the API enumerated, so
+        // the headcount is silent and this fires on the observation alone.
+        var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch),
+            registryProducts: 1, unclaimedProductFiles: 1);
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == patch);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task An_unclaimed_path_inside_the_headcounts_silent_band_still_withholds()
+    {
+        // The case the observation exists for. Ninety products enumerated
+        // against a hundred registry keys is a tenth short, which the
+        // proportional clause absorbs outright, so the headcount cannot fire
+        // however many products were really lost.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = OneProductWithASupersededPatch(patch);
+        for (var i = 0; i < 89; i++) msi.AddProduct($"{{P{i}}}");
+
+        var result = await RunAgainstRegistry(msi, registryProducts: 100, unclaimedProductFiles: 10);
+
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+        Assert.Equal(10, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task An_unclaimed_patch_path_withholds_but_counts_only_one_product()
+    {
+        // A patch entry carries no product code, and one lost product can hold
+        // any number of patches, so three of them are evidence of at least one
+        // product and of no particular number.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+
+        var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch),
+            registryProducts: 1, unclaimedPatchFiles: 3);
+
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+        Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task The_headcount_and_the_observation_are_not_added_together()
+    {
+        // Both signals estimate one quantity from opposite sides, so a machine
+        // that trips both has lost thirty-nine products, not seventy-eight. The
+        // number reaches the user as "the records for N installed programs".
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+
+        var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch),
+            registryProducts: 40, unclaimedProductFiles: 39);
+
+        Assert.Equal(39, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task A_product_already_counted_unreadable_is_not_counted_again_as_unclaimed()
+    {
+        // The double count the subtraction is for: a product whose row the API
+        // skipped has its registry value claimed by the fallback alone, so it
+        // shows up in both counts for one loss.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = OneProductWithASupersededPatch(patch);
+        msi.AddProduct("{B}", result: 1603 /* ERROR_INSTALL_FAILURE */);
+
+        var result = await RunAgainstRegistry(msi, registryProducts: 2, unclaimedProductFiles: 1);
+
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+        Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task A_registry_that_claimed_nothing_of_its_own_keeps_the_removable_verdicts()
+    {
+        // The false-fire control. Every path the registry names was already
+        // claimed by the API, which is what a whole enumeration looks like, and
+        // superseded-patch cleanup has to survive it or the feature is dead.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+
+        var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch), registryProducts: 1);
+
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
+        Assert.Equal(0, result.UnreadableProductCount);
     }
 
     // ---- Nothing claims a cached file at all ----

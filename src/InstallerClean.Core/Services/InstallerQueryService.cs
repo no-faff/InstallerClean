@@ -7,8 +7,15 @@ namespace InstallerClean.Services;
 
 /// <summary>
 /// Queries the Windows Installer API to build the complete set of registered
-/// .msi and .msp files across all installation contexts. This service only
-/// talks to the MSI API. It does not touch the filesystem.
+/// .msi and .msp files across all installation contexts, with the UserData
+/// registry keys read behind it as a second source.
+///
+/// It asks the filesystem one question and no more: whether a path only the
+/// registry claimed is really on the disk, which is what separates an
+/// enumeration that came back short from a registry key an uninstall left
+/// behind (see the cross-check in <see cref="GetRegisteredPackagesCore"/>). It
+/// does not walk the cache folder and does not decide what is orphaned; that is
+/// <see cref="IFileSystemScanService"/>'s, off the paths this returns.
 /// </summary>
 public sealed class InstallerQueryService : IInstallerQueryService
 {
@@ -59,7 +66,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// that ended early visible at all; see the cross-check in
     /// <see cref="GetRegisteredPackagesCore"/> for what it can and cannot say.
     /// </param>
-    internal readonly record struct FallbackRead(int Failures, int ProductKeys);
+    /// <param name="UnclaimedProductFiles">
+    /// Product entries whose <c>LocalPackage</c> path the API's own loop never
+    /// claimed AND whose file is on the disk. One such entry is one installed
+    /// product this enumeration did not reach, observed rather than inferred:
+    /// see the cross-check in <see cref="GetRegisteredPackagesCore"/> for why
+    /// both halves of that sentence are load-bearing.
+    /// </param>
+    /// <param name="UnclaimedPatchFiles">
+    /// The same for patch entries. It carries no product count, a patch entry
+    /// naming no product at all, so it can establish only that at least one
+    /// product went unreached.
+    /// </param>
+    internal readonly record struct FallbackRead(
+        int Failures,
+        int ProductKeys,
+        int UnclaimedProductFiles = 0,
+        int UnclaimedPatchFiles = 0);
 
     /// <summary>
     /// Production constructor: talks to the real msi.dll through
@@ -287,18 +310,42 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // a truncation puts a still-needed patch on the removal list under a
         // scan that believes it is whole. Nothing inside the API can see it.
         //
-        // The registry walk is the only independent count of how many products
-        // this machine has, so a shortfall against it is the signal. It is an
-        // inference and not a measurement, which is what the tolerance is for:
-        // UserData product keys survive a failed uninstall, so the registry
-        // legitimately runs ahead on a healthy machine, and a fifth of a
-        // machine's registrations being residue is not the ordinary case where
-        // losing a fifth of them to a truncation is one event. Two products'
-        // difference is absorbed outright, so a machine with a handful of
-        // registrations cannot trip on one stale key.
+        // Two signals answer it, and they answer different halves.
         //
-        // A small truncation stays invisible and it is not made stricter to
-        // chase one: firing costs a user their superseded-patch cleanup.
+        // The first is a headcount. The registry walk is the only independent
+        // count of how many products this machine has, so a shortfall against it
+        // says the enumeration came back short of one. It is an inference and not
+        // a measurement, which is what the tolerance is for: UserData product
+        // keys survive a failed uninstall, so the registry legitimately runs
+        // ahead on a healthy machine. Two products' difference is absorbed
+        // outright, so a machine with a handful of registrations cannot trip on
+        // one stale key, and the proportional clause absorbs a fifth so a large
+        // machine's residue does not either.
+        //
+        // What the tolerance leaves is a silent band, and the residue it was
+        // written to absorb is the only thing anyone has measured against it. On
+        // one elevated machine (2026-08-03): 137 UserData product keys, 136 of
+        // them naming a cached file really on the disk and not one naming a file
+        // that had gone, so the registry ran ahead of the live set by a single
+        // key where the band would have absorbed 27. Inside that band a
+        // truncation fires nothing at all, and what it costs is a cached file an
+        // installed product still needs.
+        //
+        // The second signal is an observation, and it is the one the band cannot
+        // make. The fallback reads the same UserData keys the API read and runs
+        // after the whole API loop, so a path it is the FIRST to claim is one no
+        // product the loop reached ever named. Its file being on the disk is the
+        // other half: a residue key whose product is gone but whose LocalPackage
+        // value survives leaves an unclaimed path too, and that population's file
+        // is usually not there. A headcount cannot separate the two at all; this
+        // separates them on the machine's own disk.
+        //
+        // Neither replaces the other. The headcount still sees a lost product the
+        // registry holds no cached-package value for, or one whose cached file
+        // another tool has already removed, where nothing is left on disk to
+        // observe. Combined by the larger of the two rather than the sum, because
+        // both are estimating one quantity (products the API never mentioned)
+        // from opposite sides, and adding them would count the same loss twice.
         var productShortfall = fallback.ProductKeys - products.Count;
         var enumerationLooksShort =
             productShortfall > 2 && products.Count * 5 < fallback.ProductKeys * 4;
@@ -307,8 +354,25 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // unreadableProducts, and absent from products.Count so inside
         // productShortfall as well. Thirty skipped rows out of a hundred
         // registrations read as sixty programs unread before the subtraction.
-        var withheldProducts = unreadableProducts
-            + (enumerationLooksShort ? Math.Max(0, productShortfall - unreadableRows) : 0);
+        var shortfallProducts =
+            enumerationLooksShort ? Math.Max(0, productShortfall - unreadableRows) : 0;
+
+        // The same double count, and it is subtracted the same way: a product
+        // whose row the API skipped, or whose LocalPackage read failed, has its
+        // registry value claimed by the fallback alone, so it is already inside
+        // unreadableProducts. Subtracting the whole of that count is deliberately
+        // generous (a product short only a patch row contributes no unclaimed
+        // path), which can leave the NUMBER low and cannot leave the withholding
+        // off: whatever it absorbs, unreadableProducts carries.
+        //
+        // A patch entry names no product, so it can say only that at least one
+        // went unreached. It floors the count rather than adding to it.
+        var unclaimedProducts = Math.Max(0, fallback.UnclaimedProductFiles - unreadableProducts);
+        var apiNeverClaimed = fallback.UnclaimedPatchFiles > 0
+            ? Math.Max(1, unclaimedProducts)
+            : unclaimedProducts;
+
+        var withheldProducts = unreadableProducts + Math.Max(shortfallProducts, apiNeverClaimed);
 
         progress?.Report(new ScanProgressUpdate(string.Format(
             Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
@@ -472,27 +536,34 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// just correctly identified: superseded-patch detection would return nothing,
     /// on every machine, for as long as the change stood.
     /// </summary>
-    internal static void MergeClaim(
+    /// <returns>
+    /// True where this call put a path into <paramref name="claimed"/> that was
+    /// not there before. For a fallback claim that is the whole signal the
+    /// cross-check in <see cref="GetRegisteredPackagesCore"/> keys on, the
+    /// scoping above being what makes it mean anything: the fallback runs after
+    /// the whole API loop over the same UserData keys, so a path it is the first
+    /// to claim is one the API never claimed rather than one it saw first.
+    /// </returns>
+    internal static bool MergeClaim(
         Dictionary<string, RegisteredPackage> claimed,
         RegisteredPackage candidate,
         ClaimSource source)
     {
         if (source == ClaimSource.RegistryFallback)
-        {
-            claimed.TryAdd(candidate.LocalPackagePath, candidate);
-            return;
-        }
+            return claimed.TryAdd(candidate.LocalPackagePath, candidate);
 
         if (!claimed.TryGetValue(candidate.LocalPackagePath, out var existing))
         {
             claimed[candidate.LocalPackagePath] = candidate;
-            return;
+            return true;
         }
 
         // Downgrade only: a removable row loses to a later non-removable claim,
         // and nothing else moves.
         if (existing.IsRemovable && !candidate.IsRemovable)
             claimed[candidate.LocalPackagePath] = candidate;
+
+        return false;
     }
 
     /// <summary>
@@ -519,6 +590,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         var failures = 0;
         var productKeys = 0;
+        var unclaimedProductFiles = 0;
+        var unclaimedPatchFiles = 0;
 
         // Budgeted, because every catch below sits inside a loop bounded by the
         // machine's registered products and patches, and what fails one key read
@@ -546,6 +619,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     var sidRead = ReadFallbackSid(udKey, sidName, claimed, ct, failureLog);
                     failures += sidRead.Failures;
                     productKeys += sidRead.ProductKeys;
+                    unclaimedProductFiles += sidRead.UnclaimedProductFiles;
+                    unclaimedPatchFiles += sidRead.UnclaimedPatchFiles;
                 }
             }
         }
@@ -567,7 +642,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             failureLog.WriteClosingEntry();
         }
 
-        return new FallbackRead(failures, productKeys);
+        return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles);
     }
 
     /// <summary>
@@ -589,6 +664,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// budget would swallow the other three, and "the Products key would not
     /// open" and "one patch's key would not read" are the two ends of a
     /// diagnosis.
+    ///
+    /// Also reports how many entries named a cached file the API's own loop
+    /// never claimed and that is really on the disk. The existence half is
+    /// answered here, against the real filesystem, because this is the only
+    /// place that knows WHICH paths those are: the merge holds one row per path
+    /// and nothing downstream can tell which source first put it there. It costs
+    /// a File.Exists per unclaimed path and nothing per claimed one, so on a
+    /// machine whose enumeration reached every product it runs nowhere.
     /// </summary>
     private static FallbackRead ReadFallbackSid(
         Microsoft.Win32.RegistryKey udKey,
@@ -599,6 +682,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         var failures = 0;
         var productKeys = 0;
+        var unclaimedProductFiles = 0;
+        var unclaimedPatchFiles = 0;
 
         try
         {
@@ -618,9 +703,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
                         var localPkg = ipKey?.GetValue("LocalPackage") as string;
                         if (!string.IsNullOrEmpty(localPkg))
-                            MergeClaim(claimed,
-                                new RegisteredPackage(NormaliseLocalPackagePath(localPkg), "", ""),
-                                ClaimSource.RegistryFallback);
+                        {
+                            var path = NormaliseLocalPackagePath(localPkg);
+                            // Short-circuited on purpose: the disk is asked about
+                            // only the paths the API left unclaimed, which on a
+                            // whole enumeration is none of them.
+                            if (MergeClaim(claimed, new RegisteredPackage(path, "", ""),
+                                    ClaimSource.RegistryFallback)
+                                && File.Exists(path))
+                                unclaimedProductFiles++;
+                        }
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
@@ -649,9 +741,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         using var patchKey = patchesKey.OpenSubKey(patchGuid);
                         var localPkg = patchKey?.GetValue("LocalPackage") as string;
                         if (!string.IsNullOrEmpty(localPkg))
-                            MergeClaim(claimed,
-                                new RegisteredPackage(NormaliseLocalPackagePath(localPkg), "", ""),
-                                ClaimSource.RegistryFallback);
+                        {
+                            var path = NormaliseLocalPackagePath(localPkg);
+                            if (MergeClaim(claimed, new RegisteredPackage(path, "", ""),
+                                    ClaimSource.RegistryFallback)
+                                && File.Exists(path))
+                                unclaimedPatchFiles++;
+                        }
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
@@ -667,7 +763,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             failureLog.Record(ex, cause: "patches-key");
         }
 
-        return new FallbackRead(failures, productKeys);
+        return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles);
     }
 
     private const int MaxProductIndex = 10_000;
