@@ -270,7 +270,14 @@ public sealed class MoveFilesService : IMoveFilesService
                     // file of a batch there is no next iteration to catch the swap
                     // at all.
                     // Every statement between here and File.Move is this service's
-                    // own, and the check is now as late as it can be made.
+                    // own, which is the claim that holds and the one worth having:
+                    // no consumer gets control again before the move. It is NOT the
+                    // last position the check could occupy. The source Exists test,
+                    // the reparse read, the containment guard's real-filesystem
+                    // resolution and GetUniqueDestPath all sit after it, and the
+                    // last of those runs a collision loop bounded at 10,000 probes,
+                    // which on a network destination is 10,000 round trips inside
+                    // the machine-wide mutex. Bounded, and not small.
                     //
                     // The ordering is not the reach, and the reach has a hole worth
                     // naming rather than a guarantee. A resolve that DEGRADED is
