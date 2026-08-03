@@ -568,6 +568,35 @@ internal static class Program
                     return ExitTransient;
                 }
 
+                // Reported after the batch rather than beside the pre-act
+                // re-verify's own line above, because it happened after that line
+                // was printed: the service takes the installer mutex and re-reads
+                // the batch's patch claims inside it, and anything reclaimed in
+                // between is kept back there. Same condition and therefore the
+                // same sentence; what differs is only when it was read.
+                //
+                // Ahead of the "deleted N" line, so the run reads in the order it
+                // happened: what was intended, what was kept back, what was done.
+                // Ahead of the cancel re-entry below for a harder reason than
+                // order: that re-entry leaves this method, so a run that held
+                // files back and was then cancelled used to say nothing at all
+                // about them, where the window reports them on both paths.
+                ReportHeldBack(result.HeldBack, result.HeldBackRecordsIncomplete);
+                // Held-back files were never touched, so they leave the tally the
+                // same way the errors below do. Without this they would be counted
+                // as freed bytes, the byte sum discounting errors alone.
+                // totalToProcess moves with them: it is the "of N" the cancelled-run
+                // audit line prints, and left at the pre-fold count it describes a
+                // batch that included files the run never intended to reach.
+                if (result.HeldBack.Count > 0)
+                {
+                    var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
+                    survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
+                    count = survivingFiles.Count;
+                    totalBytes = survivingFiles.Sum(f => f.SizeBytes);
+                    totalToProcess = count;
+                }
+
                 // The service returns its partial result on a mid-batch cancel
                 // rather than throwing, so re-enter the OCE catch by hand: a
                 // cancelled run gets one cancelled-run event-log entry and a
@@ -578,27 +607,6 @@ internal static class Program
                 {
                     committedCount = result.DeletedCount;
                     token.ThrowIfCancellationRequested();
-                }
-
-                // Reported after the batch rather than beside the pre-act
-                // re-verify's own line above, because it happened after that line
-                // was printed: the service takes the installer mutex and re-reads
-                // the batch's patch claims inside it, and anything reclaimed in
-                // between is kept back there. Same condition and therefore the
-                // same sentence; what differs is only when it was read.
-                //
-                // Ahead of the "deleted N" line, so the run reads in the order it
-                // happened: what was intended, what was kept back, what was done.
-                ReportHeldBack(result.HeldBack, result.HeldBackRecordsIncomplete);
-                // Held-back files were never touched, so they leave the tally the
-                // same way the errors below do. Without this they would be counted
-                // as freed bytes, the byte sum discounting errors alone.
-                if (result.HeldBack.Count > 0)
-                {
-                    var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
-                    survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
-                    count = survivingFiles.Count;
-                    totalBytes = survivingFiles.Sum(f => f.SizeBytes);
                 }
 
                 Console.WriteLine(string.Format(
@@ -689,6 +697,22 @@ internal static class Program
                 // also where the window catches its copy. Without this the base
                 // type's arm below prints the destination problem and nothing
                 // about the files already sitting in the destination folder.
+                //
+                // The same fold as the completed path, and the abort arm needs it
+                // more rather than less. survivingFiles is the list the byte
+                // figure is taken from POSITIONALLY: the service filtered its own
+                // copy and this host did not, so summing the first reached-many
+                // entries of an unfiltered list counts held-back files as moved
+                // and drops real ones off the end. Not a wrong total, the wrong
+                // rows. The count goes the same way, being the "of N" in the
+                // Application-log line an RMM audits.
+                ReportHeldBack(ex.Partial.HeldBack, ex.Partial.HeldBackRecordsIncomplete);
+                if (ex.Partial.HeldBack.Count > 0)
+                {
+                    var abortReclaimed = new HashSet<string>(ex.Partial.HeldBack, StringComparer.OrdinalIgnoreCase);
+                    survivingFiles = survivingFiles.Where(f => !abortReclaimed.Contains(f.FullPath)).ToList();
+                    count = survivingFiles.Count;
+                }
                 return ReportAbortedMove(arg, ex, moveDest, count, survivingFiles);
             }
 
@@ -697,17 +721,9 @@ internal static class Program
             if (moveResult.InstallerBusy)
                 return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
 
-            // Partial result returned on a mid-batch cancel; re-enter the OCE catch
-            // so the machine contract matches a thrown cancellation. See the /d
-            // branch above.
-            if (moveResult.Cancelled)
-            {
-                committedCount = moveResult.MovedCount;
-                token.ThrowIfCancellationRequested();
-            }
-
             // See the /d branch for why this is reported here and not beside the
-            // pre-act re-verify's line.
+            // pre-act re-verify's line, and for why it comes ahead of the cancel
+            // re-entry rather than after it.
             ReportHeldBack(moveResult.HeldBack, moveResult.HeldBackRecordsIncomplete);
             if (moveResult.HeldBack.Count > 0)
             {
@@ -715,6 +731,16 @@ internal static class Program
                 survivingFiles = survivingFiles.Where(f => !movedReclaimed.Contains(f.FullPath)).ToList();
                 count = survivingFiles.Count;
                 totalBytes = survivingFiles.Sum(f => f.SizeBytes);
+                totalToProcess = count;
+            }
+
+            // Partial result returned on a mid-batch cancel; re-enter the OCE catch
+            // so the machine contract matches a thrown cancellation. See the /d
+            // branch above.
+            if (moveResult.Cancelled)
+            {
+                committedCount = moveResult.MovedCount;
+                token.ThrowIfCancellationRequested();
             }
 
             Console.WriteLine(string.Format(
