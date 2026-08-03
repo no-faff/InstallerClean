@@ -542,13 +542,20 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
-    public async Task A_move_that_fails_inside_the_batch_keeps_the_folder_its_files_may_be_in()
+    public async Task A_destination_gate_refusing_after_the_pre_flight_leaves_the_folder_alone()
     {
-        // The load-bearing negative. Error_DestinationChangedMidBatch is thrown
-        // from inside the per-file loop, so files may already have arrived, and
-        // the non-recursive Delete would only refuse at the syscall AFTER the
-        // app had decided to try. A stray empty folder is the lesser outcome
-        // than any path that reaches for a folder holding moved files.
+        // The bare LocalisedInvalidOperationException is now only ever one of the
+        // move service's five destination gates, every one of which runs before
+        // the per-file loop, so this arm is reached with nothing moved. It still
+        // does not delete the folder, and the reason is the arm's own: two of
+        // those gates fire precisely because the destination has just been shown
+        // to resolve into the Installer folder or a system folder, and deleting a
+        // directory at a path just proven to land somewhere unexpected is the
+        // operation those guards exist to prevent.
+        //
+        // The mid-batch abort used to land here and no longer does. Its own twin
+        // is the test below; the two are kept apart because they are now different
+        // arms defending the same folder for entirely different reasons.
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
@@ -564,6 +571,43 @@ public class CleanupPreFlightTests
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         _directory.DidNotReceive().Delete(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task A_move_that_stopped_inside_the_batch_keeps_the_folder_its_files_may_be_in()
+    {
+        // The load-bearing negative, now staging the exception that really does
+        // come from inside the per-file loop. A destination swap detected
+        // mid-batch throws MoveAbortedException carrying what the batch had
+        // already done, so files may be sitting in the folder, and the
+        // non-recursive Delete would only refuse at the syscall AFTER the app had
+        // decided to try. A stray empty folder is the lesser outcome than any path
+        // that reaches for a folder holding moved files.
+        //
+        // It is worth its own test rather than a rename of the one above: nothing
+        // pinned this arm at all, and it pattern-matches the "nothing was placed"
+        // family the removal helper documents, so a tidy-up adding the call here
+        // would delete a folder holding the user's just-moved files with the
+        // suite green.
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(true);
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns<MoveResult>(_ => throw new MoveAbortedException(
+                "swapped", new MoveResult(1, Array.Empty<FileOperationError>())));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.DidNotReceive().Delete(Arg.Any<string>());
+        // The batch's own account of itself still reaches the user, which is what
+        // makes the folder worth keeping: it names files that are in it.
+        Assert.True(vm.Completion.IsComplete);
     }
 
     [Fact]
