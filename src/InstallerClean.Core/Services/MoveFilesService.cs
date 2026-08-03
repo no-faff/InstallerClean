@@ -172,21 +172,6 @@ public sealed class MoveFilesService : IMoveFilesService
                 cancellationToken.ThrowIfCancellationRequested();
                 var sourcePath = pathList[i];
 
-                // Re-resolve and compare to the canonical capture.
-                var currentResolved = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
-                    .TrimEnd(Path.DirectorySeparatorChar);
-                if (!currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
-                {
-                    // Out through the one exit below rather than straight up the
-                    // stack: everything a stopped batch still owes is under this
-                    // frame. Files have already left C:\Windows\Installer, so the
-                    // count, the size and the line telling the user they can put
-                    // them back are all real, and the failure log's closing entry
-                    // accounts for what the batch's failures cost it.
-                    destinationChanged = true;
-                    break;
-                }
-
                 try
                 {
                     // First statement inside the per-file try, and both halves of
@@ -198,13 +183,34 @@ public sealed class MoveFilesService : IMoveFilesService
                     // the try the throw leaves the loop altogether, and the files
                     // already moved are never reported, the result and the failure
                     // log's closing entry both being built past the loop.
-                    //
-                    // That places it after the destination re-resolve above, so a
-                    // batch stopped by a destination swap does not report the file
-                    // it stopped on. Nothing is lost: the break is an abort, that
-                    // file is not moved either, and the report would name a file
-                    // the batch never acted on.
                     progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
+
+                    // Re-resolve and compare to the canonical capture, AFTER the
+                    // report and not before it. The order is the whole guarantee:
+                    // this is a time-of-check-to-time-of-use guard, and the report
+                    // hands control to a consumer that can run for as long as it
+                    // likes, so a check taken before it leaves that consumer's whole
+                    // duration between the check and the move. On the last file of a
+                    // batch there is no next iteration to catch the swap at all.
+                    // Every statement between here and File.Move is this service's
+                    // own, and the check is now as late as it can be made.
+                    var currentResolved = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
+                        .TrimEnd(Path.DirectorySeparatorChar);
+                    if (!currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Out through the one exit below rather than straight up the
+                        // stack: everything a stopped batch still owes is under this
+                        // frame. Files have already left C:\Windows\Installer, so the
+                        // count, the size and the line telling the user they can put
+                        // them back are all real, and the failure log's closing entry
+                        // accounts for what the batch's failures cost it.
+                        //
+                        // A break is not an exception, so sitting inside the per-file
+                        // try does not hand the abort to the catch arms below: it
+                        // leaves the loop exactly as it did from outside them.
+                        destinationChanged = true;
+                        break;
+                    }
 
                     if (!_fs.File.Exists(sourcePath))
                     {

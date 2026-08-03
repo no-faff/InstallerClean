@@ -80,9 +80,13 @@ public class MoveFilesServiceTests : IDisposable
         Directory.CreateDirectory(decoy);
 
         // Asked before the batch, not during it: the swap happens inside a
-        // progress callback the service calls outside its per-file catch, so a
-        // host that refuses the link there would fail this test rather than
-        // stand aside from it.
+        // progress callback, and a host that refuses the link there would leave
+        // this test asserting an abort that had no reason to happen. Probing
+        // first is what lets such a host stand aside instead. The callback now
+        // runs inside the service's per-file try, so a refusal there would be
+        // filed as one file's error rather than thrown, which makes the probe
+        // more necessary than it was and not less: without it the failure would
+        // arrive as a missing MoveAbortedException with nothing naming the cause.
         var probe = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         try
         {
