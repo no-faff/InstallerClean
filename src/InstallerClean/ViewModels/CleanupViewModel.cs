@@ -738,6 +738,21 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 reverify = FoldHeldBack(reverify, result.HeldBack, result.HeldBackRecordsIncomplete);
             }
 
+            if (result.HeldBack.Count > 0 && survivingFiles.Count == 0)
+            {
+                // The under-lease re-read took the WHOLE batch back. See the
+                // matching arm on the delete path for why this takes the pre-lease
+                // twin's screen and its silence on the result log; Move owes a
+                // third thing as well, and it is the reason the service is careful
+                // to return before creating anything. The destination folder the
+                // PRE-FLIGHT made is still there, and nothing was ever put in it.
+                await RefreshAfterBatchAsync();
+                _completion.ShowReverifyAllSkipped(reverify);
+                OperationProgress = string.Empty;
+                if (createdDestination) await RemoveCreatedDestinationAsync(dest);
+                return;
+            }
+
             if (result.Cancelled)
             {
                 // Cancelled mid-batch: the service returned what completed rather
@@ -1020,6 +1035,26 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 reverify = FoldHeldBack(reverify, result.HeldBack, result.HeldBackRecordsIncomplete);
             }
 
+            if (result.HeldBack.Count > 0 && survivingFiles.Count == 0)
+            {
+                // The under-lease re-read took the WHOLE batch back, so this is
+                // the arm above having emptied it rather than a batch that ran.
+                // One condition owes one screen and one record, and the pre-lease
+                // twin already decided what both are, so this takes them: the
+                // all-skipped overlay, and no result-log entry.
+                //
+                // Falling through instead reported a completed operation of zero.
+                // The heading suppression below turns on errors, and there are
+                // none here, so the summary printed "0 files permanently deleted"
+                // against its own comment saying that reports an act that did not
+                // happen, and a bytesFreed of zero reached the result log, where
+                // it is a run that freed nothing rather than a run that never was.
+                await RefreshAfterBatchAsync();
+                _completion.ShowReverifyAllSkipped(reverify);
+                OperationProgress = string.Empty;
+                return;
+            }
+
             if (result.Cancelled)
             {
                 // Cancelled mid-batch: report the partial on the completion
@@ -1170,11 +1205,21 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// are added: every abandon path on which NOTHING WAS PLACED in the folder
     /// calls this, both before the confirmation (probe cancel, probe write
     /// failure, free-space refusal, confirmation decline, act-time
-    /// pending-reboot refusal) and after it (re-verify failure, re-verify
-    /// keeping every candidate back, a cancel before the first file, the
-    /// service refusing at the Global\_MSIExecute mutex, and the service's own
-    /// write-probe failure). The last two are safe because the service refuses
-    /// ahead of its CreateDestinationFolder and its per-file loop respectively.
+    /// pending-reboot refusal) and after it (re-verify failure, either half of
+    /// the re-verify keeping every candidate back, a cancel before the first
+    /// file, the service refusing at the Global\_MSIExecute mutex, and the
+    /// service's own write-probe failure). The last two are safe because the
+    /// service refuses ahead of its CreateDestinationFolder and its per-file loop
+    /// respectively.
+    ///
+    /// "Either half" is load-bearing and was once only the first half. The
+    /// pre-lease pass keeping everything back never reaches the service at all;
+    /// the under-lease re-read keeping everything back reaches it and comes
+    /// straight back out, the service returning before its own
+    /// CreateDestinationFolder precisely so that a batch it empties leaves no
+    /// folder behind. That care is undone one layer up if this is not called,
+    /// because the folder that survives is the PRE-FLIGHT's rather than the
+    /// service's.
     ///
     /// The paths that deliberately do NOT call this are the ones where a file
     /// may already have arrived: Error_DestinationChangedMidBatch, thrown from
