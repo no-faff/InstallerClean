@@ -10,8 +10,14 @@ namespace InstallerClean.Services;
 /// <see cref="RecheckUnderLease"/> answering "nothing reclaimed" is the
 /// safe no-op only because it is paired with a caller that passes no claims:
 /// with claims in hand it would be a safety check reporting a pass it never
-/// made. The action services short-circuit on an empty claim list before
-/// reaching it, so on this path the answer is a fact rather than an assumption.
+/// made. Nothing upstream guarantees that pairing. Both action services call
+/// the re-read unconditionally, an empty claim list being short-circuited
+/// inside <see cref="RemovableReverifier"/>, which is the implementation this
+/// stands in for rather than this one. So the guarantee is made here, by
+/// refusing the claims instead of answering them: a test that reaches this with
+/// a batch's claims in hand has wired the stand-in where the real reverifier
+/// belongs, and a vacuous all-clear is exactly what must not be indistinguishable
+/// from a real one.
 ///
 /// <see cref="ReverifyAsync"/> throws instead of answering, and the asymmetry is
 /// deliberate. There is no safe no-op for it: every honest return says either
@@ -32,5 +38,8 @@ internal sealed class NullRemovableReverifier : IRemovableReverifier
             "The no-op reverifier cannot re-verify a batch. Something resolved this in place of RemovableReverifier.");
 
     public UnderLeaseRecheck RecheckUnderLease(IReadOnlyList<Models.PatchClaim> claims) =>
-        new(Array.Empty<string>());
+        claims.Count == 0
+            ? new UnderLeaseRecheck(Array.Empty<string>())
+            : throw new NotSupportedException(
+                "The no-op reverifier cannot re-read patch claims. Something resolved this in place of RemovableReverifier.");
 }
