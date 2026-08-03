@@ -90,13 +90,23 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // What the hold costs, so nobody widens it and nobody removes it:
             // _MSIExecute is the machine-wide Windows Installer serialisation
             // mutex, so for as long as this batch runs, every installer on the
-            // machine that wants it waits or fails with 1618. The batch is
-            // bounded by file count and each file is one delete, so it cannot
-            // stall the way a shell round trip could, but a delete against an
-            // unresponsive volume still holds the machine's installer lock until
-            // this process is killed. That is accepted because the alternative is
-            // msiexec writing the cache in the middle of a delete, which costs a
-            // needed file rather than a wait.
+            // machine that wants it waits or fails with 1618. That is accepted
+            // because the alternative is msiexec writing the cache in the middle
+            // of a delete, which costs a needed file rather than a wait.
+            //
+            // What it is NOT is bounded by the batch's file count, and the two
+            // things that break that bound are both already inside it. The
+            // progress callback hands control to a consumer that can run for as
+            // long as it likes, which is the property the destination re-check in
+            // MoveFilesService is ordered around; in this host's command-line
+            // sibling that consumer is a console write, and a console in QuickEdit
+            // selection blocks one until the operator clears it. The prune below
+            // is a full recursive enumeration of a folder this project has
+            // measured at 6.4 million entries, materialised by OrderByDescending,
+            // and its duration has nothing to do with how many files the batch
+            // held. Both predate the range that wrote this block. Whether either
+            // belongs inside the hold is an open behaviour question and is not
+            // settled by anything here.
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
             if (lease is null && heldByAnother)
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);

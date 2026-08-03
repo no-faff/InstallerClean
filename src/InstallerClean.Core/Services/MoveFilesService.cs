@@ -116,6 +116,19 @@ public sealed class MoveFilesService : IMoveFilesService
             // cache in the middle of a move, which costs a needed file rather
             // than a wait.
             //
+            // Two more things inside the hold are unbounded by the batch, and
+            // neither is a file operation. The progress callback below hands
+            // control to a consumer that can run for as long as it likes, which
+            // is the property the destination re-check is ordered around; in the
+            // command-line host that consumer is a console write, and a console
+            // in QuickEdit selection blocks one until the operator clears it. The
+            // prune past the loop is a full recursive enumeration of a folder this
+            // project has measured at 6.4 million entries, materialised by
+            // OrderByDescending, and its duration has nothing to do with how many
+            // files the batch held. Both predate the range that wrote this block.
+            // Whether either belongs inside the hold is an open behaviour question
+            // and is not settled by anything here.
+            //
             // Delete acquires immediately, having nothing to set up first, and
             // this cannot: everything between here and the loop is the
             // destination work, and running it before the acquire would create
