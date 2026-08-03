@@ -49,7 +49,9 @@ jobs:
       # actually hit: a resx key left with no consumer; the installer language
       # set and SupportedLanguages diverging when a language is added to one and
       # not the other. These need only the checkout, not the SDK, so they run
-      # before it and cost nothing when one fails.
+      # before it and report a source fault in seconds rather than after a build.
+      # Reporting is now all they decide: the SDK steps below run whatever these
+      # say, so an early red no longer buys a shorter job by hiding the test run.
       - name: Check for dead resx keys
         run: node scripts/check-dead-resx-keys.mjs
 
@@ -85,39 +87,17 @@ jobs:
       - name: Check XAML resource keys
         run: node scripts/check-xaml-resources.mjs
 
-      # The premise every resx guard above rests on: each Strings.<code>.resx is
-      # a byte-reproducible artefact of its generator in scripts/translations/.
-      # All of them read the resx, so a value hand-edited there and not into its
-      # generator passes every one and is reverted by whoever next runs the
-      # loop. That has happened once. The generators are tracked now and
-      # CONTRIBUTING.md sends translators straight at them.
-      #
-      # The diff holds reproducibility. TEMPLATE OK holds the template, which
-      # writes no satellite for a diff to catch and which flag-retranslation.mjs
-      # skips by name, so a reworded neutral leaves it holding the old English.
-      # The satellites' own verdict lines are deliberately not read: they say
-      # "still English (untranslated)" for every key awaiting a translation
-      # round, which is what check-still-english holds at the end of this file,
-      # and they exit 0 whatever they find.
-      - name: Check every satellite reproduces from its generator
-        shell: bash
-        run: |
-          log=$(for g in scripts/translations/gen-strings-*.mjs; do node "$g"; done)
-          echo "$log"
-          git diff --exit-code -- src/InstallerClean.Core/Resources
-          # A case rather than a pipe into grep: the runner sets pipefail, and a
-          # grep that exits on its first match can leave the echo feeding it
-          # killed by SIGPIPE, which would fail this step over a log that said
-          # the right thing.
-          case "$log" in
-            *"TEMPLATE OK"*) ;;
-            *)
-              echo "gen-strings-template.mjs did not report TEMPLATE OK; its output is above." >&2
-              exit 1
-              ;;
-          esac
-
+      # Everything from here to the test run carries the same condition the
+      # publishes below do, and for a stronger reason than they have. A guard
+      # above is a statement about text; the build and the test run are the only
+      # statements about whether the app works, and twice now they have been
+      # skipped for weeks by a step in front of them going red for a reason
+      # entirely of its own. A red guard is precisely when somebody wants to know
+      # the code still builds and the suite still passes, and nothing above here
+      # is a premise for either. It is not a softening: a red guard still fails
+      # the job, it just no longer decides what gets measured.
       - name: Setup .NET SDK
+        if: success() || failure()
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
@@ -136,15 +116,19 @@ jobs:
       # no NU190x at all, so the gate stood green over an unaudited graph for as
       # long as it sat there.
       - name: Fail on a vulnerable package
+        if: success() || failure()
         run: dotnet restore src/InstallerClean.sln -p:RestoreLockedMode=true -p:NuGetAuditMode=all -warnaserror:NU1901,NU1902,NU1903,NU1904
 
       - name: Build
+        if: success() || failure()
         run: dotnet build src/InstallerClean/InstallerClean.csproj -p:RestoreLockedMode=true
 
       - name: Build CLI
+        if: success() || failure()
         run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -p:RestoreLockedMode=true
 
       - name: Test
+        if: success() || failure()
         run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true
 
       # Everything from here to the setup compile depends on the BUILD having
@@ -228,22 +212,63 @@ jobs:
           if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
           & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
 
-      # The four language gates run last, and each runs even when one before it
+      # The five language gates run last, and each runs even when one before it
       # has failed. TWO of them are red BY DESIGN for the window between a string
       # landing in English and its translation round: check-accelerators and
-      # check-still-english. The other two, check-cross-key-rules and
-      # gen-translation-table --check, are expected green at all times and their
-      # red means a mistake. Naming all four is the point, because working the
-      # other two out by elimination is what once produced a note claiming every
-      # gate here was deliberate. They sit at the end for the same reason rather
-      # than for one of their own: from the old position ahead of the build, one
-      # deliberate red took everything after it down, and the whole 2.4.0 line of
-      # work was written against a suite that had not run anywhere.
+      # check-still-english. The other three, the generator reproduction check,
+      # check-cross-key-rules and gen-translation-table --check, are expected
+      # green at all times and their red means a mistake. Naming all five is the
+      # point, because working the rest out by elimination is what once produced
+      # a note claiming every gate here was deliberate. They sit at the end for
+      # the same reason rather than for one of their own: from the old position
+      # ahead of the build, one red took everything after it down, and the whole
+      # 2.4.0 line of work was written against a suite that had not run anywhere.
+      #
+      # That is not a settled historical argument, and the reproduction check is
+      # the receipt. It was left at the front when the other four moved, and a
+      # Windows-only fault inside one generator then skipped the SDK setup, the
+      # vulnerable-package gate, both builds and the whole test run on every push
+      # for 38 commits, while the smoke publishes below carried on going green
+      # underneath it and the job looked like nothing worse than its usual reds.
       # !cancelled() is what stops that happening inside this block, one red gate
-      # hiding the three behind it, and unlike always() it stands down on a
-      # cancelled job instead of posting four more failures over the cancellation.
-      # Nothing is softened by the move: a failure here fails the job exactly as
-      # it did from the top.
+      # hiding the four behind it, and unlike always() it stands down on a
+      # cancelled job instead of posting five more failures over the cancellation.
+      # Nothing is softened by the position: a failure here fails the job exactly
+      # as it did from the top.
+
+      # The premise every resx guard in this job rests on: each Strings.<code>.resx
+      # is a byte-reproducible artefact of its generator in scripts/translations/.
+      # All of them read the resx, so a value hand-edited there and not into its
+      # generator passes every one and is reverted by whoever next runs the loop.
+      # That has happened once. The generators are tracked now and CONTRIBUTING.md
+      # sends translators straight at them.
+      #
+      # The diff holds reproducibility. TEMPLATE OK holds the template, which
+      # writes no satellite for a diff to catch and which flag-retranslation.mjs
+      # skips by name, so a reworded neutral leaves it holding the old English.
+      # The satellites' own verdict lines are deliberately not read: they say
+      # "still English (untranslated)" for every key awaiting a translation
+      # round, which is what check-still-english below holds, and they exit 0
+      # whatever they find.
+      - name: Check every satellite reproduces from its generator
+        if: '!cancelled()'
+        shell: bash
+        run: |
+          log=$(for g in scripts/translations/gen-strings-*.mjs; do node "$g"; done)
+          echo "$log"
+          git diff --exit-code -- src/InstallerClean.Core/Resources
+          # A case rather than a pipe into grep: the runner sets pipefail, and a
+          # grep that exits on its first match can leave the echo feeding it
+          # killed by SIGPIPE, which would fail this step over a log that said
+          # the right thing.
+          case "$log" in
+            *"TEMPLATE OK"*) ;;
+            *)
+              echo "gen-strings-template.mjs did not report TEMPLATE OK; its output is above." >&2
+              exit 1
+              ;;
+          esac
+
       - name: Check access keys do not clash
         if: '!cancelled()'
         # Two controls live on one window at one moment must not share an Alt
