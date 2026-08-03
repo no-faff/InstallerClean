@@ -303,13 +303,6 @@ internal static class Program
     }
 
     /// <summary>
-    /// Prints the one stdout audit line saying the Application channel was
-    /// unwritable, so an RMM consumer polling for entries that never arrived has
-    /// a record of why. Guarded, and every caller relies on that: each has
-    /// already written this run's Application-log entry, and a throw from a dead
-    /// stdout would reach <see cref="Main"/>'s catch-all and produce a second.
-    /// </summary>
-    /// <summary>
     /// Prints what an action service's under-lease re-read kept back, in the
     /// operator's language, using the same sentence the pre-act re-verify's own
     /// held-back line uses. One condition, one wording: a program claims the file
@@ -335,6 +328,13 @@ internal static class Program
             heldBack.Count, DisplayHelpers.PluraliseFile(heldBack.Count)));
     }
 
+    /// <summary>
+    /// Prints the one stdout audit line saying the Application channel was
+    /// unwritable, so an RMM consumer polling for entries that never arrived has
+    /// a record of why. Guarded, and every caller relies on that: each has
+    /// already written this run's Application-log entry, and a throw from a dead
+    /// stdout would reach <see cref="Main"/>'s catch-all and produce a second.
+    /// </summary>
     private static void NoteEventLogUnavailable()
     {
         if (!EventLogWriter.EventLogUnavailable) return;

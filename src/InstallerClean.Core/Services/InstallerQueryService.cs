@@ -1164,27 +1164,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
     internal readonly record struct PropertyRead(string Value, bool Unreadable);
 
     /// <summary>
-    /// The benign returns of an Msi*GetInfoEx property read, as an ALLOWLIST.
-    /// ERROR_SUCCESS is a value (or, at zero length, a property present and
-    /// empty); ERROR_UNKNOWN_PROPERTY is the answer for a property the record
-    /// does not carry, which is what a product or a registered-not-applied patch
-    /// with no cached package gives. A probe of 136 products and 2 patches on
-    /// Windows 10.0.26200 / msi.dll 5.0.26100.7920 (2026-07-18) established that
-    /// the two cases are distinguishable at all: an absent property returned
-    /// 1608 rather than a zero-length success, and a product that could not be
-    /// read returned 87. No product on that machine genuinely lacked a cached
-    /// package, so 1608 was observed for an absent property rather than for a
-    /// real absent LocalPackage; both shapes are on this list, so either reading
-    /// lands on the benign side.
-    ///
-    /// The direction matters more than the membership. One machine can show
-    /// which codes ARE benign; no machine can enumerate every failure code that
-    /// exists, so an unlisted code falls to the unreadable side and withholds.
-    /// Inverting this into a list of known-bad codes reinstates the exact fault
-    /// it closes: the failure nobody has seen yet would read as an absence and
-    /// silently delete a product's claim on a file it still needs.
-    /// </summary>
-    /// <summary>
     /// Whether a patch's State and Uninstallable values, exactly as
     /// <c>MsiGetPatchInfoEx</c> returned them, make its cached .msp removable.
     ///
@@ -1207,6 +1186,27 @@ public sealed class InstallerQueryService : IInstallerQueryService
         return patchState is 2 or 4 && uninstallableValue == "0";
     }
 
+    /// <summary>
+    /// The benign returns of an Msi*GetInfoEx property read, as an ALLOWLIST.
+    /// ERROR_SUCCESS is a value (or, at zero length, a property present and
+    /// empty); ERROR_UNKNOWN_PROPERTY is the answer for a property the record
+    /// does not carry, which is what a product or a registered-not-applied patch
+    /// with no cached package gives. A probe of 136 products and 2 patches on
+    /// Windows 10.0.26200 / msi.dll 5.0.26100.7920 (2026-07-18) established that
+    /// the two cases are distinguishable at all: an absent property returned
+    /// 1608 rather than a zero-length success, and a product that could not be
+    /// read returned 87. No product on that machine genuinely lacked a cached
+    /// package, so 1608 was observed for an absent property rather than for a
+    /// real absent LocalPackage; both shapes are on this list, so either reading
+    /// lands on the benign side.
+    ///
+    /// The direction matters more than the membership. One machine can show
+    /// which codes ARE benign; no machine can enumerate every failure code that
+    /// exists, so an unlisted code falls to the unreadable side and withholds.
+    /// Inverting this into a list of known-bad codes reinstates the exact fault
+    /// it closes: the failure nobody has seen yet would read as an absence and
+    /// silently delete a product's claim on a file it still needs.
+    /// </summary>
     private static bool IsBenignPropertyRead(uint error) =>
         error is MsiError.Success or MsiError.MoreData or MsiError.UnknownProperty;
 
