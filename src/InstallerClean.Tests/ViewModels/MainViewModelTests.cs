@@ -579,6 +579,72 @@ public class MainViewModelTests
         Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
     }
 
+    // The pair below covers what a crash leaves behind rather than what it
+    // reports, on each action path. They are written to the same shape because
+    // the two arms answer the same question and had drifted apart on it once.
+
+    [Fact]
+    public async Task MoveAllAsync_crash_rescans_and_stops_describing_the_batch_it_lost()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(3));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns<MoveResult>(_ =>
+            {
+                // The overlay as the crash finds it: a batch part-way through,
+                // with a filename and a part-filled bar on screen. Written onto
+                // the properties rather than through the progress reporter, for
+                // the reason the cancel case records: Progress<T> posts its
+                // callback, and with no dispatcher that lands on the thread pool.
+                vm.Cleanup.OperationCurrentFile = 1;
+                vm.Cleanup.OperationTotalFiles = 3;
+                vm.Cleanup.OperationCurrentFileName = "orphan0.msi";
+                vm.Cleanup.OperationProgressPercent = 33;
+                throw new IOException("boom");
+            });
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        Assert.Equal(3, vm.Scan.OrphanedFileCount);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move-crash-rescan");
+
+        // Sampled from inside the rescan, the only moment any of it is on
+        // screen: the caller's finally clears it again, and runs afterwards.
+        bool indeterminate = false;
+        string headingDuringRescan = string.Empty, fileNameDuringRescan = "not sampled";
+        int totalDuringRescan = -1;
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                indeterminate = vm.Cleanup.IsOperationProgressIndeterminate;
+                headingDuringRescan = vm.Cleanup.OperationProgress;
+                fileNameDuringRescan = vm.Cleanup.OperationCurrentFileName;
+                totalDuringRescan = vm.Cleanup.OperationTotalFiles;
+                return ScanResultWithOrphans(1);
+            });
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // How far the batch got is unknown, so the counts it left cannot stand:
+        // they may be offering files that are already at the destination.
+        Assert.Equal(1, vm.Scan.OrphanedFileCount);
+        await _scanService.Received(2).ScanAsync(
+            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
+        // And the card stops describing the batch that died. The heading says
+        // scanning, so the bar runs indeterminate and the count row and filename
+        // come off rather than freezing at "1 of 3" for the length of the walk.
+        Assert.Equal(Strings.Status_Scanning, headingDuringRescan);
+        Assert.True(indeterminate);
+        Assert.Equal(string.Empty, fileNameDuringRescan);
+        Assert.Equal(0, totalDuringRescan);
+        Assert.False(vm.Cleanup.IsOperationProgressIndeterminate);
+    }
+
     [Fact]
     public async Task DeleteAllAsync_crash_surfaces_a_dialog_not_an_inline_status()
     {
@@ -606,32 +672,55 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task DeleteAllAsync_crash_rescans_the_counts_it_can_no_longer_vouch_for()
+    public async Task DeleteAllAsync_crash_rescans_and_stops_describing_the_batch_it_lost()
     {
-        // A crash says nothing about how far the batch got, so the counts behind
-        // the dialog may be naming files that have already gone permanently, and
-        // the window would offer to delete them again. The second scan result is
-        // what the folder really holds; without the rescan the first one stands.
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(ScanResultWithOrphans(3), ScanResultWithOrphans(1));
+            .Returns(ScanResultWithOrphans(3));
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
                 Arg.Any<IReadOnlyList<PatchClaim>?>())
-            .ThrowsAsync(new IOException("boom"));
+            .Returns<DeleteResult>(_ =>
+            {
+                vm.Cleanup.OperationCurrentFile = 1;
+                vm.Cleanup.OperationTotalFiles = 3;
+                vm.Cleanup.OperationCurrentFileName = "orphan0.msi";
+                vm.Cleanup.OperationProgressPercent = 33;
+                throw new IOException("boom");
+            });
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
         Assert.Equal(3, vm.Scan.OrphanedFileCount);
 
+        bool indeterminate = false;
+        string headingDuringRescan = string.Empty, fileNameDuringRescan = "not sampled";
+        int totalDuringRescan = -1;
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                indeterminate = vm.Cleanup.IsOperationProgressIndeterminate;
+                headingDuringRescan = vm.Cleanup.OperationProgress;
+                fileNameDuringRescan = vm.Cleanup.OperationCurrentFileName;
+                totalDuringRescan = vm.Cleanup.OperationTotalFiles;
+                return ScanResultWithOrphans(1);
+            });
+
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
+        // The delete twin of the move case, and the stakes are the reason the
+        // pair exists: these files went permanently, so counts left standing are
+        // the window offering to delete files that have already gone.
         Assert.Equal(1, vm.Scan.OrphanedFileCount);
         await _scanService.Received(2).ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
-        // The rescan runs behind the overlay and hands the screen back to the
-        // caller's own clear, so the heading it set is not the one left showing.
+        Assert.Equal(Strings.Status_Scanning, headingDuringRescan);
+        Assert.True(indeterminate);
+        Assert.Equal(string.Empty, fileNameDuringRescan);
+        Assert.Equal(0, totalDuringRescan);
+        // The rescan hands the screen back to the caller's own clear, so the
+        // heading it set is not the one left showing.
         Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
         Assert.False(vm.Cleanup.IsOperationProgressIndeterminate);
     }

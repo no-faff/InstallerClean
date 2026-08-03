@@ -843,11 +843,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            // The unforeseen-failure arm, so whether any file moved before it is
-            // by definition unknown, and stale counts are the wrong thing to
-            // leave on screen either way. That is what the two arms above can
-            // say and this one cannot, which is why only this one refreshes.
-            await _scan.RefreshAsync();
+            // How far an unforeseen failure got is by definition unknown, so the
+            // counts on screen may be describing files that have moved. The two
+            // localised arms above are certain nothing had, their exceptions all
+            // coming from gates that run ahead of the per-file loop, which is why
+            // only they can skip the rescan. The delete path's twin of this arm
+            // is certain of just as little, and rescans on the same reasoning.
+            await RefreshAfterStoppedBatchAsync();
             // A mid-move crash is surfaced the way every other failure in the
             // app is: a dialog naming the exception type and the crash-log
             // path, never ex.Message (it can carry another user's profile path
