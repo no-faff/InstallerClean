@@ -27,7 +27,7 @@
 
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这是个 Windows 从不清理的隐藏文件夹。它几乎瞬间扫描完，告诉您有没有这类文件，想细看的还能查看更多细节，并让您删掉它们，给 C: 盘腾出空间。用上一次，就可以不再惦记了。
 - **您可能正是为此而来：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 时，看到 `C:\Windows\Installer` 占了很大空间，却不知道里面都是些什么。InstallerClean 正是您需要的工具。像 `9f05cba.msi` 这样名字看起来毫无规律的文件，它清楚里面装的是什么，并很快告诉您哪些可以安全删除。
-- **能释放多少空间：** 目前收到的（自愿、匿名）报告显示，<!-- reports-freedpct-start -->56%<!-- reports-freedpct-end --> 的机器有需要清理的文件。这些机器里，释放空间的中位数是 <!-- reports-median-start -->19.4 GB<!-- reports-median-end --><!-- reports-biggest-start -->，清得最多的一台足足清出了 327 GB<!-- reports-biggest-end -->。我自己是 1.28 GB。其余 <!-- reports-nothingpct-start -->44%<!-- reports-nothingpct-end --> 没找到可清理的，这只是说明它们的 Installer 文件夹本来就是干净的。更多细节见下文的[常见问题](#常见问题)。
+- **能释放多少空间：** 目前收到的（自愿、匿名）报告显示，<!-- reports-freedpct-start -->57%<!-- reports-freedpct-end --> 的机器有需要清理的文件。这些机器里，释放空间的中位数是 <!-- reports-median-start -->18.3 GB<!-- reports-median-end --><!-- reports-biggest-start -->，清得最多的一台足足清出了 327 GB<!-- reports-biggest-end -->。我自己是 1.28 GB。其余 <!-- reports-nothingpct-start -->43%<!-- reports-nothingpct-end --> 没找到可清理的，这只是说明它们的 Installer 文件夹本来就是干净的。更多细节见下文的[常见问题](#常见问题)。
 - **是否安全：** 是的。它直接问 Windows Installer API 哪些文件还需要，只会列出 Windows 报告为已经用完的那些。它是开源的（Apache 2.0），不向您索取任何信息：没有账号、没有广告、没有跟踪、没有遥测，也没有任何东西在后台运行。它唯一会自己发起的联网操作，就是在您运行时到 GitHub 查一下有没有新版本，而且这也可以关掉。
 - **如何获取：** [下载最新版本](../../releases/latest)。运行；点过 [“未知发布者”的警告](#unknown-publisher)和[管理员提示](#admin)。删掉任何不需要的文件。搞定。
 
@@ -252,7 +252,7 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 **我真能腾出好几 GB 空间吗？** 看您的机器。一台没装额外软件的全新 Windows 11，没有什么可清理的。一台用了很久的开发者工作站，或任何装了大量基于 MSI 的软件（Acrobat、Office、LibreOffice、大型开发工具）的机器，可能有几十 GB。无论是哪种情况，一运行您就能看到具体有多少。
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-从 v1.8.0 起就有一个选项，可以把清理结果做成一份简短的匿名报告发回来。到目前为止已经收到 162 份（谢谢大家🙏），有东西可清理的那 56% 的机器里，清出空间的中位数是 19.4 GB。有一台竟然清出了 327 GB。下面是结果的汇总。
+从 v1.8.0 起就有一个选项，可以把清理结果做成一份简短的匿名报告发回来。到目前为止已经收到 166 份（谢谢大家🙏），有东西可清理的那 57% 的机器里，清出空间的中位数是 18.3 GB。有一台竟然清出了 327 GB。下面是结果的汇总。
 
 <p align="center">
   <picture>
