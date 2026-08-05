@@ -1,8 +1,8 @@
-# InstallerClean in Français (French)
+# InstallerClean in Nederlands (Dutch)
 
 The text of InstallerClean's interface and command-line tool in English on the left, with the Dutch translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Dutch can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
-A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.fr.resx`](../../src/InstallerClean.Core/Resources/Strings.fr.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
+A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.nl.resx`](../../src/InstallerClean.Core/Resources/Strings.nl.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
 ## Window titles
 
