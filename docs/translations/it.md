@@ -163,7 +163,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | Spostato {0} {1} in: {2} |
 | {0} {1} moved to: {2} | Spostati {0} {1} in: {2} |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} lasciati al loro posto, perché un programma è tornato ad averne bisogno dopo la scansione. |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} lasciati al loro posto, perché non è stato possibile leggere completamente i record di Windows Installer quando il controllo è stato ripetuto. |
+| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
 | Moved {0} of {1} {2} before you cancelled. | Spostati {0} di {1} {2} prima dell'annullamento. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Eliminati definitivamente {0} di {1} {2} prima dell'annullamento. |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

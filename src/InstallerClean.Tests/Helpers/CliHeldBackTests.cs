@@ -2,6 +2,7 @@ using InstallerClean.Cli;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 using InstallerClean.Helpers;
+using InstallerClean.Services;
 
 namespace InstallerClean.Tests.Helpers;
 
@@ -12,10 +13,11 @@ namespace InstallerClean.Tests.Helpers;
 /// were checkable only by hand.
 ///
 /// What makes them worth reaching rather than trusting to the window's own
-/// coverage is that the two hosts do NOT share this code. They share a rule, and
-/// the rule has been implemented twice, which is exactly the shape that drifts:
-/// three of the command line's paths were missing the fold while all three of the
-/// window's had it.
+/// coverage is that the two hosts do NOT share this code. The sentences and the
+/// order they come in are Core's now, so the two cannot disagree about the words;
+/// everything around them is still written twice, which is exactly the shape that
+/// drifts. Three of the command line's paths were missing the fold while all three
+/// of the window's had it.
 /// </summary>
 public class CliHeldBackTests
 {
@@ -105,7 +107,7 @@ public class CliHeldBackTests
     public void ReportHeldBack_prints_the_reclaim_sentence_when_the_records_were_read()
     {
         var written = CaptureStdout(() =>
-            Program.ReportHeldBack(new[] { @"C:\Windows\Installer\a.msp" }, recordsIncomplete: false));
+            Program.ReportHeldBack(new HeldBackReasons(Reclaimed: 1)));
 
         Assert.Equal(
             string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
@@ -115,17 +117,49 @@ public class CliHeldBackTests
     [Fact]
     public void ReportHeldBack_prints_the_unread_records_sentence_when_they_were_not()
     {
-        // Two causes, two sentences, and saying one where the other is true names
-        // a cause that was never shown. The window makes the same distinction from
-        // the same flag.
+        // Three causes, three sentences, and saying one where another is true
+        // names a cause that was never shown. The window makes the same
+        // distinction from the same tally, through the same Core helper.
         var written = CaptureStdout(() =>
-            Program.ReportHeldBack(
-                new[] { @"C:\Windows\Installer\a.msp", @"C:\Windows\Installer\b.msp" },
-                recordsIncomplete: true));
+            Program.ReportHeldBack(new HeldBackReasons(RecordsUnreadable: 2)));
 
         Assert.Equal(
             string.Format(Strings.Completion_ReverifyIncomplete, 2, DisplayHelpers.PluraliseFile(2)),
             written.TrimEnd());
+    }
+
+    [Fact]
+    public void ReportHeldBack_prints_the_changed_records_sentence_for_a_registration_that_has_gone()
+    {
+        // The cause that used to have no sentence because it had no outcome: a
+        // pairing the records no longer hold was released to the operation.
+        var written = CaptureStdout(() =>
+            Program.ReportHeldBack(new HeldBackReasons(RecordsChanged: 1)));
+
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifyRecordsChanged, 1, DisplayHelpers.PluraliseFile(1)),
+            written.TrimEnd());
+    }
+
+    [Fact]
+    public void ReportHeldBack_prints_a_line_per_cause_present_in_the_settled_order()
+    {
+        // A mixed batch, which is the whole reason the tally replaced a flag. Each
+        // line carries its own count, and no line names a cause that did not occur
+        // for the files it counts. The order is fixed in Core so this host and the
+        // window read the same way round.
+        var written = CaptureStdout(() =>
+            Program.ReportHeldBack(
+                new HeldBackReasons(Reclaimed: 2, RecordsChanged: 1, RecordsUnreadable: 1)));
+
+        Assert.Equal(
+            new[]
+            {
+                string.Format(Strings.Completion_ReverifySkipped, 2, DisplayHelpers.PluraliseFile(2)),
+                string.Format(Strings.Completion_ReverifyRecordsChanged, 1, DisplayHelpers.PluraliseFile(1)),
+                string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
+            },
+            written.TrimEnd().Split(Environment.NewLine));
     }
 
     [Fact]
@@ -134,7 +168,7 @@ public class CliHeldBackTests
         // The commonest run by far. A line reporting a count of zero on every
         // clean run is noise in a scheduled task's log.
         var written = CaptureStdout(() =>
-            Program.ReportHeldBack(Array.Empty<string>(), recordsIncomplete: false));
+            Program.ReportHeldBack(default));
 
         Assert.Equal(string.Empty, written);
     }

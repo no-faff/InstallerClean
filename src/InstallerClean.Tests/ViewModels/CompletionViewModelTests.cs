@@ -1,5 +1,7 @@
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Resources;
+using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean.Tests.ViewModels;
@@ -336,6 +338,79 @@ public class CompletionViewModelTests
         vm.ShowAllClear(installedProductCount: 5, scanDurationMs: 10);
         Assert.False(vm.HeadingIsWarning);
         Assert.Equal(string.Empty, vm.FailedCount);
+    }
+
+    // The kept-back block. Its rule is that no sentence on it is false of any file
+    // it counts, which a single cause chosen for the batch cannot keep.
+
+    private static string Line(string flat, int count) =>
+        string.Format(flat, count, DisplayHelpers.PluraliseFile(count));
+
+    [Fact]
+    public void A_batch_kept_back_for_one_cause_carries_that_one_sentence()
+    {
+        var vm = new CompletionViewModel();
+
+        vm.ShowDeleteSummary(deletedCount: 2, deletedBytes: 4096, errors: [],
+            reverify: new ReverifyResult([], ["a.msp"], new HeldBackReasons(Reclaimed: 1)));
+
+        Assert.Equal(Line(Strings.Completion_ReverifySkipped, 1), vm.Skipped);
+    }
+
+    [Fact]
+    public void A_batch_kept_back_three_ways_carries_three_lines_in_the_settled_order()
+    {
+        // The order is most specific cause first: what a program was found to
+        // need, then what the records no longer hold, then what could not be read
+        // at all. Nothing collapses and no count is the batch's rather than its
+        // own cause's.
+        var vm = new CompletionViewModel();
+
+        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 4096, errors: [],
+            reverify: new ReverifyResult([], ["a.msp", "b.msp", "c.msp", "d.msp"],
+                new HeldBackReasons(Reclaimed: 2, RecordsChanged: 1, RecordsUnreadable: 1)));
+
+        Assert.Equal(
+            new[]
+            {
+                Line(Strings.Completion_ReverifySkipped, 2),
+                Line(Strings.Completion_ReverifyRecordsChanged, 1),
+                Line(Strings.Completion_ReverifyIncomplete, 1),
+            },
+            vm.Skipped.Split(Environment.NewLine));
+    }
+
+    [Fact]
+    public void A_batch_that_kept_nothing_back_carries_no_line_at_all()
+    {
+        // The commonest run. An empty string is what collapses the block, so a
+        // count of zero must not reach it as a sentence.
+        var vm = new CompletionViewModel();
+
+        vm.ShowDeleteSummary(deletedCount: 2, deletedBytes: 4096, errors: [],
+            reverify: new ReverifyResult(["a.msi", "b.msi"], []));
+
+        Assert.Equal(string.Empty, vm.Skipped);
+    }
+
+    [Fact]
+    public void The_all_skipped_screen_carries_every_cause_in_its_summary()
+    {
+        // This screen routes the block through Summary instead of Skipped, and
+        // Summary is the one completion field with no Text binding: its inlines are
+        // composed in the window's code-behind, which is where the line breaks are
+        // made explicit. The view model's job is only to hand over the whole block.
+        var vm = new CompletionViewModel();
+
+        vm.ShowReverifyAllSkipped(new ReverifyResult([], ["a.msp", "b.msp"],
+            new HeldBackReasons(Reclaimed: 1, RecordsUnreadable: 1)));
+
+        Assert.Equal(
+            Line(Strings.Completion_ReverifySkipped, 1)
+                + Environment.NewLine
+                + Line(Strings.Completion_ReverifyIncomplete, 1),
+            vm.Summary);
+        Assert.Equal(Strings.Completion_AllClean, vm.Heading);
     }
 
     // The donate heart's gate. The ask is only ever made after the app has

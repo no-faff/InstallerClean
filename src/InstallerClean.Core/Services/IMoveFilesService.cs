@@ -75,21 +75,20 @@ public interface IMoveFilesService
 /// </summary>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,
-/// and therefore never touched. They are the same two conditions the caller's
-/// pre-act re-verify reports and are meant to be folded into it: a program claims
-/// the file again, or the records could not be read and nothing has shown that it
-/// does not. <see cref="HeldBackRecordsIncomplete"/> says which.
-/// They are NOT errors and NOT failures, so they are not in
+/// and therefore never touched. They are the same conditions the caller's pre-act
+/// re-verify reports and are meant to be folded into it: a program claims the file
+/// again, the records no longer hold the registration, or a read failed and
+/// nothing has shown the file is not needed. <see cref="HeldBackReasons"/> says
+/// how many fell to each. They are NOT errors and NOT failures, so they are not in
 /// <see cref="Errors"/>, and a caller summing input against
 /// <see cref="MovedCount"/> + <see cref="Errors"/> must subtract them.
 /// </param>
-/// <param name="HeldBackRecordsIncomplete">
-/// At least one of the <see cref="HeldBack"/> paths is held back because a
-/// property read failed rather than because a program reclaimed it. Carried
-/// through so the caller folds it into
-/// <see cref="ReverifyResult.RecordsIncomplete"/> and the user is shown the
-/// sentence that is true: the two causes have different copy and the app has
-/// always distinguished them.
+/// <param name="HeldBackReasons">
+/// How many of the <see cref="HeldBack"/> paths fell to each cause. Carried
+/// through so the caller folds it into <see cref="ReverifyResult.Reasons"/> and
+/// the user is shown one line per cause that occurred: the causes have different
+/// copy, and a single batch can meet more than one, so a sentence chosen for the
+/// set would name a cause that did not happen to some of the files.
 /// </param>
 public record MoveResult(
     int MovedCount,
@@ -97,7 +96,7 @@ public record MoveResult(
     bool Cancelled = false,
     bool InstallerBusy = false,
     IReadOnlyList<string>? HeldBack = null,
-    bool HeldBackRecordsIncomplete = false)
+    HeldBackReasons HeldBackReasons = default)
 {
     /// <summary>Never null: an absent list reads as nothing held back.</summary>
     public IReadOnlyList<string> HeldBack { get; init; } = HeldBack ?? Array.Empty<string>();

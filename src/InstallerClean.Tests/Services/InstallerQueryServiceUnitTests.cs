@@ -501,7 +501,7 @@ public class InstallerQueryServiceUnitTests
 
         Assert.Empty(result.Surviving);
         Assert.Equal(new[] { superseded }, result.Dropped);
-        Assert.True(result.RecordsIncomplete);
+        Assert.Equal(new HeldBackReasons(RecordsUnreadable: 1), result.Reasons);
     }
 
     // ---- An empty GUID accepted as success is not added ----

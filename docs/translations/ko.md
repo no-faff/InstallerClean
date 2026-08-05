@@ -163,7 +163,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | {1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다. |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {1} {0}개는 확인을 다시 했을 때 Windows Installer 기록을 완전히 읽을 수 없어 그대로 두었습니다. |
+| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
 | Moved {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다. |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

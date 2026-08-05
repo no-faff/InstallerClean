@@ -141,7 +141,7 @@ public class RemovableReverifierTests
 
         Assert.Empty(result.Surviving);
         Assert.Equal(new[] { superseded }, result.Dropped);
-        Assert.True(result.RecordsIncomplete);
+        Assert.Equal(new HeldBackReasons(RecordsUnreadable: 1), result.Reasons);
     }
 
     [Fact]
@@ -151,7 +151,49 @@ public class RemovableReverifierTests
 
         var result = await svc.ReverifyAsync(new[] { @"C:\Windows\Installer\reverted.msp" });
 
-        Assert.False(result.RecordsIncomplete);
+        Assert.Equal(new HeldBackReasons(Reclaimed: 1), result.Reasons);
+    }
+
+    [Fact]
+    public async Task A_degraded_reverify_names_each_dropped_files_own_cause()
+    {
+        // One enumeration, two causes, and before the cause was carried per path
+        // the withholding spoke for the whole batch: a file a live registered
+        // product genuinely claims was reported as one whose records could not be
+        // read. Withholding moves ONLY rows that were removable
+        // (InstallerQueryService's withhold loop), so the row that never was
+        // separates itself.
+        const string reclaimed = @"C:\Windows\Installer\reverted.msp";
+        const string withheld = @"C:\Windows\Installer\superseded.msp";
+        var q = Substitute.For<IInstallerQueryService>();
+        q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new[] { NonRemovable(reclaimed), Withheld(withheld) }, UnreadableProductCount: 1));
+        var svc = Reverifier(q);
+
+        var result = await svc.ReverifyAsync(new[] { reclaimed, withheld });
+
+        Assert.Equal(new[] { reclaimed, withheld }, result.Dropped);
+        Assert.Equal(new HeldBackReasons(Reclaimed: 1, RecordsUnreadable: 1), result.Reasons);
+    }
+
+    [Fact]
+    public async Task Every_dropped_path_is_counted_against_exactly_one_cause()
+    {
+        // The tally and the list are built at the same point and have to agree, or
+        // a screen reports fewer files than the batch lost.
+        const string reclaimed = @"C:\Windows\Installer\reverted.msp";
+        const string withheld = @"C:\Windows\Installer\superseded.msp";
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        var q = Substitute.For<IInstallerQueryService>();
+        q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new[] { NonRemovable(reclaimed), Withheld(withheld) }, UnreadableProductCount: 1));
+        var svc = Reverifier(q);
+
+        var result = await svc.ReverifyAsync(new[] { reclaimed, withheld, orphan });
+
+        Assert.Equal(result.Dropped.Count, result.Reasons.Total);
     }
 
     [Fact]
@@ -266,7 +308,7 @@ public class RemovableReverifierTests
         // And it says WHY, because the user is shown a cause and this is not the
         // same cause as a program having taken the file back. The completion copy
         // carries a separate sentence for exactly this.
-        Assert.True(recheck.RecordsIncomplete);
+        Assert.Equal(new HeldBackReasons(RecordsUnreadable: 1), recheck.Reasons);
     }
 
     [Fact]
@@ -280,7 +322,100 @@ public class RemovableReverifierTests
         var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
 
         Assert.Equal(new[] { path }, recheck.HeldBack);
-        Assert.False(recheck.RecordsIncomplete);
+        Assert.Equal(new HeldBackReasons(Reclaimed: 1), recheck.Reasons);
+    }
+
+    [Fact]
+    public void A_pairing_the_records_no_longer_hold_is_kept_back_rather_than_released()
+    {
+        // The fail-open window this whole check used to carry: an absence answer
+        // condemned nothing, so the file went into the operation on the strength of
+        // it. The absence code means "no such product in the account and context
+        // you asked in", and the context a claim carries was settled at scan time,
+        // so a pairing that has moved context since answers absent while its
+        // registration is live.
+        const string path = @"C:\Windows\Installer\moved.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.AbsentRecord(PatchA, ProductOne, "State");
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
+
+        Assert.Equal(new[] { path }, recheck.HeldBack);
+        // And it is its own cause. A read that succeeded is not an unreadable
+        // record, and a registration that has gone cannot have gone back to being
+        // needed, so either of the other two sentences would be false here.
+        Assert.Equal(new HeldBackReasons(RecordsChanged: 1), recheck.Reasons);
+    }
+
+    [Fact]
+    public void A_patch_no_longer_applied_to_its_product_is_the_same_absence()
+    {
+        // The second member of the absence allowlist. MsiGetPatchInfoEx answers
+        // 1647 where the product is there and the patch is not, and the claim is
+        // the pairing, so nothing about the file's fate changes.
+        const string path = @"C:\Windows\Installer\unapplied.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.AbsentRecord(PatchA, ProductOne, "Uninstallable", code: 1647);
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
+
+        Assert.Equal(new[] { path }, recheck.HeldBack);
+        Assert.Equal(new HeldBackReasons(RecordsChanged: 1), recheck.Reasons);
+    }
+
+    [Fact]
+    public void An_absence_beside_a_failed_read_is_reported_as_the_failure_it_contains()
+    {
+        // One pairing, two reads an instant apart, and they disagree about what
+        // kind of answer this is. The one that failed is the honest thing to say:
+        // something here could not be read, whatever the other property managed.
+        // Calling it a changed record would claim a clean read that half of this
+        // did not get.
+        const string path = @"C:\Windows\Installer\mixed.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.AbsentRecord(PatchA, ProductOne, "State");
+        msi.FailProperty(PatchA, ProductOne, "Uninstallable");
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
+
+        Assert.Equal(new[] { path }, recheck.HeldBack);
+        Assert.Equal(new HeldBackReasons(RecordsUnreadable: 1), recheck.Reasons);
+    }
+
+    [Fact]
+    public void Claims_that_answered_differently_are_counted_against_their_own_causes()
+    {
+        // A mixed batch under one lease, which is what the tally exists for. Three
+        // paths, three causes, and no cause standing in for another.
+        const string reverted = @"C:\Windows\Installer\reverted.msp";
+        const string gone = @"C:\Windows\Installer\gone.msp";
+        const string unreadable = @"C:\Windows\Installer\unreadable.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "1", uninstallable: "0");
+        msi.Set(PatchB, ProductOne, state: "2", uninstallable: "0");
+        msi.AbsentRecord(PatchB, ProductOne, "State");
+        msi.Set(PatchA, ProductTwo, state: "2", uninstallable: "0");
+        msi.FailProperty(PatchA, ProductTwo, "State");
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var recheck = svc.RecheckUnderLease(new[]
+        {
+            Claim(reverted, PatchA, ProductOne),
+            Claim(gone, PatchB, ProductOne),
+            Claim(unreadable, PatchA, ProductTwo),
+        });
+
+        Assert.Equal(new[] { reverted, gone, unreadable }, recheck.HeldBack);
+        Assert.Equal(
+            new HeldBackReasons(Reclaimed: 1, RecordsChanged: 1, RecordsUnreadable: 1),
+            recheck.Reasons);
+        Assert.Equal(recheck.HeldBack.Count, recheck.Reasons.Total);
     }
 
     [Fact]
@@ -382,9 +517,16 @@ public class RemovableReverifierTests
         private const uint Success = 0;
         private const uint MoreData = 234;
         private const uint FunctionFailed = 1627;
+        // The two codes MsiGetPatchInfoEx documents for a pairing it cannot find,
+        // and the only two InstallerQueryService reads as an absence rather than a
+        // failure. A test scripting anything else here is scripting the other side
+        // of that allowlist.
+        private const uint UnknownProduct = 1605;
+        private const uint UnknownPatch = 1647;
 
         private readonly Dictionary<(string, string, string), string> _values = new();
         private readonly HashSet<(string, string, string)> _failing = new();
+        private readonly Dictionary<(string, string, string), uint> _absent = new();
 
         /// <summary>Property reads made, so a test can pin that a path is judged once.</summary>
         public int Reads { get; private set; }
@@ -398,6 +540,17 @@ public class RemovableReverifierTests
         public void FailProperty(string patchCode, string productCode, string property) =>
             _failing.Add((patchCode, productCode, property));
 
+        /// <summary>
+        /// Answers this property with a documented "no such record" code, which is
+        /// a successful read of an absence and not a failure. Takes the code so a
+        /// test can pin both members of the allowlist: a product that has gone
+        /// (1605) and a patch that is no longer applied to it (1647) come back
+        /// differently and mean the same thing here.
+        /// </summary>
+        public void AbsentRecord(string patchCode, string productCode, string property,
+            uint code = UnknownProduct) =>
+            _absent[(patchCode, productCode, property)] = code;
+
         public uint GetPatchInfo(string patchCode, string productCode, string? userSid,
             InstallerClean.Interop.MsiInstallContext context, string property,
             char[]? value, ref uint valueLength)
@@ -407,6 +560,11 @@ public class RemovableReverifierTests
             {
                 valueLength = 0;
                 return FunctionFailed;
+            }
+            if (_absent.TryGetValue((patchCode, productCode, property), out var absence))
+            {
+                valueLength = 0;
+                return absence;
             }
             var val = _values.GetValueOrDefault((patchCode, productCode, property), "");
             if (val.Length == 0) { valueLength = 0; return Success; }

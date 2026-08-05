@@ -303,29 +303,31 @@ internal static class Program
     }
 
     /// <summary>
-    /// Prints what an action service's under-lease re-read kept back, in the
-    /// operator's language, using the same sentence the pre-act re-verify's own
-    /// held-back line uses. One condition, one wording: a program claims the file
-    /// again, and which side of the installer mutex that was read on is a fact
-    /// about the check rather than about the file.
+    /// Prints what a re-check kept back, in the operator's language: one line per
+    /// cause that occurred, each carrying its own count. Both the pre-act
+    /// re-verify and the action services' under-lease re-read report through this,
+    /// because which side of the installer mutex a file was condemned on is a fact
+    /// about the check rather than about the file, and neither earns a wording of
+    /// its own.
     ///
-    /// Deliberately not a machine-read line, exactly as the pre-act one is not.
-    /// The Application-channel summary already carries what the run did in
-    /// English, and an RMM reads that.
+    /// The sentences and the order they come in are Core's
+    /// (<see cref="HeldBackReport.Lines"/>). The window prints the same partition
+    /// from the same helper, which is the point: the two hosts must not answer
+    /// differently for one machine state, and they share no printing code.
+    ///
+    /// Takes the tally and not the path list, though every caller holds both. The
+    /// tally already answers how many files and how many lines, so a second
+    /// argument here would be one that has to agree with it and could stop doing
+    /// so. A run that kept nothing back prints nothing, which is the commonest run
+    /// by far and the reason a count of zero must never reach a sentence.
+    ///
+    /// Deliberately not a machine-read line. The Application-channel summary
+    /// already carries what the run did in English, and an RMM reads that.
     /// </summary>
-    internal static void ReportHeldBack(IReadOnlyList<string> heldBack, bool recordsIncomplete)
+    internal static void ReportHeldBack(HeldBackReasons reasons)
     {
-        if (heldBack.Count == 0) return;
-        // Which of the two sentences, decided the same way the pre-act line above
-        // decides it: a re-read that could not read the records has kept files
-        // back without any program having reclaimed them, and saying one where the
-        // other is true names a cause that was never shown.
-        var (flat, key) = recordsIncomplete
-            ? (Strings.Completion_ReverifyIncomplete, "Completion.ReverifyIncomplete")
-            : (Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped");
-        Console.WriteLine(string.Format(
-            DisplayHelpers.Pluralise(heldBack.Count, flat, key),
-            heldBack.Count, DisplayHelpers.PluraliseFile(heldBack.Count)));
+        foreach (var line in HeldBackReport.Lines(reasons))
+            Console.WriteLine(line);
     }
 
     /// <summary>
@@ -467,23 +469,17 @@ internal static class Program
             var survivingFiles = scanResult.RemovableFiles
                 .Where(f => survivingSet.Contains(f.FullPath)).ToList();
 
-            // Anything the re-verify kept back is reported with its reason (human
-            // stdout, OS language; deliberately NOT a machine-read line). A
-            // re-verify that could not read the records keeps files back without
-            // any program having reclaimed them, so the reason comes from the
-            // re-verify rather than being assumed from the count. The counts and
-            // byte figures below are recomputed from the survivor subset so
-            // "X of Y" and the freed-space total describe what was acted on, not
-            // the pre-reverify scan.
-            if (reverify.Dropped.Count > 0)
-            {
-                var (flat, key) = reverify.RecordsIncomplete
-                    ? (Strings.Completion_ReverifyIncomplete, "Completion.ReverifyIncomplete")
-                    : (Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped");
-                Console.WriteLine(string.Format(
-                    DisplayHelpers.Pluralise(reverify.Dropped.Count, flat, key),
-                    reverify.Dropped.Count, DisplayHelpers.PluraliseFile(reverify.Dropped.Count)));
-            }
+            // Anything the re-verify kept back is reported with its reasons (human
+            // stdout, OS language; deliberately NOT a machine-read line). One line
+            // per cause that occurred: a re-verify that could not read the records
+            // keeps files back without any program having reclaimed them, so a
+            // batch that met both causes and printed either alone would name a
+            // cause that did not happen to some of the files. Through the same
+            // helper as the under-lease report below, so the run cannot describe
+            // one condition two ways. The counts and byte figures further down are
+            // recomputed from the survivor subset so "X of Y" and the freed-space
+            // total describe what was acted on, not the pre-reverify scan.
+            ReportHeldBack(reverify.Reasons);
 
             var filePaths = survivingFiles.Select(f => f.FullPath).ToList();
             count = survivingFiles.Count;
@@ -581,7 +577,7 @@ internal static class Program
                 // order: that re-entry leaves this method, so a run that held
                 // files back and was then cancelled used to say nothing at all
                 // about them, where the window reports them on both paths.
-                ReportHeldBack(result.HeldBack, result.HeldBackRecordsIncomplete);
+                ReportHeldBack(result.HeldBackReasons);
                 // Held-back files were never touched, so they leave the tally the
                 // same way the errors below do. Without this they would be counted
                 // as freed bytes, the byte sum discounting errors alone.
@@ -705,7 +701,7 @@ internal static class Program
                 // and drops real ones off the end. Not a wrong total, the wrong
                 // rows. The count goes the same way, being the "of N" in the
                 // Application-log line an RMM audits.
-                ReportHeldBack(ex.Partial.HeldBack, ex.Partial.HeldBackRecordsIncomplete);
+                ReportHeldBack(ex.Partial.HeldBackReasons);
                 if (ex.Partial.HeldBack.Count > 0)
                 {
                     survivingFiles = FoldHeldBack(survivingFiles, ex.Partial.HeldBack);
@@ -722,7 +718,7 @@ internal static class Program
             // See the /d branch for why this is reported here and not beside the
             // pre-act re-verify's line, and for why it comes ahead of the cancel
             // re-entry rather than after it.
-            ReportHeldBack(moveResult.HeldBack, moveResult.HeldBackRecordsIncomplete);
+            ReportHeldBack(moveResult.HeldBackReasons);
             if (moveResult.HeldBack.Count > 0)
             {
                 survivingFiles = FoldHeldBack(survivingFiles, moveResult.HeldBack);

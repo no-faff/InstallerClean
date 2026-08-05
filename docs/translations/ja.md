@@ -163,7 +163,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} 個の {1} はそのまま残しました。スキャン後にプログラムが再び必要としたためです。 |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} 個の {1} はそのまま残しました。確認をやり直した際に Windows Installer の登録情報を完全に読み取れなかったためです。 |
+| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
 | Moved {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を移動しました。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。 |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

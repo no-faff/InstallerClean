@@ -1008,7 +1008,8 @@ public class MainViewModelTests
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(new ReverifyResult(
                 new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\c.msi" },
-                new[] { @"C:\Windows\Installer\b.msi" }));
+                new[] { @"C:\Windows\Installer\b.msi" },
+                new HeldBackReasons(Reclaimed: 1)));
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
@@ -1073,7 +1074,8 @@ public class MainViewModelTests
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(new ReverifyResult(
                 Array.Empty<string>(),
-                new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\b.msi" }));
+                new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\b.msi" },
+                new HeldBackReasons(Reclaimed: 2)));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1108,7 +1110,7 @@ public class MainViewModelTests
             .Returns(new ReverifyResult(
                 Array.Empty<string>(),
                 new[] { @"C:\Windows\Installer\a.msp" },
-                RecordsIncomplete: true));
+                new HeldBackReasons(RecordsUnreadable: 1)));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1140,7 +1142,8 @@ public class MainViewModelTests
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(new ReverifyResult(
                 new[] { @"C:\Windows\Installer\b.msi" },
-                new[] { @"C:\Windows\Installer\a.msp" }));
+                new[] { @"C:\Windows\Installer\a.msp" },
+                new HeldBackReasons(Reclaimed: 1)));
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
@@ -1173,7 +1176,8 @@ public class MainViewModelTests
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(new ReverifyResult(
                 new[] { @"C:\Windows\Installer\x.msi" },
-                new[] { @"C:\Windows\Installer\y.msi" }));
+                new[] { @"C:\Windows\Installer\y.msi" },
+                new HeldBackReasons(Reclaimed: 1)));
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
@@ -1295,7 +1299,8 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
                 Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns(new DeleteResult(2, Array.Empty<FileOperationError>(),
-                HeldBack: new[] { @"C:\Windows\Installer\c.msp" }));
+                HeldBack: new[] { @"C:\Windows\Installer\c.msp" },
+                HeldBackReasons: new HeldBackReasons(Reclaimed: 1)));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -1339,7 +1344,8 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
                 Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
-                HeldBack: new[] { @"C:\Windows\Installer\a.msp" }));
+                HeldBack: new[] { @"C:\Windows\Installer\a.msp" },
+                HeldBackReasons: new HeldBackReasons(Reclaimed: 1)));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -1373,7 +1379,8 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
                 Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
-                HeldBack: new[] { @"C:\Windows\Installer\a.msp" }));
+                HeldBack: new[] { @"C:\Windows\Installer\a.msp" },
+                HeldBackReasons: new HeldBackReasons(Reclaimed: 1)));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1411,7 +1418,8 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
                 Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true,
-                HeldBack: new[] { @"C:\Windows\Installer\c.msp" }));
+                HeldBack: new[] { @"C:\Windows\Installer\c.msp" },
+                HeldBackReasons: new HeldBackReasons(Reclaimed: 1)));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -1455,7 +1463,8 @@ public class MainViewModelTests
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "swapped",
                 new MoveResult(1, Array.Empty<FileOperationError>(),
-                    HeldBack: new[] { @"C:\Windows\Installer\a.msp" })));
+                    HeldBack: new[] { @"C:\Windows\Installer\a.msp" },
+                    HeldBackReasons: new HeldBackReasons(Reclaimed: 1))));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1479,10 +1488,10 @@ public class MainViewModelTests
     [Fact]
     public async Task DeleteAllAsync_a_hold_back_the_records_could_not_read_names_that_reason()
     {
-        // The flag is OR-ed across the two halves of the check, because either can
-        // fail to read a record, and the two causes have different copy. Here the
-        // pre-act re-verify was healthy and the under-lease re-read was not, which
-        // is the direction the OR exists for.
+        // The tallies are added across the two halves of the check, because either
+        // can fail to read a record and the causes have different copy. Here the
+        // pre-act re-verify was healthy and the under-lease re-read was not, so the
+        // only cause present is the one that must reach the screen.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1497,7 +1506,7 @@ public class MainViewModelTests
                 Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
-                HeldBackRecordsIncomplete: true));
+                HeldBackReasons: new HeldBackReasons(RecordsUnreadable: 1)));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -1506,6 +1515,88 @@ public class MainViewModelTests
 
         Assert.Equal(
             string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Skipped);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_a_batch_held_back_two_ways_names_both_causes_with_their_own_counts()
+    {
+        // The state neither half of the check can describe on its own, and the one
+        // the fold used to destroy: the pre-act re-verify kept a file back because
+        // a program reclaimed it, and the under-lease re-read kept a DIFFERENT file
+        // back because a read failed. Merging those into one cause put a sentence
+        // over files it was false of, whichever cause won. Two files, two causes,
+        // two lines, one count each.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, true, false, Superseded),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(new ReverifyResult(
+                new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\b.msp" },
+                new[] { @"C:\Windows\Installer\c.msp" },
+                new HeldBackReasons(Reclaimed: 1)));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
+                HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
+                HeldBackReasons: new HeldBackReasons(RecordsUnreadable: 1)));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1))
+                + Environment.NewLine
+                + string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Skipped);
+        // And the counts stay each cause's own rather than the batch's: a line
+        // reading "2 files" against either sentence would be the collapse in a
+        // different disguise.
+        Assert.DoesNotContain(
+            string.Format(Strings.Completion_ReverifySkipped, 2, DisplayHelpers.PluraliseFile(2)),
+            vm.Completion.Skipped);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_a_record_that_changed_says_so_rather_than_naming_a_reclaim()
+    {
+        // The third cause reaching the screen. The under-lease re-read found the
+        // records no longer hold the registration the claim named, which is neither
+        // a program taking the file back nor a read that failed, and until this
+        // sentence existed the file was released to the delete instead.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, true, false, Superseded),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
+                HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
+                HeldBackReasons: new HeldBackReasons(RecordsChanged: 1)));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifyRecordsChanged, 1, DisplayHelpers.PluraliseFile(1)),
             vm.Completion.Skipped);
     }
 

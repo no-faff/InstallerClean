@@ -247,6 +247,7 @@ public static class Strings
     public static string Completion_PermanentDeleteSummary_Plural => Get("Completion.PermanentDeleteSummary.Plural");
     public static string Completion_PermanentDeleteSummary_Singular => Get("Completion.PermanentDeleteSummary.Singular");
     public static string Completion_ReverifyIncomplete => Get("Completion.ReverifyIncomplete");
+    public static string Completion_ReverifyRecordsChanged => Get("Completion.ReverifyRecordsChanged");
     public static string Completion_ReverifySkipped => Get("Completion.ReverifySkipped");
     public static string Confirm_DeletePermanently_Plural => Get("Confirm.DeletePermanently.Plural");
     public static string Confirm_DeletePermanently_Singular => Get("Confirm.DeletePermanently.Singular");

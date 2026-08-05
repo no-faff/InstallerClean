@@ -41,9 +41,11 @@ public interface IRemovableReverifier
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Re-reads the given patch claims and returns the paths that are no longer
-    /// removable, for the action services to call ONCE THEY HOLD
-    /// <c>Global\_MSIExecute</c> and before they touch a file.
+    /// Re-reads the given patch claims and returns the paths the re-read has not
+    /// left shown to be removable, for the action services to call ONCE THEY HOLD
+    /// <c>Global\_MSIExecute</c> and before they touch a file. Not "no longer
+    /// removable": one of the three causes is a read that established nothing
+    /// either way, and it keeps the file for want of a verdict rather than on one.
     ///
     /// It exists because <see cref="ReverifyAsync"/> cannot be the last word. The
     /// hold is taken inside the action service, so every caller runs the full
@@ -85,36 +87,109 @@ public interface IRemovableReverifier
 }
 
 /// <summary>
+/// Why one file was kept back. Three states rather than two because they are
+/// three different things to have found out, and the report the user reads names
+/// the cause: a confirmed positive, an inability, and neither.
+/// </summary>
+public enum HeldBackReason
+{
+    /// <summary>
+    /// The records were read and say an installed product needs the file: a
+    /// superseded patch back at Applied, or one still uninstallable and so needed
+    /// to roll back with.
+    /// </summary>
+    Reclaimed,
+
+    /// <summary>
+    /// The records were read and no longer hold the registration the claim names.
+    /// Not a reclaim, because nothing is left to be in any state at all; not an
+    /// unreadable record, because the read succeeded.
+    ///
+    /// It condemns the file rather than releasing it, which is not what the shape
+    /// of the answer suggests and is the measurement this state exists for. The
+    /// absence code means "no such product in the ACCOUNT AND CONTEXT you asked
+    /// in", not "no such product", and the context a claim carries was settled when
+    /// the scan collected it. A pairing that moved context between the scan and the
+    /// click therefore answers absent while its registration is live, so releasing
+    /// on that answer would put a needed file into a permanent delete on the
+    /// strength of a question asked the wrong way round.
+    /// </summary>
+    RecordsChanged,
+
+    /// <summary>
+    /// A read failed, so nothing was established either way. It has not shown the
+    /// file to be removable, which is what keeps it in place.
+    /// </summary>
+    RecordsUnreadable,
+}
+
+/// <summary>
+/// How many files were kept back for each cause. Counts rather than one cause for
+/// the set, because a batch can meet more than one and a sentence that is true of
+/// four files out of five is false.
+///
+/// The counts are the whole of what the report needs, the paths themselves being
+/// carried alongside by whichever result holds this. Every producer increments at
+/// the point it adds the path, so the two cannot come apart, and
+/// <see cref="Total"/> is what a test holds them to.
+/// </summary>
+public readonly record struct HeldBackReasons(
+    int Reclaimed = 0,
+    int RecordsChanged = 0,
+    int RecordsUnreadable = 0)
+{
+    /// <summary>Files kept back for any cause. Equals the accompanying path list's count.</summary>
+    public int Total => Reclaimed + RecordsChanged + RecordsUnreadable;
+
+    /// <summary>This tally with one more file counted against <paramref name="reason"/>.</summary>
+    public HeldBackReasons Plus(HeldBackReason reason) => reason switch
+    {
+        HeldBackReason.Reclaimed => this with { Reclaimed = Reclaimed + 1 },
+        HeldBackReason.RecordsChanged => this with { RecordsChanged = RecordsChanged + 1 },
+        _ => this with { RecordsUnreadable = RecordsUnreadable + 1 },
+    };
+
+    /// <summary>
+    /// Merges two tallies, for the fold that joins what the pre-act re-verify kept
+    /// back to what the under-lease re-read did. Addition rather than an OR of
+    /// flags: the two producers keep back DIFFERENT files, so their causes
+    /// accumulate instead of one standing in for both.
+    /// </summary>
+    public static HeldBackReasons operator +(HeldBackReasons a, HeldBackReasons b) =>
+        new(a.Reclaimed + b.Reclaimed,
+            a.RecordsChanged + b.RecordsChanged,
+            a.RecordsUnreadable + b.RecordsUnreadable);
+}
+
+/// <summary>
 /// What one under-lease re-read found.
 /// </summary>
 /// <param name="HeldBack">
-/// The paths to drop, for either of the two reasons below.
+/// The paths to drop, for any of the causes in <see cref="HeldBackReason"/>.
 /// </param>
-/// <param name="RecordsIncomplete">
-/// At least one property read failed, so at least one path is held back on those
-/// grounds rather than on a program having reclaimed it. It says which of the two
-/// happened, for exactly the reason
-/// <see cref="ReverifyResult.RecordsIncomplete"/> does: the report the user reads
-/// names a cause, the app has two causes here, and only one of them is true of
-/// any given run. A read that could not be made has not shown the file to be
-/// removable, so it is held back either way; what it has not shown is that a
-/// program wants it back.
+/// <param name="Reasons">
+/// How many of <paramref name="HeldBack"/> fell to each cause, for exactly the
+/// reason <see cref="ReverifyResult.Reasons"/> carries it: the report the user
+/// reads names a cause, one re-read can meet all three, and a file's own cause is
+/// the only thing that is true of it. A read that could not be made has not shown
+/// the file to be removable, so it is held back whichever cause it fell to; what
+/// it has not shown is that a program wants it back.
 /// </param>
 public record UnderLeaseRecheck(
     IReadOnlyList<string> HeldBack,
-    bool RecordsIncomplete = false);
+    HeldBackReasons Reasons = default);
 
 /// <summary>
 /// Result of a re-verify. <see cref="Surviving"/> + <see cref="Dropped"/> partition
 /// the input: <see cref="Surviving"/> is still safe to act on, <see cref="Dropped"/>
 /// is now claimed by a non-removable registered package and must be skipped.
 /// </summary>
-/// <param name="RecordsIncomplete">
-/// The re-verify's own enumeration could not read every product, so it withheld
-/// the removable class and dropped every superseded candidate on those grounds
-/// rather than on a program reclaiming them. It says which of the two happened,
-/// because the report the user reads names a cause and only one of the two causes
-/// is true.
+/// <param name="Reasons">
+/// How many of <see cref="Dropped"/> fell to each cause. Per file rather than per
+/// run: an enumeration that could not read every product withholds the removable
+/// class, so a single batch can hold both a file a live registered product claims
+/// and a file whose verdict was withheld, and one cause for the set would name a
+/// cause that did not occur for some of them.
 /// </param>
 /// <param name="SurvivingPatchClaims">
 /// Every claim naming a path in <see cref="Surviving"/>, for the action service
@@ -126,7 +201,7 @@ public record UnderLeaseRecheck(
 public record ReverifyResult(
     IReadOnlyList<string> Surviving,
     IReadOnlyList<string> Dropped,
-    bool RecordsIncomplete = false,
+    HeldBackReasons Reasons = default,
     IReadOnlyList<PatchClaim>? SurvivingPatchClaims = null)
 {
     /// <summary>Never null: an absent list reads as nothing to re-read rather than as a fault.</summary>

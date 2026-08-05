@@ -163,7 +163,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} verplaatst naar: {2} |
 | {0} {1} moved to: {2} | {0} {1} verplaatst naar: {2} |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} behouden, omdat een programma ze na de scan weer nodig bleek te hebben. |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} behouden, omdat de Windows Installer-records bij de herhaalde controle niet volledig konden worden gelezen. |
+| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
 | Moved {0} of {1} {2} before you cancelled. | {0} van {1} {2} verplaatst voordat je annuleerde. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | {0} van {1} {2} definitief verwijderd voordat je annuleerde. |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

@@ -405,7 +405,7 @@ const MAP = {
   'Completion.MoveCancelledSummary': `Перемещено {0}/{1} {2} до отмены.`,
   'Completion.PermanentDeleteCancelledSummary': `Удалено безвозвратно {0}/{1} {2} до отмены.`,
   'Body.PendingReboot.Lead': `Эти файлы сейчас нельзя очистить.`,
-  'Completion.ReverifyIncomplete': `Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer.`,
+  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
   'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.`,
@@ -431,6 +431,7 @@ const MAP = {
   'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
   'Error.InstallerLockUnavailableTitle': `Ничего не удалено`,
   'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
+  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -468,7 +469,7 @@ const OVERRIDES = {
   'Completion.ReverifySkipped.One': `Оставлен {0} {1} на месте: после сканирования он снова понадобился программе.`,
   // As ReverifySkipped.One: the base's "Оставлено" is the impersonal form that
   // 2-4 and 5+ both take; n==1 needs the masculine singular "Оставлен".
-  'Completion.ReverifyIncomplete.One': `Оставлен {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer.`,
+  'Completion.ReverifyIncomplete.One': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
   // The flat template «Найдено зарегистрированных {1}: {0}.» mis-agrees for counts
   // where the numeral is not adjacent to the noun. .One restores nominative agreement
   // for the One category (1, 21, ...): {1} is nominative singular "пакет" while the

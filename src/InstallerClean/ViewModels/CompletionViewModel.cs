@@ -255,28 +255,31 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// The "N files kept in place" line for a completion overlay, or empty when
+    /// The "N files kept in place" block for a completion overlay, or empty when
     /// the act-time re-verify kept nothing back. Shown alongside the Move/Delete
     /// summary so the totals still add up (acted on + kept = the scan's
     /// candidates).
     ///
-    /// The reason comes from the re-verify, never from the count. A re-verify
-    /// that could not read the records keeps files back without any program
-    /// having reclaimed them, so reporting the reclaim reason there would state a
-    /// cause that did not occur.
+    /// The reasons come from the re-verify, never from the count, and there is one
+    /// line per cause that occurred rather than one sentence for the batch. A
+    /// re-verify that could not read the records keeps files back without any
+    /// program having reclaimed them, so a batch that met both causes and reported
+    /// either alone would state a cause that did not occur for some of its files.
+    /// The ordering and the sentences are Core's
+    /// (<see cref="HeldBackReport.Lines"/>), because the command line prints the
+    /// same partition and the two must not answer differently for one machine
+    /// state.
+    ///
+    /// Joined the way <see cref="FormatErrorBreakdown"/> joins its own rows, and
+    /// read by the same kind of wrapping TextBlock. The all-skipped overlay routes
+    /// this through <see cref="Summary"/> instead, whose inlines are composed in
+    /// the window's code-behind, and that is where the line breaks are made
+    /// explicit.
     /// </summary>
     private static string SkippedText(ReverifyResult? reverify)
     {
-        var count = reverify?.Dropped.Count ?? 0;
-        if (count == 0) return string.Empty;
-
-        var (flat, key) = reverify!.RecordsIncomplete
-            ? (Strings.Completion_ReverifyIncomplete, "Completion.ReverifyIncomplete")
-            : (Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped");
-
-        return string.Format(
-            DisplayHelpers.Pluralise(count, flat, key),
-            count, DisplayHelpers.PluraliseFile(count));
+        if (reverify is null) return string.Empty;
+        return string.Join(Environment.NewLine, HeldBackReport.Lines(reverify.Reasons));
     }
 
     /// <summary>

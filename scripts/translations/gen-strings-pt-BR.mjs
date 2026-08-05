@@ -450,7 +450,7 @@ const MAP = {
   'Body.PendingReboot.Lead': `Estes arquivos não podem ser limpos agora.`,
   'Cli.TooManyArguments': `Erro: argumento extra inesperado '{0}'. Se a sua pasta de destino tiver um espaço no nome, coloque aspas em todo o caminho: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
-  'Completion.ReverifyIncomplete': `{0} {1} mantidos no lugar: não foi possível ler por completo os registros do Windows Installer quando a verificação foi repetida.`,
+  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
   'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `O InstallerClean não conseguiu ler o suficiente dos registros do Windows Installer para ter certeza do que ainda é necessário: a lista de programas instalados voltou incompleta, e ler esses mesmos registros direto do registro do Windows também deu erros. Um arquivo poderia parecer órfão só porque o registro que o nomeia era um dos ilegíveis, então o InstallerClean parou. Nada foi removido.`,
@@ -488,6 +488,7 @@ const MAP = {
   'Error.InstallerLockUnavailableTitle': `Nada foi excluído`,
   'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
   'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
+  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.
@@ -509,7 +510,7 @@ const OVERRIDES = {
   'Cli.MovedFiles.One': `Moved {0} unneeded {1}.`,
   'Completion.ReverifySkipped.One': `{0} {1} mantido no lugar: um programa voltou a precisar dele depois da análise.`,
   // Participle agreement only: "mantido" for a single file.
-  'Completion.ReverifyIncomplete.One': `{0} {1} mantido no lugar: não foi possível ler por completo os registros do Windows Installer quando a verificação foi repetida.`,
+  'Completion.ReverifyIncomplete.One': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

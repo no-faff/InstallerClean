@@ -186,7 +186,7 @@ public sealed class MoveFilesService : IMoveFilesService
                 // in still falls through and creates the destination, which the
                 // command line relies on not changing.
                 if (pathList.Count == 0)
-                    return new MoveResult(0, Array.Empty<FileOperationError>(), HeldBack: heldBack, HeldBackRecordsIncomplete: recheck.RecordsIncomplete);
+                    return new MoveResult(0, Array.Empty<FileOperationError>(), HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
             }
 
             CreateDestinationFolder(destinationFolder);
@@ -437,7 +437,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // the run as "Move cancelled" even though every file moved.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
 
-            var result = new MoveResult(moved, errors.AsReadOnly(), cancelled, HeldBack: heldBack, HeldBackRecordsIncomplete: recheck.RecordsIncomplete);
+            var result = new MoveResult(moved, errors.AsReadOnly(), cancelled, HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
 
             // A guard that trips mid-flight throws, like this service's other
             // guards and unlike a cancel, which is the user's own choice. What it

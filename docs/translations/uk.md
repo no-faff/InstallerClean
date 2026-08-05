@@ -163,7 +163,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} залишено на місці: після сканування вони знову знадобилися програмі. |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} залишено на місці: під час повторної перевірки не вдалося повністю прочитати записи Windows Installer. |
+| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
 | Moved {0} of {1} {2} before you cancelled. | Переміщено {0} з {1} {2}, перш ніж ви скасували. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували. |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

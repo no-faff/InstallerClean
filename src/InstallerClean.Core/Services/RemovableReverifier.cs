@@ -48,27 +48,45 @@ public sealed class RemovableReverifier : IRemovableReverifier
         var query = await _queryService.GetRegisteredPackagesAsync(null, cancellationToken)
             .ConfigureAwait(false);
 
-        // The set of paths a currently NON-removable registered package claims. A
-        // reverted patch (Superseded -> Applied) reappears here; a still-superseded
-        // patch is IsRemovable and stays out; a true orphan was never registered.
+        // Every path a currently NON-removable registered package claims, against
+        // whether that row's verdict was WITHHELD rather than read. A reverted
+        // patch (Superseded -> Applied) appears here unwithheld; a still-superseded
+        // patch is IsRemovable and does not appear at all; a true orphan was never
+        // registered.
         //
         // A re-verify whose own enumeration was incomplete inherits the withheld
-        // removable class from the query, so every superseded candidate lands in
-        // this set and is dropped. That is the intended direction (the check that
-        // cannot confirm keeps the file), and it is why the result reports WHY it
-        // dropped: the drop no longer implies a program reclaimed the file.
-        var nonRemovable = new HashSet<string>(
-            query.Packages.Where(p => !p.IsRemovable).Select(p => p.LocalPackagePath),
-            StringComparer.OrdinalIgnoreCase);
+        // removable class from the query, so every superseded candidate lands here
+        // too. That is the intended direction (the check that cannot confirm keeps
+        // the file), and the withheld flag is what stops the drop being reported as
+        // a program reclaiming the file. Both kinds can be in one batch, which is
+        // why the cause is carried per path and not per run.
+        //
+        // A dictionary rather than a set because InstallerQueryResult.Packages is
+        // one row per claimed path, so there is a single answer to record for each.
+        var nonRemovable = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pkg in query.Packages)
+            if (!pkg.IsRemovable)
+                nonRemovable[pkg.LocalPackagePath] = pkg.RemovableWithheld;
 
         var surviving = new List<string>(candidatePaths.Count);
         var dropped = new List<string>();
+        var reasons = default(HeldBackReasons);
         foreach (var path in candidatePaths)
         {
-            if (nonRemovable.Contains(path))
+            if (nonRemovable.TryGetValue(path, out var withheld))
+            {
                 dropped.Add(path);
+                // Withheld means the enumeration never established what this patch
+                // was, so nothing here shows a program wants the file; unwithheld
+                // means a registered package positively claims it.
+                reasons = reasons.Plus(withheld
+                    ? HeldBackReason.RecordsUnreadable
+                    : HeldBackReason.Reclaimed);
+            }
             else
+            {
                 surviving.Add(path);
+            }
         }
 
         // The claims naming a surviving path, carried forward so the action
@@ -81,7 +99,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
             .Where(c => survivingPaths.Contains(c.LocalPackagePath))
             .ToList();
 
-        return new ReverifyResult(surviving.AsReadOnly(), dropped.AsReadOnly(), query.RecordsIncomplete,
+        return new ReverifyResult(surviving.AsReadOnly(), dropped.AsReadOnly(), reasons,
             survivingClaims.AsReadOnly());
     }
 
@@ -90,9 +108,9 @@ public sealed class RemovableReverifier : IRemovableReverifier
     {
         if (claims.Count == 0) return new UnderLeaseRecheck(Array.Empty<string>());
 
-        var reclaimed = new List<string>();
+        var heldBack = new List<string>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var recordsIncomplete = false;
+        var reasons = default(HeldBackReasons);
 
         foreach (var claim in claims)
         {
@@ -110,45 +128,46 @@ public sealed class RemovableReverifier : IRemovableReverifier
                 _msi, claim.PatchCode, claim.ProductCode, claim.UserSid, context,
                 Interop.MsiInstallProperty.Uninstallable);
 
-            // A pairing the records positively no longer hold is not a pairing
-            // that reclaims anything, and it is the one answer here that must not
-            // be folded into either of the other two. A claim says "patch P,
-            // applied to product Q, holds this file". If the API answers that Q is
-            // not installed or that P is not applied to it, the claim itself has
-            // gone; it cannot have reverted to Applied, because there is no
-            // registration left to be in any state at all. So it condemns nothing
-            // and the path's fate rests on its other claims, which is exactly what
-            // the pre-lease pass would have concluded, that enumeration listing no
-            // product to claim the path in the first place. Folding it into
-            // "unreadable" told the user the records could not be read when they
-            // were read perfectly, and folding it into "a program wants it again"
-            // would name the opposite of what happened.
-            //
-            // Fail closed on a mixed answer: only a pairing where nothing failed
-            // AND something positively said the record is absent takes this route.
-            // The two reads are of one pairing an instant apart, so a mix is a
-            // race, and a race resolves to the cautious side.
             var notRegistered = state.NotRegistered || uninstallable.NotRegistered;
             var unreadable = (state.Unreadable && !state.NotRegistered)
                 || (uninstallable.Unreadable && !uninstallable.NotRegistered);
-            if (notRegistered && !unreadable) continue;
 
-            // A read that failed is not an answer. It has not shown the file to be
-            // removable, this is the last check standing in front of a permanent
-            // delete, and the scan's own rule fails the same way for the same
-            // reason. Note the asymmetry with the pre-lease pass, which is not an
-            // inconsistency: that one inherits a whole enumeration's withholding
-            // and reports it, where this one is judging a single named pairing and
-            // a failure here is about that pairing alone.
-            if (unreadable ||
-                !InstallerQueryService.IsRemovablePatch(state.Value, uninstallable.Value))
-            {
-                if (unreadable) recordsIncomplete = true;
-                seen.Add(claim.LocalPackagePath);
-                reclaimed.Add(claim.LocalPackagePath);
-            }
+            // The order these are asked in IS the judgement; what each cause means
+            // is on HeldBackReason, once.
+            //
+            // Absence first. It condemns, so the two tests below would condemn the
+            // same file anyway, and they would name the wrong cause doing it: asked
+            // after the removable test, an absent record answers that test with an
+            // empty State string and is reported as a reclaim. Right outcome, wrong
+            // sentence, and the sentence is the whole of what the user is told.
+            //
+            // Unreadable second, so a pairing where one read failed and the other
+            // came back absent is reported as the failure it contains. A read that
+            // could not be made has not shown the file to be removable, this is the
+            // last check standing in front of a permanent delete, and the scan's own
+            // rule fails the same way. Note the asymmetry with the pre-lease pass,
+            // which is not an inconsistency: that one inherits a whole enumeration's
+            // withholding, where this one judges a single named pairing and a
+            // failure here is about that pairing alone.
+            var reason =
+                notRegistered && !unreadable ? HeldBackReason.RecordsChanged
+                : unreadable ? HeldBackReason.RecordsUnreadable
+                : !InstallerQueryService.IsRemovablePatch(state.Value, uninstallable.Value)
+                    ? HeldBackReason.Reclaimed
+                    : (HeldBackReason?)null;
+
+            if (reason is null) continue;
+
+            // One cause per path, taken from the claim that condemned it. Where a
+            // path's claims disagree the later ones are never asked, so preferring
+            // a different cause would mean more property reads with the
+            // machine-wide installer lease held. The cause named is true of the
+            // file; that a second one also applied is not a defect.
+            seen.Add(claim.LocalPackagePath);
+            heldBack.Add(claim.LocalPackagePath);
+            reasons = reasons.Plus(reason.Value);
         }
 
-        return new UnderLeaseRecheck(reclaimed.AsReadOnly(), recordsIncomplete);
+        return new UnderLeaseRecheck(heldBack.AsReadOnly(), reasons);
     }
 }

@@ -62,7 +62,7 @@ const OVERRIDES = {
   'Completion.ReverifySkipped.One': `{0} {1} laissé en place, redevenu nécessaire à un programme après l'analyse.`,
   // Participle agreement only: "laissé" for a single file. The reason clause
   // is about the records, not the files, so it does not inflect.
-  'Completion.ReverifyIncomplete.One': `{0} {1} laissé en place, car les enregistrements de Windows Installer n'ont pas pu être entièrement lus lors de la nouvelle vérification.`,
+  'Completion.ReverifyIncomplete.One': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
 };
 
 const MAP = {
@@ -462,7 +462,7 @@ const MAP = {
   'Body.PendingReboot.Lead': `Ces fichiers ne peuvent pas être nettoyés pour le moment.`,
   'Cli.TooManyArguments': `Erreur : argument supplémentaire inattendu « {0} ». Si votre dossier de déplacement contient un espace, mettez le chemin entier entre guillemets : /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
-  'Completion.ReverifyIncomplete': `{0} {1} laissés en place, car les enregistrements de Windows Installer n'ont pas pu être entièrement lus lors de la nouvelle vérification.`,
+  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
   'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `InstallerClean n'a pas pu lire assez des enregistrements de Windows Installer pour savoir avec certitude ce qui sert encore : la liste des programmes installés est revenue incomplète, et lire ces mêmes enregistrements directement dans le registre a également donné des erreurs. Un fichier pourrait sembler orphelin uniquement parce que l'enregistrement qui le nomme faisait partie des illisibles, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
@@ -500,6 +500,7 @@ const MAP = {
   'Error.InstallerLockUnavailableTitle': `Rien n'a été supprimé`,
   'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
   'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
+  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

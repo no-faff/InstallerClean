@@ -163,7 +163,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | Taramadan sonra bir programın yeniden ihtiyaç duymaya başladığı {0} {1} yerinde bırakıldı. |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Kontrol yinelendiğinde Windows Installer kayıtları tam olarak okunamadığı için {0} {1} yerinde bırakıldı. |
+| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
 | Moved {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi taşındı. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi. |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

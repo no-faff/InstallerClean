@@ -163,7 +163,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。 |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} 个{1}已保留在原处，因为重新检查时无法完整读取 Windows Installer 记录。 |
+| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
 | Moved {0} of {1} {2} before you cancelled. | 在您取消前，已移动 {1} 个{2}中的 {0} 个。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

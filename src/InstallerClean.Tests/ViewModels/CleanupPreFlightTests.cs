@@ -507,7 +507,8 @@ public class CleanupPreFlightTests
             .Returns(true);
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(ci => new ReverifyResult(
-                Array.Empty<string>(), (IReadOnlyList<string>)ci[0]!));
+                Array.Empty<string>(), (IReadOnlyList<string>)ci[0]!,
+                new HeldBackReasons(Reclaimed: ((IReadOnlyList<string>)ci[0]!).Count)));
 
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);

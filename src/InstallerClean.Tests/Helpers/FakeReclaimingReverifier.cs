@@ -16,7 +16,7 @@ namespace InstallerClean.Tests.Helpers;
 internal sealed class FakeReclaimingReverifier : IRemovableReverifier
 {
     private readonly IReadOnlyList<string> _reclaim;
-    private readonly bool _recordsIncomplete;
+    private readonly HeldBackReasons _reasons;
     private readonly FakeMutexProbe? _watching;
     private readonly Action? _atRecheck;
 
@@ -28,12 +28,19 @@ internal sealed class FakeReclaimingReverifier : IRemovableReverifier
     /// from it to drive the failure path and pin that the lease is released
     /// anyway.
     /// </param>
+    /// <param name="reasons">
+    /// Omitted, every held-back path counts as a reclaim, which is the commonest
+    /// case and keeps the tally equal to the path count the way the real re-read
+    /// does. A test that cares which cause was found passes its own, and one that
+    /// passes a tally disagreeing with <paramref name="reclaim"/> is staging a
+    /// result the real re-read cannot produce.
+    /// </param>
     public FakeReclaimingReverifier(IReadOnlyList<string> reclaim, FakeMutexProbe? watching = null,
-        bool recordsIncomplete = false, Action? atRecheck = null)
+        HeldBackReasons? reasons = null, Action? atRecheck = null)
     {
         _reclaim = reclaim;
         _watching = watching;
-        _recordsIncomplete = recordsIncomplete;
+        _reasons = reasons ?? new HeldBackReasons(Reclaimed: reclaim.Count);
         _atRecheck = atRecheck;
     }
 
@@ -57,6 +64,6 @@ internal sealed class FakeReclaimingReverifier : IRemovableReverifier
         LeasesHeldWhenCalled = _watching?.Acquired;
         LeasesReleasedWhenCalled = _watching?.Released;
         _atRecheck?.Invoke();
-        return new UnderLeaseRecheck(_reclaim, _recordsIncomplete);
+        return new UnderLeaseRecheck(_reclaim, _reasons);
     }
 }

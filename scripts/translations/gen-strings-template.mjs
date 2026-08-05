@@ -314,7 +314,8 @@ const MAP = {
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.ReverifySkipped': `{0} {1} kept in place, because a program went back to needing what the scan flagged.`,
-  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated.`,
+  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
+  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
   'Completion.MoveCancelledSummary': `Moved {0} of {1} {2} before you cancelled.`,
   'Completion.PermanentDeleteCancelledSummary': `Permanently deleted {0} of {1} {2} before you cancelled.`,
 

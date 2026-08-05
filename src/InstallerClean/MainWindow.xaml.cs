@@ -734,10 +734,17 @@ public partial class MainWindow : Window
     /// sentence, whatever word order the target language uses (mirrors
     /// ConfirmMoveWindow's destination-on-its-own-line treatment). A value with
     /// no destination (the all-clear receipt, either delete summary) renders
-    /// verbatim as a single Run. Locating the raw substring
+    /// verbatim. Locating the raw substring
     /// rather than a bracket-delimited marker (as <see cref="BuildCompletionRestoreLine"/>
     /// uses for its hyperlink) is deliberate: the destination is a user-chosen
     /// folder path that could itself contain a literal '[' or ']'.
+    ///
+    /// The summary is not always one line: the overlay shown when the act-time
+    /// re-check kept the WHOLE batch back puts the held-back block here, and that
+    /// block carries a line per cause that occurred. Every Run therefore goes
+    /// through <see cref="AddTextWithLineBreaks"/> rather than straight into
+    /// Inlines, so the breaks are ones this method made rather than ones a text
+    /// formatter is trusted to find.
     /// </summary>
     private void BuildCompletionSummaryLine()
     {
@@ -756,16 +763,40 @@ public partial class MainWindow : Window
         // result into WPF inlines. See CompositionParsing.
         if (CompositionParsing.SplitAtSubstring(raw, destination) is not { } split)
         {
-            CompletionSummaryText.Inlines.Add(new Run(raw));
+            AddTextWithLineBreaks(raw);
             return;
         }
 
         var wrappedDestination = CompositionParsing.InsertPathWrapPoints(destination);
 
-        if (split.Prefix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(split.Prefix));
+        if (split.Prefix.Length > 0) AddTextWithLineBreaks(split.Prefix);
         CompletionSummaryText.Inlines.Add(new LineBreak());
         CompletionSummaryText.Inlines.Add(new Run(wrappedDestination));
-        if (split.Suffix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(split.Suffix));
+        if (split.Suffix.Length > 0) AddTextWithLineBreaks(split.Suffix);
+    }
+
+    /// <summary>
+    /// Appends <paramref name="text"/> to the summary's inlines, turning each
+    /// newline in it into an explicit <see cref="LineBreak"/>.
+    ///
+    /// A TextBlock breaks a line on a newline inside its Text property, but this
+    /// TextBlock has no Text binding at all: it is composed from Runs so the
+    /// destination path can be forced onto its own line at a position that varies
+    /// by language. Emitting the breaks rather than leaving them inside a Run's
+    /// text keeps the rendering off an assumption about how the text formatter
+    /// treats a control character it was handed.
+    ///
+    /// Splits on '\n' and trims a trailing '\r' rather than splitting on
+    /// Environment.NewLine, so a value joined either way renders the same.
+    /// </summary>
+    private void AddTextWithLineBreaks(string text)
+    {
+        var lines = text.Split('\n');
+        for (var i = 0; i < lines.Length; i++)
+        {
+            if (i > 0) CompletionSummaryText.Inlines.Add(new LineBreak());
+            CompletionSummaryText.Inlines.Add(new Run(lines[i].TrimEnd('\r')));
+        }
     }
 
     /// <summary>

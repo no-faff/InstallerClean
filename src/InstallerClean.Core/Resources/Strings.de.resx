@@ -574,15 +574,33 @@
        eight satellites whose grammar forced the issue had each added an override
        for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} an Ort und Stelle belassen, weil ein Programm sie nach dem Scan wieder benötigt.</value></data>
-  <!-- The other reason the pre-action re-check keeps files back: its own read of
-       the Windows Installer records came up short, so it withheld every
-       superseded-patch verdict rather than act on one it could not confirm.
-       Distinct from Completion.ReverifySkipped, which names a specific cause (a
-       program needing the file again) that did not happen here. 0 = the count
-       kept, 1 = pluralised "file"/"files". Flat string; a language may add a
-       satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
-       its count grammar. -->
-  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} an Ort und Stelle belassen, weil die Einträge von Windows Installer bei der wiederholten Prüfung nicht vollständig gelesen werden konnten.</value></data>
+  <!-- The third state the final check can find, and the one that is neither of
+       its siblings: the records were read perfectly well and no longer hold the
+       registration that claimed the file. Nothing has gone back to needing it
+       (Completion.ReverifySkipped), and nothing failed to be read
+       (Completion.ReverifyIncomplete), so both of those would name a cause that
+       did not occur. The file is kept in place because an answer of "not there"
+       is only ever "not there in what was asked", and what was asked was settled
+       before the button was pressed. 0 = the count kept, 1 = pluralised
+       "file"/"files". Flat string; a language may add a satellite-only
+       Completion.ReverifyRecordsChanged.One/.Few/.Many override for its count
+       grammar. The English names no pronoun for the files on purpose: one flat
+       string serves every count, the neutral carries no .One form for the English
+       to fall back on, and a "them" reads wrongly at a count of one. The three
+       sentences can appear together, one per cause, so they are deliberately
+       parallel from "kept in place, because" onwards. -->
+  <data name="Completion.ReverifyRecordsChanged" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records had changed by the final check.</value></data>
+  <!-- The third reason the pre-action re-check keeps files back: a read of the
+       Windows Installer records failed, so nothing was established either way and
+       the file is kept for want of a verdict rather than on one. Distinct from
+       Completion.ReverifySkipped, which names a program needing the file again,
+       and from Completion.ReverifyRecordsChanged, where the read succeeded.
+       0 = the count kept, 1 = pluralised "file"/"files". Flat string; a language
+       may add a satellite-only Completion.ReverifyIncomplete.One/.Few/.Many
+       override for its count grammar. "The final check" rather than "when the
+       check was repeated": the repetition is an implementation detail and the
+       user has never been told there was a first one. -->
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the

@@ -162,7 +162,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 pathList = pathList.Where(p => !reclaimed.Contains(p)).ToList();
                 total = pathList.Count;
                 if (total == 0)
-                    return new DeleteResult(0, Array.Empty<FileOperationError>(), HeldBack: heldBack, HeldBackRecordsIncomplete: recheck.RecordsIncomplete);
+                    return new DeleteResult(0, Array.Empty<FileOperationError>(), HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
             }
 
             int deleted = 0;
@@ -348,7 +348,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // CancellationToken.None: best-effort cleanup. See the
             // matching comment in MoveFilesService for the rationale.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
-            return new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled, HeldBack: heldBack, HeldBackRecordsIncomplete: recheck.RecordsIncomplete);
+            return new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled, HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
             }
             finally
             {

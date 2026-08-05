@@ -701,7 +701,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     _completion.ShowMoveSummary(ex.Partial.MovedCount,
                         CompletedBytes(abortSurviving, ex.Partial.MovedCount, ex.Partial.Errors),
                         dest, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind),
-                        FoldHeldBack(reverify, ex.Partial.HeldBack, ex.Partial.HeldBackRecordsIncomplete));
+                        FoldHeldBack(reverify, ex.Partial.HeldBack, ex.Partial.HeldBackReasons));
                 }
                 _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
                 OperationProgress = string.Empty;
@@ -735,7 +735,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
                 survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
                 survivingBytes = survivingFiles.Sum(f => f.SizeBytes);
-                reverify = FoldHeldBack(reverify, result.HeldBack, result.HeldBackRecordsIncomplete);
+                reverify = FoldHeldBack(reverify, result.HeldBack, result.HeldBackReasons);
             }
 
             if (result.HeldBack.Count > 0 && survivingFiles.Count == 0)
@@ -1032,7 +1032,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 var reclaimed = new HashSet<string>(result.HeldBack, StringComparer.OrdinalIgnoreCase);
                 survivingFiles = survivingFiles.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
                 survivingBytes = survivingFiles.Sum(f => f.SizeBytes);
-                reverify = FoldHeldBack(reverify, result.HeldBack, result.HeldBackRecordsIncomplete);
+                reverify = FoldHeldBack(reverify, result.HeldBack, result.HeldBackReasons);
             }
 
             if (result.HeldBack.Count > 0 && survivingFiles.Count == 0)
@@ -1160,22 +1160,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <summary>
     /// Folds the paths an action service held back under the installer mutex into
     /// the pre-act re-verify's own account of what it kept back, so the user is
-    /// shown one number for one condition.
+    /// shown one account of one batch.
     ///
-    /// They are the same condition: a program claims the file again. The only
-    /// difference is which side of the mutex the claim was read on, and that is
-    /// a fact about how the check is built rather than about what happened to the
-    /// file, so it earns no separate line on the completion screen and no wording
-    /// of its own.
-    ///
-    /// <c>RecordsIncomplete</c> is OR-ed rather than carried through, because both
-    /// halves of the check can meet the same condition: the pre-act enumeration
-    /// may fail to read a product, and the under-lease re-read may fail to read a
-    /// property. Either one means at least one file is kept back because nothing
-    /// could be established about it rather than because a program wants it, and
-    /// the completion copy has a separate sentence for exactly that. It is a
-    /// whole-result flag on both sides already, so OR-ing keeps the one behaviour
-    /// the app has always had here.
+    /// Which side of the mutex a file was condemned on is a fact about how the
+    /// check is built rather than about what happened to the file, so the two
+    /// producers earn no separate lines and no wording of their own. What the file
+    /// was condemned FOR is not: the two producers keep back different files and
+    /// can meet different causes, so the tallies are ADDED rather than merged into
+    /// a single cause for the batch. Adding is what lets one line per cause carry
+    /// its own count; anything that collapsed them would put one sentence over
+    /// files it is false of.
     ///
     /// The claims move with the paths, because the three collections describe one
     /// set of files and have to agree: a path leaving <c>Surviving</c> for
@@ -1186,17 +1180,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// the registered rows are, so the one case-insensitive set answers for both.
     /// </summary>
     private static ReverifyResult FoldHeldBack(
-        ReverifyResult reverify, IReadOnlyList<string> heldBack, bool recordsIncomplete)
+        ReverifyResult reverify, IReadOnlyList<string> heldBack, HeldBackReasons reasons)
     {
         if (heldBack.Count == 0) return reverify;
 
-        var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
+        var condemned = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
         return new ReverifyResult(
-            reverify.Surviving.Where(p => !reclaimed.Contains(p)).ToList().AsReadOnly(),
+            reverify.Surviving.Where(p => !condemned.Contains(p)).ToList().AsReadOnly(),
             reverify.Dropped.Concat(heldBack).ToList().AsReadOnly(),
-            reverify.RecordsIncomplete || recordsIncomplete,
+            reverify.Reasons + reasons,
             reverify.SurvivingPatchClaims
-                .Where(c => !reclaimed.Contains(c.LocalPackagePath)).ToList().AsReadOnly());
+                .Where(c => !condemned.Contains(c.LocalPackagePath)).ToList().AsReadOnly());
     }
 
     /// <summary>

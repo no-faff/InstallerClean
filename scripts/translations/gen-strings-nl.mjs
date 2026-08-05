@@ -249,7 +249,7 @@ const MAP = {
   'Completion.MoveSummary.Singular': `{0} {1} verplaatst naar: {2}`,
   'Completion.MoveSummary.Plural': `{0} {1} verplaatst naar: {2}`,
   'Completion.ReverifySkipped': `{0} {1} behouden, omdat een programma ze na de scan weer nodig bleek te hebben.`,
-  'Completion.ReverifyIncomplete': `{0} {1} behouden, omdat de Windows Installer-records bij de herhaalde controle niet volledig konden worden gelezen.`,
+  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
   'Completion.MoveCancelledSummary': `{0} van {1} {2} verplaatst voordat je annuleerde.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} van {1} {2} definitief verwijderd voordat je annuleerde.`,
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
@@ -453,6 +453,7 @@ const MAP = {
   'Error.InstallerLockUnavailableTitle': `Er is niets verwijderd`,
   'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
   'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
+  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
