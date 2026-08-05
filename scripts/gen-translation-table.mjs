@@ -40,6 +40,7 @@ const LANGS = {
   'pt-BR':   { en: 'Brazilian Portuguese',  endo: 'Português (Brasil)' },
   'ru':      { en: 'Russian',               endo: 'Русский' },
   'fr':      { en: 'French',                endo: 'Français' },
+  'nl':      { en: 'Dutch',                 endo: 'Nederlands' },
   'pl':      { en: 'Polish',                endo: 'Polski' },
   'tr':      { en: 'Turkish',               endo: 'Türkçe' },
   'id':      { en: 'Indonesian',            endo: 'Bahasa Indonesia' },
