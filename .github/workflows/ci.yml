@@ -222,7 +222,7 @@ jobs:
       # a note claiming every gate here was deliberate. They sit at the end for
       # the same reason rather than for one of their own: from the old position
       # ahead of the build, one red took everything after it down, and the whole
-      # 2.4.0 line of work was written against a suite that had not run anywhere.
+      # 3.0.0 line of work was written against a suite that had not run anywhere.
       #
       # That is not a settled historical argument, and the reproduction check is
       # the receipt. It was left at the front when the other four moved, and a
@@ -288,7 +288,7 @@ jobs:
       # showed one phrase and spoke another in two languages across four
       # releases.
       #
-      # Red for one known reason at 2.4.0, which is the rule working rather than
+      # Red for one known reason at 3.0.0, which is the rule working rather than
       # an exception to the paragraph above: Russian labels three Cancel buttons
       # "Отмена" and speaks "Отменить сканирование" and its two siblings over
       # them, and the noun is not inside the verb form. The fix is one word in
