@@ -712,8 +712,12 @@ public class InstallerQueryServiceUnitTests
     public async Task The_headcount_and_the_observation_are_not_added_together()
     {
         // Both signals estimate one quantity from opposite sides, so a machine
-        // that trips both has lost thirty-nine products, not seventy-eight. The
-        // number reaches the user as "the records for N installed programs".
+        // that trips both has lost thirty-nine products, not seventy-eight. What
+        // the number reaches the user AS is nothing: the notice it gates says only
+        // that something in the records could not be matched up, because this is
+        // an estimate and two of its four terms are absences rather than failed
+        // reads. The command line's Application-channel entry is the one surface
+        // that still prints it.
         const string patch = @"C:\Windows\Installer\superseded.msp";
 
         var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch),

@@ -172,8 +172,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // condition, which is the very history a report of it would need.
         var abandonedLog = new PerItemFailureLog("Patch enumeration",
             "The product identity in the ones not logged is recorded nowhere else. The user is "
-            + "told through the scan summary that some programs could not be read, and that "
-            + "notice names none of them.",
+            + "told through the scan summary that something in the records could not be matched "
+            + "up, and that notice names nothing and counts nothing.",
             _crashLogSink);
 
         // The closing entry is owed on every exit: the two gates below both
@@ -1122,10 +1122,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Records that one product's patch enumeration was abandoned after a full run
     /// of unreadable rows. Dev-facing crash-log breadcrumb only, deliberately not
-    /// localised and never surfaced: the user is told a program could not be read
-    /// through the scan summary's kept-patches notice, which carries no product
-    /// identity, whereas diagnosing WHY the withholding fired needs exactly that
-    /// identity. Without this line the abandonment leaves no record of which product
+    /// localised and never surfaced: the user is told through the scan summary's
+    /// kept-patches notice that something in the records could not be matched up,
+    /// which carries no product identity and no count, whereas diagnosing WHY the
+    /// withholding fired needs exactly that identity. Without this line the abandonment leaves no record of which product
     /// triggered it, so a field report can be pinned to a product only by the
     /// reporter running the Windows Installer API by hand. Carries the product
     /// code, its install context and SID (the round-trip that fails when the SID
