@@ -849,16 +849,18 @@ internal static class Program
     {
         if (scanResult.UnreadableProductCount > 0)
         {
-            // The command line's own pair, not the window's Summary.* one. That
-            // closes on Re-scan, which is a button this surface has not got, and
-            // opens its second sentence on "Everything listed", which is true
+            // The command line's own sentence, not the window's Summary.* one.
+            // That closes on Re-scan, which is a button this surface has not got,
+            // and opens its second sentence on "Everything listed", which is true
             // only of /s: a /d or an /m lists nothing at all.
-            Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(scanResult.UnreadableProductCount,
-                    Strings.Cli_ProgramsUnreadable_Singular,
-                    Strings.Cli_ProgramsUnreadable_Plural,
-                    "Cli.ProgramsUnreadable"),
-                scanResult.UnreadableProductCount));
+            //
+            // The count gates the line and does not appear in it. Four different
+            // things contribute to it and the total is an estimate rather than a
+            // headcount, so any figure printed here would be a precision the app
+            // has not got; the event-log line below keeps its own copy because a
+            // machine surface an RMM parses may gain a field and not lose one, and
+            // the machine contract records what that figure is worth.
+            Console.WriteLine(Strings.Cli_RecordsNotMatched);
             MachineContract.WriteEventLog(CliEventClass.ScanWithheldNotice,
                 () => string.Format(Strings.Cli_EventLogScanWithheld,
                     arg, scanResult.WithheldCount, scanResult.UnreadableProductCount));

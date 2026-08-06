@@ -563,17 +563,27 @@
        same technique the move-confirmation dialog uses. -->
   <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>Przeniesiono {0} {1} do: {2}</value></data>
   <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>Przeniesiono {0} {1} do: {2}</value></data>
-  <!-- Shown when the pre-action re-check found some candidates are needed again
-       (a superseded patch reverted to Applied between the scan and the click),
-       so they were left out of the batch. 0 = the count kept, 1 = pluralised
-       "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       The English names no pronoun for the files on purpose. One flat string
-       serves every count here, and the neutral carries no .One form for the
-       English to fall back on, so a "them" read wrongly at a count of one; the
-       eight satellites whose grammar forced the issue had each added an override
-       for it. "What the scan flagged" is number-blind and needs none. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął ich potrzebować.</value></data>
+  <!-- Shown when the pre-action re-check found a registered product's live claim
+       on candidates the scan had left removable, so they were left out of the
+       batch. 0 = the count kept, 1 = pluralised "file"/"files". Flat string; a
+       language may add a satellite-only Completion.ReverifySkipped.One/.Few/.Many
+       override for its count grammar. The English names no pronoun for the files
+       on purpose. One flat string serves every count here, and the neutral carries
+       no .One form for the English to fall back on, so a "them" read wrongly at a
+       count of one; the eight satellites whose grammar forced the issue had each
+       added an override for it. "What the scan flagged" is number-blind and needs
+       none.
+
+       IT STATES THE PRESENT STATE OF THE RECORDS AND NEVER A RETURN. Two
+       situations reach this line: a superseded patch whose claim now says needed,
+       and a file no claim named at all when the scan ran. Of the second, "went
+       back to needing" is false twice over, because nothing this app saw ever
+       held that file, and because whether the claim is new cannot be told apart
+       from the app's own earlier reading having missed one. Translations must not
+       reintroduce a verb of returning; a claim that HOLDS now is the whole of it.
+       The two siblings below say what this one does not: this is a live claim, one
+       is a registration that has gone, one is a read that failed. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, because the records now claim what the scan flagged.</value></data>
   <!-- The third state the final check can find, and the one that is neither of
        its siblings: the records were read perfectly well and no longer hold the
        registration that claimed the file. Nothing has gone back to needing it
@@ -643,17 +653,29 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <!-- Informational line shown when the scan could not read every installed
-       program's Windows Installer records, or found fewer of them than the
-       machine's own registrations account for. Superseded and obsoleted patches
-       are then kept rather than offered, because whether one is still needed is
-       a question about every installed program and this scan could not ask them
-       all. Nothing is wrong with the machine and there is nothing to do about
-       it, so the line says what to expect rather than warning: everything on the
-       list is still safe to remove, there may be more that are not shown, and a
-       re-scan may read them. 0 = the count of programs. -->
-  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
-  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
+  <!-- Informational line shown when the scan could not account for everything the
+       Windows Installer records hold. Superseded and obsoleted patches are then
+       kept rather than offered, because whether one is still needed is a question
+       about every installed program and this scan could not ask them all. Nothing
+       is wrong with the machine and there is nothing to do about it, so the line
+       says what to expect rather than warning: everything on the list is still
+       safe to remove, there may be more that are not shown, and a re-scan may
+       pick them up.
+
+       NO COUNT AND NO PLACEHOLDER, and neither is an omission. Four different
+       things put an entry into the number the app has, only two of them are
+       failures to read, and the number is an estimate that can come out high as
+       well as low: a registry key left behind by an uninstall that failed is
+       counted, and no installed program answers to it. So the line says neither
+       how many nor that they are programs. What is true on every one of those
+       paths, and the whole of what is claimed, is that something in the records
+       could not be matched up.
+
+       "Records" is the Windows Installer records, not files on disk. Any language
+       may recast "match up" into its own idiom for reconciling two sets of
+       records; what must not come back is a number, or a noun meaning "installed
+       program". -->
+  <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -878,11 +900,22 @@ Szczegóły w {1}.</value></data>
        gets what happened and what they can do about it. -->
   <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean nie mógł otworzyć przeglądarki. Link jest w schowku, więc możesz wkleić go samodzielnie:&#10;&#10;{0}</value></data>
   <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean nie mógł otworzyć przeglądarki ani skopiować linku do schowka. Oto link:&#10;&#10;{0}</value></data>
-  <!-- 0 = the destination folder whose canonical path changed mid-batch.
-       Raised when the folder is replaced or redirected between two files of
-       the same Move, so the copy must not claim where the files moved before
-       that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
+  <!-- 0 = the backup folder the run was given. Raised when the guard between two
+       files of the same Move can no longer confirm that folder, and it says
+       nothing about why on purpose: two conditions reach it, the folder being
+       replaced or redirected, and the folder no longer resolving at all (a UNC
+       share dropping mid-batch, an ACL change closing it to the elevated
+       process). The second is not a change of anything. The folder is exactly
+       where the user put it and has become unreachable, so any sentence naming a
+       cause is wrong for one condition or the other, and what to do next is the
+       same either way.
+
+       It names the folder the run was GIVEN, because it asks the reader to go and
+       check that folder. Where the files that already moved ended up is a
+       different question and a different string: they went wherever the folder
+       pointed then, which is what the completion summary names, so this copy must
+       not claim it. -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -1037,21 +1070,27 @@ Nie udało się zapisać dziennika awarii.</value></data>
        positions and neither may harden: Microsoft guarantees nothing here. -->
   <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it.</value></data>
   <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.</value></data>
-  <!-- The command line's own wording of Summary.ProgramsUnreadable.*, which the
-       window keeps: that one closes on Re-scan and opens its second sentence on
-       "Everything listed", and there is no Re-scan on a command line and nothing
-       listed at all on a /d or an /m. The singular deliberately spells out "one
-       installed program" and so carries NO placeholder where the plural takes
-       {0}; the window's pair is built the same way and neither is to be
-       "corrected" into symmetry. "Running it again" keeps its pronoun because
-       the tool is already established as "it" in the sentence before. -->
-  <data name="Cli.ProgramsUnreadable.Singular" xml:space="preserve"><value>Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.</value></data>
-  <data name="Cli.ProgramsUnreadable.Plural" xml:space="preserve"><value>Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.</value></data>
-  <!-- 0 = mode arg, 1 = files the scan held back, 2 = installed products it
-       could not read. A notice beside the run's summary, not a summary itself
-       (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
-       the always-plural "errors:" header the same audience scrapes: a machine
-       surface holds one shape, and the grammar is the price of it. -->
+  <!-- The command line's own wording of Summary.RecordsNotMatched, whose remarks
+       carry why there is no count and no placeholder in either. The window's
+       version closes on Re-scan and opens its second sentence on "Everything
+       listed", and there is no Re-scan on a command line and nothing listed at all
+       on a /d or an /m, which is the whole of the difference. "Running it again"
+       keeps its pronoun because the tool is already established as "it" in the
+       sentence before. -->
+  <data name="Cli.RecordsNotMatched" xml:space="preserve"><value>InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.</value></data>
+  <!-- 0 = mode arg, 1 = files the scan held back, 2 = entries in the Windows
+       Installer records it could not match up. A notice beside the run's summary,
+       not a summary itself (Event ID 3000; see MachineContract). Deliberately
+       unpluralised, matching the always-plural "errors:" header the same audience
+       scrapes: a machine surface holds one shape, and the grammar is the price of
+       it.
+
+       {1} is exact and {2} is an estimate that can come out high as well as low,
+       which MachineContract's remarks set out for the operator; it is sound to
+       alert on and to trend, and it is not a headcount of programs. The window's
+       Summary.RecordsNotMatched drops the figure entirely for that reason, and
+       this line keeps it because a machine surface an RMM already parses may gain
+       a field and may not lose one. -->
   <!-- 0 = mode arg, 1 = registered files missing from disk. The second notice
        (Event ID 3001), and the actionable one: it says outright that this tool
        did not cause it, because the entry sits in a log beside that tool's name
@@ -1132,13 +1171,13 @@ Nie udało się zapisać dziennika awarii.</value></data>
        making it would imply the word meant something about deleting. All four
        run lines carry it. -->
   <data name="Cli.MovedFiles" xml:space="preserve"><value>Moved {0} unneeded {1}.</value></data>
-  <!-- 0 = the destination folder whose canonical path changed mid-batch. The
-       command line's own wording of Error.DestinationChangedMidBatch, which the
-       window keeps: that one closes on Re-scan, and there is no Re-scan here.
-       It names the folder immediately before, so this one cannot close on "run
-       it again" the way Cli.ProgramsUnreadable.* does; "it" would reach back
-       past the folder and take that instead of the tool. -->
-  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.</value></data>
+  <!-- 0 = the backup folder the run was given. The command line's own wording of
+       Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
+       and why it names the folder the run was given: that one closes on Re-scan,
+       and there is no Re-scan here. It names the folder immediately before, so
+       this one cannot close on "run it again" the way Cli.RecordsNotMatched does;
+       "it" would reach back past the folder and take that instead of the tool. -->
+  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <!-- Same eight slots as Cli.EventLogMoveSummary, for a batch one of the
@@ -1264,7 +1303,7 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} niepotrzebne pliki do wyczyszczenia</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} zarejestrowane pliki nadal potrzebne ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
-  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął go potrzebować.</value></data>
+  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} kept in place, because the records now claim what the scan flagged.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Znaleziono {0} zarejestrowany {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Znaleziono {0} zarejestrowane {1}.</value></data>
 </root>

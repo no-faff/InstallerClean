@@ -2045,11 +2045,11 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task ScanViewModel_HasUnreadableProducts_tracks_UnreadableProductCount()
+    public async Task ScanViewModel_HasRecordsNotMatched_tracks_UnreadableProductCount()
     {
-        // A scan that could not read every program's records kept its superseded
-        // patches back. Without this line the only symptom is a quietly shorter
-        // list, so the line is the whole point of the count reaching the VM.
+        // A scan that could not account for everything the records hold kept its
+        // superseded patches back. Without this line the only symptom is a quietly
+        // shorter list, so the line is the whole point of the count reaching the VM.
         var vm = CreateViewModel();
 
         var scan = new ScanResult(
@@ -2062,13 +2062,21 @@ public class MainViewModelTests
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        Assert.True(vm.Scan.HasUnreadableProducts);
+        Assert.True(vm.Scan.HasRecordsNotMatched);
         Assert.Equal(3, vm.Scan.UnreadableProductCount);
-        Assert.Contains("3", vm.Scan.ProgramsUnreadableText);
+        // The count gates the line and stays out of it. Four different things feed
+        // that number, only two are failures to read, and a registry key an
+        // uninstall left behind is one of them with no installed program answering
+        // to it, so a figure on screen would be a precision the scan has not got.
+        // Pinned as a negative because the count reaching the VM and the count
+        // reaching the user are now different questions, and the assertion that
+        // used to stand here was the second one answering yes.
+        Assert.Equal(Strings.Summary_RecordsNotMatched, vm.Scan.RecordsNotMatchedText);
+        Assert.DoesNotContain("3", vm.Scan.RecordsNotMatchedText);
     }
 
     [Fact]
-    public async Task ScanViewModel_HasUnreadableProducts_is_false_on_a_healthy_scan()
+    public async Task ScanViewModel_HasRecordsNotMatched_is_false_on_a_healthy_scan()
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -2077,7 +2085,7 @@ public class MainViewModelTests
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        Assert.False(vm.Scan.HasUnreadableProducts);
+        Assert.False(vm.Scan.HasRecordsNotMatched);
     }
 
     [Fact]

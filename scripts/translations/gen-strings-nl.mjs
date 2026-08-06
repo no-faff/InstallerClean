@@ -64,7 +64,7 @@ const ALSO_KEEP = [
 // singular pronoun for the kept-back file (het, where the base says ze).
 const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `{0} geregistreerd {1} gevonden.`,
-  'Completion.ReverifySkipped.One': `{0} {1} behouden, omdat een programma het na de scan weer nodig bleek te hebben.`,
+  'Completion.ReverifySkipped.One': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
 };
 
 const MAP = {
@@ -248,7 +248,7 @@ const MAP = {
   'Completion.FailedCountDelete.Plural': `{0} van {1} konden niet worden verwijderd.`,
   'Completion.MoveSummary.Singular': `{0} {1} verplaatst naar: {2}`,
   'Completion.MoveSummary.Plural': `{0} {1} verplaatst naar: {2}`,
-  'Completion.ReverifySkipped': `{0} {1} behouden, omdat een programma ze na de scan weer nodig bleek te hebben.`,
+  'Completion.ReverifySkipped': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
   'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
   'Completion.MoveCancelledSummary': `{0} van {1} {2} verplaatst voordat je annuleerde.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} van {1} {2} definitief verwijderd voordat je annuleerde.`,
@@ -263,8 +263,6 @@ const MAP = {
   'Summary.OrphanedToCleanUp.Plural': `{0} overbodige bestanden om op te ruimen`,
   'Summary.MissingFromDisk.Singular': `{0} geregistreerd bestand ontbreekt (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige herstel-, update- of verwijderactie van dat programma kan mislukken. Open Details voor wat je kunt doen.`,
   'Summary.MissingFromDisk.Plural': `{0} geregistreerde bestanden ontbreken (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige herstel-, update- of verwijderactie van die programma's kan mislukken. Open Details voor wat je kunt doen.`,
-  'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
-  'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Summary.OperationFiles': `{0} van {1} {2}`,
   'Summary.OrphanedWindow': `{0} verweesd, {1} vervangen, {2} verouderd ({3})`,
   'Summary.RegisteredWindow.Singular': `{0} geregistreerd bestand dat nog nodig is ({1})`,
@@ -332,7 +330,7 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `De controle is om een onbekende reden mislukt. De details staan in crash.log, mocht je het willen melden.`,
   'BrowserLaunch.ClipboardOk': `InstallerClean kon je browser niet openen. De link staat op je klembord, dus je kunt hem zelf plakken:&#10;&#10;{0}`,
   'BrowserLaunch.ClipboardFailed': `InstallerClean kon je browser niet openen, en kon de link ook niet naar je klembord kopiëren. De link is:&#10;&#10;{0}`,
-  'Error.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
   'Error.CannotWriteFolder': `Kan niet schrijven naar {0}.`,
   'Error.NoUniqueFilename': `Kon na 10.000 pogingen geen unieke bestandsnaam vinden voor '{0}'.`,
 
@@ -445,15 +443,15 @@ const MAP = {
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
   'Cli.FoundNoOrphans': `Found no unneeded files.`,
-  'Cli.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.`,
-  'Cli.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
-  'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.`,
   'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
   'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
   'Error.InstallerLockUnavailableTitle': `Er is niets verwijderd`,
   'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
   'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
   'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
+  'Summary.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
+  'Cli.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

@@ -218,8 +218,7 @@ public static class Strings
     public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
     public static string Cli_PendingRebootBlocked_Other => Get("Cli.PendingRebootBlocked.Other");
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
-    public static string Cli_ProgramsUnreadable_Plural => Get("Cli.ProgramsUnreadable.Plural");
-    public static string Cli_ProgramsUnreadable_Singular => Get("Cli.ProgramsUnreadable.Singular");
+    public static string Cli_RecordsNotMatched => Get("Cli.RecordsNotMatched");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_TooManyArguments => Get("Cli.TooManyArguments");
     public static string Cli_TooManyArgumentsNoPath => Get("Cli.TooManyArgumentsNoPath");
@@ -392,8 +391,7 @@ public static class Strings
     public static string Summary_OrphanedToCleanUp_Plural => Get("Summary.OrphanedToCleanUp.Plural");
     public static string Summary_OrphanedToCleanUp_Singular => Get("Summary.OrphanedToCleanUp.Singular");
     public static string Summary_OrphanedWindow => Get("Summary.OrphanedWindow");
-    public static string Summary_ProgramsUnreadable_Plural => Get("Summary.ProgramsUnreadable.Plural");
-    public static string Summary_ProgramsUnreadable_Singular => Get("Summary.ProgramsUnreadable.Singular");
+    public static string Summary_RecordsNotMatched => Get("Summary.RecordsNotMatched");
     public static string Summary_RegisteredStillUsed_Plural => Get("Summary.RegisteredStillUsed.Plural");
     public static string Summary_RegisteredStillUsed_Singular => Get("Summary.RegisteredStillUsed.Singular");
     public static string Summary_RegisteredWindow_Plural => Get("Summary.RegisteredWindow.Plural");

@@ -147,14 +147,16 @@ public partial class ScanViewModel : ObservableObject
     private int _missingRemovableCount;
 
     /// <summary>
-    /// Count of installed programs whose Windows Installer records the last scan
-    /// could not fully read. Non-zero means that scan withheld every
+    /// Installed products the last scan could not account for, straight from
+    /// <see cref="ScanResult.UnreadableProductCount"/>, whose remarks say what
+    /// goes into it and why it is neither confined to records that failed to read
+    /// nor an exact headcount. Non-zero means that scan withheld every
     /// superseded-patch verdict, so it drives the line that says why the list is
-    /// shorter than usual.
+    /// shorter than usual. Nothing shows the figure itself.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasUnreadableProducts))]
-    [NotifyPropertyChangedFor(nameof(ProgramsUnreadableText))]
+    [NotifyPropertyChangedFor(nameof(HasRecordsNotMatched))]
+    [NotifyPropertyChangedFor(nameof(RecordsNotMatchedText))]
     private int _unreadableProductCount;
 
     /// <summary>
@@ -236,22 +238,21 @@ public partial class ScanViewModel : ObservableObject
             MissingNonRemovableCount);
 
     /// <summary>
-    /// True when the last scan could not read every installed program's records
-    /// and therefore kept its superseded patches back. Informational, unlike
-    /// <see cref="HasMissingFromDisk"/>: nothing is wrong with the machine and
-    /// there is nothing for the user to do. It is shown because the alternative
-    /// is a quietly shorter list, and a scan that says less than usual without
-    /// saying so is the fault this line exists to avoid.
+    /// True when the last scan could not account for everything the Windows
+    /// Installer records hold and therefore kept its superseded patches back.
+    /// Informational, unlike <see cref="HasMissingFromDisk"/>: nothing is wrong
+    /// with the machine and there is nothing for the user to do. It is shown
+    /// because the alternative is a quietly shorter list, and a scan that says
+    /// less than usual without saying so is the fault this line exists to avoid.
+    ///
+    /// The count gates the line and does not appear in it. Four different things
+    /// contribute to it and only two are failures to read, so it is an estimate
+    /// that can come out high as well as low; a figure on screen would be a
+    /// precision the scan has not got.
     /// </summary>
-    public bool HasUnreadableProducts => UnreadableProductCount > 0;
+    public bool HasRecordsNotMatched => UnreadableProductCount > 0;
 
-    public string ProgramsUnreadableText =>
-        string.Format(
-            DisplayHelpers.Pluralise(UnreadableProductCount,
-                Strings.Summary_ProgramsUnreadable_Singular,
-                Strings.Summary_ProgramsUnreadable_Plural,
-                "Summary.ProgramsUnreadable"),
-            UnreadableProductCount);
+    public string RecordsNotMatchedText => Strings.Summary_RecordsNotMatched;
 
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));

@@ -337,9 +337,9 @@
                      for the same reason: nothing is wrong with the machine and
                      there is nothing to do. It earns a line because without one
                      the only symptom is a quietly shorter list. -->
-                <TextBlock x:Name="ProgramsUnreadableText"
-                           Visibility="{Binding Scan.HasUnreadableProducts, Converter={StaticResource BoolToVis}}"
-                           Text="{Binding Scan.ProgramsUnreadableText}"
+                <TextBlock x:Name="RecordsNotMatchedText"
+                           Visibility="{Binding Scan.HasRecordsNotMatched, Converter={StaticResource BoolToVis}}"
+                           Text="{Binding Scan.RecordsNotMatchedText}"
                            Foreground="{StaticResource Text.Muted}"
                            FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
                            TextWrapping="Wrap"
