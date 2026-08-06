@@ -112,6 +112,12 @@ public class MoveFilesServiceTests : IDisposable
             swapped = true;
         });
 
+        // Taken before the batch, because after the swap the folder cannot be
+        // asked any more: the name now resolves to the decoy. This is the answer
+        // the service captured, so it is what the exception has to be carrying.
+        InstallerCacheHelpers.TryResolveFinalPath(_destDir, out var resolvedDest);
+        resolvedDest = resolvedDest.TrimEnd(Path.DirectorySeparatorChar);
+
         var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), _sourceDir);
         try
         {
@@ -122,6 +128,14 @@ public class MoveFilesServiceTests : IDisposable
             Assert.Empty(ex.Partial.Errors);
             Assert.False(File.Exists(first), "The first file moved before the swap was caught");
             Assert.True(File.Exists(second), "The batch stopped rather than writing into the wrong place");
+            // Where the file that moved actually went, which is the folder the
+            // destination named when the batch started and not the string it was
+            // asked about: that name now resolves to the decoy, so a host echoing
+            // it would send the user to a folder holding none of their files. The
+            // whole of what this exception reports is that the two came apart.
+            Assert.Equal(resolvedDest, ex.Destination);
+            Assert.NotEqual(decoy, ex.Destination);
+            Assert.Equal(MoveAbortReason.ResolvesElsewhere, ex.Reason);
         }
         finally
         {

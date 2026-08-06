@@ -239,7 +239,7 @@ public sealed class MoveFilesService : IMoveFilesService
             var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
             var total = pathList.Count;
             bool cancelled = false;
-            bool destinationChanged = false;
+            MoveAbortReason? abortReason = null;
 
             try
             {
@@ -293,9 +293,21 @@ public sealed class MoveFilesService : IMoveFilesService
                     var resolveProven = InstallerCacheHelpers.TryResolveFinalPath(
                         destinationFolder, out var currentRaw);
                     var currentResolved = currentRaw.TrimEnd(Path.DirectorySeparatorChar);
-                    if ((canonicalProven && !resolveProven) ||
-                        !currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
+                    abortReason = ClassifyAbort(
+                        canonicalProven, resolveProven, canonicalDestination, currentResolved);
+                    if (abortReason is not null)
                     {
+                        // The only record of which condition fired. Nothing else
+                        // keeps it: the host is told the batch stopped and where
+                        // the files are, which is the same either way, so a report
+                        // of one of these could not otherwise be told from a report
+                        // of the other. Once per batch, on a path that ends it.
+                        Helpers.CrashLog.TryWrite(new InvalidOperationException(
+                            $"Move stopped by the destination guard ({abortReason}). Captured "
+                            + $"'{canonicalDestination}' (resolved: {canonicalProven}); re-resolved "
+                            + $"'{currentResolved}' (resolved: {resolveProven}). "
+                            + $"{moved} of {total} files had moved."));
+
                         // Out through the one exit below rather than straight up the
                         // stack: everything a stopped batch still owes is under this
                         // frame. Files have already left C:\Windows\Installer, so the
@@ -306,7 +318,6 @@ public sealed class MoveFilesService : IMoveFilesService
                         // A break is not an exception, so sitting inside the per-file
                         // try does not hand the abort to the catch arms below: it
                         // leaves the loop exactly as it did from outside them.
-                        destinationChanged = true;
                         break;
                     }
 
@@ -443,9 +454,15 @@ public sealed class MoveFilesService : IMoveFilesService
             // guards and unlike a cancel, which is the user's own choice. What it
             // must not do is take the batch's account of itself with it, which is
             // why the result is built first and travels on the exception.
-            if (destinationChanged)
+            //
+            // The message names the folder the CALLER asked for, because it asks
+            // the reader to go and check that folder and that is the one they
+            // configured. Where the files ended up is a different question and
+            // travels separately.
+            if (abortReason is not null)
                 throw new MoveAbortedException(
-                    string.Format(Strings.Error_DestinationChangedMidBatch, destinationFolder), result);
+                    string.Format(Strings.Error_DestinationChangedMidBatch, destinationFolder),
+                    result, DisplayPath(canonicalDestination), abortReason.Value);
 
             return result;
             }
@@ -457,6 +474,53 @@ public sealed class MoveFilesService : IMoveFilesService
             }
         }, cancellationToken);
     }
+
+    /// <summary>
+    /// Whether the destination guard stops the batch, and on which of its two
+    /// conditions, from the capture and the re-resolve. Null means carry on.
+    ///
+    /// The two answers exist even though the outcome is identical, and the reason
+    /// is entirely about what may be SAID. OR them into one bool and the only
+    /// account of a stopped batch is that its destination changed, which is false
+    /// of a share that dropped or an ACL that closed: nothing replaced or
+    /// redirected anything, and the folder is exactly where the user put it. One
+    /// bool cannot answer WHY without answering it wrongly for half the batches
+    /// that reach it.
+    ///
+    /// Separated out because the loop cannot be driven into the second condition
+    /// by any test the suite can write: the resolve deliberately bypasses the
+    /// injected <see cref="System.IO.Abstractions.IFileSystem"/> and asks the real
+    /// kernel, and on a local disk the walk always finds an existing ancestor to
+    /// open, so a real-filesystem test can produce a changed target and cannot
+    /// produce a lost one. As a function of the four inputs it is pinned at every
+    /// combination. What that leaves unpinned is which inputs the kernel really
+    /// hands back on a dropped share, and no test here has ever answered that.
+    /// </summary>
+    internal static MoveAbortReason? ClassifyAbort(
+        bool canonicalProven, bool resolveProven,
+        string canonicalDestination, string currentResolved)
+    {
+        // Order matters and is not a precedence chain over one condition: a
+        // degraded re-resolve returns a best-effort string that may or may not
+        // compare equal, so asking the comparison first would report some lost
+        // destinations as changed ones and the rest not at all.
+        if (canonicalProven && !resolveProven) return MoveAbortReason.StoppedResolving;
+        if (!currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
+            return MoveAbortReason.ResolvesElsewhere;
+        return null;
+    }
+
+    /// <summary>
+    /// A resolved folder path in the form a person should read it in.
+    ///
+    /// The guard trims the trailing separator so two resolutions of one folder
+    /// compare equal whichever way the kernel spelled them, and that is right for
+    /// a comparison and wrong for a drive root: it turns <c>D:\</c> into
+    /// <c>D:</c>, which names the process's current directory on that drive
+    /// rather than the root of it.
+    /// </summary>
+    private static string DisplayPath(string resolved) =>
+        resolved.EndsWith(':') ? resolved + Path.DirectorySeparatorChar : resolved;
 
     /// <summary>
     /// Settles what actually happened to a file <c>File.Move</c> reported as

@@ -19,12 +19,21 @@ namespace InstallerClean.Services;
 ///
 /// A true orphan can be dropped here too, and that is the second reason the
 /// enumeration is full rather than per candidate. A file the API never claimed is
-/// not a file it can never claim: an install that wrote its package into the
-/// cache before the folder walk reached it, and registered that package after the
-/// query had already passed, leaves a file that is an orphan by every measurement
-/// the scan made and is claimed by the time the user clicks. Only re-walking the
-/// whole registered set finds it, and finding it is the last thing between that
-/// file and a permanent delete.
+/// not a file it can never claim: an install that wrote its package into the cache
+/// before the folder walk reached it, and registered that package after the query
+/// had already passed, leaves a file that is an orphan by every measurement the
+/// scan made and is claimed by the time the user clicks. Only re-walking the whole
+/// registered set finds it, and finding it is the last thing between that file and
+/// a permanent delete.
+///
+/// WHAT THAT DOES NOT ESTABLISH, and no copy built on this may assume: that the
+/// claim is new. An install completing inside the session and the scan's own
+/// reading having missed a claim that was there all along produce the identical
+/// observation, a candidate no query claimed and a re-verify that finds one
+/// claiming it, and nothing here can separate them. The second is the very failure
+/// this app is being hardened against, so a sentence asserting the first would have
+/// the app quietly ruling it out on the one screen where it had just fired. All
+/// that is shown is the present state of the records.
 /// </summary>
 public interface IRemovableReverifier
 {
@@ -94,9 +103,18 @@ public interface IRemovableReverifier
 public enum HeldBackReason
 {
     /// <summary>
-    /// The records were read and say an installed product needs the file: a
-    /// superseded patch back at Applied, or one still uninstallable and so needed
-    /// to roll back with.
+    /// The records were read and a registered product's live claim names the file,
+    /// where the scan's own reading left it removable.
+    ///
+    /// TWO ROUTES REACH IT and the copy has to hold for both. A patch the scan
+    /// found superseded or obsoleted whose claim now says needed, back at Applied
+    /// or still uninstallable and so needed to roll back with; and a candidate the
+    /// scan found no claim on at all, which the re-enumeration finds claimed. The
+    /// second is the one the name flatters: nothing was reclaimed, because nothing
+    /// this app saw ever held it, and whether the claim is new is not something
+    /// either route can be told apart on (see this file's interface remarks). What
+    /// is true of both, and the whole of what may be said, is that the records
+    /// claim the file now.
     /// </summary>
     Reclaimed,
 

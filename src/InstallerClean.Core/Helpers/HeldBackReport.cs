@@ -16,10 +16,16 @@ namespace InstallerClean.Helpers;
 /// its own joining to do, so the partition itself cannot come apart.
 ///
 /// A partition rather than one sentence: the three causes have no honest
-/// superordinate. One is a confirmed positive (a program needs the file), one is
-/// an inability (the records could not be read) and one is neither (the records
-/// no longer hold the registration), so any sentence covering all three either
-/// says nothing or says something false of two of them.
+/// superordinate. One is a positive claim on the file, one is an inability (the
+/// records could not be read) and one is neither (the records no longer hold the
+/// registration), so any sentence covering all three either says nothing or says
+/// something false of two of them.
+///
+/// Each sentence is then held to the same test WITHIN its own cause, which is not
+/// the same job and was the one left undone: a partition whose members are right
+/// still needs every situation reaching a member to be true of that member's
+/// sentence. Two reach the first, and only the present state of the records is
+/// true of both (see <see cref="HeldBackReason.Reclaimed"/>).
 /// </summary>
 internal static class HeldBackReport
 {

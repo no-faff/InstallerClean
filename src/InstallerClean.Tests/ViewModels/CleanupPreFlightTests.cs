@@ -623,7 +623,8 @@ public class CleanupPreFlightTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
                 Arg.Any<IReadOnlyList<PatchClaim>?>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
-                "swapped", new MoveResult(1, Array.Empty<FileOperationError>())));
+                "swapped", new MoveResult(1, Array.Empty<FileOperationError>()),
+                @"E:\resolved-elsewhere", MoveAbortReason.ResolvesElsewhere));
 
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);

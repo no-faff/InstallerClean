@@ -659,4 +659,59 @@ public class MoveFilesServiceUnitTests
         Assert.False(fs.File.Exists(source));
         Assert.True(fs.File.Exists(destPath));
     }
+
+    // The destination guard's classification, at every combination of its four
+    // inputs. It is reachable only as a function: the resolve behind those inputs
+    // asks the real kernel whatever IFileSystem is injected, and on a local disk
+    // the walk always finds an existing ancestor to open, so no test in this suite
+    // can drive the loop into the lost-destination condition. What the integration
+    // test next door covers is one condition end to end; what these cover is that
+    // the two are told apart at all. Neither covers what the kernel really returns
+    // when a share drops, and nothing here should be read as though it did.
+
+    [Theory]
+    // Both proven, same folder: nothing happened, the batch carries on.
+    [InlineData(true, true, @"D:\backup", @"D:\backup", null)]
+    // Both proven, different folder: the destination now points somewhere else.
+    [InlineData(true, true, @"D:\backup", @"E:\elsewhere", MoveAbortReason.ResolvesElsewhere)]
+    // Proven at capture, unproven now: nothing can be shown about where it points.
+    [InlineData(true, false, @"D:\backup", @"D:\backup", MoveAbortReason.StoppedResolving)]
+    [InlineData(true, false, @"D:\backup", @"E:\elsewhere", MoveAbortReason.StoppedResolving)]
+    // Never proven at capture, so a re-resolve that is also unproven has lost
+    // nothing: two best-effort strings that agree are the state the batch started
+    // in, and stopping on it would abort every move to an unresolvable path.
+    [InlineData(false, false, @"D:\backup", @"D:\backup", null)]
+    [InlineData(false, false, @"D:\backup", @"E:\elsewhere", MoveAbortReason.ResolvesElsewhere)]
+    // The proof going UP is not a change either, on its own.
+    [InlineData(false, true, @"D:\backup", @"D:\backup", null)]
+    [InlineData(false, true, @"D:\backup", @"E:\elsewhere", MoveAbortReason.ResolvesElsewhere)]
+    public void ClassifyAbort_tells_a_changed_destination_from_a_lost_one(
+        bool canonicalProven, bool resolveProven,
+        string canonical, string current, MoveAbortReason? expected)
+    {
+        Assert.Equal(expected,
+            MoveFilesService.ClassifyAbort(canonicalProven, resolveProven, canonical, current));
+    }
+
+    [Fact]
+    public void ClassifyAbort_reports_a_lost_destination_even_where_the_strings_agree()
+    {
+        // The ordering claim, pinned on the case that shows it is not a precedence
+        // chain dressing up one condition. A degraded re-resolve hands back a
+        // best-effort string, which for an ordinary path is the same string the
+        // capture proved, so a comparison asked first answers "unchanged" and the
+        // batch runs on with the one thing a containment check exists to see
+        // through no longer established.
+        Assert.Equal(MoveAbortReason.StoppedResolving,
+            MoveFilesService.ClassifyAbort(true, false, @"D:\backup", @"D:\backup"));
+    }
+
+    [Fact]
+    public void ClassifyAbort_does_not_read_a_change_of_case_as_a_change_of_folder()
+    {
+        // GetFinalPathNameByHandle returns the on-disk casing, and the path it was
+        // asked about came from a text box. A case-sensitive comparison here would
+        // abort an ordinary move at its second file.
+        Assert.Null(MoveFilesService.ClassifyAbort(true, true, @"D:\Backup", @"d:\backup"));
+    }
 }

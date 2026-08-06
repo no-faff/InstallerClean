@@ -1036,19 +1036,44 @@ internal static class Program
         // MoveAbortedException is raised from exactly one place, always built
         // from Error.DestinationChangedMidBatch over the destination this method
         // was handed, so the two sentences can only ever describe the same fault
-        // about the same folder. Should a second guard ever raise it, this line
-        // is what has to move with it.
+        // about the same folder. Neither selects on MoveAbortReason, and both
+        // hosts are held to that together: the guard's two conditions differ in
+        // nothing the reader of this line does next, and a sentence that named
+        // one of them would be naming it for a batch that met the other.
         Console.WriteLine(string.Format(Strings.Cli_DestinationChangedMidBatch, moveDest));
 
         var outcome = CliContract.ClassifyAbortedMove(partial.MovedCount);
-        // Sizes and nouns recomputed inside the en-GB scope; see the /d summary
-        // for why the stdout copies are not reused.
+        // Built inside the en-GB scope, never before it; see the /d summary for
+        // why the stdout copies are not reused.
         MachineContract.WriteEventLog(outcome.EventClass,
-            () => string.Format(Strings.Cli_EventLogMoveAborted,
-                arg, partial.MovedCount, count, DisplayHelpers.PluraliseFile(count), moveDest,
-                DisplayHelpers.FormatSize(CompletedBytes(survivingFiles, partial.MovedCount, partial.Errors)),
-                partial.Errors.Count, DisplayHelpers.PluraliseError(partial.Errors.Count)));
+            () => AbortedMoveEventLogLine(arg, ex, count, survivingFiles));
         return outcome.ExitCode;
+    }
+
+    /// <summary>
+    /// The Application-channel line for a stopped Move. Its own method so a test
+    /// can read the sentence rather than the event log, this being the surface a
+    /// sysadmin filters on and the one with no companion warning beside it.
+    /// </summary>
+    /// <remarks>
+    /// It names <see cref="MoveAbortedException.Destination"/> and never the
+    /// destination the run was given, which is the one place in this host where
+    /// the two can be different folders. Every file counted here left
+    /// <c>C:\Windows\Installer</c> for the destination as it resolved when the
+    /// batch started, and the whole of what stopped the batch is that the given
+    /// path no longer names that folder. The stdout sentence above keeps the given
+    /// path on purpose, asking the reader to go and check the folder they
+    /// configured.
+    /// </remarks>
+    internal static string AbortedMoveEventLogLine(
+        string arg, MoveAbortedException ex, int count,
+        IReadOnlyList<OrphanedFile> survivingFiles)
+    {
+        var partial = ex.Partial;
+        return string.Format(Strings.Cli_EventLogMoveAborted,
+            arg, partial.MovedCount, count, DisplayHelpers.PluraliseFile(count), ex.Destination,
+            DisplayHelpers.FormatSize(CompletedBytes(survivingFiles, partial.MovedCount, partial.Errors)),
+            partial.Errors.Count, DisplayHelpers.PluraliseError(partial.Errors.Count));
     }
 
     /// <summary>

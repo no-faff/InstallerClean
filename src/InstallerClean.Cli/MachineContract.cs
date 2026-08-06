@@ -83,6 +83,16 @@ internal static class MachineContract
     /// summary and never stands in for one, so counting runs means counting the
     /// summary bands; and a machine can emit a notice on every run for weeks,
     /// both conditions being properties of the machine rather than of the run.
+    ///
+    /// ONE FIGURE IN THE 3000 NOTICE IS AN ESTIMATE AND NOTHING HAS EVER SAID SO.
+    /// Its count of installed products is assembled from four contributors, two
+    /// of which are inferred from a headcount and from unclaimed registry values
+    /// rather than observed, and the inference can run high as well as low (see
+    /// <see cref="Models.InstallerQueryResult.UnreadableProductCount"/> for what
+    /// each contributes). It is sound to alert on and to trend; it is not a figure
+    /// to reconcile against an inventory, and a fleet report presenting it as a
+    /// headcount of affected programs would be presenting an estimate as a count.
+    /// The files figure beside it is exact.
     /// </remarks>
     internal static void WriteEventLog(CliEventClass outcome, Func<string> build) =>
         EventLogWriter.Write(outcome, () => English(build));

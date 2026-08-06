@@ -47,8 +47,11 @@ namespace InstallerClean.Models;
 /// way, and only this scan's verdict was withheld.
 /// </param>
 /// <param name="UnreadableProductCount">
-/// Installed products whose Windows Installer records this scan could not fully
-/// read. Non-zero means the scan withheld every superseded-patch verdict, so
+/// Installed products this scan did not account for, carried through from
+/// <see cref="InstallerQueryResult.UnreadableProductCount"/>, whose remarks are
+/// the ones to read before quoting this: it is not confined to records that
+/// failed to read, and it is an estimate rather than a headcount. Non-zero means
+/// the scan withheld every superseded-patch verdict, so
 /// <see cref="RemovableFiles"/> carries orphans only; the summary says so. Zero
 /// on any healthy machine, which is why nothing else keys off it.
 /// </param>

@@ -173,6 +173,37 @@ public class CliHeldBackTests
         Assert.Equal(string.Empty, written);
     }
 
+    [Fact]
+    public void AbortedMoveEventLogLine_names_the_folder_the_files_are_in()
+    {
+        // The audit record an RMM keeps, and the half of this fault with no
+        // companion warning: the window at least follows its summary with a dialog
+        // saying the folder changed, where this line stands alone in the
+        // Application channel. It exists to say where the files that left
+        // C:\Windows\Installer went, so naming the path the run was given, which is
+        // the one path now known NOT to lead there, is the one thing it must not do.
+        var files = new[] { File("a.msi", 1024), File("b.msi", 2048) };
+        var ex = new MoveAbortedException(
+            "swapped", new MoveResult(1, Array.Empty<FileOperationError>()),
+            @"E:\where-they-really-went", MoveAbortReason.ResolvesElsewhere);
+
+        //
+        // No paired "and not the path it was given" assertion, because there is
+        // nothing to assert it against: that path is not a parameter of this
+        // method, which is the guarantee itself and a stronger one than a string
+        // comparison. A negative over a value the call could never have seen
+        // passes whatever the code does.
+        var line = Program.AbortedMoveEventLogLine("/m", ex, files.Length, files);
+
+        Assert.Contains(@"E:\where-they-really-went", line);
+        // The counts either side of it, so a line that happened to carry the path
+        // in some other slot would not pass. Composed rather than written out,
+        // because this method is called inside the en-GB scope in production and
+        // outside it here: a literal would pin the noun to whatever language the
+        // machine running the suite is in.
+        Assert.Contains($"1 of 2 {DisplayHelpers.PluraliseFile(2)}", line);
+    }
+
     /// <summary>
     /// Runs <paramref name="action"/> with stdout redirected and returns what it
     /// wrote, putting the console back afterwards whatever happens.

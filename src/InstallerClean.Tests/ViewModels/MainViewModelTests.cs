@@ -1464,7 +1464,8 @@ public class MainViewModelTests
                 "swapped",
                 new MoveResult(1, Array.Empty<FileOperationError>(),
                     HeldBack: new[] { @"C:\Windows\Installer\a.msp" },
-                    HeldBackReasons: new HeldBackReasons(Reclaimed: 1))));
+                    HeldBackReasons: new HeldBackReasons(Reclaimed: 1)),
+                @"E:\resolved-elsewhere", MoveAbortReason.ResolvesElsewhere));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1483,6 +1484,77 @@ public class MainViewModelTests
         Assert.Contains(DisplayHelpers.FormatSize(1_048_576), vm.Completion.Heading);
         _dialogService.Received(1).ShowWarning(
             Arg.Any<string>(), Strings.Error_InvalidDestinationTitle);
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_an_abort_names_the_folder_the_files_are_in_not_the_one_asked_for()
+    {
+        // The one path in the app where those are different folders, and the
+        // reason this exception exists: the destination the user typed no longer
+        // resolves to where their files went. The summary line names the folder,
+        // and the restore line beneath it says "the files in that folder", so a
+        // summary naming the typed path sends somebody to an empty folder to look
+        // for files they have just been told are there.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns<MoveResult>(_ => throw new MoveAbortedException(
+                "swapped", new MoveResult(1, Array.Empty<FileOperationError>()),
+                @"E:\where-they-really-went", MoveAbortReason.ResolvesElsewhere));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        var typed = Path.Combine(Path.GetTempPath(), "ic-test-abort-destination");
+        vm.Cleanup.MoveDestination = typed;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal(@"E:\where-they-really-went", vm.Completion.SummaryDestination);
+        Assert.Contains(@"E:\where-they-really-went", vm.Completion.Summary);
+        Assert.DoesNotContain(typed, vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_a_completed_move_still_names_the_destination_it_was_given()
+    {
+        // The other side of the pair, and the reason the fix is scoped to the
+        // abort. On a batch that finished, the folder the user asked for is where
+        // their files are, whatever it resolves through: a backup folder reached by
+        // a junction is an ordinary setup, and naming the junction's target back at
+        // somebody who has never seen it would be a worse answer, not a truer one.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        var typed = Path.Combine(Path.GetTempPath(), "ic-test-completed-destination");
+        vm.Cleanup.MoveDestination = typed;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        Assert.Equal(typed, vm.Completion.SummaryDestination);
     }
 
     [Fact]
