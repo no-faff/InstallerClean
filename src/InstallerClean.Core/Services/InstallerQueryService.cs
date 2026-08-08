@@ -470,19 +470,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// handle is opened only for a path carrying one. A machine holding neither
     /// pays the scan and no I/O.
     ///
-    /// TWO THINGS THIS DOES NOT DO, because a comment claiming a closed hole is
-    /// worse than none. A flagged path the kernel declines to expand is kept in
-    /// the spelling Windows gave, so its claim still fails to match the walk and
-    /// its file is still offered; that is what happened before any resolution
-    /// existed and is no worse, and what is new is only that the residue is a
-    /// claim known to be unspellable rather than one nobody asked about, with
-    /// nothing downstream told about it. And the NT form over a volume GUID
-    /// (<c>\??\Volume{...}\</c>) is untouched: StripLongPathPrefix leaves it
-    /// whole for want of a drive root, GetFullPath then reads its leading
-    /// separator as rooted on the running process's drive, and what comes out
-    /// carries neither trigger. Recognising it means treating the two prefixes
-    /// as the one thing they are, which is a change to the strip and not to
-    /// this.
+    /// THE PREFIX IS NORMALISED BEFORE THE ASK, and that is not tidying. The NT
+    /// object form (<c>\??\</c>) and the Win32 escape (<c>\\?\</c>) name the same
+    /// object, which is why StripLongPathPrefix takes either off a drive-rooted
+    /// path; over a volume GUID neither comes off, and the NT form then has its
+    /// leading separator read as rooted on whatever drive the process is running
+    /// from. Handing the resolver the Win32 spelling is what stops the resolution
+    /// answering about a path assembled out of the running process's location.
+    ///
+    /// WHAT THIS DOES NOT DO, because a comment claiming a closed hole is worse
+    /// than none: a flagged path the kernel declines to expand is kept in the
+    /// spelling Windows gave, so its claim still fails to match the walk and its
+    /// file is still offered. That is what happened before any resolution existed
+    /// and is no worse; what is new is only that the residue is a claim known to
+    /// be unspellable rather than one nobody asked about, with nothing downstream
+    /// told about it.
     ///
     /// Measured on one elevated machine (Windows 10.0.26200, 2026-08-03): 138
     /// registered paths, every one an ordinary drive path, no tilde-and-digit
@@ -505,7 +507,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // never expanded this path, so its out value is the same string by
             // another route and using it would dress a guess as an answer.
             if (NeedsFinalPathResolution(stripped)
-                && InstallerCacheHelpers.TryResolveFinalPath(stripped, out var resolved))
+                && InstallerCacheHelpers.TryResolveFinalPath(ToWin32Prefix(stripped), out var resolved))
             {
                 return resolved;
             }
@@ -527,10 +529,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// settle. This is what keeps the resolution off the ordinary path: a handle
     /// is opened for a registration answering true here and for no other.
     ///
-    /// A tilde followed by a digit is the 8.3 alias form. A surviving
-    /// <c>\\?\</c> is what <see cref="InstallerCacheHelpers.StripLongPathPrefix"/>
+    /// A tilde followed by a digit is the 8.3 alias form. A surviving prefix,
+    /// either form, is what <see cref="InstallerCacheHelpers.StripLongPathPrefix"/>
     /// leaves on a path with no drive root, which in this position means a
-    /// volume-GUID path.
+    /// volume-GUID or device path.
     ///
     /// It over-selects deliberately. A long name may legitimately hold a
     /// tilde-and-digit, and a false positive costs one handle open on a path
@@ -538,7 +540,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     internal static bool NeedsFinalPathResolution(string path)
     {
-        if (path.StartsWith(@"\\?\", StringComparison.Ordinal)) return true;
+        if (path.StartsWith(@"\\?\", StringComparison.Ordinal)
+            || path.StartsWith(@"\??\", StringComparison.Ordinal)) return true;
 
         for (var i = 0; i < path.Length - 1; i++)
         {
@@ -761,8 +764,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     try
                     {
                         using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
-                        var localPkg = ipKey?.GetValue("LocalPackage") as string;
-                        if (!string.IsNullOrEmpty(localPkg))
+                        if (!TryReadLocalPackage(ipKey, out var localPkg))
+                        {
+                            failures++;
+                            failureLog.Record(UnreadableLocalPackage(), cause: "product-localpackage");
+                        }
+                        else if (!string.IsNullOrEmpty(localPkg))
                         {
                             var path = NormaliseLocalPackagePath(localPkg);
                             // Short-circuited on purpose: the disk is asked about
@@ -799,8 +806,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     try
                     {
                         using var patchKey = patchesKey.OpenSubKey(patchGuid);
-                        var localPkg = patchKey?.GetValue("LocalPackage") as string;
-                        if (!string.IsNullOrEmpty(localPkg))
+                        if (!TryReadLocalPackage(patchKey, out var localPkg))
+                        {
+                            failures++;
+                            failureLog.Record(UnreadableLocalPackage(), cause: "patch-localpackage");
+                        }
+                        else if (!string.IsNullOrEmpty(localPkg))
                         {
                             var path = NormaliseLocalPackagePath(localPkg);
                             if (MergeClaim(claimed, new RegisteredPackage(path, "", ""),
@@ -825,6 +836,63 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles);
     }
+
+    /// <summary>
+    /// Reads a LocalPackage value, separating the two ways it can yield nothing,
+    /// because only one of them is a failure and the caller's count is weighed by
+    /// the degraded-sources gate.
+    ///
+    /// A registration with no such value is an ordinary state: an advertised or
+    /// partially removed product carries no cached path and there is nothing to
+    /// read. A value that is PRESENT and is not a string is a read that failed.
+    /// Discarding the second silently through a cast contributes no claim and no
+    /// failure, so a subtree of them reads as a fallback that ran cleanly and
+    /// found nothing to say, which is the one state the gate exists to tell apart
+    /// from a healthy machine.
+    ///
+    /// Nothing writing these keys is obliged to use REG_SZ. One machine's 136 of
+    /// 136 being REG_SZ says what that machine holds and nothing about what the
+    /// shape can be.
+    /// </summary>
+    private static bool TryReadLocalPackage(Microsoft.Win32.RegistryKey? key, out string? path)
+    {
+        path = null;
+
+        // Absent by structure, then absent by value: neither is a failed read.
+        if (key is null) return true;
+        var raw = key.GetValue("LocalPackage");
+        if (raw is null) return true;
+
+        if (raw is not string value) return false;
+
+        path = value;
+        return true;
+    }
+
+    /// <summary>
+    /// The exception carrying an unreadable LocalPackage into the per-item
+    /// failure log. It names no path and no product: the log is read after a
+    /// report of missing registered files, and the app runs elevated, so a
+    /// registry value from another account's subtree is not something to write
+    /// down for a diagnosis that does not need it. The cause string at the call
+    /// site says which of the two loops raised it.
+    /// </summary>
+    private static InvalidDataException UnreadableLocalPackage() =>
+        new("A registered LocalPackage value was present and was not a string.");
+
+    /// <summary>
+    /// Puts a surviving prefix into the spelling Win32 accepts. Both forms reach
+    /// this from a registered value and both name the same object, but only the
+    /// <c>\\?\</c> one survives <see cref="Path.GetFullPath(string)"/> intact:
+    /// the other's leading separator is read as rooted on the running process's
+    /// drive, so the resolver would answer about a path that depends on where the
+    /// process was started from. A path with no prefix left is returned as it
+    /// arrived, the strip having already dealt with the rooted forms.
+    /// </summary>
+    private static string ToWin32Prefix(string path) =>
+        path.StartsWith(@"\??\", StringComparison.Ordinal)
+            ? string.Concat(@"\\?\", path.AsSpan(4))
+            : path;
 
     private const int MaxProductIndex = 10_000;
     private const int MaxConsecutiveNonSuccess = 20;

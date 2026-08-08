@@ -45,7 +45,13 @@ public class InstallerQueryServiceShortNameTriggerTests
     [InlineData(@"\\?\Volume{9c3a1d2e-0000-0000-0000-100000000000}\Windows\Installer\9f05cba.msi")]
     [InlineData(@"\\?\GLOBALROOT\Device\HarddiskVolume3\Windows\Installer\9f05cba.msi")]
     [InlineData(@"\\?\HarddiskVolume3\Windows\Installer\9f05cba.msi")]
-    public void A_surviving_long_path_prefix_is_worth_a_handle(string path) =>
+    // Both spellings, because a registered value can carry either and they name
+    // the same object. The NT form is the one that cannot be left to
+    // Path.GetFullPath, which reads its leading separator as rooted on the
+    // running process's drive; missing it here is how it stayed unnoticed.
+    [InlineData(@"\??\Volume{9c3a1d2e-0000-0000-0000-100000000000}\Windows\Installer\9f05cba.msi")]
+    [InlineData(@"\??\GLOBALROOT\Device\HarddiskVolume3\Windows\Installer\9f05cba.msi")]
+    public void A_surviving_prefix_of_either_form_is_worth_a_handle(string path) =>
         Assert.True(InstallerQueryService.NeedsFinalPathResolution(path));
 
     [Theory]
@@ -79,14 +85,15 @@ public class InstallerQueryServiceShortNameTriggerTests
         Assert.False(InstallerQueryService.NeedsFinalPathResolution(path));
 
     /// <summary>
-    /// The NT object form over a volume GUID is the acknowledged gap: the strip
-    /// leaves it whole for want of a drive root and it carries neither trigger,
-    /// so it is not selected. Pinned as the current behaviour rather than as
-    /// desired behaviour, so that closing it fails this test loudly instead of
-    /// passing unnoticed.
+    /// A prefix the strip already dealt with must not be selected: taking
+    /// <c>\??\</c> off a drive-rooted path is exactly what StripLongPathPrefix
+    /// does, so what arrives here is an ordinary path and a handle on it would
+    /// buy nothing. Pinned because the two prefix tests read alike and only the
+    /// surviving one is meant to fire.
     /// </summary>
-    [Fact]
-    public void The_NT_form_over_a_volume_GUID_is_not_selected_and_that_is_the_known_gap() =>
-        Assert.False(InstallerQueryService.NeedsFinalPathResolution(
-            @"\??\Volume{9c3a1d2e-0000-0000-0000-100000000000}\Windows\Installer\9f05cba.msi"));
+    [Theory]
+    [InlineData(@"C:\Windows\Installer\9f05cba.msi")]
+    [InlineData(@"\\server\share\Installer\9f05cba.msi")]
+    public void A_path_the_strip_already_settled_costs_no_handle(string path) =>
+        Assert.False(InstallerQueryService.NeedsFinalPathResolution(path));
 }
