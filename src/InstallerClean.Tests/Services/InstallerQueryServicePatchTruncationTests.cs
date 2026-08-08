@@ -29,6 +29,7 @@ public class InstallerQueryServicePatchTruncationTests
 {
     private const uint Success = 0, MoreData = 234, NoMoreItems = 259;
     private const uint UnknownPatch = 1647, BadConfiguration = 1610;
+    private const uint AccessDenied = 5, InvalidParameter = 87, UnknownProduct = 1605;
 
     private const string Superseding = "{AAAAAAAA-0000-0000-0000-00000000000A}";
     private const string StillApplied = "{BBBBBBBB-0000-0000-0000-00000000000B}";
@@ -40,6 +41,35 @@ public class InstallerQueryServicePatchTruncationTests
 
     private static Task<InstallerQueryResult> Run(FakeApi msi) =>
         new InstallerQueryService(msi, NoFallback).GetRegisteredPackagesAsync();
+
+    private static Task<InstallerQueryResult> Run(FakeApi msi, IPackageIdentityReader reader) =>
+        new InstallerQueryService(msi, NoFallback, null, reader).GetRegisteredPackagesAsync();
+
+    /// <summary>A patch file declaring the given target products.</summary>
+    private static IPackageIdentityReader Reader(string path, params string[] targets) =>
+        new FakeReader { [path] = new PackageIdentity(Patch, IsPatch: true, targets) };
+
+    /// <summary>A patch file that yields no identity at all.</summary>
+    private static IPackageIdentityReader UnreadableReader(string path) =>
+        new FakeReader { [path] = null };
+
+    private sealed class FakeReader : IPackageIdentityReader
+    {
+        private readonly Dictionary<string, PackageIdentity?> _byPath = new(StringComparer.OrdinalIgnoreCase);
+
+        public PackageIdentity? this[string path] { set => _byPath[path] = value; }
+
+        public PackageIdentity? Read(string filePath, bool isPatch, out string detail)
+        {
+            detail = string.Empty;
+            // Matched on the leaf, because the service normalises the path before
+            // it reaches here and that does different things on different hosts.
+            foreach (var kv in _byPath)
+                if (filePath.EndsWith(System.IO.Path.GetFileName(kv.Key), StringComparison.OrdinalIgnoreCase))
+                    return kv.Value;
+            return new PackageIdentity(string.Empty, isPatch, Array.Empty<string>());
+        }
+    }
 
     /// <summary>
     /// Two products hold one cached patch. The first says superseded and no
@@ -208,6 +238,181 @@ public class InstallerQueryServicePatchTruncationTests
         Assert.False(row.RemovableWithheld);
     }
 
+    [Fact]
+    public async Task The_ordinary_machine_shape_still_offers_its_removable_patch()
+    {
+        // THE SHAPE THAT MUST NOT REGRESS, taken from the machine all of this was
+        // measured on: the enumeration is whole, the registry legitimately runs
+        // one key ahead because a failed uninstall left it behind, and a
+        // superseded patch nothing else holds is on the disk.
+        //
+        // Everything added here withholds when it cannot answer, so the failure
+        // mode of the whole pass is an empty offer. This is the test that says it
+        // is not empty on the machine people actually have.
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.AddProduct(StillApplied);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+
+        var result = await new InstallerQueryService(msi,
+                (_, _) => new InstallerQueryService.FallbackRead(0, msi.WalkedProducts + 1))
+            .GetRegisteredPackagesAsync();
+
+        var row = Assert.Single(result.Packages);
+        Assert.True(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+        Assert.Equal(0, result.UnreadableProductCount);
+    }
+
+    // ---- Route A: the product the walk never returned ----
+
+    [Fact]
+    public async Task A_product_the_walk_never_returned_is_found_and_still_holds_the_patch()
+    {
+        // THE RESIDUE THIS ROUTE EXISTS FOR. The product enumeration itself came
+        // back short, so the product holding the patch is in no list the pass can
+        // iterate. Asking the API about no product in particular names it, and
+        // the keyed read then settles it.
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        // Installed, holds the patch as applied, and absent from the walk.
+        msi.HiddenFromWalk.Add(StillApplied);
+        msi.HoldPatch(StillApplied, Patch, Shared, state: "1", uninstallable: "1");
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_machine_wide_enumeration_that_refuses_withholds_every_removable_verdict()
+    {
+        // An enumeration that came back empty because it refused, read as "no
+        // other product holds it", is the exact fault this pass exists to close.
+        // So a refusal is not an answer and everything still removable is kept.
+        var msi = TwoProductsOneSharedPatch();
+        msi.MachineWidePatchEnumResult = BadConfiguration;
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+    }
+
+    [Theory]
+    [InlineData(AccessDenied)]
+    [InlineData(InvalidParameter)]
+    [InlineData(UnknownProduct)]
+    public async Task Every_documented_failure_of_that_enumeration_withholds(uint code)
+    {
+        // The page lists these among its returns. None of them is an answer, and
+        // each is decided here rather than falling through a default.
+        var msi = TwoProductsOneSharedPatch();
+        msi.MachineWidePatchEnumResult = code;
+
+        var result = await Run(msi);
+
+        Assert.True(Assert.Single(result.Packages).RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_machine_wide_row_that_names_nothing_withholds()
+    {
+        // A success that wrote no codes cannot be used and cannot be shown to be
+        // harmless, so it is treated as the row that was missed.
+        var msi = TwoProductsOneSharedPatch();
+        msi.MachineWideEmitsEmptyRow = true;
+
+        var result = await Run(msi);
+
+        Assert.True(Assert.Single(result.Packages).RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_machine_with_nothing_removable_never_runs_the_machine_wide_enumeration()
+    {
+        // It is the one call in this pass that scales with the whole machine, so
+        // the ordinary machine must not pay for it.
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "1", uninstallable: "1");
+
+        await Run(msi);
+
+        Assert.Equal(0, msi.MachineWideRowsServed);
+    }
+
+    // ---- Route B: what the patch file itself declares ----
+
+    [Fact]
+    public async Task A_target_the_patch_file_names_is_asked_even_when_no_enumeration_names_it()
+    {
+        // Route A has a documented blind spot: in the per-user-unmanaged context
+        // it enumerates only patches installed with Windows Installer 3.0 for
+        // users other than the current one. The file's own Template does not care
+        // what any enumeration returned, which is why both routes exist.
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        // Installed and holding the patch, invisible to BOTH enumerations.
+        msi.HiddenFromWalk.Add(StillApplied);
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "1");
+
+        var result = await Run(msi, Reader(Shared, StillApplied));
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_patch_whose_own_declaration_cannot_be_read_is_withheld()
+    {
+        // The row has to still be removable when route B runs, or the merge has
+        // already settled it and the file is never read.
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+
+        var result = await Run(msi, UnreadableReader(Shared));
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_declared_target_that_is_not_installed_is_a_clean_answer()
+    {
+        // A product that is not there holds no patches, so it says nothing either
+        // way and must not withhold. This is the direction that would delete the
+        // feature if it went wrong.
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+
+        var result = await Run(msi, Reader(Shared, "{EEEEEEEE-0000-0000-0000-00000000000E}"));
+
+        Assert.True(Assert.Single(result.Packages).IsRemovable);
+    }
+
+    [Fact]
+    public async Task A_declared_target_that_cannot_be_located_withholds()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.ProductResolveResult[StillApplied] = BadConfiguration;
+
+        var result = await Run(msi, Reader(Shared, StillApplied));
+
+        Assert.True(Assert.Single(result.Packages).RemovableWithheld);
+    }
+
     /// <summary>
     /// A machine, declared rather than scripted call by call. It answers the four
     /// entry points off the products and patches it has been told about, and can
@@ -223,6 +428,26 @@ public class InstallerQueryServicePatchTruncationTests
         /// <summary>Products whose patch enumeration returns nothing at all.</summary>
         public HashSet<string> EnumerationEndsEarlyFor { get; } = new();
 
+        /// <summary>
+        /// Products that ARE installed and that the product walk never returns,
+        /// which is the truncation this whole pass exists for. They answer a
+        /// filtered enumeration and every keyed read exactly as a real product
+        /// would; they are simply absent from the walk.
+        /// </summary>
+        public HashSet<string> HiddenFromWalk { get; } = new();
+
+        /// <summary>Forces a return out of the machine-wide patch enumeration (route A).</summary>
+        public uint? MachineWidePatchEnumResult { get; set; }
+
+        /// <summary>Makes the machine-wide enumeration report a row naming nothing.</summary>
+        public bool MachineWideEmitsEmptyRow { get; set; }
+
+        /// <summary>Forces a return out of the filtered product enumeration for one code.</summary>
+        public Dictionary<string, uint> ProductResolveResult { get; } = new();
+
+        /// <summary>Machine-wide patch rows actually served, for the cost assertions.</summary>
+        public int MachineWideRowsServed { get; private set; }
+
         public Dictionary<(string Patch, string Product, string Property), uint> PatchPropertyResult { get; } = new();
 
         /// <summary>
@@ -235,6 +460,21 @@ public class InstallerQueryServicePatchTruncationTests
         public List<(string Patch, string Product)> ConfirmationAsks { get; } = new();
 
         public void AddProduct(string code) => _products.Add(code);
+
+        /// <summary>How many products the walk returns, for the headcount tests.</summary>
+        public int WalkedProducts => _products.Count;
+
+        /// <summary>
+        /// The pairing exists and every keyed read answers for it, while no
+        /// enumeration names it. That is route A's documented blind spot in the
+        /// flesh, and the state only the patch file's own Template can reach.
+        /// </summary>
+        public void HoldPatchInvisibleToEnumeration(string productCode, string patchCode,
+            string state, string uninstallable)
+        {
+            _patchProps[(patchCode, productCode, "State")] = state;
+            _patchProps[(patchCode, productCode, "Uninstallable")] = uninstallable;
+        }
 
         public void HoldPatch(string productCode, string patchCode, string localPackage,
             string state, string uninstallable)
@@ -257,6 +497,22 @@ public class InstallerQueryServicePatchTruncationTests
             char[]? sid, ref uint sidLength)
         {
             installedContext = MsiInstallContext.Machine;
+
+            // Filtered to one code: the question "where is this product
+            // installed", which answers for a product the walk never returned.
+            if (productCode is not null)
+            {
+                if (ProductResolveResult.TryGetValue(productCode, out var forced)) return forced;
+                if (index > 0) return NoMoreItems;
+                var exists = _products.Contains(productCode) || HiddenFromWalk.Contains(productCode);
+                if (!exists) return NoMoreItems;
+                Write(installedProductCode, productCode);
+                sidLength = 0;
+                return Success;
+            }
+
+            // The walk. It does NOT return the hidden products, which is the
+            // whole point of them.
             if (index >= _products.Count) return NoMoreItems;
             Write(installedProductCode, _products[(int)index]);
             return Success;
@@ -267,11 +523,31 @@ public class InstallerQueryServicePatchTruncationTests
             out MsiInstallContext targetProductContext, char[]? targetUserSid, ref uint targetUserSidLength)
         {
             targetProductContext = MsiInstallContext.Machine;
+
+            // Route A: no product in particular. Every pairing the machine holds,
+            // including those of products the walk never returned.
+            if (productCode is null)
+            {
+                if (MachineWidePatchEnumResult is { } forced) return forced;
+                var rows = _patchesOf
+                    .SelectMany(kv => kv.Value.Select(pc => (Patch: pc, Product: kv.Key)))
+                    .OrderBy(r => r.Product, StringComparer.Ordinal)
+                    .ThenBy(r => r.Patch, StringComparer.Ordinal)
+                    .ToList();
+                if (index >= rows.Count) return NoMoreItems;
+                MachineWideRowsServed++;
+                if (MachineWideEmitsEmptyRow) return Success;   // buffers left blank
+                Write(patchCode, rows[(int)index].Patch);
+                Write(targetProductCode, rows[(int)index].Product);
+                targetUserSidLength = 0;
+                return Success;
+            }
+
             // A false clean end: the list stops before it should and says so the
             // same way a finished list does.
-            if (productCode is not null && EnumerationEndsEarlyFor.Contains(productCode))
+            if (EnumerationEndsEarlyFor.Contains(productCode))
                 return NoMoreItems;
-            var list = productCode is not null && _patchesOf.TryGetValue(productCode, out var l) ? l : null;
+            var list = _patchesOf.TryGetValue(productCode, out var l) ? l : null;
             if (list is null || index >= list.Count) return NoMoreItems;
             Write(patchCode, list[(int)index]);
             return Success;

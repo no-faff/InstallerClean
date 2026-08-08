@@ -37,6 +37,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private readonly Action<Exception>? _crashLogSink;
 
     /// <summary>
+    /// Reads a cached patch's own declared target products, which is the one
+    /// source that does not depend on any enumeration having been complete. See
+    /// <see cref="TargetsDeclaredByPatchFile"/>.
+    /// </summary>
+    private readonly IPackageIdentityReader _identityReader;
+
+    /// <summary>
     /// Reads the registry fallback into <paramref name="claimed"/> and reports
     /// what it saw on the way.
     ///
@@ -101,6 +108,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     public InstallerQueryService(IMsiApi msi) : this(msi, ReadRegistryFallback) { }
 
     /// <summary>
+    /// Production constructor for the composed graph: DI supplies both seams.
+    /// </summary>
+    public InstallerQueryService(IMsiApi msi, IPackageIdentityReader identityReader)
+        : this(msi, ReadRegistryFallback, null, identityReader) { }
+
+    /// <summary>
     /// Full seam constructor, for the tests that drive both sources. See
     /// <see cref="FallbackReader"/>.
     /// </summary>
@@ -113,12 +126,36 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// suite. The registry fallback owns its own budget, being a static this
     /// never reaches.
     /// </param>
+    /// <param name="identityReader">
+    /// Null in the tests whose subject is the enumeration and the merge, where it
+    /// binds a reader that yields nothing. That reads a patch file as having
+    /// declared no targets, which is the same as the file being absent and is what
+    /// those tests already assume; the tests whose subject IS route B inject one.
+    /// </param>
     internal InstallerQueryService(IMsiApi msi, FallbackReader readFallback,
-        Action<Exception>? crashLogSink = null)
+        Action<Exception>? crashLogSink = null, IPackageIdentityReader? identityReader = null)
     {
         _msi = msi;
         _readFallback = readFallback;
         _crashLogSink = crashLogSink;
+        _identityReader = identityReader ?? NoPackageIdentity.Instance;
+    }
+
+    /// <summary>
+    /// A reader that opens nothing and yields nothing, for the constructors that
+    /// take no reader. It reports the file as unread rather than as unreadable,
+    /// so a test that never meant to exercise route B is not silently made to
+    /// withhold by it.
+    /// </summary>
+    private sealed class NoPackageIdentity : IPackageIdentityReader
+    {
+        internal static readonly NoPackageIdentity Instance = new();
+
+        public Models.PackageIdentity? Read(string filePath, bool isPatch, out string detail)
+        {
+            detail = string.Empty;
+            return new Models.PackageIdentity(string.Empty, isPatch, Array.Empty<string>());
+        }
     }
 
     /// <inheritdoc />
@@ -498,6 +535,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         foreach (var claim in patchClaims)
             alreadyAsked.Add((claim.PatchCode, claim.ProductCode));
 
+        // ROUTE A. Every (patch, product) pairing the API will name when asked
+        // about no product in particular, which is the only way to hear about a
+        // product the product enumeration never returned. Null where it did not
+        // run to a clean end, and that withholds rather than reading as nothing
+        // to report: an enumeration that came back empty because it refused,
+        // taken as an answer, is the exact fault this whole pass exists to close.
+        var holders = EnumeratePatchHoldersAcrossAllProducts(ct);
+
         foreach (var (path, patchCode) in toConfirm)
         {
             ct.ThrowIfCancellationRequested();
@@ -506,7 +551,41 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // verdict is gone and cannot come back, downgrades being one-way.
             if (!claimed.TryGetValue(path, out var current) || !current.IsRemovable) continue;
 
-            foreach (var (productCode, userSid, context) in products)
+            if (holders is null)
+            {
+                Downgrade(claimed, path, withheld: true);
+                continue;
+            }
+
+            // The products to put the question to: the ones the enumeration
+            // returned, plus any route A named for this patch, plus any the patch
+            // file itself says it targets. The three overlap heavily on a healthy
+            // machine and are unioned rather than chosen between, because each
+            // sees something the others cannot and every one of them can only add
+            // a product to ask.
+            var toAsk = new List<(string ProductCode, string? Sid, MsiInstallContext Context)>(products);
+            if (holders.TryGetValue(patchCode, out var named)) toAsk.AddRange(named);
+
+            var fromFile = TargetsDeclaredByPatchFile(path, out var fileUnreadable);
+            if (fileUnreadable)
+            {
+                Downgrade(claimed, path, withheld: true);
+                continue;
+            }
+            foreach (var target in fromFile)
+            {
+                var resolved = ResolveProductInstance(target);
+                if (resolved.Unaskable)
+                {
+                    Downgrade(claimed, path, withheld: true);
+                    break;
+                }
+                if (resolved.Installed)
+                    toAsk.Add((target, resolved.Sid, resolved.Context));
+            }
+            if (!claimed.TryGetValue(path, out current) || !current.IsRemovable) continue;
+
+            foreach (var (productCode, userSid, context) in toAsk)
             {
                 if (alreadyAsked.Contains((patchCode, productCode))) continue;
 
@@ -549,6 +628,216 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// ROUTE A. Every patch the machine holds, mapped to the products holding it,
+    /// by asking the API about no product in particular.
+    ///
+    /// <c>MsiEnumPatchesEx</c> documents a null <c>szProductCode</c> as "the
+    /// patches for all products under the specified context are enumerated", and
+    /// hands back the target product's own code, context and SID on every row. So
+    /// it is the one call that can name a product the PRODUCT enumeration never
+    /// returned, which is the whole reason it is here: a product missing from
+    /// that list cannot be asked about a patch, and the pass that confirms a
+    /// removable verdict would otherwise be blind to exactly the registration
+    /// that would overturn it.
+    ///
+    /// IT HAS A DOCUMENTED BLIND SPOT AND IT IS WHY THIS IS NOT THE ONLY ROUTE.
+    /// In the per-user-unmanaged context, "only patches installed with Windows
+    /// Installer version 3.0 are enumerated for users that are not the current
+    /// user". A patch applied under another account by an installer older than
+    /// that is invisible here, whatever else is working. The patch file's own
+    /// declared targets are read alongside for that reason, and the keyed reads
+    /// both routes feed carry no such limitation: the administrator group may
+    /// query patch data for any product instance and any user on the computer.
+    ///
+    /// NULL MEANS THE ANSWER IS NOT AVAILABLE AND EVERY REMOVABLE VERDICT IS
+    /// WITHHELD, which is deliberate and is the more expensive direction. A short
+    /// or refused enumeration read as "no other product holds it" is the fault
+    /// this pass exists to close, so nothing here distinguishes a refusal from an
+    /// empty machine.
+    /// </summary>
+    private Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>?
+        EnumeratePatchHoldersAcrossAllProducts(CancellationToken ct)
+    {
+        var holders = new Dictionary<string, List<(string, string?, MsiInstallContext)>>(
+            StringComparer.OrdinalIgnoreCase);
+        var patchCode = new char[Msi.GuidBufferLength];
+        var targetProductCode = new char[Msi.GuidBufferLength];
+        var sidBuffer = new char[SidBufferLength];
+
+        for (uint index = 0; index < MaxPatchIndex; index++)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            Array.Clear(patchCode);
+            Array.Clear(targetProductCode);
+            uint sidLength = SidBufferLength;
+
+            var error = _msi.EnumPatches(
+                productCode: null,
+                userSid: AllUsersSid,
+                context: MsiInstallContext.All,
+                filter: MsiPatchFilter.All,
+                index: index,
+                patchCode: patchCode,
+                targetProductCode: targetProductCode,
+                targetProductContext: out var targetContext,
+                targetUserSid: sidBuffer,
+                targetUserSidLength: ref sidLength);
+
+            if (error == MsiError.MoreData)
+            {
+                // The SID did not fit. Documented as the count excluding the
+                // terminator, so the retry is that plus one.
+                sidLength++;
+                sidBuffer = new char[sidLength];
+                error = _msi.EnumPatches(
+                    productCode: null,
+                    userSid: AllUsersSid,
+                    context: MsiInstallContext.All,
+                    filter: MsiPatchFilter.All,
+                    index: index,
+                    patchCode: patchCode,
+                    targetProductCode: targetProductCode,
+                    targetProductContext: out targetContext,
+                    targetUserSid: sidBuffer,
+                    targetUserSidLength: ref sidLength);
+            }
+
+            if (error == MsiError.NoMoreItems) return holders;
+
+            // Every documented failure return lands here: access denied, corrupt
+            // configuration, an invalid parameter, an unknown product. None of
+            // them is an answer, and a set short by an unknown amount is a veto
+            // that does not fire.
+            if (error != MsiError.Success) return null;
+
+            var code = BufferToString(patchCode);
+            var target = BufferToString(targetProductCode);
+            if (code.Length == 0 || target.Length == 0)
+            {
+                // A success that named nothing. It cannot be used and it cannot
+                // be shown to be harmless, so it is treated as the row that was
+                // missed rather than skipped.
+                return null;
+            }
+
+            var safeSidLength = (int)Math.Min(sidLength, (uint)sidBuffer.Length);
+            var sid = (targetContext != MsiInstallContext.Machine && safeSidLength > 0)
+                ? new string(sidBuffer, 0, safeSidLength)
+                : null;
+
+            if (!holders.TryGetValue(code, out var list))
+                holders[code] = list = new List<(string, string?, MsiInstallContext)>();
+            list.Add((target, sid, targetContext));
+        }
+
+        // Ran out of budget rather than reaching the end, so the map is short for
+        // the same reason a refusal makes it short.
+        return null;
+    }
+
+    /// <summary>
+    /// ROUTE B. The product codes a cached patch says in its own Template that it
+    /// may be applied to.
+    ///
+    /// It is read from the FILE, so it does not care what any enumeration
+    /// returned, which is what makes it the answer to route A's documented blind
+    /// spot. Its own limit is the other way round: it names the products the
+    /// patch may target rather than the products that hold it, and the evidence
+    /// that the Template is complete for this purpose is two files on one
+    /// machine, which is the thinnest thing either route stands on.
+    /// </summary>
+    /// <param name="unreadable">
+    /// True where the file exists and would not yield an identity. A patch whose
+    /// own declaration cannot be read has not been shown to be unneeded by
+    /// anybody, so the caller withholds rather than proceeding on the other two
+    /// routes alone. An absent file is not unreadable: there is nothing there to
+    /// remove and nothing to withhold.
+    /// </param>
+    private IReadOnlyList<string> TargetsDeclaredByPatchFile(string path, out bool unreadable)
+    {
+        unreadable = false;
+
+        // Only a patch has a Template to read. A cached product package is not
+        // this route's business and its absence of one is not a failure.
+        if (!path.EndsWith(".msp", StringComparison.OrdinalIgnoreCase))
+            return Array.Empty<string>();
+
+        // A file that is not there is left to the read below rather than tested
+        // for, and the outcome is the same either way: a row that is withheld and
+        // whose file has gone, and a row that is removable and whose file has
+        // gone, both reach the scan's benign missing-removable count and neither
+        // is offered or reported. Testing for it here would put a real-filesystem
+        // question inside a decision that has no other, for no difference anybody
+        // can observe.
+        var identity = _identityReader.Read(path, isPatch: true, out _);
+        if (identity is null)
+        {
+            unreadable = true;
+            return Array.Empty<string>();
+        }
+
+        return identity.Value.TargetProductCodes;
+    }
+
+    /// <summary>
+    /// Where one product code is installed, asked about that code alone.
+    ///
+    /// Route B yields a product code and nothing else, and a keyed patch read
+    /// needs the account and context the instance lives in. The filtered product
+    /// enumeration answers exactly that for a single code and stops at the first
+    /// row, so it is a question about one product rather than a walk of the
+    /// machine's list.
+    /// </summary>
+    /// <returns>
+    /// <c>Installed</c> with the instance's account and context; or neither flag,
+    /// meaning the code is positively not installed, which is a clean answer
+    /// because a product that is not there holds no patches; or
+    /// <c>Unaskable</c>, which withholds.
+    /// </returns>
+    private (bool Installed, bool Unaskable, string? Sid, MsiInstallContext Context)
+        ResolveProductInstance(string productCode)
+    {
+        var installedCode = new char[Msi.GuidBufferLength];
+        var sidBuffer = new char[SidBufferLength];
+        uint sidLength = SidBufferLength;
+
+        var error = _msi.EnumProducts(
+            productCode: productCode,
+            userSid: AllUsersSid,
+            context: MsiInstallContext.All,
+            index: 0,
+            installedProductCode: installedCode,
+            installedContext: out var context,
+            sid: sidBuffer,
+            sidLength: ref sidLength);
+
+        if (error == MsiError.MoreData)
+        {
+            sidLength++;
+            sidBuffer = new char[sidLength];
+            error = _msi.EnumProducts(
+                productCode: productCode,
+                userSid: AllUsersSid,
+                context: MsiInstallContext.All,
+                index: 0,
+                installedProductCode: installedCode,
+                installedContext: out context,
+                sid: sidBuffer,
+                sidLength: ref sidLength);
+        }
+
+        if (error == MsiError.NoMoreItems) return (false, false, null, default);
+        if (error != MsiError.Success) return (false, true, null, default);
+
+        var safeSidLength = (int)Math.Min(sidLength, (uint)sidBuffer.Length);
+        var sid = (context != MsiInstallContext.Machine && safeSidLength > 0)
+            ? new string(sidBuffer, 0, safeSidLength)
+            : null;
+        return (true, false, sid, context);
     }
 
     /// <summary>
