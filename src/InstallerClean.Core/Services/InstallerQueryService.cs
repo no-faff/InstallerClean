@@ -849,7 +849,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <c>Installed</c> with the instance's account and context; or neither flag,
     /// meaning the code is positively not installed, which is a clean answer
     /// because a product that is not there holds no patches; or
-    /// <c>Unaskable</c>, which withholds.
+    /// <c>Unaskable</c>, which withholds. Which returns say "not installed" is
+    /// <see cref="IsProductNotInstalled"/>'s, and there is more than one of them.
     /// </returns>
     private (bool Installed, bool Unaskable, string? Sid, MsiInstallContext Context)
         ResolveProductInstance(string productCode)
@@ -883,7 +884,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 sidLength: ref sidLength);
         }
 
-        if (error == MsiError.NoMoreItems) return (false, false, null, default);
+        if (IsProductNotInstalled(error)) return (false, false, null, default);
         if (error != MsiError.Success) return (false, true, null, default);
 
         var safeSidLength = (int)Math.Min(sidLength, (uint)sidBuffer.Length);
@@ -1883,6 +1884,31 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private static bool IsRecordAbsent(uint error) =>
         error is MsiError.UnknownProduct or MsiError.UnknownPatch;
+
+    /// <summary>
+    /// The returns of a KEYED <c>MsiEnumProductsEx</c> that positively establish
+    /// the product asked about is not installed. A third ALLOWLIST for the reason
+    /// the two above are ones: only a code documented to mean absence may be read
+    /// as absence, and an unlisted one stays unaskable and withholds.
+    ///
+    /// ERROR_UNKNOWN_PRODUCT belongs on it because that function's return table
+    /// glosses it "The product is not installed on the computer in the specified
+    /// context", which is an answer about the machine rather than a failure to
+    /// read one. Reading it as a failure to read is the expensive direction here
+    /// and not the safe one: the products a cached patch declares as targets are
+    /// mostly products the machine does not have, so it would withhold on the
+    /// ordinary case rather than on a fault.
+    ///
+    /// THE SAME CODE IS A FAILURE WHERE THE CALL NAMES NO PRODUCT, AND THAT IS NOT
+    /// AN INCONSISTENCY TO TIDY AWAY. <see cref="EnumerateProducts"/> and
+    /// <see cref="EnumeratePatchHoldersAcrossAllProducts"/> both pass a null
+    /// product code, so there is no product for the code to be reporting absent
+    /// and it cannot carry this meaning; both are right to treat it as a row or a
+    /// set short by an unknown amount. The meaning is the question's, not the
+    /// number's.
+    /// </summary>
+    private static bool IsProductNotInstalled(uint error) =>
+        error is MsiError.NoMoreItems or MsiError.UnknownProduct;
 
     /// <summary>
     /// Retrieves a product property using the double-call buffer pattern,

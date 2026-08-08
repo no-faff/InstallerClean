@@ -34,6 +34,10 @@ public class InstallerQueryServicePatchTruncationTests
     private const string Superseding = "{AAAAAAAA-0000-0000-0000-00000000000A}";
     private const string StillApplied = "{BBBBBBBB-0000-0000-0000-00000000000B}";
     private const string Patch = "{CCCCCCCC-0000-0000-0000-00000000000C}";
+
+    /// <summary>A product code no machine here has, for the resolve's clean negative.</summary>
+    private const string NotInstalled = "{EEEEEEEE-0000-0000-0000-00000000000E}";
+
     private const string Shared = @"C:\Windows\Installer\shared.msp";
 
     private static InstallerQueryService.FallbackRead NoFallback(
@@ -411,17 +415,31 @@ public class InstallerQueryServicePatchTruncationTests
         Assert.True(row.RemovableWithheld);
     }
 
-    [Fact]
-    public async Task A_declared_target_that_is_not_installed_is_a_clean_answer()
+    /// <summary>
+    /// A product that is not there holds no patches, so it says nothing either way
+    /// and must not withhold. This is the direction that would delete the feature
+    /// if it went wrong, and a patch declares mostly products the machine does not
+    /// have, so it is the ordinary case rather than an edge.
+    ///
+    /// BOTH RETURNS ARE FORCED THROUGH THE RESOLVE RATHER THAN LEFT TO THE FAKE.
+    /// Microsoft's return table for that function carries ERROR_NO_MORE_ITEMS and
+    /// ERROR_UNKNOWN_PRODUCT, the latter glossed as the product not being
+    /// installed in the context asked about, and which one a given msi.dll picks
+    /// for a keyed call is not established anywhere. A fake left to choose one
+    /// tests the fake's choice, and the answer this test wants is that the choice
+    /// cannot matter.
+    /// </summary>
+    [Theory]
+    [InlineData(NoMoreItems)]
+    [InlineData(UnknownProduct)]
+    public async Task A_declared_target_that_is_not_installed_is_a_clean_answer(uint notInstalled)
     {
-        // A product that is not there holds no patches, so it says nothing either
-        // way and must not withhold. This is the direction that would delete the
-        // feature if it went wrong.
         var msi = new FakeApi();
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.ProductResolveResult[NotInstalled] = notInstalled;
 
-        var result = await Run(msi, Reader(Shared, "{EEEEEEEE-0000-0000-0000-00000000000E}"));
+        var result = await Run(msi, Reader(Shared, NotInstalled));
 
         Assert.True(Assert.Single(result.Packages).IsRemovable);
     }
