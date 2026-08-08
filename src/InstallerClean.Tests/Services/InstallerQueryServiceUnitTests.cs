@@ -235,6 +235,69 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
+    public void A_claim_that_establishes_something_displaces_a_row_that_does_not()
+    {
+        // Two non-removable claims on one path are not always the same finding.
+        // The row that wins is the one carrying a live claim, because it is the
+        // only one that supports a sentence: the other is a read that failed and
+        // says nothing about the file at all.
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Unread", "{A}", VerdictUnreadable: true),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Applied", "{B}", PatchState: 1),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        Assert.False(claimed[shared].VerdictUnreadable);
+        Assert.Equal("Applied", claimed[shared].ProductName);
+    }
+
+    [Fact]
+    public void A_row_whose_verdict_never_read_does_not_displace_a_live_claim()
+    {
+        // The same pair the other way round, which is the half that makes the
+        // rule an answer rather than a preference: whichever order the
+        // enumeration reaches these two products in, the file is reported the
+        // same way.
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Applied", "{B}", PatchState: 1),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Unread", "{A}", VerdictUnreadable: true),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        Assert.False(claimed[shared].VerdictUnreadable);
+        Assert.Equal("Applied", claimed[shared].ProductName);
+    }
+
+    [Fact]
+    public void A_removable_claim_does_not_displace_a_row_whose_verdict_never_read()
+    {
+        // The guard on the rule above. Displacing on the cause must not become a
+        // route back to removable: a product reading the patch as superseded says
+        // nothing about the product whose read failed, and the file it would
+        // release is one nobody has been able to ask about.
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Unread", "{A}", VerdictUnreadable: true),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Superseded", "{B}", PatchState: 2, IsRemovable: true),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        Assert.False(claimed[shared].IsRemovable);
+        Assert.True(claimed[shared].VerdictUnreadable);
+    }
+
+    [Fact]
     public void An_api_claim_never_upgrades_a_non_removable_row()
     {
         const string shared = @"C:\Windows\Installer\shared.msp";
@@ -1518,12 +1581,14 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
-    public async Task A_patch_whose_state_read_fails_is_counted_and_still_kept()
+    public async Task A_patch_whose_state_read_fails_is_counted_kept_and_marked()
     {
-        // Both halves matter and the second is the safety one. The failed read
-        // leaves the patch non-removable, so the file is kept; what the count
-        // sizes is the SENTENCE a later re-verify puts on that same failure,
-        // which reads it as a product having reclaimed the patch.
+        // Three halves, and the marking is the one that was missing. The failed
+        // read leaves the patch non-removable, so the file is kept; the count
+        // says how often the machine takes that path; and the flag is what stops
+        // a later re-verify reading the same failure as a product's live claim
+        // and telling the user so. Withheld stays false because nothing here was
+        // ever read as removable, which is the other flag's meaning.
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.AddPatch("{A}", "{P}", localPackage: @"C:\Windows\Installer\p.msp", state: "2", uninstallable: "0");
@@ -1534,14 +1599,18 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(1, result.Census.UnreadablePatchStates);
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath.EndsWith("p.msp", StringComparison.Ordinal));
         Assert.False(row.IsRemovable);
+        Assert.True(row.VerdictUnreadable);
+        Assert.False(row.RemovableWithheld);
     }
 
     [Fact]
-    public async Task An_unreadable_uninstallable_read_counts_on_the_same_term()
+    public async Task An_unreadable_uninstallable_read_counts_and_marks_on_the_same_terms()
     {
-        // Either read failing leaves the same gap, and the count says how often
-        // that happens rather than which of the two it was: the two reads answer
-        // one question between them and neither alone decides the verdict.
+        // Either read failing leaves the same gap, and both the count and the
+        // flag say how often that happens rather than which of the two it was:
+        // the two reads answer one question between them and neither alone
+        // decides the verdict. A fix keyed on State alone would leave the other
+        // half of the same question reporting a claim nobody read.
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.AddPatch("{A}", "{P}", localPackage: @"C:\Windows\Installer\p.msp", state: "2", uninstallable: "0");
@@ -1550,6 +1619,54 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         Assert.Equal(1, result.Census.UnreadablePatchStates);
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath.EndsWith("p.msp", StringComparison.Ordinal));
+        Assert.False(row.IsRemovable);
+        Assert.True(row.VerdictUnreadable);
+    }
+
+    [Fact]
+    public async Task A_read_that_answers_leaves_the_row_unmarked()
+    {
+        // The control the two above need: the flag is set by a failed read and
+        // not by the ordinary non-removable outcome, or every applied patch on
+        // every machine would be reported as a record nobody could read.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: @"C:\Windows\Installer\p.msp", state: "1", uninstallable: "1");
+
+        var result = await Run(msi);
+
+        Assert.Equal(0, result.Census.UnreadablePatchStates);
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath.EndsWith("p.msp", StringComparison.Ordinal));
+        Assert.False(row.IsRemovable);
+        Assert.False(row.VerdictUnreadable);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task A_shared_patch_one_product_really_claims_is_not_reported_as_unread(bool unreadableFirst)
+    {
+        // One patch, two products, one of them answering and one not. The file is
+        // kept whichever way round the enumeration reaches them, and so is the
+        // cause: a product that positively still holds the patch is the finding,
+        // and the failed read beside it is not a competing one. Both orders are
+        // driven because the merge keeps one row per path, so an order-dependent
+        // rule would make what the app SAYS about this file a coin flip.
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var msi = new FakeMsiApi();
+        // {A} is always the product whose read fails; only the order moves.
+        msi.AddProduct(unreadableFirst ? "{A}" : "{B}");
+        msi.AddProduct(unreadableFirst ? "{B}" : "{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: shared, state: "2", uninstallable: "0");
+        msi.AddPatch("{B}", "{P}", localPackage: shared, state: "1", uninstallable: "1");
+        msi.PatchPropertyResult[("{P}", "{A}", "State")] = BadConfiguration;
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath.EndsWith("shared.msp", StringComparison.Ordinal));
+        Assert.False(row.IsRemovable);
+        Assert.False(row.VerdictUnreadable);
     }
 
     [Fact]

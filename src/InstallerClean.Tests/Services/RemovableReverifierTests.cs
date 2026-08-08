@@ -25,6 +25,17 @@ public class RemovableReverifierTests
             PatchState: 2, IsRemovable: false, RemovableWithheld: true);
 
     /// <summary>
+    /// A patch row the re-verify's own enumeration produced with its State or
+    /// Uninstallable read failed. Non-removable like the row above and for a
+    /// different reason: that one is a verdict this scan would not act on, this
+    /// one is no verdict at all. PatchState stays 0 because an unreadable State
+    /// is what leaves it there.
+    /// </summary>
+    private static RegisteredPackage VerdictUnread(string path) =>
+        new(path, "Product", "{00000000-0000-0000-0000-000000000001}",
+            IsRemovable: false, VerdictUnreadable: true);
+
+    /// <summary>
     /// The pre-lease pass only. Its <c>IMsiApi</c> is a bare substitute because
     /// nothing on this path touches it: the under-lease re-read is the only
     /// caller, and it has tests of its own below that drive the API deliberately.
@@ -152,6 +163,45 @@ public class RemovableReverifierTests
         var result = await svc.ReverifyAsync(new[] { @"C:\Windows\Installer\reverted.msp" });
 
         Assert.Equal(new HeldBackReasons(Reclaimed: 1), result.Reasons);
+    }
+
+    [Fact]
+    public async Task A_candidate_whose_verdict_would_not_read_is_not_reported_as_a_claim()
+    {
+        // The row is non-removable, so the file is kept either way and the drop
+        // itself is not in question. What is in question is the sentence: the
+        // reclaim cause means a registered product's live claim NAMES the file,
+        // and a State or Uninstallable read that failed names nothing. Reported
+        // as a reclaim, the user is told a program wants the file back on the
+        // strength of a question nobody got an answer to.
+        const string unread = @"C:\Windows\Installer\unread-verdict.msp";
+        var svc = Reverifier(Query(VerdictUnread(unread)));
+
+        var result = await svc.ReverifyAsync(new[] { unread });
+
+        Assert.Empty(result.Surviving);
+        Assert.Equal(new[] { unread }, result.Dropped);
+        Assert.Equal(new HeldBackReasons(RecordsUnreadable: 1), result.Reasons);
+    }
+
+    [Fact]
+    public async Task One_batch_can_carry_a_claim_and_an_unread_verdict_at_once()
+    {
+        // The two rows come from one enumeration and are different findings, so
+        // one sentence for the batch is false of one of them whichever sentence
+        // is picked. Three causes rather than two makes the point sharper than
+        // the withheld pairing does: the withheld row was positively read as
+        // removable, this one was not read at all, and both are counted apart
+        // from the file a product really does claim.
+        const string reclaimed = @"C:\Windows\Installer\reverted.msp";
+        const string unread = @"C:\Windows\Installer\unread-verdict.msp";
+        var svc = Reverifier(Query(NonRemovable(reclaimed), VerdictUnread(unread)));
+
+        var result = await svc.ReverifyAsync(new[] { reclaimed, unread });
+
+        Assert.Equal(new[] { reclaimed, unread }, result.Dropped);
+        Assert.Equal(new HeldBackReasons(Reclaimed: 1, RecordsUnreadable: 1), result.Reasons);
+        Assert.Equal(result.Dropped.Count, result.Reasons.Total);
     }
 
     [Fact]

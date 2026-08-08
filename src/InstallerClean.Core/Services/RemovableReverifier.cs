@@ -77,24 +77,39 @@ public sealed class RemovableReverifier : IRemovableReverifier
             .ConfigureAwait(false);
 
         // Every path a currently NON-removable registered package claims, against
-        // whether that row's verdict was WITHHELD rather than read. A reverted
-        // patch (Superseded -> Applied) appears here unwithheld; a still-superseded
-        // patch is IsRemovable and does not appear at all; a true orphan was never
-        // registered.
+        // the cause its own row supports. A reverted patch (Superseded -> Applied)
+        // appears here as a live claim; a still-superseded patch is IsRemovable and
+        // does not appear at all; a true orphan was never registered.
         //
-        // A re-verify whose own enumeration was incomplete inherits the withheld
-        // removable class from the query, so every superseded candidate lands here
-        // too. That is the intended direction (the check that cannot confirm keeps
-        // the file), and the withheld flag is what stops the drop being reported as
-        // a program reclaiming the file. Both kinds can be in one batch, which is
-        // why the cause is carried per path and not per run.
+        // TWO ROWS OUT OF THREE CARRY NO CLAIM AT ALL, and telling them apart is
+        // the whole of what this map is for. A re-verify whose own enumeration was
+        // incomplete inherits the withheld removable class from the query, so every
+        // superseded candidate lands here too; and a patch whose State or
+        // Uninstallable read failed lands here having established nothing either
+        // way. Both are non-removable for want of a verdict rather than on one, so
+        // reporting either as a program reclaiming the file would name a cause that
+        // did not occur. All three kinds can be in one batch, which is why the
+        // cause is carried per path and not per run.
+        //
+        // THE ROW DECIDES, NOT THE CANDIDATE, AND ONE CASE THEREFORE READS WEAKER
+        // THAN IT COULD. A candidate the scan measured as an orphan, whose path a
+        // patch row names here with its verdict unread, is reported as records that
+        // could not be read, where "a registration names it now" would also have
+        // been true and is the stronger of the two. Keeping the stronger one would
+        // mean deciding the cause from what the SCAN saw, and the scan's own
+        // reading is exactly what this pass exists to distrust. A weaker true
+        // sentence is not the failure here; a stronger one reached by trusting the
+        // reading under test would be.
         //
         // A dictionary rather than a set because InstallerQueryResult.Packages is
         // one row per claimed path, so there is a single answer to record for each.
-        var nonRemovable = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        var nonRemovable = new Dictionary<string, HeldBackReason>(StringComparer.OrdinalIgnoreCase);
         foreach (var pkg in query.Packages)
             if (!pkg.IsRemovable)
-                nonRemovable[pkg.LocalPackagePath] = pkg.RemovableWithheld;
+                nonRemovable[pkg.LocalPackagePath] =
+                    pkg.RemovableWithheld || pkg.VerdictUnreadable
+                        ? HeldBackReason.RecordsUnreadable
+                        : HeldBackReason.Reclaimed;
 
         // Every path any registration names, whatever its verdict. It is what
         // separates the two branches here, exactly as the scan separates them: a
@@ -111,15 +126,10 @@ public sealed class RemovableReverifier : IRemovableReverifier
         var orphans = new List<int>();
         foreach (var path in candidatePaths)
         {
-            if (nonRemovable.TryGetValue(path, out var withheld))
+            if (nonRemovable.TryGetValue(path, out var reason))
             {
                 dropped.Add(path);
-                // Withheld means the enumeration never established what this patch
-                // was, so nothing here shows a program wants the file; unwithheld
-                // means a registered package positively claims it.
-                reasons = reasons.Plus(withheld
-                    ? HeldBackReason.RecordsUnreadable
-                    : HeldBackReason.Reclaimed);
+                reasons = reasons.Plus(reason);
             }
             else
             {
@@ -227,10 +237,11 @@ public sealed class RemovableReverifier : IRemovableReverifier
             // came back absent is reported as the failure it contains. A read that
             // could not be made has not shown the file to be removable, this is the
             // last check standing in front of a permanent delete, and the scan's own
-            // rule fails the same way. Note the asymmetry with the pre-lease pass,
-            // which is not an inconsistency: that one inherits a whole enumeration's
-            // withholding, where this one judges a single named pairing and a
-            // failure here is about that pairing alone.
+            // rule fails the same way. The pre-lease pass answers a failed read of
+            // this same pairing the same way, through the row flag its enumeration
+            // sets; what it carries and this does not is a whole enumeration's
+            // inherited withholding, which has no counterpart here because this
+            // judges one named pairing.
             var reason =
                 notRegistered && !unreadable ? HeldBackReason.RecordsChanged
                 : unreadable ? HeldBackReason.RecordsUnreadable

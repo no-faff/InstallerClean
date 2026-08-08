@@ -106,6 +106,14 @@ public enum HeldBackReason
     /// The records were read and a registered product's live claim names the file,
     /// where the scan's own reading left it removable.
     ///
+    /// BOTH LIMBS OF THAT SENTENCE ARE LOAD-BEARING and the first is the one that
+    /// was once missing. A patch row whose State or Uninstallable read failed is
+    /// non-removable too, and it names no claim at all: it is the row being there
+    /// and nothing more. Such a row carries
+    /// <see cref="Models.RegisteredPackage.VerdictUnreadable"/> and counts under
+    /// <see cref="RecordsUnreadable"/>, so nothing reaches this cause on a read
+    /// that did not answer.
+    ///
     /// TWO ROUTES REACH IT and the copy has to hold for both. A patch the scan
     /// found superseded or obsoleted whose claim now says needed, back at Applied
     /// or still uninstallable and so needed to roll back with; and a candidate the
@@ -146,6 +154,16 @@ public enum HeldBackReason
     /// Windows Installer records, which is what the sentence says. The merged
     /// count does not distinguish the mechanisms and the sentence does not claim
     /// to.
+    ///
+    /// FOUR MECHANISMS REACH IT, not three, and the fourth is the plainest of
+    /// them: a patch's own State or Uninstallable read failing during the
+    /// re-verify's enumeration
+    /// (<see cref="Models.RegisteredPackage.VerdictUnreadable"/>), and the same
+    /// pairing's read failing under the installer lease. Both are a keyed property
+    /// read of the Windows Installer records that did not answer, so the
+    /// superordinate holds against every one of the four rather than against the
+    /// three it was written for. Anything added later is held to the same test
+    /// against the code that builds the set, never against this list.
     /// </summary>
     RecordsUnreadable,
 

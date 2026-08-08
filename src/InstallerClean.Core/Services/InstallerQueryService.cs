@@ -306,32 +306,31 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     var stateStr = stateRead.Value;
                     var uninstallableStr = uninstallableRead.Value;
 
-                    // Counted, not acted on, and the distinction is the whole of
-                    // what this counter is for. Either read failing leaves the row
-                    // non-removable below and marks it withheld nowhere, so the
-                    // file stays claimed and never reaches an offer: the file is
-                    // safe. What is not established is the SENTENCE a later
-                    // re-verify puts on it, which reads the same failure as a
-                    // product having reclaimed the patch and says so. Nobody knows
-                    // how often either read fails on a machine that is not the one
-                    // this was all measured on, and a fix cannot be sized without
-                    // that. It stays right after the fix, reading zero on a machine
-                    // where neither read fails, which is what the fix would make
-                    // universal rather than what it would remove.
-                    if (stateRead.Unreadable || uninstallableRead.Unreadable)
-                        unreadablePatchStates++;
+                    // Either read failing leaves the row non-removable below, which
+                    // is the safe direction and settles what happens to the FILE:
+                    // it stays claimed and never reaches an offer. What it does not
+                    // settle is what may be SAID about it, and that is what the flag
+                    // carries: nothing here established a claim, so no surface may
+                    // name one. The count travels beside it because nobody knows how
+                    // often either read fails on a machine that is not the one this
+                    // was measured on; it reads zero wherever both reads answer.
+                    var verdictUnreadable = stateRead.Unreadable || uninstallableRead.Unreadable;
+                    if (verdictUnreadable) unreadablePatchStates++;
 
                     // Unparseable State leaves patchState at 0 (not-a-patch),
                     // so isSuperseded is false and the row is kept: the zero
                     // default is the safe direction on purpose, not luck. Only
                     // a positively read Superseded (2) or Obsoleted (4) makes a
-                    // patch a removal candidate.
+                    // patch a removal candidate. So an unreadable verdict cannot
+                    // reach the row as removable by either limb, and the flag and
+                    // IsRemovable can never both be true.
                     int.TryParse(stateStr, out var patchState);
                     var isRemovable = IsRemovablePatch(stateStr, uninstallableStr);
 
                     var claimedPath = NormaliseLocalPackagePath(patchPath.Value);
                     MergeClaim(claimed,
-                        new RegisteredPackage(claimedPath, productName, productCode, patchState, isRemovable),
+                        new RegisteredPackage(claimedPath, productName, productCode, patchState, isRemovable,
+                            VerdictUnreadable: verdictUnreadable),
                         ClaimSource.InstallerApi);
                     // Recorded whatever the verdict was. A claim that is Applied
                     // today is exactly the one that proves a path is still needed
@@ -1072,6 +1071,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// downgraded by a later non-removable claim; the verdict is never upgraded
     /// the other way.
     ///
+    /// THE SAME COIN FLIP REACHES THE CAUSE AS WELL AS THE VERDICT, which is why
+    /// there is a second rule rather than one. Two non-removable claims on a path
+    /// are not necessarily the same finding: one product's Applied claim names the
+    /// file, and another product's failed State read names nothing at all. Keeping
+    /// whichever the enumeration reached first would make what the app SAYS about
+    /// that file depend on enumeration order, which is the fault the rule above
+    /// closes for what the app DOES. So a claim that establishes something
+    /// displaces a row that establishes nothing, and never the reverse.
+    ///
     /// A fallback claim can only ADD a path, never displace the row on one. That
     /// scoping is load-bearing, not a layering preference. The fallback reads the
     /// same UserData keys the API read and runs after the whole API loop, so every
@@ -1108,6 +1116,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Downgrade only: a removable row loses to a later non-removable claim,
         // and nothing else moves.
         if (existing.IsRemovable && !candidate.IsRemovable)
+        {
+            claimed[candidate.LocalPackagePath] = candidate;
+            return false;
+        }
+
+        // Both are non-removable and only one of them is a finding. The
+        // IsRemovable test is what stops this reading as an upgrade: a removable
+        // candidate never displaces anything here, so the row can only move from
+        // "nothing was established" to "this product claims it", which is the
+        // direction that costs no file and gains a true sentence.
+        if (existing.VerdictUnreadable && !candidate.VerdictUnreadable && !candidate.IsRemovable)
             claimed[candidate.LocalPackagePath] = candidate;
 
         return false;
