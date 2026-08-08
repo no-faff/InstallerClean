@@ -270,6 +270,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             if (recordsShort) unreadableProducts++;
         }
 
+        ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, ct);
+
         progress?.Report(new ScanProgressUpdate(Strings.Status_CheckingRegistry));
 
         var fallback = _readFallback(claimed, ct);
@@ -422,6 +424,137 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             abandonedLog.WriteClosingEntry();
         }
+    }
+
+    /// <summary>
+    /// Re-establishes every removable verdict by ASKING each enumerated product
+    /// about the patch, instead of inferring it from each product's patch list
+    /// having come back whole.
+    ///
+    /// WHAT IT CLOSES, and it is not the mis-spelling class. A cached patch is
+    /// claimed once and shared by every product holding it, and the merge is
+    /// downgrade-only, so a patch that is Superseded under one product and
+    /// Applied under another stays non-removable ONLY IF the Applied row reaches
+    /// the merge. That row reaches it through the second product's patch
+    /// enumeration, and an enumeration that returns ERROR_NO_MORE_ITEMS early is
+    /// indistinguishable from one that finished: <see cref="EnumeratePatches"/>
+    /// treats it as a clean end at any index, so nothing is marked incomplete,
+    /// no product is counted unreadable, and the scan-wide withholding never
+    /// runs.
+    ///
+    /// NOTHING ELSE CATCHES IT, which is why this exists rather than a counter.
+    /// The registry fallback recovers lost PATHS and never lost VERDICTS, and its
+    /// unclaimed-patch signal counts only paths it was FIRST to claim, which this
+    /// path is not: the first product already claimed it, removable. The product
+    /// headcount is untouched because the second product WAS enumerated and only
+    /// its patch list was short. And the act-time re-reads cannot see it either,
+    /// both of them working from what this enumeration produced: the full
+    /// re-verify re-runs the same enumeration, and the under-lease re-read asks
+    /// only the claims that were collected, which do not include the one that
+    /// never happened.
+    ///
+    /// THE QUESTION IS KEYED, WHICH IS THE WHOLE POINT. <c>MsiGetPatchInfoEx</c>
+    /// takes a patch and a product and walks no list, so a product that holds the
+    /// patch answers whether or not its enumeration would have named it. Asking
+    /// every enumerated product means the answer does not depend on any
+    /// enumeration having been complete.
+    ///
+    /// WHAT IT COSTS, stated because it is the one thing here that scales with
+    /// the machine rather than with the fault: enumerated products multiplied by
+    /// removable candidates. Most pairings are settled by a single property read
+    /// returning ERROR_UNKNOWN_PATCH, and a machine with nothing removable pays
+    /// nothing at all, the method returning before it asks anything.
+    ///
+    /// The two outcomes use the two meanings the row already has, so this adds no
+    /// vocabulary. A product that holds the patch and still needs it makes the row
+    /// plainly non-removable, exactly as the merge's own downgrade does. A read
+    /// that could not answer makes it non-removable AND withheld, which is the
+    /// existing "this scan could not prove it" state, counted and surfaced as such.
+    /// </summary>
+    private void ConfirmRemovableAgainstEveryProduct(
+        Dictionary<string, RegisteredPackage> claimed,
+        List<PatchClaim> patchClaims,
+        List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
+        CancellationToken ct)
+    {
+        // One patch code per still-removable path. Built from the claims because
+        // the merged row does not carry a patch code, and keyed by path because
+        // that is what the verdict hangs on.
+        var toConfirm = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var claim in patchClaims)
+            if (claimed.TryGetValue(claim.LocalPackagePath, out var row) && row.IsRemovable)
+                toConfirm[claim.LocalPackagePath] = claim.PatchCode;
+
+        if (toConfirm.Count == 0) return;
+
+        // The pairings the product loop already read. Re-asking them would get the
+        // same answer for the same reason, so they are skipped: what this pass is
+        // for is the pairings no enumeration produced.
+        var alreadyAsked = new HashSet<(string, string)>();
+        foreach (var claim in patchClaims)
+            alreadyAsked.Add((claim.PatchCode, claim.ProductCode));
+
+        foreach (var (path, patchCode) in toConfirm)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            foreach (var (productCode, userSid, context) in products)
+            {
+                if (alreadyAsked.Contains((patchCode, productCode))) continue;
+
+                ct.ThrowIfCancellationRequested();
+
+                // State first and alone where it settles the pairing. A product
+                // that does not hold this patch answers ERROR_UNKNOWN_PATCH to
+                // the sizing call, so the overwhelming majority of pairings cost
+                // one property read and the second is never made.
+                var state = GetPatchProperty(_msi, patchCode, productCode, userSid, context,
+                    MsiInstallProperty.State);
+
+                // Not registered against this product: a positive answer that
+                // this product does not hold the patch, so it says nothing about
+                // the verdict either way.
+                if (state.NotRegistered) continue;
+
+                if (state.Unreadable)
+                {
+                    Downgrade(claimed, path, withheld: true);
+                    break;
+                }
+
+                var uninstallable = GetPatchProperty(_msi, patchCode, productCode, userSid, context,
+                    MsiInstallProperty.Uninstallable);
+                if (uninstallable.NotRegistered) continue;
+                if (uninstallable.Unreadable)
+                {
+                    Downgrade(claimed, path, withheld: true);
+                    break;
+                }
+
+                if (!IsRemovablePatch(state.Value, uninstallable.Value))
+                {
+                    // This product holds the patch and has not shown it
+                    // removable, which is the claim the truncated enumeration
+                    // would have contributed. Same verdict, reached by asking.
+                    Downgrade(claimed, path, withheld: false);
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Takes one path's removable verdict away. <paramref name="withheld"/>
+    /// separates the two reasons, because they are not the same thing to have
+    /// found out and the flag is what the rest of the app reads to tell them
+    /// apart: false is a product's live claim on the file, true is a read that
+    /// established nothing.
+    /// </summary>
+    private static void Downgrade(
+        Dictionary<string, RegisteredPackage> claimed, string path, bool withheld)
+    {
+        if (!claimed.TryGetValue(path, out var row) || !row.IsRemovable) return;
+        claimed[path] = row with { IsRemovable = false, RemovableWithheld = withheld };
     }
 
     /// <summary>
