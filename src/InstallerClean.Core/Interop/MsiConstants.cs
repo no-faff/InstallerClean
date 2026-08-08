@@ -121,6 +121,40 @@ public static class MsiSummaryProperty
     public const uint Keywords = 5;   // PID_KEYWORDS
     public const uint Comments = 6;   // PID_COMMENTS
     public const uint AppName  = 18;  // PID_APPNAME
+
+    /// <summary>
+    /// PID_TEMPLATE. What it holds depends on the kind of package, and the two
+    /// meanings have nothing to do with each other: on an installation package
+    /// it is the platform-and-language string ("Intel;1033"), and on a PATCH it
+    /// is the semicolon-delimited list of product codes the patch may be applied
+    /// to. Only the patch reading is used here, and only for a <c>.msp</c>.
+    /// </summary>
+    public const uint Template = 7;
+
+    /// <summary>
+    /// PID_REVNUMBER. On a patch this begins with the patch code, followed by
+    /// the codes of the patches it obsoletes and then the package code, all as
+    /// braced GUIDs run together with no separator. The leading 38 characters
+    /// are therefore the patch's own identity, and a value whose length is not a
+    /// whole multiple of 38 is one this fixed-width reading does not hold for.
+    /// </summary>
+    public const uint RevisionNumber = 9;
+}
+
+/// <summary>
+/// Open modes for <c>MsiOpenDatabase</c>. msiquery.h declares these as pointer
+/// values rather than strings (<c>#define MSIDBOPEN_READONLY (LPCTSTR)0</c>),
+/// which is why the P/Invoke takes an <see cref="IntPtr"/>: the number IS the
+/// argument, and no text is ever passed.
+/// </summary>
+public static class MsiDbOpen
+{
+    /// <summary>
+    /// MSIDBOPEN_READONLY. Opens the database without a transaction and without
+    /// taking a copy, and the source file is not modified. The only mode this
+    /// app has any business using: every other one either writes or creates.
+    /// </summary>
+    public static readonly IntPtr ReadOnly = IntPtr.Zero;
 }
 
 /// <summary>

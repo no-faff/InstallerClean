@@ -25,6 +25,24 @@ internal sealed class RegistryReader : IRegistryReader
         catch (ObjectDisposedException) { return false; }
     }
 
+    public string[]? LocalMachineSubKeyNames(string relativePath)
+    {
+        try
+        {
+            using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            using var key = hive.OpenSubKey(relativePath);
+            // An absent key answers null rather than an empty array, deliberately.
+            // The caller distinguishes the two, and on the one key this is used
+            // for an absence is not a machine with no accounts, it is a machine
+            // whose installer registration is not where it lives.
+            return key?.GetSubKeyNames();
+        }
+        catch (SecurityException) { return null; }
+        catch (IOException) { return null; }
+        catch (UnauthorizedAccessException) { return null; }
+        catch (ObjectDisposedException) { return null; }
+    }
+
     public string[]? LocalMachineMultiStringValue(string keyPath, string valueName)
     {
         try

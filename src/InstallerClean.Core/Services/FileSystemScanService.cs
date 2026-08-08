@@ -16,10 +16,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
 {
     private readonly IInstallerQueryService _queryService;
     private readonly IFileSystem _fs;
+    private readonly IIdentityVeto _identityVeto;
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
 
-    /// <summary>Production constructor. DI supplies both dependencies; the override fields stay null.</summary>
+    /// <summary>Production constructor. DI supplies all three dependencies; the override fields stay null.</summary>
     /// <remarks>
     /// Microsoft.Extensions.DependencyInjection resolves the public ctor
     /// with the most resolvable parameters and ignores internal ctors.
@@ -27,16 +28,24 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// at resolution time and pass defaults the production code never
     /// expects.
     /// </remarks>
-    public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
-        : this(queryService, fileSystem, null, null) { }
+    public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
+        IIdentityVeto identityVeto)
+        : this(queryService, fileSystem, identityVeto, null, null) { }
+
+    /// <summary>
+    /// Test constructor. Injects a filesystem and nothing else, for the tests
+    /// whose subject is the walk itself.
+    /// </summary>
+    internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
+        : this(queryService, fileSystem, PermissiveVeto.Instance, null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, new FileSystem(), overrideFiles, null) { }
+        : this(queryService, new FileSystem(), PermissiveVeto.Instance, overrideFiles, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, new FileSystem(), overrideFiles, installerFolderOverride) { }
+        : this(queryService, new FileSystem(), PermissiveVeto.Instance, overrideFiles, installerFolderOverride) { }
 
     /// <summary>
     /// Test constructor. Injects an <see cref="IFileSystem"/> so the
@@ -45,11 +54,47 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride)
+        : this(queryService, fileSystem, PermissiveVeto.Instance, overrideFiles, installerFolderOverride) { }
+
+    /// <summary>
+    /// Test constructor carrying the identity veto as well, for the tests whose
+    /// subject IS the veto rather than the path classification.
+    /// </summary>
+    internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
+        IIdentityVeto identityVeto, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
     {
         _queryService = queryService;
         _fs = fileSystem;
+        _identityVeto = identityVeto;
         _overrideFiles = overrideFiles;
         _installerFolderOverride = installerFolderOverride;
+    }
+
+    /// <summary>
+    /// The veto the older test constructors get: it reads nothing and keeps
+    /// nothing back, so a test written to pin the PATH classification pins the
+    /// path classification and is not silently also asserting what the identity
+    /// pass does.
+    ///
+    /// It is not a production shape and cannot become one by accident: nothing
+    /// registers it, the class is private, and the production constructor has no
+    /// default for the parameter it fills.
+    /// </summary>
+    private sealed class PermissiveVeto : IIdentityVeto
+    {
+        internal static readonly PermissiveVeto Instance = new();
+
+        public IdentityPassResult Screen(
+            IReadOnlyList<IdentityCandidate> candidates,
+            IProgress<ScanProgressUpdate>? progress = null,
+            CancellationToken cancellationToken = default)
+        {
+            // Filled rather than left at the array's default, so this keeps
+            // permitting everything if the enum's members are ever reordered.
+            var outcomes = new CandidateIdentityOutcome[candidates.Count];
+            Array.Fill(outcomes, CandidateIdentityOutcome.Unclaimed);
+            return new IdentityPassResult(outcomes, 0, 0);
+        }
     }
 
     public async Task<ScanResult> ScanAsync(
@@ -98,6 +143,14 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var removable = new List<OrphanedFile>();
 
+        // Candidates the PATH comparison did not find a claim on, held here
+        // rather than offered, because the path comparison no longer decides what
+        // is offered: it decides what is CONSIDERED, and the identity pass below
+        // decides the rest. The list is kept in walk order and the survivors are
+        // appended to the offer in that order, so what the user sees is ordered
+        // exactly as it was before the pass existed.
+        var unclaimedByPath = new List<OrphanedFile>();
+
         // Budgeted, because a refusal is a per-file event on a loop whose length
         // is the size of C:\Windows\Installer. The guard's every input is a
         // machine-wide condition, so what refuses one candidate usually refuses
@@ -131,6 +184,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         int nonRemovablePresent = 0;
         int removablePresent = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
+
+        // Declared out here because the two sanity gates below the loops read its
+        // counts. An empty pass is the honest starting value: a scan that leaves
+        // before the pass runs has kept nothing back by identity, and reporting
+        // that it had would put a cause in front of the user that never occurred.
+        var screened = new IdentityPassResult(Array.Empty<CandidateIdentityOutcome>(), 0, 0);
 
         // The closing entry is owed on every exit, not just the clean one: a
         // cancel and the correlation gate both leave through here, and the gate
@@ -172,13 +231,38 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 continue;
             }
 
-            removable.Add(new OrphanedFile(
+            unclaimedByPath.Add(new OrphanedFile(
                 FullPath: filePath,
                 SizeBytes: walked.SizeBytes,
                 IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
                 IsRemovablePatch: false,
                 IsObsoleted: false,
                 Reason: Strings.Reason_Orphaned));
+        }
+
+        // The identity pass. Nothing above it established that a candidate
+        // belongs to nothing; it established that no registration names its path,
+        // which is a different sentence and is the one that goes quiet when a
+        // location is spelled a way the walk does not produce. Here each
+        // candidate is asked what it is and Windows is asked about that, and only
+        // a candidate every source answered for, with none of them claiming it,
+        // is offered.
+        //
+        // It runs on the orphan branch and on nothing else. A superseded or
+        // obsoleted patch is offered BECAUSE Windows positively said the patch is
+        // superseded and no longer uninstallable, so it is a file Windows knows
+        // by construction; putting it through a check whose keeping condition is
+        // "Windows knows this identity" would withhold that whole class on every
+        // machine, for ever, and would be the check misreading its own question.
+        screened = _identityVeto.Screen(
+            unclaimedByPath.ConvertAll(f => new IdentityCandidate(f.FullPath, f.IsPatch)),
+            progress,
+            cancellationToken);
+
+        for (var i = 0; i < unclaimedByPath.Count; i++)
+        {
+            if (screened.Outcomes[i] == CandidateIdentityOutcome.Unclaimed)
+                removable.Add(unclaimedByPath[i]);
         }
 
         // Stat every registered package once here so the Details window
@@ -306,7 +390,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // Refusing rather than reporting an empty list, because there is nothing
         // to report: no candidate was judged, so there is no shorter answer to
         // give.
-        if (!cacheRoot.Proven && refusedCandidates > 0 && removable.Count == 0)
+        //
+        // BOTH GATES BELOW ARE MEASURED BEFORE THE IDENTITY PASS, and that is not
+        // a detail. Each of them asks whether the COMPARISON worked, and reads an
+        // empty offer as its evidence that it did not. A scan whose comparison
+        // worked perfectly and whose identity pass then kept every candidate back
+        // also has an empty offer, and refusing that scan would turn the safest
+        // possible outcome into an error. This count is what the offer was before
+        // the pass ran, so both gates go on answering the question they were
+        // written to answer.
+        var candidatesBeforeIdentity = unclaimedByPath.Count + removablePresent;
+
+        if (!cacheRoot.Proven && refusedCandidates > 0 && candidatesBeforeIdentity == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
 
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
@@ -360,13 +455,14 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var survivorsForBound = Math.Max(presentRegistered, 1);
         if (presentRegistered <= 2
             && survivorsForBound * 20 < survivorsForBound + missingNonRemovable
-            && removable.Count > 0)
+            && candidatesBeforeIdentity > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable,
-            query.UnreadableProductCount, withheld);
+            query.UnreadableProductCount, withheld,
+            screened.ClaimedCount, screened.IdentityUnreadableCount, screened.RecordsUnaskableCount);
     }
 
     /// <summary>

@@ -70,6 +70,32 @@ namespace InstallerClean.Models;
 /// reached the user, that one is what stopped qualifying between the list and
 /// the button.
 /// </param>
+/// <param name="IdentityClaimedCount">
+/// Candidates the identity pass kept back because a live registration answers to
+/// what the file says it is. No registration named its PATH, so the path
+/// comparison had nothing to go on; asking about the identity found something.
+///
+/// It is a positive claim on the file and nothing stronger. It does NOT establish
+/// that a program would break without this particular copy: a product that caches
+/// a fresh package on each of twenty updates leaves nineteen files that answer to
+/// a live product code and are dead weight, and every one of them counts here.
+/// Copy built on this figure has to say what it really means.
+/// </param>
+/// <param name="IdentityUnreadableCount">
+/// Candidates kept back because the file did not yield an identity to ask about
+/// at all: it would not open, it declares no code, or a patch names no product it
+/// targets. An inability about the FILE.
+/// </param>
+/// <param name="IdentityUnaskableCount">
+/// Candidates kept back because the identity was read and the question could not
+/// be put to Windows. An inability about the RECORDS.
+///
+/// THE THREE ARE SEPARATE BECAUSE THEY ARE THREE DIFFERENT THINGS TO HAVE FOUND
+/// OUT, and nothing may report them under one sentence. A confirmed claim, an
+/// unreadable file and an unanswerable question have no honest superordinate: any
+/// sentence covering all three either says nothing or says something false of two
+/// of them. They are summed nowhere for the same reason.
+/// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
@@ -77,7 +103,10 @@ public record ScanResult(
     int MissingNonRemovableCount = 0,
     int MissingRemovableCount = 0,
     int UnreadableProductCount = 0,
-    int WithheldCount = 0)
+    int WithheldCount = 0,
+    int IdentityClaimedCount = 0,
+    int IdentityUnreadableCount = 0,
+    int IdentityUnaskableCount = 0)
 {
     /// <summary>Total registered packages missing on disk; sum of the two sub-counts.</summary>
     public int MissingFromDiskCount => MissingNonRemovableCount + MissingRemovableCount;

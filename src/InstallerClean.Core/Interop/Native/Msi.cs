@@ -153,4 +153,65 @@ internal static partial class Msi
     /// </summary>
     [LibraryImport(Library, EntryPoint = "MsiCloseHandle")]
     public static partial uint MsiCloseHandle(uint hAny);
+
+    /// <summary>
+    /// Opens an installation package as a database. The handle MUST be closed
+    /// via <see cref="MsiCloseHandle"/>.
+    /// </summary>
+    /// <param name="szPersist">
+    /// Declared as a pointer rather than a string because msiquery.h's open modes
+    /// are POINTER-VALUED constants, not text: <c>MSIDBOPEN_READONLY</c> is
+    /// <c>(LPCTSTR)0</c>, <c>MSIDBOPEN_TRANSACT</c> is <c>(LPCTSTR)1</c>, and so
+    /// on up to 4, with <c>MSIDBOPEN_PATCHFILE</c> at 32 as a bit to combine.
+    /// Spelling it as a string would make the read-only mode indistinguishable
+    /// from a null path argument at the call site and invite somebody to "fix"
+    /// it by passing the text "0", which is a pointer into the first page and
+    /// not a mode. <see cref="MsiDbOpen.ReadOnly"/> carries the value.
+    /// </param>
+    [LibraryImport(Library, EntryPoint = "MsiOpenDatabaseW",
+                   StringMarshalling = StringMarshalling.Utf16)]
+    public static partial uint MsiOpenDatabase(
+        string szDatabasePath,
+        IntPtr szPersist,
+        out uint phDatabase);
+
+    /// <summary>
+    /// Prepares a query against an open database. The view handle MUST be closed
+    /// via <see cref="MsiCloseHandle"/>. A query naming a table the database does
+    /// not have fails here rather than at execute time.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "MsiDatabaseOpenViewW",
+                   StringMarshalling = StringMarshalling.Utf16)]
+    public static partial uint MsiDatabaseOpenView(
+        uint hDatabase,
+        string szQuery,
+        out uint phView);
+
+    /// <summary>
+    /// Executes a prepared view. <paramref name="hRecord"/> supplies the query's
+    /// parameters and is 0 for a query that has none.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "MsiViewExecute")]
+    public static partial uint MsiViewExecute(uint hView, uint hRecord);
+
+    /// <summary>
+    /// Fetches the next row of an executed view, returning
+    /// <see cref="InstallerClean.Interop.MsiError.NoMoreItems"/> when the result
+    /// set is exhausted. Each record handle MUST be closed via
+    /// <see cref="MsiCloseHandle"/>.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "MsiViewFetch")]
+    public static partial uint MsiViewFetch(uint hView, out uint phRecord);
+
+    /// <summary>
+    /// Reads one field of a fetched record as text, using the same double-call
+    /// buffer pattern as the property reads above. Fields are 1-based.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "MsiRecordGetStringW",
+                   StringMarshalling = StringMarshalling.Utf16)]
+    public static partial uint MsiRecordGetString(
+        uint hRecord,
+        uint iField,
+        [MarshalUsing(CountElementName = nameof(pcchValueBuf))] char[]? szValueBuf,
+        ref uint pcchValueBuf);
 }

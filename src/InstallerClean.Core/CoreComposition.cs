@@ -42,6 +42,11 @@ public static class CoreComposition
         services.AddSingleton<IInstallerQueryService, InstallerQueryService>();
         services.AddSingleton<IPendingRebootService, PendingRebootService>();
         services.AddSingleton<IMsiFileInfoService, MsiFileInfoService>();
+        // Reads a cached package's own identity, and asks Windows about it before
+        // any candidate can be offered. Both are stateless; the per-scan caching
+        // lives inside a single Screen call and does not outlive it.
+        services.AddSingleton<IPackageIdentityReader, PackageIdentityReader>();
+        services.AddSingleton<IIdentityVeto, IdentityVeto>();
         // Re-verifies removable candidates against the API at action time; the
         // GUI and CLI call it just before a Move/Delete batch.
         services.AddSingleton<IRemovableReverifier, RemovableReverifier>();
