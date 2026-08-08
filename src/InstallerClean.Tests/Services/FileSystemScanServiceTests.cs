@@ -746,9 +746,10 @@ public class FileSystemScanServiceTests
         // values throughout so a transposition between two fields fails rather
         // than cancelling out.
         var census = new EnumerationCensus(
-            UnreadableProducts: 1, ShortfallProducts: 2, ApiNeverClaimed: 3,
-            NonStringLocalPackageValues: 4, UnreadablePatchStates: 5,
-            ProductCount: 6, PatchClaimCount: 7, LongLeafStemCount: 8);
+            UnreadableProducts: 1, SkippedProductRows: 2, RegistryProductKeys: 3,
+            UnclaimedProductFiles: 4, UnclaimedPatchFiles: 5,
+            NonStringLocalPackageValues: 6, UnreadablePatchStates: 7,
+            ProductCount: 8, PatchClaimCount: 9, LongLeafStemCount: 10);
         var query = QueryReturning(new InstallerQueryResult(
             Array.Empty<RegisteredPackage>(), Census: census));
 

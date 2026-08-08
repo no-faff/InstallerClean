@@ -53,8 +53,9 @@ public class ResultLogEntryTests
         MissingNeededCount: 0,
         WithheldPatchCount: 0,
         UnreadableProductCount: 0,
-        ShortfallProductCount: 0,
-        UnlistedProductCount: 0,
+        SkippedProductRowCount: 0,
+        UnclaimedProductFileCount: 0,
+        UnclaimedPatchFileCount: 0,
         KeptIdentityClaimedCount: 0,
         KeptIdentityUnreadableCount: 0,
         KeptIdentityUnaskableCount: 0);
@@ -65,6 +66,7 @@ public class ResultLogEntryTests
         NonStringLocalPackageCount: 0,
         UnreadablePatchStateCount: 0,
         ProductCount: 137,
+        RegistryProductKeyCount: 137,
         PatchClaimCount: 2);
 
     private static ResultLogEntry SampleEntry() => new(
@@ -135,7 +137,8 @@ public class ResultLogEntryTests
         Assert.Equal(
             [
                 "shortNameCreation", "longFileNameCount", "nonStringLocalPackageCount",
-                "unreadablePatchStateCount", "productCount", "patchClaimCount",
+                "unreadablePatchStateCount", "productCount", "registryProductKeyCount",
+                "patchClaimCount",
             ],
             root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
 
@@ -144,8 +147,9 @@ public class ResultLogEntryTests
                 "durationMs", "registeredCount", "registeredBytes", "orphanedCount",
                 "supersededCount", "obsoletedCount", "removableBytes", "missingFromDiskCount",
                 "missingNeededCount", "withheldPatchCount", "unreadableProductCount",
-                "shortfallProductCount", "unlistedProductCount", "keptIdentityClaimedCount",
-                "keptIdentityUnreadableCount", "keptIdentityUnaskableCount",
+                "skippedProductRowCount", "unclaimedProductFileCount", "unclaimedPatchFileCount",
+                "keptIdentityClaimedCount", "keptIdentityUnreadableCount",
+                "keptIdentityUnaskableCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 
@@ -199,27 +203,62 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void The_three_withheld_terms_go_separately_and_the_composite_goes_nowhere()
+    public void The_withholding_arithmetic_travels_as_its_tallies_and_never_as_its_terms()
     {
-        // The number the app combines them into can run high as well as low and is
-        // neither a count nor a bound, so a field carrying it would make every
-        // sentence built on it a sentence about three causes at once. The terms
-        // are sent and the combination is left to whoever wants it.
+        // The app derives two figures from these: a shortfall against the
+        // registry's own headcount, which reads zero inside a tolerance band, and
+        // a product estimate floored at one and biased low. Neither is the count
+        // its name would claim, and both are reproducible from what IS sent, so
+        // the tallies go and the derived terms go nowhere.
         var scan = new ScanResult(
             Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
             UnaccountedProductCount: 9,
             Census: new EnumerationCensus(
-                UnreadableProducts: 4, ShortfallProducts: 5, ApiNeverClaimed: 2));
+                UnreadableProducts: 4, SkippedProductRows: 1,
+                RegistryProductKeys: 40, UnclaimedProductFiles: 6, UnclaimedPatchFiles: 2,
+                ProductCount: 30));
 
         var info = ScanInfo.From(scan, 10);
+        var machine = MachineInfo.From(scan);
 
         Assert.Equal(4, info.UnreadableProductCount);
-        Assert.Equal(5, info.ShortfallProductCount);
-        Assert.Equal(2, info.UnlistedProductCount);
+        Assert.Equal(1, info.SkippedProductRowCount);
+        Assert.Equal(6, info.UnclaimedProductFileCount);
+        Assert.Equal(2, info.UnclaimedPatchFileCount);
+        Assert.Equal(30, machine.ProductCount);
+        Assert.Equal(40, machine.RegistryProductKeyCount);
+
+        // Both derived figures reproduce from those six, which is the whole
+        // argument for sending tallies: the shortfall net of skipped rows, and
+        // the never-claimed estimate net of the unreadable products and floored
+        // at one because a patch file was seen unclaimed.
+        Assert.Equal(9, (machine.RegistryProductKeyCount - machine.ProductCount) - info.SkippedProductRowCount);
+        Assert.Equal(2, Math.Max(1, info.UnclaimedProductFileCount - info.UnreadableProductCount));
 
         var json = JsonSerializer.Serialize(info, JsonOptions);
         Assert.DoesNotContain("unaccounted", json, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("\"withheldProducts\"", json);
+        Assert.DoesNotContain("shortfall", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("unlisted", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void A_shortfall_the_tolerance_band_absorbs_is_still_visible_in_the_payload()
+    {
+        // THE FIELD SET'S STRONGEST REASON, pinned so it cannot be quietly undone.
+        // The app's own rule absorbs a difference of two outright, so a machine
+        // whose registry holds two more products than the enumeration returned
+        // computes a shortfall of zero and looks exactly like a machine with none.
+        // Sending both headcounts is what tells them apart.
+        var absorbed = new ScanResult(
+            Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+            Census: new EnumerationCensus(RegistryProductKeys: 139, ProductCount: 137));
+        var clean = new ScanResult(
+            Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+            Census: new EnumerationCensus(RegistryProductKeys: 137, ProductCount: 137));
+
+        Assert.NotEqual(MachineInfo.From(clean), MachineInfo.From(absorbed));
+        Assert.Equal(2,
+            MachineInfo.From(absorbed).RegistryProductKeyCount - MachineInfo.From(absorbed).ProductCount);
     }
 
     [Fact]
@@ -256,7 +295,8 @@ public class ResultLogEntryTests
             Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
             Census: new EnumerationCensus(
                 NonStringLocalPackageValues: 1, UnreadablePatchStates: 2,
-                ProductCount: 3, PatchClaimCount: 4, LongLeafStemCount: 5),
+                ProductCount: 3, PatchClaimCount: 4, LongLeafStemCount: 5,
+                RegistryProductKeys: 6),
             ShortNameCreation: ShortNameCreationLabels.PerVolume);
 
         var machine = MachineInfo.From(scan);
@@ -266,6 +306,7 @@ public class ResultLogEntryTests
         Assert.Equal(1, machine.NonStringLocalPackageCount);
         Assert.Equal(2, machine.UnreadablePatchStateCount);
         Assert.Equal(3, machine.ProductCount);
+        Assert.Equal(6, machine.RegistryProductKeyCount);
         Assert.Equal(4, machine.PatchClaimCount);
     }
 

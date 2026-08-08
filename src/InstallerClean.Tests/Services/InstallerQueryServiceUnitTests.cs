@@ -1461,18 +1461,20 @@ public class InstallerQueryServiceUnitTests
         var result = await RunAgainstRegistry(msi, registryProducts: 10, unclaimedProductFiles: 4);
 
         Assert.Equal(1, result.Census.UnreadableProducts);
-        // 10 registry keys less the 2 products the API returned. The subtraction
-        // guarding this term is of SKIPPED ROWS, which is not the same as the
-        // unreadable-product count and is zero here: a product whose row came
-        // back and whose value would not read is still a product the API
-        // returned, so it is not missing from the headcount.
-        Assert.Equal(8, result.Census.ShortfallProducts);
-        // 4 unclaimed files less the one unreadable product already counted is 3.
-        Assert.Equal(3, result.Census.ApiNeverClaimed);
+        // ZERO skipped rows, and it is not the same number as the one above: a
+        // product whose row came back and whose value would not read is still a
+        // product the API returned, so it is not missing from the headcount. The
+        // shortfall arithmetic subtracts THIS, which is why it travels separately.
+        Assert.Equal(0, result.Census.SkippedProductRows);
+        Assert.Equal(10, result.Census.RegistryProductKeys);
+        Assert.Equal(2, result.Census.ProductCount);
+        Assert.Equal(4, result.Census.UnclaimedProductFiles);
+        Assert.Equal(0, result.Census.UnclaimedPatchFiles);
 
-        // And the composite the app acts on is still the first plus the larger of
-        // the other two, which is what the terms have to be able to reproduce.
-        Assert.Equal(1 + 8, result.UnaccountedProductCount);
+        // The composite the app acts on is the unreadable count plus the larger
+        // of the two derived terms, and both of those reproduce from the tallies:
+        // the shortfall is 10 - 2 - 0, and the never-claimed estimate is 4 - 1.
+        Assert.Equal(1 + Math.Max(10 - 2 - 0, 4 - 1), result.UnaccountedProductCount);
     }
 
     [Fact]
@@ -1488,10 +1490,31 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         Assert.Equal(0, result.Census.UnreadableProducts);
-        Assert.Equal(0, result.Census.ShortfallProducts);
-        Assert.Equal(0, result.Census.ApiNeverClaimed);
+        Assert.Equal(0, result.Census.SkippedProductRows);
+        Assert.Equal(0, result.Census.UnclaimedProductFiles);
+        Assert.Equal(0, result.Census.UnclaimedPatchFiles);
         Assert.Equal(0, result.Census.UnreadablePatchStates);
         Assert.Equal(0, result.Census.NonStringLocalPackageValues);
+    }
+
+    [Fact]
+    public async Task A_registry_that_holds_two_more_products_than_the_API_returned_still_reports_both_counts()
+    {
+        // THE CASE THE DERIVED TERM CANNOT EXPRESS. The app's tolerance band
+        // absorbs a difference of two outright, so the shortfall it computes here
+        // is zero and this machine is indistinguishable from a clean one on that
+        // figure alone. Both headcounts travel, so it is distinguishable in the
+        // report, which is the whole reason the tallies go instead of the term.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+
+        var result = await RunAgainstRegistry(msi, registryProducts: 3);
+
+        Assert.Equal(3, result.Census.RegistryProductKeys);
+        Assert.Equal(1, result.Census.ProductCount);
+        // The app itself withheld nothing: the band absorbed it.
+        Assert.Equal(0, result.UnaccountedProductCount);
     }
 
     [Fact]

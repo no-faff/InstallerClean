@@ -494,10 +494,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
 
         return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts, patchClaims.AsReadOnly(),
+            // The four tallies rather than the two terms computed from them. The
+            // shortfall is silently zero inside its tolerance band and the
+            // never-claimed term is floored and biased low, so neither is the
+            // count its name would claim; both are reproducible from these.
             new EnumerationCensus(
                 unreadableProducts,
-                shortfallProducts,
-                apiNeverClaimed,
+                unreadableRows,
+                fallback.ProductKeys,
+                fallback.UnclaimedProductFiles,
+                fallback.UnclaimedPatchFiles,
                 fallback.NonStringLocalPackageValues,
                 unreadablePatchStates,
                 products.Count,

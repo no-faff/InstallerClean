@@ -192,6 +192,18 @@ public sealed record AppInfo(string Version, string Language)
 /// sentence rather than a lost file: both reads fail towards keeping the file.
 /// </param>
 /// <param name="ProductCount">Installed products the enumeration returned.</param>
+/// <param name="RegistryProductKeyCount">
+/// Installed products the REGISTRY holds, which is the only count of a machine's
+/// products that does not come from the enumeration being measured. It sits here
+/// beside <see cref="ProductCount"/> rather than under the scan because two scans
+/// of one machine agree about it.
+///
+/// The pair is the whole of what makes a truncated enumeration visible from
+/// outside, and the app's own rule for reading it absorbs a difference of two
+/// outright plus a fifth proportionally. That band was set from the residue of
+/// one machine. Sending both numbers raw is what lets anybody else's machine say
+/// whether it is the right band.
+/// </param>
 /// <param name="PatchClaimCount">
 /// Product-to-patch claims read, one per claim rather than per patch. With
 /// <see cref="ProductCount"/> it gives the ratio that says how patch-heavy a real
@@ -203,6 +215,7 @@ public sealed record MachineInfo(
     int NonStringLocalPackageCount,
     int UnreadablePatchStateCount,
     int ProductCount,
+    int RegistryProductKeyCount,
     int PatchClaimCount)
 {
     public static MachineInfo From(ScanResult scan) =>
@@ -212,6 +225,7 @@ public sealed record MachineInfo(
             scan.Census.NonStringLocalPackageValues,
             scan.Census.UnreadablePatchStates,
             scan.Census.ProductCount,
+            scan.Census.RegistryProductKeys,
             scan.Census.PatchClaimCount);
 }
 
@@ -243,24 +257,34 @@ public sealed record MachineInfo(
 /// COST, where the three product terms below are its causes.
 /// </param>
 /// <param name="UnreadableProductCount">
-/// Products whose records came back short. The only one of the three that is a
-/// failure to read.
+/// Products whose records came back short. An exact per-product tally.
 /// </param>
-/// <param name="ShortfallProductCount">
-/// Products the API's headcount fell short of the registry's own by, past the
-/// tolerance band. An inference from two counts that can differ innocently.
+/// <param name="SkippedProductRowCount">
+/// Enumeration rows that could not be read at all. A subset of
+/// <paramref name="UnreadableProductCount"/>, sent because it and not the wider
+/// count is what the app's shortfall arithmetic subtracts.
 /// </param>
-/// <param name="UnlistedProductCount">
-/// Products inferred from cached files that are on the disk, that the registry
-/// claims, and that the API's own enumeration never named. An observation.
+/// <param name="UnclaimedProductFileCount">
+/// Product registrations naming a cached file that is really on the disk and that
+/// the enumeration never claimed.
+/// </param>
+/// <param name="UnclaimedPatchFileCount">
+/// The same for patch registrations. A patch entry names no product, so it
+/// establishes only that at least one product went unreached.
 ///
-/// THE THREE GO SEPARATELY AND THE NUMBER THAT MIXES THEM GOES NOWHERE. Inside
-/// the app they are combined as the first plus the larger of the other two,
-/// because the last two estimate one quantity from opposite sides; that combined
-/// figure is neither a count nor a bound, can run high as well as low, and a
-/// single field carrying it would make every sentence built on it a sentence
-/// about all three causes at once. Anything wanting the combined figure can
-/// compute it from these and know what it has.
+/// THESE ARE THE TALLIES, AND THE TWO FIGURES THE APP DERIVES FROM THEM ARE SENT
+/// NOWHERE. One of those is a shortfall against the registry's own headcount that
+/// reads zero inside a tolerance band, so a machine the band absorbs is
+/// indistinguishable from a machine with nothing wrong. The other is a product
+/// estimate floored at one by patch evidence and biased low by a deliberately
+/// generous subtraction, so it is a lower bound and a field called a count would
+/// have asserted an exactness it has not got.
+///
+/// Every derived figure is reproducible from these plus
+/// <paramref name="UnreadableProductCount"/> and the machine object's two product
+/// headcounts, so nothing is lost by sending the tallies instead, and the
+/// tolerance band itself becomes answerable on machines other than the one it was
+/// set from.
 /// </param>
 /// <param name="KeptIdentityClaimedCount">
 /// Candidates the scan kept back because a live registration answers to the code
@@ -293,8 +317,9 @@ public sealed record ScanInfo(
     int MissingNeededCount,
     int WithheldPatchCount,
     int UnreadableProductCount,
-    int ShortfallProductCount,
-    int UnlistedProductCount,
+    int SkippedProductRowCount,
+    int UnclaimedProductFileCount,
+    int UnclaimedPatchFileCount,
     int KeptIdentityClaimedCount,
     int KeptIdentityUnreadableCount,
     int KeptIdentityUnaskableCount)
@@ -318,8 +343,9 @@ public sealed record ScanInfo(
             scan.MissingNonRemovableCount,
             scan.WithheldCount,
             scan.Census.UnreadableProducts,
-            scan.Census.ShortfallProducts,
-            scan.Census.ApiNeverClaimed,
+            scan.Census.SkippedProductRows,
+            scan.Census.UnclaimedProductFiles,
+            scan.Census.UnclaimedPatchFiles,
             scan.IdentityClaimedCount,
             scan.IdentityUnreadableCount,
             scan.IdentityUnaskableCount);

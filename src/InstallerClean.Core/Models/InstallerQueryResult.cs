@@ -95,24 +95,42 @@ public record InstallerQueryResult(
 /// <param name="UnreadableProducts">
 /// Products whose records came back short: a skipped enumeration row, an
 /// unreadable <c>LocalPackage</c> value, or a patch enumeration that did not run
-/// to a clean end. One per product however many of the three it met. The only
-/// term of the three that is a failure to read.
+/// to a clean end. One per product however many of the three it met. An exact
+/// per-product tally with no floor and no threshold under it, which is what
+/// separates it from the two figures the withholding is actually computed from.
 /// </param>
-/// <param name="ShortfallProducts">
-/// How far the API's product headcount fell short of the registry's own, net of
-/// the read failures already counted above, and zero unless the shortfall clears
-/// the tolerance band. An inference from two counts that can differ innocently,
-/// never a measurement.
+/// <param name="SkippedProductRows">
+/// Enumeration rows the product loop could not read at all, one per row. A subset
+/// of <see cref="UnreadableProducts"/>, which is seeded from it and then grows.
+/// Carried separately because it, and not the wider count, is what the shortfall
+/// arithmetic subtracts.
 /// </param>
-/// <param name="ApiNeverClaimed">
-/// Products inferred from cached files the registry claims, whose file is really
-/// on the disk, and which the API's own loop never named. An observation rather
-/// than an inference, and the one the headcount's tolerance band cannot make.
+/// <param name="RegistryProductKeys">
+/// Product subkeys the registry fallback walked under <c>UserData</c>. The only
+/// independent count of how many products a machine has, and the other half of
+/// the shortfall.
+/// </param>
+/// <param name="UnclaimedProductFiles">
+/// Product registry entries whose cached path the API's own loop never claimed
+/// AND whose file is really on the disk. Both halves are load-bearing and both
+/// are observed rather than inferred.
+/// </param>
+/// <param name="UnclaimedPatchFiles">
+/// The same for patch entries. A patch entry names no product, so it can
+/// establish only that at least one product went unreached.
 ///
-/// SEPARATE FROM <see cref="ShortfallProducts"/> BECAUSE THEY ESTIMATE THE SAME
-/// QUANTITY FROM OPPOSITE SIDES and the assembly site combines them by the larger
-/// of the two rather than by addition. Adding them here would be the same double
-/// count in a different place.
+/// THESE FOUR ARE THE TALLIES THE APP'S OWN WITHHOLDING ARITHMETIC IS BUILT FROM,
+/// AND THE ARITHMETIC ITSELF IS DELIBERATELY NOT CARRIED. Its two derived terms
+/// are a shortfall that is silently zero inside a tolerance band, and a
+/// product estimate floored at one by patch evidence and biased low by a generous
+/// subtraction. Neither is the count its name would claim, and both are
+/// reproducible from these four plus <see cref="UnreadableProducts"/>.
+///
+/// The band matters most. It was set from the residue of one machine, it decides
+/// whether a truncated enumeration is noticed at all, and a machine whose real
+/// shortfall it absorbs is indistinguishable from a machine with no shortfall
+/// once the derived term is all that survives. Carrying both headcounts is what
+/// makes that threshold answerable anywhere but the machine it came from.
 /// </param>
 /// <param name="NonStringLocalPackageValues">
 /// Registrations whose <c>LocalPackage</c> value was present and was not a string.
@@ -151,8 +169,10 @@ public record InstallerQueryResult(
 /// </param>
 public readonly record struct EnumerationCensus(
     int UnreadableProducts = 0,
-    int ShortfallProducts = 0,
-    int ApiNeverClaimed = 0,
+    int SkippedProductRows = 0,
+    int RegistryProductKeys = 0,
+    int UnclaimedProductFiles = 0,
+    int UnclaimedPatchFiles = 0,
     int NonStringLocalPackageValues = 0,
     int UnreadablePatchStates = 0,
     int ProductCount = 0,
