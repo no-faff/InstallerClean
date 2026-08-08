@@ -137,8 +137,42 @@ public enum HeldBackReason
     /// <summary>
     /// A read failed, so nothing was established either way. It has not shown the
     /// file to be removable, which is what keeps it in place.
+    ///
+    /// The identity re-check's own unaskable state folds in here rather than
+    /// taking a fourth cause, and that is a superordinate rather than a
+    /// convenience: an account list that would not read, a keyed property read
+    /// answering outside its documented set, and a target product's patch
+    /// enumeration that did not run to a clean end are all failures to read the
+    /// Windows Installer records, which is what the sentence says. The merged
+    /// count does not distinguish the mechanisms and the sentence does not claim
+    /// to.
     /// </summary>
     RecordsUnreadable,
+
+    /// <summary>
+    /// The file declares a product or patch code inside itself, and Windows holds
+    /// a record under that code.
+    ///
+    /// SEPARATE FROM <see cref="Reclaimed"/> BECAUSE IT IS WEAKER, and folding it
+    /// in would state something false of every member. Reclaimed means a live
+    /// claim NAMES THE FILE. This means a record exists under the code the FILE
+    /// declares about ITSELF, which is all that can be said: the file is here
+    /// precisely because no registration names its path. One product that has
+    /// cached a fresh package on each of twenty updates leaves nineteen files
+    /// answering to a live code and needed by nothing.
+    /// </summary>
+    IdentityClaimed,
+
+    /// <summary>
+    /// The file yielded nothing that could be asked about: it would not open, it
+    /// declares no code, or a patch names no product it targets.
+    ///
+    /// An inability about the FILE, where <see cref="RecordsUnreadable"/> is an
+    /// inability about the records, so neither covers the other. It is also not a
+    /// fault the user has anything to do about: a patch naming no target product
+    /// is an ordinary file this app has no way to ask about.
+    /// </summary>
+    IdentityUnreadable,
 }
 
 /// <summary>
@@ -154,16 +188,21 @@ public enum HeldBackReason
 public readonly record struct HeldBackReasons(
     int Reclaimed = 0,
     int RecordsChanged = 0,
-    int RecordsUnreadable = 0)
+    int RecordsUnreadable = 0,
+    int IdentityClaimed = 0,
+    int IdentityUnreadable = 0)
 {
     /// <summary>Files kept back for any cause. Equals the accompanying path list's count.</summary>
-    public int Total => Reclaimed + RecordsChanged + RecordsUnreadable;
+    public int Total =>
+        Reclaimed + RecordsChanged + RecordsUnreadable + IdentityClaimed + IdentityUnreadable;
 
     /// <summary>This tally with one more file counted against <paramref name="reason"/>.</summary>
     public HeldBackReasons Plus(HeldBackReason reason) => reason switch
     {
         HeldBackReason.Reclaimed => this with { Reclaimed = Reclaimed + 1 },
         HeldBackReason.RecordsChanged => this with { RecordsChanged = RecordsChanged + 1 },
+        HeldBackReason.IdentityClaimed => this with { IdentityClaimed = IdentityClaimed + 1 },
+        HeldBackReason.IdentityUnreadable => this with { IdentityUnreadable = IdentityUnreadable + 1 },
         _ => this with { RecordsUnreadable = RecordsUnreadable + 1 },
     };
 
@@ -176,7 +215,9 @@ public readonly record struct HeldBackReasons(
     public static HeldBackReasons operator +(HeldBackReasons a, HeldBackReasons b) =>
         new(a.Reclaimed + b.Reclaimed,
             a.RecordsChanged + b.RecordsChanged,
-            a.RecordsUnreadable + b.RecordsUnreadable);
+            a.RecordsUnreadable + b.RecordsUnreadable,
+            a.IdentityClaimed + b.IdentityClaimed,
+            a.IdentityUnreadable + b.IdentityUnreadable);
 }
 
 /// <summary>

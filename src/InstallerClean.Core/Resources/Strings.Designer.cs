@@ -240,11 +240,14 @@ public static class Strings
     public static string Completion_MoveSummary_Singular => Get("Completion.MoveSummary.Singular");
     public static string Completion_NothingDeleted => Get("Completion.NothingDeleted");
     public static string Completion_NothingMoved => Get("Completion.NothingMoved");
+    public static string Completion_NothingRemoved => Get("Completion.NothingRemoved");
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");
     public static string Completion_PermanentDeleteCancelledSummary => Get("Completion.PermanentDeleteCancelledSummary");
     public static string Completion_PermanentDeleteSummary_Plural => Get("Completion.PermanentDeleteSummary.Plural");
     public static string Completion_PermanentDeleteSummary_Singular => Get("Completion.PermanentDeleteSummary.Singular");
+    public static string Completion_ReverifyIdentityClaimed => Get("Completion.ReverifyIdentityClaimed");
+    public static string Completion_ReverifyIdentityUnreadable => Get("Completion.ReverifyIdentityUnreadable");
     public static string Completion_ReverifyIncomplete => Get("Completion.ReverifyIncomplete");
     public static string Completion_ReverifyRecordsChanged => Get("Completion.ReverifyRecordsChanged");
     public static string Completion_ReverifySkipped => Get("Completion.ReverifySkipped");

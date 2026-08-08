@@ -146,6 +146,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | All clean | 全部干净 |
+| Nothing removed | Nothing removed |
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder} 中没有需要清理的内容 |
 | Scanned {0} {1} in {2} | 扫描了 {0} 个{1}，用时 {2} |
 | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
@@ -165,6 +166,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} kept in place, because the records now claim what the scan flagged. | {0} {1} kept in place, because the records now claim what the scan flagged. |
 | {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
+| {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} kept in place, because Windows has a record of the program named inside. |
+| {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. |
 | Moved {0} of {1} {2} before you cancelled. | 在您取消前，已移动 {1} 个{2}中的 {0} 个。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

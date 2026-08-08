@@ -290,6 +290,7 @@ const MAP = {
 
   // Completion screen
   'Completion.AllClean': `All clean`,
+  'Completion.NothingRemoved': `Nothing removed`,
   'Completion.NothingToCleanUp': `Nothing to clean up in {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `Scanned {0} {1} in {2}`,
 
@@ -316,6 +317,8 @@ const MAP = {
   'Completion.ReverifySkipped': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
   'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
   'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
+  'Completion.ReverifyIdentityClaimed': `{0} {1} kept in place, because Windows has a record of the program named inside.`,
+  'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
   'Completion.MoveCancelledSummary': `Moved {0} of {1} {2} before you cancelled.`,
   'Completion.PermanentDeleteCancelledSummary': `Permanently deleted {0} of {1} {2} before you cancelled.`,
 

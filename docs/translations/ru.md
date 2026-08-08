@@ -146,6 +146,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | All clean | Всё чисто |
+| Nothing removed | Nothing removed |
 | Nothing to clean up in {InstallerFolder} | В {InstallerFolder} нечего очищать |
 | Scanned {0} {1} in {2} | Просканировано {0} {1} за {2} |
 | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
@@ -165,6 +166,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} kept in place, because the records now claim what the scan flagged. | {0} {1} kept in place, because the records now claim what the scan flagged. |
 | {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
+| {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} kept in place, because Windows has a record of the program named inside. |
+| {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. |
 | Moved {0} of {1} {2} before you cancelled. | Перемещено {0}/{1} {2} до отмены. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Удалено безвозвратно {0}/{1} {2} до отмены. |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

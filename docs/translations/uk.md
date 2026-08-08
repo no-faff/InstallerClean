@@ -146,6 +146,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Українська |
 | --- | --- |
 | All clean | Усе чисто |
+| Nothing removed | Nothing removed |
 | Nothing to clean up in {InstallerFolder} | У {InstallerFolder} немає чого прибирати |
 | Scanned {0} {1} in {2} | Проскановано {0} {1} за {2} |
 | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
@@ -165,6 +166,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} kept in place, because the records now claim what the scan flagged. | {0} {1} kept in place, because the records now claim what the scan flagged. |
 | {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
+| {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} kept in place, because Windows has a record of the program named inside. |
+| {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. |
 | Moved {0} of {1} {2} before you cancelled. | Переміщено {0} з {1} {2}, перш ніж ви скасували. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували. |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

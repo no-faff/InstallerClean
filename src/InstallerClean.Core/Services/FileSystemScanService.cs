@@ -37,15 +37,15 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// whose subject is the walk itself.
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
-        : this(queryService, fileSystem, PermissiveVeto.Instance, null, null) { }
+        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, new FileSystem(), PermissiveVeto.Instance, overrideFiles, null) { }
+        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, overrideFiles, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, new FileSystem(), PermissiveVeto.Instance, overrideFiles, installerFolderOverride) { }
+        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, overrideFiles, installerFolderOverride) { }
 
     /// <summary>
     /// Test constructor. Injects an <see cref="IFileSystem"/> so the
@@ -54,7 +54,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, fileSystem, PermissiveVeto.Instance, overrideFiles, installerFolderOverride) { }
+        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, overrideFiles, installerFolderOverride) { }
 
     /// <summary>
     /// Test constructor carrying the identity veto as well, for the tests whose
@@ -68,33 +68,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
         _identityVeto = identityVeto;
         _overrideFiles = overrideFiles;
         _installerFolderOverride = installerFolderOverride;
-    }
-
-    /// <summary>
-    /// The veto the older test constructors get: it reads nothing and keeps
-    /// nothing back, so a test written to pin the PATH classification pins the
-    /// path classification and is not silently also asserting what the identity
-    /// pass does.
-    ///
-    /// It is not a production shape and cannot become one by accident: nothing
-    /// registers it, the class is private, and the production constructor has no
-    /// default for the parameter it fills.
-    /// </summary>
-    private sealed class PermissiveVeto : IIdentityVeto
-    {
-        internal static readonly PermissiveVeto Instance = new();
-
-        public IdentityPassResult Screen(
-            IReadOnlyList<IdentityCandidate> candidates,
-            IProgress<ScanProgressUpdate>? progress = null,
-            CancellationToken cancellationToken = default)
-        {
-            // Filled rather than left at the array's default, so this keeps
-            // permitting everything if the enum's members are ever reordered.
-            var outcomes = new CandidateIdentityOutcome[candidates.Count];
-            Array.Fill(outcomes, CandidateIdentityOutcome.Unclaimed);
-            return new IdentityPassResult(outcomes, 0, 0);
-        }
     }
 
     public async Task<ScanResult> ScanAsync(
@@ -460,6 +433,25 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
+        // THE THREE IDENTITY COUNTS ARE READ BY NO HOST, AND THAT IS THE DECISION
+        // RATHER THAN AN OMISSION. The scan says nothing about a file it kept
+        // back, because the app exists to list the files it is certain about and
+        // does not claim to find them all: two of the three causes are the
+        // ordinary case of declining to be sure about one file, and a line saying
+        // there may be three more tells somebody something they can neither act on
+        // nor check.
+        //
+        // The sibling notice is not a precedent for one here, though it looks like
+        // the same case. Summary.RecordsNotMatched fires when a whole CLASS is
+        // withheld because the records could not be matched up, which reports that
+        // a scan ran worse than usual and that running it again may genuinely fix
+        // it. Neither is true of these.
+        //
+        // What they are for is the question nothing else can answer: whether any
+        // of this fires on a machine that is not the one it was all measured on.
+        // They are exact per-file counts of exactly that, and are named inputs to
+        // the outstanding reports schema. A schema designed without them is a
+        // departure somebody has to argue for.
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable,
             query.UnreadableProductCount, withheld,
             screened.ClaimedCount, screened.IdentityUnreadableCount, screened.RecordsUnaskableCount);

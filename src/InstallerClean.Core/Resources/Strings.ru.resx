@@ -483,6 +483,14 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>Всё чисто</value></data>
+  <!-- The heading for the completion screen where the final check kept EVERY
+       candidate back, so nothing was moved or deleted. Completion.AllClean is
+       correct in its own case and wrong in this one: nothing was removed because
+       everything was held, which is not the same as there being nothing to do,
+       and that screen previously read "All clean" over a summary that named the
+       causes. States what happened and claims nothing about why; the causes are
+       the lines underneath, one per cause with its own count. -->
+  <data name="Completion.NothingRemoved" xml:space="preserve"><value>Nothing removed</value></data>
   <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>В {InstallerFolder} нечего очищать</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
@@ -611,6 +619,52 @@
        check was repeated": the repetition is an implementation detail and the
        user has never been told there was a first one. -->
   <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.</value></data>
+  <!-- The fourth state, and the first that comes from asking what a file says it
+       IS rather than what the records say about its location. The candidate
+       declares a product or patch code inside itself, and Windows holds a record
+       under that code.
+
+       WHAT IT ESTABLISHES AND THE LIMIT THE WORDING IS BUILT ON: a record exists
+       under the code the FILE declares about ITSELF. It does NOT establish that
+       the records name this file, and cannot: the file is a candidate precisely
+       because no registration names its path. So "the records claim this file"
+       would be false of every one of them, which is why this cannot reuse
+       Completion.ReverifySkipped, whose own meaning is that a live claim names
+       the file. One product that has cached a fresh package on each of twenty
+       updates leaves nineteen files answering to a live code, so the plural case
+       is the ordinary one and not the edge.
+
+       IT MUST NOT BE REWORDED TO ASSERT A CHANGE, and neither may its sibling
+       below. It is tempting, because the scan screens these candidates already,
+       so a drop here looks like it must be new. It need not be: a superseded or
+       obsoleted patch is offered without ever being screened, and if its
+       registration has gone by the time the button is pressed it reaches this
+       check for the first time, in a state that was equally true during the scan
+       and was simply never asked about. A "now" here would be the app explaining
+       a change it has not established. 0 = the count kept, 1 = pluralised
+       "file"/"files". Flat string; a language may add a satellite-only
+       Completion.ReverifyIdentityClaimed.One/.Few/.Many override for its count
+       grammar. Parallel to its siblings from "kept in place, because" onwards,
+       because all of them can appear together, one per cause. -->
+  <data name="Completion.ReverifyIdentityClaimed" xml:space="preserve"><value>{0} {1} kept in place, because Windows has a record of the program named inside.</value></data>
+  <!-- The fifth state, and the only one about the FILE rather than about the
+       records. The candidate yielded nothing that could be asked about: it would
+       not open, it declares no code, or a patch names no product it targets.
+
+       THAT IS WHY IT CANNOT FOLD INTO Completion.ReverifyIncomplete, which says
+       the Windows Installer records could not be fully read. The records were
+       fine here and were never reached, so that sentence would be false of every
+       member. "Records" means the registration data everywhere else in this app,
+       and stretching it to cover a package's own contents would be a reading that
+       is defensible and not ordinary.
+
+       It says nothing was found rather than that anything is wrong: a patch that
+       names no target product is a perfectly ordinary file this app has no way to
+       ask about, and the user has nothing to act on. See the sibling above for
+       why neither may assert a change. 0 = the count kept, 1 = pluralised
+       "file"/"files". Flat string; a language may add a satellite-only
+       Completion.ReverifyIdentityUnreadable.One/.Few/.Many override. -->
+  <data name="Completion.ReverifyIdentityUnreadable" xml:space="preserve"><value>{0} {1} kept in place, because InstallerClean couldn't find a program named inside.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the

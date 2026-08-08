@@ -146,6 +146,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | All clean | Her şey temiz |
+| Nothing removed | Nothing removed |
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder} içinde temizlenecek bir şey yok |
 | Scanned {0} {1} in {2} | {2} içinde {0} {1} tarandı |
 | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
@@ -165,6 +166,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} kept in place, because the records now claim what the scan flagged. | {0} {1} kept in place, because the records now claim what the scan flagged. |
 | {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
+| {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} kept in place, because Windows has a record of the program named inside. |
+| {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. |
 | Moved {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi taşındı. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi. |
 | {0} {1} permanently deleted | {0} {1} permanently deleted |

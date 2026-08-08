@@ -494,7 +494,11 @@ public partial class CompletionViewModel : ObservableObject
     public void ShowReverifyAllSkipped(ReverifyResult reverify)
     {
         HeadingIsWarning = false;
-        Heading = Strings.Completion_AllClean;
+        // Not Completion_AllClean, which ShowAllClear uses correctly for a machine
+        // with nothing to do. Here everything the user confirmed was kept back,
+        // which is not the same as there having been nothing to remove, and the
+        // screen previously read "All clean" over a summary naming the causes.
+        Heading = Strings.Completion_NothingRemoved;
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
         Summary = SkippedText(reverify);
