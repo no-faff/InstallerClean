@@ -448,33 +448,41 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// the right direction: the normalised form names the same file and names it
     /// the way the rest of the app spells it.
     ///
-    /// TWO SPELLINGS ARE NOT SETTLED HERE. A volume-GUID path keeps its prefix
-    /// (see the method above), and an 8.3 short name is not expanded. Both leave
-    /// a claim that names its file and does not match the walk, so the cached
-    /// file is offered as an orphan while the claim is counted against the
-    /// missing-from-disk alarm.
-    ///
-    /// The 8.3 argument that stood here was wrong rather than incomplete, and it
-    /// is worth saying which half. Windows Installer does name the files it
-    /// caches itself, as short hex (<c>9f05cba.msi</c>, <c>1e4a2f.msp</c>), so
-    /// the FILENAME cannot have a short form that differs. The path also carries
-    /// the folder, and <c>Installer</c> is nine characters, so on a volume still
-    /// creating 8dot3 aliases it has a short form of its own:
+    /// TWO SPELLINGS SURVIVE GetFullPath, BECAUSE NEITHER IS DECIDABLE FROM THE
+    /// STRING. Windows Installer names the files it caches itself, as short hex
+    /// (<c>9f05cba.msi</c>, <c>1e4a2f.msp</c>), so the FILENAME cannot have a
+    /// short form that differs; the path also carries the folder, and
+    /// <c>Installer</c> is nine characters, so on a volume still creating 8dot3
+    /// aliases the folder has a short form of its own and
     /// <c>C:\Windows\INSTAL~1\1a2b3c.msi</c> names an ordinary file a product
-    /// still needs, and GetFullPath does not expand it. Nothing downstream sees
-    /// it either, which is what makes it worse than the volume-GUID case: the
-    /// short-formed value answers true to File.Exists, so it counts as a
-    /// registered file found on disk and the scan's correlation gate reads a
-    /// healthy machine.
+    /// still needs. A volume-GUID path is the other, keeping its prefix for the
+    /// reason <see cref="InstallerCacheHelpers.StripLongPathPrefix"/> gives.
+    /// Neither matches the walk, and the short form is the worse of the two: it
+    /// answers true to File.Exists, so the row counts as a registered file found
+    /// on disk and the scan's correlation gate reads a healthy machine.
     ///
-    /// Whether to handle either is open. Expanding a spelling needs
-    /// GetFinalPathNameByHandle per registered path, an open handle per
-    /// registration on every scan; the cheap form is a lexical pre-filter (a
-    /// <c>~</c> followed by a digit anywhere in the path, or a prefix the strip
-    /// above left on) deciding which registrations are worth a handle, which on
-    /// a healthy machine is none of them. That is the cheap form of a lexical
-    /// comparison, and whether the comparison stays lexical at all is the larger
-    /// question underneath it.
+    /// Both are settled by asking the filesystem what the path really is, which
+    /// is what <see cref="InstallerCacheHelpers.TryResolveFinalPath"/> already
+    /// does at every containment gate. The only open question was the cost of
+    /// asking once per registration, and it is not asked once per registration:
+    /// both spellings announce themselves in the string, so
+    /// <see cref="NeedsFinalPathResolution"/> decides on a character scan and a
+    /// handle is opened only for a path carrying one. A machine holding neither
+    /// pays the scan and no I/O.
+    ///
+    /// TWO THINGS THIS DOES NOT DO, because a comment claiming a closed hole is
+    /// worse than none. A flagged path the kernel declines to expand is kept in
+    /// the spelling Windows gave, so its claim still fails to match the walk and
+    /// its file is still offered; that is what happened before any resolution
+    /// existed and is no worse, and what is new is only that the residue is a
+    /// claim known to be unspellable rather than one nobody asked about, with
+    /// nothing downstream told about it. And the NT form over a volume GUID
+    /// (<c>\??\Volume{...}\</c>) is untouched: StripLongPathPrefix leaves it
+    /// whole for want of a drive root, GetFullPath then reads its leading
+    /// separator as rooted on the running process's drive, and what comes out
+    /// carries neither trigger. Recognising it means treating the two prefixes
+    /// as the one thing they are, which is a change to the strip and not to
+    /// this.
     ///
     /// Measured on one elevated machine (Windows 10.0.26200, 2026-08-03): 138
     /// registered paths, every one an ordinary drive path, no tilde-and-digit
@@ -486,7 +494,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         try
         {
-            return Path.GetFullPath(InstallerCacheHelpers.StripLongPathPrefix(value));
+            var stripped = InstallerCacheHelpers.StripLongPathPrefix(value);
+
+            // The test runs on the stripped value rather than the fully
+            // normalised one because GetFullPath destroys the evidence it needs:
+            // a prefix it cannot root is folded into an ordinary-looking path,
+            // and a trigger that has been normalised away cannot be tested for.
+            //
+            // Only a proven expansion is taken. A false return means the kernel
+            // never expanded this path, so its out value is the same string by
+            // another route and using it would dress a guess as an answer.
+            if (NeedsFinalPathResolution(stripped)
+                && InstallerCacheHelpers.TryResolveFinalPath(stripped, out var resolved))
+            {
+                return resolved;
+            }
+
+            return Path.GetFullPath(stripped);
         }
         catch
         {
@@ -496,6 +520,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // unreadable spelling into an orphaned file.
             return value;
         }
+    }
+
+    /// <summary>
+    /// Whether a prefix-stripped path carries a spelling only the filesystem can
+    /// settle. This is what keeps the resolution off the ordinary path: a handle
+    /// is opened for a registration answering true here and for no other.
+    ///
+    /// A tilde followed by a digit is the 8.3 alias form. A surviving
+    /// <c>\\?\</c> is what <see cref="InstallerCacheHelpers.StripLongPathPrefix"/>
+    /// leaves on a path with no drive root, which in this position means a
+    /// volume-GUID path.
+    ///
+    /// It over-selects deliberately. A long name may legitimately hold a
+    /// tilde-and-digit, and a false positive costs one handle open on a path
+    /// that resolves to itself; a false negative costs a file.
+    /// </summary>
+    internal static bool NeedsFinalPathResolution(string path)
+    {
+        if (path.StartsWith(@"\\?\", StringComparison.Ordinal)) return true;
+
+        for (var i = 0; i < path.Length - 1; i++)
+        {
+            if (path[i] == '~' && char.IsAsciiDigit(path[i + 1])) return true;
+        }
+
+        return false;
     }
 
     /// <summary>

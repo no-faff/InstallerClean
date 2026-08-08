@@ -265,9 +265,10 @@ internal static class InstallerCacheHelpers
     /// the command line answered differently for it. Left whole, a volume-GUID
     /// path is still a path Win32 accepts, so it names its file, answers true to
     /// <c>File.Exists</c>, and reads the same from either host. It does not match
-    /// the folder walk's spelling, which no lexical rule can settle; see
-    /// <c>InstallerQueryService.NormaliseLocalPackagePath</c> for the open
-    /// question there.
+    /// the folder walk's spelling, and no lexical rule can make it: a caller
+    /// wanting the walk's spelling asks the filesystem, which is what
+    /// <c>InstallerQueryService.NormaliseLocalPackagePath</c> does with the
+    /// surviving prefix as its trigger.
     /// </summary>
     internal static string StripLongPathPrefix(string path)
     {
