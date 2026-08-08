@@ -166,8 +166,18 @@ public sealed record IdentityPassResult(
     /// <summary>Candidates whose identity was read and could not be put to Windows.</summary>
     public int RecordsUnaskableCount => Count(CandidateIdentityOutcome.RecordsUnaskable);
 
-    /// <summary>Everything this pass kept back, for any of its three causes.</summary>
-    public int KeptBackCount => ClaimedCount + IdentityUnreadableCount + RecordsUnaskableCount;
+    // THERE IS DELIBERATELY NO TOTAL OVER THE THREE ABOVE, and one stood here
+    // until it was noticed that nothing outside a test had ever read it. A
+    // confirmed claim, a file that yielded no identity and a question Windows
+    // would not answer are three different things to have found out; the record
+    // that receives them says in as many words that they are summed nowhere,
+    // because the surface that has a total and no partition in front of it is the
+    // surface that reaches for one sentence over all three, and any such sentence
+    // is either empty or false of two of them.
+    //
+    // A caller wanting "how many did the pass keep back" wants three numbers and
+    // a line each. If a total is ever genuinely needed it can be added back
+    // BESIDE a partition that is already being shown, never instead of one.
 
     /// <summary>
     /// Derived rather than carried, so a count and the verdicts it describes

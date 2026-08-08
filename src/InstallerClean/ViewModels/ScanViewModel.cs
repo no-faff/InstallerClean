@@ -124,9 +124,16 @@ public partial class ScanViewModel : ObservableObject
     private int _missingNonRemovableCount;
 
     /// <summary>
-    /// Count of superseded / obsoleted packages whose file is already
-    /// gone from disk. Drives the diagnostic-info line under the body
-    /// explanation.
+    /// Count of superseded / obsoleted packages whose file is already gone from
+    /// disk. The benign half of the missing-from-disk pair, kept apart from
+    /// <see cref="MissingNonRemovableCount"/> so the banner fires only on the
+    /// half that means something.
+    ///
+    /// NOTHING BINDS TO IT. It said it drove a line under the body explanation
+    /// and no such binding exists anywhere in the app, which a sweep for the name
+    /// established rather than assumed. It is kept because the pair is what makes
+    /// the sibling above readable: a reader arriving at a count of missing files
+    /// that does NOT raise the banner needs to see where the rest of them went.
     /// </summary>
     [ObservableProperty]
     private int _missingRemovableCount;

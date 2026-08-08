@@ -388,7 +388,9 @@ public class IdentityVetoTests
             .Screen(Array.Empty<IdentityCandidate>());
 
         Assert.Empty(result.Outcomes);
-        Assert.Equal(0, result.KeptBackCount);
+        Assert.Equal(0, result.ClaimedCount);
+        Assert.Equal(0, result.IdentityUnreadableCount);
+        Assert.Equal(0, result.RecordsUnaskableCount);
         registry.DidNotReceive().LocalMachineSubKeyNames(Arg.Any<string>());
     }
 
@@ -456,8 +458,10 @@ public class IdentityVetoTests
         Assert.Equal(1, result.ClaimedCount);
         Assert.Equal(1, result.RecordsUnaskableCount);
         Assert.Equal(1, result.IdentityUnreadableCount);
-        Assert.Equal(3, result.KeptBackCount);
+        // The three counts and the outcome list, never a total over them: the
+        // three are three different findings and the pass exposes no sum.
         Assert.Equal(4, result.Outcomes.Count);
+        Assert.Equal(1, result.Outcomes.Count(o => o == CandidateIdentityOutcome.Unclaimed));
     }
 
     // ---- Helpers ----
