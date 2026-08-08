@@ -8,15 +8,23 @@ namespace InstallerClean.Services;
 /// candidate whose path a currently-registered, non-removable package claims.
 /// Testable through the same <c>IMsiApi</c> seam the query service uses.
 ///
-/// The full re-enumeration is the cost of the answer, not an oversight to be
-/// optimised into a per-candidate query later. Most candidates are orphans, and
-/// an orphan's verdict is the ABSENCE of any claim on its path: there is no
-/// registration to re-read, because the reason the file is a candidate is that
-/// no registration names it. Only walking the whole registered set again can
-/// re-establish an absence. A per-candidate form could re-read the superseded
-/// and obsoleted rows, which do have an identity to query, and would silently
-/// answer nothing at all for every orphan, while still reporting itself as a
-/// re-verification.
+/// The full re-enumeration is the cost of the answer for the question this asks.
+/// Most candidates are orphans, and what this re-establishes about an orphan is
+/// the ABSENCE of any claim ON ITS PATH: there is no registration to re-read,
+/// because the reason the file is a candidate is that no registration names it,
+/// and only walking the whole registered set again can re-establish an absence.
+/// A per-candidate re-read of the same question would answer nothing at all for
+/// every orphan while still reporting itself as a re-verification.
+///
+/// THAT ARGUMENT IS ABOUT THE PATH QUESTION AND DOES NOT REACH THE IDENTITY ONE,
+/// which is a distinction worth keeping straight because the wording here once
+/// blurred it. A candidate's own declared identity IS a per-candidate thing to
+/// query, and <see cref="IIdentityVeto"/> queries it during the scan. Re-running
+/// that query here would be a real second reading rather than a repeat of this
+/// one, and it is not built: what stops it is not the argument above but that
+/// its withholding is a new cause, and a cause the completion surface cannot yet
+/// name is one that would drop files out of a confirmed batch without accounting
+/// for them.
 /// </summary>
 public sealed class RemovableReverifier : IRemovableReverifier
 {
