@@ -538,7 +538,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 patchClaims.Count,
                 packages.Count(p => HasLongLeafStem(p.LocalPackagePath)),
                 missed.Recovered.Count,
-                missed.Unresolved));
+                missed.Unresolved,
+                // Counted off the merged rows rather than at the read site, which
+                // is what makes it a different number from the pairing count
+                // above: several products' failed reads on one shared patch are
+                // one row here and several there.
+                packages.Count(p => p.VerdictUnreadable)));
         }
         finally
         {

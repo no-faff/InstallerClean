@@ -147,10 +147,22 @@ public record InstallerQueryResult(
 /// A subset of the fallback's failure count rather than a term beside it.
 /// </param>
 /// <param name="UnreadablePatchStates">
-/// Patches whose <c>State</c> or <c>Uninstallable</c> read failed. The file is
-/// safe either way, both reads failing towards keeping it; what the number sizes
-/// is a known wrong SENTENCE, an act-time re-verify reading the same failure as a
-/// product having reclaimed the patch.
+/// Patch claims whose <c>State</c> or <c>Uninstallable</c> read failed, one per
+/// (patch, product) pairing asked. The file is safe either way, both reads
+/// failing towards keeping it; what the number sizes is how often a machine
+/// cannot answer the question the whole superseded-patch verdict rests on.
+/// </param>
+/// <param name="UnreadableVerdictPaths">
+/// Cached paths whose removable verdict no read established, one per merged row
+/// where the count above is one per pairing. The pair is the interesting reading:
+/// a machine where several products' reads failed on one shared patch reports a
+/// high pairing count against a single path, and a machine where the failures are
+/// spread reports the two close together, which are different faults wearing one
+/// number.
+///
+/// Existence is not tested, unlike the two unclaimed-file counts above, so this
+/// counts registrations rather than files on the disk. Nothing downstream may
+/// read it as a count of space or of files a user could see.
 /// </param>
 /// <param name="ProductCount">
 /// Product rows the API enumeration returned. With
@@ -210,4 +222,5 @@ public readonly record struct EnumerationCensus(
     int PatchClaimCount = 0,
     int LongLeafStemCount = 0,
     int RecoveredProductCount = 0,
-    int UnresolvableProductCount = 0);
+    int UnresolvableProductCount = 0,
+    int UnreadableVerdictPaths = 0);

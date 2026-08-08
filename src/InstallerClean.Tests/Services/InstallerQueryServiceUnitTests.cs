@@ -1642,6 +1642,45 @@ public class InstallerQueryServiceUnitTests
         Assert.False(row.VerdictUnreadable);
     }
 
+    [Fact]
+    public async Task The_census_separates_failed_reads_from_the_files_they_left_unread()
+    {
+        // The two counts answer different questions and a machine where they
+        // diverge is the reason both travel. One shared patch whose read fails
+        // under both products holding it is two failed reads and one file nobody
+        // could judge; reported as one number, that machine is indistinguishable
+        // from a machine with two separate unjudgeable files.
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddProduct("{B}");
+        msi.AddPatch("{A}", "{P}", localPackage: shared, state: "2", uninstallable: "0");
+        msi.AddPatch("{B}", "{P}", localPackage: shared, state: "2", uninstallable: "0");
+        msi.PatchPropertyResult[("{P}", "{A}", "State")] = BadConfiguration;
+        msi.PatchPropertyResult[("{P}", "{B}", "State")] = BadConfiguration;
+
+        var result = await Run(msi);
+
+        Assert.Equal(2, result.Census.UnreadablePatchStates);
+        Assert.Equal(1, result.Census.UnreadableVerdictPaths);
+    }
+
+    [Fact]
+    public async Task The_census_counts_no_unread_verdict_on_a_scan_that_read_everything()
+    {
+        // The control for the pair above: on a machine where every read answers,
+        // both terms are zero and a report carrying a non-zero one is saying
+        // something about that machine rather than about the app.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: @"C:\Windows\Installer\p.msp", state: "1", uninstallable: "1");
+
+        var result = await Run(msi);
+
+        Assert.Equal(0, result.Census.UnreadablePatchStates);
+        Assert.Equal(0, result.Census.UnreadableVerdictPaths);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
