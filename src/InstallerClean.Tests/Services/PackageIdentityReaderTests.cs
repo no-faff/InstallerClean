@@ -96,9 +96,17 @@ public class PackageIdentityReaderTests
     [InlineData("Intel;1033")]
     [InlineData("{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE};Intel")]
     [InlineData("not a guid")]
-    // One padded part refuses the whole list rather than the part. A target list
-    // short by one is a veto that does not fire for whatever that target holds.
+    // ONE BAD MEMBER REFUSES THE WHOLE LIST, and these are the rows that say so.
+    // A target list short by one is a veto that does not fire for whatever that
+    // target holds, so a partial parse would be worse than no parse. The middle
+    // position is tested as well as the ends, a loop that gave up early having
+    // exactly the same signature as one that refused.
     [InlineData("{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE} ;{11111111-2222-3333-4444-555555555555}")]
+    [InlineData("{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE};nonsense;{11111111-2222-3333-4444-555555555555}")]
+    [InlineData("{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE};{11111111-2222-3333-4444-555555555555};Intel")]
+    // Unbraced, which is a real product code in another spelling and is refused
+    // for the same reason a single unbraced value is.
+    [InlineData("{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE};11111111-2222-3333-4444-555555555555")]
     public void Refuses_a_template_holding_anything_that_is_not_a_product_code(string template) =>
         Assert.Null(PackageIdentityReader.ParseTargets(template));
 }
