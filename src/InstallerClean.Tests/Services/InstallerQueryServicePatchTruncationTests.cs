@@ -566,14 +566,15 @@ public class InstallerQueryServicePatchTruncationTests
 
         Assert.True(Assert.Single(result.Packages).IsRemovable);
         Assert.Equal(0, result.Census.RecoveredProductCount);
-        Assert.Equal(0, result.Census.UnresolvableProductCount);
+        Assert.Equal(0, result.Census.UnansweredProductCount);
     }
 
     /// <summary>
-    /// The two census tallies, which are what make the tolerance band answerable on
-    /// a machine that is not the one it was set on. One machine reporting a
-    /// recovered product and another reporting only residue are the two states the
-    /// band cannot tell apart, and these separate them without any band.
+    /// The two census tallies. A machine reporting a recovered product and one
+    /// reporting only residue are the two states a difference between product
+    /// totals cannot tell apart, which is what a tolerance band on that difference
+    /// was guessing at before it was removed. These separate them by name, and
+    /// report the separation per machine.
     /// </summary>
     [Fact]
     public async Task The_census_separates_a_recovered_product_from_registry_residue()
@@ -586,7 +587,7 @@ public class InstallerQueryServicePatchTruncationTests
         var result = await Run(msi, Registry(Superseding, StillApplied, NotInstalled));
 
         Assert.Equal(1, result.Census.RecoveredProductCount);
-        Assert.Equal(0, result.Census.UnresolvableProductCount);
+        Assert.Equal(0, result.Census.UnansweredProductCount);
         Assert.Equal(3, result.Census.RegistryProductKeys);
         Assert.Equal(1, result.Census.ProductCount);
     }

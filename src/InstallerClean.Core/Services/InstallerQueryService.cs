@@ -110,13 +110,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// that was not a packed GUID, which is a key naming no product to ask about.
     /// Null where the caller supplied no reader.
     /// </param>
+    /// <param name="UnparseableProductKeyNames">
+    /// Product subkeys counted in <paramref name="ProductKeys"/> whose name was
+    /// not a packed GUID, so no code could be taken from them. The difference
+    /// between the two, and the one state where naming products sees LESS than
+    /// counting them did: the registry says the machine has this product and
+    /// nothing can turn its name into a question. It withholds for that reason,
+    /// on the same terms as a code Windows would not answer about.
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
         int UnclaimedProductFiles = 0,
         int UnclaimedPatchFiles = 0,
         int NonStringLocalPackageValues = 0,
-        IReadOnlyCollection<string>? RegistryProductCodes = null);
+        IReadOnlyCollection<string>? RegistryProductCodes = null,
+        int UnparseableProductKeyNames = 0);
 
     /// <summary>
     /// Production constructor: talks to the real msi.dll through
@@ -413,62 +422,57 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // a patch that is Superseded under one product and Applied under another
         // being offered, and it can only fire for a product the loop reached, so
         // a truncation puts a still-needed patch on the removal list under a
-        // scan that believes it is whole. Nothing inside the API can see it.
+        // scan that believes it is whole.
         //
-        // Two signals answer it, and they answer different halves.
+        // THE QUESTION IS SETTLED BY IDENTITY, ABOVE, AND NOT BY ARITHMETIC HERE.
+        // LocateProductsTheEnumerationMissed compares the product codes the
+        // registry holds against the codes the enumeration returned, and puts each
+        // difference to Windows as a question about that one product. So a
+        // truncation is not estimated from how far two totals disagree; the
+        // products behind the disagreement are named, and each is either recovered
+        // into the questions the confirmation pass asks, or shown not to be
+        // installed, or counted in missed.Unresolved because Windows would not
+        // say. Only the last of the three withholds anything.
         //
-        // The first is a headcount. The registry walk is the only independent
-        // count of how many products this machine has, so a shortfall against it
-        // says the enumeration came back short of one. It is an inference and not
-        // a measurement, which is what the tolerance is for: UserData product
-        // keys survive a failed uninstall, so the registry legitimately runs
-        // ahead on a healthy machine. Two products' difference is absorbed
-        // outright, so a machine with a handful of registrations cannot trip on
-        // one stale key, and the proportional clause absorbs a fifth so a large
-        // machine's residue does not either.
+        // WHY A LEFTOVER KEY NOW PROVES NOTHING. A UserData product key outlives
+        // a failed or partial uninstall, so the registry legitimately holds more
+        // keys than the machine has products, and against a TOTAL that residue is
+        // indistinguishable from a truncation: both read as the registry running
+        // ahead. That is the whole reason a total ever needed a tolerance, and any
+        // tolerance is a guess at how much residue is normal. Asked by name, the
+        // same key answers "not installed", which settles it outright and costs
+        // nothing, because a product that is not there holds no patches. Residue
+        // no longer has to be absorbed, so nothing has to decide how much of it to
+        // absorb.
         //
-        // What the tolerance leaves is a silent band, and the residue it was
-        // written to absorb is the only thing anyone has measured against it. On
-        // one elevated machine (2026-08-03): 137 UserData product keys, 136 of
-        // them naming a cached file really on the disk and not one naming a file
-        // that had gone, so the registry ran ahead of the live set by a single
-        // key where the band would have absorbed 27. Inside that band a
-        // truncation fires nothing at all, and what it costs is a cached file an
-        // installed product still needs.
+        // AND WHERE THE REGISTRY READ ITSELF FAILS, NOTHING HAS BEEN GIVEN UP.
+        // This is the case to check before concluding an inference was safer than
+        // a measurement, because a headcount looks as though it would survive it.
+        // It does not: ProductKeys is counted from the subkeys the fallback
+        // actually walked, so a fallback that failed reports FEWER keys, which
+        // shrinks the difference against the enumeration rather than widening it.
+        // A total is blinded by exactly the failure that empties the comparison,
+        // and blinded quietly, reading as a machine whose two sources agree. What
+        // is keyed on that state is the both-sources gate above, which weighs the
+        // fallback's own failure count and refuses.
         //
-        // The second signal is an observation, and it is the one the band cannot
-        // make. The fallback reads the same UserData keys the API read and runs
+        // What remains here is an OBSERVATION and not an estimate, which is why it
+        // stays. The fallback reads the same UserData keys the API read and runs
         // after the whole API loop, so a path it is the FIRST to claim is one no
         // product the loop reached ever named. Its file being on the disk is the
         // other half: a residue key whose product is gone but whose LocalPackage
         // value survives leaves an unclaimed path too, and that population's file
-        // is usually not there. A headcount cannot separate the two at all; this
-        // separates them on the machine's own disk.
+        // is usually not there. It overlaps the comparison on a machine where both
+        // fire, and the redundancy is worth its cost: this one sees a lost product
+        // through a file on the disk rather than through a code, so it does not
+        // depend on any key name being a packed GUID this code can read.
         //
-        // Neither replaces the other. The headcount still sees a lost product the
-        // registry holds no cached-package value for, or one whose cached file
-        // another tool has already removed, where nothing is left on disk to
-        // observe. Combined by the larger of the two rather than the sum, because
-        // both are estimating one quantity (products the API never mentioned)
-        // from opposite sides, and adding them would count the same loss twice.
-        var productShortfall = fallback.ProductKeys - products.Count;
-        var enumerationLooksShort =
-            productShortfall > 2 && products.Count * 5 < fallback.ProductKeys * 4;
-
-        // A skipped row is inside both counts: one product in
-        // unreadableProducts, and absent from products.Count so inside
-        // productShortfall as well. Thirty skipped rows out of a hundred
-        // registrations read as sixty programs unread before the subtraction.
-        var shortfallProducts =
-            enumerationLooksShort ? Math.Max(0, productShortfall - unreadableRows) : 0;
-
-        // The same double count, and it is subtracted the same way: a product
-        // whose row the API skipped, or whose LocalPackage read failed, has its
-        // registry value claimed by the fallback alone, so it is already inside
-        // unreadableProducts. Subtracting the whole of that count is deliberately
-        // generous (a product short only a patch row contributes no unclaimed
-        // path), which can leave the NUMBER low and cannot leave the withholding
-        // off: whatever it absorbs, unreadableProducts carries.
+        // A product whose row the API skipped, or whose LocalPackage read failed,
+        // has its registry value claimed by the fallback alone, so it is already
+        // inside unreadableProducts. Subtracting the whole of that count is
+        // deliberately generous (a product short only a patch row contributes no
+        // unclaimed path), which can leave the NUMBER low and cannot leave the
+        // withholding off: whatever it absorbs, unreadableProducts carries.
         //
         // A patch entry names no product, so it can say only that at least one
         // went unreached. It floors the count rather than adding to it.
@@ -477,17 +481,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ? Math.Max(1, unclaimedProducts)
             : unclaimedProducts;
 
-        // The registry named a product and Windows would not say whether it is
-        // installed, so whether the enumeration was complete is not established
-        // and cannot be. ADDED rather than folded into the larger-of-two above,
-        // because it is not another estimate of the same quantity: those two
-        // estimate how many products were missed, and this counts the codes on
-        // which that question got no answer at all. A product recovered by name
-        // contributes nothing here and nothing above, which is the whole gain:
-        // the gap it would have been part of was closed by asking rather than
-        // covered by withholding.
-        var withheldProducts = unreadableProducts + Math.Max(shortfallProducts, apiNeverClaimed)
-            + missed.Unresolved;
+        // Registry products this scan could not settle either way: a code Windows
+        // would not answer about, and a key whose name yielded no code to ask
+        // with. Two steps of one state, so one figure.
+        var unresolvedProducts = missed.Unresolved + fallback.UnparseableProductKeyNames;
+
+        // ADDED rather than weighed against the observation, because the two are
+        // not estimates of one quantity: the observation counts products seen to
+        // have gone unclaimed, and this counts the ones the question got no answer
+        // for. A product RECOVERED by name contributes to neither, which is the
+        // whole gain: the gap it would have been part of was closed by asking
+        // rather than covered by withholding.
+        var withheldProducts = unreadableProducts + apiNeverClaimed + unresolvedProducts;
 
         progress?.Report(new ScanProgressUpdate(string.Format(
             Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
@@ -522,10 +527,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
 
         return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts, patchClaims.AsReadOnly(),
-            // The four tallies rather than the two terms computed from them. The
-            // shortfall is silently zero inside its tolerance band and the
-            // never-claimed term is floored and biased low, so neither is the
-            // count its name would claim; both are reproducible from these.
+            // The tallies rather than the term computed from them: the
+            // never-claimed figure is floored and biased low, so it is not the
+            // count its name would claim, and it is reproducible from these.
             new EnumerationCensus(
                 unreadableProducts,
                 unreadableRows,
@@ -538,7 +542,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 patchClaims.Count,
                 packages.Count(p => HasLongLeafStem(p.LocalPackagePath)),
                 missed.Recovered.Count,
+                // The two halves of unresolvedProducts, apart. The arithmetic
+                // above adds them because it needs what could not be settled, and
+                // that superordinate is true of both; no narrower sentence is, so
+                // nothing that names a cause may carry the sum.
                 missed.Unresolved,
+                fallback.UnparseableProductKeyNames,
                 // Counted off the merged rows rather than at the read site, which
                 // is what makes it a different number from the pairing count
                 // above: several products' failed reads on one shared patch are
@@ -1281,6 +1290,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unclaimedProductFiles = 0;
         var unclaimedPatchFiles = 0;
         var nonStringValues = 0;
+        var unparseableKeyNames = 0;
         var productCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         // Budgeted, because every catch below sits inside a loop bounded by the
@@ -1312,6 +1322,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     unclaimedProductFiles += sidRead.UnclaimedProductFiles;
                     unclaimedPatchFiles += sidRead.UnclaimedPatchFiles;
                     nonStringValues += sidRead.NonStringLocalPackageValues;
+                    unparseableKeyNames += sidRead.UnparseableProductKeyNames;
                 }
             }
         }
@@ -1334,7 +1345,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
-            nonStringValues, productCodes);
+            nonStringValues, productCodes, unparseableKeyNames);
     }
 
     /// <summary>
@@ -1378,6 +1389,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unclaimedProductFiles = 0;
         var unclaimedPatchFiles = 0;
         var nonStringValues = 0;
+        var unparseableKeyNames = 0;
 
         try
         {
@@ -1402,6 +1414,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // about.
                     var unpacked = UnpackRegistryProductCode(prodGuid);
                     if (unpacked is not null) productCodes.Add(unpacked);
+                    // A key name that is not a packed GUID is the one place the
+                    // comparison is blind where a headcount was not: the registry
+                    // says this machine has a product and nothing here can turn
+                    // the name into a question. Counted, and counted into the
+                    // same withholding an unanswerable code reaches, because it
+                    // is the same state one step earlier. Skipping it silently
+                    // would let a registry this code cannot read look exactly
+                    // like a registry that agreed with the enumeration.
+                    else unparseableKeyNames++;
 
                     try
                     {
@@ -1483,7 +1504,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
-            nonStringValues);
+            nonStringValues, null, unparseableKeyNames);
     }
 
     /// <summary>
@@ -1674,10 +1695,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Every arm that advances past a non-Success return also increments
         // unreadableRows, which reaches unreadableProducts and withholds the
         // whole removable class for the scan, so a product this loop skips is a
-        // product the scan has already declared it did not read. The failure the
-        // caller's cross-check is looking for is a SILENT shortfall, and this
-        // cannot produce one. Do not "fix" the advance into a retry without
-        // replacing that guarantee first.
+        // product the scan has already declared it did not read. What the caller
+        // goes looking for by name is a product lost SILENTLY, and this cannot
+        // produce one. Do not "fix" the advance into a retry without replacing
+        // that guarantee first.
         for (uint index = 0; index < MaxProductIndex; index++)
         {
             ct.ThrowIfCancellationRequested();

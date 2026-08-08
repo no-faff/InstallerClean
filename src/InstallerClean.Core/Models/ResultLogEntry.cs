@@ -206,6 +206,16 @@ public sealed record AppInfo(string Version, string Language)
 /// the unclaimed-file counts under the scan. Nothing may read it as a quantity of
 /// space or as files a user could go and look at.
 /// </param>
+/// <param name="UnparseableProductKeyCount">
+/// Registry product key names that yielded no product code, so there was nothing
+/// to ask Windows about. The registry says the machine has a product and nothing
+/// can turn its name into a question.
+///
+/// A MACHINE FACT AND NOT A RUN OBSERVATION, which is what puts it here: it is
+/// counted while walking every product key rather than only the ones a run
+/// happened to miss, so two scans of one machine agree about it. Its sibling under
+/// the scan, the unanswered count, is the opposite on both points.
+/// </param>
 /// <param name="ProductCount">Installed products the enumeration returned.</param>
 /// <param name="RegistryProductKeyCount">
 /// Installed products the REGISTRY holds, which is the only count of a machine's
@@ -230,6 +240,7 @@ public sealed record MachineInfo(
     int NonStringLocalPackageCount,
     int UnreadablePatchStateCount,
     int UnreadableVerdictPathCount,
+    int UnparseableProductKeyCount,
     int ProductCount,
     int RegistryProductKeyCount,
     int PatchClaimCount)
@@ -241,6 +252,7 @@ public sealed record MachineInfo(
             scan.Census.NonStringLocalPackageValues,
             scan.Census.UnreadablePatchStates,
             scan.Census.UnreadableVerdictPaths,
+            scan.Census.UnparseableProductKeyNames,
             scan.Census.ProductCount,
             scan.Census.RegistryProductKeys,
             scan.Census.PatchClaimCount);
@@ -299,18 +311,16 @@ public sealed record MachineInfo(
 /// UNDER THE SCAN AND NOT THE MACHINE because it exists only where a run came back
 /// short, so two scans of one machine need not agree about it.
 /// </param>
-/// <param name="UnresolvableProductCount">
+/// <param name="UnansweredProductCount">
 /// Products the registry named, this enumeration never returned, and Windows would
 /// then not say were installed or not. A question that was put and got no answer,
 /// which withholds, because nothing about an enumeration's completeness follows
 /// from silence.
 ///
-/// IT IS EXACTLY THAT AND NOTHING ELSE, and the distinction is worth stating
-/// because it is the one this field could lose. A registry key name that yields no
-/// product code is a DIFFERENT finding: Windows was never asked about it, so it did
-/// not decline to answer, and a sentence about what Windows would not say is false
-/// of every such member. Anything that comes to carry both needs two fields here,
-/// not a wider sentence over one.
+/// NOT THE MACHINE OBJECT'S UNPARSEABLE COUNT, and the two may never be added
+/// together under one name outside the withholding total: Windows was never asked
+/// about those, so a sentence about what Windows would not say is false of every
+/// one of them. One figure carried both until this schema separated them.
 /// </param>
 /// <param name="UnclaimedPatchFileCount">
 /// The same for patch registrations. A patch entry names no product, so it
@@ -364,7 +374,7 @@ public sealed record ScanInfo(
     int UnclaimedProductFileCount,
     int UnclaimedPatchFileCount,
     int RecoveredProductCount,
-    int UnresolvableProductCount,
+    int UnansweredProductCount,
     int KeptIdentityClaimedCount,
     int KeptIdentityUnreadableCount,
     int KeptIdentityUnaskableCount)
@@ -392,7 +402,7 @@ public sealed record ScanInfo(
             scan.Census.UnclaimedProductFiles,
             scan.Census.UnclaimedPatchFiles,
             scan.Census.RecoveredProductCount,
-            scan.Census.UnresolvableProductCount,
+            scan.Census.UnansweredProductCount,
             scan.IdentityClaimedCount,
             scan.IdentityUnreadableCount,
             scan.IdentityUnaskableCount);

@@ -49,9 +49,9 @@ public class InstallerQueryServiceUnitTests
     /// <summary>
     /// A registry fallback that contributes nothing, fails at nothing and names
     /// no products: the healthy-second-source baseline every test but the
-    /// degraded ones wants. Naming no products keeps it out of the
-    /// enumeration-shortfall cross-check as well, which weighs the API's count
-    /// against the registry's and cannot find the API short of nothing.
+    /// degraded ones wants. Naming no products also keeps it out of the
+    /// comparison that looks for products the enumeration missed, which has
+    /// nothing to compare and so recovers none and withholds for none.
     /// </summary>
     private static InstallerQueryService.FallbackRead NoFallback(
         Dictionary<string, RegisteredPackage> claimed, CancellationToken ct) => new(0, 0);
@@ -608,8 +608,8 @@ public class InstallerQueryServiceUnitTests
 
     /// <summary>
     /// A machine with one product, one superseded patch of its own, and nothing
-    /// else. Whether that patch is offered is the whole subject of the four
-    /// tests below.
+    /// else. Whether that patch is offered is the whole subject of the tests
+    /// below it.
     /// </summary>
     private static FakeMsiApi OneProductWithASupersededPatch(string patch)
     {
@@ -619,63 +619,75 @@ public class InstallerQueryServiceUnitTests
         return msi;
     }
 
-    [Fact]
-    public async Task An_enumeration_far_short_of_the_registrys_product_count_withholds_the_removable_class()
+    /// <summary>
+    /// THE HEADCOUNTS ALONE DECIDE NOTHING, AT ANY RATIO. A registry holding more
+    /// product keys than the enumeration returned is the ordinary shape of a
+    /// machine that has ever had an uninstall go wrong, and a difference between
+    /// two totals cannot tell that from an enumeration that stopped early. What
+    /// separates them is asking about the products by name, which is done above
+    /// and reaches this arithmetic already settled.
+    ///
+    /// The ratios below are the ones a proportional rule would have divided on:
+    /// one key ahead, a tenth ahead, and thirty-nine of forty. **None of them may
+    /// withhold anything**, and the last is the case a machine really can be in
+    /// while perfectly healthy.
+    /// </summary>
+    [Theory]
+    [InlineData(1, 5)]     // four products enumerated, five keys
+    [InlineData(90, 100)]  // a tenth ahead
+    [InlineData(1, 40)]    // the registry far ahead of a small enumeration
+    public async Task A_registry_ahead_of_the_enumeration_withholds_nothing_on_the_totals_alone(
+        int enumerated, int registryProducts)
     {
         const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = OneProductWithASupersededPatch(patch);
+        for (var i = 1; i < enumerated; i++) msi.AddProduct($"{{P{i}}}");
 
-        var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch), registryProducts: 40);
+        var result = await RunAgainstRegistry(msi, registryProducts: registryProducts);
 
-        // Withheld, not refused: the orphan half of the scan is unaffected and
-        // the user still has a list to act on.
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
+        Assert.Equal(0, result.UnaccountedProductCount);
+    }
+
+    [Fact]
+    public async Task A_registry_key_whose_name_yields_no_product_code_withholds()
+    {
+        // THE ONE PLACE NAMING PRODUCTS SEES LESS THAN COUNTING THEM DID, and it
+        // is why the count is not simply gone. A subkey whose name is not a packed
+        // GUID is a product the registry says this machine has and that nothing
+        // here can turn into a question, so it is neither recovered nor shown to
+        // be residue. Withheld on the same terms as a code Windows refuses to
+        // answer about, because it is that state one step earlier. Left
+        // uncounted it would look exactly like a registry that agreed with the
+        // enumeration.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = OneProductWithASupersededPatch(patch);
+
+        var result = await new InstallerQueryService(msi,
+            (_, _) => new InstallerQueryService.FallbackRead(
+                Failures: 0, ProductKeys: 3, UnparseableProductKeyNames: 2))
+            .GetRegisteredPackagesAsync();
+
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == patch);
         Assert.False(row.IsRemovable);
         Assert.True(row.RemovableWithheld);
-        Assert.Equal(39, result.UnaccountedProductCount);
+        Assert.Equal(2, result.UnaccountedProductCount);
+        // The specific cause, not the sum it feeds: nothing could be asked, as
+        // against a question asked and refused.
+        Assert.Equal(2, result.Census.UnparseableProductKeyNames);
+        Assert.Equal(0, result.Census.UnansweredProductCount);
     }
 
     [Fact]
-    public async Task A_registry_two_products_ahead_of_the_api_withholds_nothing()
+    public async Task A_failing_fallback_beside_a_clean_enumeration_withholds_rather_than_refusing()
     {
-        // UserData product keys outlive a failed uninstall, so the registry
-        // legitimately runs a little ahead on a healthy machine. Two is absorbed
-        // outright, which is what stops a machine with a handful of
-        // registrations tripping on one piece of residue.
-        const string patch = @"C:\Windows\Installer\superseded.msp";
-        var msi = OneProductWithASupersededPatch(patch);
-        msi.AddProduct("{B}");
-        msi.AddProduct("{C}");
-
-        var result = await RunAgainstRegistry(msi, registryProducts: 5);
-
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
-        Assert.Equal(0, result.UnaccountedProductCount);
-    }
-
-    [Fact]
-    public async Task A_registry_a_tenth_ahead_of_the_api_withholds_nothing()
-    {
-        // The proportional half, which is what keeps the absolute one from
-        // becoming a rule about big machines: nine products of residue on a
-        // ninety-product machine is not an enumeration that gave up early.
-        const string patch = @"C:\Windows\Installer\superseded.msp";
-        var msi = OneProductWithASupersededPatch(patch);
-        for (var i = 0; i < 89; i++) msi.AddProduct($"{{P{i}}}");
-
-        var result = await RunAgainstRegistry(msi, registryProducts: 100);
-
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
-        Assert.Equal(0, result.UnaccountedProductCount);
-    }
-
-    [Fact]
-    public async Task A_short_enumeration_beside_a_failing_fallback_still_withholds_rather_than_refusing()
-    {
-        // The refusal above it stays keyed on what the API said about ITSELF. A
-        // shortfall is inferred from two counts that can differ innocently, and
-        // inference is sound enough to hold a class back and not sound enough to
-        // take a machine's scan away: this run has both a short count and a
-        // failed key read and still comes back with a list.
+        // The refusal above stays keyed on what the API said about ITSELF, and
+        // this run has nothing to say: every product enumerated cleanly, and only
+        // the fallback's own key reads failed. A backstop that stumbled where the
+        // primary answered in full is not a reason to take a machine's scan away,
+        // so the run still comes back with a list. What the failed reads do cost
+        // is the comparison, which cannot name a product out of a key it never
+        // read, and that shows up as keys counted with no code taken from them.
         const string patch = @"C:\Windows\Installer\superseded.msp";
         var msi = OneProductWithASupersededPatch(patch);
 
@@ -683,7 +695,8 @@ public class InstallerQueryServiceUnitTests
             (_, _) => new InstallerQueryService.FallbackRead(Failures: 3, ProductKeys: 40))
             .GetRegisteredPackagesAsync();
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+        Assert.NotEmpty(result.Packages);
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
     }
 
     [Fact]
@@ -1526,18 +1539,22 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(1, result.Census.UnreadableProducts);
         // ZERO skipped rows, and it is not the same number as the one above: a
         // product whose row came back and whose value would not read is still a
-        // product the API returned, so it is not missing from the headcount. The
-        // shortfall arithmetic subtracts THIS, which is why it travels separately.
+        // product the API returned. It travels separately because the two answer
+        // different questions about the same product, one that a claim was lost
+        // and one that the row itself never arrived.
         Assert.Equal(0, result.Census.SkippedProductRows);
         Assert.Equal(10, result.Census.RegistryProductKeys);
         Assert.Equal(2, result.Census.ProductCount);
         Assert.Equal(4, result.Census.UnclaimedProductFiles);
         Assert.Equal(0, result.Census.UnclaimedPatchFiles);
 
-        // The composite the app acts on is the unreadable count plus the larger
-        // of the two derived terms, and both of those reproduce from the tallies:
-        // the shortfall is 10 - 2 - 0, and the never-claimed estimate is 4 - 1.
-        Assert.Equal(1 + Math.Max(10 - 2 - 0, 4 - 1), result.UnaccountedProductCount);
+        // The composite the app acts on, and it reproduces from the tallies: one
+        // product whose records came back short, plus the never-claimed estimate
+        // of 4 - 1. The registry's ten keys against the API's two contribute
+        // NOTHING to it, which is the point: eight keys nobody could turn into a
+        // named product are eight keys this fake never named, and a difference
+        // between two totals is not evidence about any product.
+        Assert.Equal(1 + (4 - 1), result.UnaccountedProductCount);
     }
 
     [Fact]
@@ -1563,11 +1580,12 @@ public class InstallerQueryServiceUnitTests
     [Fact]
     public async Task A_registry_that_holds_two_more_products_than_the_API_returned_still_reports_both_counts()
     {
-        // THE CASE THE DERIVED TERM CANNOT EXPRESS. The app's tolerance band
-        // absorbs a difference of two outright, so the shortfall it computes here
-        // is zero and this machine is indistinguishable from a clean one on that
-        // figure alone. Both headcounts travel, so it is distinguishable in the
-        // report, which is the whole reason the tallies go instead of the term.
+        // THE CASE NO SINGLE FIGURE CAN EXPRESS. The app withholds nothing on a
+        // difference between totals, so on the app's own arithmetic this machine
+        // is indistinguishable from a clean one. Both headcounts travel anyway,
+        // because the report's job is to describe machines rather than to repeat
+        // the app's conclusions, and a fleet where this difference is routinely
+        // large says something about registry residue that no verdict carries.
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
@@ -1576,7 +1594,7 @@ public class InstallerQueryServiceUnitTests
 
         Assert.Equal(3, result.Census.RegistryProductKeys);
         Assert.Equal(1, result.Census.ProductCount);
-        // The app itself withheld nothing: the band absorbed it.
+        // The app itself withheld nothing, and no band was involved in that.
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
