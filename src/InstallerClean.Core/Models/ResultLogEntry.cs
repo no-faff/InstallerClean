@@ -188,8 +188,33 @@ public sealed record AppInfo(string Version, string Language)
 /// is worth more than any number of the first kind.
 /// </param>
 /// <param name="UnreadablePatchStateCount">
-/// Patches whose state could not be read during the scan. It sizes a known wrong
-/// sentence rather than a lost file: both reads fail towards keeping the file.
+/// Patches whose state could not be read during the scan, one per product-to-patch
+/// pairing. It sizes a known wrong sentence rather than a lost file: both reads
+/// fail towards keeping the file.
+/// </param>
+/// <param name="UnreadableVerdictPathCount">
+/// The same failures counted once per cached PATH rather than once per pairing.
+///
+/// IT IS HERE RATHER THAN UNDER THE SCAN BECAUSE THE PAIR IS THE READING and
+/// splitting them across two objects would throw that away: a machine where
+/// several products' reads failed on one shared patch reports a high pairing count
+/// against a single path, and a machine where the failures are spread reports the
+/// two close together. Those are different faults wearing one number, and only the
+/// two side by side tell them apart.
+///
+/// It counts REGISTRATIONS, not files on the disk: existence is not tested, unlike
+/// the unclaimed-file counts under the scan. Nothing may read it as a quantity of
+/// space or as files a user could go and look at.
+/// </param>
+/// <param name="UnparseableProductKeyCount">
+/// Registry product key names that yielded no product code, so there was nothing
+/// to ask Windows about. The registry says the machine has a product and nothing
+/// can turn its name into a question.
+///
+/// A MACHINE FACT AND NOT A RUN OBSERVATION, which is what puts it here: it is
+/// counted while walking every product key rather than only the ones a run
+/// happened to miss, so two scans of one machine agree about it. Its sibling under
+/// the scan, the unanswered count, is the opposite on both points.
 /// </param>
 /// <param name="ProductCount">Installed products the enumeration returned.</param>
 /// <param name="RegistryProductKeyCount">
@@ -214,6 +239,8 @@ public sealed record MachineInfo(
     int LongFileNameCount,
     int NonStringLocalPackageCount,
     int UnreadablePatchStateCount,
+    int UnreadableVerdictPathCount,
+    int UnparseableProductKeyCount,
     int ProductCount,
     int RegistryProductKeyCount,
     int PatchClaimCount)
@@ -224,6 +251,8 @@ public sealed record MachineInfo(
             scan.Census.LongLeafStemCount,
             scan.Census.NonStringLocalPackageValues,
             scan.Census.UnreadablePatchStates,
+            scan.Census.UnreadableVerdictPaths,
+            scan.Census.UnparseableProductKeyNames,
             scan.Census.ProductCount,
             scan.Census.RegistryProductKeys,
             scan.Census.PatchClaimCount);
@@ -261,30 +290,54 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="SkippedProductRowCount">
 /// Enumeration rows that could not be read at all. A subset of
-/// <paramref name="UnreadableProductCount"/>, sent because it and not the wider
-/// count is what the app's shortfall arithmetic subtracts.
+/// <paramref name="UnreadableProductCount"/>, sent because the two answer
+/// different questions about one product: that a claim was lost, and that the row
+/// itself never arrived.
 /// </param>
 /// <param name="UnclaimedProductFileCount">
 /// Product registrations naming a cached file that is really on the disk and that
 /// the enumeration never claimed.
 /// </param>
+/// <param name="RecoveredProductCount">
+/// Products the registry named, this enumeration never returned, and a keyed ask
+/// then found installed. THE TRUNCATION, MEASURED, where every other signal about
+/// a short enumeration is an inference from two totals.
+///
+/// A non-zero reading anywhere would be the first evidence that a truncated
+/// enumeration happens at all, which is a premise a whole mechanism once rested on
+/// and which nothing has ever confirmed. It withholds nothing: the products behind
+/// it were asked about rather than guessed at.
+///
+/// UNDER THE SCAN AND NOT THE MACHINE because it exists only where a run came back
+/// short, so two scans of one machine need not agree about it.
+/// </param>
+/// <param name="UnansweredProductCount">
+/// Products the registry named, this enumeration never returned, and Windows would
+/// then not say were installed or not. A question that was put and got no answer,
+/// which withholds, because nothing about an enumeration's completeness follows
+/// from silence.
+///
+/// NOT THE MACHINE OBJECT'S UNPARSEABLE COUNT, and the two may never be added
+/// together under one name outside the withholding total: Windows was never asked
+/// about those, so a sentence about what Windows would not say is false of every
+/// one of them. One figure carried both until this schema separated them.
+/// </param>
 /// <param name="UnclaimedPatchFileCount">
 /// The same for patch registrations. A patch entry names no product, so it
 /// establishes only that at least one product went unreached.
 ///
-/// THESE ARE THE TALLIES, AND THE TWO FIGURES THE APP DERIVES FROM THEM ARE SENT
-/// NOWHERE. One of those is a shortfall against the registry's own headcount that
-/// reads zero inside a tolerance band, so a machine the band absorbs is
-/// indistinguishable from a machine with nothing wrong. The other is a product
-/// estimate floored at one by patch evidence and biased low by a deliberately
-/// generous subtraction, so it is a lower bound and a field called a count would
-/// have asserted an exactness it has not got.
+/// THESE ARE THE TALLIES, AND THE FIGURE THE APP DERIVES FROM THEM IS SENT
+/// NOWHERE. That figure is a product estimate floored at one by patch evidence and
+/// biased low by a deliberately generous subtraction, so it is a lower bound and a
+/// field called a count would have asserted an exactness it has not got.
 ///
-/// Every derived figure is reproducible from these plus
-/// <paramref name="UnreadableProductCount"/> and the machine object's two product
-/// headcounts, so nothing is lost by sending the tallies instead, and the
-/// tolerance band itself becomes answerable on machines other than the one it was
-/// set from.
+/// It is reproducible from these plus <paramref name="UnreadableProductCount"/>,
+/// so nothing is lost by sending the tallies instead. The machine object's two
+/// product headcounts are no longer inputs to anything the app derives: their
+/// difference turned out unable to tell a truncated enumeration from ordinary
+/// registry residue, and the products behind it are asked about by name instead.
+/// They travel because how far a real machine's registry runs ahead of its
+/// enumeration is a fact only these reports can establish.
 /// </param>
 /// <param name="KeptIdentityClaimedCount">
 /// Candidates the scan kept back because a live registration answers to the code
@@ -320,6 +373,8 @@ public sealed record ScanInfo(
     int SkippedProductRowCount,
     int UnclaimedProductFileCount,
     int UnclaimedPatchFileCount,
+    int RecoveredProductCount,
+    int UnansweredProductCount,
     int KeptIdentityClaimedCount,
     int KeptIdentityUnreadableCount,
     int KeptIdentityUnaskableCount)
@@ -346,6 +401,8 @@ public sealed record ScanInfo(
             scan.Census.SkippedProductRows,
             scan.Census.UnclaimedProductFiles,
             scan.Census.UnclaimedPatchFiles,
+            scan.Census.RecoveredProductCount,
+            scan.Census.UnansweredProductCount,
             scan.IdentityClaimedCount,
             scan.IdentityUnreadableCount,
             scan.IdentityUnaskableCount);

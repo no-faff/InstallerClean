@@ -56,6 +56,8 @@ public class ResultLogEntryTests
         SkippedProductRowCount: 0,
         UnclaimedProductFileCount: 0,
         UnclaimedPatchFileCount: 0,
+        RecoveredProductCount: 0,
+        UnansweredProductCount: 0,
         KeptIdentityClaimedCount: 0,
         KeptIdentityUnreadableCount: 0,
         KeptIdentityUnaskableCount: 0);
@@ -65,6 +67,8 @@ public class ResultLogEntryTests
         LongFileNameCount: 0,
         NonStringLocalPackageCount: 0,
         UnreadablePatchStateCount: 0,
+        UnreadableVerdictPathCount: 0,
+        UnparseableProductKeyCount: 0,
         ProductCount: 137,
         RegistryProductKeyCount: 137,
         PatchClaimCount: 2);
@@ -137,7 +141,8 @@ public class ResultLogEntryTests
         Assert.Equal(
             [
                 "shortNameCreation", "longFileNameCount", "nonStringLocalPackageCount",
-                "unreadablePatchStateCount", "productCount", "registryProductKeyCount",
+                "unreadablePatchStateCount", "unreadableVerdictPathCount",
+                "unparseableProductKeyCount", "productCount", "registryProductKeyCount",
                 "patchClaimCount",
             ],
             root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
@@ -148,6 +153,7 @@ public class ResultLogEntryTests
                 "supersededCount", "obsoletedCount", "removableBytes", "missingFromDiskCount",
                 "missingNeededCount", "withheldPatchCount", "unreadableProductCount",
                 "skippedProductRowCount", "unclaimedProductFileCount", "unclaimedPatchFileCount",
+                "recoveredProductCount", "unansweredProductCount",
                 "keptIdentityClaimedCount", "keptIdentityUnreadableCount",
                 "keptIdentityUnaskableCount",
             ],
@@ -205,11 +211,13 @@ public class ResultLogEntryTests
     [Fact]
     public void The_withholding_arithmetic_travels_as_its_tallies_and_never_as_its_terms()
     {
-        // The app derives two figures from these: a shortfall against the
-        // registry's own headcount, which reads zero inside a tolerance band, and
-        // a product estimate floored at one and biased low. Neither is the count
-        // its name would claim, and both are reproducible from what IS sent, so
-        // the tallies go and the derived terms go nowhere.
+        // The app derives a product estimate from these, floored at one and
+        // biased low, which is not the count its name would claim and IS
+        // reproducible from what is sent. So the tallies go and the derived term
+        // goes nowhere. The registry and API headcounts travel for their own
+        // sake rather than as its inputs: nothing is derived from the difference
+        // between them any more, and a fleet's spread of that difference is a
+        // fact about machines that no verdict of the app's carries.
         var scan = new ScanResult(
             Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
             UnaccountedProductCount: 9,
@@ -228,11 +236,10 @@ public class ResultLogEntryTests
         Assert.Equal(30, machine.ProductCount);
         Assert.Equal(40, machine.RegistryProductKeyCount);
 
-        // Both derived figures reproduce from those six, which is the whole
-        // argument for sending tallies: the shortfall net of skipped rows, and
-        // the never-claimed estimate net of the unreadable products and floored
-        // at one because a patch file was seen unclaimed.
-        Assert.Equal(9, (machine.RegistryProductKeyCount - machine.ProductCount) - info.SkippedProductRowCount);
+        // The derived figure reproduces from those six, which is the whole
+        // argument for sending tallies: the never-claimed estimate net of the
+        // unreadable products and floored at one because a patch file was seen
+        // unclaimed.
         Assert.Equal(2, Math.Max(1, info.UnclaimedProductFileCount - info.UnreadableProductCount));
 
         var json = JsonSerializer.Serialize(info, JsonOptions);
@@ -242,13 +249,14 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void A_shortfall_the_tolerance_band_absorbs_is_still_visible_in_the_payload()
+    public void A_registry_ahead_of_the_enumeration_is_still_visible_in_the_payload()
     {
         // THE FIELD SET'S STRONGEST REASON, pinned so it cannot be quietly undone.
-        // The app's own rule absorbs a difference of two outright, so a machine
-        // whose registry holds two more products than the enumeration returned
-        // computes a shortfall of zero and looks exactly like a machine with none.
-        // Sending both headcounts is what tells them apart.
+        // The app withholds nothing on a difference between these two totals, so
+        // a machine whose registry holds two more products than the enumeration
+        // returned reaches every verdict a machine with none does. Sending both
+        // headcounts is what tells them apart, and how common that difference is
+        // across real machines is a thing only the reports can answer.
         var absorbed = new ScanResult(
             Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
             Census: new EnumerationCensus(RegistryProductKeys: 139, ProductCount: 137));
