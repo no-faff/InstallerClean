@@ -169,10 +169,17 @@ public sealed record AppInfo(string Version, string Language)
 /// Where the machine still generates 8dot3 short names, one of
 /// <see cref="ShortNameCreationLabels"/>.
 /// </param>
-/// <param name="LongStemCount">
-/// Registered cached paths whose leaf name is longer than eight characters before
-/// the extension. Read against <see cref="ScanInfo.RegisteredCount"/> in the same
-/// report, which is the population it is drawn from.
+/// <param name="LongFileNameCount">
+/// Registered cached paths whose file name is longer than eight characters before
+/// the extension, so the name itself cannot be an 8dot3 short name. Read against
+/// <see cref="ScanInfo.RegisteredCount"/> in the same report, which is the
+/// population it is drawn from.
+///
+/// The census calls the same number <c>LongLeafStemCount</c>, which is the precise
+/// word for the part of a name before its extension. This one is what a person
+/// reads off the confirmation dialog, and it pairs with
+/// <see cref="ShortNameCreation"/> two lines above: short name against long name is
+/// a pair anybody can follow without knowing what a stem is.
 /// </param>
 /// <param name="NonStringLocalPackageCount">
 /// Registrations whose cached-path value was there and was not a string. Every
@@ -192,7 +199,7 @@ public sealed record AppInfo(string Version, string Language)
 /// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
-    int LongStemCount,
+    int LongFileNameCount,
     int NonStringLocalPackageCount,
     int UnreadablePatchStateCount,
     int ProductCount,

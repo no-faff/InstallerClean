@@ -61,7 +61,7 @@ public class ResultLogEntryTests
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
-        LongStemCount: 0,
+        LongFileNameCount: 0,
         NonStringLocalPackageCount: 0,
         UnreadablePatchStateCount: 0,
         ProductCount: 137,
@@ -134,7 +134,7 @@ public class ResultLogEntryTests
 
         Assert.Equal(
             [
-                "shortNameCreation", "longStemCount", "nonStringLocalPackageCount",
+                "shortNameCreation", "longFileNameCount", "nonStringLocalPackageCount",
                 "unreadablePatchStateCount", "productCount", "patchClaimCount",
             ],
             root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
@@ -262,7 +262,7 @@ public class ResultLogEntryTests
         var machine = MachineInfo.From(scan);
 
         Assert.Equal(ShortNameCreationLabels.PerVolume, machine.ShortNameCreation);
-        Assert.Equal(5, machine.LongStemCount);
+        Assert.Equal(5, machine.LongFileNameCount);
         Assert.Equal(1, machine.NonStringLocalPackageCount);
         Assert.Equal(2, machine.UnreadablePatchStateCount);
         Assert.Equal(3, machine.ProductCount);
