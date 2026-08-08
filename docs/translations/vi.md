@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Tiếng Việt |
 | --- | --- |
-| {0} file still needed | {0} tệp vẫn cần thiết |
-| {0} files still needed | {0} tệp vẫn cần thiết |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | {0} tệp không cần thiết để dọn |
 | {0} unneeded files to clean up | {0} tệp không cần thiết để dọn |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} tệp đã đăng ký bị thiếu (không phải do InstallerClean xóa). Hiện chưa có vấn đề, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt chương trình liên quan trong tương lai có thể thất bại. Mở Chi tiết để biết cần làm gì. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} bị bỏ lại, {1} bị thay thế, {2} đã lỗi thời ({3}) |
-| {0} registered file that is still needed ({1}) | {0} tệp đã đăng ký vẫn cần thiết ({1}) |
-| {0} registered files that are still needed ({1}) | {0} tệp đã đăng ký vẫn cần thiết ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

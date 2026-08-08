@@ -262,8 +262,8 @@ const MAP = {
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} fichier encore nécessaire`,
-  'Summary.RegisteredStillUsed.Plural': `{0} fichiers encore nécessaires`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} fichier inutile à nettoyer`,
   'Summary.OrphanedToCleanUp.Plural': `{0} fichiers inutiles à nettoyer`,
   'Summary.MissingFromDisk.Singular': `{0} fichier enregistré est manquant (non supprimé par InstallerClean). Aucun problème pour l'instant, mais une future réparation, mise à jour ou désinstallation de ce programme pourrait échouer. Ouvrez les Détails pour savoir quoi faire.`,
@@ -276,8 +276,8 @@ const MAP = {
   'Summary.OrphanedWindow': `{0} orphelins, {1} remplacés, {2} obsolètes ({3})`,
 
   // 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} fichier enregistré encore nécessaire ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} fichiers enregistrés encore nécessaires ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 

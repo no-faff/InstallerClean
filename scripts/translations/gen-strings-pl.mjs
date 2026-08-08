@@ -57,9 +57,9 @@ const OVERRIDES = {
   'Plural.Package.Few': `pakiety`,
   'Plural.Product.Few': `produkty`,
   'Plural.Patch.Few': `poprawki`,
-  'Summary.RegisteredStillUsed.Few': `{0} pliki nadal potrzebne`,
+  'Summary.RegisteredStillUsed.Few': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Few': `{0} niepotrzebne pliki do wyczyszczenia`,
-  'Summary.RegisteredWindow.Few': `{0} zarejestrowane pliki nadal potrzebne ({1})`,
+  'Summary.RegisteredWindow.Few': `{0} registered files left alone ({1})`,
   'Completion.PermanentDeleteSummary.Few': `{0} {1} permanently deleted`,
   'Completion.ReverifySkipped.One': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
   'Status.RegisteredPackagesFound.One': `Znaleziono {0} zarejestrowany {1}.`,
@@ -264,8 +264,8 @@ const MAP = {
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} plik nadal potrzebny`,
-  'Summary.RegisteredStillUsed.Plural': `{0} plików nadal potrzebnych`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} niepotrzebny plik do wyczyszczenia`,
   'Summary.OrphanedToCleanUp.Plural': `{0} niepotrzebnych plików do wyczyszczenia`,
   'Summary.MissingFromDisk.Singular': `Brakuje {0} zarejestrowanego pliku (nie usunął go InstallerClean). Na razie to nie problem, ale w przyszłości naprawa, aktualizacja lub odinstalowanie tego programu mogą się nie powieść. Otwórz Szczegóły, aby dowiedzieć się, co zrobić.`,
@@ -279,8 +279,8 @@ const MAP = {
   'Summary.OrphanedWindow': `{0} osieroconych, {1} zastąpionych, {2} przestarzałych ({3})`,
 
   // Registered-window footer; split singular/plural, .Few in OVERRIDES. 0 = count, 1 = size.
-  'Summary.RegisteredWindow.Singular': `{0} zarejestrowany plik nadal potrzebny ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} zarejestrowanych plików nadal potrzebnych ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 

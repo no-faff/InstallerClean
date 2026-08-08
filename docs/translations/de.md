@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Deutsch |
 | --- | --- |
-| {0} file still needed | {0} Datei noch benötigt |
-| {0} files still needed | {0} Dateien noch benötigt |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | {0} nicht benötigte Datei zum Aufräumen |
 | {0} unneeded files to clean up | {0} nicht benötigte Dateien zum Aufräumen |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} registrierte Datei fehlt (nicht von InstallerClean gelöscht). Im Moment kein Problem, aber eine spätere Reparatur, Aktualisierung oder Deinstallation dieses Programms könnte fehlschlagen. Öffne Details, um zu erfahren, was zu tun ist. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {0} von {1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} verwaist, {1} ersetzt, {2} veraltet ({3}) |
-| {0} registered file that is still needed ({1}) | {0} registrierte Datei, die noch benötigt wird ({1}) |
-| {0} registered files that are still needed ({1}) | {0} registrierte Dateien, die noch benötigt werden ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

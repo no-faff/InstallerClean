@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 日本語 |
 | --- | --- |
-| {0} file still needed | まだ必要なファイルが {0} 個 |
-| {0} files still needed | まだ必要なファイルが {0} 個 |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | クリーンアップ対象の不要ファイルが {0} 個 |
 | {0} unneeded files to clean up | クリーンアップ対象の不要ファイルが {0} 個 |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、そのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。 |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {2} {1} 個中 {0} 個 |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 孤立 {0}、置換済み {1}、廃止 {2}({3}) |
-| {0} registered file that is still needed ({1}) | まだ必要な登録ファイルが {0} 個({1}) |
-| {0} registered files that are still needed ({1}) | まだ必要な登録ファイルが {0} 個({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

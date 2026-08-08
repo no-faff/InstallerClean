@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Português (Brasil) |
 | --- | --- |
-| {0} file still needed | {0} arquivo ainda necessário |
-| {0} files still needed | {0} arquivos ainda necessários |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | {0} arquivo desnecessário para limpar |
 | {0} unneeded files to clean up | {0} arquivos desnecessários para limpar |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} arquivo registrado está ausente (não foi excluído pelo InstallerClean). Sem problema agora, mas uma futura reparação, atualização ou desinstalação desse programa pode falhar. Abra Detalhes para saber o que fazer. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {0} de {1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} órfãos, {1} substituídos, {2} obsoletos ({3}) |
-| {0} registered file that is still needed ({1}) | {0} arquivo registrado que ainda é necessário ({1}) |
-| {0} registered files that are still needed ({1}) | {0} arquivos registrados que ainda são necessários ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

@@ -262,8 +262,8 @@ const MAP = {
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} Datei noch benötigt`,
-  'Summary.RegisteredStillUsed.Plural': `{0} Dateien noch benötigt`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} nicht benötigte Datei zum Aufräumen`,
   'Summary.OrphanedToCleanUp.Plural': `{0} nicht benötigte Dateien zum Aufräumen`,
   'Summary.MissingFromDisk.Singular': `{0} registrierte Datei fehlt (nicht von InstallerClean gelöscht). Im Moment kein Problem, aber eine spätere Reparatur, Aktualisierung oder Deinstallation dieses Programms könnte fehlschlagen. Öffne Details, um zu erfahren, was zu tun ist.`,
@@ -277,8 +277,8 @@ const MAP = {
   'Summary.OrphanedWindow': `{0} verwaist, {1} ersetzt, {2} veraltet ({3})`,
 
   // Registered-window footer, split so noun and verb agree. 0 = count, 1 = size.
-  'Summary.RegisteredWindow.Singular': `{0} registrierte Datei, die noch benötigt wird ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} registrierte Dateien, die noch benötigt werden ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 

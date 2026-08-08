@@ -240,8 +240,8 @@ const MAP = {
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `아직 필요한 파일 {0}개`,
-  'Summary.RegisteredStillUsed.Plural': `아직 필요한 파일 {0}개`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `정리할 불필요한 파일 {0}개`,
   'Summary.OrphanedToCleanUp.Plural': `정리할 불필요한 파일 {0}개`,
   'Summary.MissingFromDisk.Singular': `등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요.`,
@@ -255,8 +255,8 @@ const MAP = {
   'Summary.OrphanedWindow': `고립됨 {0}개, 대체됨 {1}개, 폐기됨 {2}개 ({3})`,
 
   // Registered-window footer. 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `아직 필요한 등록된 파일 {0}개 ({1})`,
-  'Summary.RegisteredWindow.Plural': `아직 필요한 등록된 파일 {0}개 ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 

@@ -2115,7 +2115,7 @@ public class MainViewModelTests
 
         // The cancellation reaches App.OnStartup, which opens the main window
         // anyway. HasScanned is what stops that window painting "0 unneeded
-        // files to clean up" and "0 files still needed": a clean bill of health
+        // files to clean up" and "0 files left alone": a clean bill of health
         // for a scan that never ran.
         Assert.False(vm.Scan.HasScanned);
         Assert.True(vm.Scan.LastScanWasCancelled);

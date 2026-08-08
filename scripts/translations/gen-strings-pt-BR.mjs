@@ -249,8 +249,8 @@ const MAP = {
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} arquivo ainda necessário`,
-  'Summary.RegisteredStillUsed.Plural': `{0} arquivos ainda necessários`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} arquivo desnecessário para limpar`,
   'Summary.OrphanedToCleanUp.Plural': `{0} arquivos desnecessários para limpar`,
   'Summary.MissingFromDisk.Singular': `{0} arquivo registrado está ausente (não foi excluído pelo InstallerClean). Sem problema agora, mas uma futura reparação, atualização ou desinstalação desse programa pode falhar. Abra Detalhes para saber o que fazer.`,
@@ -262,8 +262,8 @@ const MAP = {
   // 0 = orphaned count, 1 = superseded count, 2 = obsoleted count, 3 = size display
   'Summary.OrphanedWindow': `{0} órfãos, {1} substituídos, {2} obsoletos ({3})`,
   // 0 = count, 1 = size display. Singular/plural split so the noun and verb agree.
-  'Summary.RegisteredWindow.Singular': `{0} arquivo registrado que ainda é necessário ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} arquivos registrados que ainda são necessários ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 

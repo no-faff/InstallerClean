@@ -695,8 +695,11 @@
        crosses the placeholder (Slavic case selection, Arabic dual,
        Japanese particle placement, etc). A translator rewrites both
        singular and plural keys per their language's rule. -->
-  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} plik nadal potrzebny</value></data>
-  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} plików nadal potrzebnych</value></data>
+  <!-- Main-window count of the registered set. "Left alone" rather than "still
+       needed" because that set is three populations and only one of them makes
+       "needed" true; Summary.RegisteredWindow below carries the detail. -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file left alone</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files left alone</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} niepotrzebny plik do wyczyszczenia</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} niepotrzebnych plików do wyczyszczenia</value></data>
   <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Brakuje {0} zarejestrowanego pliku (nie usunął go InstallerClean). Na razie to nie problem, ale w przyszłości naprawa, aktualizacja lub odinstalowanie tego programu mogą się nie powieść. Otwórz Szczegóły, aby dowiedzieć się, co zrobić.</value></data>
@@ -738,12 +741,17 @@
        0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
        3 = size display. No trailing noun, so it agrees at any count. -->
   <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} osieroconych, {1} zastąpionych, {2} przestarzałych ({3})</value></data>
-  <!-- Registered-window footer summary, reinforcing the "still needed" framing
-       (the flip side of the main window's "unneeded"). Split singular/plural so
-       the noun and verb agree at one file ("file ... is" vs "files ... are").
+  <!-- Registered-window footer summary, over the same set the main window counts.
+       Says what the scan did, not what the files are: that set is three
+       populations (a live registration claims it; the records called it
+       superseded or obsoleted and this scan could not clear it; no read
+       established a verdict), and "needed" is true of the first alone.
+       ScanResult documents the partition and a test holds it.
+       Still split singular/plural though the verb has gone, for the noun and for
+       the .Few overrides pl, ru and uk declare on this key.
        0 = count, 1 = size display. -->
-  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} zarejestrowany plik nadal potrzebny ({1})</value></data>
-  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} zarejestrowanych plików nadal potrzebnych ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} registered file left alone ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} registered files left alone ({1})</value></data>
 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
@@ -1353,9 +1361,9 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Plural.Package.Few" xml:space="preserve"><value>pakiety</value></data>
   <data name="Plural.Product.Few" xml:space="preserve"><value>produkty</value></data>
   <data name="Plural.Patch.Few" xml:space="preserve"><value>poprawki</value></data>
-  <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} pliki nadal potrzebne</value></data>
+  <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} files left alone</value></data>
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} niepotrzebne pliki do wyczyszczenia</value></data>
-  <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} zarejestrowane pliki nadal potrzebne ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} registered files left alone ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} kept in place, because the records now claim what the scan flagged.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Znaleziono {0} zarejestrowany {1}.</value></data>

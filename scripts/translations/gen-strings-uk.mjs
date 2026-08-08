@@ -44,12 +44,12 @@ const OVERRIDES = {
   'Plural.Patch.Few': `виправлення`,
 
   // Sentence-level count keys: the 2-4 form (nominative plural noun/adjective).
-  'Summary.RegisteredStillUsed.Few': `{0} файли ще потрібні`,
+  'Summary.RegisteredStillUsed.Few': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Few': `{0} непотрібні файли для очищення`,
   'Summary.MissingFromDisk.Few': `{0} зареєстровані файли відсутні (їх не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тих програм може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
   // 2-4 takes "встановлені програми"; the base Plural key carries the 5+
   // genitive "встановлених програм".
-  'Summary.RegisteredWindow.Few': `{0} зареєстровані файли, які ще потрібні ({1})`,
+  'Summary.RegisteredWindow.Few': `{0} registered files left alone ({1})`,
 
   // Flat key with an inflecting adjective: one / few / (base = many).
   'Status.RegisteredPackagesFound.One': `Знайдено {0} зареєстрований {1}.`,
@@ -258,8 +258,8 @@ const MAP = {
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} файл ще потрібен`,
-  'Summary.RegisteredStillUsed.Plural': `{0} файлів ще потрібно`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} непотрібний файл для очищення`,
   'Summary.OrphanedToCleanUp.Plural': `{0} непотрібних файлів для очищення`,
   'Summary.MissingFromDisk.Singular': `{0} зареєстрований файл відсутній (його не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тієї програми може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
@@ -273,8 +273,8 @@ const MAP = {
   'Summary.OrphanedWindow': `{0} осиротілих, {1} заміщених, {2} застарілих ({3})`,
 
   // Registered-window footer, split singular/plural. 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} зареєстрований файл, який ще потрібен ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} зареєстрованих файлів, які ще потрібні ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 

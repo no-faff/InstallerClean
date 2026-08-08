@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Українська |
 | --- | --- |
-| {0} file still needed | {0} файл ще потрібен |
-| {0} files still needed | {0} файлів ще потрібно |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | {0} непотрібний файл для очищення |
 | {0} unneeded files to clean up | {0} непотрібних файлів для очищення |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} зареєстрований файл відсутній (його не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тієї програми може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {0} з {1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} осиротілих, {1} заміщених, {2} застарілих ({3}) |
-| {0} registered file that is still needed ({1}) | {0} зареєстрований файл, який ще потрібен ({1}) |
-| {0} registered files that are still needed ({1}) | {0} зареєстрованих файлів, які ще потрібні ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

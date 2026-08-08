@@ -257,16 +257,16 @@ const MAP = {
   'Completion.DonateAsk': `Graag gedaan. Er staat een fooienpot klaar, mocht je je gul voelen.`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} bestand nog nodig`,
-  'Summary.RegisteredStillUsed.Plural': `{0} bestanden nog nodig`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} overbodig bestand om op te ruimen`,
   'Summary.OrphanedToCleanUp.Plural': `{0} overbodige bestanden om op te ruimen`,
   'Summary.MissingFromDisk.Singular': `{0} geregistreerd bestand ontbreekt (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige herstel-, update- of verwijderactie van dat programma kan mislukken. Open Details voor wat je kunt doen.`,
   'Summary.MissingFromDisk.Plural': `{0} geregistreerde bestanden ontbreken (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige herstel-, update- of verwijderactie van die programma's kan mislukken. Open Details voor wat je kunt doen.`,
   'Summary.OperationFiles': `{0} van {1} {2}`,
   'Summary.OrphanedWindow': `{0} verweesd, {1} vervangen, {2} verouderd ({3})`,
-  'Summary.RegisteredWindow.Singular': `{0} geregistreerd bestand dat nog nodig is ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} geregistreerde bestanden die nog nodig zijn ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
   'Confirm.MoveTitle': `{0} {1} verplaatsen ({2})?`,

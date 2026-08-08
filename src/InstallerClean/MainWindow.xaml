@@ -123,7 +123,7 @@
                  to its viewport, so a focus visual (drawn 2px outside its
                  control by the *FocusVisual styles' Margin=-2) on a control
                  flush against the viewport edge is clipped on that side. The
-                 still-needed row's "Details" pill sits flush right and, with no
+                 left-alone row's "Details" pill sits flush right and, with no
                  missing-from-disk banner below it, flush bottom, so
                  its ring was cut on both; the 4px of viewport headroom clears it
                  while the pill stays aligned with the orphaned row's "Details"
@@ -240,7 +240,7 @@
 
                 <!-- Rule under the intro (and the pending-reboot warning when
                      shown): marks the explanation as its own section above the
-                     scan counts. Matches the separator below the still-needed
+                     scan counts. Matches the separator below the left-alone
                      count. Collapses with the counts it introduces: before the
                      first scan there are no counts, and a rule with nothing
                      under it is a stray line. -->
@@ -248,10 +248,10 @@
                                          Visibility="{Binding Scan.HasScanned, Converter={StaticResource BoolToVis}}"/>
 
                 <!-- Unneeded (orphaned) count: the loud heading-tier row leads
-                     the scan results, sitting above the quiet still-needed row
+                     the scan results, sitting above the quiet left-alone row
                      so position agrees with the existing emphasis. Both count
                      rows hang off HasScanned: "0 unneeded files" and "0 files
-                     still needed" are a scan result, and printing them before
+                     left alone" are a scan result, and printing them before
                      any scan has run tells a user who cancelled the startup scan
                      that their machine is clean. -->
                 <Grid Visibility="{Binding Scan.HasScanned, Converter={StaticResource BoolToVis}}">
@@ -261,7 +261,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <!-- Wraps for the same width-clamp reason as the
-                         still-needed line below. -->
+                         left-alone line below. -->
                     <TextBlock Grid.Column="0" VerticalAlignment="Center"
                                Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                                TextWrapping="Wrap"
@@ -279,7 +279,7 @@
                             AutomationProperties.HelpText="{loc:Translate Automation.ViewOrphanedFiles.HelpText}"/>
                 </Grid>
 
-                <!-- The quiet still-needed row sits a small gap (GapTop.Sm)
+                <!-- The quiet left-alone row sits a small gap (GapTop.Sm)
                      below the loud unneeded row above. -->
                 <Grid Margin="{StaticResource GapTop.Sm}"
                       Visibility="{Binding Scan.HasScanned, Converter={StaticResource BoolToVis}}">
@@ -292,7 +292,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Still needed. Wraps so a work-area width clamp at
+                    <!-- Left alone. Wraps so a work-area width clamp at
                          large text scales shortens the line instead of
                          clipping it against the size column. -->
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
@@ -313,7 +313,7 @@
                 </Grid>
 
                 <!-- Registered files missing from disk. Sits as a footnote
-                     under the still-needed count: a missing file is one of the
+                     under the left-alone count: a missing file is one of the
                      needed files, Windows still expects it, it just isn't on
                      disk. DockPanel (not a horizontal StackPanel) so the
                      advisory wraps; icon docks left, aligned to the first line. -->

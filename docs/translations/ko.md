@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 한국어 |
 | --- | --- |
-| {0} file still needed | 아직 필요한 파일 {0}개 |
-| {0} files still needed | 아직 필요한 파일 {0}개 |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | 정리할 불필요한 파일 {0}개 |
 | {0} unneeded files to clean up | 정리할 불필요한 파일 {0}개 |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | 등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {2} {1}개 중 {0}개 |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 고립됨 {0}개, 대체됨 {1}개, 폐기됨 {2}개 ({3}) |
-| {0} registered file that is still needed ({1}) | 아직 필요한 등록된 파일 {0}개 ({1}) |
-| {0} registered files that are still needed ({1}) | 아직 필요한 등록된 파일 {0}개 ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

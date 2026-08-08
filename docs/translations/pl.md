@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Polski |
 | --- | --- |
-| {0} file still needed | {0} plik nadal potrzebny |
-| {0} files still needed | {0} plików nadal potrzebnych |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | {0} niepotrzebny plik do wyczyszczenia |
 | {0} unneeded files to clean up | {0} niepotrzebnych plików do wyczyszczenia |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | Brakuje {0} zarejestrowanego pliku (nie usunął go InstallerClean). Na razie to nie problem, ale w przyszłości naprawa, aktualizacja lub odinstalowanie tego programu mogą się nie powieść. Otwórz Szczegóły, aby dowiedzieć się, co zrobić. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} osieroconych, {1} zastąpionych, {2} przestarzałych ({3}) |
-| {0} registered file that is still needed ({1}) | {0} zarejestrowany plik nadal potrzebny ({1}) |
-| {0} registered files that are still needed ({1}) | {0} zarejestrowanych plików nadal potrzebnych ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

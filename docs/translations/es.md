@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Español |
 | --- | --- |
-| {0} file still needed | {0} archivo aún necesario |
-| {0} files still needed | {0} archivos aún necesarios |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | {0} archivo innecesario para limpiar |
 | {0} unneeded files to clean up | {0} archivos innecesarios para limpiar |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | Falta {0} archivo registrado (no lo ha eliminado InstallerClean). Por ahora sin problemas, pero en el futuro una reparación, actualización o desinstalación de ese programa podría fallar. Abre Detalles para saber qué hacer. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {0} de {1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} huérfanos, {1} sustituidos, {2} obsoletos ({3}) |
-| {0} registered file that is still needed ({1}) | {0} archivo registrado aún necesario ({1}) |
-| {0} registered files that are still needed ({1}) | {0} archivos registrados aún necesarios ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

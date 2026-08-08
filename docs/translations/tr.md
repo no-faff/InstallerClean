@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Türkçe |
 | --- | --- |
-| {0} file still needed | {0} dosya hâlâ gerekli |
-| {0} files still needed | {0} dosya hâlâ gerekli |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | temizlenecek {0} gereksiz dosya |
 | {0} unneeded files to clean up | temizlenecek {0} gereksiz dosya |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programı onarma, güncelleştirme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {1} {2} içinden {0} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} sahipsiz, {1} yerine geçilmiş, {2} geçersiz kılınmış ({3}) |
-| {0} registered file that is still needed ({1}) | {0} kayıtlı dosya hâlâ gerekli ({1}) |
-| {0} registered files that are still needed ({1}) | {0} kayıtlı dosya hâlâ gerekli ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

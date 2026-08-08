@@ -178,8 +178,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Nederlands |
 | --- | --- |
-| {0} file still needed | {0} bestand nog nodig |
-| {0} files still needed | {0} bestanden nog nodig |
+| {0} file left alone | {0} file left alone |
+| {0} files left alone | {0} files left alone |
 | {0} unneeded file to clean up | {0} overbodig bestand om op te ruimen |
 | {0} unneeded files to clean up | {0} overbodige bestanden om op te ruimen |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} geregistreerd bestand ontbreekt (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige herstel-, update- of verwijderactie van dat programma kan mislukken. Open Details voor wat je kunt doen. |
@@ -187,8 +187,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
 | {0} of {1} {2} | {0} van {1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} verweesd, {1} vervangen, {2} verouderd ({3}) |
-| {0} registered file that is still needed ({1}) | {0} geregistreerd bestand dat nog nodig is ({1}) |
-| {0} registered files that are still needed ({1}) | {0} geregistreerde bestanden die nog nodig zijn ({1}) |
+| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
+| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
 
 ## Confirmation dialogs
 

@@ -328,8 +328,8 @@ const MAP = {
   'Completion.DonateAsk': `Glad to help. There's a tip jar if you're feeling kind.`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} file still needed`,
-  'Summary.RegisteredStillUsed.Plural': `{0} files still needed`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} unneeded file to clean up`,
   'Summary.OrphanedToCleanUp.Plural': `{0} unneeded files to clean up`,
   'Summary.MissingFromDisk.Singular': `{0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
@@ -346,8 +346,8 @@ const MAP = {
 
   // Registered-window footer, split singular/plural so the noun and verb agree at
   // one file ("file ... is" vs "files ... are"). 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} registered file that is still needed ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} registered files that are still needed ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 

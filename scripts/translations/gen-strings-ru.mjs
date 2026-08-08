@@ -241,8 +241,8 @@ const MAP = {
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} файл ещё нужен`,
-  'Summary.RegisteredStillUsed.Plural': `{0} файлов ещё нужны`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} ненужный файл для очистки`,
   'Summary.OrphanedToCleanUp.Plural': `{0} ненужных файлов для очистки`,
   'Summary.MissingFromDisk.Singular': `Отсутствует {0} зарегистрированный файл (InstallerClean его не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление той программы может не выполниться. Откройте «Подробности», чтобы узнать, что делать.`,
@@ -258,8 +258,8 @@ const MAP = {
   // Many (ru integers never resolve to Other), so no .Many key, matching the GUI's
   // Summary.RegisteredStillUsed shape.
   'Summary.OrphanedWindow': `{0} бесхозных, {1} замещённых, {2} устаревших ({3})`,
-  'Summary.RegisteredWindow.Singular': `{0} зарегистрированный файл ещё нужен ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} зарегистрированных файлов ещё нужны ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 
@@ -457,12 +457,12 @@ const OVERRIDES = {
   'Plural.Product.Few': `продукта`,
   'Plural.Error.Few': `ошибки`,
   'Plural.Patch.Few': `исправления`,
-  'Summary.RegisteredStillUsed.Few': `{0} файла ещё нужны`,
+  'Summary.RegisteredStillUsed.Few': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Few': `{0} ненужных файла для очистки`,
   'Summary.MissingFromDisk.Few': `Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.`,
   // 2-4 takes the accusative-plural "установленные программы"; the base Plural
   // key carries the 5+ genitive "установленных программ".
-  'Summary.RegisteredWindow.Few': `{0} зарегистрированных файла ещё нужны ({1})`,
+  'Summary.RegisteredWindow.Few': `{0} registered files left alone ({1})`,
   'Completion.PermanentDeleteSummary.Few': `{0} {1} permanently deleted`,
   // ReverifySkipped's flat base carries the 2-4/5+ agreement ("оставлено ... они
   // ... понадобились"); .One restores the singular-masculine agreement a single

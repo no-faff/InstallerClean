@@ -244,8 +244,8 @@ const MAP = {
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} tệp vẫn cần thiết`,
-  'Summary.RegisteredStillUsed.Plural': `{0} tệp vẫn cần thiết`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
+  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} tệp không cần thiết để dọn`,
   'Summary.OrphanedToCleanUp.Plural': `{0} tệp không cần thiết để dọn`,
   'Summary.MissingFromDisk.Singular': `{0} tệp đã đăng ký bị thiếu (không phải do InstallerClean xóa). Hiện chưa có vấn đề, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt chương trình liên quan trong tương lai có thể thất bại. Mở Chi tiết để biết cần làm gì.`,
@@ -262,8 +262,8 @@ const MAP = {
 
   // Registered-window footer, split singular/plural so the noun and verb agree at
   // one file ("file ... is" vs "files ... are"). 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} tệp đã đăng ký vẫn cần thiết ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} tệp đã đăng ký vẫn cần thiết ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
 
   // Confirmation dialogs
 
