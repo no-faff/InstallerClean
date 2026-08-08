@@ -328,8 +328,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // PropertyChanged throws InvalidOperationException, the
             // outer catch swallows it, and the Send button silently
             // never appears on a happy-path startup-scan.
-            var entry = ResultLogEntry.ForScanOnly(
-                result, Scan.LastScanDurationMs, Scan.PendingRebootLabel);
+            var entry = ResultLogEntry.ForScanOnly(result, Scan.LastScanDurationMs);
             var written = await _resultLogService.WriteAsync(entry).ConfigureAwait(false);
             if (written)
             {

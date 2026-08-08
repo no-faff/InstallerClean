@@ -29,10 +29,18 @@
                      box would never engage and the caption and buttons
                      below it would clip once the window's work-area
                      MaxHeight binds. Sized to content, the window shows
-                     the whole report with no scrollbar; the box scrolls
-                     only when the report genuinely cannot fit the
-                     screen (an error-heavy report or a very large text
-                     scale). -->
+                     as much of the report as the work area allows and
+                     the box scrolls for the rest, which is the only
+                     arrangement that keeps the buttons reachable at
+                     every screen height and text scale.
+
+                     Whether it scrolls at all is a property of the
+                     payload's length against the screen, so it moves
+                     with the schema and is not worth pinning to a
+                     number here. What must stay true, and is what this
+                     row buys, is that the caption, the reassurance line
+                     and both buttons are on screen whether it scrolls
+                     or not. -->
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>

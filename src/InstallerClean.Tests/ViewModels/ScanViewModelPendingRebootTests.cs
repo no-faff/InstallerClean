@@ -60,51 +60,23 @@ public class ScanViewModelPendingRebootTests
         Assert.True(vm.HasPendingReboot);
     }
 
-    [Fact]
-    public void Every_reason_has_a_diagnostic_label_of_its_own()
-    {
-        // The log's filter is the whole point of these: a report that says
-        // "clean" about a machine that was blocked sends the reader past it.
-        var vm = NewViewModel();
-        var seen = new List<string>();
-
-        foreach (var reason in Enum.GetValues<PendingRebootReason>())
-        {
-            vm.PendingRebootResult = PendingRebootResult.Block(reason);
-            Assert.NotEqual(PendingRebootLabels.Clean, vm.PendingRebootLabel);
-            seen.Add(vm.PendingRebootLabel);
-        }
-
-        Assert.Equal(seen.Count, seen.Distinct().Count());
-    }
+    // Three tests over a non-localised PendingRebootLabel stood here and went with
+    // that property in schema 4, the payload having been its only reader. What
+    // they were protecting, that a blocked machine is never recorded as clean, is
+    // now protected by there being nothing to record: the state reaches the screen
+    // through the banner above, and both action paths take their own fresh probe.
 
     [Fact]
-    public void A_reason_with_no_label_of_its_own_is_not_recorded_as_clean()
-    {
-        // The label half of the arm above, and the two must agree about the same
-        // moment: this state paints the generic banner and disables both
-        // buttons, so a payload calling it clean says the opposite of the screen
-        // about a machine that was blocked.
-        var vm = NewViewModel();
-        vm.PendingRebootResult = PendingRebootResult.Block((PendingRebootReason)99);
-
-        Assert.Equal(PendingRebootLabels.BlockedOther, vm.PendingRebootLabel);
-        Assert.True(vm.HasPendingReboot);
-    }
-
-    [Fact]
-    public void No_block_leaves_the_banner_empty_and_the_label_clean()
+    public void No_block_leaves_the_banner_empty()
     {
         var vm = NewViewModel();
 
         Assert.Equal(string.Empty, vm.PendingRebootBannerText);
-        Assert.Equal(PendingRebootLabels.Clean, vm.PendingRebootLabel);
         Assert.False(vm.HasPendingReboot);
 
         vm.PendingRebootResult = PendingRebootResult.Clean;
 
         Assert.Equal(string.Empty, vm.PendingRebootBannerText);
-        Assert.Equal(PendingRebootLabels.Clean, vm.PendingRebootLabel);
         Assert.False(vm.HasPendingReboot);
     }
 }

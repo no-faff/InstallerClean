@@ -206,7 +206,7 @@ public class FileSystemScanServiceTests
     {
         const string patch = @"C:\Windows\Installer\withheld.msp";
         var query = QueryReturning(new InstallerQueryResult(
-            new List<RegisteredPackage> { Withheld(patch) }.AsReadOnly(), UnreadableProductCount: 1));
+            new List<RegisteredPackage> { Withheld(patch) }.AsReadOnly(), UnaccountedProductCount: 1));
 
         var fs = new MockFileSystem();
         fs.AddFile(patch, new MockFileData("x"));
@@ -215,7 +215,7 @@ public class FileSystemScanServiceTests
 
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.RegisteredPackages);
-        Assert.Equal(1, result.UnreadableProductCount);
+        Assert.Equal(1, result.UnaccountedProductCount);
     }
 
     [Fact]
@@ -229,7 +229,7 @@ public class FileSystemScanServiceTests
         const string gone = @"C:\Windows\Installer\withheld-gone.msp";
         var query = QueryReturning(new InstallerQueryResult(
             new List<RegisteredPackage> { Withheld(present), Withheld(gone) }.AsReadOnly(),
-            UnreadableProductCount: 2));
+            UnaccountedProductCount: 2));
 
         var fs = new MockFileSystem();
         fs.AddFile(present, new MockFileData("x"));
@@ -237,7 +237,7 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
 
         Assert.Equal(1, result.WithheldCount);
-        Assert.Equal(2, result.UnreadableProductCount);
+        Assert.Equal(2, result.UnaccountedProductCount);
     }
 
     [Fact]
@@ -250,7 +250,7 @@ public class FileSystemScanServiceTests
         // tell the user their machine has a problem it does not have.
         const string gone = @"C:\Windows\Installer\withheld-gone.msp";
         var query = QueryReturning(new InstallerQueryResult(
-            new List<RegisteredPackage> { Withheld(gone) }.AsReadOnly(), UnreadableProductCount: 1));
+            new List<RegisteredPackage> { Withheld(gone) }.AsReadOnly(), UnaccountedProductCount: 1));
 
         var result = await new FileSystemScanService(
             query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
@@ -736,5 +736,53 @@ public class FileSystemScanServiceTests
 
         Assert.Equal(2, result.RemovableFiles.Count);
         Assert.Equal(2, result.MissingNonRemovableCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_carries_the_enumeration_census_through_untouched()
+    {
+        // The scan does not compute any of these and must not start: they are the
+        // enumeration's own measurements and the scan is a courier. Distinct
+        // values throughout so a transposition between two fields fails rather
+        // than cancelling out.
+        var census = new EnumerationCensus(
+            UnreadableProducts: 1, ShortfallProducts: 2, ApiNeverClaimed: 3,
+            NonStringLocalPackageValues: 4, UnreadablePatchStates: 5,
+            ProductCount: 6, PatchClaimCount: 7, LongLeafStemCount: 8);
+        var query = QueryReturning(new InstallerQueryResult(
+            Array.Empty<RegisteredPackage>(), Census: census));
+
+        var result = await new FileSystemScanService(
+            query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(census, result.Census);
+    }
+
+    [Fact]
+    public async Task ScanAsync_reports_the_machines_short_name_policy()
+    {
+        var probe = Substitute.For<IShortNameCreationProbe>();
+        probe.Read().Returns(ShortNameCreationLabels.SystemVolumeOnly);
+        var query = QueryReturning(new InstallerQueryResult(Array.Empty<RegisteredPackage>()));
+
+        var result = await new FileSystemScanService(
+            query, new MockFileSystem(), PermissiveIdentityVeto.Instance, probe,
+            Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(ShortNameCreationLabels.SystemVolumeOnly, result.ShortNameCreation);
+    }
+
+    [Fact]
+    public async Task A_scan_with_no_probe_reports_the_policy_as_unreadable_rather_than_guessing()
+    {
+        // The control for the row above, and the one that matters: a default of
+        // any real setting would put a figure nobody measured into the one payload
+        // that exists to measure, and it would look exactly like a measurement.
+        var query = QueryReturning(new InstallerQueryResult(Array.Empty<RegisteredPackage>()));
+
+        var result = await new FileSystemScanService(
+            query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(ShortNameCreationLabels.Unreadable, result.ShortNameCreation);
     }
 }

@@ -85,11 +85,28 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// naming no product at all, so it can establish only that at least one
     /// product went unreached.
     /// </param>
+    /// <param name="NonStringLocalPackageValues">
+    /// Registrations whose <c>LocalPackage</c> value was PRESENT and was not a
+    /// string, so nothing could be read out of it. A SUBSET of
+    /// <see cref="Failures"/> rather than a term beside it, and the overlap is
+    /// deliberate: the degraded-sources gate weighs reads that failed, this one
+    /// failed, and narrowing that gate is not an instrumentation change's
+    /// business. What it is for is the one thing the merged counter cannot say,
+    /// namely whether anything on real machines writes that value under a type
+    /// other than <c>REG_SZ</c>. Every other contributor to
+    /// <see cref="Failures"/> is a thrown exception, so the two are separable by
+    /// subtraction and neither has to state a cause for the other's members.
+    ///
+    /// Nothing writing these keys is obliged to use <c>REG_SZ</c>, and one
+    /// machine's 136 of 136 says what that machine holds and nothing about the
+    /// population.
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
         int UnclaimedProductFiles = 0,
-        int UnclaimedPatchFiles = 0);
+        int UnclaimedPatchFiles = 0,
+        int NonStringLocalPackageValues = 0);
 
     /// <summary>
     /// Production constructor: talks to the real msi.dll through
@@ -198,6 +215,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // product enumeration itself lost.
         var unreadableProducts = unreadableRows;
 
+        // Patches whose State or Uninstallable read failed. Decides nothing; see
+        // the increment site for what it measures and why it is worth measuring.
+        var unreadablePatchStates = 0;
+
         progress?.Report(new ScanProgressUpdate(Strings.Status_FoundProducts));
 
         // Budgeted, because the abandonment breadcrumb is one full entry per
@@ -280,8 +301,25 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 }
                 else if (patchPath.Value.Length > 0)
                 {
-                    var stateStr = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State).Value;
-                    var uninstallableStr = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable).Value;
+                    var stateRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State);
+                    var uninstallableRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable);
+                    var stateStr = stateRead.Value;
+                    var uninstallableStr = uninstallableRead.Value;
+
+                    // Counted, not acted on, and the distinction is the whole of
+                    // what this counter is for. Either read failing leaves the row
+                    // non-removable below and marks it withheld nowhere, so the
+                    // file stays claimed and never reaches an offer: the file is
+                    // safe. What is not established is the SENTENCE a later
+                    // re-verify puts on it, which reads the same failure as a
+                    // product having reclaimed the patch and says so. Nobody knows
+                    // how often either read fails on a machine that is not the one
+                    // this was all measured on, and a fix cannot be sized without
+                    // that. It stays right after the fix, reading zero on a machine
+                    // where neither read fails, which is what the fix would make
+                    // universal rather than what it would remove.
+                    if (stateRead.Unreadable || uninstallableRead.Unreadable)
+                        unreadablePatchStates++;
 
                     // Unparseable State leaves patchState at 0 (not-a-patch),
                     // so isSuperseded is false and the row is kept: the zero
@@ -455,7 +493,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 if (packages[i].IsRemovable)
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
 
-        return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts, patchClaims.AsReadOnly());
+        return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts, patchClaims.AsReadOnly(),
+            new EnumerationCensus(
+                unreadableProducts,
+                shortfallProducts,
+                apiNeverClaimed,
+                fallback.NonStringLocalPackageValues,
+                unreadablePatchStates,
+                products.Count,
+                patchClaims.Count,
+                packages.Count(p => HasLongLeafStem(p.LocalPackagePath))));
         }
         finally
         {
@@ -1085,6 +1132,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var productKeys = 0;
         var unclaimedProductFiles = 0;
         var unclaimedPatchFiles = 0;
+        var nonStringValues = 0;
 
         // Budgeted, because every catch below sits inside a loop bounded by the
         // machine's registered products and patches, and what fails one key read
@@ -1114,6 +1162,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     productKeys += sidRead.ProductKeys;
                     unclaimedProductFiles += sidRead.UnclaimedProductFiles;
                     unclaimedPatchFiles += sidRead.UnclaimedPatchFiles;
+                    nonStringValues += sidRead.NonStringLocalPackageValues;
                 }
             }
         }
@@ -1135,7 +1184,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             failureLog.WriteClosingEntry();
         }
 
-        return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles);
+        return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
+            nonStringValues);
     }
 
     /// <summary>
@@ -1177,6 +1227,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var productKeys = 0;
         var unclaimedProductFiles = 0;
         var unclaimedPatchFiles = 0;
+        var nonStringValues = 0;
 
         try
         {
@@ -1197,6 +1248,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         if (!TryReadLocalPackage(ipKey, out var localPkg))
                         {
                             failures++;
+                            // The only way this returns false is a value that was
+                            // there and was not a string, so the two counters move
+                            // together here and nowhere else: everything else
+                            // reaching failures is a thrown exception.
+                            nonStringValues++;
                             failureLog.Record(UnreadableLocalPackage(), cause: "product-localpackage");
                         }
                         else if (!string.IsNullOrEmpty(localPkg))
@@ -1239,6 +1295,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         if (!TryReadLocalPackage(patchKey, out var localPkg))
                         {
                             failures++;
+                            nonStringValues++;
                             failureLog.Record(UnreadableLocalPackage(), cause: "patch-localpackage");
                         }
                         else if (!string.IsNullOrEmpty(localPkg))
@@ -1264,7 +1321,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             failureLog.Record(ex, cause: "patches-key");
         }
 
-        return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles);
+        return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
+            nonStringValues);
     }
 
     /// <summary>
@@ -1309,6 +1367,39 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private static InvalidDataException UnreadableLocalPackage() =>
         new("A registered LocalPackage value was present and was not a string.");
+
+    /// <summary>
+    /// Whether a claimed path's leaf name has more than eight characters before
+    /// its extension, so the name itself cannot be an 8dot3 short name.
+    ///
+    /// The separator search is explicit rather than <c>Path.GetFileName</c>
+    /// because this file's own paths are Windows-spelled whatever the host is,
+    /// and the framework helper reads a backslash as an ordinary character
+    /// anywhere but Windows: the whole path would come back as the leaf, every
+    /// row would count, and the number would look like a finding. Nothing here
+    /// runs off Windows in production and the counter is not worth a
+    /// platform-shaped answer in a test either.
+    ///
+    /// Eight is the short name's own limit, so this counts the names that cannot
+    /// be one and says nothing about whether the volume has generated one
+    /// alongside; the two questions are asked separately and answered in the same
+    /// report.
+    /// </summary>
+    internal static bool HasLongLeafStem(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return false;
+
+        var lastSeparator = path.LastIndexOfAny(LeafSeparators);
+        var leaf = lastSeparator < 0 ? path : path[(lastSeparator + 1)..];
+
+        // Windows takes the LAST dot as the extension separator, so a leaf with
+        // several is measured to the last one, and a leaf with none is all stem.
+        var lastDot = leaf.LastIndexOf('.');
+        var stemLength = lastDot < 0 ? leaf.Length : lastDot;
+        return stemLength > 8;
+    }
+
+    private static readonly char[] LeafSeparators = ['\\', '/'];
 
     /// <summary>
     /// Puts a surviving prefix into the spelling Win32 accepts. Both forms reach

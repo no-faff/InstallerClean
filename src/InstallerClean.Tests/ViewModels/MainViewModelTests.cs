@@ -2045,7 +2045,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task ScanViewModel_HasRecordsNotMatched_tracks_UnreadableProductCount()
+    public async Task ScanViewModel_HasRecordsNotMatched_tracks_UnaccountedProductCount()
     {
         // A scan that could not account for everything the records hold kept its
         // superseded patches back. Without this line the only symptom is a quietly
@@ -2056,14 +2056,14 @@ public class MainViewModelTests
             RemovableFiles: Array.Empty<OrphanedFile>(),
             RegisteredPackages: Array.Empty<RegisteredPackage>(),
             RegisteredTotalBytes: 0,
-            UnreadableProductCount: 3);
+            UnaccountedProductCount: 3);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         Assert.True(vm.Scan.HasRecordsNotMatched);
-        Assert.Equal(3, vm.Scan.UnreadableProductCount);
+        Assert.Equal(3, vm.Scan.UnaccountedProductCount);
         // The count gates the line and stays out of it. Four different things feed
         // that number, only two are failures to read, and a registry key an
         // uninstall left behind is one of them with no installed program answering

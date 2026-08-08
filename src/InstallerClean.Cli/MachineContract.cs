@@ -88,7 +88,7 @@ internal static class MachineContract
     /// Its count of installed products is assembled from four contributors, two
     /// of which are inferred from a headcount and from unclaimed registry values
     /// rather than observed, and the inference can run high as well as low (see
-    /// <see cref="Models.InstallerQueryResult.UnreadableProductCount"/> for what
+    /// <see cref="Models.InstallerQueryResult.UnaccountedProductCount"/> for what
     /// each contributes). It is sound to alert on and to trend; it is not a figure
     /// to reconcile against an inventory, and a fleet report presenting it as a
     /// headcount of affected programs would be presenting an estimate as a count.

@@ -19,7 +19,7 @@ namespace InstallerClean.Models;
 /// superseded or obsoleted. Superseded patches go into
 /// <see cref="RemovableFiles"/> instead. Drives the registered list
 /// and the totals on the main screen. On a scan with a non-zero
-/// <see cref="UnreadableProductCount"/> the superseded patches are in here as
+/// <see cref="UnaccountedProductCount"/> the superseded patches are in here as
 /// well, carrying <c>RemovableWithheld</c>: that scan is keeping them, so it
 /// counts them among the files it is keeping.
 /// </param>
@@ -46,9 +46,9 @@ namespace InstallerClean.Models;
 /// counts here too: the file having gone is the same expected end state either
 /// way, and only this scan's verdict was withheld.
 /// </param>
-/// <param name="UnreadableProductCount">
+/// <param name="UnaccountedProductCount">
 /// Installed products this scan did not account for, carried through from
-/// <see cref="InstallerQueryResult.UnreadableProductCount"/>, whose remarks are
+/// <see cref="InstallerQueryResult.UnaccountedProductCount"/>, whose remarks are
 /// the ones to read before quoting this: it is not confined to records that
 /// failed to read, and it is an estimate rather than a headcount. Non-zero means
 /// the scan withheld every superseded-patch verdict, so
@@ -59,7 +59,7 @@ namespace InstallerClean.Models;
 /// What the withholding cost this run: superseded or obsoleted packages whose
 /// file is on disk and which the scan would have offered, had it been able to
 /// say that no installed product still needs them.
-/// <see cref="UnreadableProductCount"/> is the reason, this is the price, and
+/// <see cref="UnaccountedProductCount"/> is the reason, this is the price, and
 /// both are zero on a scan that read every product's records.
 ///
 /// Two consumers. The command line reads it now, into the 3000 notice's
@@ -96,18 +96,78 @@ namespace InstallerClean.Models;
 /// sentence covering all three either says nothing or says something false of two
 /// of them. They are summed nowhere for the same reason.
 /// </param>
+/// <param name="Census">
+/// What the enumeration behind this scan measured about itself and about the
+/// machine, carried straight through from
+/// <see cref="InstallerQueryResult.Census"/>. Instrumentation for the opt-in
+/// report; nothing in the app reads it to decide anything.
+/// </param>
+/// <param name="ShortNameCreation">
+/// The machine's 8dot3 short-name creation policy, one of
+/// <see cref="ShortNameCreationLabels"/>. Sampled once per scan and used for
+/// nothing but the opt-in report, so it is a plain label with no default assumed:
+/// an unconfigured machine reads as <see cref="ShortNameCreationLabels.Unset"/>
+/// rather than as whichever setting a document guesses is usual.
+/// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
     long RegisteredTotalBytes,
     int MissingNonRemovableCount = 0,
     int MissingRemovableCount = 0,
-    int UnreadableProductCount = 0,
+    int UnaccountedProductCount = 0,
     int WithheldCount = 0,
     int IdentityClaimedCount = 0,
     int IdentityUnreadableCount = 0,
-    int IdentityUnaskableCount = 0)
+    int IdentityUnaskableCount = 0,
+    EnumerationCensus Census = default,
+    string ShortNameCreation = ShortNameCreationLabels.Unreadable)
 {
     /// <summary>Total registered packages missing on disk; sum of the two sub-counts.</summary>
     public int MissingFromDiskCount => MissingNonRemovableCount + MissingRemovableCount;
+
+    /// <summary>Total bytes of the files this scan is offering for removal.</summary>
+    public long RemovableTotalBytes => RemovableFiles.Sum(f => f.SizeBytes);
+}
+
+/// <summary>
+/// Where a machine is still generating 8dot3 short names, as the opt-in report
+/// records it. The four settings are Microsoft's, from the fsutil 8dot3name
+/// reference; the three beyond them are the three ways of having no setting to
+/// report, kept apart because a machine left at its default, a machine configured
+/// with something this does not recognise and a read that failed are three
+/// different findings and one label for all three would be false of two.
+///
+/// THE LABELS INVERT THE REGISTRY VALUE, which disables rather than enables, so
+/// each says where short names are still being made.
+/// </summary>
+public static class ShortNameCreationLabels
+{
+    /// <summary>Setting 0: creation is on for every volume.</summary>
+    public const string AllVolumes = "allVolumes";
+
+    /// <summary>Setting 1: creation is off everywhere.</summary>
+    public const string NoVolumes = "noVolumes";
+
+    /// <summary>Setting 2: each volume carries its own flag, which this does not read.</summary>
+    public const string PerVolume = "perVolume";
+
+    /// <summary>
+    /// Setting 3: creation is off everywhere but the system volume, which is the
+    /// volume <c>C:\Windows\Installer</c> is on.
+    /// </summary>
+    public const string SystemVolumeOnly = "systemVolumeOnly";
+
+    /// <summary>No such value: the machine has never been configured either way.</summary>
+    public const string Unset = "unset";
+
+    /// <summary>A value that is there and is not one of the four documented settings.</summary>
+    public const string Unrecognised = "unrecognised";
+
+    /// <summary>
+    /// The read failed, so nothing was established. The default for a
+    /// <see cref="ScanResult"/> nobody sampled, so an unsampled scan cannot be
+    /// read as a machine whose setting is known.
+    /// </summary>
+    public const string Unreadable = "unreadable";
 }

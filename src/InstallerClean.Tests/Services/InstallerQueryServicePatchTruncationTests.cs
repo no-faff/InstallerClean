@@ -261,7 +261,7 @@ public class InstallerQueryServicePatchTruncationTests
         var row = Assert.Single(result.Packages);
         Assert.True(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
-        Assert.Equal(0, result.UnreadableProductCount);
+        Assert.Equal(0, result.UnaccountedProductCount);
     }
 
     // ---- Route A: the product the walk never returned ----

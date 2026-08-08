@@ -83,25 +83,10 @@ public partial class ScanViewModel : ObservableObject
     /// <summary>True when the last probe returned Block.</summary>
     public bool HasPendingReboot => PendingRebootResult?.IsBlocked == true;
 
-    /// <summary>
-    /// Stable, non-localised label for the current pending-reboot state, read
-    /// by the result-log payload and nothing else, so a non-en-GB user's report
-    /// still matches a developer's filter on <c>"installerInProgress"</c>.
-    ///
-    /// Null is both states that genuinely are clean, no probe yet and a Clean
-    /// verdict, <c>Block</c> being unable to exist without a reason. The arm
-    /// under it is a Block whose reason has no label, which paints the generic
-    /// banner and disables both buttons: calling that clean would have the
-    /// payload contradict the screen about the same moment.
-    /// </summary>
-    public string PendingRebootLabel => PendingRebootResult?.Reason switch
-    {
-        PendingRebootReason.MsiExecuteMutexHeld => PendingRebootLabels.MsiExecuteMutexHeld,
-        PendingRebootReason.InstallerInProgress => PendingRebootLabels.InstallerInProgress,
-        PendingRebootReason.PendingRenameInCache => PendingRebootLabels.PendingRenameInCache,
-        null => PendingRebootLabels.Clean,
-        _ => PendingRebootLabels.BlockedOther,
-    };
+    // A non-localised PendingRebootLabel lived here for the result-log payload
+    // and went with that field in schema 4. Nothing else ever read it: the state
+    // reaches the screen through PendingRebootBannerText below and reaches both
+    // action paths through their own fresh probe, neither of which wants a label.
 
     /// <summary>
     /// Localised banner text for the current Block reason; empty otherwise.
@@ -148,7 +133,7 @@ public partial class ScanViewModel : ObservableObject
 
     /// <summary>
     /// Installed products the last scan could not account for, straight from
-    /// <see cref="ScanResult.UnreadableProductCount"/>, whose remarks say what
+    /// <see cref="ScanResult.UnaccountedProductCount"/>, whose remarks say what
     /// goes into it and why it is neither confined to records that failed to read
     /// nor an exact headcount. Non-zero means that scan withheld every
     /// superseded-patch verdict, so it drives the line that says why the list is
@@ -157,7 +142,7 @@ public partial class ScanViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasRecordsNotMatched))]
     [NotifyPropertyChangedFor(nameof(RecordsNotMatchedText))]
-    private int _unreadableProductCount;
+    private int _unaccountedProductCount;
 
     /// <summary>
     /// Cached result of the most recent successful scan. Null until
@@ -250,7 +235,7 @@ public partial class ScanViewModel : ObservableObject
     /// that can come out high as well as low; a figure on screen would be a
     /// precision the scan has not got.
     /// </summary>
-    public bool HasRecordsNotMatched => UnreadableProductCount > 0;
+    public bool HasRecordsNotMatched => UnaccountedProductCount > 0;
 
     public string RecordsNotMatchedText => Strings.Summary_RecordsNotMatched;
 
@@ -301,7 +286,7 @@ public partial class ScanViewModel : ObservableObject
             OrphanedSizeDisplay = orphanedSize;
             MissingNonRemovableCount = result.MissingNonRemovableCount;
             MissingRemovableCount = result.MissingRemovableCount;
-            UnreadableProductCount = result.UnreadableProductCount;
+            UnaccountedProductCount = result.UnaccountedProductCount;
             HasScanned = true;
         }
         finally

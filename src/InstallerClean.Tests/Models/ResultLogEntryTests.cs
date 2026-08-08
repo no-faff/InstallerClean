@@ -13,6 +13,11 @@ namespace InstallerClean.Tests.Models;
 /// (not a combined removableCount); a silent rename here would land in
 /// production unnoticed until the aggregator started returning zero
 /// totals.
+///
+/// That receiver allowlists every key at every object level, so a field this
+/// side renames is not a mismatch anybody sees: the report is accepted, the key
+/// is dropped, and the series simply stops. Hence the whole-payload pin below
+/// rather than a test per interesting field.
 /// </summary>
 public class ResultLogEntryTests
 {
@@ -24,30 +29,56 @@ public class ResultLogEntryTests
     private static OperationInfo SampleOperation() => new(
         Kind: OperationKinds.Move,
         Outcome: OperationOutcomes.Complete,
+        DurationMs: 900,
         FilesProcessed: 5,
         FilesFailed: 0,
         BytesFreed: 1024,
         Errors: Array.Empty<ErrorBucket>(),
-        MoveDestinationKind: MoveDestinationKinds.SameDrive);
+        MoveDestinationKind: MoveDestinationKinds.SameDrive,
+        HeldBackReclaimed: 0,
+        HeldBackRecordsChanged: 0,
+        HeldBackRecordsUnreadable: 0,
+        HeldBackIdentityClaimed: 0,
+        HeldBackIdentityUnreadable: 0);
 
     private static ScanInfo SampleScan() => new(
         DurationMs: 100,
         RegisteredCount: 50,
+        RegisteredBytes: 5_000_000,
         OrphanedCount: 3,
         SupersededCount: 2,
         ObsoletedCount: 0,
+        RemovableBytes: 300_000,
         MissingFromDiskCount: 0,
-        PendingReboot: PendingRebootLabels.Clean);
+        MissingNeededCount: 0,
+        WithheldPatchCount: 0,
+        UnreadableProductCount: 0,
+        ShortfallProductCount: 0,
+        UnlistedProductCount: 0,
+        KeptIdentityClaimedCount: 0,
+        KeptIdentityUnreadableCount: 0,
+        KeptIdentityUnaskableCount: 0);
+
+    private static MachineInfo SampleMachine() => new(
+        ShortNameCreation: ShortNameCreationLabels.NoVolumes,
+        LongStemCount: 0,
+        NonStringLocalPackageCount: 0,
+        UnreadablePatchStateCount: 0,
+        ProductCount: 137,
+        PatchClaimCount: 2);
+
+    private static ResultLogEntry SampleEntry() => new(
+        SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
+        App: new AppInfo("1.8.0", "en-GB"),
+        Os: "Windows 11 (X64)",
+        Machine: SampleMachine(),
+        Scan: SampleScan(),
+        Operation: SampleOperation());
 
     [Fact]
     public void Serialises_bytesFreed_not_bytesCleared()
     {
-        var entry = new ResultLogEntry(
-            SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
-            App: new AppInfo("1.8.0"), Os: "Windows 11 (X64)",
-            Scan: SampleScan(), Operation: SampleOperation());
-
-        var json = JsonSerializer.Serialize(entry, JsonOptions);
+        var json = JsonSerializer.Serialize(SampleEntry(), JsonOptions);
 
         Assert.Contains("\"bytesFreed\"", json);
         Assert.DoesNotContain("bytesCleared", json);
@@ -56,12 +87,7 @@ public class ResultLogEntryTests
     [Fact]
     public void Drops_removableCount_in_favour_of_three_atoms()
     {
-        var entry = new ResultLogEntry(
-            SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
-            App: new AppInfo("1.8.0"), Os: "Windows 11 (X64)",
-            Scan: SampleScan(), Operation: SampleOperation());
-
-        var json = JsonSerializer.Serialize(entry, JsonOptions);
+        var json = JsonSerializer.Serialize(SampleEntry(), JsonOptions);
 
         Assert.Contains("\"orphanedCount\"", json);
         Assert.Contains("\"supersededCount\"", json);
@@ -70,17 +96,232 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void Schema_version_is_three()
+    public void Schema_version_is_four()
     {
-        // The receiving Edge Function field-validates per version; a
-        // silent bump routes every record through its lenient
-        // v<n>-unknown/ path. This pin makes a version change a
-        // deliberate, reviewed act. It did not move when Delete stopped
-        // going through the shell, which retired two delete-only error
-        // categories and the per-code map that only they populated: an
-        // allowlisting receiver sees both as subtractions, so neither
-        // needs a new version to be understood.
-        Assert.Equal(3, ResultLogEntry.CurrentSchemaVersion);
+        // The receiving Edge Function field-validates per version; a silent bump
+        // routes every record through its lenient v<n>-unknown/ path. This pin
+        // makes a version change a deliberate, reviewed act. It did not move when
+        // Delete stopped going through the shell, which retired two delete-only
+        // error categories and the per-code map that only they populated: an
+        // allowlisting receiver sees both as subtractions, so neither needed a new
+        // version to be understood.
+        //
+        // It moved to 4 for the population fields, which are additions, and for
+        // pendingReboot leaving, which is not: a receiver that requires that field
+        // has to be told which versions still carry it.
+        Assert.Equal(4, ResultLogEntry.CurrentSchemaVersion);
+    }
+
+    [Fact]
+    public void The_whole_payload_is_pinned_key_by_key()
+    {
+        // ONE TEST FOR THE WHOLE SHAPE, because the failure this guards against is
+        // not a wrong value: it is a key that quietly stops being sent, which the
+        // receiver accepts in silence and which no per-field assertion would ever
+        // reach. Every key the receiver allowlists is named here, so adding a
+        // field to the payload without adding it to the receiver fails here first.
+        var json = JsonSerializer.Serialize(SampleEntry(), JsonOptions);
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+
+        Assert.Equal(
+            ["schemaVersion", "app", "os", "machine", "scan", "operation"],
+            root.EnumerateObject().Select(p => p.Name));
+
+        Assert.Equal(
+            ["version", "language"],
+            root.GetProperty("app").EnumerateObject().Select(p => p.Name));
+
+        Assert.Equal(
+            [
+                "shortNameCreation", "longStemCount", "nonStringLocalPackageCount",
+                "unreadablePatchStateCount", "productCount", "patchClaimCount",
+            ],
+            root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
+
+        Assert.Equal(
+            [
+                "durationMs", "registeredCount", "registeredBytes", "orphanedCount",
+                "supersededCount", "obsoletedCount", "removableBytes", "missingFromDiskCount",
+                "missingNeededCount", "withheldPatchCount", "unreadableProductCount",
+                "shortfallProductCount", "unlistedProductCount", "keptIdentityClaimedCount",
+                "keptIdentityUnreadableCount", "keptIdentityUnaskableCount",
+            ],
+            root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
+
+        Assert.Equal(
+            [
+                "kind", "outcome", "durationMs", "filesProcessed", "filesFailed", "bytesFreed",
+                "errors", "moveDestinationKind", "heldBackReclaimed", "heldBackRecordsChanged",
+                "heldBackRecordsUnreadable", "heldBackIdentityClaimed", "heldBackIdentityUnreadable",
+            ],
+            root.GetProperty("operation").EnumerateObject().Select(p => p.Name));
+    }
+
+    [Fact]
+    public void The_payload_carries_no_pendingReboot_anywhere()
+    {
+        // It went with schema 4: a move or a delete is gated on that state and so
+        // can only ever report it clean, and the one place it could vary never
+        // had. Pinned as an absence because a re-add would otherwise be a silent
+        // 400 from a receiver that no longer allowlists the key.
+        var json = JsonSerializer.Serialize(SampleEntry(), JsonOptions);
+
+        Assert.DoesNotContain("pendingReboot", json, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void The_two_kinds_of_holding_back_keep_different_names()
+    {
+        // The scan's withholding and the act-time re-verify's are different
+        // numbers about different moments, and they sit in one payload. Neither
+        // may be called just "held back", which is what this pins: getting it
+        // wrong is a silent data fault rather than a compile error, because both
+        // are ints and either would serialise happily under the other's name.
+        var json = JsonSerializer.Serialize(SampleEntry(), JsonOptions);
+
+        Assert.Contains("\"withheldPatchCount\"", json);
+        Assert.Contains("\"heldBackReclaimed\"", json);
+        Assert.DoesNotContain("\"heldBackCount\"", json);
+        Assert.DoesNotContain("\"withheldCount\"", json);
+    }
+
+    [Fact]
+    public void The_scan_duration_and_the_operation_duration_are_both_carried()
+    {
+        // Two durationMs keys in one payload, one per object, and the pair is the
+        // point: the scan's has always been sent and the operation's never has.
+        var json = JsonSerializer.Serialize(SampleEntry(), JsonOptions);
+        using var doc = JsonDocument.Parse(json);
+
+        Assert.Equal(100, doc.RootElement.GetProperty("scan").GetProperty("durationMs").GetInt64());
+        Assert.Equal(900, doc.RootElement.GetProperty("operation").GetProperty("durationMs").GetInt64());
+    }
+
+    [Fact]
+    public void The_three_withheld_terms_go_separately_and_the_composite_goes_nowhere()
+    {
+        // The number the app combines them into can run high as well as low and is
+        // neither a count nor a bound, so a field carrying it would make every
+        // sentence built on it a sentence about three causes at once. The terms
+        // are sent and the combination is left to whoever wants it.
+        var scan = new ScanResult(
+            Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+            UnaccountedProductCount: 9,
+            Census: new EnumerationCensus(
+                UnreadableProducts: 4, ShortfallProducts: 5, ApiNeverClaimed: 2));
+
+        var info = ScanInfo.From(scan, 10);
+
+        Assert.Equal(4, info.UnreadableProductCount);
+        Assert.Equal(5, info.ShortfallProductCount);
+        Assert.Equal(2, info.UnlistedProductCount);
+
+        var json = JsonSerializer.Serialize(info, JsonOptions);
+        Assert.DoesNotContain("unaccounted", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("\"withheldProducts\"", json);
+    }
+
+    [Fact]
+    public void All_five_held_back_causes_reach_the_payload_and_are_not_summed()
+    {
+        // A batch can meet several causes at once, and one cause named for the set
+        // would be false of some of its members. Five distinct values so a
+        // transposition between two of them fails rather than cancelling out.
+        var reasons = new HeldBackReasons(
+            Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3,
+            IdentityClaimed: 4, IdentityUnreadable: 5);
+
+        var op = OperationInfo.FromDelete(
+            new DeleteResult(0, Array.Empty<FileOperationError>()),
+            bytesFreed: 0, durationMs: 0, heldBack: reasons);
+
+        Assert.Equal(1, op.HeldBackReclaimed);
+        Assert.Equal(2, op.HeldBackRecordsChanged);
+        Assert.Equal(3, op.HeldBackRecordsUnreadable);
+        Assert.Equal(4, op.HeldBackIdentityClaimed);
+        Assert.Equal(5, op.HeldBackIdentityUnreadable);
+
+        // The tally knows its own total and the payload deliberately does not
+        // carry it: a total invites one sentence over five causes.
+        Assert.Equal(15, reasons.Total);
+        var json = JsonSerializer.Serialize(op, JsonOptions);
+        Assert.DoesNotContain("heldBackTotal", json);
+    }
+
+    [Fact]
+    public void The_machine_object_reports_the_scan_it_was_built_from()
+    {
+        var scan = new ScanResult(
+            Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+            Census: new EnumerationCensus(
+                NonStringLocalPackageValues: 1, UnreadablePatchStates: 2,
+                ProductCount: 3, PatchClaimCount: 4, LongLeafStemCount: 5),
+            ShortNameCreation: ShortNameCreationLabels.PerVolume);
+
+        var machine = MachineInfo.From(scan);
+
+        Assert.Equal(ShortNameCreationLabels.PerVolume, machine.ShortNameCreation);
+        Assert.Equal(5, machine.LongStemCount);
+        Assert.Equal(1, machine.NonStringLocalPackageCount);
+        Assert.Equal(2, machine.UnreadablePatchStateCount);
+        Assert.Equal(3, machine.ProductCount);
+        Assert.Equal(4, machine.PatchClaimCount);
+    }
+
+    [Fact]
+    public void A_scan_nobody_sampled_reports_the_short_name_policy_as_unreadable()
+    {
+        // The default matters: a ScanResult built without a probe must not read as
+        // a machine whose policy is known, and every other label would say
+        // something nobody measured.
+        var scan = new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0);
+
+        Assert.Equal(ShortNameCreationLabels.Unreadable, MachineInfo.From(scan).ShortNameCreation);
+    }
+
+    [Fact]
+    public void The_scan_object_carries_both_byte_totals()
+    {
+        var files = new List<OrphanedFile>
+        {
+            new(@"C:\a.msi", 1000, false, IsRemovablePatch: false, IsObsoleted: false, "Orphaned"),
+            new(@"C:\b.msi", 2000, false, IsRemovablePatch: false, IsObsoleted: false, "Orphaned"),
+        };
+        var scan = new ScanResult(files, Array.Empty<RegisteredPackage>(), RegisteredTotalBytes: 9999);
+
+        var info = ScanInfo.From(scan, 10);
+
+        Assert.Equal(9999, info.RegisteredBytes);
+        Assert.Equal(3000, info.RemovableBytes);
+    }
+
+    [Fact]
+    public void The_needed_half_of_the_missing_count_is_added_beside_the_total_not_instead_of_it()
+    {
+        // The public chart reads missingFromDiskCount with no version gate, so
+        // replacing it would split a live series at this release. Both are sent
+        // and the benign half falls out by subtraction.
+        var scan = new ScanResult(
+            Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+            MissingNonRemovableCount: 2, MissingRemovableCount: 7);
+
+        var info = ScanInfo.From(scan, 10);
+
+        Assert.Equal(9, info.MissingFromDiskCount);
+        Assert.Equal(2, info.MissingNeededCount);
+    }
+
+    [Fact]
+    public void The_display_language_is_the_UI_culture_and_never_empty()
+    {
+        // Sixteen possible values on any shipped build, so it narrows nobody; it
+        // is here because which languages are actually used is not otherwise
+        // knowable. The invariant culture has an empty name and is reported as a
+        // word rather than as a blank, which would read as a field that failed.
+        var language = AppInfo.Current().Language;
+
+        Assert.False(string.IsNullOrWhiteSpace(language));
     }
 
     [Fact]
@@ -89,9 +330,9 @@ public class ResultLogEntryTests
         // The result log derives a bucket's category from the record's type
         // name, so splitting a held-open file out of IOFailure gives the
         // aggregate a new category for free. That is the whole cost of the
-        // split as far as the log is concerned: schema 3 is untouched, and the
-        // category stays a label with no path or identifier in it. The name is
-        // therefore load-bearing, which is what this pins.
+        // split as far as the log is concerned: the category stays a label with
+        // no path or identifier in it. The name is therefore load-bearing, which
+        // is what this pins.
         var errors = new List<FileOperationError>
         {
             new FileInUse(@"C:\Windows\Installer\a.msi"),
@@ -100,7 +341,9 @@ public class ResultLogEntryTests
         };
 
         var op = OperationInfo.FromMove(new MoveResult(0, errors),
-            bytesFreed: 0, moveDestinationKind: MoveDestinationKinds.DifferentFixedDrive);
+            bytesFreed: 0, durationMs: 0,
+            moveDestinationKind: MoveDestinationKinds.DifferentFixedDrive,
+            heldBack: default);
 
         var inUse = Assert.Single(op.Errors, b => b.Category == "FileInUse");
         Assert.Equal(2, inUse.Count);
@@ -116,7 +359,8 @@ public class ResultLogEntryTests
         // allowlists field names and a stray key is rejected at the door.
         var errors = new List<FileOperationError> { new MissingSourceFile(@"C:\Windows\Installer\gone.msi") };
 
-        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), bytesFreed: 0);
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors),
+            bytesFreed: 0, durationMs: 0, heldBack: default);
 
         var bucket = Assert.Single(op.Errors);
         Assert.Equal("MissingSourceFile", bucket.Category);
@@ -126,18 +370,24 @@ public class ResultLogEntryTests
         Assert.DoesNotContain("codes", json);
     }
 
-
     [Fact]
     public void OperationInfo_ScanOnly_produces_noFiles_outcome()
     {
         var op = OperationInfo.ScanOnly();
         Assert.Equal(OperationKinds.Scan, op.Kind);
         Assert.Equal(OperationOutcomes.NoFiles, op.Outcome);
+        Assert.Equal(0, op.DurationMs);
         Assert.Equal(0, op.FilesProcessed);
         Assert.Equal(0, op.FilesFailed);
         Assert.Equal(0, op.BytesFreed);
         Assert.Empty(op.Errors);
         Assert.Null(op.MoveDestinationKind);
+
+        // No operation ran, so nothing was held back by one. Zero here is a real
+        // answer rather than an absent field, which is what keeps the receiver's
+        // required-key check the same on all three run kinds.
+        Assert.Equal(0, op.HeldBackReclaimed);
+        Assert.Equal(0, op.HeldBackIdentityUnreadable);
     }
 
     [Fact]
@@ -155,11 +405,14 @@ public class ResultLogEntryTests
             new FileInUse(@"C:\Windows\Installer\b.msi"),
         };
 
-        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), bytesFreed: 0);
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors),
+            bytesFreed: 0, durationMs: 0,
+            heldBack: new HeldBackReasons(Reclaimed: 3));
 
         Assert.Equal(OperationOutcomes.Failed, op.Outcome);
         Assert.Equal(0, op.FilesProcessed);
         Assert.Equal(2, op.FilesFailed);
+        Assert.Equal(3, op.HeldBackReclaimed);
     }
 
     [Fact]
@@ -172,7 +425,8 @@ public class ResultLogEntryTests
         // one, showing the held-back summary instead, but the classifier is
         // reached by the CLI and must not invent a failure from two zeroes.)
         var op = OperationInfo.FromMove(new MoveResult(0, Array.Empty<FileOperationError>()),
-            bytesFreed: 0, moveDestinationKind: MoveDestinationKinds.SameDrive);
+            bytesFreed: 0, durationMs: 0,
+            moveDestinationKind: MoveDestinationKinds.SameDrive, heldBack: default);
 
         Assert.Equal(OperationOutcomes.Complete, op.Outcome);
         Assert.Equal(0, op.FilesProcessed);
@@ -184,7 +438,8 @@ public class ResultLogEntryTests
     {
         var errors = new List<FileOperationError> { new FileInUse(@"C:\Windows\Installer\a.msi") };
 
-        var op = OperationInfo.FromDelete(new DeleteResult(1, errors), bytesFreed: 1024);
+        var op = OperationInfo.FromDelete(new DeleteResult(1, errors),
+            bytesFreed: 1024, durationMs: 0, heldBack: default);
 
         Assert.Equal(OperationOutcomes.Partial, op.Outcome);
     }
@@ -203,7 +458,8 @@ public class ResultLogEntryTests
             var errors = Enumerable.Range(0, failed)
                 .Select(i => (FileOperationError)new FileInUse($@"C:\Windows\Installer\{i}.msi"))
                 .ToList();
-            var outcome = OperationInfo.FromDelete(new DeleteResult(processed, errors), bytesFreed: 0).Outcome;
+            var outcome = OperationInfo.FromDelete(new DeleteResult(processed, errors),
+                bytesFreed: 0, durationMs: 0, heldBack: default).Outcome;
             var cli = CliContract.ClassifyFileOperation(processed, failed);
 
             var expected = cli.ExitCode switch
@@ -235,7 +491,7 @@ public class ResultLogEntryTests
         };
         var scan = new ScanResult(files, Array.Empty<RegisteredPackage>(), 0);
 
-        var info = ScanInfo.From(scan, 500, PendingRebootLabels.Clean);
+        var info = ScanInfo.From(scan, 500);
 
         Assert.Equal(2, info.OrphanedCount);
         Assert.Equal(3, info.SupersededCount);
@@ -256,7 +512,7 @@ public class ResultLogEntryTests
         };
         var scan = new ScanResult(files, Array.Empty<RegisteredPackage>(), 0);
 
-        var info = ScanInfo.From(scan, 200, PendingRebootLabels.Clean);
+        var info = ScanInfo.From(scan, 200);
 
         Assert.Equal(0, info.OrphanedCount);
         Assert.Equal(0, info.SupersededCount);

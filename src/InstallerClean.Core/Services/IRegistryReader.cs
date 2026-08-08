@@ -20,4 +20,39 @@ public interface IRegistryReader
     /// read is not a list of nobody.
     /// </summary>
     string[]? LocalMachineSubKeyNames(string relativePath);
+
+    /// <summary>
+    /// A REG_DWORD value, four-state because the three ways of having no number
+    /// are three different things to have found out and a caller reporting them
+    /// would otherwise have to pick one sentence for all three. Absent is an
+    /// answer (the setting is at its default), a wrong type is a machine
+    /// configured in a way nothing here anticipated, and a failed read is no
+    /// answer at all.
+    /// </summary>
+    RegistryDwordRead LocalMachineDwordValue(string keyPath, string valueName);
 }
+
+/// <summary>How a REG_DWORD read turned out. See <see cref="RegistryDwordRead"/>.</summary>
+public enum RegistryDwordState
+{
+    /// <summary>The value was there and was a number, which is in <see cref="RegistryDwordRead.Value"/>.</summary>
+    Read,
+
+    /// <summary>The key or the value is not there. Not a failure: it is how a setting left at its default reads.</summary>
+    Absent,
+
+    /// <summary>The value is there and is not a number, so there is nothing to report but the fact.</summary>
+    WrongType,
+
+    /// <summary>The read itself failed, so nothing at all was established.</summary>
+    Unreadable,
+}
+
+/// <summary>
+/// One REG_DWORD read. <see cref="Value"/> is meaningful only when
+/// <see cref="State"/> is <see cref="RegistryDwordState.Read"/>; it is zero in
+/// every other state, and zero is a legitimate setting value, so a caller that
+/// reads the number without the state cannot tell a machine set to 0 from a
+/// machine that answered nothing.
+/// </summary>
+public readonly record struct RegistryDwordRead(RegistryDwordState State, int Value = 0);

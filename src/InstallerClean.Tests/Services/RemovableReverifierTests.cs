@@ -134,7 +134,7 @@ public class RemovableReverifierTests
         var q = Substitute.For<IInstallerQueryService>();
         q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new InstallerQueryResult(
-                new[] { Withheld(superseded) }, UnreadableProductCount: 1));
+                new[] { Withheld(superseded) }, UnaccountedProductCount: 1));
         var svc = Reverifier(q);
 
         var result = await svc.ReverifyAsync(new[] { superseded });
@@ -168,7 +168,7 @@ public class RemovableReverifierTests
         var q = Substitute.For<IInstallerQueryService>();
         q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new InstallerQueryResult(
-                new[] { NonRemovable(reclaimed), Withheld(withheld) }, UnreadableProductCount: 1));
+                new[] { NonRemovable(reclaimed), Withheld(withheld) }, UnaccountedProductCount: 1));
         var svc = Reverifier(q);
 
         var result = await svc.ReverifyAsync(new[] { reclaimed, withheld });
@@ -188,7 +188,7 @@ public class RemovableReverifierTests
         var q = Substitute.For<IInstallerQueryService>();
         q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new InstallerQueryResult(
-                new[] { NonRemovable(reclaimed), Withheld(withheld) }, UnreadableProductCount: 1));
+                new[] { NonRemovable(reclaimed), Withheld(withheld) }, UnaccountedProductCount: 1));
         var svc = Reverifier(q);
 
         var result = await svc.ReverifyAsync(new[] { reclaimed, withheld, orphan });
@@ -206,7 +206,7 @@ public class RemovableReverifierTests
         var q = Substitute.For<IInstallerQueryService>();
         q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new InstallerQueryResult(
-                Array.Empty<RegisteredPackage>(), UnreadableProductCount: 3));
+                Array.Empty<RegisteredPackage>(), UnaccountedProductCount: 3));
         var svc = Reverifier(q);
 
         var result = await svc.ReverifyAsync(new[] { orphan });
@@ -494,7 +494,7 @@ public class RemovableReverifierTests
         q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new InstallerQueryResult(
                 new[] { NonRemovable(dropped) },
-                UnreadableProductCount: 0,
+                UnaccountedProductCount: 0,
                 PatchClaims: new[] { Claim(dropped, PatchA, ProductOne), Claim(kept, PatchB, ProductOne) }));
         var svc = Reverifier(q);
 

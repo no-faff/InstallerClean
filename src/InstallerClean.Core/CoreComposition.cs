@@ -42,6 +42,10 @@ public static class CoreComposition
         services.AddSingleton<IInstallerQueryService, InstallerQueryService>();
         services.AddSingleton<IPendingRebootService, PendingRebootService>();
         services.AddSingleton<IMsiFileInfoService, MsiFileInfoService>();
+        // Reads the machine's short-name policy for the opt-in report and for
+        // nothing else. Registered beside the other registry readers rather than
+        // inside the scan because it answers about the machine, not about the run.
+        services.AddSingleton<IShortNameCreationProbe, ShortNameCreationProbe>();
         // Reads a cached package's own identity, and asks Windows about it before
         // any candidate can be offered. Both are stateless; the per-scan caching
         // lives inside a single Screen call and does not outlive it.

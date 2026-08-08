@@ -378,7 +378,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // result captured here.
         var preOpScan = _scan.LastScanResult;
         var preOpDurationMs = _scan.LastScanDurationMs;
-        var preOpRebootLabel = _scan.PendingRebootLabel;
 
         var dest = MoveDestination.Trim();
 
@@ -620,6 +619,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         OperationProgress = Strings.Status_Moving;
         IsOperating = true;
 
+        // Started with the overlay and read where the report is built, so the
+        // figure is the whole wait the user sat through: the pre-act re-verify,
+        // the batch itself and the post-batch refresh. Narrower readings were
+        // available and none of them is the question, which is whether moving a
+        // few thousand files is a pleasant thing to do.
+        var operationTimer = System.Diagnostics.Stopwatch.StartNew();
+
         try
         {
             // Re-verify the removable set against the API immediately before
@@ -808,9 +814,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             if (!_completion.IsResultLogLocked)
             {
                 var entry = ResultLogEntry.ForMove(
-                    preOpScan, preOpDurationMs, preOpRebootLabel,
+                    preOpScan, preOpDurationMs,
                     result, movedBytes,
-                    destinationKind);
+                    operationTimer.ElapsedMilliseconds,
+                    destinationKind,
+                    // The folded tally, so the under-lease re-read's own kept-back
+                    // files are counted with the pre-act ones rather than lost:
+                    // the two producers keep back DIFFERENT files and the report
+                    // owes an account of both.
+                    reverify.Reasons);
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }
@@ -926,8 +938,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             removableFiles.Select(f => f.FullPath).ToList(),
             count,
             _scan.LastScanResult,
-            _scan.LastScanDurationMs,
-            _scan.PendingRebootLabel);
+            _scan.LastScanDurationMs);
 
         await RunDeleteAsync(ctx);
     }
@@ -955,6 +966,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // path for why it carries no count.
         OperationProgress = Strings.Status_Deleting;
         IsOperating = true;
+
+        // Same span as the Move path's timer, for the same reason.
+        var operationTimer = System.Diagnostics.Stopwatch.StartNew();
 
         try
         {
@@ -1100,8 +1114,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             if (!_completion.IsResultLogLocked)
             {
                 var entry = ResultLogEntry.ForDelete(
-                    ctx.PreOpScan, ctx.PreOpDurationMs, ctx.PreOpRebootLabel,
-                    result, deletedBytes);
+                    ctx.PreOpScan, ctx.PreOpDurationMs,
+                    result, deletedBytes,
+                    operationTimer.ElapsedMilliseconds,
+                    reverify.Reasons);
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }
@@ -1295,8 +1311,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         IReadOnlyList<string> FilePaths,
         int Count,
         ScanResult PreOpScan,
-        long PreOpDurationMs,
-        string PreOpRebootLabel);
+        long PreOpDurationMs);
 
     /// <summary>
     /// Bytes of the files a cancelled batch actually completed. The action

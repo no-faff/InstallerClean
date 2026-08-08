@@ -847,7 +847,7 @@ internal static class Program
     /// </remarks>
     private static void ReportScanSignals(string arg, ScanResult scanResult)
     {
-        if (scanResult.UnreadableProductCount > 0)
+        if (scanResult.UnaccountedProductCount > 0)
         {
             // The command line's own sentence, not the window's Summary.* one.
             // That closes on Re-scan, which is a button this surface has not got,
@@ -863,7 +863,7 @@ internal static class Program
             Console.WriteLine(Strings.Cli_RecordsNotMatched);
             MachineContract.WriteEventLog(CliEventClass.ScanWithheldNotice,
                 () => string.Format(Strings.Cli_EventLogScanWithheld,
-                    arg, scanResult.WithheldCount, scanResult.UnreadableProductCount));
+                    arg, scanResult.WithheldCount, scanResult.UnaccountedProductCount));
         }
 
         // MissingNonRemovableCount, never MissingFromDiskCount: a superseded patch

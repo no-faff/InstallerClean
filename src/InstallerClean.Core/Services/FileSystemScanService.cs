@@ -17,35 +17,40 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private readonly IInstallerQueryService _queryService;
     private readonly IFileSystem _fs;
     private readonly IIdentityVeto _identityVeto;
+    private readonly IShortNameCreationProbe? _shortNames;
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
 
-    /// <summary>Production constructor. DI supplies all three dependencies; the override fields stay null.</summary>
+    /// <summary>Production constructor. DI supplies all four dependencies; the override fields stay null.</summary>
     /// <remarks>
     /// Microsoft.Extensions.DependencyInjection resolves the public ctor
     /// with the most resolvable parameters and ignores internal ctors.
     /// The test ctors below are <c>internal</c> so DI cannot select one
     /// at resolution time and pass defaults the production code never
     /// expects.
+    ///
+    /// The short-name probe is the one dependency that decides nothing, and it is
+    /// here rather than sampled by a host so that both hosts report the same
+    /// figure without either having to remember to ask.
     /// </remarks>
     public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
-        IIdentityVeto identityVeto)
-        : this(queryService, fileSystem, identityVeto, null, null) { }
+        IIdentityVeto identityVeto, IShortNameCreationProbe shortNames)
+        : this(queryService, fileSystem, identityVeto, shortNames, null, null) { }
 
     /// <summary>
     /// Test constructor. Injects a filesystem and nothing else, for the tests
     /// whose subject is the walk itself.
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
-        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, null) { }
+        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, overrideFiles, null) { }
+        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, null, overrideFiles, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, overrideFiles, installerFolderOverride) { }
+        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, null, overrideFiles, installerFolderOverride) { }
 
     /// <summary>
     /// Test constructor. Injects an <see cref="IFileSystem"/> so the
@@ -54,7 +59,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, overrideFiles, installerFolderOverride) { }
+        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, overrideFiles, installerFolderOverride) { }
 
     /// <summary>
     /// Test constructor carrying the identity veto as well, for the tests whose
@@ -62,10 +67,26 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IIdentityVeto identityVeto, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
+        : this(queryService, fileSystem, identityVeto, null, overrideFiles, installerFolderOverride) { }
+
+    /// <summary>
+    /// Test constructor carrying the short-name probe as well, for the tests
+    /// whose subject is what the scan reports about the machine.
+    /// </summary>
+    /// <param name="shortNames">
+    /// Null in every test that is not about this, which reports the setting as
+    /// unreadable: a scan nobody sampled must not read as a machine whose policy
+    /// is known, and the alternative of defaulting to a plausible setting would
+    /// put a figure nobody measured into the one payload that exists to measure.
+    /// </param>
+    internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
+        IIdentityVeto identityVeto, IShortNameCreationProbe? shortNames,
+        IEnumerable<string>? overrideFiles, string? installerFolderOverride)
     {
         _queryService = queryService;
         _fs = fileSystem;
         _identityVeto = identityVeto;
+        _shortNames = shortNames;
         _overrideFiles = overrideFiles;
         _installerFolderOverride = installerFolderOverride;
     }
@@ -453,8 +474,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // the outstanding reports schema. A schema designed without them is a
         // departure somebody has to argue for.
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable,
-            query.UnreadableProductCount, withheld,
-            screened.ClaimedCount, screened.IdentityUnreadableCount, screened.RecordsUnaskableCount);
+            query.UnaccountedProductCount, withheld,
+            screened.ClaimedCount, screened.IdentityUnreadableCount, screened.RecordsUnaskableCount,
+            query.Census,
+            // Read after the classification is settled, so a probe that threw
+            // could not cost anybody a scan; it does not throw, and the ordering
+            // is the guarantee rather than the interface's promise.
+            _shortNames?.Read() ?? ShortNameCreationLabels.Unreadable);
     }
 
     /// <summary>
