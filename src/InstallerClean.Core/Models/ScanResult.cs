@@ -65,16 +65,23 @@ namespace InstallerClean.Models;
 /// What the withholding cost this run: superseded or obsoleted packages whose
 /// file is on disk and which the scan would have offered, had it been able to
 /// say that no installed product still needs them.
-/// <see cref="UnaccountedProductCount"/> is the reason, this is the price, and
-/// both are zero on a scan that read every product's records.
+///
+/// <see cref="UnaccountedProductCount"/> IS NOT ITS ONLY REASON AND THE TWO CAN
+/// DISAGREE, which the pairing once claimed they could not. That count is the
+/// scan-wide withholding, which moves every removable row at once; the per-patch
+/// confirmation pass withholds a single path on its own answer, without any
+/// product being unaccounted for. A run where only the second fires reports a
+/// cost with no cause beside it: the window's kept-patches notice and the
+/// command line's both gate on the other count, so neither says anything, and the
+/// files land in the kept list with nothing marking them.
 ///
 /// Two consumers. The command line reads it now, into the 3000 notice's
 /// <c>Cli.EventLogScanWithheld</c> line, so an operator watching a fleet learns
-/// what a withheld run cost and not merely that one happened. The schema 4
-/// result-log payload takes it as well, where it sits beside the act-time
-/// re-verify's own held-back count, a different number: this one is what never
-/// reached the user, that one is what stopped qualifying between the list and
-/// the button.
+/// what a withheld run cost and not merely that one happened, on the runs where
+/// that notice fires at all. The schema 4 result-log payload takes it as well,
+/// where it sits beside the act-time re-verify's own held-back count, a different
+/// number: this one is what never reached the user, that one is what stopped
+/// qualifying between the list and the button.
 /// </param>
 /// <param name="IdentityClaimedCount">
 /// Candidates the identity pass kept back because a live registration answers to

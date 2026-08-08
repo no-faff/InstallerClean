@@ -9,10 +9,14 @@ namespace InstallerClean.Models;
 /// claim, but a row can equally be a patch the API positively called removable on
 /// a scan that could not confirm it, or one whose verdict never read at all.
 ///
-/// RemovableWithheld marks the first: the API called it removable and this scan's
-/// product enumeration was incomplete, so the verdict was withheld, IsRemovable
-/// reads false and the row is kept. It is a separate flag rather than a plain
-/// false because the two are not the same fact downstream. A genuinely needed
+/// RemovableWithheld marks the first: the API called it removable and this scan
+/// could not confirm it, so the verdict was withheld, IsRemovable reads false and
+/// the row is kept. TWO PASSES SET IT and they are not the same event. The
+/// scan-wide one moves every removable row together, on a product enumeration
+/// that came back short; the per-patch confirmation moves one path, on its own
+/// unanswered question, with nothing else about the scan amiss. It is a separate
+/// flag rather than a plain false because the two are not the same fact
+/// downstream. A genuinely needed
 /// file missing from disk is the load-bearing alarm signal (an install, uninstall
 /// or repair will fail on it); a withheld patch missing from disk is the ordinary
 /// end state of a patch Windows itself calls removable, and counting it as the
