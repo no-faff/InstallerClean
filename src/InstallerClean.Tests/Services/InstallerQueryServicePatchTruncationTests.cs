@@ -592,6 +592,36 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     /// <summary>
+    /// A per-user product must be asked about AS ITSELF: the account and context
+    /// the walk handed back have to come round to the keyed read unchanged.
+    ///
+    /// THIS IS THE FAULT CLASS THAT HAS COST THIS PASS TWICE, and neither instance
+    /// was a wrong verdict anybody could see. A keyed read given the wrong account
+    /// is refused by Windows, the refusal is read as "could not ask", and every
+    /// candidate is withheld: the app finds nothing, on every machine, while every
+    /// test that only checks which PAIRINGS were asked still passes. Asserting the
+    /// pairing is not asserting the question.
+    /// </summary>
+    [Fact]
+    public async Task A_per_user_product_is_asked_under_its_own_account_and_context()
+    {
+        const string Sid = "S-1-5-21-1-2-3-1001";
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.AddPerUserProduct(StillApplied, Sid);
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "1");
+
+        var result = await Run(msi);
+
+        Assert.Contains((Patch, StillApplied, (string?)Sid, MsiInstallContext.UserUnmanaged),
+            msi.ConfirmationAskIdentities);
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+    }
+
+    /// <summary>
     /// A machine, declared rather than scripted call by call. It answers the four
     /// entry points off the products and patches it has been told about, and can
     /// be made to end one product's patch enumeration early without that product
@@ -637,7 +667,30 @@ public class InstallerQueryServicePatchTruncationTests
         /// </summary>
         public List<(string Patch, string Product)> ConfirmationAsks { get; } = new();
 
+        /// <summary>
+        /// The same asks with the account and context each was made under. Kept
+        /// beside the pairing rather than folded into it because the two questions
+        /// are different: the pairing asks whether the right product was asked at
+        /// all, and this asks whether it was asked AS ITSELF. Nothing recorded the
+        /// second until a defect turned on it.
+        /// </summary>
+        public List<(string Patch, string Product, string? Sid, MsiInstallContext Context)>
+            ConfirmationAskIdentities { get; } = new();
+
         public void AddProduct(string code) => _products.Add(code);
+
+        /// <summary>
+        /// A product installed under a named account rather than per-machine. The
+        /// walk hands back its SID and context, and every keyed read about it is
+        /// then supposed to carry both back unchanged.
+        /// </summary>
+        public void AddPerUserProduct(string code, string sid)
+        {
+            _products.Add(code);
+            _perUser[code] = sid;
+        }
+
+        private readonly Dictionary<string, string> _perUser = new();
 
         /// <summary>How many products the walk returns, for the headcount tests.</summary>
         public int WalkedProducts => _products.Count;
@@ -692,7 +745,14 @@ public class InstallerQueryServicePatchTruncationTests
             // The walk. It does NOT return the hidden products, which is the
             // whole point of them.
             if (index >= _products.Count) return NoMoreItems;
-            Write(installedProductCode, _products[(int)index]);
+            var walked = _products[(int)index];
+            Write(installedProductCode, walked);
+            if (_perUser.TryGetValue(walked, out var perUserSid))
+            {
+                installedContext = MsiInstallContext.UserUnmanaged;
+                Write(sid, perUserSid);
+                sidLength = (uint)perUserSid.Length;
+            }
             return Success;
         }
 
@@ -748,7 +808,11 @@ public class InstallerQueryServicePatchTruncationTests
             // patch, which is the one thing the product loop cannot have asked.
             var enumeratedIt = !EnumerationEndsEarlyFor.Contains(productCode)
                 && _patchesOf.TryGetValue(productCode, out var held) && held.Contains(patchCode);
-            if (!enumeratedIt) ConfirmationAsks.Add((patchCode, productCode));
+            if (!enumeratedIt)
+            {
+                ConfirmationAsks.Add((patchCode, productCode));
+                ConfirmationAskIdentities.Add((patchCode, productCode, userSid, context));
+            }
 
             if (PatchPropertyResult.TryGetValue((patchCode, productCode, property), out var forced))
             {

@@ -39,7 +39,7 @@ namespace InstallerClean.Models;
 /// IT WAS CALLED <c>UnreadableProductCount</c> AND THAT NAME WAS A CAUSE STATED
 /// FOR A MIXED SET, inside the app rather than on a screen: half its contributors
 /// are absences and nothing failed to read for them. Any sentence built on this
-/// number is a sentence about all four, which is why the name now says only that
+/// number is a sentence about all five, which is why the name now says only that
 /// the enumeration could not account for them. The terms themselves are in
 /// <see cref="Census"/>, separately, for anything that needs to say which.
 ///
@@ -79,7 +79,7 @@ public record InstallerQueryResult(
     /// cannot say of any patch that no installed product still needs it. Whether
     /// that product's records failed to read or were never reached does not enter
     /// into it: what withholds the verdict is the missing claim, not the mechanism
-    /// (see <see cref="UnaccountedProductCount"/> for the four). Every consumer of
+    /// (see <see cref="UnaccountedProductCount"/> for the five). Every consumer of
     /// a removable verdict inherits this through the withheld rows themselves; it
     /// is exposed for the copy that explains the shorter list.
     /// </summary>
@@ -133,6 +133,11 @@ public record InstallerQueryResult(
 /// product estimate floored at one by patch evidence and biased low by a generous
 /// subtraction. Neither is the count its name would claim, and both are
 /// reproducible from these four plus <see cref="UnreadableProducts"/>.
+///
+/// <see cref="UnresolvableProductCount"/> is the arithmetic's one other input and
+/// is not one of these, being neither a headcount nor an observation of the disk:
+/// it is a tally of the questions that got no answer, and it is added to the
+/// derived terms rather than weighed against them.
 ///
 /// The band matters most. It was set from the residue of one machine, it decides
 /// whether a truncated enumeration is noticed at all, and a machine whose real
