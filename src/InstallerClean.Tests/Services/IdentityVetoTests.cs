@@ -36,6 +36,13 @@ public class IdentityVetoTests
     /// </summary>
     private const uint BadConfiguration = 1610;
 
+    /// <summary>
+    /// ERROR_INVALID_PARAMETER. What both keyed entry points return for the
+    /// machine account in a per-user context, measured on one machine in every
+    /// context and documented by Microsoft as a call that may not be made.
+    /// </summary>
+    private const uint InvalidParameter = 87;
+
     private const string MachineSid = "S-1-5-18";
     private const string OtherAccountSid = "S-1-5-21-1-2-3-1001";
 
@@ -200,6 +207,44 @@ public class IdentityVetoTests
         Assert.Equal(CandidateIdentityOutcome.Claimed, outcome);
     }
 
+    [Fact]
+    public void The_machine_account_is_never_asked_about_per_user_products()
+    {
+        // S-1-5-18 IS ALWAYS A UserData SUBKEY, being where per-machine
+        // registrations live, so it reaches any ladder built from that key list.
+        // Microsoft documents that it cannot be used that way and one machine
+        // measured ERROR_INVALID_PARAMETER for it in every context, which is on
+        // no allowlist and so reads as "the records could not be asked".
+        //
+        // Left in, it fires on the FIRST rung after the per-machine ask, so every
+        // candidate whose product Windows genuinely does not know is withheld and
+        // the offer is empty on every machine. This is the test that says the
+        // ladder does not ask it.
+        var api = new FakeApi();
+        api.RejectsPerUserSid = MachineSid;
+
+        var outcome = Screen(api, Reader((FileA, Product(ProductA))), FileA,
+            sids: new[] { MachineSid, OtherAccountSid });
+
+        Assert.Equal(CandidateIdentityOutcome.Unclaimed, outcome);
+    }
+
+    [Fact]
+    public void A_real_account_answering_invalid_parameter_still_withholds()
+    {
+        // The other half, and it is what stops the fix above becoming a licence.
+        // Only the machine account is left out of the per-user rungs. Any OTHER
+        // account answering something outside the documented set is a question
+        // that could not be put, and withholds.
+        var api = new FakeApi();
+        api.RejectsPerUserSid = OtherAccountSid;
+
+        var outcome = Screen(api, Reader((FileA, Product(ProductA))), FileA,
+            sids: new[] { MachineSid, OtherAccountSid });
+
+        Assert.Equal(CandidateIdentityOutcome.RecordsUnaskable, outcome);
+    }
+
     // ---- Patch candidates ----
 
     [Fact]
@@ -301,9 +346,9 @@ public class IdentityVetoTests
         Assert.Equal(1, result.IdentityCacheHits);
         Assert.Equal(2, result.Outcomes.Count(o => o == CandidateIdentityOutcome.Unclaimed));
         // Counted independently of the result's own figures, so the cache is
-        // shown to be real rather than merely reported. One account plus the
-        // machine context is a ladder of three, every rung of which runs when the
-        // answer is "no such product", so three asks is one code asked once and
+        // shown to be real rather than merely reported. The default ladder is the
+        // per-machine ask plus one real account's two contexts, the machine
+        // account being no part of it, so three asks is one code asked once and
         // six would be one code asked twice.
         Assert.Equal(3, api.ProductAsks.Count);
     }
@@ -420,7 +465,8 @@ public class IdentityVetoTests
     private static IdentityVeto Veto(FakeApi api, IPackageIdentityReader reader, string[]? sids = null)
     {
         var registry = Substitute.For<IRegistryReader>();
-        registry.LocalMachineSubKeyNames(Arg.Any<string>()).Returns(sids ?? new[] { MachineSid });
+        registry.LocalMachineSubKeyNames(Arg.Any<string>()).Returns(
+            sids ?? new[] { MachineSid, OtherAccountSid });
         // The crash-log sink is bound to a no-op: several of these drive the
         // unreadable branch deliberately, and the real sink would append to the
         // log of whatever machine ran the suite.
@@ -502,6 +548,12 @@ public class IdentityVetoTests
         /// <summary>Every product code a keyed read was made for, for the caching tests.</summary>
         public List<string> ProductAsks { get; } = new();
 
+        /// <summary>
+        /// A SID that refuses every per-user question, whatever the product. It
+        /// models the machine account, which the API rejects in that position.
+        /// </summary>
+        public string? RejectsPerUserSid { get; set; }
+
         public void Install(string code, string? sid, MsiInstallContext context) =>
             Installed.Add((code, sid, context));
 
@@ -513,6 +565,7 @@ public class IdentityVetoTests
         {
             ProductAsks.Add(productCode);
             valueLength = 0;
+            if (RejectsPerUserSid is not null && userSid == RejectsPerUserSid) return InvalidParameter;
             if (ProductAskResult.TryGetValue(productCode, out var forced)) return forced;
 
             var known = Installed.Any(p =>

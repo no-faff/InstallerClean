@@ -47,6 +47,14 @@ public sealed class IdentityVeto : IIdentityVeto
     /// </summary>
     private const string AllUsersSid = "S-1-1-0";
 
+    /// <summary>
+    /// The SYSTEM account, whose <c>UserData</c> subkey is where per-machine
+    /// registrations are kept. It is therefore always in the account list and is
+    /// never a per-user account to ask about; see <see cref="BuildAccountLadder"/>
+    /// for what including it costs.
+    /// </summary>
+    private const string MachineAccountSid = "S-1-5-18";
+
     /// <summary>Matches <c>InstallerQueryService</c>: long enough that the retry never runs.</summary>
     private const int SidBufferLength = 256;
 
@@ -248,6 +256,27 @@ public sealed class IdentityVeto : IIdentityVeto
         };
         foreach (var sid in sids)
         {
+            // THE MACHINE ACCOUNT IS NOT AN ACCOUNT FOR THIS PURPOSE, and leaving
+            // it in empties the offer on every machine. Its key is where
+            // per-machine registrations live, so it is always present in this
+            // list, and the per-machine context above already covers everything
+            // under it. Asked in a per-USER context it is a question that may not
+            // be put: "the special SID string S-1-5-18 (system) cannot be used to
+            // enumerate products installed as per-machine", and one machine
+            // measured ERROR_INVALID_PARAMETER for it in every context, for both
+            // keyed entry points.
+            //
+            // That code is on no allowlist, so it reads as a question that could
+            // not be answered, and this rung is reached the moment the per-machine
+            // ask says it does not know the product. Left in, every candidate
+            // Windows genuinely does not know is withheld and nothing is ever
+            // offered.
+            //
+            // Only this one SID is dropped, and only from the per-user rungs. Any
+            // OTHER account answering outside the documented set is a question
+            // that really could not be put, and still withholds.
+            if (string.Equals(sid, MachineAccountSid, StringComparison.OrdinalIgnoreCase)) continue;
+
             ladder.Add((sid, MsiInstallContext.UserUnmanaged));
             ladder.Add((sid, MsiInstallContext.UserManaged));
         }
