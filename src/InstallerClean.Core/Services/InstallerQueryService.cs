@@ -101,12 +101,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// machine's 136 of 136 says what that machine holds and nothing about the
     /// population.
     /// </param>
+    /// <param name="RegistryProductCodes">
+    /// The product codes behind <paramref name="ProductKeys"/>, unpacked out of
+    /// the subkey names (see <see cref="UnpackRegistryProductCode"/>). The count
+    /// answers how many products the machine has; this answers WHICH, and the
+    /// difference is what lets an enumeration that came back short be named rather
+    /// than estimated. Short of <paramref name="ProductKeys"/> by any key name
+    /// that was not a packed GUID, which is a key naming no product to ask about.
+    /// Null where the caller supplied no reader.
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
         int UnclaimedProductFiles = 0,
         int UnclaimedPatchFiles = 0,
-        int NonStringLocalPackageValues = 0);
+        int NonStringLocalPackageValues = 0,
+        IReadOnlyCollection<string>? RegistryProductCodes = null);
 
     /// <summary>
     /// Production constructor: talks to the real msi.dll through
@@ -344,10 +354,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
             if (recordsShort) unreadableProducts++;
         }
 
-        ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, ct);
-
         progress?.Report(new ScanProgressUpdate(Strings.Status_CheckingRegistry));
 
+        // READ BEFORE THE CONFIRMATION PASS RATHER THAN AFTER IT, because that
+        // pass needs the products this enumeration missed and the registry is
+        // where their names are. Nothing about the fallback's own answer moves
+        // with the order: it claims paths through TryAdd and never displaces a
+        // row, its unclaimed-file counts describe what the API LOOP claimed and
+        // that loop has finished above, and the confirmation pass puts no new path
+        // into the set, only downgrades rows already in it.
         var fallback = _readFallback(claimed, ct);
 
         // Even a fresh Windows install has OS-level MSI products. Zero
@@ -355,6 +370,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // reporting "all clear" would be worse than failing.
         if (claimed.Count == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
+
+        var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, ct);
+
+        ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered, ct);
 
         // Both sources degraded at once: refuse the scan outright rather than
         // report a shorter one.
@@ -458,7 +477,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ? Math.Max(1, unclaimedProducts)
             : unclaimedProducts;
 
-        var withheldProducts = unreadableProducts + Math.Max(shortfallProducts, apiNeverClaimed);
+        // The registry named a product and Windows would not say whether it is
+        // installed, so whether the enumeration was complete is not established
+        // and cannot be. ADDED rather than folded into the larger-of-two above,
+        // because it is not another estimate of the same quantity: those two
+        // estimate how many products were missed, and this counts the codes on
+        // which that question got no answer at all. A product recovered by name
+        // contributes nothing here and nothing above, which is the whole gain:
+        // the gap it would have been part of was closed by asking rather than
+        // covered by withholding.
+        var withheldProducts = unreadableProducts + Math.Max(shortfallProducts, apiNeverClaimed)
+            + missed.Unresolved;
 
         progress?.Report(new ScanProgressUpdate(string.Format(
             Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
@@ -507,12 +536,90 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 unreadablePatchStates,
                 products.Count,
                 patchClaims.Count,
-                packages.Count(p => HasLongLeafStem(p.LocalPackagePath))));
+                packages.Count(p => HasLongLeafStem(p.LocalPackagePath)),
+                missed.Recovered.Count,
+                missed.Unresolved));
         }
         finally
         {
             abandonedLog.WriteClosingEntry();
         }
+    }
+
+    /// <summary>
+    /// Which installed products the product enumeration did not return, asked as a
+    /// question about named products rather than inferred from two headcounts.
+    ///
+    /// THE REGISTRY NAMES THE MACHINE'S PRODUCTS AND SO DOES THE ENUMERATION, so a
+    /// code the first holds and the second never returned is not evidence that
+    /// something was missed; it is the thing that was missed, identified. Each one
+    /// is then put to Windows on its own (<see cref="ResolveProductInstance"/>,
+    /// which asks about that code and walks no list), and the answer decides which
+    /// of three quite different states this is:
+    ///
+    /// INSTALLED. The enumeration was short and this product is why. It is
+    /// recovered into the confirmation pass's ask list, where it answers for the
+    /// patches it holds exactly as an enumerated product would. Nothing is withheld
+    /// for it, because nothing needed to be: the gap was closed rather than
+    /// estimated.
+    ///
+    /// NOT INSTALLED. A UserData key outliving its product, which is the ordinary
+    /// residue of a failed or partial uninstall and the reason a headcount needed a
+    /// tolerance in the first place. It establishes nothing and costs nothing. This
+    /// is where the difference between comparing names and comparing counts is
+    /// worth the most: a count cannot tell this state from the one above, and every
+    /// tolerance band that has ever been written here exists to guess at the
+    /// proportion of them.
+    ///
+    /// UNASKABLE. The registry names a product and Windows would not say whether it
+    /// is installed. Nothing about the enumeration's completeness can be
+    /// established, so the caller withholds; see <paramref name="registryCodes"/>
+    /// for the one other way this method reports the same not-knowing.
+    /// </summary>
+    /// <param name="registryCodes">
+    /// Null where no fallback ran, which is not the same as an empty set and must
+    /// not read as one: an empty set says the registry holds no product this
+    /// enumeration missed, and null says nobody looked. Null yields no recovered
+    /// products and no unresolved ones, leaving the caller's other signals to
+    /// speak, because a comparison that did not happen may not withhold on its own
+    /// silence.
+    /// </param>
+    /// <returns>
+    /// The products to ask alongside the enumerated ones, and how many codes could
+    /// not be resolved either way. The second is a count and not a list on purpose:
+    /// there is nothing to be done with the identity of a product Windows will not
+    /// answer about, and the count is what the withholding needs.
+    /// </returns>
+    private (List<(string ProductCode, string? Sid, MsiInstallContext Context)> Recovered, int Unresolved)
+        LocateProductsTheEnumerationMissed(
+            List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
+            IReadOnlyCollection<string>? registryCodes,
+            CancellationToken ct)
+    {
+        var recovered = new List<(string, string?, MsiInstallContext)>();
+        if (registryCodes is null || registryCodes.Count == 0) return (recovered, 0);
+
+        var enumerated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (code, _, _) in products) enumerated.Add(code);
+
+        // Unbounded by design, and the restraint is deliberate rather than an
+        // oversight: one keyed read per code the enumeration did not return, on a
+        // set already bounded by the machine's own registry keys, which the
+        // fallback has just opened one at a time anyway. Capping it would put back
+        // exactly the kind of unjustified number this comparison exists to remove,
+        // and the cap would fall on the machines with the most to recover.
+        var unresolved = 0;
+        foreach (var code in registryCodes)
+        {
+            ct.ThrowIfCancellationRequested();
+            if (enumerated.Contains(code)) continue;
+
+            var resolved = ResolveProductInstance(code);
+            if (resolved.Unaskable) { unresolved++; continue; }
+            if (resolved.Installed) recovered.Add((code, resolved.Sid, resolved.Context));
+        }
+
+        return (recovered, unresolved);
     }
 
     /// <summary>
@@ -560,10 +667,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// that could not answer makes it non-removable AND withheld, which is the
     /// existing "this scan could not prove it" state, counted and surfaced as such.
     /// </summary>
+    /// <param name="recovered">
+    /// Products the enumeration never returned and the registry comparison then
+    /// found installed (<see cref="LocateProductsTheEnumerationMissed"/>). They are
+    /// asked exactly as enumerated products are, which is the point: a product
+    /// recovered by name can answer for the patches it holds, where a product
+    /// merely inferred from a headcount could only ever have withheld.
+    /// </param>
     private void ConfirmRemovableAgainstEveryProduct(
         Dictionary<string, RegisteredPackage> claimed,
         List<PatchClaim> patchClaims,
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
+        List<(string ProductCode, string? Sid, MsiInstallContext Context)> recovered,
         CancellationToken ct)
     {
         // EVERY patch code naming a still-removable path, not one per path. The
@@ -610,12 +725,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
 
             // The products to put the question to: the ones the enumeration
-            // returned, plus any route A named for this patch, plus any the patch
-            // file itself says it targets. The three overlap heavily on a healthy
-            // machine and are unioned rather than chosen between, because each
-            // sees something the others cannot and every one of them can only add
-            // a product to ask.
+            // returned, the ones the registry named and the enumeration did not,
+            // plus any route A named for this patch, plus any the patch file
+            // itself says it targets. They overlap heavily on a healthy machine
+            // and are unioned rather than chosen between, because each sees
+            // something the others cannot and every one of them can only add a
+            // product to ask.
             var toAsk = new List<(string ProductCode, string? Sid, MsiInstallContext Context)>(products);
+            toAsk.AddRange(recovered);
             if (holders.TryGetValue(patchCode, out var named)) toAsk.AddRange(named);
 
             var fromFile = TargetsDeclaredByPatchFile(path, out var fileUnreadable);
@@ -1159,6 +1276,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unclaimedProductFiles = 0;
         var unclaimedPatchFiles = 0;
         var nonStringValues = 0;
+        var productCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         // Budgeted, because every catch below sits inside a loop bounded by the
         // machine's registered products and patches, and what fails one key read
@@ -1183,7 +1301,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 foreach (var sidName in udKey.GetSubKeyNames())
                 {
                     ct.ThrowIfCancellationRequested();
-                    var sidRead = ReadFallbackSid(udKey, sidName, claimed, ct, failureLog);
+                    var sidRead = ReadFallbackSid(udKey, sidName, claimed, productCodes, ct, failureLog);
                     failures += sidRead.Failures;
                     productKeys += sidRead.ProductKeys;
                     unclaimedProductFiles += sidRead.UnclaimedProductFiles;
@@ -1211,7 +1329,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
-            nonStringValues);
+            nonStringValues, productCodes);
     }
 
     /// <summary>
@@ -1246,6 +1364,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         Microsoft.Win32.RegistryKey udKey,
         string sidName,
         Dictionary<string, RegisteredPackage> claimed,
+        HashSet<string> productCodes,
         CancellationToken ct,
         PerItemFailureLog failureLog)
     {
@@ -1268,6 +1387,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // is still a product this machine has, and the count exists
                     // to be weighed against how many the API enumerated.
                     productKeys++;
+
+                    // Named from the key list for the same reason, and it is the
+                    // stronger half: the count can only say the two sources
+                    // disagree, where the name says which product the API never
+                    // mentioned and can therefore be put to Windows as a question.
+                    // Taken before InstallProperties is opened, so a product whose
+                    // entry will not read is still a product that can be asked
+                    // about.
+                    var unpacked = UnpackRegistryProductCode(prodGuid);
+                    if (unpacked is not null) productCodes.Add(unpacked);
+
                     try
                     {
                         using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
@@ -1426,6 +1556,71 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     private static readonly char[] LeafSeparators = ['\\', '/'];
+
+    /// <summary>
+    /// A <c>UserData</c> product subkey name turned back into the braced GUID the
+    /// Windows Installer API answers in.
+    ///
+    /// The registry names those keys in the packed form the installer writes: 32
+    /// hex characters, no braces and no hyphens, with each of the first three GUID
+    /// fields written backwards and the last eight bytes written as swapped pairs.
+    /// Unpacking it is what lets a registry product and an enumerated product be
+    /// recognised as THE SAME PRODUCT instead of merely counted against each
+    /// other, which is the whole difference between naming what an enumeration
+    /// missed and estimating how much it missed.
+    ///
+    /// Null for anything that is not 32 hex characters, and that is not a
+    /// tidiness check: the caller turns each of these into a question about a real
+    /// machine, and a code invented out of a key name that was never a packed GUID
+    /// would be a question about nothing whose answer withholds.
+    ///
+    /// THE TRANSFORM IS MEASURED, NOT DERIVED. Against the 137 product keys of one
+    /// elevated machine (2026-08-08), 136 unpacked to exactly the GUID inside
+    /// their own <c>InstallProperties\UninstallString</c>, none disagreed, and the
+    /// remaining key carried no UninstallString to check against. One machine's
+    /// agreement cannot establish that no other packing exists, which is the
+    /// reason an unparseable name refuses rather than guesses.
+    /// </summary>
+    internal static string? UnpackRegistryProductCode(string packed)
+    {
+        if (packed.Length != 32) return null;
+        foreach (var c in packed)
+            if (!char.IsAsciiHexDigit(c)) return null;
+
+        var guid = new char[38];
+        guid[0] = '{';
+        guid[9] = guid[14] = guid[19] = guid[24] = '-';
+        guid[37] = '}';
+
+        CopyReversed(packed, 0, 8, guid, 1);
+        CopyReversed(packed, 8, 4, guid, 10);
+        CopyReversed(packed, 12, 4, guid, 15);
+        CopySwappedPairs(packed, 16, 4, guid, 20);
+        CopySwappedPairs(packed, 20, 12, guid, 25);
+
+        return new string(guid);
+    }
+
+    /// <summary>One field of the packed form, which is written least-significant first.</summary>
+    private static void CopyReversed(string source, int start, int length, char[] target, int at)
+    {
+        for (var i = 0; i < length; i++) target[at + i] = source[start + length - 1 - i];
+    }
+
+    /// <summary>
+    /// The packed form's trailing bytes, where the order of the BYTES is kept and
+    /// the two hex characters within each are swapped. Reversing the whole run
+    /// instead produces a GUID that looks entirely plausible and names a different
+    /// product.
+    /// </summary>
+    private static void CopySwappedPairs(string source, int start, int length, char[] target, int at)
+    {
+        for (var i = 0; i < length; i += 2)
+        {
+            target[at + i] = source[start + i + 1];
+            target[at + i + 1] = source[start + i];
+        }
+    }
 
     /// <summary>
     /// Puts a surviving prefix into the spelling Win32 accepts. Both forms reach

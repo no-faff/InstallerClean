@@ -854,7 +854,7 @@ internal static class Program
             // and opens its second sentence on "Everything listed", which is true
             // only of /s: a /d or an /m lists nothing at all.
             //
-            // The count gates the line and does not appear in it. Four different
+            // The count gates the line and does not appear in it. Five different
             // things contribute to it and the total is an estimate rather than a
             // headcount, so any figure printed here would be a precision the app
             // has not got; the event-log line below keeps its own copy because a

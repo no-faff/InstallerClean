@@ -18,7 +18,7 @@ namespace InstallerClean.Models;
 /// as the scan summary's kept-patches notice, and the trigger for withholding the
 /// removable class.
 ///
-/// FOUR contributors, and only the first two are failures to read. A product row
+/// FIVE contributors, and only the first two are failures to read. A product row
 /// the API skipped (identity unknowable, counted one per row); a product whose
 /// rows came back but whose LocalPackage value, or one of whose patch rows, would
 /// not read. Then two that are absences rather than failures: a shortfall of the
@@ -27,6 +27,14 @@ namespace InstallerClean.Models;
 /// the read failures (see the subtractions at the assembly site), so by
 /// construction they count only products where nothing failed to read at all.
 /// A product meeting more than one contributor counts once.
+///
+/// The fifth is neither a failure to read nor an absence: a product code the
+/// registry named and Windows would not say was installed or not, so whether the
+/// enumeration was complete could not be established for it either way. Its
+/// opposite number, a registry code confirmed installed and recovered into the
+/// questions the scan asks, contributes NOTHING here, and that asymmetry is the
+/// point: a product that can be asked about is asked, and only a product nobody
+/// can get an answer about withholds.
 ///
 /// IT WAS CALLED <c>UnreadableProductCount</c> AND THAT NAME WAS A CAUSE STATED
 /// FOR A MIXED SET, inside the app rather than on a screen: half its contributors
@@ -167,6 +175,29 @@ public record InstallerQueryResult(
 /// which is why this is a count rather than the boolean the question was first
 /// asked as.
 /// </param>
+/// <param name="RecoveredProductCount">
+/// Products the registry named, the enumeration never returned, and a keyed ask
+/// then found installed. THE TRUNCATION, MEASURED: every other signal about a
+/// short enumeration on this list is an inference from two totals, and this one
+/// is a count of products identified individually and confirmed one at a time.
+///
+/// Zero is the answer on a machine whose enumeration was whole, and it is also
+/// the answer on a machine whose registry holds nothing but residue, so a
+/// non-zero reading is the interesting one. It withholds nothing, the products
+/// behind it having been asked rather than guessed at, which is why it is only
+/// here and nowhere in the arithmetic.
+/// </param>
+/// <param name="UnresolvableProductCount">
+/// Product codes the registry named that Windows would not say were installed or
+/// not. The one state the comparison cannot resolve, and unlike the count above
+/// it does withhold, because nothing about the enumeration's completeness follows
+/// from a question that got no answer.
+///
+/// These two are what make the tolerance band answerable somewhere other than the
+/// machine it was set on. The band guesses at the proportion of registry keys that
+/// are residue; between them these two report what that proportion actually was,
+/// per machine, without any band being involved.
+/// </param>
 public readonly record struct EnumerationCensus(
     int UnreadableProducts = 0,
     int SkippedProductRows = 0,
@@ -177,4 +208,6 @@ public readonly record struct EnumerationCensus(
     int UnreadablePatchStates = 0,
     int ProductCount = 0,
     int PatchClaimCount = 0,
-    int LongLeafStemCount = 0);
+    int LongLeafStemCount = 0,
+    int RecoveredProductCount = 0,
+    int UnresolvableProductCount = 0);

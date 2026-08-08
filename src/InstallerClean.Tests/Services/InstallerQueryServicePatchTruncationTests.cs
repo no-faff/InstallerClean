@@ -49,6 +49,19 @@ public class InstallerQueryServicePatchTruncationTests
     private static Task<InstallerQueryResult> Run(FakeApi msi, IPackageIdentityReader reader) =>
         new InstallerQueryService(msi, NoFallback, null, reader).GetRegisteredPackagesAsync();
 
+    /// <summary>
+    /// A fallback that read the registry cleanly and found the given product
+    /// codes. The key count is the number of codes, which is what a real read of
+    /// those keys would report.
+    /// </summary>
+    private static InstallerQueryService.FallbackReader Registry(params string[] productCodes) =>
+        (_, _) => new InstallerQueryService.FallbackRead(
+            Failures: 0, ProductKeys: productCodes.Length, RegistryProductCodes: productCodes);
+
+    private static Task<InstallerQueryResult> Run(
+        FakeApi msi, InstallerQueryService.FallbackReader fallback) =>
+        new InstallerQueryService(msi, fallback).GetRegisteredPackagesAsync();
+
     /// <summary>A patch file declaring the given target products.</summary>
     private static IPackageIdentityReader Reader(string path, params string[] targets) =>
         new FakeReader { [path] = new PackageIdentity(Patch, IsPatch: true, targets) };
@@ -455,6 +468,127 @@ public class InstallerQueryServicePatchTruncationTests
         var result = await Run(msi, Reader(Shared, StillApplied));
 
         Assert.True(Assert.Single(result.Packages).RemovableWithheld);
+    }
+
+    /// <summary>
+    /// The registry names a product the walk never returned, the keyed ask finds it
+    /// installed, and it turns out to be holding the patch. Nothing else on the
+    /// machine can reach it: the walk did not return it, so the product loop never
+    /// asked it anything, and it holds the patch invisibly to every enumeration, so
+    /// route A does not name it and the patch file declares no targets here.
+    ///
+    /// The verdict must come back as an ordinary claim rather than as a withholding,
+    /// and that distinction is the entire gain over a headcount. A shortfall against
+    /// the registry's own total can only ever say "something was missed, so trust
+    /// nothing"; a name can be put to Windows, and Windows answers.
+    /// </summary>
+    [Fact]
+    public async Task A_product_only_the_registry_names_is_asked_and_its_claim_stands()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.HiddenFromWalk.Add(StillApplied);
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "1");
+
+        var result = await Run(msi, Registry(Superseding, StillApplied));
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        // Not withheld: a product said it still holds the patch. The scan knows
+        // why this file is being kept and could say so.
+        Assert.False(row.RemovableWithheld);
+        Assert.Contains((Patch, StillApplied), msi.ConfirmationAsks);
+    }
+
+    /// <summary>
+    /// The residue case, and the one the tolerance band existed to guess at. A
+    /// UserData key outliving its product makes the registry run ahead of the live
+    /// set, which is ordinary on a healthy machine. Asked by name, it answers "not
+    /// installed", which settles it: no product is missing, so nothing is withheld
+    /// and the removable patch is still offered.
+    ///
+    /// A headcount cannot reach this answer at any tolerance. It sees one more key
+    /// than products and has to choose between absorbing a real truncation and
+    /// withholding on a stale key, which is the choice the band was picking a
+    /// number for.
+    /// </summary>
+    [Fact]
+    public async Task A_registry_key_whose_product_is_gone_settles_as_residue_and_costs_nothing()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+
+        // Named by the registry, installed nowhere: neither walked nor hidden.
+        var result = await Run(msi, Registry(Superseding, NotInstalled));
+
+        Assert.True(Assert.Single(result.Packages).IsRemovable);
+        Assert.Equal(0, result.UnaccountedProductCount);
+    }
+
+    /// <summary>
+    /// The registry names a product and Windows will not say whether it is
+    /// installed. Whether the enumeration was complete cannot be established, so
+    /// the removable class goes. This is the honest end of the mechanism: it
+    /// refuses to answer rather than picking the answer that keeps the list long.
+    /// </summary>
+    [Fact]
+    public async Task A_registry_code_windows_will_not_answer_about_withholds()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.ProductResolveResult[StillApplied] = BadConfiguration;
+
+        var result = await Run(msi, Registry(Superseding, StillApplied));
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(1, result.UnaccountedProductCount);
+    }
+
+    /// <summary>
+    /// A fallback that never ran reports no codes at all, and that must not read as
+    /// a registry holding nothing: an empty set says the enumeration missed no
+    /// product, where no set at all says nobody looked. A comparison that did not
+    /// happen may neither recover a product nor withhold on its own silence.
+    /// </summary>
+    [Fact]
+    public async Task No_registry_read_neither_recovers_nor_withholds()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+
+        var result = await Run(msi);
+
+        Assert.True(Assert.Single(result.Packages).IsRemovable);
+        Assert.Equal(0, result.Census.RecoveredProductCount);
+        Assert.Equal(0, result.Census.UnresolvableProductCount);
+    }
+
+    /// <summary>
+    /// The two census tallies, which are what make the tolerance band answerable on
+    /// a machine that is not the one it was set on. One machine reporting a
+    /// recovered product and another reporting only residue are the two states the
+    /// band cannot tell apart, and these separate them without any band.
+    /// </summary>
+    [Fact]
+    public async Task The_census_separates_a_recovered_product_from_registry_residue()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.HiddenFromWalk.Add(StillApplied);
+
+        var result = await Run(msi, Registry(Superseding, StillApplied, NotInstalled));
+
+        Assert.Equal(1, result.Census.RecoveredProductCount);
+        Assert.Equal(0, result.Census.UnresolvableProductCount);
+        Assert.Equal(3, result.Census.RegistryProductKeys);
+        Assert.Equal(1, result.Census.ProductCount);
     }
 
     /// <summary>
