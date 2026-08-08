@@ -83,7 +83,7 @@ The standard advice confuses deleting files at random (which genuinely is danger
 1. **Scans** `C:\Windows\Installer` for `.msi` and `.msp` files
 2. **Queries** the Windows Installer API to find which files are still registered
 3. **Shows** how much you can free and how much is still needed, with optional detail windows listing every file
-4. **Removes** the unneeded files: delete to the Recycle Bin, or move to a folder you choose
+4. **Removes** the unneeded files: delete permanently, or move to a folder you choose
 
 ## Screenshots
 
@@ -148,10 +148,13 @@ InstallerClean identifies three kinds of unneeded files.
 To find them, InstallerClean calls the Windows Installer COM interface directly via P/Invoke:
 
 - `MsiEnumProductsEx` to enumerate every installed product
-- `MsiEnumPatchesEx` to find all registered patches for each product
+- `MsiEnumPatchesEx` to find registered patches, both per product and across the whole machine
 - `MsiGetPatchInfoEx` to read patch state (applied, superseded or obsoleted)
+- `MsiGetProductInfoEx` to ask about one specific product code, rather than trusting a list to be complete
 
-Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a registered product is orphaned and flagged as removable. So is any patch the database marks superseded or obsoleted that isn't required for uninstall.
+A file no registered product claims is a candidate, not a verdict. Before offering one, InstallerClean opens the file itself, reads the product or patch it says it belongs to, and asks Windows about that identity directly. Only a file Windows has no record of at all is offered. If the file won't say what it belongs to, or Windows can't be asked, the file stays where it is.
+
+Superseded and obsoleted patches work the other way round, because there Windows has positively told the app they've been replaced. Each one is confirmed against every installed product before it's offered, so a product that still has the patch applied keeps its copy whatever any single list says.
 
 The app also reads the same records straight from the registry on every scan, as a second, independent source. If either reading comes back incomplete (rare, but it can happen with a corrupted installer state), InstallerClean keeps files back or refuses the scan rather than guess. That second reading only adds files to the "still needed" set, never to the "removable" set.
 
@@ -160,11 +163,9 @@ After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer`
 <a id="is-it-safe"></a>
 ## Is it safe?
 
-Yes. InstallerClean queries the same Windows Installer API database that Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.
+Yes. InstallerClean doesn't guess from filenames, dates or sizes. It asks Windows, twice over: once through the Windows Installer API and once by reading the registry directly. And it asks about each file's own identity rather than about where the file sits, so a registration written in a form it doesn't recognise can't make a needed file look removable. Anything it can't get a clear answer about stays where it is. Nothing has been reported broken after <!-- downloads-start -->50,000+<!-- downloads-end --> downloads.
 
-**About Delete and Move.** The files InstallerClean deletes are safe to delete permanently. **Delete** moves them to the Recycle Bin (you'll be warned if it's not available); you gain the space back on your C: drive when you empty your Recycle Bin.
-
-You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If you find something broken (extremely unlikely and nothing has been reported so far after <!-- downloads-start -->50,000+<!-- downloads-end --> downloads), restore the files from the Recycle Bin to fix it. To be extra safe, you can instead use **Move** to back up the files to a folder of your choice (obviously choose a folder on another drive/partition if you're looking to free space on C:). Simply copy the files back to `C:\Windows\Installer` to restore things back to how they were (though you almost certainly won't ever need to). If a file picked up a "(1)" in its name (that happens if you moved files into the same folder twice), remove it before copying the file back.
+**About Delete and Move.** Delete permanently removes the files. Move takes them out of `C:\Windows\Installer` to a folder you choose; put that folder on another drive and you get the space back on C: straight away and still have the files. Copy them back and you are exactly where you started.
 
 If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown.
 
@@ -196,7 +197,7 @@ If it's approved, releases will carry the line SignPath ask for: free code signi
 <a id="recovery"></a>
 ## If you do have a file missing from `C:\Windows\Installer`
 
-InstallerClean only removes files Windows itself reports as no longer needed, so it can never be the reason a file is missing. But if one has already gone, InstallerClean spots it and flags it. Here's the fix.
+InstallerClean only removes files Windows has no record of needing. If one has gone missing, InstallerClean spots it and flags it. The steps below are the same whatever the cause, InstallerClean included.
 
 Download that program's installer from its maker and run it over your existing installation; don't uninstall first. Use the version you have now if you can, because Windows may turn down a different one. That usually puts the file back and leaves your settings alone. Re-scan in InstallerClean and the warning will be gone if it worked.
 
@@ -225,6 +226,8 @@ Full guidance: [Restore missing Windows Installer cache files](https://learn.mic
 > "The upgrade cannot be installed by the Windows Installer service because the program to be upgraded may be missing, or the upgrade may update a different version of the program."
 
 </details>
+
+If InstallerClean is ever the reason a file is missing, I want to know. [Open an issue](../../issues) and I'll fix it.
 
 ## Accessibility
 
@@ -273,13 +276,13 @@ Sending a report is a totally optional click of a button in the app. Nothing per
 
 **Why does Windows say "Unknown publisher"?** InstallerClean isn't code-signed, and Windows marks files downloaded from the internet, so on first run SmartScreen usually shows "Windows protected your PC" with the publisher listed as unknown. A paid signing certificate costs money every year and I'd rather keep the app free than pay for one, so I've applied to SignPath Foundation, who sign open source software for nothing (see [Code signing policy](#code-signing-policy)). Until that comes through, click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
 
-**Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete moves files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). And if you'd rather have a way back you control, Move puts the files in a folder you choose; delete them from there whenever you're satisfied.
+**Can I undo a Delete?** No. Delete removes the files permanently, behind a confirmation. If you want a way back you control, use Move instead: it puts the files in a folder you choose, and you delete them from there whenever you're satisfied (see [Is it safe?](#is-it-safe)).
 
 **Will Windows complain if I remove these files?** No. InstallerClean only ever removes the files Windows itself reports as finished with, so nothing it removes is needed to repair, update or uninstall a program. If a needed file does go missing from `C:\Windows\Installer` by some other means, see [If you do have a file missing from C:\Windows\Installer](#recovery).
 
 **Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. InstallerClean calls the Windows Installer COM API directly with no side effects.
 
-**Why not just a PowerShell script?** A short script that calls `MsiEnumPatchesEx` is enough to *list* patches, but the load-bearing parts of InstallerClean are the bits a script glosses over: the orphan-vs-superseded classification, the registry fallback that only ever adds files to the "still needed" set (never to "removable"), the pending-reboot block, the Move-to-elsewhere safety net, the per-file progress with cancellation and the Recycle-Bin-not-permanent-delete default. Edge cases on real heavy-MSI machines (corrupt registrations, junctions inside the cache, products in `HKU\.DEFAULT`, suspended Installer transactions) are easy to mishandle in a one-off script. The `installerclean-cli` is the headless face if scripting is what you want.
+**Why not just a PowerShell script?** A short script that calls `MsiEnumPatchesEx` is enough to *list* patches, but the load-bearing parts of InstallerClean are the bits a script glosses over: the orphan-vs-superseded classification, the registry fallback that only ever adds files to the "still needed" set (never to "removable"), the pending-reboot block, the Move-to-elsewhere safety net, the per-file progress with cancellation and the identity check that asks Windows about each file's own product or patch code before offering it. Edge cases on real heavy-MSI machines (corrupt registrations, junctions inside the cache, products in `HKU\.DEFAULT`, suspended Installer transactions) are easy to mishandle in a one-off script. The `installerclean-cli` is the headless face if scripting is what you want.
 
 **Does it work on Windows 7 or 8?** Untested and not supported. Targets Windows 10 and 11.
 
@@ -331,7 +334,7 @@ InstallerClean reads the Windows Installer's own patch records, so rather than h
 | Adobe handling | Detects superseded patches | Excludes by default |
 | UI | Dark theme (WPF) | Windows Forms |
 | Data collection | None | None |
-| Delete safety | Recycle Bin. If it isn't available, it asks: move instead or delete permanently | Permanent, no Recycle Bin |
+| Delete safety | Permanent, with Move to a folder you choose offered alongside | Permanent, no Recycle Bin |
 
 > **A note on `Win32_Product`:** The common-but-broken approach for listing installed products is `Win32_Product` (WMI), which [triggers MSI repair operations](https://gregramsey.net/2012/02/20/win32_product-is-evil/) on every product during enumeration. Both InstallerClean and PatchCleaner avoid it. Both use the Windows Installer COM interface. The `WMIProducts.vbs` filename in PatchCleaner's script is misleading; the script uses MSI COM, not WMI.
 
@@ -345,12 +348,12 @@ InstallerClean supports headless operation for scripting and sysadmin use:
 
 ```
 Usage:
-  installerclean-cli --help   Show this help (also accepts /?, -h)
+  installerclean-cli --help     Show this help (also accepts /?, -h)
   installerclean-cli --version  Print the version (also accepts -v)
-  installerclean-cli /s       Scan only - list removable files
-  installerclean-cli /d       Delete removable files (Recycle Bin)
-  installerclean-cli /m       Move to saved default location
-  installerclean-cli /m PATH  Move to specified path
+  installerclean-cli /s         Scan only - list unneeded files
+  installerclean-cli /d         Delete unneeded files permanently
+  installerclean-cli /m         Move to the saved backup folder
+  installerclean-cli /m PATH    Move to specified path
 ```
 
 To launch the GUI, run `InstallerClean.exe` (or use the Start-menu shortcut from the setup install).
@@ -359,7 +362,7 @@ Run with no argument, or an unrecognised flag, and `installerclean-cli` prints t
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is `0` on a successful scan, `1` if the scan fails and `130` on Ctrl+C. All files are in `C:\Windows\Installer`.
 
-`/d` and `/m` scan and then act. `/d` moves removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). That saved default is stored per-user, so a scheduled task running as SYSTEM or a service account won't see it; those runs have to pass the folder explicitly with `/m PATH`. Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for a Ctrl+C before any file was processed (a Ctrl+C that lands mid-batch exits `2`, partial, since work was committed).
+`/d` and `/m` scan and then act. `/d` deletes removable files permanently. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). That saved default is stored per-user, so a scheduled task running as SYSTEM or a service account won't see it; those runs have to pass the folder explicitly with `/m PATH`. Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for a Ctrl+C before any file was processed (a Ctrl+C that lands mid-batch exits `2`, partial, since work was committed).
 
 All of the CLI's output, including error and diagnostic messages, goes to stdout; there is no separate stderr stream. The exit code is the machine-readable signal (and the per-run Application event log entry mirrors it), so a script should key off the exit code rather than parse the text, and `installerclean-cli /s > audit.txt` captures the whole run including any error line.
 
