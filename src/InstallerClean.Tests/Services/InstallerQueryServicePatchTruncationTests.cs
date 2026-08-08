@@ -346,6 +346,32 @@ public class InstallerQueryServicePatchTruncationTests
         Assert.Equal(0, msi.MachineWideRowsServed);
     }
 
+    [Fact]
+    public async Task A_product_that_has_the_patch_registered_but_not_applied_still_keeps_it()
+    {
+        // MSIPATCHSTATE_REGISTERED is 8: registered and not yet applied. It is
+        // not a removable state, so a product holding it that way keeps the file,
+        // and this pins that the confirmation reads it that way rather than
+        // treating anything that is not Applied as spent.
+        //
+        // It matters more than its rarity suggests. The enumeration's REGISTERED
+        // filter carries its own exclusion for other users' per-user-unmanaged
+        // patches, and unlike the sibling exclusion on the context itself that one
+        // names no installer version, so this is the state in which a holder can
+        // be invisible to route A on a current machine.
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.HiddenFromWalk.Add(StillApplied);
+        msi.HoldPatch(StillApplied, Patch, Shared, state: "8", uninstallable: "0");
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+    }
+
     // ---- Route B: what the patch file itself declares ----
 
     [Fact]
