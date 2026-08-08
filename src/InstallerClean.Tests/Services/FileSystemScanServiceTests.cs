@@ -25,6 +25,15 @@ public class FileSystemScanServiceTests
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}",
             PatchState: 2, IsRemovable: false, RemovableWithheld: true);
 
+    /// <summary>
+    /// A patch whose State or Uninstallable read failed, so no verdict was ever
+    /// established for it. Kept like the row above and for the opposite reason:
+    /// that one the records called removable, this one they said nothing about.
+    /// </summary>
+    private static RegisteredPackage Unjudged(string path) =>
+        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}",
+            IsRemovable: false, VerdictUnreadable: true);
+
     private static IInstallerQueryService QueryReturning(InstallerQueryResult result)
     {
         var q = Substitute.For<IInstallerQueryService>();
@@ -216,6 +225,96 @@ public class FileSystemScanServiceTests
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.RegisteredPackages);
         Assert.Equal(1, result.UnaccountedProductCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_partitions_the_files_it_keeps_by_what_is_true_of_them()
+    {
+        // The list the window shows holds three different findings and reads as
+        // one. Only the first is a file a registration claims; the second the
+        // records called REMOVABLE and this scan would not act on; about the third
+        // nothing was established at all. Counted apart, each can be described in
+        // words that are true of it; counted together, any sentence naming a need
+        // is false of two of them.
+        const string claimed = @"C:\Windows\Installer\claimed.msi";
+        const string withheld = @"C:\Windows\Installer\withheld.msp";
+        const string unjudged = @"C:\Windows\Installer\unjudged.msp";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Registered(claimed), Withheld(withheld), Unjudged(unjudged) }
+                .AsReadOnly(),
+            UnaccountedProductCount: 1));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(claimed, new MockFileData(new byte[3]));
+        fs.AddFile(withheld, new MockFileData(new byte[5]));
+        fs.AddFile(unjudged, new MockFileData(new byte[7]));
+
+        var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(3, result.RegisteredPackages.Count);
+        Assert.Equal(1, result.RegisteredClaimedCount);
+        Assert.Equal(1, result.RegisteredWithheldCount);
+        Assert.Equal(1, result.RegisteredUnjudgedCount);
+        // The size travels beside the count and is read with it, so it covers the
+        // same files: the whole 15 bytes against a count of one would put the
+        // other two files' space behind a sentence about the first.
+        Assert.Equal(15, result.RegisteredTotalBytes);
+        Assert.Equal(3, result.RegisteredClaimedBytes);
+    }
+
+    [Fact]
+    public async Task ScanAsync_leaves_no_kept_file_outside_the_three_counts()
+    {
+        // A partition rather than three tallies that happen to be near the total.
+        // Missing files are in it too, because the count on the screen is of rows
+        // and not of files on the disk, and a row whose file has gone is still
+        // one the window lists.
+        var packages = new List<RegisteredPackage>
+        {
+            Registered(@"C:\Windows\Installer\a.msi"),
+            Registered(@"C:\Windows\Installer\b.msi"),
+            Registered(@"C:\Windows\Installer\gone.msi"),
+            Withheld(@"C:\Windows\Installer\w1.msp"),
+            Withheld(@"C:\Windows\Installer\w2.msp"),
+            Unjudged(@"C:\Windows\Installer\u1.msp"),
+        };
+        var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly(), UnaccountedProductCount: 1));
+
+        var fs = new MockFileSystem();
+        foreach (var p in packages.Where(p => !p.LocalPackagePath.EndsWith(@"\gone.msi", StringComparison.Ordinal)))
+            fs.AddFile(p.LocalPackagePath, new MockFileData("x"));
+
+        var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(6, result.RegisteredPackages.Count);
+        Assert.Equal(
+            result.RegisteredPackages.Count,
+            result.RegisteredClaimedCount + result.RegisteredWithheldCount + result.RegisteredUnjudgedCount);
+        Assert.Equal(3, result.RegisteredClaimedCount);
+        Assert.Equal(2, result.RegisteredWithheldCount);
+        Assert.Equal(1, result.RegisteredUnjudgedCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_on_a_machine_that_read_cleanly_claims_every_file_it_keeps()
+    {
+        // The control the two above need. On an ordinary machine the partition is
+        // one population and the other two are empty, so a surface built on the
+        // claimed count says exactly what the old one said and the change is
+        // invisible to everybody it should be invisible to.
+        const string claimed = @"C:\Windows\Installer\claimed.msi";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Registered(claimed) }.AsReadOnly()));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(claimed, new MockFileData(new byte[42]));
+
+        var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(1, result.RegisteredClaimedCount);
+        Assert.Equal(0, result.RegisteredWithheldCount);
+        Assert.Equal(0, result.RegisteredUnjudgedCount);
+        Assert.Equal(result.RegisteredTotalBytes, result.RegisteredClaimedBytes);
     }
 
     [Fact]

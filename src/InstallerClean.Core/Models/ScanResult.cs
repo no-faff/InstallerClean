@@ -15,13 +15,19 @@ namespace InstallerClean.Models;
 /// a Move or Delete would fail with MissingSourceFile.
 /// </param>
 /// <param name="RegisteredPackages">
-/// <c>LocalPackage</c> paths the API still claims that aren't marked
-/// superseded or obsoleted. Superseded patches go into
-/// <see cref="RemovableFiles"/> instead. Drives the registered list
-/// and the totals on the main screen. On a scan with a non-zero
-/// <see cref="UnaccountedProductCount"/> the superseded patches are in here as
-/// well, carrying <c>RemovableWithheld</c>: that scan is keeping them, so it
-/// counts them among the files it is keeping.
+/// <c>LocalPackage</c> paths this scan is keeping. Drives the registered list
+/// and the totals on the main screen.
+///
+/// IT IS NOT A LIST OF FILES SHOWN TO BE NEEDED, and no surface may describe it
+/// as one. Three populations are in here and only the first carries a claim: a
+/// path a live registration names; a superseded or obsoleted patch whose verdict
+/// this scan withheld (<c>RemovableWithheld</c>), which the records called
+/// REMOVABLE; and a patch whose State or Uninstallable read failed
+/// (<c>VerdictUnreadable</c>), about which nothing was established at all. Every
+/// one of them is kept, which is the safe direction and is not in question. What
+/// they do not share is a sentence, which is why they are counted apart in
+/// <see cref="RegisteredClaimedCount"/>, <see cref="RegisteredWithheldCount"/>
+/// and <see cref="RegisteredUnjudgedCount"/>.
 /// </param>
 /// <param name="RegisteredTotalBytes">
 /// Sum of <see cref="RegisteredPackage.FileSizeBytes"/> across
@@ -109,6 +115,38 @@ namespace InstallerClean.Models;
 /// an unconfigured machine reads as <see cref="ShortNameCreationLabels.Unset"/>
 /// rather than as whichever setting a document guesses is usual.
 /// </param>
+/// <param name="RegisteredClaimedCount">
+/// Kept files a live registration positively claims: a product's own cached
+/// package, an applied patch, a path the registry fallback named, or a patch a
+/// keyed re-ask found a product still holding. The only one of the three
+/// populations in <see cref="RegisteredPackages"/> that a sentence about being
+/// needed is true of.
+/// </param>
+/// <param name="RegisteredClaimedBytes">
+/// The same population's bytes, files on disk only, on the same rule as
+/// <see cref="RegisteredTotalBytes"/>. It exists because a count and a size shown
+/// together are read as one statement: a size taken across all three populations
+/// beside a count of one of them would attribute the other two's space to files
+/// this scan says are needed.
+/// </param>
+/// <param name="RegisteredWithheldCount">
+/// Kept files the records called superseded or obsoleted and this scan would not
+/// act on, because it could not establish that no installed product still needs
+/// them. Every row carrying <c>RemovableWithheld</c>, whether or not its file is
+/// still on disk, which is what separates it from <see cref="WithheldCount"/>:
+/// that one is what the withholding COST, so it counts the files that could have
+/// been offered, and this one is what the withholding KEPT.
+/// </param>
+/// <param name="RegisteredUnjudgedCount">
+/// Kept files whose removable verdict no read established, one per path
+/// (<c>VerdictUnreadable</c>). Neither claimed nor called removable: the question
+/// was put and the records did not answer.
+///
+/// THE THREE PARTITION <see cref="RegisteredPackages"/> EXACTLY and a test holds
+/// them to it. The two flags cannot both be set on one row, the withheld one
+/// being written only over a positively removable verdict and the unjudged one
+/// only where there was none, so no file is counted twice and none falls between.
+/// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
@@ -121,7 +159,11 @@ public record ScanResult(
     int IdentityUnreadableCount = 0,
     int IdentityUnaskableCount = 0,
     EnumerationCensus Census = default,
-    string ShortNameCreation = ShortNameCreationLabels.Unreadable)
+    string ShortNameCreation = ShortNameCreationLabels.Unreadable,
+    int RegisteredClaimedCount = 0,
+    long RegisteredClaimedBytes = 0,
+    int RegisteredWithheldCount = 0,
+    int RegisteredUnjudgedCount = 0)
 {
     /// <summary>Total registered packages missing on disk; sum of the two sub-counts.</summary>
     public int MissingFromDiskCount => MissingNonRemovableCount + MissingRemovableCount;

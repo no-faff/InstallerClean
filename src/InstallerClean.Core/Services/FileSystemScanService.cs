@@ -400,6 +400,21 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
+        // The three populations inside that list, counted off the list itself
+        // rather than tallied through the loop above. That is the point rather
+        // than a tidiness: what the counts have to partition is exactly the set
+        // the window shows, and a counter incremented on a different pass can
+        // come apart from it without anything noticing. The withheld and unjudged
+        // rows are the two that carry no claim, so a sentence about files being
+        // needed is true of the first count and of nothing else.
+        var registeredClaimed = stillUsed
+            .Count(p => !p.RemovableWithheld && !p.VerdictUnreadable);
+        var registeredClaimedBytes = stillUsed
+            .Where(p => p.FileExists && !p.RemovableWithheld && !p.VerdictUnreadable)
+            .Sum(p => p.FileSizeBytes);
+        var registeredWithheld = stillUsed.Count(p => p.RemovableWithheld);
+        var registeredUnjudged = stillUsed.Count(p => p.VerdictUnreadable);
+
         // Correlation sanity gate. On any real machine some registered path
         // resolves to a file that is actually there. If next to none do, yet the
         // walk still yielded files to offer for removal, then what Windows says
@@ -480,7 +495,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // Read after the classification is settled, so a probe that threw
             // could not cost anybody a scan; it does not throw, and the ordering
             // is the guarantee rather than the interface's promise.
-            _shortNames?.Read() ?? ShortNameCreationLabels.Unreadable);
+            _shortNames?.Read() ?? ShortNameCreationLabels.Unreadable,
+            registeredClaimed,
+            registeredClaimedBytes,
+            registeredWithheld,
+            registeredUnjudged);
     }
 
     /// <summary>
