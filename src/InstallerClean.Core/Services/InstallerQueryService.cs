@@ -477,13 +477,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
         CancellationToken ct)
     {
-        // One patch code per still-removable path. Built from the claims because
-        // the merged row does not carry a patch code, and keyed by path because
-        // that is what the verdict hangs on.
-        var toConfirm = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        // EVERY patch code naming a still-removable path, not one per path. The
+        // merged row carries no patch code, so the codes come from the claims,
+        // and a path can legitimately be named by more than one of them: the
+        // claims are collected per claim precisely because several products claim
+        // one file, and a corrupt LocalPackage can aim a patch row at a file that
+        // is not that patch's at all. Keeping one code per path would confirm one
+        // of them and clear the file on its answer.
+        var toConfirm = new HashSet<(string Path, string PatchCode)>();
         foreach (var claim in patchClaims)
             if (claimed.TryGetValue(claim.LocalPackagePath, out var row) && row.IsRemovable)
-                toConfirm[claim.LocalPackagePath] = claim.PatchCode;
+                toConfirm.Add((claim.LocalPackagePath, claim.PatchCode));
 
         if (toConfirm.Count == 0) return;
 
@@ -497,6 +501,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         foreach (var (path, patchCode) in toConfirm)
         {
             ct.ThrowIfCancellationRequested();
+
+            // A path another code has already settled needs no second pass: the
+            // verdict is gone and cannot come back, downgrades being one-way.
+            if (!claimed.TryGetValue(path, out var current) || !current.IsRemovable) continue;
 
             foreach (var (productCode, userSid, context) in products)
             {

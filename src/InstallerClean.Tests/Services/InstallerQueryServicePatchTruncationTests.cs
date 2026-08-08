@@ -178,6 +178,36 @@ public class InstallerQueryServicePatchTruncationTests
         Assert.Equal(new[] { (Patch, StillApplied) }, msi.ConfirmationAsks.Distinct().ToArray());
     }
 
+    [Fact]
+    public async Task Every_patch_code_naming_one_path_is_confirmed_not_just_the_last()
+    {
+        // A path can be named by more than one patch code: claims are collected
+        // per claim because several products claim one file, and a corrupt
+        // LocalPackage can aim a patch row at a file that is not that patch's.
+        // Confirming one code and clearing the file on its answer would leave the
+        // other unasked, which is the direction that costs a file.
+        const string other = "{DDDDDDDD-0000-0000-0000-00000000000D}";
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.AddProduct(StillApplied);
+        // Both codes name the same cached file and both look removable to the
+        // product that enumerated them.
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.HoldPatch(Superseding, other, Shared, state: "2", uninstallable: "0");
+        // The second product still has ONE of them applied, and its enumeration
+        // never says so. It is deliberately the code that a per-path map would
+        // have dropped, so this test fails if only one code per path is asked
+        // about rather than passing on the survivor's answer.
+        msi.HoldPatch(StillApplied, Patch, Shared, state: "1", uninstallable: "1");
+        msi.EnumerationEndsEarlyFor.Add(StillApplied);
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+    }
+
     /// <summary>
     /// A machine, declared rather than scripted call by call. It answers the four
     /// entry points off the products and patches it has been told about, and can
