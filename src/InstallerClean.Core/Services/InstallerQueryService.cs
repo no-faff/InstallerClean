@@ -1444,6 +1444,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
         uint lastError = MsiError.Success;
         bool reachedEnd = false;
 
+        // THE INDEX ADVANCES ON EVERY ITERATION, AND MsiEnumProductsEx DOCUMENTS
+        // THAT IT SHOULD NOT: "The index should be incremented, only if the
+        // previous call has returned ERROR_SUCCESS." Holding the index across a
+        // failed row is unimplementable as stated, because a row that fails
+        // permanently would then be retried for ever, so the advance is the
+        // deliberate reading and not an oversight.
+        //
+        // What makes it affordable is that it cannot lose a product silently.
+        // Every arm that advances past a non-Success return also increments
+        // unreadableRows, which reaches unreadableProducts and withholds the
+        // whole removable class for the scan, so a product this loop skips is a
+        // product the scan has already declared it did not read. The failure the
+        // caller's cross-check is looking for is a SILENT shortfall, and this
+        // cannot produce one. Do not "fix" the advance into a retry without
+        // replacing that guarantee first.
         for (uint index = 0; index < MaxProductIndex; index++)
         {
             ct.ThrowIfCancellationRequested();
@@ -1729,6 +1744,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
             {
                 consecutiveNonSuccess++;
                 incomplete = true;
+                // ERROR_UNKNOWN_PRODUCT REACHES HERE AND MUST KEEP REACHING HERE.
+                // This call names a product, so unlike the machine-wide one the
+                // code can carry its documented meaning ("The product that
+                // szProduct specifies is not installed on the computer in the
+                // specified contexts"), and read that way it would say this
+                // product holds no patches and cost nothing. It is not read that
+                // way on purpose. The product came out of the product
+                // enumeration moments earlier, so the two answers contradict each
+                // other, and the reading that fits both is that the identity or
+                // the context this call was given did not round-trip, which is a
+                // registration this scan cannot see the patch list of rather than
+                // a product with no patches. Taking the absence at face value
+                // would drop that product's Applied claims and let a patch it
+                // still holds be offered. The contradiction is information, not
+                // an answer, so it degrades like any other unreadable row.
+                //
                 // One product whose patch rows keep coming back unreadable is a
                 // per-product loss, not a scan failure: stop enumerating THIS
                 // product's patches and return Incomplete so the caller records
