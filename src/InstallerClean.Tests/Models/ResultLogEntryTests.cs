@@ -57,7 +57,7 @@ public class ResultLogEntryTests
         UnclaimedProductFileCount: 0,
         UnclaimedPatchFileCount: 0,
         RecoveredProductCount: 0,
-        UnansweredProductCount: 0,
+        UnresolvableProductCount: 0,
         KeptIdentityClaimedCount: 0,
         KeptIdentityUnreadableCount: 0,
         KeptIdentityUnaskableCount: 0);
@@ -68,7 +68,6 @@ public class ResultLogEntryTests
         NonStringLocalPackageCount: 0,
         UnreadablePatchStateCount: 0,
         UnreadableVerdictPathCount: 0,
-        UnparseableProductKeyCount: 0,
         ProductCount: 137,
         RegistryProductKeyCount: 137,
         PatchClaimCount: 2);
@@ -142,8 +141,7 @@ public class ResultLogEntryTests
             [
                 "shortNameCreation", "longFileNameCount", "nonStringLocalPackageCount",
                 "unreadablePatchStateCount", "unreadableVerdictPathCount",
-                "unparseableProductKeyCount", "productCount", "registryProductKeyCount",
-                "patchClaimCount",
+                "productCount", "registryProductKeyCount", "patchClaimCount",
             ],
             root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
 
@@ -153,7 +151,7 @@ public class ResultLogEntryTests
                 "supersededCount", "obsoletedCount", "removableBytes", "missingFromDiskCount",
                 "missingNeededCount", "withheldPatchCount", "unreadableProductCount",
                 "skippedProductRowCount", "unclaimedProductFileCount", "unclaimedPatchFileCount",
-                "recoveredProductCount", "unansweredProductCount",
+                "recoveredProductCount", "unresolvableProductCount",
                 "keptIdentityClaimedCount", "keptIdentityUnreadableCount",
                 "keptIdentityUnaskableCount",
             ],
