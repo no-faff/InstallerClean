@@ -177,9 +177,9 @@
        window name in the spoken one was an internal note being read out to
        somebody who can only be in that window to hear it. -->
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Traktir saya secangkir kopi</value></data>
-  <data name="Automation.CancelOperation" xml:space="preserve"><value>Batalkan operasi</value></data>
-  <data name="Automation.CancelScan" xml:space="preserve"><value>Batalkan pemindaian</value></data>
-  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Batalkan pemindaian awal</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>Batal, operasi</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>Batal, pemindaian</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Batal, pemindaian awal</value></data>
   <data name="Automation.Close" xml:space="preserve"><value>Tutup</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Tutup jendela</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Tutup hasil dan kembali ke jendela utama</value></data>

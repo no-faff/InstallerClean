@@ -112,9 +112,19 @@ const MAP = {
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Donasi`,
   'Automation.BuyMeACuppa.About': `Traktir saya secangkir kopi`,
-  'Automation.CancelOperation': `Batalkan operasi`,
-  'Automation.CancelScan': `Batalkan pemindaian`,
-  'Automation.CancelStartupScan': `Batalkan pemindaian awal`,
+  // The three Cancel names name the button and then say which one, the shape
+  // Automation.ViewOrphanedFiles and its sibling already take, rather than the
+  // verb batalkan: WCAG 2.5.3 (Label in Name) asks that a control's spoken name
+  // contain the word drawn on it, and batal is not a word inside batalkan, only
+  // its first five letters. Batal is what Microsoft's own Indonesian puts on
+  // that button (comdlg32.dll string 372, en-US "Cancel"), and batalkan is what
+  // it uses for Undo (windows.ui.xaml.dll string 5037). The alignment is about
+  // the WORD alone. Casing is decided separately, by ear, and
+  // Automation.CheckForUpdates.HelpText holds the reasoning for the one that
+  // looks like a slip and is not.
+  'Automation.CancelOperation': `Batal, operasi`,
+  'Automation.CancelScan': `Batal, pemindaian`,
+  'Automation.CancelStartupScan': `Batal, pemindaian awal`,
   'Automation.Close': `Tutup`,
   'Automation.CloseWindow': `Tutup jendela`,
   'Automation.CloseResult': `Tutup hasil dan kembali ke jendela utama`,
