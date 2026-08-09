@@ -233,7 +233,7 @@ If InstallerClean is ever the reason a file is missing, I want to know. [Open an
 
 InstallerClean is built to be fully usable from the keyboard and with a screen reader.
 
-- **Keyboard-operable throughout.** Everything the app does is reachable from the keyboard, and the detail-window columns sort from the keyboard too, so nothing here needs a mouse. The title-bar buttons behave like the Windows ones and are reached with Alt+Space or Alt+F4 rather than with Tab. Keyboard focus stays visible wherever it lands.
+- **Keyboard-operable throughout.** Everything the app does is reachable from the keyboard, and the detail-window columns sort from the keyboard too, so nothing here needs a mouse. The title-bar buttons behave like the Windows ones and are reached with Alt+Space or Alt+F4. Keyboard focus stays visible wherever it lands.
 - **Narrator and Voice Access.** Every control is labelled, and the visible word on a button is the word that activates it by voice. When a Move or Delete finishes, the outcome is read aloud.
 - **Built to be read.** Text meets WCAG AA contrast throughout the dark theme.
 
