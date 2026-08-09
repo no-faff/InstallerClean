@@ -307,6 +307,7 @@ public static class Strings
     public static string Error_ScanCacheRootUnresolved => Get("Error.ScanCacheRootUnresolved");
     public static string Error_ScanCorrelationFailed => Get("Error.ScanCorrelationFailed");
     public static string Error_ScanFailedTitle => Get("Error.ScanFailedTitle");
+    public static string Error_ScanNoRegisteredFileInFolder => Get("Error.ScanNoRegisteredFileInFolder");
     public static string Error_ScanRecordsUnreadable => Get("Error.ScanRecordsUnreadable");
     public static string Error_SettingNotSavedBody => Get("Error.SettingNotSavedBody");
     public static string Error_SettingNotSavedTitle => Get("Error.SettingNotSavedTitle");

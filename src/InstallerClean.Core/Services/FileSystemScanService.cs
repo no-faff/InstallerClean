@@ -170,12 +170,27 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // candidate per file against it (see InstallerCacheRoot).
         var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
 
+        // The folder the walk enumerated, in the spelling it enumerated it in,
+        // for the two correlation counts below and for nothing else. Deliberately
+        // NOT cacheRoot.Resolved: see NamesFileDirectlyIn.
+        var walkedFolder = (_installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
         long stillUsedBytes = 0;
         int refusedCandidates = 0;
         int withheld = 0;
         int missingNonRemovable = 0;
         int missingRemovable = 0;
-        int nonRemovablePresent = 0;
+        // The correlation gate's two inputs, and they are counted here rather
+        // than derived from the branches below because they answer a different
+        // question from the ones those branches exist for. Every registered row
+        // is measured by ONE rule, whether it is removable or not: the survivor
+        // count used to be a non-removable half counted on File.Exists alone plus
+        // a removable half counted only after the containment guard passed, which
+        // is two rules in one sum, and the larger half proved nothing about the
+        // folder at all.
+        int registeredNamingFolder = 0;
+        int registeredInFolderPresent = 0;
         int removablePresent = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
 
@@ -285,6 +300,17 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
             sizedPackages.Add(pkg with { FileSizeBytes = size, FileExists = exists });
 
+            // The correlation measurement, taken on every registered row before
+            // the branch below splits them by verdict. A row's verdict has
+            // nothing to do with whether the two sides of the scan describe the
+            // same folder, so measuring it inside the branches is what let two
+            // rules into one sum.
+            if (NamesFileDirectlyIn(pkg.LocalPackagePath, walkedFolder))
+            {
+                registeredNamingFolder++;
+                if (exists) registeredInFolderPresent++;
+            }
+
             // Non-removable + missing is the load-bearing banner signal:
             // Windows still claims the file but it is gone from disk, so
             // a future install / uninstall / patch will fail. Removable
@@ -349,7 +375,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
             else if (exists)
             {
                 stillUsedBytes += size;
-                nonRemovablePresent++;
                 // Counted only where the file is on disk, because the count is
                 // what the withholding COST this run: a withheld row whose file
                 // is already gone had nothing to offer either way.
@@ -415,19 +440,51 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var registeredWithheld = stillUsed.Count(p => p.RemovableWithheld);
         var registeredUnjudged = stillUsed.Count(p => p.VerdictUnreadable);
 
+        // The first correlation question, and it is asked before the numeric one
+        // because it is the one that can be answered outright. Of the rows
+        // Windows holds, do ANY of them name a file sitting directly in the
+        // folder this run walked? Existence is not part of it, and that is what
+        // makes it work where a survivor count cannot: a machine whose cache
+        // another tool emptied still has registrations naming in-folder files,
+        // they are simply gone, where a machine whose two sides describe
+        // different places has none and can have none. Counting how many exist
+        // cannot separate those two; asking whether any point here does.
+        //
+        // A registered set that is empty is not an answer to it, so it is not
+        // treated as one. Nothing can be asked of no rows, and the empty case has
+        // its own gate upstream (InstallerQueryService's Error.InstallerDbEmpty),
+        // which is where it belongs: this one would be reporting a mismatch it
+        // never measured.
+        //
+        // Ordered before the numeric gate deliberately, and it is not a
+        // precedence chain covering a false sentence: where both conditions hold,
+        // both messages are true of the machine, and this one names what was
+        // actually established rather than a proportion.
+        if (registered.Count > 0
+            && registeredNamingFolder == 0
+            && candidatesBeforeIdentity > 0)
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanNoRegisteredFileInFolder);
+
         // Correlation sanity gate. On any real machine some registered path
         // resolves to a file that is actually there. If next to none do, yet the
         // walk still yielded files to offer for removal, then what Windows says
         // it has and what the folder holds have not correlated, and no healthy
         // machine looks like that.
         //
-        // Present means File.Exists against the registered path, which for a
-        // superseded row also has to pass the containment guard to be counted
-        // (see the removable branch above). Both are normalised before they are
-        // claimed, in InstallerQueryService's NormaliseLocalPackagePath.
+        // ONE RULE FOR EVERY ROW, which it was not: a survivor is a registered
+        // path that lexically names a file directly in the walked folder AND is
+        // on disk. It used to be the non-removable rows counted on File.Exists
+        // alone, with no containment test of any kind, plus the removable ones
+        // counted only after the containment guard passed. A handful of packages
+        // cached under a user profile, which exist and are nowhere near the
+        // folder, then held the count above the absolute bound and disarmed this
+        // gate permanently on a machine whose correlation was wholly broken.
+        // Paths are normalised before they are claimed, in InstallerQueryService's
+        // NormaliseLocalPackagePath, which is what makes a lexical test the right
+        // one here.
         //
         // A tool that genuinely wiped the cache would leave no files to be
-        // orphans, so removable.Count > 0 rules that benign case out. Refuse the
+        // orphans, so the candidate clause rules that benign case out. Refuse the
         // scan rather than offer the whole cache for deletion on a broken
         // correlation.
         //
@@ -436,18 +493,29 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // same fault as one that spares none.
         //
         // Every registered file found on disk counts as one, superseded ones
-        // included. What the gate is asking is whether any registered path
-        // resolved to a real file, and a superseded patch's does exactly as much
-        // as a needed package's; leaving those out would refuse a machine that
-        // had ten of them sitting in the folder about to be offered.
+        // included. What the gate is asking is whether any registered path named
+        // a real file in the folder, and a superseded patch's does exactly as
+        // much as a needed package's; leaving those out would refuse a machine
+        // that had ten of them sitting in the folder about to be offered. One
+        // that exists in the folder and then fails the containment guard counts
+        // too, and that is not an oversight: the guard answers whether a file may
+        // be removed, which is a different question from whether the records and
+        // the folder line up, and a row answering neither counter used to fall
+        // out of this arithmetic entirely.
         //
         // Two rather than a round number, because the absolute bound answers the
         // finding and no more; machines with most of their cache missing are
         // real, another tool having emptied the folder being exactly what the
         // missing-from-disk banner is for.
-        // Measured against the result logs rather than judged: of the 92 runs
-        // that could reach this gate at all, not one would have been refused by
-        // these bounds, taking each run at the worst reading its figures allow.
+        //
+        // THE 92-RUN MEASUREMENT NO LONGER DESCRIBES THIS CODE and is recorded
+        // here as history rather than as a receipt. Of the 92 result-log runs
+        // that could reach this gate at all, none would have been refused by
+        // these bounds, taking each run at the worst reading its figures allow;
+        // that was measured against a survivor count including registered files
+        // anywhere on disk, and this one counts only those in the folder, so the
+        // number it was taken on is not the number the code now computes. Nothing
+        // published anywhere may cite it for the present shape.
         //
         // The proportional clause is 19P < M, with P floored at one before it is
         // applied. Unfloored it is 0 < M at P = 0, so one missing row refused the
@@ -456,11 +524,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // and not the fault this gate was written for. Floored, a machine with no
         // survivor has to show the same twenty missing rows a machine with one
         // survivor already had to, and P = 1 and P = 2 are arithmetically
-        // untouched, which is why the measurement above stands as it was taken.
-        // Its denominator excludes the superseded rows whose file Windows has
-        // already removed, so it is not a fifth of the registrations, and the
-        // tests pin both sides at each P the absolute bound admits.
-        var presentRegistered = nonRemovablePresent + removablePresent;
+        // untouched. Its denominator excludes the superseded rows whose file
+        // Windows has already removed, so it is not a fifth of the registrations,
+        // and the tests pin both sides at each P the absolute bound admits.
+        var presentRegistered = registeredInFolderPresent;
         var survivorsForBound = Math.Max(presentRegistered, 1);
         if (presentRegistered <= 2
             && survivorsForBound * 20 < survivorsForBound + missingNonRemovable
@@ -517,6 +584,39 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// removable re-verify and the action-time gates already govern.
     /// </summary>
     private readonly record struct WalkedFile(string FullPath, long SizeBytes);
+
+    /// <summary>
+    /// Whether a registered path names a file sitting DIRECTLY in the folder the
+    /// walk enumerated, judged on the string alone. Feeds the two correlation
+    /// counts and decides nothing about any file.
+    ///
+    /// NOT A GATE, and the distance from <see cref="CandidateGuard.CheckSafeToRemove"/>
+    /// is why it exists rather than borrowing that. The guard asks the kernel
+    /// where a path really is, because a wrong answer there costs somebody a
+    /// file. This asks whether the two sides of the scan describe the same place,
+    /// and they meet as strings: orphanhood is decided by string equality between
+    /// a registered path and a walked one, so a spelling the walk never produces
+    /// is exactly what this has to be able to see. Resolving first would hide the
+    /// thing it counts.
+    ///
+    /// Measured against the WALKED folder and not against the run's resolved
+    /// <see cref="InstallerCacheRoot"/>, which is the same point from the other
+    /// end. A junctioned or subst-mapped cache resolves to a spelling no
+    /// registration carries, so a comparison against the resolved root would read
+    /// an ordinary machine as one whose two sides disagree and refuse its scan.
+    /// The walked spelling is the one the registrations have to match to be
+    /// recognised at all, which is what the count is about.
+    /// </summary>
+    private static bool NamesFileDirectlyIn(string path, string folder)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+
+        var parent = Path.GetDirectoryName(
+            path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        return parent is not null
+            && parent.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                .Equals(folder, StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <summary>
     /// Enumerates the walk into a list, checking the cancellation token per

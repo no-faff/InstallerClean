@@ -824,6 +824,18 @@ InstallerClean s'exécutait déjà en tant qu'administrateur, le relancer ainsi 
        be tightened back into an absolute. Deliberately does not offer anything
        for removal. No placeholders. -->
   <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.</value></data>
+  <!-- Shown when not one Windows Installer record names a file sitting directly
+       in the cache folder this scan walked, while that folder still holds files
+       the scan would otherwise have offered. Its sibling above weighs how many
+       records point at files that are still there; this one asks whether any of
+       them point at the folder at all, which a machine whose cache was merely
+       emptied still does. States what was measured and no cause for it, because
+       more than one condition produces it and naming one would be false on the
+       others. Deliberately NOT merged into the sibling: that one says the files
+       are missing from the folder, which is false of this machine, so one string
+       covering both would have to be rewritten in every language to stay true.
+       Names the folder through the {InstallerFolder} token. No placeholders. -->
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of

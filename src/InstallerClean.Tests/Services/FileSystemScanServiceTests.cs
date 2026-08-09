@@ -68,6 +68,107 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
+    public async Task ScanAsync_does_not_let_a_registered_file_outside_the_folder_hold_the_survivor_count_up()
+    {
+        // The survivor count is what disarms the gate, and it used to count a
+        // registered path existing ANYWHERE on disk. Three packages cached under
+        // a user profile, which is where Windows Installer caches a per-user
+        // unmanaged install, then held it past the absolute bound and disarmed
+        // the gate permanently on a machine whose folder correlation is wholly
+        // broken. They exist, they are registered, and they say nothing whatever
+        // about the folder this scan walked.
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        var packages = new List<RegisteredPackage>();
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+
+        for (var i = 0; i < 3; i++)
+        {
+            var elsewhere = $@"C:\Users\someone\AppData\Local\Package Cache\p{i}.msi";
+            packages.Add(Registered(elsewhere));
+            fs.AddFile(elsewhere, new MockFileData("x"));
+        }
+        // Enough in-folder registrations that the gate has something to ask
+        // about, all of them gone from disk, which is the collapse it is for.
+        for (var i = 0; i < 20; i++)
+            packages.Add(Registered($@"C:\Windows\Installer\gone{i}.msi"));
+
+        var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly()));
+
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
+
+        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+    }
+
+    [Fact]
+    public async Task ScanAsync_refuses_when_no_record_names_a_file_in_the_folder_it_walked()
+    {
+        // The question a survivor count cannot ask. Every registration here names
+        // a file on a drive the walk never touched, which is what an image
+        // restore that moved the system volume's letter leaves behind, so nothing
+        // in the folder can be matched against anything and the whole of it would
+        // otherwise be offered. Five missing rows is below the proportional
+        // clause's twenty, so the numeric gate cannot see this machine at all.
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        var packages = new List<RegisteredPackage>();
+        for (var i = 0; i < 5; i++)
+            packages.Add(Registered($@"D:\Windows\Installer\needed{i}.msi"));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+
+        var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly()));
+
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
+
+        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanNoRegisteredFileInFolder, ex.Message);
+    }
+
+    [Fact]
+    public async Task ScanAsync_still_scans_when_the_records_name_the_folder_and_the_files_are_simply_gone()
+    {
+        // The control that separates the two machines, and the reason the check
+        // above ignores existence. This one had its cache emptied by another
+        // tool: not one registered file is on disk either, and every one of them
+        // still names the folder, so the comparison worked and the orphans are
+        // real. Four missing rows keeps the numeric gate out of it.
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        var packages = new List<RegisteredPackage>();
+        for (var i = 0; i < 4; i++)
+            packages.Add(Registered($@"C:\Windows\Installer\gone{i}.msi"));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+
+        var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly()));
+        var result = await new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+        Assert.Equal(4, result.MissingNonRemovableCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_does_not_refuse_a_registered_set_it_was_handed_none_of()
+    {
+        // Nothing can be asked of no rows. An empty registered set is the
+        // installer database being unreadable, which InstallerQueryService
+        // refuses on its own before the scan sees it, and a gate here reporting a
+        // mismatch it never measured would be the fault this project keeps
+        // naming: a section that could not measure printing the sentence somebody
+        // would be glad to see.
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+
+        var query = QueryReturning(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
+        var result = await new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+    }
+
+    [Fact]
     public async Task ScanAsync_refuses_a_correlation_that_one_surviving_package_would_have_disarmed()
     {
         // The finding: testing for a total collapse meant a single registered
