@@ -206,7 +206,7 @@ const MAP = {
   'Body.NoFileSelected': `Selecteer een bestand om de details te bekijken.`,
   'Body.NoProductSelected': `Selecteer een product om de details te bekijken.`,
   'Body.NoMetadata': `Geen metadata beschikbaar.`,
-  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.`,
+  'Body.RegisteredMissingFromDisk': `Dit installatiebestand ontbreekt. Dit levert nu geen problemen op, en dat zal ook zo blijven totdat je het programma waartoe het behoort probeert te herstellen, bij te werken of te verwijderen. Die stap kan dan mislukken, omdat Windows naar dit bestand zoekt en het er niet is.&#10;&#10; Om dit te verhelpen, download je het installatieprogramma van de maker en voer je het uit over je bestaande exemplaar heen (verwijder het programma niet eerst, want het verwijderen is zelf een stap waarvoor dit bestand nodig is). Gebruik de versie die je hebt geïnstalleerd als je die kunt vinden, aangezien Windows een andere versie mogelijk afwijst. Dit zou het bestand moeten herstellen zonder je instellingen te wijzigen, maar Microsoft garandeert dit niet, en hun eigen laatste redmiddel is het programma opnieuw te installeren.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `Het README-bestand [legt uit wat deze map is], en hoe je een bestand terugzet, in Microsofts eigen woorden.`,
   'Body.NoPatches': `(geen)`,
 
@@ -270,8 +270,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} bestanden ongemoeid gelaten`,
   'Summary.OrphanedToCleanUp.Singular': `{0} overbodig bestand om op te ruimen`,
   'Summary.OrphanedToCleanUp.Plural': `{0} overbodige bestanden om op te ruimen`,
-  'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
-  'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Singular': `{0} het geregistreerde bestand ontbreekt. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Open ‘Details’ voor meer informatie over wat je moet doen.`,
+  'Summary.MissingFromDisk.Plural': `{0} er ontbreken geregistreerde bestanden. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma’s zou kunnen mislukken. Open ‘Details’ voor meer informatie over wat je moet doen.`,
   'Summary.OperationFiles': `{0} van {1} {2}`,
   'Summary.OrphanedWindow': `{0} verweesd, {1} vervangen, {2} verouderd ({3})`,
   'Summary.RegisteredWindow.Singular': `{0} geregistreerd bestand ongemoeid gelaten ({1})`,
@@ -464,7 +464,7 @@ const MAP = {
   'Completion.ReverifyIdentityClaimed': `{0} {1} behouden, omdat Windows een registratie heeft van het programma dat erin genoemd wordt.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} behouden, omdat InstallerClean geen programma kon vinden dat erin genoemd wordt.`,
   'Completion.NothingRemoved': `Niets verwijderd`,
-  'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Error.ScanNoRegisteredFileInFolder': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voorgesteld en er is niets verwijderd.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
