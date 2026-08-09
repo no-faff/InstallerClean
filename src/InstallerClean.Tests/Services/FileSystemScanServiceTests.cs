@@ -102,6 +102,41 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
+    public async Task ScanAsync_does_not_weigh_a_missing_file_the_folder_never_held_against_the_folder()
+    {
+        // The other half of the same mixed measurement. The survivor count asks
+        // about registrations naming this folder; the missing count used to take
+        // the whole needed set wherever its paths pointed, so absent
+        // registrations that were never in the folder counted against a
+        // correlation they say nothing about and could never answer back on the
+        // survivor side. This machine's folder correlation is perfect, two of two
+        // present, and forty needed files registered elsewhere have gone.
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        var packages = new List<RegisteredPackage>();
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+
+        for (var i = 0; i < 2; i++)
+        {
+            var here = $@"C:\Windows\Installer\present{i}.msi";
+            packages.Add(Registered(here));
+            fs.AddFile(here, new MockFileData("x"));
+        }
+        for (var i = 0; i < 40; i++)
+            packages.Add(Registered($@"C:\Users\someone\AppData\Local\Package Cache\gone{i}.msi"));
+
+        var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly()));
+        var result = await new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+        // And the banner is untouched, which is the reason the gate got its own
+        // counter instead of this one being narrowed: a needed file registered
+        // anywhere and now gone is exactly as much of a problem, so the alarm
+        // still fires on all forty.
+        Assert.Equal(40, result.MissingNonRemovableCount);
+    }
+
+    [Fact]
     public async Task ScanAsync_refuses_when_no_record_names_a_file_in_the_folder_it_walked()
     {
         // The question a survivor count cannot ask. Every registration here names

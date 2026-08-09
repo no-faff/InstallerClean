@@ -181,16 +181,32 @@ public sealed class FileSystemScanService : IFileSystemScanService
         int withheld = 0;
         int missingNonRemovable = 0;
         int missingRemovable = 0;
-        // The correlation gate's two inputs, and they are counted here rather
-        // than derived from the branches below because they answer a different
-        // question from the ones those branches exist for. Every registered row
-        // is measured by ONE rule, whether it is removable or not: the survivor
-        // count used to be a non-removable half counted on File.Exists alone plus
-        // a removable half counted only after the containment guard passed, which
-        // is two rules in one sum, and the larger half proved nothing about the
-        // folder at all.
+        // The correlation gate's inputs, counted here rather than derived from the
+        // branches below because they answer a different question from the ones
+        // those branches exist for. Every registered row is measured by ONE rule,
+        // whether it is removable or not: the survivor count used to be a
+        // non-removable half counted on File.Exists alone plus a removable half
+        // counted only after the containment guard passed, which is two rules in
+        // one sum, and the larger half proved nothing about the folder at all.
+        //
+        // ALL THREE ASK ABOUT ONE POPULATION, the registrations naming a file
+        // directly in the folder this run walked. What still differs inside it is
+        // deliberate and is stated at the gate: a survivor is any such
+        // registration whose file is there, superseded ones included, while the
+        // missing count takes only the needed ones, a superseded patch whose file
+        // Windows has already removed being the expected end state rather than a
+        // loss.
+        //
+        // The missing count is separate from missingNonRemovable and does not
+        // replace it. That one drives the missing-from-disk banner, the command
+        // line's own notice and the result-log payload, and a needed file
+        // registered somewhere other than this folder and now gone is exactly as
+        // much of a problem, so narrowing it would silence an alarm that is right
+        // to fire. What it is not is evidence about whether the records and THIS
+        // folder describe the same place, which is all the gate is asking.
         int registeredNamingFolder = 0;
         int registeredInFolderPresent = 0;
+        int missingNeededInFolder = 0;
         int removablePresent = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
 
@@ -305,7 +321,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // nothing to do with whether the two sides of the scan describe the
             // same folder, so measuring it inside the branches is what let two
             // rules into one sum.
-            if (NamesFileDirectlyIn(pkg.LocalPackagePath, walkedFolder))
+            var namesFileInFolder = NamesFileDirectlyIn(pkg.LocalPackagePath, walkedFolder);
+            if (namesFileInFolder)
             {
                 registeredNamingFolder++;
                 if (exists) registeredInFolderPresent++;
@@ -387,6 +404,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             else
             {
                 missingNonRemovable++;
+                if (namesFileInFolder) missingNeededInFolder++;
             }
         }
         }
@@ -503,6 +521,17 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // the folder line up, and a row answering neither counter used to fall
         // out of this arithmetic entirely.
         //
+        // BOTH SIDES OF THE PROPORTION ASK ABOUT THE SAME POPULATION, the
+        // registrations naming a file directly in this folder. The missing side
+        // was the whole needed set wherever its paths pointed, so a registration
+        // naming a file somewhere else that had gone counted against a folder it
+        // says nothing about, and could never answer back on the survivor side.
+        // A machine whose folder correlation was perfect could be refused on
+        // forty absent registrations that were never in the folder to begin with.
+        // Its narrower reading is not shared with the missing-from-disk banner,
+        // which still counts every needed file that has gone: see the counter's
+        // own note above for why the two must not be the same number.
+        //
         // Two rather than a round number, because the absolute bound answers the
         // finding and no more; machines with most of their cache missing are
         // real, another tool having emptied the folder being exactly what the
@@ -513,9 +542,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // that could reach this gate at all, none would have been refused by
         // these bounds, taking each run at the worst reading its figures allow;
         // that was measured against a survivor count including registered files
-        // anywhere on disk, and this one counts only those in the folder, so the
-        // number it was taken on is not the number the code now computes. Nothing
-        // published anywhere may cite it for the present shape.
+        // anywhere on disk and a missing count doing the same, and both now read
+        // the folder only, so neither number it was taken on is the number the
+        // code computes. Nothing published anywhere may cite it for the present
+        // shape.
         //
         // The proportional clause is 19P < M, with P floored at one before it is
         // applied. Unfloored it is 0 < M at P = 0, so one missing row refused the
@@ -530,7 +560,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var presentRegistered = registeredInFolderPresent;
         var survivorsForBound = Math.Max(presentRegistered, 1);
         if (presentRegistered <= 2
-            && survivorsForBound * 20 < survivorsForBound + missingNonRemovable
+            && survivorsForBound * 20 < survivorsForBound + missingNeededInFolder
             && candidatesBeforeIdentity > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
 
