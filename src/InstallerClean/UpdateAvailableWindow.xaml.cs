@@ -28,7 +28,7 @@ public partial class UpdateAvailableWindow : Window
         // Open with focus on Cancel (IsCancel, the conservative default) so a
         // keyboard user gets a visible focus ring at once rather than focus on
         // the window itself. Deferred to Loaded so the visual tree exists when
-        // Focus runs. Mirrors RecycleUnavailableWindow.
+        // Focus runs.
         Loaded += (_, _) => CancelButton.Focus();
     }
 

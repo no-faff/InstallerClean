@@ -155,11 +155,9 @@
                           window's Delete permanently, against Move). Its other
                           use is the way out of a window carrying bad news,
                           where the accent would read as encouragement.
-           DangerPill   - the one action with no way back: deleting without a
-                          Recycle Bin. Not for deleting to the bin, which the
-                          app states plainly is safe and reversible; red on
-                          that would argue against the app's own text and
-                          spend the alarm on the routine path.
+           DangerPill   - a red fill for an action with no way back. Unused:
+                          the only candidate declined it, for the reason
+                          written at its Button in ConfirmDeleteWindow.xaml.
            GhostPill    - text-only action with no fill (Cancel / Details / About).
 
          A window whose only button is a way out takes the accent, the

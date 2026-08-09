@@ -455,9 +455,8 @@ public partial class App : Application
     /// bringing InstallerClean's window to the foreground, which is what its own
     /// icon does anyway. The event handle is deliberately never disposed: the
     /// listener is parked inside WaitOne, and disposing the handle under it throws
-    /// on a background thread, which takes the process down (the same trap
-    /// RecycleEngine's bounded join has to avoid). A background thread and its
-    /// handle both die with the process.
+    /// on a background thread, which takes the process down. A background thread
+    /// and its handle both die with the process.
     /// </summary>
     private static void StartActivationListener()
     {
