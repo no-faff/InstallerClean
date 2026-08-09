@@ -206,7 +206,7 @@ const MAP = {
   'Body.NoFileSelected': `Selecteer een bestand om de details te bekijken.`,
   'Body.NoProductSelected': `Selecteer een product om de details te bekijken.`,
   'Body.NoMetadata': `Geen metadata beschikbaar.`,
-  'Body.RegisteredMissingFromDisk': `Dit installatiebestand ontbreekt. InstallerClean heeft het niet verwijderd, het verwijdert nooit een bestand dat een programma nog nodig heeft; het was al weg voordat je InstallerClean uitvoerde.&#10;&#10;Het levert nu geen problemen op, en dat doet het pas op de dag dat je het bijbehorende programma probeert te herstellen, bij te werken of te verwijderen. Die stap kan dan mislukken, omdat Windows dit bestand zoekt en het er niet is.&#10;&#10;Je kunt proberen het te verhelpen door het installatieprogramma van dat programma bij de maker te downloaden en over je bestaande installatie heen uit te voeren (verwijder het programma niet eerst: verwijderen is zelf een stap die dit bestand nodig heeft). Gebruik de versie die je hebt geïnstalleerd als je die kunt krijgen, want Windows kan een andere weigeren. Meestal komt het bestand daarmee terug en blijven je instellingen ongemoeid, maar Microsoft garandeert het niet: het laatste redmiddel is volgens Microsoft zelf het programma opnieuw installeren, of Windows.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `Het README-bestand [legt uit wat deze map is], en hoe je een bestand terugzet, in Microsofts eigen woorden.`,
   'Body.NoPatches': `(geen)`,
 
@@ -270,8 +270,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} bestanden ongemoeid gelaten`,
   'Summary.OrphanedToCleanUp.Singular': `{0} overbodig bestand om op te ruimen`,
   'Summary.OrphanedToCleanUp.Plural': `{0} overbodige bestanden om op te ruimen`,
-  'Summary.MissingFromDisk.Singular': `{0} geregistreerd bestand ontbreekt (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van dat programma kan mislukken. Open Details voor wat je kunt doen.`,
-  'Summary.MissingFromDisk.Plural': `{0} geregistreerde bestanden ontbreken (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van die programma's kan mislukken. Open Details voor wat je kunt doen.`,
+  'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
   'Summary.OperationFiles': `{0} van {1} {2}`,
   'Summary.OrphanedWindow': `{0} verweesd, {1} vervangen, {2} verouderd ({3})`,
   'Summary.RegisteredWindow.Singular': `{0} geregistreerd bestand ongemoeid gelaten ({1})`,
@@ -279,7 +279,7 @@ const MAP = {
 
   // Confirmation dialogs
   'Confirm.MoveTitle': `{0} {1} verplaatsen ({2})?`,
-  'Confirm.MoveDestination': `Bestanden worden verplaatst naar:`,
+  'Confirm.MoveDestination': `Move to:`,
   'Confirm.DeleteTitle': `{0} {1} verwijderen ({2})?`,
   'Confirm.MoveSameDrive': `Die map staat op dezelfde schijf, dus de ruimte komt pas vrij als je hem verwijdert. Kies een map op een andere schijf als je de ruimte meteen wilt hebben.`,
 
@@ -447,8 +447,8 @@ const MAP = {
   'Automation.Scroll.ProductDetails': `Productgegevens`,
   'Body.PendingReboot.Other': `Windows Installer heeft iets lopen, dus Verplaatsen en Verwijderen staan stil. InstallerClean raakt {InstallerFolder} niet aan terwijl daar iets verandert. Zodra het klaar is, klik je op Opnieuw scannen en komen ze terug.`,
   'Cli.TooManyArgumentsNoPath': `Fout: onverwacht extra argument '{0}'. /s en /d nemen geen verdere argumenten, en er kan maar één vlag per uitvoering worden gebruikt.`,
-  'Cli.MissingFromDisk.Singular': `{0} geregistreerd bestand ontbreekt in {InstallerFolder} (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van dat programma kan mislukken. Het installatieprogramma van dat programma opnieuw uitvoeren, dezelfde versie, zet het meestal terug.`,
-  'Cli.MissingFromDisk.Plural': `{0} geregistreerde bestanden ontbreken in {InstallerFolder} (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van die programma's kan mislukken. Het installatieprogramma van elk programma opnieuw uitvoeren, dezelfde versie, zet ze meestal terug.`,
+  'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.`,
+  'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.`,
   'Cli.MoveNotEnoughSpace': `Fout: onvoldoende ruimte op {0}. Deze bestanden verplaatsen vraagt {1} en er is {2} vrij. Er is niets verplaatst.`,
   'Cli.PendingRebootBlocked.Other': `Fout: Windows Installer heeft iets lopen, dus /m en /d zijn geblokkeerd. InstallerClean raakt {InstallerFolder} niet aan terwijl daar iets verandert. Probeer het opnieuw zodra het klaar is.`,
   'Cli.FoundNoOrphans': `Geen overbodige bestanden gevonden.`,

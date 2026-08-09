@@ -46,7 +46,7 @@ const OVERRIDES = {
   // Sentence-level count keys: the 2-4 form (nominative plural noun/adjective).
   'Summary.RegisteredStillUsed.Few': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Few': `{0} непотрібні файли для очищення`,
-  'Summary.MissingFromDisk.Few': `{0} зареєстровані файли відсутні (їх не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тих програм може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
+  'Summary.MissingFromDisk.Few': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
   // 2-4 takes "встановлені програми"; the base Plural key carries the 5+
   // genitive "встановлених програм".
   'Summary.RegisteredWindow.Few': `{0} registered files left alone ({1})`,
@@ -188,7 +188,7 @@ const MAP = {
   'Body.NoFileSelected': `Виберіть файл, щоб переглянути деталі.`,
   'Body.NoProductSelected': `Виберіть продукт, щоб переглянути деталі.`,
   'Body.NoMetadata': `Метадані недоступні.`,
-  'Body.RegisteredMissingFromDisk': `This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README [пояснює цю папку] і як відновити файл, словами самої Microsoft.`,
   'Body.NoPatches': `(немає)`,
 
@@ -267,8 +267,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Singular': `{0} непотрібний файл для очищення`,
   'Summary.OrphanedToCleanUp.Plural': `{0} непотрібних файлів для очищення`,
-  'Summary.MissingFromDisk.Singular': `{0} зареєстрований файл відсутній (його не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тієї програми може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
-  'Summary.MissingFromDisk.Plural': `{0} зареєстрованих файлів відсутні (їх не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тих програм може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
+  'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
 
   // 0 = current file count, 1 = total count, 2 = pluralised noun.
   'Summary.OperationFiles': `{0} з {1} {2}`,
@@ -287,7 +287,7 @@ const MAP = {
   'Confirm.MoveTitle': `Перемістити {0} {1} ({2})?`,
 
   // 0 = destination path
-  'Confirm.MoveDestination': `Файли буде переміщено до:`,
+  'Confirm.MoveDestination': `Move to:`,
   'Confirm.DeleteTitle': `Видалити {0} {1} ({2})?`,
 
   // Error messages
@@ -487,8 +487,8 @@ const MAP = {
   'Automation.Scroll.ProductDetails': `Product details`,
   'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
   'Cli.TooManyArgumentsNoPath': `Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.`,
-  'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it.`,
-  'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.`,
+  'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.`,
+  'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
   'Cli.FoundNoOrphans': `Found no unneeded files.`,

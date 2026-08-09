@@ -125,16 +125,17 @@ const NO_VISIBLE_LABEL = new Set([
 // can quote uninflected. Not every sentence that mentions one: the
 // pending-reboot family says "Move and Delete are paused", which several
 // languages have to inflect, so a rule there would fault a correct translation.
-// And four that do belong (Automation.ConfirmDelete,
-// Confirm.DeletePermanently.*, Summary.ProgramsUnreadable.* and
-// Error.DestinationChangedMidBatch) are out only while their satellites hold
-// English for the coming translation round: added now they would fault fifteen
-// languages for the one thing the still-English gate already reports.
+// And five that do belong (Automation.ConfirmDelete,
+// Confirm.DeletePermanently.*, Summary.ProgramsUnreadable.*,
+// Error.DestinationChangedMidBatch and Summary.MissingFromDisk.*) are out only
+// while their satellites hold English for the coming translation round: added
+// now they would fault fifteen languages for the one thing the still-English
+// gate already reports. Summary.MissingFromDisk.* is the one to put back, its
+// sentence being "Open Details for what to do" against the registered files
+// row's own button; the other four are new or reworded English that has never
+// had a round.
 const QUOTES_A_LABEL = [
   { sentence: 'Body.NotScanned.Why', label: 'Action.Rescan' },
-  // "Open Details for what to do", against the registered files row's button.
-  { sentence: 'Summary.MissingFromDisk.Singular', label: 'Action.Details' },
-  { sentence: 'Summary.MissingFromDisk.Plural', label: 'Action.Details' },
   // The two confirmation dialogs' spoken help names both of their own buttons,
   // which is the whole of what it says: "Move puts the files in the chosen
   // folder. Cancel leaves them where they are."

@@ -398,7 +398,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Selecteer een product om de details te bekijken.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Geen metadata beschikbaar.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>Dit installatiebestand ontbreekt. InstallerClean heeft het niet verwijderd, het verwijdert nooit een bestand dat een programma nog nodig heeft; het was al weg voordat je InstallerClean uitvoerde.&#10;&#10;Het levert nu geen problemen op, en dat doet het pas op de dag dat je het bijbehorende programma probeert te herstellen, bij te werken of te verwijderen. Die stap kan dan mislukken, omdat Windows dit bestand zoekt en het er niet is.&#10;&#10;Je kunt proberen het te verhelpen door het installatieprogramma van dat programma bij de maker te downloaden en over je bestaande installatie heen uit te voeren (verwijder het programma niet eerst: verwijderen is zelf een stap die dit bestand nodig heeft). Gebruik de versie die je hebt geïnstalleerd als je die kunt krijgen, want Windows kan een andere weigeren. Meestal komt het bestand daarmee terug en blijven je instellingen ongemoeid, maar Microsoft garandeert het niet: het laatste redmiddel is volgens Microsoft zelf het programma opnieuw installeren, of Windows.</value>
+    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -702,8 +702,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} bestanden ongemoeid gelaten</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} overbodig bestand om op te ruimen</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} overbodige bestanden om op te ruimen</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} geregistreerd bestand ontbreekt (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van dat programma kan mislukken. Open Details voor wat je kunt doen.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} geregistreerde bestanden ontbreken (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van die programma's kan mislukken. Open Details voor wat je kunt doen.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning
@@ -756,7 +756,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} {1} verplaatsen ({2})?</value></data>
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Bestanden worden verplaatst naar:</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Move to:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} {1} verwijderen ({2})?</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
@@ -1142,8 +1142,8 @@ Het crashlog kon niet worden weggeschreven.</value></data>
        there is no Details window here, so the last sentence carries the recovery
        step itself. "Could fail" and "usually restores" are the verified
        positions and neither may harden: Microsoft guarantees nothing here. -->
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} geregistreerd bestand ontbreekt in {InstallerFolder} (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van dat programma kan mislukken. Het installatieprogramma van dat programma opnieuw uitvoeren, dezelfde versie, zet het meestal terug.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} geregistreerde bestanden ontbreken in {InstallerFolder} (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van die programma's kan mislukken. Het installatieprogramma van elk programma opnieuw uitvoeren, dezelfde versie, zet ze meestal terug.</value></data>
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.</value></data>
   <!-- The command line's own wording of Summary.RecordsNotMatched, whose remarks
        carry why there is no count and no placeholder in either. The window's
        version closes on Re-scan and opens its second sentence on "Everything

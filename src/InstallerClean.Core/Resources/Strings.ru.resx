@@ -398,7 +398,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Выберите продукт, чтобы посмотреть сведения.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Метаданные недоступны.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.</value>
+    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -702,8 +702,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files left alone</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} ненужный файл для очистки</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} ненужных файлов для очистки</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Отсутствует {0} зарегистрированный файл (InstallerClean его не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление той программы может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файлов (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning
@@ -756,7 +756,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Переместить {0} {1} ({2})?</value></data>
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Файлы будут перемещены в:</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Move to:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Удалить {0} {1} ({2})?</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
@@ -1331,7 +1331,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Plural.Patch.Few" xml:space="preserve"><value>исправления</value></data>
   <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} files left alone</value></data>
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} ненужных файла для очистки</value></data>
-  <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
+  <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} registered files left alone ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} kept in place, because the records now claim what the scan flagged.</value></data>
@@ -1378,8 +1378,8 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.TooManyArguments" xml:space="preserve"><value>Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке для перемещения есть пробел, возьмите весь путь в кавычки: /m "D:\My Backup"</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.TooManyArgumentsNoPath" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.</value></data>
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.</value></data>
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.</value></data>
   <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.</value></data>
   <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
   <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Found no unneeded files.</value></data>
