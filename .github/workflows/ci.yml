@@ -213,9 +213,9 @@ jobs:
           & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
 
       # The five language gates run last, and each runs even when one before it
-      # has failed. TWO of them are red BY DESIGN for the window between a string
-      # landing in English and its translation round: check-accelerators and
-      # check-still-english. The other three, the generator reproduction check,
+      # has failed. ONE of them is red BY DESIGN for the window between a string
+      # landing in English and its translation round: check-still-english. The
+      # other four, the generator reproduction check, check-accelerators,
       # check-cross-key-rules and gen-translation-table --check, are expected
       # green at all times and their red means a mistake. Naming all five is the
       # point, because working the rest out by elimination is what once produced
@@ -288,12 +288,10 @@ jobs:
       # showed one phrase and spoke another in two languages across four
       # releases.
       #
-      # Red for one known reason at 3.0.0, which is the rule working rather than
-      # an exception to the paragraph above: Russian labels three Cancel buttons
-      # "Отмена" and speaks "Отменить сканирование" and its two siblings over
-      # them, and the noun is not inside the verb form. The fix is one word in
-      # gen-strings-ru.mjs, so it belongs to the translation batch and the red
-      # stands until that runs.
+      # A red naming a language is a fix in that language's generator under
+      # scripts/translations/, never a hand-edit of the resx the message names.
+      # Rules 7 and 8 fault the XAML and the C# instead and carry their own
+      # instruction, which is what the script's closing footer is gated on.
       - name: Check cross-key rules
         if: '!cancelled()'
         run: node scripts/check-cross-key-rules.mjs
