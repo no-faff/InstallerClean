@@ -104,9 +104,17 @@ const MAP = {
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Поддержать`,
   'Automation.BuyMeACuppa.About': `Угостите меня чаем`,
-  'Automation.CancelOperation': `Отменить операцию`,
-  'Automation.CancelScan': `Отменить сканирование`,
-  'Automation.CancelStartupScan': `Отменить сканирование при запуске`,
+  // The three Cancel names are built on the noun Отмена rather than the verb
+  // Отменить, which share only a root: WCAG 2.5.3 (Label in Name) asks that a
+  // control's spoken name contain the word drawn on it, so speech input can
+  // reach the control by what the user sees. Отмена is what Windows Installer's
+  // own Russian puts on that button (msimsg.dll string 18, en-US "Cancel").
+  // The alignment is about the WORD and nothing else. Casing is decided
+  // separately, by ear, and Automation.CheckForUpdates.HelpText holds the
+  // reasoning for the lower-case github that looks like a slip and is not.
+  'Automation.CancelOperation': `Отмена операции`,
+  'Automation.CancelScan': `Отмена сканирования`,
+  'Automation.CancelStartupScan': `Отмена сканирования при запуске`,
   'Automation.Close': `Закрыть`,
   'Automation.CloseWindow': `Закрыть окно`,
   'Automation.CloseResult': `Закрыть результат и вернуться в главное окно`,
