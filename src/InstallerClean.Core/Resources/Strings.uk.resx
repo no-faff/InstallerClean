@@ -129,7 +129,7 @@
        confirmation dialog's. It says "permanently" because Delete here does
        not mean what Delete means elsewhere in Windows, and the label is the
        only place that difference can be carried. -->
-  <data name="Action.DeletePermanently" xml:space="preserve"><value>Видалити _назавжди</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>_Видалити назавжди</value></data>
   <!-- Alt+D safe here because the Delete button under the overlay is
        disabled while Completion.IsComplete is true (IsMainContentInteractive
        binds the body region to false); the mnemonic only resolves to

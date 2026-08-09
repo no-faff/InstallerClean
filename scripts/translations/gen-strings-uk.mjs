@@ -104,7 +104,12 @@ const MAP = {
   'Action.Cancel': `_Скасувати`,
   'Action.CheckForUpdates': `Перевірити о_новлення`,
   'Action.Close': `_Закрити`,
-  'Action.DeletePermanently': `Видалити _назавжди`,
+  // Delete permanently marks В, the label's own initial, as en-GB marks D. The
+  // natural Н is spoken for by Check for updates (Перевірити о_новлення) on the
+  // same results view; the rest of that view holds О (Огляд), М (Перемістити),
+  // Т (Повторити) and П (Про програму), and this button's other window, the
+  // delete confirmation, carries only Cancel on С.
+  'Action.DeletePermanently': `_Видалити назавжди`,
   'Action.Done': `_Готово`,
   'Action.Details': `Деталі`,
   'Action.BuyMeACuppa': `Пригостіть мене _кавою`,
