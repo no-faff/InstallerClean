@@ -137,7 +137,7 @@
        keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Klaar</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
-  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Trakteer me op een kop _koffie</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Trakteer me op een kopje _koffie</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Geef een s_ter op GitHub</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0-licentie</value></data>
   <data name="Action.Move" xml:space="preserve"><value>Ver_plaatsen</value></data>
@@ -176,7 +176,7 @@
        name only, and the value says what the button says on screen, because a
        window name in the spoken one was an internal note being read out to
        somebody who can only be in that window to hear it. -->
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Trakteer me op een kop koffie</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Trakteer me op een kopje koffie</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Bewerking annuleren</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Scan annuleren</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Opstartscan annuleren</value></data>
@@ -196,9 +196,9 @@
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
   <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete permanently removes the unneeded files. Cancel closes without deleting.</value></data>
-  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Verplaatsen zet de overbodige bestanden in de gekozen doelmap. Annuleren laat ze staan waar ze staan.</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Verplaatsen zet de overbodige bestanden in de gekozen doelmap. Annuleren laat ze waar ze zijn.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Zeg bedankt</value></data>
-  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Verzenden stuurt het getoonde rapport naar No Faff. Annuleren verstuurt niets.</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Verzenden stuurt het getoonde rapport naar No Faff. Annuleren stuurt niets.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Controleren op updates</value></data>
   <!-- Heard, never read: the update button carries no tooltip, so this help
        text is the only description it has, and it is written for a speech
@@ -249,7 +249,7 @@
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the ConfirmSendResultLog window.
        The version numbers are in the body text; this states the choice. -->
-  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Open de releasepagina om de nieuwere versie te downloaden, of annuleer om de huidige versie te houden.</value></data>
+  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Open de releasepagina om de nieuwere versie te downloaden, of annuleer om de huidige versie te behouden.</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Opent het licentiebestand op github.com in je browser.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (BACKUP FOLDER / PRODUCTS / PATCHES / PRODUCT
@@ -316,8 +316,8 @@
     <comment>Tooltip and screen-reader help on the About window's star pill. The button it hangs on already names GitHub (Action.LeaveStarOnGitHub, "Leave a star on GitHub"), so naming it again here says the same word twice in one glance; keep the tooltip to what the star does. "It" is InstallerClean, which most languages will want to say outright.</comment>
   </data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimaliseren</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Dat is aan jou, maar ik zou het op prijs stellen. Er wordt een anonieme samenvatting verstuurd die me alleen laat weten of het werkt en hoeveel ruimte mensen vrijmaken. Op het volgende scherm zie je precies wat er wordt verstuurd voordat je bevestigt.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Dat is aan jou, maar ik zou het op prijs stellen. Er wordt een anonieme samenvatting verstuurd die me alleen laat weten of het werkt. Op het volgende scherm zie je precies wat er wordt verstuurd voordat je bevestigt.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Dat is aan jou, maar ik zou het op prijs stellen. Er wordt een anonieme samenvatting verstuurd die me alleen laat weten of het werkt en hoeveel ruimte mensen vrijmaken. Op het volgende scherm kun je zien wat er wordt verstuurd voordat je het bevestigt.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Dat is aan jou, maar ik zou het op prijs stellen. Er wordt een anonieme samenvatting verstuurd die me alleen laat weten of het werkt. Op het volgende scherm kun je zien wat er wordt verstuurd voordat je het bevestigt.</value></data>
   <!-- The Move button's three tooltip states, chosen by whether the backup
        folder is set and whether it sits on the drive the files are already
        on. Each is also the button's screen-reader help text, one value
@@ -350,7 +350,7 @@
        already the app's word for this: the reports chart says "Space
        reclaimed from C:\Windows\Installer". -->
   <data name="Tooltip.Delete" xml:space="preserve"><value>Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.</value></data>
-  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Naam van het onderwerp uit het ingesloten Authenticode-certificaat. Niet gecontroleerd via de certificaatketen.</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Naam van het onderwerp uit het ingebedde Authenticode-certificaat. Niet via de certificaatketen geverifieerd.</value></data>
 
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
@@ -358,7 +358,7 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause. The bracketed phrase becomes a hyperlink into the README's "Is it safe?" section (rendered in MainWindow.xaml.cs BuildIntroLeadLine); the brackets are the delimiter and are not shown. This is the screen's strongest safety claim and the only link on it, so keep the brackets on whatever phrase carries that claim in this language.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>Ze staan in {InstallerFolder}, achtergebleven toen een programma werd verwijderd ({0}), een nieuwere patch een oudere verving ({1}) of de uitgever hem introk ({2}). InstallerClean toont alleen bestanden waarvan Windows zelf aangeeft dat het ermee klaar is.</value>
+    <value>Ze staan in {InstallerFolder}, achtergebleven toen een programma werd verwijderd ({0}), een nieuwere patch een oudere verving ({1}) of de uitgever hem introk ({2}). InstallerClean toont uitsluitend bestanden waarvan Windows zelf aangeeft dat het ermee klaar is.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
@@ -374,7 +374,7 @@
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
-    <value>Deze bestanden kunnen nu niet worden opgeruimd.</value>
+    <value>Deze bestanden kunnen op dit moment niet worden opgeruimd.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
   <!-- The three reason-specific banners. Each names the folder with the
@@ -394,8 +394,8 @@
        nothing it cannot know. Names the folder with the token like its three
        siblings. -->
   <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.</value></data>
-  <data name="Body.NoFileSelected" xml:space="preserve"><value>Selecteer een bestand om de details te zien.</value></data>
-  <data name="Body.NoProductSelected" xml:space="preserve"><value>Selecteer een product om de details te zien.</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>Selecteer een bestand om de details te bekijken.</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>Selecteer een product om de details te bekijken.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Geen metadata beschikbaar.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
     <value>This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.</value>
@@ -429,7 +429,7 @@
   <data name="Status.StartingScan" xml:space="preserve"><value>Scan starten...</value></data>
   <data name="Status.QueryingApi" xml:space="preserve"><value>Windows vragen naar geïnstalleerde software...</value></data>
   <data name="Status.ScanningCache" xml:space="preserve"><value>Installatiecache scannen...</value></data>
-  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Geïnstalleerde producten doorlopen...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Geïnstalleerde producten opsommen...</value></data>
   <data name="Status.CheckingRegistry" xml:space="preserve"><value>Register controleren op extra pakketten...</value></data>
   <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
   <!-- Fires mid-scan as a step-progress update after the registry-
@@ -463,9 +463,9 @@
        the status pill so the user can find the log; full message +
        stack trace go to the log itself. -->
   <data name="Status.MoveFailed" xml:space="preserve"><value>Verplaatsen mislukt ({0}). Details in {1}.</value></data>
-  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Verplaatsen mislukt ({0}). Het crashlog kon niet worden geschreven.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Verplaatsen mislukt ({0}). Het crashlog kon niet worden weggeschreven.</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Verwijderen mislukt ({0}). Details in {1}.</value></data>
-  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Verwijderen mislukt ({0}). Het crashlog kon niet worden geschreven.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Verwijderen mislukt ({0}). Het crashlog kon niet worden weggeschreven.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Toegang geweigerd. Windows heeft de scan geweigerd.</value></data>
   <!-- The overlay line for the same ladder branch as
        Error.InstallerDbUnavailableTitle, passed together in one record, so the
@@ -473,13 +473,13 @@
        "database". -->
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan mislukt: de Windows Installer-records konden niet worden gelezen.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scan geannuleerd.</value></data>
-  <data name="Status.Done" xml:space="preserve"><value>Gereed</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>Klaar</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
        the crash log because exception messages from elevated framework
        calls can contain paths from another user's profile. 1 = crash
        log path. -->
   <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scan mislukt ({0}). Details in {1}.</value></data>
-  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Scan mislukt ({0}). Het crashlog kon niet worden geschreven.</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Scan mislukt ({0}). Het crashlog kon niet worden weggeschreven.</value></data>
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>Alles schoon</value></data>
@@ -702,8 +702,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files left alone</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} overbodig bestand om op te ruimen</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} overbodige bestanden om op te ruimen</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} geregistreerd bestand ontbreekt (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige herstel-, update- of verwijderactie van dat programma kan mislukken. Open Details voor wat je kunt doen.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} geregistreerde bestanden ontbreken (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige herstel-, update- of verwijderactie van die programma's kan mislukken. Open Details voor wat je kunt doen.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} geregistreerd bestand ontbreekt (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van dat programma kan mislukken. Open Details voor wat je kunt doen.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} geregistreerde bestanden ontbreken (niet door InstallerClean verwijderd). Nu geen probleem, maar een toekomstige reparatie, update of verwijdering van die programma's kan mislukken. Open Details voor wat je kunt doen.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning
@@ -756,7 +756,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} {1} verplaatsen ({2})?</value></data>
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>De bestanden gaan naar:</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Bestanden worden verplaatst naar:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} {1} verwijderen ({2})?</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
@@ -800,9 +800,9 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
        ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
        "database" because that is the word every one of those bodies uses. -->
-  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Kon de Windows Installer-records niet lezen</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Windows Installer-records konden niet worden gelezen</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan mislukt</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>De Windows Installer-records kwamen volledig leeg terug: geen enkel geïnstalleerd programma of geen enkele update maakt aanspraak op een installatiebestand in de cache. Dat komt op een werkende computer niet voor (zelfs een verse Windows-installatie heeft er een paar), dus of de records zijn beschadigd, of ze konden niet worden gelezen, en een scan die dit antwoord zou geloven, zou elk bestand in {InstallerFolder} ten onrechte verweesd noemen. InstallerClean is daarom gestopt. Er is niets verwijderd.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>De Windows Installer-records kwamen volledig leeg terug: geen enkel geïnstalleerd programma of geen enkele update maakt aanspraak op een installatiebestand in de cache. Dat komt op een werkende computer niet voor (zelfs een gloednieuwe Windows-installatie heeft er een paar), dus ofwel zijn de records beschadigd, ofwel konden ze niet worden gelezen, en een scan die dit antwoord zou geloven, zou elk bestand in {InstallerFolder} ten onrechte verweesd noemen. InstallerClean is in plaats daarvan gestopt. Er is niets verwijderd.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer weigerde InstallerClean te laten zien wat er geïnstalleerd is. InstallerClean draaide al als administrator, dus het nogmaals als administrator uitvoeren verandert niets. Zonder die lijst is er geen veilige manier om te bepalen welke bestanden in de cache nog nodig zijn, dus InstallerClean is gestopt. Er is niets verwijderd.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -832,7 +832,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean kon niet genoeg van de Windows Installer-records lezen om zeker te weten wat er nog nodig is: de lijst met geïnstalleerde programma's kwam te kort terug, en dezelfde records rechtstreeks uit het register lezen leverde ook fouten op. Een bestand kon er verweesd uitzien enkel doordat het record dat het benoemt een van de onleesbare was, dus InstallerClean is gestopt. Er is niets verwijderd.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean kon niet genoeg van de Windows Installer-records lezen om zeker te weten wat er nog nodig is: de lijst met geïnstalleerde programma's kwam onvolledig terug, en dezelfde records rechtstreeks uit het register lezen leverde ook fouten op. Een bestand kon er verweesd uitzien enkel doordat het record dat het benoemt een van de onleesbare was, dus InstallerClean is gestopt. Er is niets verwijderd.</value></data>
   <!-- Shown when the kernel would not expand the cache folder's own path, so
        the containment guard had nothing proven to measure a candidate against
        and refused every one of them. Without it that scan reports "nothing to
@@ -880,10 +880,10 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
   <!-- 0 = destination, 1 = required size, 2 = available size -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Onvoldoende ruimte op {0}
 
-Nodig: {1}
+Vereist: {1}
 Beschikbaar: {2}</value></data>
   <!-- 0 = destination -->
-  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Je hebt geen rechten om naar {0} te schrijven.
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Je hebt geen schrijfrechten voor {0}.
 Probeer een map in je gebruikersprofiel of op een schijf die van jou is.</value></data>
   <data name="Error.PathTooLong" xml:space="preserve"><value>Het pad {0} is te lang voor Windows. Kies een korter pad.</value></data>
   <data name="Error.DestinationMissing" xml:space="preserve"><value>De map {0} bestaat niet en kon niet worden aangemaakt. Controleer de stationsletter of het netwerkpad.</value></data>
@@ -893,16 +893,16 @@ Probeer een map in je gebruikersprofiel of op een schijf die van jou is.</value>
        Detail goes to the crash log; the user is pointed at it. -->
   <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows kan niet schrijven naar {0}.
 Details in {1}.</value></data>
-  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows kan niet schrijven naar {0}. Het crashlog kon niet worden geschreven.</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows kan niet schrijven naar {0}. Het crashlog kon niet worden weggeschreven.</value></data>
   <data name="Error.WriteDestination" xml:space="preserve"><value>Kan niet schrijven naar {0}.
 Details in {1}.</value></data>
-  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Kan niet schrijven naar {0}. Het crashlog kon niet worden geschreven.</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Kan niet schrijven naar {0}. Het crashlog kon niet worden weggeschreven.</value></data>
   <data name="Error.MissingSourceFile" xml:space="preserve"><value>Bestand bestaat niet meer.</value></data>
-  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Bronbestand is een symlink of junction; voor de veiligheid geweigerd.</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Bronbestand is een symlink of junction; om veiligheidsredenen geweigerd.</value></data>
   <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
        that does not resolve inside C:\Windows\Installer, refused at the Move /
        Delete service boundary. Should never reach a user in practice. -->
-  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Dit bestand staat niet direct in de Windows Installer-map; voor de veiligheid geweigerd.</value></data>
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Dit bestand bevindt zich niet direct in de Windows Installer-map; om veiligheidsredenen geweigerd.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
@@ -926,10 +926,10 @@ Details in {1}.</value></data>
   <data name="Error.AccessDenied.Plural" xml:space="preserve"><value>Windows heeft de toegang tot deze bestanden geweigerd; ze zijn blijven staan.</value></data>
   <data name="Error.FileInUse.Singular" xml:space="preserve"><value>This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.</value></data>
   <data name="Error.FileInUse.Plural" xml:space="preserve"><value>These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.</value></data>
-  <data name="Error.IOFailure.Singular" xml:space="preserve"><value>Windows meldde een bestandsfout; het bestand is blijven staan.</value></data>
-  <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows meldde bestandsfouten; deze bestanden zijn blijven staan.</value></data>
-  <data name="Error.UnknownError.Singular" xml:space="preserve"><value>Er ging iets mis met dit bestand; het is blijven staan.</value></data>
-  <data name="Error.UnknownError.Plural" xml:space="preserve"><value>Er ging iets mis met deze bestanden; ze zijn blijven staan.</value></data>
+  <data name="Error.IOFailure.Singular" xml:space="preserve"><value>Windows heeft een bestandsfout gemeld; het bestand is blijven staan.</value></data>
+  <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows heeft bestandsfouten gemeld; deze bestanden zijn blijven staan.</value></data>
+  <data name="Error.UnknownError.Singular" xml:space="preserve"><value>Er is iets misgegaan met dit bestand; het is blijven staan.</value></data>
+  <data name="Error.UnknownError.Plural" xml:space="preserve"><value>Er is iets misgegaan met deze bestanden; ze zijn blijven staan.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Weigert bestanden naar de Windows Installer-map te verplaatsen (bestemming: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
@@ -949,11 +949,11 @@ Details in {1}.</value></data>
   </data>
   <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Update beschikbaar</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
-  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Je draait versie {0}.&#10;Versie {1} is beschikbaar.</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Je gebruikt versie {0}.&#10;Versie {1} is beschikbaar.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Kon GitHub niet bereiken. Controleer je internetverbinding en probeer het opnieuw.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub gaf een foutmelding terug. Probeer het over een paar minuten opnieuw.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub heeft een foutmelding teruggestuurd. Probeer het over een paar minuten opnieuw.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>In het antwoord van GitHub was geen release te herkennen. Probeer het later opnieuw, of open de releasepagina rechtstreeks.</value></data>
-  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>De controle duurde te lang. Je verbinding met GitHub is misschien traag; probeer het opnieuw.</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>De controle duurde te lang. Je verbinding met GitHub is mogelijk traag; probeer het opnieuw.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>De controle is om een onbekende reden mislukt. De details staan in crash.log, mocht je het willen melden.</value></data>
   <!-- 0 = the URL the user was trying to reach. The reason the launch failed
        (this process is elevated, so the browser has to be started from the
@@ -961,7 +961,7 @@ Details in {1}.</value></data>
        an internal distinction with no name outside this codebase; the user
        gets what happened and what they can do about it. -->
   <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean kon je browser niet openen. De link staat op je klembord, dus je kunt hem zelf plakken:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean kon je browser niet openen, en kon de link ook niet naar je klembord kopiëren. De link is:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean kon je browser niet openen en kon de link ook niet naar je klembord kopiëren. De link is:&#10;&#10;{0}</value></data>
   <!-- 0 = the backup folder the run was given. Raised when the guard between two
        files of the same Move can no longer confirm that folder, and it says
        nothing about why on purpose: two conditions reach it, the folder being
@@ -984,7 +984,7 @@ Details in {1}.</value></data>
        out of another user's profile, in front of the user. -->
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Kan niet schrijven naar {0}.</value></data>
   <!-- 0 = file name -->
-  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Kon na 10.000 pogingen geen unieke bestandsnaam vinden voor '{0}'.</value></data>
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Na 10.000 pogingen kon er geen unieke bestandsnaam voor '{0}' worden gevonden.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Verzenden...</value></data>
@@ -1018,23 +1018,23 @@ Details in {1}.</value></data>
        framework-provided messages can carry absolute paths from other
        users' profiles into a dialog the current user reads. The full
        detail is written to the crash log instead. -->
-  <data name="Startup.UnhandledBody" xml:space="preserve"><value>Er is een onverwachte fout opgetreden en InstallerClean moet afsluiten.
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>Er is een onverwachte fout opgetreden en InstallerClean moet worden afgesloten.
 
 {0}
 
 Details weggeschreven naar:
 {1}</value></data>
-  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>Er is een onverwachte fout opgetreden en InstallerClean moet afsluiten.
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>Er is een onverwachte fout opgetreden en InstallerClean moet worden afgesloten.
 
 {0}
 
-Het crashlog kon niet worden geschreven.</value></data>
+Het crashlog kon niet worden weggeschreven.</value></data>
   <data name="Startup.ErrorTitle" xml:space="preserve"><value>Opstartfout</value></data>
   <!-- 0 = exception type name (see Startup.UnhandledBody for why this
        is the type name and not the message), 1 = crash log path. -->
   <data name="Startup.FailedToStart" xml:space="preserve"><value>Starten mislukt ({0}). Details weggeschreven naar:
 {1}</value></data>
-  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Starten mislukt ({0}). Het crashlog kon niet worden geschreven.</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Starten mislukt ({0}). Het crashlog kon niet worden weggeschreven.</value></data>
 
   <!-- File picker -->
   <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>Kies de doelmap voor de verplaatste bestanden</value></data>
@@ -1090,7 +1090,7 @@ Het crashlog kon niet worden geschreven.</value></data>
        token is most often an unquoted move path with a space, so the message
        names the quoting fix. The literal " quotes and the \ in the example are
        part of the sentence the user copies. -->
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Fout: onverwacht extra argument '{0}'. Staat er een spatie in je verplaatsingsmap, zet dan aanhalingstekens om het hele pad: /m "D:\My Backup"</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Fout: onverwacht extra argument '{0}'. Als de verplaatsingsmap een spatie bevat, zet dan het volledige pad tussen aanhalingstekens: /m "D:\My Backup"</value></data>
   <!-- 0 = the extra (unexpected) token. The same condition for /s and /d, which
        take no path at all, so the quoting advice above would answer about a flag
        the user did not type. The way in is combining flags ("/s /d"), which is
@@ -1172,10 +1172,10 @@ Het crashlog kon niet worden geschreven.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
        back at the moment of the delete rather than when a bin is emptied. -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Fout: geen verplaatsbestemming opgegeven. Gebruik /m PAD. (Een standaard die in de GUI is ingesteld, geldt per gebruiker en niet voor geplande taken of serviceaccounts.)</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Fout: er is geen bestemming voor het verplaatsen opgegeven. Gebruik /m PAD. (Een standaard die in de GUI is ingesteld, geldt per gebruiker en niet voor geplande taken of serviceaccounts.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Fout: de bestemming mag niet in de Windows Installer-map liggen.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
-  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Fout: de bestemming moet een volledig gekwalificeerd pad zijn. Gekregen: {0}</value></data>
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Fout: de bestemming moet een volledig gekwalificeerd pad zijn. Ontvangen: {0}</value></data>
   <!-- 0 = the destination. The four names are the four roots
        InstallerCacheHelpers.IsSystemFolderOrChild resolves and refuses, and
        listing three of them sent anyone who read the list to a Program Files
@@ -1258,7 +1258,7 @@ Het crashlog kon niet worden geschreven.</value></data>
        names the contending parties (GUI or another CLI run) and
        points at exit code 75 so an RMM operator parsing stdout
        knows it is transient and safe to retry. -->
-  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Een ander InstallerClean-proces houdt de single-instance-vergrendeling vast (de GUI of een andere CLI-run). Exit 75 (tijdelijk); later opnieuw proberen kan veilig.</value></data>
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Een ander InstallerClean-proces houdt de single-instance-vergrendeling vast (de GUI of een andere CLI-uitvoering). Exit 75 (tijdelijk); je kunt het later veilig opnieuw proberen.</value></data>
   <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
        can't acquire the single-instance mutex, so an RMM consumer of
        the Application channel sees a record of every scheduled-job
@@ -1286,7 +1286,7 @@ Het crashlog kon niet worden geschreven.</value></data>
        Event Log write failed (Group Policy or service unavailable).
        Tells an RMM consumer expecting an Application entry that the
        channel was unwritable, not just empty. -->
-  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Let op: schrijven naar het gebeurtenislogboek is mislukt. Controleer de rechten op het logboek Toepassing of het groepsbeleid.</value></data>
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Opmerking: het schrijven naar het gebeurtenislogboek is mislukt. Controleer de machtigingen voor het logboek Toepassing of het groepsbeleid.</value></data>
 
   <!-- crash.log privacy header. Prepended to a fresh crash.log so a
        user attaching the file to a public bug report has the
@@ -1321,12 +1321,12 @@ Het crashlog kon niet worden geschreven.</value></data>
        the only place it can be said. -->
   <data name="Cli.Help.Elevation" xml:space="preserve"><value>Needs an elevated (administrator) prompt; Windows will not start it.</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Gebruik:</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Deze hulp tonen (ook /?, -h)</value></data>
-  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  De versie tonen (ook -v)</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Deze helptekst weergeven (ook /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  De versie weergeven (ook -v)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PAD     Naar het opgegeven pad</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PAD     Verplaatsen naar het opgegeven pad</value></data>
   <!-- ONE value carrying TWO printed lines, and the &#10; is where the English
        breaks rather than where every language must. It was three keys
        hard-wrapped at English word boundaries, which forced each language to
@@ -1350,7 +1350,7 @@ Het crashlog kon niet worden geschreven.</value></data>
   <!-- A Ctrl+C part way through exits 2 with nothing failed at all, so this
        cannot say that some files failed. -->
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some processed, some not (a failure or a Ctrl+C part way)</value></data>
-  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  tijdelijk: iets blokkeerde de run (zie de melding)</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  tijdelijk: iets tijdelijks blokkeerde de uitvoering (zie de melding)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 geannuleerd (Ctrl+C)</value></data>
   <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Taal wijzigen. Het programma start opnieuw.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Taal wijzigen</value></data>
