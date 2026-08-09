@@ -199,7 +199,7 @@ If it's approved, releases will carry the line SignPath ask for: free code signi
 
 InstallerClean only removes files Windows has no record of needing. If one has gone missing, InstallerClean spots it and flags it. The steps below are the same whatever the cause, InstallerClean included.
 
-Download that program's installer from its maker and run it over your existing installation; don't uninstall first. Use the version you have now if you can, because Windows may turn down a different one. That usually puts the file back and leaves your settings alone. Re-scan in InstallerClean and the warning will be gone if it worked.
+Download that program's installer from its maker and run it over your existing installation; don't uninstall first. Use the version you have now if you can, because Windows may turn down a different one. This should restore the file and leave your settings alone. Re-scan in InstallerClean and the warning will be gone if it worked.
 
 That usually works. What follows is Microsoft's own, fuller account: the official detail, and the harder cases for when it isn't that simple. None of it is InstallerClean's doing, and I can't improve on Microsoft's guidance, so I'm just passing it on.
 
