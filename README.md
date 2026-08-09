@@ -233,7 +233,7 @@ If InstallerClean is ever the reason a file is missing, I want to know. [Open an
 
 InstallerClean is built to be fully usable from the keyboard and with a screen reader.
 
-- **Keyboard-operable throughout.** Tab reaches every control, and the detail-window columns sort from the keyboard, so nothing here needs a mouse. Keyboard focus stays visible wherever it lands.
+- **Keyboard-operable throughout.** Everything the app does is reachable from the keyboard, and the detail-window columns sort from the keyboard too, so nothing here needs a mouse. The title-bar buttons behave like the Windows ones and are reached with Alt+Space or Alt+F4 rather than with Tab. Keyboard focus stays visible wherever it lands.
 - **Narrator and Voice Access.** Every control is labelled, and the visible word on a button is the word that activates it by voice. When a Move or Delete finishes, the outcome is read aloud.
 - **Built to be read.** Text meets WCAG AA contrast throughout the dark theme.
 
@@ -377,6 +377,8 @@ schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.e
 ```
 
 The task blocks until the run finishes and records the exit code as its Last Run Result, so your RMM can key off the codes above (`0` full success, `2` partial, `75` transient, `1` hard failure) the same way a script would.
+
+Two things about the destination. Nothing empties it: a scheduled `/m` only ever adds to that folder, and a file moved twice picks up a `(1)` in its name, so the folder wants its own clear-out on whatever schedule suits you. And a task running as SYSTEM reaches the network as the machine account, not as you, so a `\\server\share` destination only works if that account has been given rights to it.
 
 ### Why `installerclean-cli` and not `installerclean.exe`?
 
