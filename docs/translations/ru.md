@@ -326,9 +326,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Donate | Поддержать |
 | Buy me a cuppa | Угостите меня чаем |
-| Cancel operation | Отменить операцию |
-| Cancel scan | Отменить сканирование |
-| Cancel startup scan | Отменить сканирование при запуске |
+| Cancel operation | Отмена операции |
+| Cancel scan | Отмена сканирования |
+| Cancel startup scan | Отмена сканирования при запуске |
 | Close | Закрыть |
 | Close window | Закрыть окно |
 | Close result and return to main window | Закрыть результат и вернуться в главное окно |

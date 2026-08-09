@@ -38,7 +38,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Cancel | _Скасувати |
 | Check for _updates | Перевірити о_новлення |
 | _Close | _Закрити |
-| _Delete permanently | Видалити _назавжди |
+| _Delete permanently | _Видалити назавжди |
 | _Done | _Готово |
 | Details | Деталі |
 | _Buy me a cuppa | Пригостіть мене _кавою |
