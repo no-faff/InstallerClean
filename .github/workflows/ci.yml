@@ -80,6 +80,19 @@ jobs:
       - name: Check CLI help fits its column budget
         run: node scripts/check-cli-help-width.mjs
 
+      # Its sibling above holds how wide a help line may be; this holds where the
+      # description column starts, which the sibling states it does not, the
+      # column being per-language: it is set by that language's longest
+      # installerclean-cli prefix, and a translated metavariable is not the width
+      # of PATH, so there is no one number any check could compare against. A
+      # translation round is when it goes wrong, reflagging some rows and leaving
+      # others translated so the two end up at different columns with every value
+      # correct read on its own. Here with the source guards for the same reason
+      # as the width check: it passes today, a row still holding the English
+      # neutral being left to check-still-english rather than measured.
+      - name: Check CLI help columns line up
+        run: node scripts/check-cli-help-alignment.mjs
+
       # The only mechanical check on XAML resource keys. A {StaticResource} whose
       # key nothing defines compiles clean and throws a XamlParseException when
       # the window is first opened, so neither the build nor the test run below
