@@ -382,7 +382,7 @@
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
        and introduced nowhere. -->
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.</value></data>
   <!-- The fourth arm, for a reason the app can detect but has no line of its
@@ -817,13 +817,21 @@ InstallerClean s'exécutait déjà en tant qu'administrateur, le relancer ainsi 
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
   <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer n'a jamais signalé la fin de la liste des correctifs d'un programme : InstallerClean a renoncé après {0} entrées (dernier code d'erreur {1}). Une liste sans fin n'est pas fiable, donc InstallerClean s'est arrêté. Rien n'a été supprimé.</value></data>
-  <!-- Shown when the scan's two halves (what Windows still registers, and what
-       is on disk) cannot be reconciled: a sign the correlation broke, not a real
-       list of removable files. "Nearly" and "almost" are what the gate actually
+  <!-- Shown when what Windows still registers and what is in the cache folder
+       cannot be reconciled: a sign the correlation broke, not a real list of
+       removable files. "Nearly" and "almost" are what the gate actually
        tests, a survivor or two no longer disarming it, and neither is a hedge to
-       be tightened back into an absolute. Deliberately does not offer anything
-       for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.</value></data>
+       be tightened back into an absolute. Both counts it weighs are taken over
+       the registrations naming a file directly in the folder the scan walked, so
+       both clauses are about that folder and not about the disk at large.
+       States no cause, and the cause it used to name was false of a machine whose
+       records read perfectly and whose folder was replaced or restored under
+       them; three conditions reach this gate, the app cannot tell them apart,
+       and that inability is the gate. A second refusal runs BEFORE this one
+       (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
+       the folder at all. Deliberately does not offer anything for removal. No
+       placeholders. -->
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -1206,7 +1214,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>

@@ -382,7 +382,7 @@
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
        and introduced nowhere. -->
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Er is op dit moment iets bezig met Windows Installer, meestal een Windows-update of een programma dat op de achtergrond installeert. Verplaatsen en Verwijderen staan stil zolang dat loopt, zodat InstallerClean {InstallerFolder} niet aanraakt terwijl daar iets verandert. Zodra het klaar is, klik je op Opnieuw scannen en komen ze terug.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Een eerdere Windows Installer-transactie is op deze computer opgeschort. Hervat die installatie of draai haar terug (of herstart Windows) voordat je {InstallerFolder} opruimt.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows heeft voor de volgende herstart een bestandshernoeming in de wachtrij staan die {InstallerFolder} raakt. Herstart Windows voordat je opruimt.</value></data>
   <!-- The fourth arm, for a reason the app can detect but has no line of its
@@ -817,13 +817,21 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
   <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer heeft het einde van de patchlijst van één programma nooit gemeld: InstallerClean heeft het na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd.</value></data>
-  <!-- Shown when the scan's two halves (what Windows still registers, and what
-       is on disk) cannot be reconciled: a sign the correlation broke, not a real
-       list of removable files. "Nearly" and "almost" are what the gate actually
+  <!-- Shown when what Windows still registers and what is in the cache folder
+       cannot be reconciled: a sign the correlation broke, not a real list of
+       removable files. "Nearly" and "almost" are what the gate actually
        tests, a survivor or two no longer disarming it, and neither is a hedge to
-       be tightened back into an absolute. Deliberately does not offer anything
-       for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean kon deze scan niet rijmen met de Windows Installer-records: bijna elk bestand dat Windows nog als nodig vermeldt, ontbreekt in {InstallerFolder}, terwijl wat er werkelijk in de map staat vrijwel niets in de records terugvindt. Zo ziet geen enkele echte computer eruit, dus het wijst op een probleem met het lezen van de records en niet op bestanden die je veilig kunt verwijderen. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+       be tightened back into an absolute. Both counts it weighs are taken over
+       the registrations naming a file directly in the folder the scan walked, so
+       both clauses are about that folder and not about the disk at large.
+       States no cause, and the cause it used to name was false of a machine whose
+       records read perfectly and whose folder was replaced or restored under
+       them; three conditions reach this gate, the app cannot tell them apart,
+       and that inability is the gate. A second refusal runs BEFORE this one
+       (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
+       the folder at all. Deliberately does not offer anything for removal. No
+       placeholders. -->
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -1206,7 +1214,7 @@ Het crashlog kon niet worden weggeschreven.</value></data>
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Fout: er is op dit moment iets bezig met Windows Installer, meestal een Windows-update of een programma dat op de achtergrond installeert. /m en /d zijn geblokkeerd zolang dat loopt. Probeer het opnieuw zodra het klaar is.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Fout: een eerdere Windows Installer-transactie is op deze computer opgeschort. Hervat die installatie of draai haar terug (of herstart Windows) voordat je {InstallerFolder} opruimt.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Fout: een bestandsbewerking die na de herstart in de wachtrij staat, richt zich op {InstallerFolder} ({0}). Herstart Windows om die bewerking te voltooien voordat je opruimt.</value></data>
