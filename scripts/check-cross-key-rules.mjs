@@ -262,6 +262,13 @@ const RAW_READ_ALLOWED = [
       + 'nor the literal, so the audit would pass by construction.',
   },
   {
+    file: 'src/InstallerClean.Tests/Helpers/CountedStringTests.cs',
+    reason: 'Enumerates a whole resource set per culture to prove every CLDR category '
+      + 'override names a prefix the code actually passes to Pluralise. A door that '
+      + 'answers one named key cannot list a set. Every other read in the file goes '
+      + 'through Find or Get.',
+  },
+  {
     file: 'src/InstallerClean.Tests/Helpers/LocalisationOverrideTests.cs',
     reason: 'Reads one key at a named culture to prove an explicit language pick '
       + 'drives the typed accessor. The expectation has to come from the satellite '
