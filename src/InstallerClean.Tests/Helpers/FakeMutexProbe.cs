@@ -34,14 +34,14 @@ internal sealed class FakeMutexProbe : IMutexProbe
 
     public bool IsHeld(string name) => _mode == Mode.HeldByAnother;
 
-    public IMutexLease? TryAcquire(string name, out bool heldByAnother)
+    public IMutexLease? TryAcquire(string name, out bool shownHeldByAnother)
     {
         AcquireAttempts++;
-        heldByAnother = false;
+        shownHeldByAnother = false;
         switch (_mode)
         {
             case Mode.HeldByAnother:
-                heldByAnother = true;
+                shownHeldByAnother = true;
                 return null;
             case Mode.RefusedNotHeld:
                 return null;

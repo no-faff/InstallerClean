@@ -26,9 +26,9 @@ internal sealed class NullMutexProbe : IMutexProbe
 
     public bool IsHeld(string name) => false;
 
-    public IMutexLease? TryAcquire(string name, out bool heldByAnother)
+    public IMutexLease? TryAcquire(string name, out bool shownHeldByAnother)
     {
-        heldByAnother = false;
+        shownHeldByAnother = false;
         return NullLease.Instance;
     }
 

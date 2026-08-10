@@ -23,10 +23,10 @@ public interface IMutexProbe
     ///   <item>a non-null lease when acquired: the caller now OWNS the mutex and
     ///   MUST dispose the lease on the SAME thread that called this (Win32
     ///   requires the acquiring thread to release);</item>
-    ///   <item><c>null</c> with <paramref name="heldByAnother"/> = <c>true</c>
+    ///   <item><c>null</c> with <paramref name="shownHeldByAnother"/> = <c>true</c>
     ///   when the mutex is held by someone else: the caller should refuse the
     ///   operation;</item>
-    ///   <item><c>null</c> with <paramref name="heldByAnother"/> = <c>false</c>
+    ///   <item><c>null</c> with <paramref name="shownHeldByAnother"/> = <c>false</c>
     ///   when the mutex could not be acquired for any other reason (a DACL that
     ///   refuses creation/open, a transient failure). The false is "not shown to
     ///   be held", never "not held": this process could not find out. Both
@@ -37,7 +37,7 @@ public interface IMutexProbe
     /// mutex a zero wait failed to take; false is the absence of one, and the
     /// two are not opposites.
     /// </summary>
-    IMutexLease? TryAcquire(string name, out bool heldByAnother);
+    IMutexLease? TryAcquire(string name, out bool shownHeldByAnother);
 }
 
 /// <summary>

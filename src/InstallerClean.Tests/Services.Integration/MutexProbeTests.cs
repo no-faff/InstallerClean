@@ -8,7 +8,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// test: the fake defines the contract it imitates, so the real probe has to be
 /// held to that contract independently. The mutex hold that stops a msiexec
 /// racing a delete batch rests entirely on
-/// <c>TryAcquire</c> setting <c>heldByAnother</c> correctly, since
+/// <c>TryAcquire</c> setting <c>shownHeldByAnother</c> correctly, since
 /// DeleteFilesService and MoveFilesService refuse the whole batch and report
 /// InstallerBusy on exactly that flag.
 ///
@@ -17,7 +17,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// would serialise every installer on whichever machine ran the suite, which
 /// is the very cost the production comment warns about.
 ///
-/// The DACL-refused arm (returns null with heldByAnother false, which both
+/// The DACL-refused arm (returns null with shownHeldByAnother false, which both
 /// callers now refuse on) is not covered: reproducing it means creating a named
 /// object with a deny ACE, and a test that got that setup subtly wrong would
 /// pass for the wrong reason.
@@ -79,10 +79,10 @@ public class MutexProbeTests
     {
         var probe = new MutexProbe();
 
-        using var lease = probe.TryAcquire(_name, out var heldByAnother);
+        using var lease = probe.TryAcquire(_name, out var shownHeldByAnother);
 
         Assert.NotNull(lease);
-        Assert.False(heldByAnother);
+        Assert.False(shownHeldByAnother);
     }
 
     [Fact]
@@ -92,17 +92,17 @@ public class MutexProbeTests
         {
             var probe = new MutexProbe();
 
-            var lease = probe.TryAcquire(_name, out var heldByAnother);
+            var lease = probe.TryAcquire(_name, out var shownHeldByAnother);
 
             // The pair that decides WHICH refusal the caller reports. Both
-            // answers stop the batch, so a null lease with heldByAnother false
+            // answers stop the batch, so a null lease with the flag left false
             // would not let anything through; what it would do is send a live
             // installer transaction down the lock-unavailable path, where the
             // user is told nothing was shown to be holding the lock and the
             // pending-reboot banner that would have named the real cause is
             // never painted.
             Assert.Null(lease);
-            Assert.True(heldByAnother);
+            Assert.True(shownHeldByAnother);
         });
     }
 
@@ -117,10 +117,10 @@ public class MutexProbeTests
         Assert.NotNull(first);
         first.Dispose();
 
-        using var second = probe.TryAcquire(_name, out var heldByAnother);
+        using var second = probe.TryAcquire(_name, out var shownHeldByAnother);
 
         Assert.NotNull(second);
-        Assert.False(heldByAnother);
+        Assert.False(shownHeldByAnother);
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public class MutexProbeTests
         // A holder thread that exits without releasing leaves the mutex
         // abandoned, which surfaces as AbandonedMutexException on the next
         // acquire WITH ownership already transferred. Reporting that as
-        // heldByAnother would refuse every batch after a crashed installer,
+        // held by another would refuse every batch after a crashed installer,
         // and go on refusing until the machine restarted.
         var holder = new Thread(() =>
         {
@@ -142,10 +142,10 @@ public class MutexProbeTests
         Assert.True(holder.Join(TimeSpan.FromSeconds(30)));
 
         var probe = new MutexProbe();
-        using var lease = probe.TryAcquire(_name, out var heldByAnother);
+        using var lease = probe.TryAcquire(_name, out var shownHeldByAnother);
 
         Assert.NotNull(lease);
-        Assert.False(heldByAnother);
+        Assert.False(shownHeldByAnother);
     }
 
     [Fact]

@@ -61,9 +61,9 @@ internal sealed class MutexProbe : IMutexProbe
         }
     }
 
-    public IMutexLease? TryAcquire(string name, out bool heldByAnother)
+    public IMutexLease? TryAcquire(string name, out bool shownHeldByAnother)
     {
-        heldByAnother = false;
+        shownHeldByAnother = false;
 
         // Create-or-open: if _MSIExecute does not exist (no install running,
         // or the Installer service lingering with the object gone), we create
@@ -100,7 +100,7 @@ internal sealed class MutexProbe : IMutexProbe
         {
             // The object exists but its DACL refuses us create/open rights. The
             // probe reports and the callers decide, which is why this returns a
-            // null lease with heldByAnother left false rather than choosing for
+            // null lease with shownHeldByAnother left false rather than choosing for
             // them: nothing has been shown to hold the object, and that fact
             // alone does not settle whether an act should run without the hold.
             //
@@ -137,7 +137,7 @@ internal sealed class MutexProbe : IMutexProbe
 
         if (!acquired)
         {
-            heldByAnother = true;
+            shownHeldByAnother = true;
             mutex.Dispose();
             return null;
         }

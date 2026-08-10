@@ -117,10 +117,11 @@ public sealed class MoveFilesService : IMoveFilesService
             // the host-side gate re-check has passed.
             //
             // Refusing the second case rather than running on unheld, and the three
-            // things that decide it. A heldByAnother of false does not mean nothing
-            // is installing, it means this process could not find out, and both the
-            // name and the branch reading it invite the stronger reading. The object
-            // is not permanent, so being refused it is evidence rather than noise:
+            // things that decide it. A false there does not mean nothing is
+            // installing, it means this process could not find out, which is what
+            // the flag is named for and what the branch reading it must not forget.
+            // The object is not permanent, so being refused it is evidence rather
+            // than noise:
             // Windows Installer creates _MSIExecute when an install begins and drops
             // it when the install ends, so between installs the create-or-open path
             // below makes the object and succeeds, and the only object that can
@@ -137,7 +138,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // that the plausible cause of a refusal is a non-elevated per-user
             // install, which does not write the machine cache, so the hazard would
             // not apply. It does not survive this branch being unable to see which
-            // cause it has. The same null-with-heldByAnother-false answer comes back
+            // cause it has. The same null-with-nothing-shown answer comes back
             // from that probe's catch-all for any other non-fatal failure, so acting
             // on the benign reading is choosing a behaviour for a mixed set on the
             // strength of one member of it.
@@ -171,8 +172,8 @@ public sealed class MoveFilesService : IMoveFilesService
             // the destination folder even on the runs the checks below refuse. A
             // refusal that has touched nothing is worth more than a shorter hold,
             // and both refusals below are reached before any of that work.
-            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
-            if (lease is null && heldByAnother)
+            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var shownHeldByAnother);
+            if (lease is null && shownHeldByAnother)
                 return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
             if (lease is null)
             {

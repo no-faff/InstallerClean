@@ -111,8 +111,8 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // held. Both predate the range that wrote this block. Whether either
             // belongs inside the hold is an open behaviour question and is not
             // settled by anything here.
-            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
-            if (lease is null && heldByAnother)
+            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var shownHeldByAnother);
+            if (lease is null && shownHeldByAnother)
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
             if (lease is null)
             {
