@@ -549,20 +549,9 @@ internal static class Program
                     return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
 
                 // The service could not take Global\_MSIExecute and nothing was
-                // shown to be holding it, so it refused and touched nothing. Not
-                // routed through EmitPendingRebootBlocked: every PendingRebootReason
-                // it can name asserts something is in progress, and the defining
-                // fact here is that nothing has been shown to be. Transient and
-                // TransientSkip all the same, on the same reasoning its sibling
-                // carries: the condition can clear on its own, so a scheduler should
-                // come back rather than treat the machine as broken.
+                // shown to be holding it, so it refused and touched nothing.
                 if (result.InstallerLockUnavailable)
-                {
-                    Console.WriteLine(Strings.Cli_InstallerLockUnavailable);
-                    MachineContract.WriteEventLog(CliEventClass.TransientSkip,
-                        () => string.Format(Strings.Cli_EventLogInstallerLockUnavailable, arg));
-                    return ExitTransient;
-                }
+                    return EmitInstallerLockUnavailable(arg);
 
                 // Reported after the batch rather than beside the pre-act
                 // re-verify's own line above, because it happened after that line
@@ -717,20 +706,9 @@ internal static class Program
 
             // The service could not take Global\_MSIExecute and nothing was shown
             // to be holding it, so it refused and touched nothing, its own
-            // destination folder included. Not routed through
-            // EmitPendingRebootBlocked, for the reason the /d branch states: every
-            // PendingRebootReason it can name asserts something is in progress, and
-            // the defining fact here is that nothing has been shown to be.
-            // TransientSkip and ExitTransient on the same reasoning as its /d
-            // sibling: the condition can clear on its own, so a scheduler should
-            // come back rather than treat the machine as broken.
+            // destination folder included.
             if (moveResult.InstallerLockUnavailable)
-            {
-                Console.WriteLine(Strings.Cli_MoveInstallerLockUnavailable);
-                MachineContract.WriteEventLog(CliEventClass.TransientSkip,
-                    () => string.Format(Strings.Cli_EventLogInstallerLockUnavailable, arg));
-                return ExitTransient;
-            }
+                return EmitInstallerLockUnavailable(arg);
 
             // See the /d branch for why this is reported here and not beside the
             // pre-act re-verify's line, and for why it comes ahead of the cancel
@@ -1109,6 +1087,63 @@ internal static class Program
     /// (stdout line, event-log entry, exit code) a gate block does, so an RMM
     /// consumer cannot tell the two apart.
     /// </summary>
+    /// <summary>
+    /// The stdout sentence for a run refused because <c>Global\_MSIExecute</c>
+    /// could not be taken and nothing could be shown to be holding it, chosen by
+    /// the flag that ran. <paramref name="arg"/> is the lower-cased flag, so the
+    /// comparison needs no casing rules.
+    /// </summary>
+    /// <remarks>
+    /// Two sentences rather than one, because each closes by naming what did not
+    /// happen to the files and neither ending is true of the other's run. Keyed
+    /// off the flag rather than a bool the caller passes, so a caller cannot hand
+    /// this the wrong one; a third mutating mode would have to come here for a
+    /// sentence of its own, which is the failure worth having.
+    /// </remarks>
+    internal static string InstallerLockUnavailableLine(string arg) =>
+        arg == "/m" ? Strings.Cli_MoveInstallerLockUnavailable : Strings.Cli_InstallerLockUnavailable;
+
+    /// <summary>
+    /// The Application-channel line for that same refusal. ONE line covers both
+    /// flags and <c>{0}</c> names which one ran, so its tail has to be true of a
+    /// move and of a delete alike: an ending naming a single action is false of
+    /// half the runs that can produce it.
+    /// </summary>
+    /// <remarks>
+    /// Built outside the en-GB scope, like <see cref="AbortedMoveEventLogLine"/>:
+    /// the caller wraps it, so the line renders English in production and in the
+    /// ambient culture anywhere else.
+    /// </remarks>
+    internal static string InstallerLockUnavailableEventLogLine(string arg) =>
+        string.Format(Strings.Cli_EventLogInstallerLockUnavailable, arg);
+
+    /// <summary>
+    /// Reports a <c>/d</c> or <c>/m</c> the action service refused for want of
+    /// <c>Global\_MSIExecute</c>, and returns the exit code for it.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately NOT routed through <see cref="EmitPendingRebootBlocked"/>:
+    /// every <see cref="PendingRebootReason"/> it can name asserts something is in
+    /// progress, and the defining fact here is that nothing has been shown to be.
+    /// TransientSkip and ExitTransient all the same, on that method's own
+    /// reasoning: the condition can clear on its own, so a scheduler should come
+    /// back rather than treat the machine as broken.
+    ///
+    /// The two lines it emits are separately reachable and this method is not, so
+    /// that the wording can be held by tests without one of them writing to the
+    /// Application channel. An entry forged by a test run is indistinguishable
+    /// from one a real run wrote, on the channel whose whole contract is that a
+    /// run leaves exactly one summary; the suite must not be able to add to
+    /// somebody's audit trail.
+    /// </remarks>
+    private static int EmitInstallerLockUnavailable(string arg)
+    {
+        Console.WriteLine(InstallerLockUnavailableLine(arg));
+        MachineContract.WriteEventLog(CliEventClass.TransientSkip,
+            () => InstallerLockUnavailableEventLogLine(arg));
+        return ExitTransient;
+    }
+
     private static int EmitPendingRebootBlocked(string arg, PendingRebootReason reason, string? detail)
     {
         var stdoutMessage = reason switch
