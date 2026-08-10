@@ -398,7 +398,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Selecteer een product om de details te bekijken.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Geen metadata beschikbaar.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>Dit installatiebestand ontbreekt. Dit levert nu geen problemen op, en dat zal ook zo blijven totdat je het programma waartoe het behoort probeert te herstellen, bij te werken of te verwijderen. Die stap kan dan mislukken, omdat Windows naar dit bestand zoekt en het er niet is.&#10;&#10; Om dit te verhelpen, download je het installatieprogramma van de maker en voer je het uit over je bestaande exemplaar heen (verwijder het programma niet eerst, want het verwijderen is zelf een stap waarvoor dit bestand nodig is). Gebruik de versie die je hebt geïnstalleerd als je die kunt vinden, aangezien Windows een andere versie mogelijk afwijst. Dit zou het bestand moeten herstellen zonder je instellingen te wijzigen, maar Microsoft garandeert dit niet, en hun eigen laatste redmiddel is het programma opnieuw te installeren.</value>
+    <value>Dit installatiebestand ontbreekt. Dit levert nu geen problemen op, en dat zal ook zo blijven totdat je het programma waartoe het behoort probeert te herstellen, bij te werken of te verwijderen. Die stap kan dan mislukken, omdat Windows naar dit bestand zoekt en het er niet is.&#10;&#10;Om te proberen dit te verhelpen, download je het installatieprogramma van de maker en voer je het uit over je bestaande exemplaar heen (verwijder het programma niet eerst, want het verwijderen is zelf een stap waarvoor dit bestand nodig is). Gebruik de versie die je hebt geïnstalleerd als je die kunt vinden, aangezien Windows een andere versie mogelijk afwijst. Dit zou het bestand moeten herstellen zonder je instellingen te wijzigen, maar Microsoft garandeert dit niet, en hun eigen laatste redmiddel is het programma opnieuw te installeren.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -702,8 +702,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} bestanden ongemoeid gelaten</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} overbodig bestand om op te ruimen</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} overbodige bestanden om op te ruimen</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} het geregistreerde bestand ontbreekt. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Open ‘Details’ voor meer informatie over wat je moet doen.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} er ontbreken geregistreerde bestanden. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma’s zou kunnen mislukken. Open ‘Details’ voor meer informatie over wat je moet doen.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} geregistreerd bestand ontbreekt. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Open Details voor meer informatie over wat je moet doen.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} geregistreerde bestanden ontbreken. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma's zou kunnen mislukken. Open Details voor meer informatie over wat je moet doen.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning
@@ -756,7 +756,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} {1} verplaatsen ({2})?</value></data>
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Verplaats naar:</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Verplaatsen naar:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} {1} verwijderen ({2})?</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
@@ -831,7 +831,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean kon deze scan niet rijmen met de Windows Installer-records: bijna elk bestand dat Windows nog als nodig vermeldt, ontbreekt in {InstallerFolder}, terwijl wat er werkelijk in de map staat vrijwel niets in de records terugvindt. Zo ziet geen enkele echte computer eruit, dus het wijst op een probleem met het lezen van de records en niet op bestanden die je veilig kunt verwijderen. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean kon deze scan niet rijmen met de Windows Installer-records: bijna elk bestand dat Windows nog als nodig vermeldt, ontbreekt in {InstallerFolder}, terwijl wat er werkelijk in de map staat vrijwel niets in de records terugvindt. Daardoor kon er niets als overbodig worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -884,7 +884,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
   <!-- The move half of the heading above, and it takes the same wording as
        Completion.NothingMoved for the same reason its sibling takes
        Completion.NothingDeleted's. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Nothing was moved</value></data>
+  <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Er is niets verplaatst</value></data>
   <!-- Shown when a Delete could not take Global\_MSIExecute and nothing else
        was shown to be holding it (a DACL that refuses the object, or any other
        non-fatal failure to acquire). Without that hold nothing stops a program
@@ -900,7 +900,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        is as absent from it as a deleted one, so a transaction starting part-way
        through fails to find it either way, and the recovery a move leaves the
        user does not make the batch safer to run. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
+  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean kon de vergrendeling niet krijgen waarmee Windows Installer voorkomt dat twee programma's tegelijk geïnstalleerde software wijzigen, en kon dus niet uitsluiten dat een bestand halverwege alsnog nodig werd, dus er is niets verplaatst. Probeer het opnieuw, en herstart Windows als het zich blijft voordoen.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Ongeldige bestemming</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Kon niet naar de bestemming schrijven</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Verplaatsen mislukt</value></data>
@@ -1169,8 +1169,8 @@ Het crashlog kon niet worden weggeschreven.</value></data>
        there is no Details window here, so the last sentence carries the recovery
        step itself. "Could fail" and "usually restores" are the verified
        positions and neither may harden: Microsoft guarantees nothing here. -->
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>geregistreerde bestand {0} ontbreekt in {InstallerFolder}. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Door het installatieprogramma van dat programma opnieuw uit te voeren, bij voorkeur dezelfde versie, wordt het bestand teruggezet.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} geregistreerde bestanden ontbreken in {InstallerFolder}. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma’s zou kunnen mislukken. Door het installatieprogramma van elk programma opnieuw uit te voeren – bij voorkeur dezelfde versie – zouden deze bestanden teruggezet moeten worden.</value></data>
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} geregistreerd bestand ontbreekt in {InstallerFolder}. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Door het installatieprogramma van dat programma opnieuw uit te voeren, bij voorkeur dezelfde versie, zou het bestand teruggezet moeten worden.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} geregistreerde bestanden ontbreken in {InstallerFolder}. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma's zou kunnen mislukken. Door het installatieprogramma van elk programma opnieuw uit te voeren, bij voorkeur dezelfde versie, zouden deze bestanden teruggezet moeten worden.</value></data>
   <!-- The command line's own wording of Summary.RecordsNotMatched, whose remarks
        carry why there is no count and no placeholder in either. The window's
        version closes on Re-scan and opens its second sentence on "Everything
@@ -1252,7 +1252,7 @@ Het crashlog kon niet worden weggeschreven.</value></data>
   <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Fout: InstallerClean kon de Windows Installer-vergrendeling niet krijgen die voorkomt dat twee programma's tegelijk geïnstalleerde software wijzigen, en kon dus niet uitsluiten dat een bestand halverwege alsnog nodig werd. Er is niets verwijderd. Probeer het opnieuw, en herstart Windows als het zich blijft voordoen.</value></data>
   <!-- The /m half of the line above, the pair matching the two Error.* pairs in
        the window's family. No placeholders. -->
-  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
+  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Fout: InstallerClean kon de Windows Installer-vergrendeling niet krijgen die voorkomt dat twee programma's tegelijk geïnstalleerde software wijzigen, en kon dus niet uitsluiten dat een bestand halverwege alsnog nodig werd. Er is niets verplaatst. Probeer het opnieuw, en herstart Windows als het zich blijft voordoen.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
