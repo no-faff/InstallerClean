@@ -186,7 +186,12 @@ public class MoveFilesServiceTests : IDisposable
         using var reader = new StreamReader(stream);
         var written = await reader.ReadToEndAsync();
         var appended = written.Length >= baseline ? written[(int)baseline..] : written;
-        Assert.Contains("Move refused", appended);
+        // The whole clause, not the "Move refused" opening: this service writes
+        // that opening for its containment refusals too, so the prefix alone no
+        // longer says which refusal reached the log. Its delete twin pins the
+        // same clause.
+        Assert.Contains(
+            "Move refused: the Windows Installer mutex could not be acquired", appended);
     }
 
     public void Dispose()
