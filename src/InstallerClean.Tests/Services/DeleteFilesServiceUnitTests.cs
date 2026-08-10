@@ -411,8 +411,8 @@ public class DeleteFilesServiceUnitTests
         Assert.Empty(result.Errors);
         Assert.True(fs.File.Exists(a));
         // Distinguishable from the held case, because the caller answers them
-        // differently: the pending-reboot gate can explain that one and can say
-        // nothing at all about this one.
+        // differently: the pending-reboot gate can explain that one and can
+        // account for this one neither way.
         Assert.False(result.InstallerBusy);
         Assert.Equal(0, mutex.Released);
     }

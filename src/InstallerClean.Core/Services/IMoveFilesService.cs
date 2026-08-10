@@ -78,13 +78,16 @@ public interface IMoveFilesService
 /// </param>
 /// <param name="InstallerLockUnavailable">
 /// The batch was refused before it started because <c>Global\_MSIExecute</c>
-/// could not be acquired AND nothing else was holding it: nothing was touched,
-/// and the service returns before it creates or probes the destination folder.
-/// Kept separate from <see cref="InstallerBusy"/> because the two need different
-/// answers, not different wording. The pending-reboot gate is what reports the
-/// busy case, and it can say nothing at all about this one: no process holds the
-/// mutex, so a re-run of the gate comes back clean and the caller would report a
-/// refusal it could not account for. This flag carries its own sentence instead.
+/// could not be acquired and nothing was shown to be holding it: nothing was
+/// touched, and the service returns before it creates or probes the destination
+/// folder. Kept separate from <see cref="InstallerBusy"/> because the two need
+/// different answers, not different wording. The pending-reboot gate is what
+/// reports the busy case, and it accounts for this one neither way: its probe
+/// asks through a different call requesting different rights, so it can come
+/// back clean and leave a refusal with nothing on screen explaining it, and on
+/// an object whose DACL refuses that call too it reports held, which would
+/// assert an install nothing has shown. This flag carries its own sentence
+/// instead.
 /// </param>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,

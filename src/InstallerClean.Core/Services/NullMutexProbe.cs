@@ -8,12 +8,11 @@ namespace InstallerClean.Services;
 /// always gets the real <see cref="MutexProbe"/> through DI.
 /// </summary>
 /// <remarks>
-/// It used to report "could not acquire, fall back" instead, which meant the
-/// same thing while both services ran on without the hold. It stopped meaning it
-/// the moment Delete began refusing that answer, because a permanent delete
-/// cannot rule out a file becoming needed under it: reporting the fall-back here
-/// would have every test built through those constructors exercise the refusal
-/// path rather than the delete it was written for, and pass or fail for a reason
+/// It used to report "could not acquire, nothing shown to be holding it"
+/// instead, which meant the same thing back when both services ran on without
+/// the hold. Both refuse that answer now, so reporting it here would have every
+/// test built through those constructors exercise the refusal path rather than
+/// the move or delete it was written for, and pass or fail for a reason
 /// unrelated to its subject.
 ///
 /// So the fall-back is deliberately NOT what this stands for. A test that means

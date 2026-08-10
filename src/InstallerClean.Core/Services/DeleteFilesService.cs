@@ -69,12 +69,18 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // threads between acquire and release.
             //
             // Neither way of missing the hold proceeds, and the two are reported
-            // separately because the caller can only account for one of them. Held
+            // separately because the caller can account for only one of them. Held
             // by a live transaction => the pending-reboot gate the caller re-runs
-            // meets the same mutex and paints its banner. Refused with nobody
-            // holding it (a DACL on the object, or any other non-fatal failure) =>
-            // that gate comes back clean, so the result has to carry its own
-            // sentence or the user is refused with no reason given.
+            // meets the same mutex and paints its banner, which says an install is
+            // in progress, which it is. Refused with nothing shown to be holding it
+            // (a DACL on the object, or any other non-fatal failure) => that gate
+            // is no account of the condition at all, whichever way it answers.
+            // IsHeld asks through a different call requesting different rights, so
+            // it can come back clean, leaving a refusal with nothing on screen
+            // explaining it; and on a DACL it returns held (its own catch says so),
+            // which would paint a banner asserting an install nothing has shown. So
+            // this result carries its own sentence rather than deferring to the
+            // gate.
             //
             // Refusing the second case is younger than the hold itself, and what
             // changed the sum was the delete becoming permanent rather than

@@ -1057,12 +1057,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             if (result.InstallerLockUnavailable)
             {
                 // The service could not take Global\_MSIExecute and nothing was
-                // holding it, so it refused and touched nothing. No gate re-check
-                // here, unlike the arm above, and that is the whole reason this is
-                // a separate flag rather than a second cause behind the same one:
-                // no process holds the mutex, so the gate would come back clean
-                // and paint nothing, leaving a refusal the user could not account
-                // for. A dialog carries the reason instead.
+                // shown to be holding it, so it refused and touched nothing. No
+                // gate re-check here, unlike the arm above, and that is the whole
+                // reason this is a separate flag rather than a second cause behind
+                // the same one: the gate is no account of this condition whichever
+                // way it answers, since it can come back clean and paint nothing,
+                // leaving a refusal with no reason on screen, and on a DACL it
+                // reports held and would paint a banner asserting an install
+                // nothing has shown. A dialog carries the reason instead. The
+                // service's own acquire has the detail.
                 _dialogService.ShowWarning(
                     Strings.Error_InstallerLockUnavailable, Strings.Error_InstallerLockUnavailableTitle);
                 OperationProgress = string.Empty;

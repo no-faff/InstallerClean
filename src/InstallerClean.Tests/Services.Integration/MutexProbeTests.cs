@@ -17,10 +17,10 @@ namespace InstallerClean.Tests.Services.Integration;
 /// would serialise every installer on whichever machine ran the suite, which
 /// is the very cost the production comment warns about.
 ///
-/// The DACL-refused arm (returns null with heldByAnother false, so the caller
-/// proceeds without the hold) is not covered: reproducing it means creating a
-/// named object with a deny ACE, and a test that got that setup subtly wrong
-/// would pass for the wrong reason.
+/// The DACL-refused arm (returns null with heldByAnother false, which both
+/// callers now refuse on) is not covered: reproducing it means creating a named
+/// object with a deny ACE, and a test that got that setup subtly wrong would
+/// pass for the wrong reason.
 /// </summary>
 public class MutexProbeTests
 {
@@ -94,10 +94,13 @@ public class MutexProbeTests
 
             var lease = probe.TryAcquire(_name, out var heldByAnother);
 
-            // The pair the refuse-the-batch path depends on. A null lease with
-            // heldByAnother false would instead mean "carry on without the
-            // hold", which on a live installer transaction is the one outcome
-            // that must not happen.
+            // The pair that decides WHICH refusal the caller reports. Both
+            // answers stop the batch, so a null lease with heldByAnother false
+            // would not let anything through; what it would do is send a live
+            // installer transaction down the lock-unavailable path, where the
+            // user is told nothing was shown to be holding the lock and the
+            // pending-reboot banner that would have named the real cause is
+            // never painted.
             Assert.Null(lease);
             Assert.True(heldByAnother);
         });

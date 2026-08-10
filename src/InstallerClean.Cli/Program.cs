@@ -549,13 +549,13 @@ internal static class Program
                     return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
 
                 // The service could not take Global\_MSIExecute and nothing was
-                // holding it, so it refused and touched nothing. Not routed through
-                // EmitPendingRebootBlocked: every PendingRebootReason it can name
-                // asserts something is in progress, and the defining fact here is
-                // that nothing is. Transient and TransientSkip all the same, on the
-                // same reasoning its sibling carries: the condition can clear on
-                // its own, so a scheduler should come back rather than treat the
-                // machine as broken.
+                // shown to be holding it, so it refused and touched nothing. Not
+                // routed through EmitPendingRebootBlocked: every PendingRebootReason
+                // it can name asserts something is in progress, and the defining
+                // fact here is that nothing has been shown to be. Transient and
+                // TransientSkip all the same, on the same reasoning its sibling
+                // carries: the condition can clear on its own, so a scheduler should
+                // come back rather than treat the machine as broken.
                 if (result.InstallerLockUnavailable)
                 {
                     Console.WriteLine(Strings.Cli_InstallerLockUnavailable);

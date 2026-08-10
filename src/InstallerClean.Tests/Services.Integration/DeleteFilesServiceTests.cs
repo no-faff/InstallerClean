@@ -181,8 +181,9 @@ public class DeleteFilesServiceTests : IDisposable
 
         var result = await new DeleteFilesService(fs, mutex, installerFolderOverride: null).DeleteFilesAsync(new[] { source });
 
-        // Refused, and distinguishably so: nothing held the mutex, so the
-        // pending-reboot gate the busy case is answered by would report nothing.
+        // Refused, and distinguishably so: nothing was shown to hold the mutex, so
+        // the pending-reboot gate the busy case is answered by can account for this
+        // one neither way.
         Assert.True(result.InstallerLockUnavailable);
         Assert.False(result.InstallerBusy);
         Assert.Equal(0, result.DeletedCount);

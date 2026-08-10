@@ -28,9 +28,14 @@ public interface IMutexProbe
     ///   operation;</item>
     ///   <item><c>null</c> with <paramref name="heldByAnother"/> = <c>false</c>
     ///   when the mutex could not be acquired for any other reason (a DACL that
-    ///   refuses creation/open, a transient failure): the caller should FALL
-    ///   BACK to proceeding without the hold, never refuse on this.</item>
+    ///   refuses creation/open, a transient failure). The false is "not shown to
+    ///   be held", never "not held": this process could not find out. Both
+    ///   callers refuse on it, and a new caller that means to act on the cache
+    ///   should too.</item>
     /// </list>
+    /// The flag is a positive signal only. True is a measurement, an opened
+    /// mutex a zero wait failed to take; false is the absence of one, and the
+    /// two are not opposites.
     /// </summary>
     IMutexLease? TryAcquire(string name, out bool heldByAnother);
 }

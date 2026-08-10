@@ -1720,11 +1720,12 @@ public class MainViewModelTests
         // The twin of the installer-busy test above, and the difference between
         // them is the whole reason this is a second flag rather than a second
         // cause behind the first. Busy re-runs the pending-reboot gate, which now
-        // meets the held mutex and paints its banner. This one must NOT: nothing
-        // holds the mutex, so the gate would come back clean and paint nothing,
-        // leaving the user refused with no reason on screen. The dialog carries it
-        // instead, and the title is pinned as well as the body because this arm
-        // borrowed the crash arm's title once.
+        // meets the held mutex and paints its banner. This one must NOT, because
+        // the gate can account for the condition neither way: clean paints nothing
+        // and leaves the user refused with no reason on screen, and held asserts an
+        // install nothing has shown. The dialog carries it instead, and the title
+        // is pinned as well as the body because this arm borrowed the crash arm's
+        // title once.
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
