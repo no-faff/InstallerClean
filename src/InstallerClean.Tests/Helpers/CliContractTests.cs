@@ -5,9 +5,10 @@ namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
 /// Pins the CLI's arg-to-command and result-to-exit-code contract that RMM
-/// tooling depends on. The console host (installerclean-cli) has no test
-/// coverage of its own (the Tests project does not reference it), so the
-/// branch logic lives in CliContract (Core) and is verified here.
+/// tooling depends on. The branch logic lives in CliContract (Core) rather than
+/// in the console host, so that it is decided in one place and held here; what
+/// coverage the host itself has reaches only the helpers it exposes for the
+/// purpose, never a path through its work loop.
 /// </summary>
 /// <remarks>
 /// CliCommand and CliEventClass are internal to Core (visible here via
