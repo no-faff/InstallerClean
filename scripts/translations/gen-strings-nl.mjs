@@ -206,7 +206,7 @@ const MAP = {
   'Body.NoFileSelected': `Selecteer een bestand om de details te bekijken.`,
   'Body.NoProductSelected': `Selecteer een product om de details te bekijken.`,
   'Body.NoMetadata': `Geen metadata beschikbaar.`,
-  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.`,
+  'Body.RegisteredMissingFromDisk': `Dit installatiebestand ontbreekt. Dit levert nu geen problemen op, en dat zal ook zo blijven totdat je het programma waartoe het behoort probeert te herstellen, bij te werken of te verwijderen. Die stap kan dan mislukken, omdat Windows naar dit bestand zoekt en het er niet is.&#10;&#10; Om dit te verhelpen, download je het installatieprogramma van de maker en voer je het uit over je bestaande exemplaar heen (verwijder het programma niet eerst, want het verwijderen is zelf een stap waarvoor dit bestand nodig is). Gebruik de versie die je hebt geïnstalleerd als je die kunt vinden, aangezien Windows een andere versie mogelijk afwijst. Dit zou het bestand moeten herstellen zonder je instellingen te wijzigen, maar Microsoft garandeert dit niet, en hun eigen laatste redmiddel is het programma opnieuw te installeren.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `Het README-bestand [legt uit wat deze map is], en hoe je een bestand terugzet, in Microsofts eigen woorden.`,
   'Body.NoPatches': `(geen)`,
 
@@ -270,8 +270,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} bestanden ongemoeid gelaten`,
   'Summary.OrphanedToCleanUp.Singular': `{0} overbodig bestand om op te ruimen`,
   'Summary.OrphanedToCleanUp.Plural': `{0} overbodige bestanden om op te ruimen`,
-  'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
-  'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Singular': `{0} het geregistreerde bestand ontbreekt. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Open ‘Details’ voor meer informatie over wat je moet doen.`,
+  'Summary.MissingFromDisk.Plural': `{0} er ontbreken geregistreerde bestanden. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma’s zou kunnen mislukken. Open ‘Details’ voor meer informatie over wat je moet doen.`,
   'Summary.OperationFiles': `{0} van {1} {2}`,
   'Summary.OrphanedWindow': `{0} verweesd, {1} vervangen, {2} verouderd ({3})`,
   'Summary.RegisteredWindow.Singular': `{0} geregistreerd bestand ongemoeid gelaten ({1})`,
@@ -279,7 +279,7 @@ const MAP = {
 
   // Confirmation dialogs
   'Confirm.MoveTitle': `{0} {1} verplaatsen ({2})?`,
-  'Confirm.MoveDestination': `Move to:`,
+  'Confirm.MoveDestination': `Verplaats naar:`,
   'Confirm.DeleteTitle': `{0} {1} verwijderen ({2})?`,
   'Confirm.MoveSameDrive': `Die map staat op dezelfde schijf, dus de ruimte komt pas vrij als je hem verwijdert. Kies een map op een andere schijf als je de ruimte meteen wilt hebben.`,
 
@@ -293,7 +293,7 @@ const MAP = {
   'Error.MsiNonSuccess': `Windows Installer kon InstallerClean geen leesbare lijst van de geïnstalleerde programma's geven: {0} vermeldingen op rij kwamen onleesbaar terug (laatste foutcode {1}). In plaats van met een half gelezen lijst te werken is InstallerClean gestopt. Er is niets verwijderd.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer heeft het einde van de lijst met geïnstalleerde programma's nooit gemeld: InstallerClean heeft het na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer heeft het einde van de patchlijst van één programma nooit gemeld: InstallerClean heeft het na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd.`,
-  'Error.ScanCorrelationFailed': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Error.ScanCorrelationFailed': `InstallerClean kon deze scan niet rijmen met de Windows Installer-records: bijna elk bestand dat Windows nog als nodig vermeldt, ontbreekt in {InstallerFolder}, terwijl wat er werkelijk in de map staat vrijwel niets in de records terugvindt. Zo ziet geen enkele echte computer eruit, dus het wijst op een probleem met het lezen van de records en niet op bestanden die je veilig kunt verwijderen. Er is niets voor opruimen aangeboden en er is niets verwijderd.`,
   'Error.ScanRecordsUnreadable': `InstallerClean kon niet genoeg van de Windows Installer-records lezen om zeker te weten wat er nog nodig is: de lijst met geïnstalleerde programma's kwam onvolledig terug, en dezelfde records rechtstreeks uit het register lezen leverde ook fouten op. Een bestand kon er verweesd uitzien enkel doordat het record dat het benoemt een van de onleesbare was, dus InstallerClean is gestopt. Er is niets verwijderd.`,
   'Error.InvalidDestinationTitle': `Ongeldige bestemming`,
   'Error.DestinationWriteFailedTitle': `Kon niet naar de bestemming schrijven`,
@@ -447,8 +447,8 @@ const MAP = {
   'Automation.Scroll.ProductDetails': `Productgegevens`,
   'Body.PendingReboot.Other': `Windows Installer heeft iets lopen, dus Verplaatsen en Verwijderen staan stil. InstallerClean raakt {InstallerFolder} niet aan terwijl daar iets verandert. Zodra het klaar is, klik je op Opnieuw scannen en komen ze terug.`,
   'Cli.TooManyArgumentsNoPath': `Fout: onverwacht extra argument '{0}'. /s en /d nemen geen verdere argumenten, en er kan maar één vlag per uitvoering worden gebruikt.`,
-  'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.`,
-  'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.`,
+  'Cli.MissingFromDisk.Singular': `geregistreerde bestand {0} ontbreekt in {InstallerFolder}. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Door het installatieprogramma van dat programma opnieuw uit te voeren, bij voorkeur dezelfde versie, wordt het bestand teruggezet.`,
+  'Cli.MissingFromDisk.Plural': `{0} geregistreerde bestanden ontbreken in {InstallerFolder}. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma’s zou kunnen mislukken. Door het installatieprogramma van elk programma opnieuw uit te voeren – bij voorkeur dezelfde versie – zouden deze bestanden teruggezet moeten worden.`,
   'Cli.MoveNotEnoughSpace': `Fout: onvoldoende ruimte op {0}. Deze bestanden verplaatsen vraagt {1} en er is {2} vrij. Er is niets verplaatst.`,
   'Cli.PendingRebootBlocked.Other': `Fout: Windows Installer heeft iets lopen, dus /m en /d zijn geblokkeerd. InstallerClean raakt {InstallerFolder} niet aan terwijl daar iets verandert. Probeer het opnieuw zodra het klaar is.`,
   'Cli.FoundNoOrphans': `Geen overbodige bestanden gevonden.`,
@@ -467,7 +467,7 @@ const MAP = {
   'Completion.ReverifyIdentityClaimed': `{0} {1} behouden, omdat Windows een registratie heeft van het programma dat erin genoemd wordt.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} behouden, omdat InstallerClean geen programma kon vinden dat erin genoemd wordt.`,
   'Completion.NothingRemoved': `Niets verwijderd`,
-  'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Error.ScanNoRegisteredFileInFolder': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voorgesteld en er is niets verwijderd.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
