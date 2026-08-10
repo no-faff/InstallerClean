@@ -5,15 +5,17 @@ namespace InstallerClean.Tests.Helpers;
 /// <summary>
 /// Hand fake for <see cref="IMutexProbe"/> so the action services'
 /// <c>Global\_MSIExecute</c> hold can be driven without a real Windows named
-/// mutex. Simulates the three
-/// outcomes of <see cref="IMutexProbe.TryAcquire"/>: the mutex is held by another
-/// (refuse), it was acquired (proceed, then release), or it could not be acquired
-/// for another reason (fall back and proceed). Records how many times a lease was
-/// taken and released so a test can assert the lease is released exactly once.
+/// mutex. Simulates the three outcomes of
+/// <see cref="IMutexProbe.TryAcquire"/>, named for what the probe returns rather
+/// than for what a caller does with it: the mutex was acquired, it is held by
+/// another process, or the acquire was refused with nothing shown to be holding
+/// it (a DACL on the object, or any other non-fatal failure). Records how many
+/// times a lease was taken and released so a test can assert the lease is
+/// released exactly once.
 /// </summary>
 internal sealed class FakeMutexProbe : IMutexProbe
 {
-    internal enum Mode { HeldByAnother, Acquire, FallBack }
+    internal enum Mode { HeldByAnother, Acquire, RefusedNotHeld }
 
     private readonly Mode _mode;
     public int Acquired { get; private set; }
@@ -41,7 +43,7 @@ internal sealed class FakeMutexProbe : IMutexProbe
             case Mode.HeldByAnother:
                 heldByAnother = true;
                 return null;
-            case Mode.FallBack:
+            case Mode.RefusedNotHeld:
                 return null;
             default:
                 Acquired++;

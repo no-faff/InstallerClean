@@ -210,6 +210,7 @@ public static class Strings
     public static string Cli_MoveDestinationInSystemFolder => Get("Cli.MoveDestinationInSystemFolder");
     public static string Cli_MoveDestinationRelative => Get("Cli.MoveDestinationRelative");
     public static string Cli_MovedFiles => Get("Cli.MovedFiles");
+    public static string Cli_MoveInstallerLockUnavailable => Get("Cli.MoveInstallerLockUnavailable");
     public static string Cli_MoveNotEnoughSpace => Get("Cli.MoveNotEnoughSpace");
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
@@ -295,6 +296,8 @@ public static class Strings
     public static string Error_IOWriteDestination_NoLog => Get("Error.IOWriteDestination.NoLog");
     public static string Error_MissingSourceFile => Get("Error.MissingSourceFile");
     public static string Error_MoveFailedTitle => Get("Error.MoveFailedTitle");
+    public static string Error_MoveInstallerLockUnavailable => Get("Error.MoveInstallerLockUnavailable");
+    public static string Error_MoveInstallerLockUnavailableTitle => Get("Error.MoveInstallerLockUnavailableTitle");
     public static string Error_MoveIntoInstaller => Get("Error.MoveIntoInstaller");
     public static string Error_MsiAccessDenied => Get("Error.MsiAccessDenied");
     public static string Error_MsiEnumerationNeverEnded => Get("Error.MsiEnumerationNeverEnded");

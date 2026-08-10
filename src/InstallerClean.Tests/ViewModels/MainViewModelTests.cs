@@ -993,6 +993,48 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task MoveAllAsync_lock_unavailable_result_shows_the_dialog_and_leaves_the_gate_alone()
+    {
+        // The twin of the installer-busy test above, and of the delete path's own
+        // pair, which is why this is a second flag rather than a second cause
+        // behind the first. Busy re-runs the pending-reboot gate, which meets the
+        // held mutex and paints its banner. This one must NOT, because the gate
+        // can account for the condition neither way: clean paints nothing and
+        // leaves the user refused with no reason on screen, and held asserts an
+        // install nothing has shown. The dialog carries it instead,
+        // and the title is pinned as well as the body because the Move copy is a
+        // separate pair from the Delete copy and either could be wired to the
+        // other's.
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
+                InstallerLockUnavailable: true));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-lock-unavailable");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            Strings.Error_MoveInstallerLockUnavailable,
+            Strings.Error_MoveInstallerLockUnavailableTitle);
+        // Twice and no more: once for the scan, once for the act-time gate. A
+        // third would be the busy arm's re-check, which this arm must not run.
+        _rebootService.Received(2).Check();
+        Assert.False(vm.Scan.HasPendingReboot);
+        Assert.False(vm.Completion.IsComplete);
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task MoveAllAsync_reverify_dropping_one_acts_on_the_rest_and_reports_it_skipped()
     {
         var vm = CreateViewModel();

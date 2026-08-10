@@ -397,14 +397,15 @@ public class DeleteFilesServiceUnitTests
     {
         var fs = new MockFileSystem();
         var a = AddFile(fs, "a.msi");
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.FallBack);
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.RefusedNotHeld);
         var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
         var result = await svc.DeleteFilesAsync(new[] { a });
 
         // A delete without the hold has nothing stopping a program registering a
         // package part-way through it, and no bin to fetch a wrongly-removed file
-        // back from, so the batch does not run.
+        // back from, so the batch does not run. The Move path answers this input
+        // the same way, for a reason of its own that its test states.
         Assert.True(result.InstallerLockUnavailable);
         Assert.Equal(0, result.DeletedCount);
         Assert.Empty(result.Errors);

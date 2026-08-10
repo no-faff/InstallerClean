@@ -735,6 +735,32 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return;
             }
 
+            if (result.InstallerLockUnavailable)
+            {
+                // The service could not take Global\_MSIExecute and nothing was
+                // shown to be holding it, so it refused and touched nothing. No
+                // gate re-check here, unlike the arm above, and that is the whole
+                // reason this is a separate flag rather than a second cause behind
+                // the same one: the gate is no account of this condition whichever
+                // way it answers, since it can come back clean and paint nothing,
+                // leaving a refusal with no reason on screen, and on a DACL it
+                // reports held and would paint a banner asserting an install
+                // nothing has shown. A dialog carries the reason instead. The
+                // service's own acquire has the detail.
+                //
+                // The destination cleanup matches the arm above, and for the same
+                // reason: the service refuses ahead of its own
+                // CreateDestinationFolder, so nothing it did needs undoing, and
+                // what does is the folder THIS pre-flight made, which would
+                // otherwise be left empty behind a batch that never ran.
+                _dialogService.ShowWarning(
+                    Strings.Error_MoveInstallerLockUnavailable,
+                    Strings.Error_MoveInstallerLockUnavailableTitle);
+                OperationProgress = string.Empty;
+                if (createdDestination) await RemoveCreatedDestinationAsync(dest);
+                return;
+            }
+
             if (result.HeldBack.Count > 0)
             {
                 // The service's own re-read, taken under the installer mutex, took

@@ -100,11 +100,47 @@ public sealed class MoveFilesService : IMoveFilesService
             // cache. Acquired here (not on the dispatcher) and released in the
             // finally on the SAME thread (Win32 owner-thread rule); the body is
             // synchronous, so no await hops threads between acquire and release.
-            // Held by a live transaction => refuse and touch nothing (the caller
-            // re-checks the pending-reboot gate and shows its banner). A
-            // DACL-refused acquire (lease null, not heldByAnother) proceeds
-            // without the hold rather than refusing. This closes only the
-            // sub-millisecond race after the host-side gate re-check has passed.
+            //
+            // Neither way of missing the hold proceeds, and the two are reported
+            // separately because the caller can account for only one of them. Held
+            // by a live transaction => the pending-reboot gate the caller re-runs
+            // meets the same mutex and paints its banner, which says an install is
+            // in progress, which it is. Refused with nothing shown to be holding it
+            // (a DACL on the object, or any other non-fatal failure) => that gate
+            // is no account of the condition at all, whichever way it answers.
+            // IsHeld asks through a different call requesting different rights, so
+            // it can come back clean, leaving a refusal with nothing on screen
+            // explaining it; and on a DACL it returns held (its own catch says so),
+            // which would paint a banner asserting an install nothing has shown. So
+            // this result carries its own sentence rather than deferring to the
+            // gate. Holding the mutex closes only the sub-millisecond race after
+            // the host-side gate re-check has passed.
+            //
+            // Refusing the second case rather than running on unheld, and the three
+            // things that decide it. A heldByAnother of false does not mean nothing
+            // is installing, it means this process could not find out, and both the
+            // name and the branch reading it invite the stronger reading. The object
+            // is not permanent, so being refused it is evidence rather than noise:
+            // Windows Installer creates _MSIExecute when an install begins and drops
+            // it when the install ends, so between installs the create-or-open path
+            // below makes the object and succeeds, and the only object that can
+            // refuse this process is one something else has already made. That is
+            // the documented lifetime plus MutexProbe's account of the
+            // create-or-open; it has not been measured on a live machine. And a
+            // move's exposure to the hazard is the delete's: a moved file is as
+            // absent from the cache as a deleted one, so a transaction that starts
+            // mid-batch fails to find it either way. Only the recovery differs, and
+            // running on here bought a recovery property at the price of a safety
+            // one.
+            //
+            // The counter-argument this rejects: MutexProbe's DACL comment reasons
+            // that the plausible cause of a refusal is a non-elevated per-user
+            // install, which does not write the machine cache, so the hazard would
+            // not apply. It does not survive this branch being unable to see which
+            // cause it has. The same null-with-heldByAnother-false answer comes back
+            // from that probe's catch-all for any other non-fatal failure, so acting
+            // on the benign reading is choosing a behaviour for a mixed set on the
+            // strength of one member of it.
             //
             // What the hold costs, so nobody widens it and nobody removes it:
             // _MSIExecute is the machine-wide Windows Installer serialisation
@@ -132,12 +168,23 @@ public sealed class MoveFilesService : IMoveFilesService
             // Delete acquires immediately, having nothing to set up first, and
             // this cannot: everything between here and the loop is the
             // destination work, and running it before the acquire would create
-            // the destination folder even on the runs the busy check above
-            // refuses. A refusal that has touched nothing is worth more than a
-            // shorter hold.
+            // the destination folder even on the runs the checks below refuse. A
+            // refusal that has touched nothing is worth more than a shorter hold,
+            // and both refusals below are reached before any of that work.
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
             if (lease is null && heldByAnother)
                 return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
+            if (lease is null)
+            {
+                // Recorded as well as refused. The refusal is what the user is
+                // told; the crash log is the only place the machine's own
+                // condition is written down, and an operator seeing this on every
+                // run is looking at a DACL on the object rather than at a passing
+                // race. Once per batch, so it costs nothing at any file count.
+                Helpers.CrashLog.TryWrite(new InvalidOperationException(
+                    "Move refused: the Windows Installer mutex could not be acquired and was not held by another process."));
+                return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true);
+            }
 
             try
             {
@@ -168,12 +215,9 @@ public sealed class MoveFilesService : IMoveFilesService
             // mutex. What can still have moved is a verdict on a claim that
             // already existed, and those carry an identity to ask about.
             //
-            // Move reaches this line without the hold on the fall-back path,
-            // where Delete now refuses instead, so here the re-read is a narrower
-            // thing than it is there: still worth taking, because a verdict that
-            // has already moved is found either way, and not a guarantee, because
-            // nothing is stopping another one moving underneath it. The asymmetry
-            // is the one recorded at the acquire.
+            // Synchronous on the acquiring thread by necessity, not by taste: the
+            // lease is released by the thread that took it, so nothing between the
+            // acquire and the release may await.
             var recheck = _reverifier.RecheckUnderLease(
                 patchClaims ?? Array.Empty<PatchClaim>());
             var heldBack = recheck.HeldBack;
@@ -221,17 +265,6 @@ public sealed class MoveFilesService : IMoveFilesService
             var errors = new List<FileOperationError>();
             var failureLog = new PerItemFailureLog("Move",
                 "The per-file list is on the completion screen.");
-            // A skipped hold is not a refusal: TryAcquire returns null with
-            // heldByAnother false on a DACL refusal or any other non-fatal
-            // failure, and running on is the right call. It is recorded because
-            // the hold is the only thing stopping a msiexec registering a package
-            // mid-batch, so a run without it is the one window in which the
-            // act-time re-verify's proof can go stale under the batch, and a
-            // report of a needed file being removed could never be attributed to
-            // it. Once per batch, so it costs nothing at any file count.
-            if (lease is null)
-                Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                    "Move ran without the Windows Installer mutex: it could not be acquired and was not held by another process."));
             // Resolved once for the batch; the guard resolves each SOURCE per
             // file against it (see InstallerCacheRoot). Separate from
             // canonicalDestination above, which guards the other end and is
@@ -468,9 +501,11 @@ public sealed class MoveFilesService : IMoveFilesService
             }
             finally
             {
-                // Release on this same worker thread (Win32 owner-thread rule);
-                // no-op when the acquire fell back (lease null).
-                lease?.Dispose();
+                // Release on this same worker thread (Win32 owner-thread rule).
+                // Non-null by the time this try is entered: both ways of failing
+                // to acquire return above, so a batch that reaches here holds the
+                // mutex and a batch that does not never started.
+                lease.Dispose();
             }
         }, cancellationToken);
     }

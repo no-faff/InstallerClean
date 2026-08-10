@@ -715,6 +715,23 @@ internal static class Program
             if (moveResult.InstallerBusy)
                 return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
 
+            // The service could not take Global\_MSIExecute and nothing was shown
+            // to be holding it, so it refused and touched nothing, its own
+            // destination folder included. Not routed through
+            // EmitPendingRebootBlocked, for the reason the /d branch states: every
+            // PendingRebootReason it can name asserts something is in progress, and
+            // the defining fact here is that nothing has been shown to be.
+            // TransientSkip and ExitTransient on the same reasoning as its /d
+            // sibling: the condition can clear on its own, so a scheduler should
+            // come back rather than treat the machine as broken.
+            if (moveResult.InstallerLockUnavailable)
+            {
+                Console.WriteLine(Strings.Cli_MoveInstallerLockUnavailable);
+                MachineContract.WriteEventLog(CliEventClass.TransientSkip,
+                    () => string.Format(Strings.Cli_EventLogInstallerLockUnavailable, arg));
+                return ExitTransient;
+            }
+
             // See the /d branch for why this is reported here and not beside the
             // pre-act re-verify's line, and for why it comes ahead of the cancel
             // re-entry rather than after it.

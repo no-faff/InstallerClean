@@ -284,27 +284,35 @@ public class MoveFilesServiceUnitTests
     }
 
     [Fact]
-    public async Task MoveFilesAsync_falls_back_and_proceeds_when_the_mutex_cannot_be_acquired()
+    public async Task MoveFilesAsync_refuses_when_the_installer_mutex_cannot_be_acquired_and_nobody_holds_it()
     {
         var fs = new MockFileSystem();
         var source = $@"{SourceDir}\a.msi";
         fs.AddFile(source, new MockFileData("payload"));
-        fs.AddDirectory(DestDir);
-        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.FallBack);
+        // The destination is deliberately NOT pre-created, which is half of what
+        // this test is for: a refusal must leave the folder unmade as well as the
+        // file unmoved. The service creates it on any run that gets past the
+        // acquire, so an assertion that it does not exist afterwards is an
+        // assertion that the acquire is what stopped the batch.
+        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.RefusedNotHeld);
 
         var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
 
+        // Without the hold nothing stops a program registering a package part-way
+        // through, so the act-time proof can go stale under the batch. A file this
+        // moves out of the cache is as absent from it as a deleted one, so the
+        // exposure is the delete path's and the answer matches it.
+        Assert.True(result.InstallerLockUnavailable);
+        Assert.Equal(0, result.MovedCount);
+        Assert.Empty(result.Errors);
+        Assert.True(fs.File.Exists(source));
+        Assert.False(fs.Directory.Exists(DestDir));
+        // Distinguishable from the held case, because the caller answers them
+        // differently: the pending-reboot gate can explain that one and can say
+        // nothing at all about this one.
         Assert.False(result.InstallerBusy);
-        Assert.Equal(1, result.MovedCount); // proceeded without the hold
         Assert.Equal(0, mutex.Released);
-        // Deliberately NOT what Delete does with the same answer, and pinned here
-        // so the difference cannot be tidied away as an inconsistency. Delete
-        // refuses, because a file it removes on a stale verdict is gone. This is a
-        // rename into a folder the user chose, so the same mid-batch registration
-        // leaves them a file they can put back, and refusing would cost them the
-        // one route to their disk space that never needed the lock in the first
-        // place.
     }
 
     [Fact]

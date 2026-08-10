@@ -498,6 +498,33 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
+    public async Task A_lock_the_service_could_not_take_removes_the_folder_the_pre_flight_created()
+    {
+        // The other way the service can refuse at its acquire: the mutex could not
+        // be taken and nothing was shown to be holding it. It refuses ahead of its
+        // own CreateDestinationFolder exactly as the busy arm above does, so the
+        // only folder in existence is this pre-flight's and it has nothing in it.
+        // Its own service-level test pins that the service creates none; this pins
+        // that the host clears the one it made.
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(true);
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
+                Arg.Any<IReadOnlyList<PatchClaim>?>())
+            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
+                InstallerLockUnavailable: true));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.Received(1).Delete(_destination);
+    }
+
+    [Fact]
     public async Task A_re_verify_that_keeps_every_file_back_removes_the_folder_the_pre_flight_created()
     {
         // A patch that was superseded at scan time but is wanted again by act

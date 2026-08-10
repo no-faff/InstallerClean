@@ -104,11 +104,13 @@ internal sealed class MutexProbe : IMutexProbe
             // them: nothing has been shown to hold the object, and that fact
             // alone does not settle whether an act should run without the hold.
             //
-            // The two callers answer it differently and the split is deliberate.
-            // Move runs on, because a rename into a folder the user chose leaves
-            // them a file they can put back. Delete refuses, because a permanent
-            // delete leaves nothing to put back. Each states its own reasoning at
-            // its own acquire; neither belongs here.
+            // Both callers refuse on it. A file this app has moved out of the cache
+            // is as absent from it as one this app has deleted, so an installer
+            // transaction that starts mid-batch fails to find it either way, and
+            // the recovery a move leaves the user is not a reason to run unheld.
+            // Each states its own reasoning at its own acquire; neither belongs
+            // here, and this method still reports rather than decides, because the
+            // answer it hands back is the same one either way.
             return null;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)

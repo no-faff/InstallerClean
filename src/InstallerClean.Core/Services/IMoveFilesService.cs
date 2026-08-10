@@ -51,20 +51,17 @@ public interface IMoveFilesService
 }
 
 /// <summary>
-/// Outcome of a Move. When <see cref="Cancelled"/> and
-/// <see cref="InstallerBusy"/> are both <c>false</c>, <see cref="MovedCount"/> +
-/// <see cref="Errors"/>.Count + <see cref="HeldBack"/>.Count sum to the input
-/// count: every file is either moved, recorded as a failure, or kept back by the
-/// under-lease re-read (never silently dropped). <see cref="HeldBack"/> is in
-/// that sum rather than a footnote to it, because it is the term a caller is most
-/// likely to forget and the one that makes the other two describe a smaller batch
-/// than the caller handed in. When <see cref="Cancelled"/> is <c>true</c> the
-/// batch was stopped mid-way, so the three account for the files reached before
-/// the cancel and the rest of the input was never touched.
-/// When <see cref="InstallerBusy"/> is <c>true</c> the batch was refused before it
-/// started because a Windows Installer transaction held <c>Global\_MSIExecute</c>:
-/// nothing was touched, so <see cref="MovedCount"/> is 0 and <see cref="Errors"/>
-/// is empty. The caller re-checks the pending-reboot gate and shows its banner.
+/// Outcome of a Move. When <see cref="Cancelled"/>, <see cref="InstallerBusy"/>
+/// and <see cref="InstallerLockUnavailable"/> are all <c>false</c>,
+/// <see cref="MovedCount"/> + <see cref="Errors"/>.Count + <see cref="HeldBack"/>.Count
+/// sum to the input count: every file is either moved, recorded as a failure, or
+/// kept back by the under-lease re-read (never silently dropped).
+/// <see cref="HeldBack"/> is in that sum rather than a footnote to it, because it
+/// is the term a caller is most likely to forget and the one that makes the other
+/// two describe a smaller batch than the caller handed in. When
+/// <see cref="Cancelled"/> is <c>true</c> the batch was stopped mid-way, so the
+/// three account for the files reached before the cancel and the rest of the input
+/// was never touched.
 ///
 /// One outcome is NOT in this record, and a caller reading only the record would
 /// miss it: a destination guard tripping mid-batch throws
@@ -73,6 +70,22 @@ public interface IMoveFilesService
 /// hold of that partial result too; what does not hold is the assumption that a
 /// returned result is the only way this method reports.
 /// </summary>
+/// <param name="InstallerBusy">
+/// The batch was refused before it started because a Windows Installer
+/// transaction held <c>Global\_MSIExecute</c>: nothing was touched, so
+/// <see cref="MovedCount"/> is 0 and <see cref="Errors"/> is empty. The caller
+/// re-checks the pending-reboot gate and shows its banner.
+/// </param>
+/// <param name="InstallerLockUnavailable">
+/// The batch was refused before it started because <c>Global\_MSIExecute</c>
+/// could not be acquired AND nothing else was holding it: nothing was touched,
+/// and the service returns before it creates or probes the destination folder.
+/// Kept separate from <see cref="InstallerBusy"/> because the two need different
+/// answers, not different wording. The pending-reboot gate is what reports the
+/// busy case, and it can say nothing at all about this one: no process holds the
+/// mutex, so a re-run of the gate comes back clean and the caller would report a
+/// refusal it could not account for. This flag carries its own sentence instead.
+/// </param>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,
 /// and therefore never touched. They are the same conditions the caller's pre-act
@@ -95,6 +108,7 @@ public record MoveResult(
     IReadOnlyList<FileOperationError> Errors,
     bool Cancelled = false,
     bool InstallerBusy = false,
+    bool InstallerLockUnavailable = false,
     IReadOnlyList<string>? HeldBack = null,
     HeldBackReasons HeldBackReasons = default)
 {

@@ -860,7 +860,18 @@ InstallerClean уже працював від імені адміністрат�
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
   <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
-  <!-- The heading over Error.InstallerLockUnavailable below. It is the first
+  <!-- The next four keys are two PAIRS, one per action, for one condition: the
+       Windows Installer lock could not be taken and nothing was shown to be
+       holding it, so the batch was refused before it reached a file. The two
+       unprefixed keys are the delete half and the two Move* keys are the move
+       half. The delete half is unprefixed because it is the established name,
+       and an unprefixed name in this file promises nothing about being
+       action-neutral: Error.DestinationInSystemFolder is move-only and carries no
+       prefix either. Each half is word for word its sibling with the action word
+       changed, deliberately, because a second phrasing of one idea is worse than
+       a parallel one.
+
+       The heading over Error.InstallerLockUnavailable below. It is the first
        thing a screen reader announces when that dialog opens and the first
        thing a glancing eye takes, so it carries the outcome rather than the
        condition: the delete was refused before it reached a file, and nothing
@@ -870,18 +881,26 @@ InstallerClean уже працював від імені адміністрат�
        over a delete that reached no file, so a language carries one wording for
        the two rather than two wordings for one thing. No placeholders. -->
   <data name="Error.InstallerLockUnavailableTitle" xml:space="preserve"><value>Нічого не видалено</value></data>
+  <!-- The move half of the heading above, and it takes the same wording as
+       Completion.NothingMoved for the same reason its sibling takes
+       Completion.NothingDeleted's. No placeholders. -->
+  <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Nothing was moved</value></data>
   <!-- Shown when a Delete could not take Global\_MSIExecute and nothing else
-       was holding it (a DACL that refuses the object, or any other non-fatal
-       failure to acquire). Without that hold nothing stops a program
+       was shown to be holding it (a DACL that refuses the object, or any other
+       non-fatal failure to acquire). Without that hold nothing stops a program
        registering a package part-way through the batch, so the proof the
-       act-time re-verify produced can go stale under the delete, and Delete
-       refuses rather than proceed. Move is deliberately not refused and has no
-       string here: it is a rename the user can undo, so the same condition
-       degrades to something recoverable. Written to the shape of
+       act-time re-verify produced can go stale under the delete, and the batch
+       is refused rather than run. Written to the shape of
        Error.ScanCacheRootUnresolved above, which supplies the middle step of
        its own causal chain: what the app could not do, what followed from it,
        and that nothing has been removed. No placeholders. -->
   <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.</value></data>
+  <!-- The move half of the sentence above. Move refuses on the same condition
+       because its exposure to it is the delete's: a file moved out of the cache
+       is as absent from it as a deleted one, so a transaction starting part-way
+       through fails to find it either way, and the recovery a move leaves the
+       user does not make the batch safer to run. No placeholders. -->
+  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недійсне призначення</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не вдалося записати в призначення</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Не вдалося перемістити</value></data>
@@ -1229,8 +1248,11 @@ InstallerClean уже працював від імені адміністрат�
        string rather than a shared one because this whole family is: all four
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
        it, which is the console's shape and not the window's. Same condition,
-       same refusal, /d only. No placeholders. -->
+       same refusal, /d. No placeholders. -->
   <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.</value></data>
+  <!-- The /m half of the line above, the pair matching the two Error.* pairs in
+       the window's family. No placeholders. -->
+  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1239,12 +1261,16 @@ InstallerClean уже працював від імені адміністрат�
        grep can match a known string regardless of OS UI culture. -->
   <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
        2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
-  <!-- 0 = arg ("/d"). The audit twin of Cli.InstallerLockUnavailable, and it
-       cannot share Cli.EventLogPendingRebootBlocked: that line names a reason
-       from Cli.EventLogReason.*, and every one of those asserts something is in
+  <!-- 0 = arg ("/d" or "/m"). The audit twin of the two stdout lines above, and
+       ONE line for both modes where they are a pair, because a machine-read line
+       is matched on its shape and {0} already carries which mode ran. It cannot
+       share Cli.EventLogPendingRebootBlocked: that line names a reason from
+       Cli.EventLogReason.*, and every one of those asserts something is in
        progress, which is exactly what this condition is not. Machine-read like
        every Cli.EventLog* line, so it is forced English at the emit site and
-       states the condition rather than the advice. -->
+       states the condition rather than the advice. The tail names both actions
+       because the line covers both modes; naming one would be false of a run in
+       the other. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} unneeded {1} to {2}...</value></data>

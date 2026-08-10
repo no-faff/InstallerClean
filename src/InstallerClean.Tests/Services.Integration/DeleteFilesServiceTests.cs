@@ -162,9 +162,10 @@ public class DeleteFilesServiceTests : IDisposable
         // part-way through, so the act-time proof can go stale underneath a delete
         // that no longer has a Recycle Bin to take the mistake back out of.
         //
-        // Its Move twin asserts the opposite outcome on the same input, and the
-        // pair is where the asymmetry is pinned: a move is a rename the user can
-        // undo, so it degrades to something recoverable and carries on.
+        // Its Move twin asserts the same outcome on the same input, and the pair
+        // is where that is pinned: a file moved out of the cache is as absent
+        // from it as a deleted one, so the exposure is shared and only the
+        // recovery differs.
         //
         // Real filesystem because the record is a real crash-log write, which is
         // half the behaviour under test: the user is told the run refused, and the
@@ -176,7 +177,7 @@ public class DeleteFilesServiceTests : IDisposable
         var fs = new MockFileSystem();
         var source = @"C:\Windows\Installer\never-reached.msi";
         fs.AddFile(source, new MockFileData("payload"));
-        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.FallBack);
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.RefusedNotHeld);
 
         var result = await new DeleteFilesService(fs, mutex, installerFolderOverride: null).DeleteFilesAsync(new[] { source });
 

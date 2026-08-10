@@ -144,29 +144,36 @@ public class MoveFilesServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task MoveFilesAsync_records_a_batch_that_ran_without_the_installer_mutex()
+    public async Task MoveFilesAsync_records_a_batch_refused_for_want_of_the_installer_mutex()
     {
         // The sibling of DeleteFilesServiceTests' own record test, and the
-        // reasoning is that file's: a skipped hold is not a refusal, and it is
-        // the one window in which the act-time re-verify's proof can go stale
-        // underneath the batch. Real filesystem because the record is a real
-        // crash-log write, which is the behaviour under test; the move itself
-        // runs against a mock so nothing on disk is touched.
+        // reasoning is that file's: a hold that could not be taken, with nothing
+        // shown to be holding it, stops the batch, because without it nothing
+        // prevents a program registering a package part-way through and the
+        // act-time proof can go stale underneath. Real filesystem because the
+        // record is a real crash-log write, which is half the behaviour under
+        // test; the batch itself runs against a mock so nothing on disk is
+        // touched.
         var logPath = InstallerClean.Helpers.CrashLog.Write(
-            new InvalidOperationException("baseline for the move mutex fall-back record"));
+            new InvalidOperationException("baseline for the move mutex refusal record"));
         var baseline = new FileInfo(logPath).Length;
 
         var fs = new System.IO.Abstractions.TestingHelpers.MockFileSystem();
         var source = @"C:\Windows\Installer\never-reached.msi";
         fs.AddFile(source, new System.IO.Abstractions.TestingHelpers.MockFileData("payload"));
-        fs.AddDirectory(_destDir);
-        var mutex = new Tests.Helpers.FakeMutexProbe(Tests.Helpers.FakeMutexProbe.Mode.FallBack);
+        var mutex = new Tests.Helpers.FakeMutexProbe(Tests.Helpers.FakeMutexProbe.Mode.RefusedNotHeld);
 
         var result = await new MoveFilesService(fs, mutex, installerFolderOverride: null)
             .MoveFilesAsync(new[] { source }, _destDir);
 
-        // The fall-back proceeds rather than refusing, and takes no lease.
+        // Refused, and distinguishably so: nothing held the mutex, so the
+        // pending-reboot gate the busy case is answered by would report nothing.
+        Assert.True(result.InstallerLockUnavailable);
         Assert.False(result.InstallerBusy);
+        Assert.Equal(0, result.MovedCount);
+        Assert.Empty(result.Errors);
+        Assert.True(fs.File.Exists(source), "A refused batch touches nothing");
+        Assert.False(fs.Directory.Exists(_destDir), "A refused batch creates no destination");
         Assert.Equal(1, mutex.AcquireAttempts);
         Assert.Equal(0, mutex.Acquired);
 
@@ -178,7 +185,7 @@ public class MoveFilesServiceTests : IDisposable
         using var reader = new StreamReader(stream);
         var written = await reader.ReadToEndAsync();
         var appended = written.Length >= baseline ? written[(int)baseline..] : written;
-        Assert.Contains("Move ran without the Windows Installer mutex", appended);
+        Assert.Contains("Move refused", appended);
     }
 
     public void Dispose()

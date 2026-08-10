@@ -81,11 +81,9 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // anything about the mutex. Running on unserialised used to risk, at
             // worst, a file that had just become needed going to the Recycle Bin,
             // where the user could fetch it back; there is no bin to fetch it from.
-            // Move deliberately does NOT match this and still runs on: it is a
-            // rename into a folder the user chose, so the same mid-batch
-            // registration leaves them a file they can put back, and a refusal
-            // there would cost them the one route to their disk space that never
-            // depended on getting the installer's lock at all.
+            // MoveFilesService refuses on the same answer, for reasons it states at
+            // its own acquire: its exposure to the hazard is this one's, and only
+            // the recovery differs.
             //
             // What the hold costs, so nobody widens it and nobody removes it:
             // _MSIExecute is the machine-wide Windows Installer serialisation
