@@ -80,7 +80,7 @@ const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `Over`,
-  'Window.Registered.Title': `Geregistreerde bestanden die niet mogen worden verwijderd`,
+  'Window.Registered.Title': `Geregistreerde bestanden die beter niet kunnen worden verwijderd`,
   'Window.Orphaned.Title': `Overbodige bestanden die veilig kunnen worden verwijderd`,
 
   // Section headings
@@ -293,7 +293,7 @@ const MAP = {
   'Error.MsiNonSuccess': `Windows Installer kon InstallerClean geen leesbare lijst van de geïnstalleerde programma's geven: {0} vermeldingen op rij kwamen onleesbaar terug (laatste foutcode {1}). In plaats van met een half gelezen lijst te werken is InstallerClean gestopt. Er is niets verwijderd.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer heeft het einde van de lijst met geïnstalleerde programma's nooit gemeld: InstallerClean heeft het na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer heeft het einde van de patchlijst van één programma nooit gemeld: InstallerClean heeft het na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd.`,
-  'Error.ScanCorrelationFailed': `InstallerClean kon deze scan niet rijmen met de Windows Installer-records: bijna elk bestand dat Windows nog als nodig vermeldt, ontbreekt in {InstallerFolder}, terwijl wat er werkelijk in de map staat vrijwel niets in de records terugvindt. Daardoor kon er niets als overbodig worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.`,
+  'Error.ScanCorrelationFailed': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. Bijna elk bestand dat Windows nog als nodig vermeldt, ontbreekt daar, terwijl wat er werkelijk in de map staat vrijwel niets in de records terugvindt, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.`,
   'Error.ScanRecordsUnreadable': `InstallerClean kon niet genoeg van de Windows Installer-records lezen om zeker te weten wat er nog nodig is: de lijst met geïnstalleerde programma's kwam onvolledig terug, en dezelfde records rechtstreeks uit het register lezen leverde ook fouten op. Een bestand kon er verweesd uitzien enkel doordat het record dat het benoemt een van de onleesbare was, dus InstallerClean is gestopt. Er is niets verwijderd.`,
   'Error.InvalidDestinationTitle': `Ongeldige bestemming`,
   'Error.DestinationWriteFailedTitle': `Kon niet naar de bestemming schrijven`,
@@ -425,7 +425,7 @@ const MAP = {
   'Cli.Help.Help': `  installerclean-cli --help     Deze helptekst weergeven (ook /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version  De versie weergeven (ook -v)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s         Alleen scannen: overbodige bestanden tonen`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Overbodige bestanden voorgoed verwijderen`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Definitief verwijderen wat overbodig is`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Verplaatsen naar de opgeslagen back-upmap`,
   'Cli.Help.MovePath': `  installerclean-cli /m PAD     Verplaatsen naar het opgegeven pad`,
   'Cli.Help.NoteLine1': `installerclean-cli blokkeert de prompt tot het klaar is, zodat een script&#10;of geplande taak erop kan wachten.`,
@@ -467,7 +467,7 @@ const MAP = {
   'Completion.ReverifyIdentityClaimed': `{0} {1} behouden, omdat Windows een registratie heeft van het programma dat erin genoemd wordt.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} behouden, omdat InstallerClean geen programma kon vinden dat erin genoemd wordt.`,
   'Completion.NothingRemoved': `Niets verwijderd`,
-  'Error.ScanNoRegisteredFileInFolder': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voorgesteld en er is niets verwijderd.`,
+  'Error.ScanNoRegisteredFileInFolder': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

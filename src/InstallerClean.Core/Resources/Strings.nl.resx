@@ -86,7 +86,7 @@
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Window.About.Title" xml:space="preserve"><value>Over</value></data>
-  <data name="Window.Registered.Title" xml:space="preserve"><value>Geregistreerde bestanden die niet mogen worden verwijderd</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Geregistreerde bestanden die beter niet kunnen worden verwijderd</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Overbodige bestanden die veilig kunnen worden verwijderd</value></data>
 
   <!-- Section headings -->
@@ -831,7 +831,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean kon deze scan niet rijmen met de Windows Installer-records: bijna elk bestand dat Windows nog als nodig vermeldt, ontbreekt in {InstallerFolder}, terwijl wat er werkelijk in de map staat vrijwel niets in de records terugvindt. Daardoor kon er niets als overbodig worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. Bijna elk bestand dat Windows nog als nodig vermeldt, ontbreekt daar, terwijl wat er werkelijk in de map staat vrijwel niets in de records terugvindt, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -843,7 +843,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voorgesteld en er is niets verwijderd.</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -1371,7 +1371,7 @@ Het crashlog kon niet worden weggeschreven.</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Deze helptekst weergeven (ook /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  De versie weergeven (ook -v)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Alleen scannen: overbodige bestanden tonen</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Overbodige bestanden voorgoed verwijderen</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Definitief verwijderen wat overbodig is</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Verplaatsen naar de opgeslagen back-upmap</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PAD     Verplaatsen naar het opgegeven pad</value></data>
   <!-- ONE value carrying TWO printed lines, and the &#10; is where the English
