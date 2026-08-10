@@ -1283,12 +1283,12 @@ The crash log could not be written.</value></data>
        is matched on its shape and {0} already carries which mode ran. It cannot
        share Cli.EventLogPendingRebootBlocked: that line names a reason from
        Cli.EventLogReason.*, and every one of those asserts something is in
-       progress, which is exactly what this condition is not. Machine-read like
+       progress, which is exactly what nothing here has shown. Machine-read like
        every Cli.EventLog* line, so it is forced English at the emit site and
        states the condition rather than the advice. The tail names both actions
        because the line covers both modes; naming one would be false of a run in
        the other. -->
-  <data name="Cli.EventLogInstallerLockUnavailable" xml:space="preserve"><value>{0} mode aborted: the Windows Installer mutex could not be acquired and no other process was holding it, so no files were moved or deleted.</value></data>
+  <data name="Cli.EventLogInstallerLockUnavailable" xml:space="preserve"><value>{0} mode aborted: the Windows Installer mutex could not be acquired and nothing could be shown to be holding it, so no files were moved or deleted.</value></data>
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} unneeded {1} to {2}...</value></data>

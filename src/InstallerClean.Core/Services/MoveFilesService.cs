@@ -183,7 +183,7 @@ public sealed class MoveFilesService : IMoveFilesService
                 // run is looking at a DACL on the object rather than at a passing
                 // race. Once per batch, so it costs nothing at any file count.
                 Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                    "Move refused: the Windows Installer mutex could not be acquired and was not held by another process."));
+                    "Move refused: the Windows Installer mutex could not be acquired and nothing could be shown to be holding it."));
                 return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true);
             }
 

@@ -122,7 +122,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 // run is looking at a DACL on the object rather than at a passing
                 // race. Once per batch, so it costs nothing at any file count.
                 Helpers.CrashLog.TryWrite(new InvalidOperationException(
-                    "Delete refused: the Windows Installer mutex could not be acquired and was not held by another process."));
+                    "Delete refused: the Windows Installer mutex could not be acquired and nothing could be shown to be holding it."));
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true);
             }
 

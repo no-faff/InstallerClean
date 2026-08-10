@@ -200,7 +200,7 @@ public class DeleteFilesServiceTests : IDisposable
         var written = await reader.ReadToEndAsync();
         var appended = written.Length >= baseline ? written[(int)baseline..] : written;
         Assert.Contains("Delete refused", appended);
-        Assert.Contains("could not be acquired and was not held by another process", appended);
+        Assert.Contains("could not be acquired and nothing could be shown to be holding it", appended);
     }
 
     public void Dispose()

@@ -1278,7 +1278,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        is matched on its shape and {0} already carries which mode ran. It cannot
        share Cli.EventLogPendingRebootBlocked: that line names a reason from
        Cli.EventLogReason.*, and every one of those asserts something is in
-       progress, which is exactly what this condition is not. Machine-read like
+       progress, which is exactly what nothing here has shown. Machine-read like
        every Cli.EventLog* line, so it is forced English at the emit site and
        states the condition rather than the advice. The tail names both actions
        because the line covers both modes; naming one would be false of a run in
