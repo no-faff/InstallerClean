@@ -129,9 +129,34 @@ namespace InstallerClean.Models;
 ///
 /// It is a property of the MACHINE and not of any file, so it is all-or-nothing:
 /// zero on a machine that does not install products under instance transforms,
-/// and otherwise the whole candidate set, with no removable files offered. See
+/// and otherwise every candidate that would otherwise have been offered, with no
+/// removable files at all. See
 /// <see cref="Services.CandidateIdentityOutcome.InstanceTransformsInUse"/> for the
 /// mechanism and for what is still not established about it.
+/// </param>
+/// <param name="IdentityInstanceTransformsBytes">
+/// What those files come to. Carried rather than derived because the surface that
+/// names them is telling somebody what they are not getting, and a count with no
+/// size would leave them guessing at it.
+/// </param>
+/// <param name="WithheldFiles">
+/// Every candidate the identity pass kept back, whatever the cause, in walk order.
+///
+/// IT EXISTS SO THE TWO SUMMARY LINES ACCOUNT FOR EVERY FILE IN THE FOLDER. A
+/// withheld file used to appear in neither: not offered, because the pass kept it
+/// back, and not among the registered rows either, because no registration names
+/// it. The two lines could therefore add up to less than the folder holds, with
+/// the difference in no line at all and no way for anyone to notice.
+///
+/// The list rather than a count and a total, so the number shown and the rows
+/// shown cannot come apart: both are read off this. Null means a scan that never
+/// ran the pass, which is not the same as a pass that kept nothing back, and both
+/// read as an empty list to a caller that does not care.
+///
+/// NO CAUSE TRAVELS WITH IT, deliberately. Four different findings put a file in
+/// here and any sentence over all four would be false of three, so the surfaces
+/// that show these files say what is true of every one of them and nothing more:
+/// InstallerClean could not be sure about them.
 /// </param>
 /// <param name="Census">
 /// What the enumeration behind this scan measured about itself and about the
@@ -225,7 +250,9 @@ public record ScanResult(
     int RegisteredUnjudgedCount = 0,
     int RegisteredSupersededCount = 0,
     long RegisteredSupersededBytes = 0,
-    int IdentityInstanceTransformsCount = 0)
+    int IdentityInstanceTransformsCount = 0,
+    long IdentityInstanceTransformsBytes = 0,
+    IReadOnlyList<OrphanedFile>? WithheldFiles = null)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk; the sum of the two

@@ -255,6 +255,47 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Shows the state where the scan completed, kept every candidate back, and did
+    /// so because this machine installs a product as a second instance of itself.
+    ///
+    /// SEPARATE FROM <see cref="ShowAllClear"/> AND THAT IS THE WHOLE POINT. Both
+    /// end with an empty offer and they are not the same finding: one says the
+    /// folder holds nothing to remove, the other says the app could not tell. Until
+    /// this existed the second was shown as the first, so a machine with files the
+    /// app could not vouch for read as a machine with nothing to vouch for.
+    ///
+    /// The heading is not a warning colour. Nothing is wrong with the machine and
+    /// there is nothing for the user to do, which the body says in as many words.
+    /// </summary>
+    /// <param name="heldBackCount">
+    /// The files that would otherwise have been offered, not everything in the
+    /// folder. The folder total is mostly registered files that would never be
+    /// offered on any machine, and printing it on the screen that tells somebody
+    /// they are getting nothing would imply that much was going spare.
+    /// </param>
+    public void ShowNothingOffered(int heldBackCount, string heldBackSize,
+        int installedProductCount, long scanDurationMs)
+    {
+        HeadingIsWarning = false;
+        Heading = Strings.Completion_NothingOffered;
+        FailedCount = string.Empty;
+        SummaryDestination = string.Empty;
+        Summary = string.Format(
+            Strings.Completion_NothingOfferedBody, heldBackCount, heldBackSize);
+        Restore = string.Format(
+            Strings.Completion_NothingToCleanUpReceipt,
+            installedProductCount,
+            DisplayHelpers.PluraliseProduct(installedProductCount),
+            DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
+        Errors = string.Empty;
+        Skipped = string.Empty;
+        ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = true;
+        ShowDonate = false;
+        IsComplete = true;
+    }
+
+    /// <summary>
     /// The "N files kept in place" block for a completion overlay, or empty when
     /// the act-time re-verify kept nothing back. Shown alongside the Move/Delete
     /// summary so the totals still add up (acted on + kept = the scan's
@@ -501,7 +542,15 @@ public partial class CompletionViewModel : ObservableObject
         Heading = Strings.Completion_NothingRemoved;
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
-        Summary = SkippedText(reverify);
+        // ONE CONDITION OVERRIDES THE PARTITION, and only this one, because it is
+        // the only one that is not about the files. The machine gained a product
+        // installed as a second instance of itself between the scan and the click,
+        // so no file in the batch is the one at fault and the per-file causes below
+        // have nothing to say about any of them. Every other outcome keeps its line
+        // and its count.
+        Summary = reverify.InstanceTransformsInUse
+            ? Strings.Completion_InstanceRefusal
+            : SkippedText(reverify);
         Restore = string.Empty;
         Errors = string.Empty;
         Skipped = string.Empty;

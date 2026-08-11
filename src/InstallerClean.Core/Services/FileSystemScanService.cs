@@ -147,6 +147,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var removable = new List<OrphanedFile>();
 
+        // Everything the identity pass keeps back, and the bytes of the one cause
+        // that gets a screen of its own. Declared here rather than inside the try
+        // because the result is built below it and an empty list is the honest
+        // value for a scan that left before the pass ran.
+        var withheldFiles = new List<OrphanedFile>();
+        long instanceWithheldBytes = 0;
+
         // Candidates the PATH comparison did not find a claim on, held here
         // rather than offered, because the path comparison no longer decides what
         // is offered: it decides what is CONSIDERED, and the identity pass below
@@ -328,10 +335,22 @@ public sealed class FileSystemScanService : IFileSystemScanService
             progress,
             cancellationToken);
 
+        // The offer and its complement, built in one walk so a count and the rows
+        // it describes cannot come apart. WITHHELD IS EVERY CAUSE, not the new one
+        // alone: a file kept back is a file kept back, and the summary line these
+        // feed exists so that the offer plus the kept rows account for the whole
+        // folder. Which cause it was stays in the counts and reaches no sentence.
         for (var i = 0; i < unclaimedByPath.Count; i++)
         {
             if (screened.Outcomes[i] == CandidateIdentityOutcome.Unclaimed)
+            {
                 removable.Add(unclaimedByPath[i]);
+                continue;
+            }
+
+            withheldFiles.Add(unclaimedByPath[i]);
+            if (screened.Outcomes[i] == CandidateIdentityOutcome.InstanceTransformsInUse)
+                instanceWithheldBytes += unclaimedByPath[i].SizeBytes;
         }
 
         // Stat every registered package once here so the Details window
@@ -626,7 +645,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registeredUnjudged,
             registeredSuperseded,
             registeredSupersededBytes,
-            screened.InstanceTransformsInUseCount);
+            screened.InstanceTransformsInUseCount,
+            instanceWithheldBytes,
+            withheldFiles.AsReadOnly());
     }
 
     /// <summary>

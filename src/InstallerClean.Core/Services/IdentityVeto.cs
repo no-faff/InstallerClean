@@ -40,22 +40,6 @@ public sealed class IdentityVeto : IIdentityVeto
         @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData";
 
     /// <summary>
-    /// The advertisement store, keyed by packed product code. A different subtree
-    /// from <see cref="UserDataKey"/> and holding different things: this one is
-    /// where <see cref="InstanceTypeValue"/> sits, which the installer's own
-    /// UserData subtree does not carry (measured on one machine: 0 instance-named
-    /// values across 136 InstallProperties keys, and one on each of 123 products
-    /// here).
-    /// </summary>
-    private const string AdvertisedProductsKey = @"SOFTWARE\Classes\Installer\Products";
-
-    /// <summary>
-    /// Zero or absent for an ordinary product, one for a product installed with a
-    /// multiple-instance transform. See <see cref="MachineUsesInstanceTransforms"/>.
-    /// </summary>
-    private const string InstanceTypeValue = "InstanceType";
-
-    /// <summary>
     /// The everyone SID, which the two ENUMERATION entry points accept as "across
     /// all accounts" and the two PROPERTY entry points reject outright. The split
     /// is why the ladder exists: the property reads have to be told which account
@@ -80,6 +64,15 @@ public sealed class IdentityVeto : IIdentityVeto
     /// bounded by something, and no product has ten thousand patches.
     /// </summary>
     private const int MaxPatchIndex = 10_000;
+
+    /// <summary>
+    /// The same kind of backstop for the product enumeration, and the same reason:
+    /// an enumeration that will not terminate must be bounded by something. Running
+    /// out of it is not a clean end and does not establish that no product on the
+    /// machine is an instance, which costs nothing, the answer being the same as
+    /// the one a failure gives.
+    /// </summary>
+    private const int MaxProductIndex = 100_000;
 
     /// <summary>
     /// How often the ticker fires. Time-based rather than every Nth candidate,
@@ -318,47 +311,143 @@ public sealed class IdentityVeto : IIdentityVeto
     /// transform, which is what makes a negative identity answer stop meaning that
     /// nothing needs the file.
     ///
-    /// <c>InstanceType</c> is documented on <c>MsiGetProductInfoEx</c> as "a value
-    /// of one (1) indicates a product installed using a multiple instance
-    /// transform and the MSINEWINSTANCE property", with a missing value or zero
-    /// meaning an ordinary installation. It is also a plain registry value beside
-    /// each product in the advertisement store, which is where it is read from
-    /// here: the keyed API form would need a product code to ask about, and the
-    /// codes worth asking about are exactly the ones this cannot see.
+    /// ASKED OF WINDOWS RATHER THAN READ OUT OF THE REGISTRY, and the difference is
+    /// two holes rather than a preference. The per-machine advertisement store this
+    /// once read is a strict subset of what Windows will answer for: it cannot see a
+    /// second-instance product installed per-user at all, and it is not even complete
+    /// for per-machine ones, holding 123 products on one machine where the installer's
+    /// own records held 136. Enumerating and asking closes both.
     ///
-    /// A POSITIVE READING IS THE ONLY THING THAT ACTS, and everything else leaves
-    /// the scan where it was. The store not opening, a product whose value will
-    /// not read, a machine registering its instances somewhere this cannot reach:
-    /// all of them answer false, and false is what the app already did. So this is
-    /// a trigger that can only ever remove files from the offer, never add one,
-    /// and its incompleteness costs nothing that was not already being spent.
+    /// The enumeration passes the everyone SID over all three contexts at once, which
+    /// Microsoft documents as the way to reach every account: "The special SID string
+    /// s-1-1-0 (Everyone) specifies enumeration across all users in the system"
+    /// (<see href="https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msienumproductsexw"/>).
+    /// Each row comes back with the context and the account that owns it, and the
+    /// property read is then keyed in that same pairing, because a per-user product
+    /// answers in its own account and nowhere else. The per-machine rows pass no
+    /// account, the API documenting a named one there as invalid.
     ///
-    /// THE INCOMPLETENESS IS REAL AND WORTH NAMING RATHER THAN LEAVING TO BE
-    /// DISCOVERED. This store is per-machine, so a per-user instance registration
-    /// in a user's own hive is not seen; and the store held 123 products on the one
-    /// machine measured where the installer's own UserData subtree held 136, so it
-    /// is not a complete list of what is installed even per-machine. It is a
-    /// signal that the machine does this at all, not a census of what does it.
+    /// A POSITIVE READING IS THE ONLY THING THAT ACTS, exactly as before. An
+    /// enumeration that fails or stops short, a property that will not read,
+    /// ERROR_ACCESS_DENIED from a call made without the privileges to cross accounts,
+    /// ERROR_UNKNOWN_PRODUCT, ERROR_UNKNOWN_PROPERTY, a value that is not a number:
+    /// none of them is a positive, none withholds and none releases. The scan is left
+    /// exactly where it would have been, so this can only ever remove files from the
+    /// offer and its incompleteness costs nothing that was not already being spent.
+    ///
+    /// THE ONE DOCUMENTED CLASS NEITHER CALL CAN REACH, written down rather than left
+    /// to be found: a product advertised only, in the per-user-unmanaged context of an
+    /// account other than the caller's. Both pages say so. It has no subject here,
+    /// because an advertised product caches no package at all, measured in both
+    /// contexts in <c>non-repo-files/00-user-now/FACTS-advertised-products-and-the-cache.md</c>
+    /// (that folder, not <c>0-claude/</c>, which it has been cited as more than once).
+    /// No cached file means no candidate can belong to such a product.
     /// </summary>
     private bool MachineUsesInstanceTransforms()
     {
-        var products = _registry.LocalMachineSubKeyNames(AdvertisedProductsKey);
-        if (products is null) return false;
+        var installedCode = new char[Msi.GuidBufferLength];
 
-        foreach (var product in products)
+        for (uint index = 0; index < MaxProductIndex; index++)
         {
-            var read = _registry.LocalMachineDwordValue(
-                $@"{AdvertisedProductsKey}\{product}", InstanceTypeValue);
+            Array.Clear(installedCode);
+            var sidBuffer = new char[SidBufferLength];
+            uint sidLength = SidBufferLength;
 
-            // Read AND non-zero. Absent is the documented shape of an ordinary
-            // product, a wrong type is a machine nothing here anticipated, and an
-            // unreadable value established nothing; none of the three is a
-            // positive, and reading any of them as one would withhold on every
-            // machine whose store is not exactly as expected.
-            if (read.State == RegistryDwordState.Read && read.Value != 0) return true;
+            var error = _msi.EnumProducts(
+                productCode: null,
+                userSid: AllUsersSid,
+                context: MsiInstallContext.All,
+                index: index,
+                installedProductCode: installedCode,
+                installedContext: out var context,
+                sid: sidBuffer,
+                sidLength: ref sidLength);
+
+            if (error == MsiError.MoreData)
+            {
+                // As in the scan's own enumeration: on MoreData the count excludes
+                // the terminator, so the retry asks for that count plus one.
+                sidLength++;
+                sidBuffer = new char[sidLength];
+                error = _msi.EnumProducts(
+                    productCode: null,
+                    userSid: AllUsersSid,
+                    context: MsiInstallContext.All,
+                    index: index,
+                    installedProductCode: installedCode,
+                    installedContext: out context,
+                    sid: sidBuffer,
+                    sidLength: ref sidLength);
+            }
+
+            // A clean end and a failure are the same answer here, which is the
+            // point of the invariant: neither has found an instance product, and
+            // neither may be read as having established that there is none.
+            if (error != MsiError.Success) break;
+
+            var productCode = BufferToString(installedCode);
+            if (productCode.Length == 0) continue;
+
+            // The machine context takes no account name, a named one there being
+            // documented as invalid and measured returning ERROR_INVALID_PARAMETER.
+            // Every other row is asked in the account the enumeration named it under.
+            var sid = context == MsiInstallContext.Machine ? null : BufferToString(sidBuffer);
+            if (context != MsiInstallContext.Machine && string.IsNullOrEmpty(sid)) continue;
+
+            if (ReadsAsInstanceProduct(productCode, sid, context)) return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Whether one product answers 1 to <c>InstanceType</c>. False for every other
+    /// outcome, including every failure: see the invariant in
+    /// <see cref="MachineUsesInstanceTransforms"/>.
+    ///
+    /// The value is compared as a NUMBER rather than against the string "1",
+    /// because nothing documents the spelling the API returns it in and a machine
+    /// answering "1 " or "01" would read as an ordinary product on a string test.
+    /// Anything that will not parse is not a positive either.
+    /// </summary>
+    private bool ReadsAsInstanceProduct(string productCode, string? sid, MsiInstallContext context)
+    {
+        uint bufferLen = 0;
+
+        var error = _msi.GetProductInfo(
+            productCode: productCode,
+            userSid: sid,
+            context: context,
+            property: MsiInstallProperty.InstanceType,
+            value: null,
+            valueLength: ref bufferLen);
+
+        // A missing value is documented as meaning an ordinary installation, so a
+        // record that does not carry the property is a clean negative rather than
+        // a failure; it reaches the same answer as one, which is why neither is
+        // singled out.
+        if (error is not (MsiError.Success or MsiError.MoreData) || bufferLen == 0) return false;
+
+        bufferLen++; // space for the null terminator
+        var buffer = new char[bufferLen];
+
+        error = _msi.GetProductInfo(
+            productCode: productCode,
+            userSid: sid,
+            context: context,
+            property: MsiInstallProperty.InstanceType,
+            value: buffer,
+            valueLength: ref bufferLen);
+
+        if (error != MsiError.Success) return false;
+
+        // Defensive clamp, as at every other use of this pattern: a successful
+        // call returns the count excluding the terminator and never larger than
+        // the input.
+        var value = new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length))
+            .TrimEnd('\0');
+
+        return int.TryParse(value.Trim(), out var instanceType) && instanceType != 0;
     }
 
     /// <summary>

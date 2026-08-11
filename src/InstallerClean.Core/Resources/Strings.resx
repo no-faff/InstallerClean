@@ -507,6 +507,19 @@
        + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Scanned {0} {1} in {2}</value></data>
+  <!-- Shown instead of Completion.AllClean and Completion.NothingToCleanUp where the
+       identity pass kept the whole offer back because this machine installs a product
+       as a second instance of itself. The two are different claims and must not share
+       a screen: "nothing to clean up" says the folder is clear, and this says the app
+       could not tell. {0} is the count of files held back and {1} their size, which is
+       the set that would otherwise have been offered rather than everything in the
+       folder: printing the folder total here would imply that much was going spare. -->
+  <data name="Completion.NothingOffered" xml:space="preserve"><value>Nothing offered on this PC</value></data>
+  <data name="Completion.NothingOfferedBody" xml:space="preserve"><value>A program here is installed as a second copy of itself, so InstallerClean can't be certain which cached files belong to it. It has held back all {0} files it might otherwise have offered, {1}, rather than guess. Sorry to send you away empty-handed. Nothing is wrong with your PC and there's nothing for you to do.</value></data>
+  <!-- The act-time twin, in the pending-reboot gate's shape: the batch was confirmed and
+       nothing ran. Separate from the scan-time pair above because it has to explain a
+       button press that did nothing, where those explain an empty list. -->
+  <data name="Completion.InstanceRefusal" xml:space="preserve"><value>Since the scan, a program on this PC has been installed as a second copy of itself. InstallerClean can no longer be certain which cached files belong to it, so it hasn't moved or deleted anything. Re-scan to check again.</value></data>
   <!-- The line under the post-Move summary, in its four forms: the backup
        folder is on another drive or on the same one, at one file or at more.
        Delete has no counterpart, and deliberately: it makes no safety claim on
@@ -792,6 +805,11 @@
        0 = count, 1 = size display. -->
   <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} registered file left alone ({1})</value></data>
   <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} registered files left alone ({1})</value></data>
+  <!-- The two groups in the registered-files window. The second states NO cause on
+       purpose: four different findings put a file in it and any sentence naming one
+       would be false of the others on a machine carrying more than one. -->
+  <data name="Details.GroupRegistered" xml:space="preserve"><value>Windows still has a record of these</value></data>
+  <data name="Details.GroupUnsure" xml:space="preserve"><value>InstallerClean couldn't be sure about these</value></data>
 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
@@ -1202,6 +1220,15 @@ The crash log could not be written.</value></data>
        opens "{0} mode:", and a filter for delete runs has to find this one.
        1 = registered package count, 2 = pluralised "package"/"packages". -->
   <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>{0} mode: no unneeded files. Installer database has {1} registered {2}.</value></data>
+  <!-- The command line's half of the second-instance pair. It says "a second instance"
+       where the window says "a second copy of itself": this audience knows the term and
+       that one does not, and the split is deliberate. The event-log line carries no
+       registered-package tail, unlike Cli.EventLogScanNoOrphans above. -->
+  <data name="Cli.NothingOfferedInstance" xml:space="preserve"><value>A product on this PC has a second instance installed, so InstallerClean can't be certain which cached files belong to it. Nothing offered. {0} files held back.</value></data>
+  <data name="Cli.EventLogNothingOfferedInstance" xml:space="preserve"><value>{0} mode: nothing offered. A product on this PC has a second instance installed, so InstallerClean could not be certain which cached files belong to it. {1} files held back.</value></data>
+  <!-- The act-time refusal. It cannot tell anyone to press anything, this surface having
+       no button, so it ends "Run it again." where the window says "Re-scan to check again." -->
+  <data name="Cli.InstanceRefusal" xml:space="preserve"><value>Since the scan, a program on this PC has been installed as a second copy of itself. InstallerClean can no longer be certain which cached files belong to it, so it hasn't moved or deleted anything. Run it again.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
   <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} unneeded {2} found, {3}. No action taken.</value></data>
   <!-- 0 = how many files, 1 = the programs they belong to

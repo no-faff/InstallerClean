@@ -43,9 +43,8 @@ public class IdentityVetoTests
     /// </summary>
     private const uint InvalidParameter = 87;
 
-    /// <summary>The two registry subtrees the veto reads, which are not the same key.</summary>
+    /// <summary>The registry subtree the veto reads, for the account ladder.</summary>
     private const string UserData = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData";
-    private const string AdvertisedProducts = @"SOFTWARE\Classes\Installer\Products";
 
     private const string MachineSid = "S-1-5-18";
     private const string OtherAccountSid = "S-1-5-21-1-2-3-1001";
@@ -480,7 +479,7 @@ public class IdentityVetoTests
         // for it declares the base code, so "no record of the base code" and "no
         // registration needs this file" have come apart.
         var outcome = Screen(new FakeApi(), Reader((FileA, Product(ProductA))), FileA,
-            instanceType: new RegistryDwordRead(RegistryDwordState.Read, 1));
+            instanceType: "1");
 
         Assert.Equal(CandidateIdentityOutcome.InstanceTransformsInUse, outcome);
     }
@@ -492,43 +491,62 @@ public class IdentityVetoTests
         // a veto that withholds everything unconditionally, and the two are
         // indistinguishable from the outside: both report an empty offer.
         var outcome = Screen(new FakeApi(), Reader((FileA, Product(ProductA))), FileA,
-            instanceType: new RegistryDwordRead(RegistryDwordState.Read, 0));
+            instanceType: "0");
 
         Assert.Equal(CandidateIdentityOutcome.Unclaimed, outcome);
     }
 
     [Theory]
-    // Absent is how a product that was installed normally reads, and is the
-    // commonest shape by far. The other two are a machine nothing here
-    // anticipated and a read that established nothing; none of the three says
-    // this machine does instance installs, and reading any of them as though it
-    // did would empty the offer on every machine whose store is not exactly as
-    // expected.
-    [InlineData(RegistryDwordState.Absent)]
-    [InlineData(RegistryDwordState.WrongType)]
-    [InlineData(RegistryDwordState.Unreadable)]
-    public void Only_a_positive_reading_withholds(RegistryDwordState state)
+    // Zero is how a product installed normally reads, and an empty or unparseable
+    // value is a machine nothing here anticipated. None of them says this machine
+    // does instance installs, and reading any as though it did would empty the
+    // offer on every machine that answers in a shape nobody expected.
+    [InlineData("0")]
+    [InlineData("")]
+    [InlineData("not a number")]
+    [InlineData("   ")]
+    public void Only_a_positive_reading_withholds(string value)
     {
         var outcome = Screen(new FakeApi(), Reader((FileA, Product(ProductA))), FileA,
-            instanceType: new RegistryDwordRead(state));
+            instanceType: value);
+
+        Assert.Equal(CandidateIdentityOutcome.Unclaimed, outcome);
+    }
+
+    [Theory]
+    // Compared as a number, not against the string "1", because nothing documents
+    // the spelling the API returns it in and a machine answering with padding
+    // would read as an ordinary product on a string test.
+    [InlineData("1")]
+    [InlineData(" 1 ")]
+    [InlineData("2")]
+    public void Any_non_zero_instance_type_withholds(string value)
+    {
+        var outcome = Screen(new FakeApi(), Reader((FileA, Product(ProductA))), FileA,
+            instanceType: value);
+
+        Assert.Equal(CandidateIdentityOutcome.InstanceTransformsInUse, outcome);
+    }
+
+    [Fact]
+    public void An_enumeration_that_fails_leaves_the_scan_where_it_was()
+    {
+        // This is a withholding TRIGGER and not a release condition, so its failing
+        // to fire costs nothing that was not already being spent: the scan behaves
+        // exactly as it did before the reading existed. ERROR_ACCESS_DENIED is the
+        // documented return for a call made without the privileges to enumerate
+        // across accounts, and it is on no allowlist here for the same reason.
+        var api = new FakeApi { UnfilteredEnumResult = 5 };   // ERROR_ACCESS_DENIED
+
+        var outcome = Screen(api, Reader((FileA, Product(ProductA))), FileA, instanceType: "1");
 
         Assert.Equal(CandidateIdentityOutcome.Unclaimed, outcome);
     }
 
     [Fact]
-    public void A_store_that_will_not_open_leaves_the_scan_where_it_was()
+    public void A_machine_whose_walk_returns_nothing_leaves_the_scan_where_it_was()
     {
-        // Null subkey names, which is what an absent or unreadable key answers.
-        // This is a withholding TRIGGER and not a release condition, so its
-        // failing to fire costs nothing that was not already being spent: the
-        // scan behaves exactly as it did before the reading existed.
-        var registry = Substitute.For<IRegistryReader>();
-        registry.LocalMachineSubKeyNames(AdvertisedProducts).Returns((string[]?)null);
-        registry.LocalMachineSubKeyNames(UserData).Returns(new[] { MachineSid });
-
-        var outcome = new IdentityVeto(Reader((FileA, Product(ProductA))), new FakeApi(), registry, _ => { })
-            .Screen(new[] { new IdentityCandidate(FileA, false) })
-            .Outcomes[0];
+        var outcome = Screen(new FakeApi(), Reader((FileA, Product(ProductA))), FileA);
 
         Assert.Equal(CandidateIdentityOutcome.Unclaimed, outcome);
     }
@@ -544,7 +562,7 @@ public class IdentityVetoTests
         api.Install(ProductA, sid: null, MsiInstallContext.Machine);
 
         var outcome = Screen(api, Reader((FileA, Product(ProductA))), FileA,
-            instanceType: new RegistryDwordRead(RegistryDwordState.Read, 1));
+            instanceType: "1");
 
         Assert.Equal(CandidateIdentityOutcome.Claimed, outcome);
     }
@@ -558,7 +576,7 @@ public class IdentityVetoTests
         api.ProductAskResult[ProductA] = BadConfiguration;
 
         var outcome = Screen(api, Reader((FileA, Product(ProductA))), FileA,
-            instanceType: new RegistryDwordRead(RegistryDwordState.Read, 1));
+            instanceType: "1");
 
         Assert.Equal(CandidateIdentityOutcome.RecordsUnaskable, outcome);
     }
@@ -571,7 +589,7 @@ public class IdentityVetoTests
         // a surface reaching for one sentence over all four would say something
         // false of three of them.
         var result = Veto(new FakeApi(), Reader((FileA, Product(ProductA))),
-                instanceType: new RegistryDwordRead(RegistryDwordState.Read, 1))
+                instanceType: "1")
             .Screen(new[] { new IdentityCandidate(FileA, false) });
 
         Assert.Equal(1, result.InstanceTransformsInUseCount);
@@ -583,26 +601,26 @@ public class IdentityVetoTests
     // ---- Helpers ----
 
     /// <param name="instanceType">
-    /// What the advertisement store reports for its one product's
-    /// <c>InstanceType</c>. Null leaves the store empty, which is the ordinary
-    /// machine and is what every test that is not about this gets.
+    /// What this machine's one enumerable product answers to <c>InstanceType</c>,
+    /// or null for a machine whose walk returns no products at all. Null is the
+    /// ordinary machine and is what every test that is not about this gets.
     /// </param>
     private static IdentityVeto Veto(FakeApi api, IPackageIdentityReader reader, string[]? sids = null,
-        RegistryDwordRead? instanceType = null)
+        string? instanceType = null)
     {
-        var registry = Substitute.For<IRegistryReader>();
-        // The two subtrees are stubbed SEPARATELY and not through Arg.Any, because
-        // they hold different things and a single stub would hand the account
-        // walk's SIDs to the instance-type walk as though they were products.
-        registry.LocalMachineSubKeyNames(AdvertisedProducts).Returns(
-            instanceType is null ? Array.Empty<string>() : new[] { "PACKEDPRODUCTCODE" });
-        registry.LocalMachineSubKeyNames(UserData).Returns(
-            sids ?? new[] { MachineSid, OtherAccountSid });
         if (instanceType is not null)
         {
-            registry.LocalMachineDwordValue($@"{AdvertisedProducts}\PACKEDPRODUCTCODE", "InstanceType")
-                .Returns(instanceType.Value);
+            // A DIFFERENT PRODUCT FROM THE CANDIDATE'S. The instance product is by
+            // definition one whose code the candidate file does not carry, so a
+            // test that gave them the same code would be exercising a case that
+            // cannot occur.
+            api.Enumerable.Add(ProductB);
+            api.InstanceTypes[ProductB] = instanceType;
         }
+
+        var registry = Substitute.For<IRegistryReader>();
+        registry.LocalMachineSubKeyNames(UserData).Returns(
+            sids ?? new[] { MachineSid, OtherAccountSid });
         // The crash-log sink is bound to a no-op: several of these drive the
         // unreadable branch deliberately, and the real sink would append to the
         // log of whatever machine ran the suite.
@@ -611,7 +629,7 @@ public class IdentityVetoTests
 
     private static CandidateIdentityOutcome Screen(
         FakeApi api, IPackageIdentityReader reader, string path, bool isPatch = false, string[]? sids = null,
-        RegistryDwordRead? instanceType = null) =>
+        string? instanceType = null) =>
         Veto(api, reader, sids, instanceType)
             .Screen(new[] { new IdentityCandidate(path, isPatch) })
             .Outcomes[0];
@@ -682,6 +700,17 @@ public class IdentityVetoTests
         /// </summary>
         public Dictionary<string, List<string>> EnumeratedPatches { get; } = new();
 
+        /// <summary>
+        /// What the machine-wide walk returns, in order, and what each of those
+        /// products answers to InstanceType. Only the instance reading uses either.
+        /// </summary>
+        public List<string> Enumerable { get; } = new();
+
+        public Dictionary<string, string> InstanceTypes { get; } = new();
+
+        /// <summary>Forces a return out of the unfiltered walk, for the failure cases.</summary>
+        public uint? UnfilteredEnumResult { get; set; }
+
         /// <summary>Every product code a keyed read was made for, for the caching tests.</summary>
         public List<string> ProductAsks { get; } = new();
 
@@ -700,6 +729,25 @@ public class IdentityVetoTests
         public uint GetProductInfo(string productCode, string? userSid, MsiInstallContext context,
             string property, char[]? value, ref uint valueLength)
         {
+            // Answered before the ask is recorded, because the instance reading is
+            // not one of the asks the caching tests count.
+            if (property == MsiInstallProperty.InstanceType)
+            {
+                if (!InstanceTypes.TryGetValue(productCode, out var it))
+                {
+                    valueLength = 0;
+                    return UnknownProperty;
+                }
+                if (value is null)
+                {
+                    valueLength = (uint)it.Length;
+                    return it.Length == 0 ? Success : MoreData;
+                }
+                it.AsSpan().CopyTo(value);
+                valueLength = (uint)it.Length;
+                return Success;
+            }
+
             ProductAsks.Add(productCode);
             valueLength = 0;
             if (RejectsPerUserSid is not null && userSid == RejectsPerUserSid) return InvalidParameter;
@@ -739,7 +787,18 @@ public class IdentityVetoTests
         {
             installedContext = MsiInstallContext.Machine;
             sidLength = 0;
-            if (productCode is null) return NoMoreItems;
+
+            // The UNFILTERED form, which is a different question from the filtered
+            // one below: "what does this machine have" rather than "does it have
+            // this". The instance reading is the only caller, walking by index.
+            if (productCode is null)
+            {
+                if (UnfilteredEnumResult is { } forcedAll) return forcedAll;
+                if (index >= Enumerable.Count) return NoMoreItems;
+                Enumerable[(int)index].AsSpan().CopyTo(installedProductCode!);
+                return Success;
+            }
+
             if (ProductEnumResult.TryGetValue(productCode, out var forced)) return forced;
             if (index > 0) return NoMoreItems;
             return Installed.Any(p => p.Code == productCode) ? Success : NoMoreItems;

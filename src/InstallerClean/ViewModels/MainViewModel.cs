@@ -305,7 +305,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
                 return;
 
-            Completion.ShowAllClear(result.RegisteredPackages.Count, Scan.LastScanDurationMs);
+            // Two different findings, two different screens. An empty offer because
+            // the folder holds nothing to remove is not an empty offer because the
+            // app could not tell, and the second used to be shown as the first.
+            if (result.IdentityInstanceTransformsCount > 0)
+                Completion.ShowNothingOffered(
+                    result.IdentityInstanceTransformsCount,
+                    DisplayHelpers.FormatSize(result.IdentityInstanceTransformsBytes),
+                    result.RegisteredPackages.Count, Scan.LastScanDurationMs);
+            else
+                Completion.ShowAllClear(result.RegisteredPackages.Count, Scan.LastScanDurationMs);
 
             if (suppress) return;
             // Either lock (the prior-session persisted flag or the

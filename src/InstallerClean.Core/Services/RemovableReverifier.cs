@@ -166,6 +166,25 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
             // Walked back to front so removing by index cannot move an index not
             // yet used.
+            // THE MACHINE CONDITION IS ANSWERED BEFORE ANY FILE IS, because it is not
+            // about a file. If the identity pass reports it for one candidate it
+            // reports it for every candidate it reached, so there is no batch to
+            // salvage and no per-file cause to record: the run stops and says why.
+            // Returning early also keeps it out of the loop below, whose causes are
+            // all findings about individual files.
+            for (var i = 0; i < orphans.Count; i++)
+            {
+                if (screened.Outcomes[i] != CandidateIdentityOutcome.InstanceTransformsInUse)
+                    continue;
+
+                return new ReverifyResult(
+                    Array.Empty<string>(),
+                    candidatePaths,
+                    reasons,
+                    Array.Empty<PatchClaim>(),
+                    InstanceTransformsInUse: true);
+            }
+
             for (var i = orphans.Count - 1; i >= 0; i--)
             {
                 var reason = screened.Outcomes[i] switch

@@ -275,11 +275,29 @@ public record UnderLeaseRecheck(
 /// claim, not per path, because a patch applied to several products is claimed
 /// by each of them and any one of those verdicts can move on its own.
 /// </param>
+/// <param name="InstanceTransformsInUse">
+/// True where the re-verify found that this machine installs a product as a second
+/// instance of itself, which it did not when the scan ran.
+///
+/// IT REFUSES THE WHOLE BATCH RATHER THAN DROPPING FILES FROM IT, and that is not a
+/// severity judgement, it is what the finding is. The condition is a property of the
+/// MACHINE and not of any file, so no file in the batch is the one at fault and a
+/// per-file held-back line would attach a cause to each of them that has nothing to
+/// do with any of them. The caller stops, exactly as it stops for a pending reboot,
+/// and <see cref="Surviving"/> is empty.
+///
+/// It can only be reached in the window between the scan and the click, the scan
+/// having offered nothing at all on a machine already in this state. For Delete that
+/// window is shut by the installer lease the act path refuses without, a new
+/// registration needing a transaction and a transaction needing that mutex; Move
+/// does not take the lease by design, so the window is open there.
+/// </param>
 public record ReverifyResult(
     IReadOnlyList<string> Surviving,
     IReadOnlyList<string> Dropped,
     HeldBackReasons Reasons = default,
-    IReadOnlyList<PatchClaim>? SurvivingPatchClaims = null)
+    IReadOnlyList<PatchClaim>? SurvivingPatchClaims = null,
+    bool InstanceTransformsInUse = false)
 {
     /// <summary>Never null: an absent list reads as nothing to re-read rather than as a fault.</summary>
     public IReadOnlyList<PatchClaim> SurvivingPatchClaims { get; init; }

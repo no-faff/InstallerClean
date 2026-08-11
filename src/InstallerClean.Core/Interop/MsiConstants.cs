@@ -108,6 +108,16 @@ public static class MsiInstallProperty
 
     /// <summary>Whether the patch can be uninstalled ("1" = yes).</summary>
     public const string Uninstallable = "Uninstallable";
+
+    /// <summary>
+    /// Whether a product was installed as one of several instances of itself.
+    /// Microsoft: "A missing value or a value of 0 (zero) indicates a normal
+    /// product installation. A value of one (1) indicates a product installed
+    /// using a multiple instance transform and the MSINEWINSTANCE property",
+    /// and the property "is available for advertised or installed products"
+    /// (<see href="https://learn.microsoft.com/en-us/windows/win32/api/msi/nf-msi-msigetproductinfoexw"/>).
+    /// </summary>
+    public const string InstanceType = "InstanceType";
 }
 
 /// <summary>

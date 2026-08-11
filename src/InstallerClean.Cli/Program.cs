@@ -396,20 +396,37 @@ internal static class Program
             // commonest output this tool produces, and somebody reading a
             // scheduled task's log wants the state of the machine rather than
             // the tool's intention towards it.
-            Console.WriteLine(count == 0
-                ? Strings.Cli_FoundNoOrphans
-                : string.Format(
-                    DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
-                    count, DisplayHelpers.PluraliseFile(count), size));
+            // Three outcomes, not two. "Found no unneeded files" says the folder holds
+            // nothing to remove; the second-instance line says the app could not tell,
+            // and until it existed the second printed as the first. The count in it is
+            // the files that would otherwise have been offered rather than everything
+            // left alone, matching the window.
+            var heldBackForInstances = scanResult.IdentityInstanceTransformsCount;
+            Console.WriteLine(count == 0 && heldBackForInstances > 0
+                ? string.Format(Strings.Cli_NothingOfferedInstance, heldBackForInstances)
+                : count == 0
+                    ? Strings.Cli_FoundNoOrphans
+                    : string.Format(
+                        DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
+                        count, DisplayHelpers.PluraliseFile(count), size));
 
             ReportScanSignals(arg, scanResult);
 
             if (count == 0)
             {
-                MachineContract.WriteEventLog(CliEventClass.Ok,
-                    () => string.Format(Strings.Cli_EventLogScanNoOrphans,
-                        arg, scanResult.RegisteredPackages.Count,
-                        DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
+                // The audit line follows the same three-way split as stdout, so an RMM
+                // filtering the Application channel can tell "this machine is clean"
+                // from "this machine could not be judged". It carries no registered-package
+                // tail: the count says nothing about why nothing was offered.
+                if (heldBackForInstances > 0)
+                    MachineContract.WriteEventLog(CliEventClass.Ok,
+                        () => string.Format(Strings.Cli_EventLogNothingOfferedInstance,
+                            arg, heldBackForInstances));
+                else
+                    MachineContract.WriteEventLog(CliEventClass.Ok,
+                        () => string.Format(Strings.Cli_EventLogScanNoOrphans,
+                            arg, scanResult.RegisteredPackages.Count,
+                            DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
                 return ExitOk;
             }
 
@@ -479,6 +496,23 @@ internal static class Program
             // one condition two ways. The counts and byte figures further down are
             // recomputed from the survivor subset so "X of Y" and the freed-space
             // total describe what was acted on, not the pre-reverify scan.
+            // The machine condition is answered before the per-file causes, because it
+            // is not one of them: no file in the batch is at fault and the reverify
+            // returns an empty survivor set with no per-file reasons to report. The
+            // command line's wording ends "Run it again" rather than "Re-scan",
+            // having no button to press.
+            if (reverify.InstanceTransformsInUse)
+            {
+                Console.WriteLine(Strings.Cli_InstanceRefusal);
+                // NO AUDIT LINE YET, and that is a gap rather than a decision. The
+                // scan-time entry beside it says "nothing offered", which is false
+                // here: these files WERE offered and the run then refused to act on
+                // them. Reusing it would put a sentence in the Application log that
+                // did not happen, so nothing is written until this state has a line
+                // of its own.
+                return ExitOk;
+            }
+
             ReportHeldBack(reverify.Reasons);
 
             var filePaths = survivingFiles.Select(f => f.FullPath).ToList();
