@@ -74,10 +74,24 @@ internal static class CliExitCode
     public const int Ok = 0;
 
     /// <summary>
-    /// 1: hard failure with nothing accomplished, a scan that threw, a
-    /// malformed or absent argument, or a batch in which every file failed.
-    /// Distinct from <see cref="Partial"/> so a retry policy can treat
-    /// total failure differently from a run that did part of the work.
+    /// 1: nothing was accomplished. A scan that threw, a malformed or absent
+    /// argument, a batch in which every file failed, or a run the app declined to
+    /// perform at all. Distinct from <see cref="Partial"/> so a retry policy can
+    /// treat total failure differently from a run that did part of the work.
+    ///
+    /// A REFUSAL IS NOT A FAILURE AND SHARES THIS CODE ANYWAY, which is worth
+    /// saying so nobody later reads one as a crash. The app declining to act is a
+    /// correct outcome and the machine is not broken; what it shares with a hard
+    /// failure is the posture a caller should take, which is that nothing was done
+    /// and coming back will not change that on its own.
+    ///
+    /// THAT LAST CLAUSE IS THE WHOLE TEST FOR WHICH CODE A BLOCKED RUN TAKES, and
+    /// it is why <see cref="Transient"/> is wrong for some of them.
+    /// <see cref="Transient"/> is for a condition that clears by itself, so a
+    /// scheduler should come back; a condition that clears only when somebody
+    /// changes the machine belongs here, or a nightly retry is refused for ever.
+    /// A product installed as a second instance of itself is the worked example:
+    /// it goes when that product is uninstalled and at no other time.
     /// </summary>
     public const int Error = 1;
 

@@ -504,13 +504,19 @@ internal static class Program
             if (reverify.InstanceTransformsInUse)
             {
                 Console.WriteLine(Strings.Cli_InstanceRefusal);
-                // Its own audit line, not the scan-time one beside it: that says
-                // "nothing offered", which is false here, these files having been
-                // offered before the run refused to act on them.
-                MachineContract.WriteEventLog(CliEventClass.Ok,
+                // HardError, not TransientSkip, and the exit code below is why: the
+                // two must agree, and this condition does not clear on its own. A
+                // second instance goes when somebody uninstalls that product and at
+                // no other time, so a retry-on-transient policy would come back
+                // nightly and be refused every time. Its own audit line rather than
+                // the scan-time one beside it, whose "nothing offered" is false
+                // here: these files were offered before the run refused to act.
+                MachineContract.WriteEventLog(CliEventClass.HardError,
                     () => string.Format(Strings.Cli_EventLogInstanceRefusal,
                         arg, scanResult.RemovableFiles.Count));
-                return ExitOk;
+                // Not ExitOk: 0 means every file the scan flagged was processed, and
+                // none of them was. Not ExitTransient: see CliExitCode.Error.
+                return ExitError;
             }
 
             ReportHeldBack(reverify.Reasons);
