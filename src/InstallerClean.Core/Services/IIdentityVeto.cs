@@ -81,15 +81,16 @@ public interface IIdentityVeto
 public readonly record struct IdentityCandidate(string FullPath, bool IsPatch);
 
 /// <summary>
-/// What one candidate's identity settled. Four states, and three of them keep the
+/// What one candidate's identity settled. Five states, and four of them keep the
 /// file.
 ///
-/// THE THREE KEEPING STATES ARE NOT ONE STATE AND MAY NEVER BE REPORTED AS ONE.
-/// A positive claim, an inability to read the file and an inability to put the
-/// question are three different things to have found out, and any sentence
-/// covering all three either says nothing or says something false of two of them.
-/// The app's rule on this is absolute: a message must not state a cause for a set
-/// that can have mixed causes.
+/// THE FOUR KEEPING STATES ARE NOT ONE STATE AND MAY NEVER BE REPORTED AS ONE.
+/// A positive claim, an inability to read the file, an inability to put the
+/// question, and an answer that does not settle the question on this machine are
+/// four different things to have found out, and any sentence covering them either
+/// says nothing or says something false of three of them. The app's rule on this
+/// is absolute: a message must not state a cause for a set that can have mixed
+/// causes.
 /// </summary>
 public enum CandidateIdentityOutcome
 {
@@ -135,6 +136,39 @@ public enum CandidateIdentityOutcome
     /// the returns that mean an answer.
     /// </summary>
     RecordsUnaskable,
+
+    /// <summary>
+    /// Every source answered, none of them knows this file's identity, and on this
+    /// machine that does not settle it. Kept back.
+    ///
+    /// A FOURTH THING TO HAVE FOUND OUT, and the only one that is not about this
+    /// file at all. The other three describe the candidate; this describes the
+    /// machine, and it turns what would otherwise have been
+    /// <see cref="Unclaimed"/> into a withholding.
+    ///
+    /// The whole check rests on one premise: that a cached file's own declared
+    /// identity is an identity Windows holds a record of, whenever anything still
+    /// needs that file. Windows Installer breaks that premise in one documented
+    /// way. A product installed with an instance transform is registered under a
+    /// product code the transform produced, while the package cached for it is the
+    /// base package declaring the base code, so a keyed question about the base
+    /// code can be answered "no record" while a registration under the instance
+    /// code still needs the file. The patch side is the same mechanism reached
+    /// through <c>MsiApplyPatch</c> with <c>INSTALLTYPE_SINGLE_INSTANCE</c>, which
+    /// applies a patch to an instance whose code the patch's own Template had no
+    /// reason to list.
+    ///
+    /// So on a machine that installs products this way, a negative answer about a
+    /// declared code no longer means no registration needs the file, and every
+    /// candidate that would have been offered on such an answer is kept instead.
+    ///
+    /// WHETHER A CACHED PACKAGE FOR AN INSTANCE DECLARES THE BASE OR THE INSTANCE
+    /// CODE IS NOT ESTABLISHED. Microsoft documents neither, on any page, and no
+    /// machine anybody here can reach holds an instance install to measure.
+    /// Withholding is what lets that question stay open without the app's claim
+    /// resting on the answer.
+    /// </summary>
+    InstanceTransformsInUse,
 }
 
 /// <summary>
@@ -165,6 +199,18 @@ public sealed record IdentityPassResult(
 
     /// <summary>Candidates whose identity was read and could not be put to Windows.</summary>
     public int RecordsUnaskableCount => Count(CandidateIdentityOutcome.RecordsUnaskable);
+
+    /// <summary>
+    /// Candidates Windows answered for, negatively, on a machine where that answer
+    /// does not settle whether a registration needs the file.
+    ///
+    /// It reads zero on every machine that does not install products under instance
+    /// transforms, which is every machine anybody has measured. Where it is not
+    /// zero it is the whole offer, because the condition is a property of the
+    /// machine rather than of any file: a scan reporting a number here reports no
+    /// removable files at all.
+    /// </summary>
+    public int InstanceTransformsInUseCount => Count(CandidateIdentityOutcome.InstanceTransformsInUse);
 
     // THERE IS DELIBERATELY NO TOTAL OVER THE THREE ABOVE, and one stood here
     // until it was noticed that nothing outside a test had ever read it. A

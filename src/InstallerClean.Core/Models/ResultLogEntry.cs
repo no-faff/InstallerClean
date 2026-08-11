@@ -364,9 +364,19 @@ public sealed record MachineInfo(
 /// Kept back because the identity was read and the question could not be put to
 /// Windows. An inability about the RECORDS.
 ///
-/// THE THREE ARE NEVER SUMMED, here or anywhere. A confirmed claim, an unreadable
-/// file and an unanswerable question have no honest superordinate, and a total
-/// would invite one.
+/// THE FOUR ARE NEVER SUMMED, here or anywhere. A confirmed claim, an unreadable
+/// file, an unanswerable question and an answer that does not settle the question
+/// have no honest superordinate, and a total would invite one.
+/// </param>
+/// <param name="KeptIdentityInstanceTransformsCount">
+/// Kept back because every source answered, none holds a record of what the file
+/// says it is, and this machine installs products under instance transforms, so
+/// that answer does not establish that nothing needs the file. Not an inability:
+/// the question was put and was answered.
+///
+/// All-or-nothing, being a property of the machine: a report carrying a number
+/// here carries no removable files at all. Zero on every machine measured so far,
+/// which is what makes any non-zero one worth having.
 /// </param>
 public sealed record ScanInfo(
     long DurationMs,
@@ -387,7 +397,8 @@ public sealed record ScanInfo(
     int UnansweredProductCount,
     int KeptIdentityClaimedCount,
     int KeptIdentityUnreadableCount,
-    int KeptIdentityUnaskableCount)
+    int KeptIdentityUnaskableCount,
+    int KeptIdentityInstanceTransformsCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -418,7 +429,8 @@ public sealed record ScanInfo(
             scan.Census.UnansweredProductCount,
             scan.IdentityClaimedCount,
             scan.IdentityUnreadableCount,
-            scan.IdentityUnaskableCount);
+            scan.IdentityUnaskableCount,
+            scan.IdentityInstanceTransformsCount);
     }
 }
 

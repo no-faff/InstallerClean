@@ -40,6 +40,22 @@ public sealed class IdentityVeto : IIdentityVeto
         @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData";
 
     /// <summary>
+    /// The advertisement store, keyed by packed product code. A different subtree
+    /// from <see cref="UserDataKey"/> and holding different things: this one is
+    /// where <see cref="InstanceTypeValue"/> sits, which the installer's own
+    /// UserData subtree does not carry (measured on one machine: 0 instance-named
+    /// values across 136 InstallProperties keys, and one on each of 123 products
+    /// here).
+    /// </summary>
+    private const string AdvertisedProductsKey = @"SOFTWARE\Classes\Installer\Products";
+
+    /// <summary>
+    /// Zero or absent for an ordinary product, one for a product installed with a
+    /// multiple-instance transform. See <see cref="MachineUsesInstanceTransforms"/>.
+    /// </summary>
+    private const string InstanceTypeValue = "InstanceType";
+
+    /// <summary>
     /// The everyone SID, which the two ENUMERATION entry points accept as "across
     /// all accounts" and the two PROPERTY entry points reject outright. The split
     /// is why the ladder exists: the property reads have to be told which account
@@ -112,6 +128,11 @@ public sealed class IdentityVeto : IIdentityVeto
         // every candidate that gets as far as needing it is unaskable. Null
         // carries that; an empty list would silently mean "asked everybody".
         var ladder = BuildAccountLadder();
+
+        // Also once for the pass, and it is a property of the MACHINE rather than
+        // of any candidate: see CandidateIdentityOutcome.InstanceTransformsInUse
+        // for what it means and why a positive reading withholds.
+        var instanceTransforms = MachineUsesInstanceTransforms();
 
         // Budgeted, because the conditions that make one package unreadable are
         // usually properties of the machine rather than of one file: a filter
@@ -193,9 +214,18 @@ public sealed class IdentityVeto : IIdentityVeto
                     asked++;
                 }
 
+                // The machine reading touches ONE arm and only ever moves it
+                // towards keeping the file. A claim stays a claim and an
+                // unanswerable question stays unanswerable; what changes is that
+                // the single releasing arm stops releasing. That is what keeps
+                // this composable with everything else here under the
+                // only-ever-withholds invariant, and it is why it could be added
+                // without re-arguing any other source.
                 outcomes[i] = verdict switch
                 {
                     CodeVerdict.Known => CandidateIdentityOutcome.Claimed,
+                    CodeVerdict.NotKnown when instanceTransforms
+                        => CandidateIdentityOutcome.InstanceTransformsInUse,
                     CodeVerdict.NotKnown => CandidateIdentityOutcome.Unclaimed,
                     _ => CandidateIdentityOutcome.RecordsUnaskable,
                 };
@@ -281,6 +311,54 @@ public sealed class IdentityVeto : IIdentityVeto
             ladder.Add((sid, MsiInstallContext.UserManaged));
         }
         return ladder;
+    }
+
+    /// <summary>
+    /// Whether any product on this machine was installed with an instance
+    /// transform, which is what makes a negative identity answer stop meaning that
+    /// nothing needs the file.
+    ///
+    /// <c>InstanceType</c> is documented on <c>MsiGetProductInfoEx</c> as "a value
+    /// of one (1) indicates a product installed using a multiple instance
+    /// transform and the MSINEWINSTANCE property", with a missing value or zero
+    /// meaning an ordinary installation. It is also a plain registry value beside
+    /// each product in the advertisement store, which is where it is read from
+    /// here: the keyed API form would need a product code to ask about, and the
+    /// codes worth asking about are exactly the ones this cannot see.
+    ///
+    /// A POSITIVE READING IS THE ONLY THING THAT ACTS, and everything else leaves
+    /// the scan where it was. The store not opening, a product whose value will
+    /// not read, a machine registering its instances somewhere this cannot reach:
+    /// all of them answer false, and false is what the app already did. So this is
+    /// a trigger that can only ever remove files from the offer, never add one,
+    /// and its incompleteness costs nothing that was not already being spent.
+    ///
+    /// THE INCOMPLETENESS IS REAL AND WORTH NAMING RATHER THAN LEAVING TO BE
+    /// DISCOVERED. This store is per-machine, so a per-user instance registration
+    /// in a user's own hive is not seen; and the store held 123 products on the one
+    /// machine measured where the installer's own UserData subtree held 136, so it
+    /// is not a complete list of what is installed even per-machine. It is a
+    /// signal that the machine does this at all, not a census of what does it.
+    /// </summary>
+    private bool MachineUsesInstanceTransforms()
+    {
+        var products = _registry.LocalMachineSubKeyNames(AdvertisedProductsKey);
+        if (products is null) return false;
+
+        foreach (var product in products)
+        {
+            var read = _registry.LocalMachineDwordValue(
+                $@"{AdvertisedProductsKey}\{product}", InstanceTypeValue);
+
+            // Read AND non-zero. Absent is the documented shape of an ordinary
+            // product, a wrong type is a machine nothing here anticipated, and an
+            // unreadable value established nothing; none of the three is a
+            // positive, and reading any of them as one would withhold on every
+            // machine whose store is not exactly as expected.
+            if (read.State == RegistryDwordState.Read && read.Value != 0) return true;
+        }
+
+        return false;
     }
 
     /// <summary>

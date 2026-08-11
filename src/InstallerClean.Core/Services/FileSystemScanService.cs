@@ -18,10 +18,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private readonly IFileSystem _fs;
     private readonly IIdentityVeto _identityVeto;
     private readonly IShortNameCreationProbe? _shortNames;
+    private readonly IFileIdentityReader? _fileIds;
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
 
-    /// <summary>Production constructor. DI supplies all four dependencies; the override fields stay null.</summary>
+    /// <summary>Production constructor. DI supplies all five dependencies; the override fields stay null.</summary>
     /// <remarks>
     /// Microsoft.Extensions.DependencyInjection resolves the public ctor
     /// with the most resolvable parameters and ignores internal ctors.
@@ -34,23 +35,24 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// figure without either having to remember to ask.
     /// </remarks>
     public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
-        IIdentityVeto identityVeto, IShortNameCreationProbe shortNames)
-        : this(queryService, fileSystem, identityVeto, shortNames, null, null) { }
+        IIdentityVeto identityVeto, IShortNameCreationProbe shortNames,
+        IFileIdentityReader fileIdentities)
+        : this(queryService, fileSystem, identityVeto, shortNames, null, null, fileIdentities) { }
 
     /// <summary>
     /// Test constructor. Injects a filesystem and nothing else, for the tests
     /// whose subject is the walk itself.
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
-        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, null, null) { }
+        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, null, null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, null, overrideFiles, null) { }
+        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, null, overrideFiles, null, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, null, overrideFiles, installerFolderOverride) { }
+        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, null, overrideFiles, installerFolderOverride, null) { }
 
     /// <summary>
     /// Test constructor. Injects an <see cref="IFileSystem"/> so the
@@ -59,7 +61,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, overrideFiles, installerFolderOverride) { }
+        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, overrideFiles, installerFolderOverride, null) { }
 
     /// <summary>
     /// Test constructor carrying the identity veto as well, for the tests whose
@@ -67,7 +69,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IIdentityVeto identityVeto, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, fileSystem, identityVeto, null, overrideFiles, installerFolderOverride) { }
+        : this(queryService, fileSystem, identityVeto, null, overrideFiles, installerFolderOverride, null) { }
 
     /// <summary>
     /// Test constructor carrying the short-name probe as well, for the tests
@@ -79,14 +81,22 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// is known, and the alternative of defaulting to a plausible setting would
     /// put a figure nobody measured into the one payload that exists to measure.
     /// </param>
+    /// <param name="fileIdentities">
+    /// Null in every test that is not about it, which leaves the path comparison
+    /// exactly as it was before this existed: a string match and nothing more. A
+    /// null reader cannot make a scan offer MORE than it would have, only the same,
+    /// which is why the tests that pin the string classification go on pinning it.
+    /// </param>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IIdentityVeto identityVeto, IShortNameCreationProbe? shortNames,
-        IEnumerable<string>? overrideFiles, string? installerFolderOverride)
+        IEnumerable<string>? overrideFiles, string? installerFolderOverride,
+        IFileIdentityReader? fileIdentities)
     {
         _queryService = queryService;
         _fs = fileSystem;
         _identityVeto = identityVeto;
         _shortNames = shortNames;
+        _fileIds = fileIdentities;
         _overrideFiles = overrideFiles;
         _installerFolderOverride = installerFolderOverride;
     }
@@ -210,6 +220,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // that it had would put a cause in front of the user that never occurred.
         var screened = new IdentityPassResult(Array.Empty<CandidateIdentityOutcome>(), 0, 0);
 
+        // Declared out here for the same reason: the three gates below the loops
+        // read it, and it is taken inside them. Zero is the honest starting value,
+        // a scan that leaves before the walk finishes having produced no
+        // candidates for anything to have judged.
+        var candidatesFromWalk = 0;
+
         // The closing entry is owed on every exit, not just the clean one: a
         // cancel and the correlation gate both leave through here, and the gate
         // in particular fires on exactly the kind of broken machine that makes
@@ -258,6 +274,37 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 IsObsoleted: false,
                 Reason: Strings.Reason_Orphaned));
         }
+
+        // THE SECOND HALF OF THE PATH COMPARISON, and it is part of that gate
+        // rather than of the identity pass below. The loop above asked whether any
+        // registration's recorded path is SPELLED the same as a walked file. This
+        // asks whether any registration's recorded path NAMES the same file, which
+        // is the question that was always meant and which no comparison of strings
+        // can settle.
+        //
+        // The two are separated by cost, not by principle. Asking the filesystem
+        // costs a handle per file, and this folder reaches millions of them, so the
+        // string comparison runs over the whole walk and this runs over what it
+        // left: bounded by the candidate count on one side and the registration
+        // count on the other, both small on every machine anybody has measured.
+        //
+        // A DROPPED CANDIDATE IS NOT COUNTED ANYWHERE, and that is deliberate
+        // rather than an omission. A file the string comparison matched has never
+        // been counted either; it is simply claimed, and so is this one. Counting
+        // it separately would invite a sentence about files "held back by the
+        // identity check" that was false of it.
+        //
+        // THE THREE GATES BELOW ARE MEASURED BEFORE IT RUNS, for exactly the
+        // reason they are measured before the identity pass. Each of them reads an
+        // empty candidate list as evidence that the comparison never worked, and a
+        // candidate dropped here is the comparison WORKING: it found the
+        // registration that names the file. Counting after the drop would let a
+        // machine whose every candidate turned out to be a registered file under
+        // another spelling be refused as a machine whose comparison was broken.
+        candidatesFromWalk = unclaimedByPath.Count;
+
+        DropCandidatesRegisteredUnderAnotherSpelling(
+            unclaimedByPath, registered, cancellationToken);
 
         // The identity pass. Nothing above it established that a candidate
         // belongs to nothing; it established that no registration names its path,
@@ -380,7 +427,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // It is the walk's candidates and nothing else from 3.0.0. A registered
         // row can no longer become a candidate, so the term that used to add the
         // superseded patches about to be offered has gone with them.
-        var candidatesBeforeIdentity = unclaimedByPath.Count;
+        //
+        // Taken where the walk left it rather than re-read here, because the
+        // file-identity match above has since removed the candidates that turned
+        // out to be registered files under another spelling. Those are claims the
+        // comparison made, not files it failed to judge, and the gates below are
+        // asking whether it judged anything at all.
+        var candidatesBeforeIdentity = candidatesFromWalk;
 
         if (!cacheRoot.Proven && refusedCandidates > 0 && candidatesBeforeIdentity == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
@@ -572,7 +625,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registeredWithheld,
             registeredUnjudged,
             registeredSuperseded,
-            registeredSupersededBytes);
+            registeredSupersededBytes,
+            screened.InstanceTransformsInUseCount);
     }
 
     /// <summary>
@@ -590,6 +644,55 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// removable re-verify and the action-time gates already govern.
     /// </summary>
     private readonly record struct WalkedFile(string FullPath, long SizeBytes);
+
+    /// <summary>
+    /// Removes from <paramref name="candidates"/> every file that some
+    /// registration's recorded path actually names, whatever that path was spelled
+    /// as. Mutates the list in place, keeping the walk order of the survivors.
+    ///
+    /// The registration side is walked first and the candidate side second, so a
+    /// machine whose registrations all resolve to files the walk already matched
+    /// costs one handle per registration and nothing more. Nothing is opened at all
+    /// where there are no candidates, or where no registration yielded an identity.
+    ///
+    /// EVERY FAILURE LEAVES THE CANDIDATE WHERE IT WAS. A registration path that
+    /// will not open contributes no identity and so claims nothing extra; a
+    /// candidate that will not open is compared against nothing and stays a
+    /// candidate, going on to the identity pass exactly as before. That is the
+    /// direction the whole mechanism has to fail in, and it is why this could be
+    /// added without re-arguing anything downstream of it.
+    ///
+    /// A HARD LINK IS DROPPED AND THAT IS THE RIGHT ANSWER HERE, though it is a
+    /// stricter one than strictly necessary. Two names for one file share an
+    /// identity, so a candidate hard-linked to a registered package is treated as
+    /// that package. Removing one link would in fact leave the data reachable
+    /// through the other, so the file could safely have been offered; withholding
+    /// it costs an offer and claims nothing untrue, and no machine anybody has
+    /// measured holds one (every cached file's link count read 1).
+    /// </summary>
+    private void DropCandidatesRegisteredUnderAnotherSpelling(
+        List<OrphanedFile> candidates,
+        IReadOnlyList<RegisteredPackage> registered,
+        CancellationToken cancellationToken)
+    {
+        if (_fileIds is null || candidates.Count == 0 || registered.Count == 0) return;
+
+        var registeredIds = new HashSet<FileIdentity>();
+        foreach (var pkg in registered)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (_fileIds.TryRead(pkg.LocalPackagePath, out var id))
+                registeredIds.Add(id);
+        }
+
+        if (registeredIds.Count == 0) return;
+
+        candidates.RemoveAll(c =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return _fileIds.TryRead(c.FullPath, out var id) && registeredIds.Contains(id);
+        });
+    }
 
     /// <summary>
     /// Whether a registered path names a file sitting DIRECTLY in the folder the

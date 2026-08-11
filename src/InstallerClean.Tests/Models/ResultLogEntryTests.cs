@@ -60,7 +60,8 @@ public class ResultLogEntryTests
         UnansweredProductCount: 0,
         KeptIdentityClaimedCount: 0,
         KeptIdentityUnreadableCount: 0,
-        KeptIdentityUnaskableCount: 0);
+        KeptIdentityUnaskableCount: 0,
+        KeptIdentityInstanceTransformsCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,

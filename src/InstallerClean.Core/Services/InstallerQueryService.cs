@@ -1564,19 +1564,49 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Nothing writing these keys is obliged to use REG_SZ. One machine's 136 of
     /// 136 being REG_SZ says what that machine holds and nothing about what the
     /// shape can be.
+    ///
+    /// AND TWO TYPES NEVER REACH THE CAST, which is why the presence test below is
+    /// not belt and braces over it. Microsoft documents that
+    /// <c>RegistryKey.GetValue</c> "does not support reading values of type
+    /// REG_NONE or REG_LINK. In both cases, the default value (null) is returned
+    /// instead of the actual value." So a value that is PRESENT in either of those
+    /// types arrives here as null and, read naively, is indistinguishable from a
+    /// registration that simply has no cached path. The claim is dropped, no
+    /// failure is counted, and the fallback reports itself as having run cleanly
+    /// and found nothing to say, which is the one state the degraded-sources gate
+    /// exists to tell apart from a healthy machine. Asking the key which value
+    /// names it holds is what separates the two, because the name list is typed
+    /// nowhere and carries every value whatever its type.
     /// </summary>
-    private static bool TryReadLocalPackage(Microsoft.Win32.RegistryKey? key, out string? path)
+    internal static bool TryReadLocalPackage(Microsoft.Win32.RegistryKey? key, out string? path)
     {
         path = null;
 
-        // Absent by structure, then absent by value: neither is a failed read.
+        // Absent by structure: not a failed read.
         if (key is null) return true;
+
         var raw = key.GetValue("LocalPackage");
-        if (raw is null) return true;
+        if (raw is string value)
+        {
+            path = value;
+            return true;
+        }
 
-        if (raw is not string value) return false;
+        // Present and not a string: a read that failed, and the ordinary shape of
+        // one (REG_DWORD, REG_BINARY, REG_MULTI_SZ).
+        if (raw is not null) return false;
 
-        path = value;
+        // Null, which is two different things. Absent by value is an ordinary
+        // state; present-but-unreadable is a failure the cast above could never
+        // have seen. The name comparison is case-insensitive because registry
+        // value names are, so a key holding "localpackage" must not read as a key
+        // holding nothing.
+        foreach (var name in key.GetValueNames())
+        {
+            if (string.Equals(name, "LocalPackage", StringComparison.OrdinalIgnoreCase))
+                return false;
+        }
+
         return true;
     }
 

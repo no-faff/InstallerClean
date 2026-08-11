@@ -89,6 +89,45 @@ internal static partial class Kernel32
         public uint nFileIndexLow;
     }
 
+    /// <summary>
+    /// Reads one class of metadata from an open handle. Declared for
+    /// <see cref="FILE_ID_INFO"/> only, which is why the class parameter is typed
+    /// as the constant rather than as an enum: nothing else here asks for another
+    /// class, and a second caller would want its own overload with its own
+    /// out-parameter type anyway, the API writing a different struct per class.
+    ///
+    /// PREFERRED OVER <see cref="GetFileInformationByHandle"/> FOR IDENTITY, and
+    /// the difference is not cosmetic. That call's nFileIndexHigh/Low pair is 64
+    /// bits and Microsoft documents it as not necessarily unique on ReFS, where
+    /// this call's 128-bit id is documented unique per volume on both NTFS and
+    /// ReFS. A comparison that can collide would claim two files are one.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "GetFileInformationByHandleEx", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetFileInformationByHandleEx(
+        SafeFileHandle hFile,
+        uint fileInformationClass,
+        out FILE_ID_INFO lpFileInformation,
+        uint dwBufferSize);
+
+    /// <summary>
+    /// The volume and the 128-bit file id that together name one file on one
+    /// machine. The id is declared as two ulongs rather than as a 16-byte array
+    /// because the assembly disables runtime marshalling, so the struct has to be
+    /// blittable; the layout is byte-for-byte the FILE_ID_128 the API writes, and
+    /// the halves are never interpreted, only compared.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILE_ID_INFO
+    {
+        public ulong VolumeSerialNumber;
+        public ulong FileIdLow;
+        public ulong FileIdHigh;
+    }
+
+    /// <summary>FileIdInfo of FILE_INFO_BY_HANDLE_CLASS.</summary>
+    public const uint FileIdInfo = 18;
+
     [StructLayout(LayoutKind.Sequential)]
     public struct FILETIME
     {

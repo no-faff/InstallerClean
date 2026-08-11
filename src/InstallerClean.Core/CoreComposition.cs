@@ -51,6 +51,10 @@ public static class CoreComposition
         // lives inside a single Screen call and does not outlive it.
         services.AddSingleton<IPackageIdentityReader, PackageIdentityReader>();
         services.AddSingleton<IIdentityVeto, IdentityVeto>();
+        // Answers which file a recorded path names, so the scan's path comparison
+        // is not defeated by a registration written in a spelling the folder walk
+        // does not produce. Stateless, and it holds nothing between scans.
+        services.AddSingleton<IFileIdentityReader, FileIdentityReader>();
         // Re-verifies removable candidates against the API at action time; the
         // GUI and CLI call it just before a Move/Delete batch.
         services.AddSingleton<IRemovableReverifier, RemovableReverifier>();

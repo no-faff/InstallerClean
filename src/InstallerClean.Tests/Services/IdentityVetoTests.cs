@@ -43,6 +43,10 @@ public class IdentityVetoTests
     /// </summary>
     private const uint InvalidParameter = 87;
 
+    /// <summary>The two registry subtrees the veto reads, which are not the same key.</summary>
+    private const string UserData = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData";
+    private const string AdvertisedProducts = @"SOFTWARE\Classes\Installer\Products";
+
     private const string MachineSid = "S-1-5-18";
     private const string OtherAccountSid = "S-1-5-21-1-2-3-1001";
 
@@ -464,13 +468,141 @@ public class IdentityVetoTests
         Assert.Equal(1, result.Outcomes.Count(o => o == CandidateIdentityOutcome.Unclaimed));
     }
 
+    // ---- The machine reading: products installed under instance transforms ----
+
+    [Fact]
+    public void Withholds_where_the_machine_installs_products_under_instance_transforms()
+    {
+        // Windows knows nothing about the code this file declares, which on an
+        // ordinary machine is the one answer that permits an offer. Here it does
+        // not, because a product installed with an instance transform is
+        // registered under a code the transform produced while the package cached
+        // for it declares the base code, so "no record of the base code" and "no
+        // registration needs this file" have come apart.
+        var outcome = Screen(new FakeApi(), Reader((FileA, Product(ProductA))), FileA,
+            instanceType: new RegistryDwordRead(RegistryDwordState.Read, 1));
+
+        Assert.Equal(CandidateIdentityOutcome.InstanceTransformsInUse, outcome);
+    }
+
+    [Fact]
+    public void An_ordinary_machine_still_offers_what_Windows_answered_for()
+    {
+        // The must-fail control. Without it the test above passes equally against
+        // a veto that withholds everything unconditionally, and the two are
+        // indistinguishable from the outside: both report an empty offer.
+        var outcome = Screen(new FakeApi(), Reader((FileA, Product(ProductA))), FileA,
+            instanceType: new RegistryDwordRead(RegistryDwordState.Read, 0));
+
+        Assert.Equal(CandidateIdentityOutcome.Unclaimed, outcome);
+    }
+
+    [Theory]
+    // Absent is how a product that was installed normally reads, and is the
+    // commonest shape by far. The other two are a machine nothing here
+    // anticipated and a read that established nothing; none of the three says
+    // this machine does instance installs, and reading any of them as though it
+    // did would empty the offer on every machine whose store is not exactly as
+    // expected.
+    [InlineData(RegistryDwordState.Absent)]
+    [InlineData(RegistryDwordState.WrongType)]
+    [InlineData(RegistryDwordState.Unreadable)]
+    public void Only_a_positive_reading_withholds(RegistryDwordState state)
+    {
+        var outcome = Screen(new FakeApi(), Reader((FileA, Product(ProductA))), FileA,
+            instanceType: new RegistryDwordRead(state));
+
+        Assert.Equal(CandidateIdentityOutcome.Unclaimed, outcome);
+    }
+
+    [Fact]
+    public void A_store_that_will_not_open_leaves_the_scan_where_it_was()
+    {
+        // Null subkey names, which is what an absent or unreadable key answers.
+        // This is a withholding TRIGGER and not a release condition, so its
+        // failing to fire costs nothing that was not already being spent: the
+        // scan behaves exactly as it did before the reading existed.
+        var registry = Substitute.For<IRegistryReader>();
+        registry.LocalMachineSubKeyNames(AdvertisedProducts).Returns((string[]?)null);
+        registry.LocalMachineSubKeyNames(UserData).Returns(new[] { MachineSid });
+
+        var outcome = new IdentityVeto(Reader((FileA, Product(ProductA))), new FakeApi(), registry, _ => { })
+            .Screen(new[] { new IdentityCandidate(FileA, false) })
+            .Outcomes[0];
+
+        Assert.Equal(CandidateIdentityOutcome.Unclaimed, outcome);
+    }
+
+    [Fact]
+    public void The_machine_reading_cannot_turn_a_claim_into_an_offer()
+    {
+        // The invariant, from the direction that would actually hurt. The reading
+        // touches one arm of the verdict and only ever moves it towards keeping
+        // the file; a product Windows positively answers for stays claimed
+        // whatever the machine does with instances.
+        var api = new FakeApi();
+        api.Install(ProductA, sid: null, MsiInstallContext.Machine);
+
+        var outcome = Screen(api, Reader((FileA, Product(ProductA))), FileA,
+            instanceType: new RegistryDwordRead(RegistryDwordState.Read, 1));
+
+        Assert.Equal(CandidateIdentityOutcome.Claimed, outcome);
+    }
+
+    [Fact]
+    public void The_machine_reading_cannot_turn_an_unanswerable_question_into_an_offer()
+    {
+        // The same invariant on the other keeping state, so a future change that
+        // reordered the switch arms could not quietly promote one.
+        var api = new FakeApi();
+        api.ProductAskResult[ProductA] = BadConfiguration;
+
+        var outcome = Screen(api, Reader((FileA, Product(ProductA))), FileA,
+            instanceType: new RegistryDwordRead(RegistryDwordState.Read, 1));
+
+        Assert.Equal(CandidateIdentityOutcome.RecordsUnaskable, outcome);
+    }
+
+    [Fact]
+    public void The_withheld_candidates_are_counted_apart_from_the_other_three()
+    {
+        // Four causes, four counts, no total. A candidate every source answered
+        // for is not an unreadable file and is not an unanswerable question, and
+        // a surface reaching for one sentence over all four would say something
+        // false of three of them.
+        var result = Veto(new FakeApi(), Reader((FileA, Product(ProductA))),
+                instanceType: new RegistryDwordRead(RegistryDwordState.Read, 1))
+            .Screen(new[] { new IdentityCandidate(FileA, false) });
+
+        Assert.Equal(1, result.InstanceTransformsInUseCount);
+        Assert.Equal(0, result.ClaimedCount);
+        Assert.Equal(0, result.IdentityUnreadableCount);
+        Assert.Equal(0, result.RecordsUnaskableCount);
+    }
+
     // ---- Helpers ----
 
-    private static IdentityVeto Veto(FakeApi api, IPackageIdentityReader reader, string[]? sids = null)
+    /// <param name="instanceType">
+    /// What the advertisement store reports for its one product's
+    /// <c>InstanceType</c>. Null leaves the store empty, which is the ordinary
+    /// machine and is what every test that is not about this gets.
+    /// </param>
+    private static IdentityVeto Veto(FakeApi api, IPackageIdentityReader reader, string[]? sids = null,
+        RegistryDwordRead? instanceType = null)
     {
         var registry = Substitute.For<IRegistryReader>();
-        registry.LocalMachineSubKeyNames(Arg.Any<string>()).Returns(
+        // The two subtrees are stubbed SEPARATELY and not through Arg.Any, because
+        // they hold different things and a single stub would hand the account
+        // walk's SIDs to the instance-type walk as though they were products.
+        registry.LocalMachineSubKeyNames(AdvertisedProducts).Returns(
+            instanceType is null ? Array.Empty<string>() : new[] { "PACKEDPRODUCTCODE" });
+        registry.LocalMachineSubKeyNames(UserData).Returns(
             sids ?? new[] { MachineSid, OtherAccountSid });
+        if (instanceType is not null)
+        {
+            registry.LocalMachineDwordValue($@"{AdvertisedProducts}\PACKEDPRODUCTCODE", "InstanceType")
+                .Returns(instanceType.Value);
+        }
         // The crash-log sink is bound to a no-op: several of these drive the
         // unreadable branch deliberately, and the real sink would append to the
         // log of whatever machine ran the suite.
@@ -478,8 +610,9 @@ public class IdentityVetoTests
     }
 
     private static CandidateIdentityOutcome Screen(
-        FakeApi api, IPackageIdentityReader reader, string path, bool isPatch = false, string[]? sids = null) =>
-        Veto(api, reader, sids)
+        FakeApi api, IPackageIdentityReader reader, string path, bool isPatch = false, string[]? sids = null,
+        RegistryDwordRead? instanceType = null) =>
+        Veto(api, reader, sids, instanceType)
             .Screen(new[] { new IdentityCandidate(path, isPatch) })
             .Outcomes[0];
 

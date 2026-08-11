@@ -115,11 +115,23 @@ namespace InstallerClean.Models;
 /// Candidates kept back because the identity was read and the question could not
 /// be put to Windows. An inability about the RECORDS.
 ///
-/// THE THREE ARE SEPARATE BECAUSE THEY ARE THREE DIFFERENT THINGS TO HAVE FOUND
+/// THE FOUR ARE SEPARATE BECAUSE THEY ARE FOUR DIFFERENT THINGS TO HAVE FOUND
 /// OUT, and nothing may report them under one sentence. A confirmed claim, an
-/// unreadable file and an unanswerable question have no honest superordinate: any
-/// sentence covering all three either says nothing or says something false of two
-/// of them. They are summed nowhere for the same reason.
+/// unreadable file, an unanswerable question and an answer that does not settle
+/// the question have no honest superordinate: any sentence covering all four
+/// either says nothing or says something false of three of them. They are summed
+/// nowhere for the same reason.
+/// </param>
+/// <param name="IdentityInstanceTransformsCount">
+/// Candidates kept back because Windows answered that it holds no record of what
+/// the file says it is, on a machine where that answer does not settle whether a
+/// registration needs the file. Not an inability at all: every source answered.
+///
+/// It is a property of the MACHINE and not of any file, so it is all-or-nothing:
+/// zero on a machine that does not install products under instance transforms,
+/// and otherwise the whole candidate set, with no removable files offered. See
+/// <see cref="Services.CandidateIdentityOutcome.InstanceTransformsInUse"/> for the
+/// mechanism and for what is still not established about it.
 /// </param>
 /// <param name="Census">
 /// What the enumeration behind this scan measured about itself and about the
@@ -212,7 +224,8 @@ public record ScanResult(
     int RegisteredWithheldCount = 0,
     int RegisteredUnjudgedCount = 0,
     int RegisteredSupersededCount = 0,
-    long RegisteredSupersededBytes = 0)
+    long RegisteredSupersededBytes = 0,
+    int IdentityInstanceTransformsCount = 0)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk; the sum of the two

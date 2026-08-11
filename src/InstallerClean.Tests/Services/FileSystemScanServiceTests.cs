@@ -1082,7 +1082,7 @@ public class FileSystemScanServiceTests
 
         var result = await new FileSystemScanService(
             query, new MockFileSystem(), PermissiveIdentityVeto.Instance, probe,
-            Array.Empty<string>(), null).ScanAsync();
+            Array.Empty<string>(), null, null).ScanAsync();
 
         Assert.Equal(ShortNameCreationLabels.SystemVolumeOnly, result.ShortNameCreation);
     }
