@@ -90,7 +90,6 @@
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Unneeded files that are safe to delete</value></data>
 
   <!-- Section headings -->
-  <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUCTS</value></data>
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCHES</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>PRODUCT DETAILS</value></data>
   <data name="Section.Backup.Folder" xml:space="preserve"><value>BACKUP FOLDER</value></data>
@@ -263,7 +262,6 @@
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
   <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
-  <data name="Automation.Section.Products" xml:space="preserve"><value>Products</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Patches</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Product details</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as
@@ -803,8 +801,8 @@
        Still split singular/plural though the verb has gone, for the noun and for
        the .Few overrides pl, ru and uk declare on this key.
        0 = count, 1 = size display. -->
-  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} registered file left alone ({1})</value></data>
-  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} registered files left alone ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file left alone ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} files left alone ({1})</value></data>
   <!-- The two groups in the registered-files window. The second states NO cause on
        purpose: four different findings put a file in it and any sentence naming one
        would be false of the others on a machine carrying more than one. -->
@@ -1229,6 +1227,12 @@ The crash log could not be written.</value></data>
   <!-- The act-time refusal. It cannot tell anyone to press anything, this surface having
        no button, so it ends "Run it again." where the window says "Re-scan to check again." -->
   <data name="Cli.InstanceRefusal" xml:space="preserve"><value>Since the scan, a program on this PC has been installed as a second copy of itself. InstallerClean can no longer be certain which cached files belong to it, so it hasn't moved or deleted anything. Run it again.</value></data>
+  <!-- The act-time audit line. It does NOT reuse Cli.EventLogNothingOfferedInstance
+       above, whose "nothing offered" is false here: these files were offered and the
+       run then refused to act on them. "No action taken" is the vocabulary
+       Cli.EventLogScanFound already ends with, so a filter watching the Application
+       channel meets one phrase rather than two. -->
+  <data name="Cli.EventLogInstanceRefusal" xml:space="preserve"><value>{0} mode: no action taken. Since the scan, a product on this PC has been installed as a second instance, so InstallerClean could not be certain which cached files belong to it. {1} files left untouched.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
   <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} unneeded {2} found, {3}. No action taken.</value></data>
   <!-- 0 = how many files, 1 = the programs they belong to

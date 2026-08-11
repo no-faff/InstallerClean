@@ -33,7 +33,17 @@
                  the split behaves as plain 2*/3*. The cap scales with
                  the OS text size so the list keeps showing the same
                  number of rows as they get taller. -->
-            <RowDefinition Height="2*" MaxHeight="{a11y:TextScaled 208}"/><RowDefinition Height="20"/>
+            <RowDefinition Height="2*" MaxHeight="{a11y:TextScaled 208}"/>
+            <!-- The second group: spacer, heading, list. All three are Auto and
+                 all three hold nothing but content bound to HasUnsure, so on a
+                 machine where the identity pass kept nothing back they measure
+                 zero and the window lays out exactly as it did before the group
+                 existed. That is the property to preserve in any later change
+                 here: the ordinary machine must see no difference at all. -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="3*"/><RowDefinition Height="12"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -52,9 +62,8 @@
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
                 Margin="{StaticResource Margin.CloseButtonOverhang}" AutomationProperties.Name="{loc:Translate Automation.CloseWindow}" ToolTip="{loc:Translate Tooltip.Close}"/>
 
-        <TextBlock Grid.Row="1" Text="{loc:Translate Section.Registered.Products}" Foreground="{StaticResource Text.Body}"
-                   FontSize="{DynamicResource Type.Heading.Sm}"
-                   AutomationProperties.Name="{loc:Translate Automation.Section.Products}"/>
+        <TextBlock Grid.Row="1" Text="{loc:Translate Details.GroupRegistered}" Foreground="{StaticResource Text.Body}"
+                   FontSize="{DynamicResource Type.Heading.Sm}" TextWrapping="Wrap"/>
 
         <Border Grid.Row="3" Style="{StaticResource CardNoPad}" ClipToBounds="True">
             <!-- Negative top/bottom margin bleeds the ListView past the
@@ -199,7 +208,52 @@
             </ListView>
         </Border>
 
-        <Grid Grid.Row="5">
+        <!-- SECOND GROUP. An ItemsControl and not a ListView, deliberately: these
+             rows have no product behind them, so there is nothing for the detail
+             pane below to show, and a selectable row would blank that pane and
+             leave the reader wondering what they had broken. An ItemsControl has
+             no selection to give, so the pane goes on following the products list
+             and cannot be emptied from here. -->
+        <Border Grid.Row="4" Height="8" Background="Transparent"
+                Visibility="{Binding HasUnsure, Converter={StaticResource BoolToVis}}"/>
+
+        <TextBlock Grid.Row="5" Text="{loc:Translate Details.GroupUnsure}" Foreground="{StaticResource Text.Body}"
+                   FontSize="{DynamicResource Type.Heading.Sm}" Margin="0,0,0,8"
+                   TextWrapping="Wrap"
+                   Visibility="{Binding HasUnsure, Converter={StaticResource BoolToVis}}"/>
+
+        <Border Grid.Row="6" Style="{StaticResource CardNoPad}" ClipToBounds="True"
+                MaxHeight="{a11y:TextScaled 120}"
+                Visibility="{Binding HasUnsure, Converter={StaticResource BoolToVis}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          Padding="0" Margin="0,-1,0,-6">
+                <ItemsControl ItemsSource="{Binding Unsure}" Background="Transparent">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid AutomationProperties.Name="{Binding AccessibleName}"
+                                  Margin="{StaticResource GapX.Md}" MinHeight="{a11y:TextScaled 28}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding FileName}"
+                                           Foreground="{StaticResource Text.Heading}"
+                                           FontSize="{DynamicResource Type.Heading.Sm}"
+                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                                           ToolTip="{Binding FileName}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}"
+                                           Foreground="{StaticResource Text.Body}"
+                                           FontSize="{DynamicResource Type.Heading.Sm}"
+                                           VerticalAlignment="Center"
+                                           MinWidth="{a11y:TextScaled 72}" TextAlignment="Right"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <Grid Grid.Row="8">
             <Grid.ColumnDefinitions>
                 <!-- Auto plus an explicit text-scaled width on the pane
                      itself: ColumnDefinition.Width is a GridLength, which
@@ -416,7 +470,7 @@
             </Grid>
         </Grid>
 
-        <DockPanel Grid.Row="7" LastChildFill="False">
+        <DockPanel Grid.Row="10" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}" VerticalAlignment="Center"/>
             <!-- Named so Window_Loaded can land focus here when the list opens

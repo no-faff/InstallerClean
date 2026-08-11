@@ -32,6 +32,25 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     private readonly CancellationTokenSource _lifetimeCts = new();
 
     public IReadOnlyList<ProductRow> Products { get; }
+
+    /// <summary>
+    /// The files the identity pass kept back, which belong to no product row
+    /// because no registration names them. Shown as a second group under its own
+    /// heading rather than mixed in, because they are a different finding: Windows
+    /// answers for the first group and the app could not be sure about this one.
+    ///
+    /// NO CAUSE IS SHOWN AND NONE MAY BE. Four different findings put a file here
+    /// and a machine can carry more than one at once, so any sentence naming a
+    /// cause would be false of some of the rows under it.
+    /// </summary>
+    public IReadOnlyList<UnsureRow> Unsure { get; }
+
+    /// <summary>Hides the whole second group, heading and spacer included, on the
+    /// ordinary machine where the pass kept nothing back. The rows it occupies are
+    /// Auto-height, so a collapsed group takes none and the window lays out exactly
+    /// as it did before the group existed.</summary>
+    public bool HasUnsure => Unsure.Count > 0;
+
     public string Summary { get; }
 
     [ObservableProperty]
@@ -63,10 +82,15 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     public string SelectedMissingNote => Strings.Body_RegisteredMissingFromDisk;
     public IReadOnlyList<PatchRow> SelectedPatches => SelectedProduct?.Patches ?? Array.Empty<PatchRow>();
 
+    /// <param name="unsure">
+    /// Every file the identity pass kept back, whatever the cause. Empty on the
+    /// machines anybody has measured.
+    /// </param>
     public RegisteredFilesViewModel(
         IReadOnlyList<RegisteredPackage> packages,
         long totalBytes,
-        IMsiFileInfoService infoService)
+        IMsiFileInfoService infoService,
+        IReadOnlyList<OrphanedFile>? unsure = null)
     {
         _infoService = infoService;
 
@@ -161,10 +185,23 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         }
 
         Products = products;
+
+        Unsure = (unsure ?? Array.Empty<OrphanedFile>())
+            .Select(f => new UnsureRow(
+                System.IO.Path.GetFileName(f.FullPath),
+                DisplayHelpers.FormatSize(f.SizeBytes)))
+            .ToList();
+
+        // BOTH GROUPS, because both are on the screen. The line used to say
+        // "registered" and count the product rows alone, which was true while they
+        // were all the window held; with a second group under it, a figure covering
+        // only the first would describe less than the reader can see, and it has to
+        // agree with the main window's own left-alone line, which counts both.
+        var shownCount = packages.Count + Unsure.Count;
         Summary = string.Format(
-            DisplayHelpers.Pluralise(packages.Count, Strings.Summary_RegisteredWindow_Singular, Strings.Summary_RegisteredWindow_Plural, "Summary.RegisteredWindow"),
-            packages.Count,
-            DisplayHelpers.FormatSize(totalBytes));
+            DisplayHelpers.Pluralise(shownCount, Strings.Summary_RegisteredWindow_Singular, Strings.Summary_RegisteredWindow_Plural, "Summary.RegisteredWindow"),
+            shownCount,
+            DisplayHelpers.FormatSize(totalBytes + (unsure ?? Array.Empty<OrphanedFile>()).Sum(f => f.SizeBytes)));
 
         // Open on the first product whose installer file is missing from disk,
         // when there is one. The main window's missing-from-disk banner ends
@@ -236,4 +273,28 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         _lifetimeCts.Cancel();
         _lifetimeCts.Dispose();
     }
+}
+
+/// <summary>
+/// One row of the second group: a cached file the identity pass kept back.
+///
+/// It carries a file name and a size and nothing else, which is the whole of what
+/// is known about it. There is no product name because no registration names the
+/// file, which is why it is in this group at all, and inventing a placeholder
+/// would put a claim on the row that nothing supports.
+///
+/// NOT SELECTABLE, and that is a decision rather than an omission. The window is a
+/// master/detail pair whose detail pane reads a product's summary stream; a row
+/// with no product has nothing to put in it, so letting one be selected would
+/// blank the pane and leave the reader wondering what they broke. The group is
+/// rendered by an ItemsControl, which has no selection to give, so the pane goes
+/// on following the products list and cannot be emptied from here.
+/// </summary>
+/// <param name="AccessibleName">
+/// What a screen reader announces for the row, the two columns read as one line,
+/// matching how the product rows carry their own.
+/// </param>
+public sealed record UnsureRow(string FileName, string SizeDisplay)
+{
+    public string AccessibleName => $"{FileName}, {SizeDisplay}";
 }

@@ -122,7 +122,6 @@ public static class Strings
     public static string Automation_Section_BackupFolder => Get("Automation.Section.BackupFolder");
     public static string Automation_Section_Patches => Get("Automation.Section.Patches");
     public static string Automation_Section_ProductDetails => Get("Automation.Section.ProductDetails");
-    public static string Automation_Section_Products => Get("Automation.Section.Products");
     public static string Automation_SortStatus_Ascending => Get("Automation.SortStatus.Ascending");
     public static string Automation_SortStatus_Descending => Get("Automation.SortStatus.Descending");
     public static string Automation_StartupScanProgress => Get("Automation.StartupScanProgress");
@@ -162,6 +161,7 @@ public static class Strings
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
     public static string Cli_EventLogHardError_NoLog => Get("Cli.EventLogHardError.NoLog");
     public static string Cli_EventLogInstallerLockUnavailable => Get("Cli.EventLogInstallerLockUnavailable");
+    public static string Cli_EventLogInstanceRefusal => Get("Cli.EventLogInstanceRefusal");
     public static string Cli_EventLogMissingFromDisk => Get("Cli.EventLogMissingFromDisk");
     public static string Cli_EventLogMoveAborted => Get("Cli.EventLogMoveAborted");
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
@@ -365,7 +365,6 @@ public static class Strings
     public static string Section_Backup_Folder => Get("Section.Backup.Folder");
     public static string Section_Registered_Details => Get("Section.Registered.Details");
     public static string Section_Registered_Patches => Get("Section.Registered.Patches");
-    public static string Section_Registered_Products => Get("Section.Registered.Products");
     public static string Section_SayThanks => Get("Section.SayThanks");
     public static string Startup_AlreadyRunningBody => Get("Startup.AlreadyRunningBody");
     public static string Startup_AlreadyRunningTitle => Get("Startup.AlreadyRunningTitle");

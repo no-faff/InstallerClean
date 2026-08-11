@@ -504,12 +504,12 @@ internal static class Program
             if (reverify.InstanceTransformsInUse)
             {
                 Console.WriteLine(Strings.Cli_InstanceRefusal);
-                // NO AUDIT LINE YET, and that is a gap rather than a decision. The
-                // scan-time entry beside it says "nothing offered", which is false
-                // here: these files WERE offered and the run then refused to act on
-                // them. Reusing it would put a sentence in the Application log that
-                // did not happen, so nothing is written until this state has a line
-                // of its own.
+                // Its own audit line, not the scan-time one beside it: that says
+                // "nothing offered", which is false here, these files having been
+                // offered before the run refused to act on them.
+                MachineContract.WriteEventLog(CliEventClass.Ok,
+                    () => string.Format(Strings.Cli_EventLogInstanceRefusal,
+                        arg, scanResult.RemovableFiles.Count));
                 return ExitOk;
             }
 
