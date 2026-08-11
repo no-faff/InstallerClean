@@ -283,12 +283,14 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
 /// file, which is why it is in this group at all, and inventing a placeholder
 /// would put a claim on the row that nothing supports.
 ///
-/// NOT SELECTABLE, and that is a decision rather than an omission. The window is a
-/// master/detail pair whose detail pane reads a product's summary stream; a row
-/// with no product has nothing to put in it, so letting one be selected would
-/// blank the pane and leave the reader wondering what they broke. The group is
-/// rendered by an ItemsControl, which has no selection to give, so the pane goes
-/// on following the products list and cannot be emptied from here.
+/// IT DRIVES NOTHING, which is not the same as not being selectable and the
+/// difference cost a rewrite here. The window is a master/detail pair whose detail
+/// pane follows SelectedProduct, and SelectedProduct is the PRODUCTS list's
+/// selection; a second list has its own, which nothing reads. So these rows can be
+/// selected, focused and arrowed through without the pane below moving at all. The
+/// group was first rendered by an ItemsControl to stop a selection reaching that
+/// pane, which it never could, and the cost was real: an ItemsControl puts no rows
+/// in the tab order and does not present itself to a screen reader as a list.
 /// </summary>
 /// <param name="AccessibleName">
 /// What a screen reader announces for the row, the two columns read as one line,
