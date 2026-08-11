@@ -6,12 +6,12 @@ namespace InstallerClean.Models;
 /// between them claim, plus how much of the enumeration failed to read.
 /// </summary>
 /// <param name="Packages">
-/// One row per claimed path. On a run where
-/// <see cref="UnaccountedProductCount"/> is non-zero, no row carries
-/// <see cref="RegisteredPackage.IsRemovable"/>: the removable class is withheld
-/// wholesale (see <see cref="RecordsIncomplete"/>) and the rows that would have
-/// carried it are marked <see cref="RegisteredPackage.RemovableWithheld"/>
-/// instead.
+/// One row per claimed path. NO ROW EVER CARRIES
+/// <see cref="RegisteredPackage.IsRemovable"/> from 3.0.0: this enumeration
+/// grants no removable verdict to any patch, whatever its state, so the flag and
+/// the two mechanisms that used to take it away are inert. A patch Windows
+/// reports superseded or obsoleted arrives here as an ordinary claimed row
+/// carrying its <see cref="RegisteredPackage.PatchState"/>.
 /// </param>
 /// <param name="UnaccountedProductCount">
 /// Installed products this enumeration did not account for. Surfaced to the user
@@ -75,13 +75,16 @@ public record InstallerQueryResult(
     public IReadOnlyList<PatchClaim> PatchClaims { get; init; } = PatchClaims ?? Array.Empty<PatchClaim>();
 
     /// <summary>
-    /// The enumeration did not account for at least one installed product, so it
-    /// cannot say of any patch that no installed product still needs it. Whether
-    /// that product's records failed to read or were never reached does not enter
-    /// into it: what withholds the verdict is the missing claim, not the mechanism
-    /// (see <see cref="UnaccountedProductCount"/> for the four). Every consumer of
-    /// a removable verdict inherits this through the withheld rows themselves; it
-    /// is exposed for the copy that explains the shorter list.
+    /// The enumeration did not account for at least one installed product, so the
+    /// set of registrations it read may be short of one. Whether that product's
+    /// records failed to read or were never reached does not enter into it: what
+    /// matters is the missing claim, not the mechanism (see
+    /// <see cref="UnaccountedProductCount"/> for the four).
+    ///
+    /// WHAT IT BEARS ON IS NOW THE MISSING-FILES REPORT rather than the offer. It
+    /// used to withhold every superseded-patch verdict, and no verdict is granted
+    /// to withhold; a registration this scan never saw is instead one whose file,
+    /// had it gone, went uncounted. Exposed for the copy that says so.
     /// </summary>
     public bool RecordsIncomplete => UnaccountedProductCount > 0;
 }
@@ -155,13 +158,14 @@ public record InstallerQueryResult(
 /// </param>
 /// <param name="UnreadablePatchStates">
 /// Patch claims whose <c>State</c> or <c>Uninstallable</c> read failed, one per
-/// (patch, product) pairing asked. The file is safe either way, both reads
-/// failing towards keeping it; what the number sizes is how often a machine
-/// cannot answer the question the whole superseded-patch verdict rests on.
+/// (patch, product) pairing asked. No file turns on it any more, every
+/// registration being kept; what the number sizes is how often a machine cannot
+/// answer a plain question about its own installer records at all, which is the
+/// one thing these reports can establish and one machine never could.
 /// </param>
 /// <param name="UnreadableVerdictPaths">
-/// Cached paths whose removable verdict no read established, one per merged row
-/// where the count above is one per pairing. The pair is the interesting reading:
+/// Cached paths whose patch state no read established, one per merged row where
+/// the count above is one per pairing. The pair is the interesting reading:
 /// a machine where several products' reads failed on one shared patch reports a
 /// high pairing count against a single path, and a machine where the failures are
 /// spread reports the two close together, which are different faults wearing one

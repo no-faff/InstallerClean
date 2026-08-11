@@ -178,9 +178,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         long stillUsedBytes = 0;
         int refusedCandidates = 0;
-        int withheld = 0;
-        int missingNonRemovable = 0;
-        int missingRemovable = 0;
+        int missingNotSuperseded = 0;
+        int missingSuperseded = 0;
         // The correlation gate's inputs, counted here rather than derived from the
         // branches below because they answer a different question from the ones
         // those branches exist for. Every registered row is measured by ONE rule,
@@ -190,24 +189,19 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // one sum, and the larger half proved nothing about the folder at all.
         //
         // ALL THREE ASK ABOUT ONE POPULATION, the registrations naming a file
-        // directly in the folder this run walked. What still differs inside it is
-        // deliberate and is stated at the gate: a survivor is any such
-        // registration whose file is there, superseded ones included, while the
-        // missing count takes only the needed ones, a superseded patch whose file
-        // Windows has already removed being the expected end state rather than a
-        // loss.
+        // directly in the folder this run walked, and they ask it of every row on
+        // the same rule whatever state the row carries.
         //
-        // The missing count is separate from missingNonRemovable and does not
-        // replace it. That one drives the missing-from-disk banner, the command
-        // line's own notice and the result-log payload, and a needed file
-        // registered somewhere other than this folder and now gone is exactly as
-        // much of a problem, so narrowing it would silence an alarm that is right
-        // to fire. What it is not is evidence about whether the records and THIS
-        // folder describe the same place, which is all the gate is asking.
+        // The missing count is separate from the two the report speaks and does
+        // not replace them. Those drive the missing-from-disk line on both hosts
+        // and the result-log payload, and a registration naming a file somewhere
+        // other than this folder that has gone is exactly as much of a problem, so
+        // narrowing them would silence something that is right to say. What that
+        // is not is evidence about whether the records and THIS folder describe the
+        // same place, which is all the gate is asking.
         int registeredNamingFolder = 0;
         int registeredInFolderPresent = 0;
-        int missingNeededInFolder = 0;
-        int removablePresent = 0;
+        int missingInFolder = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
 
         // Declared out here because the two sanity gates below the loops read its
@@ -273,12 +267,15 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // a candidate every source answered for, with none of them claiming it,
         // is offered.
         //
-        // It runs on the orphan branch and on nothing else. A superseded or
-        // obsoleted patch is offered BECAUSE Windows positively said the patch is
-        // superseded and no longer uninstallable, so it is a file Windows knows
-        // by construction; putting it through a check whose keeping condition is
-        // "Windows knows this identity" would withhold that whole class on every
-        // machine, for ever, and would be the check misreading its own question.
+        // IT NOW COVERS THE WHOLE OFFER, which it did not until 3.0.0. There was
+        // a second branch, the superseded and obsoleted patches, and this check
+        // was deliberately kept off it: such a patch was offered BECAUSE Windows
+        // positively said so, making it a file Windows knows by construction, and
+        // a check whose keeping condition is "Windows knows this identity" would
+        // have withheld that whole class on every machine for ever. The reasoning
+        // was sound and the asymmetry it left was the one every investigation kept
+        // naming. With the class no longer offered there is one branch, and every
+        // file this app puts in front of anybody has been through here.
         screened = _identityVeto.Screen(
             unclaimedByPath.ConvertAll(f => new IdentityCandidate(f.FullPath, f.IsPatch)),
             progress,
@@ -328,83 +325,26 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 if (exists) registeredInFolderPresent++;
             }
 
-            // Non-removable + missing is the load-bearing banner signal:
-            // Windows still claims the file but it is gone from disk, so
-            // a future install / uninstall / patch will fail. Removable
-            // + missing is benign (Windows considers the patch already
-            // removed; the file having gone is the expected end state)
-            // and counts separately so the banner does not fire on it.
-            // A withheld row is removable-in-fact on a scan that could not
-            // prove it, so it takes the benign side too: only this scan's
-            // verdict was withheld, and the API's own reading of the file
-            // did not change.
-            if (pkg.IsRemovable)
-            {
-                // Containment guard at candidate creation. Unlike the orphan
-                // walk, a superseded/obsoleted candidate's path comes from an
-                // API or registry LocalPackage value, which a corrupt
-                // registration could point anywhere on disk. Drop one that does
-                // not resolve to a file directly in the cache root (or is a
-                // reparse point) rather than offer it; a genuine cache patch
-                // always passes, its LocalPackage naming a file at that root.
-                // Below the root is out of scope for the same reason the walk
-                // never descends. An unproven answer drops it too, logged under
-                // words that do not claim more than the check showed.
-                var patchSafety = exists
-                    ? CandidateGuard.CheckSafeToRemove(pkg.LocalPackagePath, cacheRoot)
-                    : CandidateGuard.RemovalSafety.Refused;
-                if (exists && patchSafety == CandidateGuard.RemovalSafety.Safe)
-                {
-                    var ext = _fs.Path.GetExtension(pkg.LocalPackagePath);
-                    // PatchState 2 = superseded by a newer patch.
-                    // PatchState 4 = obsoleted (publisher-withdrawn);
-                    // distinct API state, distinct Reason label, same
-                    // user-visible outcome (the patch is removable).
-                    removablePresent++;
-                    var isObsoleted = pkg.PatchState == 4;
-                    var reason = isObsoleted
-                        ? Strings.Reason_Obsoleted
-                        : Strings.Reason_Superseded;
-                    removable.Add(new OrphanedFile(
-                        FullPath: pkg.LocalPackagePath,
-                        SizeBytes: size,
-                        IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
-                        IsRemovablePatch: true,
-                        IsObsoleted: isObsoleted,
-                        Reason: reason));
-                }
-                else if (exists)
-                {
-                    // In-bounds check failed on an existing removable file: drop
-                    // it (do not offer, do not count as missing) and log.
-                    refusedCandidates++;
-                    refusalLog.Record(new InvalidOperationException(
-                        patchSafety == CandidateGuard.RemovalSafety.Refused
-                            ? $"Removable-patch candidate refused (not directly in the Installer cache, or a reparse point): {pkg.LocalPackagePath}"
-                            : $"Removable-patch candidate not offered (its symlink status or location could not be read): {pkg.LocalPackagePath}"),
-                        cause: $"removable-patch/{patchSafety}");
-                }
-                else
-                {
-                    missingRemovable++;
-                }
-            }
-            else if (exists)
+            // EVERY REGISTERED ROW IS KEPT AND THERE IS NO LONGER A BRANCH THAT
+            // OFFERS ONE. A patch Windows reports superseded or obsoleted is a
+            // patch Windows still holds, and it goes into the kept list, the kept
+            // bytes and the kept counts exactly as an applied one does.
+            //
+            // What the state still decides is which of the two missing counts a
+            // row lands in when its file has gone, and that is a split in the DATA
+            // and not a difference either host may speak: Windows opens every
+            // registered patch's cached file whether superseded or not, so a
+            // record naming an absent file is one condition with one recovery
+            // step. RegisteredPackage.IsMissingFromDisk carries the citations.
+            if (exists)
             {
                 stillUsedBytes += size;
-                // Counted only where the file is on disk, because the count is
-                // what the withholding COST this run: a withheld row whose file
-                // is already gone had nothing to offer either way.
-                if (pkg.RemovableWithheld) withheld++;
-            }
-            else if (pkg.RemovableWithheld)
-            {
-                missingRemovable++;
             }
             else
             {
-                missingNonRemovable++;
-                if (namesFileInFolder) missingNeededInFolder++;
+                if (pkg.IsSupersededOrObsoleted) missingSuperseded++;
+                else missingNotSuperseded++;
+                if (namesFileInFolder) missingInFolder++;
             }
         }
         }
@@ -436,20 +376,26 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // possible outcome into an error. This count is what the offer was before
         // the pass ran, so both gates go on answering the question they were
         // written to answer.
-        var candidatesBeforeIdentity = unclaimedByPath.Count + removablePresent;
+        //
+        // It is the walk's candidates and nothing else from 3.0.0. A registered
+        // row can no longer become a candidate, so the term that used to add the
+        // superseded patches about to be offered has gone with them.
+        var candidatesBeforeIdentity = unclaimedByPath.Count;
 
         if (!cacheRoot.Proven && refusedCandidates > 0 && candidatesBeforeIdentity == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
 
-        var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
+        // Every registered row, no row being removable. The filter that used to
+        // stand here took the offered patches back out of the kept list.
+        var stillUsed = sizedPackages.AsReadOnly();
 
-        // The three populations inside that list, counted off the list itself
-        // rather than tallied through the loop above. That is the point rather
-        // than a tidiness: what the counts have to partition is exactly the set
-        // the window shows, and a counter incremented on a different pass can
-        // come apart from it without anything noticing. The withheld and unjudged
-        // rows are the two that carry no claim, so a sentence about files being
-        // needed is true of the first count and of nothing else.
+        // The populations inside that list, counted off the list itself rather
+        // than tallied through the loop above. That is the point rather than a
+        // tidiness: what the counts have to partition is exactly the set the
+        // window shows, and a counter incremented on a different pass can come
+        // apart from it without anything noticing. The unjudged rows are the ones
+        // carrying no claim, so a sentence about files being needed is true of the
+        // claimed count and of nothing else.
         var registeredClaimed = stillUsed
             .Count(p => !p.RemovableWithheld && !p.VerdictUnreadable);
         var registeredClaimedBytes = stillUsed
@@ -457,6 +403,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
             .Sum(p => p.FileSizeBytes);
         var registeredWithheld = stillUsed.Count(p => p.RemovableWithheld);
         var registeredUnjudged = stillUsed.Count(p => p.VerdictUnreadable);
+
+        // The patches 3.0.0 stopped offering, measured where they now sit. A
+        // sub-count of the claimed rows rather than a fourth population (one shape
+        // falls under the unjudged instead, a State that read 2 or 4 whose
+        // Uninstallable read then failed), so the two are never added. Files on
+        // disk only: a superseded registration whose file has already gone is in
+        // the missing counts and has no space to give back.
+        var registeredSuperseded = stillUsed
+            .Count(p => p.IsSupersededOrObsoleted && p.FileExists);
+        var registeredSupersededBytes = stillUsed
+            .Where(p => p.IsSupersededOrObsoleted && p.FileExists)
+            .Sum(p => p.FileSizeBytes);
 
         // The first correlation question, and it is asked before the numeric one
         // because it is the one that can be answered outright. Of the rows
@@ -513,13 +471,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // Every registered file found on disk counts as one, superseded ones
         // included. What the gate is asking is whether any registered path named
         // a real file in the folder, and a superseded patch's does exactly as
-        // much as a needed package's; leaving those out would refuse a machine
-        // that had ten of them sitting in the folder about to be offered. One
-        // that exists in the folder and then fails the containment guard counts
-        // too, and that is not an oversight: the guard answers whether a file may
-        // be removed, which is a different question from whether the records and
-        // the folder line up, and a row answering neither counter used to fall
-        // out of this arithmetic entirely.
+        // much as an applied one's. One that exists in the folder and then fails
+        // the containment guard counts too, and that is not an oversight: the
+        // guard answers whether a file may be removed, which is a different
+        // question from whether the records and the folder line up, and a row
+        // answering neither counter used to fall out of this arithmetic entirely.
         //
         // BOTH SIDES OF THE PROPORTION ASK ABOUT THE SAME POPULATION, the
         // registrations naming a file directly in this folder. The missing side
@@ -528,9 +484,23 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // says nothing about, and could never answer back on the survivor side.
         // A machine whose folder correlation was perfect could be refused on
         // forty absent registrations that were never in the folder to begin with.
-        // Its narrower reading is not shared with the missing-from-disk banner,
-        // which still counts every needed file that has gone: see the counter's
-        // own note above for why the two must not be the same number.
+        // Its narrower reading is not shared with the missing-from-disk report,
+        // which still counts every registration whose file has gone wherever it
+        // pointed: see the counters' own notes above for why the two must not be
+        // the same number.
+        //
+        // AND IT DID NOT ASK ABOUT ONE POPULATION UNTIL 3.0.0, the sentence above
+        // notwithstanding. The survivor side counted every in-folder registration
+        // whose file was there, superseded ones included, while the missing side
+        // took only the rows that carried no superseded or obsoleted state, on the
+        // reading that such a file having gone was its expected end state. That
+        // reading is what this release removes, so the exclusion goes with it and
+        // the two sides now measure the same rows. It widens the gate: a machine
+        // whose absent in-folder registrations are mostly superseded patches can
+        // now reach the bound where it could not before. That needs at most two
+        // registered files present in the folder, twenty times as many absent, and
+        // an offer with something in it, which is not a shape a healthy machine
+        // takes.
         //
         // Two rather than a round number, because the absolute bound answers the
         // finding and no more; machines with most of their cache missing are
@@ -554,13 +524,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // and not the fault this gate was written for. Floored, a machine with no
         // survivor has to show the same twenty missing rows a machine with one
         // survivor already had to, and P = 1 and P = 2 are arithmetically
-        // untouched. Its denominator excludes the superseded rows whose file
-        // Windows has already removed, so it is not a fifth of the registrations,
-        // and the tests pin both sides at each P the absolute bound admits.
+        // untouched. It is a fifth of the in-folder registrations rather than of
+        // all of them, and the tests pin both sides at each P the absolute bound
+        // admits.
         var presentRegistered = registeredInFolderPresent;
         var survivorsForBound = Math.Max(presentRegistered, 1);
         if (presentRegistered <= 2
-            && survivorsForBound * 20 < survivorsForBound + missingNeededInFolder
+            && survivorsForBound * 20 < survivorsForBound + missingInFolder
             && candidatesBeforeIdentity > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
 
@@ -585,8 +555,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // They are exact per-file counts of exactly that, and are named inputs to
         // the outstanding reports schema. A schema designed without them is a
         // departure somebody has to argue for.
-        return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable,
-            query.UnaccountedProductCount, withheld,
+        return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes,
+            missingNotSuperseded, missingSuperseded,
+            // WithheldCount is zero from here on and is passed as a literal rather
+            // than dropped: the field is in the result-log schema, so a receiver
+            // meets the key it expects with a value that is true.
+            query.UnaccountedProductCount, 0,
             screened.ClaimedCount, screened.IdentityUnreadableCount, screened.RecordsUnaskableCount,
             query.Census,
             // Read after the classification is settled, so a probe that threw
@@ -596,7 +570,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registeredClaimed,
             registeredClaimedBytes,
             registeredWithheld,
-            registeredUnjudged);
+            registeredUnjudged,
+            registeredSuperseded,
+            registeredSupersededBytes);
     }
 
     /// <summary>

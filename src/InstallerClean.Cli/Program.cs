@@ -826,17 +826,17 @@ internal static class Program
 
     /// <summary>
     /// Reports the two scan-level conditions that are facts about the machine
-    /// rather than about this run: a scan that had to withhold its superseded and
-    /// obsoleted verdicts, and registered files missing from disk. Each goes to
-    /// stdout in the operator's language and to the Application log in English,
-    /// because scheduled tasks and RMM tools discard the first and read the second.
+    /// rather than about this run: records the scan could not fully read, and
+    /// registrations naming a file that is not there. Each goes to stdout in the
+    /// operator's language and to the Application log in English, because
+    /// scheduled tasks and RMM tools discard the first and read the second.
     /// </summary>
     /// <remarks>
     /// Called once, immediately after the scan, so every return the work loop can
-    /// take from there on has reported these first, the nothing-to-do one included:
-    /// a fleet whose superseded-patch cleanup has been withheld every night for a
-    /// month otherwise looks, on the only surface anybody watches, exactly like a
-    /// fleet with nothing to clean. The four returns in
+    /// take from there on has reported these first, the nothing-to-do one
+    /// included: a fleet carrying either condition every night for a month
+    /// otherwise looks, on the only surface anybody watches, exactly like a fleet
+    /// with nothing to clean. The four returns in
     /// <see cref="ResolveAndValidateMoveDestination"/> come before the scan, so
     /// there is nothing to report by the time they take it.
     /// </remarks>
@@ -845,35 +845,38 @@ internal static class Program
         if (scanResult.UnaccountedProductCount > 0)
         {
             // The command line's own sentence, not the window's Summary.* one.
-            // That closes on Re-scan, which is a button this surface has not got,
-            // and opens its second sentence on "Everything listed", which is true
-            // only of /s: a /d or an /m lists nothing at all.
+            // That closes on Re-scan, which is a button this surface has not got.
             //
             // The count gates the line and does not appear in it. Five different
             // things contribute to it and the total is an estimate rather than a
             // headcount, so any figure printed here would be a precision the app
-            // has not got; the event-log line below keeps its own copy because a
-            // machine surface an RMM parses may gain a field and not lose one, and
-            // the machine contract records what that figure is worth.
+            // has not got; the event-log line below keeps its own copy because an
+            // RMM needs a number to hang a filter on, and the machine contract
+            // records what that figure is worth.
             Console.WriteLine(Strings.Cli_RecordsNotMatched);
-            MachineContract.WriteEventLog(CliEventClass.ScanWithheldNotice,
+            MachineContract.WriteEventLog(CliEventClass.ScanRecordsIncompleteNotice,
                 () => string.Format(Strings.Cli_EventLogScanWithheld,
-                    arg, scanResult.WithheldCount, scanResult.UnaccountedProductCount));
+                    arg, scanResult.UnaccountedProductCount));
         }
 
-        // MissingNonRemovableCount, never MissingFromDiskCount: a superseded patch
-        // whose file has already gone is the expected end state, not an alarm.
-        if (scanResult.MissingNonRemovableCount > 0)
+        // Every registration naming a file that is not there, superseded ones
+        // included: this took the non-superseded half until 3.0.0, on the reading
+        // that a superseded patch's file having gone was its expected end state.
+        // Windows opens every registered patch's cached file whichever state it
+        // carries, so the two are one condition and the line speaks for both.
+        if (scanResult.MissingFromDiskCount > 0)
         {
+            var programs = MissingFilesReport.Inline(
+                MissingFilesReport.Products(scanResult.RegisteredPackages));
             Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(scanResult.MissingNonRemovableCount,
+                DisplayHelpers.Pluralise(scanResult.MissingFromDiskCount,
                     Strings.Cli_MissingFromDisk_Singular,
                     Strings.Cli_MissingFromDisk_Plural,
                     "Cli.MissingFromDisk"),
-                scanResult.MissingNonRemovableCount));
+                scanResult.MissingFromDiskCount, programs));
             MachineContract.WriteEventLog(CliEventClass.ScanMissingFilesNotice,
                 () => string.Format(Strings.Cli_EventLogMissingFromDisk,
-                    arg, scanResult.MissingNonRemovableCount));
+                    arg, scanResult.MissingFromDiskCount));
         }
     }
 

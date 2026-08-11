@@ -66,15 +66,36 @@ public class RemovableReverifierTests
     }
 
     [Fact]
-    public async Task Keeps_a_candidate_still_marked_removable()
+    public async Task Drops_a_candidate_a_superseded_registration_names()
     {
+        // THE INVERSE OF WHAT THIS PINNED, and it is a tightening rather than a
+        // loss. It used to assert that a candidate still marked removable
+        // survived, because a removable row was excluded from the non-removable
+        // map by construction and the superseded class was offered on exactly that
+        // verdict. No enumeration grants the verdict now, so every registered path
+        // is in that map and a candidate any registration names is dropped with a
+        // cause, superseded ones included.
         const string superseded = @"C:\Windows\Installer\superseded.msp";
-        // Still superseded => IsRemovable, so not in the non-removable set.
-        var svc = Reverifier(Query(Removable(superseded)));
+        var svc = Reverifier(Query(NonRemovable(superseded) with { PatchState = 2 }));
 
         var result = await svc.ReverifyAsync(new[] { superseded });
 
-        Assert.Equal(new[] { superseded }, result.Surviving);
+        Assert.Empty(result.Surviving);
+        Assert.Equal(new[] { superseded }, result.Dropped);
+    }
+
+    [Fact]
+    public async Task Keeps_a_candidate_no_registration_names_at_all()
+    {
+        // The direction that must not move with it. A true orphan is a candidate
+        // precisely because nothing names its path, so nothing in the re-verify's
+        // map can match it and it survives to be acted on.
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        var svc = Reverifier(Query(NonRemovable(@"C:\Windows\Installer\something-else.msi")));
+
+        var result = await svc.ReverifyAsync(new[] { orphan });
+
+        Assert.Equal(new[] { orphan }, result.Surviving);
         Assert.Empty(result.Dropped);
     }
 

@@ -52,14 +52,11 @@ public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
         Files = files.OrderByDescending(f => f.SizeBytes).ToList();
 
         var totalSize = DisplayHelpers.FormatSize(files.Sum(f => f.SizeBytes));
-        // Footer mirrors the Reason-column split of removable files: true
-        // orphans (never claimed by the API, so not a removable patch), then
-        // the two disjoint patch states. The three counts partition Files.
-        var orphaned = files.Count(f => !f.IsRemovablePatch);
-        var obsoleted = files.Count(f => f.IsObsoleted);
-        var superseded = files.Count(f => f.IsRemovablePatch && !f.IsObsoleted);
+        // One count, because one pathway reaches this window. The footer used to
+        // mirror the Reason column's three-way split, and two of those three would
+        // now read zero on every machine.
         Summary = string.Format(Strings.Summary_OrphanedWindow,
-            orphaned, superseded, obsoleted, totalSize);
+            files.Count, DisplayHelpers.PluraliseFile(files.Count), totalSize);
 
         if (Files.Count > 0)
             SelectedFile = Files[0];

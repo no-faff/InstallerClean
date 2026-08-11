@@ -46,6 +46,60 @@ public class InstallerQueryServicePatchTruncationTests
     private static Task<InstallerQueryResult> Run(FakeApi msi) =>
         new InstallerQueryService(msi, NoFallback).GetRegisteredPackagesAsync();
 
+    /// <summary>
+    /// Drives the confirmation pass over the state the enumeration used to hand
+    /// it, and returns the claimed set for the assertions.
+    ///
+    /// WHY THESE TESTS DRIVE IT DIRECTLY RATHER THAN THROUGH A SCAN. From 3.0.0 no
+    /// enumeration grants a removable verdict to any patch, so nothing reaches
+    /// this pass through a real scan and a test driving one would exercise nothing
+    /// at all while still passing. The pass is kept whole because it is what made
+    /// the superseded class as safe as it was and what the class would need again;
+    /// keeping it without keeping its tests would preserve it in name only, and
+    /// would turn its eventual deletion into a formality rather than the decision
+    /// it is. There is deliberately NO production switch that re-grants the
+    /// verdict: a flag in a shipped binary that turns this class back on is the
+    /// thing the release exists to prevent.
+    ///
+    /// THE STARTING VERDICT COMES FROM THE PRODUCTION RULE, not from a copy of it.
+    /// <see cref="InstallerQueryService.IsRemovablePatch"/> decides it and
+    /// <see cref="InstallerQueryService.MergeClaim"/> merges it, so the only thing
+    /// assembled here is the shape of the enumeration's output: which products the
+    /// walk returned and which pairings it read. That is a small reimplementation
+    /// and it can drift; what it cannot do is change what the pass under test
+    /// concludes from what it is given.
+    /// </summary>
+    private static Dictionary<string, RegisteredPackage> Confirm(
+        FakeApi msi, IPackageIdentityReader? reader = null, params string[] recovered)
+    {
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+        var claims = new List<PatchClaim>();
+
+        foreach (var row in msi.EnumeratedPairings())
+        {
+            claims.Add(new PatchClaim(row.Path, row.Patch, row.Product, row.UserSid, (int)row.Context));
+            int.TryParse(row.State, out var patchState);
+            InstallerQueryService.MergeClaim(
+                claimed,
+                new RegisteredPackage(row.Path, "Product", row.Product, patchState,
+                    InstallerQueryService.IsRemovablePatch(row.State, row.Uninstallable)),
+                InstallerQueryService.ClaimSource.InstallerApi);
+        }
+
+        new InstallerQueryService(msi, NoFallback, null, reader).ConfirmRemovableAgainstEveryProduct(
+            claimed,
+            claims,
+            msi.WalkedProductInstances.ToList(),
+            recovered.Select(p => (ProductCode: p, Sid: (string?)null, Context: MsiInstallContext.Machine)).ToList(),
+            CancellationToken.None);
+
+        return claimed;
+    }
+
+    /// <summary>The one row every test here is about.</summary>
+    private static RegisteredPackage TheSharedPatch(Dictionary<string, RegisteredPackage> claimed) =>
+        Assert.Contains(Shared, claimed);
+
     private static Task<InstallerQueryResult> Run(FakeApi msi, IPackageIdentityReader reader) =>
         new InstallerQueryService(msi, NoFallback, null, reader).GetRegisteredPackagesAsync();
 
@@ -107,11 +161,9 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     [Fact]
-    public async Task A_patch_another_product_still_needs_is_not_offered_when_its_row_was_lost()
+    public void A_patch_another_product_still_needs_is_not_offered_when_its_row_was_lost()
     {
-        var result = await Run(TwoProductsOneSharedPatch());
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(TwoProductsOneSharedPatch()));
         Assert.False(row.IsRemovable);
         // Not a withholding. A product was asked and answered that it holds the
         // patch and has not shown it removable, which is a live claim on the
@@ -121,21 +173,19 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     [Fact]
-    public async Task The_same_machine_without_the_truncation_reaches_the_same_verdict()
+    public void The_same_machine_without_the_truncation_reaches_the_same_verdict()
     {
         // The control that makes the test above mean something: with the second
         // product's enumeration whole, the merge's own downgrade produces the
         // identical answer. So the fix restores a verdict rather than inventing
         // one.
-        var result = await Run(TwoProductsOneSharedPatch(truncateSecond: false));
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(TwoProductsOneSharedPatch(truncateSecond: false)));
         Assert.False(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
     }
 
     [Fact]
-    public async Task A_patch_no_other_product_holds_is_still_offered()
+    public void A_patch_no_other_product_holds_is_still_offered()
     {
         // The direction that must NOT move. Every other product answers that it
         // does not hold the patch, which is a positive answer and not a failure,
@@ -145,21 +195,17 @@ public class InstallerQueryServicePatchTruncationTests
         msi.AddProduct(StillApplied);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
 
-        var result = await Run(msi);
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi));
         Assert.True(row.IsRemovable);
     }
 
     [Fact]
-    public async Task A_read_that_could_not_answer_keeps_the_patch_and_says_it_was_withheld()
+    public void A_read_that_could_not_answer_keeps_the_patch_and_says_it_was_withheld()
     {
         var msi = TwoProductsOneSharedPatch();
         msi.PatchPropertyResult[(Patch, StillApplied, "State")] = BadConfiguration;
 
-        var result = await Run(msi);
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi));
         Assert.False(row.IsRemovable);
         // The other of the two meanings: nothing was established, so the row is
         // kept for want of a verdict rather than on one.
@@ -167,22 +213,20 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     [Fact]
-    public async Task An_unreadable_uninstallable_value_keeps_the_patch_too()
+    public void An_unreadable_uninstallable_value_keeps_the_patch_too()
     {
         // Uninstallable is only asked once State has answered, so this pins the
         // second read's failure separately from the first's.
         var msi = TwoProductsOneSharedPatch();
         msi.PatchPropertyResult[(Patch, StillApplied, "Uninstallable")] = BadConfiguration;
 
-        var result = await Run(msi);
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi));
         Assert.False(row.IsRemovable);
         Assert.True(row.RemovableWithheld);
     }
 
     [Fact]
-    public async Task A_machine_with_nothing_removable_is_never_asked_anything()
+    public void A_machine_with_nothing_removable_is_never_asked_anything()
     {
         // The cost guard. This pass scales with products multiplied by removable
         // candidates, so a machine with no removable candidate has to pay
@@ -193,14 +237,12 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HoldPatch(Superseding, Patch, Shared, state: "1", uninstallable: "1");
         msi.EnumerationEndsEarlyFor.Add(StillApplied);
 
-        var result = await Run(msi);
-
-        Assert.False(Assert.Single(result.Packages).IsRemovable);
+        Assert.False(TheSharedPatch(Confirm(msi)).IsRemovable);
         Assert.Empty(msi.ConfirmationAsks);
     }
 
     [Fact]
-    public async Task A_pairing_the_enumeration_already_read_is_not_asked_again()
+    public void A_pairing_the_enumeration_already_read_is_not_asked_again()
     {
         // Both products enumerated the patch, so both claims reached the merge
         // and there is nothing left to establish. Re-asking would get the same
@@ -208,17 +250,17 @@ public class InstallerQueryServicePatchTruncationTests
         // scan.
         var msi = TwoProductsOneSharedPatch(truncateSecond: false);
 
-        await Run(msi);
+        Confirm(msi);
 
         Assert.Empty(msi.ConfirmationAsks);
     }
 
     [Fact]
-    public async Task Only_the_products_that_never_named_the_patch_are_asked()
+    public void Only_the_products_that_never_named_the_patch_are_asked()
     {
         var msi = TwoProductsOneSharedPatch();
 
-        await Run(msi);
+        Confirm(msi);
 
         // One pairing, once: the product whose enumeration came back short. The
         // other product's claim was read by the enumeration itself.
@@ -226,7 +268,7 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     [Fact]
-    public async Task Every_patch_code_naming_one_path_is_confirmed_not_just_the_last()
+    public void Every_patch_code_naming_one_path_is_confirmed_not_just_the_last()
     {
         // A path can be named by more than one patch code: claims are collected
         // per claim because several products claim one file, and a corrupt
@@ -248,9 +290,7 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HoldPatch(StillApplied, Patch, Shared, state: "1", uninstallable: "1");
         msi.EnumerationEndsEarlyFor.Add(StillApplied);
 
-        var result = await Run(msi);
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi));
         Assert.False(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
     }
@@ -284,7 +324,7 @@ public class InstallerQueryServicePatchTruncationTests
     // ---- Route A: the product the walk never returned ----
 
     [Fact]
-    public async Task A_product_the_walk_never_returned_is_found_and_still_holds_the_patch()
+    public void A_product_the_walk_never_returned_is_found_and_still_holds_the_patch()
     {
         // THE RESIDUE THIS ROUTE EXISTS FOR. The product enumeration itself came
         // back short, so the product holding the patch is in no list the pass can
@@ -297,15 +337,13 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HiddenFromWalk.Add(StillApplied);
         msi.HoldPatch(StillApplied, Patch, Shared, state: "1", uninstallable: "1");
 
-        var result = await Run(msi);
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi));
         Assert.False(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
     }
 
     [Fact]
-    public async Task A_machine_wide_enumeration_that_refuses_withholds_every_removable_verdict()
+    public void A_machine_wide_enumeration_that_refuses_withholds_every_removable_verdict()
     {
         // An enumeration that came back empty because it refused, read as "no
         // other product holds it", is the exact fault this pass exists to close.
@@ -313,9 +351,7 @@ public class InstallerQueryServicePatchTruncationTests
         var msi = TwoProductsOneSharedPatch();
         msi.MachineWidePatchEnumResult = BadConfiguration;
 
-        var result = await Run(msi);
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi));
         Assert.False(row.IsRemovable);
         Assert.True(row.RemovableWithheld);
     }
@@ -324,33 +360,29 @@ public class InstallerQueryServicePatchTruncationTests
     [InlineData(AccessDenied)]
     [InlineData(InvalidParameter)]
     [InlineData(UnknownProduct)]
-    public async Task Every_documented_failure_of_that_enumeration_withholds(uint code)
+    public void Every_documented_failure_of_that_enumeration_withholds(uint code)
     {
         // The page lists these among its returns. None of them is an answer, and
         // each is decided here rather than falling through a default.
         var msi = TwoProductsOneSharedPatch();
         msi.MachineWidePatchEnumResult = code;
 
-        var result = await Run(msi);
-
-        Assert.True(Assert.Single(result.Packages).RemovableWithheld);
+        Assert.True(TheSharedPatch(Confirm(msi)).RemovableWithheld);
     }
 
     [Fact]
-    public async Task A_machine_wide_row_that_names_nothing_withholds()
+    public void A_machine_wide_row_that_names_nothing_withholds()
     {
         // A success that wrote no codes cannot be used and cannot be shown to be
         // harmless, so it is treated as the row that was missed.
         var msi = TwoProductsOneSharedPatch();
         msi.MachineWideEmitsEmptyRow = true;
 
-        var result = await Run(msi);
-
-        Assert.True(Assert.Single(result.Packages).RemovableWithheld);
+        Assert.True(TheSharedPatch(Confirm(msi)).RemovableWithheld);
     }
 
     [Fact]
-    public async Task A_machine_with_nothing_removable_never_runs_the_machine_wide_enumeration()
+    public void A_machine_with_nothing_removable_never_runs_the_machine_wide_enumeration()
     {
         // It is the one call in this pass that scales with the whole machine, so
         // the ordinary machine must not pay for it.
@@ -358,13 +390,13 @@ public class InstallerQueryServicePatchTruncationTests
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "1", uninstallable: "1");
 
-        await Run(msi);
+        Confirm(msi);
 
         Assert.Equal(0, msi.MachineWideRowsServed);
     }
 
     [Fact]
-    public async Task A_product_that_has_the_patch_registered_but_not_applied_still_keeps_it()
+    public void A_product_that_has_the_patch_registered_but_not_applied_still_keeps_it()
     {
         // MSIPATCHSTATE_REGISTERED is 8: registered and not yet applied. It is
         // not a removable state, so a product holding it that way keeps the file,
@@ -382,9 +414,7 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HiddenFromWalk.Add(StillApplied);
         msi.HoldPatch(StillApplied, Patch, Shared, state: "8", uninstallable: "0");
 
-        var result = await Run(msi);
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi));
         Assert.False(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
     }
@@ -392,7 +422,7 @@ public class InstallerQueryServicePatchTruncationTests
     // ---- Route B: what the patch file itself declares ----
 
     [Fact]
-    public async Task A_target_the_patch_file_names_is_asked_even_when_no_enumeration_names_it()
+    public void A_target_the_patch_file_names_is_asked_even_when_no_enumeration_names_it()
     {
         // Route A has a documented blind spot: in the per-user-unmanaged context
         // it enumerates only patches installed with Windows Installer 3.0 for
@@ -405,15 +435,13 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HiddenFromWalk.Add(StillApplied);
         msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "1");
 
-        var result = await Run(msi, Reader(Shared, StillApplied));
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi, Reader(Shared, StillApplied)));
         Assert.False(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
     }
 
     [Fact]
-    public async Task A_patch_whose_own_declaration_cannot_be_read_is_withheld()
+    public void A_patch_whose_own_declaration_cannot_be_read_is_withheld()
     {
         // The row has to still be removable when route B runs, or the merge has
         // already settled it and the file is never read.
@@ -421,9 +449,7 @@ public class InstallerQueryServicePatchTruncationTests
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
 
-        var result = await Run(msi, UnreadableReader(Shared));
-
-        var row = Assert.Single(result.Packages);
+        var row = TheSharedPatch(Confirm(msi, UnreadableReader(Shared)));
         Assert.False(row.IsRemovable);
         Assert.True(row.RemovableWithheld);
     }
@@ -445,29 +471,25 @@ public class InstallerQueryServicePatchTruncationTests
     [Theory]
     [InlineData(NoMoreItems)]
     [InlineData(UnknownProduct)]
-    public async Task A_declared_target_that_is_not_installed_is_a_clean_answer(uint notInstalled)
+    public void A_declared_target_that_is_not_installed_is_a_clean_answer(uint notInstalled)
     {
         var msi = new FakeApi();
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
         msi.ProductResolveResult[NotInstalled] = notInstalled;
 
-        var result = await Run(msi, Reader(Shared, NotInstalled));
-
-        Assert.True(Assert.Single(result.Packages).IsRemovable);
+        Assert.True(TheSharedPatch(Confirm(msi, Reader(Shared, NotInstalled))).IsRemovable);
     }
 
     [Fact]
-    public async Task A_declared_target_that_cannot_be_located_withholds()
+    public void A_declared_target_that_cannot_be_located_withholds()
     {
         var msi = new FakeApi();
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
         msi.ProductResolveResult[StillApplied] = BadConfiguration;
 
-        var result = await Run(msi, Reader(Shared, StillApplied));
-
-        Assert.True(Assert.Single(result.Packages).RemovableWithheld);
+        Assert.True(TheSharedPatch(Confirm(msi, Reader(Shared, StillApplied))).RemovableWithheld);
     }
 
     /// <summary>
@@ -483,7 +505,7 @@ public class InstallerQueryServicePatchTruncationTests
     /// nothing"; a name can be put to Windows, and Windows answers.
     /// </summary>
     [Fact]
-    public async Task A_product_only_the_registry_names_is_asked_and_its_claim_stands()
+    public void A_product_only_the_registry_names_is_asked_and_its_claim_stands()
     {
         var msi = new FakeApi();
         msi.AddProduct(Superseding);
@@ -491,9 +513,10 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HiddenFromWalk.Add(StillApplied);
         msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "1");
 
-        var result = await Run(msi, Registry(Superseding, StillApplied));
-
-        var row = Assert.Single(result.Packages);
+        // The recovered product is handed in, standing for the registry
+        // comparison that finds it and the keyed ask that confirms it installed;
+        // that part of the scan is unchanged and has its own tests below.
+        var row = TheSharedPatch(Confirm(msi, null, StillApplied));
         Assert.False(row.IsRemovable);
         // Not withheld: a product said it still holds the patch. The scan knows
         // why this file is being kept and could say so.
@@ -521,10 +544,12 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
 
         // Named by the registry, installed nowhere: neither walked nor hidden.
+        // The enumeration settles it as residue and counts nothing, and the
+        // confirmation pass is left with nothing to overturn.
         var result = await Run(msi, Registry(Superseding, NotInstalled));
-
-        Assert.True(Assert.Single(result.Packages).IsRemovable);
         Assert.Equal(0, result.UnaccountedProductCount);
+
+        Assert.True(TheSharedPatch(Confirm(msi)).IsRemovable);
     }
 
     /// <summary>
@@ -541,12 +566,16 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
         msi.ProductResolveResult[StillApplied] = BadConfiguration;
 
+        // The count is what survives: a product the registry named and Windows
+        // would not answer about is one the enumeration cannot account for, which
+        // still drives the refusal gate and the records-incomplete notice. The
+        // withholding it used to trigger has nothing left to withhold.
         var result = await Run(msi, Registry(Superseding, StillApplied));
 
+        Assert.Equal(1, result.UnaccountedProductCount);
         var row = Assert.Single(result.Packages);
         Assert.False(row.IsRemovable);
-        Assert.True(row.RemovableWithheld);
-        Assert.Equal(1, result.UnaccountedProductCount);
+        Assert.False(row.RemovableWithheld);
     }
 
     /// <summary>
@@ -563,10 +592,10 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
 
         var result = await Run(msi);
-
-        Assert.True(Assert.Single(result.Packages).IsRemovable);
         Assert.Equal(0, result.Census.RecoveredProductCount);
         Assert.Equal(0, result.Census.UnansweredProductCount);
+
+        Assert.True(TheSharedPatch(Confirm(msi)).IsRemovable);
     }
 
     /// <summary>
@@ -604,7 +633,7 @@ public class InstallerQueryServicePatchTruncationTests
     /// pairing is not asserting the question.
     /// </summary>
     [Fact]
-    public async Task A_per_user_product_is_asked_under_its_own_account_and_context()
+    public void A_per_user_product_is_asked_under_its_own_account_and_context()
     {
         const string Sid = "S-1-5-21-1-2-3-1001";
         var msi = new FakeApi();
@@ -613,11 +642,10 @@ public class InstallerQueryServicePatchTruncationTests
         msi.AddPerUserProduct(StillApplied, Sid);
         msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "1");
 
-        var result = await Run(msi);
+        var row = TheSharedPatch(Confirm(msi));
 
         Assert.Contains((Patch, StillApplied, (string?)Sid, MsiInstallContext.UserUnmanaged),
             msi.ConfirmationAskIdentities);
-        var row = Assert.Single(result.Packages);
         Assert.False(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
     }
@@ -695,6 +723,42 @@ public class InstallerQueryServicePatchTruncationTests
 
         /// <summary>How many products the walk returns, for the headcount tests.</summary>
         public int WalkedProducts => _products.Count;
+
+        /// <summary>
+        /// What the walk returns, each with the account and context it is
+        /// installed under, in walk order. The enumeration hands this list to the
+        /// confirmation pass, so the harness that drives that pass directly has to
+        /// hand it the same thing; hidden products are absent, which is what makes
+        /// them hidden.
+        /// </summary>
+        public IEnumerable<(string ProductCode, string? UserSid, MsiInstallContext Context)>
+            WalkedProductInstances =>
+            _products.Select(p => _perUser.TryGetValue(p, out var sid)
+                ? (p, (string?)sid, MsiInstallContext.UserUnmanaged)
+                : (p, (string?)null, MsiInstallContext.Machine));
+
+        /// <summary>
+        /// The (patch, product) pairings the patch enumeration would have read:
+        /// every patch a walked product holds, unless that product's enumeration
+        /// ends early or the pairing was declared invisible to enumeration. Both
+        /// of those are the fault the confirmation pass exists to close, so a
+        /// harness that included them would be handing the pass the answer.
+        /// </summary>
+        public IEnumerable<(string Patch, string Product, string Path, string State,
+            string Uninstallable, string? UserSid, MsiInstallContext Context)> EnumeratedPairings()
+        {
+            foreach (var (product, sid, context) in WalkedProductInstances)
+            {
+                if (EnumerationEndsEarlyFor.Contains(product)) continue;
+                if (!_patchesOf.TryGetValue(product, out var patches)) continue;
+                foreach (var patch in patches)
+                    yield return (patch, product,
+                        _patchProps[(patch, product, "LocalPackage")],
+                        _patchProps[(patch, product, "State")],
+                        _patchProps[(patch, product, "Uninstallable")],
+                        sid, context);
+            }
+        }
 
         /// <summary>
         /// The pairing exists and every keyed read answers for it, while no

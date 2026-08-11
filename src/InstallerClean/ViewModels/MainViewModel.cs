@@ -220,15 +220,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
         !Scan.HasScanned && Scan.LastScanWasCancelled ? Strings.Status_ScanCancelled : string.Empty;
 
     /// <summary>
-    /// The middle ("why") sentence of the main-window intro, with the three
-    /// Reason values formatted in. The intro is three resx keys
-    /// (<c>Body.MainExplanation.Lead</c> / <c>.Why</c> / <c>.Action</c>) so each
-    /// reads at its own text tier; only this one interpolates, so only it binds
-    /// to the view-model. The <c>{0}</c>, <c>{1}</c> and <c>{2}</c> slots carry
-    /// Reason.Orphaned, Reason.Superseded and Reason.Obsoleted so a translator
-    /// edits the column labels in one place and the copy follows. Obsoleted
-    /// (PatchState 4) is publisher-withdrawn rather than newer-patch-replaced;
-    /// the copy distinguishes both.
+    /// The middle ("why") sentence of the main-window intro. The intro is three
+    /// resx keys (<c>Body.MainExplanation.Lead</c> / <c>.Why</c> / <c>.Action</c>)
+    /// so each reads at its own text tier; only this one ever interpolated, which
+    /// is why only it binds to the view-model.
+    ///
+    /// THE SENTENCE TAKES NO ARGUMENTS AND THREE ARE STILL PASSED. It carried a
+    /// slot per Reason label while three kinds of file reached the list, so that a
+    /// translator edited the column labels in one place and the copy followed, and
+    /// one kind reaches it now. A translation of the older sentence still carries
+    /// the three slots, and string.Format ignores a surplus argument, so passing
+    /// them costs nothing here and is the difference between such a translation
+    /// rendering its old sentence and rendering its own placeholder markers on
+    /// screen.
     /// </summary>
     public string MainExplanationWhyText =>
         string.Format(Strings.Body_MainExplanation_Why,

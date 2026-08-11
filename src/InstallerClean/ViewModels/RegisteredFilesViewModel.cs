@@ -13,12 +13,17 @@ namespace InstallerClean.ViewModels;
 /// by product name, and lazy-loads MSI summary metadata for the
 /// selected row off the UI thread. The cache survives selection cycles.
 ///
-/// Rows flag as missing on <c>IsMissingAndNeeded</c>, not on the raw
-/// FileExists: the flag drives the "this file has been deleted, a future
-/// repair could fail" note and the window's opening selection, and a scan that
-/// withheld a superseded patch's verdict passes that patch through here with
-/// its file legitimately gone. Alarming the user about it would be the fault
-/// the note exists to report.
+/// Rows flag as missing on <c>IsMissingFromDisk</c>, which is now the plain
+/// question of whether the file is there. It drives the "a future repair could
+/// fail" note and the window's opening selection, and it takes every
+/// registration: a superseded patch reaches this window like any other row and
+/// its file having gone is the same condition, Windows opening every registered
+/// patch's cached file whatever state it carries. The property excluded that
+/// class until 3.0.0, on a reading Microsoft does not support.
+///
+/// THIS IS WHERE THE PROGRAMS ARE NAMED. The main window's line says how many
+/// files and names the first few; this window has room for all of them, which is
+/// what "Open Details for what to do" is sending the reader to.
 /// </summary>
 public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
 {
@@ -112,7 +117,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     msi.FileSizeBytes,
                     patches.Count,
                     patches,
-                    IsMissing: msi.IsMissingAndNeeded));
+                    IsMissing: msi.IsMissingFromDisk));
 
                 // One ProductCode can be registered with several .msi
                 // caches (a product installed per machine AND per user
@@ -133,7 +138,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                         extra.FileSizeBytes,
                         PatchCount: 0,
                         new List<PatchRow>(),
-                        IsMissing: extra.IsMissingAndNeeded));
+                        IsMissing: extra.IsMissingFromDisk));
                 }
             }
             else
@@ -151,7 +156,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     patchBytes,
                     patches.Count,
                     patches,
-                    IsMissing: items.First().IsMissingAndNeeded));
+                    IsMissing: items.First().IsMissingFromDisk));
             }
         }
 

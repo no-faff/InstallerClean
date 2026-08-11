@@ -323,32 +323,41 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     var stateRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State);
                     var uninstallableRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable);
                     var stateStr = stateRead.Value;
-                    var uninstallableStr = uninstallableRead.Value;
 
-                    // Either read failing leaves the row non-removable below, which
-                    // is the safe direction and settles what happens to the FILE:
-                    // it stays claimed and never reaches an offer. What it does not
-                    // settle is what may be SAID about it, and that is what the flag
-                    // carries: nothing here established a claim, so no surface may
-                    // name one. The count travels beside it because nobody knows how
-                    // often either read fails on a machine that is not the one this
-                    // was measured on; it reads zero wherever both reads answer.
+                    // Nothing here decides whether a file may be removed, and that
+                    // is the 3.0.0 change rather than an omission. Both properties
+                    // are still read and neither grants anything: every registered
+                    // patch is kept, so what the pair is for now is whether the
+                    // records answered at all. A read that failed leaves nothing
+                    // established about the registration, which no surface may
+                    // describe as a claim, and the count travels beside the flag
+                    // because nobody knows how often either read fails on a machine
+                    // that is not the one this was measured on.
+                    //
+                    // BOTH READS SURVIVE, INCLUDING THE ONE NO RULE CONSUMES.
+                    // Uninstallable answered the second half of the old removable
+                    // rule and answers nothing now, but dropping it would narrow
+                    // what counts as "the records did not answer" without saying
+                    // so: the merge below prefers a row that established something
+                    // over one that did not, and the act-time re-check names its
+                    // cause from the same flag, so a half-read record quietly
+                    // becoming a fully-read one moves both. It also keeps
+                    // UnreadablePatchStates measuring across this release what it
+                    // measured before it.
                     var verdictUnreadable = stateRead.Unreadable || uninstallableRead.Unreadable;
                     if (verdictUnreadable) unreadablePatchStates++;
 
-                    // Unparseable State leaves patchState at 0 (not-a-patch),
-                    // so isSuperseded is false and the row is kept: the zero
-                    // default is the safe direction on purpose, not luck. Only
-                    // a positively read Superseded (2) or Obsoleted (4) makes a
-                    // patch a removal candidate. So an unreadable verdict cannot
-                    // reach the row as removable by either limb, and the flag and
-                    // IsRemovable can never both be true.
+                    // An unparseable State leaves patchState at 0 (not-a-patch),
+                    // which is the safe direction on purpose rather than luck: only
+                    // a positively read Superseded (2) or Obsoleted (4) labels a row
+                    // as one of those, and the label decides nothing but what is
+                    // reported. IsRemovable is left at its default and is never set
+                    // from here.
                     int.TryParse(stateStr, out var patchState);
-                    var isRemovable = IsRemovablePatch(stateStr, uninstallableStr);
 
                     var claimedPath = NormaliseLocalPackagePath(patchPath.Value);
                     MergeClaim(claimed,
-                        new RegisteredPackage(claimedPath, productName, productCode, patchState, isRemovable,
+                        new RegisteredPackage(claimedPath, productName, productCode, patchState,
                             VerdictUnreadable: verdictUnreadable),
                         ClaimSource.InstallerApi);
                     // Recorded whatever the verdict was. A claim that is Applied
@@ -387,12 +396,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Both sources degraded at once: refuse the scan outright rather than
         // report a shorter one.
         //
-        // Withholding the removable class answers a short API enumeration on its
-        // own, because the paths the lost product would have claimed are still
-        // reachable: the fallback reads the same UserData keys and contributes
-        // them as non-removable rows, so the file stays out of the orphan list
-        // even though its owner went missing from the API's answer. That is the
-        // whole reason the withholding can say orphan detection is unaffected.
+        // THIS GATE PROTECTS THE ORPHAN HALF AND IS THE ONE THING IN THIS REGION
+        // THAT KEPT ITS SUBJECT WHEN THE REMOVABLE CLASS WENT. Read it before
+        // concluding that unreadableProducts is now a dead term because the
+        // withholding below cannot fire: what that count answers here is whether a
+        // product's claim on a cached file exists anywhere at all, and a file no
+        // source claims is offered as an ORPHAN.
+        //
+        // A short API enumeration alone is answered by the fallback, because the
+        // paths the lost product would have claimed are still reachable: the
+        // fallback reads the same UserData keys and contributes them as rows, so
+        // the file stays out of the orphan list even though its owner went missing
+        // from the API's answer.
         //
         // The moment the fallback is ALSO failing reads, that recovery is no
         // longer established. A product lost from the API whose UserData key was
@@ -500,11 +515,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         var packages = claimed.Values.ToList();
 
-        // A scan that lost any claim withholds the whole removable class.
-        // "Removable" asserts that NO installed product still needs the file, and
-        // a product set known to be short of at least one claim cannot support
-        // that assertion for any patch on the machine: the product behind the
-        // loss is exactly the one whose "I still have this applied" claim never
+        // DEAD FROM 3.0.0 AND DELIBERATELY LEFT STANDING. No row reaches here
+        // carrying IsRemovable, so the loop runs over no rows and RemovableWithheld
+        // is never set on a real scan. It is kept because it is the mechanism the
+        // superseded class would need if it were ever offered again, and because
+        // deleting the machinery that made that class as safe as it was is a
+        // decision about the product rather than a tidy-up.
+        //
+        // NOT TO BE CONFUSED WITH THE REFUSAL GATE ABOVE, which weighs the same
+        // count and is very much alive; see its own note for why.
+        //
+        // What it did: a scan that lost any claim withheld the whole removable
+        // class. "Removable" asserts that NO installed product still needs the
+        // file, and a product set known to be short of at least one claim cannot
+        // support that assertion for any patch on the machine: the product behind
+        // the loss is exactly the one whose "I still have this applied" claim never
         // reached the merge, and a patch is cached once and shared across the
         // products that hold it.
         //
@@ -680,6 +705,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// plainly non-removable, exactly as the merge's own downgrade does. A read
     /// that could not answer makes it non-removable AND withheld, which is the
     /// existing "this scan could not prove it" state, counted and surfaced as such.
+    ///
+    /// IT RETURNS AT ITS FIRST GUARD FROM 3.0.0, no row carrying a removable
+    /// verdict for it to confirm, so it asks nothing and costs nothing. Left
+    /// standing for the reason the withholding loop above is: it is what made the
+    /// class as safe as it was and what the class would need again. Do not read
+    /// its emptiness as evidence that the questions it asks were unnecessary.
     /// </summary>
     /// <param name="recovered">
     /// Products the enumeration never returned and the registry comparison then
@@ -688,7 +719,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// recovered by name can answer for the patches it holds, where a product
     /// merely inferred from a headcount could only ever have withheld.
     /// </param>
-    private void ConfirmRemovableAgainstEveryProduct(
+    /// <remarks>
+    /// INTERNAL RATHER THAN PRIVATE SO ITS TESTS CAN REACH IT, which is the same
+    /// reason <see cref="IsRemovablePatch"/> and <see cref="MergeClaim"/> are.
+    /// Nothing reaches it through the enumeration any more, so a test driving the
+    /// enumeration can no longer exercise it at all, and the alternative to a seam
+    /// was letting the coverage go: preserved-but-untested machinery is preserved
+    /// in name only. There is no production switch that re-grants a removable
+    /// verdict and there must never be one; a flag in a shipped binary that turns
+    /// this class back on is the thing the release exists to prevent.
+    /// </remarks>
+    internal void ConfirmRemovableAgainstEveryProduct(
         Dictionary<string, RegisteredPackage> claimed,
         List<PatchClaim> patchClaims,
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
@@ -2089,21 +2130,35 @@ public sealed class InstallerQueryService : IInstallerQueryService
     internal readonly record struct PropertyRead(string Value, bool Unreadable, bool NotRegistered = false);
 
     /// <summary>
-    /// Whether a patch's State and Uninstallable values, exactly as
-    /// <c>MsiGetPatchInfoEx</c> returned them, make its cached .msp removable.
+    /// The rule that decided, up to v2.3.0, whether a patch's cached .msp was
+    /// offered for removal, from its State and Uninstallable values exactly as
+    /// <c>MsiGetPatchInfoEx</c> returned them.
     ///
-    /// One copy on purpose. The scan reads these two properties and so does the
-    /// act-time re-read that runs under the installer mutex, and a rule that
-    /// drifted between them would put the two halves of one safety check in
-    /// disagreement, with the act-time half winning because it runs last.
+    /// NO CALLER ACTS ON IT FROM 3.0.0. The enumeration does not consult it, and
+    /// the two act-time passes that do reach it are handed the patch claims naming
+    /// a candidate, of which there are now none. It is kept whole, with its tests,
+    /// because it is the rule itself rather than a helper: if the class is ever
+    /// offered again this is what it would be offered on, and rebuilding it from
+    /// the documentation a second time is how a subtlety gets lost.
     ///
-    /// Both directions fail safe, and neither is an accident. An unparseable
-    /// State leaves the parsed value at 0 (not a patch), so only a positively
-    /// read Superseded (2) or Obsoleted (4) can make a patch a candidate. And
-    /// only a positively read "0" for Uninstallable (the patch cannot be
-    /// uninstalled, so its cached .msp is dead weight) clears the second half:
-    /// an unreadable value must not lean removable, because a superseded patch
-    /// that CAN still be uninstalled needs its .msp to roll back.
+    /// WHAT THE RULE IS WORTH, WHICH IS WHY IT STOPPED BEING USED. The State half
+    /// carries real information: Windows has computed that a later patch took over
+    /// this one's fixes. It does not say the cached file is spare, and Microsoft's
+    /// own words for the two states are "applied to this product instance but is
+    /// superseded" and "applied in this product instance but obsolete". The
+    /// Uninstallable half was taken for the cautious conjunct and is not one: it
+    /// reports whether Windows can UNDO the patch, which its own reference page
+    /// gives eight causes for, the commonest being that the patch author never set
+    /// the AllowRemoval row. So a positively read "0" says the patch cannot be
+    /// rolled back, and nothing whatever about whether anything still reads the
+    /// file. Measured against real patches the conjunct behaves as a vendor filter
+    /// pointing the wrong way: all 58 patches in Office 2010 SP2 declare
+    /// themselves removable and were refused, and three live Adobe patches declare
+    /// themselves not removable and were offered.
+    ///
+    /// Both directions still fail safe and that has not changed. An unparseable
+    /// State leaves the parsed value at 0 (not a patch), and only a positively
+    /// read "0" for Uninstallable clears the second half.
     /// </summary>
     internal static bool IsRemovablePatch(string stateValue, string uninstallableValue)
     {

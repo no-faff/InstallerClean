@@ -20,11 +20,12 @@ namespace InstallerClean.Services;
 /// which is a distinction worth keeping straight because the wording here once
 /// blurred it. A candidate's own declared identity IS a per-candidate thing to
 /// query, and <see cref="IIdentityVeto"/> queries it during the scan. Re-running
-/// that query here would be a real second reading rather than a repeat of this
-/// one, and it is not built: what stops it is not the argument above but that
-/// its withholding is a new cause, and a cause the completion surface cannot yet
-/// name is one that would drop files out of a confirmed batch without accounting
-/// for them.
+/// it here is a real second reading rather than a repeat of this one, and it IS
+/// built: the pass runs below over the surviving candidates no registration
+/// names, and each of its three outcomes reaches the completion surface as its
+/// own sentence. This paragraph said it was not built, having been corrected to
+/// say so one commit before the thing was built, and stayed wrong through two
+/// full readings of the file.
 /// </summary>
 public sealed class RemovableReverifier : IRemovableReverifier
 {
@@ -41,11 +42,11 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// </summary>
     /// <param name="identityVeto">
     /// The same check the scan runs, re-run here over the candidates still in the
-    /// batch. It is not merely a repeat: a superseded or obsoleted patch is
-    /// offered WITHOUT ever being screened, the scan running the veto on the
-    /// orphan branch alone, so a patch whose registration has gone by the time the
-    /// button is pressed reaches this check for the first time. For those files
-    /// this is the only identity check there is.
+    /// batch. Every candidate has now been through it once already, the scan
+    /// screening the whole offer since 3.0.0; what this adds is a second reading
+    /// taken after the batch was confirmed, against records that may have moved in
+    /// between. Until 3.0.0 it was also the FIRST identity check a superseded or
+    /// obsoleted patch ever got, that class being offered without screening.
     /// </param>
     public RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi,
         IIdentityVeto identityVeto)
@@ -81,15 +82,20 @@ public sealed class RemovableReverifier : IRemovableReverifier
         // appears here as a live claim; a still-superseded patch is IsRemovable and
         // does not appear at all; a true orphan was never registered.
         //
-        // TWO ROWS OUT OF THREE CARRY NO CLAIM AT ALL, and telling them apart is
-        // the whole of what this map is for. A re-verify whose own enumeration was
-        // incomplete inherits the withheld removable class from the query, so every
-        // superseded candidate lands here too; and a patch whose State or
-        // Uninstallable read failed lands here having established nothing either
-        // way. Both are non-removable for want of a verdict rather than on one, so
-        // reporting either as a program reclaiming the file would name a cause that
-        // did not occur. All three kinds can be in one batch, which is why the
-        // cause is carried per path and not per run.
+        // ONE ROW IN TWO CARRIES NO CLAIM AT ALL, and telling them apart is the
+        // whole of what this map is for. A patch whose State or Uninstallable read
+        // failed lands here having established nothing either way: non-removable
+        // for want of a verdict rather than on one, so reporting it as a program
+        // reclaiming the file would name a cause that did not occur. The withheld
+        // kind was the third and cannot occur now, no verdict being granted to
+        // withhold; the arm stays because the flag does. Both kinds can be in one
+        // batch, which is why the cause is carried per path and not per run.
+        //
+        // EVERY REGISTERED PATH IS IN THIS MAP FROM 3.0.0, no row being removable,
+        // which is strictly stricter than what stood here before: a candidate the
+        // scan offered and a registration has since come to name is now dropped
+        // with a cause, where the superseded class used to be exempt from the
+        // comparison by construction.
         //
         // THE ROW DECIDES, NOT THE CANDIDATE, AND ONE CASE THEREFORE READS WEAKER
         // THAN IT COULD. A candidate the scan measured as an orphan, whose path a
@@ -111,12 +117,20 @@ public sealed class RemovableReverifier : IRemovableReverifier
                         ? HeldBackReason.RecordsUnreadable
                         : HeldBackReason.Reclaimed;
 
-        // Every path any registration names, whatever its verdict. It is what
-        // separates the two branches here, exactly as the scan separates them: a
-        // path no registration names is an orphan and gets the identity check, and
-        // a path some registration names is a superseded or obsoleted patch, which
-        // is offered BECAUSE Windows positively said so and must not be put
-        // through a check whose keeping condition is that Windows knows it.
+        // Every path any registration names. It used to separate the two branches
+        // here, exactly as the scan separated them: a path no registration named
+        // was an orphan and got the identity check, and a path some registration
+        // named was a superseded or obsoleted patch, which was offered BECAUSE
+        // Windows positively said so and must not be put through a check whose
+        // keeping condition is that Windows knows it.
+        //
+        // NO SURVIVOR IS IN IT NOW. Every registered path is non-removable, so a
+        // candidate any registration names has already been dropped above and the
+        // set below can only exclude what is not there. It is kept, and kept
+        // measured off this run's own enumeration rather than assumed empty,
+        // because what it guards against is a candidate reaching the identity
+        // check that a registration answers for, and an assumption would be a
+        // second copy of a rule that lives up there.
         var namedByAnyRegistration = new HashSet<string>(
             query.Packages.Select(p => p.LocalPackagePath), StringComparer.OrdinalIgnoreCase);
 
@@ -196,6 +210,15 @@ public sealed class RemovableReverifier : IRemovableReverifier
         path.EndsWith(".msp", StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc />
+    /// <remarks>
+    /// IT RETURNS AT ITS FIRST LINE FROM 3.0.0 AND IS NOT DEAD WEIGHT. Its input
+    /// is the patch claims naming a SURVIVING candidate, and no surviving
+    /// candidate is named by any registration now, so the list is always empty.
+    /// This is the last check standing in front of a permanent delete and it is
+    /// what the superseded class would need again; deleting it is a decision about
+    /// the product, not a tidy-up. Do not read the empty list as evidence that the
+    /// re-read it performs was unnecessary.
+    /// </remarks>
     public UnderLeaseRecheck RecheckUnderLease(IReadOnlyList<PatchClaim> claims)
     {
         if (claims.Count == 0) return new UnderLeaseRecheck(Array.Empty<string>());

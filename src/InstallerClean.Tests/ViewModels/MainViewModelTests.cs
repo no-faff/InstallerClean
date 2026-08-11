@@ -12,7 +12,6 @@ namespace InstallerClean.Tests.ViewModels;
 public class MainViewModelTests
 {
     private static readonly string Orphaned = Strings.Reason_Orphaned;
-    private static readonly string Superseded = Strings.Reason_Superseded;
 
     // Every specification of MoveFilesAsync / DeleteFilesAsync below names the
     // trailing patchClaims argument, assertions included. It is optional on the
@@ -1144,7 +1143,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1176,7 +1175,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, false, false, Orphaned),
             new(@"C:\Windows\Installer\b.msi", 1_048_576, false, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -1254,7 +1253,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1288,7 +1287,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\x.msp", 524_288, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\x.msp", 524_288, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1332,7 +1331,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
             new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
-            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1377,7 +1376,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1412,7 +1411,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1451,7 +1450,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
             new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
-            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1492,7 +1491,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msp", 4_194_304, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\a.msp", 4_194_304, true, false, false, Orphaned),
             new(@"C:\Windows\Installer\b.msi", 1_048_576, false, false, false, Orphaned),
             new(@"C:\Windows\Installer\c.msi", 2_097_152, false, false, false, Orphaned),
         };
@@ -1610,7 +1609,7 @@ public class MainViewModelTests
         var orphans = new List<OrphanedFile>
         {
             new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
-            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1645,8 +1644,8 @@ public class MainViewModelTests
         var orphans = new List<OrphanedFile>
         {
             new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
-            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, true, false, Superseded),
-            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, false, false, Orphaned),
+            new(@"C:\Windows\Installer\c.msp", 4_194_304, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -1692,7 +1691,7 @@ public class MainViewModelTests
         var orphans = new List<OrphanedFile>
         {
             new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
-            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\b.msp", 2_097_152, true, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -2031,60 +2030,93 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task ScanViewModel_HasMissingFromDisk_tracks_MissingNonRemovableCount()
+    public async Task ScanViewModel_missing_files_line_names_the_programs()
     {
-        // HasMissingFromDisk fires on the non-removable count alone.
-        // The removable+missing case (Windows considers them removed,
-        // the file having gone is the expected end state) counts
-        // separately so the load-bearing banner does not fire on it.
+        // The line is a count and the programs behind it. A bare count would be
+        // an alarm with nothing in it: the one thing a reader can act on is which
+        // program to run an installer for, and the count alone does not say.
         var vm = CreateViewModel();
 
-        var nonRemovable = new RegisteredPackage(
-            @"C:\Windows\Installer\nonremovable.msi", "Product", "{aaa}",
-            IsRemovable: false, FileExists: false);
         var scan = new ScanResult(
             RemovableFiles: Array.Empty<OrphanedFile>(),
-            RegisteredPackages: new[] { nonRemovable },
+            RegisteredPackages: new[]
+            {
+                new RegisteredPackage(@"C:\Windows\Installer\a.msi", "Contoso Reader", "{aaa}", FileExists: false),
+                new RegisteredPackage(@"C:\Windows\Installer\b.msp", "Contoso Reader", "{aaa}", FileExists: false),
+                new RegisteredPackage(@"C:\Windows\Installer\c.msi", "Fabrikam Suite", "{bbb}", FileExists: false),
+            },
             RegisteredTotalBytes: 0,
-            MissingNonRemovableCount: 1);
+            MissingNotSupersededCount: 3);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         Assert.True(vm.Scan.HasMissingFromDisk);
-        Assert.Equal(1, vm.Scan.MissingNonRemovableCount);
-        Assert.Contains("1", vm.Scan.MissingFromDiskSummaryText);
+        Assert.Equal(3, vm.Scan.MissingFromDiskCount);
+        Assert.Contains("3", vm.Scan.MissingFromDiskSummaryText);
+        Assert.Contains("Contoso Reader", vm.Scan.MissingFromDiskSummaryText);
+        Assert.Contains("Fabrikam Suite", vm.Scan.MissingFromDiskSummaryText);
     }
 
     [Fact]
-    public async Task ScanViewModel_MissingRemovableCount_stays_off_the_missing_from_disk_banner()
+    public async Task ScanViewModel_missing_files_line_fires_for_a_superseded_patch_too()
     {
-        // Removable+missing is the expected end state of a patch the API
-        // still claims but whose file has already been cleaned away, and
-        // InstallerClean leaves one behind every time it removes a
-        // superseded patch. Nothing on screen reports them; the count is
-        // carried for the opt-in report. What matters is that it never
-        // reaches the load-bearing missing-from-disk banner, which means
-        // files Windows still needs have gone.
+        // THE REVERSE OF THE TEST THIS REPLACES, which held that a superseded
+        // patch whose file had gone must never reach this line because the file
+        // having gone was its expected end state. Windows opens every registered
+        // patch's cached file whether superseded or not, so the record is the same
+        // condition as any other and the line covers both. The scan result carries
+        // the split apart; the line does not.
         var vm = CreateViewModel();
 
-        var removable = new RegisteredPackage(
-            @"C:\Windows\Installer\removable.msp", "Patch", "{bbb}",
-            IsRemovable: true, FileExists: false);
         var scan = new ScanResult(
             RemovableFiles: Array.Empty<OrphanedFile>(),
-            RegisteredPackages: new[] { removable },
+            RegisteredPackages: new[]
+            {
+                new RegisteredPackage(@"C:\Windows\Installer\superseded.msp", "Contoso Reader", "{bbb}",
+                    PatchState: 2, FileExists: false),
+            },
             RegisteredTotalBytes: 0,
-            MissingNonRemovableCount: 0,
-            MissingRemovableCount: 2);
+            MissingNotSupersededCount: 0,
+            MissingSupersededCount: 1);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        Assert.False(vm.Scan.HasMissingFromDisk);
-        Assert.Equal(2, vm.Scan.MissingRemovableCount);
+        Assert.True(vm.Scan.HasMissingFromDisk);
+        Assert.Equal(1, vm.Scan.MissingFromDiskCount);
+        Assert.Contains("Contoso Reader", vm.Scan.MissingFromDiskSummaryText);
+    }
+
+    [Fact]
+    public async Task ScanViewModel_missing_files_line_says_nothing_about_what_removed_them()
+    {
+        // A hard constraint rather than a nuance. Every tool that deletes from
+        // that folder leaves the same record, this one included up to v2.3.0, so
+        // the app cannot tell whose work it is looking at. The line fires on
+        // machines it has never run on.
+        var vm = CreateViewModel();
+
+        var scan = new ScanResult(
+            RemovableFiles: Array.Empty<OrphanedFile>(),
+            RegisteredPackages: new[]
+            {
+                new RegisteredPackage(@"C:\Windows\Installer\a.msi", "Contoso Reader", "{aaa}", FileExists: false),
+            },
+            RegisteredTotalBytes: 0,
+            MissingNotSupersededCount: 1);
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(scan);
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        var line = vm.Scan.MissingFromDiskSummaryText;
+        Assert.DoesNotContain("InstallerClean", line);
+        Assert.DoesNotContain("another tool", line, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("deleted", line, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("removed", line, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -2290,19 +2322,40 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void MainExplanationWhyText_carries_all_three_reason_labels()
+    public void MainExplanationWhyText_renders_with_no_placeholder_markers_left()
     {
-        // The "why" sentence of the intro carries the three Reason format
-        // slots; a missing arg would surface as a literal "{2}" in the
-        // rendered text rather than a localised tag.
+        // It carried one format slot per Reason label while three kinds of file
+        // reached the list, and this pinned all three being passed, a missing
+        // argument surfacing as a literal "{2}" on screen. One kind reaches it
+        // now, so the sentence takes no arguments at all.
+        //
+        // THE THREE ARE STILL PASSED AND THAT IS NOT AN OVERSIGHT. string.Format
+        // ignores a surplus argument, and a translation still carrying the older
+        // three-slot sentence renders that sentence rather than its own
+        // placeholder markers. What this asserts is the outcome either way: no
+        // marker survives to the screen.
         var vm = CreateViewModel();
 
-        Assert.Contains(Strings.Reason_Orphaned, vm.MainExplanationWhyText);
-        Assert.Contains(Strings.Reason_Superseded, vm.MainExplanationWhyText);
-        Assert.Contains(Strings.Reason_Obsoleted, vm.MainExplanationWhyText);
         Assert.DoesNotContain("{0}", vm.MainExplanationWhyText);
         Assert.DoesNotContain("{1}", vm.MainExplanationWhyText);
         Assert.DoesNotContain("{2}", vm.MainExplanationWhyText);
+    }
+
+    [Fact]
+    public void MainExplanationWhyText_claims_only_what_the_scan_established()
+    {
+        // The sentence is about the ANSWER the app got, not about the state of the
+        // world, and the difference is load-bearing rather than a hedge. "Windows
+        // has no record of them" would be an assertion the app cannot make: a
+        // product installed as a second instance registers under its instance
+        // code, and a recorded path can be spelled in a form the folder walk never
+        // produces, so a file it offers can in principle be one Windows does hold
+        // a record for. What it did establish is that it asked and the answer came
+        // back empty.
+        var vm = CreateViewModel();
+
+        Assert.Contains("no record", vm.MainExplanationWhyText, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Windows has no record", vm.MainExplanationWhyText, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

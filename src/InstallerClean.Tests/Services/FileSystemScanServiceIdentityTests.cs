@@ -49,16 +49,22 @@ public class FileSystemScanServiceIdentityTests
     }
 
     [Fact]
-    public async Task The_veto_is_not_applied_to_superseded_patches()
+    public async Task A_superseded_patch_is_not_offered_and_never_reaches_the_veto()
     {
-        // THE ONE THAT WOULD HAVE BEEN A PERMANENT REGRESSION. A superseded patch
-        // is offered BECAUSE Windows positively said the patch is superseded and
-        // no longer uninstallable, so it is a file Windows knows by construction.
-        // Putting it through a check whose keeping condition is "Windows knows
-        // this identity" would withhold the whole class on every machine.
+        // THE ASYMMETRY THIS FILE USED TO PIN IS GONE, AND SO IS ITS SUBJECT. The
+        // veto ran on the orphan branch and deliberately not on the superseded
+        // one, because such a patch was offered on Windows positively saying so
+        // and a check whose keeping condition is "Windows knows this identity"
+        // would have withheld the whole class on every machine. The reasoning was
+        // right and the gap it left was the one every investigation named.
         //
-        // The veto here would keep back anything it was shown; the assertion is
-        // that the patch was never shown to it.
+        // With the class no longer offered there is one branch, and the veto
+        // covers the whole of what the app puts in front of anybody. The patch
+        // still never reaches the veto, and now for the plain reason that it is
+        // never a candidate: it is a registered file and it is kept.
+        //
+        // The veto here would keep back anything it was shown, so an empty log
+        // beside an empty offer says the row never entered the branch at all.
         const string superseded = @"C:\Windows\Installer\old.msp";
         var fs = new MockFileSystem(new Dictionary<string, MockFileData>
         {
@@ -67,10 +73,10 @@ public class FileSystemScanServiceIdentityTests
         var veto = new RecordingVeto(CandidateIdentityOutcome.Claimed);
 
         var result = await Scan(fs, veto, Query(
-            new RegisteredPackage(superseded, "Product", "{P}", PatchState: 2, IsRemovable: true)));
+            new RegisteredPackage(superseded, "Product", "{P}", PatchState: 2)));
 
-        Assert.Single(result.RemovableFiles);
-        Assert.True(result.RemovableFiles[0].IsRemovablePatch);
+        Assert.Empty(result.RemovableFiles);
+        Assert.Single(result.RegisteredPackages);
         Assert.Empty(veto.Seen);
     }
 

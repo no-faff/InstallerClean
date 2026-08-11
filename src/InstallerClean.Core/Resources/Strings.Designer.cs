@@ -265,6 +265,7 @@ public static class Strings
     public static string Display_ElapsedLong_Seconds => Get("Display.ElapsedLong.Seconds");
     public static string Display_Elapsed_Ms => Get("Display.Elapsed.Ms");
     public static string Display_Elapsed_S => Get("Display.Elapsed.S");
+    public static string Display_ListSeparator => Get("Display.ListSeparator");
     public static string Display_Size_B => Get("Display.Size.B");
     public static string Display_Size_GB => Get("Display.Size.GB");
     public static string Display_Size_KB => Get("Display.Size.KB");
@@ -392,8 +393,12 @@ public static class Strings
     public static string Status_Scanning => Get("Status.Scanning");
     public static string Status_ScanningCache => Get("Status.ScanningCache");
     public static string Status_StartingScan => Get("Status.StartingScan");
+    public static string Summary_MissingFromDisk_OtherPrograms_Plural => Get("Summary.MissingFromDisk.OtherPrograms.Plural");
+    public static string Summary_MissingFromDisk_OtherPrograms_Singular => Get("Summary.MissingFromDisk.OtherPrograms.Singular");
     public static string Summary_MissingFromDisk_Plural => Get("Summary.MissingFromDisk.Plural");
     public static string Summary_MissingFromDisk_Singular => Get("Summary.MissingFromDisk.Singular");
+    public static string Summary_MissingFromDisk_Unnamed_Plural => Get("Summary.MissingFromDisk.Unnamed.Plural");
+    public static string Summary_MissingFromDisk_Unnamed_Singular => Get("Summary.MissingFromDisk.Unnamed.Singular");
     public static string Summary_OperationFiles => Get("Summary.OperationFiles");
     public static string Summary_OrphanedToCleanUp_Plural => Get("Summary.OrphanedToCleanUp.Plural");
     public static string Summary_OrphanedToCleanUp_Singular => Get("Summary.OrphanedToCleanUp.Singular");

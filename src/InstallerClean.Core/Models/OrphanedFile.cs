@@ -4,35 +4,34 @@ using InstallerClean.Helpers;
 namespace InstallerClean.Models;
 
 /// <summary>
-/// A single file in <c>C:\Windows\Installer</c> that the scan classified
-/// as removable. Three pathways add entries here: files the API never
-/// claimed (true orphans, PatchState absent), patches the API still
-/// claims but has marked PatchState=Superseded (2), and patches marked
-/// PatchState=Obsoleted (4). The user-visible outcome (removable) is the
-/// same for all three; the distinction is recorded so the result-log
-/// schema and the in-app body copy can describe each cause separately.
+/// A single file at the root of <c>C:\Windows\Installer</c> that the scan is
+/// offering for removal. ONE pathway adds entries here: a file no registration
+/// names, which the identity pass then found nothing claiming.
+///
+/// It was three. Patches Windows reports superseded (PatchState 2) or obsoleted
+/// (4) reached this list until 3.0.0, on a reading of those states that Microsoft
+/// does not support (<see cref="RegisteredPackage"/> carries the citations). They
+/// are registered files and are kept with the rest.
 /// </summary>
 /// <param name="FullPath">Absolute path inside <c>C:\Windows\Installer</c>.</param>
 /// <param name="SizeBytes">File size on disk; 0 if the file disappeared between scan and stat.</param>
 /// <param name="IsPatch">True for <c>.msp</c>, false for <c>.msi</c>. Drives the patch/installer column.</param>
 /// <param name="IsRemovablePatch">
-/// True for entries the Windows Installer database marks removable
-/// (PatchState=Superseded or PatchState=Obsoleted); false for true
-/// orphans the API never claimed.
+/// PERMANENTLY FALSE FROM 3.0.0: no registered patch is offered, whatever its
+/// state. Kept so the result-log schema's <c>supersededCount</c> and
+/// <c>obsoletedCount</c> go on being derived from the offer rather than being
+/// hard-coded to zero somewhere a later change could quietly make wrong again.
 /// </param>
 /// <param name="IsObsoleted">
-/// True only for entries with PatchState=Obsoleted (4). Implies
-/// <see cref="IsRemovablePatch"/>; the inverse does not hold. The
-/// result-log schema splits <c>supersededCount</c> and
-/// <c>obsoletedCount</c> on this flag.
+/// Permanently false for the same reason, and formerly true only for
+/// PatchState=Obsoleted (4). It implies <see cref="IsRemovablePatch"/>; the
+/// inverse does not hold.
 /// </param>
 /// <param name="Reason">
-/// Localised tag shown in the Reason column of the orphan list. Sourced
-/// from the resx (<c>Reason.Orphaned</c>, <c>Reason.Superseded</c> or
-/// <c>Reason.Obsoleted</c>); callers pass a localised value rather than
-/// relying on a default so a non-en-GB UI never shows a stray English
-/// fragment. Display only; the machine-readable signals are
-/// <see cref="IsRemovablePatch"/> and <see cref="IsObsoleted"/>.
+/// Localised tag shown in the Reason column of the orphan list. Now always
+/// <c>Reason.Orphaned</c>, there being one pathway; callers pass a localised
+/// value rather than relying on a default so a non-en-GB UI never shows a stray
+/// English fragment.
 /// </param>
 public record OrphanedFile(
     string FullPath,

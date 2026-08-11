@@ -222,7 +222,7 @@ public class CliContractTests
     [Fact]
     public void EventId_notices_have_a_band_of_their_own()
     {
-        Assert.Equal(3000, CliContract.EventIdFor(CliEventClass.ScanWithheldNotice));
+        Assert.Equal(3000, CliContract.EventIdFor(CliEventClass.ScanRecordsIncompleteNotice));
         Assert.Equal(3001, CliContract.EventIdFor(CliEventClass.ScanMissingFilesNotice));
     }
 
@@ -238,7 +238,7 @@ public class CliContractTests
             CliEventClass.TransientSkip, CliEventClass.HardError,
         }.Select(CliContract.EventIdFor).ToHashSet();
 
-        Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanWithheldNotice), outcomes);
+        Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanRecordsIncompleteNotice), outcomes);
         Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanMissingFilesNotice), outcomes);
     }
 
@@ -256,7 +256,7 @@ public class CliContractTests
     public void EntryType_the_withheld_notice_is_warning()
     {
         Assert.Equal(EventLogEntryType.Warning,
-            CliContract.EntryTypeFor(CliEventClass.ScanWithheldNotice));
+            CliContract.EntryTypeFor(CliEventClass.ScanRecordsIncompleteNotice));
     }
 
     [Fact]

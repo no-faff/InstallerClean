@@ -56,6 +56,31 @@ public class InstallerQueryServiceUnitTests
     private static InstallerQueryService.FallbackRead NoFallback(
         Dictionary<string, RegisteredPackage> claimed, CancellationToken ct) => new(0, 0);
 
+    /// <summary>
+    /// What every registered patch row looks like after an enumeration: kept, no
+    /// verdict granted, none withheld, and its state recorded while deciding
+    /// nothing.
+    ///
+    /// ONE HELPER RATHER THAN THE ASSERTIONS SPELLED OUT AT EACH SITE, because
+    /// two dozen tests below make this claim and what they are each ABOUT is
+    /// something else: what a degraded enumeration counts, which rows survive it,
+    /// which conditions add a product to the unaccounted total. Spelled out at
+    /// every site, one of them drifting would read as a deliberate exception.
+    ///
+    /// The pairing is the point. <c>RemovableWithheld</c> being false is not the
+    /// old "nothing was withheld here" finding, which several of these tests were
+    /// written to make: it is that there was no verdict to withhold, and the two
+    /// look identical from a single assertion. What still distinguishes a degraded
+    /// run from a clean one is <c>UnaccountedProductCount</c>, which the tests
+    /// assert for themselves.
+    /// </summary>
+    private static void AssertKeptWithNoVerdict(RegisteredPackage row, int expectedState)
+    {
+        Assert.False(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+        Assert.Equal(expectedState, row.PatchState);
+    }
+
     private static async Task<InstallerQueryResult> Run(FakeMsiApi msi) =>
         await new InstallerQueryService(msi, NoFallback).GetRegisteredPackagesAsync();
 
@@ -367,7 +392,7 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
-    public async Task Superseded_patch_claimed_by_a_single_product_stays_removable()
+    public async Task Superseded_patch_claimed_by_a_single_product_is_never_offered()
     {
         const string dead = @"C:\Windows\Installer\dead.msp";
         var msi = new FakeMsiApi();
@@ -376,7 +401,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
     }
 
     // ---- Uninstallable guard fails safe ----
@@ -396,7 +421,7 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
-    public async Task Positively_read_zero_Uninstallable_allows_removal_of_a_superseded_patch()
+    public async Task Positively_read_zero_Uninstallable_no_longer_allows_removal()
     {
         const string p = @"C:\Windows\Installer\rem0.msp";
         var msi = new FakeMsiApi();
@@ -405,7 +430,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == p).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == p), expectedState: 2);
     }
 
     // ---- Patch enumeration AccessDenied throws (matches product loop) ----
@@ -448,8 +473,7 @@ public class InstallerQueryServiceUnitTests
 
         Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\displaylink.msi");
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        Assert.False(row.IsRemovable);              // removable class withheld scan-wide
-        Assert.True(row.RemovableWithheld);
+        AssertKeptWithNoVerdict(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount); // the degraded product counts exactly once
         Assert.True(result.RecordsIncomplete);
     }
@@ -498,8 +522,7 @@ public class InstallerQueryServiceUnitTests
 
         Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\b.msi");
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        Assert.False(row.IsRemovable);
-        Assert.True(row.RemovableWithheld);
+        AssertKeptWithNoVerdict(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
         Assert.True(result.RecordsIncomplete);
     }
@@ -636,7 +659,7 @@ public class InstallerQueryServiceUnitTests
     [InlineData(1, 5)]     // four products enumerated, five keys
     [InlineData(90, 100)]  // a tenth ahead
     [InlineData(1, 40)]    // the registry far ahead of a small enumeration
-    public async Task A_registry_ahead_of_the_enumeration_withholds_nothing_on_the_totals_alone(
+    public async Task A_registry_ahead_of_the_enumeration_counts_nothing_on_the_totals_alone(
         int enumerated, int registryProducts)
     {
         const string patch = @"C:\Windows\Installer\superseded.msp";
@@ -645,12 +668,12 @@ public class InstallerQueryServiceUnitTests
 
         var result = await RunAgainstRegistry(msi, registryProducts: registryProducts);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task A_registry_key_whose_name_yields_no_product_code_withholds()
+    public async Task A_registry_key_whose_name_yields_no_product_code_counts_unaccounted()
     {
         // THE ONE PLACE NAMING PRODUCTS SEES LESS THAN COUNTING THEM DID, and it
         // is why the count is not simply gone. A subkey whose name is not a packed
@@ -669,8 +692,7 @@ public class InstallerQueryServiceUnitTests
             .GetRegisteredPackagesAsync();
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == patch);
-        Assert.False(row.IsRemovable);
-        Assert.True(row.RemovableWithheld);
+        AssertKeptWithNoVerdict(row, expectedState: 2);
         Assert.Equal(2, result.UnaccountedProductCount);
         // The specific cause, not the sum it feeds: nothing could be asked, as
         // against a question asked and refused.
@@ -679,7 +701,7 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
-    public async Task A_failing_fallback_beside_a_clean_enumeration_withholds_rather_than_refusing()
+    public async Task A_failing_fallback_beside_a_clean_enumeration_does_not_refuse_the_scan()
     {
         // The refusal above stays keyed on what the API said about ITSELF, and
         // this run has nothing to say: every product enumerated cleanly, and only
@@ -696,7 +718,7 @@ public class InstallerQueryServiceUnitTests
             .GetRegisteredPackagesAsync();
 
         Assert.NotEmpty(result.Packages);
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
     }
 
     [Fact]
@@ -724,7 +746,7 @@ public class InstallerQueryServiceUnitTests
         var result = await RunAgainstRegistry(msi, registryProducts: 20);
 
         Assert.Equal(16, result.UnaccountedProductCount);
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
     }
 
     // ---- ...and seen directly, in a path only the registry ever claimed ----
@@ -737,7 +759,7 @@ public class InstallerQueryServiceUnitTests
     // apply to it.
 
     [Fact]
-    public async Task A_path_only_the_registry_claimed_withholds_the_removable_class()
+    public async Task A_path_only_the_registry_claimed_counts_unaccounted()
     {
         const string patch = @"C:\Windows\Installer\superseded.msp";
 
@@ -747,13 +769,12 @@ public class InstallerQueryServiceUnitTests
             registryProducts: 1, unclaimedProductFiles: 1);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == patch);
-        Assert.False(row.IsRemovable);
-        Assert.True(row.RemovableWithheld);
+        AssertKeptWithNoVerdict(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task An_unclaimed_path_inside_the_headcounts_silent_band_still_withholds()
+    public async Task An_unclaimed_path_inside_the_headcounts_silent_band_still_counts()
     {
         // The case the observation exists for. Ninety products enumerated
         // against a hundred registry keys is a tenth short, which the
@@ -765,12 +786,12 @@ public class InstallerQueryServiceUnitTests
 
         var result = await RunAgainstRegistry(msi, registryProducts: 100, unclaimedProductFiles: 10);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(10, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task An_unclaimed_patch_path_withholds_but_counts_only_one_product()
+    public async Task An_unclaimed_patch_path_counts_only_one_product()
     {
         // A patch entry carries no product code, and one lost product can hold
         // any number of patches, so three of them are evidence of at least one
@@ -780,7 +801,7 @@ public class InstallerQueryServiceUnitTests
         var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch),
             registryProducts: 1, unclaimedPatchFiles: 3);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -814,12 +835,12 @@ public class InstallerQueryServiceUnitTests
 
         var result = await RunAgainstRegistry(msi, registryProducts: 2, unclaimedProductFiles: 1);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task A_registry_that_claimed_nothing_of_its_own_keeps_the_removable_verdicts()
+    public async Task A_registry_that_claimed_nothing_of_its_own_counts_nothing_unaccounted()
     {
         // The false-fire control. Every path the registry names was already
         // claimed by the API, which is what a whole enumeration looks like, and
@@ -828,7 +849,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch), registryProducts: 1);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
@@ -1024,7 +1045,7 @@ public class InstallerQueryServiceUnitTests
     // Each of the four ways a row can be lost reaches the same demotion.
 
     [Fact]
-    public async Task A_clean_enumeration_keeps_its_removable_verdicts()
+    public async Task A_clean_enumeration_counts_nothing_unaccounted()
     {
         const string dead = @"C:\Windows\Installer\clean-dead.msp";
         var msi = new FakeMsiApi();
@@ -1033,13 +1054,13 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
         Assert.False(result.RecordsIncomplete);
     }
 
     [Fact]
-    public async Task A_skipped_product_row_withholds_every_removable_verdict()
+    public async Task A_skipped_product_row_counts_an_unaccounted_product()
     {
         const string dead = @"C:\Windows\Installer\skipped-product.msp";
         var msi = new FakeMsiApi();
@@ -1052,13 +1073,12 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        Assert.False(row.IsRemovable);
-        Assert.True(row.RemovableWithheld);
+        AssertKeptWithNoVerdict(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task A_skipped_patch_row_withholds_every_removable_verdict()
+    public async Task A_skipped_patch_row_counts_an_unaccounted_product()
     {
         // The same corridor reached through a product whose own row read fine:
         // B enumerates, but one of its patch rows fails, so whatever that row
@@ -1074,13 +1094,12 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        Assert.False(row.IsRemovable);
-        Assert.True(row.RemovableWithheld);
+        AssertKeptWithNoVerdict(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task An_empty_product_guid_withholds_every_removable_verdict()
+    public async Task An_empty_product_guid_counts_an_unaccounted_product()
     {
         const string dead = @"C:\Windows\Installer\empty-product.msp";
         var msi = new FakeMsiApi();
@@ -1095,7 +1114,7 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
-    public async Task An_empty_patch_guid_withholds_every_removable_verdict()
+    public async Task An_empty_patch_guid_counts_an_unaccounted_product()
     {
         const string dead = @"C:\Windows\Installer\empty-patch.msp";
         var msi = new FakeMsiApi();
@@ -1168,7 +1187,7 @@ public class InstallerQueryServiceUnitTests
     // unreadable product returns a real error, never a zero-length success.
 
     [Fact]
-    public async Task A_failed_product_LocalPackage_read_withholds_every_removable_verdict()
+    public async Task A_failed_product_LocalPackage_read_counts_an_unaccounted_product()
     {
         // B's row enumerates fine and its package path cannot be read, so B's
         // claim on whatever it holds never reaches the merge. B may be the
@@ -1183,13 +1202,12 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        Assert.False(row.IsRemovable);
-        Assert.True(row.RemovableWithheld);
+        AssertKeptWithNoVerdict(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task A_failed_patch_LocalPackage_read_withholds_every_removable_verdict()
+    public async Task A_failed_patch_LocalPackage_read_counts_an_unaccounted_product()
     {
         // The shared-patch chain: one .msp cached once, Superseded under A and
         // Applied under B. B's row for it comes back and the path it names does
@@ -1205,8 +1223,7 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == shared);
-        Assert.False(row.IsRemovable);
-        Assert.True(row.RemovableWithheld);
+        AssertKeptWithNoVerdict(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -1236,7 +1253,7 @@ public class InstallerQueryServiceUnitTests
     // every machine and superseded-patch detection would be dead.
 
     [Fact]
-    public async Task A_product_with_no_cached_package_does_not_withhold()
+    public async Task A_product_with_no_cached_package_counts_nothing_unaccounted()
     {
         const string dead = @"C:\Windows\Installer\absent-product-package.msp";
         var msi = new FakeMsiApi();
@@ -1247,12 +1264,12 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task A_registered_patch_with_no_cached_package_does_not_withhold()
+    public async Task A_registered_patch_with_no_cached_package_counts_nothing_unaccounted()
     {
         const string dead = @"C:\Windows\Installer\absent-patch-package.msp";
         var msi = new FakeMsiApi();
@@ -1264,12 +1281,12 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task A_readable_but_empty_LocalPackage_does_not_withhold()
+    public async Task A_readable_but_empty_LocalPackage_counts_nothing_unaccounted()
     {
         // The other benign shape: a success carrying zero characters. The probe
         // did not see one, and the allowlist covers it anyway, because guessing
@@ -1283,12 +1300,12 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task A_failed_ProductName_read_does_not_withhold()
+    public async Task A_failed_ProductName_read_counts_nothing_unaccounted()
     {
         // Scoped to LocalPackage on purpose. A name that cannot be read costs a
         // display string, not a claim, and counting it would withhold on
@@ -1303,7 +1320,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
         Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\b.msi");
     }
@@ -1345,7 +1362,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi, fallbackFailures: 0);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).RemovableWithheld);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -1363,7 +1380,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi, fallbackFailures: 3);
 
-        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 

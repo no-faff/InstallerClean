@@ -353,7 +353,7 @@ public class ResultLogEntryTests
         // and the benign half falls out by subtraction.
         var scan = new ScanResult(
             Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-            MissingNonRemovableCount: 2, MissingRemovableCount: 7);
+            MissingNotSupersededCount: 2, MissingSupersededCount: 7);
 
         var info = ScanInfo.From(scan, 10);
 
@@ -524,6 +524,13 @@ public class ResultLogEntryTests
     [Fact]
     public void ScanInfo_From_counts_orphaned_superseded_obsoleted_via_explicit_flags()
     {
+        // THE INPUTS NO LONGER ARISE FROM A SCAN AND THE DERIVATION IS KEPT
+        // DELIBERATELY. No registered patch reaches the offer from 3.0.0, so both
+        // figures are zero in every real report; they go on being DERIVED from the
+        // offer rather than written as literals, and this is the test that would
+        // notice if a patch ever reached that list again. The rows are built by
+        // hand here for the same reason.
+        //
         // IsRemovablePatch and IsObsoleted are stamped at scan time so
         // ScanInfo.From is culture-invariant (it doesn't read the
         // localised Reason string). PatchState=Superseded (2) sets

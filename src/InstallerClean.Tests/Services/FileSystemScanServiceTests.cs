@@ -11,15 +11,22 @@ public class FileSystemScanServiceTests
     private static RegisteredPackage Registered(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}");
 
+    /// <summary>
+    /// A patch Windows reports superseded, in the shape the enumeration now
+    /// produces: the state on the row and no removable verdict. Building one with
+    /// IsRemovable set would pin behaviour against a row the query service cannot
+    /// emit.
+    /// </summary>
     private static RegisteredPackage Superseded(string path) =>
-        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2, IsRemovable: true);
+        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2);
 
     private static RegisteredPackage Obsoleted(string path) =>
-        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 4, IsRemovable: true);
+        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 4);
 
     /// <summary>
-    /// A superseded patch from a scan whose product enumeration was incomplete:
-    /// the API called it removable, the scan withheld the verdict.
+    /// A superseded patch carrying the withheld flag, which no enumeration sets
+    /// now. Kept so the scan is still held to handling such a row rather than to
+    /// an assumption that one cannot arrive.
     /// </summary>
     private static RegisteredPackage Withheld(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}",
@@ -133,7 +140,7 @@ public class FileSystemScanServiceTests
         // counter instead of this one being narrowed: a needed file registered
         // anywhere and now gone is exactly as much of a problem, so the alarm
         // still fires on all forty.
-        Assert.Equal(40, result.MissingNonRemovableCount);
+        Assert.Equal(40, result.MissingNotSupersededCount);
     }
 
     [Fact]
@@ -181,7 +188,7 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
 
         Assert.Single(result.RemovableFiles);
-        Assert.Equal(4, result.MissingNonRemovableCount);
+        Assert.Equal(4, result.MissingNotSupersededCount);
     }
 
     [Fact]
@@ -217,6 +224,40 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
+    public async Task ScanAsync_weighs_a_missing_superseded_registration_in_the_correlation_gate()
+    {
+        // A DELIBERATE WIDENING, PINNED SO NOBODY LATER READS IT AS AN ACCIDENT.
+        // The gate's own comment says both sides of its proportion ask about one
+        // population, the registrations naming a file directly in the walked
+        // folder. They did not: the survivor side counted every such registration
+        // whose file was there, superseded ones included, and the missing side
+        // took only the rows carrying no superseded or obsoleted state, on the
+        // reading that such a file having gone was its expected end state. That
+        // reading is what 3.0.0 removes, so the exclusion goes with it.
+        //
+        // This machine could not reach the bound before and reaches it now: one
+        // registered file present in the folder, twenty absent and all of them
+        // superseded, and an offer with something in it. Refusing is the safe
+        // direction, and the shape is not one a healthy machine takes.
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        const string present = @"C:\Windows\Installer\present.msi";
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+        fs.AddFile(present, new MockFileData("x"));
+
+        var packages = new List<RegisteredPackage> { Registered(present) };
+        for (var i = 0; i < 20; i++)
+            packages.Add(Superseded($@"C:\Windows\Installer\gone{i}.msp"));
+
+        var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly()));
+
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync());
+
+        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+    }
+
+    [Fact]
     public async Task ScanAsync_does_not_refuse_a_machine_that_has_merely_lost_most_of_its_cache()
     {
         // Machines with most of their registered files gone are real: another
@@ -226,7 +267,7 @@ public class FileSystemScanServiceTests
         var result = await ScanWithRegisteredSplit(present: 3, missing: 30);
 
         Assert.Single(result.RemovableFiles);
-        Assert.Equal(30, result.MissingNonRemovableCount);
+        Assert.Equal(30, result.MissingNotSupersededCount);
     }
 
     [Fact]
@@ -254,7 +295,7 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
 
         Assert.Equal(2, result.RemovableFiles.Count);
-        Assert.Equal(30, result.MissingNonRemovableCount);
+        Assert.Equal(30, result.MissingNotSupersededCount);
     }
 
     [Fact]
@@ -454,12 +495,13 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
-    public async Task ScanAsync_counts_only_the_withheld_files_it_could_have_offered()
+    public async Task ScanAsync_reports_no_withheld_files_even_where_the_records_were_incomplete()
     {
-        // What the withholding COST this run, which is not the same as how many
-        // rows carried the flag: a withheld patch whose file is already gone had
-        // nothing to offer either way, so counting it would overstate what the
-        // user did not get.
+        // The count is what withholding the removable class cost a run, and no
+        // run withholds it: nothing is offered on that verdict, so there is
+        // nothing to withhold. It is pinned at zero rather than deleted because
+        // the result-log schema carries the field, and a field quietly acquiring a
+        // non-zero value again is the shape this asserts against.
         const string present = @"C:\Windows\Installer\withheld-present.msp";
         const string gone = @"C:\Windows\Installer\withheld-gone.msp";
         var query = QueryReturning(new InstallerQueryResult(
@@ -471,34 +513,37 @@ public class FileSystemScanServiceTests
 
         var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
 
-        Assert.Equal(1, result.WithheldCount);
+        Assert.Equal(0, result.WithheldCount);
         Assert.Equal(2, result.UnaccountedProductCount);
     }
 
     [Fact]
-    public async Task ScanAsync_keeps_a_withheld_patch_missing_from_disk_off_the_missing_from_disk_banner()
+    public async Task ScanAsync_reports_a_superseded_patch_missing_from_disk()
     {
-        // The hazard in withholding by flipping IsRemovable: MissingNonRemovable
-        // drives the "a future repair, update or uninstall could fail" banner. A
-        // withheld patch whose file is already gone is the same benign end state
-        // it was before the verdict was withheld, and firing that banner would
-        // tell the user their machine has a problem it does not have.
-        const string gone = @"C:\Windows\Installer\withheld-gone.msp";
+        // THIS TEST'S CLAIM IS THE REVERSE OF THE ONE IT REPLACES, which asserted
+        // that such a row stayed off the missing-files report because the file
+        // having gone was its expected end state. Windows opens every registered
+        // patch's cached file whether it has been superseded or not, and a missing
+        // one gives error 1635, so the record is exactly as much of a problem as
+        // any other and the report speaks for it.
+        const string gone = @"C:\Windows\Installer\superseded-gone.msp";
         var query = QueryReturning(new InstallerQueryResult(
-            new List<RegisteredPackage> { Withheld(gone) }.AsReadOnly(), UnaccountedProductCount: 1));
+            new List<RegisteredPackage> { Superseded(gone) }.AsReadOnly()));
 
         var result = await new FileSystemScanService(
             query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
 
-        Assert.Equal(0, result.MissingNonRemovableCount);
-        Assert.Equal(1, result.MissingRemovableCount);
+        Assert.Equal(1, result.MissingSupersededCount);
+        Assert.Equal(0, result.MissingNotSupersededCount);
+        // The split is data and the total is what both hosts speak.
+        Assert.Equal(1, result.MissingFromDiskCount);
     }
 
     [Fact]
-    public async Task ScanAsync_still_counts_a_genuinely_needed_missing_file_as_missing()
+    public async Task ScanAsync_counts_a_missing_file_with_no_patch_state_apart_from_the_superseded_ones()
     {
-        // The other side of the branch above: a row that is non-removable because
-        // Windows needs it, not because a verdict was withheld, still fires it.
+        // The other side of the split. Same total, different half, and no host
+        // says anything different about the two.
         const string gone = @"C:\Windows\Installer\needed-gone.msi";
         var query = QueryReturning(new InstallerQueryResult(
             new List<RegisteredPackage> { Registered(gone) }.AsReadOnly()));
@@ -506,8 +551,9 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(
             query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
 
-        Assert.Equal(1, result.MissingNonRemovableCount);
-        Assert.Equal(0, result.MissingRemovableCount);
+        Assert.Equal(1, result.MissingNotSupersededCount);
+        Assert.Equal(0, result.MissingSupersededCount);
+        Assert.Equal(1, result.MissingFromDiskCount);
     }
 
     [Fact]
@@ -665,13 +711,20 @@ public class FileSystemScanServiceTests
         Assert.Equal(2, result.RegisteredPackages.Count);
         // Only the present package contributes bytes; the missing one is excluded.
         Assert.Equal(100, result.RegisteredTotalBytes);
-        Assert.Equal(1, result.MissingNonRemovableCount);
+        Assert.Equal(1, result.MissingNotSupersededCount);
         Assert.Single(result.RemovableFiles);
     }
 
     [Fact]
-    public async Task ScanAsync_superseded_patches_appear_in_removable_list()
+    public async Task ScanAsync_never_offers_a_superseded_patch()
     {
+        // THE CHANGE ITSELF, AND THE TEST THAT REPLACES ITS OPPOSITE. The one it
+        // supersedes asserted that a superseded patch appeared in the removable
+        // list with Reason "Superseded". Microsoft's own engineer documented in
+        // 2008 that Windows opens every patch registered to a product whether or
+        // not it has been superseded, and a missing cached file then gives error
+        // 1635, so a file Windows holds a live registration for is not this app's
+        // to remove whatever state that registration carries.
         var registered = new List<RegisteredPackage>
         {
             Registered(@"C:\Windows\Installer\applied.msp"),
@@ -683,8 +736,6 @@ public class FileSystemScanServiceTests
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
-        // Both registered files present on disk so the superseded entry
-        // passes the on-disk existence guard.
         var fs = new MockFileSystem();
         fs.AddFile(@"C:\Windows\Installer\applied.msp", new MockFileData(new byte[100]));
         fs.AddFile(@"C:\Windows\Installer\superseded.msp", new MockFileData(new byte[200]));
@@ -692,20 +743,21 @@ public class FileSystemScanServiceTests
         var svc = new FileSystemScanService(mockQuery, fs, Array.Empty<string>(), null);
         var result = await svc.ScanAsync();
 
-        // The superseded patch should appear in RemovableFiles with Reason="Superseded"
-        Assert.Single(result.RemovableFiles);
-        Assert.Equal("Superseded", result.RemovableFiles[0].Reason);
-
-        // The applied patch stays in RegisteredPackages
-        Assert.Single(result.RegisteredPackages);
+        Assert.Empty(result.RemovableFiles);
+        // Both rows are kept, and the superseded one's bytes are in the kept
+        // total: it is a file still sitting in the folder, and a total that left
+        // it out would account for less of the folder than is there.
+        Assert.Equal(2, result.RegisteredPackages.Count);
+        Assert.Equal(300, result.RegisteredTotalBytes);
     }
 
     [Fact]
-    public async Task ScanAsync_obsoleted_patches_use_distinct_reason_label()
+    public async Task ScanAsync_never_offers_an_obsoleted_patch_either()
     {
-        // MSI PatchState 4 (obsoleted) is a different API state from 2
-        // (superseded). The Reason column distinguishes them so a user
-        // examining the orphan list sees the precise MSI lifecycle state.
+        // Obsoleted (PatchState 4) goes with superseded (2) and NOT because it is
+        // rare, which it is: Microsoft's wording for it is "applied in this
+        // product instance but obsolete", so it carries the same word as its
+        // sibling and the same reasoning reaches it.
         var registered = new List<RegisteredPackage>
         {
             Obsoleted(@"C:\Windows\Installer\obsoleted.msp"),
@@ -722,18 +774,47 @@ public class FileSystemScanServiceTests
         var svc = new FileSystemScanService(mockQuery, fs, Array.Empty<string>(), null);
         var result = await svc.ScanAsync();
 
-        Assert.Single(result.RemovableFiles);
-        Assert.Equal("Obsoleted", result.RemovableFiles[0].Reason);
+        Assert.Empty(result.RemovableFiles);
+        Assert.Single(result.RegisteredPackages);
     }
 
     [Fact]
-    public async Task ScanAsync_superseded_patches_missing_from_disk_counted_to_removable_bucket()
+    public async Task ScanAsync_counts_the_superseded_patches_it_is_keeping()
     {
-        // MSI database lists a patch as superseded but the underlying
-        // file is no longer on disk. The scan should count it against
-        // MissingRemovableCount (benign: Windows considers the patch
-        // removable already) and leave it out of RemovableFiles so a
-        // subsequent Delete or Move does not fail with MissingSourceFile.
+        // The two figures nobody had. The field data records superseded patches
+        // by count only and never by size, so how much space the class occupies
+        // on a real machine has only ever been estimated; these are what a report
+        // can carry instead. Files on disk only, the missing ones having no space
+        // to give back and their own count already.
+        var registered = new List<RegisteredPackage>
+        {
+            Superseded(@"C:\Windows\Installer\here.msp"),
+            Obsoleted(@"C:\Windows\Installer\also-here.msp"),
+            Superseded(@"C:\Windows\Installer\gone.msp"),
+            Registered(@"C:\Windows\Installer\applied.msi"),
+        };
+
+        var fs = new MockFileSystem();
+        fs.AddFile(@"C:\Windows\Installer\here.msp", new MockFileData(new byte[200]));
+        fs.AddFile(@"C:\Windows\Installer\also-here.msp", new MockFileData(new byte[50]));
+        fs.AddFile(@"C:\Windows\Installer\applied.msi", new MockFileData(new byte[10]));
+
+        var query = QueryReturning(new InstallerQueryResult(registered.AsReadOnly()));
+        var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(2, result.RegisteredSupersededCount);
+        Assert.Equal(250, result.RegisteredSupersededBytes);
+        Assert.Equal(1, result.MissingSupersededCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_keeps_a_superseded_patch_whose_file_has_gone_in_the_registered_list()
+    {
+        // Windows lists a patch as superseded and the file is not there. It is
+        // reported as a missing registration, and the ROW stays in the registered
+        // list, which is the visible half of the change: the window has to be able
+        // to name the program it belongs to, and a row taken out of that list to
+        // be offered for removal cannot be named there.
         var registered = new List<RegisteredPackage>
         {
             Superseded(@"C:\Windows\Installer\ghost.msp"),
@@ -751,20 +832,18 @@ public class FileSystemScanServiceTests
         var result = await svc.ScanAsync();
 
         Assert.Empty(result.RemovableFiles);
-        Assert.Empty(result.RegisteredPackages);
-        Assert.Equal(1, result.MissingRemovableCount);
-        Assert.Equal(0, result.MissingNonRemovableCount);
+        Assert.Single(result.RegisteredPackages);
+        Assert.Equal(1, result.MissingSupersededCount);
+        Assert.Equal(0, result.MissingNotSupersededCount);
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
     [Fact]
-    public async Task ScanAsync_non_removable_missing_from_disk_counted_to_non_removable_bucket()
+    public async Task ScanAsync_counts_a_missing_product_package_on_the_other_side_of_the_split()
     {
-        // A registered, non-removable package (a current product, not a
-        // superseded patch) whose file has gone missing from disk. The
-        // load-bearing condition for the missing-from-disk banner: an
-        // API-claimed file Windows still needs is gone, and a future
-        // install / uninstall / patch will fail.
+        // A registered package with no patch state whose file has gone. Same
+        // condition and same total as its superseded neighbour above; only the
+        // sub-count differs, and no surface reads the sub-counts.
         var registered = new List<RegisteredPackage>
         {
             Registered(@"C:\Windows\Installer\ghost.msi"),
@@ -782,8 +861,8 @@ public class FileSystemScanServiceTests
 
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.RegisteredPackages);
-        Assert.Equal(1, result.MissingNonRemovableCount);
-        Assert.Equal(0, result.MissingRemovableCount);
+        Assert.Equal(1, result.MissingNotSupersededCount);
+        Assert.Equal(0, result.MissingSupersededCount);
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
@@ -970,7 +1049,7 @@ public class FileSystemScanServiceTests
         var result = await svc.ScanAsync();
 
         Assert.Equal(2, result.RemovableFiles.Count);
-        Assert.Equal(2, result.MissingNonRemovableCount);
+        Assert.Equal(2, result.MissingNotSupersededCount);
     }
 
     [Fact]

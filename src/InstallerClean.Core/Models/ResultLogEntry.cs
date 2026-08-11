@@ -274,16 +274,26 @@ public sealed record MachineInfo(
 /// ever carried them.
 /// </param>
 /// <param name="MissingNeededCount">
-/// Registered files gone from disk that Windows still treats as needed, the half
-/// of <paramref name="MissingFromDiskCount"/> that is a real problem on the
-/// machine. Added BESIDE the total rather than replacing it: the total is read by
-/// the public chart with no version gate, and replacing it would split a live
-/// series at this release. The benign half falls out by subtraction.
+/// The half of <paramref name="MissingFromDiskCount"/> whose registration carries
+/// no superseded or obsoleted state. Added BESIDE the total rather than replacing
+/// it: the total is read by the public chart with no version gate, and replacing
+/// it would split a live series at this release. The other half falls out by
+/// subtraction.
+///
+/// THE NAME IS NOW WRONG AND THE WIRE SHAPE IS HELD ANYWAY. It says "needed"
+/// because the other half was read as benign, and that reading is what 3.0.0
+/// removes: Windows opens every registered patch's cached file whether superseded
+/// or not, so both halves are registrations naming a file that is not there and
+/// neither is the lesser. The population also shifts slightly at this release,
+/// having previously excluded any patch a scan called removable and now excluding
+/// every superseded or obsoleted one. Renaming a key is a schema decision with a
+/// receiver on the other end of it, so the key stays and this note is the record.
 /// </param>
 /// <param name="WithheldPatchCount">
-/// Superseded and obsoleted files this scan would have offered and did not,
-/// because it could not account for every installed product. What the withholding
-/// COST, where the three product terms below are its causes.
+/// Superseded and obsoleted files a scan would have offered and did not, because
+/// it could not account for every installed product. PERMANENTLY ZERO FROM 3.0.0,
+/// which offers none of them for any reason; the field is held so a receiver
+/// reading schema 4 meets the key it expects.
 /// </param>
 /// <param name="UnreadableProductCount">
 /// Products whose records came back short. An exact per-product tally.
@@ -381,9 +391,10 @@ public sealed record ScanInfo(
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
-        // IsRemovablePatch is the union of Superseded (2) and Obsoleted
-        // (4); IsObsoleted is true only for PatchState=4. OrphanedCount
-        // is the remainder after subtracting both.
+        // Both are permanently zero from 3.0.0, no registered patch reaching the
+        // offer, and both are still DERIVED from the offer rather than written as
+        // literals. The derivation is what would notice if a patch ever reached
+        // the list again; a hard-coded zero would report a clean shape over it.
         var obsoletedCount = scan.RemovableFiles.Count(f => f.IsObsoleted);
         var supersededCount = scan.RemovableFiles.Count(f => f.IsRemovablePatch) - obsoletedCount;
         return new(
@@ -395,7 +406,9 @@ public sealed record ScanInfo(
             obsoletedCount,
             scan.RemovableTotalBytes,
             scan.MissingFromDiskCount,
-            scan.MissingNonRemovableCount,
+            // The wire shape is unchanged and the population behind this one has
+            // moved a little; see the field's own note.
+            scan.MissingNotSupersededCount,
             scan.WithheldCount,
             scan.Census.UnreadableProducts,
             scan.Census.SkippedProductRows,

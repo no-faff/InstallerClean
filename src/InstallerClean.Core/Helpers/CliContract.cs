@@ -127,16 +127,26 @@ internal enum CliEventClass
     HardError,
 
     /// <summary>
-    /// Notice: the scan could not read every installed product's records, so it
-    /// withheld the superseded and obsoleted class wholesale and this run's list
-    /// is shorter than the same machine would normally give.
+    /// Notice: the scan could not read every installed product's records, so the
+    /// registrations it saw may be short of one and anything it reports about
+    /// files missing from the cache may be short with them.
+    ///
+    /// It was <c>ScanWithheldNotice</c>, and what it reported was that the run had
+    /// withheld the superseded and obsoleted class wholesale. No run withholds
+    /// that class now, none of it being offered on any run, so the condition
+    /// survives with the other half of its meaning. The Event ID does not move
+    /// with the name: 3000 is the wire contract and the name is this codebase's.
     /// </summary>
-    ScanWithheldNotice,
+    ScanRecordsIncompleteNotice,
 
     /// <summary>
-    /// Notice: packages Windows still references have no file on disk. Nothing
-    /// this tool did, and nothing that bites today, but a future repair, update
-    /// or uninstall of those programs can fail on it.
+    /// Notice: registrations Windows holds name a file that is not in the cache.
+    /// Nothing that bites today, but a repair, update or uninstall of those
+    /// programs can fail on it.
+    ///
+    /// IT SAYS NOTHING ABOUT WHAT REMOVED THEM AND NEITHER MAY THIS COMMENT. Every
+    /// tool that deletes from that folder leaves the same record, this one
+    /// included up to v2.3.0.
     /// </summary>
     ScanMissingFilesNotice,
 }
@@ -246,7 +256,7 @@ internal static class CliContract
         CliEventClass.Partial => 1002,
         CliEventClass.TransientSkip => 2000,
         CliEventClass.HardError => 4000,
-        CliEventClass.ScanWithheldNotice => 3000,
+        CliEventClass.ScanRecordsIncompleteNotice => 3000,
         CliEventClass.ScanMissingFilesNotice => 3001,
         _ => 0,
     };

@@ -4,31 +4,30 @@ namespace InstallerClean.Models;
 /// A cached installer package (.msi or .msp) some Windows Installer registration
 /// names. PatchState: 0 = not a patch, 1 = applied, 2 = superseded, 4 = obsoleted.
 ///
-/// A ROW IS NOT A STATEMENT THAT THE FILE IS NEEDED, and reading it as one is the
-/// mistake the two flags below exist to stop. Most rows do carry a product's live
-/// claim, but a row can equally be a patch the API positively called removable on
-/// a scan that could not confirm it, or one whose verdict never read at all.
+/// EVERY ROW IS KEPT. Nothing here decides that a file may be removed, and no
+/// verdict on this record puts a file into the offer: the offer is built from the
+/// files no registration names at all. A patch Windows reports superseded or
+/// obsoleted is a patch Windows still holds, in Microsoft's own words "applied to
+/// this product instance but is superseded"
+/// (learn.microsoft.com/en-us/windows/win32/msi/patch-state), and it stays on this
+/// side of the scan with every other registration.
 ///
-/// RemovableWithheld marks the first: the API called it removable and this scan
-/// could not confirm it, so the verdict was withheld, IsRemovable reads false and
-/// the row is kept. TWO PASSES SET IT and they are not the same event. The
-/// scan-wide one moves every removable row together, on a product enumeration
-/// that came back short; the per-patch confirmation moves one path, on its own
-/// unanswered question, with nothing else about the scan amiss. It is a separate
-/// flag rather than a plain false because the two are not the same fact
-/// downstream. A genuinely needed
-/// file missing from disk is the load-bearing alarm signal (an install, uninstall
-/// or repair will fail on it); a withheld patch missing from disk is the ordinary
-/// end state of a patch Windows itself calls removable, and counting it as the
-/// alarm would tell the user their machine has a problem it does not have.
+/// <see cref="PatchState"/> IS THE ONLY THING THAT SEPARATES THEM, and it separates
+/// them for reporting rather than for acting. What the state says about a file that
+/// has GONE from disk is nothing: Windows opens every patch registered to a product
+/// whether or not it has been superseded, so a record pointing at an absent file is
+/// the same condition whichever state it carries (see
+/// <see cref="IsMissingFromDisk"/>).
 ///
-/// VerdictUnreadable marks the second, and the difference from its neighbour is
-/// what the API DID: there, it answered and the scan could not act on the answer;
-/// here, it did not answer. A patch's State or Uninstallable read that fails
-/// leaves the row non-removable, which is the safe direction and is not in
-/// question, but it leaves nothing established about the file either way. Nothing
-/// may put such a row under a sentence that names a claim, because there is no
-/// claim to name.
+/// RemovableWithheld and VerdictUnreadable both survive from the arrangement where
+/// this record could carry a removable verdict. VerdictUnreadable is still written
+/// on every scan and still means what it says: a patch's State or Uninstallable
+/// read failed, so nothing was established about that registration either way.
+/// RemovableWithheld is written only where a removable verdict is taken away, and
+/// no verdict is granted now, so it is never set on a real scan; the code that
+/// writes it is kept because it is the machinery the class would need if it ever
+/// came back. Nothing may put a row carrying either flag under a sentence that
+/// names a claim, because there is no claim to name.
 /// </summary>
 public record RegisteredPackage(
     string LocalPackagePath,
@@ -42,18 +41,34 @@ public record RegisteredPackage(
     bool FileExists = true)
 {
     /// <summary>
-    /// Windows still claims this file, it is gone from disk, and that is a
-    /// problem: the one condition the missing-from-disk warning is for. Both
-    /// removable and withheld rows are excluded, because for either one the file
-    /// having gone is the expected end state and nothing will fail over it.
+    /// Windows holds a record naming this file and the file is not there. The one
+    /// condition the missing-from-disk report is for, and the whole of it.
     ///
-    /// A VERDICT THAT NEVER READ IS NOT EXCLUDED, which is the opposite direction
-    /// to its sibling flag and is deliberate. A withheld row was positively read
-    /// as removable, so its file going is expected; an unread one may be an
-    /// applied patch, whose file going is exactly what the warning is for. The
-    /// warning says a future repair, update or uninstall COULD fail, which is
-    /// true of a file whose state nobody could read, where excluding it would
-    /// keep a real problem off the screen to keep a count tidy.
+    /// IT USED TO EXCLUDE SUPERSEDED AND OBSOLETED PATCHES AND THAT WAS WRONG. The
+    /// exclusion rested on the file having gone being those patches' expected end
+    /// state, which rested in turn on the state meaning Windows had finished with
+    /// the file. It does not. Microsoft's own Windows Installer engineer, on
+    /// Microsoft's setup blog on 16 August 2008: "Windows Installer will always
+    /// open every patch registered to a product whether or not it has already been
+    /// obsolesced or superseded when opening a product or package handle", and a
+    /// cached file that has gone then gives error 1635. Microsoft's currently
+    /// maintained article on this exact state (KB 971187) tests for it without any
+    /// carve-out: "if the LocalPackage string value or referenced package is
+    /// missing, the product is affected".
+    ///
+    /// SO NO SENTENCE MAY GRADE THE TWO. The consequence is the same, the recovery
+    /// step is the same, and the only thing that ever differed is what removed the
+    /// file, which no surface may speak to (any tool that removed one, this one
+    /// included up to v2.3.0, leaves an identical record). The split survives as
+    /// two counts on <see cref="ScanResult"/> so the data keeps it; the copy does
+    /// not.
     /// </summary>
-    public bool IsMissingAndNeeded => !FileExists && !IsRemovable && !RemovableWithheld;
+    public bool IsMissingFromDisk => !FileExists;
+
+    /// <summary>
+    /// Windows reports this registration as a patch it has superseded (2) or
+    /// obsoleted (4). Both are sub-states of applied and neither says the cached
+    /// file is spare; this is a label on the record, not a verdict on the file.
+    /// </summary>
+    public bool IsSupersededOrObsoleted => PatchState is 2 or 4;
 }

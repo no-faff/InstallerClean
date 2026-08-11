@@ -99,18 +99,26 @@ public class RemovableReverifierIdentityTests
     }
 
     [Fact]
-    public async Task A_superseded_patch_a_registration_still_names_is_not_screened()
+    public async Task A_candidate_a_superseded_registration_names_is_dropped_before_the_identity_check()
     {
-        // The scope rule, and the one that would be a permanent regression if it
-        // went. A superseded patch is offered BECAUSE Windows positively said so,
-        // and a check whose keeping condition is that Windows knows the identity
-        // would withhold the whole class on every machine.
+        // THE SCOPE RULE INVERTED, AND THAT IS THE 3.0.0 CHANGE. It used to be
+        // that a superseded patch survived here and was never screened, because it
+        // was offered on Windows positively saying so and a check whose keeping
+        // condition is that Windows knows the identity would have withheld the
+        // whole class on every machine. Nothing is offered on that verdict now, so
+        // a candidate any registration names is dropped by the path comparison
+        // before the identity check is reached, and the exemption has no subject.
+        //
+        // The veto here would keep back anything it was shown, so its empty log is
+        // the assertion that the drop happened first rather than after it.
         var veto = new RecordingVeto(CandidateIdentityOutcome.Claimed);
-        var svc = Reverifier(Query(Removable(Superseded)), veto);
+        var svc = Reverifier(Query(NonRemovable(Superseded) with { PatchState = 2 }), veto);
 
         var result = await svc.ReverifyAsync(new[] { Superseded });
 
-        Assert.Equal(new[] { Superseded }, result.Surviving);
+        Assert.Empty(result.Surviving);
+        Assert.Equal(new[] { Superseded }, result.Dropped);
+        Assert.Equal(1, result.Reasons.Reclaimed);
         Assert.Empty(veto.Seen);
     }
 

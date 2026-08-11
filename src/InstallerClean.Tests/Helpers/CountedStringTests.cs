@@ -53,13 +53,15 @@ public class CountedStringTests
         "Error.AccessDenied", "Error.FileInUse", "Error.IOFailure", "Error.UnknownError",
         "Plural.Error", "Plural.File", "Plural.Package", "Plural.Patch", "Plural.Product",
         "Status.RegisteredPackagesFound",
-        "Summary.MissingFromDisk", "Summary.OrphanedToCleanUp", "Summary.RegisteredStillUsed",
+        "Summary.MissingFromDisk", "Summary.MissingFromDisk.OtherPrograms",
+        "Summary.MissingFromDisk.Unnamed",
+        "Summary.OrphanedToCleanUp", "Summary.RegisteredStillUsed",
         "Summary.RegisteredWindow",
     };
 
     /// <summary>
-    /// The eighteen counted strings 3.0.0 adds: the ones whose singular form no
-    /// shipped build has ever rendered.
+    /// The counted strings 3.0.0 adds: the ones whose singular form no shipped
+    /// build has ever rendered.
     /// </summary>
     private static readonly string[] NewInThisRelease =
     {
@@ -71,6 +73,7 @@ public class CountedStringTests
         "Completion.ReverifyIncomplete", "Completion.ReverifyRecordsChanged",
         "Completion.ReverifySkipped",
         "Confirm.DeletePermanently", "Error.FileInUse",
+        "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
         "Summary.RegisteredStillUsed", "Summary.RegisteredWindow",
     };
 

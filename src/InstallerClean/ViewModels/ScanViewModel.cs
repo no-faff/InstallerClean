@@ -112,39 +112,36 @@ public partial class ScanViewModel : ObservableObject
     };
 
     /// <summary>
-    /// Count of registered, non-removable packages whose file is missing
-    /// from disk. Drives the missing-from-disk banner: the banner only
-    /// triggers on this population, not on superseded patches whose
-    /// file is already gone (those are benign and counted separately
-    /// in <see cref="MissingRemovableCount"/>).
+    /// Every registration this scan found naming a file that is not on disk,
+    /// whatever state the record carries. Drives the missing-files line.
+    ///
+    /// IT USED TO BE HALF OF THAT. The superseded and obsoleted registrations
+    /// were counted apart and the line never fired on them, on the reading that
+    /// such a file having gone was its expected end state. Windows opens every
+    /// registered patch's cached file either way, so they are the same condition
+    /// and the line speaks for both; the split survives in the scan result for
+    /// anyone reading the data.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMissingFromDisk))]
     [NotifyPropertyChangedFor(nameof(MissingFromDiskSummaryText))]
-    private int _missingNonRemovableCount;
+    private int _missingFromDiskCount;
 
     /// <summary>
-    /// Count of superseded / obsoleted packages whose file is already gone from
-    /// disk. The benign half of the missing-from-disk pair, kept apart from
-    /// <see cref="MissingNonRemovableCount"/> so the banner fires only on the
-    /// half that means something.
-    ///
-    /// NOTHING BINDS TO IT. It said it drove a line under the body explanation
-    /// and no such binding exists anywhere in the app, which a sweep for the name
-    /// established rather than assumed. It is kept because the pair is what makes
-    /// the sibling above readable: a reader arriving at a count of missing files
-    /// that does NOT raise the banner needs to see where the rest of them went.
+    /// The programs those files belong to, as the one phrase the line names them
+    /// in, already capped and joined by <see cref="MissingFilesReport"/> so the
+    /// window and the command line say the same thing. Empty when there are none.
     /// </summary>
     [ObservableProperty]
-    private int _missingRemovableCount;
+    [NotifyPropertyChangedFor(nameof(MissingFromDiskSummaryText))]
+    private string _missingFromDiskPrograms = string.Empty;
 
     /// <summary>
     /// Installed products the last scan could not account for, straight from
     /// <see cref="ScanResult.UnaccountedProductCount"/>, whose remarks say what
     /// goes into it and why it is neither confined to records that failed to read
-    /// nor an exact headcount. Non-zero means that scan withheld every
-    /// superseded-patch verdict, so it drives the line that says why the list is
-    /// shorter than usual. Nothing shows the figure itself.
+    /// nor an exact headcount. Non-zero drives the line saying the records were
+    /// not fully read. Nothing shows the figure itself.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasRecordsNotMatched))]
@@ -219,23 +216,25 @@ public partial class ScanViewModel : ObservableObject
     /// </summary>
     public bool HasOrphans => HasScanned && OrphanedFileCount > 0;
 
-    public bool HasMissingFromDisk => MissingNonRemovableCount > 0;
+    public bool HasMissingFromDisk => MissingFromDiskCount > 0;
 
     public string MissingFromDiskSummaryText =>
         string.Format(
-            DisplayHelpers.Pluralise(MissingNonRemovableCount,
+            DisplayHelpers.Pluralise(MissingFromDiskCount,
                 Strings.Summary_MissingFromDisk_Singular,
                 Strings.Summary_MissingFromDisk_Plural,
                 "Summary.MissingFromDisk"),
-            MissingNonRemovableCount);
+            MissingFromDiskCount, MissingFromDiskPrograms);
 
     /// <summary>
     /// True when the last scan could not account for everything the Windows
-    /// Installer records hold and therefore kept its superseded patches back.
-    /// Informational, unlike <see cref="HasMissingFromDisk"/>: nothing is wrong
-    /// with the machine and there is nothing for the user to do. It is shown
-    /// because the alternative is a quietly shorter list, and a scan that says
-    /// less than usual without saying so is the fault this line exists to avoid.
+    /// Installer records hold, so it did not read all of them. Informational,
+    /// unlike <see cref="HasMissingFromDisk"/>: nothing is wrong with the machine
+    /// and there is nothing for the user to do. It is shown because a scan that
+    /// saw less than usual without saying so is the fault this line exists to
+    /// avoid, and what it now bears on is the missing-files line rather than the
+    /// offer: a registration this scan never reached is one whose file, had it
+    /// gone, went uncounted.
     ///
     /// The count gates the line and does not appear in it. Four different things
     /// contribute to it and only two are failures to read, so it is an estimate
@@ -284,6 +283,12 @@ public partial class ScanViewModel : ObservableObject
             var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
             var orphanedCount = result.RemovableFiles.Count;
             var orphanedSize = DisplayHelpers.FormatSize(result.RemovableFiles.Sum(f => f.SizeBytes));
+            // Built here with the rest of the display state rather than in the
+            // property, which is read on every binding refresh: it walks the whole
+            // registered set and groups it, and the answer only changes when a
+            // scan does.
+            var missingPrograms = MissingFilesReport.Inline(
+                MissingFilesReport.Products(result.RegisteredPackages));
 
             PendingRebootResult = pendingRebootResult;
             LastScanResult = result;
@@ -291,8 +296,8 @@ public partial class ScanViewModel : ObservableObject
             RegisteredSizeDisplay = registeredSize;
             OrphanedFileCount = orphanedCount;
             OrphanedSizeDisplay = orphanedSize;
-            MissingNonRemovableCount = result.MissingNonRemovableCount;
-            MissingRemovableCount = result.MissingRemovableCount;
+            MissingFromDiskCount = result.MissingFromDiskCount;
+            MissingFromDiskPrograms = missingPrograms;
             UnaccountedProductCount = result.UnaccountedProductCount;
             HasScanned = true;
         }
