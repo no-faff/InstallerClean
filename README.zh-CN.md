@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.0-blue" alt="GitHub 版本"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-51k-brightgreen" alt="总下载量"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-53k-brightgreen" alt="总下载量"></a>
 </p>
 
 ![InstallerClean 成功清理后的截图：已清理 1.28 GB，68 个文件已移到回收站](docs/screenshots/zh/07-success-done.webp)
 
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这是个 Windows 从不清理的隐藏文件夹。它几乎瞬间扫描完，告诉您有没有这类文件，想细看的还能查看更多细节，并让您删掉它们，给 C: 盘腾出空间。用上一次，就可以不再惦记了。
 - **您可能正是为此而来：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 时，看到 `C:\Windows\Installer` 占了很大空间，却不知道里面都是些什么。InstallerClean 正是您需要的工具。像 `9f05cba.msi` 这样名字看起来毫无规律的文件，它清楚里面装的是什么，并很快告诉您哪些可以安全删除。
-- **能释放多少空间：** 目前收到的（自愿、匿名）报告显示，<!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 的机器有需要清理的文件。这些机器里，释放空间的中位数是 <!-- reports-median-start -->18.8 GB<!-- reports-median-end --><!-- reports-biggest-start -->，清得最多的一台足足清出了 462 GB<!-- reports-biggest-end -->。其余 <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> 没找到可清理的，这只是说明它们的 Installer 文件夹本来就是干净的。更多细节见下文的[常见问题](#常见问题)。
+- **能释放多少空间：** 目前收到的（自愿、匿名）报告显示，<!-- reports-freedpct-start -->60%<!-- reports-freedpct-end --> 的机器有需要清理的文件。这些机器里，释放空间的中位数是 <!-- reports-median-start -->17.8 GB<!-- reports-median-end --><!-- reports-biggest-start -->，清得最多的一台足足清出了 462 GB<!-- reports-biggest-end -->。其余 <!-- reports-nothingpct-start -->40%<!-- reports-nothingpct-end --> 没找到可清理的，这只是说明它们的 Installer 文件夹本来就是干净的。更多细节见下文的[常见问题](#常见问题)。
 - **是否安全：** 是的。它直接问 Windows Installer API 哪些文件还需要，只会列出 Windows 报告为已经用完的那些。它是开源的（Apache 2.0），不向您索取任何信息：没有账号、没有广告、没有跟踪、没有遥测，也没有任何东西在后台运行。它唯一会自己发起的联网操作，就是在您运行时到 GitHub 查一下有没有新版本，而且这也可以关掉。
 - **如何获取：** [下载最新版本](../../releases/latest)。运行；点过 [“未知发布者”的警告](#unknown-publisher)和[管理员提示](#admin)。删掉任何不需要的文件。搞定。
 
@@ -164,7 +164,7 @@ InstallerClean 会识别三类不需要的文件。
 
 **关于删除和移动。** InstallerClean 删除的这些文件，永久删掉也是安全的。**删除**会把它们移到回收站（回收站不可用时会有提示）；等您清空回收站，C: 盘上的空间就回来了。
 
-不过，这些文件能否放心删除，您不必只听我说。趁它们还在回收站里，您有机会确认一下：用到这个文件夹的那些应用（Office、Acrobat、Visual Studio 之类）是否还能照常更新和卸载。万一您发现有什么坏了（这种可能性极低，而且在 <!-- downloads-start -->51,000+<!-- downloads-end --> 次下载之后至今没有收到过任何报告），从回收站把文件还原回去就能修好。想格外稳妥，也可以改用**移动**，把文件备份到您选定的文件夹里（当然，如果您是想给 C: 盘腾空间，就该选另一个分区或驱动器上的文件夹）。想恢复原状，把文件复制回 `C:\Windows\Installer` 就行（不过您几乎肯定永远用不着这么做）。如果某个文件名里多了一个“(1)”（把文件两次移到同一个文件夹时会这样），复制回去之前先把它去掉。
+不过，这些文件能否放心删除，您不必只听我说。趁它们还在回收站里，您有机会确认一下：用到这个文件夹的那些应用（Office、Acrobat、Visual Studio 之类）是否还能照常更新和卸载。万一您发现有什么坏了（这种可能性极低，而且在 <!-- downloads-start -->53,000+<!-- downloads-end --> 次下载之后至今没有收到过任何报告），从回收站把文件还原回去就能修好。想格外稳妥，也可以改用**移动**，把文件备份到您选定的文件夹里（当然，如果您是想给 C: 盘腾空间，就该选另一个分区或驱动器上的文件夹）。想恢复原状，把文件复制回 `C:\Windows\Installer` 就行（不过您几乎肯定永远用不着这么做）。如果某个文件名里多了一个“(1)”（把文件两次移到同一个文件夹时会这样），复制回去之前先把它去掉。
 
 如果 Windows Installer 正在写入缓存、有上一笔事务被挂起，或有一项排队等候的、指向该缓存的重启后重命名，移动和删除都会被禁用，并显示具体原因。
 
@@ -176,7 +176,7 @@ InstallerClean 会识别三类不需要的文件。
 - VirusTotal：每个构建都会扫描，各引擎的完整结果链接在对应版本的发布页面上，方便您查看每个文件的检测结果并自行重新扫描。发布时仍然存在的误报，会在该版本的发布页面上点明并解释；等厂商撤销之后，该页面也会随之更新。
 - 源代码在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)，CI 会对每次提交进行构建和测试（见上方绿色的 CI 徽章）。
 - 发布版本的构建是确定性的：编译设置让相同的源代码和相同的 SDK 产出完全相同的字节；而且发布流程会拒绝为某个版本打标签，除非发布的 exe 正是在该标签所对应的干净工作树上构建出来的。所以您可以检出该标签、自己构建一遍，再把算出的哈希值与公布的哈希值对比：这样就能证明您下载到的文件与公开的源代码一致。请先用同一个 SDK 版本（每个版本的发布说明都会写明是用哪个 SDK 构建的）；SDK 补丁版本不同，产出的字节就会不同，看起来像是对不上，其实不是。
-- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->51,000+<!-- downloads-end --> 次下载。
+- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->53,000+<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 认证 100% 干净" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 会对每个版本做病毒、间谍软件和广告软件检测。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 认证 100% 干净" width="190"></a>
 
@@ -252,7 +252,7 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 **我真能腾出好几 GB 空间吗？** 看您的机器。一台没装额外软件的全新 Windows 11，没有什么可清理的。一台用了很久的开发者工作站，或任何装了大量基于 MSI 的软件（Acrobat、Office、LibreOffice、大型开发工具）的机器，可能有几十 GB。无论是哪种情况，一运行您就能看到具体有多少。
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-从 v1.8.0 起就有一个选项，可以把清理结果做成一份简短的匿名报告发回来。到目前为止已经收到 180 份（谢谢大家🙏），有东西可清理的那 59% 的机器里，清出空间的中位数是 18.8 GB。有一台竟然清出了 462 GB。下面是结果的汇总。
+从 v1.8.0 起就有一个选项，可以把清理结果做成一份简短的匿名报告发回来。到目前为止已经收到 187 份（谢谢大家🙏），有东西可清理的那 60% 的机器里，清出空间的中位数是 17.8 GB。有一台竟然清出了 462 GB。下面是结果的汇总。
 
 <p align="center">
   <picture>

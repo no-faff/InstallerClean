@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.0-blue" alt="GitHub Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-51k-brightgreen" alt="Total downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-53k-brightgreen" alt="Total downloads"></a>
 </p>
 
 ![Screenshot of InstallerClean after a successful clean-up: 1.28 GB cleaned up, 68 files moved to the Recycle Bin](docs/screenshots/en/07-success-done.webp)
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely delete.
-- **How much space:** The (optional and anonymous) reports sent in so far show <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->18.8 GB<!-- reports-median-end --><!-- reports-biggest-start --> - with one machine reclaiming a whopping 462 GB<!-- reports-biggest-end -->. The other <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
+- **How much space:** The (optional and anonymous) reports sent in so far show <!-- reports-freedpct-start -->60%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->17.8 GB<!-- reports-median-end --><!-- reports-biggest-start --> - with one machine reclaiming a whopping 462 GB<!-- reports-biggest-end -->. The other <!-- reports-nothingpct-start -->40%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
 - **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (Apache 2.0) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. The only thing it does online by itself is check GitHub for a newer version when you run it, and you can turn that off.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; click through [the unknown-publisher warning](#unknown-publisher) and [the admin prompt](#admin). Delete any unneeded files. Done.
 
@@ -163,7 +163,7 @@ After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer`
 <a id="is-it-safe"></a>
 ## Is it safe?
 
-Yes. InstallerClean doesn't guess from filenames, dates or sizes. It asks Windows, twice over: once through the Windows Installer API and once by reading the registry directly. And it asks about each file's own identity rather than about where the file sits, so a registration written in a form it doesn't recognise can't make a needed file look removable. Anything it can't get a clear answer about stays where it is. Nothing has been reported broken after <!-- downloads-start -->51,000+<!-- downloads-end --> downloads.
+Yes. InstallerClean doesn't guess from filenames, dates or sizes. It asks Windows, twice over: once through the Windows Installer API and once by reading the registry directly. And it asks about each file's own identity rather than about where the file sits, so a registration written in a form it doesn't recognise can't make a needed file look removable. Anything it can't get a clear answer about stays where it is. Nothing has been reported broken after <!-- downloads-start -->53,000+<!-- downloads-end --> downloads.
 
 **About Delete and Move.** Delete permanently removes the files. Move takes them out of `C:\Windows\Installer` to a folder you choose; put that folder on another drive and you get the space back on C: straight away and still have the files. Copy them back and you are exactly where you started.
 
@@ -177,7 +177,7 @@ The scan, query, move, delete, settings and pending-reboot services are covered 
 - VirusTotal: every build is scanned, with the full per-engine results linked on its release page so you can see how each file scored and re-scan it yourself. A false positive that's live when a release goes out is named and explained on that release's page, and the page is updated once the vendor clears it.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
 - Release builds are deterministic: the compiler settings make the same source and SDK produce the same bytes, and the release process refuses to tag a version unless the shipped exes were built from a clean tree at exactly that tag. So you can check out the tag, build it yourself and compare hashes with the published ones: the portable and the command-line downloads provably match the public source. The setup is compiled by Inno Setup rather than by the SDK and stamps the build year into itself, so reproducing its hash needs the same Inno version and the same calendar year as well. Match the SDK version first (each release's notes say which it was built with); a different SDK patch produces different bytes, which looks like a mismatch and isn't.
-- <!-- downloads-start -->51,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
+- <!-- downloads-start -->53,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks certified 100% clean" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
@@ -253,7 +253,7 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 **Will I actually free up GBs of space?** It depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Either way, you'll see exactly how much the moment you run it.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Since v1.8.0 there's been an option to send in a brief anonymous report of the outcome. 180 have come in so far (thanks everyone 🙏) and of the 59% of machines that had something to clean up, the median freed is 18.8 GB. One machine reclaimed a pretty staggering 462 GB. Here's a summary of the results.
+Since v1.8.0 there's been an option to send in a brief anonymous report of the outcome. 187 have come in so far (thanks everyone 🙏) and of the 60% of machines that had something to clean up, the median freed is 17.8 GB. One machine reclaimed a pretty staggering 462 GB. Here's a summary of the results.
 
 <p align="center">
   <picture>
