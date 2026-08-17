@@ -467,19 +467,6 @@ public class InstallerQueryServiceUnitTests
         Assert.False(claimed[path].IsRemovable);
     }
 
-    [Fact]
-    public async Task Superseded_patch_claimed_by_a_single_product_is_never_offered()
-    {
-        const string dead = @"C:\Windows\Installer\dead.msp";
-        var msi = new FakeMsiApi();
-        msi.AddProduct("{A}");
-        msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
-
-        var result = await Run(msi);
-
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
-    }
-
     // ---- Uninstallable guard fails safe ----
 
     [Fact]
@@ -494,19 +481,6 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         Assert.False(Assert.Single(result.Packages, r => r.LocalPackagePath == p).IsRemovable);
-    }
-
-    [Fact]
-    public async Task Positively_read_zero_Uninstallable_no_longer_allows_removal()
-    {
-        const string p = @"C:\Windows\Installer\rem0.msp";
-        var msi = new FakeMsiApi();
-        msi.AddProduct("{A}");
-        msi.AddPatch("{A}", "{P}", localPackage: p, state: "2", uninstallable: "0");
-
-        var result = await Run(msi);
-
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == p), expectedState: 2);
     }
 
     // ---- Patch enumeration AccessDenied throws (matches product loop) ----

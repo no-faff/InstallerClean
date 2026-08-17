@@ -20,6 +20,20 @@ public class FileSystemScanServiceTests
     private static RegisteredPackage Superseded(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2);
 
+    /// <summary>
+    /// A superseded row whose per-product condition WAS established clean, which is
+    /// the only shape that lands in the unaffected half.
+    ///
+    /// <see cref="Superseded"/> is not that shape and the difference is easy to miss:
+    /// the verdict defaults to unestablished, deliberately, so a row built without one
+    /// models a scan that could not settle the question and its absence is reported.
+    /// Every test here used that helper, so nothing was exercising the other side of
+    /// the split at all.
+    /// </summary>
+    private static RegisteredPackage SupersededAndCleared(string path) =>
+        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2,
+            ProductPatchSetVerdict: ProductPatchSet.AllNonRemovable);
+
     private static RegisteredPackage Obsoleted(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 4);
 
@@ -518,6 +532,28 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
+    public async Task A_superseded_patch_the_condition_cleared_is_missing_but_unaffected()
+    {
+        // THE OTHER HALF OF THE SPLIT, which nothing exercised. The row is superseded
+        // AND the per-product condition positively established that nothing sharing it
+        // could be uninstalled and roll back onto its file, so its absence is the one
+        // case this scan can call harmless and the missing-files line does not speak
+        // for it. Without this, every test here sat on one side and a split that had
+        // collapsed to a single answer would have passed the lot.
+        const string cleared = @"C:\Windows\Installer\cleared-gone.msp";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { SupersededAndCleared(cleared) }.AsReadOnly()));
+
+        var result = await new FileSystemScanService(
+            query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(0, result.MissingAffectedCount);
+        Assert.Equal(1, result.MissingUnaffectedCount);
+        // The total still counts it: the split is data, and both hosts speak the sum.
+        Assert.Equal(1, result.MissingFromDiskCount);
+    }
+
+    [Fact]
     public async Task ScanAsync_reports_a_superseded_patch_missing_from_disk()
     {
         // THIS TEST'S CLAIM IS THE REVERSE OF THE ONE IT REPLACES, which asserted
@@ -533,8 +569,8 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(
             query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
 
-        Assert.Equal(1, result.MissingUnaffectedCount);
-        Assert.Equal(0, result.MissingAffectedCount);
+        Assert.Equal(1, result.MissingAffectedCount);
+        Assert.Equal(0, result.MissingUnaffectedCount);
         // The split is data and the total is what both hosts speak.
         Assert.Equal(1, result.MissingFromDiskCount);
     }
@@ -804,7 +840,7 @@ public class FileSystemScanServiceTests
 
         Assert.Equal(2, result.RegisteredSupersededCount);
         Assert.Equal(250, result.RegisteredSupersededBytes);
-        Assert.Equal(1, result.MissingUnaffectedCount);
+        Assert.Equal(1, result.MissingAffectedCount);
     }
 
     [Fact]
@@ -833,8 +869,8 @@ public class FileSystemScanServiceTests
 
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.RegisteredPackages);
-        Assert.Equal(1, result.MissingUnaffectedCount);
-        Assert.Equal(0, result.MissingAffectedCount);
+        Assert.Equal(1, result.MissingAffectedCount);
+        Assert.Equal(0, result.MissingUnaffectedCount);
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 

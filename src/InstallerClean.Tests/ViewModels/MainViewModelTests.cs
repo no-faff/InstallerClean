@@ -2093,8 +2093,14 @@ public class MainViewModelTests
                     PatchState: 2, FileExists: false),
             },
             RegisteredTotalBytes: 0,
-            MissingAffectedCount: 0,
-            MissingUnaffectedCount: 1);
+            // AFFECTED, and the swap is the point of this test rather than a detail. A
+            // superseded patch reaches this line when the scan could not establish that
+            // nothing could roll back onto its file, which is what a row carrying no
+            // product verdict means. Built in the other half it would be the one case
+            // the line is right to stay silent about, and the test would be asserting
+            // that the app alarms on a file it has shown to be spare.
+            MissingAffectedCount: 1,
+            MissingUnaffectedCount: 0);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 

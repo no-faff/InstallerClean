@@ -636,7 +636,16 @@ public class RemovableReverifierTests
         // One verdict per path is all a caller can act on, and the second claim
         // is not queried at all once the first has condemned it.
         Assert.Equal(new[] { shared }, reclaimed);
-        Assert.Equal(2, msi.Reads); // State + Uninstallable, for the first claim only
+
+        // FOUR READS, AND THE SPLIT IS THE ASSERTION RATHER THAN THE TOTAL. Two are
+        // the batch loop's State and Uninstallable for the FIRST claim only, which is
+        // the short-circuit this test is about and which still holds: a second claim
+        // on a path already condemned is skipped. The other two are the sibling pass
+        // added for the rollback case, which reads Uninstallable once per PRODUCT
+        // holding the patch, and this fixture names two products. A bare total would
+        // have gone on passing if the short-circuit broke and the sibling pass got
+        // cheaper by the same amount.
+        Assert.Equal(2 + 2, msi.Reads);
     }
 
     [Fact]
