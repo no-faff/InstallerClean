@@ -234,6 +234,32 @@ public sealed record AppInfo(string Version, string Language)
 /// <see cref="ProductCount"/> it gives the ratio that says how patch-heavy a real
 /// machine is, which is the single thing the measured machine is least like.
 /// </param>
+/// <param name="InstanceProductCount">
+/// Products installed as a second instance of themselves under an instance
+/// transform. PRODUCTS, not files, and not a count of anything held back.
+///
+/// IT IS HERE BECAUSE THE APP HAS JUST STOPPED BEING ABLE TO TELL US. Until 3.0.0
+/// this condition emptied the entire offer on any machine carrying one; that
+/// withholding is gone, along with the check it protected, because nothing reads a
+/// product code out of a cached file any more and the condition therefore picks out
+/// no risk such a machine does not share with every other. What is left is a
+/// question nobody anywhere has an answer to: whether a machine carrying such a
+/// product exists in the field at all. Every measurement this project has of it is
+/// from one machine, where it reads zero.
+///
+/// A machine fact rather than a run observation, which is what puts it in this
+/// object: two scans of one machine agree about it.
+/// </param>
+/// <param name="InstanceTypeUnreadableCount">
+/// Products whose <c>InstanceType</c> read failed, so they were neither counted
+/// above nor shown to be ordinary.
+///
+/// IT TRAVELS SO THAT A ZERO ABOVE CANNOT BE READ AS "NO SUCH PRODUCT HERE". A
+/// complete negative is a zero in both, and a zero above with a number here is a
+/// machine that did not answer rather than a machine with none. The completeness of
+/// the walk that asked is carried by the counts already in this object and under
+/// the scan: a product the enumeration never reached was never asked this either.
+/// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
     int LongFileNameCount,
@@ -243,7 +269,9 @@ public sealed record MachineInfo(
     int UnparseableProductKeyCount,
     int ProductCount,
     int RegistryProductKeyCount,
-    int PatchClaimCount)
+    int PatchClaimCount,
+    int InstanceProductCount,
+    int InstanceTypeUnreadableCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -255,7 +283,9 @@ public sealed record MachineInfo(
             scan.Census.UnparseableProductKeyNames,
             scan.Census.ProductCount,
             scan.Census.RegistryProductKeys,
-            scan.Census.PatchClaimCount);
+            scan.Census.PatchClaimCount,
+            scan.Census.InstanceProductCount,
+            scan.Census.InstanceTypeUnreadableCount);
 }
 
 /// <summary>

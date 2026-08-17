@@ -238,6 +238,42 @@ public record InstallerQueryResult(
 /// to tell residue from a truncated enumeration; the band is gone and these are
 /// the measurement that replaced the guess.
 /// </param>
+/// <param name="InstanceProductCount">
+/// Products that answered a non-zero <c>InstanceType</c>: installed as a second
+/// instance of themselves under an instance transform. PRODUCTS, not files, and
+/// not a count of anything held back.
+///
+/// IT DECIDES NOTHING, WHICH IS THE POINT OF IT. Up to 3.0.0 this condition
+/// emptied the whole offer, on the reading that a keyed question about the product
+/// code written inside a cached package can answer "no record" while a
+/// registration under a transform-generated code still needs the file. Nothing
+/// reads inside a file any more, so that reading has no subject and the condition
+/// picks out no risk this machine does not carry for every other product. What
+/// remains is a fact about machines that nobody anywhere has measured: whether a
+/// machine carrying such a product exists in the field at all. Counted and sent;
+/// acted on nowhere.
+///
+/// A POSITIVE READING IS THE ONLY THING COUNTED. A value that will not parse is
+/// not a positive, and neither is an absent property, which Microsoft documents as
+/// meaning an ordinary installation. The value is compared as a NUMBER rather than
+/// against the string "1", because nothing documents the spelling the API returns
+/// and a machine answering "01" or "1 " would read as ordinary on a string test.
+/// </param>
+/// <param name="InstanceTypeUnreadableCount">
+/// Products whose <c>InstanceType</c> read failed, so they were neither counted
+/// above nor shown to be ordinary. THIS IS WHAT STOPS A ZERO ABOVE BEING READ AS
+/// "NO SUCH PRODUCT ON THIS MACHINE".
+///
+/// IT IS THE HALF THAT MAKES THE COUNT HONEST AND IT IS NOT A TRI-STATE. A single
+/// three-valued verdict could say complete, incomplete or unreadable and could not
+/// say how many products it failed on, which is the number a receiver comparing
+/// machines needs. A count beside a count is the shape every other member here
+/// uses, and it composes with them: a complete negative is a zero here AND a zero
+/// in <see cref="UnreadableProducts"/>, <see cref="UnansweredProductCount"/> and
+/// <see cref="UnparseableProductKeyNames"/>, because a product the walk never
+/// reached was never asked this question either. Any of those non-zero makes the
+/// count above a floor.
+/// </param>
 public readonly record struct EnumerationCensus(
     int UnreadableProducts = 0,
     int SkippedProductRows = 0,
@@ -252,4 +288,6 @@ public readonly record struct EnumerationCensus(
     int RecoveredProductCount = 0,
     int UnansweredProductCount = 0,
     int UnparseableProductKeyNames = 0,
-    int UnreadableVerdictPaths = 0);
+    int UnreadableVerdictPaths = 0,
+    int InstanceProductCount = 0,
+    int InstanceTypeUnreadableCount = 0);

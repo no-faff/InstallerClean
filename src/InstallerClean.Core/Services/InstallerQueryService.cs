@@ -238,6 +238,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // the increment site for what it measures and why it is worth measuring.
         var unreadablePatchStates = 0;
 
+        // Products installed as a second instance of themselves, and the products
+        // that would not answer the question. Both decide nothing at all: see
+        // EnumerationCensus.InstanceProductCount for what the pair is for and why
+        // neither may be read without the other.
+        var instanceProducts = 0;
+        var instanceTypeUnreadable = 0;
+
         progress?.Report(new ScanProgressUpdate(Strings.Status_FoundProducts));
 
         // Budgeted, because the abandonment breadcrumb is one full entry per
@@ -272,6 +279,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             var productName = GetProductProperty(productCode, userSid, context, MsiInstallProperty.ProductName).Value;
             var localPackage = GetProductProperty(productCode, userSid, context, MsiInstallProperty.LocalPackage);
+
+            // One more keyed property read on a product this loop has already
+            // reached, rather than a second enumeration: the walk behind this loop
+            // already passes the everyone SID across all three contexts, which is
+            // the shape the question needs, so asking here costs one call per
+            // product and nothing per machine.
+            //
+            // IT REACHES NO VERDICT AND MUST NOT ACQUIRE ONE. A failed read does
+            // not count as an instance product, does not count as an ordinary one,
+            // and above all does not feed recordsShort: the whole class the other
+            // reads in this loop withhold for is about a CLAIM that never reached
+            // the merge, and this property carries no claim on any file. Counting
+            // it there would withhold the removable class over a diagnostic.
+            var instanceType = GetProductProperty(productCode, userSid, context, MsiInstallProperty.InstanceType);
+            if (instanceType.Unreadable) instanceTypeUnreadable++;
+            else if (int.TryParse(instanceType.Value.TrimEnd('\0').Trim(), out var instanceTypeValue)
+                     && instanceTypeValue != 0) instanceProducts++;
 
             // LocalPackage is the one property whose failed read DELETES this
             // product's claim rather than degrading it. An unreadable State
@@ -577,7 +601,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // is what makes it a different number from the pairing count
                 // above: several products' failed reads on one shared patch are
                 // one row here and several there.
-                packages.Count(p => p.VerdictUnreadable)));
+                packages.Count(p => p.VerdictUnreadable),
+                instanceProducts,
+                instanceTypeUnreadable));
         }
         finally
         {

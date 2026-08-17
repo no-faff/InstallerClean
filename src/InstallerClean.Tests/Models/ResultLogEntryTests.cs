@@ -72,7 +72,9 @@ public class ResultLogEntryTests
         UnparseableProductKeyCount: 0,
         ProductCount: 137,
         RegistryProductKeyCount: 137,
-        PatchClaimCount: 2);
+        PatchClaimCount: 2,
+        InstanceProductCount: 0,
+        InstanceTypeUnreadableCount: 0);
 
     private static ResultLogEntry SampleEntry() => new(
         SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
@@ -144,7 +146,7 @@ public class ResultLogEntryTests
                 "shortNameCreation", "longFileNameCount", "nonStringLocalPackageCount",
                 "unreadablePatchStateCount", "unreadableVerdictPathCount",
                 "unparseableProductKeyCount", "productCount", "registryProductKeyCount",
-                "patchClaimCount",
+                "patchClaimCount", "instanceProductCount", "instanceTypeUnreadableCount",
             ],
             root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
 
@@ -156,7 +158,7 @@ public class ResultLogEntryTests
                 "skippedProductRowCount", "unclaimedProductFileCount", "unclaimedPatchFileCount",
                 "recoveredProductCount", "unansweredProductCount",
                 "keptIdentityClaimedCount", "keptIdentityUnreadableCount",
-                "keptIdentityUnaskableCount",
+                "keptIdentityUnaskableCount", "keptIdentityInstanceTransformsCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 

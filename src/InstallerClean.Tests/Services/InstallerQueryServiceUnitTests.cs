@@ -1474,6 +1474,102 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(unimprovable, Assert.Single(result.Packages).LocalPackagePath);
     }
 
+    // ---- The instance-product count, which decides nothing ----
+
+    [Theory]
+    // Microsoft's documented positive. 1 is the value an instance transform writes.
+    [InlineData("1", 1)]
+    // Compared as a NUMBER and not against the string "1", because nothing
+    // documents the spelling the API returns it in. Both of these would read as
+    // ordinary products on a string test and are instance products.
+    [InlineData("01", 1)]
+    [InlineData(" 1 ", 1)]
+    // A second instance beyond the first is still an instance product.
+    [InlineData("2", 1)]
+    // The documented ordinary installation.
+    [InlineData("0", 0)]
+    // Not a number, so not a positive. It is also not a failure: the read
+    // succeeded and gave something nobody can act on.
+    [InlineData("yes", 0)]
+    [InlineData("", 0)]
+    public async Task An_instance_product_is_counted_only_on_a_positive_reading(string value, int expected)
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.SetProductProperty("{A}", "InstanceType", value);
+
+        var result = await Run(msi);
+
+        Assert.Equal(expected, result.Census.InstanceProductCount);
+        Assert.Equal(0, result.Census.InstanceTypeUnreadableCount);
+    }
+
+    [Fact]
+    public async Task A_product_carrying_no_InstanceType_is_neither_counted_nor_unreadable()
+    {
+        // The ordinary case on every machine measured. An absent property is
+        // documented as meaning an ordinary installation, so it is a clean negative
+        // rather than a read that failed, and the two must not share a counter.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.ProductPropertyResult[("{A}", "InstanceType")] = UnknownProperty;
+
+        var result = await Run(msi);
+
+        Assert.Equal(0, result.Census.InstanceProductCount);
+        Assert.Equal(0, result.Census.InstanceTypeUnreadableCount);
+    }
+
+    [Fact]
+    public async Task An_unreadable_InstanceType_counts_apart_and_withholds_nothing()
+    {
+        // THE LOAD-BEARING ONE. The count exists so a zero cannot be read as "no
+        // such product here", which needs the failures counted separately. And the
+        // failure must not reach recordsShort: every other failed read in that loop
+        // is about a CLAIM that never got to the merge and withholds the whole
+        // removable class for the scan, where this property carries no claim on any
+        // file at all. Wiring it into that count would empty a machine's offer over
+        // a diagnostic nothing acts on.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.ProductPropertyResult[("{A}", "InstanceType")] = BadConfiguration;
+
+        var result = await Run(msi);
+
+        Assert.Equal(1, result.Census.InstanceTypeUnreadableCount);
+        Assert.Equal(0, result.Census.InstanceProductCount);
+        // The withholding, from both ends: nothing unaccounted for, and the row
+        // still carries the verdict it would have carried.
+        Assert.Equal(0, result.UnaccountedProductCount);
+        Assert.Equal(0, result.Census.UnreadableProducts);
+    }
+
+    [Fact]
+    public async Task The_two_instance_counters_are_per_product_and_independent()
+    {
+        // Three products, one of each shape, so the counters are shown not to be
+        // booleans wearing an int and not to be reading each other's rows.
+        var msi = new FakeMsiApi();
+        foreach (var code in new[] { "{A}", "{B}", "{C}" })
+        {
+            msi.AddProduct(code);
+            msi.SetProductProperty(code, "LocalPackage", $@"C:\Windows\Installer\{code.Trim('{', '}')}.msi");
+        }
+        msi.SetProductProperty("{A}", "InstanceType", "1");
+        msi.SetProductProperty("{B}", "InstanceType", "0");
+        msi.ProductPropertyResult[("{C}", "InstanceType")] = BadConfiguration;
+
+        var result = await Run(msi);
+
+        Assert.Equal(1, result.Census.InstanceProductCount);
+        Assert.Equal(1, result.Census.InstanceTypeUnreadableCount);
+        Assert.Equal(3, result.Census.ProductCount);
+        Assert.Equal(0, result.UnaccountedProductCount);
+    }
+
     // ---- The environment-variable form ----
 
     // The variable is this test's own and is set for the duration of one test
