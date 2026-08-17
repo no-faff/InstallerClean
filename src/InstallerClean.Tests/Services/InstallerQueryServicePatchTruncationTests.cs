@@ -92,15 +92,15 @@ public class InstallerQueryServicePatchTruncationTests
         // clean reading every product would be unestablished, every path would be
         // withheld for that reason alone, and every assertion here would pass or fail
         // for something it is not about. The condition has its own tests.
-        var patchSets = new Dictionary<string, InstallerQueryService.ProductPatchSet>(
+        var patchSets = new Dictionary<string, ProductPatchSet>(
             StringComparer.OrdinalIgnoreCase);
         foreach (var row in msi.EnumeratedPairings())
         {
             var verdict = row.Uninstallable == "0"
-                ? InstallerQueryService.ProductPatchSet.AllNonRemovable
+                ? ProductPatchSet.AllNonRemovable
                 : row.Uninstallable.Length == 0
-                    ? InstallerQueryService.ProductPatchSet.Unestablished
-                    : InstallerQueryService.ProductPatchSet.RemovablePatchPresent;
+                    ? ProductPatchSet.Unestablished
+                    : ProductPatchSet.RemovablePatchPresent;
             patchSets[row.Product] = patchSets.TryGetValue(row.Product, out var seen)
                 ? InstallerQueryService.Worse(seen, verdict)
                 : verdict;

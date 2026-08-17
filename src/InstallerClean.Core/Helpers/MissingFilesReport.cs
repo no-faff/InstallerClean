@@ -51,14 +51,45 @@ internal static class MissingFilesReport
     /// product name are folded into a single unnamed entry at the end, because
     /// several of them are not several programs: the registry fallback names none
     /// of its rows, so counting them as one program each would invent a headcount.
+    ///
+    /// IT NAMES THE SAME POPULATION THE BANNER COUNTS, WHICH IS NARROWER THAN "EVERY
+    /// MISSING REGISTRATION" FROM 3.0.0. The banner fires where something could still
+    /// reach for a file that is gone, so a registration whose absence the app has
+    /// positively established to be harmless is not one of the programs it should name:
+    /// listing it would put a program in front of somebody as affected when the same
+    /// scan had just decided it is not. The two filters are the same expression and must
+    /// stay that way; see <see cref="Affected"/> for why the conjunction
+    /// and not either half.
     /// </summary>
+    /// <summary>
+    /// ONE EXPRESSION FOR THE BANNER'S POPULATION, NAMED SO THE SURFACES CANNOT DRIFT.
+    /// A missing registration is affected unless the app has positively established that
+    /// nothing could reach for the file: the state is superseded or obsoleted AND every
+    /// product sharing the patch was shown to hold no patch that could be uninstalled.
+    ///
+    /// Neither half of that conjunction would do alone. The state alone calls a missing
+    /// superseded file benign because Windows marked the patch replaced, which was
+    /// measured false. The app's own removable verdict alone fires on every missing
+    /// OBSOLETED registration, because such a patch is not removable for a policy reason
+    /// rather than a dangerous one, and that is an alarm at past users about files this
+    /// app itself removed.
+    ///
+    /// AND AN UNESTABLISHED VERDICT IS AFFECTED, deliberately, which is the opposite
+    /// direction from the offer. Both refuse to claim what the app has not shown: there
+    /// that the file is spare, here that its absence is harmless.
+    /// </summary>
+    internal static bool Affected(RegisteredPackage row) =>
+        row.IsMissingFromDisk
+        && !(row.IsSupersededOrObsoleted
+             && row.ProductPatchSetVerdict == ProductPatchSet.AllNonRemovable);
+
     internal static IReadOnlyList<AffectedProduct> Products(IEnumerable<RegisteredPackage> registered)
     {
         var named = new List<AffectedProduct>();
         var unnamed = 0;
 
         foreach (var group in registered
-            .Where(p => p.IsMissingFromDisk)
+            .Where(Affected)
             .GroupBy(p => p.ProductName ?? string.Empty, StringComparer.OrdinalIgnoreCase))
         {
             if (string.IsNullOrWhiteSpace(group.Key)) unnamed += group.Count();

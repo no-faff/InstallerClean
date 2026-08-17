@@ -166,57 +166,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
         int ProductsWithRemovablePatch = 0,
         int ProductsWithPatchSetUnestablished = 0);
 
-    /// <summary>
-    /// What one product's registered patch set says about whether a superseded
-    /// patch sharing that product may be offered.
-    ///
-    /// THE QUESTION IT ANSWERS IS ABOUT THE PRODUCT AND NOT ABOUT ANY ONE PATCH,
-    /// which is the whole reason it exists. A superseded patch B is cached once and
-    /// registered once per product it applies to, so a rollback on ANY of those
-    /// products reaches for the same file. Reading B's own removability answers a
-    /// different question from the one the risk turns on, which is whether anything
-    /// that could supersede B on a product they share can still be uninstalled.
-    ///
-    /// TWO OF THE THREE VALUES WITHHOLD AND THEY ARE NOT THE SAME FINDING. One is
-    /// the app saying it looked and the answer was no; the other is the app saying
-    /// it could not tell. That distinction is carried through to
-    /// <c>Downgrade(claimed, path, withheld:)</c>, which already has both causes and
-    /// gains no vocabulary from this.
-    /// </summary>
-    internal enum ProductPatchSet
-    {
-        /// <summary>
-        /// Every patch registered to this product positively declared
-        /// <c>Uninstallable</c> as a number equal to zero. The only value that
-        /// permits, and deliberately the one requiring the most to have gone right.
-        /// </summary>
-        AllNonRemovable,
-
-        /// <summary>
-        /// At least one registered patch positively declared itself removable, so
-        /// something on this product can be uninstalled and reach for a superseded
-        /// patch's cached file.
-        ///
-        /// IT BEATS <see cref="Unestablished"/> WHEN A PRODUCT MEETS BOTH, because
-        /// it is a finding where the other is an absence of one, and the surface
-        /// that names a cause should name the one that was established. Same
-        /// direction as <see cref="MergeClaim"/>'s second rule.
-        /// </summary>
-        RemovablePatchPresent,
-
-        /// <summary>
-        /// The set could not be established: the key would not open, a patch
-        /// carried no <c>Uninstallable</c>, or one carried a value that was not a
-        /// number. Anything that is not a positive zero lands here or above.
-        ///
-        /// A PRODUCT WITH NO PATCHES AT ALL READS AS THIS AND IT COSTS NOTHING. Such
-        /// a product has no reason to carry a <c>Patches</c> key, so an absent key
-        /// cannot be told from a key that would not open. It does not matter,
-        /// because this verdict is only ever consulted for a product some candidate
-        /// patch is registered to, and such a product has patches by construction.
-        /// </summary>
-        Unestablished,
-    }
 
     /// <summary>
     /// Production constructor: talks to the real msi.dll through
@@ -928,7 +877,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // the rest confirms that no product claims this patch as still needed, and
         // this asks whether anything on a product sharing the patch could be
         // uninstalled and reach for its file.
-        WithholdWhereAProductCanRollBack(
+        JudgeAndWithholdAgainstEveryProductPatchSet(
             claimed, patchClaims, holders, registryPatchSets, apiPatchSets, ct);
 
         foreach (var (path, patchCode) in toConfirm)
@@ -1884,7 +1833,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// patch that is non-removable today can be replaced tomorrow by one that is not.
     /// That is true of every check this app makes and is not a defect here.
     /// </summary>
-    private static void WithholdWhereAProductCanRollBack(
+    private static void JudgeAndWithholdAgainstEveryProductPatchSet(
         Dictionary<string, RegisteredPackage> claimed,
         List<PatchClaim> patchClaims,
         Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? holders,
@@ -1892,14 +1841,33 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets,
         CancellationToken ct)
     {
-        // The patch codes naming each still-removable path, which is what decides
-        // which products the path has to be clean against. Several codes can name one
-        // path, and one code can be registered to several products, so both are
-        // collected rather than reduced.
+        // The patch codes naming each PATCH path, which is what decides which products
+        // the path has to be clean against. Several codes can name one path, and one
+        // code can be registered to several products, so both are collected rather than
+        // reduced.
+        //
+        // IT IS EVERY PATCH ROW AND NOT ONLY THE REMOVABLE ONES, which is wider than
+        // this pass began as, and the extra rows are the reason. The verdict has two
+        // consumers: the offer, which reads it for removable rows, and the missing-file
+        // split, which reads it for rows whose file has gone. Those two sets are
+        // disjoint, a missing file never being offered, so judging removable rows alone
+        // would leave the second consumer with nothing to read.
+        //
+        // AND IT CANNOT BE NARROWED TO "REMOVABLE PLUS MISSING", which is the obvious
+        // saving: this runs in the enumeration, and the enumeration does not know
+        // whether a file exists. Existence is established later, against the injected
+        // filesystem, in FileSystemScanService. So the narrowest set available here is
+        // the one both consumers can draw from, which is the patch rows.
+        //
+        // A state of 2 or 4 is the test rather than "has a patch claim", because that IS
+        // the narrowing: an applied patch and a product's own package can be neither
+        // offered from the registered set nor called a benign absence, so nothing ever
+        // reads their verdict.
         var codesByPath = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
         foreach (var claim in patchClaims)
         {
-            if (!claimed.TryGetValue(claim.LocalPackagePath, out var row) || !row.IsRemovable) continue;
+            if (!claimed.TryGetValue(claim.LocalPackagePath, out var row)) continue;
+            if (row.PatchState is not (2 or 4)) continue;
             if (!codesByPath.TryGetValue(claim.LocalPackagePath, out var codes))
                 codesByPath[claim.LocalPackagePath] = codes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             codes.Add(claim.PatchCode);
@@ -1931,22 +1899,30 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             ct.ThrowIfCancellationRequested();
 
-            // A path another product has already settled needs no second look:
-            // downgrades are one-way and the verdict cannot come back.
-            if (!claimed.TryGetValue(path, out var row) || !row.IsRemovable) continue;
+            if (!claimed.TryGetValue(path, out var row)) continue;
 
+            // THE VERDICT ACROSS EVERY PRODUCT, WORSENED, and never from one of them.
+            // The row carries whichever product code survived the claim merge, which is
+            // whichever was reached first, so reading the verdict off the row's own code
+            // would answer about one product of several and let enumeration order decide
+            // what the app says about a file.
+            var verdict = ProductPatchSet.AllNonRemovable;
             foreach (var productCode in products)
-            {
-                var verdict = ProductVerdict(productCode, registryPatchSets, apiPatchSets);
-                if (verdict == ProductPatchSet.AllNonRemovable) continue;
+                verdict = Worse(verdict, ProductVerdict(productCode, registryPatchSets, apiPatchSets));
 
-                // The two causes reach the two words Downgrade already has, and they
-                // are not the same finding: one is the app having established that
-                // something on this product can be uninstalled, the other is the app
-                // unable to establish that nothing can. Both keep the file.
-                Downgrade(claimed, path, withheld: verdict == ProductPatchSet.Unestablished);
-                break;
-            }
+            claimed[path] = row with { ProductPatchSetVerdict = verdict };
+
+            if (verdict == ProductPatchSet.AllNonRemovable) continue;
+
+            // The downgrade applies to a removable row only, and the guard is not
+            // redundant: this pass now judges rows that never carried a verdict, and
+            // Downgrade's own contract is that it takes one away. The two causes reach
+            // the two words it already has, and they are not the same finding: one is
+            // the app having established that something on this product can be
+            // uninstalled, the other is the app unable to establish that nothing can.
+            // Both keep the file.
+            if (!row.IsRemovable) continue;
+            Downgrade(claimed, path, withheld: verdict == ProductPatchSet.Unestablished);
         }
     }
 
@@ -2678,7 +2654,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// HALF the rule that decides whether a patch's cached .msp is offered, from its
     /// State and Uninstallable values exactly as <c>MsiGetPatchInfoEx</c> returned
     /// them. The other half is
-    /// <see cref="WithholdWhereAProductCanRollBack"/> and a row this returns true for
+    /// <see cref="JudgeAndWithholdAgainstEveryProductPatchSet"/> and a row this returns true for
     /// is still withheld unless every product sharing the patch passes that.
     /// **Nothing may read this alone as permission to remove a file.**
     ///

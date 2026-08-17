@@ -433,20 +433,55 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
             sizedPackages.Add(sized);
 
-            // What the state still decides is which of the two missing counts a
-            // row lands in when its file has gone, and that is a split in the DATA
-            // and not a difference either host may speak: Windows opens every
-            // registered patch's cached file whether superseded or not, so a
-            // record naming an absent file is one condition with one recovery
-            // step. RegisteredPackage.IsMissingFromDisk carries the citations.
+            // THE BANNER FIRES WHEN SOMETHING COULD STILL REACH FOR A FILE THAT IS
+            // GONE. That is the whole rule, and the split below is how it is computed.
+            //
+            // NEITHER BARE AXIS WOULD DO IT, and both were tried. Splitting on the patch
+            // STATE alone says a missing superseded file is benign because Windows has
+            // marked the patch replaced, and that claim was measured false: with the
+            // superseded files gone, uninstalling the superseding patch discarded both
+            // patches and went to the unpatched base, with Windows demonstrably looking
+            // for the absent files. Splitting on the app's own REMOVABLE verdict alone
+            // fires on every missing obsoleted registration, because an obsoleted patch
+            // is not removable in 3.0.0 for a policy reason rather than a dangerous one
+            // — and that is precisely an alarm at past users about files THIS APP
+            // removed, which is the scenario the whole reversal exists to avoid.
+            //
+            // So the benign half is the conjunction: the state is superseded or
+            // obsoleted, AND the app has POSITIVELY established that nothing on any
+            // product sharing the patch could be uninstalled and roll back onto it.
+            // Everything else fires, including every case the app could not establish.
+            //
+            // THE UNESTABLISHED CASE FIRES, WHICH IS THE OPPOSITE DIRECTION FROM THE
+            // OFFER, and the two are not inconsistent: both refuse to claim something
+            // the app has not shown. On the offer, what is unshown is that the file is
+            // spare, so it is kept. Here, what is unshown is that its absence is
+            // harmless, so it is reported. The costs are not symmetrical either: an
+            // alarm nobody needed costs somebody a repair they choose to run, and a
+            // silence that should have been an alarm costs them a failure months later
+            // with nothing pointing back at this.
+            //
+            // AND RemovableWithheld IS THE CLEAREST CASE RATHER THAN THE BORDERLINE ONE,
+            // though v2.3.0 put it on the benign side. What changed is what the flag
+            // means. There it meant one thing: the enumeration was short of a product,
+            // so the whole class was withheld. From 3.0.0 it ALSO means this product's
+            // patch set could not be established, which is exactly the case where the
+            // app cannot say that nothing could reach for the file. Putting that on the
+            // benign side would be the app calling an absence harmless in the one case
+            // where it explicitly failed to establish harmlessness. It falls out of the
+            // conjunction below without a carve-out, because such a row's verdict is
+            // Unestablished by construction.
             if (exists)
             {
                 stillUsedBytes += size;
             }
             else
             {
-                if (pkg.IsSupersededOrObsoleted) missingSuperseded++;
-                else missingNotSuperseded++;
+                // Through the one named predicate rather than the expression written out
+                // again, because the banner's population and the programs it names have
+                // to be the same set and two copies of a conjunction drift.
+                if (MissingFilesReport.Affected(sized)) missingNotSuperseded++;
+                else missingSuperseded++;
                 if (namesFileInFolder) missingInFolder++;
             }
         }

@@ -1,3 +1,4 @@
+using InstallerClean.Models;
 using InstallerClean.Services;
 using Microsoft.Win32;
 
@@ -35,7 +36,7 @@ public class ProductPatchSetTests
 
             var (set, keys, registrations) = Read(products);
 
-            Assert.Equal(InstallerQueryService.ProductPatchSet.AllNonRemovable, set);
+            Assert.Equal(ProductPatchSet.AllNonRemovable, set);
             Assert.Equal(1, keys);
             Assert.Equal(2, registrations);
         });
@@ -55,7 +56,7 @@ public class ProductPatchSetTests
 
             var (set, _, _) = Read(products);
 
-            Assert.Equal(InstallerQueryService.ProductPatchSet.RemovablePatchPresent, set);
+            Assert.Equal(ProductPatchSet.RemovablePatchPresent, set);
         });
     }
 
@@ -77,7 +78,7 @@ public class ProductPatchSetTests
 
             var (set, _, registrations) = Read(products);
 
-            Assert.Equal(InstallerQueryService.ProductPatchSet.Unestablished, set);
+            Assert.Equal(ProductPatchSet.Unestablished, set);
             // Counted anyway: the registration exists and was seen, which is what the
             // shape figure is for. Only the verdict withholds.
             Assert.Equal(1, registrations);
@@ -94,7 +95,7 @@ public class ProductPatchSetTests
 
             var (set, _, _) = Read(products);
 
-            Assert.Equal(InstallerQueryService.ProductPatchSet.Unestablished, set);
+            Assert.Equal(ProductPatchSet.Unestablished, set);
         });
     }
 
@@ -112,7 +113,7 @@ public class ProductPatchSetTests
 
             var (set, _, _) = Read(products);
 
-            Assert.Equal(InstallerQueryService.ProductPatchSet.RemovablePatchPresent, set);
+            Assert.Equal(ProductPatchSet.RemovablePatchPresent, set);
         });
     }
 
@@ -129,7 +130,7 @@ public class ProductPatchSetTests
 
             var (set, keys, registrations) = Read(products);
 
-            Assert.Equal(InstallerQueryService.ProductPatchSet.Unestablished, set);
+            Assert.Equal(ProductPatchSet.Unestablished, set);
             Assert.Equal(0, keys);
             Assert.Equal(0, registrations);
         });
@@ -148,7 +149,7 @@ public class ProductPatchSetTests
 
             var (set, keys, registrations) = Read(products);
 
-            Assert.Equal(InstallerQueryService.ProductPatchSet.AllNonRemovable, set);
+            Assert.Equal(ProductPatchSet.AllNonRemovable, set);
             Assert.Equal(1, keys);
             Assert.Equal(0, registrations);
         });
@@ -177,7 +178,7 @@ public class ProductPatchSetTests
 
             var (set, _, registrations) = Read(products);
 
-            Assert.Equal(InstallerQueryService.ProductPatchSet.RemovablePatchPresent, set);
+            Assert.Equal(ProductPatchSet.RemovablePatchPresent, set);
             Assert.Equal(2, registrations);
         });
     }
@@ -189,12 +190,12 @@ public class ProductPatchSetTests
         // subtree the walk reached first. A Theory would be the natural shape and
         // cannot be used: the enum is internal, and an internal parameter type on the
         // public method xUnit needs is a compile error.
-        const InstallerQueryService.ProductPatchSet clean =
-            InstallerQueryService.ProductPatchSet.AllNonRemovable;
-        const InstallerQueryService.ProductPatchSet unknown =
-            InstallerQueryService.ProductPatchSet.Unestablished;
-        const InstallerQueryService.ProductPatchSet removable =
-            InstallerQueryService.ProductPatchSet.RemovablePatchPresent;
+        const ProductPatchSet clean =
+            ProductPatchSet.AllNonRemovable;
+        const ProductPatchSet unknown =
+            ProductPatchSet.Unestablished;
+        const ProductPatchSet removable =
+            ProductPatchSet.RemovablePatchPresent;
 
         Assert.Equal(clean, InstallerQueryService.Worse(clean, clean));
 
@@ -216,7 +217,7 @@ public class ProductPatchSetTests
         patch.SetValue("State", 2, RegistryValueKind.DWord);
     }
 
-    private static (InstallerQueryService.ProductPatchSet Set, int Keys, int Registrations) Read(
+    private static (ProductPatchSet Set, int Keys, int Registrations) Read(
         RegistryKey products)
     {
         var keys = 0;

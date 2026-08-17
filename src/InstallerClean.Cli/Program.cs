@@ -882,24 +882,25 @@ internal static class Program
                     arg, scanResult.UnaccountedProductCount));
         }
 
-        // Every registration naming a file that is not there, superseded ones
-        // included: this took the non-superseded half until 3.0.0, on the reading
-        // that a superseded patch's file having gone was its expected end state.
-        // Windows opens every registered patch's cached file whichever state it
-        // carries, so the two are one condition and the line speaks for both.
-        if (scanResult.MissingFromDiskCount > 0)
+        // THE AFFECTED HALF, and the two hosts must not diverge on which population
+        // this is. A registration whose absence the app positively established to be
+        // harmless is not reported: the state alone would not establish that, Windows
+        // opening every registered patch's cached file whichever state it carries, so
+        // what earns the exclusion is the state CONJOINED with every sharing product
+        // having been shown to hold no patch that could be uninstalled.
+        if (scanResult.MissingNotSupersededCount > 0)
         {
             var programs = MissingFilesReport.Inline(
                 MissingFilesReport.Products(scanResult.RegisteredPackages));
             Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(scanResult.MissingFromDiskCount,
+                DisplayHelpers.Pluralise(scanResult.MissingNotSupersededCount,
                     Strings.Cli_MissingFromDisk_Singular,
                     Strings.Cli_MissingFromDisk_Plural,
                     "Cli.MissingFromDisk"),
-                scanResult.MissingFromDiskCount, programs));
+                scanResult.MissingNotSupersededCount, programs));
             MachineContract.WriteEventLog(CliEventClass.ScanMissingFilesNotice,
                 () => string.Format(Strings.Cli_EventLogMissingFromDisk,
-                    arg, scanResult.MissingFromDiskCount));
+                    arg, scanResult.MissingNotSupersededCount));
         }
     }
 

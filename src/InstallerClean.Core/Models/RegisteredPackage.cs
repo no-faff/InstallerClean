@@ -30,6 +30,32 @@ namespace InstallerClean.Models;
 /// came back. Nothing may put a row carrying either flag under a sentence that
 /// names a claim, because there is no claim to name.
 /// </summary>
+/// <param name="ProductPatchSetVerdict">
+/// Whether anything on any product this registration is registered under could be
+/// uninstalled and roll back onto its cached file, across the union of every source
+/// that can see those products' patch sets.
+///
+/// SEPARATE FROM <paramref name="IsRemovable"/> BECAUSE THAT FLAG CONFLATES THREE
+/// FACTS AND THIS IS ONLY ONE OF THEM. A row is removable where the state read
+/// SUPERSEDED, its own <c>Uninstallable</c> positively read zero, AND this verdict is
+/// clean. So a clean verdict cannot be recovered from the flag: an OBSOLETED row on
+/// entirely clean products is not removable, because the rule gates on superseded, and
+/// is then indistinguishable from a superseded row that failed this very condition.
+/// Those two need opposite treatment where a missing file is being judged, which is
+/// what this member exists for.
+///
+/// IT IS STAMPED FOR PATCH ROWS ONLY, meaning a state of 2 or 4, and defaults to
+/// <see cref="ProductPatchSet.Unestablished"/> everywhere else. That is not a claim
+/// about those other rows: it is the honest default for a question nobody asked of
+/// them. Its two consumers only ever read it for a patch row, because a product's own
+/// package and an applied patch can be neither offered from the registered set nor
+/// called a benign absence.
+///
+/// DEFAULTING TO UNESTABLISHED RATHER THAN CLEAN IS LOAD-BEARING. A row nobody judged
+/// must not read as a row judged safe, and every consumer treats this value's absence
+/// of a positive as a reason to act cautiously: to withhold on the offer, and to raise
+/// the alarm on a missing file.
+/// </param>
 public record RegisteredPackage(
     string LocalPackagePath,
     string ProductName,
@@ -38,6 +64,7 @@ public record RegisteredPackage(
     bool IsRemovable = false,
     bool RemovableWithheld = false,
     bool VerdictUnreadable = false,
+    ProductPatchSet ProductPatchSetVerdict = ProductPatchSet.Unestablished,
     long FileSizeBytes = 0,
     bool FileExists = true)
 {

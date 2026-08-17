@@ -112,15 +112,24 @@ public partial class ScanViewModel : ObservableObject
     };
 
     /// <summary>
-    /// Every registration this scan found naming a file that is not on disk,
-    /// whatever state the record carries. Drives the missing-files line.
+    /// The registrations this scan found naming a file that is not on disk AND whose
+    /// absence it could not establish to be harmless. Drives the missing-files line, and
+    /// it is the count the line prints as well as the condition that fires it, so the two
+    /// cannot disagree.
     ///
-    /// IT USED TO BE HALF OF THAT. The superseded and obsoleted registrations
-    /// were counted apart and the line never fired on them, on the reading that
-    /// such a file having gone was its expected end state. Windows opens every
-    /// registered patch's cached file either way, so they are the same condition
-    /// and the line speaks for both; the split survives in the scan result for
-    /// anyone reading the data.
+    /// IT IS A HALF, AND WHICH HALF HAS MOVED TWICE. It was once the registrations
+    /// carrying no superseded or obsoleted state, on the reading that such a file having
+    /// gone was its expected end state; that reading is false, Windows opening every
+    /// registered patch's cached file whichever state it carries. It was then every
+    /// missing registration, which alarms past users of this app about files the app
+    /// itself removed. It is now neither axis but the conjunction: benign means the state
+    /// is superseded or obsoleted AND every product sharing the patch was shown to hold
+    /// no patch that could be uninstalled and roll back onto the file.
+    ///
+    /// <see cref="MissingFilesReport.Affected"/> is that expression, named once, and the
+    /// programs this line names come off the same predicate. The full total still travels
+    /// in the scan result and in the report payload, where a public chart reads it with no
+    /// version gate.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMissingFromDisk))]
@@ -304,7 +313,13 @@ public partial class ScanViewModel : ObservableObject
             RegisteredSizeDisplay = registeredSize;
             OrphanedFileCount = orphanedCount;
             OrphanedSizeDisplay = orphanedSize;
-            MissingFromDiskCount = result.MissingFromDiskCount;
+            // THE AFFECTED HALF, NOT THE SUM, which is the line item 5 moves back. The
+            // banner fires where something could still reach for a file that is gone, so
+            // a registration whose absence the app positively established to be harmless
+            // is not in the count and its program is not named. Both come off the same
+            // predicate in MissingFilesReport, and the sum still travels in the report
+            // payload, where a public chart reads it with no version gate.
+            MissingFromDiskCount = result.MissingNotSupersededCount;
             MissingFromDiskPrograms = missingPrograms;
             UnaccountedProductCount = result.UnaccountedProductCount;
             HasScanned = true;

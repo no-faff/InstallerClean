@@ -1485,7 +1485,7 @@ public class InstallerQueryServiceUnitTests
     /// offer has to say what the registry saw.
     /// </summary>
     private static async Task<InstallerQueryResult> RunWithPatchSets(
-        FakeMsiApi msi, params (string Product, InstallerQueryService.ProductPatchSet Set)[] sets)
+        FakeMsiApi msi, params (string Product, ProductPatchSet Set)[] sets)
     {
         var map = sets.ToDictionary(x => x.Product, x => x.Set, StringComparer.OrdinalIgnoreCase);
         return await new InstallerQueryService(
@@ -1507,7 +1507,7 @@ public class InstallerQueryServiceUnitTests
         msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: "0");
 
         var result = await RunWithPatchSets(msi,
-            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable));
+            ("{A}", ProductPatchSet.AllNonRemovable));
 
         var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
         Assert.True(row.IsRemovable);
@@ -1528,7 +1528,7 @@ public class InstallerQueryServiceUnitTests
         msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: "0");
 
         var result = await RunWithPatchSets(msi,
-            ("{A}", InstallerQueryService.ProductPatchSet.RemovablePatchPresent));
+            ("{A}", ProductPatchSet.RemovablePatchPresent));
 
         var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
         Assert.False(row.IsRemovable);
@@ -1546,7 +1546,7 @@ public class InstallerQueryServiceUnitTests
         msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: "0");
 
         var result = await RunWithPatchSets(msi,
-            ("{A}", InstallerQueryService.ProductPatchSet.Unestablished));
+            ("{A}", ProductPatchSet.Unestablished));
 
         var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
         Assert.False(row.IsRemovable);
@@ -1589,8 +1589,8 @@ public class InstallerQueryServiceUnitTests
         }
 
         var result = await RunWithPatchSets(msi,
-            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable),
-            ("{B}", InstallerQueryService.ProductPatchSet.RemovablePatchPresent));
+            ("{A}", ProductPatchSet.AllNonRemovable),
+            ("{B}", ProductPatchSet.RemovablePatchPresent));
 
         var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
         Assert.False(row.IsRemovable);
@@ -1607,7 +1607,7 @@ public class InstallerQueryServiceUnitTests
         msi.AddPatch("{A}", "{P}", CleanPatch, state: "4", uninstallable: "0");
 
         var result = await RunWithPatchSets(msi,
-            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable));
+            ("{A}", ProductPatchSet.AllNonRemovable));
 
         var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
         Assert.False(row.IsRemovable);
@@ -1628,7 +1628,7 @@ public class InstallerQueryServiceUnitTests
         msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: uninstallable);
 
         var result = await RunWithPatchSets(msi,
-            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable));
+            ("{A}", ProductPatchSet.AllNonRemovable));
 
         Assert.False(result.Packages.Single(p => p.LocalPackagePath == CleanPatch).IsRemovable);
     }
@@ -1647,7 +1647,7 @@ public class InstallerQueryServiceUnitTests
         msi.PatchPropertyResult[("{P}", "{A}", "Uninstallable")] = BadConfiguration;
 
         var result = await RunWithPatchSets(msi,
-            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable));
+            ("{A}", ProductPatchSet.AllNonRemovable));
 
         var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
         Assert.False(row.IsRemovable);
