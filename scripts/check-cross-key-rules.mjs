@@ -47,7 +47,6 @@ const MUST_AGREE = [
   // screen reader never meets the glyph mapping, and the name is the same words
   // in ordinary case. It exists for the casing alone.
   { label: 'Section.SayThanks', name: 'Automation.SayThanks' },
-  { label: 'Section.Registered.Products', name: 'Automation.Section.Products' },
   { label: 'Section.Registered.Patches', name: 'Automation.Section.Patches' },
   { label: 'Section.Registered.Details', name: 'Automation.Section.ProductDetails' },
   { label: 'Section.Backup.Folder', name: 'Automation.Section.BackupFolder' },
