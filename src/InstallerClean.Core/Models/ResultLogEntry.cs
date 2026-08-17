@@ -459,8 +459,13 @@ public sealed record MachineInfo(
 /// ever carried them.
 /// </param>
 /// <param name="MissingNeededCount">
-/// The half of <paramref name="MissingFromDiskCount"/> whose registration carries
-/// no superseded or obsoleted state. Added BESIDE the total rather than replacing
+/// The half of <paramref name="MissingFromDiskCount"/> whose absence this scan could
+/// not establish to be harmless. NOT the half carrying no superseded or obsoleted
+/// state, which is what this said and what the axis stopped being in 3.0.0: a row
+/// leaves this count only where the state is superseded or obsoleted AND the
+/// per-product condition positively established that nothing could roll back onto
+/// the file. The key name is on the wire and stays; what was wrong was the
+/// description of what fills it. Added BESIDE the total rather than replacing
 /// it: the total is read by the public chart with no version gate, and replacing
 /// it would split a live series at this release. The other half falls out by
 /// subtraction.
@@ -579,7 +584,7 @@ public sealed record ScanInfo(
             scan.MissingFromDiskCount,
             // The wire shape is unchanged and the population behind this one has
             // moved a little; see the field's own note.
-            scan.MissingNotSupersededCount,
+            scan.MissingAffectedCount,
             scan.WithheldCount,
             scan.Census.UnreadableProducts,
             scan.Census.SkippedProductRows,

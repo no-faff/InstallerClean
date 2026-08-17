@@ -330,7 +330,7 @@ public partial class ScanViewModel : ObservableObject
             // is not in the count and its program is not named. Both come off the same
             // predicate in MissingFilesReport, and the sum still travels in the report
             // payload, where a public chart reads it with no version gate.
-            MissingFromDiskCount = result.MissingNotSupersededCount;
+            MissingFromDiskCount = result.MissingAffectedCount;
             MissingFromDiskPrograms = missingPrograms;
             UnaccountedProductCount = result.UnaccountedProductCount;
             HasScanned = true;

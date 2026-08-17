@@ -18,7 +18,7 @@ namespace InstallerClean.Helpers;
 /// superseded, because Windows opens every patch registered to a product either
 /// way and a missing one gives error 1635
 /// (<see cref="RegisteredPackage.IsMissingFromDisk"/> carries the citations). The
-/// data keeps the split, in <see cref="ScanResult.MissingSupersededCount"/> and
+/// data keeps the split, in <see cref="ScanResult.MissingUnaffectedCount"/> and
 /// its sibling; the copy does not.
 ///
 /// AND IT SAYS NOTHING ABOUT WHAT REMOVED THEM, which is not a nicety. Every tool

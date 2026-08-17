@@ -888,19 +888,19 @@ internal static class Program
         // opening every registered patch's cached file whichever state it carries, so
         // what earns the exclusion is the state CONJOINED with every sharing product
         // having been shown to hold no patch that could be uninstalled.
-        if (scanResult.MissingNotSupersededCount > 0)
+        if (scanResult.MissingAffectedCount > 0)
         {
             var programs = MissingFilesReport.Inline(
                 MissingFilesReport.Products(scanResult.RegisteredPackages));
             Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(scanResult.MissingNotSupersededCount,
+                DisplayHelpers.Pluralise(scanResult.MissingAffectedCount,
                     Strings.Cli_MissingFromDisk_Singular,
                     Strings.Cli_MissingFromDisk_Plural,
                     "Cli.MissingFromDisk"),
-                scanResult.MissingNotSupersededCount, programs));
+                scanResult.MissingAffectedCount, programs));
             MachineContract.WriteEventLog(CliEventClass.ScanMissingFilesNotice,
                 () => string.Format(Strings.Cli_EventLogMissingFromDisk,
-                    arg, scanResult.MissingNotSupersededCount));
+                    arg, scanResult.MissingAffectedCount));
         }
     }
 

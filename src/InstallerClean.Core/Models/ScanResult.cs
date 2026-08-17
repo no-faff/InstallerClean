@@ -47,11 +47,25 @@ namespace InstallerClean.Models;
 /// disk. Excludes <see cref="MissingFromDiskCount"/> entries so the
 /// total never includes non-existent files.
 /// </param>
-/// <param name="MissingNotSupersededCount">
-/// Registrations whose <c>LocalPackage</c> file is not on disk and which carry no
-/// superseded or obsoleted state: a product's own cached package, an applied
-/// patch, a patch whose state no read established, a path only the registry
-/// fallback named.
+/// <param name="MissingAffectedCount">
+/// Registrations whose <c>LocalPackage</c> file is not on disk and whose absence
+/// this scan could NOT establish to be harmless. It is the population the
+/// missing-files line speaks for, and it is <c>MissingFilesReport.Affected</c> that
+/// decides it.
+///
+/// THE AXIS IS A CONJUNCTION AND IT IS NOT THE PATCH STATE. A row is left out of
+/// this count only where Windows reports the patch superseded or obsoleted AND the
+/// per-product condition positively established that nothing on any product sharing
+/// it could be uninstalled and roll back onto its file. Everything else is in here:
+/// a product's own cached package, an applied patch, a patch whose state no read
+/// established, a path only the registry fallback named, and every superseded row
+/// whose product condition could not be settled.
+///
+/// IT WAS CALLED <c>MissingNotSupersededCount</c> AND THAT NAME DESCRIBED AN AXIS
+/// THE CODE STOPPED USING. The split moved to the conjunction in 3.0.0 and the two
+/// names stayed behind, so both said the state decided it when the state is half of
+/// what decides it. A name is a specification to the next reader, and these two were
+/// specifying the rule the release had just replaced.
 ///
 /// IT STATES NO CAUSE AND NOTHING BUILT ON IT MAY EITHER. It used to say a
 /// non-zero value means another tool removed files Windows still references. That
@@ -61,20 +75,26 @@ namespace InstallerClean.Models;
 /// exactly this record. What the number says is that Windows holds records naming
 /// files that are not there.
 /// </param>
-/// <param name="MissingSupersededCount">
-/// The same condition where the registration is a patch Windows reports
-/// superseded (2) or obsoleted (4). Note the width: the report schema's
-/// <c>supersededCount</c> is state 2 alone, and this is both states, because
-/// nothing here turns on which of them a record carries.
+/// <param name="MissingUnaffectedCount">
+/// The other half: registrations whose file is not on disk and whose absence this
+/// scan POSITIVELY established to be harmless. Windows reports the patch superseded
+/// or obsoleted, and every product sharing it was established to hold no patch that
+/// could be uninstalled and roll back onto its file.
 ///
-/// COUNTED APART FROM ITS SIBLING AND SPOKEN WITH IT. The split is kept so the
-/// data does not lose it and anyone reading a report can still see the shape of a
-/// machine. It earns no sentence of its own: the two have the same consequence
-/// (Windows opens every registered patch's file whether superseded or not, and a
-/// missing one gives error 1635) and the same recovery step, and the only thing
-/// that ever separated them is what removed the file, which no surface may speak
-/// to. <see cref="RegisteredPackage.IsMissingFromDisk"/> carries the citations
-/// and is the property both hosts read.
+/// BOTH HALVES OF THAT CONJUNCTION ARE LOAD-BEARING AND THE STATE ALONE IS NOT
+/// ENOUGH. Splitting on the state was tried and the claim it makes was measured
+/// false: with the superseded files gone, uninstalling the superseding patch
+/// discarded both patches and went to the unpatched base, with Windows demonstrably
+/// looking for the absent files. So a superseded row whose product condition could
+/// not be settled is NOT in here; it is in the affected half, and the
+/// missing-files line speaks for it.
+///
+/// COUNTED APART FROM ITS SIBLING AND NOT SPOKEN. The split is data, kept so a
+/// report can still show the shape of a machine, and no surface states it. It earns
+/// no sentence of its own: what separates the two is what this scan could
+/// establish, which is a fact about the scan rather than about the file.
+/// <see cref="RegisteredPackage.IsMissingFromDisk"/> carries the citations and is
+/// the property both hosts read.
 /// </param>
 /// <param name="UnaccountedProductCount">
 /// Installed products this scan did not account for, carried through from
@@ -173,7 +193,7 @@ namespace InstallerClean.Models;
 /// <see cref="RegisteredUnjudgedCount"/> instead, a patch whose State read gave 2
 /// or 4 and whose Uninstallable read then failed, so the two must never be added.
 /// Ones whose file has already gone are not here at all; they are in
-/// <see cref="MissingSupersededCount"/>.
+/// <see cref="MissingUnaffectedCount"/>.
 /// </param>
 /// <param name="RegisteredSupersededBytes">
 /// The same population's bytes. It is the figure nobody had: the field data
@@ -240,8 +260,8 @@ public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
     long RegisteredTotalBytes,
-    int MissingNotSupersededCount = 0,
-    int MissingSupersededCount = 0,
+    int MissingAffectedCount = 0,
+    int MissingUnaffectedCount = 0,
     int UnaccountedProductCount = 0,
     int WithheldCount = 0,
     EnumerationCensus Census = default,
@@ -261,7 +281,7 @@ public record ScanResult(
     /// sub-counts and the figure both hosts speak, the split beneath it being
     /// data rather than copy.
     /// </summary>
-    public int MissingFromDiskCount => MissingNotSupersededCount + MissingSupersededCount;
+    public int MissingFromDiskCount => MissingAffectedCount + MissingUnaffectedCount;
 
     /// <summary>Total bytes of the files this scan is offering for removal.</summary>
     public long RemovableTotalBytes => RemovableFiles.Sum(f => f.SizeBytes);

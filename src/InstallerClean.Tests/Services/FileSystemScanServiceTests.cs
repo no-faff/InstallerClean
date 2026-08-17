@@ -140,7 +140,7 @@ public class FileSystemScanServiceTests
         // counter instead of this one being narrowed: a needed file registered
         // anywhere and now gone is exactly as much of a problem, so the alarm
         // still fires on all forty.
-        Assert.Equal(40, result.MissingNotSupersededCount);
+        Assert.Equal(40, result.MissingAffectedCount);
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
 
         Assert.Single(result.RemovableFiles);
-        Assert.Equal(4, result.MissingNotSupersededCount);
+        Assert.Equal(4, result.MissingAffectedCount);
     }
 
     [Fact]
@@ -267,7 +267,7 @@ public class FileSystemScanServiceTests
         var result = await ScanWithRegisteredSplit(present: 3, missing: 30);
 
         Assert.Single(result.RemovableFiles);
-        Assert.Equal(30, result.MissingNotSupersededCount);
+        Assert.Equal(30, result.MissingAffectedCount);
     }
 
     [Fact]
@@ -295,7 +295,7 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
 
         Assert.Equal(2, result.RemovableFiles.Count);
-        Assert.Equal(30, result.MissingNotSupersededCount);
+        Assert.Equal(30, result.MissingAffectedCount);
     }
 
     [Fact]
@@ -533,8 +533,8 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(
             query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
 
-        Assert.Equal(1, result.MissingSupersededCount);
-        Assert.Equal(0, result.MissingNotSupersededCount);
+        Assert.Equal(1, result.MissingUnaffectedCount);
+        Assert.Equal(0, result.MissingAffectedCount);
         // The split is data and the total is what both hosts speak.
         Assert.Equal(1, result.MissingFromDiskCount);
     }
@@ -551,8 +551,8 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(
             query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
 
-        Assert.Equal(1, result.MissingNotSupersededCount);
-        Assert.Equal(0, result.MissingSupersededCount);
+        Assert.Equal(1, result.MissingAffectedCount);
+        Assert.Equal(0, result.MissingUnaffectedCount);
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
@@ -711,7 +711,7 @@ public class FileSystemScanServiceTests
         Assert.Equal(2, result.RegisteredPackages.Count);
         // Only the present package contributes bytes; the missing one is excluded.
         Assert.Equal(100, result.RegisteredTotalBytes);
-        Assert.Equal(1, result.MissingNotSupersededCount);
+        Assert.Equal(1, result.MissingAffectedCount);
         Assert.Single(result.RemovableFiles);
     }
 
@@ -804,7 +804,7 @@ public class FileSystemScanServiceTests
 
         Assert.Equal(2, result.RegisteredSupersededCount);
         Assert.Equal(250, result.RegisteredSupersededBytes);
-        Assert.Equal(1, result.MissingSupersededCount);
+        Assert.Equal(1, result.MissingUnaffectedCount);
     }
 
     [Fact]
@@ -833,8 +833,8 @@ public class FileSystemScanServiceTests
 
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.RegisteredPackages);
-        Assert.Equal(1, result.MissingSupersededCount);
-        Assert.Equal(0, result.MissingNotSupersededCount);
+        Assert.Equal(1, result.MissingUnaffectedCount);
+        Assert.Equal(0, result.MissingAffectedCount);
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
@@ -861,8 +861,8 @@ public class FileSystemScanServiceTests
 
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.RegisteredPackages);
-        Assert.Equal(1, result.MissingNotSupersededCount);
-        Assert.Equal(0, result.MissingSupersededCount);
+        Assert.Equal(1, result.MissingAffectedCount);
+        Assert.Equal(0, result.MissingUnaffectedCount);
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
@@ -1049,7 +1049,7 @@ public class FileSystemScanServiceTests
         var result = await svc.ScanAsync();
 
         Assert.Equal(2, result.RemovableFiles.Count);
-        Assert.Equal(2, result.MissingNotSupersededCount);
+        Assert.Equal(2, result.MissingAffectedCount);
     }
 
     [Fact]

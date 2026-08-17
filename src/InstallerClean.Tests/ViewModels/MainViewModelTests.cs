@@ -2061,7 +2061,7 @@ public class MainViewModelTests
                 new RegisteredPackage(@"C:\Windows\Installer\c.msi", "Fabrikam Suite", "{bbb}", FileExists: false),
             },
             RegisteredTotalBytes: 0,
-            MissingNotSupersededCount: 3);
+            MissingAffectedCount: 3);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 
@@ -2093,8 +2093,8 @@ public class MainViewModelTests
                     PatchState: 2, FileExists: false),
             },
             RegisteredTotalBytes: 0,
-            MissingNotSupersededCount: 0,
-            MissingSupersededCount: 1);
+            MissingAffectedCount: 0,
+            MissingUnaffectedCount: 1);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 
@@ -2121,7 +2121,7 @@ public class MainViewModelTests
                 new RegisteredPackage(@"C:\Windows\Installer\a.msi", "Contoso Reader", "{aaa}", FileExists: false),
             },
             RegisteredTotalBytes: 0,
-            MissingNotSupersededCount: 1);
+            MissingAffectedCount: 1);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 

@@ -193,8 +193,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         int supersededRegistrations = 0;
         int obsoletedRegistrations = 0;
         int refusedCandidates = 0;
-        int missingNotSuperseded = 0;
-        int missingSuperseded = 0;
+        int missingAffected = 0;
+        int missingUnaffected = 0;
         // The correlation gate's inputs, counted here rather than derived from the
         // branches below because they answer a different question from the ones
         // those branches exist for. Every registered row is measured by ONE rule,
@@ -525,8 +525,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 // Through the one named predicate rather than the expression written out
                 // again, because the banner's population and the programs it names have
                 // to be the same set and two copies of a conjunction drift.
-                if (MissingFilesReport.Affected(sized)) missingNotSuperseded++;
-                else missingSuperseded++;
+                if (MissingFilesReport.Affected(sized)) missingAffected++;
+                else missingUnaffected++;
                 if (namesFileInFolder) missingInFolder++;
             }
         }
@@ -745,7 +745,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // back is only ever interesting alongside the reason, and the four reasons
         // had no honest superordinate to report them under.
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes,
-            missingNotSuperseded, missingSuperseded,
+            missingAffected, missingUnaffected,
             // WITHHELD IS A REAL FIGURE AGAIN AND WAS A LITERAL ZERO IN THE COMMITS
             // BETWEEN. It counts what the withholding cost this run: superseded rows on
             // disk that the scan would have offered had it been able to establish that

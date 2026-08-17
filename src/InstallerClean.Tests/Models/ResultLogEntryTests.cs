@@ -375,7 +375,7 @@ public class ResultLogEntryTests
         // and the benign half falls out by subtraction.
         var scan = new ScanResult(
             Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-            MissingNotSupersededCount: 2, MissingSupersededCount: 7);
+            MissingAffectedCount: 2, MissingUnaffectedCount: 7);
 
         var info = ScanInfo.From(scan, 10);
 
