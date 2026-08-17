@@ -81,8 +81,84 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(expectedState, row.PatchState);
     }
 
+    /// <summary>
+    /// The row is kept and the WITHHOLDING IS THE POINT, not a side effect: the
+    /// enumeration did not account for every product, and a scan in that state
+    /// withholds the whole removable class rather than offering what it happened to
+    /// see. Every test using this asserts a non-zero unaccounted count of its own,
+    /// which is the condition that fires it.
+    ///
+    /// IT IS THE OPPOSITE CLAIM FROM <see cref="AssertKeptWithNoVerdict"/> AND THE
+    /// PAIR IS DELIBERATE. There the row carries no verdict because none was
+    /// reached; here a verdict was reached and taken away. A single assertion
+    /// cannot tell those apart, which is how two dozen tests came to make the
+    /// weaker claim while their fixtures were making the stronger one.
+    /// </summary>
+    private static void AssertWithheldByADegradedEnumeration(RegisteredPackage row, int expectedState)
+    {
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(expectedState, row.PatchState);
+    }
+
+    /// <summary>
+    /// The row is OFFERED: a superseded patch that declares itself non-removable, on
+    /// a product whose registered patch set was established and holds nothing that
+    /// could be uninstalled and roll back onto its file.
+    ///
+    /// THIS IS THE PATH PRODUCTION TAKES and almost nothing in this file was
+    /// exercising it. A fixture that supplies no per-product patch sets makes every
+    /// product read unestablished, so every superseded row is withheld and the whole
+    /// file was testing the degraded machine. Supplying them is what makes a test
+    /// about the ordinary one.
+    /// </summary>
+    private static void AssertOffered(RegisteredPackage row, int expectedState)
+    {
+        Assert.True(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+        Assert.Equal(expectedState, row.PatchState);
+    }
+
     private static async Task<InstallerQueryResult> Run(FakeMsiApi msi) =>
         await new InstallerQueryService(msi, NoFallback).GetRegisteredPackagesAsync();
+
+    /// <summary>
+    /// Every product in the fixture as a HEALTHY machine's registry reports it: the
+    /// patch set established, and holding nothing that could be uninstalled and roll
+    /// back onto a superseded patch's file.
+    ///
+    /// WITHOUT THIS A FIXTURE IS A BROKEN MACHINE AND MOST OF THIS FILE WAS ONE.
+    /// A run supplying no per-product patch sets makes every product read
+    /// unestablished, so every superseded row is withheld and a test that meant to
+    /// be about something else quietly becomes a test about the degraded path.
+    /// </summary>
+    private static Dictionary<string, ProductPatchSet> HealthyPatchSets(FakeMsiApi msi)
+    {
+        var map = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
+        // Indexer rather than ToDictionary: a fixture may add the same code twice, or
+        // an empty one, and neither is this helper's business to reject.
+        foreach (var (code, _) in msi.Products) map[code] = ProductPatchSet.AllNonRemovable;
+        return map;
+    }
+
+    /// <summary>
+    /// <see cref="Run(FakeMsiApi)"/> against an ordinary machine: the same
+    /// enumeration, with the registry's per-product patch verdicts supplied.
+    /// </summary>
+    private static async Task<InstallerQueryResult> RunHealthy(FakeMsiApi msi, int fallbackFailures = 0) =>
+        await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(
+                fallbackFailures, 0, ProductPatchSets: HealthyPatchSets(msi)))
+            .GetRegisteredPackagesAsync();
+
+    /// <summary>
+    /// <see cref="RunAgainstRegistry"/> against an ordinary machine, for the tests
+    /// whose subject is the registry headcount rather than the patch verdict.
+    /// </summary>
+    private static async Task<InstallerQueryResult> RunAgainstRegistryHealthy(
+        FakeMsiApi msi, int registryProducts) =>
+        await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(
+                0, registryProducts, ProductPatchSets: HealthyPatchSets(msi)))
+            .GetRegisteredPackagesAsync();
 
     /// <summary>
     /// Runs with a fallback that reports <paramref name="fallbackFailures"/>
@@ -473,7 +549,7 @@ public class InstallerQueryServiceUnitTests
 
         Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\displaylink.msi");
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        AssertKeptWithNoVerdict(row, expectedState: 2);
+        AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount); // the degraded product counts exactly once
         Assert.True(result.RecordsIncomplete);
     }
@@ -522,7 +598,7 @@ public class InstallerQueryServiceUnitTests
 
         Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\b.msi");
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        AssertKeptWithNoVerdict(row, expectedState: 2);
+        AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
         Assert.True(result.RecordsIncomplete);
     }
@@ -666,9 +742,9 @@ public class InstallerQueryServiceUnitTests
         var msi = OneProductWithASupersededPatch(patch);
         for (var i = 1; i < enumerated; i++) msi.AddProduct($"{{P{i}}}");
 
-        var result = await RunAgainstRegistry(msi, registryProducts: registryProducts);
+        var result = await RunAgainstRegistryHealthy(msi, registryProducts);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
+        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
@@ -692,7 +768,7 @@ public class InstallerQueryServiceUnitTests
             .GetRegisteredPackagesAsync();
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == patch);
-        AssertKeptWithNoVerdict(row, expectedState: 2);
+        AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(2, result.UnaccountedProductCount);
         // The specific cause, not the sum it feeds: nothing could be asked, as
         // against a question asked and refused.
@@ -718,7 +794,7 @@ public class InstallerQueryServiceUnitTests
             .GetRegisteredPackagesAsync();
 
         Assert.NotEmpty(result.Packages);
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
+        AssertWithheldByADegradedEnumeration(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
     }
 
     [Fact]
@@ -769,7 +845,7 @@ public class InstallerQueryServiceUnitTests
             registryProducts: 1, unclaimedProductFiles: 1);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == patch);
-        AssertKeptWithNoVerdict(row, expectedState: 2);
+        AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -786,7 +862,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await RunAgainstRegistry(msi, registryProducts: 100, unclaimedProductFiles: 10);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
+        AssertWithheldByADegradedEnumeration(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(10, result.UnaccountedProductCount);
     }
 
@@ -801,7 +877,7 @@ public class InstallerQueryServiceUnitTests
         var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch),
             registryProducts: 1, unclaimedPatchFiles: 3);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
+        AssertWithheldByADegradedEnumeration(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -835,7 +911,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await RunAgainstRegistry(msi, registryProducts: 2, unclaimedProductFiles: 1);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
+        AssertWithheldByADegradedEnumeration(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -847,9 +923,9 @@ public class InstallerQueryServiceUnitTests
         // superseded-patch cleanup has to survive it or the feature is dead.
         const string patch = @"C:\Windows\Installer\superseded.msp";
 
-        var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch), registryProducts: 1);
+        var result = await RunAgainstRegistryHealthy(OneProductWithASupersededPatch(patch), 1);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
+        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
@@ -1052,9 +1128,9 @@ public class InstallerQueryServiceUnitTests
         msi.AddProduct("{A}");
         msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
 
-        var result = await Run(msi);
+        var result = await RunHealthy(msi);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
+        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
         Assert.False(result.RecordsIncomplete);
     }
@@ -1073,7 +1149,7 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        AssertKeptWithNoVerdict(row, expectedState: 2);
+        AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -1094,7 +1170,7 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        AssertKeptWithNoVerdict(row, expectedState: 2);
+        AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -1202,7 +1278,7 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
-        AssertKeptWithNoVerdict(row, expectedState: 2);
+        AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -1223,7 +1299,7 @@ public class InstallerQueryServiceUnitTests
         var result = await Run(msi);
 
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == shared);
-        AssertKeptWithNoVerdict(row, expectedState: 2);
+        AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -1262,9 +1338,9 @@ public class InstallerQueryServiceUnitTests
         msi.AddProduct("{B}");
         msi.ProductPropertyResult[("{B}", "LocalPackage")] = UnknownProperty;
 
-        var result = await Run(msi);
+        var result = await RunHealthy(msi);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
+        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
@@ -1279,9 +1355,9 @@ public class InstallerQueryServiceUnitTests
         msi.PatchCodes["{B}"] = new() { "{R}" };
         msi.PatchPropertyResult[("{R}", "{B}", "LocalPackage")] = UnknownProperty;
 
-        var result = await Run(msi);
+        var result = await RunHealthy(msi);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
+        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
@@ -1298,9 +1374,9 @@ public class InstallerQueryServiceUnitTests
         msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
         msi.AddProduct("{B}");   // no LocalPackage set: Success, zero length
 
-        var result = await Run(msi);
+        var result = await RunHealthy(msi);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
+        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
@@ -1318,9 +1394,9 @@ public class InstallerQueryServiceUnitTests
         msi.SetProductProperty("{B}", "LocalPackage", @"C:\Windows\Installer\b.msi");
         msi.ProductPropertyResult[("{B}", "ProductName")] = BadConfiguration;
 
-        var result = await Run(msi);
+        var result = await RunHealthy(msi);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
+        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
         Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\b.msi");
     }
@@ -1362,7 +1438,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi, fallbackFailures: 0);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
+        AssertWithheldByADegradedEnumeration(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
@@ -1378,9 +1454,9 @@ public class InstallerQueryServiceUnitTests
         msi.AddProduct("{A}");
         msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
 
-        var result = await Run(msi, fallbackFailures: 3);
+        var result = await RunHealthy(msi, fallbackFailures: 3);
 
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
+        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
