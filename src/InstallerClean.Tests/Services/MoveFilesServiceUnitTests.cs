@@ -407,7 +407,7 @@ public class MoveFilesServiceUnitTests
         var reverifier = new Helpers.FakeReclaimingReverifier(Array.Empty<string>(), mutex);
         var svc = new MoveFilesService(fs, mutex, null, reverifier);
 
-        await svc.MoveFilesAsync(new[] { source }, DestDir, patchClaims: claims);
+        await svc.MoveFilesAsync(new[] { source }, DestDir, underLeaseClaims: new UnderLeaseClaims(claims, claims));
 
         Assert.Equal(claims, reverifier.ClaimsSeen);
     }

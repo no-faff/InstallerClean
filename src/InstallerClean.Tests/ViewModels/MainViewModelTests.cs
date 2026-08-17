@@ -476,7 +476,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -490,7 +490,7 @@ public class MainViewModelTests
         await _moveService.Received(1).MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), vm.Cleanup.MoveDestination,
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.True(vm.Completion.IsComplete);
         // %TEMP% sits on the system drive, so this is a same-volume move
         // and the heading claims "moved", not "freed".
@@ -514,7 +514,7 @@ public class MainViewModelTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
     }
 
     [Fact]
@@ -530,7 +530,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -543,7 +543,7 @@ public class MainViewModelTests
         await _deleteService.Received(1).DeleteFilesAsync(
             Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("permanently deleted", vm.Completion.Summary);
     }
@@ -561,7 +561,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .ThrowsAsync(new IOException("boom"));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -591,7 +591,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns<MoveResult>(_ =>
             {
                 // The overlay as the crash finds it: a batch part-way through,
@@ -657,7 +657,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .ThrowsAsync(new IOException("boom"));
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -679,7 +679,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns<DeleteResult>(_ =>
             {
                 vm.Cleanup.OperationCurrentFile = 1;
@@ -740,7 +740,7 @@ public class MainViewModelTests
         await _deleteService.DidNotReceive().DeleteFilesAsync(
             Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
     }
 
     [Fact]
@@ -760,7 +760,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>(), Cancelled: true));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -796,7 +796,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true));
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -849,7 +849,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(_ =>
             {
                 // The overlay as the user left it: a batch stopped at file 1 of
@@ -931,7 +931,7 @@ public class MainViewModelTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.False(vm.Completion.IsComplete);
     }
 
@@ -954,7 +954,7 @@ public class MainViewModelTests
         await _deleteService.DidNotReceive().DeleteFilesAsync(
             Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.False(vm.Completion.IsComplete);
     }
 
@@ -974,7 +974,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -1010,7 +1010,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
                 InstallerLockUnavailable: true));
         _confirmationService.ConfirmMove(
@@ -1054,7 +1054,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -1069,7 +1069,7 @@ public class MainViewModelTests
             Arg.Is<IEnumerable<string>>(paths =>
                 paths != null && paths.Count() == 2 && !paths.Contains(@"C:\Windows\Installer\b.msi")),
             Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.True(vm.Completion.IsComplete);
         Assert.NotEqual(string.Empty, vm.Completion.Skipped);
         Assert.Contains("1", vm.Completion.Skipped);
@@ -1095,7 +1095,7 @@ public class MainViewModelTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         // The failure surfaces through the scan error ladder, not a completion.
         _dialogService.Received(1).ShowError(Arg.Any<string>(), Strings.Error_InstallerDbUnavailableTitle);
         Assert.False(vm.Completion.IsComplete);
@@ -1128,7 +1128,7 @@ public class MainViewModelTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("2", vm.Completion.Summary);
     }
@@ -1163,7 +1163,7 @@ public class MainViewModelTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.Equal(
             string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
             vm.Completion.Summary);
@@ -1188,7 +1188,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -1222,7 +1222,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
@@ -1234,7 +1234,7 @@ public class MainViewModelTests
             Arg.Is<IEnumerable<string>>(paths =>
                 paths != null && paths.Count() == 1 && paths.Contains(@"C:\Windows\Installer\x.msi")),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("1", vm.Completion.Skipped);
     }
@@ -1258,14 +1258,18 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         var claims = new[] { Claim(@"C:\Windows\Installer\a.msp") };
+        // The sibling half is the wire D7 added, and a wire that is not asserted is
+        // a wire that can quietly come loose.
+        var siblings = new[] { Claim(@"C:\Windows\Installer\a.msp"), Claim(@"C:\Windows\Installer\sibling.msp") };
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(new ReverifyResult(
                 new[] { @"C:\Windows\Installer\a.msp" }, Array.Empty<string>(),
-                SurvivingPatchClaims: claims));
+                SurvivingPatchClaims: claims,
+                SiblingPatchClaims: siblings));
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -1278,7 +1282,10 @@ public class MainViewModelTests
         await _moveService.Received(1).MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Is<IReadOnlyList<PatchClaim>?>(c => c != null && c.SequenceEqual(claims)));
+            Arg.Is<UnderLeaseClaims?>(c =>
+                c != null
+                && c.Value.Batch.SequenceEqual(claims)
+                && c.Value.Siblings.SequenceEqual(siblings)));
     }
 
     [Fact]
@@ -1292,14 +1299,19 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         var claims = new[] { Claim(@"C:\Windows\Installer\x.msp") };
+        // The sibling half is the wire D7 added, and a wire that is not asserted is
+        // a wire that can quietly come loose: the batch would then be re-checked
+        // against the narrower question with nothing to say so.
+        var siblings = new[] { Claim(@"C:\Windows\Installer\x.msp"), Claim(@"C:\Windows\Installer\sibling.msp") };
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(new ReverifyResult(
                 new[] { @"C:\Windows\Installer\x.msp" }, Array.Empty<string>(),
-                SurvivingPatchClaims: claims));
+                SurvivingPatchClaims: claims,
+                SiblingPatchClaims: siblings));
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
@@ -1310,7 +1322,10 @@ public class MainViewModelTests
         await _deleteService.Received(1).DeleteFilesAsync(
             Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Is<IReadOnlyList<PatchClaim>?>(c => c != null && c.SequenceEqual(claims)));
+            Arg.Is<UnderLeaseClaims?>(c =>
+                c != null
+                && c.Value.Batch.SequenceEqual(claims)
+                && c.Value.Siblings.SequenceEqual(siblings)));
     }
 
     // The block below pins the other direction of that wire: what the window does
@@ -1338,7 +1353,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(2, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\c.msp" },
                 HeldBackReasons: new HeldBackReasons(Reclaimed: 1)));
@@ -1383,7 +1398,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\a.msp" },
                 HeldBackReasons: new HeldBackReasons(Reclaimed: 1)));
@@ -1418,7 +1433,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\a.msp" },
                 HeldBackReasons: new HeldBackReasons(Reclaimed: 1)));
@@ -1457,7 +1472,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true,
                 HeldBack: new[] { @"C:\Windows\Installer\c.msp" },
                 HeldBackReasons: new HeldBackReasons(Reclaimed: 1)));
@@ -1500,7 +1515,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "swapped",
                 new MoveResult(1, Array.Empty<FileOperationError>(),
@@ -1547,7 +1562,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "swapped", new MoveResult(1, Array.Empty<FileOperationError>()),
                 @"E:\where-they-really-went", MoveAbortReason.ResolvesElsewhere));
@@ -1584,7 +1599,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -1616,7 +1631,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
                 HeldBackReasons: new HeldBackReasons(RecordsUnreadable: 1)));
@@ -1657,7 +1672,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
                 HeldBackReasons: new HeldBackReasons(RecordsUnreadable: 1)));
@@ -1698,7 +1713,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\b.msp" },
                 HeldBackReasons: new HeldBackReasons(RecordsChanged: 1)));
@@ -1731,7 +1746,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(),
                 InstallerLockUnavailable: true));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -1925,7 +1940,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
@@ -1987,7 +2002,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);

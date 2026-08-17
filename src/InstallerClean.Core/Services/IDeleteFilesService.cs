@@ -39,8 +39,7 @@ public interface IDeleteFilesService
         IEnumerable<string> filePaths,
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default,
-        IReadOnlyList<PatchClaim>? patchClaims = null,
-        IReadOnlyList<PatchClaim>? siblingPatchClaims = null);
+        UnderLeaseClaims? underLeaseClaims = null);
 }
 
 /// <summary>

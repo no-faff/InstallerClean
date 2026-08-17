@@ -178,38 +178,16 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// rather than the design, and the ruling that named it says nobody may adopt it
     /// without measuring the read cost first, which nobody has.
     /// </remarks>
-    public UnderLeaseRecheck RecheckUnderLease(
-        IReadOnlyList<PatchClaim> claims,
-        IReadOnlyList<PatchClaim> siblingClaims)
+    public UnderLeaseRecheck RecheckUnderLease(UnderLeaseClaims underLease)
     {
+        var claims = underLease.Batch;
+        var siblingClaims = underLease.Siblings;
         if (claims.Count == 0) return new UnderLeaseRecheck(Array.Empty<string>());
 
         var heldBack = new List<string>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var reasons = default(HeldBackReasons);
 
-        // A CALLER THAT FORGOT THE SIBLINGS IS DETECTED RATHER THAN QUIETLY GIVEN THE
-        // WEAKER CHECK, which is the one thing a trailing list argument makes easy to get
-        // wrong. The sibling set is built as a superset of the batch's own claims, so
-        // every product named here must appear there; if none does, the list did not come
-        // from the pre-lease pass and the condition cannot be applied at all. The whole
-        // batch is then held back, because a re-verify that cannot re-check the fact the
-        // offer rests on has not re-verified anything.
-        //
-        // It cannot fire on a genuine no-sibling batch: a batch with claims has products,
-        // and those products' own pairings are in the set by construction.
-        var siblingProducts = new HashSet<string>(
-            siblingClaims.Select(c => c.ProductCode), StringComparer.OrdinalIgnoreCase);
-        if (!claims.Any(c => siblingProducts.Contains(c.ProductCode)))
-        {
-            var everyPath = claims
-                .Select(c => c.LocalPackagePath)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-            var refused = default(HeldBackReasons);
-            foreach (var _ in everyPath) refused = refused.Plus(HeldBackReason.RecordsUnreadable);
-            return new UnderLeaseRecheck(everyPath.AsReadOnly(), refused);
-        }
 
         foreach (var claim in claims)
         {

@@ -563,8 +563,7 @@ internal static class Program
                     ? new DeleteResult(0, Array.Empty<FileOperationError>())
                     : await deleteService.DeleteFilesAsync(
                         filePaths, progress: progress, cancellationToken: token,
-                        patchClaims: reverify.SurvivingPatchClaims,
-                        siblingPatchClaims: reverify.SiblingPatchClaims);
+                        underLeaseClaims: UnderLeaseClaims.From(reverify));
 
                 // A Windows Installer transaction grabbed Global\_MSIExecute in the
                 // race after the gate check passed, so the service refused and
@@ -696,8 +695,7 @@ internal static class Program
                 moveResult = filePaths.Count == 0
                     ? new MoveResult(0, Array.Empty<FileOperationError>())
                     : await moveService.MoveFilesAsync(filePaths, moveDest, progress, token,
-                        reverify.SurvivingPatchClaims,
-                        reverify.SiblingPatchClaims);
+                        UnderLeaseClaims.From(reverify));
             }
             catch (MoveAbortedException ex)
             {

@@ -543,7 +543,7 @@ public class DeleteFilesServiceUnitTests
         var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex);
         var svc = new DeleteFilesService(fs, mutex, null, reverifier);
 
-        await svc.DeleteFilesAsync(new[] { a }, patchClaims: claims);
+        await svc.DeleteFilesAsync(new[] { a }, underLeaseClaims: new UnderLeaseClaims(claims, claims));
 
         Assert.Equal(claims, reverifier.ClaimsSeen);
     }

@@ -58,8 +58,7 @@ public sealed class MoveFilesService : IMoveFilesService
         string destinationFolder,
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default,
-        IReadOnlyList<PatchClaim>? patchClaims = null,
-        IReadOnlyList<PatchClaim>? siblingPatchClaims = null)
+        UnderLeaseClaims? underLeaseClaims = null)
     {
         return Task.Run(() =>
         {
@@ -221,8 +220,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // lease is released by the thread that took it, so nothing between the
             // acquire and the release may await.
             var recheck = _reverifier.RecheckUnderLease(
-                patchClaims ?? Array.Empty<PatchClaim>(),
-                siblingPatchClaims ?? Array.Empty<PatchClaim>());
+                underLeaseClaims ?? UnderLeaseClaims.None);
             var heldBack = recheck.HeldBack;
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             if (heldBack.Count > 0)

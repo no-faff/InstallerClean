@@ -19,7 +19,7 @@ namespace InstallerClean.Tests.EndToEnd;
 /// </summary>
 public class ScanMoveCompletionTests
 {
-    // The action-service stubs below name the trailing patchClaims argument: it
+    // The action-service stubs below name the trailing under-lease argument: it
     // is optional on the interface and never omitted in practice, so a stub that
     // leaves it out matches nothing the view-model actually calls and hands back
     // a null result instead of the canned one.
@@ -68,7 +68,7 @@ public class ScanMoveCompletionTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
 
         var vm = CreateMain();
@@ -123,7 +123,7 @@ public class ScanMoveCompletionTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
 
         var vm = CreateMain();
@@ -264,7 +264,7 @@ public class ScanMoveCompletionTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(1, errors));
 
         var vm = CreateMain();

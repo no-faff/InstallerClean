@@ -86,38 +86,64 @@ public interface IRemovableReverifier
     /// which is a worse trade than the sliver it buys.
     /// </summary>
     /// <param name="claims">
-    /// Every claim naming a path still in the batch, from the
-    /// <see cref="ReverifyResult.SurvivingPatchClaims"/> the pre-lease pass
-    /// returned. Empty short-circuits without touching the API, which is the
-    /// ordinary case: most batches are true orphans, which carry no claim to
-    /// re-read.
-    /// </param>
-    /// <param name="siblingClaims">
-    /// Every claim on any product one of those paths is registered to, from
-    /// <see cref="ReverifyResult.SiblingPatchClaims"/>. The offer rests on a fact about
-    /// OTHER patches, so a re-verify that re-read only the batch's own pairings would
-    /// not re-check the fact the offer rests on.
+    /// The batch's own pairings and the sibling pairings on the products they name, as
+    /// one argument. See <see cref="UnderLeaseClaims"/> for why it is one and not two.
     ///
-    /// IT IS A REQUIRED PARAMETER RATHER THAN AN OPTIONAL ONE ON PURPOSE. An optional
-    /// list defaulting to empty would give any caller that forgot it the weaker check
-    /// with nothing to say so, which is the shape of fault this codebase keeps finding.
-    /// A caller with genuinely no siblings passes an empty list and means it.
-    ///
-    /// MEASURED COST, because the ruling that asked for this forbade adopting the
-    /// narrower question without one. The added reads are the patch registrations of
-    /// the products the batch touches, so they are bounded by the batch's own products
-    /// and never by an enumeration. On the machine every other figure came from: two
-    /// patch registrations on the whole machine, one per product, and no product holding
-    /// a superseded patch at all, so a batch there adds nothing. The largest
-    /// single-product figure this project has captured anywhere is 58, from Office 2010
-    /// SP2. Against that, this method ALREADY makes two keyed reads per claim in the
+    /// MEASURED COST, because the ruling that asked for the sibling half forbade
+    /// adopting the narrower question without one. The added reads are the patch
+    /// registrations of the products the batch touches, so they are bounded by the
+    /// batch's own products and never by an enumeration. On the machine every other
+    /// figure came from: two patch registrations in total, one per product, and no
+    /// product holding a superseded patch, so a batch there adds nothing. The largest
+    /// single-product figure captured anywhere in this project is 58, from Office 2010
+    /// SP2. Against that, this method already makes two keyed reads per claim in the
     /// batch, and the pre-lease pass runs a whole enumeration moments earlier outside
-    /// the lease, so the addition is the same kind of call at a bounded multiple of work
-    /// already being done.
+    /// the lease.
     /// </param>
-    UnderLeaseRecheck RecheckUnderLease(
-        IReadOnlyList<PatchClaim> claims,
-        IReadOnlyList<PatchClaim> siblingClaims);
+    UnderLeaseRecheck RecheckUnderLease(UnderLeaseClaims claims);
+}
+
+/// <summary>
+/// The two claim lists the under-lease re-read needs, carried as ONE argument.
+///
+/// THAT IS THE WHOLE POINT OF THE TYPE AND IT REPLACED A GUARD. The re-read needs the
+/// batch's own pairings and the sibling pairings on the products those name, because
+/// the offer rests on a fact about other patches. As two arguments, a caller could
+/// supply the first and forget the second and silently receive a weaker check, so this
+/// first shipped with a consistency guard that detected the mismatch and refused the
+/// batch. The guard was the wrong answer: it could only ever fire on a programming
+/// error, and refusing a batch puts a sentence on somebody's screen, so it would have
+/// had to name a cause about their machine that had not occurred.
+///
+/// One argument removes the mistake instead of detecting it, which is the rule this
+/// project states as handling beating guarding: establish that a limit cannot simply be
+/// removed before designing around it. <see cref="From"/> is how production builds one,
+/// out of the pre-lease pass's own result, so the two halves cannot come from different
+/// places.
+/// </summary>
+/// <param name="Batch">
+/// Every claim naming a path still in the batch. Empty short-circuits the re-read
+/// without touching the API, which is the ordinary case: most batches are true orphans,
+/// which carry no claim to re-read.
+/// </param>
+/// <param name="Siblings">
+/// Every claim on any product one of those paths is registered to, including the batch's
+/// own claims, a patch's own removability being part of the condition.
+/// </param>
+public readonly record struct UnderLeaseClaims(
+    IReadOnlyList<PatchClaim> Batch,
+    IReadOnlyList<PatchClaim> Siblings)
+{
+    /// <summary>Nothing to re-read, for a caller with no claims at all.</summary>
+    public static UnderLeaseClaims None { get; } =
+        new(Array.Empty<PatchClaim>(), Array.Empty<PatchClaim>());
+
+    /// <summary>
+    /// The pair a pre-lease re-verify produced. The only route production uses, so the
+    /// two lists always come from one enumeration and one another.
+    /// </summary>
+    public static UnderLeaseClaims From(ReverifyResult reverify) =>
+        new(reverify.SurvivingPatchClaims, reverify.SiblingPatchClaims);
 }
 
 /// <summary>

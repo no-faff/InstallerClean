@@ -47,6 +47,10 @@ internal sealed class FakeReclaimingReverifier : IRemovableReverifier
     /// <summary>Claims the service handed over, so a test can pin what it passed on.</summary>
     public IReadOnlyList<PatchClaim>? ClaimsSeen { get; private set; }
 
+    /// <summary>The sibling half of the same argument, so a test can pin that the
+    /// per-product pairings reached the lease and not only the batch's own.</summary>
+    public IReadOnlyList<PatchClaim>? SiblingsSeen { get; private set; }
+
     /// <summary>Leases the probe had granted when this was called; null if never called.</summary>
     public int? LeasesHeldWhenCalled { get; private set; }
 
@@ -58,11 +62,10 @@ internal sealed class FakeReclaimingReverifier : IRemovableReverifier
         CancellationToken cancellationToken = default) =>
         throw new NotSupportedException("This fake stands in for the under-lease half only.");
 
-    public UnderLeaseRecheck RecheckUnderLease(
-        IReadOnlyList<PatchClaim> claims,
-        IReadOnlyList<PatchClaim> siblingClaims)
+    public UnderLeaseRecheck RecheckUnderLease(UnderLeaseClaims claims)
     {
-        ClaimsSeen = claims;
+        ClaimsSeen = claims.Batch;
+        SiblingsSeen = claims.Siblings;
         LeasesHeldWhenCalled = _watching?.Acquired;
         LeasesReleasedWhenCalled = _watching?.Released;
         _atRecheck?.Invoke();

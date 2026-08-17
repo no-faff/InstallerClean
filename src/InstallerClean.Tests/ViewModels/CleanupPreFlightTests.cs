@@ -21,7 +21,7 @@ namespace InstallerClean.Tests.ViewModels;
 /// </summary>
 public class CleanupPreFlightTests
 {
-    // Every specification of MoveFilesAsync below names the trailing patchClaims
+    // Every specification of MoveFilesAsync below names the trailing under-lease
     // argument, and the DidNotReceive ones are why it matters most: the argument
     // is optional on the interface and never omitted in practice, so leaving it
     // out matches a literal null no real call can carry, and a negative asserted
@@ -121,7 +121,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
 
         // IsCancellationRequested is what gates the Cancel button, so a
         // pre-flight that cancels without clearing it leaves Cancel and Esc
@@ -134,7 +134,7 @@ public class CleanupPreFlightTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(_ => Task.Run(() =>
             {
                 releaseMove.Wait();
@@ -182,7 +182,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.False(vm.Cleanup.IsCancellationRequested);
         Assert.False(vm.Cleanup.IsOperating);
     }
@@ -206,7 +206,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.False(vm.Cleanup.IsOperating);
         Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
     }
@@ -232,7 +232,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
     }
 
     [Fact]
@@ -251,7 +251,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
     }
 
     [Fact]
@@ -409,7 +409,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
     }
 
     [Fact]
@@ -460,7 +460,7 @@ public class CleanupPreFlightTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
 
         var vm = CreateViewModel();
@@ -485,7 +485,7 @@ public class CleanupPreFlightTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true));
 
         var vm = CreateViewModel();
@@ -511,7 +511,7 @@ public class CleanupPreFlightTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
                 InstallerLockUnavailable: true));
 
@@ -547,7 +547,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
     }
 
     [Fact]
@@ -563,7 +563,7 @@ public class CleanupPreFlightTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns(new MoveResult(0, Array.Empty<FileOperationError>(),
                 HeldBack: new[] { @"C:\Windows\Installer\a.msi" }));
 
@@ -615,7 +615,7 @@ public class CleanupPreFlightTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns<MoveResult>(_ => throw new LocalisedInvalidOperationException("swapped"));
 
         var vm = CreateViewModel();
@@ -648,7 +648,7 @@ public class CleanupPreFlightTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<IReadOnlyList<PatchClaim>?>())
+                Arg.Any<UnderLeaseClaims?>())
             .Returns<MoveResult>(_ => throw new MoveAbortedException(
                 "swapped", new MoveResult(1, Array.Empty<FileOperationError>()),
                 @"E:\resolved-elsewhere", MoveAbortReason.ResolvesElsewhere));
@@ -719,7 +719,7 @@ public class CleanupPreFlightTests
         await _moveService.Received(1).MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), chosen,
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         // The answer is kept, so the box shows where the files went.
         Assert.Equal(chosen, vm.Cleanup.MoveDestination);
     }
@@ -738,7 +738,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         // Backing out leaves the box as it was rather than recording a choice
@@ -786,7 +786,7 @@ public class CleanupPreFlightTests
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-            Arg.Any<IReadOnlyList<PatchClaim>?>());
+            Arg.Any<UnderLeaseClaims?>());
         Assert.False(vm.Cleanup.IsOperationInFlight);
     }
 }
