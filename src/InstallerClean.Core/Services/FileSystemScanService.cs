@@ -136,6 +136,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var removable = new List<OrphanedFile>();
 
+        // Candidates the scan declined to offer, so the left-alone line and the offer
+        // between them still account for every file in the folder. Empty on every
+        // machine whose registrations all spell a path, which is every machine anybody
+        // has measured. See the decision below it for what fills it.
+        var withheld = new List<OrphanedFile>();
+
         // Candidates no registration claims, in walk order. The path comparison and
         // the file-identity match below it are the whole of what decides THIS half of
         // the offer, and there is no second screening pass over it, so a survivor of
@@ -332,7 +338,46 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // separate faults in that class, four of them live in every shipped
         // version, so treating any one of them as redundant cover for the others is
         // the mistake this comment exists to prevent.
-        removable.AddRange(unclaimedByPath);
+        //
+        // AND THE FIFTH IS HERE: A CLAIM NOBODY CAN SPELL WITHHOLDS THIS WHOLE HALF.
+        // Where any registration's recorded path could not be turned into a path at
+        // all, that claim is kept in the raw spelling Windows gave and matches nothing
+        // the walk produces, so the cached file it names is sitting in this candidate
+        // list right now, unclaimed. WHICH ONE cannot be established: the claim will
+        // not resolve, and the identity match immediately above cannot reach it
+        // either, because a value the path API refuses is a value CreateFile refuses
+        // too and there is nothing to open and compare. Every candidate is therefore
+        // one that claim could have meant, so none of them can be offered.
+        //
+        // THE WHOLE SET, WHICH IS THE COST AND IS NOT AN ARGUMENT AGAINST IT. Holding
+        // a file back is this app working. The alternative is offering a file it
+        // cannot say is spare, and the two are not comparable.
+        //
+        // IT CANNOT BE CAUSED BY AN ABSENCE OR BY A PERMISSION, which is what
+        // separates this from two designs that were withdrawn. A registration whose
+        // file is simply gone resolves normally, the resolver climbing to an existing
+        // ancestor and reattaching the missing suffix as text; an unattached drive and
+        // a refused handle are counted apart and act on nothing. What fires here is
+        // only a value that is not a path: an embedded null, a device name, a length
+        // past the API's limit.
+        //
+        // THE SUPERSEDED HALF OF THE OFFER IS NOT WITHHELD WITH IT. Those rows are
+        // judged on products, through registry keys read by product code and patch
+        // code, and nothing on that path reads a cached-package path at all; measured
+        // with a planted unspellable value against an ordinary-value control, the
+        // sibling patch's offer did not move. What is unobserved rather than ruled out
+        // is an unspellable registration naming the very same file an offered
+        // superseded row names, which would be a second claim on that path that the
+        // merge cannot see.
+        var unspellableClaims =
+            query.Census.PathNormalisationRefusedAtExpansionCount
+            + query.Census.PathNormalisationRefusedAtPrefixStripCount
+            + query.Census.PathNormalisationRefusedAtFullPathCount;
+
+        if (unspellableClaims > 0)
+            withheld.AddRange(unclaimedByPath);
+        else
+            removable.AddRange(unclaimedByPath);
 
         // Stat every registered package once here so the Details window
         // doesn't have to hit disk on the UI thread when it opens.
@@ -720,7 +765,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registeredSuperseded,
             registeredSupersededBytes,
             supersededRegistrations,
-            obsoletedRegistrations);
+            obsoletedRegistrations,
+            withheld.AsReadOnly());
     }
 
     /// <summary>

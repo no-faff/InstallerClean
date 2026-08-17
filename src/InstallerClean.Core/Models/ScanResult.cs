@@ -192,6 +192,39 @@ namespace InstallerClean.Models;
 /// differing is itself the finding, being the size of the class the condition
 /// excludes, which nobody has measured.
 /// </param>
+/// <param name="WithheldFiles">
+/// Every candidate this scan declined to offer, in walk order, because at least one
+/// registration's recorded path could not be turned into a path at all.
+///
+/// WHY THE WHOLE WALK-DERIVED SET AND NOT ONE FILE. Such a registration's claim is
+/// kept in the raw spelling Windows gave, so it matches nothing the walk produces,
+/// and the cached file it names is one the walk saw and nothing claimed. Which file
+/// that is cannot be established: the claim cannot be resolved, and the identity
+/// match cannot help either, because a value the path API refuses is a value
+/// CreateFile refuses too, so there is nothing to open and compare. Every unclaimed
+/// file is therefore one the unspellable claim could have meant, and the app cannot
+/// say of any of them that nothing needs it.
+///
+/// THE SUPERSEDED HALF OF THE OFFER IS NOT IN HERE, and that is a finding rather
+/// than an omission. Those rows are judged on products, through registry keys read
+/// by product code and patch code, and nothing on that path reads a cached-package
+/// path at all; measured with a planted unspellable value beside an ordinary-value
+/// control, the sibling patch's offer was identical. What remains unobserved rather
+/// than ruled out is an unspellable registration naming the very same file an offered
+/// superseded row names, which would be a second claim on that path that the merge
+/// cannot see.
+///
+/// IT EXISTS SO THE TWO SUMMARY LINES ACCOUNT FOR EVERY FILE IN THE FOLDER. A
+/// withheld file would otherwise appear in neither: not offered, and not a registered
+/// row either, because no registration names it. The two lines could then add up to
+/// less than the folder holds, with the difference in no line at all and no way for
+/// anyone to notice.
+///
+/// The list rather than a count and a total, so the number shown and the rows shown
+/// cannot come apart: both are read off this. Null means a scan that never reached
+/// the decision, which is not the same as a scan that kept nothing back, and both
+/// read as an empty list to a caller that does not care.
+/// </param>
 /// <param name="ObsoletedRegistrationCount">
 /// The same for state 4. For this class it is the ONLY figure that can ever be
 /// non-zero, obsoleted patches not being offered at all, so it is the only way the
@@ -220,7 +253,8 @@ public record ScanResult(
     int RegisteredSupersededCount = 0,
     long RegisteredSupersededBytes = 0,
     int SupersededRegistrationCount = 0,
-    int ObsoletedRegistrationCount = 0)
+    int ObsoletedRegistrationCount = 0,
+    IReadOnlyList<OrphanedFile>? WithheldFiles = null)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk; the sum of the two

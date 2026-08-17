@@ -40,6 +40,110 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task An_unspellable_recorded_path_withholds_the_whole_walk_derived_offer()
+    {
+        // The condition is a registration whose recorded path could not be turned
+        // into a path at all, so its claim is kept in the raw spelling Windows gave
+        // and matches nothing the walk produces. The cached file it means is
+        // therefore sitting in the candidate list unclaimed, and WHICH one cannot be
+        // established, so none of them may be offered.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "two.msp"), new byte[] { 2, 2 });
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new List<RegisteredPackage>().AsReadOnly(),
+                Census: new EnumerationCensus(PathNormalisationRefusedAtFullPathCount: 1)));
+
+        var svc = new FileSystemScanService(query, null, _fakeInstallerDir);
+        var result = await svc.ScanAsync();
+
+        // Nothing offered, and the files accounted for rather than vanished: the
+        // left-alone line is built from the withheld list, so a file counted nowhere
+        // would make the two summary lines add up to less than the folder holds.
+        Assert.Empty(result.RemovableFiles);
+        Assert.Equal(2, result.WithheldFiles?.Count);
+        Assert.Contains(result.WithheldFiles!, f => f.FileName == "one.msi");
+        Assert.Contains(result.WithheldFiles!, f => f.FileName == "two.msp");
+    }
+
+    [Theory]
+    [InlineData(1, 0, 0)]
+    [InlineData(0, 1, 0)]
+    [InlineData(0, 0, 1)]
+    public async Task Any_of_the_three_normalisation_refusals_withholds(
+        int expansion, int prefixStrip, int fullPath)
+    {
+        // THE WITHHOLDING FIRES ON THE UNION, not on the one member that occurs in
+        // practice. All three mean the same thing about the claim that came out of
+        // it, and a rule keyed on one of them would let the other two through.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new List<RegisteredPackage>().AsReadOnly(),
+                Census: new EnumerationCensus(
+                    PathNormalisationRefusedAtExpansionCount: expansion,
+                    PathNormalisationRefusedAtPrefixStripCount: prefixStrip,
+                    PathNormalisationRefusedAtFullPathCount: fullPath)));
+
+        var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
+
+        Assert.Empty(result.RemovableFiles);
+        Assert.Single(result.WithheldFiles!);
+    }
+
+    [Fact]
+    public async Task A_clean_census_withholds_nothing_and_the_offer_stands()
+    {
+        // THE CONTROL FOR THE THREE ABOVE. Identical fixture with every refusal count
+        // at zero: without it, a withholding that fired unconditionally would pass
+        // all four and nobody would know.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new List<RegisteredPackage>().AsReadOnly(),
+                Census: new EnumerationCensus()));
+
+        var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+        Assert.Equal("one.msi", result.RemovableFiles[0].FileName);
+        Assert.Empty(result.WithheldFiles!);
+    }
+
+    [Fact]
+    public async Task An_unspellable_recorded_path_does_not_withhold_a_superseded_row()
+    {
+        // The withholding covers the WALK-DERIVED half only. A superseded patch
+        // reaches the offer from the registered set, judged on products through
+        // registry keys read by product and patch code, and nothing on that path
+        // reads a cached-package path. Withholding it here would cost a file for a
+        // condition that has no bearing on it.
+        var superseded = Path.Combine(_fakeInstallerDir, "superseded.msp");
+        File.WriteAllBytes(superseded, new byte[] { 3, 3, 3 });
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new List<RegisteredPackage>
+                {
+                    new(superseded, "Product", "{P}", PatchState: 2, IsRemovable: true),
+                }.AsReadOnly(),
+                Census: new EnumerationCensus(PathNormalisationRefusedAtFullPathCount: 1)));
+
+        var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+        Assert.Equal("superseded.msp", result.RemovableFiles[0].FileName);
+        Assert.Empty(result.WithheldFiles!);
+    }
+
+    [Fact]
     public async Task Real_directory_skips_registered_files_case_insensitively()
     {
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "KEPT.msi"), new byte[] { 1 });

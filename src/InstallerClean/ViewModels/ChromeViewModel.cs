@@ -334,7 +334,11 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
         var viewModel = new RegisteredFilesViewModel(
             _scan.LastScanResult.RegisteredPackages,
             _scan.LastScanResult.RegisteredTotalBytes,
-            _msiInfoService);
+            _msiInfoService,
+            // The withheld files, so this window's own header counts the same two
+            // populations the main window's left-alone line does. The two are one
+            // click apart and must not disagree.
+            _scan.LastScanResult.WithheldFiles);
 
         _windowService.ShowRegisteredDetails(viewModel);
     }
