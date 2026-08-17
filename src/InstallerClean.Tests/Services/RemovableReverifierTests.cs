@@ -312,13 +312,101 @@ public class RemovableReverifierTests
     private static PatchClaim Claim(string path, string patchCode, string productCode) =>
         new(path, patchCode, productCode, null, 4);
 
+    // ---- The per-product condition, re-read under the lease ----
+    //
+    // The offer now rests on a fact about OTHER patches: a superseded patch is offered
+    // only where nothing on any product sharing it can be uninstalled and roll back
+    // onto its file. So the re-read has to re-ask about the siblings, not only about
+    // the batch's own pairings, or it does not re-check the fact the offer rests on.
+
+    [Fact]
+    public void A_sibling_patch_turning_removable_holds_the_batch_path_back()
+    {
+        // THE CASE THE SIBLING PASS EXISTS FOR. The batch's own pairing is unchanged and
+        // still passes on its own answer; what moved is another patch on the same
+        // product, which can now be uninstalled and roll the product back onto this
+        // file. Without the sibling pass this batch would proceed.
+        const string path = @"C:\Windows\Installer\superseded.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.Set(PatchB, ProductOne, state: "2", uninstallable: "1");
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var recheck = svc.RecheckUnderLease(
+            new[] { Claim(path, PatchA, ProductOne) },
+            new[] { Claim(path, PatchA, ProductOne), Claim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne) });
+
+        Assert.Equal(new[] { path }, recheck.HeldBack);
+        Assert.Equal(1, recheck.Reasons.Reclaimed);
+    }
+
+    [Fact]
+    public void A_sibling_on_a_DIFFERENT_product_does_not_hold_the_batch_path_back()
+    {
+        // THE MUST-MISS CONTROL FOR THE TEST ABOVE. Without it a sibling pass that held
+        // back on any dirty patch anywhere would pass that test and empty every offer on
+        // any machine with one removable patch. The condition is per product because the
+        // file is only reachable from the products it is registered to.
+        const string path = @"C:\Windows\Installer\superseded.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.Set(PatchB, ProductTwo, state: "2", uninstallable: "1");
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var recheck = svc.RecheckUnderLease(
+            new[] { Claim(path, PatchA, ProductOne) },
+            new[] { Claim(path, PatchA, ProductOne), Claim(@"C:\Windows\Installer\other.msp", PatchB, ProductTwo) });
+
+        Assert.Empty(recheck.HeldBack);
+    }
+
+    [Fact]
+    public void A_sibling_whose_Uninstallable_will_not_read_holds_the_batch_path_back()
+    {
+        // Anything that is not a positive zero refuses, and the cause is the inability
+        // rather than a claim: the app has not established that nothing can roll back.
+        const string path = @"C:\Windows\Installer\superseded.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        msi.Set(PatchB, ProductOne, state: "2", uninstallable: "");
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var recheck = svc.RecheckUnderLease(
+            new[] { Claim(path, PatchA, ProductOne) },
+            new[] { Claim(path, PatchA, ProductOne), Claim(@"C:\Windows\Installer\other.msp", PatchB, ProductOne) });
+
+        Assert.Equal(new[] { path }, recheck.HeldBack);
+    }
+
+    [Fact]
+    public void A_caller_that_forgets_the_sibling_list_has_the_whole_batch_refused()
+    {
+        // The trailing-list argument is the one thing about this signature that is easy
+        // to get wrong, and a caller that got it wrong would silently get the weaker
+        // check. The sibling set is a superset of the batch's own claims by
+        // construction, so a batch whose products appear nowhere in it did not come from
+        // the pre-lease pass, and a re-verify that cannot apply the condition has not
+        // re-verified anything.
+        const string path = @"C:\Windows\Installer\superseded.msp";
+        var msi = new ScriptedPatchApi();
+        msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
+        var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
+
+        var recheck = svc.RecheckUnderLease(
+            new[] { Claim(path, PatchA, ProductOne) },
+            Array.Empty<PatchClaim>());
+
+        Assert.Equal(new[] { path }, recheck.HeldBack);
+        Assert.Equal(1, recheck.Reasons.RecordsUnreadable);
+    }
+
     [Fact]
     public void An_empty_claim_list_answers_without_touching_the_api()
     {
         var msi = new ScriptedPatchApi();
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        Assert.Empty(svc.RecheckUnderLease(Array.Empty<PatchClaim>()).HeldBack);
+        Assert.Empty(svc.RecheckUnderLease(Array.Empty<PatchClaim>(), Array.Empty<PatchClaim>()).HeldBack);
         // The ordinary batch is true orphans, which carry no claim at all, so the
         // machine-wide lock is held over no API call whatsoever on most runs.
         Assert.Equal(0, msi.Reads);
@@ -332,7 +420,7 @@ public class RemovableReverifierTests
         msi.Set(PatchA, ProductOne, state: "2", uninstallable: "0");
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        Assert.Empty(svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }).HeldBack);
+        Assert.Empty(svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) }).HeldBack);
     }
 
     [Fact]
@@ -346,7 +434,7 @@ public class RemovableReverifierTests
         msi.Set(PatchA, ProductOne, state: "1", uninstallable: "0");
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        Assert.Equal(new[] { path }, svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }).HeldBack);
+        Assert.Equal(new[] { path }, svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) }).HeldBack);
     }
 
     [Fact]
@@ -359,7 +447,7 @@ public class RemovableReverifierTests
         msi.Set(PatchA, ProductOne, state: "2", uninstallable: "1");
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        Assert.Equal(new[] { path }, svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }).HeldBack);
+        Assert.Equal(new[] { path }, svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) }).HeldBack);
     }
 
     [Fact]
@@ -373,7 +461,7 @@ public class RemovableReverifierTests
         msi.FailProperty(PatchA, ProductOne, "State");
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
+        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) });
 
         Assert.Equal(new[] { path }, recheck.HeldBack);
         // And it says WHY, because the user is shown a cause and this is not the
@@ -390,7 +478,7 @@ public class RemovableReverifierTests
         msi.Set(PatchA, ProductOne, state: "1", uninstallable: "0");
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
+        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) });
 
         Assert.Equal(new[] { path }, recheck.HeldBack);
         Assert.Equal(new HeldBackReasons(Reclaimed: 1), recheck.Reasons);
@@ -411,7 +499,7 @@ public class RemovableReverifierTests
         msi.AbsentRecord(PatchA, ProductOne, "State");
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
+        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) });
 
         Assert.Equal(new[] { path }, recheck.HeldBack);
         // And it is its own cause. A read that succeeded is not an unreadable
@@ -432,7 +520,7 @@ public class RemovableReverifierTests
         msi.AbsentRecord(PatchA, ProductOne, "Uninstallable", code: 1647);
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
+        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) });
 
         Assert.Equal(new[] { path }, recheck.HeldBack);
         Assert.Equal(new HeldBackReasons(RecordsChanged: 1), recheck.Reasons);
@@ -453,7 +541,7 @@ public class RemovableReverifierTests
         msi.FailProperty(PatchA, ProductOne, "Uninstallable");
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
-        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) });
+        var recheck = svc.RecheckUnderLease(new[] { Claim(path, PatchA, ProductOne) }, new[] { Claim(path, PatchA, ProductOne) });
 
         Assert.Equal(new[] { path }, recheck.HeldBack);
         Assert.Equal(new HeldBackReasons(RecordsUnreadable: 1), recheck.Reasons);
@@ -476,6 +564,11 @@ public class RemovableReverifierTests
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
 
         var recheck = svc.RecheckUnderLease(new[]
+        {
+            Claim(reverted, PatchA, ProductOne),
+            Claim(gone, PatchB, ProductOne),
+            Claim(unreadable, PatchA, ProductTwo),
+        }, new[]
         {
             Claim(reverted, PatchA, ProductOne),
             Claim(gone, PatchB, ProductOne),
@@ -507,6 +600,10 @@ public class RemovableReverifierTests
         {
             Claim(shared, PatchA, ProductOne),
             Claim(shared, PatchA, ProductTwo),
+        }, new[]
+        {
+            Claim(shared, PatchA, ProductOne),
+            Claim(shared, PatchA, ProductTwo),
         }).HeldBack;
 
         Assert.Equal(new[] { shared }, reclaimed);
@@ -522,6 +619,10 @@ public class RemovableReverifierTests
 
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
         var reclaimed = svc.RecheckUnderLease(new[]
+        {
+            Claim(shared, PatchA, ProductOne),
+            Claim(shared, PatchA, ProductTwo),
+        }, new[]
         {
             Claim(shared, PatchA, ProductOne),
             Claim(shared, PatchA, ProductTwo),
@@ -544,6 +645,10 @@ public class RemovableReverifierTests
 
         var svc = new RemovableReverifier(Substitute.For<IInstallerQueryService>(), msi);
         var reclaimed = svc.RecheckUnderLease(new[]
+        {
+            Claim(kept, PatchA, ProductOne),
+            Claim(taken, PatchB, ProductOne),
+        }, new[]
         {
             Claim(kept, PatchA, ProductOne),
             Claim(taken, PatchB, ProductOne),

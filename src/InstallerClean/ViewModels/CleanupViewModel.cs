@@ -684,7 +684,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             try
             {
                 result = await _moveService.MoveFilesAsync(survivingPaths, dest, progress, _operationCts!.Token,
-                    reverify.SurvivingPatchClaims);
+                    reverify.SurvivingPatchClaims,
+                    reverify.SiblingPatchClaims);
             }
             catch (MoveAbortedException ex)
             {
@@ -1041,7 +1042,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
             var result = await _deleteService.DeleteFilesAsync(
-                survivingPaths, progress, _operationCts.Token, reverify.SurvivingPatchClaims);
+                survivingPaths, progress, _operationCts.Token, reverify.SurvivingPatchClaims,
+                reverify.SiblingPatchClaims);
 
             if (result.InstallerBusy)
             {

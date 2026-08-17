@@ -122,8 +122,28 @@ public sealed class RemovableReverifier : IRemovableReverifier
             .Where(c => survivingPaths.Contains(c.LocalPackagePath))
             .ToList();
 
+        // THE SIBLING PAIRINGS, carried forward so the under-lease re-read can apply the
+        // per-product condition rather than only the batch's own pairings. The offer
+        // rests on a fact about OTHER patches, and a re-verify that does not re-check the
+        // fact the offer rests on is not a re-verify.
+        //
+        // Collected here rather than under the lease because collecting them needs the
+        // enumeration this pass has just run, and an enumeration is the one thing that
+        // must not happen inside the machine-wide installer lock. What crosses into the
+        // lock is a list of codes to re-read by key.
+        //
+        // It includes the surviving claims themselves, a patch's own removability being
+        // part of the condition, and it is deduplicated by pairing rather than by patch:
+        // one patch registered to three products is three pairings and each answers for
+        // its own product.
+        var survivingProducts = new HashSet<string>(
+            survivingClaims.Select(c => c.ProductCode), StringComparer.OrdinalIgnoreCase);
+        var siblingClaims = query.PatchClaims
+            .Where(c => survivingProducts.Contains(c.ProductCode))
+            .ToList();
+
         return new ReverifyResult(surviving.AsReadOnly(), dropped.AsReadOnly(), reasons,
-            survivingClaims.AsReadOnly());
+            survivingClaims.AsReadOnly(), siblingClaims.AsReadOnly());
     }
 
     /// <inheritdoc />
@@ -158,13 +178,38 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// rather than the design, and the ruling that named it says nobody may adopt it
     /// without measuring the read cost first, which nobody has.
     /// </remarks>
-    public UnderLeaseRecheck RecheckUnderLease(IReadOnlyList<PatchClaim> claims)
+    public UnderLeaseRecheck RecheckUnderLease(
+        IReadOnlyList<PatchClaim> claims,
+        IReadOnlyList<PatchClaim> siblingClaims)
     {
         if (claims.Count == 0) return new UnderLeaseRecheck(Array.Empty<string>());
 
         var heldBack = new List<string>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var reasons = default(HeldBackReasons);
+
+        // A CALLER THAT FORGOT THE SIBLINGS IS DETECTED RATHER THAN QUIETLY GIVEN THE
+        // WEAKER CHECK, which is the one thing a trailing list argument makes easy to get
+        // wrong. The sibling set is built as a superset of the batch's own claims, so
+        // every product named here must appear there; if none does, the list did not come
+        // from the pre-lease pass and the condition cannot be applied at all. The whole
+        // batch is then held back, because a re-verify that cannot re-check the fact the
+        // offer rests on has not re-verified anything.
+        //
+        // It cannot fire on a genuine no-sibling batch: a batch with claims has products,
+        // and those products' own pairings are in the set by construction.
+        var siblingProducts = new HashSet<string>(
+            siblingClaims.Select(c => c.ProductCode), StringComparer.OrdinalIgnoreCase);
+        if (!claims.Any(c => siblingProducts.Contains(c.ProductCode)))
+        {
+            var everyPath = claims
+                .Select(c => c.LocalPackagePath)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            var refused = default(HeldBackReasons);
+            foreach (var _ in everyPath) refused = refused.Plus(HeldBackReason.RecordsUnreadable);
+            return new UnderLeaseRecheck(everyPath.AsReadOnly(), refused);
+        }
 
         foreach (var claim in claims)
         {
@@ -221,6 +266,69 @@ public sealed class RemovableReverifier : IRemovableReverifier
             seen.Add(claim.LocalPackagePath);
             heldBack.Add(claim.LocalPackagePath);
             reasons = reasons.Plus(reason.Value);
+        }
+
+        // THE PER-PRODUCT CONDITION, RE-READ BY KEY. Everything above re-asks about the
+        // batch's own pairings; this re-asks about the OTHER patches on the products
+        // those pairings name, which is the fact the offer actually rests on. Without it
+        // a sibling patch turning removable between the pre-lease enumeration and this
+        // moment would go unseen.
+        //
+        // Keyed reads and never an enumeration, which is what makes it affordable under
+        // the machine-wide lease: the pre-lease pass already worked out exactly which
+        // pairings to look at, so this asks about records by name and each answer is
+        // about the record named or says there is no such record.
+        //
+        // ONE PRODUCT'S FAILURE CONDEMNS EVERY BATCH PATH ON THAT PRODUCT, which is the
+        // shape of the condition rather than a shortcut: the patch's one cached file is
+        // shared by every product holding it, so a rollback on any of them reaches for
+        // it.
+        var productsAlreadyJudged = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var sibling in siblingClaims)
+        {
+            // A product settled by an earlier sibling needs no second look. The verdict
+            // is one-way, so re-asking could only cost reads while the lease is held.
+            if (!productsAlreadyJudged.Add(sibling.ProductCode)) continue;
+
+            foreach (var onThisProduct in siblingClaims)
+            {
+                if (!string.Equals(onThisProduct.ProductCode, sibling.ProductCode,
+                        StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var siblingContext = (Interop.MsiInstallContext)onThisProduct.Context;
+                var siblingUninstallable = InstallerQueryService.GetPatchProperty(
+                    _msi, onThisProduct.PatchCode, onThisProduct.ProductCode,
+                    onThisProduct.UserSid, siblingContext,
+                    Interop.MsiInstallProperty.Uninstallable);
+
+                // A POSITIVE ZERO IS THE ONLY CLEAN ANSWER, exactly as the scan's own
+                // reading of this has it. A record that is no longer registered is not a
+                // patch that can be rolled back and does not condemn; anything else,
+                // including a read that failed and a value that is absent, does.
+                if (siblingUninstallable.NotRegistered) continue;
+                if (!siblingUninstallable.Unreadable && siblingUninstallable.Value == "0") continue;
+
+                // Every batch path registered to this product goes, with the cause the
+                // read supports: a read that failed is an inability, and a patch that
+                // answered something other than zero is a live claim on the rollback.
+                var siblingReason = siblingUninstallable.Unreadable
+                    ? HeldBackReason.RecordsUnreadable
+                    : HeldBackReason.Reclaimed;
+
+                foreach (var batchClaim in claims)
+                {
+                    if (!string.Equals(batchClaim.ProductCode, sibling.ProductCode,
+                            StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    if (!seen.Add(batchClaim.LocalPackagePath)) continue;
+
+                    heldBack.Add(batchClaim.LocalPackagePath);
+                    reasons = reasons.Plus(siblingReason);
+                }
+
+                break;
+            }
         }
 
         return new UnderLeaseRecheck(heldBack.AsReadOnly(), reasons);

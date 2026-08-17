@@ -58,7 +58,9 @@ internal sealed class FakeReclaimingReverifier : IRemovableReverifier
         CancellationToken cancellationToken = default) =>
         throw new NotSupportedException("This fake stands in for the under-lease half only.");
 
-    public UnderLeaseRecheck RecheckUnderLease(IReadOnlyList<PatchClaim> claims)
+    public UnderLeaseRecheck RecheckUnderLease(
+        IReadOnlyList<PatchClaim> claims,
+        IReadOnlyList<PatchClaim> siblingClaims)
     {
         ClaimsSeen = claims;
         LeasesHeldWhenCalled = _watching?.Acquired;

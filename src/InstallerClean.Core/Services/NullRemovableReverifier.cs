@@ -37,7 +37,9 @@ internal sealed class NullRemovableReverifier : IRemovableReverifier
         throw new NotSupportedException(
             "The no-op reverifier cannot re-verify a batch. Something resolved this in place of RemovableReverifier.");
 
-    public UnderLeaseRecheck RecheckUnderLease(IReadOnlyList<Models.PatchClaim> claims) =>
+    public UnderLeaseRecheck RecheckUnderLease(
+        IReadOnlyList<Models.PatchClaim> claims,
+        IReadOnlyList<Models.PatchClaim> siblingClaims) =>
         claims.Count == 0
             ? new UnderLeaseRecheck(Array.Empty<string>())
             : throw new NotSupportedException(

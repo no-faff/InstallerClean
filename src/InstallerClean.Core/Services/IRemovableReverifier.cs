@@ -92,7 +92,32 @@ public interface IRemovableReverifier
     /// ordinary case: most batches are true orphans, which carry no claim to
     /// re-read.
     /// </param>
-    UnderLeaseRecheck RecheckUnderLease(IReadOnlyList<PatchClaim> claims);
+    /// <param name="siblingClaims">
+    /// Every claim on any product one of those paths is registered to, from
+    /// <see cref="ReverifyResult.SiblingPatchClaims"/>. The offer rests on a fact about
+    /// OTHER patches, so a re-verify that re-read only the batch's own pairings would
+    /// not re-check the fact the offer rests on.
+    ///
+    /// IT IS A REQUIRED PARAMETER RATHER THAN AN OPTIONAL ONE ON PURPOSE. An optional
+    /// list defaulting to empty would give any caller that forgot it the weaker check
+    /// with nothing to say so, which is the shape of fault this codebase keeps finding.
+    /// A caller with genuinely no siblings passes an empty list and means it.
+    ///
+    /// MEASURED COST, because the ruling that asked for this forbade adopting the
+    /// narrower question without one. The added reads are the patch registrations of
+    /// the products the batch touches, so they are bounded by the batch's own products
+    /// and never by an enumeration. On the machine every other figure came from: two
+    /// patch registrations on the whole machine, one per product, and no product holding
+    /// a superseded patch at all, so a batch there adds nothing. The largest
+    /// single-product figure this project has captured anywhere is 58, from Office 2010
+    /// SP2. Against that, this method ALREADY makes two keyed reads per claim in the
+    /// batch, and the pre-lease pass runs a whole enumeration moments earlier outside
+    /// the lease, so the addition is the same kind of call at a bounded multiple of work
+    /// already being done.
+    /// </param>
+    UnderLeaseRecheck RecheckUnderLease(
+        IReadOnlyList<PatchClaim> claims,
+        IReadOnlyList<PatchClaim> siblingClaims);
 }
 
 /// <summary>
@@ -244,9 +269,21 @@ public record ReverifyResult(
     IReadOnlyList<string> Surviving,
     IReadOnlyList<string> Dropped,
     HeldBackReasons Reasons = default,
-    IReadOnlyList<PatchClaim>? SurvivingPatchClaims = null)
+    IReadOnlyList<PatchClaim>? SurvivingPatchClaims = null,
+    IReadOnlyList<PatchClaim>? SiblingPatchClaims = null)
 {
     /// <summary>Never null: an absent list reads as nothing to re-read rather than as a fault.</summary>
     public IReadOnlyList<PatchClaim> SurvivingPatchClaims { get; init; }
         = SurvivingPatchClaims ?? Array.Empty<PatchClaim>();
+
+    /// <summary>
+    /// Every claim on any product a surviving path is registered to, for the
+    /// under-lease re-read to apply the per-product condition rather than only the
+    /// batch's own pairings. Includes the surviving claims themselves, a patch's own
+    /// removability being part of that condition.
+    ///
+    /// Never null, on the same terms as the list above.
+    /// </summary>
+    public IReadOnlyList<PatchClaim> SiblingPatchClaims { get; init; }
+        = SiblingPatchClaims ?? Array.Empty<PatchClaim>();
 }
