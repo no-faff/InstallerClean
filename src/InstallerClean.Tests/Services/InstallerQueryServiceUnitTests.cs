@@ -2372,6 +2372,37 @@ public class InstallerQueryServiceUnitTests
                 valueLength = 0;
                 return forced;
             }
+
+            // A PAIRING THIS FIXTURE NEVER SET UP ANSWERS ERROR_UNKNOWN_PATCH, and
+            // the distinction is between the PAIRING and the PROPERTY. This fell
+            // through to DoubleCall("") for both, so a product asked about a patch it
+            // does not hold answered "present but empty" instead of "no such
+            // registration". 1608 is on IsBenignPropertyRead's allowlist and 1647 is
+            // on IsRecordAbsent's, and the confirmation pass reads the two in
+            // opposite directions: absence says nothing either way and moves on,
+            // while a benign empty read is an answer, fails IsRemovablePatch and
+            // downgrades a row that should have survived. Every cross-product ask
+            // this fake served was therefore answering the wrong question, and the
+            // fake beside it in the truncation tests already gets this right.
+            //
+            // An unset property on a pairing that DOES exist still reads as a
+            // readable empty value, which is deliberate and is what lets a test
+            // reach the branch separating a record with no cached package from one
+            // that would not read.
+            var pairingExists =
+                (PatchCodes.TryGetValue(productCode, out var held) && held.Contains(patchCode))
+                || _patchProps.ContainsKey((patchCode, productCode, "LocalPackage"))
+                || _patchProps.ContainsKey((patchCode, productCode, "State"))
+                || _patchProps.ContainsKey((patchCode, productCode, "Uninstallable"));
+
+            if (!pairingExists)
+            {
+                // The production constant rather than a local copy, so the fake
+                // cannot drift from the allowlist that reads it.
+                valueLength = 0;
+                return MsiError.UnknownPatch;
+            }
+
             return DoubleCall(_patchProps.GetValueOrDefault((patchCode, productCode, property), ""), value, ref valueLength);
         }
 
