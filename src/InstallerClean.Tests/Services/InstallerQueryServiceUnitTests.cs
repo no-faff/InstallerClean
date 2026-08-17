@@ -1474,6 +1474,186 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(unimprovable, Assert.Single(result.Packages).LocalPackagePath);
     }
 
+    // ---- The superseded-patch condition: every product, every patch ----
+
+    private const string CleanPatch = @"C:\Windows\Installer\superseded.msp";
+
+    /// <summary>
+    /// Runs with a fallback supplying the registry's per-product patch verdicts, which
+    /// is the source that makes the superseded condition's set trustworthy. Without it
+    /// every product reads unestablished and nothing is offered, so any test about the
+    /// offer has to say what the registry saw.
+    /// </summary>
+    private static async Task<InstallerQueryResult> RunWithPatchSets(
+        FakeMsiApi msi, params (string Product, InstallerQueryService.ProductPatchSet Set)[] sets)
+    {
+        var map = sets.ToDictionary(x => x.Product, x => x.Set, StringComparer.OrdinalIgnoreCase);
+        return await new InstallerQueryService(
+                msi,
+                (_, _) => new InstallerQueryService.FallbackRead(
+                    0, 0, ProductPatchSets: map))
+            .GetRegisteredPackagesAsync();
+    }
+
+    [Fact]
+    public async Task A_superseded_non_removable_patch_on_a_clean_product_is_offered()
+    {
+        // THE MUST-HIT CONTROL FOR EVERY TEST BELOW. Without it a condition that
+        // withheld unconditionally would pass all of them, and the app would offer
+        // nothing while every assertion about withholding stayed green.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: "0");
+
+        var result = await RunWithPatchSets(msi,
+            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable));
+
+        var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
+        Assert.True(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_sibling_patch_that_can_be_uninstalled_withholds_the_superseded_one()
+    {
+        // THE FIX, AND THE ROUTE TEST 4 MEASURED. Uninstalling the patch that
+        // superseded this one rolls the product back onto this one's cached file; with
+        // the file gone that rollback went all the way to the unpatched base and
+        // reported success. The old rule read THIS patch's own removability, which says
+        // nothing about whether the superseding patch can be uninstalled.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: "0");
+
+        var result = await RunWithPatchSets(msi,
+            ("{A}", InstallerQueryService.ProductPatchSet.RemovablePatchPresent));
+
+        var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
+        Assert.False(row.IsRemovable);
+        // withheld FALSE: the app looked and the answer was no, which is a different
+        // sentence from being unable to look.
+        Assert.False(row.RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_product_whose_patch_set_could_not_be_established_withholds_and_says_so()
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: "0");
+
+        var result = await RunWithPatchSets(msi,
+            ("{A}", InstallerQueryService.ProductPatchSet.Unestablished));
+
+        var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
+        Assert.False(row.IsRemovable);
+        // withheld TRUE: the app could not tell. The two causes reach two different
+        // sentences and a surface that names one must name the right one.
+        Assert.True(row.RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_registry_that_names_no_products_at_all_withholds_everything()
+    {
+        // The production shape of a machine whose UserData would not open. An absent
+        // verdict is an inability and not a clean bill, so the offer empties rather
+        // than the condition passing by default.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: "0");
+
+        var result = await RunWithPatchSets(msi);
+
+        var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task The_condition_must_hold_for_EVERY_product_the_patch_is_registered_to()
+    {
+        // D1, and the reason the brief's original wording was under-specified. A patch
+        // is cached once and registered once per product it applies to, and its one
+        // file is shared, so a rollback on ANY of those products reaches for it. One
+        // clean product is not enough.
+        var msi = new FakeMsiApi();
+        foreach (var code in new[] { "{A}", "{B}" })
+        {
+            msi.AddProduct(code);
+            msi.SetProductProperty(code, "LocalPackage", $@"C:\Windows\Installer\{code.Trim('{', '}')}.msi");
+            msi.AddPatch(code, "{P}", CleanPatch, state: "2", uninstallable: "0");
+        }
+
+        var result = await RunWithPatchSets(msi,
+            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable),
+            ("{B}", InstallerQueryService.ProductPatchSet.RemovablePatchPresent));
+
+        var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
+        Assert.False(row.IsRemovable);
+    }
+
+    [Fact]
+    public async Task An_obsoleted_patch_is_never_offered_even_on_a_clean_product()
+    {
+        // Off the offer for policy rather than for safety: never observed on any
+        // machine, so it reclaims nothing, and never tested. It is counted instead.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddPatch("{A}", "{P}", CleanPatch, state: "4", uninstallable: "0");
+
+        var result = await RunWithPatchSets(msi,
+            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable));
+
+        var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
+        Assert.False(row.IsRemovable);
+        Assert.Equal(4, row.PatchState);
+    }
+
+    [Theory]
+    // The patch's own conjunct survives: it declares itself removable, so it can be
+    // rolled back and its file is needed to do it.
+    [InlineData("1")]
+    // Absent, which is an inability rather than a finding and refuses either way.
+    [InlineData("")]
+    public async Task A_patch_that_does_not_positively_declare_zero_is_not_offered(string uninstallable)
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: uninstallable);
+
+        var result = await RunWithPatchSets(msi,
+            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable));
+
+        Assert.False(result.Packages.Single(p => p.LocalPackagePath == CleanPatch).IsRemovable);
+    }
+
+    [Fact]
+    public async Task An_unreadable_Uninstallable_is_not_offered_and_the_registry_cannot_rescue_it()
+    {
+        // Both halves have to answer positively. A read that failed establishes
+        // nothing, and a clean registry reading of the product does not stand in for
+        // the patch's own answer: the two sources union to withhold more, never to
+        // permit what one of them refused.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddPatch("{A}", "{P}", CleanPatch, state: "2", uninstallable: "0");
+        msi.PatchPropertyResult[("{P}", "{A}", "Uninstallable")] = BadConfiguration;
+
+        var result = await RunWithPatchSets(msi,
+            ("{A}", InstallerQueryService.ProductPatchSet.AllNonRemovable));
+
+        var row = result.Packages.Single(p => p.LocalPackagePath == CleanPatch);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.VerdictUnreadable);
+    }
+
     // ---- The instance-product count, which decides nothing ----
 
     [Theory]

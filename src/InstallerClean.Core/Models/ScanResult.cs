@@ -7,15 +7,22 @@ namespace InstallerClean.Models;
 /// all functions of these fields.
 /// </summary>
 /// <param name="RemovableFiles">
-/// Files at the root of <c>C:\Windows\Installer</c> that no registration names,
-/// judged first as text and then, for whatever the text left over, by asking the
-/// filesystem which file each recorded path really names. Safe to move or delete.
+/// The files this scan is offering to move or delete. Two populations, and the
+/// paragraph below says which and on what each was judged.
 ///
-/// ONE PATHWAY REACHES IT. A patch Windows reports superseded or obsoleted is
-/// registered, so it never enters this list whatever its state: Windows opens
-/// every patch registered to a product whether or not it has been superseded
-/// (see <see cref="RegisteredPackage.IsMissingFromDisk"/> for the citation), so
-/// the state is a label on the record rather than permission to remove the file.
+/// TWO PATHWAYS REACH IT AND THEY ASK DIFFERENT QUESTIONS. A file no registration
+/// names arrives from the folder walk, having been judged on paths. A superseded
+/// patch arrives from the registered set, having been judged on products: Windows
+/// reports it superseded, it declares itself non-removable, and every product it is
+/// registered under was established to hold no patch that could be uninstalled and
+/// roll back onto its file. Obsoleted patches reach it by neither pathway and are
+/// counted instead.
+///
+/// The state alone is never permission. Windows opens every patch registered to a
+/// product whether or not it has been superseded (see
+/// <see cref="RegisteredPackage.IsMissingFromDisk"/> for the citation), so a
+/// superseded label is a fact about the record and the per-product condition is what
+/// makes the file safe to offer.
 /// </param>
 /// <param name="RegisteredPackages">
 /// <c>LocalPackage</c> paths this scan is keeping, which is every path any
@@ -32,7 +39,7 @@ namespace InstallerClean.Models;
 /// not share is a sentence, which is why they are counted apart in
 /// <see cref="RegisteredClaimedCount"/> and
 /// <see cref="RegisteredUnjudgedCount"/>. <see cref="RegisteredWithheldCount"/>
-/// is the third and is extinct.
+/// is the third and counts what the per-product condition held back.
 /// </param>
 /// <param name="RegisteredTotalBytes">
 /// Sum of <see cref="RegisteredPackage.FileSizeBytes"/> across
@@ -75,25 +82,27 @@ namespace InstallerClean.Models;
 /// the ones to read before quoting this: it is not confined to records that
 /// failed to read, and it is an estimate rather than a headcount.
 ///
-/// WHAT A NON-ZERO VALUE MEANS CHANGED IN 3.0.0 and the old meaning has gone. It
-/// used to mean the scan had withheld every superseded-patch verdict, so the
-/// offer was shorter than the machine would normally give. Nothing is withheld
-/// now, because no verdict is granted to withhold. What survives is the other
-/// half, and it is about the missing-files report rather than the offer: a
-/// product whose records did not fully read is a product whose registrations this
-/// scan may not have seen, so the count of records naming files that are not
-/// there can be short. "No missing files" and "no missing files that could be
-/// seen" are different claims and only the second is earned on such a run.
+/// IT BEARS ON BOTH HALVES OF THE SCAN AND THE SECOND IS THE ONE USUALLY FORGOTTEN.
+/// A non-zero value withholds every superseded-patch verdict, so the offer is shorter
+/// than the machine would normally give, which is the meaning it has always had. It
+/// also bears on the missing-files report: a product whose records did not fully read
+/// is a product whose registrations this scan may not have seen, so the count of
+/// records naming files that are not there can be short. "No missing files" and "no
+/// missing files that could be seen" are different claims and only the second is
+/// earned on such a run.
 /// </param>
 /// <param name="WithheldCount">
 /// What withholding the removable class cost a run: superseded or obsoleted
 /// packages whose file was on disk and which the scan would have offered, had it
 /// been able to say that no installed product still needed them.
 ///
-/// PERMANENTLY ZERO FROM 3.0.0, and kept rather than removed because the field is
-/// in the result-log schema and a receiver reading a version it knows must not
-/// meet a key that has vanished. Nothing grants a removable verdict, so nothing
-/// takes one away. The command line's 3000 notice no longer carries it.
+/// A REAL FIGURE AGAIN, HAVING BEEN A LITERAL ZERO WHILE NOTHING WAS OFFERED. It
+/// counts what the withholding cost this run: rows Windows reports superseded whose
+/// file is on disk and which declared themselves non-removable, held back anyway
+/// because some product sharing the patch holds one that could be uninstalled, or
+/// because that product's patch set could not be established at all. Obsoleted rows
+/// are NOT in it; they are not withheld, they are simply not offered, and they have
+/// their own count.
 /// </param>
 /// <param name="Census">
 /// What the enumeration behind this scan measured about itself and about the
@@ -135,10 +144,12 @@ namespace InstallerClean.Models;
 /// on, because it could not establish that no installed product still needed
 /// them: every row carrying <c>RemovableWithheld</c>.
 ///
-/// PERMANENTLY ZERO FROM 3.0.0. Nothing grants a removable verdict, so nothing
-/// withholds one. Kept for the same reason <see cref="WithheldCount"/> is, and
-/// still counted off the list rather than assumed, so a row that somehow acquired
-/// the flag would show up rather than being silently folded into its neighbour.
+/// THE SAME POPULATION AS <see cref="WithheldCount"/>, counted off the kept list
+/// rather than tallied through the loop that built it, so the number shown and the
+/// rows shown cannot come apart. It reads zero on a machine with no superseded patch
+/// and on a machine whose every superseded patch passed the condition, and those are
+/// different findings that this count cannot separate; the scan-time registration
+/// counts are what separate them.
 /// </param>
 /// <param name="RegisteredUnjudgedCount">
 /// Kept files whose patch state no read established, one per path
@@ -151,9 +162,11 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="RegisteredSupersededCount">
 /// Kept files whose registration is a patch Windows reports superseded (2) or
-/// obsoleted (4), and whose file is on disk. The population 3.0.0 stopped
-/// offering, measured where it sits: still in the folder, still registered, still
-/// counted in the left-alone totals.
+/// obsoleted (4), and whose file is on disk. The population this scan is KEEPING,
+/// which is not the same as the population that exists: every superseded row that
+/// passed the per-product condition has left this list for the offer, so what is
+/// counted here is the withheld superseded rows plus every obsoleted row, the latter
+/// never being offered at all.
 ///
 /// A SUB-COUNT AND NOT A PARTITION MEMBER. Nearly all of these rows are inside
 /// <see cref="RegisteredClaimedCount"/>; one shape falls under
@@ -167,6 +180,28 @@ namespace InstallerClean.Models;
 /// records superseded patches by count only, so how much space they occupy on a
 /// real machine has only ever been estimated. Files on disk only, on the same
 /// rule as <see cref="RegisteredTotalBytes"/>.
+/// </param>
+/// <param name="SupersededRegistrationCount">
+/// Every registration Windows reports superseded (2), counted at scan time off the
+/// MACHINE and never off the offer, whatever its removability and whether or not
+/// anything was offered.
+///
+/// THE DISTINCTION FROM THE OFFER-DERIVED FIGURE IS THE WHOLE POINT OF IT. A count
+/// taken from the offer can only ever see the registrations that passed the
+/// removability condition, so it cannot answer whether a machine HAS any. The two
+/// differing is itself the finding, being the size of the class the condition
+/// excludes, which nobody has measured.
+/// </param>
+/// <param name="ObsoletedRegistrationCount">
+/// The same for state 4. For this class it is the ONLY figure that can ever be
+/// non-zero, obsoleted patches not being offered at all, so it is the only way the
+/// question of whether anybody has any is ever answered.
+///
+/// WHY THAT QUESTION IS OPEN AT ALL. Across every report this project has received,
+/// obsoleted patches have never been seen on any machine, so offering them would
+/// reclaim nothing; and nobody has ever manufactured one to test with. Counting them
+/// answers the question that was going to be answered by offering them, and puts
+/// nothing on anyone's list.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
@@ -183,7 +218,9 @@ public record ScanResult(
     int RegisteredWithheldCount = 0,
     int RegisteredUnjudgedCount = 0,
     int RegisteredSupersededCount = 0,
-    long RegisteredSupersededBytes = 0)
+    long RegisteredSupersededBytes = 0,
+    int SupersededRegistrationCount = 0,
+    int ObsoletedRegistrationCount = 0)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk; the sum of the two

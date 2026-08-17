@@ -68,7 +68,13 @@ public class ResultLogEntryTests
         RegistryProductKeyCount: 137,
         PatchClaimCount: 2,
         InstanceProductCount: 0,
-        InstanceTypeUnreadableCount: 0);
+        InstanceTypeUnreadableCount: 0,
+        SupersededRegistrationCount: 0,
+        ObsoletedRegistrationCount: 0,
+        ProductPatchKeyCount: 0,
+        ProductPatchRegistrationCount: 0,
+        ProductsWithRemovablePatchCount: 0,
+        ProductsWithPatchSetUnestablishedCount: 0);
 
     private static ResultLogEntry SampleEntry() => new(
         SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
@@ -141,6 +147,9 @@ public class ResultLogEntryTests
                 "unreadablePatchStateCount", "unreadableVerdictPathCount",
                 "unparseableProductKeyCount", "productCount", "registryProductKeyCount",
                 "patchClaimCount", "instanceProductCount", "instanceTypeUnreadableCount",
+                "supersededRegistrationCount", "obsoletedRegistrationCount",
+                "productPatchKeyCount", "productPatchRegistrationCount",
+                "productsWithRemovablePatchCount", "productsWithPatchSetUnestablishedCount",
             ],
             root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
 

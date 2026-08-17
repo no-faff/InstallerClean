@@ -62,16 +62,19 @@ public sealed class RemovableReverifier : IRemovableReverifier
         // whole of what this map is for. A patch whose State or Uninstallable read
         // failed lands here having established nothing either way: non-removable
         // for want of a verdict rather than on one, so reporting it as a program
-        // reclaiming the file would name a cause that did not occur. The withheld
-        // kind was the third and cannot occur now, no verdict being granted to
-        // withhold; the arm stays because the flag does. Both kinds can be in one
-        // batch, which is why the cause is carried per path and not per run.
+        // reclaiming the file would name a cause that did not occur. The withheld kind
+        // is the third and occurs again from 3.0.0: a superseded patch whose product's
+        // patch set this run could not establish is non-removable for want of a reading
+        // rather than on one. Both kinds can be in one batch, which is why the cause is
+        // carried per path and not per run.
         //
-        // EVERY REGISTERED PATH IS IN THIS MAP FROM 3.0.0, no row being removable,
-        // which is strictly stricter than what stood here before: a candidate the
-        // scan offered and a registration has since come to name is now dropped
-        // with a cause, where the superseded class used to be exempt from the
-        // comparison by construction.
+        // A STILL-REMOVABLE SUPERSEDED PATCH IS DELIBERATELY NOT IN THIS MAP, and that
+        // is the one entry whose absence is the point. The map is what condemns a
+        // candidate, so a row that is still removable must stay out of it or the offer
+        // would be emptied by the pass that exists to re-check it. A superseded patch
+        // whose verdict has MOVED since the scan is non-removable now and is therefore
+        // in the map, dropped with a cause, which is exactly the reverting-patch case
+        // this whole pass was built for.
         //
         // THE ROW DECIDES, NOT THE CANDIDATE, AND ONE CASE THEREFORE READS WEAKER
         // THAN IT COULD. A candidate the scan measured as an orphan, whose path a
@@ -125,13 +128,35 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
     /// <inheritdoc />
     /// <remarks>
-    /// IT RETURNS AT ITS FIRST LINE FROM 3.0.0 AND IS NOT DEAD WEIGHT. Its input
-    /// is the patch claims naming a SURVIVING candidate, and no surviving
-    /// candidate is named by any registration now, so the list is always empty.
-    /// This is the last check standing in front of a permanent delete and it is
-    /// what the superseded class would need again; deleting it is a decision about
-    /// the product, not a tidy-up. Do not read the empty list as evidence that the
-    /// re-read it performs was unnecessary.
+    /// IT HAS REAL WORK AGAIN FROM 3.0.0, having returned at its first line while
+    /// nothing registered was offered. Its input is the patch claims naming a
+    /// surviving candidate, and a surviving superseded patch is named by every product
+    /// it is registered to, so the list is non-empty on any batch containing one. This
+    /// is the last check standing in front of a permanent delete.
+    ///
+    /// IT RE-READS THE PAIRING AND NOT THE PRODUCT'S WHOLE PATCH SET, SO IT IS NARROWER
+    /// THAN THE RULE THE SCAN APPLIED. This is a known gap and not a considered
+    /// equivalence, and it must not be described as one. The scan withholds unless every
+    /// patch on every product sharing this one positively declares itself
+    /// non-removable; this re-asks only whether THIS pairing is still superseded and
+    /// still declares zero, which is what <c>IsRemovablePatch</c> answers and that is
+    /// half the rule. A SIBLING patch turning removable between the scan and the click
+    /// is therefore not seen here.
+    ///
+    /// WHAT COVERS THE GAP TODAY IS THE PRE-LEASE PASS AND NOTHING ELSE. It re-runs the
+    /// whole enumeration moments earlier and does apply the per-product condition, so
+    /// the uncovered window is between that enumeration and this re-read rather than
+    /// between the scan and the click.
+    ///
+    /// THE DESIGNED FIX IS NOT BUILT. It is to carry the sibling patch codes forward
+    /// from the pre-lease pass, which already knows exactly which they are, and re-read
+    /// them here by key: a bounded set of keyed reads rather than an enumeration, and a
+    /// keyed read either answers about the record named or says there is no such record.
+    /// The reason for building it is that the offer now rests on a fact about OTHER
+    /// patches, and a re-verify that does not re-check the fact the offer rests on is
+    /// not a re-verify. Leaving it at the narrower question is explicitly the fallback
+    /// rather than the design, and the ruling that named it says nobody may adopt it
+    /// without measuring the read cost first, which nobody has.
     /// </remarks>
     public UnderLeaseRecheck RecheckUnderLease(IReadOnlyList<PatchClaim> claims)
     {

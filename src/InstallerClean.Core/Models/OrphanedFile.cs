@@ -17,21 +17,32 @@ namespace InstallerClean.Models;
 /// <param name="SizeBytes">File size on disk; 0 if the file disappeared between scan and stat.</param>
 /// <param name="IsPatch">True for <c>.msp</c>, false for <c>.msi</c>. Drives the patch/installer column.</param>
 /// <param name="IsRemovablePatch">
-/// PERMANENTLY FALSE FROM 3.0.0: no registered patch is offered, whatever its
-/// state. Kept so the result-log schema's <c>supersededCount</c> and
-/// <c>obsoletedCount</c> go on being derived from the offer rather than being
-/// hard-coded to zero somewhere a later change could quietly make wrong again.
+/// True where this offered file is a registered patch rather than a file no
+/// registration names: Windows reported it superseded, it declared itself
+/// non-removable, and every product it is registered under was established to hold
+/// no patch that could be uninstalled and roll back onto it. The result-log schema's
+/// <c>supersededCount</c> is derived from it.
 /// </param>
 /// <param name="IsObsoleted">
-/// Permanently false for the same reason, and formerly true only for
-/// PatchState=Obsoleted (4). It implies <see cref="IsRemovablePatch"/>; the
-/// inverse does not hold.
+/// PERMANENTLY FALSE, AND FOR A REASON RATHER THAN AS A PLACEHOLDER. It was true only
+/// for PatchState=Obsoleted (4), and an obsoleted patch is not offered at all from
+/// 3.0.0: never observed on any machine in any report, so offering it reclaims
+/// nothing, and never manufactured to test with, so it would put an unexercised class
+/// on a list whose whole claim is certainty. The field is kept, and the schema's
+/// <c>obsoletedCount</c> goes on being DERIVED from it rather than hard-coded to zero,
+/// because the derivation is what would notice if one ever reached the offer again.
+/// Whether any machine has one is answered instead by the scan-time registration count
+/// on <see cref="ScanResult.ObsoletedRegistrationCount"/>, taken off the machine.
+///
+/// It still implies <see cref="IsRemovablePatch"/> by construction; the inverse does
+/// not hold, and now never will.
 /// </param>
 /// <param name="Reason">
-/// Localised tag shown in the Reason column of the orphan list. Now always
-/// <c>Reason.Orphaned</c>, there being one pathway; callers pass a localised
-/// value rather than relying on a default so a non-en-GB UI never shows a stray
-/// English fragment.
+/// Localised tag shown in the Reason column of the orphan list, and there are two
+/// again: <c>Reason.Orphaned</c> for a file no registration names, and
+/// <c>Reason.Superseded</c> for a registered patch that passed the per-product
+/// condition. Callers pass a localised value rather than relying on a default, so a
+/// non-en-GB UI never shows a stray English fragment.
 /// </param>
 public record OrphanedFile(
     string FullPath,

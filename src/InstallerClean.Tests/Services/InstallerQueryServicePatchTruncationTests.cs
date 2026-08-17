@@ -86,11 +86,33 @@ public class InstallerQueryServicePatchTruncationTests
                 InstallerQueryService.ClaimSource.InstallerApi);
         }
 
+        // The per-product patch-set reading, built from the same rows above and
+        // supplied from BOTH sources so they agree. These tests' subject is route A
+        // and the confirmation pass, not the superseded-patch condition: without a
+        // clean reading every product would be unestablished, every path would be
+        // withheld for that reason alone, and every assertion here would pass or fail
+        // for something it is not about. The condition has its own tests.
+        var patchSets = new Dictionary<string, InstallerQueryService.ProductPatchSet>(
+            StringComparer.OrdinalIgnoreCase);
+        foreach (var row in msi.EnumeratedPairings())
+        {
+            var verdict = row.Uninstallable == "0"
+                ? InstallerQueryService.ProductPatchSet.AllNonRemovable
+                : row.Uninstallable.Length == 0
+                    ? InstallerQueryService.ProductPatchSet.Unestablished
+                    : InstallerQueryService.ProductPatchSet.RemovablePatchPresent;
+            patchSets[row.Product] = patchSets.TryGetValue(row.Product, out var seen)
+                ? InstallerQueryService.Worse(seen, verdict)
+                : verdict;
+        }
+
         new InstallerQueryService(msi, NoFallback, null, reader).ConfirmRemovableAgainstEveryProduct(
             claimed,
             claims,
             msi.WalkedProductInstances.ToList(),
             recovered.Select(p => (ProductCode: p, Sid: (string?)null, Context: MsiInstallContext.Machine)).ToList(),
+            patchSets,
+            patchSets,
             CancellationToken.None);
 
         return claimed;

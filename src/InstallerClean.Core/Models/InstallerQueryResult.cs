@@ -6,12 +6,13 @@ namespace InstallerClean.Models;
 /// between them claim, plus how much of the enumeration failed to read.
 /// </summary>
 /// <param name="Packages">
-/// One row per claimed path. NO ROW EVER CARRIES
-/// <see cref="RegisteredPackage.IsRemovable"/> from 3.0.0: this enumeration
-/// grants no removable verdict to any patch, whatever its state, so the flag and
-/// the two mechanisms that used to take it away are inert. A patch Windows
-/// reports superseded or obsoleted arrives here as an ordinary claimed row
-/// carrying its <see cref="RegisteredPackage.PatchState"/>.
+/// One row per claimed path. A row carries
+/// <see cref="RegisteredPackage.IsRemovable"/> only where Windows reported the patch
+/// SUPERSEDED, the patch positively declared itself non-removable, and every product
+/// it is registered under was established to hold no patch that could be uninstalled
+/// and roll back onto its file. An obsoleted patch never carries it, being off the
+/// offer for policy rather than for safety, and neither does a row whose State or
+/// Uninstallable read failed.
 /// </param>
 /// <param name="UnaccountedProductCount">
 /// Installed products this enumeration did not account for. Surfaced to the user
@@ -82,9 +83,9 @@ public record InstallerQueryResult(
     /// <see cref="UnaccountedProductCount"/> for the four).
     ///
     /// WHAT IT BEARS ON IS NOW THE MISSING-FILES REPORT rather than the offer. It
-    /// used to withhold every superseded-patch verdict, and no verdict is granted
-    /// to withhold; a registration this scan never saw is instead one whose file,
-    /// had it gone, went uncounted. Exposed for the copy that says so.
+    /// withholds every superseded-patch verdict, which it has always done; and a
+    /// registration this scan never saw is also one whose file, had it gone, went
+    /// uncounted. Exposed for the copy that says so.
     /// </summary>
     public bool RecordsIncomplete => UnaccountedProductCount > 0;
 }

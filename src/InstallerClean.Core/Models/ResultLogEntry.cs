@@ -270,6 +270,41 @@ public sealed record AppInfo(string Version, string Language)
 /// the walk that asked is carried by the counts already in this object and under
 /// the scan: a product the enumeration never reached was never asked this either.
 /// </param>
+/// <param name="SupersededRegistrationCount">
+/// Registrations Windows reports superseded, counted off the machine rather than off
+/// the offer. A machine fact: two scans of one machine agree about it, where the
+/// scan object's <c>supersededCount</c> answers what a run OFFERED and moves with the
+/// condition.
+///
+/// THE TWO DIFFERING IS THE MEASUREMENT NOBODY HAS. The difference is the size of the
+/// class the per-product condition excludes, and no reading of one machine can
+/// establish it.
+/// </param>
+/// <param name="ObsoletedRegistrationCount">
+/// The same for obsoleted registrations, and for that class this is the only figure
+/// that can ever be non-zero: they are not offered, so nothing derived from the offer
+/// can see them. It exists to answer whether any machine anywhere has one, which no
+/// report has ever shown and nobody has ever manufactured one to test with.
+/// </param>
+/// <param name="ProductPatchKeyCount">
+/// Products whose registry patch-list key opened, from the listing the per-product
+/// condition rests on. Against <see cref="ProductCount"/> it says how usual it is for
+/// a product to carry one.
+/// </param>
+/// <param name="ProductPatchRegistrationCount">
+/// Patch subkeys under those keys, one per (product, patch) registration. With the
+/// count above it is the shape fact the measured machine is least like.
+/// </param>
+/// <param name="ProductsWithRemovablePatchCount">
+/// Products where at least one registered patch positively declared itself removable,
+/// so a rollback there could reach for a superseded patch's cached file. THE FIGURE
+/// THAT SAYS WHAT THE CONDITION COSTS, and one machine cannot answer it.
+/// </param>
+/// <param name="ProductsWithPatchSetUnestablishedCount">
+/// Products whose patch set could not be established. The other half of the same
+/// question and kept apart from it: one is the condition finding a reason to withhold,
+/// this is the condition unable to look.
+/// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
     int LongFileNameCount,
@@ -281,7 +316,13 @@ public sealed record MachineInfo(
     int RegistryProductKeyCount,
     int PatchClaimCount,
     int InstanceProductCount,
-    int InstanceTypeUnreadableCount)
+    int InstanceTypeUnreadableCount,
+    int SupersededRegistrationCount,
+    int ObsoletedRegistrationCount,
+    int ProductPatchKeyCount,
+    int ProductPatchRegistrationCount,
+    int ProductsWithRemovablePatchCount,
+    int ProductsWithPatchSetUnestablishedCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -295,7 +336,13 @@ public sealed record MachineInfo(
             scan.Census.RegistryProductKeys,
             scan.Census.PatchClaimCount,
             scan.Census.InstanceProductCount,
-            scan.Census.InstanceTypeUnreadableCount);
+            scan.Census.InstanceTypeUnreadableCount,
+            scan.SupersededRegistrationCount,
+            scan.ObsoletedRegistrationCount,
+            scan.Census.ProductPatchKeyCount,
+            scan.Census.ProductPatchRegistrationCount,
+            scan.Census.ProductsWithRemovablePatchCount,
+            scan.Census.ProductsWithPatchSetUnestablishedCount);
 }
 
 /// <summary>
@@ -330,10 +377,12 @@ public sealed record MachineInfo(
 /// receiver on the other end of it, so the key stays and this note is the record.
 /// </param>
 /// <param name="WithheldPatchCount">
-/// Superseded and obsoleted files a scan would have offered and did not, because
-/// it could not account for every installed product. PERMANENTLY ZERO FROM 3.0.0,
-/// which offers none of them for any reason; the field is held so a receiver
-/// reading schema 4 meets the key it expects.
+/// Superseded files a scan would have offered and did not: it could not account for
+/// every installed product, or some product sharing the patch holds one that could be
+/// uninstalled and roll back onto the file, or that product's patch set could not be
+/// established at all. A real figure again from 3.0.0, having been a literal zero
+/// while nothing registered was offered. Obsoleted files are not in it: they are not
+/// withheld, they are simply not offered, and they have their own count.
 /// </param>
 /// <param name="UnreadableProductCount">
 /// Products whose records came back short. An exact per-product tally.
@@ -409,10 +458,16 @@ public sealed record ScanInfo(
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
-        // Both are permanently zero from 3.0.0, no registered patch reaching the
-        // offer, and both are still DERIVED from the offer rather than written as
-        // literals. The derivation is what would notice if a patch ever reached
-        // the list again; a hard-coded zero would report a clean shape over it.
+        // DERIVED FROM THE OFFER, WHICH IS WHAT THESE TWO KEYS HAVE ALWAYS MEANT, and
+        // the obsoleted one is now structurally zero rather than incidentally so: an
+        // obsoleted patch cannot reach the offer at all. It stays derived rather than
+        // written as a literal, because the derivation is what would notice if one ever
+        // did, where a hard-coded zero would report a clean shape over it.
+        //
+        // THE SCAN-TIME COUNTS ARE THE DIFFERENT QUESTION AND TRAVEL SEPARATELY. These
+        // two answer what this run OFFERED; the machine object's registration counts
+        // answer what the machine HAS. For obsoleted patches the second is the only one
+        // that can ever be non-zero, which is the whole reason it was added.
         var obsoletedCount = scan.RemovableFiles.Count(f => f.IsObsoleted);
         var supersededCount = scan.RemovableFiles.Count(f => f.IsRemovablePatch) - obsoletedCount;
         return new(

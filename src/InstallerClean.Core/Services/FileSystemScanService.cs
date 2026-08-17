@@ -136,13 +136,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var removable = new List<OrphanedFile>();
 
-        // Candidates no registration claims, in walk order. From 3.0.0 the path
-        // comparison and the file-identity match below it are the whole of what
-        // decides the offer: there is no second screening pass, so a survivor of
-        // those two IS an offered file. Kept as its own list anyway, because the
-        // three sanity gates further down are measured against what the comparison
-        // produced rather than against the offer, and folding the two together
-        // would put a gate's input and its subject in one variable.
+        // Candidates no registration claims, in walk order. The path comparison and
+        // the file-identity match below it are the whole of what decides THIS half of
+        // the offer, and there is no second screening pass over it, so a survivor of
+        // those two is an offered file.
+        //
+        // IT IS ONE OF TWO SOURCES OF OFFERED FILES AND THE OTHER IS NOT THE WALK AT
+        // ALL. A superseded patch reaches the offer from the registered set, having
+        // passed a condition about products rather than about paths. Keeping this list
+        // separate is what lets the three sanity gates below be measured against what
+        // the path comparison produced rather than against the whole offer, which is a
+        // different quantity and would read a machine whose only offered files were
+        // superseded patches as a machine whose comparison found nothing.
         var unclaimedByPath = new List<OrphanedFile>();
 
         // Budgeted, because a refusal is a per-file event on a loop whose length
@@ -177,6 +182,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
         long stillUsedBytes = 0;
+        // Registrations Windows reports superseded (2) and obsoleted (4), counted off
+        // the machine rather than off the offer. See the increment site.
+        int supersededRegistrations = 0;
+        int obsoletedRegistrations = 0;
         int refusedCandidates = 0;
         int missingNotSuperseded = 0;
         int missingSuperseded = 0;
@@ -349,7 +358,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             catch (UnauthorizedAccessException) { /* unreadable payload subfolder */ }
             catch (SecurityException) { /* CAS policy denies the FileInfo construction */ }
 
-            sizedPackages.Add(pkg with { FileSizeBytes = size, FileExists = exists });
+            var sized = pkg with { FileSizeBytes = size, FileExists = exists };
 
             // The correlation measurement, taken on every registered row before
             // the branch below splits them by verdict. A row's verdict has
@@ -363,11 +372,67 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 if (exists) registeredInFolderPresent++;
             }
 
-            // EVERY REGISTERED ROW IS KEPT AND THERE IS NO LONGER A BRANCH THAT
-            // OFFERS ONE. A patch Windows reports superseded or obsoleted is a
-            // patch Windows still holds, and it goes into the kept list, the kept
-            // bytes and the kept counts exactly as an applied one does.
+            // THE SCAN-TIME COUNTS, TAKEN OFF THE MACHINE AND NEVER OFF THE OFFER.
+            // Every registration Windows reports superseded or obsoleted is counted
+            // here whatever its removability and whether or not anything is offered,
+            // which is the whole point of them: a count derived from the offer can
+            // only ever see the registrations that passed the removability condition,
+            // so it cannot answer whether a machine HAS any. Obsoleted patches are not
+            // offered at all, so this is the only way that class is ever visible; and
+            // the superseded pair differing from the offer-derived figure is itself
+            // the finding, being the size of the class the condition excludes, which
+            // nobody has measured.
+            if (pkg.PatchState == 2) supersededRegistrations++;
+            else if (pkg.PatchState == 4) obsoletedRegistrations++;
+
+            // A SUPERSEDED PATCH THAT SURVIVED EVERY WITHHOLDING IS OFFERED, and this
+            // is the branch 3.0.0 puts back. What it rests on is not this line: by the
+            // time a row arrives here carrying IsRemovable it has passed a positively
+            // read Superseded state, its own positively read Uninstallable, and the
+            // per-product condition that asks whether anything on any product sharing
+            // the patch could be uninstalled and roll back onto its file. Four later
+            // passes can still take the verdict away and none can grant one.
             //
+            // ON DISK ONLY. A removable row whose file has already gone has nothing to
+            // offer and belongs in the missing counts below, which is where it goes.
+            //
+            // THE CONTAINMENT GUARD RUNS HERE TOO, exactly as it does on a walked
+            // candidate, and for the same reason: a registered path is a string out of
+            // the records rather than something this run enumerated, so it has not been
+            // shown to sit directly in the cache folder and must not be offered on the
+            // strength of the records alone.
+            if (exists && sized.IsRemovable)
+            {
+                var safety = CandidateGuard.CheckSafeToRemove(pkg.LocalPackagePath, cacheRoot);
+                if (safety == CandidateGuard.RemovalSafety.Safe)
+                {
+                    removable.Add(new OrphanedFile(
+                        FullPath: pkg.LocalPackagePath,
+                        SizeBytes: size,
+                        IsPatch: true,
+                        IsRemovablePatch: true,
+                        IsObsoleted: false,
+                        Reason: Strings.Reason_Superseded));
+                    // AND IT COMES OUT OF THE KEPT LIST, which is the half that is
+                    // easy to forget. The kept list drives the left-alone count, the
+                    // left-alone bytes and the details window, so a row on the offer
+                    // that stayed in it would be shown to the user twice and counted
+                    // on both summary lines. v2.3.0 filtered these out of that list
+                    // after the fact; taking the row out here is the same rule at the
+                    // one place that can see both destinations.
+                    continue;
+                }
+
+                refusedCandidates++;
+                refusalLog.Record(new InvalidOperationException(
+                    safety == CandidateGuard.RemovalSafety.Refused
+                        ? $"Registered removal candidate refused (not directly in the Installer cache, or a reparse point): {pkg.LocalPackagePath}"
+                        : $"Registered removal candidate not offered (its symlink status or location could not be read): {pkg.LocalPackagePath}"),
+                    cause: $"registered/{safety}");
+            }
+
+            sizedPackages.Add(sized);
+
             // What the state still decides is which of the two missing counts a
             // row lands in when its file has gone, and that is a split in the DATA
             // and not a difference either host may speak: Windows opens every
@@ -419,16 +484,19 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // offer and a comparison that worked perfectly. Reading the offer here
         // would refuse that machine.
         //
-        // It is the walk's candidates and nothing else from 3.0.0. A registered
-        // row can no longer become a candidate, so the term that used to add the
-        // superseded patches about to be offered has gone with them.
+        // It is the walk's candidates and NOT the offer, and the difference is real
+        // again now that a registered row can reach the offer without ever having been
+        // a candidate. A machine whose only offered files are superseded patches has an
+        // offer and no candidates, and the gates below must read that as a comparison
+        // that found nothing rather than as a comparison that worked.
         var candidatesFromComparison = candidatesFromWalk;
 
         if (!cacheRoot.Proven && refusedCandidates > 0 && candidatesFromComparison == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
 
-        // Every registered row, no row being removable. The filter that used to
-        // stand here took the offered patches back out of the kept list.
+        // The registered rows this scan is keeping. A superseded patch that reached
+        // the offer is not among them, having been left out at the loop above rather
+        // than filtered out here.
         var stillUsed = sizedPackages.AsReadOnly();
 
         // The populations inside that list, counted off the list itself rather
@@ -446,12 +514,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var registeredWithheld = stillUsed.Count(p => p.RemovableWithheld);
         var registeredUnjudged = stillUsed.Count(p => p.VerdictUnreadable);
 
-        // The patches 3.0.0 stopped offering, measured where they now sit. A
-        // sub-count of the claimed rows rather than a fourth population (one shape
-        // falls under the unjudged instead, a State that read 2 or 4 whose
-        // Uninstallable read then failed), so the two are never added. Files on
-        // disk only: a superseded registration whose file has already gone is in
-        // the missing counts and has no space to give back.
+        // SUPERSEDED AND OBSOLETED ROWS THIS SCAN IS KEEPING, which is a different
+        // population from the one this pair counted before the offer came back. Every
+        // superseded row that passed the per-product condition has left the kept list
+        // for the offer, so what is counted here is the class the app declined to
+        // offer: superseded rows some product could roll back onto or whose patch set
+        // could not be established, plus every obsoleted row, which is not offered at
+        // all. Files on disk only, a registration whose file has already gone having no
+        // space to give back and belonging to the missing counts.
+        //
+        // A sub-count of the claimed rows rather than a fourth population (one shape
+        // falls under the unjudged instead, a State that read 2 or 4 whose Uninstallable
+        // read then failed), so the two are never added.
         var registeredSuperseded = stillUsed
             .Count(p => p.IsSupersededOrObsoleted && p.FileExists);
         var registeredSupersededBytes = stillUsed
@@ -592,10 +666,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // had no honest superordinate to report them under.
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes,
             missingNotSuperseded, missingSuperseded,
-            // WithheldCount is zero from here on and is passed as a literal rather
-            // than dropped: the field is in the result-log schema, so a receiver
-            // meets the key it expects with a value that is true.
-            query.UnaccountedProductCount, 0,
+            // WITHHELD IS A REAL FIGURE AGAIN AND WAS A LITERAL ZERO IN THE COMMITS
+            // BETWEEN. It counts what the withholding cost this run: superseded rows on
+            // disk that the scan would have offered had it been able to establish that
+            // nothing on any product sharing them could roll back onto the file.
+            // Counted off the kept rows rather than tallied, on the same reasoning as
+            // the three counts above it.
+            query.UnaccountedProductCount, registeredWithheld,
             query.Census,
             // Read after the classification is settled, so a probe that threw
             // could not cost anybody a scan; it does not throw, and the ordering
@@ -606,7 +683,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registeredWithheld,
             registeredUnjudged,
             registeredSuperseded,
-            registeredSupersededBytes);
+            registeredSupersededBytes,
+            supersededRegistrations,
+            obsoletedRegistrations);
     }
 
     /// <summary>

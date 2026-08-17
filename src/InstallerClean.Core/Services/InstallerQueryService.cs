@@ -336,6 +336,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var instanceProducts = 0;
         var instanceTypeUnreadable = 0;
 
+        // THE API's OWN READING OF EACH PRODUCT'S PATCH SET, which is one of the
+        // three sources the superseded-patch condition unions. It is built here
+        // rather than asked for later because the loop below already reads every
+        // patch's Uninstallable for every product it reaches, so the answers are
+        // free at this point and a keyed re-read afterwards would ask the same
+        // question twice.
+        //
+        // ONE ENTRY PER PRODUCT, NOT PER PATCH, because the condition is about the
+        // product: a rollback on any product holding a superseded patch reaches for
+        // that patch's one cached file, so what matters is whether ANY patch on that
+        // product can be uninstalled. See ProductPatchSet for the three answers and
+        // why two of them withhold for different reasons.
+        var apiPatchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
+
         progress?.Report(new ScanProgressUpdate(Strings.Status_FoundProducts));
 
         // Budgeted, because the abandonment breadcrumb is one full entry per
@@ -439,40 +453,59 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     var uninstallableRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable);
                     var stateStr = stateRead.Value;
 
-                    // Nothing here decides whether a file may be removed, and that
-                    // is the 3.0.0 change rather than an omission. Both properties
-                    // are still read and neither grants anything: every registered
-                    // patch is kept, so what the pair is for now is whether the
-                    // records answered at all. A read that failed leaves nothing
-                    // established about the registration, which no surface may
-                    // describe as a claim, and the count travels beside the flag
-                    // because nobody knows how often either read fails on a machine
-                    // that is not the one this was measured on.
-                    //
-                    // BOTH READS SURVIVE, INCLUDING THE ONE NO RULE CONSUMES.
-                    // Uninstallable answered the second half of the old removable
-                    // rule and answers nothing now, but dropping it would narrow
-                    // what counts as "the records did not answer" without saying
-                    // so: the merge below prefers a row that established something
-                    // over one that did not, and the act-time re-check names its
-                    // cause from the same flag, so a half-read record quietly
-                    // becoming a fully-read one moves both. It also keeps
-                    // UnreadablePatchStates measuring across this release what it
-                    // measured before it.
+                    // A read that failed leaves nothing established about the
+                    // registration, which no surface may describe as a claim, and the
+                    // count travels beside the flag because nobody knows how often
+                    // either read fails on a machine that is not the one this was
+                    // measured on. It also refuses the removable verdict below, both
+                    // halves of that rule needing a positive answer.
                     var verdictUnreadable = stateRead.Unreadable || uninstallableRead.Unreadable;
                     if (verdictUnreadable) unreadablePatchStates++;
 
                     // An unparseable State leaves patchState at 0 (not-a-patch),
                     // which is the safe direction on purpose rather than luck: only
                     // a positively read Superseded (2) or Obsoleted (4) labels a row
-                    // as one of those, and the label decides nothing but what is
-                    // reported. IsRemovable is left at its default and is never set
-                    // from here.
+                    // as one of those.
                     int.TryParse(stateStr, out var patchState);
 
+                    // THIS PATCH'S CONTRIBUTION TO ITS PRODUCT'S PATCH SET, which is
+                    // the API's reading of one of the three sources the superseded
+                    // condition unions. Free here: the loop has just read this
+                    // pairing's Uninstallable for its own purposes.
+                    //
+                    // THE ORDER OF THE ARMS IS THE WHOLE OF IT. A read that failed
+                    // establishes nothing. A positive "0" is the only clean answer.
+                    // An EMPTY value is an inability and not a finding, which is the
+                    // arm easiest to get wrong: comparing against "0" alone would read
+                    // an absent property as a removable patch, which is a cause stated
+                    // for something nobody measured. Anything else present is a
+                    // positive finding that something on this product can be
+                    // uninstalled.
+                    var apiVerdict =
+                        stateRead.Unreadable || uninstallableRead.Unreadable
+                            ? ProductPatchSet.Unestablished
+                        : uninstallableRead.Value == "0" ? ProductPatchSet.AllNonRemovable
+                        : uninstallableRead.Value.Length == 0 ? ProductPatchSet.Unestablished
+                        : ProductPatchSet.RemovablePatchPresent;
+                    apiPatchSets[productCode] = apiPatchSets.TryGetValue(productCode, out var seenApi)
+                        ? Worse(seenApi, apiVerdict)
+                        : apiVerdict;
+
                     var claimedPath = NormaliseLocalPackagePath(patchPath.Value);
+
+                    // THE REMOVABLE VERDICT IS GRANTED HERE AND TAKEN AWAY LATER, and
+                    // the order is the architecture rather than a convenience. This
+                    // half needs only what has just been read; the other half needs
+                    // the registry's per-product patch sets, which are read after this
+                    // loop finishes. So the verdict is granted provisionally and
+                    // WithholdWhereAProductCanRollBack removes it, which works because
+                    // every path a verdict can travel is downgrade-only: MergeClaim
+                    // never upgrades, and Downgrade is one-way. A row that leaves this
+                    // loop removable can still be withheld by four separate later
+                    // passes and can never be made removable again by any of them.
                     MergeClaim(claimed,
                         new RegisteredPackage(claimedPath, productName, productCode, patchState,
+                            IsRemovable: IsRemovablePatch(stateStr, uninstallableRead.Value),
                             VerdictUnreadable: verdictUnreadable),
                         ClaimSource.InstallerApi);
                     // Recorded whatever the verdict was. A claim that is Applied
@@ -506,7 +539,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, ct);
 
-        ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered, ct);
+        ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered,
+            fallback.ProductPatchSets, apiPatchSets, ct);
 
         // Both sources degraded at once: refuse the scan outright rather than
         // report a shorter one.
@@ -632,7 +666,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         // DEAD FROM 3.0.0 AND DELIBERATELY LEFT STANDING. No row reaches here
         // carrying IsRemovable, so the loop runs over no rows and RemovableWithheld
-        // is never set on a real scan. It is kept because it is the mechanism the
+        // is set on any scan that withholds one. It is the mechanism the
         // superseded class would need if it were ever offered again, and because
         // deleting the machinery that made that class as safe as it was is a
         // decision about the product rather than a tidy-up.
@@ -855,6 +889,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         List<PatchClaim> patchClaims,
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
         List<(string ProductCode, string? Sid, MsiInstallContext Context)> recovered,
+        IReadOnlyDictionary<string, ProductPatchSet>? registryPatchSets,
+        IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets,
         CancellationToken ct)
     {
         // EVERY patch code naming a still-removable path, not one per path. The
@@ -885,6 +921,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // to report: an enumeration that came back empty because it refused,
         // taken as an answer, is the exact fault this whole pass exists to close.
         var holders = EnumeratePatchHoldersAcrossAllProducts(ct);
+
+        // THE PER-PRODUCT CONDITION, RUN BEFORE THE PER-PAIRING WORK BELOW because
+        // it can settle a path outright and the pairing reads are the expensive
+        // half. It asks a different question from everything else in this method:
+        // the rest confirms that no product claims this patch as still needed, and
+        // this asks whether anything on a product sharing the patch could be
+        // uninstalled and reach for its file.
+        WithholdWhereAProductCanRollBack(
+            claimed, patchClaims, holders, registryPatchSets, apiPatchSets, ct);
 
         foreach (var (path, patchCode) in toConfirm)
         {
@@ -1774,6 +1819,138 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
+    /// One product's patch-set verdict, unioned across the sources that can see its
+    /// patches. Every source can only ADD a patch to the set, so unioning costs reads
+    /// and can only ever withhold more.
+    ///
+    /// THE REGISTRY IS WHAT MAKES THE SET TRUSTWORTHY AND THE API IS WHAT STOPS IT
+    /// RESTING ON ONE READING. The registry side is a key listing, so it has no index
+    /// and no early end to be blind to, which is the fault every enumeration of a
+    /// patch set shares. The API side is the same pairings the product loop already
+    /// read, so it costs nothing and it catches a patch the registry's own key does
+    /// not list.
+    ///
+    /// AN ABSENT REGISTRY ENTRY IS AN INABILITY AND AN ABSENT API ENTRY IS NOT, which
+    /// looks inconsistent and is the point. The registry walk visits every product key
+    /// on the machine and writes a verdict for each, so a product missing from it is a
+    /// product the walk could not account for. The API map is built only from patches
+    /// the loop actually read, so a product missing from it is usually a product with
+    /// no patches, which is not a failure to establish anything. A product with no
+    /// registry entry therefore withholds, and in production that is either a machine
+    /// whose <c>UserData</c> would not open at all, which the degraded-sources gate
+    /// also sees, or a test that supplied no patch sets.
+    /// </summary>
+    internal static ProductPatchSet ProductVerdict(
+        string productCode,
+        IReadOnlyDictionary<string, ProductPatchSet>? registryPatchSets,
+        IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets)
+    {
+        var fromRegistry = registryPatchSets is not null
+            && registryPatchSets.TryGetValue(productCode, out var r)
+                ? r
+                : ProductPatchSet.Unestablished;
+
+        return apiPatchSets.TryGetValue(productCode, out var a)
+            ? Worse(fromRegistry, a)
+            : fromRegistry;
+    }
+
+    /// <summary>
+    /// Withholds every still-removable path that any product could roll back onto.
+    ///
+    /// THE DEFECT THIS CLOSES, MEASURED RATHER THAN REASONED. The rule that decided
+    /// this until 3.0.0 read the SUPERSEDED patch's own removability, and the risk
+    /// turns on the SUPERSEDING patch's. Uninstalling patch C with the superseded
+    /// patches' cached files present rolled a product back one step correctly; with
+    /// those files missing it went all the way to the unpatched base, discarded both
+    /// patches and reported success, and the log carries Windows looking for the
+    /// absent files by name. So removing a superseded patch's cached file can silently
+    /// cost somebody a security update, in exactly the operation Microsoft always
+    /// named as the reason the file is cached.
+    ///
+    /// SO THE CONDITION IS ABOUT THE PRODUCT AND ABOUT EVERY PRODUCT. A superseded
+    /// patch is cached once and registered once per product it applies to, and its one
+    /// file is shared by all of them, so a rollback on ANY of those products reaches
+    /// for it. A condition holding only for the product a loop happened to be standing
+    /// in would offer a file that a second product's removable patch can still need.
+    /// One file was measured carrying four registrations across two products.
+    ///
+    /// THE PRODUCTS ARE UNIONED TOO, not just the patches. The claims name the
+    /// products the enumeration reached; route A names products it never returned. A
+    /// product either source names is a product the condition has to hold for.
+    ///
+    /// WHAT IT CANNOT PROMISE, so no copy may say otherwise: the condition is read
+    /// here and re-read at act time, and neither is a statement about the future. A
+    /// patch that is non-removable today can be replaced tomorrow by one that is not.
+    /// That is true of every check this app makes and is not a defect here.
+    /// </summary>
+    private static void WithholdWhereAProductCanRollBack(
+        Dictionary<string, RegisteredPackage> claimed,
+        List<PatchClaim> patchClaims,
+        Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? holders,
+        IReadOnlyDictionary<string, ProductPatchSet>? registryPatchSets,
+        IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets,
+        CancellationToken ct)
+    {
+        // The patch codes naming each still-removable path, which is what decides
+        // which products the path has to be clean against. Several codes can name one
+        // path, and one code can be registered to several products, so both are
+        // collected rather than reduced.
+        var codesByPath = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var claim in patchClaims)
+        {
+            if (!claimed.TryGetValue(claim.LocalPackagePath, out var row) || !row.IsRemovable) continue;
+            if (!codesByPath.TryGetValue(claim.LocalPackagePath, out var codes))
+                codesByPath[claim.LocalPackagePath] = codes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            codes.Add(claim.PatchCode);
+        }
+
+        if (codesByPath.Count == 0) return;
+
+        // The products each path's codes are registered to, from the claims and from
+        // route A. Route A being null is already answered by the caller, which
+        // withholds every path on it, so this pass adds nothing there and does not
+        // second-guess it.
+        var productsByPath = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var claim in patchClaims)
+        {
+            if (!codesByPath.ContainsKey(claim.LocalPackagePath)) continue;
+            if (!productsByPath.TryGetValue(claim.LocalPackagePath, out var set))
+                productsByPath[claim.LocalPackagePath] = set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            set.Add(claim.ProductCode);
+        }
+
+        if (holders is not null)
+            foreach (var (path, codes) in codesByPath)
+                foreach (var code in codes)
+                    if (holders.TryGetValue(code, out var named))
+                        foreach (var (productCode, _, _) in named)
+                            productsByPath[path].Add(productCode);
+
+        foreach (var (path, products) in productsByPath)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            // A path another product has already settled needs no second look:
+            // downgrades are one-way and the verdict cannot come back.
+            if (!claimed.TryGetValue(path, out var row) || !row.IsRemovable) continue;
+
+            foreach (var productCode in products)
+            {
+                var verdict = ProductVerdict(productCode, registryPatchSets, apiPatchSets);
+                if (verdict == ProductPatchSet.AllNonRemovable) continue;
+
+                // The two causes reach the two words Downgrade already has, and they
+                // are not the same finding: one is the app having established that
+                // something on this product can be uninstalled, the other is the app
+                // unable to establish that nothing can. Both keep the file.
+                Downgrade(claimed, path, withheld: verdict == ProductPatchSet.Unestablished);
+                break;
+            }
+        }
+    }
+
+    /// <summary>
     /// Reads one product's registered patch set out of
     /// <c>Products\&lt;packed product&gt;\Patches</c> and reduces it to a single
     /// verdict.
@@ -2498,40 +2675,48 @@ public sealed class InstallerQueryService : IInstallerQueryService
     internal readonly record struct PropertyRead(string Value, bool Unreadable, bool NotRegistered = false);
 
     /// <summary>
-    /// The rule that decided, up to v2.3.0, whether a patch's cached .msp was
-    /// offered for removal, from its State and Uninstallable values exactly as
-    /// <c>MsiGetPatchInfoEx</c> returned them.
+    /// HALF the rule that decides whether a patch's cached .msp is offered, from its
+    /// State and Uninstallable values exactly as <c>MsiGetPatchInfoEx</c> returned
+    /// them. The other half is
+    /// <see cref="WithholdWhereAProductCanRollBack"/> and a row this returns true for
+    /// is still withheld unless every product sharing the patch passes that.
+    /// **Nothing may read this alone as permission to remove a file.**
     ///
-    /// NO CALLER ACTS ON IT FROM 3.0.0. The enumeration does not consult it, and
-    /// the two act-time passes that do reach it are handed the patch claims naming
-    /// a candidate, of which there are now none. It is kept whole, with its tests,
-    /// because it is the rule itself rather than a helper: if the class is ever
-    /// offered again this is what it would be offered on, and rebuilding it from
-    /// the documentation a second time is how a subtlety gets lost.
+    /// SUPERSEDED ONLY FROM 3.0.0, WHERE IT WAS <c>2 or 4</c>. Obsoleted patches come
+    /// off the offer for a reason that is not about safety: measured across every
+    /// report this project has ever received, obsoleted patches have never been seen
+    /// on any machine at all, so offering them reclaims nothing, and nobody has ever
+    /// manufactured one to test with. A class that buys no space and has never been
+    /// exercised does not belong on a list whose whole claim is certainty. They are
+    /// counted at scan time instead, off the machine rather than off the offer, so the
+    /// question of whether anybody has any gets answered without anything appearing on
+    /// anyone's list.
     ///
-    /// WHAT THE RULE IS WORTH, WHICH IS WHY IT STOPPED BEING USED. The State half
-    /// carries real information: Windows has computed that a later patch took over
-    /// this one's fixes. It does not say the cached file is spare, and Microsoft's
-    /// own words for the two states are "applied to this product instance but is
-    /// superseded" and "applied in this product instance but obsolete". The
-    /// Uninstallable half was taken for the cautious conjunct and is not one: it
-    /// reports whether Windows can UNDO the patch, which its own reference page
-    /// gives eight causes for, the commonest being that the patch author never set
-    /// the AllowRemoval row. So a positively read "0" says the patch cannot be
-    /// rolled back, and nothing whatever about whether anything still reads the
-    /// file. Measured against real patches the conjunct behaves as a vendor filter
-    /// pointing the wrong way: all 58 patches in Office 2010 SP2 declare
-    /// themselves removable and were refused, and three live Adobe patches declare
-    /// themselves not removable and were offered.
+    /// WHAT EACH HALF IS WORTH, because the two are not the same kind of fact. The
+    /// State half carries real information: Windows has computed that a later patch
+    /// took over this one's fixes. It does not say the cached file is spare, and
+    /// Microsoft's own words for the state are "applied to this product instance but
+    /// is superseded". The Uninstallable half reports whether Windows can UNDO this
+    /// patch, which its own reference page gives eight causes for, the commonest being
+    /// that the patch author never set the AllowRemoval row. So a positively read "0"
+    /// says this patch cannot be rolled back, and nothing about whether anything still
+    /// reads the file.
     ///
-    /// Both directions still fail safe and that has not changed. An unparseable
-    /// State leaves the parsed value at 0 (not a patch), and only a positively
-    /// read "0" for Uninstallable clears the second half.
+    /// AND ON ITS OWN THE CONJUNCT ASKS THE WRONG PATCH. Measured against real
+    /// patches it behaves as a vendor filter pointing the wrong way: all 58 patches in
+    /// Office 2010 SP2 declare themselves removable and were refused, and three live
+    /// Adobe patches declare themselves not removable and were offered. The risk turns
+    /// on whether the patch that SUPERSEDED this one can be uninstalled, which this
+    /// never reads, and that is precisely what the other half was built for.
+    ///
+    /// Both directions fail safe. An unparseable State leaves the parsed value at 0
+    /// (not a patch), and only a positively read "0" for Uninstallable clears the
+    /// second test, so an absent or unreadable value refuses.
     /// </summary>
     internal static bool IsRemovablePatch(string stateValue, string uninstallableValue)
     {
         int.TryParse(stateValue, out var patchState);
-        return patchState is 2 or 4 && uninstallableValue == "0";
+        return patchState == 2 && uninstallableValue == "0";
     }
 
     /// <summary>

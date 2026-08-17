@@ -24,7 +24,8 @@ namespace InstallerClean.Models;
 /// on every scan and still means what it says: a patch's State or Uninstallable
 /// read failed, so nothing was established about that registration either way.
 /// RemovableWithheld is written only where a removable verdict is taken away, and
-/// no verdict is granted now, so it is never set on a real scan; the code that
+/// a verdict is granted again from 3.0.0, so it is set on any scan that withholds
+/// one; the code that
 /// writes it is kept because it is the machinery the class would need if it ever
 /// came back. Nothing may put a row carrying either flag under a sentence that
 /// names a claim, because there is no claim to name.
