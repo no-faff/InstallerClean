@@ -86,22 +86,32 @@ public class InstallerQueryServicePatchTruncationTests
                 InstallerQueryService.ClaimSource.InstallerApi);
         }
 
-        // The per-product patch-set reading, built from the same rows above and
-        // supplied from BOTH sources so they agree. These tests' subject is route A
-        // and the confirmation pass, not the superseded-patch condition: without a
-        // clean reading every product would be unestablished, every path would be
-        // withheld for that reason alone, and every assertion here would pass or fail
-        // for something it is not about. The condition has its own tests.
+        // The per-product patch-set reading, and it comes from a DIFFERENT source
+        // from the claims above, which is the correction rather than a detail. These
+        // tests' subject is route A and the confirmation pass, not the
+        // superseded-patch condition: without a clean reading every product would be
+        // unestablished, every path would be withheld for that reason alone, and
+        // every assertion here would pass or fail for something it is not about. The
+        // condition has its own tests.
+        //
+        // BUILT FROM EVERY REGISTRATION RATHER THAN FROM THE ENUMERATED ONES. It was
+        // built from the enumerated rows, which meant a product the walk LOST had no
+        // patch set, read as unestablished, and withheld the path before the pass
+        // could go and find it. That is the exact case these tests exist for, so they
+        // were withholding on the fixture's shape instead of exercising the pass. In
+        // production the two sources really are different: the claims come from the
+        // API walk, and the patch sets are read by walking UserData's own product
+        // subkeys, which see a product the walk never returned.
         var patchSets = new Dictionary<string, ProductPatchSet>(
             StringComparer.OrdinalIgnoreCase);
-        foreach (var row in msi.EnumeratedPairings())
+        foreach (var (product, uninstallable) in msi.AllRegistrations())
         {
-            var verdict = row.Uninstallable == "0"
+            var verdict = uninstallable == "0"
                 ? ProductPatchSet.AllNonRemovable
-                : row.Uninstallable.Length == 0
+                : uninstallable.Length == 0
                     ? ProductPatchSet.Unestablished
                     : ProductPatchSet.RemovablePatchPresent;
-            patchSets[row.Product] = patchSets.TryGetValue(row.Product, out var seen)
+            patchSets[product] = patchSets.TryGetValue(product, out var seen)
                 ? InstallerQueryService.Worse(seen, verdict)
                 : verdict;
         }
@@ -780,6 +790,27 @@ public class InstallerQueryServicePatchTruncationTests
                         _patchProps[(patch, product, "Uninstallable")],
                         sid, context);
             }
+        }
+
+        /// <summary>
+        /// Every (product, patch) registration this fixture holds, whether or not any
+        /// enumeration names it.
+        ///
+        /// IT IS DELIBERATELY WIDER THAN <see cref="EnumeratedPairings"/> AND THE
+        /// DIFFERENCE IS THE WHOLE POINT. That one models what the API walk returned,
+        /// so it must exclude a product the walk lost: including it would hand the
+        /// confirmation pass the very claim the pass exists to go and find. This one
+        /// models what the REGISTRY holds, and the registry does see a product the
+        /// walk lost, because the per-product patch sets are read by walking
+        /// UserData's own product subkeys rather than the enumeration's output.
+        /// Building both from one source made every lost product's patch set read
+        /// unestablished, which withheld the path before the pass could reach it.
+        /// </summary>
+        public IEnumerable<(string Product, string Uninstallable)> AllRegistrations()
+        {
+            foreach (var ((_, product, prop), value) in _patchProps)
+                if (prop == "Uninstallable")
+                    yield return (product, value);
         }
 
         /// <summary>
