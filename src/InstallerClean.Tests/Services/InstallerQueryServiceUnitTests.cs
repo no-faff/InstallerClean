@@ -1474,6 +1474,112 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(unimprovable, Assert.Single(result.Packages).LocalPackagePath);
     }
 
+    // ---- The environment-variable form ----
+
+    // The variable is this test's own and is set for the duration of one test
+    // rather than borrowed from the machine, so the assertion does not depend on
+    // where Windows happens to be installed and nothing else in a parallel run
+    // reads it. The name appears in the attributes as a literal because an
+    // InlineData value cannot interpolate a constant; the two must stay in step.
+    private const string EnvRootName = "INSTALLERCLEAN_TEST_ROOT";
+    private const string EnvRootValue = @"C:\TestWindows";
+
+    [Theory]
+    // The plain form, which nothing in this application expanded before 3.0.0:
+    // NeedsFinalPathResolution answers false for a '%', so the value fell through
+    // to GetFullPath, which completed it from the process working directory and
+    // produced a well-formed path naming nothing. The claim then failed to match
+    // the walk and the cached file it meant was offered as unclaimed, which is the
+    // one direction of a spelling fault that costs somebody a file rather than
+    // merely mis-filing a row.
+    [InlineData(@"%INSTALLERCLEAN_TEST_ROOT%\Installer\env.msi")]
+    // The same with a doubled separator and a relative segment on top, so the
+    // expansion and GetFullPath are shown to compose rather than either undoing
+    // the other.
+    [InlineData(@"%INSTALLERCLEAN_TEST_ROOT%\Temp\..\\Installer\env.msi")]
+    // Behind each prefix, which is what pins the ORDER rather than merely the
+    // expansion. StripLongPathPrefix takes a prefix off a DRIVE-ROOTED path only,
+    // and neither of these is drive-rooted until the variable is expanded, so
+    // expanding second leaves the prefix on: the \??\ form's leading separator is
+    // then read as rooted on whatever drive the process is running from, and the
+    // \\?\ form is left alone by GetFullPath on purpose. Both would name a file
+    // nowhere.
+    [InlineData(@"\??\%INSTALLERCLEAN_TEST_ROOT%\Installer\env.msi")]
+    [InlineData(@"\\?\%INSTALLERCLEAN_TEST_ROOT%\Installer\env.msi")]
+    public async Task An_environment_variable_in_a_claim_is_expanded_before_the_prefix_strip(string registeredAs)
+    {
+        var previous = Environment.GetEnvironmentVariable(EnvRootName);
+        Environment.SetEnvironmentVariable(EnvRootName, EnvRootValue);
+        try
+        {
+            var msi = new FakeMsiApi();
+            msi.AddProduct("{A}");
+            msi.SetProductProperty("{A}", "LocalPackage", registeredAs);
+
+            var result = await Run(msi);
+
+            Assert.Equal($@"{EnvRootValue}\Installer\env.msi",
+                Assert.Single(result.Packages).LocalPackagePath);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(EnvRootName, previous);
+        }
+    }
+
+    [Fact]
+    public async Task A_patch_claim_is_expanded_the_same_way()
+    {
+        // The patch side separately, because it reaches the normaliser by its own
+        // call site and because the .msp is the file a wrong answer here would put
+        // on the list.
+        var previous = Environment.GetEnvironmentVariable(EnvRootName);
+        Environment.SetEnvironmentVariable(EnvRootName, EnvRootValue);
+        try
+        {
+            var msi = new FakeMsiApi();
+            msi.AddProduct("{A}");
+            msi.AddPatch("{A}", "{P}",
+                localPackage: @"%INSTALLERCLEAN_TEST_ROOT%\Installer\env.msp",
+                state: "2", uninstallable: "0");
+
+            var result = await Run(msi);
+
+            Assert.Equal($@"{EnvRootValue}\Installer\env.msp",
+                Assert.Single(result.Packages).LocalPackagePath);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(EnvRootName, previous);
+        }
+    }
+
+    [Fact]
+    public async Task A_variable_the_machine_does_not_hold_is_left_in_the_claim()
+    {
+        // Pinned here rather than asserted in a comment, because it is a property
+        // of the platform call and not of this code, and because the alternative
+        // behaviour is the dangerous one: a variable EMPTIED rather than left would
+        // turn this value into "\Installer\absent.msi", which GetFullPath roots on
+        // the current drive and which then looks like an ordinary claim on a
+        // location nobody registered. Left as written, the claim stays recognisably
+        // unspellable and behaves exactly as it did before expansion existed.
+        //
+        // The name is deliberately one no machine sets, and it is not the name the
+        // tests above set: those restore the previous value in a finally, so a
+        // failure there cannot leave a value behind that would quietly make this
+        // test assert nothing.
+        const string absent = @"%INSTALLERCLEAN_TEST_NO_SUCH_ROOT%\Installer\absent.msi";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", absent);
+
+        var claimed = Assert.Single((await Run(msi)).Packages).LocalPackagePath;
+
+        Assert.Contains("%INSTALLERCLEAN_TEST_NO_SUCH_ROOT%", claimed, StringComparison.Ordinal);
+        Assert.EndsWith(@"\Installer\absent.msi", claimed, StringComparison.OrdinalIgnoreCase);
+    }
+
     // ---- The SID-buffer retry's own return code ----
 
     [Fact]

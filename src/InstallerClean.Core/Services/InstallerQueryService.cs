@@ -1098,6 +1098,37 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// running from. Which prefixes come off, and why one is left on, is
     /// <see cref="InstallerCacheHelpers.StripLongPathPrefix"/>'s.
     ///
+    /// AN ENVIRONMENT-VARIABLE FORM IS ANOTHER SUCH SPELLING AND IS EXPANDED HERE
+    /// FROM 3.0.0. A value spelled <c>%SystemRoot%\Installer\1e038.msi</c> is a
+    /// claim on a real cached file, and nothing in this application expanded one:
+    /// <see cref="NeedsFinalPathResolution"/> answers false for a <c>%</c>, so the
+    /// value fell through to GetFullPath, which completed it from the process's
+    /// working directory and produced a well-formed path naming nothing. The claim
+    /// then failed to match the walk and the file it meant was offered as
+    /// unclaimed, which is the one way a spelling fault puts a needed file in front
+    /// of somebody rather than merely mis-filing a row.
+    ///
+    /// THE DEFECT WAS THAT BEHAVIOUR TURNED ON A REGISTRY VALUE'S TYPE. .NET
+    /// expands a <c>REG_EXPAND_SZ</c> as part of reading it, so the registry
+    /// fallback already coped with that form without anything here deciding to
+    /// (<see cref="TryReadLocalPackage"/>, where it is now explicit). The
+    /// <c>REG_SZ</c> value holding the same text was expanded nowhere, and neither
+    /// was anything the API side returned. Two registrations naming one location,
+    /// one stored expandable and one stored plain, got different answers, and no
+    /// comment anywhere said so or meant it.
+    ///
+    /// EXPANSION CAN ONLY EVER MOVE A FILE OFF THE OFFER, which is what makes it a
+    /// correctness fix rather than a judgement. A registration that now resolves is
+    /// one that matches its file, so the file is claimed and kept; one that expands
+    /// to somewhere else either names nothing, which is exactly the old behaviour,
+    /// or names some other file, which is then claimed and kept. No arrangement of
+    /// it puts a file on the list that was not on it before. So it needed no finding
+    /// about whether Windows Installer ever writes such a value, and there is none:
+    /// all 296 path values across the three SIDs of one elevated machine are plain
+    /// absolute drive paths, zero containing a <c>%</c> (2026-08-16, and one machine
+    /// cannot show that the form never occurs, which is the reason for handling it
+    /// rather than waiting to find out).
+    ///
     /// This is also the string a removable candidate is later moved or deleted
     /// by (FileSystemScanService builds the candidate straight off it), which is
     /// the right direction: the normalised form names the same file and names it
@@ -1134,12 +1165,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// answering about a path assembled out of the running process's location.
     ///
     /// WHAT THIS DOES NOT DO, because a comment claiming a closed hole is worse
-    /// than none: a flagged path the kernel declines to expand is kept in the
+    /// than none: a flagged path the kernel declines to RESOLVE is kept in the
     /// spelling Windows gave, so its claim still fails to match the walk and its
     /// file is still offered. That is what happened before any resolution existed
     /// and is no worse; what is new is only that the residue is a claim known to
     /// be unspellable rather than one nobody asked about, with nothing downstream
-    /// told about it.
+    /// told about it. (Resolve, not expand: two different operations are in this
+    /// method and the one word was doing for both. The kernel resolving a final
+    /// path is <see cref="InstallerCacheHelpers.TryResolveFinalPath"/>, which
+    /// answers yes or no; expanding an environment variable is the paragraph above,
+    /// which has no failure to report. What it does with a variable the machine has
+    /// never heard of is pinned by a test rather than asserted here, that being a
+    /// property of the platform call and not of this code.)
     ///
     /// Measured on one elevated machine (Windows 10.0.26200, 2026-08-03): 138
     /// registered paths, every one an ordinary drive path, no tilde-and-digit
@@ -1151,7 +1188,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         try
         {
-            var stripped = InstallerCacheHelpers.StripLongPathPrefix(value);
+            // BEFORE THE PREFIX STRIP, and the order is load-bearing rather than
+            // incidental. StripLongPathPrefix takes a prefix off a DRIVE-ROOTED
+            // path, and \??\%SystemRoot%\... is not drive-rooted as text, so
+            // stripping first leaves the prefix on and hands GetFullPath a string it
+            // reads as rooted on whatever drive the process is running from.
+            // Expanding first makes it drive-rooted and the strip then works as it
+            // always did. On a value holding no % this is the identity, so nothing
+            // that reached here before reaches anything different now.
+            var expanded = Environment.ExpandEnvironmentVariables(value);
+            var stripped = InstallerCacheHelpers.StripLongPathPrefix(expanded);
 
             // The test runs on the stripped value rather than the fully
             // normalised one because GetFullPath destroys the evidence it needs:
@@ -1577,6 +1623,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// exists to tell apart from a healthy machine. Asking the key which value
     /// names it holds is what separates the two, because the name list is typed
     /// nowhere and carries every value whatever its type.
+    ///
+    /// AND IT HAS ALWAYS EXPANDED A <c>REG_EXPAND_SZ</c> VALUE WITHOUT ANYBODY
+    /// DECIDING TO, which is worth stating because it was the load-bearing half of a
+    /// defect nobody had noticed. .NET expands that type as part of the read, so a
+    /// registration spelled <c>%SystemRoot%\Installer\...</c> and STORED expandable
+    /// came back as a usable path here, while the same text stored as a plain
+    /// <c>REG_SZ</c> was expanded nowhere in the application and became a claim on a
+    /// location that did not exist. Behaviour turned on the value's registry type
+    /// rather than on anything in the code.
+    /// <c>NormaliseLocalPackagePath</c> closes that from 3.0.0 by expanding on the
+    /// main path, so this read's expansion is now the belt to that brace rather than
+    /// the only thing standing between one storage type and a wrong answer.
     /// </summary>
     internal static bool TryReadLocalPackage(Microsoft.Win32.RegistryKey? key, out string? path)
     {
@@ -1585,7 +1643,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Absent by structure: not a failed read.
         if (key is null) return true;
 
-        var raw = key.GetValue("LocalPackage");
+        // RegistryValueOptions.None is the option that selects expansion, and it is
+        // passed explicitly rather than left to the default because the expansion is
+        // now part of a documented pair with NormaliseLocalPackagePath and a reader
+        // has to be able to see it. GetValue(name) delegates to this same overload
+        // with this same option, so the call does exactly what it did and only says
+        // so; anyone "simplifying" it back has removed the statement and not the
+        // behaviour.
+        var raw = key.GetValue("LocalPackage", null, Microsoft.Win32.RegistryValueOptions.None);
         if (raw is string value)
         {
             path = value;
