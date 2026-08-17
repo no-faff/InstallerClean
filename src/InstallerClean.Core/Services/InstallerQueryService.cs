@@ -396,6 +396,19 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 {
                     recordsShort = true;
                 }
+                // AND A PATCH WHOSE PATH READS BENIGNLY EMPTY TAKES NEITHER ARM,
+                // WHICH IS THE ONE MEASURED REASON THE PER-PRODUCT CONDITION UNIONS
+                // THREE SOURCES RATHER THAN TRUSTING THIS LOOP. Present and
+                // zero-length is not a read failure, so recordsShort stays false and
+                // nothing records the gap; and the whole block below is skipped, so
+                // the pairing contributes no claim, no State read and no verdict to
+                // its own product's entry in apiPatchSets. The API's view of that
+                // product's patch set is then short of a patch, silently, and a
+                // product holding one patch that could be uninstalled and one whose
+                // path read empty looks from here like a product holding nothing
+                // removable. The registry patch-set read and the all-products patch
+                // enumeration are what see it, which is why the condition asks all
+                // three and takes the worst answer rather than the first.
                 else if (patchPath.Value.Length > 0)
                 {
                     var stateRead = GetPatchProperty(_msi, patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State);

@@ -5,6 +5,74 @@ using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Services;
 
+/// <summary>
+/// What <see cref="InstallerCacheHelpers.ResolveFinalPathOutcome"/> established,
+/// with the five ways it can fail kept apart rather than collapsed into one
+/// <c>false</c>.
+///
+/// TWO OF THEM ARE ORDINARY MACHINE STATES AND THREE ARE NOT, and that is the
+/// whole reason the distinction is carried rather than a preference for detail.
+/// <see cref="NoExistingAncestor"/> is an unattached drive, an unmapped share or a
+/// detached virtual disk; <see cref="OpenRefused"/> is most often an ACL. Neither
+/// says anything about whether the recorded path could have been handled.
+/// <see cref="NotAPath"/>, <see cref="FinalNameUnavailable"/> and
+/// <see cref="Faulted"/> cannot be produced by an absence or by a permission. A
+/// count over all five together cannot be acted on, and acting on one was
+/// designed twice and withdrawn twice, the second time by the session that
+/// proposed it: it would have emptied a machine's whole offer because a USB drive
+/// was unplugged.
+///
+/// A REGISTRATION WHOSE FILE IS SIMPLY GONE REACHES NONE OF THESE, which is the
+/// first objection anybody raises and the thing that separates this from that
+/// withdrawn design. The walk climbs to an existing ancestor and reattaches the
+/// missing suffix as text, so a missing file resolves normally and answers
+/// <see cref="Resolved"/>.
+///
+/// NOTHING IN THE APPLICATION BRANCHES ON WHICH MEMBER IT IS. Every gate asks the
+/// bool question. These travel to the opt-in report so the shape of this failure
+/// on real machines can be measured before anything is designed around it, which
+/// is the step both withdrawn designs skipped.
+/// </summary>
+internal enum PathResolution
+{
+    /// <summary>
+    /// The kernel expanded the path, so the out value is a proven location rather
+    /// than a spelling. The only member any gate treats as success.
+    /// </summary>
+    Resolved,
+
+    /// <summary>
+    /// <see cref="Path.GetFullPath(string)"/> refused the string outright: an
+    /// embedded null, a device name, or a length past the API's limit. The value
+    /// names nothing that can be looked for and cannot be improved.
+    /// </summary>
+    NotAPath,
+
+    /// <summary>
+    /// Nothing on the path exists, all the way up to the root, so there was no
+    /// ancestor to open a handle on.
+    /// </summary>
+    NoExistingAncestor,
+
+    /// <summary>
+    /// An ancestor exists and <c>CreateFile</c> would not hand back a handle on
+    /// it.
+    /// </summary>
+    OpenRefused,
+
+    /// <summary>
+    /// The handle opened and <c>GetFinalPathNameByHandle</c> answered zero, on
+    /// either the first call or the resized retry.
+    /// </summary>
+    FinalNameUnavailable,
+
+    /// <summary>
+    /// The attempt threw. Distinct from every member above, each of which is the
+    /// call answering rather than failing to complete.
+    /// </summary>
+    Faulted,
+}
+
 internal static class InstallerCacheHelpers
 {
     internal static readonly string InstallerFolder =
@@ -167,12 +235,33 @@ internal static class InstallerCacheHelpers
     /// there to see through. A gate that cannot tell the two apart calls a
     /// junction in-bounds on the strength of how its name is spelled. See
     /// <see cref="ResolvesInsideInstallerFolder"/> for which side wants which.
+    ///
+    /// THE BOOL IS THE WHOLE OF WHAT ANY GATE ASKS, and this stays the entry
+    /// every one of them takes. <see cref="ResolveFinalPathOutcome"/> is the same
+    /// call with the failure named rather than collapsed, and it exists for the
+    /// opt-in report alone. Routing the gates through the outcome and comparing
+    /// members would put a containment decision one mistyped member away from
+    /// treating a refusal as a proof.
     /// </summary>
-    internal static bool TryResolveFinalPath(string path, out string resolved)
+    internal static bool TryResolveFinalPath(string path, out string resolved) =>
+        ResolveFinalPathOutcome(path, out resolved) == PathResolution.Resolved;
+
+    /// <summary>
+    /// <see cref="TryResolveFinalPath"/> with its single <c>false</c> separated
+    /// into the five distinct failures behind it. The resolution itself is here;
+    /// the bool form above is this call with the answer narrowed, so the two
+    /// cannot drift apart and no caller has to be trusted to keep them in step.
+    ///
+    /// WHY THE FIVE ARE WORTH SEPARATING is <see cref="PathResolution"/>'s own
+    /// note: two of them are ordinary machine states and three cannot be produced
+    /// by absence or by a permission, so a count over all five together says
+    /// nothing anybody could act on.
+    /// </summary>
+    internal static PathResolution ResolveFinalPathOutcome(string path, out string resolved)
     {
         string normalised;
         try { normalised = Path.GetFullPath(path); }
-        catch { resolved = path; return false; }
+        catch { resolved = path; return PathResolution.NotAPath; }
 
         resolved = normalised;
 
@@ -182,7 +271,8 @@ internal static class InstallerCacheHelpers
         while (probe.Length > 0 && !Directory.Exists(probe) && !File.Exists(probe))
         {
             var parent = Path.GetDirectoryName(probe);
-            if (string.IsNullOrEmpty(parent) || parent == probe) return false;
+            if (string.IsNullOrEmpty(parent) || parent == probe)
+                return PathResolution.NoExistingAncestor;
             probe = parent;
         }
 
@@ -201,11 +291,11 @@ internal static class InstallerCacheHelpers
                 Kernel32.FILE_FLAG_BACKUP_SEMANTICS,
                 IntPtr.Zero);
 
-            if (handle.IsInvalid) return false;
+            if (handle.IsInvalid) return PathResolution.OpenRefused;
 
             var length = Kernel32.GetFinalPathNameByHandle(
                 handle, buffer, (uint)buffer.Length, Kernel32.VOLUME_NAME_DOS);
-            if (length == 0) return false;
+            if (length == 0) return PathResolution.FinalNameUnavailable;
             if (length >= buffer.Length)
             {
                 // Buffer too small. The returned length includes the
@@ -218,7 +308,7 @@ internal static class InstallerCacheHelpers
                 buffer = larger;
                 length = Kernel32.GetFinalPathNameByHandle(
                     handle, buffer, (uint)buffer.Length, Kernel32.VOLUME_NAME_DOS);
-                if (length == 0) return false;
+                if (length == 0) return PathResolution.FinalNameUnavailable;
             }
 
             var final = StripLongPathPrefix(new string(buffer, 0, (int)length));
@@ -234,12 +324,12 @@ internal static class InstallerCacheHelpers
             }
 
             resolved = final;
-            return true;
+            return PathResolution.Resolved;
         }
         catch
         {
             resolved = normalised;
-            return false;
+            return PathResolution.Faulted;
         }
         finally
         {
