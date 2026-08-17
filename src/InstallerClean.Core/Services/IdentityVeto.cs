@@ -339,9 +339,7 @@ public sealed class IdentityVeto : IIdentityVeto
     /// to be found: a product advertised only, in the per-user-unmanaged context of an
     /// account other than the caller's. Both pages say so. It has no subject here,
     /// because an advertised product caches no package at all, measured in both
-    /// contexts in <c>non-repo-files/00-user-now/FACTS-advertised-products-and-the-cache.md</c>
-    /// (that folder, not <c>0-claude/</c>, which it has been cited as more than once).
-    /// No cached file means no candidate can belong to such a product.
+    /// contexts. No cached file means no candidate can belong to such a product.
     /// </summary>
     private bool MachineUsesInstanceTransforms()
     {
