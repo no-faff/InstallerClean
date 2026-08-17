@@ -337,7 +337,7 @@ public sealed record AppInfo(string Version, string Language)
 /// </param>
 /// <param name="PathNormalisationRefusedCount">
 /// Recorded values this scan could not turn into a path at all, whatever refused them.
-/// The sum of the three below, computed from them at the one place they are read, so
+/// The sum of the four below, computed from them at the one place they are read, so
 /// the total and its parts cannot come apart.
 ///
 /// WHAT IT MEANS, and it is the figure this group exists for: such a claim is kept in
@@ -346,22 +346,33 @@ public sealed record AppInfo(string Version, string Language)
 /// file, a missing drive or a permission, which is what separates it from the two
 /// ordinary states above.
 ///
-/// NOTHING IN THE APPLICATION ACTS ON IT IN THIS RELEASE. It is here to size a failure
-/// nobody has measured, which is the step two withdrawn designs skipped.
+/// AND THE APPLICATION ACTS ON IT. Above zero, the scan withholds its whole
+/// walk-derived offer rather than name a file it cannot say is spare. So this number
+/// is not only a measurement: it says whether that machine's offer was held back.
 /// </param>
 /// <param name="PathNormalisationRefusedAtExpansionCount">
 /// Of those, refused while expanding an environment variable.
 ///
-/// THE THREE ARE ONE POPULATION SPLIT BY CAUSE AND MUST NOT BE DESCRIBED AS ONE. A
-/// sentence naming any single cause is false of the other two members; the only thing
-/// true of every member is the superordinate above.
+/// THE FOUR ARE ONE POPULATION SPLIT BY CAUSE AND MUST NOT BE DESCRIBED AS ONE. A
+/// sentence naming any single cause is false of the other three members; the only
+/// thing true of every member is the superordinate above.
 /// </param>
 /// <param name="PathNormalisationRefusedAtPrefixStripCount">
 /// Of those, refused while taking a prefix off or preparing the resolver's ask.
 /// </param>
 /// <param name="PathNormalisationRefusedAtFullPathCount">
-/// Of those, refused by the full-path call: an embedded null, a device name, a length
-/// past the API's limit. The member that fires in practice.
+/// Of those, refused by the full-path call: a device name, a length past the API's
+/// limit.
+/// </param>
+/// <param name="PathNormalisationRefusedAtEmbeddedNullCount">
+/// Of those, refused for carrying an embedded null, which no path can carry. The
+/// member that fires on Windows, and the reason it is asked for separately: the
+/// expansion cuts such a value at the null and returns without throwing, so until
+/// this release the condition happened and every count above it stayed at zero.
+///
+/// LAST IN THE LIST AND FIRST IN THE METHOD. These are positional parameters and all
+/// four are <c>int</c>, so a member inserted among the others would re-point every
+/// argument after it with nothing in the build to say so.
 /// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
@@ -389,7 +400,8 @@ public sealed record MachineInfo(
     int PathResolverFaultedCount,
     int PathNormalisationRefusedAtExpansionCount,
     int PathNormalisationRefusedAtPrefixStripCount,
-    int PathNormalisationRefusedAtFullPathCount)
+    int PathNormalisationRefusedAtFullPathCount,
+    int PathNormalisationRefusedAtEmbeddedNullCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -418,11 +430,12 @@ public sealed record MachineInfo(
             scan.Census.PathResolverFaultedCount,
             scan.Census.PathNormalisationRefusedAtExpansionCount,
             scan.Census.PathNormalisationRefusedAtPrefixStripCount,
-            scan.Census.PathNormalisationRefusedAtFullPathCount);
+            scan.Census.PathNormalisationRefusedAtFullPathCount,
+            scan.Census.PathNormalisationRefusedAtEmbeddedNullCount);
 
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
-    /// it: the sum of the three above.
+    /// it: the sum of the four above.
     ///
     /// DERIVED RATHER THAN PASSED IN, and that is the whole of why it is down here
     /// instead of among the parameters. As a parameter it could be constructed
@@ -431,8 +444,8 @@ public sealed record MachineInfo(
     /// possibly diagnose. It is serialised like any other property, so the receiver
     /// sees it as a key beside them.
     ///
-    /// IT IS THE ONLY MEMBER OF THIS GROUP A SENTENCE MAY BE BUILT ON, the three
-    /// parts being three different facts about a machine. What it means is that the
+    /// IT IS THE ONLY MEMBER OF THIS GROUP A SENTENCE MAY BE BUILT ON, the four
+    /// parts being four different facts about a machine. What it means is that the
     /// recorded path could not be turned into a path at all, so the claim is kept in
     /// the raw spelling Windows gave, matches nothing the folder walk produces, and
     /// the cached file it names is offered as unclaimed.
@@ -440,7 +453,8 @@ public sealed record MachineInfo(
     public int PathNormalisationRefusedCount =>
         PathNormalisationRefusedAtExpansionCount
         + PathNormalisationRefusedAtPrefixStripCount
-        + PathNormalisationRefusedAtFullPathCount;
+        + PathNormalisationRefusedAtFullPathCount
+        + PathNormalisationRefusedAtEmbeddedNullCount;
 }
 
 /// <summary>

@@ -348,12 +348,12 @@ public record InstallerQueryResult(
 /// <param name="PathNormalisationRefusedAtExpansionCount">
 /// Recorded values refused while expanding an environment variable.
 ///
-/// THESE THREE ARE ONE POPULATION SPLIT BY CAUSE, AND THE SPLIT IS THE POINT. A
-/// value refused by the expansion, by the prefix work and by <c>GetFullPath</c> are
-/// three different facts about a machine, so a single count named for any one of
-/// them would be false of the other two. The only thing true of all three, and the
-/// only thing any sentence may say over their sum, is that the recorded path could
-/// not be turned into a path at all.
+/// THESE FOUR ARE ONE POPULATION SPLIT BY CAUSE, AND THE SPLIT IS THE POINT. A
+/// value carrying a character no path can carry, and one refused by the expansion,
+/// by the prefix work and by <c>GetFullPath</c>, are four different facts about a
+/// machine, so a single count named for any one of them would be false of the other
+/// three. The only thing true of all four, and the only thing any sentence may say
+/// over their sum, is that the recorded path could not be turned into a path at all.
 ///
 /// WHAT THE SUM MEANS, since it is the one that matters: such a claim is kept in
 /// the raw spelling Windows gave, so it matches nothing the folder walk produces
@@ -364,8 +364,23 @@ public record InstallerQueryResult(
 /// The same, refused while taking a prefix off or preparing the resolver's ask.
 /// </param>
 /// <param name="PathNormalisationRefusedAtFullPathCount">
-/// The same, refused by <c>GetFullPath</c>, which is the one that fires in practice:
-/// an embedded null, a device name, a length past the API's limit.
+/// The same, refused by <c>GetFullPath</c>: a device name, a length past the API's
+/// limit.
+/// </param>
+/// <param name="PathNormalisationRefusedAtEmbeddedNullCount">
+/// The same, refused for carrying an embedded null, which no path can carry.
+///
+/// LAST IN THE LIST AND FIRST IN THE METHOD, and the order here is the safe one
+/// rather than the tidy one. These are positional parameters and every one of them
+/// is an <c>int</c>, so inserting a member among the others would re-point each
+/// argument after it at its neighbour's value with nothing in the build to say so.
+/// Appending cannot do that.
+///
+/// IT IS THE MEMBER THAT FIRES ON WINDOWS, which is why it is not folded into the
+/// expansion it precedes. The expansion cuts such a value at the null and returns
+/// without throwing, so before this count existed the condition was invisible on
+/// the platform the application runs on: the report said no path failed while one
+/// had.
 /// </param>
 public readonly record struct EnumerationCensus(
     int UnreadableProducts = 0,
@@ -396,4 +411,28 @@ public readonly record struct EnumerationCensus(
     int PathResolverFaultedCount = 0,
     int PathNormalisationRefusedAtExpansionCount = 0,
     int PathNormalisationRefusedAtPrefixStripCount = 0,
-    int PathNormalisationRefusedAtFullPathCount = 0);
+    int PathNormalisationRefusedAtFullPathCount = 0,
+    int PathNormalisationRefusedAtEmbeddedNullCount = 0)
+{
+    /// <summary>
+    /// Every recorded value this scan could not turn into a path, whatever refused
+    /// it: the sum of the four counts above, and the population the withholding
+    /// acts on.
+    ///
+    /// IT IS A PROPERTY HERE SO THAT THE SUM EXISTS ONCE. The rule that reads it
+    /// lives in another service and used to add the parts itself, which meant a
+    /// member added to the split was a member that rule silently did not act on:
+    /// the build stays green, the counter still reports, and the withholding just
+    /// does not fire for the new cause. That is the failure this release found in
+    /// the embedded-null case, and a hand-rolled sum is how it would arrive again.
+    ///
+    /// A MIXED SET, SO NOTHING MAY STATE A CAUSE FOR IT. The four are four different
+    /// facts about a machine and the only thing true of every member is that the
+    /// recorded path could not be turned into a path at all.
+    /// </summary>
+    public int PathNormalisationRefusedTotal =>
+        PathNormalisationRefusedAtExpansionCount
+        + PathNormalisationRefusedAtPrefixStripCount
+        + PathNormalisationRefusedAtFullPathCount
+        + PathNormalisationRefusedAtEmbeddedNullCount;
+}

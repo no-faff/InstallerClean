@@ -176,6 +176,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     internal enum NormalisationStage
     {
+        /// <summary>
+        /// The value carries a character no path can carry, tested before anything
+        /// is attempted on it. Its own member rather than part of the expansion
+        /// below, because for such a value the expansion is never reached: what it
+        /// names is the value's own shape, where the other three name a call that
+        /// refused it.
+        /// </summary>
+        EmbeddedNull,
+
         /// <summary>Expanding an environment variable.</summary>
         Expansion,
 
@@ -204,10 +213,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// receiver would take the second reading. <see cref="ResolverAttempts"/> is
     /// what separates them.
     ///
-    /// NOTHING IN THE APPLICATION READS ANY OF THIS. They exist to size a failure
-    /// nobody has measured, before anything is designed around it, which is the step
-    /// two withdrawn designs skipped. A counter that acquired a consumer would be a
-    /// second, quieter copy of a rule that already lives in one place.
+    /// THE TWO GROUPS ARE READ DIFFERENTLY AND THE DIFFERENCE IS NOT A DETAIL. The
+    /// resolver's attempts and its five outcomes are read by nothing: they exist to
+    /// size a failure nobody has measured, before anything is designed around it,
+    /// which is the step two withdrawn designs skipped. The normalisation refusals
+    /// are not in that position any more. <see cref="NormalisationRefusedTotal"/>
+    /// acquired a consumer in this release, and it is one rule in one place rather
+    /// than a second quiet copy of one: FileSystemScanService withholds the whole
+    /// walk-derived offer on it.
     /// </summary>
     internal sealed class PathCensus
     {
@@ -229,6 +242,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
         /// <summary>Of those, the ones where the attempt threw.</summary>
         internal int ResolverFaulted;
 
+        /// <summary>
+        /// Values refused for carrying a character no path can carry, before the
+        /// expansion below was attempted on them.
+        /// </summary>
+        internal int NormalisationRefusedAtEmbeddedNull;
+
         /// <summary>Values refused while expanding an environment variable.</summary>
         internal int NormalisationRefusedAtExpansion;
 
@@ -242,11 +261,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
         /// Every value this scan could not turn into a path, whatever refused it.
         /// Derived rather than tallied, so the parts and the total cannot disagree.
         /// This is the population a claim is kept raw for, and the one the
-        /// withholding acts on: a mixed set with three causes, so nothing may state
+        /// withholding acts on: a mixed set with four causes, so nothing may state
         /// a single cause for it.
         /// </summary>
         internal int NormalisationRefusedTotal =>
-            NormalisationRefusedAtExpansion
+            NormalisationRefusedAtEmbeddedNull
+            + NormalisationRefusedAtExpansion
             + NormalisationRefusedAtPrefixStrip
             + NormalisationRefusedAtFullPath;
 
@@ -268,6 +288,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             switch (stage)
             {
+                case NormalisationStage.EmbeddedNull: NormalisationRefusedAtEmbeddedNull++; break;
                 case NormalisationStage.Expansion: NormalisationRefusedAtExpansion++; break;
                 case NormalisationStage.PrefixStrip: NormalisationRefusedAtPrefixStrip++; break;
                 case NormalisationStage.FullPath: NormalisationRefusedAtFullPath++; break;
@@ -288,6 +309,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ResolverOpenRefused += other.ResolverOpenRefused;
             ResolverFinalNameUnavailable += other.ResolverFinalNameUnavailable;
             ResolverFaulted += other.ResolverFaulted;
+            NormalisationRefusedAtEmbeddedNull += other.NormalisationRefusedAtEmbeddedNull;
             NormalisationRefusedAtExpansion += other.NormalisationRefusedAtExpansion;
             NormalisationRefusedAtPrefixStrip += other.NormalisationRefusedAtPrefixStrip;
             NormalisationRefusedAtFullPath += other.NormalisationRefusedAtFullPath;
@@ -847,7 +869,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 paths.ResolverFaulted,
                 paths.NormalisationRefusedAtExpansion,
                 paths.NormalisationRefusedAtPrefixStrip,
-                paths.NormalisationRefusedAtFullPath));
+                paths.NormalisationRefusedAtFullPath,
+                paths.NormalisationRefusedAtEmbeddedNull));
         }
         finally
         {
@@ -1410,6 +1433,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// cannot show that the form never occurs, which is the reason for handling it
     /// rather than waiting to find out).
     ///
+    /// AND ONE VALUE IS REFUSED BEFORE THE EXPANSION RUNS AT ALL. A recorded value
+    /// carrying an embedded null is never put through it: on Windows that call cuts
+    /// the value at the null and returns silently, so a claim that should have been
+    /// unspellable becomes a well-formed path naming whatever is left, and nothing
+    /// downstream is told. Such a value comes back raw and counted, like every other
+    /// this method cannot spell, and the body says why the test has to come first.
+    ///
     /// This is also the string a removable candidate is later moved or deleted
     /// by (FileSystemScanService builds the candidate straight off it), which is
     /// the right direction: the normalised form names the same file and names it
@@ -1467,19 +1497,52 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private static string NormaliseLocalPackagePath(string value, PathCensus census)
     {
-        // A MARKER IN SCOPE RATHER THAN THREE TRY BLOCKS, and the reason is what
+        // THE NULL IS TESTED BEFORE ANYTHING IS ATTEMPTED ON THE VALUE, AND IT IS THE
+        // ONE ORDERING THAT WORKS. On Windows ExpandEnvironmentVariables TRUNCATES a
+        // value holding an embedded null and does not throw: measured on CI, where
+        // C:\Windows\Installer\bad\0name.msi came back as C:\Windows\Installer\bad,
+        // cut at the null. Nothing throws, so the catch below never runs, so no
+        // refusal is counted, so the withholding never fires. Putting this test after
+        // the expansion would run it against a string the null had gone from.
+        //
+        // AND THE TRUNCATED VALUE IS THE DANGEROUS HALF, not the missing count. What
+        // comes out is a WELL-FORMED PATH, which on a real machine can match a real
+        // file: the claim would then be filed against a file that needed no claim
+        // while the file the registration meant stays unclaimed. A raw value carrying
+        // a null can match nothing, so this test costs the offer nothing it was
+        // entitled to.
+        //
+        // ON THE RAW VALUE, NEVER ON "THE EXPANSION SHORTENED IT". A variable
+        // legitimately expands to something shorter than its own name, so a length
+        // test would refuse ordinary paths. A path cannot carry a null, so its
+        // presence is refusal by definition: exact, and free.
+        //
+        // IT ALSO TAKES A PLATFORM DIFFERENCE OUT OF THE MECHANISM, which is how this
+        // survived. Off Windows the same call returns the value untouched and
+        // GetFullPath then throws, so this one input was refused at a different step
+        // on each platform, and the harness that could reach it was the one that could
+        // not see the fault. A string test behaves the same everywhere, so both
+        // platforms now refuse the value here.
+        if (value.Contains('\0'))
+        {
+            census.RecordNormalisationRefusal(NormalisationStage.EmbeddedNull);
+            return value;
+        }
+
+        // A MARKER IN SCOPE RATHER THAN A TRY BLOCK PER STAGE, and the reason is what
         // this method is: the last thing between a registry value and a claim, whose
         // refusal behaviour is pinned by a test. Splitting the try to sharpen a
         // counter would restructure the control flow of a safety-critical path to
         // improve instrumentation, which is the wrong way round. The marker costs an
         // assignment and the catch reads it.
         //
-        // THE THREE ARE COUNTED APART BECAUSE THEY ARE NOT ONE FINDING. A value the
-        // expansion refused, one the prefix work refused and one GetFullPath refused
-        // are three different things about a machine, and a single counter named for
-        // any one of them would be false of the other two. What they share, and the
-        // only thing any sentence may say over all three, is that the recorded path
-        // could not be turned into a path.
+        // THE FOUR ARE COUNTED APART BECAUSE THEY ARE NOT ONE FINDING. A value
+        // carrying a character no path can carry, one the expansion refused, one the
+        // prefix work refused and one GetFullPath refused are four different things
+        // about a machine, and a single counter named for any one of them would be
+        // false of the other three. What they share, and the only thing any sentence
+        // may say over all four, is that the recorded path could not be turned into a
+        // path.
         var stage = NormalisationStage.Expansion;
         try
         {
@@ -1524,10 +1587,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
         catch
         {
-            // A value GetFullPath refuses (an embedded null, a device name, a
-            // length past the API's limit) is kept exactly as Windows returned
-            // it. It cannot be improved, and dropping the claim would turn an
-            // unreadable spelling into an orphaned file.
+            // A value GetFullPath refuses (a device name, a length past the API's
+            // limit) is kept exactly as Windows returned it. It cannot be improved,
+            // and dropping the claim would turn an unreadable spelling into an
+            // orphaned file. The embedded null used to be named here as the third
+            // and is refused above instead, because on Windows it never reaches
+            // this call: the expansion truncates it away without throwing.
             //
             // AND THE FACT IS NOW CARRIED OUT RATHER THAN ENDING HERE. What leaves
             // this method is a claim that cannot match anything the folder walk

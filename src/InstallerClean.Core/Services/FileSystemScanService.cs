@@ -369,10 +369,14 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // is an unspellable registration naming the very same file an offered
         // superseded row names, which would be a second claim on that path that the
         // merge cannot see.
-        var unspellableClaims =
-            query.Census.PathNormalisationRefusedAtExpansionCount
-            + query.Census.PathNormalisationRefusedAtPrefixStripCount
-            + query.Census.PathNormalisationRefusedAtFullPathCount;
+        // THE SUM COMES FROM THE CENSUS RATHER THAN BEING ADDED UP HERE. This line
+        // used to name the members one by one, which was correct and was one edit
+        // away from not being: a cause added to the split is a cause this rule would
+        // silently not act on, with a green build, a counter still reporting it and
+        // nothing to show for it but files still being offered. The release that
+        // added a fourth cause is the release that would have walked into it, so the
+        // addition is spelled once, where the members are.
+        var unspellableClaims = query.Census.PathNormalisationRefusedTotal;
 
         if (unspellableClaims > 0)
             withheld.AddRange(unclaimedByPath);

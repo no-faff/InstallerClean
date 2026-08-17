@@ -69,15 +69,22 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     }
 
     [Theory]
-    [InlineData(1, 0, 0)]
-    [InlineData(0, 1, 0)]
-    [InlineData(0, 0, 1)]
-    public async Task Any_of_the_three_normalisation_refusals_withholds(
-        int expansion, int prefixStrip, int fullPath)
+    [InlineData(1, 0, 0, 0)]
+    [InlineData(0, 1, 0, 0)]
+    [InlineData(0, 0, 1, 0)]
+    [InlineData(0, 0, 0, 1)]
+    public async Task Any_of_the_four_normalisation_refusals_withholds(
+        int expansion, int prefixStrip, int fullPath, int embeddedNull)
     {
         // THE WITHHOLDING FIRES ON THE UNION, not on the one member that occurs in
-        // practice. All three mean the same thing about the claim that came out of
-        // it, and a rule keyed on one of them would let the other two through.
+        // practice. All four mean the same thing about the claim that came out of
+        // it, and a rule keyed on one of them would let the other three through.
+        //
+        // THE FOURTH CASE IS WHY THIS IS A THEORY AND NOT ONE TEST. The embedded-null
+        // member was added after the rule was written, and the rule then read three
+        // named counters rather than their sum, so the count would have moved and the
+        // offer would not. A case per member is what makes that visible instead of
+        // arithmetic nobody re-reads.
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
 
         var query = Substitute.For<IInstallerQueryService>();
@@ -87,7 +94,8 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
                 Census: new EnumerationCensus(
                     PathNormalisationRefusedAtExpansionCount: expansion,
                     PathNormalisationRefusedAtPrefixStripCount: prefixStrip,
-                    PathNormalisationRefusedAtFullPathCount: fullPath)));
+                    PathNormalisationRefusedAtFullPathCount: fullPath,
+                    PathNormalisationRefusedAtEmbeddedNullCount: embeddedNull)));
 
         var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
 
@@ -98,7 +106,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     [Fact]
     public async Task A_clean_census_withholds_nothing_and_the_offer_stands()
     {
-        // THE CONTROL FOR THE THREE ABOVE. Identical fixture with every refusal count
+        // THE CONTROL FOR THE FOUR ABOVE. Identical fixture with every refusal count
         // at zero: without it, a withholding that fired unconditionally would pass
         // all four and nobody would know.
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });

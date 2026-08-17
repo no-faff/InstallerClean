@@ -83,7 +83,8 @@ public class ResultLogEntryTests
         PathResolverFaultedCount: 0,
         PathNormalisationRefusedAtExpansionCount: 0,
         PathNormalisationRefusedAtPrefixStripCount: 0,
-        PathNormalisationRefusedAtFullPathCount: 0);
+        PathNormalisationRefusedAtFullPathCount: 0,
+        PathNormalisationRefusedAtEmbeddedNullCount: 0);
 
     private static ResultLogEntry SampleEntry() => new(
         SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
@@ -165,6 +166,11 @@ public class ResultLogEntryTests
                 "pathNormalisationRefusedAtExpansionCount",
                 "pathNormalisationRefusedAtPrefixStripCount",
                 "pathNormalisationRefusedAtFullPathCount",
+                // After the other three although its refusal happens before all of
+                // them. The four are positional int parameters, so a member inserted
+                // among them would re-point every argument after it and the build
+                // would not notice; appending is the arrangement that cannot.
+                "pathNormalisationRefusedAtEmbeddedNullCount",
                 // Last, not beside its parts: it is a derived property rather than a
                 // constructor parameter, so that a total contradicting its own
                 // breakdown inside one object is impossible rather than merely

@@ -1524,6 +1524,51 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(unimprovable, Assert.Single(result.Packages).LocalPackagePath);
     }
 
+    [Fact]
+    public async Task An_embedded_null_is_refused_as_its_own_cause_and_not_as_a_full_path_failure()
+    {
+        // WHAT THIS FIXTURE HOLDS IS THE POINT OF IT. On Windows the expansion at the
+        // front of the normalisation cuts a value at an embedded null and returns
+        // without throwing, so nothing was refused, nothing was counted, and the
+        // withholding that reads the count did not fire: the claim came back as
+        // C:\Windows\Installer\bad and named a path that on another machine could be
+        // a real file. Only a value carrying a null reaches any of that.
+        const string withNull = "C:\\Windows\\Installer\\bad\0name.msi";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", withNull);
+
+        var census = (await Run(msi)).Census;
+
+        Assert.Equal(1, census.PathNormalisationRefusedAtEmbeddedNullCount);
+
+        // AND THE OTHER THREE UNMOVED, which is the half that would go unnoticed. The
+        // split exists so a report can say which cause fired; a member that also
+        // incremented a neighbour would leave the total right and every part of it
+        // wrong, and nothing reading the payload could tell.
+        Assert.Equal(0, census.PathNormalisationRefusedAtExpansionCount);
+        Assert.Equal(0, census.PathNormalisationRefusedAtPrefixStripCount);
+        Assert.Equal(0, census.PathNormalisationRefusedAtFullPathCount);
+        Assert.Equal(1, census.PathNormalisationRefusedTotal);
+    }
+
+    [Fact]
+    public async Task An_ordinary_recorded_value_counts_no_normalisation_refusal()
+    {
+        // THE MUST-MISS CONTROL FOR THE TEST ABOVE, and it guards the more expensive
+        // direction. A check that answered yes to every registration would satisfy
+        // that test exactly as well as a correct one does, and the scan withholds its
+        // whole walk-derived offer above zero, so a false positive here costs a
+        // healthy machine everything it came for.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\ordinary.msi");
+
+        var census = (await Run(msi)).Census;
+
+        Assert.Equal(0, census.PathNormalisationRefusedTotal);
+    }
+
     // ---- The superseded-patch condition: every product, every patch ----
 
     private const string CleanPatch = @"C:\Windows\Installer\superseded.msp";
