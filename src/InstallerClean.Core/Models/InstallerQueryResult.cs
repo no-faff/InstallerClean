@@ -313,6 +313,60 @@ public record InstallerQueryResult(
 /// fix is withholding without having established anything, which is safe and is not
 /// the same as safe-and-informed.
 /// </param>
+/// <param name="PathResolverAttemptCount">
+/// Recorded paths this scan put to the final-path resolver: the ones carrying a
+/// long-path or NT object prefix, or an 8dot3 alias, and no others.
+///
+/// THE FIVE OUTCOME COUNTS BELOW CANNOT BE READ WITHOUT IT, which is the only
+/// reason it exists. Most machines flag no path at all, so the resolver is never
+/// asked and its five failures all read zero: identical, on the wire, to a machine
+/// that asked and got five clean answers. This is what tells those two apart, and a
+/// receiver reading any of the five without it is reading a number that cannot mean
+/// what it appears to.
+/// </param>
+/// <param name="PathResolverNotAPathCount">
+/// Of those, the ones the resolver refused outright as not a path.
+/// </param>
+/// <param name="PathResolverNoAncestorCount">
+/// Of those, the ones with no existing component anywhere up to the root: an
+/// unattached drive, an unmapped share, a detached virtual disk. An ordinary
+/// machine state that says nothing about whether the path could be handled.
+/// </param>
+/// <param name="PathResolverOpenRefusedCount">
+/// Of those, the ones an ancestor existed for and no handle could be opened on.
+/// Most often an ACL, and the second of the two ordinary states.
+/// </param>
+/// <param name="PathResolverNoFinalNameCount">
+/// Of those, the ones whose final name came back empty from an opened handle.
+/// </param>
+/// <param name="PathResolverFaultedCount">
+/// Of those, the ones where the attempt threw rather than answering.
+///
+/// THE RESOLVED COUNT IS NOT CARRIED. It is the attempts less these five, and a
+/// stored copy could disagree with its own parts.
+/// </param>
+/// <param name="PathNormalisationRefusedAtExpansionCount">
+/// Recorded values refused while expanding an environment variable.
+///
+/// THESE THREE ARE ONE POPULATION SPLIT BY CAUSE, AND THE SPLIT IS THE POINT. A
+/// value refused by the expansion, by the prefix work and by <c>GetFullPath</c> are
+/// three different facts about a machine, so a single count named for any one of
+/// them would be false of the other two. The only thing true of all three, and the
+/// only thing any sentence may say over their sum, is that the recorded path could
+/// not be turned into a path at all.
+///
+/// WHAT THE SUM MEANS, since it is the one that matters: such a claim is kept in
+/// the raw spelling Windows gave, so it matches nothing the folder walk produces
+/// and the cached file it names is offered as unclaimed. It cannot be caused by a
+/// missing file, a missing drive or a permission.
+/// </param>
+/// <param name="PathNormalisationRefusedAtPrefixStripCount">
+/// The same, refused while taking a prefix off or preparing the resolver's ask.
+/// </param>
+/// <param name="PathNormalisationRefusedAtFullPathCount">
+/// The same, refused by <c>GetFullPath</c>, which is the one that fires in practice:
+/// an embedded null, a device name, a length past the API's limit.
+/// </param>
 public readonly record struct EnumerationCensus(
     int UnreadableProducts = 0,
     int SkippedProductRows = 0,
@@ -333,4 +387,13 @@ public readonly record struct EnumerationCensus(
     int ProductPatchKeyCount = 0,
     int ProductPatchRegistrationCount = 0,
     int ProductsWithRemovablePatchCount = 0,
-    int ProductsWithPatchSetUnestablishedCount = 0);
+    int ProductsWithPatchSetUnestablishedCount = 0,
+    int PathResolverAttemptCount = 0,
+    int PathResolverNotAPathCount = 0,
+    int PathResolverNoAncestorCount = 0,
+    int PathResolverOpenRefusedCount = 0,
+    int PathResolverNoFinalNameCount = 0,
+    int PathResolverFaultedCount = 0,
+    int PathNormalisationRefusedAtExpansionCount = 0,
+    int PathNormalisationRefusedAtPrefixStripCount = 0,
+    int PathNormalisationRefusedAtFullPathCount = 0);

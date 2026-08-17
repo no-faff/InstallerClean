@@ -164,7 +164,135 @@ public sealed class InstallerQueryService : IInstallerQueryService
         int ProductPatchKeys = 0,
         int ProductPatchRegistrations = 0,
         int ProductsWithRemovablePatch = 0,
-        int ProductsWithPatchSetUnestablished = 0);
+        int ProductsWithPatchSetUnestablished = 0,
+        PathCensus? Paths = null);
+
+    /// <summary>
+    /// Which step of <see cref="NormaliseLocalPackagePath"/> a recorded path was
+    /// being put through when it was refused. A marker in scope rather than three
+    /// separate try blocks, because that method is on the path every claim takes
+    /// and restructuring its control flow to improve a counter is the wrong trade:
+    /// the value it hands back on refusal is pinned by a test and must not move.
+    /// </summary>
+    internal enum NormalisationStage
+    {
+        /// <summary>Expanding an environment variable.</summary>
+        Expansion,
+
+        /// <summary>
+        /// Taking the long-path or NT object prefix off, and preparing and putting
+        /// the value to the final-path resolver. Both are prefix work on a string;
+        /// the resolver itself reports its own failures separately and does not
+        /// throw, so what this covers is the preparation around it.
+        /// </summary>
+        PrefixStrip,
+
+        /// <summary>The closing <see cref="Path.GetFullPath(string)"/> alone.</summary>
+        FullPath,
+    }
+
+    /// <summary>
+    /// How the recorded paths one scan read turned out: how often the final-path
+    /// resolver was asked and what it answered, and how often a value could not be
+    /// turned into a path at all.
+    ///
+    /// THE DENOMINATOR TRAVELS WITH THE FIVE OUTCOMES AND WITHOUT IT THEY CANNOT BE
+    /// READ. The resolver is asked only for a value carrying a prefix or an 8dot3
+    /// alias (<see cref="NeedsFinalPathResolution"/>), which on most machines is no
+    /// value at all. Four of its five failures would then read zero because nothing
+    /// asked, which is indistinguishable from zero because nothing failed, and a
+    /// receiver would take the second reading. <see cref="ResolverAttempts"/> is
+    /// what separates them.
+    ///
+    /// NOTHING IN THE APPLICATION READS ANY OF THIS. They exist to size a failure
+    /// nobody has measured, before anything is designed around it, which is the step
+    /// two withdrawn designs skipped. A counter that acquired a consumer would be a
+    /// second, quieter copy of a rule that already lives in one place.
+    /// </summary>
+    internal sealed class PathCensus
+    {
+        /// <summary>Recorded paths put to the final-path resolver.</summary>
+        internal int ResolverAttempts;
+
+        /// <summary>Of those, the ones it refused outright as not a path.</summary>
+        internal int ResolverNotAPath;
+
+        /// <summary>Of those, the ones with no existing ancestor anywhere.</summary>
+        internal int ResolverNoExistingAncestor;
+
+        /// <summary>Of those, the ones it could not open a handle on.</summary>
+        internal int ResolverOpenRefused;
+
+        /// <summary>Of those, the ones whose final name came back empty.</summary>
+        internal int ResolverFinalNameUnavailable;
+
+        /// <summary>Of those, the ones where the attempt threw.</summary>
+        internal int ResolverFaulted;
+
+        /// <summary>Values refused while expanding an environment variable.</summary>
+        internal int NormalisationRefusedAtExpansion;
+
+        /// <summary>Values refused while taking a prefix off or preparing the resolver ask.</summary>
+        internal int NormalisationRefusedAtPrefixStrip;
+
+        /// <summary>Values <see cref="Path.GetFullPath(string)"/> refused.</summary>
+        internal int NormalisationRefusedAtFullPath;
+
+        /// <summary>
+        /// Every value this scan could not turn into a path, whatever refused it.
+        /// Derived rather than tallied, so the parts and the total cannot disagree.
+        /// This is the population a claim is kept raw for, and the one the
+        /// withholding acts on: a mixed set with three causes, so nothing may state
+        /// a single cause for it.
+        /// </summary>
+        internal int NormalisationRefusedTotal =>
+            NormalisationRefusedAtExpansion
+            + NormalisationRefusedAtPrefixStrip
+            + NormalisationRefusedAtFullPath;
+
+        internal void RecordResolution(PathResolution outcome)
+        {
+            switch (outcome)
+            {
+                case PathResolution.NotAPath: ResolverNotAPath++; break;
+                case PathResolution.NoExistingAncestor: ResolverNoExistingAncestor++; break;
+                case PathResolution.OpenRefused: ResolverOpenRefused++; break;
+                case PathResolution.FinalNameUnavailable: ResolverFinalNameUnavailable++; break;
+                case PathResolution.Faulted: ResolverFaulted++; break;
+                    // Resolved is not counted: it is the attempts less the five, and a
+                    // stored copy could disagree with them.
+            }
+        }
+
+        internal void RecordNormalisationRefusal(NormalisationStage stage)
+        {
+            switch (stage)
+            {
+                case NormalisationStage.Expansion: NormalisationRefusedAtExpansion++; break;
+                case NormalisationStage.PrefixStrip: NormalisationRefusedAtPrefixStrip++; break;
+                case NormalisationStage.FullPath: NormalisationRefusedAtFullPath++; break;
+            }
+        }
+
+        /// <summary>
+        /// Folds another scan-half's tallies in. The API loop and the registry
+        /// fallback each normalise their own paths and neither can see the other's,
+        /// so the census the report carries is the sum.
+        /// </summary>
+        internal void Add(PathCensus? other)
+        {
+            if (other is null) return;
+            ResolverAttempts += other.ResolverAttempts;
+            ResolverNotAPath += other.ResolverNotAPath;
+            ResolverNoExistingAncestor += other.ResolverNoExistingAncestor;
+            ResolverOpenRefused += other.ResolverOpenRefused;
+            ResolverFinalNameUnavailable += other.ResolverFinalNameUnavailable;
+            ResolverFaulted += other.ResolverFaulted;
+            NormalisationRefusedAtExpansion += other.NormalisationRefusedAtExpansion;
+            NormalisationRefusedAtPrefixStrip += other.NormalisationRefusedAtPrefixStrip;
+            NormalisationRefusedAtFullPath += other.NormalisationRefusedAtFullPath;
+        }
+    }
 
 
     /// <summary>
@@ -299,6 +427,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // why two of them withhold for different reasons.
         var apiPatchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
 
+        // How the recorded paths THIS loop read turned out. The registry fallback
+        // keeps its own and the two are added at the census, neither half being able
+        // to see the other's.
+        var pathCensus = new PathCensus();
+
         progress?.Report(new ScanProgressUpdate(Strings.Status_FoundProducts));
 
         // Budgeted, because the abandonment breadcrumb is one full entry per
@@ -373,7 +506,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 progress?.Report(new ScanProgressUpdate(
                     productName.Length > 0 ? productName : productCode, IsMilestone: false));
                 MergeClaim(claimed,
-                    new RegisteredPackage(NormaliseLocalPackagePath(localPackage.Value), productName, productCode),
+                    new RegisteredPackage(NormaliseLocalPackagePath(localPackage.Value, pathCensus), productName, productCode),
                     ClaimSource.InstallerApi);
             }
 
@@ -453,7 +586,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         ? Worse(seenApi, apiVerdict)
                         : apiVerdict;
 
-                    var claimedPath = NormaliseLocalPackagePath(patchPath.Value);
+                    var claimedPath = NormaliseLocalPackagePath(patchPath.Value, pathCensus);
 
                     // THE REMOVABLE VERDICT IS GRANTED HERE AND TAKEN AWAY LATER, and
                     // the order is the architecture rather than a convenience. This
@@ -662,6 +795,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 if (packages[i].IsRemovable)
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
 
+        // The run's whole path census: this loop's, plus the fallback's own.
+        var paths = new PathCensus();
+        paths.Add(pathCensus);
+        paths.Add(fallback.Paths);
+
         return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts, patchClaims.AsReadOnly(),
             // The tallies rather than the term computed from them: the
             // never-claimed figure is floored and biased low, so it is not the
@@ -694,7 +832,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 fallback.ProductPatchKeys,
                 fallback.ProductPatchRegistrations,
                 fallback.ProductsWithRemovablePatch,
-                fallback.ProductsWithPatchSetUnestablished));
+                fallback.ProductsWithPatchSetUnestablished,
+                // BOTH HALVES OF THE SCAN, ADDED. The API loop and the registry
+                // fallback each normalise the paths they read and neither can see
+                // the other's, so a census taken from either alone would report a
+                // fraction of the machine as the whole of it. Added here rather
+                // than shared as one object through both, so the fallback stays a
+                // function of its own inputs.
+                paths.ResolverAttempts,
+                paths.ResolverNotAPath,
+                paths.ResolverNoExistingAncestor,
+                paths.ResolverOpenRefused,
+                paths.ResolverFinalNameUnavailable,
+                paths.ResolverFaulted,
+                paths.NormalisationRefusedAtExpansion,
+                paths.NormalisationRefusedAtPrefixStrip,
+                paths.NormalisationRefusedAtFullPath));
         }
         finally
         {
@@ -1312,8 +1465,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// volume. That says how exposed one machine was, and nothing about whether
     /// another holds one.
     /// </summary>
-    private static string NormaliseLocalPackagePath(string value)
+    private static string NormaliseLocalPackagePath(string value, PathCensus census)
     {
+        // A MARKER IN SCOPE RATHER THAN THREE TRY BLOCKS, and the reason is what
+        // this method is: the last thing between a registry value and a claim, whose
+        // refusal behaviour is pinned by a test. Splitting the try to sharpen a
+        // counter would restructure the control flow of a safety-critical path to
+        // improve instrumentation, which is the wrong way round. The marker costs an
+        // assignment and the catch reads it.
+        //
+        // THE THREE ARE COUNTED APART BECAUSE THEY ARE NOT ONE FINDING. A value the
+        // expansion refused, one the prefix work refused and one GetFullPath refused
+        // are three different things about a machine, and a single counter named for
+        // any one of them would be false of the other two. What they share, and the
+        // only thing any sentence may say over all three, is that the recorded path
+        // could not be turned into a path.
+        var stage = NormalisationStage.Expansion;
         try
         {
             // BEFORE THE PREFIX STRIP, and the order is load-bearing rather than
@@ -1325,6 +1492,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // always did. On a value holding no % this is the identity, so nothing
             // that reached here before reaches anything different now.
             var expanded = Environment.ExpandEnvironmentVariables(value);
+
+            stage = NormalisationStage.PrefixStrip;
             var stripped = InstallerCacheHelpers.StripLongPathPrefix(expanded);
 
             // The test runs on the stripped value rather than the fully
@@ -1335,12 +1504,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // Only a proven expansion is taken. A false return means the kernel
             // never expanded this path, so its out value is the same string by
             // another route and using it would dress a guess as an answer.
-            if (NeedsFinalPathResolution(stripped)
-                && InstallerCacheHelpers.TryResolveFinalPath(ToWin32Prefix(stripped), out var resolved))
+            if (NeedsFinalPathResolution(stripped))
             {
-                return resolved;
+                // COUNTED WHETHER IT ANSWERS OR NOT, which is the whole use of the
+                // number: the five failures below are meaningless without how many
+                // times anything was asked, since a machine carrying no flagged
+                // spelling never reaches here and would otherwise report five clean
+                // zeros indistinguishable from a machine that asked and got them.
+                census.ResolverAttempts++;
+                var outcome = InstallerCacheHelpers.ResolveFinalPathOutcome(
+                    ToWin32Prefix(stripped), out var resolved);
+                census.RecordResolution(outcome);
+
+                if (outcome == PathResolution.Resolved) return resolved;
             }
 
+            stage = NormalisationStage.FullPath;
             return Path.GetFullPath(stripped);
         }
         catch
@@ -1349,6 +1528,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // length past the API's limit) is kept exactly as Windows returned
             // it. It cannot be improved, and dropping the claim would turn an
             // unreadable spelling into an orphaned file.
+            //
+            // AND THE FACT IS NOW CARRIED OUT RATHER THAN ENDING HERE. What leaves
+            // this method is a claim that cannot match anything the folder walk
+            // produces, so the file it means is offered as unclaimed. Until this
+            // release nothing downstream was told, and the count is the first step
+            // in finding out how often it happens on a real machine.
+            census.RecordNormalisationRefusal(stage);
             return value;
         }
     }
@@ -1510,6 +1696,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var productPatchKeys = 0;
         var productPatchRegistrations = 0;
         var patchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
+        var pathCensus = new PathCensus();
 
         // Budgeted, because every catch below sits inside a loop bounded by the
         // machine's registered products and patches, and what fails one key read
@@ -1543,6 +1730,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     unparseableKeyNames += sidRead.UnparseableProductKeyNames;
                     productPatchKeys += sidRead.ProductPatchKeys;
                     productPatchRegistrations += sidRead.ProductPatchRegistrations;
+                    pathCensus.Add(sidRead.Paths);
                     // Worsening merge across SID subtrees: one product code can be
                     // registered under several, and whichever subtree the walk
                     // reached first must not settle a disagreement between them.
@@ -1579,7 +1767,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // the verdict-unreadable count is: a product registered under two
             // subtrees is one product here and two increments there.
             patchSets.Values.Count(v => v == ProductPatchSet.RemovablePatchPresent),
-            patchSets.Values.Count(v => v == ProductPatchSet.Unestablished));
+            patchSets.Values.Count(v => v == ProductPatchSet.Unestablished),
+            pathCensus);
     }
 
     /// <summary>
@@ -1618,6 +1807,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct,
         PerItemFailureLog failureLog)
     {
+        // This subtree's own tally of how its recorded paths turned out, folded into
+        // the run's by the caller.
+        var pathCensus = new PathCensus();
         var failures = 0;
         var productKeys = 0;
         var unclaimedProductFiles = 0;
@@ -1711,7 +1903,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         }
                         else if (!string.IsNullOrEmpty(localPkg))
                         {
-                            var path = NormaliseLocalPackagePath(localPkg);
+                            var path = NormaliseLocalPackagePath(localPkg, pathCensus);
                             // Short-circuited on purpose: the disk is asked about
                             // only the paths the API left unclaimed, which on a
                             // whole enumeration is none of them.
@@ -1754,7 +1946,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         }
                         else if (!string.IsNullOrEmpty(localPkg))
                         {
-                            var path = NormaliseLocalPackagePath(localPkg);
+                            var path = NormaliseLocalPackagePath(localPkg, pathCensus);
                             if (MergeClaim(claimed, new RegisteredPackage(path, "", ""),
                                     ClaimSource.RegistryFallback)
                                 && File.Exists(path))
@@ -1777,7 +1969,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
             nonStringValues, null, unparseableKeyNames, patchSets,
-            productPatchKeys, productPatchRegistrations);
+            productPatchKeys, productPatchRegistrations,
+            Paths: pathCensus);
     }
 
     /// <summary>

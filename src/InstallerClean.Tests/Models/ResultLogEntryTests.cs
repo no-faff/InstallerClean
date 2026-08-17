@@ -74,7 +74,16 @@ public class ResultLogEntryTests
         ProductPatchKeyCount: 0,
         ProductPatchRegistrationCount: 0,
         ProductsWithRemovablePatchCount: 0,
-        ProductsWithPatchSetUnestablishedCount: 0);
+        ProductsWithPatchSetUnestablishedCount: 0,
+        PathResolverAttemptCount: 0,
+        PathResolverNotAPathCount: 0,
+        PathResolverNoAncestorCount: 0,
+        PathResolverOpenRefusedCount: 0,
+        PathResolverNoFinalNameCount: 0,
+        PathResolverFaultedCount: 0,
+        PathNormalisationRefusedAtExpansionCount: 0,
+        PathNormalisationRefusedAtPrefixStripCount: 0,
+        PathNormalisationRefusedAtFullPathCount: 0);
 
     private static ResultLogEntry SampleEntry() => new(
         SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
@@ -150,6 +159,17 @@ public class ResultLogEntryTests
                 "supersededRegistrationCount", "obsoletedRegistrationCount",
                 "productPatchKeyCount", "productPatchRegistrationCount",
                 "productsWithRemovablePatchCount", "productsWithPatchSetUnestablishedCount",
+                "pathResolverAttemptCount", "pathResolverNotAPathCount",
+                "pathResolverNoAncestorCount", "pathResolverOpenRefusedCount",
+                "pathResolverNoFinalNameCount", "pathResolverFaultedCount",
+                "pathNormalisationRefusedAtExpansionCount",
+                "pathNormalisationRefusedAtPrefixStripCount",
+                "pathNormalisationRefusedAtFullPathCount",
+                // Last, not beside its parts: it is a derived property rather than a
+                // constructor parameter, so that a total contradicting its own
+                // breakdown inside one object is impossible rather than merely
+                // unlikely. The serialiser emits the positional members first.
+                "pathNormalisationRefusedCount",
             ],
             root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
 

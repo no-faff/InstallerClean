@@ -305,6 +305,64 @@ public sealed record AppInfo(string Version, string Language)
 /// question and kept apart from it: one is the condition finding a reason to withhold,
 /// this is the condition unable to look.
 /// </param>
+/// <param name="PathResolverAttemptCount">
+/// Recorded paths this scan put to the final-path resolver, which is asked only for a
+/// value carrying a long-path or NT object prefix or an 8dot3 alias.
+///
+/// READ THE FIVE BELOW AGAINST IT OR NOT AT ALL. On a machine flagging no path the
+/// resolver is never asked and all five read zero, which on the wire is identical to a
+/// machine that asked and got five clean answers. This is the only thing separating
+/// those two readings, and every one of the five is uninterpretable without it.
+/// </param>
+/// <param name="PathResolverNotAPathCount">
+/// Of those, refused outright as not a path.
+/// </param>
+/// <param name="PathResolverNoAncestorCount">
+/// Of those, with no existing component up to the root: an unattached drive, an
+/// unmapped share, a detached virtual disk. An ordinary machine state.
+/// </param>
+/// <param name="PathResolverOpenRefusedCount">
+/// Of those, where an ancestor existed and no handle could be opened on it, most often
+/// an ACL. The second ordinary state, and the pair is why these are not one number: a
+/// count folding all five together could not be acted on, and acting on such a count
+/// was designed twice and withdrawn twice.
+/// </param>
+/// <param name="PathResolverNoFinalNameCount">
+/// Of those, where an opened handle yielded an empty final name.
+/// </param>
+/// <param name="PathResolverFaultedCount">
+/// Of those, where the attempt threw rather than answering. The resolved count is not
+/// sent: it is the attempts less these five, and a stored copy could disagree with its
+/// own parts.
+/// </param>
+/// <param name="PathNormalisationRefusedCount">
+/// Recorded values this scan could not turn into a path at all, whatever refused them.
+/// The sum of the three below, computed from them at the one place they are read, so
+/// the total and its parts cannot come apart.
+///
+/// WHAT IT MEANS, and it is the figure this group exists for: such a claim is kept in
+/// the raw spelling Windows gave, matches nothing the folder walk produces, and the
+/// cached file it names is offered as unclaimed. It cannot be produced by a missing
+/// file, a missing drive or a permission, which is what separates it from the two
+/// ordinary states above.
+///
+/// NOTHING IN THE APPLICATION ACTS ON IT IN THIS RELEASE. It is here to size a failure
+/// nobody has measured, which is the step two withdrawn designs skipped.
+/// </param>
+/// <param name="PathNormalisationRefusedAtExpansionCount">
+/// Of those, refused while expanding an environment variable.
+///
+/// THE THREE ARE ONE POPULATION SPLIT BY CAUSE AND MUST NOT BE DESCRIBED AS ONE. A
+/// sentence naming any single cause is false of the other two members; the only thing
+/// true of every member is the superordinate above.
+/// </param>
+/// <param name="PathNormalisationRefusedAtPrefixStripCount">
+/// Of those, refused while taking a prefix off or preparing the resolver's ask.
+/// </param>
+/// <param name="PathNormalisationRefusedAtFullPathCount">
+/// Of those, refused by the full-path call: an embedded null, a device name, a length
+/// past the API's limit. The member that fires in practice.
+/// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
     int LongFileNameCount,
@@ -322,7 +380,16 @@ public sealed record MachineInfo(
     int ProductPatchKeyCount,
     int ProductPatchRegistrationCount,
     int ProductsWithRemovablePatchCount,
-    int ProductsWithPatchSetUnestablishedCount)
+    int ProductsWithPatchSetUnestablishedCount,
+    int PathResolverAttemptCount,
+    int PathResolverNotAPathCount,
+    int PathResolverNoAncestorCount,
+    int PathResolverOpenRefusedCount,
+    int PathResolverNoFinalNameCount,
+    int PathResolverFaultedCount,
+    int PathNormalisationRefusedAtExpansionCount,
+    int PathNormalisationRefusedAtPrefixStripCount,
+    int PathNormalisationRefusedAtFullPathCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -342,7 +409,38 @@ public sealed record MachineInfo(
             scan.Census.ProductPatchKeyCount,
             scan.Census.ProductPatchRegistrationCount,
             scan.Census.ProductsWithRemovablePatchCount,
-            scan.Census.ProductsWithPatchSetUnestablishedCount);
+            scan.Census.ProductsWithPatchSetUnestablishedCount,
+            scan.Census.PathResolverAttemptCount,
+            scan.Census.PathResolverNotAPathCount,
+            scan.Census.PathResolverNoAncestorCount,
+            scan.Census.PathResolverOpenRefusedCount,
+            scan.Census.PathResolverNoFinalNameCount,
+            scan.Census.PathResolverFaultedCount,
+            scan.Census.PathNormalisationRefusedAtExpansionCount,
+            scan.Census.PathNormalisationRefusedAtPrefixStripCount,
+            scan.Census.PathNormalisationRefusedAtFullPathCount);
+
+    /// <summary>
+    /// Every recorded value this scan could not turn into a path, whatever refused
+    /// it: the sum of the three above.
+    ///
+    /// DERIVED RATHER THAN PASSED IN, and that is the whole of why it is down here
+    /// instead of among the parameters. As a parameter it could be constructed
+    /// disagreeing with its own parts, and a total that contradicts its breakdown
+    /// inside one object is the failure that no reader of the payload could
+    /// possibly diagnose. It is serialised like any other property, so the receiver
+    /// sees it as a key beside them.
+    ///
+    /// IT IS THE ONLY MEMBER OF THIS GROUP A SENTENCE MAY BE BUILT ON, the three
+    /// parts being three different facts about a machine. What it means is that the
+    /// recorded path could not be turned into a path at all, so the claim is kept in
+    /// the raw spelling Windows gave, matches nothing the folder walk produces, and
+    /// the cached file it names is offered as unclaimed.
+    /// </summary>
+    public int PathNormalisationRefusedCount =>
+        PathNormalisationRefusedAtExpansionCount
+        + PathNormalisationRefusedAtPrefixStripCount
+        + PathNormalisationRefusedAtFullPathCount;
 }
 
 /// <summary>
