@@ -274,6 +274,44 @@ public record InstallerQueryResult(
 /// reached was never asked this question either. Any of those non-zero makes the
 /// count above a floor.
 /// </param>
+/// <param name="ProductPatchKeyCount">
+/// Products whose registry <c>Patches</c> key opened, from the per-product patch
+/// listing the superseded-patch condition rests on.
+///
+/// THESE FOUR ARE CARRIED AND NOT YET SENT. They land here ahead of the rule that
+/// consumes the reading and ahead of the payload fields that will report them, so the
+/// three can be reviewed and reverted apart. Nothing outside this record reads them
+/// today, which is deliberate and is not the licence to delete them that an unread
+/// counter usually is. Against
+/// <see cref="ProductCount"/> it says how usual it is for a product to carry one:
+/// one machine reads 138 of 139, and a product with no patches has no reason to.
+/// </param>
+/// <param name="ProductPatchRegistrationCount">
+/// Patch subkeys under those keys, one per (product, patch) registration rather
+/// than per patch. With the count above it is the shape fact the measured machine
+/// is least like, holding five.
+/// </param>
+/// <param name="ProductsWithRemovablePatchCount">
+/// Products where at least one registered patch positively declared itself
+/// removable, so a rollback on that product could reach for a superseded patch's
+/// cached file.
+///
+/// IT IS THE FIGURE THAT SAYS WHAT THE CONDITION COSTS, and nothing measured on one
+/// machine can answer it. On the machine every other measurement came from, the only
+/// patch declaring itself removable sits on a Visual C++ redistributable with no
+/// superseded patch to withhold, so the condition costs that machine nothing at all.
+/// Whether that is usual is exactly what these reports exist to find out.
+/// </param>
+/// <param name="ProductsWithPatchSetUnestablishedCount">
+/// Products whose patch set could not be established: the key would not open, or a
+/// patch carried no <c>Uninstallable</c> or one that was not a number.
+///
+/// THE OTHER HALF OF THE SAME QUESTION, and kept apart from it because they are
+/// different findings. One is the condition finding a reason to withhold; this is
+/// the condition unable to look. A machine reading high here is a machine where the
+/// fix is withholding without having established anything, which is safe and is not
+/// the same as safe-and-informed.
+/// </param>
 public readonly record struct EnumerationCensus(
     int UnreadableProducts = 0,
     int SkippedProductRows = 0,
@@ -290,4 +328,8 @@ public readonly record struct EnumerationCensus(
     int UnparseableProductKeyNames = 0,
     int UnreadableVerdictPaths = 0,
     int InstanceProductCount = 0,
-    int InstanceTypeUnreadableCount = 0);
+    int InstanceTypeUnreadableCount = 0,
+    int ProductPatchKeyCount = 0,
+    int ProductPatchRegistrationCount = 0,
+    int ProductsWithRemovablePatchCount = 0,
+    int ProductsWithPatchSetUnestablishedCount = 0);

@@ -118,6 +118,40 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// nothing can turn its name into a question. It withholds for that reason,
     /// on the same terms as a code Windows would not answer about.
     /// </param>
+    /// <param name="ProductPatchSets">
+    /// One verdict per product code, from the registry's own per-product patch
+    /// list, or null where the caller supplied no reader. See
+    /// <see cref="ProductPatchSet"/> for what the three values mean and
+    /// <see cref="ReadProductPatchSet"/> for how each is reached.
+    ///
+    /// IT DECIDES NOTHING YET AND IS SENT NOWHERE YET. The reading lands ahead of
+    /// both the rule that consumes it and the payload fields that will carry it, so
+    /// that the three can be reviewed and reverted apart. The four counts beside it
+    /// reach <see cref="EnumerationCensus"/> and stop there; wiring them to the wire
+    /// is a payload change and lands with the rule.
+    /// </param>
+    /// <param name="ProductPatchKeys">
+    /// Products whose <c>Patches</c> key opened. Against
+    /// <paramref name="ProductKeys"/> it answers how usual it is for a product to
+    /// carry one at all: one machine reads 138 of 139, and a product with no
+    /// patches has no reason to carry it.
+    /// </param>
+    /// <param name="ProductPatchRegistrations">
+    /// Patch subkeys seen under those keys, one per (product, patch) registration
+    /// rather than per patch. With <paramref name="ProductPatchKeys"/> it is the
+    /// shape fact the measured machine is least like, holding five.
+    /// </param>
+    /// <param name="ProductsWithRemovablePatch">
+    /// Products where at least one registered patch positively declared itself
+    /// removable. THIS IS THE COUNT THAT SAYS WHETHER THE PER-PRODUCT CONDITION
+    /// WILL WITHHOLD ANYTHING IN THE FIELD, which no measurement of one machine can
+    /// answer.
+    /// </param>
+    /// <param name="ProductsWithPatchSetUnestablished">
+    /// Products whose patch set could not be established at all. The other half of
+    /// the same question, and the one that separates "the condition found a reason"
+    /// from "the condition could not look".
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -125,7 +159,64 @@ public sealed class InstallerQueryService : IInstallerQueryService
         int UnclaimedPatchFiles = 0,
         int NonStringLocalPackageValues = 0,
         IReadOnlyCollection<string>? RegistryProductCodes = null,
-        int UnparseableProductKeyNames = 0);
+        int UnparseableProductKeyNames = 0,
+        IReadOnlyDictionary<string, ProductPatchSet>? ProductPatchSets = null,
+        int ProductPatchKeys = 0,
+        int ProductPatchRegistrations = 0,
+        int ProductsWithRemovablePatch = 0,
+        int ProductsWithPatchSetUnestablished = 0);
+
+    /// <summary>
+    /// What one product's registered patch set says about whether a superseded
+    /// patch sharing that product may be offered.
+    ///
+    /// THE QUESTION IT ANSWERS IS ABOUT THE PRODUCT AND NOT ABOUT ANY ONE PATCH,
+    /// which is the whole reason it exists. A superseded patch B is cached once and
+    /// registered once per product it applies to, so a rollback on ANY of those
+    /// products reaches for the same file. Reading B's own removability answers a
+    /// different question from the one the risk turns on, which is whether anything
+    /// that could supersede B on a product they share can still be uninstalled.
+    ///
+    /// TWO OF THE THREE VALUES WITHHOLD AND THEY ARE NOT THE SAME FINDING. One is
+    /// the app saying it looked and the answer was no; the other is the app saying
+    /// it could not tell. That distinction is carried through to
+    /// <c>Downgrade(claimed, path, withheld:)</c>, which already has both causes and
+    /// gains no vocabulary from this.
+    /// </summary>
+    internal enum ProductPatchSet
+    {
+        /// <summary>
+        /// Every patch registered to this product positively declared
+        /// <c>Uninstallable</c> as a number equal to zero. The only value that
+        /// permits, and deliberately the one requiring the most to have gone right.
+        /// </summary>
+        AllNonRemovable,
+
+        /// <summary>
+        /// At least one registered patch positively declared itself removable, so
+        /// something on this product can be uninstalled and reach for a superseded
+        /// patch's cached file.
+        ///
+        /// IT BEATS <see cref="Unestablished"/> WHEN A PRODUCT MEETS BOTH, because
+        /// it is a finding where the other is an absence of one, and the surface
+        /// that names a cause should name the one that was established. Same
+        /// direction as <see cref="MergeClaim"/>'s second rule.
+        /// </summary>
+        RemovablePatchPresent,
+
+        /// <summary>
+        /// The set could not be established: the key would not open, a patch
+        /// carried no <c>Uninstallable</c>, or one carried a value that was not a
+        /// number. Anything that is not a positive zero lands here or above.
+        ///
+        /// A PRODUCT WITH NO PATCHES AT ALL READS AS THIS AND IT COSTS NOTHING. Such
+        /// a product has no reason to carry a <c>Patches</c> key, so an absent key
+        /// cannot be told from a key that would not open. It does not matter,
+        /// because this verdict is only ever consulted for a product some candidate
+        /// patch is registered to, and such a product has patches by construction.
+        /// </summary>
+        Unestablished,
+    }
 
     /// <summary>
     /// Production constructor: talks to the real msi.dll through
@@ -603,7 +694,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // one row here and several there.
                 packages.Count(p => p.VerdictUnreadable),
                 instanceProducts,
-                instanceTypeUnreadable));
+                instanceTypeUnreadable,
+                fallback.ProductPatchKeys,
+                fallback.ProductPatchRegistrations,
+                fallback.ProductsWithRemovablePatch,
+                fallback.ProductsWithPatchSetUnestablished));
         }
         finally
         {
@@ -1405,6 +1500,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
         var productCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var productPatchKeys = 0;
+        var productPatchRegistrations = 0;
+        var patchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
 
         // Budgeted, because every catch below sits inside a loop bounded by the
         // machine's registered products and patches, and what fails one key read
@@ -1436,6 +1534,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     unclaimedPatchFiles += sidRead.UnclaimedPatchFiles;
                     nonStringValues += sidRead.NonStringLocalPackageValues;
                     unparseableKeyNames += sidRead.UnparseableProductKeyNames;
+                    productPatchKeys += sidRead.ProductPatchKeys;
+                    productPatchRegistrations += sidRead.ProductPatchRegistrations;
+                    // Worsening merge across SID subtrees: one product code can be
+                    // registered under several, and whichever subtree the walk
+                    // reached first must not settle a disagreement between them.
+                    if (sidRead.ProductPatchSets is not null)
+                        foreach (var (code, set) in sidRead.ProductPatchSets)
+                            patchSets[code] = patchSets.TryGetValue(code, out var seen)
+                                ? Worse(seen, set)
+                                : set;
                 }
             }
         }
@@ -1458,7 +1566,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
-            nonStringValues, productCodes, unparseableKeyNames);
+            nonStringValues, productCodes, unparseableKeyNames, patchSets,
+            productPatchKeys, productPatchRegistrations,
+            // Counted off the merged map rather than tallied per SID, for the reason
+            // the verdict-unreadable count is: a product registered under two
+            // subtrees is one product here and two increments there.
+            patchSets.Values.Count(v => v == ProductPatchSet.RemovablePatchPresent),
+            patchSets.Values.Count(v => v == ProductPatchSet.Unestablished));
     }
 
     /// <summary>
@@ -1503,6 +1617,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unclaimedPatchFiles = 0;
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
+        var productPatchKeys = 0;
+        var productPatchRegistrations = 0;
+        var patchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
@@ -1536,6 +1653,41 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // would let a registry this code cannot read look exactly
                     // like a registry that agreed with the enumeration.
                     else unparseableKeyNames++;
+
+                    // The per-product patch set, read here because this loop is
+                    // already standing on the key it lives one level below, so it
+                    // costs one OpenSubKey per product and no second walk of
+                    // UserData. Its own try/catch and its own cause: a product whose
+                    // patch list will not read is a different diagnosis from one
+                    // whose InstallProperties will not, and the budget keys on the
+                    // cause string.
+                    //
+                    // Keyed on the UNPACKED code because that is what every caller
+                    // holds; a key name that would not unpack has no code to ask
+                    // about and is already counted above as withholding for that
+                    // reason.
+                    if (unpacked is not null)
+                    {
+                        try
+                        {
+                            var set = ReadProductPatchSet(productsKey, prodGuid,
+                                ref productPatchKeys, ref productPatchRegistrations);
+                            patchSets[unpacked] = patchSets.TryGetValue(unpacked, out var existing)
+                                ? Worse(existing, set)
+                                : set;
+                        }
+                        catch (Exception ex) when (ex is not OperationCanceledException)
+                        {
+                            failures++;
+                            // The verdict is written rather than left absent, so a
+                            // product whose read threw is on record as unestablished
+                            // instead of as a product nobody asked about. An absent
+                            // entry and an unestablished one must not be the same
+                            // thing to a caller.
+                            patchSets[unpacked] = ProductPatchSet.Unestablished;
+                            failureLog.Record(ex, cause: "product-patches");
+                        }
+                    }
 
                     try
                     {
@@ -1617,7 +1769,102 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
-            nonStringValues, null, unparseableKeyNames);
+            nonStringValues, null, unparseableKeyNames, patchSets,
+            productPatchKeys, productPatchRegistrations);
+    }
+
+    /// <summary>
+    /// Reads one product's registered patch set out of
+    /// <c>Products\&lt;packed product&gt;\Patches</c> and reduces it to a single
+    /// verdict.
+    ///
+    /// IT IS A LISTING AND NOT AN ENUMERATION, which is the reason this source is
+    /// worth having at all. There is no index and no <c>NoMoreItems</c>, so there is
+    /// no early-end case to be blind to: the fault every other source of a patch set
+    /// shares is that a truncated enumeration is indistinguishable from a complete
+    /// one, and a key listing cannot be truncated that way.
+    ///
+    /// NEVER <c>AllPatches</c>, AND THIS IS THE DECISION MOST LIKELY TO BE UNDONE BY
+    /// SOMEBODY TIDYING UP. The same key carries an <c>AllPatches</c>
+    /// <c>REG_MULTI_SZ</c> that looks like a ready-made list of exactly this. It is
+    /// the EFFECTIVE list and not the registration list: measured against one machine
+    /// while that machine still held superseded patches, it agreed with the subkeys
+    /// on 137 of 138 products and disagreed about exactly one, the only product
+    /// holding superseded patches, by listing the applied patch alone and omitting all
+    /// three superseded ones. So anything built on it silently excludes the exact
+    /// class this condition exists for.
+    ///
+    /// THAT MEASUREMENT CANNOT BE RE-TAKEN AND A FRESH CHECK WILL LOOK LIKE IT
+    /// REFUTES IT. Re-run over the same machine on 2026-08-17, after its superseded
+    /// patches had gone: 148 product keys, 147 carrying a <c>Patches</c> key, 147
+    /// carrying <c>AllPatches</c>, and ZERO disagreements. `measured` Of course there
+    /// were none, because the disagreement is ABOUT superseded patches and the machine
+    /// no longer had any. **A reader who checks this on a machine with no superseded
+    /// patch and finds perfect agreement has not disproved anything**, and the whole
+    /// value of this paragraph is stopping them concluding otherwise. The live guard is
+    /// now a test rather than a machine: see
+    /// <c>ProductPatchSetTests.AllPatches_is_not_read_even_when_it_contradicts_the_subkeys</c>,
+    /// which plants the disagreement rather than waiting for one.
+    ///
+    /// <c>Uninstallable</c> IS ACCEPTED ONLY AS AN <c>int</c>, and the strictness is
+    /// the safe direction rather than tidiness. A value stored as text, or as a
+    /// 64-bit number, is a shape nothing here anticipated, and reading it more
+    /// permissively would turn an unanticipated store into a product read as clean,
+    /// which is the one direction that puts a file on the list. <c>State</c> is not
+    /// read: the condition asks about every registered patch whatever state it
+    /// carries, so filtering by state could only ever narrow the set and offer more.
+    /// </summary>
+    internal static ProductPatchSet ReadProductPatchSet(
+        Microsoft.Win32.RegistryKey productsKey,
+        string packedProductCode,
+        ref int patchKeys,
+        ref int patchRegistrations)
+    {
+        using var patchesKey = productsKey.OpenSubKey($@"{packedProductCode}\Patches");
+        if (patchesKey is null) return ProductPatchSet.Unestablished;
+
+        patchKeys++;
+
+        var unestablished = false;
+        foreach (var patchName in patchesKey.GetSubKeyNames())
+        {
+            patchRegistrations++;
+
+            using var patchKey = patchesKey.OpenSubKey(patchName);
+            if (patchKey is null) { unestablished = true; continue; }
+
+            // A positive zero is the only clean answer. Absent, wrong-typed and
+            // anything non-zero all fail the product, and only the last of the three
+            // is a finding rather than an inability.
+            if (patchKey.GetValue("Uninstallable") is not int uninstallable)
+            {
+                unestablished = true;
+                continue;
+            }
+
+            if (uninstallable != 0) return ProductPatchSet.RemovablePatchPresent;
+        }
+
+        return unestablished ? ProductPatchSet.Unestablished : ProductPatchSet.AllNonRemovable;
+    }
+
+    /// <summary>
+    /// Merges two readings of one product code, which happens when the same product
+    /// is registered under more than one SID subtree.
+    ///
+    /// WORSENING ONLY, on the same reasoning as <see cref="MergeClaim"/>: a reading
+    /// that finds a removable patch can never be cancelled by one that did not look
+    /// there, and two SIDs disagreeing must not be settled by whichever the walk
+    /// reached first. A positive finding outranks an inability, and an inability
+    /// outranks a clean bill.
+    /// </summary>
+    internal static ProductPatchSet Worse(ProductPatchSet a, ProductPatchSet b)
+    {
+        if (a == ProductPatchSet.RemovablePatchPresent || b == ProductPatchSet.RemovablePatchPresent)
+            return ProductPatchSet.RemovablePatchPresent;
+        if (a == ProductPatchSet.Unestablished || b == ProductPatchSet.Unestablished)
+            return ProductPatchSet.Unestablished;
+        return ProductPatchSet.AllNonRemovable;
     }
 
     /// <summary>
