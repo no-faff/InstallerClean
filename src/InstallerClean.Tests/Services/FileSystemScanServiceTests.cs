@@ -509,25 +509,39 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
-    public async Task ScanAsync_reports_no_withheld_files_even_where_the_records_were_incomplete()
+    public async Task The_withheld_count_reports_the_flagged_rows_on_an_incomplete_run()
     {
-        // The count is what withholding the removable class cost a run, and no
-        // run withholds it: nothing is offered on that verdict, so there is
-        // nothing to withhold. It is pinned at zero rather than deleted because
-        // the result-log schema carries the field, and a field quietly acquiring a
-        // non-zero value again is the shape this asserts against.
-        const string present = @"C:\Windows\Installer\withheld-present.msp";
-        const string gone = @"C:\Windows\Installer\withheld-gone.msp";
+        // ITS SUBJECT WAS PINNED AT ZERO AND THE PREMISE IS GONE. This asserted that
+        // the count stays zero however incomplete the records were, on the reasoning
+        // that nothing was offered on a superseded verdict so there was nothing to
+        // withhold. 3.0.0 offers that class again and the field is a real figure, so
+        // the claim to pin now is the live one: an incomplete run reports the rows
+        // actually carrying the flag, rather than the field going quiet again.
+        //
+        // BOTH FILES ARE PRESENT ON PURPOSE, and it is not tidying. WithheldCount is
+        // computed as every kept row carrying RemovableWithheld, with no test of
+        // whether the file is still there, while ScanResult.WithheldCount's own doc
+        // says the population is rows "whose file was on disk". One of those is
+        // wrong and it is a question about the app rather than about this test, so
+        // this fixture keeps out of it: with both files present the count is two
+        // under either reading. The disagreement is reported separately and nothing
+        // here should be read as settling it.
+        const string first = @"C:\Windows\Installer\withheld-one.msp";
+        const string second = @"C:\Windows\Installer\withheld-two.msp";
         var query = QueryReturning(new InstallerQueryResult(
-            new List<RegisteredPackage> { Withheld(present), Withheld(gone) }.AsReadOnly(),
+            new List<RegisteredPackage> { Withheld(first), Withheld(second) }.AsReadOnly(),
             UnaccountedProductCount: 2));
 
         var fs = new MockFileSystem();
-        fs.AddFile(present, new MockFileData("x"));
+        fs.AddFile(first, new MockFileData("x"));
+        fs.AddFile(second, new MockFileData("yy"));
 
         var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
 
-        Assert.Equal(0, result.WithheldCount);
+        Assert.Equal(2, result.WithheldCount);
+        // The same population counted off the kept list, which must not come apart
+        // from the figure above it.
+        Assert.Equal(2, result.RegisteredWithheldCount);
         Assert.Equal(2, result.UnaccountedProductCount);
     }
 
