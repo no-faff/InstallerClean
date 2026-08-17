@@ -179,6 +179,40 @@ public class InstallerQueryServicePatchTruncationTests
     /// longer uninstallable; the second still has it applied and its patch
     /// enumeration comes back empty, which is the whole fault.
     /// </summary>
+    /// <summary>
+    /// Two products sharing one patch, where the REGISTRY CANNOT SETTLE THE PATH and
+    /// the confirmation pass has to go and ask. The second product holds the patch
+    /// applied and declares it not uninstallable, so its registered patch set reads
+    /// all-non-removable and the per-product condition passes the path through; the
+    /// pairing itself is still one the pass will find is not removable, because the
+    /// state is applied rather than superseded.
+    ///
+    /// IT EXISTS BECAUSE <see cref="TwoProductsOneSharedPatch"/> CANNOT REACH THE PASS
+    /// AT ALL, and that is correct behaviour rather than a fault in it. There the
+    /// sibling declares the patch uninstallable, so the registry reports a removable
+    /// patch present, and the condition settles the path on that evidence before the
+    /// pairing reads happen. The condition is deliberately in front of the pass for
+    /// exactly that saving. A test of the PASS therefore needs a machine the condition
+    /// does not answer for, and this is the ordinary shape of one: most second
+    /// products holding a patch cannot uninstall it.
+    ///
+    /// The shared fixture is left alone rather than changed to this, because several
+    /// tests below are about the sibling still needing the patch, and re-pointing them
+    /// silently would be the same class of fault this fixture exists to avoid.
+    /// </summary>
+    private static FakeApi TwoProductsTheRegistryCannotSettle()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.AddProduct(StillApplied);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        // Applied and NOT uninstallable: all-non-removable to the registry, and still
+        // not a removable pairing to the pass, which needs a superseded state.
+        msi.HoldPatch(StillApplied, Patch, Shared, state: "1", uninstallable: "0");
+        msi.EnumerationEndsEarlyFor.Add(StillApplied);
+        return msi;
+    }
+
     private static FakeApi TwoProductsOneSharedPatch(bool truncateSecond = true)
     {
         var msi = new FakeApi();
@@ -234,7 +268,7 @@ public class InstallerQueryServicePatchTruncationTests
     [Fact]
     public void A_read_that_could_not_answer_keeps_the_patch_and_says_it_was_withheld()
     {
-        var msi = TwoProductsOneSharedPatch();
+        var msi = TwoProductsTheRegistryCannotSettle();
         msi.PatchPropertyResult[(Patch, StillApplied, "State")] = BadConfiguration;
 
         var row = TheSharedPatch(Confirm(msi));
@@ -249,7 +283,7 @@ public class InstallerQueryServicePatchTruncationTests
     {
         // Uninstallable is only asked once State has answered, so this pins the
         // second read's failure separately from the first's.
-        var msi = TwoProductsOneSharedPatch();
+        var msi = TwoProductsTheRegistryCannotSettle();
         msi.PatchPropertyResult[(Patch, StillApplied, "Uninstallable")] = BadConfiguration;
 
         var row = TheSharedPatch(Confirm(msi));
@@ -290,7 +324,7 @@ public class InstallerQueryServicePatchTruncationTests
     [Fact]
     public void Only_the_products_that_never_named_the_patch_are_asked()
     {
-        var msi = TwoProductsOneSharedPatch();
+        var msi = TwoProductsTheRegistryCannotSettle();
 
         Confirm(msi);
 
@@ -598,16 +632,27 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
         msi.ProductResolveResult[StillApplied] = BadConfiguration;
 
-        // The count is what survives: a product the registry named and Windows
-        // would not answer about is one the enumeration cannot account for, which
-        // still drives the refusal gate and the records-incomplete notice. The
-        // withholding it used to trigger has nothing left to withhold.
+        // A product the registry named and Windows would not answer about is one the
+        // enumeration cannot account for, which drives the refusal gate and the
+        // records-incomplete notice.
+        //
+        // AND IT NOW WITHHOLDS SOMETHING, WHICH IS WHAT CHANGED. This asserted the
+        // flag was clear, on a comment saying the withholding had nothing left to
+        // withhold: true while no scan offered a superseded patch at all. 3.0.0
+        // offers that class, so a scan that cannot account for a product takes the
+        // whole removable class back and marks every row it took, which is the
+        // long-standing rule finally having a subject again.
+        //
+        // THE FLAG IS A READING RATHER THAN A MEASUREMENT, and it is written down as
+        // one. The suite is Windows-only and cannot run on the build host, so what
+        // says this is right is the CI run on the next push, read by name. If it
+        // disagrees, the disagreement is the finding and not this comment.
         var result = await Run(msi, Registry(Superseding, StillApplied));
 
         Assert.Equal(1, result.UnaccountedProductCount);
         var row = Assert.Single(result.Packages);
         Assert.False(row.IsRemovable);
-        Assert.False(row.RemovableWithheld);
+        Assert.True(row.RemovableWithheld);
     }
 
     /// <summary>
