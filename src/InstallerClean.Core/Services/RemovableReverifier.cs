@@ -16,22 +16,17 @@ namespace InstallerClean.Services;
 /// A per-candidate re-read of the same question would answer nothing at all for
 /// every orphan while still reporting itself as a re-verification.
 ///
-/// THAT ARGUMENT IS ABOUT THE PATH QUESTION AND DOES NOT REACH THE IDENTITY ONE,
-/// which is a distinction worth keeping straight because the wording here once
-/// blurred it. A candidate's own declared identity IS a per-candidate thing to
-/// query, and <see cref="IIdentityVeto"/> queries it during the scan. Re-running
-/// it here is a real second reading rather than a repeat of this one, and it IS
-/// built: the pass runs below over the surviving candidates no registration
-/// names, and each of its three outcomes reaches the completion surface as its
-/// own sentence. This paragraph said it was not built, having been corrected to
-/// say so one commit before the thing was built, and stayed wrong through two
-/// full readings of the file.
+/// THAT ARGUMENT IS ABOUT THE PATH QUESTION AND THERE IS NO LONGER A SECOND ONE
+/// HERE. A per-candidate identity re-read ran below this until 3.0.0, opening each
+/// surviving candidate and asking Windows about the code the file declares about
+/// itself, and it went with the scan-time pass it duplicated. What re-verifies a
+/// candidate now is this full re-enumeration and the under-lease re-read below it,
+/// both of which ask about registrations rather than about file contents.
 /// </summary>
 public sealed class RemovableReverifier : IRemovableReverifier
 {
     private readonly IInstallerQueryService _queryService;
     private readonly Interop.IMsiApi _msi;
-    private readonly IIdentityVeto _identityVeto;
 
     /// <summary>
     /// The query service answers the pre-lease pass; the raw API answers the
@@ -40,30 +35,11 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// enumeration and nothing narrower, and an enumeration is the one thing that
     /// must not run inside a machine-wide installer lock.
     /// </summary>
-    /// <param name="identityVeto">
-    /// The same check the scan runs, re-run here over the candidates still in the
-    /// batch. Every candidate has now been through it once already, the scan
-    /// screening the whole offer since 3.0.0; what this adds is a second reading
-    /// taken after the batch was confirmed, against records that may have moved in
-    /// between. Until 3.0.0 it was also the FIRST identity check a superseded or
-    /// obsoleted patch ever got, that class being offered without screening.
-    /// </param>
-    public RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi,
-        IIdentityVeto identityVeto)
+    public RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi)
     {
         _queryService = queryService;
         _msi = msi;
-        _identityVeto = identityVeto;
     }
-
-    /// <summary>
-    /// Test constructor, for the tests whose subject is the path and claim
-    /// re-reads. It binds a veto that keeps nothing back, so those tests go on
-    /// pinning what they pin rather than silently also asserting what the identity
-    /// check does; the tests whose subject IS the identity check inject one.
-    /// </summary>
-    internal RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi)
-        : this(queryService, msi, PermissiveIdentityVeto.Instance) { }
 
     public async Task<ReverifyResult> ReverifyAsync(
         IReadOnlyList<string> candidatePaths,
@@ -117,27 +93,9 @@ public sealed class RemovableReverifier : IRemovableReverifier
                         ? HeldBackReason.RecordsUnreadable
                         : HeldBackReason.Reclaimed;
 
-        // Every path any registration names. It used to separate the two branches
-        // here, exactly as the scan separated them: a path no registration named
-        // was an orphan and got the identity check, and a path some registration
-        // named was a superseded or obsoleted patch, which was offered BECAUSE
-        // Windows positively said so and must not be put through a check whose
-        // keeping condition is that Windows knows it.
-        //
-        // NO SURVIVOR IS IN IT NOW. Every registered path is non-removable, so a
-        // candidate any registration names has already been dropped above and the
-        // set below can only exclude what is not there. It is kept, and kept
-        // measured off this run's own enumeration rather than assumed empty,
-        // because what it guards against is a candidate reaching the identity
-        // check that a registration answers for, and an assumption would be a
-        // second copy of a rule that lives up there.
-        var namedByAnyRegistration = new HashSet<string>(
-            query.Packages.Select(p => p.LocalPackagePath), StringComparer.OrdinalIgnoreCase);
-
         var surviving = new List<string>(candidatePaths.Count);
         var dropped = new List<string>();
         var reasons = default(HeldBackReasons);
-        var orphans = new List<int>();
         foreach (var path in candidatePaths)
         {
             if (nonRemovable.TryGetValue(path, out var reason))
@@ -147,61 +105,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
             }
             else
             {
-                if (!namedByAnyRegistration.Contains(path)) orphans.Add(surviving.Count);
                 surviving.Add(path);
-            }
-        }
-
-        // The identity check over the survivors that no registration names. Run in
-        // one pass so each distinct identity is asked about once, and after the
-        // path comparison so it screens the smallest set that can still be acted
-        // on.
-        if (orphans.Count > 0)
-        {
-            var screened = _identityVeto.Screen(
-                orphans.ConvertAll(i => new IdentityCandidate(
-                    surviving[i], IsPatchFile(surviving[i]))),
-                null,
-                cancellationToken);
-
-            // Walked back to front so removing by index cannot move an index not
-            // yet used.
-            // THE MACHINE CONDITION IS ANSWERED BEFORE ANY FILE IS, because it is not
-            // about a file. If the identity pass reports it for one candidate it
-            // reports it for every candidate it reached, so there is no batch to
-            // salvage and no per-file cause to record: the run stops and says why.
-            // Returning early also keeps it out of the loop below, whose causes are
-            // all findings about individual files.
-            for (var i = 0; i < orphans.Count; i++)
-            {
-                if (screened.Outcomes[i] != CandidateIdentityOutcome.InstanceTransformsInUse)
-                    continue;
-
-                return new ReverifyResult(
-                    Array.Empty<string>(),
-                    candidatePaths,
-                    reasons,
-                    Array.Empty<PatchClaim>(),
-                    InstanceTransformsInUse: true);
-            }
-
-            for (var i = orphans.Count - 1; i >= 0; i--)
-            {
-                var reason = screened.Outcomes[i] switch
-                {
-                    CandidateIdentityOutcome.Claimed => HeldBackReason.IdentityClaimed,
-                    CandidateIdentityOutcome.IdentityUnreadable => HeldBackReason.IdentityUnreadable,
-                    // The records could not be asked, which is the same thing to
-                    // have found out as a property read that failed and is counted
-                    // under the same sentence.
-                    CandidateIdentityOutcome.RecordsUnaskable => HeldBackReason.RecordsUnreadable,
-                    _ => (HeldBackReason?)null,
-                };
-                if (reason is null) continue;
-
-                dropped.Add(surviving[orphans[i]]);
-                surviving.RemoveAt(orphans[i]);
-                reasons = reasons.Plus(reason.Value);
             }
         }
 
@@ -218,15 +122,6 @@ public sealed class RemovableReverifier : IRemovableReverifier
         return new ReverifyResult(surviving.AsReadOnly(), dropped.AsReadOnly(), reasons,
             survivingClaims.AsReadOnly());
     }
-
-    /// <summary>
-    /// Which reading the identity check takes, decided from the extension here
-    /// rather than guessed at inside it. An installation package keeps its code in
-    /// the Property table and a patch has no Property table at all, so the two are
-    /// read by entirely different routes.
-    /// </summary>
-    private static bool IsPatchFile(string path) =>
-        path.EndsWith(".msp", StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc />
     /// <remarks>

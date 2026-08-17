@@ -1081,7 +1081,7 @@ public class FileSystemScanServiceTests
         var query = QueryReturning(new InstallerQueryResult(Array.Empty<RegisteredPackage>()));
 
         var result = await new FileSystemScanService(
-            query, new MockFileSystem(), PermissiveIdentityVeto.Instance, probe,
+            query, new MockFileSystem(), probe,
             Array.Empty<string>(), null, null).ScanAsync();
 
         Assert.Equal(ShortNameCreationLabels.SystemVolumeOnly, result.ShortNameCreation);

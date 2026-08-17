@@ -90,8 +90,13 @@ internal static class CliExitCode
     /// <see cref="Transient"/> is for a condition that clears by itself, so a
     /// scheduler should come back; a condition that clears only when somebody
     /// changes the machine belongs here, or a nightly retry is refused for ever.
-    /// A product installed as a second instance of itself is the worked example:
-    /// it goes when that product is uninstalled and at no other time.
+    /// A malformed or absent argument is the plainest worked example: nothing about
+    /// waiting and running again fixes it.
+    ///
+    /// The example this comment used to give was a product installed as a second
+    /// instance of itself, which took this code for exactly that reason and stopped
+    /// being detectable in 3.0.0 when the check behind it was removed. The test the
+    /// example illustrated is unchanged, and no exit code moved with it.
     /// </summary>
     public const int Error = 1;
 

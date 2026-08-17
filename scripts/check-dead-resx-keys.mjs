@@ -49,6 +49,53 @@ const ALLOWLIST = new Set([
   // the resx losing a string a later state might want back.
   'Status.MoveCancelled.Partial',
   'Status.DeleteCancelled.Partial',
+
+  // ---- Retired in 3.0.0 with the identity check, and RETIRED IS NOT DEAD ----
+  // The scan used to open each removal candidate, read the product or patch code
+  // the file declares about itself, and ask Windows about that code before the
+  // file could be offered. That check was removed in 3.0.0: the class it guarded
+  // is covered by the file-identity match, the registry fallback, the
+  // records-unreadable refusal and the environment-variable expansion, and what it
+  // uniquely reached is one case nobody has ever observed. Every key below was a
+  // surface for that check or for the machine condition inside it.
+  //
+  // They are kept rather than deleted, and kept in all fifteen satellites with
+  // them, because whether the app should say anything at all about a file it
+  // declines to touch is an OPEN question the owner has not ruled on: it waits on
+  // scan-time counts that do not exist yet. Deleting the English would throw away
+  // fifteen translations of the only wording this project has ever had for it.
+  // Each line below says what the string was for and what removed it, so a later
+  // reader can tell a retired string from an oversight.
+
+  // The second headed list in the registered-files details window, over the files
+  // the identity pass had kept back. The list went with the pass; this is the one
+  // piece of interface the app has ever had for "I found this and chose not to
+  // touch it".
+  'Details.GroupUnsure',
+
+  // Two of the five held-back causes on the completion overlay, both produced only
+  // by the identity re-check at action time: a record existing under the code the
+  // FILE declares about itself, and a file that yielded no code to ask about.
+  'Completion.ReverifyIdentityClaimed',
+  'Completion.ReverifyIdentityUnreadable',
+
+  // The completion screen for a machine whose entire offer the identity pass had
+  // emptied because a product was installed as a second instance of itself. It
+  // existed so that "the app could not tell" was not shown as "nothing to remove".
+  'Completion.NothingOffered',
+  'Completion.NothingOfferedBody',
+
+  // The same condition arriving between the scan and the click, which refused the
+  // whole batch rather than dropping files from it with per-file causes.
+  'Completion.InstanceRefusal',
+
+  // The command line's counterparts: its third scan outcome and that outcome's
+  // Application-channel line, then its act-time refusal and that refusal's own
+  // audit line. No exit code changed when these went.
+  'Cli.NothingOfferedInstance',
+  'Cli.EventLogNothingOfferedInstance',
+  'Cli.InstanceRefusal',
+  'Cli.EventLogInstanceRefusal',
 ]);
 
 // Every .cs / .xaml under src/, minus bin/ and obj/ (build output mirrors source)

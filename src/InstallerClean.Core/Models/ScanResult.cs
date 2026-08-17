@@ -7,9 +7,9 @@ namespace InstallerClean.Models;
 /// all functions of these fields.
 /// </summary>
 /// <param name="RemovableFiles">
-/// Files at the root of <c>C:\Windows\Installer</c> that no registration names
-/// and that the identity pass then found nothing claiming. Safe to move or
-/// delete.
+/// Files at the root of <c>C:\Windows\Installer</c> that no registration names,
+/// judged first as text and then, for whatever the text left over, by asking the
+/// filesystem which file each recorded path really names. Safe to move or delete.
 ///
 /// ONE PATHWAY REACHES IT. A patch Windows reports superseded or obsoleted is
 /// registered, so it never enters this list whatever its state: Windows opens
@@ -95,69 +95,6 @@ namespace InstallerClean.Models;
 /// meet a key that has vanished. Nothing grants a removable verdict, so nothing
 /// takes one away. The command line's 3000 notice no longer carries it.
 /// </param>
-/// <param name="IdentityClaimedCount">
-/// Candidates the identity pass kept back because a live registration answers to
-/// what the file says it is. No registration named its PATH, so the path
-/// comparison had nothing to go on; asking about the identity found something.
-///
-/// It is a positive claim on the file and nothing stronger. It does NOT establish
-/// that a program would break without this particular copy: a product that caches
-/// a fresh package on each of twenty updates leaves nineteen files that answer to
-/// a live product code and are dead weight, and every one of them counts here.
-/// Copy built on this figure has to say what it really means.
-/// </param>
-/// <param name="IdentityUnreadableCount">
-/// Candidates kept back because the file did not yield an identity to ask about
-/// at all: it would not open, it declares no code, or a patch names no product it
-/// targets. An inability about the FILE.
-/// </param>
-/// <param name="IdentityUnaskableCount">
-/// Candidates kept back because the identity was read and the question could not
-/// be put to Windows. An inability about the RECORDS.
-///
-/// THE FOUR ARE SEPARATE BECAUSE THEY ARE FOUR DIFFERENT THINGS TO HAVE FOUND
-/// OUT, and nothing may report them under one sentence. A confirmed claim, an
-/// unreadable file, an unanswerable question and an answer that does not settle
-/// the question have no honest superordinate: any sentence covering all four
-/// either says nothing or says something false of three of them. They are summed
-/// nowhere for the same reason.
-/// </param>
-/// <param name="IdentityInstanceTransformsCount">
-/// Candidates kept back because Windows answered that it holds no record of what
-/// the file says it is, on a machine where that answer does not settle whether a
-/// registration needs the file. Not an inability at all: every source answered.
-///
-/// It is a property of the MACHINE and not of any file, so it is all-or-nothing:
-/// zero on a machine that does not install products under instance transforms,
-/// and otherwise every candidate that would otherwise have been offered, with no
-/// removable files at all. See
-/// <see cref="Services.CandidateIdentityOutcome.InstanceTransformsInUse"/> for the
-/// mechanism and for what is still not established about it.
-/// </param>
-/// <param name="IdentityInstanceTransformsBytes">
-/// What those files come to. Carried rather than derived because the surface that
-/// names them is telling somebody what they are not getting, and a count with no
-/// size would leave them guessing at it.
-/// </param>
-/// <param name="WithheldFiles">
-/// Every candidate the identity pass kept back, whatever the cause, in walk order.
-///
-/// IT EXISTS SO THE TWO SUMMARY LINES ACCOUNT FOR EVERY FILE IN THE FOLDER. A
-/// withheld file used to appear in neither: not offered, because the pass kept it
-/// back, and not among the registered rows either, because no registration names
-/// it. The two lines could therefore add up to less than the folder holds, with
-/// the difference in no line at all and no way for anyone to notice.
-///
-/// The list rather than a count and a total, so the number shown and the rows
-/// shown cannot come apart: both are read off this. Null means a scan that never
-/// ran the pass, which is not the same as a pass that kept nothing back, and both
-/// read as an empty list to a caller that does not care.
-///
-/// NO CAUSE TRAVELS WITH IT, deliberately. Four different findings put a file in
-/// here and any sentence over all four would be false of three, so the surfaces
-/// that show these files say what is true of every one of them and nothing more:
-/// InstallerClean could not be sure about them.
-/// </param>
 /// <param name="Census">
 /// What the enumeration behind this scan measured about itself and about the
 /// machine, carried straight through from
@@ -239,9 +176,6 @@ public record ScanResult(
     int MissingSupersededCount = 0,
     int UnaccountedProductCount = 0,
     int WithheldCount = 0,
-    int IdentityClaimedCount = 0,
-    int IdentityUnreadableCount = 0,
-    int IdentityUnaskableCount = 0,
     EnumerationCensus Census = default,
     string ShortNameCreation = ShortNameCreationLabels.Unreadable,
     int RegisteredClaimedCount = 0,
@@ -249,10 +183,7 @@ public record ScanResult(
     int RegisteredWithheldCount = 0,
     int RegisteredUnjudgedCount = 0,
     int RegisteredSupersededCount = 0,
-    long RegisteredSupersededBytes = 0,
-    int IdentityInstanceTransformsCount = 0,
-    long IdentityInstanceTransformsBytes = 0,
-    IReadOnlyList<OrphanedFile>? WithheldFiles = null)
+    long RegisteredSupersededBytes = 0)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk; the sum of the two

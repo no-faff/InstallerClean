@@ -51,6 +51,16 @@ public sealed record ResultLogEntry(
     /// answer. <c>pendingReboot</c> leaves, being structurally forced on any run
     /// that could act and unvarying across every report received.
     ///
+    /// SIX OF THOSE KEYS WENT AGAIN IN 3.0.0 AND THE VERSION DID NOT MOVE, on the
+    /// schema-3 precedent above: the identity pass's three scan-time outcomes, its
+    /// instance-transform count, and two of the re-verify's five held-back causes
+    /// all stopped being produced when the check that produced them was removed. Two
+    /// arrived in the same release, under <c>machine</c>, counting the products
+    /// installed as a second instance of themselves and the products that would not
+    /// answer that question. A KEY THAT CEASES TO BE PRODUCED IS A SUBTRACTION; A
+    /// KEY WHOSE MEANING CHANGES IS NOT, which is why the missing-files split was
+    /// added beside its total rather than over it.
+    ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
     /// never loses data even if the allowlist has not caught up. THAT LENIENCE
@@ -379,35 +389,6 @@ public sealed record MachineInfo(
 /// They travel because how far a real machine's registry runs ahead of its
 /// enumeration is a fact only these reports can establish.
 /// </param>
-/// <param name="KeptIdentityClaimedCount">
-/// Candidates the scan kept back because a live registration answers to the code
-/// the FILE declares about itself. Weaker than it sounds and copy must not
-/// strengthen it: one product that cached a fresh package on each of twenty
-/// updates leaves nineteen files that answer to a live code and are needed by
-/// nothing.
-/// </param>
-/// <param name="KeptIdentityUnreadableCount">
-/// Kept back because the file yielded no identity to ask about. An inability
-/// about the FILE.
-/// </param>
-/// <param name="KeptIdentityUnaskableCount">
-/// Kept back because the identity was read and the question could not be put to
-/// Windows. An inability about the RECORDS.
-///
-/// THE FOUR ARE NEVER SUMMED, here or anywhere. A confirmed claim, an unreadable
-/// file, an unanswerable question and an answer that does not settle the question
-/// have no honest superordinate, and a total would invite one.
-/// </param>
-/// <param name="KeptIdentityInstanceTransformsCount">
-/// Kept back because every source answered, none holds a record of what the file
-/// says it is, and this machine installs products under instance transforms, so
-/// that answer does not establish that nothing needs the file. Not an inability:
-/// the question was put and was answered.
-///
-/// All-or-nothing, being a property of the machine: a report carrying a number
-/// here carries no removable files at all. Zero on every machine measured so far,
-/// which is what makes any non-zero one worth having.
-/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -424,11 +405,7 @@ public sealed record ScanInfo(
     int UnclaimedProductFileCount,
     int UnclaimedPatchFileCount,
     int RecoveredProductCount,
-    int UnansweredProductCount,
-    int KeptIdentityClaimedCount,
-    int KeptIdentityUnreadableCount,
-    int KeptIdentityUnaskableCount,
-    int KeptIdentityInstanceTransformsCount)
+    int UnansweredProductCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -456,11 +433,7 @@ public sealed record ScanInfo(
             scan.Census.UnclaimedProductFiles,
             scan.Census.UnclaimedPatchFiles,
             scan.Census.RecoveredProductCount,
-            scan.Census.UnansweredProductCount,
-            scan.IdentityClaimedCount,
-            scan.IdentityUnreadableCount,
-            scan.IdentityUnaskableCount,
-            scan.IdentityInstanceTransformsCount);
+            scan.Census.UnansweredProductCount);
     }
 }
 
@@ -500,13 +473,11 @@ public sealed record OperationInfo(
     string? MoveDestinationKind,
     int HeldBackReclaimed,
     int HeldBackRecordsChanged,
-    int HeldBackRecordsUnreadable,
-    int HeldBackIdentityClaimed,
-    int HeldBackIdentityUnreadable)
+    int HeldBackRecordsUnreadable)
 {
     public static OperationInfo ScanOnly() =>
         new(OperationKinds.Scan, OperationOutcomes.NoFiles, 0, 0, 0, 0,
-            Array.Empty<ErrorBucket>(), null, 0, 0, 0, 0, 0);
+            Array.Empty<ErrorBucket>(), null, 0, 0, 0);
 
     public static OperationInfo FromMove(MoveResult result, long bytesFreed, long durationMs,
         string moveDestinationKind, HeldBackReasons heldBack) =>
@@ -521,9 +492,7 @@ public sealed record OperationInfo(
             moveDestinationKind,
             heldBack.Reclaimed,
             heldBack.RecordsChanged,
-            heldBack.RecordsUnreadable,
-            heldBack.IdentityClaimed,
-            heldBack.IdentityUnreadable);
+            heldBack.RecordsUnreadable);
 
     public static OperationInfo FromDelete(DeleteResult result, long bytesFreed, long durationMs,
         HeldBackReasons heldBack) =>
@@ -538,9 +507,7 @@ public sealed record OperationInfo(
             null,
             heldBack.Reclaimed,
             heldBack.RecordsChanged,
-            heldBack.RecordsUnreadable,
-            heldBack.IdentityClaimed,
-            heldBack.IdentityUnreadable);
+            heldBack.RecordsUnreadable);
 
     /// <summary>
     /// The outcome label, decided from the two counts the finished batch

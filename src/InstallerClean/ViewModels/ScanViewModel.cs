@@ -279,21 +279,16 @@ public partial class ScanViewModel : ObservableObject
             // probing first would miss it.
             var pendingRebootResult = await Task.Run(() => _rebootService.Check(), cancellationToken);
 
-            // THE LEFT-ALONE LINE COUNTS THE WITHHELD FILES TOO, so that it and the
-            // offer between them account for every file in the folder. A file the
-            // identity pass kept back is in neither population otherwise: not
-            // offered, and not a registered row either, because no registration
-            // names it. The two lines could then add up to less than the folder
-            // holds with nothing on screen showing the difference.
-            //
-            // Every cause counts, not just the second-instance one. Which finding
-            // kept a file back is carried in the counts and reaches no sentence
-            // here: four different things put a file in this set and one line over
-            // all four would be false of three of them.
-            var withheld = result.WithheldFiles ?? Array.Empty<OrphanedFile>();
-            var registeredCount = result.RegisteredPackages.Count + withheld.Count;
-            var registeredSize = DisplayHelpers.FormatSize(
-                result.RegisteredTotalBytes + withheld.Sum(f => f.SizeBytes));
+            // THE TWO LINES ACCOUNT FOR THE WHOLE FOLDER AGAIN WITHOUT A THIRD TERM,
+            // and that is the property to keep rather than the arithmetic. A third
+            // population sat between them until 3.0.0: files the identity pass kept
+            // back, which were neither offered nor registered rows, so the two lines
+            // could add up to less than the folder held with the difference shown
+            // nowhere. Nothing is kept back per file now, so every walked cache file
+            // is either offered or claimed by a registration, and the sum closes on
+            // two terms. Anything added here later has to close it again.
+            var registeredCount = result.RegisteredPackages.Count;
+            var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
             var orphanedCount = result.RemovableFiles.Count;
             var orphanedSize = DisplayHelpers.FormatSize(result.RemovableFiles.Sum(f => f.SizeBytes));
             // Built here with the rest of the display state rather than in the

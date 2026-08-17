@@ -305,16 +305,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
                 return;
 
-            // Two different findings, two different screens. An empty offer because
-            // the folder holds nothing to remove is not an empty offer because the
-            // app could not tell, and the second used to be shown as the first.
-            if (result.IdentityInstanceTransformsCount > 0)
-                Completion.ShowNothingOffered(
-                    result.IdentityInstanceTransformsCount,
-                    DisplayHelpers.FormatSize(result.IdentityInstanceTransformsBytes),
-                    result.RegisteredPackages.Count, Scan.LastScanDurationMs);
-            else
-                Completion.ShowAllClear(result.RegisteredPackages.Count, Scan.LastScanDurationMs);
+            // ONE FINDING AND ONE SCREEN AGAIN. A second stood here until 3.0.0, for
+            // a machine whose whole offer the identity pass had emptied because a
+            // product was installed as a second instance of itself: an empty offer
+            // because the app could not tell, which is not the same as an empty offer
+            // because the folder holds nothing to remove, and it was shown as the
+            // first until it had a screen of its own. Nothing empties an offer that
+            // way now, so an empty offer has one meaning and says it plainly.
+            Completion.ShowAllClear(result.RegisteredPackages.Count, Scan.LastScanDurationMs);
 
             if (suppress) return;
             // Either lock (the prior-session persisted flag or the

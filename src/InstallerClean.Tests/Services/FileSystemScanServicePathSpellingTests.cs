@@ -205,7 +205,7 @@ public class FileSystemScanServicePathSpellingTests
                 registeredPaths.Select(p => new RegisteredPackage(p, "Product", "{code}")).ToList())));
 
         return await new FileSystemScanService(
-            query, fs, PermissiveIdentityVeto.Instance, null, walkedFiles, CacheRoot, fileIds)
+            query, fs, null, walkedFiles, CacheRoot, fileIds)
             .ScanAsync();
     }
 }

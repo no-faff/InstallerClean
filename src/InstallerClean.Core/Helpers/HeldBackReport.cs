@@ -16,18 +16,18 @@ namespace InstallerClean.Helpers;
 /// its own joining to do, so the partition itself cannot come apart.
 ///
 /// A partition rather than one sentence: the causes have no honest superordinate.
-/// Two are positive claims of different strengths, one is an inability about the
-/// records, one is an inability about the FILE, and one is neither (the records no
-/// longer hold the registration), so any sentence covering them all either says
-/// nothing or says something false of most of them.
+/// One is a positive claim, one is an inability about the records, and one is
+/// neither (the records no longer hold the registration), so any sentence covering
+/// all three either says nothing or says something false of two of them.
 ///
-/// WHERE A SUPERORDINATE DOES HOLD IT IS TAKEN, which is the difference between a
-/// partition and a pile. The identity check's unaskable state gets no line of its
-/// own: an account list that would not read, a property read answering outside its
-/// documented set and a patch enumeration that did not reach a clean end are all
-/// failures to read the Windows Installer records, which is what
-/// <see cref="HeldBackReason.RecordsUnreadable"/> already says, so they count under
-/// that sentence rather than beside it.
+/// IT CARRIED FIVE UNTIL 3.0.0, the two extra being the identity re-check's own
+/// findings: a record existing under the code the FILE declares about itself, and a
+/// file that yielded no code to ask about at all. Both went with that check. What
+/// is worth keeping from them is the principle that survived: where a superordinate
+/// genuinely holds it is taken, which is why a keyed read that answered outside its
+/// documented set never got a line of its own but counted under
+/// <see cref="HeldBackReason.RecordsUnreadable"/>, that being what the sentence
+/// already says.
 ///
 /// Each sentence is then held to the same test WITHIN its own cause, which is not
 /// the same job and was the one left undone: a partition whose members are right
@@ -42,28 +42,22 @@ internal static class HeldBackReport
     /// they are meant to be read, and empty when nothing was kept back.
     ///
     /// The order is strongest finding first and weakest last, so a block of
-    /// several reads downwards from what was established to what could not be:
-    /// a live claim that names the file, then a record under the name the file
-    /// gives itself, then a registration the records no longer hold, then a file
-    /// that could not be read, then records that could not be read. The two
-    /// positive findings lead because they are the only ones that say anything
-    /// about the file; the two inabilities trail because neither establishes
-    /// anything about it at all. It is fixed here rather than at each call site so
-    /// both hosts read the same way round.
+    /// several reads downwards from what was established to what could not be: a
+    /// live claim that names the file, then a registration the records no longer
+    /// hold, then records that could not be read. The positive finding leads
+    /// because it is the only one that says anything about the file; the inability
+    /// trails because it establishes nothing about it at all. It is fixed here
+    /// rather than at each call site so both hosts read the same way round.
     /// </summary>
     internal static IReadOnlyList<string> Lines(HeldBackReasons reasons)
     {
         if (reasons.Total == 0) return Array.Empty<string>();
 
-        var lines = new List<string>(5);
+        var lines = new List<string>(3);
         Add(lines, reasons.Reclaimed,
             Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped");
-        Add(lines, reasons.IdentityClaimed,
-            Strings.Completion_ReverifyIdentityClaimed, "Completion.ReverifyIdentityClaimed");
         Add(lines, reasons.RecordsChanged,
             Strings.Completion_ReverifyRecordsChanged, "Completion.ReverifyRecordsChanged");
-        Add(lines, reasons.IdentityUnreadable,
-            Strings.Completion_ReverifyIdentityUnreadable, "Completion.ReverifyIdentityUnreadable");
         Add(lines, reasons.RecordsUnreadable,
             Strings.Completion_ReverifyIncomplete, "Completion.ReverifyIncomplete");
         return lines.AsReadOnly();

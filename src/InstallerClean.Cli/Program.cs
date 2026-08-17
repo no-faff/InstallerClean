@@ -396,37 +396,32 @@ internal static class Program
             // commonest output this tool produces, and somebody reading a
             // scheduled task's log wants the state of the machine rather than
             // the tool's intention towards it.
-            // Three outcomes, not two. "Found no unneeded files" says the folder holds
-            // nothing to remove; the second-instance line says the app could not tell,
-            // and until it existed the second printed as the first. The count in it is
-            // the files that would otherwise have been offered rather than everything
-            // left alone, matching the window.
-            var heldBackForInstances = scanResult.IdentityInstanceTransformsCount;
-            Console.WriteLine(count == 0 && heldBackForInstances > 0
-                ? string.Format(Strings.Cli_NothingOfferedInstance, heldBackForInstances)
-                : count == 0
-                    ? Strings.Cli_FoundNoOrphans
-                    : string.Format(
-                        DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
-                        count, DisplayHelpers.PluraliseFile(count), size));
+            // Two outcomes. There were three until 3.0.0: a second-instance line for
+            // a machine whose whole offer the identity pass had emptied, which said
+            // the app could not tell rather than that the folder held nothing, and
+            // which printed as the clean line until it had one of its own. Nothing
+            // empties an offer that way now, so an empty offer means one thing again.
+            // The window makes the same two-way split; the two hosts must not diverge
+            // on it.
+            Console.WriteLine(count == 0
+                ? Strings.Cli_FoundNoOrphans
+                : string.Format(
+                    DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
+                    count, DisplayHelpers.PluraliseFile(count), size));
 
             ReportScanSignals(arg, scanResult);
 
             if (count == 0)
             {
-                // The audit line follows the same three-way split as stdout, so an RMM
-                // filtering the Application channel can tell "this machine is clean"
-                // from "this machine could not be judged". It carries no registered-package
-                // tail: the count says nothing about why nothing was offered.
-                if (heldBackForInstances > 0)
-                    MachineContract.WriteEventLog(CliEventClass.Ok,
-                        () => string.Format(Strings.Cli_EventLogNothingOfferedInstance,
-                            arg, heldBackForInstances));
-                else
-                    MachineContract.WriteEventLog(CliEventClass.Ok,
-                        () => string.Format(Strings.Cli_EventLogScanNoOrphans,
-                            arg, scanResult.RegisteredPackages.Count,
-                            DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
+                // The audit line follows the same split as stdout, which is now the
+                // two-way one: it carried a third arm for the machine the app could
+                // not judge, so an RMM filtering the Application channel could tell
+                // that from a clean machine, and that arm went with the condition
+                // behind it.
+                MachineContract.WriteEventLog(CliEventClass.Ok,
+                    () => string.Format(Strings.Cli_EventLogScanNoOrphans,
+                        arg, scanResult.RegisteredPackages.Count,
+                        DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
                 return ExitOk;
             }
 
@@ -496,29 +491,17 @@ internal static class Program
             // one condition two ways. The counts and byte figures further down are
             // recomputed from the survivor subset so "X of Y" and the freed-space
             // total describe what was acted on, not the pre-reverify scan.
-            // The machine condition is answered before the per-file causes, because it
-            // is not one of them: no file in the batch is at fault and the reverify
-            // returns an empty survivor set with no per-file reasons to report. The
-            // command line's wording ends "Run it again" rather than "Re-scan",
-            // having no button to press.
-            if (reverify.InstanceTransformsInUse)
-            {
-                Console.WriteLine(Strings.Cli_InstanceRefusal);
-                // HardError, not TransientSkip, and the exit code below is why: the
-                // two must agree, and this condition does not clear on its own. A
-                // second instance goes when somebody uninstalls that product and at
-                // no other time, so a retry-on-transient policy would come back
-                // nightly and be refused every time. Its own audit line rather than
-                // the scan-time one beside it, whose "nothing offered" is false
-                // here: these files were offered before the run refused to act.
-                MachineContract.WriteEventLog(CliEventClass.HardError,
-                    () => string.Format(Strings.Cli_EventLogInstanceRefusal,
-                        arg, scanResult.RemovableFiles.Count));
-                // Not ExitOk: 0 means every file the scan flagged was processed, and
-                // none of them was. Not ExitTransient: see CliExitCode.Error.
-                return ExitError;
-            }
-
+            // A WHOLE-BATCH REFUSAL STOOD HERE UNTIL 3.0.0 and its shape is worth
+            // keeping in mind rather than rediscovering. It fired when the machine
+            // gained a product installed as a second instance of itself between the
+            // scan and the click, which is a fact about the machine and not about any
+            // file, so it printed one sentence, wrote a HardError audit line and
+            // returned ExitError rather than dropping files from the batch with
+            // per-file causes none of them had earned. HardError and not
+            // TransientSkip, because the condition does not clear on its own and a
+            // retry-on-transient policy would have come back nightly to be refused
+            // every time. It went with the identity check that detected it. No exit
+            // code changed: ExitError is still 1 and every other route to it stands.
             ReportHeldBack(reverify.Reasons);
 
             var filePaths = survivingFiles.Select(f => f.FullPath).ToList();

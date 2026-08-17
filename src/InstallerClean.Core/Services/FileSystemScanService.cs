@@ -16,13 +16,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
 {
     private readonly IInstallerQueryService _queryService;
     private readonly IFileSystem _fs;
-    private readonly IIdentityVeto _identityVeto;
     private readonly IShortNameCreationProbe? _shortNames;
     private readonly IFileIdentityReader? _fileIds;
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
 
-    /// <summary>Production constructor. DI supplies all five dependencies; the override fields stay null.</summary>
+    /// <summary>Production constructor. DI supplies all four dependencies; the override fields stay null.</summary>
     /// <remarks>
     /// Microsoft.Extensions.DependencyInjection resolves the public ctor
     /// with the most resolvable parameters and ignores internal ctors.
@@ -35,24 +34,23 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// figure without either having to remember to ask.
     /// </remarks>
     public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
-        IIdentityVeto identityVeto, IShortNameCreationProbe shortNames,
-        IFileIdentityReader fileIdentities)
-        : this(queryService, fileSystem, identityVeto, shortNames, null, null, fileIdentities) { }
+        IShortNameCreationProbe shortNames, IFileIdentityReader fileIdentities)
+        : this(queryService, fileSystem, shortNames, null, null, fileIdentities) { }
 
     /// <summary>
     /// Test constructor. Injects a filesystem and nothing else, for the tests
     /// whose subject is the walk itself.
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
-        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, null, null, null) { }
+        : this(queryService, fileSystem, null, null, null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, null, overrideFiles, null, null) { }
+        : this(queryService, new FileSystem(), null, overrideFiles, null, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, new FileSystem(), PermissiveIdentityVeto.Instance, null, overrideFiles, installerFolderOverride, null) { }
+        : this(queryService, new FileSystem(), null, overrideFiles, installerFolderOverride, null) { }
 
     /// <summary>
     /// Test constructor. Injects an <see cref="IFileSystem"/> so the
@@ -61,15 +59,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, fileSystem, PermissiveIdentityVeto.Instance, null, overrideFiles, installerFolderOverride, null) { }
-
-    /// <summary>
-    /// Test constructor carrying the identity veto as well, for the tests whose
-    /// subject IS the veto rather than the path classification.
-    /// </summary>
-    internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
-        IIdentityVeto identityVeto, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, fileSystem, identityVeto, null, overrideFiles, installerFolderOverride, null) { }
+        : this(queryService, fileSystem, null, overrideFiles, installerFolderOverride, null) { }
 
     /// <summary>
     /// Test constructor carrying the short-name probe as well, for the tests
@@ -88,13 +78,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// which is why the tests that pin the string classification go on pinning it.
     /// </param>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
-        IIdentityVeto identityVeto, IShortNameCreationProbe? shortNames,
+        IShortNameCreationProbe? shortNames,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride,
         IFileIdentityReader? fileIdentities)
     {
         _queryService = queryService;
         _fs = fileSystem;
-        _identityVeto = identityVeto;
         _shortNames = shortNames;
         _fileIds = fileIdentities;
         _overrideFiles = overrideFiles;
@@ -147,19 +136,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var removable = new List<OrphanedFile>();
 
-        // Everything the identity pass keeps back, and the bytes of the one cause
-        // that gets a screen of its own. Declared here rather than inside the try
-        // because the result is built below it and an empty list is the honest
-        // value for a scan that left before the pass ran.
-        var withheldFiles = new List<OrphanedFile>();
-        long instanceWithheldBytes = 0;
-
-        // Candidates the PATH comparison did not find a claim on, held here
-        // rather than offered, because the path comparison no longer decides what
-        // is offered: it decides what is CONSIDERED, and the identity pass below
-        // decides the rest. The list is kept in walk order and the survivors are
-        // appended to the offer in that order, so what the user sees is ordered
-        // exactly as it was before the pass existed.
+        // Candidates no registration claims, in walk order. From 3.0.0 the path
+        // comparison and the file-identity match below it are the whole of what
+        // decides the offer: there is no second screening pass, so a survivor of
+        // those two IS an offered file. Kept as its own list anyway, because the
+        // three sanity gates further down are measured against what the comparison
+        // produced rather than against the offer, and folding the two together
+        // would put a gate's input and its subject in one variable.
         var unclaimedByPath = new List<OrphanedFile>();
 
         // Budgeted, because a refusal is a per-file event on a loop whose length
@@ -220,12 +203,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
         int registeredInFolderPresent = 0;
         int missingInFolder = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
-
-        // Declared out here because the two sanity gates below the loops read its
-        // counts. An empty pass is the honest starting value: a scan that leaves
-        // before the pass runs has kept nothing back by identity, and reporting
-        // that it had would put a cause in front of the user that never occurred.
-        var screened = new IdentityPassResult(Array.Empty<CandidateIdentityOutcome>(), 0, 0);
 
         // Declared out here for the same reason: the three gates below the loops
         // read it, and it is taken inside them. Zero is the honest starting value,
@@ -313,45 +290,40 @@ public sealed class FileSystemScanService : IFileSystemScanService
         DropCandidatesRegisteredUnderAnotherSpelling(
             unclaimedByPath, registered, cancellationToken);
 
-        // The identity pass. Nothing above it established that a candidate
-        // belongs to nothing; it established that no registration names its path,
-        // which is a different sentence and is the one that goes quiet when a
-        // location is spelled a way the walk does not produce. Here each
-        // candidate is asked what it is and Windows is asked about that, and only
-        // a candidate every source answered for, with none of them claiming it,
-        // is offered.
+        // WHAT SURVIVES THE TWO COMPARISONS IS THE OFFER, and there is no third
+        // pass. A per-candidate identity screen stood here until 3.0.0: it opened
+        // each candidate, read the product or patch code the file declares about
+        // ITSELF, asked Windows about that code, and kept the file back unless
+        // every source answered and none claimed it.
         //
-        // IT NOW COVERS THE WHOLE OFFER, which it did not until 3.0.0. There was
-        // a second branch, the superseded and obsoleted patches, and this check
-        // was deliberately kept off it: such a patch was offered BECAUSE Windows
-        // positively said so, making it a file Windows knows by construction, and
-        // a check whose keeping condition is "Windows knows this identity" would
-        // have withheld that whole class on every machine for ever. The reasoning
-        // was sound and the asymmetry it left was the one every investigation kept
-        // naming. With the class no longer offered there is one branch, and every
-        // file this app puts in front of anybody has been through here.
-        screened = _identityVeto.Screen(
-            unclaimedByPath.ConvertAll(f => new IdentityCandidate(f.FullPath, f.IsPatch)),
-            progress,
-            cancellationToken);
-
-        // The offer and its complement, built in one walk so a count and the rows
-        // it describes cannot come apart. WITHHELD IS EVERY CAUSE, not the new one
-        // alone: a file kept back is a file kept back, and the summary line these
-        // feed exists so that the offer plus the kept rows account for the whole
-        // folder. Which cause it was stays in the counts and reaches no sentence.
-        for (var i = 0; i < unclaimedByPath.Count; i++)
-        {
-            if (screened.Outcomes[i] == CandidateIdentityOutcome.Unclaimed)
-            {
-                removable.Add(unclaimedByPath[i]);
-                continue;
-            }
-
-            withheldFiles.Add(unclaimedByPath[i]);
-            if (screened.Outcomes[i] == CandidateIdentityOutcome.InstanceTransformsInUse)
-                instanceWithheldBytes += unclaimedByPath[i].SizeBytes;
-        }
+        // WHAT COVERS THAT CLASS NOW, and it is four mechanisms rather than none,
+        // which is the thing to know before anybody simplifies one of them away.
+        // A registration written in a spelling the walk never produces is matched
+        // by volume serial and file ID immediately above, whatever it was spelled
+        // as, for as long as its recorded path can be opened. A product the API
+        // enumeration lost is claimed by the registry fallback instead, which reads
+        // the same UserData keys and contributes the same paths. When the fallback
+        // is ALSO failing reads, the scan does not offer the file: it refuses
+        // outright, at InstallerQueryService's records-unreadable gate, on one
+        // unreadable product and any fallback failure. And a recorded path holding
+        // an environment variable now resolves, that having been the one live hole
+        // in the set.
+        //
+        // WHAT IS LEFT UNGUARDED, stated so a reader can find it rather than
+        // rediscover it: a registration whose recorded path resolves to nothing
+        // where that is not a read failure, so no counter fires and no gate
+        // refuses, while the file it means sits in the folder under a spelling the
+        // identity match cannot reach because there is nothing to open. Never
+        // observed, on any machine, and it is recorded as open and unguarded in
+        // 1-evidence/standing/WHAT-IS-KNOWN-about-harm-and-how-to-find-out.md.
+        // Two designs to close it have been proposed and both were withdrawn, the
+        // second by the session that designed it.
+        //
+        // SO THE FOUR ABOVE ARE NOT BELT AND BRACES. This release alone fixed six
+        // separate faults in that class, four of them live in every shipped
+        // version, so treating any one of them as redundant cover for the others is
+        // the mistake this comment exists to prevent.
+        removable.AddRange(unclaimedByPath);
 
         // Stat every registered package once here so the Details window
         // doesn't have to hit disk on the UI thread when it opens.
@@ -434,27 +406,25 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // to report: no candidate was judged, so there is no shorter answer to
         // give.
         //
-        // BOTH GATES BELOW ARE MEASURED BEFORE THE IDENTITY PASS, and that is not
-        // a detail. Each of them asks whether the COMPARISON worked, and reads an
-        // empty offer as its evidence that it did not. A scan whose comparison
-        // worked perfectly and whose identity pass then kept every candidate back
-        // also has an empty offer, and refusing that scan would turn the safest
-        // possible outcome into an error. This count is what the offer was before
-        // the pass ran, so both gates go on answering the question they were
-        // written to answer.
+        // WHAT THE GATES BELOW ARE MEASURED AGAINST, AND IT IS NOT THE OFFER.
+        // Each asks whether the COMPARISON worked and reads an empty result as its
+        // evidence that it did not, so what they need is the count of files the
+        // walk put in front of the comparison. That was a separate quantity from
+        // the offer while a per-candidate screen sat between the two; the screen has
+        // gone and on most runs the two numbers are now equal, but they are still
+        // not the same question, and the file-identity match is why. It removes the
+        // candidates that turned out to be registered files under another spelling,
+        // which are claims the comparison MADE rather than files it failed to
+        // judge, so a machine whose every candidate resolved that way has an empty
+        // offer and a comparison that worked perfectly. Reading the offer here
+        // would refuse that machine.
         //
         // It is the walk's candidates and nothing else from 3.0.0. A registered
         // row can no longer become a candidate, so the term that used to add the
         // superseded patches about to be offered has gone with them.
-        //
-        // Taken where the walk left it rather than re-read here, because the
-        // file-identity match above has since removed the candidates that turned
-        // out to be registered files under another spelling. Those are claims the
-        // comparison made, not files it failed to judge, and the gates below are
-        // asking whether it judged anything at all.
-        var candidatesBeforeIdentity = candidatesFromWalk;
+        var candidatesFromComparison = candidatesFromWalk;
 
-        if (!cacheRoot.Proven && refusedCandidates > 0 && candidatesBeforeIdentity == 0)
+        if (!cacheRoot.Proven && refusedCandidates > 0 && candidatesFromComparison == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
 
         // Every registered row, no row being removable. The filter that used to
@@ -510,7 +480,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // actually established rather than a proportion.
         if (registered.Count > 0
             && registeredNamingFolder == 0
-            && candidatesBeforeIdentity > 0)
+            && candidatesFromComparison > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanNoRegisteredFileInFolder);
 
         // Correlation sanity gate. On any real machine some registered path
@@ -603,37 +573,29 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var survivorsForBound = Math.Max(presentRegistered, 1);
         if (presentRegistered <= 2
             && survivorsForBound * 20 < survivorsForBound + missingInFolder
-            && candidatesBeforeIdentity > 0)
+            && candidatesFromComparison > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
-        // THE THREE IDENTITY COUNTS ARE READ BY NO HOST, AND THAT IS THE DECISION
-        // RATHER THAN AN OMISSION. The scan says nothing about a file it kept
-        // back, because the app exists to list the files it is certain about and
-        // does not claim to find them all: two of the three causes are the
-        // ordinary case of declining to be sure about one file, and a line saying
-        // there may be three more tells somebody something they can neither act on
-        // nor check.
+        // NO SCAN NOW REPORTS A FILE IT KEPT BACK, because it keeps none back per
+        // file. Everything the walk offered the comparison and the comparison did
+        // not claim is offered; there is no fourth population and no count of one,
+        // and the three identity counts that used to travel here went with the pass
+        // that produced them.
         //
-        // The sibling notice is not a precedent for one here, though it looks like
-        // the same case. Summary.RecordsNotMatched fires when a whole CLASS is
-        // withheld because the records could not be matched up, which reports that
-        // a scan ran worse than usual and that running it again may genuinely fix
-        // it. Neither is true of these.
-        //
-        // What they are for is the question nothing else can answer: whether any
-        // of this fires on a machine that is not the one it was all measured on.
-        // They are exact per-file counts of exactly that, and are named inputs to
-        // the outstanding reports schema. A schema designed without them is a
-        // departure somebody has to argue for.
+        // WHAT REPLACED THEM AS THE QUESTION THIS SCAN CAN ANSWER ABOUT ITSELF is
+        // in query.Census, which carries the enumeration's own failures per
+        // product. That is a fact about the records rather than about any file, and
+        // it is the shape the removed counts should have had: a count of files kept
+        // back is only ever interesting alongside the reason, and the four reasons
+        // had no honest superordinate to report them under.
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes,
             missingNotSuperseded, missingSuperseded,
             // WithheldCount is zero from here on and is passed as a literal rather
             // than dropped: the field is in the result-log schema, so a receiver
             // meets the key it expects with a value that is true.
             query.UnaccountedProductCount, 0,
-            screened.ClaimedCount, screened.IdentityUnreadableCount, screened.RecordsUnaskableCount,
             query.Census,
             // Read after the classification is settled, so a probe that threw
             // could not cost anybody a scan; it does not throw, and the ordering
@@ -644,10 +606,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registeredWithheld,
             registeredUnjudged,
             registeredSuperseded,
-            registeredSupersededBytes,
-            screened.InstanceTransformsInUseCount,
-            instanceWithheldBytes,
-            withheldFiles.AsReadOnly());
+            registeredSupersededBytes);
     }
 
     /// <summary>

@@ -46,11 +46,12 @@ public static class CoreComposition
         // nothing else. Registered beside the other registry readers rather than
         // inside the scan because it answers about the machine, not about the run.
         services.AddSingleton<IShortNameCreationProbe, ShortNameCreationProbe>();
-        // Reads a cached package's own identity, and asks Windows about it before
-        // any candidate can be offered. Both are stateless; the per-scan caching
-        // lives inside a single Screen call and does not outlive it.
+        // Reads a cached package's own declared identity. Its consumer is the
+        // enumeration's patch-target route, which asks a patch file which products
+        // it names; nothing decides a candidate's fate on it. It is NOT left over
+        // from the identity check that was removed in 3.0.0 and must not be tidied
+        // away with the rest of it.
         services.AddSingleton<IPackageIdentityReader, PackageIdentityReader>();
-        services.AddSingleton<IIdentityVeto, IdentityVeto>();
         // Answers which file a recorded path names, so the scan's path comparison
         // is not defeated by a registration written in a spelling the folder walk
         // does not produce. Stateless, and it holds nothing between scans.

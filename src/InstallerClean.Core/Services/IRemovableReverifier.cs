@@ -146,51 +146,22 @@ public enum HeldBackReason
     /// A read failed, so nothing was established either way. It has not shown the
     /// file to be removable, which is what keeps it in place.
     ///
-    /// The identity re-check's own unaskable state folds in here rather than
-    /// taking a fourth cause, and that is a superordinate rather than a
-    /// convenience: an account list that would not read, a keyed property read
-    /// answering outside its documented set, and a target product's patch
-    /// enumeration that did not run to a clean end are all failures to read the
-    /// Windows Installer records, which is what the sentence says. The merged
-    /// count does not distinguish the mechanisms and the sentence does not claim
-    /// to.
-    ///
-    /// FOUR MECHANISMS REACH IT, not three, and the fourth is the plainest of
-    /// them: a patch's own State or Uninstallable read failing during the
-    /// re-verify's enumeration
+    /// TWO MECHANISMS REACH IT and the sentence is a superordinate over both
+    /// rather than a convenience: a patch's own State or Uninstallable read
+    /// failing during the re-verify's enumeration
     /// (<see cref="Models.RegisteredPackage.VerdictUnreadable"/>), and the same
     /// pairing's read failing under the installer lease. Both are a keyed property
-    /// read of the Windows Installer records that did not answer, so the
-    /// superordinate holds against every one of the four rather than against the
-    /// three it was written for. Anything added later is held to the same test
-    /// against the code that builds the set, never against this list.
+    /// read of the Windows Installer records that did not answer, which is what the
+    /// sentence says, and the merged count does not distinguish them.
+    ///
+    /// IT REACHED FOUR UNTIL 3.0.0. The other two were the identity re-check's
+    /// unaskable state, an account list that would not read and a keyed read
+    /// answering outside its documented set, and they folded in here rather than
+    /// taking a cause of their own. They went with the check. Anything added later
+    /// is held to the same test against the code that builds the set, never against
+    /// this list.
     /// </summary>
     RecordsUnreadable,
-
-    /// <summary>
-    /// The file declares a product or patch code inside itself, and Windows holds
-    /// a record under that code.
-    ///
-    /// SEPARATE FROM <see cref="Reclaimed"/> BECAUSE IT IS WEAKER, and folding it
-    /// in would state something false of every member. Reclaimed means a live
-    /// claim NAMES THE FILE. This means a record exists under the code the FILE
-    /// declares about ITSELF, which is all that can be said: the file is here
-    /// precisely because no registration names its path. One product that has
-    /// cached a fresh package on each of twenty updates leaves nineteen files
-    /// answering to a live code and needed by nothing.
-    /// </summary>
-    IdentityClaimed,
-
-    /// <summary>
-    /// The file yielded nothing that could be asked about: it would not open, it
-    /// declares no code, or a patch names no product it targets.
-    ///
-    /// An inability about the FILE, where <see cref="RecordsUnreadable"/> is an
-    /// inability about the records, so neither covers the other. It is also not a
-    /// fault the user has anything to do about: a patch naming no target product
-    /// is an ordinary file this app has no way to ask about.
-    /// </summary>
-    IdentityUnreadable,
 }
 
 /// <summary>
@@ -206,21 +177,17 @@ public enum HeldBackReason
 public readonly record struct HeldBackReasons(
     int Reclaimed = 0,
     int RecordsChanged = 0,
-    int RecordsUnreadable = 0,
-    int IdentityClaimed = 0,
-    int IdentityUnreadable = 0)
+    int RecordsUnreadable = 0)
 {
     /// <summary>Files kept back for any cause. Equals the accompanying path list's count.</summary>
     public int Total =>
-        Reclaimed + RecordsChanged + RecordsUnreadable + IdentityClaimed + IdentityUnreadable;
+        Reclaimed + RecordsChanged + RecordsUnreadable;
 
     /// <summary>This tally with one more file counted against <paramref name="reason"/>.</summary>
     public HeldBackReasons Plus(HeldBackReason reason) => reason switch
     {
         HeldBackReason.Reclaimed => this with { Reclaimed = Reclaimed + 1 },
         HeldBackReason.RecordsChanged => this with { RecordsChanged = RecordsChanged + 1 },
-        HeldBackReason.IdentityClaimed => this with { IdentityClaimed = IdentityClaimed + 1 },
-        HeldBackReason.IdentityUnreadable => this with { IdentityUnreadable = IdentityUnreadable + 1 },
         _ => this with { RecordsUnreadable = RecordsUnreadable + 1 },
     };
 
@@ -233,9 +200,7 @@ public readonly record struct HeldBackReasons(
     public static HeldBackReasons operator +(HeldBackReasons a, HeldBackReasons b) =>
         new(a.Reclaimed + b.Reclaimed,
             a.RecordsChanged + b.RecordsChanged,
-            a.RecordsUnreadable + b.RecordsUnreadable,
-            a.IdentityClaimed + b.IdentityClaimed,
-            a.IdentityUnreadable + b.IdentityUnreadable);
+            a.RecordsUnreadable + b.RecordsUnreadable);
 }
 
 /// <summary>
@@ -275,29 +240,11 @@ public record UnderLeaseRecheck(
 /// claim, not per path, because a patch applied to several products is claimed
 /// by each of them and any one of those verdicts can move on its own.
 /// </param>
-/// <param name="InstanceTransformsInUse">
-/// True where the re-verify found that this machine installs a product as a second
-/// instance of itself, which it did not when the scan ran.
-///
-/// IT REFUSES THE WHOLE BATCH RATHER THAN DROPPING FILES FROM IT, and that is not a
-/// severity judgement, it is what the finding is. The condition is a property of the
-/// MACHINE and not of any file, so no file in the batch is the one at fault and a
-/// per-file held-back line would attach a cause to each of them that has nothing to
-/// do with any of them. The caller stops, exactly as it stops for a pending reboot,
-/// and <see cref="Surviving"/> is empty.
-///
-/// It can only be reached in the window between the scan and the click, the scan
-/// having offered nothing at all on a machine already in this state. For Delete that
-/// window is shut by the installer lease the act path refuses without, a new
-/// registration needing a transaction and a transaction needing that mutex; Move
-/// does not take the lease by design, so the window is open there.
-/// </param>
 public record ReverifyResult(
     IReadOnlyList<string> Surviving,
     IReadOnlyList<string> Dropped,
     HeldBackReasons Reasons = default,
-    IReadOnlyList<PatchClaim>? SurvivingPatchClaims = null,
-    bool InstanceTransformsInUse = false)
+    IReadOnlyList<PatchClaim>? SurvivingPatchClaims = null)
 {
     /// <summary>Never null: an absent list reads as nothing to re-read rather than as a fault.</summary>
     public IReadOnlyList<PatchClaim> SurvivingPatchClaims { get; init; }

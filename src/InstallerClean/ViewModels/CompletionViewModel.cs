@@ -254,46 +254,18 @@ public partial class CompletionViewModel : ObservableObject
         IsComplete = true;
     }
 
-    /// <summary>
-    /// Shows the state where the scan completed, kept every candidate back, and did
-    /// so because this machine installs a product as a second instance of itself.
-    ///
-    /// SEPARATE FROM <see cref="ShowAllClear"/> AND THAT IS THE WHOLE POINT. Both
-    /// end with an empty offer and they are not the same finding: one says the
-    /// folder holds nothing to remove, the other says the app could not tell. Until
-    /// this existed the second was shown as the first, so a machine with files the
-    /// app could not vouch for read as a machine with nothing to vouch for.
-    ///
-    /// The heading is not a warning colour. Nothing is wrong with the machine and
-    /// there is nothing for the user to do, which the body says in as many words.
-    /// </summary>
-    /// <param name="heldBackCount">
-    /// The files that would otherwise have been offered, not everything in the
-    /// folder. The folder total is mostly registered files that would never be
-    /// offered on any machine, and printing it on the screen that tells somebody
-    /// they are getting nothing would imply that much was going spare.
-    /// </param>
-    public void ShowNothingOffered(int heldBackCount, string heldBackSize,
-        int installedProductCount, long scanDurationMs)
-    {
-        HeadingIsWarning = false;
-        Heading = Strings.Completion_NothingOffered;
-        FailedCount = string.Empty;
-        SummaryDestination = string.Empty;
-        Summary = string.Format(
-            Strings.Completion_NothingOfferedBody, heldBackCount, heldBackSize);
-        Restore = string.Format(
-            Strings.Completion_NothingToCleanUpReceipt,
-            installedProductCount,
-            DisplayHelpers.PluraliseProduct(installedProductCount),
-            DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
-        Errors = string.Empty;
-        Skipped = string.Empty;
-        ResultLogStatusMessage = string.Empty;
-        LastResultFreedNothing = true;
-        ShowDonate = false;
-        IsComplete = true;
-    }
+    // A SECOND EMPTY-OFFER SCREEN STOOD HERE UNTIL 3.0.0 and is worth naming so
+    // nobody reinvents it from the same reasoning. It existed because two different
+    // findings both end with an empty offer, and showing them alike had told a
+    // machine full of files the app could not vouch for that there was nothing to
+    // vouch for: ShowAllClear says the folder holds nothing to remove, and this said
+    // the app could not tell. What made the app unable to tell was the identity
+    // pass, and specifically a machine installing a product as a second instance of
+    // itself, on which the pass withheld the entire offer. Nothing withholds an
+    // offer that way now, so an empty offer has one meaning again and ShowAllClear
+    // is true of every machine that reaches it. The distinction was right while it
+    // had a subject; if anything ever empties an offer wholesale again it needs its
+    // own screen back, and not ShowAllClear.
 
     /// <summary>
     /// The "N files kept in place" block for a completion overlay, or empty when
@@ -542,15 +514,14 @@ public partial class CompletionViewModel : ObservableObject
         Heading = Strings.Completion_NothingRemoved;
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
-        // ONE CONDITION OVERRIDES THE PARTITION, and only this one, because it is
-        // the only one that is not about the files. The machine gained a product
+        // EVERY OUTCOME KEEPS ITS LINE AND ITS COUNT, and no condition overrides the
+        // partition any more. One did until 3.0.0: the machine gaining a product
         // installed as a second instance of itself between the scan and the click,
-        // so no file in the batch is the one at fault and the per-file causes below
-        // have nothing to say about any of them. Every other outcome keeps its line
-        // and its count.
-        Summary = reverify.InstanceTransformsInUse
-            ? Strings.Completion_InstanceRefusal
-            : SkippedText(reverify);
+        // which was not a finding about the files at all, so no file in the batch was
+        // at fault and the per-file causes had nothing to say about any of them. It
+        // went with the check that detected it, and if a whole-batch condition ever
+        // returns it needs the same treatment rather than a per-file line.
+        Summary = SkippedText(reverify);
         Restore = string.Empty;
         Errors = string.Empty;
         Skipped = string.Empty;

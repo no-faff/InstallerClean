@@ -37,9 +37,7 @@ public class ResultLogEntryTests
         MoveDestinationKind: MoveDestinationKinds.SameDrive,
         HeldBackReclaimed: 0,
         HeldBackRecordsChanged: 0,
-        HeldBackRecordsUnreadable: 0,
-        HeldBackIdentityClaimed: 0,
-        HeldBackIdentityUnreadable: 0);
+        HeldBackRecordsUnreadable: 0);
 
     private static ScanInfo SampleScan() => new(
         DurationMs: 100,
@@ -57,11 +55,7 @@ public class ResultLogEntryTests
         UnclaimedProductFileCount: 0,
         UnclaimedPatchFileCount: 0,
         RecoveredProductCount: 0,
-        UnansweredProductCount: 0,
-        KeptIdentityClaimedCount: 0,
-        KeptIdentityUnreadableCount: 0,
-        KeptIdentityUnaskableCount: 0,
-        KeptIdentityInstanceTransformsCount: 0);
+        UnansweredProductCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -157,8 +151,6 @@ public class ResultLogEntryTests
                 "missingNeededCount", "withheldPatchCount", "unreadableProductCount",
                 "skippedProductRowCount", "unclaimedProductFileCount", "unclaimedPatchFileCount",
                 "recoveredProductCount", "unansweredProductCount",
-                "keptIdentityClaimedCount", "keptIdentityUnreadableCount",
-                "keptIdentityUnaskableCount", "keptIdentityInstanceTransformsCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 
@@ -166,7 +158,7 @@ public class ResultLogEntryTests
             [
                 "kind", "outcome", "durationMs", "filesProcessed", "filesFailed", "bytesFreed",
                 "errors", "moveDestinationKind", "heldBackReclaimed", "heldBackRecordsChanged",
-                "heldBackRecordsUnreadable", "heldBackIdentityClaimed", "heldBackIdentityUnreadable",
+                "heldBackRecordsUnreadable",
             ],
             root.GetProperty("operation").EnumerateObject().Select(p => p.Name));
     }
@@ -276,11 +268,11 @@ public class ResultLogEntryTests
     public void All_five_held_back_causes_reach_the_payload_and_are_not_summed()
     {
         // A batch can meet several causes at once, and one cause named for the set
-        // would be false of some of its members. Five distinct values so a
-        // transposition between two of them fails rather than cancelling out.
+        // would be false of some of its members. Distinct values so a transposition
+        // between two of them fails rather than cancelling out. It carried five until
+        // 3.0.0; the identity re-check's two went with the check.
         var reasons = new HeldBackReasons(
-            Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3,
-            IdentityClaimed: 4, IdentityUnreadable: 5);
+            Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3);
 
         var op = OperationInfo.FromDelete(
             new DeleteResult(0, Array.Empty<FileOperationError>()),
@@ -289,8 +281,6 @@ public class ResultLogEntryTests
         Assert.Equal(1, op.HeldBackReclaimed);
         Assert.Equal(2, op.HeldBackRecordsChanged);
         Assert.Equal(3, op.HeldBackRecordsUnreadable);
-        Assert.Equal(4, op.HeldBackIdentityClaimed);
-        Assert.Equal(5, op.HeldBackIdentityUnreadable);
 
         // The tally knows its own total and the payload deliberately does not
         // carry it: a total invites one sentence over five causes.
@@ -439,7 +429,7 @@ public class ResultLogEntryTests
         // answer rather than an absent field, which is what keeps the receiver's
         // required-key check the same on all three run kinds.
         Assert.Equal(0, op.HeldBackReclaimed);
-        Assert.Equal(0, op.HeldBackIdentityUnreadable);
+        Assert.Equal(0, op.HeldBackRecordsUnreadable);
     }
 
     [Fact]
