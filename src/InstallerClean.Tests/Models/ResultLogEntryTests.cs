@@ -300,12 +300,14 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void All_five_held_back_causes_reach_the_payload_and_are_not_summed()
+    public void All_three_held_back_causes_reach_the_payload_and_are_not_summed()
     {
         // A batch can meet several causes at once, and one cause named for the set
-        // would be false of some of its members. Distinct values so a transposition
-        // between two of them fails rather than cancelling out. It carried five until
-        // 3.0.0; the identity re-check's two went with the check.
+        // would be false of some of its members. THAT IS WHY THERE ARE SEVERAL COUNTS
+        // RATHER THAN ONE, and it is as true of three causes as it was of five.
+        // Distinct values so a transposition between two of them fails rather than
+        // cancelling out. It carried five until 3.0.0; the identity re-check's two
+        // went with the check.
         var reasons = new HeldBackReasons(
             Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3);
 
@@ -318,8 +320,8 @@ public class ResultLogEntryTests
         Assert.Equal(3, op.HeldBackRecordsUnreadable);
 
         // The tally knows its own total and the payload deliberately does not
-        // carry it: a total invites one sentence over five causes.
-        Assert.Equal(15, reasons.Total);
+        // carry it: a total invites one sentence over causes that need three.
+        Assert.Equal(6, reasons.Total);
         var json = JsonSerializer.Serialize(op, JsonOptions);
         Assert.DoesNotContain("heldBackTotal", json);
     }
