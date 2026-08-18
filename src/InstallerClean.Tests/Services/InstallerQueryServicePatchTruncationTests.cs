@@ -144,6 +144,34 @@ public class InstallerQueryServicePatchTruncationTests
         (_, _) => new InstallerQueryService.FallbackRead(
             Failures: 0, ProductKeys: productCodes.Length, RegistryProductCodes: productCodes);
 
+    /// <summary>
+    /// The same read, plus the per-product patch set each of those products carries,
+    /// every one of them positively established as holding nothing that can be
+    /// uninstalled.
+    ///
+    /// WITHOUT IT NO TEST DRIVING THE WHOLE PIPELINE CAN PRODUCE A REMOVABLE ROW, and
+    /// that is a trap rather than an inconvenience. <see cref="Registry"/> leaves the
+    /// patch sets null, and a null map answers "unestablished" for every product, so
+    /// the per-product condition takes the verdict away and marks the row withheld
+    /// before anything downstream of it runs. A test asserting that something FURTHER
+    /// DOWN withheld the row then passes whether or not that thing exists at all. One
+    /// test in this file was doing exactly that, and its own commit named the next CI
+    /// run as what would settle the question; CI cannot settle it, because the
+    /// assertion is green either way.
+    ///
+    /// A CLEAN SET FOR EVERY PRODUCT RATHER THAN FOR THE SHARERS ALONE, deliberately.
+    /// It leaves exactly one thing in the run able to withhold, which is whatever the
+    /// test is actually about, so a green result names its own cause.
+    /// </summary>
+    private static InstallerQueryService.FallbackReader RegistryWithCleanPatchSets(
+        params string[] productCodes) =>
+        (_, _) => new InstallerQueryService.FallbackRead(
+            Failures: 0,
+            ProductKeys: productCodes.Length,
+            RegistryProductCodes: productCodes,
+            ProductPatchSets: productCodes.ToDictionary(
+                c => c, _ => ProductPatchSet.AllNonRemovable, StringComparer.OrdinalIgnoreCase));
+
     private static Task<InstallerQueryResult> Run(
         FakeApi msi, InstallerQueryService.FallbackReader fallback) =>
         new InstallerQueryService(msi, fallback).GetRegisteredPackagesAsync();
@@ -372,13 +400,38 @@ public class InstallerQueryServicePatchTruncationTests
         // Everything added here withholds when it cannot answer, so the failure
         // mode of the whole pass is an empty offer. This is the test that says it
         // is not empty on the machine people actually have.
+        //
+        // AND IT SAID NOTHING OF THE KIND UNTIL THE PATCH SETS WERE SUPPLIED HERE.
+        // The fallback was built with a key count alone, which leaves the per-product
+        // patch sets null, and a null map answers "unestablished" for every product
+        // before the API's own reading is weighed. So the superseded row was withheld
+        // by the condition that asks whether anything on any product sharing the patch
+        // could be uninstalled, and the assertion below failed for a reason that has
+        // nothing to do with the machine shape this test is named for. An ordinary
+        // machine's registry answers that question, which is what these three lines
+        // now say it does.
+        //
+        // THE SECOND PRODUCT'S VERDICT IS SUPPLIED AND IS DELIBERATELY THE WORSE ONE.
+        // It holds no patches, so a real read of its Patches key establishes nothing,
+        // and it claims none of this path, so nothing may consult it. Naming it here
+        // rather than leaving it out is what holds the pass to reading the verdicts of
+        // the products that SHARE the patch and not of every product on the machine.
+        //
+        // The extra key decides nothing any more and is left because the machine
+        // really has one: a shortfall against the registry's total stopped being an
+        // input when the question moved from arithmetic to asking Windows by name.
         var msi = new FakeApi();
         msi.AddProduct(Superseding);
         msi.AddProduct(StillApplied);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
 
         var result = await new InstallerQueryService(msi,
-                (_, _) => new InstallerQueryService.FallbackRead(0, msi.WalkedProducts + 1))
+                (_, _) => new InstallerQueryService.FallbackRead(0, msi.WalkedProducts + 1,
+                    ProductPatchSets: new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        [Superseding] = ProductPatchSet.AllNonRemovable,
+                        [StillApplied] = ProductPatchSet.Unestablished,
+                    }))
             .GetRegisteredPackagesAsync();
 
         var row = Assert.Single(result.Packages);
@@ -643,16 +696,46 @@ public class InstallerQueryServicePatchTruncationTests
         // whole removable class back and marks every row it took, which is the
         // long-standing rule finally having a subject again.
         //
-        // THE FLAG IS A READING RATHER THAN A MEASUREMENT, and it is written down as
-        // one. The suite is Windows-only and cannot run on the build host, so what
-        // says this is right is the CI run on the next push, read by name. If it
-        // disagrees, the disagreement is the finding and not this comment.
-        var result = await Run(msi, Registry(Superseding, StillApplied));
+        // THE ASSERTION WAS RIGHT AND THE FIXTURE COULD NOT REACH IT, WHICH IS THE
+        // WHOLE OF WHAT WAS WRONG HERE. The withholding is guarded on the row still
+        // being removable when it runs, and it runs after the per-product condition.
+        // Built on a registry read carrying no patch sets, every product read as
+        // unestablished, so the condition had already taken the verdict away and set
+        // this very flag, and the withholding this test is named for was stepped over
+        // on a row it could no longer touch. Delete that withholding outright and the
+        // test still passed. Its own commit named the next CI run as what would settle
+        // the reading; CI cannot settle it, because it is green either way. A clean
+        // patch set for every product is what leaves the row removable, so the flag
+        // below can only have come from the rule in the name.
+        var result = await Run(msi, RegistryWithCleanPatchSets(Superseding, StillApplied));
 
         Assert.Equal(1, result.UnaccountedProductCount);
         var row = Assert.Single(result.Packages);
         Assert.False(row.IsRemovable);
         Assert.True(row.RemovableWithheld);
+    }
+
+    /// <summary>
+    /// The must-miss control for the test above, and without it that one passes just
+    /// as well against a run that withholds unconditionally.
+    ///
+    /// One field of the machine differs: no product is unaccounted for. Everything
+    /// else is the same fixture, so if the row comes back offered here and withheld
+    /// there, the unaccounted product is what did it and nothing else can be.
+    /// </summary>
+    [Fact]
+    public async Task The_same_machine_with_every_product_accounted_for_still_offers_the_patch()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+
+        var result = await Run(msi, RegistryWithCleanPatchSets(Superseding));
+
+        Assert.Equal(0, result.UnaccountedProductCount);
+        var row = Assert.Single(result.Packages);
+        Assert.True(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
     }
 
     /// <summary>

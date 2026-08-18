@@ -771,16 +771,44 @@ public class InstallerQueryServiceUnitTests
         AssertWithheldByADegradedEnumeration(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
     }
 
-    [Fact]
-    public async Task A_row_the_enumeration_skipped_is_not_counted_twice()
+    /// <summary>
+    /// A LOST ROW IS COUNTED ONCE, BY THE ONLY THING THAT SAW IT, AND THE REGISTRY'S
+    /// OWN TOTAL ADDS NOTHING TO THE ANSWER WHATEVER IT SAYS.
+    ///
+    /// THIS TEST USED TO PIN THE ARITHMETIC THAT IS NO LONGER DONE, and the rewrite
+    /// is why rather than a rename. It was called
+    /// <c>A_row_the_enumeration_skipped_is_not_counted_twice</c>, and the double count
+    /// it guarded against was a skipped row landing in two sums at once: the
+    /// enumeration's own admission of loss, and the shortfall of the enumerated total
+    /// against the registry's headcount. That second sum has gone. The question is
+    /// settled by identity now: the codes the registry holds are compared against the
+    /// codes the enumeration returned and each difference is put to Windows as a
+    /// question about that one product, so a truncation is named rather than estimated
+    /// and a leftover key answers "not installed" instead of having to be absorbed by
+    /// a tolerance somebody chose. With the second addend gone the old double count
+    /// cannot happen, and asserting a single figure under a name about counting twice
+    /// would be a test whose body says the opposite of its name.
+    ///
+    /// WHAT IS STILL FAILABLE IS THE RULE THAT REPLACED IT, which is what this now
+    /// pins. Four rows really are lost here, so there is a real count to distort, and
+    /// the registry total is walked from agreeing exactly to absurdly ahead. If a
+    /// shortfall against that total is ever readmitted as a term, this goes red on the
+    /// day it happens, and it goes red in the one place where a wrong answer is not
+    /// just a bad number: the count drives the withholding of the whole removable
+    /// class.
+    ///
+    /// It is deliberately NOT the same claim as
+    /// <see cref="A_registry_ahead_of_the_enumeration_counts_nothing_on_the_totals_alone"/>,
+    /// which asks the question of a machine that lost nothing and can only ever assert
+    /// zero. A rule that returned the shortfall whenever anything else had already been
+    /// counted would pass that one and fail this.
+    /// </summary>
+    [Theory]
+    [InlineData(4)]    // the registry agrees with the enumerated products exactly
+    [InlineData(20)]   // sixteen keys the enumeration never mentioned
+    [InlineData(500)]  // absurd, and it decides exactly as much: nothing
+    public async Task A_lost_row_is_counted_once_and_the_registry_total_adds_nothing(int registryProducts)
     {
-        // A skipped row sits inside both counts: it is one product the
-        // enumeration owned up to losing, and it is also absent from the
-        // enumerated total the registry count is measured against. Twenty
-        // registrations, four read cleanly, four skipped and twelve the
-        // enumeration never mentioned is sixteen programs whose records this
-        // scan did not get. Adding the counts made it twenty, which is every
-        // product on the machine including the four it read perfectly well.
         const string patch = @"C:\Windows\Installer\superseded.msp";
         var msi = new FakeMsiApi();
         for (var i = 0; i < 4; i++)
@@ -793,10 +821,19 @@ public class InstallerQueryServiceUnitTests
         }
         msi.AddPatch("{P0}", "{PATCH}", localPackage: patch, state: "2", uninstallable: "0");
 
-        var result = await RunAgainstRegistry(msi, registryProducts: 20);
+        // Healthy patch sets, so the per-product condition settles clean and the ONE
+        // thing left able to take the removable verdict away is the count under test.
+        // Supplied without them, every product reads unestablished, the row is
+        // withheld before this rule is reached, and the assertion below passes whether
+        // the rule fired or not.
+        var result = await RunAgainstRegistryHealthy(msi, registryProducts);
 
-        Assert.Equal(16, result.UnaccountedProductCount);
-        AssertKeptWithNoVerdict(Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
+        Assert.Equal(4, result.UnaccountedProductCount);
+        // And the count is not decoration: four products the scan cannot account for
+        // takes the whole removable class back, so the superseded row is kept and
+        // marked as having been kept.
+        AssertWithheldByADegradedEnumeration(
+            Assert.Single(result.Packages, r => r.LocalPackagePath == patch), expectedState: 2);
     }
 
     // ---- ...and seen directly, in a path only the registry ever claimed ----
