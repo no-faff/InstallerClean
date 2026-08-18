@@ -396,13 +396,14 @@ internal static class Program
             // commonest output this tool produces, and somebody reading a
             // scheduled task's log wants the state of the machine rather than
             // the tool's intention towards it.
-            // Two outcomes. There were three until 3.0.0: a second-instance line for
-            // a machine whose whole offer the identity pass had emptied, which said
-            // the app could not tell rather than that the folder held nothing, and
-            // which printed as the clean line until it had one of its own. Nothing
-            // empties an offer that way now, so an empty offer means one thing again.
-            // The window makes the same two-way split; the two hosts must not diverge
-            // on it.
+            // Two outcomes, and an empty offer has one meaning: the scan found
+            // nothing it could offer. A third stood here for as long as the cached
+            // package identity check was in the tree, for a machine whose whole
+            // offer that check had held back, which is not the same as a scan that
+            // found nothing; it printed as the clean line until it had one of its
+            // own. No release ever carried it, so nothing shipped has printed more
+            // than these two, and its strings sit retired in the resx. The window
+            // makes the same two-way split; the two hosts must not diverge on it.
             Console.WriteLine(count == 0
                 ? Strings.Cli_FoundNoOrphans
                 : string.Format(

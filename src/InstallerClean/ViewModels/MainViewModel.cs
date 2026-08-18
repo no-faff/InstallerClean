@@ -305,13 +305,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
                 return;
 
-            // ONE FINDING AND ONE SCREEN AGAIN. A second stood here until 3.0.0, for
-            // a machine whose whole offer the identity pass had emptied because a
-            // product was installed as a second instance of itself: an empty offer
-            // because the app could not tell, which is not the same as an empty offer
-            // because the folder holds nothing to remove, and it was shown as the
-            // first until it had a screen of its own. Nothing empties an offer that
-            // way now, so an empty offer has one meaning and says it plainly.
+            // ONE FINDING AND ONE SCREEN. An empty offer has one meaning, that the
+            // scan found nothing it could offer, and this is the screen that says
+            // so. A second stood here for as long as the cached package identity
+            // check was in the tree, for a machine whose whole offer that check had
+            // held back because a product was installed as a second instance of
+            // itself, which is not the same as a scan that found nothing; it was
+            // shown as the first until it had a screen of its own. No release ever
+            // carried it, and its strings sit retired in the resx.
             Completion.ShowAllClear(result.RegisteredPackages.Count, Scan.LastScanDurationMs);
 
             if (suppress) return;
