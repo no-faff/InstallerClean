@@ -177,8 +177,8 @@ namespace InstallerClean.Models;
 /// answer.
 ///
 /// THE THREE PARTITION <see cref="RegisteredPackages"/> EXACTLY and a test holds
-/// them to it, one of the three now being permanently empty. The two flags cannot
-/// both be set on one row, so no file is counted twice and none falls between.
+/// them to it. The two flags cannot both be set on one row, so no file is counted
+/// twice and none falls between.
 /// </param>
 /// <param name="RegisteredSupersededCount">
 /// Kept files whose registration is a patch Windows reports superseded (2) or

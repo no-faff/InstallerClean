@@ -4,31 +4,36 @@ namespace InstallerClean.Models;
 /// A cached installer package (.msi or .msp) some Windows Installer registration
 /// names. PatchState: 0 = not a patch, 1 = applied, 2 = superseded, 4 = obsoleted.
 ///
-/// EVERY ROW IS KEPT. Nothing here decides that a file may be removed, and no
-/// verdict on this record puts a file into the offer: the offer is built from the
-/// files no registration names at all. A patch Windows reports superseded or
-/// obsoleted is a patch Windows still holds, in Microsoft's own words "applied to
-/// this product instance but is superseded"
-/// (learn.microsoft.com/en-us/windows/win32/msi/patch-state), and it stays on this
-/// side of the scan with every other registration.
+/// NEARLY EVERY ROW IS KEPT, AND ONE NARROW SHAPE LEAVES FOR THE OFFER. A row is
+/// offered only where Windows positively reported the patch SUPERSEDED, its own
+/// <c>Uninstallable</c> positively read zero, <see cref="ProductPatchSetVerdict"/>
+/// came back clean across every product sharing the patch, the file is on disk and
+/// the containment guard passed it. Everything else on this record is kept, and
+/// nothing here grants that verdict on its own: see
+/// <see cref="Services.IFileSystemScanService"/> for where the row is read and
+/// <see cref="ProductPatchSetVerdict"/> for what the flags do and do not establish.
 ///
-/// <see cref="PatchState"/> IS THE ONLY THING THAT SEPARATES THEM, and it separates
-/// them for reporting rather than for acting. What the state says about a file that
-/// has GONE from disk is nothing: Windows opens every patch registered to a product
-/// whether or not it has been superseded, so a record pointing at an absent file is
-/// the same condition whichever state it carries (see
-/// <see cref="IsMissingFromDisk"/>).
+/// A SUPERSEDED PATCH IS ONE WINDOWS STILL HOLDS A RECORD OF, in Microsoft's own
+/// words "applied to this product instance but is superseded"
+/// (learn.microsoft.com/en-us/windows/win32/msi/patch-state). THAT IS WHY THE STATE
+/// IS NOT ENOUGH ON ITS OWN and never decides anything by itself. Windows holding a
+/// record is exactly the condition under which uninstalling the superseding patch
+/// can reach back for the cached file, so the state opens the question and the
+/// per-product condition is what answers it.
 ///
-/// RemovableWithheld and VerdictUnreadable both survive from the arrangement where
-/// this record could carry a removable verdict. VerdictUnreadable is still written
-/// on every scan and still means what it says: a patch's State or Uninstallable
-/// read failed, so nothing was established about that registration either way.
-/// RemovableWithheld is written only where a removable verdict is taken away, and
-/// a verdict is granted again from 3.0.0, so it is set on any scan that withholds
-/// one; the code that
-/// writes it is kept because it is the machinery the class would need if it ever
-/// came back. Nothing may put a row carrying either flag under a sentence that
-/// names a claim, because there is no claim to name.
+/// <see cref="PatchState"/> SEPARATES THEM FOR REPORTING AND IS PART OF WHAT ACTS.
+/// What the state says about a file that has GONE from disk is still nothing:
+/// Windows opens every patch registered to a product whether or not it has been
+/// superseded, so a record pointing at an absent file is the same condition
+/// whichever state it carries (see <see cref="IsMissingFromDisk"/>).
+///
+/// RemovableWithheld and VerdictUnreadable are both live and neither is machinery
+/// kept against a class coming back. VerdictUnreadable means a patch's State or
+/// Uninstallable read failed, so nothing was established about that registration
+/// either way. RemovableWithheld means a removable verdict was taken away, which is
+/// a thing that happens on any scan that withholds one. Nothing may put a row
+/// carrying either flag under a sentence that names a claim, because there is no
+/// claim to name.
 /// </summary>
 /// <param name="ProductPatchSetVerdict">
 /// Whether anything on any product this registration is registered under could be

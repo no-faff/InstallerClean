@@ -5,13 +5,27 @@ namespace InstallerClean.Models;
 
 /// <summary>
 /// A single file at the root of <c>C:\Windows\Installer</c> that the scan is
-/// offering for removal. ONE pathway adds entries here: a file no registration
-/// names, which the identity pass then found nothing claiming.
+/// offering for removal.
 ///
-/// It was three. Patches Windows reports superseded (PatchState 2) or obsoleted
-/// (4) reached this list until 3.0.0, on a reading of those states that Microsoft
-/// does not support (<see cref="RegisteredPackage"/> carries the citations). They
-/// are registered files and are kept with the rest.
+/// TWO PATHWAYS ADD ENTRIES HERE AND THEY ARRIVE BY OPPOSITE ROUTES. One is a file
+/// the folder walk found and NO registration claims. The other is a registered
+/// superseded patch, which is on this list BECAUSE of its registration rather than
+/// for want of one: Windows reported it superseded, it declared itself
+/// non-removable, and every product sharing it was established to hold no patch
+/// that could be uninstalled and roll back onto its file. <see cref="Reason"/>
+/// carries the two labels and is the only thing on the row that tells them apart.
+///
+/// THE FIRST PATHWAY IS DECIDED BY THREE MECHANISMS AND NOT ONE, which is worth
+/// knowing before anybody reasons about how a file gets here. A recorded path is
+/// compared with the walk as text; then by the file each names, so a registration
+/// spelled in a form the walk never produces is still matched; then the candidate
+/// package itself is asked which product it declares it belongs to and that code is
+/// put to Windows. The third only ever keeps a file back, and it runs on
+/// installation packages alone.
+///
+/// AN OBSOLETED PATCH (PatchState 4) IS NOT OFFERED AT ALL. It is not a pathway and
+/// never becomes one; see <see cref="IsObsoleted"/> for why that is a decision
+/// rather than an omission.
 /// </summary>
 /// <param name="FullPath">Absolute path inside <c>C:\Windows\Installer</c>.</param>
 /// <param name="SizeBytes">File size on disk; 0 if the file disappeared between scan and stat.</param>
