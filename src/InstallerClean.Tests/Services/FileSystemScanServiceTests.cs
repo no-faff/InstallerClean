@@ -12,13 +12,38 @@ public class FileSystemScanServiceTests
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}");
 
     /// <summary>
-    /// A patch Windows reports superseded, in the shape the enumeration now
-    /// produces: the state on the row and no removable verdict. Building one with
-    /// IsRemovable set would pin behaviour against a row the query service cannot
-    /// emit.
+    /// A patch Windows reports superseded whose per-product condition the scan could
+    /// NOT settle: the state on the row and no removable verdict, the verdict
+    /// defaulting to unestablished. That is a machine the app cannot clear the file
+    /// on, so it is kept and, where its file has gone, its absence is reported.
+    ///
+    /// IT IS ONE OF THE TWO SUPERSEDED SHAPES AND NOT THE ONLY ONE, which this
+    /// comment claimed until 3.0.0. It said that building a row with IsRemovable set
+    /// would pin behaviour against a row the query service cannot emit. The query
+    /// service emits exactly that row: a positively read Superseded state with a
+    /// positively read Uninstallable of zero grants the verdict, and the per-product
+    /// pass leaves it standing where every product sharing the patch was shown to
+    /// hold nothing that could be uninstalled. The sentence was true only for the
+    /// window in which no scan offered the class at all. See
+    /// <see cref="SupersededAndOffered"/> and <see cref="SupersededAndCleared"/>.
     /// </summary>
     private static RegisteredPackage Superseded(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2);
+
+    /// <summary>
+    /// A superseded patch in the one shape that reaches the OFFER: the condition
+    /// positively established clean, so the verdict survived, so the row still
+    /// carries the removable flag when the scan finds its file on the disk.
+    ///
+    /// THE THREE FIELDS GO TOGETHER AND SEPARATING THEM WOULD MODEL A MACHINE THAT
+    /// CANNOT EXIST. A removable verdict is granted from a Superseded state, and the
+    /// per-product pass takes it away again unless the condition read
+    /// AllNonRemovable, so a row carrying IsRemovable and an unestablished verdict
+    /// is one no enumeration can produce.
+    /// </summary>
+    private static RegisteredPackage SupersededAndOffered(string path) =>
+        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2,
+            IsRemovable: true, ProductPatchSetVerdict: ProductPatchSet.AllNonRemovable);
 
     /// <summary>
     /// A superseded row whose per-product condition WAS established clean, which is
@@ -36,6 +61,26 @@ public class FileSystemScanServiceTests
 
     private static RegisteredPackage Obsoleted(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 4);
+
+    /// <summary>
+    /// An obsoleted row whose per-product condition WAS established clean, which is
+    /// the second arm of the silent side of the missing-file split and the one
+    /// nothing in this file reached.
+    ///
+    /// THE SPLIT'S SILENT SIDE IS A CONJUNCTION WITH TWO STATES UNDER IT, because
+    /// the state test is "superseded OR obsoleted". <see cref="SupersededAndCleared"/>
+    /// covers one. This covers the other, and production really does produce it: the
+    /// per-product pass writes a verdict onto every claimed patch path it can judge
+    /// without looking at which of the two states the patch is in, so an obsoleted
+    /// patch on a clean product comes out of a real scan carrying AllNonRemovable.
+    ///
+    /// AND COPYING <see cref="Obsoleted"/>'s EXISTING CALL SITES WOULD NOT HAVE
+    /// REACHED IT. Both of them put the file on the filesystem, so neither row is
+    /// missing and neither reaches the split at all.
+    /// </summary>
+    private static RegisteredPackage ObsoletedAndCleared(string path) =>
+        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 4,
+            ProductPatchSetVerdict: ProductPatchSet.AllNonRemovable);
 
     /// <summary>
     /// A superseded patch carrying the withheld flag, which no enumeration sets
@@ -293,10 +338,16 @@ public class FileSystemScanServiceTests
         // registered paths that resolved to real files, so the two halves of
         // the scan demonstrably line up, and a gate that only looked at the
         // non-removable rows would have refused that machine its scan.
+        //
+        // THE ROW HAS TO BE A REMOVABLE ONE OR THIS TEST CANNOT FAIL AT ITS OWN
+        // SUBJECT. Built with the plain superseded helper it is not offered, so it is
+        // one of the non-removable rows, and the gate this test exists to hold would
+        // count it whether or not it counted the removable ones. The offer count
+        // below is what says the row was really on the removable side.
         const string orphan = @"C:\Windows\Installer\orphan.msi";
         const string needed = @"C:\Windows\Installer\needed.msi";
         const string superseded = @"C:\Windows\Installer\superseded.msp";
-        var packages = new List<RegisteredPackage> { Registered(needed), Superseded(superseded) };
+        var packages = new List<RegisteredPackage> { Registered(needed), SupersededAndOffered(superseded) };
         for (var i = 0; i < 30; i++)
             packages.Add(Registered($@"C:\Windows\Installer\gone{i}.msi"));
 
@@ -564,6 +615,62 @@ public class FileSystemScanServiceTests
         Assert.Equal(0, result.MissingAffectedCount);
         Assert.Equal(1, result.MissingUnaffectedCount);
         // The total still counts it: the split is data, and both hosts speak the sum.
+        Assert.Equal(1, result.MissingFromDiskCount);
+    }
+
+    [Fact]
+    public async Task An_obsoleted_patch_the_condition_cleared_is_missing_but_unaffected()
+    {
+        // THE SECOND ARM OF THE SAME SILENT SIDE, AND NOTHING IN THIS SUITE REACHED IT.
+        // The state test is "superseded or obsoleted", so the conjunction that keeps the
+        // missing-files line quiet has two states under it and the superseded one had a
+        // fixture to itself. This is the obsoleted one. It is not hypothetical: the
+        // per-product pass writes its verdict onto every claimed patch path it can judge
+        // without asking which state the patch is in, so an obsoleted patch on a clean
+        // product comes out of a real scan in exactly this shape.
+        //
+        // WHAT GOES UNDETECTED WITHOUT IT. Narrow that state test to superseded alone,
+        // in any later tidy of the expression, and every missing obsoleted registration
+        // moves into the banner's population. That banner exists to say something could
+        // still reach for a file that has gone, and an obsoleted patch is not offered
+        // for a policy reason rather than a dangerous one, so what the narrowing
+        // produces is an alarm at past users about files this app itself removed. The
+        // suite would have stayed green through it: the only obsoleted rows it held were
+        // present on the disk, so neither of them reached this split at all.
+        const string cleared = @"C:\Windows\Installer\obsoleted-cleared-gone.msp";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { ObsoletedAndCleared(cleared) }.AsReadOnly()));
+
+        var result = await new FileSystemScanService(
+            query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(0, result.MissingAffectedCount);
+        Assert.Equal(1, result.MissingUnaffectedCount);
+        Assert.Equal(1, result.MissingFromDiskCount);
+    }
+
+    [Fact]
+    public async Task An_obsoleted_patch_the_condition_could_not_clear_is_missing_and_affected()
+    {
+        // THE MUST-FAIL CONTROL FOR THE TEST ABOVE, and it is the half that stops that
+        // one passing for the wrong reason. The two fixtures differ in one field, the
+        // per-product verdict, so a split that had collapsed to a single answer fails
+        // one of them whichever answer it collapsed to. Without this, a conjunction
+        // that had lost its verdict clause entirely would still pass the first test.
+        //
+        // And the direction is the one the whole split argues for: what is unshown here
+        // is that the file's absence was harmless, so it is reported. The app refusing
+        // to claim what it has not established is the same rule that keeps a file OFF
+        // the offer, pointing the other way.
+        const string gone = @"C:\Windows\Installer\obsoleted-gone.msp";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Obsoleted(gone) }.AsReadOnly()));
+
+        var result = await new FileSystemScanService(
+            query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(1, result.MissingAffectedCount);
+        Assert.Equal(0, result.MissingUnaffectedCount);
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
