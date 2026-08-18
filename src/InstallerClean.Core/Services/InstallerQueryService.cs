@@ -946,7 +946,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ct.ThrowIfCancellationRequested();
             if (enumerated.Contains(code)) continue;
 
-            var resolved = ResolveProductInstance(code);
+            var resolved = ResolveProductInstance(_msi, code);
             if (resolved.Unaskable) { unresolved++; continue; }
             if (resolved.Installed) recovered.Add((code, resolved.Sid, resolved.Context));
         }
@@ -1102,7 +1102,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
             foreach (var target in fromFile)
             {
-                var resolved = ResolveProductInstance(target);
+                var resolved = ResolveProductInstance(_msi, target);
                 if (resolved.Unaskable)
                 {
                     Downgrade(claimed, path, withheld: true);
@@ -1327,14 +1327,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <c>Unaskable</c>, which withholds. Which returns say "not installed" is
     /// <see cref="IsProductNotInstalled"/>'s, and there is more than one of them.
     /// </returns>
-    private (bool Installed, bool Unaskable, string? Sid, MsiInstallContext Context)
-        ResolveProductInstance(string productCode)
+    /// <remarks>
+    /// STATIC AND SHARED RATHER THAN COPIED, because
+    /// <see cref="DeclaredProductCheck"/> has to put the identical question about
+    /// a product code a cached package declared. What is worth sharing is not the
+    /// buffer dance: it is <see cref="IsProductNotInstalled"/>, the allowlist that
+    /// decides which returns may be read as absence. A second copy of that is a
+    /// second place for a return to be added to, or not added to, and the
+    /// direction it fails in is a file offered on a question that was never
+    /// answered.
+    /// </remarks>
+    internal static (bool Installed, bool Unaskable, string? Sid, MsiInstallContext Context)
+        ResolveProductInstance(IMsiApi msi, string productCode)
     {
         var installedCode = new char[Msi.GuidBufferLength];
         var sidBuffer = new char[SidBufferLength];
         uint sidLength = SidBufferLength;
 
-        var error = _msi.EnumProducts(
+        var error = msi.EnumProducts(
             productCode: productCode,
             userSid: AllUsersSid,
             context: MsiInstallContext.All,
@@ -1348,7 +1358,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             sidLength++;
             sidBuffer = new char[sidLength];
-            error = _msi.EnumProducts(
+            error = msi.EnumProducts(
                 productCode: productCode,
                 userSid: AllUsersSid,
                 context: MsiInstallContext.All,

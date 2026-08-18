@@ -18,6 +18,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private readonly IFileSystem _fs;
     private readonly IShortNameCreationProbe? _shortNames;
     private readonly IFileIdentityReader? _fileIds;
+    private readonly IDeclaredProductCheck? _declaredProducts;
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
 
@@ -34,23 +35,24 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// figure without either having to remember to ask.
     /// </remarks>
     public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
-        IShortNameCreationProbe shortNames, IFileIdentityReader fileIdentities)
-        : this(queryService, fileSystem, shortNames, null, null, fileIdentities) { }
+        IShortNameCreationProbe shortNames, IFileIdentityReader fileIdentities,
+        IDeclaredProductCheck declaredProducts)
+        : this(queryService, fileSystem, shortNames, null, null, fileIdentities, declaredProducts) { }
 
     /// <summary>
     /// Test constructor. Injects a filesystem and nothing else, for the tests
     /// whose subject is the walk itself.
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
-        : this(queryService, fileSystem, null, null, null, null) { }
+        : this(queryService, fileSystem, null, null, null, null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, new FileSystem(), null, overrideFiles, null, null) { }
+        : this(queryService, new FileSystem(), null, overrideFiles, null, null, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, new FileSystem(), null, overrideFiles, installerFolderOverride, null) { }
+        : this(queryService, new FileSystem(), null, overrideFiles, installerFolderOverride, null, null) { }
 
     /// <summary>
     /// Test constructor. Injects an <see cref="IFileSystem"/> so the
@@ -59,7 +61,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, fileSystem, null, overrideFiles, installerFolderOverride, null) { }
+        : this(queryService, fileSystem, null, overrideFiles, installerFolderOverride, null, null) { }
 
     /// <summary>
     /// Test constructor carrying the short-name probe as well, for the tests
@@ -77,15 +79,32 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// null reader cannot make a scan offer MORE than it would have, only the same,
     /// which is why the tests that pin the string classification go on pinning it.
     /// </param>
+    /// <param name="declaredProducts">
+    /// Null in every test that is not about it, on the same rule and for the same
+    /// reason: the screen it performs can only ever keep a file back, so a scan
+    /// built without one offers exactly what it offered before the screen existed
+    /// and never more. The tests whose subject IS the screen inject one.
+    ///
+    /// DEFAULTED, WHICH IS THE ONE THING TO BE CAREFUL OF HERE. Every other seam on
+    /// this constructor has to be spelled, so a test carries a null for each
+    /// collaborator it is not about and the reader can see what was decided. This
+    /// one may be left off, and the hazard that buys is narrow but real: a test
+    /// asserting that the screen does NOT keep a file back passes just as well
+    /// against a scan that has no screen at all. A test whose subject is this
+    /// injects one for BOTH directions, and the pinning test for what the default
+    /// itself means is in the suite beside them.
+    /// </param>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
         IShortNameCreationProbe? shortNames,
         IEnumerable<string>? overrideFiles, string? installerFolderOverride,
-        IFileIdentityReader? fileIdentities)
+        IFileIdentityReader? fileIdentities,
+        IDeclaredProductCheck? declaredProducts = null)
     {
         _queryService = queryService;
         _fs = fileSystem;
         _shortNames = shortNames;
         _fileIds = fileIdentities;
+        _declaredProducts = declaredProducts;
         _overrideFiles = overrideFiles;
         _installerFolderOverride = installerFolderOverride;
     }
@@ -275,8 +294,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
         }
 
         // THE SECOND HALF OF THE PATH COMPARISON, and it is part of that gate
-        // rather than of the identity pass below. The loop above asked whether any
-        // registration's recorded path is SPELLED the same as a walked file. This
+        // rather than of the declared-product screen below. The loop above asked
+        // whether any registration's recorded path is SPELLED the same as a walked
+        // file. This
         // asks whether any registration's recorded path NAMES the same file, which
         // is the question that was always meant and which no comparison of strings
         // can settle.
@@ -289,40 +309,58 @@ public sealed class FileSystemScanService : IFileSystemScanService
         //
         // A DROPPED CANDIDATE IS NOT COUNTED ANYWHERE, and that is deliberate
         // rather than an omission. A file the string comparison matched has never
-        // been counted either; it is simply claimed, and so is this one. Counting
-        // it separately would invite a sentence about files "held back by the
-        // identity check" that was false of it.
+        // been counted either; it is simply claimed, and so is this one. A file
+        // dropped here is not kept back at all: a registration names it, which is
+        // the ordinary answer, and a count of it would invite a sentence about
+        // files the app was unsure of that was false of every one of them.
         //
-        // THE THREE GATES BELOW ARE MEASURED BEFORE IT RUNS, for exactly the
-        // reason they are measured before the identity pass. Each of them reads an
-        // empty candidate list as evidence that the comparison never worked, and a
-        // candidate dropped here is the comparison WORKING: it found the
-        // registration that names the file. Counting after the drop would let a
-        // machine whose every candidate turned out to be a registered file under
-        // another spelling be refused as a machine whose comparison was broken.
+        // THE THREE GATES BELOW ARE MEASURED BEFORE IT RUNS, and before the
+        // declared-product screen too. Each of them reads an empty candidate list
+        // as evidence that the comparison never worked, and a candidate dropped
+        // here is the comparison WORKING: it found the registration that names the
+        // file. Counting after the drop would let a machine whose every candidate
+        // turned out to be a registered file under another spelling be refused as a
+        // machine whose comparison was broken, and counting after the screen would
+        // do the same to a machine whose candidates were all kept back.
         candidatesFromWalk = unclaimedByPath.Count;
 
         DropCandidatesRegisteredUnderAnotherSpelling(
             unclaimedByPath, registered, cancellationToken);
 
-        // WHAT SURVIVES THE TWO COMPARISONS IS THE OFFER, and there is no third
-        // pass. A per-candidate identity screen stood here until 3.0.0: it opened
-        // each candidate, read the product or patch code the file declares about
-        // ITSELF, asked Windows about that code, and kept the file back unless
-        // every source answered and none claimed it.
+        // WHAT DECIDES THIS HALF OF THE OFFER: TWO COMPARISONS AND ONE SCREEN, and
+        // the difference between them is which end they start at. The path
+        // comparison and the file-identity match above both start at a
+        // REGISTRATION and ask whether it names this file. The screen a few lines
+        // below starts at the FILE: it asks an installation package which product
+        // it declares itself to belong to, puts that product code to Windows, and
+        // keeps the file back where Windows still holds a record of it or where
+        // the question could not be settled. It can subtract from the offer and do
+        // nothing else, so what survives all three is the offer. Product packages
+        // only, for a reason that is load-bearing rather than incidental; see
+        // IDeclaredProductCheck.
         //
-        // WHAT COVERS THAT CLASS NOW, and it is four mechanisms rather than none,
-        // which is the thing to know before anybody simplifies one of them away.
-        // A registration written in a spelling the walk never produces is matched
-        // by volume serial and file ID immediately above, whatever it was spelled
-        // as, for as long as its recorded path can be opened. A product the API
-        // enumeration lost is claimed by the registry fallback instead, which reads
-        // the same UserData keys and contributes the same paths. When the fallback
-        // is ALSO failing reads, the scan does not offer the file: it refuses
-        // outright, at InstallerQueryService's records-unreadable gate, on one
-        // unreadable product and any fallback failure. And a recorded path holding
-        // an environment variable now resolves, that having been the one live hole
-        // in the set.
+        // THE CLASS WHERE A REGISTRATION EXISTS AND THE SCAN FAILED TO MATCH IT TO
+        // ITS FILE is reached by four separate mechanisms besides, which is the
+        // thing to know before anybody simplifies one of them away. A registration
+        // written in a spelling the walk never produces is matched by volume serial
+        // and file ID immediately above, whatever it was spelled as, for as long as
+        // its recorded path can be opened. A product the API enumeration lost is
+        // claimed by the registry fallback instead, which reads the same UserData
+        // keys and contributes the same paths. When the fallback is ALSO failing
+        // reads, the scan does not offer the file: it refuses outright, at
+        // InstallerQueryService's records-unreadable gate, on one unreadable
+        // product and any fallback failure. And a recorded path holding an
+        // environment variable now resolves, that having been the one live hole in
+        // the set.
+        //
+        // ALL FOUR OF THOSE READ A REGISTRATION, WHICH IS WHY THE SCREEN IS NOT ONE
+        // MORE OF THEM. Where a product's records hold no path to match, all four
+        // have nothing to work from and nothing records the gap: a LocalPackage
+        // value that is present and zero-length merges no claim AND sets no
+        // shortfall, so the enumeration reports itself complete while short of a
+        // claim, and the product's cached package is walked, matched against
+        // nothing and offered while the product is installed. Asking the file is
+        // the only view of that which does not go through the records.
         //
         // WHAT IS LEFT UNGUARDED, stated so a reader can find it rather than
         // rediscover it: a registration whose recorded path resolves to nothing
@@ -333,6 +371,14 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // 1-evidence/standing/WHAT-IS-KNOWN-about-harm-and-how-to-find-out.md.
         // Two designs to close it have been proposed and both were withdrawn, the
         // second by the session that designed it.
+        //
+        // THE SCREEN NARROWS THAT ONE WITHOUT CLOSING IT, and the half it leaves is
+        // the half to remember. Where such a candidate is an installation package
+        // the screen reaches it, having no interest in the registration that could
+        // not be resolved: it either finds the declared product installed or fails
+        // to settle the question, and both keep the file. Where the candidate is a
+        // PATCH the screen does not run at all, so that half stands exactly as the
+        // paragraph above describes it.
         //
         // SO THE FOUR ABOVE ARE NOT BELT AND BRACES. This release alone fixed six
         // separate faults in that class, four of them live in every shipped
@@ -379,9 +425,19 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var unspellableClaims = query.Census.PathNormalisationRefusedTotal;
 
         if (unspellableClaims > 0)
+        {
+            // Every candidate is already kept back on a fact about the machine's
+            // records, so the per-file screen below could only reach the same
+            // answer at the cost of opening every one of them. Skipped rather
+            // than run and thrown away.
             withheld.AddRange(unclaimedByPath);
+        }
         else
+        {
+            WithholdCandidatesTheirOwnProductStillClaims(
+                unclaimedByPath, withheld, cancellationToken);
             removable.AddRange(unclaimedByPath);
+        }
 
         // Stat every registered package once here so the Details window
         // doesn't have to hit disk on the UI thread when it opens.
@@ -492,8 +548,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // patches and went to the unpatched base, with Windows demonstrably looking
             // for the absent files. Splitting on the app's own REMOVABLE verdict alone
             // fires on every missing obsoleted registration, because an obsoleted patch
-            // is not removable in 3.0.0 for a policy reason rather than a dangerous one
-            // — and that is precisely an alarm at past users about files THIS APP
+            // is not removable in 3.0.0 for a policy reason rather than a dangerous
+            // one. And that is precisely an alarm at past users about files THIS APP
             // removed, which is the scenario the whole reversal exists to avoid.
             //
             // So the benign half is the conjunction: the state is superseded or
@@ -802,9 +858,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// EVERY FAILURE LEAVES THE CANDIDATE WHERE IT WAS. A registration path that
     /// will not open contributes no identity and so claims nothing extra; a
     /// candidate that will not open is compared against nothing and stays a
-    /// candidate, going on to the identity pass exactly as before. That is the
-    /// direction the whole mechanism has to fail in, and it is why this could be
-    /// added without re-arguing anything downstream of it.
+    /// candidate, decided by everything downstream exactly as it would have been.
+    /// That is the direction the whole mechanism has to fail in, and it is why this
+    /// could be added without re-arguing anything downstream of it.
     ///
     /// A HARD LINK IS DROPPED AND THAT IS THE RIGHT ANSWER HERE, though it is a
     /// stricter one than strictly necessary. Two names for one file share an
@@ -836,6 +892,73 @@ public sealed class FileSystemScanService : IFileSystemScanService
             cancellationToken.ThrowIfCancellationRequested();
             return _fileIds.TryRead(c.FullPath, out var id) && registeredIds.Contains(id);
         });
+    }
+
+    /// <summary>
+    /// Moves out of <paramref name="candidates"/> and into
+    /// <paramref name="withheld"/> every installation package whose own declared
+    /// product Windows still holds a record of, and every one this pass could not
+    /// settle. Both lists keep walk order.
+    ///
+    /// THE THIRD SOURCE, AND IT IS THE ONLY ONE THAT STARTS AT THE FILE. The two
+    /// comparisons above it start at a registration and work towards a file, and
+    /// both of them read the same recorded LocalPackage value, so a product whose
+    /// records hold no value to read has nothing for either to find and nothing
+    /// records the gap. See <see cref="IDeclaredProductCheck"/> for the mechanism
+    /// in full; what it means here is that a product package can be walked,
+    /// matched against nothing and offered while its product is installed.
+    ///
+    /// IT CAN ONLY EVER SUBTRACT FROM THE OFFER. Nothing it returns adds a file,
+    /// clears a withholding made anywhere else, or reaches a patch at all. So a
+    /// scan with no screen injected offers exactly what it offered before the
+    /// screen existed, and a fault inside the screen costs offers rather than
+    /// files.
+    ///
+    /// A WITHHELD CANDIDATE CARRIES NO CAUSE AND MUST NOT ACQUIRE ONE. It joins a
+    /// list that already holds files kept back for a different reason entirely,
+    /// and the surfaces that read that list say only that the app left these
+    /// alone, which is true of both. Any sentence naming a cause over the whole
+    /// list would be false of one half or the other, and the two inabilities
+    /// behind an unestablished verdict have no honest superordinate between them
+    /// either.
+    /// </summary>
+    private void WithholdCandidatesTheirOwnProductStillClaims(
+        List<OrphanedFile> candidates,
+        List<OrphanedFile> withheld,
+        CancellationToken cancellationToken)
+    {
+        if (_declaredProducts is null || candidates.Count == 0) return;
+
+        var outcomes = _declaredProducts.Screen(candidates, cancellationToken);
+
+        // A screen that answered a different number of candidates than it was
+        // given has not answered about these files, and reading it positionally
+        // would attach one file's verdict to another. Every candidate is kept
+        // rather than none, which is the direction this whole pass fails in.
+        if (outcomes.Count != candidates.Count)
+        {
+            withheld.AddRange(candidates);
+            candidates.Clear();
+            return;
+        }
+
+        // Partitioned forward into a second list rather than removed in place from
+        // the back, so that BOTH sides come out in walk order without either of
+        // them being reversed afterwards. Reversing would have been right only
+        // while the withheld list was known to be empty on arrival, and it is
+        // filled from another decision entirely a few lines up: a later edit that
+        // let both fill would have quietly reordered the first one's files.
+        var survivors = new List<OrphanedFile>(candidates.Count);
+        for (var i = 0; i < candidates.Count; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (outcomes[i].Withholds()) withheld.Add(candidates[i]);
+            else survivors.Add(candidates[i]);
+        }
+
+        candidates.Clear();
+        candidates.AddRange(survivors);
     }
 
     /// <summary>

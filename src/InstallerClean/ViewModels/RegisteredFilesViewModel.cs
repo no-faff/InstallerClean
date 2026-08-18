@@ -41,8 +41,15 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     /// one.
     ///
     /// NO CAUSE IS SHOWN AND NONE MAY BE ADDED. The heading says what is true of
-    /// every row, that the app could not be sure about them, and stops there. What
-    /// put them here travels in the opt-in report and nowhere else.
+    /// every row, that the app could not be sure about them, and stops there. More
+    /// than one cause reaches this group and they are not one thing, so any sentence
+    /// covering the lot would be false of part of it; see
+    /// <see cref="ScanResult.WithheldFiles"/>, which lists them.
+    ///
+    /// AND THERE IS NO PER-FILE RECORD OF WHICH CAUSE PUT A ROW HERE, on this screen
+    /// or anywhere else. One of the causes is counted in the opt-in report, as a
+    /// figure about the machine's records rather than about any file; the other is
+    /// counted nowhere.
     /// </summary>
     public IReadOnlyList<UnsureRow> Unsure { get; }
 

@@ -213,26 +213,42 @@ namespace InstallerClean.Models;
 /// excludes, which nobody has measured.
 /// </param>
 /// <param name="WithheldFiles">
-/// Every candidate this scan declined to offer, in walk order, because at least one
-/// registration's recorded path could not be turned into a path at all.
+/// Every candidate this scan declined to offer, in walk order. TWO CAUSES REACH IT
+/// AND THEY ARE NOT ONE THING, so they are listed rather than covered by a sentence
+/// that would be false of one of them:
 ///
-/// WHY THE WHOLE WALK-DERIVED SET AND NOT ONE FILE. Such a registration's claim is
-/// kept in the raw spelling Windows gave, so it matches nothing the walk produces,
-/// and the cached file it names is one the walk saw and nothing claimed. Which file
-/// that is cannot be established: the claim cannot be resolved, and the identity
-/// match cannot help either, because a value the path API refuses is a value
-/// CreateFile refuses too, so there is nothing to open and compare. Every unclaimed
-/// file is therefore one the unspellable claim could have meant, and the app cannot
-/// say of any of them that nothing needs it.
+/// At least one registration's recorded path could not be turned into a path at all,
+/// which withholds the whole walk-derived set at once; or the candidate is an
+/// installation package whose own declared product Windows still holds a record of,
+/// or whose declaration this scan could not settle, which withholds that one file.
+/// A run can hold files put here by either, and a reader of this list may assume
+/// neither.
 ///
-/// THE SUPERSEDED HALF OF THE OFFER IS NOT IN HERE, and that is a finding rather
-/// than an omission. Those rows are judged on products, through registry keys read
-/// by product code and patch code, and nothing on that path reads a cached-package
-/// path at all; measured with a planted unspellable value beside an ordinary-value
-/// control, the sibling patch's offer was identical. What remains unobserved rather
-/// than ruled out is an unspellable registration naming the very same file an offered
-/// superseded row names, which would be a second claim on that path that the merge
-/// cannot see.
+/// NO SURFACE STATES A CAUSE OVER IT AND NONE MAY START. The main window counts these
+/// into its left-alone line, and the Details window shows them in a second group
+/// headed only "InstallerClean couldn't be sure about these". Both are true of every
+/// row whichever cause put it there, and there is no per-file record of which did.
+///
+/// WHY THE FIRST CAUSE TAKES THE WHOLE WALK-DERIVED SET AND NOT ONE FILE. Such a
+/// registration's claim is kept in the raw spelling Windows gave, so it matches
+/// nothing the walk produces, and the cached file it names is one the walk saw and
+/// nothing claimed. Which file that is cannot be established: the claim cannot be
+/// resolved, and the identity match cannot help either, because a value the path API
+/// refuses is a value CreateFile refuses too, so there is nothing to open and
+/// compare. Every unclaimed file is therefore one the unspellable claim could have
+/// meant, and the app cannot say of any of them that nothing needs it.
+///
+/// THE SUPERSEDED HALF OF THE OFFER IS NOT IN HERE, under either cause. Those rows
+/// are judged on products, through registry keys read by product code and patch code,
+/// and nothing on that path reads a cached-package path at all; measured with a
+/// planted unspellable value beside an ordinary-value control, the sibling patch's
+/// offer was identical. They cannot be reached by the second cause either, on the
+/// structure rather than on a measurement: that screen runs over the walk's unclaimed
+/// candidates, a superseded row reaches the offer from the registered set without
+/// ever having been one, and the screen refuses a patch in any case. What remains
+/// unobserved rather than ruled out is an unspellable registration naming the very
+/// same file an offered superseded row names, which would be a second claim on that
+/// path that the merge cannot see.
 ///
 /// IT EXISTS SO THE TWO SUMMARY LINES ACCOUNT FOR EVERY FILE IN THE FOLDER. A
 /// withheld file would otherwise appear in neither: not offered, and not a registered
