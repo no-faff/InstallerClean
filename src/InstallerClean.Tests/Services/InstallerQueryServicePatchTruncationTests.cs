@@ -35,6 +35,9 @@ public class InstallerQueryServicePatchTruncationTests
     private const string StillApplied = "{BBBBBBBB-0000-0000-0000-00000000000B}";
     private const string Patch = "{CCCCCCCC-0000-0000-0000-00000000000C}";
 
+    /// <summary>The patch that supersedes <see cref="Patch"/> and can still come off.</summary>
+    private const string Superseder = "{DDDDDDDD-0000-0000-0000-00000000000D}";
+
     /// <summary>A product code no machine here has, for the resolve's clean negative.</summary>
     private const string NotInstalled = "{EEEEEEEE-0000-0000-0000-00000000000E}";
 
@@ -50,16 +53,19 @@ public class InstallerQueryServicePatchTruncationTests
     /// Drives the confirmation pass over the state the enumeration used to hand
     /// it, and returns the claimed set for the assertions.
     ///
-    /// WHY THESE TESTS DRIVE IT DIRECTLY RATHER THAN THROUGH A SCAN. From 3.0.0 no
-    /// enumeration grants a removable verdict to any patch, so nothing reaches
-    /// this pass through a real scan and a test driving one would exercise nothing
-    /// at all while still passing. The pass is kept whole because it is what made
-    /// the superseded class as safe as it was and what the class would need again;
-    /// keeping it without keeping its tests would preserve it in name only, and
-    /// would turn its eventual deletion into a formality rather than the decision
-    /// it is. There is deliberately NO production switch that re-grants the
-    /// verdict: a flag in a shipped binary that turns this class back on is the
-    /// thing the release exists to prevent.
+    /// WHY THESE TESTS DRIVE IT DIRECTLY RATHER THAN THROUGH A SCAN, AND IT IS NO
+    /// LONGER BECAUSE NOTHING REACHES IT. This paragraph said that from 3.0.0 no
+    /// enumeration grants a removable verdict to any patch, so nothing reached this
+    /// pass through a real scan. That was true while the superseded class was out;
+    /// restoring the offer restored the route, the enumeration grants the verdict
+    /// again through IsRemovablePatch, and a full scan does now reach this pass. The
+    /// reason to drive it directly is the ordinary one instead: an assertion about
+    /// this pass should turn on this pass, and a scan puts the whole enumeration,
+    /// the merge and the per-product condition in front of it.
+    ///
+    /// There is deliberately NO production switch that re-grants the verdict
+    /// selectively: a flag in a shipped binary that turns a class of file back on is
+    /// the thing the release exists to prevent.
     ///
     /// THE STARTING VERDICT COMES FROM THE PRODUCTION RULE, not from a copy of it.
     /// <see cref="InstallerQueryService.IsRemovablePatch"/> decides it and
@@ -547,15 +553,141 @@ public class InstallerQueryServicePatchTruncationTests
         // it enumerates only patches installed with Windows Installer 3.0 for
         // users other than the current one. The file's own Template does not care
         // what any enumeration returned, which is why both routes exist.
+        //
+        // WHAT THIS FIXTURE MAKES TRUE, AND IT IS CHOSEN RATHER THAN INHERITED. The
+        // hidden product holds the patch APPLIED and not uninstallable, so its
+        // registered patch set reads all-non-removable and the per-product condition
+        // passes the path through to this pass, while the PAIRING is still one this
+        // pass will find is not removable. The same reasoning, and the same shape, as
+        // TwoProductsTheRegistryCannotSettle.
+        //
+        // IT USED TO DECLARE THE PATCH UNINSTALLABLE, AND THAT STOPPED TESTING THIS.
+        // Once the patch file's declared targets were unioned into the per-product
+        // condition as well, a hidden product carrying a removable patch was settled
+        // by that condition BEFORE this pass ran, so the pairing below was never asked
+        // and both assertions passed on the earlier mechanism. Nothing about the
+        // assertions would have shown it, which is why the ask is now asserted too.
         var msi = new FakeApi();
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
         // Installed and holding the patch, invisible to BOTH enumerations.
         msi.HiddenFromWalk.Add(StillApplied);
-        msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "1");
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "0");
 
         var row = TheSharedPatch(Confirm(msi, Reader(Shared, StillApplied)));
         Assert.False(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+        // THE SUBJECT, ASSERTED. Without this the test passes whenever anything at all
+        // takes the verdict away, which is how it survived the change above.
+        Assert.Contains((Patch, StillApplied), msi.ConfirmationAsks);
+    }
+
+    /// <summary>
+    /// The product the patch file names, that nothing else on the machine can reach,
+    /// and that holds a REMOVABLE patch of its own.
+    ///
+    /// THIS IS THE GAP THE DECLARED TARGETS CLOSE, and it is a different question from
+    /// the test above. That one asks whether the pairing is put to a product no
+    /// enumeration named; this one asks whether that product's whole PATCH SET is
+    /// judged. The pairing answers "superseded and not uninstallable", which is
+    /// truthful and is the wrong question: what can reach for the cached file is not
+    /// this patch coming off, it is the SUPERSEDING patch coming off and rolling the
+    /// product back. So the pairing pass cannot withhold here and must not be relied
+    /// on to.
+    ///
+    /// WHAT THE FIXTURE MAKES TRUE: the hidden product holds the shared patch
+    /// superseded and not uninstallable, so every pairing read about it is a clean
+    /// answer, AND holds a second patch that IS uninstallable, so its registered patch
+    /// set reads removable-patch-present. The claims cannot see it, because the walk
+    /// never returned it. Route A cannot see it, because it holds both patches
+    /// invisibly to enumeration. The patch file's Template is the only thing on the
+    /// machine that names it.
+    /// </summary>
+    [Fact]
+    public void A_product_only_the_patch_file_names_has_its_patch_set_judged()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.HiddenFromWalk.Add(StillApplied);
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "2", uninstallable: "0");
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Superseder, state: "1", uninstallable: "1");
+
+        var row = TheSharedPatch(Confirm(msi, Reader(Shared, StillApplied)));
+
+        Assert.False(row.IsRemovable);
+        // A FINDING AND NOT AN INABILITY. The app established that something on that
+        // product can be uninstalled; it did not fail to establish anything. The two
+        // reach different sentences and a test that accepted either would pass on the
+        // wrong one.
+        Assert.False(row.RemovableWithheld);
+    }
+
+    /// <summary>
+    /// MUST-MISS CONTROL FOR THE TEST ABOVE. The identical machine, with the patch
+    /// file declaring nothing, and the offer stands.
+    ///
+    /// It is what makes the test above mean anything: without it, a run that withheld
+    /// every superseded patch for any reason at all would pass it. The two differ in
+    /// one thing only, which is whether the file names the product.
+    /// </summary>
+    [Fact]
+    public void The_same_machine_offers_the_patch_when_the_file_names_nobody()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.HiddenFromWalk.Add(StillApplied);
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "2", uninstallable: "0");
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Superseder, state: "1", uninstallable: "1");
+
+        Assert.True(TheSharedPatch(Confirm(msi)).IsRemovable);
+    }
+
+    /// <summary>
+    /// A declared target that is installed and holds no patches at all costs the offer
+    /// nothing, which is what makes reading the declared targets affordable.
+    ///
+    /// A patch names in its Template every product it may be applied to, and on an
+    /// ordinary machine most of them either are not installed or hold nothing that can
+    /// be uninstalled. If a product like that answered "could not establish", the
+    /// condition would withhold, and it would withhold on nearly every superseded
+    /// patch on nearly every machine. It answers all-non-removable instead, because a
+    /// product with no registered patch positively holds no removable one.
+    ///
+    /// WHAT THIS TEST DOES AND DOES NOT ESTABLISH, because the difference matters.
+    /// This is a MUST-MISS CONTROL and it passes with or without the change that
+    /// unions declared targets in; its job is to fail if that union ever starts
+    /// withholding on a clean product. It does NOT establish that a real registry read
+    /// of a patch-less product returns all-non-removable, because the verdict is
+    /// supplied here rather than read. The real read is pinned on Windows by
+    /// ProductPatchSetTests.A_product_with_no_Patches_key_is_clean_and_its_key_is_not_counted,
+    /// and that test is the one that fails without the change.
+    ///
+    /// It goes through a whole scan rather than through Confirm, deliberately: Confirm
+    /// builds its patch sets from the fixture's patch REGISTRATIONS, so a product
+    /// holding none is absent from that map altogether and would read as unestablished
+    /// for a reason no machine has. The registry walk this stands in for visits every
+    /// product key and writes a verdict for each.
+    /// </summary>
+    [Fact]
+    public async Task A_declared_target_holding_no_patches_leaves_the_offer_standing()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        // Installed, named by the patch file, and holding nothing whatever.
+        msi.HiddenFromWalk.Add(StillApplied);
+
+        var result = await new InstallerQueryService(
+                msi,
+                RegistryWithCleanPatchSets(Superseding, StillApplied),
+                null,
+                Reader(Shared, StillApplied))
+            .GetRegisteredPackagesAsync();
+
+        var row = Assert.Single(result.Packages);
+        Assert.True(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
     }
 

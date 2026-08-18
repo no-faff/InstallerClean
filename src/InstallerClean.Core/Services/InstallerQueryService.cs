@@ -615,7 +615,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // half needs only what has just been read; the other half needs
                     // the registry's per-product patch sets, which are read after this
                     // loop finishes. So the verdict is granted provisionally and
-                    // WithholdWhereAProductCanRollBack removes it, which works because
+                    // JudgeAndWithholdAgainstEveryProductPatchSet removes it, which works because
                     // every path a verdict can travel is downgrade-only: MergeClaim
                     // never upgrades, and Downgrade is one-way. A row that leaves this
                     // loop removable can still be withheld by four separate later
@@ -1067,6 +1067,46 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // taken as an answer, is the exact fault this whole pass exists to close.
         var holders = EnumeratePatchHoldersAcrossAllProducts(ct);
 
+        // ROUTE B, READ ONCE PER PATH AND SHARED BY BOTH PASSES BELOW. The file names
+        // the products it may be applied to, so it answers about a product no
+        // enumeration returned, which is what makes it the cover for route A's
+        // documented blind spot. It was reaching the per-pairing pass alone.
+        //
+        // MEMOISED BECAUSE THE READS ARE THE EXPENSIVE PART AND THE ANSWER CANNOT
+        // CHANGE WITHIN ONE SCAN. A path named by two patch codes was read twice
+        // before this, once per pairing, and both passes now want the same answer.
+        // The cache is per call and dies with it, so nothing is carried between
+        // scans and no staleness is possible.
+        //
+        // THE RESOLVE HAPPENS HERE AND NOT AT EITHER CONSUMER, because a declared
+        // target is a product code and nothing more, and the two things a caller
+        // needs to know about it are decided by the same call: whether it is
+        // installed at all, and, if it is, which account and context to ask in. A
+        // code the file names and the machine does not hold contributes nothing and
+        // is not a failure; a code that could not be asked about withholds.
+        var declaredByPath = new Dictionary<string, DeclaredTargets>(StringComparer.OrdinalIgnoreCase);
+        DeclaredTargets DeclaredTargetsFor(string patchPath)
+        {
+            if (declaredByPath.TryGetValue(patchPath, out var already)) return already;
+
+            var declared = TargetsDeclaredByPatchFile(patchPath, out var unreadable);
+            var installed = new List<(string ProductCode, string? Sid, MsiInstallContext Context)>();
+            var unaskable = false;
+            foreach (var target in declared)
+            {
+                // EVERY TARGET IS RESOLVED EVEN ONCE ONE HAS FAILED, where the pairing
+                // pass used to stop at the first. The outcome for the path is the same
+                // either way, that path being withheld on the flag below, and reading
+                // the rest is what makes one cached answer serve both consumers rather
+                // than depending on which of them asked first.
+                var resolved = ResolveProductInstance(_msi, target);
+                if (resolved.Unaskable) { unaskable = true; continue; }
+                if (resolved.Installed) installed.Add((target, resolved.Sid, resolved.Context));
+            }
+
+            return declaredByPath[patchPath] = new DeclaredTargets(installed, unreadable, unaskable);
+        }
+
         // THE PER-PRODUCT CONDITION, RUN BEFORE THE PER-PAIRING WORK BELOW because
         // it can settle a path outright and the pairing reads are the expensive
         // half. It asks a different question from everything else in this method:
@@ -1074,7 +1114,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // this asks whether anything on a product sharing the patch could be
         // uninstalled and reach for its file.
         JudgeAndWithholdAgainstEveryProductPatchSet(
-            claimed, patchClaims, holders, registryPatchSets, apiPatchSets, ct);
+            claimed, patchClaims, holders, registryPatchSets, apiPatchSets,
+            DeclaredTargetsFor, ct);
 
         foreach (var (path, patchCode) in toConfirm)
         {
@@ -1101,24 +1142,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
             toAsk.AddRange(recovered);
             if (holders.TryGetValue(patchCode, out var named)) toAsk.AddRange(named);
 
-            var fromFile = TargetsDeclaredByPatchFile(path, out var fileUnreadable);
-            if (fileUnreadable)
+            // Both withholdings are the same shape and were the same shape before
+            // this read was shared: a patch whose own declaration will not be read
+            // has been shown to be unneeded by nobody, and a product it names that
+            // Windows will not answer about is a question left open rather than an
+            // answer of no.
+            var fromFile = DeclaredTargetsFor(path);
+            if (fromFile.Unreadable || fromFile.Unaskable)
             {
                 Downgrade(claimed, path, withheld: true);
                 continue;
             }
-            foreach (var target in fromFile)
-            {
-                var resolved = ResolveProductInstance(_msi, target);
-                if (resolved.Unaskable)
-                {
-                    Downgrade(claimed, path, withheld: true);
-                    break;
-                }
-                if (resolved.Installed)
-                    toAsk.Add((target, resolved.Sid, resolved.Context));
-            }
-            if (!claimed.TryGetValue(path, out current) || !current.IsRemovable) continue;
+            toAsk.AddRange(fromFile.Installed);
 
             foreach (var (productCode, userSid, context) in toAsk)
             {
@@ -1273,6 +1308,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // the same reason a refusal makes it short.
         return null;
     }
+
+    /// <summary>
+    /// One patch file's route B reading, resolved against the machine, in the form
+    /// both consumers of it need.
+    ///
+    /// THE TWO FLAGS ARE NOT THE SAME FINDING AND NEITHER IS AN EMPTY LIST. A patch
+    /// that declares targets none of which are installed yields an empty
+    /// <paramref name="Installed"/> with both flags clear, and that is a positive
+    /// answer: nothing on this machine holds it, so nothing on this machine can roll
+    /// back onto its file. <paramref name="Unreadable"/> is the file declining to say
+    /// what it targets, and <paramref name="Unaskable"/> is Windows declining to say
+    /// where a declared target lives. Both leave the question open and both withhold.
+    /// </summary>
+    private readonly record struct DeclaredTargets(
+        IReadOnlyList<(string ProductCode, string? Sid, MsiInstallContext Context)> Installed,
+        bool Unreadable,
+        bool Unaskable);
 
     /// <summary>
     /// ROUTE B. The product codes a cached patch says in its own Template that it
@@ -2113,8 +2165,19 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// One file was measured carrying four registrations across two products.
     ///
     /// THE PRODUCTS ARE UNIONED TOO, not just the patches. The claims name the
-    /// products the enumeration reached; route A names products it never returned. A
-    /// product either source names is a product the condition has to hold for.
+    /// products the enumeration reached; route A names products it never returned;
+    /// the patch file's own declared targets name products no enumeration on the
+    /// machine has to have mentioned at all. A product any of the three names is a
+    /// product the condition has to hold for.
+    ///
+    /// THE THIRD SOURCE IS THE ONE THAT COVERS ROUTE A'S DOCUMENTED BLIND SPOT, and
+    /// it reached the per-pairing pass first and this condition second. While it was
+    /// missing here, a product that route A cannot see and that carries no claim for
+    /// this path was never put into the set, so its removable patch was never seen,
+    /// and this condition could answer AllNonRemovable for a file that product can
+    /// still reach for. The per-pairing pass below would then ask that product about
+    /// the patch and be told, truthfully, that it holds it and cannot uninstall it,
+    /// which is an answer to a different question.
     ///
     /// WHAT IT CANNOT PROMISE, so no copy may say otherwise: the condition is read
     /// here and re-read at act time, and neither is a statement about the future. A
@@ -2127,6 +2190,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? holders,
         IReadOnlyDictionary<string, ProductPatchSet>? registryPatchSets,
         IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets,
+        Func<string, DeclaredTargets> declaredTargets,
         CancellationToken ct)
     {
         // The patch codes naming each PATCH path, which is what decides which products
@@ -2188,6 +2252,30 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ct.ThrowIfCancellationRequested();
 
             if (!claimed.TryGetValue(path, out var row)) continue;
+
+            // ROUTE B, UNIONED IN HERE TOO. The two sources above are the claims and
+            // route A, and both of them can only name a product some enumeration
+            // returned. The patch file is read from disk and does not care what any
+            // enumeration said, so it is the one source that can name the product
+            // whose removable patch would overturn this verdict and that nothing else
+            // on the machine mentions. It was already unioned into the per-pairing
+            // pass below for exactly that reason; this condition asked a narrower set
+            // than the pass it runs ahead of, and the gap between the two is a file
+            // offered because the product that could roll back onto it was never
+            // asked.
+            //
+            // ONLY WHERE A ROW IS STILL REMOVABLE, which is where widening the set can
+            // change what the app does. The verdict is also read by the missing-file
+            // split, and a file that has gone yields no declaration to read, so
+            // widening there would cost a read per obsoleted row and could not alter
+            // an answer.
+            //
+            // ADDING A PRODUCT CAN ONLY EVER WITHHOLD MORE. Worse() takes the worst of
+            // the set, so a product joining it can move the verdict away from
+            // AllNonRemovable and can never move it back.
+            if (row.IsRemovable)
+                foreach (var (productCode, _, _) in declaredTargets(path).Installed)
+                    products.Add(productCode);
 
             // THE VERDICT ACROSS EVERY PRODUCT, WORSENED, and never from one of them.
             // The row carries whichever product code survived the claim merge, which is
@@ -2262,8 +2350,34 @@ public sealed class InstallerQueryService : IInstallerQueryService
         ref int patchRegistrations)
     {
         using var patchesKey = productsKey.OpenSubKey($@"{packedProductCode}\Patches");
-        if (patchesKey is null) return ProductPatchSet.Unestablished;
 
+        // AN ABSENT KEY IS AN ANSWER AND NOT AN INABILITY, and the difference decides
+        // whether a file is offered. A product with no Patches key holds no registered
+        // patch, so it holds no removable one, so nothing on it can be uninstalled and
+        // reach for the file this verdict is being asked about. That is the same
+        // sentence AllNonRemovable already carries, arrived at without reading a
+        // registration because there are none to read.
+        //
+        // THE FUNCTION ALREADY SAYS SO ONE BRANCH AWAY. A Patches key that opens and
+        // holds no subkeys runs the loop zero times, leaves unestablished false and
+        // returns AllNonRemovable at the closing line. An empty patch list and an
+        // absent one say the identical thing about the machine, and reporting them
+        // differently made the emptier of the two the more suspicious.
+        //
+        // THE TWO WAYS OF GETTING NOTHING ARE TOLD APART, AND AT THE CALLER RATHER
+        // THAN HERE. A key that exists and will not open throws, and the caller's own
+        // catch writes Unestablished for that product with its own failure cause. A
+        // key that is not there returns null and arrives on this line. So this branch
+        // carries the absent case alone and does not have to hedge for the other.
+        if (patchesKey is null) return ProductPatchSet.AllNonRemovable;
+
+        // COUNTED WHERE THE KEY OPENED AND NOWHERE ELSE, unchanged by the line above.
+        // The count answers how usual it is for a product to carry a Patches key at
+        // all, read against ProductKeys, and a product that has no such key has not
+        // got one whatever verdict is returned for it. Moving the increment up would
+        // make the two counts agree on every machine and stop the pair saying
+        // anything. This reading feeds the opt-in report, where a counter that
+        // quietly changes meaning is worse than one that is missing.
         patchKeys++;
 
         var unestablished = false;

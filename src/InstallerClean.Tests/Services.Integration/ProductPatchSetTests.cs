@@ -118,19 +118,38 @@ public class ProductPatchSetTests
     }
 
     [Fact]
-    public void A_product_with_no_Patches_key_is_unestablished_and_its_key_is_not_counted()
+    public void A_product_with_no_Patches_key_is_clean_and_its_key_is_not_counted()
     {
-        // A product with no patches has no reason to carry the key, so this cannot be
-        // told from a key that would not open. It costs nothing: the verdict is only
-        // ever consulted for a product some candidate patch is registered to, and
-        // such a product has patches by construction.
+        // WHAT THIS FIXTURE MAKES TRUE: the product key exists and carries no Patches
+        // subkey at all. That is a product holding no registered patch, so it holds no
+        // removable one, so nothing on it can be uninstalled and reach for a
+        // superseded patch's cached file. The verdict says so.
+        //
+        // IT USED TO ANSWER Unestablished AND THE RECORDED REASON WAS THAT THE TWO WAYS
+        // OF GETTING NOTHING COULD NOT BE TOLD APART. They can: a key that exists and
+        // will not open THROWS, and the caller catches it and writes Unestablished with
+        // its own failure cause. Nothing that fails to open arrives here.
+        //
+        // AND THE OLD REASON'S SECOND HALF WAS THAT IT COST NOTHING, because the
+        // verdict was only ever consulted for a product some candidate patch was
+        // registered to. That stopped being true when the judged product set gained
+        // the patch file's own declared targets, which name products holding no patch
+        // at all. Withholding on those would have withheld the superseded class on
+        // every ordinary machine.
         WithProductsKey(products =>
         {
             using var _ = products.CreateSubKey($@"{Product}\InstallProperties", writable: true)!;
 
             var (set, keys, registrations) = Read(products);
 
-            Assert.Equal(ProductPatchSet.Unestablished, set);
+            Assert.Equal(ProductPatchSet.AllNonRemovable, set);
+            // NOT COUNTED, AND THAT IS WHAT KEEPS THIS FIXTURE DISTINGUISHABLE FROM THE
+            // NEXT ONE. The two now agree on the verdict, deliberately, because they
+            // say the same thing about the machine. The counter is the only thing left
+            // that tells them apart, and it answers a different question: how usual it
+            // is for a product to carry the key at all. Moving the increment above the
+            // branch would make these two fixtures indistinguishable in every respect
+            // and neither test could then fail at its own subject.
             Assert.Equal(0, keys);
             Assert.Equal(0, registrations);
         });
@@ -139,10 +158,17 @@ public class ProductPatchSetTests
     [Fact]
     public void An_empty_Patches_key_is_clean_and_says_so()
     {
-        // The key opened and listed nothing, which is a complete reading of an empty
-        // set rather than a failure to read one. It is the must-miss control for the
-        // absent-key test above: a reader that answered Unestablished for both would
-        // pass that test and be unable to tell the two apart.
+        // WHAT THIS FIXTURE MAKES TRUE: the Patches key exists and lists nothing. The
+        // key opened and the listing was complete, which is a reading of an empty set
+        // rather than a failure to read one.
+        //
+        // IT IS THE PAIR TO THE ABSENT-KEY TEST ABOVE AND THE RELATIONSHIP HAS
+        // CHANGED. They used to answer differently and this one was that one's
+        // must-miss control. They now answer the SAME verdict, because an absent list
+        // and an empty list say the same thing about the machine, and the pair is held
+        // apart by the key counter instead: 0 here against 1 there. A reader that
+        // stopped distinguishing them at all would still pass both assertions on the
+        // verdict and would fail on the counts, which is why the counts are asserted.
         WithProductsKey(products =>
         {
             using var _ = products.CreateSubKey($@"{Product}\Patches", writable: true)!;
