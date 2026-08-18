@@ -410,7 +410,11 @@ public class CompletionViewModelTests
                 + Environment.NewLine
                 + Line(Strings.Completion_ReverifyIncomplete, 1),
             vm.Summary);
-        Assert.Equal(Strings.Completion_AllClean, vm.Heading);
+        // The heading beside the block, because a summary naming causes under a
+        // heading saying there were none is the state this screen was rewritten out
+        // of. Completion_AllClean is right for a machine with nothing to do and
+        // wrong here, where everything was kept back.
+        Assert.Equal(Strings.Completion_NothingRemoved, vm.Heading);
     }
 
     // The donate heart's gate. The ask is only ever made after the app has

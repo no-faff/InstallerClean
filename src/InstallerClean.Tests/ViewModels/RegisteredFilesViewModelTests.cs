@@ -87,7 +87,10 @@ public class RegisteredFilesViewModelTests
 
         var vm = new RegisteredFilesViewModel(packages, 1_048_576, NullInfoService());
 
-        Assert.Equal("2 registered files left alone (1.0 MB)", vm.Summary);
+        // "Left alone" and nothing about the files themselves: the window shows two
+        // populations and only one of them is registered, so a count called
+        // "registered files" would be false of the other half the moment it has one.
+        Assert.Equal("2 files left alone (1.0 MB)", vm.Summary);
     }
 
     [Fact]

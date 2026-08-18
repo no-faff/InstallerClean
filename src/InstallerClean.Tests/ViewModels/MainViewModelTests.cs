@@ -1380,14 +1380,20 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task DeleteAllAsync_a_batch_the_service_empties_reports_all_clean_and_logs_nothing()
+    public async Task DeleteAllAsync_a_batch_the_service_empties_reports_nothing_removed_and_logs_nothing()
     {
         // One condition, one screen, one record. The re-read taking the whole
         // batch back is the same machine state as the pre-act re-verify taking it
-        // back, so it gets that arm's screen: the all-clean heading with the
-        // kept-back sentence as its summary, and no result-log entry. Falling
+        // back, so it gets that arm's screen: the kept-everything-back heading with
+        // the kept-back sentence as its summary, and no result-log entry. Falling
         // through instead reported a completed delete of zero and wrote a run that
         // freed nothing into the public reports.
+        //
+        // NOT THE ALL-CLEAN HEADING, WHICH THIS TEST ASSERTED UNTIL 3.0.0 AND WHICH
+        // ITS OWN NAME USED TO CLAIM. That heading belongs to a machine with nothing
+        // to do. Here everything the user confirmed was kept back, which is the
+        // opposite finding, and saying "All clean" over a summary naming the causes
+        // said the opposite of what had happened.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1409,7 +1415,7 @@ public class MainViewModelTests
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
-        Assert.Equal(Strings.Completion_AllClean, vm.Completion.Heading);
+        Assert.Equal(Strings.Completion_NothingRemoved, vm.Completion.Heading);
         Assert.Equal(
             string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
             vm.Completion.Summary);
@@ -1418,11 +1424,13 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task MoveAllAsync_a_batch_the_service_empties_reports_all_clean_and_logs_nothing()
+    public async Task MoveAllAsync_a_batch_the_service_empties_reports_nothing_removed_and_logs_nothing()
     {
         // The Move twin, which had two more things wrong with it: the summary read
         // "0 files moved to: <folder>" and the restore line told the user how to
-        // put back files that never left.
+        // put back files that never left. Same heading as the Delete twin above and
+        // for the same reason, which is why it is one string and not two: the two
+        // hosts are describing one machine state and must not drift apart on it.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1446,7 +1454,7 @@ public class MainViewModelTests
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
-        Assert.Equal(Strings.Completion_AllClean, vm.Completion.Heading);
+        Assert.Equal(Strings.Completion_NothingRemoved, vm.Completion.Heading);
         Assert.Equal(string.Empty, vm.Completion.Restore);
         Assert.Equal(string.Empty, vm.Completion.SummaryDestination);
         await _resultLogService.DidNotReceive().WriteAsync(
