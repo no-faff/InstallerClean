@@ -10,9 +10,11 @@ namespace InstallerClean.Tests.Services;
 /// the registration's recorded path and the walk's path are not the same string.
 ///
 /// THIS IS THE GATE THE WHOLE OFFER RESTS ON. A registration the scan fails to
-/// match does not make its file safe to remove; it makes the file a candidate, and
-/// the only thing left between it and the user is the identity check. Everything
-/// here is about not needing that second chance.
+/// match does not make its file safe to remove; it makes the file a candidate.
+/// What is left between a candidate and the user is the declared-product screen,
+/// which asks an installation package what it says it belongs to and puts that to
+/// Windows. It runs on installation packages only, and a patch has no second
+/// reader behind this gate. Everything here is about not needing a second chance.
 ///
 /// Two mechanisms, pinned separately because they close different things. The
 /// comparer handles case, which is the divergence real machines actually produce.
@@ -25,6 +27,36 @@ public class FileSystemScanServicePathSpellingTests
     private const string CacheRoot = @"C:\Windows\Installer";
     private const string Walked = @"C:\Windows\Installer\9f05cba.msi";
     private const string Orphan = @"C:\Windows\Installer\orphan.msi";
+
+    /// <summary>
+    /// One registration naming a file directly in the walked folder, present on
+    /// disk, added to every fixture here by <see cref="Scan"/>.
+    ///
+    /// WITHOUT IT NONE OF THESE TESTS REACHES ITS OWN SUBJECT, and for five of them
+    /// that was true from the day they were written. The scan refuses outright when
+    /// the records hold rows, no row names a file in the folder it walked, and the
+    /// walk still produced candidates: two sides that describe different places
+    /// cannot be compared, so nothing is offered and nothing is claimed. Every test
+    /// below that registers a path OUTSIDE the folder (through a junction, or
+    /// somewhere else on the disk, or nowhere at all) builds exactly that shape, so
+    /// the scan threw before the mechanism under test could be read. The scan was
+    /// right and the fixtures were not.
+    ///
+    /// AND IT CHANGES NOTHING ANY TEST HERE ASSERTS, which is the part to check
+    /// rather than assume, because a fixture added to satisfy a gate can quietly
+    /// alter the pass it was added to protect. It is claimed by the path comparison
+    /// in the walk loop, so it never enters the candidate list and the count of
+    /// candidates the gates are measured against is unmoved. The identity pass reads
+    /// every registration's path, and this one is absent from every identity map
+    /// here, so it yields no identity and claims nothing extra. The numeric
+    /// correlation gate needs a folder whose in-folder registrations are almost all
+    /// missing, and this one is present. The only quantity it moves is the number of
+    /// registrations, which nothing below reads.
+    ///
+    /// It is what every real machine has and none of these fixtures had: a record
+    /// pointing at a file that is really there.
+    /// </summary>
+    private const string Anchor = @"C:\Windows\Installer\anchor.msi";
 
     // ---- The comparer, which is what actually carries real machines ----
 
@@ -194,18 +226,26 @@ public class FileSystemScanServicePathSpellingTests
         string[] registeredPaths,
         IFileIdentityReader? fileIds = null)
     {
+        // The anchor goes in on all three sides at once, because that is what makes
+        // it an ordinary registration rather than a token: walked, on the disk, and
+        // in the records. See its own note for why it is here and why it moves
+        // nothing. Added centrally so no fixture can omit it and go red at the gate
+        // instead of at its own subject, which is what happened to five of these.
+        var walked = walkedFiles.Append(Anchor).ToArray();
+        var registered = registeredPaths.Append(Anchor).ToArray();
+
         var fs = new MockFileSystem();
         fs.AddDirectory(CacheRoot);
-        foreach (var path in walkedFiles) fs.AddFile(path, new MockFileData("x"));
+        foreach (var path in walked) fs.AddFile(path, new MockFileData("x"));
 
         var query = Substitute.For<IInstallerQueryService>();
         query.GetRegisteredPackagesAsync(
                 Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(new InstallerQueryResult(
-                registeredPaths.Select(p => new RegisteredPackage(p, "Product", "{code}")).ToList())));
+                registered.Select(p => new RegisteredPackage(p, "Product", "{code}")).ToList())));
 
         return await new FileSystemScanService(
-            query, fs, null, walkedFiles, CacheRoot, fileIds)
+            query, fs, null, walked, CacheRoot, fileIds)
             .ScanAsync();
     }
 }
