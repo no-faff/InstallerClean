@@ -781,17 +781,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         var packages = claimed.Values.ToList();
 
-        // DEAD FROM 3.0.0 AND DELIBERATELY LEFT STANDING. No row reaches here
-        // carrying IsRemovable, so the loop runs over no rows and RemovableWithheld
-        // is set on any scan that withholds one. It is the mechanism the
-        // superseded class would need if it were ever offered again, and because
-        // deleting the machinery that made that class as safe as it was is a
-        // decision about the product rather than a tidy-up.
+        // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. This note said
+        // the opposite until 3.0.0 restored the superseded offer, and the old
+        // wording was true only while that class was not offered: with nothing
+        // removable in the result no row reached here, so the loop ran over
+        // nothing. Rows reach it again. A superseded row on a machine whose patch
+        // sets read clean arrives here still carrying IsRemovable, and this loop
+        // is what takes it off the offer when the scan lost a claim.
+        //
+        // Measured rather than argued: the same machine that offers such a patch
+        // withholds it once one product's LocalPackage read fails, which is this
+        // loop and nothing else.
         //
         // NOT TO BE CONFUSED WITH THE REFUSAL GATE ABOVE, which weighs the same
         // count and is very much alive; see its own note for why.
         //
-        // What it did: a scan that lost any claim withheld the whole removable
+        // What it does: a scan that loses any claim withholds the whole removable
         // class. "Removable" asserts that NO installed product still needs the
         // file, and a product set known to be short of at least one claim cannot
         // support that assertion for any patch on the machine: the product behind
@@ -999,11 +1004,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// that could not answer makes it non-removable AND withheld, which is the
     /// existing "this scan could not prove it" state, counted and surfaced as such.
     ///
-    /// IT RETURNS AT ITS FIRST GUARD FROM 3.0.0, no row carrying a removable
-    /// verdict for it to confirm, so it asks nothing and costs nothing. Left
-    /// standing for the reason the withholding loop above is: it is what made the
-    /// class as safe as it was and what the class would need again. Do not read
-    /// its emptiness as evidence that the questions it asks were unnecessary.
+    /// IT IS THE CONDITION THE SUPERSEDED OFFER RESTS ON, and this note said the
+    /// opposite until 3.0.0 restored that offer. While the class was not offered
+    /// no row carried a removable verdict for it to confirm, so it returned at its
+    /// first guard and cost nothing. Rows reach it again, and a superseded patch
+    /// is offered only where this pass has asked every product it knows of and
+    /// none of them still holds it. Emptiness here is a machine with nothing
+    /// removable, never a mechanism that is not needed.
     /// </summary>
     /// <param name="recovered">
     /// Products the enumeration never returned and the registry comparison then
