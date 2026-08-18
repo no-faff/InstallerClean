@@ -367,10 +367,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // where that is not a read failure, so no counter fires and no gate
         // refuses, while the file it means sits in the folder under a spelling the
         // identity match cannot reach because there is nothing to open. Never
-        // observed, on any machine, and it is recorded as open and unguarded in
-        // 1-evidence/standing/WHAT-IS-KNOWN-about-harm-and-how-to-find-out.md.
-        // Two designs to close it have been proposed and both were withdrawn, the
-        // second by the session that designed it.
+        // observed, on any machine. It stands open and unguarded rather than
+        // closed, and saying so here is the point of this note: two designs to
+        // close it have been proposed and both were withdrawn, the second by its
+        // own author.
         //
         // THE SCREEN NARROWS THAT ONE WITHOUT CLOSING IT, and the half it leaves is
         // the half to remember. Where such a candidate is an installation package
