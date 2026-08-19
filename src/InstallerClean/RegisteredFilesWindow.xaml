@@ -23,26 +23,22 @@
     <Grid Margin="{StaticResource Margin.DetailWindow}">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
-            <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
-            <!-- The MaxHeight holds the products list at the height the
-                 2*/3* split gives it in a 680-tall window at 100% text
-                 scale, so on a taller window every extra unit lands in
-                 the patches + product details band, where content
-                 overflows; the products list is the pane that does not
-                 need to grow. Below that height the cap is slack and
-                 the split behaves as plain 2*/3*. The cap scales with
-                 the OS text size so the list keeps showing the same
-                 number of rows as they get taller. -->
+            <!-- The MaxHeight is a fixed ceiling on the file list, so on a
+                 taller window every extra unit lands in the patches +
+                 product details band, where content overflows; the file
+                 list is the pane that does not need to grow. Below that
+                 height the cap is slack and the split behaves as plain
+                 2*/3*. The cap scales with the OS text size so the list
+                 keeps showing the same number of rows as they get taller.
+
+                 208 was derived from the height the split gave the list in
+                 a 680-tall window at 100% text scale, BEFORE the two group
+                 headings came out. Removing them returned their rows to the
+                 split, so the cap now starts biting in a slightly shorter
+                 window than the one it was measured in. The value is
+                 unchanged and eye-verified; what moved is the crossover, and
+                 the checklist says to look at it. -->
             <RowDefinition Height="2*" MaxHeight="{a11y:TextScaled 208}"/>
-            <!-- The second group: spacer, heading, list. All three are Auto and all
-                 three hold nothing but content bound to HasUnsure, so on a machine
-                 where nothing was kept back they measure zero and the window lays out
-                 exactly as it does without the group. That is the property to preserve
-                 in any later change here: the ordinary machine must see no difference
-                 at all. -->
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
             <RowDefinition Height="3*"/><RowDefinition Height="12"/>
             <RowDefinition Height="Auto"/>
@@ -62,10 +58,14 @@
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
                 Margin="{StaticResource Margin.CloseButtonOverhang}" AutomationProperties.Name="{loc:Translate Automation.CloseWindow}" ToolTip="{loc:Translate Tooltip.Close}"/>
 
-        <TextBlock Grid.Row="1" Text="{loc:Translate Details.GroupRegistered}" Foreground="{StaticResource Text.Body}"
-                   FontSize="{DynamicResource Type.Heading.Sm}" TextWrapping="Wrap"/>
-
-        <Border Grid.Row="3" Style="{StaticResource CardNoPad}" ClipToBounds="True">
+        <!-- ONE LIST, and no heading over it. The window title says what the
+             list is, and the two headings that stood here said what the two
+             groups were; with the groups merged, neither sentence is true of
+             every row and a second sentence directly under a title bar that
+             already carries one is furniture. OrphanedFilesWindow is the pair
+             to this window and lays out the same way: title bar, then its
+             list. -->
+        <Border Grid.Row="1" Style="{StaticResource CardNoPad}" ClipToBounds="True">
             <!-- Negative top/bottom margin bleeds the ListView past the
                  CardNoPad inner edges so the first and last rows sit flush with
                  the card border instead of inside a thin inset. The Orphaned and
@@ -208,68 +208,7 @@
             </ListView>
         </Border>
 
-        <!-- SECOND GROUP. A ListBox with nothing bound to its selection, which is
-             what keeps the detail pane below safe: that pane follows SelectedProduct,
-             which is the PRODUCTS list's SelectedItem, so a second list's own
-             selection reaches nothing and cannot blank it. An ItemsControl stood here
-             first, on the reasoning that a selectable row would empty the pane. That
-             reasoning was wrong (selection here is not the pane's selection) and it
-             cost what a plain ItemsControl costs: its rows are not in the tab order
-             and it does not present itself to a screen reader as a list at all. A
-             ListBox is one tab stop, arrow-navigable, announced as a list, and
-             announces each row through the same ItemContainerStyle the products list
-             already uses. -->
-        <Border Grid.Row="4" Height="8" Background="Transparent"
-                Visibility="{Binding HasUnsure, Converter={StaticResource BoolToVis}}"/>
-
-        <TextBlock Grid.Row="5" x:Name="UnsureHeading"
-                   Text="{loc:Translate Details.GroupUnsure}" Foreground="{StaticResource Text.Body}"
-                   FontSize="{DynamicResource Type.Heading.Sm}" Margin="0,0,0,8"
-                   TextWrapping="Wrap"
-                   Visibility="{Binding HasUnsure, Converter={StaticResource BoolToVis}}"/>
-
-        <Border Grid.Row="6" Style="{StaticResource CardNoPad}" ClipToBounds="True"
-                MaxHeight="{a11y:TextScaled 120}"
-                Visibility="{Binding HasUnsure, Converter={StaticResource BoolToVis}}">
-            <ListBox x:Name="UnsureList" ItemsSource="{Binding Unsure}"
-                     BorderThickness="0" Background="Transparent"
-                     Padding="0" Margin="0,-1,0,-6"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     AutomationProperties.LabeledBy="{Binding ElementName=UnsureHeading}"
-                     AutomationProperties.Name="{loc:Translate Details.GroupUnsure}">
-                <!-- Per row, exactly as the products list does it: the whole row is
-                     announced as one line rather than left to be read cell by cell. -->
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                        <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="{StaticResource GapX.Md}" MinHeight="{a11y:TextScaled 28}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding FileName}"
-                                       Foreground="{StaticResource Text.Heading}"
-                                       FontSize="{DynamicResource Type.Heading.Sm}"
-                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
-                                       ToolTip="{Binding FileName}"/>
-                            <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}"
-                                       Foreground="{StaticResource Text.Body}"
-                                       FontSize="{DynamicResource Type.Heading.Sm}"
-                                       VerticalAlignment="Center"
-                                       MinWidth="{a11y:TextScaled 72}" TextAlignment="Right"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Border>
-
-        <Grid Grid.Row="8">
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <!-- Auto plus an explicit text-scaled width on the pane
                      itself: ColumnDefinition.Width is a GridLength, which
@@ -486,7 +425,7 @@
             </Grid>
         </Grid>
 
-        <DockPanel Grid.Row="10" LastChildFill="False">
+        <DockPanel Grid.Row="5" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}" VerticalAlignment="Center"/>
             <!-- Named so Window_Loaded can land focus here when the list opens

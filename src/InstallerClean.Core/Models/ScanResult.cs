@@ -255,9 +255,16 @@ namespace InstallerClean.Models;
 /// neither.
 ///
 /// NO SURFACE STATES A CAUSE OVER IT AND NONE MAY START. The main window counts these
-/// into its left-alone line, and the Details window shows them in a second group
-/// headed only "InstallerClean couldn't be sure about these". Both are true of every
-/// row whichever cause put it there, and there is no per-file record of which did.
+/// into its left-alone line. The Details window lists them among the registrations, in
+/// one list, with nothing marking a row out: no heading, no column, no indicator and no
+/// lookup of a program that might have used the file. Both are true of every row
+/// whichever cause put it there, and there is no per-file record of which did.
+///
+/// THE HEADING THAT USED TO CARRY THIS RULE IS GONE AND THE RULE IS NOT. Until 3.0.0 the
+/// Details window held a second group under "InstallerClean couldn't be sure about
+/// these", chosen because it was true of every row whatever had put it there. The two
+/// groups are now one list and that heading has gone with them, which weakens nothing
+/// here: a surface that says nothing about these rows cannot state a cause over them.
 ///
 /// WHY THE FIRST CAUSE TAKES THE WHOLE WALK-DERIVED SET AND NOT ONE FILE. Such a
 /// registration's claim is kept in the raw spelling Windows gave, so it matches

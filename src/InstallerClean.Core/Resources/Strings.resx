@@ -810,12 +810,6 @@
        0 = count, 1 = size display. -->
   <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file left alone ({1})</value></data>
   <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} files left alone ({1})</value></data>
-  <!-- The two groups in the registered-files window. The second states NO cause on
-       purpose: four different findings put a file in it and any sentence naming one
-       would be false of the others on a machine carrying more than one. -->
-  <data name="Details.GroupRegistered" xml:space="preserve"><value>Windows still has a record of these</value></data>
-  <data name="Details.GroupUnsure" xml:space="preserve"><value>InstallerClean couldn't be sure about these</value></data>
-
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Move {0} {1} ({2})?</value></data>

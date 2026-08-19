@@ -8,10 +8,19 @@ using InstallerClean.Services;
 namespace InstallerClean.ViewModels;
 
 /// <summary>
-/// Backs the registered-files detail window. Groups packages by product
-/// (so an MSI and its patches show as a single row), sorts alphabetically
-/// by product name, and lazy-loads MSI summary metadata for the
-/// selected row off the UI thread. The cache survives selection cycles.
+/// Backs the details window's file list. Groups packages by product (so an MSI
+/// and its patches show as a single row), sorts alphabetically by product
+/// name, and lazy-loads MSI summary metadata for the selected row off the UI
+/// thread. The cache survives selection cycles.
+///
+/// ONE LIST, HOLDING TWO POPULATIONS. The registrations Windows still has a
+/// record of, and the files this scan declined to offer. They sat under
+/// separate headings until 3.0.0 and now share <see cref="Products"/>, a
+/// withheld file arriving as an ordinary row whose product name is empty. The
+/// detail pane needs no special case for one, because it reads the FILE rather
+/// than the registration: author, title, signing certificate and the rest all
+/// come out of the package's own summary stream, which is why the orphaned
+/// window can show a certificate for a file no registration claims.
 ///
 /// Rows flag as missing on <c>IsMissingFromDisk</c>, which is now the plain
 /// question of whether the file is there. It drives the "a future repair could
@@ -32,32 +41,6 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     private readonly CancellationTokenSource _lifetimeCts = new();
 
     public IReadOnlyList<ProductRow> Products { get; }
-
-    /// <summary>
-    /// The files this scan declined to offer, which belong to no product row because
-    /// no registration names them. Shown as a second group under its own heading
-    /// rather than mixed into the first, because they are a different finding:
-    /// Windows answers for the first group and the app could not be sure about this
-    /// one.
-    ///
-    /// NO CAUSE IS SHOWN AND NONE MAY BE ADDED. The heading says what is true of
-    /// every row, that the app could not be sure about them, and stops there. More
-    /// than one cause reaches this group and they are not one thing, so any sentence
-    /// covering the lot would be false of part of it; see
-    /// <see cref="ScanResult.WithheldFiles"/>, which lists them.
-    ///
-    /// AND THERE IS NO PER-FILE RECORD OF WHICH CAUSE PUT A ROW HERE, on this screen
-    /// or anywhere else. One of the causes is counted in the opt-in report, as a
-    /// figure about the machine's records rather than about any file; the other is
-    /// counted nowhere.
-    /// </summary>
-    public IReadOnlyList<UnsureRow> Unsure { get; }
-
-    /// <summary>Hides the whole second group, heading and spacer included, on the
-    /// ordinary machine where nothing was kept back. The rows it occupies are
-    /// Auto-height, so a collapsed group takes none and the window lays out exactly
-    /// as it does without the group.</summary>
-    public bool HasUnsure => Unsure.Count > 0;
 
     public string Summary { get; }
 
@@ -188,25 +171,69 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
             }
         }
 
+        // The files this scan declined to offer, in the same list as the
+        // registrations rather than under a heading of their own. Nothing marks
+        // them out: no column, no indicator and no lookup of a program that might
+        // have used the file. The product cell is simply empty, because no
+        // registration names the file and there is therefore no product to name,
+        // and NO PLACEHOLDER STANDS IN FOR IT. Not "(unknown)" above all, which
+        // this window already uses for a REGISTERED product whose display name did
+        // not come back: reusing it here would tell the reader a product had been
+        // established when none has.
+        //
+        // NO CAUSE TRAVELS WITH THESE ROWS AND NONE MAY BE ADDED. More than one
+        // condition puts a file here and they are not one thing, so any sentence
+        // covering the lot would be false of part of it; see
+        // <see cref="ScanResult.WithheldFiles"/>, which lists them. Merging the two
+        // lists did not overturn that: it removed the one heading that was true of
+        // every row, and nothing has replaced it.
+        //
+        // AND THERE IS NO PER-FILE RECORD OF WHICH CAUSE PUT A ROW HERE, on this
+        // screen or anywhere else. One of the causes is counted in the opt-in
+        // report, as a figure about the machine's records rather than about any
+        // file; the other is counted nowhere.
+        //
+        // No patches and not missing, both being the truth rather than a gap. A
+        // file no registration names has no registered patches to list, and the
+        // missing flag drives a recovery note about a file WINDOWS HAS A RECORD
+        // FOR, which is the one thing these rows are not.
+        //
+        // THE EMPTY PRODUCT NAME PUTS EVERY ONE OF THESE ROWS AT THE TOP OF THE
+        // DISPLAYED LIST, which is accepted rather than overlooked. The window
+        // orders by product name ascending and an empty string sorts first; the
+        // note that says so in full is beside that sort, in Window_Loaded.
+        var withheld = unsure ?? Array.Empty<OrphanedFile>();
+        foreach (var file in withheld)
+        {
+            products.Add(new ProductRow(
+                ProductName: string.Empty,
+                Path.GetFileName(file.FullPath),
+                file.FullPath,
+                DisplayHelpers.FormatSize(file.SizeBytes),
+                file.SizeBytes,
+                PatchCount: 0,
+                Array.Empty<PatchRow>(),
+                IsMissing: false));
+        }
+
         Products = products;
 
-        Unsure = (unsure ?? Array.Empty<OrphanedFile>())
-            .Select(f => new UnsureRow(
-                System.IO.Path.GetFileName(f.FullPath),
-                DisplayHelpers.FormatSize(f.SizeBytes)))
-            .ToList();
-
-        // BOTH GROUPS, because both are on the screen. A figure covering only the
-        // first would describe less than the reader can see, and it has to agree with
-        // the main window's own left-alone line, which counts both the same way. The
-        // two are one click apart, so a reader comparing them must not find them
-        // disagreeing.
-        var shownCount = packages.Count + Unsure.Count;
+        // BOTH POPULATIONS, because both are on the screen. A figure covering only
+        // the registrations would describe less than the reader can see, and it has
+        // to agree with the main window's own left-alone line, which counts both the
+        // same way. The two are one click apart, so a reader comparing them must not
+        // find them disagreeing.
+        //
+        // PACKAGES, NOT ROWS, and that is the part the next editor will get wrong
+        // now that the withheld files are rows too. A product registered with three
+        // patches is ONE row and FOUR packages, so Products.Count would report a
+        // number neither window has ever shown. The count is of files, and it is
+        // taken from the two inputs rather than from the list built out of them.
+        var shownCount = packages.Count + withheld.Count;
         Summary = string.Format(
             DisplayHelpers.Pluralise(shownCount, Strings.Summary_RegisteredWindow_Singular, Strings.Summary_RegisteredWindow_Plural, "Summary.RegisteredWindow"),
             shownCount,
-            DisplayHelpers.FormatSize(
-                totalBytes + (unsure ?? Array.Empty<OrphanedFile>()).Sum(f => f.SizeBytes)));
+            DisplayHelpers.FormatSize(totalBytes + withheld.Sum(f => f.SizeBytes)));
 
         // Open on the first product whose installer file is missing from disk,
         // when there is one. The main window's missing-from-disk banner ends
@@ -278,30 +305,4 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         _lifetimeCts.Cancel();
         _lifetimeCts.Dispose();
     }
-}
-
-/// <summary>
-/// One row of the second group: a cached file this scan declined to offer.
-///
-/// It carries a file name and a size and nothing else, which is the whole of what is
-/// known about it. There is no product name because no registration names the file,
-/// which is why it is in this group at all, and inventing a placeholder would put a
-/// claim on the row that nothing supports.
-///
-/// IT DRIVES NOTHING, which is not the same as not being selectable and the
-/// difference cost a rewrite here once. The window is a master/detail pair whose
-/// detail pane follows SelectedProduct, and SelectedProduct is the PRODUCTS list's
-/// selection; a second list has its own, which nothing reads. So these rows can be
-/// selected, focused and arrowed through without the pane below moving at all. The
-/// group was first rendered by an ItemsControl to stop a selection reaching that
-/// pane, which it never could, and the cost was real: an ItemsControl puts no rows in
-/// the tab order and does not present itself to a screen reader as a list.
-/// </summary>
-/// <param name="AccessibleName">
-/// What a screen reader announces for the row, the two columns read as one line,
-/// matching how the product rows carry their own.
-/// </param>
-public sealed record UnsureRow(string FileName, string SizeDisplay)
-{
-    public string AccessibleName => $"{FileName}, {SizeDisplay}";
 }

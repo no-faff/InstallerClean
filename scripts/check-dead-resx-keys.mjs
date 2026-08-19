@@ -67,12 +67,6 @@ const ALLOWLIST = new Set([
   // Each line below says what the string was for and what removed it, so a later
   // reader can tell a retired string from an oversight.
 
-  // The second headed list in the registered-files details window, over the files
-  // the identity pass had kept back. The list went with the pass; this is the one
-  // piece of interface the app has ever had for "I found this and chose not to
-  // touch it".
-  'Details.GroupUnsure',
-
   // Two of the five held-back causes on the completion overlay, both produced only
   // by the identity re-check at action time: a record existing under the code the
   // FILE declares about itself, and a file that yielded no code to ask about.
@@ -133,9 +127,38 @@ const consumedDotted = (k) =>
 const orphans = keys.filter((k) => !consumedUnderscored(k) && !consumedDotted(k));
 const unexpected = orphans.filter((k) => !ALLOWLIST.has(k));
 
+// An allowlist entry that is NOT an orphan, reported first and separately: it is
+// a claim this file makes about a key, and a false one says nothing about any
+// key while reading as though it had been checked.
+//
+// IT WENT UNCAUGHT FOR AS LONG AS IT EXISTED, which is why the check is here.
+// 'Details.GroupUnsure' sat in the list carrying a reason that had stopped being
+// true: the interface it described was restored, the key was consumed again, and
+// the guard's own output stopped naming it, because an entry only ever suppresses
+// a finding and there was no finding left to suppress. Nothing anywhere printed a
+// word about it.
+//
+// Two ways an entry goes stale and the message names both, because the fix
+// differs: the key is consumed again (delete the entry, the string is in use), or
+// the key has left the neutral resx entirely (delete the entry, there is nothing
+// to allow).
+const orphanSet = new Set(orphans);
+const stale = [...ALLOWLIST].filter((k) => !orphanSet.has(k));
+
 if (orphans.length) {
   console.log(`Dead-resx-key guard: ${orphans.length} neutral key(s) with no static consumer:`);
   for (const k of orphans.sort()) console.log(`  ${ALLOWLIST.has(k) ? '(allowlisted) ' : ''}${k}`);
+}
+if (stale.length) {
+  console.error(`\nFAILED: ${stale.length} stale allowlist entr(ies), allowing nothing:`);
+  for (const k of stale.sort()) {
+    const why = keys.includes(k)
+      ? 'the key is consumed again, so it is not an orphan'
+      : 'the key is no longer in the neutral resx at all';
+    console.error(`  ${k} - ${why}`);
+  }
+  console.error('\nRemove the entry and its reason. An allowlist entry that allows nothing');
+  console.error('reads as a checked decision and is not one.');
 }
 if (unexpected.length) {
   console.error(`\nFAILED: ${unexpected.length} unexpected orphaned key(s), not in the allowlist:`);
@@ -143,8 +166,10 @@ if (unexpected.length) {
   console.error('\nEither the key is genuinely dead (remove it from Strings.resx and every');
   console.error('satellite), or it is consumed in a way this guard cannot see (add it to the');
   console.error('allowlist with a one-line reason). Do not silence it without deciding which.');
-  process.exit(1);
 }
+if (stale.length || unexpected.length) process.exit(1);
+
 console.log(orphans.length
-  ? `\nOK: all ${orphans.length} unconsumed key(s) are allowlisted.`
-  : 'OK: every neutral resx key has a consumer.');
+  ? `\nOK: all ${orphans.length} unconsumed key(s) are allowlisted, and all `
+    + `${ALLOWLIST.size} allowlist entr(ies) are allowing one.`
+  : `OK: every neutral resx key has a consumer, and the allowlist is empty.`);

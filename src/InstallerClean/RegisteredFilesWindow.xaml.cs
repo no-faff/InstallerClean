@@ -34,12 +34,15 @@ public partial class RegisteredFilesWindow : Window
         // it, so an unscaled default would overflow into a horizontal
         // scrollbar. 770 lets the longest products' whole details, down to
         // the comment line, read by arrowing down the list without clicking
-        // into the details pane to scroll: the products list is capped
-        // (MaxHeight 208 scaled, the rows a 680 window showed) so every unit
-        // above 680 lands in the patches/details band, and the longest real
-        // metadata (a 7-line signing identity plus a 2-line comment) needs
-        // about 90 of those units beyond 680. A rarer longer entry still
-        // scrolls, as all three panes do. The clamps keep the window inside
+        // into the details pane to scroll: the file list is capped (MaxHeight
+        // 208 scaled, the rows a 680 window showed) so the units above that
+        // land in the patches/details band, and the longest real metadata (a
+        // 7-line signing identity plus a 2-line comment) needs about 90 of
+        // them beyond 680. A rarer longer entry still scrolls, as all three
+        // panes do. The 680 figure was taken before the two group headings
+        // came out of the layout, so the cap now begins to bite in a slightly
+        // shorter window than it did; that gives the details band more room
+        // rather than less, which is the direction this sizing wants. The clamps keep the window inside
         // the work area, as little as ~672 device-independent units of
         // height on a 1080p laptop at 150% display scale.
         var factor = AccessibilitySettings.Current.TextScaleFactor;
@@ -66,6 +69,23 @@ public partial class RegisteredFilesWindow : Window
         // Sort before selecting, not after painting the arrow: the view's order
         // is what decides the index the bound selection sits at, and the scroll
         // and the container focus below are both taken from that index.
+        //
+        // EVERY FILE THE SCAN COULD NOT SETTLE SITS AT THE TOP OF THIS LIST, AND
+        // THAT IS THE DELIBERATE RESULT OF TWO DECISIONS RATHER THAN AN OVERSIGHT.
+        // The list opens ordered by product name ascending. A file the scan
+        // declined to offer has no product name at all, because no registration
+        // names it and no placeholder is invented for it, and an empty string
+        // sorts before every real name. So those rows cluster above the first
+        // registered product, each with a blank first cell.
+        //
+        // It was looked at and accepted in that form. Anybody minting a
+        // placeholder name to fill the cell, special-casing these rows in the
+        // sort, or splitting them back out under a heading of their own is
+        // undoing a decision rather than tidying a layout: the window held two
+        // headed groups until 3.0.0 and the merge into one list is the ruling.
+        //
+        // How many rows land there is not something this app can know. It is
+        // whatever the scan could not settle on the machine in front of it.
         ApplySort(nameof(ProductRow.ProductName), ListSortDirection.Ascending, ColProductName);
 
         if (ProductsList.Items.Count > 0)

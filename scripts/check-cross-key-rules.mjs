@@ -94,11 +94,19 @@ const ELABORATES_A_LABEL = [
 ];
 
 // A control whose automation name resolves to THE SAME KEY as the visible
-// heading that labels it. There is one: the Details window's unsure group, whose
-// ListBox carries AutomationProperties.LabeledBy pointing at the heading and an
-// explicit Name resolving to the heading's own key.
+// heading that labels it, through AutomationProperties.LabeledBy pointing at
+// that heading plus an explicit Name resolving to the heading's own key.
 //
-// IT IS NOT MUST_AGREE, AND PUTTING IT THERE WOULD BE THIS FILE'S OWN NAMED
+// IT IS EMPTY, AND EMPTY IS SAFE HERE IN A WAY AN EMPTY ALLOWLIST USUALLY IS
+// NOT. Its one member was the details window's second group, whose heading and
+// ListBox both went when the window became a single list. Emptying a list that
+// SUPPRESSES a check would quietly stop the checking; this one only ever ADMITS
+// a key to a classification, and rule 2 below fails on any automation name that
+// is in none of the five lists. So an empty list here can make the guard
+// stricter and never looser, and the classification stays written down for
+// whoever builds that shape again.
+//
+// IT IS NOT MUST_AGREE, AND PUTTING A KEY THERE WOULD BE THIS FILE'S OWN NAMED
 // MISTAKE. That list measures whether two keys' values agree in every language.
 // One key cannot disagree with itself, so the comparison would pass in all
 // sixteen whatever anybody wrote, and the entry would be a control classified
@@ -108,9 +116,7 @@ const ELABORATES_A_LABEL = [
 // appear as visible Text in the same XAML file. That is not vacuous. Repoint the
 // Name at a different key, or delete the heading, and the guard fails and the
 // control has to be classified again by whoever did it.
-const NAME_IS_THE_LABEL = new Set([
-  'Details.GroupUnsure',
-]);
+const NAME_IS_THE_LABEL = new Set([]);
 
 // Nothing visible to agree with: an icon-only button, a scroll region, a
 // progress bar. The name is the control's only text.
