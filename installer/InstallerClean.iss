@@ -67,6 +67,7 @@ VersionInfoCopyright=(c) {#CurrentYear} {#MyCompany}
 VersionInfoDescription=InstallerClean Setup
 DefaultDirName={autopf}\InstallerClean
 DefaultGroupName=InstallerClean
+UninstallDisplayName=InstallerClean
 UninstallDisplayIcon={app}\InstallerClean.exe
 OutputDir={#PublishDir}
 ; The version is part of the download's name from 2.2.0 on. A setup exe sitting
