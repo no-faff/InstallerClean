@@ -77,11 +77,31 @@ internal static class MissingFilesReport
     /// AND AN UNESTABLISHED VERDICT IS AFFECTED, deliberately, which is the opposite
     /// direction from the offer. Both refuse to claim what the app has not shown: there
     /// that the file is spare, here that its absence is harmless.
+    ///
+    /// AND A WITHHELD ROW IS AFFECTED WHATEVER ITS VERDICT SAYS, which is the third
+    /// conjunct and the one that is easy to leave out. A row reaches the flag by two
+    /// routes. The per-product pass sets it while downgrading a row whose patch set
+    /// could not be established, and such a row's verdict is Unestablished, so the
+    /// clause above already reports it. The scan-wide withholding sets it when the run
+    /// lost a claim anywhere, on a row the per-product pass had already judged
+    /// AllNonRemovable and left alone, so that row arrives here flagged and carrying a
+    /// clean verdict. Without this conjunct it lands on the silent side, and the silent
+    /// side means the app has established that nothing could reach for the file.
+    ///
+    /// IT HAS ESTABLISHED NOTHING OF THE KIND IN THAT STATE. The withholding fired
+    /// because the enumeration was short of a product, and the product it lost is
+    /// exactly the one that could have held a patch able to roll back onto this file.
+    /// The offer distrusts that verdict and keeps the file; reading the same verdict
+    /// here as proof of harmlessness would have the scan trust, for the purpose of
+    /// staying quiet, precisely what it has just refused to trust for the purpose of
+    /// acting. The flag is the app's own record that it declined to rely on the
+    /// verdict, so it is read here rather than the verdict alone.
     /// </summary>
     internal static bool Affected(RegisteredPackage row) =>
         row.IsMissingFromDisk
         && !(row.IsSupersededOrObsoleted
-             && row.ProductPatchSetVerdict == ProductPatchSet.AllNonRemovable);
+             && row.ProductPatchSetVerdict == ProductPatchSet.AllNonRemovable
+             && !row.RemovableWithheld);
 
     internal static IReadOnlyList<AffectedProduct> Products(IEnumerable<RegisteredPackage> registered)
     {

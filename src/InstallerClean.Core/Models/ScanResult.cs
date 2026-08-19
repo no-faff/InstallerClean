@@ -54,12 +54,21 @@ namespace InstallerClean.Models;
 /// decides it.
 ///
 /// THE AXIS IS A CONJUNCTION AND IT IS NOT THE PATCH STATE. A row is left out of
-/// this count only where Windows reports the patch superseded or obsoleted AND the
+/// this count only where Windows reports the patch superseded or obsoleted, AND the
 /// per-product condition positively established that nothing on any product sharing
-/// it could be uninstalled and roll back onto its file. Everything else is in here:
-/// a product's own cached package, an applied patch, a patch whose state no read
-/// established, a path only the registry fallback named, and every superseded row
-/// whose product condition could not be settled.
+/// it could be uninstalled and roll back onto its file, AND this scan did not
+/// withhold that row's verdict. Everything else is in here: a product's own cached
+/// package, an applied patch, a patch whose state no read established, a path only
+/// the registry fallback named, every superseded row whose product condition could
+/// not be settled, and every row a scan that lost a claim held back.
+///
+/// THE THIRD CONJUNCT ARRIVED LAST AND IT CLOSES A SILENCE. A run that lost a claim
+/// anywhere withholds the whole removable class, and it does that to rows the
+/// per-product pass had already judged clean, so such a row carries the withheld flag
+/// and an AllNonRemovable verdict at once. Read on the verdict alone it left this
+/// count, and the notice, and the program's name, all of which simply did not appear.
+/// A scan that has just declined to rely on a verdict may not then rely on it to stay
+/// quiet.
 ///
 /// IT WAS CALLED <c>MissingNotSupersededCount</c> AND THAT NAME DESCRIBED AN AXIS
 /// THE CODE STOPPED USING. The split moved to the conjunction in 3.0.0 and the two
@@ -78,8 +87,9 @@ namespace InstallerClean.Models;
 /// <param name="MissingUnaffectedCount">
 /// The other half: registrations whose file is not on disk and whose absence this
 /// scan POSITIVELY established to be harmless. Windows reports the patch superseded
-/// or obsoleted, and every product sharing it was established to hold no patch that
-/// could be uninstalled and roll back onto its file.
+/// or obsoleted, every product sharing it was established to hold no patch that
+/// could be uninstalled and roll back onto its file, and the scan did not go on to
+/// withhold that verdict for a claim it lost elsewhere.
 ///
 /// BOTH HALVES OF THAT CONJUNCTION ARE LOAD-BEARING AND THE STATE ALONE IS NOT
 /// ENOUGH. Splitting on the state was tried and the claim it makes was measured

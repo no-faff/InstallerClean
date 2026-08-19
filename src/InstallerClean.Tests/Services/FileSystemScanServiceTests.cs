@@ -1,6 +1,7 @@
 using System.IO.Abstractions.TestingHelpers;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
@@ -718,6 +719,103 @@ public class FileSystemScanServiceTests
         Assert.Equal(1, result.MissingAffectedCount);
         Assert.Equal(0, result.MissingUnaffectedCount);
         Assert.Equal(1, result.MissingFromDiskCount);
+    }
+
+    /// <summary>
+    /// Builds the state a scan reaches when it LOST A CLAIM, through the real
+    /// enumeration rather than by writing the row out here, because the row's shape is
+    /// the whole subject: superseded, withheld, and carrying a CLEAN per-product
+    /// verdict at the same time. A hand-built row would let a later reader assume the
+    /// combination is hypothetical. It is what the query service emits.
+    /// </summary>
+    private static async Task<InstallerQueryResult> EnumerateWithSupersededPatch(bool aClaimWasLost)
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\product.msi");
+        msi.SetProductProperty("{A}", "ProductName", "Test Product");
+        msi.AddPatch("{A}", "{P}", @"C:\Windows\Installer\superseded-lost.msp",
+            state: "2", uninstallable: "0");
+
+        var sets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["{A}"] = ProductPatchSet.AllNonRemovable,
+        };
+        return await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(
+                0, 0, UnclaimedProductFiles: aClaimWasLost ? 1 : 0, ProductPatchSets: sets))
+            .GetRegisteredPackagesAsync();
+    }
+
+    /// <summary>
+    /// The scan that goes with it: every registered file present except the patch,
+    /// whose row is the one under test. Paths are read back off the rows rather than
+    /// spelled again, so the fixture says the same thing whatever the normalisation
+    /// made of them.
+    /// </summary>
+    private static Task<ScanResult> ScanWithThePatchFileGone(InstallerQueryResult enumerated)
+    {
+        var fs = new MockFileSystem();
+        foreach (var row in enumerated.Packages)
+            if (row.PatchState != 2) fs.AddFile(row.LocalPackagePath, new MockFileData("x"));
+        return new FileSystemScanService(
+            QueryReturning(enumerated), fs, Array.Empty<string>(), null).ScanAsync();
+    }
+
+    [Fact]
+    public async Task A_superseded_patch_withheld_for_a_lost_claim_is_missing_and_affected()
+    {
+        // THE STATE THIS EXISTS FOR, AND IT IS NOT THE OBVIOUS ONE. A run that loses a
+        // claim anywhere withholds the whole removable class, and it does that to rows
+        // the per-product pass has already judged clean, so the row carries the
+        // withheld flag AND an AllNonRemovable verdict at once. Read on the verdict
+        // alone, its absence was called harmless and nothing was said: no count, no
+        // notice, and no program named. The app had established nothing of the kind.
+        // The withholding fired because the enumeration was short of a product, and
+        // that product is exactly the one that could have held a patch able to roll
+        // back onto this file.
+        var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: true);
+
+        // THE FIXTURE IS THE SUBJECT HERE, so it is asserted before the behaviour. A
+        // change that stopped producing this combination would otherwise leave the
+        // test green while testing nothing.
+        var row = enumerated.Packages.Single(p => p.PatchState == 2);
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+        Assert.False(row.IsRemovable);
+
+        var result = await ScanWithThePatchFileGone(enumerated);
+
+        Assert.Equal(1, result.MissingFromDiskCount);
+        Assert.Equal(1, result.MissingAffectedCount);
+        Assert.Equal(0, result.MissingUnaffectedCount);
+        // And the program is named, which is the half a count assertion cannot see:
+        // the notice carries the program's name and it was that sentence, whole, that
+        // did not appear.
+        var named = Assert.Single(MissingFilesReport.Products(result.RegisteredPackages));
+        Assert.Equal("Test Product", named.ProductName);
+    }
+
+    [Fact]
+    public async Task A_superseded_patch_on_a_run_that_lost_nothing_is_missing_and_unaffected()
+    {
+        // THE MUST-MISS CONTROL, and the two fixtures differ in one thing only:
+        // whether the run lost a claim. Without it, a predicate that had lost its
+        // benign half entirely would pass the test above, and every missing superseded
+        // registration on every machine would be named in a notice the app cannot
+        // support. That is the direction this split was built to avoid, and holding
+        // the pair together is what keeps both from drifting.
+        var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: false);
+
+        var row = enumerated.Packages.Single(p => p.PatchState == 2);
+        Assert.False(row.RemovableWithheld);
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+
+        var result = await ScanWithThePatchFileGone(enumerated);
+
+        Assert.Equal(1, result.MissingFromDiskCount);
+        Assert.Equal(0, result.MissingAffectedCount);
+        Assert.Equal(1, result.MissingUnaffectedCount);
+        Assert.Empty(MissingFilesReport.Products(result.RegisteredPackages));
     }
 
     [Fact]
