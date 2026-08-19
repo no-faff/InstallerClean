@@ -77,7 +77,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         IReadOnlyList<RegisteredPackage> packages,
         long totalBytes,
         IMsiFileInfoService infoService,
-        IReadOnlyList<OrphanedFile>? unsure = null)
+        IReadOnlyList<OrphanedFile>? withheldFiles = null)
     {
         _infoService = infoService;
 
@@ -202,7 +202,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         // DISPLAYED LIST, which is accepted rather than overlooked. The window
         // orders by product name ascending and an empty string sorts first; the
         // note that says so in full is beside that sort, in Window_Loaded.
-        var withheld = unsure ?? Array.Empty<OrphanedFile>();
+        var withheld = withheldFiles ?? Array.Empty<OrphanedFile>();
         foreach (var file in withheld)
         {
             products.Add(new ProductRow(
