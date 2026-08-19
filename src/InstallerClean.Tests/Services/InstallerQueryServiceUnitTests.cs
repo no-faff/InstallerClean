@@ -1548,9 +1548,17 @@ public class InstallerQueryServiceUnitTests
     [Fact]
     public async Task A_value_that_cannot_be_normalised_is_claimed_exactly_as_returned()
     {
-        // GetFullPath refuses an embedded null. The claim must survive it
-        // anyway: dropping the row would turn a spelling nobody can improve
-        // into a file with no claim on it at all, which is an orphan.
+        // THE EMBEDDED-NULL TEST AT THE FRONT OF THE NORMALISATION REFUSES THIS
+        // VALUE, and naming the refuser is the point rather than pedantry: this
+        // comment said GetFullPath until 3.0.0, which was true while the null
+        // reached that far, and the value now never gets past the first test in the
+        // method. The distinction is the one
+        // An_embedded_null_is_refused_as_its_own_cause_and_not_as_a_full_path_failure
+        // below exists for, that release having found the two behaving differently.
+        //
+        // The claim must survive the refusal anyway: dropping the row would turn a
+        // spelling nobody can improve into a file with no claim on it at all, which
+        // is an orphan.
         const string unimprovable = "C:\\Windows\\Installer\\bad\0name.msi";
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
