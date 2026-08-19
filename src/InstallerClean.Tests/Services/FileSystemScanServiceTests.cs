@@ -511,6 +511,13 @@ public class FileSystemScanServiceTests
         // Missing files are in it too, because the count on the screen is of rows
         // and not of files on the disk, and a row whose file has gone is still
         // one the window lists.
+        //
+        // AND ONE WITHHELD ROW'S FILE HAS GONE, WHICH IS THE FIXTURE AND NOT THE
+        // ASSERTION. Until 3.0.0 every withheld row here was present on the disk, so
+        // this test could not have failed at the thing it is named for: the withheld
+        // count is now the one member of the partition that a second, narrower figure
+        // is also computed from, and a fixture with no withheld-and-missing row stays
+        // green whichever population either count takes.
         var packages = new List<RegisteredPackage>
         {
             Registered(@"C:\Windows\Installer\a.msi"),
@@ -518,23 +525,29 @@ public class FileSystemScanServiceTests
             Registered(@"C:\Windows\Installer\gone.msi"),
             Withheld(@"C:\Windows\Installer\w1.msp"),
             Withheld(@"C:\Windows\Installer\w2.msp"),
+            Withheld(@"C:\Windows\Installer\w-gone.msp"),
             Unjudged(@"C:\Windows\Installer\u1.msp"),
         };
         var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly(), UnaccountedProductCount: 1));
 
         var fs = new MockFileSystem();
-        foreach (var p in packages.Where(p => !p.LocalPackagePath.EndsWith(@"\gone.msi", StringComparison.Ordinal)))
+        foreach (var p in packages.Where(p =>
+                     !p.LocalPackagePath.EndsWith(@"\gone.msi", StringComparison.Ordinal)
+                     && !p.LocalPackagePath.EndsWith(@"\w-gone.msp", StringComparison.Ordinal)))
             fs.AddFile(p.LocalPackagePath, new MockFileData("x"));
 
         var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
 
-        Assert.Equal(6, result.RegisteredPackages.Count);
+        Assert.Equal(7, result.RegisteredPackages.Count);
         Assert.Equal(
             result.RegisteredPackages.Count,
             result.RegisteredClaimedCount + result.RegisteredWithheldCount + result.RegisteredUnjudgedCount);
         Assert.Equal(3, result.RegisteredClaimedCount);
-        Assert.Equal(2, result.RegisteredWithheldCount);
+        Assert.Equal(3, result.RegisteredWithheldCount);
         Assert.Equal(1, result.RegisteredUnjudgedCount);
+        // The cost figure is the other count over the same flag and it leaves the
+        // missing row out, which is what the partition must survive.
+        Assert.Equal(2, result.WithheldCount);
     }
 
     [Fact]
@@ -569,14 +582,13 @@ public class FileSystemScanServiceTests
         // the claim to pin now is the live one: an incomplete run reports the rows
         // actually carrying the flag, rather than the field going quiet again.
         //
-        // BOTH FILES ARE PRESENT ON PURPOSE, and it is not tidying. WithheldCount is
-        // computed as every kept row carrying RemovableWithheld, with no test of
-        // whether the file is still there, while ScanResult.WithheldCount's own doc
-        // says the population is rows "whose file was on disk". One of those is
-        // wrong and it is a question about the app rather than about this test, so
-        // this fixture keeps out of it: with both files present the count is two
-        // under either reading. The disagreement is reported separately and nothing
-        // here should be read as settling it.
+        // BOTH FILES ARE PRESENT, WHICH NOW MEANS THE TWO COUNTS AGREE RATHER THAN
+        // THAT THIS FIXTURE IS KEEPING OUT OF A DISAGREEMENT. It was written while
+        // the code counted every flagged row and the doc said the population was rows
+        // whose file was on disk, and it deliberately sat where both readings gave
+        // two. That is settled: the cost figure takes the on-disk term and the
+        // partition member does not. The row whose file has gone is tested next door,
+        // which is where the two counts come apart.
         const string first = @"C:\Windows\Installer\withheld-one.msp";
         const string second = @"C:\Windows\Installer\withheld-two.msp";
         var query = QueryReturning(new InstallerQueryResult(
@@ -590,10 +602,44 @@ public class FileSystemScanServiceTests
         var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
 
         Assert.Equal(2, result.WithheldCount);
-        // The same population counted off the kept list, which must not come apart
-        // from the figure above it.
+        // The other count over the same flag. On a machine whose cache is intact the
+        // two are equal, and this fixture is that machine.
         Assert.Equal(2, result.RegisteredWithheldCount);
         Assert.Equal(2, result.UnaccountedProductCount);
+    }
+
+    [Fact]
+    public async Task A_withheld_row_whose_file_has_gone_cost_the_run_nothing_and_is_still_a_row()
+    {
+        // THE TWO COUNTS OVER ONE FLAG, AND THE ONE CASE THAT TELLS THEM APART.
+        // WithheldCount answers what the withholding COST this run, and an absent
+        // file cost nothing: the branch that offers a superseded row is gated on the
+        // file being there, so such a row was never offerable and holding it back
+        // took nothing away. RegisteredWithheldCount is a member of the partition of
+        // the kept list, and the registered-files window lists that row like any
+        // other, so leaving it out would leave a hole in the partition.
+        //
+        // THE DIRECTION IS WHY IT IS WORTH ITS OWN TEST. This count travels in the
+        // opt-in report and nowhere else, and that report is the only instrument this
+        // project has for telling whether the withholding is expensive. Counting rows
+        // that cost nothing inflates it, and an inflated cost invites relaxing the
+        // condition being measured.
+        const string present = @"C:\Windows\Installer\withheld-present.msp";
+        const string gone = @"C:\Windows\Installer\withheld-gone.msp";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Withheld(present), Withheld(gone) }.AsReadOnly(),
+            UnaccountedProductCount: 1));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(present, new MockFileData("x"));
+
+        var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(1, result.WithheldCount);
+        Assert.Equal(2, result.RegisteredWithheldCount);
+        // And the missing one is accounted for where a missing row belongs, rather
+        // than having quietly left the scan.
+        Assert.Equal(1, result.MissingFromDiskCount);
     }
 
     [Fact]

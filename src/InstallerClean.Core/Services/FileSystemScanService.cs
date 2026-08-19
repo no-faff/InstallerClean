@@ -661,7 +661,29 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var registeredClaimedBytes = stillUsed
             .Where(p => p.FileExists && !p.RemovableWithheld && !p.VerdictUnreadable)
             .Sum(p => p.FileSizeBytes);
+        // TWO COUNTS OVER ONE FLAG, AND THEY ANSWER DIFFERENT QUESTIONS. Both were
+        // one variable until 3.0.0, and the pair below is the fix rather than a
+        // duplication.
+        //
+        // The partition member counts ROWS. It has to, because what the three counts
+        // partition is exactly the set the registered-files window lists, and that
+        // window lists a row whose file has already gone like any other.
+        //
+        // The cost figure counts FILES, and only the ones that are there. It answers
+        // what the withholding cost this run, and a row whose file is not on the disk
+        // cost nothing: an absent file could never have been offered, the branch that
+        // offers a superseded row being gated on its existence. Counting it inflated
+        // the one instrument this project has for telling whether the withholding is
+        // expensive, and inflating that invites relaxing the very condition the
+        // release exists to add.
+        //
+        // The flag itself is right in both cases and is not narrowed here. It records
+        // a true fact about the RECORDS, established in the enumeration, which cannot
+        // know whether a file exists: existence is settled here, against the injected
+        // filesystem. Clearing it later would move the row into the claimed count,
+        // which asserts a live claim the app has not established.
         var registeredWithheld = stillUsed.Count(p => p.RemovableWithheld);
+        var withheldCost = stillUsed.Count(p => p.RemovableWithheld && p.FileExists);
         var registeredUnjudged = stillUsed.Count(p => p.VerdictUnreadable);
 
         // SUPERSEDED AND OBSOLETED ROWS THIS SCAN IS KEEPING, which is a different
@@ -821,8 +843,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // disk that the scan would have offered had it been able to establish that
             // nothing on any product sharing them could roll back onto the file.
             // Counted off the kept rows rather than tallied, on the same reasoning as
-            // the three counts above it.
-            query.UnaccountedProductCount, registeredWithheld,
+            // the three counts above it, and over the rows whose file is still there,
+            // which is the half the partition member below deliberately does not share.
+            query.UnaccountedProductCount, withheldCost,
             query.Census,
             // Read after the classification is settled, so a probe that threw
             // could not cost anybody a scan; it does not throw, and the ordering

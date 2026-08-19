@@ -123,6 +123,17 @@ namespace InstallerClean.Models;
 /// because that product's patch set could not be established at all. Obsoleted rows
 /// are NOT in it; they are not withheld, they are simply not offered, and they have
 /// their own count.
+///
+/// THE ON-DISK QUALIFIER IS THE WHOLE DIFFERENCE FROM
+/// <see cref="RegisteredWithheldCount"/> AND IT IS LOAD-BEARING. A row whose file
+/// has already gone cost this run nothing: an absent file could never have been
+/// offered, the branch that offers a superseded row being gated on its existence.
+/// The two counts were one variable until 3.0.0, so this figure carried those rows
+/// and overstated what the withholding cost, on the one channel that answers what
+/// the app is doing on machines nobody here can see. A cost figure that overstates
+/// invites relaxing the condition it is measuring. The direction of the correction
+/// is downward and only on a machine that has already lost part of its cache; on an
+/// intact one the two counts are equal.
 /// </param>
 /// <param name="Census">
 /// What the enumeration behind this scan measured about itself and about the
@@ -160,16 +171,25 @@ namespace InstallerClean.Models;
 /// scan says are needed.
 /// </param>
 /// <param name="RegisteredWithheldCount">
-/// Kept files the records called superseded or obsoleted and a scan would not act
+/// Kept ROWS the records called superseded or obsoleted and a scan would not act
 /// on, because it could not establish that no installed product still needed
-/// them: every row carrying <c>RemovableWithheld</c>.
+/// them: every row carrying <c>RemovableWithheld</c>, whether or not its file is
+/// still on the disk.
 ///
-/// THE SAME POPULATION AS <see cref="WithheldCount"/>, counted off the kept list
-/// rather than tallied through the loop that built it, so the number shown and the
-/// rows shown cannot come apart. It reads zero on a machine with no superseded patch
-/// and on a machine whose every superseded patch passed the condition, and those are
-/// different findings that this count cannot separate; the scan-time registration
-/// counts are what separate them.
+/// NEARLY THE SAME POPULATION AS <see cref="WithheldCount"/> AND DELIBERATELY NOT
+/// THE SAME COUNT. This one is a member of a three-way partition of the kept list,
+/// so it counts what the registered-files window lists, and that window lists a row
+/// whose file has gone like any other; leaving such a row out would leave a hole in
+/// the partition. <see cref="WithheldCount"/> answers what the withholding COST,
+/// and a row whose file is absent cost nothing. The two agree on any machine whose
+/// cache is intact and differ by exactly the withheld rows whose files something
+/// else has already removed.
+///
+/// Counted off the kept list rather than tallied through the loop that built it, so
+/// the number shown and the rows shown cannot come apart. It reads zero on a machine
+/// with no superseded patch and on a machine whose every superseded patch passed the
+/// condition, and those are different findings that this count cannot separate; the
+/// scan-time registration counts are what separate them.
 /// </param>
 /// <param name="RegisteredUnjudgedCount">
 /// Kept files whose patch state no read established, one per path
