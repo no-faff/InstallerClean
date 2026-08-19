@@ -225,14 +225,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// so each reads at its own text tier; only this one ever interpolated, which
     /// is why only it binds to the view-model.
     ///
-    /// THE SENTENCE TAKES NO ARGUMENTS AND THREE ARE STILL PASSED. It carried a
-    /// slot per Reason label while three kinds of file reached the list, so that a
-    /// translator edited the column labels in one place and the copy followed, and
-    /// one kind reaches it now. A translation of the older sentence still carries
-    /// the three slots, and string.Format ignores a surplus argument, so passing
-    /// them costs nothing here and is the difference between such a translation
-    /// rendering its old sentence and rendering its own placeholder markers on
-    /// screen.
+    /// THE SENTENCE TAKES TWO ARGUMENTS AND THREE ARE STILL PASSED. It carries a
+    /// slot per Reason label so that a translator edits the column labels in one
+    /// place and the copy follows. Two kinds of file reach the list, orphaned and
+    /// superseded, so the sentence itself uses only the first two slots.
+    /// Reason.Obsoleted is passed for the translations that still carry the older
+    /// three-slot sentence, and string.Format ignores a surplus argument, so
+    /// passing it costs nothing here and is the difference between such a
+    /// translation rendering its old sentence and rendering its own placeholder
+    /// markers on screen.
     /// </summary>
     public string MainExplanationWhyText =>
         string.Format(Strings.Body_MainExplanation_Why,
