@@ -573,9 +573,19 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // patch set could not be established, which is exactly the case where the
             // app cannot say that nothing could reach for the file. Putting that on the
             // benign side would be the app calling an absence harmless in the one case
-            // where it explicitly failed to establish harmlessness. It falls out of the
-            // conjunction below without a carve-out, because such a row's verdict is
-            // Unestablished by construction.
+            // where it explicitly failed to establish harmlessness.
+            //
+            // THE FLAG IS REACHED BY TWO ROUTES AND THE CONJUNCTION BELOW ANSWERS
+            // THEM DIFFERENTLY. The per-product pass sets it while downgrading a row
+            // whose patch set could not be established, so that row carries an
+            // Unestablished verdict and its absence is reported. The scan-wide
+            // withholding sets it on any row still carrying IsRemovable when the run
+            // lost a claim, and a row is still carrying IsRemovable only because the
+            // per-product pass judged it AllNonRemovable and returned before its own
+            // downgrade, so that row keeps the clean verdict and its absence reads as
+            // harmless. Both states come out of a real enumeration rather than from
+            // reading the code: driven through the query service with a claim lost,
+            // the row arrives here flagged, superseded and AllNonRemovable.
             if (exists)
             {
                 stillUsedBytes += size;
