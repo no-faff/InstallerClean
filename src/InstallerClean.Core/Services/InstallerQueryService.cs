@@ -1490,17 +1490,35 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// one stored expandable and one stored plain, got different answers, and no
     /// comment anywhere said so or meant it.
     ///
-    /// EXPANSION CAN ONLY EVER MOVE A FILE OFF THE OFFER, which is what makes it a
-    /// correctness fix rather than a judgement. A registration that now resolves is
-    /// one that matches its file, so the file is claimed and kept; one that expands
-    /// to somewhere else either names nothing, which is exactly the old behaviour,
-    /// or names some other file, which is then claimed and kept. No arrangement of
-    /// it puts a file on the list that was not on it before. So it needed no finding
-    /// about whether Windows Installer ever writes such a value, and there is none:
-    /// all 296 path values across the three SIDs of one elevated machine are plain
-    /// absolute drive paths, zero containing a <c>%</c> (2026-08-16, and one machine
-    /// cannot show that the form never occurs, which is the reason for handling it
-    /// rather than waiting to find out).
+    /// WHAT THE EXPANSION DOES TO THE OFFER, ONE LINE PER HALF, because the two
+    /// halves reach the list by opposite routes and no one sentence is true of both.
+    /// A walked file is offered when no registration names it, so a value that now
+    /// resolves takes its file OFF the list: the registration matches, and the file
+    /// is claimed and kept. A value that expands to somewhere else either names
+    /// nothing, which is exactly the old behaviour, or names some other file, which
+    /// is then claimed and kept in its place. A registered superseded patch is on
+    /// the list BECAUSE of its registration, and there the expansion can ADD:
+    /// <c>%SystemRoot%\Installer\1e038.msi</c> named nothing, so the row read as
+    /// missing from disk and the branch that offers it is gated on the file being
+    /// there; expanded, the row names the file that is really there and can reach
+    /// the offer.
+    ///
+    /// AND WHAT MAKES THAT SAFE IS NOT THIS METHOD. Such a row is put to the same
+    /// per-product condition, the same confirmation pass and the same act-time
+    /// re-verify as every other row on the machine. The expansion settles which file
+    /// a registration names and settles nothing about whether that file may go, so a
+    /// row it repairs arrives at the offer's conditions unprivileged and is judged
+    /// there. That is the whole argument and there is nothing in it that a later
+    /// release can falsify: this paragraph used to say the expansion could only ever
+    /// move a file OFF the offer, which was true only while the superseded class was
+    /// not offered at all, and 3.0.0 put that class back.
+    ///
+    /// HOW OFTEN THE FORM OCCURS IS NOT WHAT MAKES THE HANDLING RIGHT, so no
+    /// prevalence finding stands behind it and none is needed. What there is is one
+    /// reading: all 296 path values across the three SIDs of one elevated machine
+    /// were plain absolute drive paths, zero containing a <c>%</c> (read 2026-08-16;
+    /// one machine cannot show that the form never occurs, which is the reason for
+    /// handling it rather than waiting to find out).
     ///
     /// AND ONE VALUE IS REFUSED BEFORE THE EXPANSION RUNS AT ALL. A recorded value
     /// carrying an embedded null is never put through it: on Windows that call cuts
