@@ -93,6 +93,25 @@ const ELABORATES_A_LABEL = [
   { label: 'Action.Details', name: 'Automation.ViewRegisteredFiles' },
 ];
 
+// A control whose automation name resolves to THE SAME KEY as the visible
+// heading that labels it. There is one: the Details window's unsure group, whose
+// ListBox carries AutomationProperties.LabeledBy pointing at the heading and an
+// explicit Name resolving to the heading's own key.
+//
+// IT IS NOT MUST_AGREE, AND PUTTING IT THERE WOULD BE THIS FILE'S OWN NAMED
+// MISTAKE. That list measures whether two keys' values agree in every language.
+// One key cannot disagree with itself, so the comparison would pass in all
+// sixteen whatever anybody wrote, and the entry would be a control classified
+// into a list that measures nothing, which is exactly what the merge above hid.
+//
+// The rule it owes instead is KEY IDENTITY, checked below: the key must also
+// appear as visible Text in the same XAML file. That is not vacuous. Repoint the
+// Name at a different key, or delete the heading, and the guard fails and the
+// control has to be classified again by whoever did it.
+const NAME_IS_THE_LABEL = new Set([
+  'Details.GroupUnsure',
+]);
+
 // Nothing visible to agree with: an icon-only button, a scroll region, a
 // progress bar. The name is the control's only text.
 const NO_VISIBLE_LABEL = new Set([
@@ -409,21 +428,43 @@ const stale = [];
 // language.
 const xamlFiles = collectXaml(GUI);
 const namedInXaml = new Set();
+const visibleTextInXaml = {};
 for (const file of xamlFiles) {
   const xaml = readFileSync(file, 'utf8');
   for (const m of xaml.matchAll(/AutomationProperties\.Name="\{loc:Translate ([A-Za-z0-9._]+)\}"/g))
     namedInXaml.add(m[1]);
+  for (const m of xaml.matchAll(/Text="\{loc:Translate ([A-Za-z0-9._]+)\}"/g))
+    (visibleTextInXaml[file] ??= new Set()).add(m[1]);
+}
+
+// Rule 2a. A NAME_IS_THE_LABEL key must still BE the label: the same key drawn as
+// visible Text in the same file. The list's whole rule is this identity, so a
+// name repointed at another key, or a heading deleted, fails here rather than
+// passing an equality test it could never fail.
+for (const key of [...NAME_IS_THE_LABEL].sort()) {
+  const drawnIn = Object.entries(visibleTextInXaml)
+    .filter(([, keys]) => keys.has(key)).map(([file]) => file);
+  const namedIn = xamlFiles.filter((file) => readFileSync(file, 'utf8')
+    .includes(`AutomationProperties.Name="{loc:Translate ${key}}"`));
+  if (!namedIn.length)
+    stale.push(`${key} is in NAME_IS_THE_LABEL and names no control in the XAML. `
+      + 'Renamed, removed, or moved to code-behind: update the lists above.');
+  else if (!drawnIn.some((file) => namedIn.includes(file)))
+    stale.push(`${key} is in NAME_IS_THE_LABEL but is not drawn as visible Text in `
+      + `${namedIn.join(', ')}. Its whole rule is that the name and the label are one key, `
+      + 'so either restore the heading or classify the control into another list.');
 }
 const classified = new Set([
   ...MUST_AGREE.map((p) => p.name), ...ELABORATES_A_LABEL.map((p) => p.name),
-  ...LABELS_A_VALUE, ...NO_VISIBLE_LABEL,
+  ...LABELS_A_VALUE, ...NO_VISIBLE_LABEL, ...NAME_IS_THE_LABEL,
 ]);
 for (const key of [...namedInXaml].sort())
   if (!classified.has(key))
-    stale.push(`${key} names a control in the XAML and is in none of this file's four lists. `
+    stale.push(`${key} names a control in the XAML and is in none of this file's five lists. `
       + 'Decide whether its name restates a visible label (MUST_AGREE), elaborates one to tell '
       + 'identical controls apart (ELABORATES_A_LABEL), names the field behind a value '
-      + '(LABELS_A_VALUE), or labels a control with no visible text (NO_VISIBLE_LABEL).');
+      + '(LABELS_A_VALUE), labels a control with no visible text (NO_VISIBLE_LABEL), or is the '
+      + 'same key as the visible label itself (NAME_IS_THE_LABEL).');
 for (const key of [...classified].sort())
   if (!namedInXaml.has(key))
     stale.push(`${key} is classified in this file but names no control in the XAML. `
@@ -492,6 +533,13 @@ const linkKeys = new Set(
 if (stale.length) {
   console.error(`Cross-key rules FAILED (${stale.length}): the declarations in this file are stale.`);
   for (const s of stale) console.error(`  ${s}`);
+  // AND SAY WHAT THIS EXIT DID NOT CHECK, because it silently skipped the whole
+  // per-language pass and that is not visible from the message above. One stale
+  // declaration once hid sixty per-language failures: the run reported a single
+  // problem, was read as "one thing to fix", and the four keys that had lost
+  // their folder token in every satellite were invisible until it was fixed.
+  console.error(`\n  Rules 1 and 3 to 6 did NOT run: ${LANGS.length} languages unchecked. `
+    + 'Fix the declarations and run again before believing anything about the translations.');
   process.exit(1);
 }
 
@@ -598,5 +646,5 @@ if (problems.length) {
 console.log(`\nCross-key rules OK: ${LANGS.length} languages, ${MUST_AGREE.length} label/name pairs `
   + `and ${ELABORATES_A_LABEL.length} measured by containment, `
   + `${tokenKeys.length} keys carrying ${FOLDER_TOKEN}, ${linkKeys.size} carrying a [link phrase], `
-  + `${namedInXaml.size} automation names classified, `
+  + `${namedInXaml.size} automation names classified (${NAME_IS_THE_LABEL.size} by key identity), `
   + `${csFiles.length} C# files read through Strings bar ${rawAllowed.size} allowed direct.`);
