@@ -151,6 +151,81 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         Assert.Empty(result.WithheldFiles!);
     }
 
+    /// <summary>
+    /// THE WIRE BETWEEN THE TWO ENDS, which nothing exercised. Both ends were
+    /// already covered and neither could see this one. The enumeration's end is
+    /// pinned by the query service's own fixtures: a real value goes through the
+    /// real normalisation and the right counter moves while the other three do not.
+    /// The scan's end is the pair of tests above, driven with a census written by
+    /// hand. Between them sits one property read on a record built by merging the
+    /// API loop's tally with the registry fallback's, and a scan whose census never
+    /// reached the rule would look exactly like a machine with nothing to withhold.
+    ///
+    /// NEITHER END IS SIMULATED HERE. The census is the one a real enumeration built
+    /// from a real refusal, and the scan is the real one reading it.
+    /// </summary>
+    [Fact]
+    public async Task A_refusal_a_real_enumeration_counted_withholds_the_walk_derived_offer()
+    {
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "two.msp"), new byte[] { 2, 2 });
+
+        var enumerated = await Enumerate("C:\\Windows\\Installer\\bad\0name.msi");
+
+        // Asserted at both ends, so a failure says which half broke rather than only
+        // that the two disagree.
+        Assert.Equal(1, enumerated.Census.PathNormalisationRefusedTotal);
+
+        var result = await new FileSystemScanService(
+            QueryReturning(enumerated), null, _fakeInstallerDir).ScanAsync();
+
+        Assert.Empty(result.RemovableFiles);
+        Assert.Equal(2, result.WithheldFiles!.Count);
+    }
+
+    [Fact]
+    public async Task An_enumeration_that_spelled_everything_withholds_nothing()
+    {
+        // THE MUST-MISS CONTROL, and it guards the expensive direction: a wire that
+        // withheld unconditionally would satisfy the test above on every machine
+        // while costing a healthy one its whole offer. The two fixtures differ by one
+        // character in one registered value.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "two.msp"), new byte[] { 2, 2 });
+
+        var enumerated = await Enumerate(@"C:\Windows\Installer\ordinary.msi");
+
+        Assert.Equal(0, enumerated.Census.PathNormalisationRefusedTotal);
+
+        var result = await new FileSystemScanService(
+            QueryReturning(enumerated), null, _fakeInstallerDir).ScanAsync();
+
+        Assert.Equal(2, result.RemovableFiles.Count);
+        Assert.Empty(result.WithheldFiles!);
+    }
+
+    /// <summary>
+    /// One product registered with the value given, enumerated by the real query
+    /// service through the scriptable API fake, with no registry fallback. What
+    /// comes back carries the census that enumeration actually built.
+    /// </summary>
+    private static async Task<InstallerQueryResult> Enumerate(string localPackage)
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", localPackage);
+        return await new InstallerQueryService(msi, (_, _) =>
+            new InstallerQueryService.FallbackRead(0, 0)).GetRegisteredPackagesAsync();
+    }
+
+    private static IInstallerQueryService QueryReturning(InstallerQueryResult result)
+    {
+        var q = Substitute.For<IInstallerQueryService>();
+        q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(result);
+        return q;
+    }
+
     [Fact]
     public async Task Real_directory_skips_registered_files_case_insensitively()
     {
