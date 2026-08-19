@@ -877,8 +877,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// identity, so a candidate hard-linked to a registered package is treated as
     /// that package. Removing one link would in fact leave the data reachable
     /// through the other, so the file could safely have been offered; withholding
-    /// it costs an offer and claims nothing untrue, and no machine anybody has
-    /// measured holds one (every cached file's link count read 1).
+    /// it costs an offer and claims nothing untrue, and no machine measured up to
+    /// 2026-08-11 held one (every cached file's link count read 1). The date is part
+    /// of the reading: it says what had been looked at, not what every machine holds.
     /// </summary>
     private void DropCandidatesRegisteredUnderAnotherSpelling(
         List<OrphanedFile> candidates,

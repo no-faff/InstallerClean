@@ -139,7 +139,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <param name="ProductPatchRegistrations">
     /// Patch subkeys seen under those keys, one per (product, patch) registration
     /// rather than per patch. With <paramref name="ProductPatchKeys"/> it is the
-    /// shape fact the measured machine is least like, holding five.
+    /// shape fact the measured machine is least like: it held five when this was
+    /// written on 2026-08-17 and three when its hives were read on 2026-08-18, with
+    /// nothing in this code changing in between. The figure is dated because it is
+    /// one machine's state at one moment, and an undated one reads as current for
+    /// ever.
     /// </param>
     /// <param name="ProductsWithRemovablePatch">
     /// Products where at least one registered patch positively declared itself
@@ -2180,7 +2184,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// file is shared by all of them, so a rollback on ANY of those products reaches
     /// for it. A condition holding only for the product a loop happened to be standing
     /// in would offer a file that a second product's removable patch can still need.
-    /// One file was measured carrying four registrations across two products.
+    /// One file was measured carrying four registrations across two products, read on
+    /// or before 2026-08-17. What it establishes is that the shape occurs, which no
+    /// later reading can take back; how many any machine holds today is a different
+    /// question and this figure does not answer it.
     ///
     /// THE PRODUCTS ARE UNIONED TOO, not just the patches. The claims name the
     /// products the enumeration reached; route A names products it never returned;
@@ -3080,9 +3087,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// SUPERSEDED ONLY FROM 3.0.0, WHERE IT WAS <c>2 or 4</c>. Obsoleted patches come
     /// off the offer for a reason that is not about safety: measured across every
-    /// report this project has ever received, obsoleted patches have never been seen
-    /// on any machine at all, so offering them reclaims nothing, and nobody has ever
-    /// manufactured one to test with. A class that buys no space and has never been
+    /// opt-in report this project had received as at 2026-08-17, obsoleted patches had
+    /// never been seen on any machine at all, so offering them reclaims nothing, and
+    /// nobody has ever manufactured one to test with. The date is part of the claim,
+    /// the corpus being one that grows. A class that buys no space and has never been
     /// exercised does not belong on a list whose whole claim is certainty. They are
     /// counted at scan time instead, off the machine rather than off the offer, so the
     /// question of whether anybody has any gets answered without anything appearing on
@@ -3101,7 +3109,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// AND ON ITS OWN THE CONJUNCT ASKS THE WRONG PATCH. Measured against real
     /// patches it behaves as a vendor filter pointing the wrong way: all 58 patches in
     /// Office 2010 SP2 declare themselves removable and were refused, and three live
-    /// Adobe patches declare themselves not removable and were offered. The risk turns
+    /// Adobe patches declared themselves not removable and were offered. The Office
+    /// figure comes from captured data about one product's patch set; the Adobe one is
+    /// one machine's state, read on or before 2026-08-17, and that machine held two
+    /// Adobe patch registrations when its hives were read on 2026-08-18. Neither
+    /// re-reading changes what the pair shows, which is that the declaration tracks
+    /// the vendor rather than the risk. The risk turns
     /// on whether the patch that SUPERSEDED this one can be uninstalled, which this
     /// never reads, and that is precisely what the other half was built for.
     ///

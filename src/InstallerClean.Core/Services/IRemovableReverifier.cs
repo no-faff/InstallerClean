@@ -92,13 +92,21 @@ public interface IRemovableReverifier
     /// MEASURED COST, because the ruling that asked for the sibling half forbade
     /// adopting the narrower question without one. The added reads are the patch
     /// registrations of the products the batch touches, so they are bounded by the
-    /// batch's own products and never by an enumeration. On the machine every other
-    /// figure came from: two patch registrations in total, one per product, and no
-    /// product holding a superseded patch, so a batch there adds nothing. The largest
-    /// single-product figure captured anywhere in this project is 58, from Office 2010
-    /// SP2. Against that, this method already makes two keyed reads per claim in the
-    /// batch, and the pre-lease pass runs a whole enumeration moments earlier outside
-    /// the lease.
+    /// batch's own products and never by an enumeration.
+    ///
+    /// THE FIGURE CARRIES THE DATE IT WAS READ, because it is a fact about one
+    /// machine at one moment and not a property of this code. Read out of the
+    /// per-product Patches keys under UserData on 2026-08-18, the machine every other
+    /// figure here came from held THREE patch registrations across two products, one
+    /// product holding two of them and one of those superseded with its Uninstallable
+    /// read as zero. So a batch touching that product adds two keyed reads there. This
+    /// paragraph previously gave an undated two, one per product and none superseded,
+    /// from an earlier reading of the same machine, and nothing in this code changed
+    /// between the two: an update landed and the sentence went stale where it stood.
+    /// The largest single-product figure captured anywhere in this project is 58, from
+    /// Office 2010 SP2. Against any of those, this method already makes two keyed
+    /// reads per claim in the batch, and the pre-lease pass runs a whole enumeration
+    /// moments earlier outside the lease.
     /// </param>
     UnderLeaseRecheck RecheckUnderLease(UnderLeaseClaims claims);
 }
