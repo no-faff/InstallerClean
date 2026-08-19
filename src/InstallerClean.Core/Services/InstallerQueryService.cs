@@ -274,8 +274,57 @@ public sealed class InstallerQueryService : IInstallerQueryService
             + NormalisationRefusedAtPrefixStrip
             + NormalisationRefusedAtFullPath;
 
+#if DEBUG
+        /// <summary>
+        /// The thread that built this census, kept in debug builds only so that the
+        /// increments below can be held to it.
+        /// </summary>
+        private readonly int _owningThread = Environment.CurrentManagedThreadId;
+#endif
+
+        /// <summary>
+        /// THE ONE THING THAT MAKES THIS TYPE SAFE IS THE CALL GRAPH'S SHAPE, WHICH IS
+        /// NOT SOMETHING THE TYPE CAN HOLD ANYBODY TO. Every increment on a census is
+        /// a read-modify-write on a plain int field, so two threads incrementing one
+        /// census lose counts, and a lost normalisation refusal is a withholding that
+        /// does not fire. Today the enumeration is single-threaded by construction of
+        /// its entry point: the whole synchronous core runs inside one Task.Run with
+        /// no await in it, and this file holds no other concurrency primitive.
+        ///
+        /// This is what makes the first change to that fail a test rather than report
+        /// a smaller number. Debug builds only, which is where the suite runs: a
+        /// release build must not acquire a new way to throw on a user's machine for
+        /// the sake of an assertion about this project's own code.
+        /// </summary>
+        [System.Diagnostics.Conditional("DEBUG")]
+        private void AssertOwningThread()
+        {
+#if DEBUG
+            if (Environment.CurrentManagedThreadId == _owningThread) return;
+            throw new InvalidOperationException(
+                "A PathCensus was incremented on a thread other than the one that built it. "
+                + "The counts are plain int fields with no interlocking, so a parallel "
+                + "enumeration loses increments silently, and a lost normalisation refusal "
+                + "is a withholding that does not fire. Give each unit of parallel work its "
+                + "own census and fold them with Add, which is what the API loop and the "
+                + "registry fallback already do.");
+#endif
+        }
+
+        /// <summary>
+        /// One value put to the final-path resolver, counted whether it answers or
+        /// not. A method rather than a bare increment at the call site so that the
+        /// thread guard covers every counter and not merely the ones a switch reaches.
+        /// </summary>
+        internal void RecordResolverAttempt()
+        {
+            AssertOwningThread();
+            ResolverAttempts++;
+        }
+
         internal void RecordResolution(PathResolution outcome)
         {
+            AssertOwningThread();
             switch (outcome)
             {
                 case PathResolution.NotAPath: ResolverNotAPath++; break;
@@ -290,6 +339,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         internal void RecordNormalisationRefusal(NormalisationStage stage)
         {
+            AssertOwningThread();
             switch (stage)
             {
                 case NormalisationStage.EmbeddedNull: NormalisationRefusedAtEmbeddedNull++; break;
@@ -306,6 +356,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         /// </summary>
         internal void Add(PathCensus? other)
         {
+            AssertOwningThread();
             if (other is null) return;
             ResolverAttempts += other.ResolverAttempts;
             ResolverNotAPath += other.ResolverNotAPath;
@@ -1665,7 +1716,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // times anything was asked, since a machine carrying no flagged
                 // spelling never reaches here and would otherwise report five clean
                 // zeros indistinguishable from a machine that asked and got them.
-                census.ResolverAttempts++;
+                census.RecordResolverAttempt();
                 var outcome = InstallerCacheHelpers.ResolveFinalPathOutcome(
                     ToWin32Prefix(stripped), out var resolved);
                 census.RecordResolution(outcome);

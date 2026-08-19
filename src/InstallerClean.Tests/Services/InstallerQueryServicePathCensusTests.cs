@@ -36,10 +36,15 @@ namespace InstallerClean.Tests.Services;
 /// </summary>
 public class InstallerQueryServicePathCensusTests
 {
+    /// <summary>
+    /// The census's counters: every mutable int field on it. Readonly ints are
+    /// excluded and there is one, the owning thread the debug guard stamps at
+    /// construction, which is a fact about the instance rather than a tally.
+    /// </summary>
     private static FieldInfo[] Counters() =>
         typeof(InstallerQueryService.PathCensus)
             .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-            .Where(f => f.FieldType == typeof(int))
+            .Where(f => f.FieldType == typeof(int) && !f.IsInitOnly)
             .OrderBy(f => f.Name, StringComparer.Ordinal)
             .ToArray();
 
@@ -188,4 +193,73 @@ public class InstallerQueryServicePathCensusTests
                 + "withheld on, so a refusal outside it is a cause the withholding does not act on.");
         }
     }
+
+#if DEBUG
+    /// <summary>
+    /// THE CENSUS IS MUTABLE AND THREADED BY ARGUMENT, so what keeps its counts
+    /// honest is the shape of the call graph rather than anything the type enforces.
+    /// The enumeration is single-threaded by construction of its entry point today,
+    /// and that is provable rather than read off: the whole synchronous core runs
+    /// inside one Task.Run with no await in it and the file holds no other
+    /// concurrency primitive. What this pins is the FIRST change to that. Every
+    /// increment is a read-modify-write on a plain int, so two threads on one census
+    /// lose counts, and a lost normalisation refusal is a withholding that does not
+    /// fire: files offered that the app meant to keep back, on a machine whose scan
+    /// reads clean.
+    ///
+    /// A real thread rather than Task.Run, because a pool thread can be the one the
+    /// test itself was running on and the assertion would then pass for the wrong
+    /// reason. Debug builds only, which is where the suite runs; a release build must
+    /// not acquire a new way to throw on a user's machine for this.
+    /// </summary>
+    [Fact]
+    public void Every_increment_is_held_to_the_thread_that_built_the_census()
+    {
+        var census = new InstallerQueryService.PathCensus();
+        var other = new InstallerQueryService.PathCensus();
+
+        var offenders = new (string Name, Action Act)[]
+        {
+            ("RecordResolverAttempt", () => census.RecordResolverAttempt()),
+            ("RecordResolution", () => census.RecordResolution(PathResolution.NotAPath)),
+            ("RecordNormalisationRefusal",
+                () => census.RecordNormalisationRefusal(InstallerQueryService.NormalisationStage.FullPath)),
+            ("Add", () => census.Add(other)),
+        };
+
+        foreach (var (name, act) in offenders)
+        {
+            Exception? captured = null;
+            var thread = new Thread(() => captured = Record.Exception(act));
+            thread.Start();
+            thread.Join();
+
+            Assert.True(captured is InvalidOperationException,
+                $"PathCensus.{name} accepted an increment from another thread (got "
+                + $"{captured?.GetType().Name ?? "no exception"}). Every entry point that mutates a "
+                + "census has to carry the guard, or a parallelising change loses counts silently "
+                + "through the one that does not.");
+        }
+    }
+
+    [Fact]
+    public void The_thread_that_built_the_census_increments_it_freely()
+    {
+        // THE MUST-MISS CONTROL. A guard that refused every caller would satisfy the
+        // test above and stop every scan, so this drives the same four entry points
+        // from the owning thread and reads the counts back.
+        var census = new InstallerQueryService.PathCensus();
+        var other = new InstallerQueryService.PathCensus();
+        other.RecordResolverAttempt();
+
+        census.RecordResolverAttempt();
+        census.RecordResolution(PathResolution.NotAPath);
+        census.RecordNormalisationRefusal(InstallerQueryService.NormalisationStage.FullPath);
+        census.Add(other);
+
+        Assert.Equal(2, census.ResolverAttempts);
+        Assert.Equal(1, census.ResolverNotAPath);
+        Assert.Equal(1, census.NormalisationRefusedTotal);
+    }
+#endif
 }
