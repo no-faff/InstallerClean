@@ -1614,6 +1614,84 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(0, census.PathNormalisationRefusedTotal);
     }
 
+    /// <summary>
+    /// THE RESOLVER'S DENOMINATOR, DRIVEN THROUGH A REAL SCAN. Its five outcome
+    /// counters cannot be read at all without it: the resolver is asked only for a
+    /// value carrying a prefix or an 8dot3 alias, which on most machines is no value
+    /// at all, so four of the five read zero because nothing asked, and
+    /// zero-because-nothing-asked is indistinguishable from zero-because-nothing-
+    /// failed. A receiver takes the second reading. Until this test the six had no
+    /// behavioural assertion anywhere in the suite: they appeared once each, as
+    /// literal zeros in a payload fixture.
+    ///
+    /// WHICH FAILURE THE KERNEL GIVES IS NOT PINNED, DELIBERATELY. A volume GUID no
+    /// machine has cannot resolve, so exactly one of the five must move; which one is
+    /// a property of the platform rather than of this code, and asserting it would
+    /// pin a machine. The pair that IS this counter's contract is asserted: the
+    /// attempt was counted, and it produced exactly one outcome.
+    /// </summary>
+    [Fact]
+    public async Task A_volume_guid_value_counts_a_resolver_attempt_and_exactly_one_outcome()
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage",
+            @"\\?\Volume{9c3a1d2e-0000-0000-0000-100000000000}\Windows\Installer\vol.msi");
+
+        var census = (await Run(msi)).Census;
+
+        Assert.Equal(1, census.PathResolverAttemptCount);
+        Assert.Equal(1,
+            census.PathResolverNotAPathCount
+            + census.PathResolverNoAncestorCount
+            + census.PathResolverOpenRefusedCount
+            + census.PathResolverNoFinalNameCount
+            + census.PathResolverFaultedCount);
+    }
+
+    /// <summary>
+    /// The other trigger, which is the one a real machine is likelier to hold. The
+    /// outcome is not asserted at all here and the reason is the fixture rather than
+    /// the assertion: the walk up to an existing ancestor reaches this machine's own
+    /// Windows folder, so whether the resolution succeeds depends on the runner and
+    /// on whether the volume still creates 8dot3 aliases. What does not depend on
+    /// either is that the ask was counted.
+    /// </summary>
+    [Fact]
+    public async Task An_8dot3_value_counts_a_resolver_attempt()
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\INSTAL~1\9f05cba.msi");
+
+        var census = (await Run(msi)).Census;
+
+        Assert.Equal(1, census.PathResolverAttemptCount);
+    }
+
+    [Fact]
+    public async Task An_ordinary_recorded_value_asks_the_resolver_nothing()
+    {
+        // THE MUST-MISS CONTROL FOR BOTH TESTS ABOVE. Every path on a healthy machine
+        // has this shape, and a trigger that fired on all of them would open a handle
+        // per registration over a folder that reaches millions of files, while
+        // satisfying every assertion above. It also pins the reading of a clean
+        // census: five zeros UNDER a zero denominator say nothing was asked, which is
+        // a different fact from five zeros under a positive one.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\ordinary.msi");
+
+        var census = (await Run(msi)).Census;
+
+        Assert.Equal(0, census.PathResolverAttemptCount);
+        Assert.Equal(0, census.PathResolverNotAPathCount);
+        Assert.Equal(0, census.PathResolverNoAncestorCount);
+        Assert.Equal(0, census.PathResolverOpenRefusedCount);
+        Assert.Equal(0, census.PathResolverNoFinalNameCount);
+        Assert.Equal(0, census.PathResolverFaultedCount);
+    }
+
     // ---- The superseded-patch condition: every product, every patch ----
 
     private const string CleanPatch = @"C:\Windows\Installer\superseded.msp";
