@@ -86,7 +86,7 @@
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Window.About.Title" xml:space="preserve"><value>About</value></data>
-  <data name="Window.Registered.Title" xml:space="preserve"><value>Registered files that should not be deleted</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Files left alone</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Unneeded files that are safe to delete</value></data>
 
   <!-- Section headings -->
@@ -276,7 +276,7 @@
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Startup scan progress</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Details, unneeded files</value></data>
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Available for cleanup.</value></data>
-  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Details, registered files</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Details, files left alone</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Read-only inventory.</value></data>
   <!-- Screen-reader sort state for the detail-window lists, set in
        UpdateSortIndicators as the sorted column header's accessible
