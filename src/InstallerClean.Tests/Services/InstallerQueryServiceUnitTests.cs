@@ -1629,6 +1629,11 @@ public class InstallerQueryServiceUnitTests
     /// a property of the platform rather than of this code, and asserting it would
     /// pin a machine. The pair that IS this counter's contract is asserted: the
     /// attempt was counted, and it produced exactly one outcome.
+    ///
+    /// AND THREE OF THE FIVE OUTCOMES ARE REACHED BY NOTHING IN THIS SUITE, so what
+    /// is here must not be read as covering the six end to end.
+    /// <see cref="InstallerQueryServicePathCensusTests"/> says which three, and why
+    /// a zero in them is not evidence of anything.
     /// </summary>
     [Fact]
     public async Task A_volume_guid_value_counts_a_resolver_attempt_and_exactly_one_outcome()
