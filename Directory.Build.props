@@ -5,7 +5,7 @@
          and the release script reads it from here to pass /DAppVersion
          to the Inno Setup compiler, so the installer never drifts from
          the assembly. -->
-    <Version>2.3.0</Version>
+    <Version>3.0.0</Version>
     <!-- Right-click, Properties, Details is a surface cautious Windows users
          actually open on an unsigned binary, and a blank Copyright beside a
          populated Company is the shape of a repacked one. Company comes free

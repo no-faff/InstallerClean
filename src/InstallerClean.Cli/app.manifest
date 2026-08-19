@@ -11,7 +11,7 @@
        in the exe, where sigcheck -m and any resource viewer show it; this
        comment is not. Untying it from the release version leaves the shipped
        binary asserting a version it is not, to the people most likely to look. -->
-  <assemblyIdentity version="2.3.0.0" name="InstallerClean.cli"/>
+  <assemblyIdentity version="3.0.0.0" name="InstallerClean.cli"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
