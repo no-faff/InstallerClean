@@ -84,7 +84,8 @@ public class ResultLogEntryTests
         PathNormalisationRefusedAtExpansionCount: 0,
         PathNormalisationRefusedAtPrefixStripCount: 0,
         PathNormalisationRefusedAtFullPathCount: 0,
-        PathNormalisationRefusedAtEmbeddedNullCount: 0);
+        PathNormalisationRefusedAtEmbeddedNullCount: 0,
+        PathFlaggedSpellingCount: 0);
 
     private static ResultLogEntry SampleEntry() => new(
         SchemaVersion: ResultLogEntry.CurrentSchemaVersion,

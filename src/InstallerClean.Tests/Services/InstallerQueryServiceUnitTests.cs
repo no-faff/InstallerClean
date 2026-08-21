@@ -1985,7 +1985,7 @@ public class InstallerQueryServiceUnitTests
 
     [Theory]
     // The plain form, which nothing in this application expanded before 3.0.0:
-    // NeedsFinalPathResolution answers false for a '%', so the value fell through
+    // CarriesFlaggedSpelling answers false for a '%', so the value fell through
     // to GetFullPath, which completed it from the process working directory and
     // produced a well-formed path naming nothing. The claim then failed to match
     // the walk and the cached file it meant was offered as unclaimed, which is the

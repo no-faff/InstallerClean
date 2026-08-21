@@ -306,13 +306,19 @@ public sealed record AppInfo(string Version, string Language)
 /// this is the condition unable to look.
 /// </param>
 /// <param name="PathResolverAttemptCount">
-/// Recorded paths this scan put to the final-path resolver, which is asked only for a
-/// value carrying a long-path or NT object prefix or an 8dot3 alias.
+/// Recorded paths this scan put to the final-path resolver, which from 3.0.0 is EVERY
+/// value that got past the embedded-null test and the expansion.
 ///
-/// READ THE FIVE BELOW AGAINST IT OR NOT AT ALL. On a machine flagging no path the
-/// resolver is never asked and all five read zero, which on the wire is identical to a
-/// machine that asked and got five clean answers. This is the only thing separating
-/// those two readings, and every one of the five is uninterpretable without it.
+/// READ THE FIVE BELOW AGAINST IT OR NOT AT ALL. Five zeros are five clean answers on
+/// a machine that asked, and nothing at all on a machine with no registrations to ask
+/// about. This is the only thing separating those two readings.
+///
+/// ITS MEANING CHANGED IN 3.0.0 AND THE OLD ONE IS WORTH KNOWING, because a receiver
+/// comparing across that boundary is comparing two different quantities. Until then
+/// the resolver was asked only for a value carrying a long-path or NT object prefix or
+/// an 8dot3 alias, so this counted flagged spellings as well as attempts. It counts
+/// attempts alone now, and <see cref="PathFlaggedSpellingCount"/> carries the other
+/// half.
 /// </param>
 /// <param name="PathResolverNotAPathCount">
 /// Of those, refused outright as not a path.
@@ -371,6 +377,16 @@ public sealed record AppInfo(string Version, string Language)
 /// Of those, refused by the full-path call: a device name, a length past the API's
 /// limit.
 /// </param>
+/// <param name="PathFlaggedSpellingCount">
+/// Recorded values carrying a spelling only the filesystem can settle: an 8dot3 alias,
+/// or a prefix the strip left on for want of a drive root.
+///
+/// NOT AN OUTCOME AND NOT A FAULT. Every other count in this group says what happened
+/// to a value; this says what the value looked like. A flagged spelling that resolves
+/// is the mechanism working. What a figure above zero says is that this machine holds
+/// the spellings the resolution was built for, which nobody has been able to size from
+/// one machine.
+/// </param>
 /// <param name="PathNormalisationRefusedAtEmbeddedNullCount">
 /// Of those, refused for carrying an embedded null, which no path can carry. The
 /// member that fires on Windows, and the reason it is asked for separately: the
@@ -408,7 +424,8 @@ public sealed record MachineInfo(
     int PathNormalisationRefusedAtExpansionCount,
     int PathNormalisationRefusedAtPrefixStripCount,
     int PathNormalisationRefusedAtFullPathCount,
-    int PathNormalisationRefusedAtEmbeddedNullCount)
+    int PathNormalisationRefusedAtEmbeddedNullCount,
+    int PathFlaggedSpellingCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -438,7 +455,8 @@ public sealed record MachineInfo(
             scan.Census.PathNormalisationRefusedAtExpansionCount,
             scan.Census.PathNormalisationRefusedAtPrefixStripCount,
             scan.Census.PathNormalisationRefusedAtFullPathCount,
-            scan.Census.PathNormalisationRefusedAtEmbeddedNullCount);
+            scan.Census.PathNormalisationRefusedAtEmbeddedNullCount,
+            scan.Census.PathFlaggedSpellingCount);
 
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused

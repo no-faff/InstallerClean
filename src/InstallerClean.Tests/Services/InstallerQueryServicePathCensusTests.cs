@@ -54,20 +54,32 @@ public class InstallerQueryServicePathCensusTests
         Counters().Where(f => Read(f, c) != 0).Select(f => f.Name).ToArray();
 
     [Fact]
-    public void The_census_still_holds_the_ten_counters_this_file_walks()
+    public void The_census_still_holds_the_eleven_counters_this_file_walks()
     {
-        // A COUNT ASSERTION THAT EXISTS TO BE READ BY WHOEVER ADDS THE ELEVENTH. It
-        // is not here to keep the number at ten: it is here so that adding a counter
+        // A COUNT ASSERTION THAT EXISTS TO BE READ BY WHOEVER ADDS THE TWELFTH. It is
+        // not here to keep the number where it is: it is here so that adding a counter
         // fails a test that tells you what else the counter needs, rather than
         // passing and reading zero on half of every scan.
+        //
+        // IT WENT FROM TEN TO ELEVEN IN 3.0.0 AND THE CHECKLIST BELOW IS WHY THAT WAS
+        // CHEAP. FlaggedSpellings was added when the final-path resolution widened to
+        // every recorded path: ResolverAttempts had been answering two questions at
+        // once, how many values were asked about and how many carried a spelling only
+        // the filesystem can settle, and widening the ask took the second answer away
+        // from it. This test named every place the new counter had to reach, and the
+        // one thing it correctly did NOT ask for is a place in the withholding: a
+        // flagged spelling that resolves is the mechanism working rather than a
+        // failure, so it belongs in no refusal total.
         var counters = Counters();
-        Assert.True(counters.Length == 10,
-            $"The census now holds {counters.Length} int fields rather than 10. If you have added "
+        Assert.True(counters.Length == 11,
+            $"The census now holds {counters.Length} int fields rather than 11. If you have added "
             + "a counter, this test is the checklist: fold it in PathCensus.Add, record it from "
             + "the switch that produces it, add it to the EnumerationCensus record (APPEND, never "
             + "insert: the arguments are positional and all int), carry it in the payload, and "
             + "put it in NormalisationRefusedTotal if it is a refusal, because that total is what "
-            + "the walk-derived offer is withheld on. Then change the 10 here. Fields found: "
+            + "the walk-derived offer is withheld on, and add it to the set "
+            + "EnumerationCensusTests requires AnyRecordedPathUnestablished to fire on, or to that "
+            + "test's must-miss half if it is not a refusal. Then change the 11 here. Fields found: "
             + string.Join(", ", counters.Select(f => f.Name)));
     }
 
@@ -146,6 +158,26 @@ public class InstallerQueryServicePathCensusTests
                 + "so the report cannot tell the two apart.");
             seen[moved[0]] = outcome;
         }
+    }
+
+    [Fact]
+    public void A_flagged_spelling_is_counted_apart_from_every_outcome()
+    {
+        // IT IS THE ONE COUNTER HERE THAT RECORDS WHAT A VALUE LOOKED LIKE rather than
+        // what happened to it, so it must move on its own and share with nothing. A
+        // flagged spelling folded into any outcome would report a resolution that
+        // never failed as one that did, and the five outcomes are what the offer is
+        // withheld on.
+        var census = new InstallerQueryService.PathCensus();
+
+        census.RecordFlaggedSpelling();
+
+        var moved = Moved(census);
+        Assert.True(moved.Length == 1 && moved[0] == nameof(InstallerQueryService.PathCensus.FlaggedSpellings),
+            $"RecordFlaggedSpelling moved {moved.Length} counter(s): {string.Join(", ", moved)}. It must "
+            + "move FlaggedSpellings and nothing else. This counter says what a recorded value looked "
+            + "like, not what happened to it, and anything it shares with an outcome counter would "
+            + "report a spelling that resolved cleanly as a resolution that failed.");
     }
 
     [Fact]

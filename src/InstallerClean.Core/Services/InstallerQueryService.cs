@@ -211,7 +211,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// THE DENOMINATOR TRAVELS WITH THE FIVE OUTCOMES AND WITHOUT IT THEY CANNOT BE
     /// READ. The resolver is asked only for a value carrying a prefix or an 8dot3
-    /// alias (<see cref="NeedsFinalPathResolution"/>), which on most machines is no
+    /// alias (<see cref="CarriesFlaggedSpelling"/>), which on most machines is no
     /// value at all. Four of its five failures would then read zero because nothing
     /// asked, which is indistinguishable from zero because nothing failed, and a
     /// receiver would take the second reading. <see cref="ResolverAttempts"/> is
@@ -233,8 +233,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     internal sealed class PathCensus
     {
-        /// <summary>Recorded paths put to the final-path resolver.</summary>
+        /// <summary>
+        /// Recorded paths put to the final-path resolver, which from 3.0.0 is every
+        /// value that got past the embedded-null test and the expansion.
+        /// </summary>
         internal int ResolverAttempts;
+
+        /// <summary>
+        /// Of those, the ones carrying a spelling only the filesystem can settle: an
+        /// 8dot3 alias, or a prefix the strip left on for want of a drive root.
+        ///
+        /// IT DECIDES NOTHING AND IS THE ONLY MEMBER HERE THAT NEVER DID. The other
+        /// counters record what happened to a value; this records what the value
+        /// LOOKED LIKE. It exists because widening the resolver to every path took
+        /// the answer away from <see cref="ResolverAttempts"/>, which used to be both
+        /// figures at once, and how often these spellings occur on real machines is a
+        /// question this project has been trying to answer rather than an incidental.
+        /// </summary>
+        internal int FlaggedSpellings;
 
         /// <summary>Of those, the ones it refused outright as not a path.</summary>
         internal int ResolverNotAPath;
@@ -327,6 +343,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ResolverAttempts++;
         }
 
+        /// <summary>
+        /// One value seen to carry a spelling only the filesystem can settle. A
+        /// method rather than a bare increment for the same reason as the attempt
+        /// above: the thread guard has to cover every counter.
+        /// </summary>
+        internal void RecordFlaggedSpelling()
+        {
+            AssertOwningThread();
+            FlaggedSpellings++;
+        }
+
         internal void RecordResolution(PathResolution outcome)
         {
             AssertOwningThread();
@@ -364,6 +391,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             AssertOwningThread();
             if (other is null) return;
             ResolverAttempts += other.ResolverAttempts;
+            FlaggedSpellings += other.FlaggedSpellings;
             ResolverNotAPath += other.ResolverNotAPath;
             ResolverNoExistingAncestor += other.ResolverNoExistingAncestor;
             ResolverOpenRefused += other.ResolverOpenRefused;
@@ -935,7 +963,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 paths.NormalisationRefusedAtExpansion,
                 paths.NormalisationRefusedAtPrefixStrip,
                 paths.NormalisationRefusedAtFullPath,
-                paths.NormalisationRefusedAtEmbeddedNull));
+                paths.NormalisationRefusedAtEmbeddedNull,
+                paths.FlaggedSpellings));
         }
         finally
         {
@@ -1534,7 +1563,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// AN ENVIRONMENT-VARIABLE FORM IS ANOTHER SUCH SPELLING AND IS EXPANDED HERE
     /// FROM 3.0.0. A value spelled <c>%SystemRoot%\Installer\1e038.msi</c> is a
     /// claim on a real cached file, and nothing in this application expanded one:
-    /// <see cref="NeedsFinalPathResolution"/> answers false for a <c>%</c>, so the
+    /// <see cref="CarriesFlaggedSpelling"/> answers false for a <c>%</c>, so the
     /// value fell through to GetFullPath, which completed it from the process's
     /// working directory and produced a well-formed path naming nothing. The claim
     /// then failed to match the walk and the file it meant was offered as
@@ -1607,12 +1636,42 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// Both are settled by asking the filesystem what the path really is, which
     /// is what <see cref="InstallerCacheHelpers.TryResolveFinalPath"/> already
-    /// does at every containment gate. The only open question was the cost of
-    /// asking once per registration, and it is not asked once per registration:
-    /// both spellings announce themselves in the string, so
-    /// <see cref="NeedsFinalPathResolution"/> decides on a character scan and a
-    /// handle is opened only for a path carrying one. A machine holding neither
-    /// pays the scan and no I/O.
+    /// does at every containment gate. EVERY RECORDED PATH IS ASKED, FROM 3.0.0,
+    /// where until then only a path announcing one of the two spellings in its own
+    /// characters was.
+    ///
+    /// THE INVARIANT THAT BUYS IS THE REASON FOR THE CHANGE, and it is worth more
+    /// than the spellings it settles. Every claim leaving this method is now EITHER
+    /// a location the kernel proved OR one whose failure to resolve has been counted,
+    /// and a counted failure withholds the whole walk-derived offer
+    /// (<c>EnumerationCensus.AnyRecordedPathUnestablished</c>). There is no third
+    /// case. So anything downstream comparing a claim is comparing a proven path,
+    /// and a reader asking "could this claim be wrong about where its file is" has
+    /// one answer rather than a case analysis.
+    ///
+    /// THE COST ARGUMENT THAT KEPT THE ASK NARROW IS SPENT, and this is what
+    /// replaced it. It said a handle per registration was too much to pay. But
+    /// <c>CandidateGuard.CheckSafeToRemove</c> already calls
+    /// <see cref="InstallerCacheHelpers.TryResolveFinalPath"/> once per walked
+    /// CANDIDATE, which is the same call and the far larger population: that is why
+    /// the resolver rents its buffer rather than allocating one, a decision taken
+    /// for a folder reaching 800,000 files. Registrations number in the hundreds on
+    /// every machine measured. The ask was being kept off the small side of a cost
+    /// the large side already pays.
+    ///
+    /// AND IT REPAIRS A CLAIM, WHICH IS WHAT SEPARATES IT FROM THE IDENTITY MATCH
+    /// AND IS WHY BOTH EXIST. <c>FileSystemScanService</c> also reconciles a
+    /// differently-spelled registration by opening both sides and comparing file
+    /// identity, and that is the more general of the two for the candidate list: it
+    /// reconciles any spelling at all, hard links and junctions included. But it
+    /// SUBTRACTS from the candidate list and never repairs the claim, so it feeds
+    /// nothing else. The correlation gate that refuses a scan outright counts
+    /// registrations whose recorded path LEXICALLY names a file in the walked folder
+    /// (<c>FileSystemScanService.NamesFileDirectlyIn</c>), and an unsettled spelling
+    /// silently withholds its row from that count while the identity pass is
+    /// structurally unable to put it back. The missing-from-disk counts and the
+    /// registered-files window read the claim the same way. Resolving here is what
+    /// makes all of them true.
     ///
     /// THE PREFIX IS NORMALISED BEFORE THE ASK, and that is not tidying. The NT
     /// object form (<c>\??\</c>) and the Win32 escape (<c>\\?\</c>) name the same
@@ -1718,21 +1777,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // Only a proven expansion is taken. A false return means the kernel
             // never expanded this path, so its out value is the same string by
             // another route and using it would dress a guess as an answer.
-            if (NeedsFinalPathResolution(stripped))
-            {
-                // COUNTED WHETHER IT ANSWERS OR NOT, which is the whole use of the
-                // number: the five failures below are meaningless without how many
-                // times anything was asked, since a machine carrying no flagged
-                // spelling never reaches here and would otherwise report five clean
-                // zeros indistinguishable from a machine that asked and got them.
-                census.RecordResolverAttempt();
-                var outcome = InstallerCacheHelpers.ResolveFinalPathOutcome(
-                    ToWin32Prefix(stripped), out var resolved);
-                census.RecordResolution(outcome);
+            // COUNTED BEFORE THE ASK AND NO LONGER GATING IT. The two spellings
+            // announce themselves in the string, and until 3.0.0 that character scan
+            // decided whether a handle was opened at all. It decides nothing now:
+            // every recorded path is resolved. What the scan still answers is how
+            // many of a machine's recorded values carry such a spelling, which is a
+            // fact about that machine this project has been trying to size and which
+            // the attempts count stopped being able to report the moment the ask
+            // widened to everything.
+            if (CarriesFlaggedSpelling(stripped)) census.RecordFlaggedSpelling();
 
-                if (outcome == PathResolution.Resolved) return resolved;
-            }
+            // COUNTED WHETHER IT ANSWERS OR NOT, which is the whole use of the
+            // number: the five failures below are meaningless without how many times
+            // anything was asked. That mattered most when most machines never asked
+            // at all; it still separates a scan that read no registrations from one
+            // whose every registration resolved.
+            census.RecordResolverAttempt();
+            var outcome = InstallerCacheHelpers.ResolveFinalPathOutcome(
+                ToWin32Prefix(stripped), out var resolved);
+            census.RecordResolution(outcome);
 
+            if (outcome == PathResolution.Resolved) return resolved;
+
+            // ONLY A CLAIM THE RESOLVER REFUSED REACHES THIS, and the refusal has
+            // been counted one line above, so the offer is already being withheld by
+            // the time this value is used for anything. What it produces is the best
+            // spelling available for a claim nothing is going to act on.
             stage = NormalisationStage.FullPath;
             return Path.GetFullPath(stripped);
         }
@@ -1757,19 +1827,30 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
     /// <summary>
     /// Whether a prefix-stripped path carries a spelling only the filesystem can
-    /// settle. This is what keeps the resolution off the ordinary path: a handle
-    /// is opened for a registration answering true here and for no other.
+    /// settle. A tilde followed by a digit is the 8.3 alias form. A surviving
+    /// prefix, either form, is what
+    /// <see cref="InstallerCacheHelpers.StripLongPathPrefix"/> leaves on a path with
+    /// no drive root, which in this position means a volume-GUID or device path.
     ///
-    /// A tilde followed by a digit is the 8.3 alias form. A surviving prefix,
-    /// either form, is what <see cref="InstallerCacheHelpers.StripLongPathPrefix"/>
-    /// leaves on a path with no drive root, which in this position means a
-    /// volume-GUID or device path.
+    /// IT DECIDES NOTHING. It was the gate on the final-path resolution until 3.0.0,
+    /// which is what the old name said, and every recorded path is resolved now
+    /// whatever this answers. What it does is COUNT, into
+    /// <see cref="PathCensus.FlaggedSpellings"/>, and the reason that survived the
+    /// gate is that the two questions came apart when the ask widened.
+    /// <see cref="PathCensus.ResolverAttempts"/> used to answer both, being the
+    /// number of paths asked about AND therefore the number carrying such a
+    /// spelling; it now answers only the first. Losing the second would have been a
+    /// measurement quietly disappearing from the only instrument this project has,
+    /// and a report that stops being able to answer a question reads exactly like a
+    /// machine that has nothing to report.
     ///
-    /// It over-selects deliberately. A long name may legitimately hold a
-    /// tilde-and-digit, and a false positive costs one handle open on a path
-    /// that resolves to itself; a false negative costs a file.
+    /// It over-selects deliberately, and what that costs has changed with its job. A
+    /// long name may legitimately hold a tilde-and-digit; as a gate a false positive
+    /// cost one handle on a path that resolved to itself, and as a count it inflates
+    /// a figure nothing acts on. A false negative used to cost a file and now costs
+    /// nothing at all, the resolution no longer depending on it.
     /// </summary>
-    internal static bool NeedsFinalPathResolution(string path)
+    internal static bool CarriesFlaggedSpelling(string path)
     {
         if (path.StartsWith(@"\\?\", StringComparison.Ordinal)
             || path.StartsWith(@"\??\", StringComparison.Ordinal)) return true;

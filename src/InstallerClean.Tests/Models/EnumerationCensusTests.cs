@@ -122,6 +122,24 @@ public class EnumerationCensusTests
     }
 
     [Fact]
+    public void Carrying_a_flagged_spelling_is_not_a_reason_to_withhold()
+    {
+        // THE OTHER MEMBER MOST LIKELY TO BE FOLDED IN BY MISTAKE, and it reads more
+        // like a fault than the attempts count does, which is why it is pinned by
+        // name as well as by the walk. A recorded value carrying an 8dot3 alias or a
+        // volume-GUID prefix is the exact case the final-path resolution was built
+        // for; a machine reporting several of them and no failures is one where the
+        // mechanism did its job. Withholding there would empty the offer on the
+        // machines the work was done for.
+        var flagged = new EnumerationCensus(
+            PathResolverAttemptCount: 6,
+            PathFlaggedSpellingCount: 6);
+
+        Assert.False(flagged.AnyRecordedPathUnestablished);
+        Assert.Equal(0, flagged.PathResolverRefusedTotal);
+    }
+
+    [Fact]
     public void The_two_populations_are_counted_apart_and_are_never_added()
     {
         // One recorded value can be refused by both halves: the resolver declines to

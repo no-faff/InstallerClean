@@ -314,8 +314,14 @@ public record InstallerQueryResult(
 /// the same as safe-and-informed.
 /// </param>
 /// <param name="PathResolverAttemptCount">
-/// Recorded paths this scan put to the final-path resolver: the ones carrying a
-/// long-path or NT object prefix, or an 8dot3 alias, and no others.
+/// Recorded paths this scan put to the final-path resolver, which from 3.0.0 is
+/// EVERY value that got past the embedded-null test and the expansion. Until then it
+/// was only a value carrying a long-path or NT object prefix or an 8dot3 alias, and
+/// the number therefore answered two questions at once: how many were asked, and how
+/// many carried such a spelling. It answers only the first now.
+/// <see cref="PathFlaggedSpellingCount"/> is where the second went, and it went
+/// somewhere rather than being dropped because a report that quietly stops being able
+/// to answer a question reads exactly like a machine with nothing to report.
 ///
 /// THE FIVE OUTCOME COUNTS BELOW CANNOT BE READ WITHOUT IT. Most machines flag no
 /// path at all, so the resolver is never asked and its five failures all read zero:
@@ -392,6 +398,20 @@ public record InstallerQueryResult(
 /// the platform the application runs on: the report said no path failed while one
 /// had.
 /// </param>
+/// <param name="PathFlaggedSpellingCount">
+/// Recorded values carrying a spelling only the filesystem can settle: an 8dot3
+/// alias, or a prefix the strip left on for want of a drive root.
+///
+/// THE ONLY MEMBER OF THIS GROUP THAT IS NOT AN OUTCOME. Every other count here says
+/// what happened to a value; this says what the value looked like, and it decides
+/// nothing. A machine reporting a figure above zero is one holding the spellings the
+/// resolution was built for, which is a question this project has been trying to
+/// answer from real machines rather than from one.
+///
+/// IT IS NOT A COUNT OF ANYTHING GOING WRONG and must never be reported as one. A
+/// flagged spelling that resolves is a claim correctly settled: the mechanism
+/// working, not a fault. The five resolver outcomes are where a failure would appear.
+/// </param>
 public readonly record struct EnumerationCensus(
     int UnreadableProducts = 0,
     int SkippedProductRows = 0,
@@ -422,7 +442,8 @@ public readonly record struct EnumerationCensus(
     int PathNormalisationRefusedAtExpansionCount = 0,
     int PathNormalisationRefusedAtPrefixStripCount = 0,
     int PathNormalisationRefusedAtFullPathCount = 0,
-    int PathNormalisationRefusedAtEmbeddedNullCount = 0)
+    int PathNormalisationRefusedAtEmbeddedNullCount = 0,
+    int PathFlaggedSpellingCount = 0)
 {
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
