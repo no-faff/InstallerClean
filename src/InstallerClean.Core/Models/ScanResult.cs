@@ -311,8 +311,8 @@ namespace InstallerClean.Models;
 /// nothing on anyone's list.
 /// </param>
 /// <param name="WalkOfferWithheldWholesale">
-/// True where a rule about the machine's RECORDS emptied the walk-derived offer in one
-/// go, rather than each candidate being judged and kept.
+/// True where this scan emptied its walk-derived offer in one go, rather than judging
+/// each candidate and keeping it.
 ///
 /// IT IS NOT "THE OFFER IS EMPTY" AND THE TWO MUST NOT BE CONFLATED, which is the
 /// whole reason this exists rather than the hosts asking
@@ -335,6 +335,30 @@ namespace InstallerClean.Models;
 /// offer wholesale and they are different facts about a machine, so a bool is the
 /// whole of what may be carried: any sentence naming one cause would be false on the
 /// others. The census is where the causes are counted apart.
+///
+/// THE LINE ABOVE USED TO OPEN "A RULE ABOUT THE MACHINE'S RECORDS", WHICH WAS A
+/// CAUSE, and 3.0.0 added a condition it is false of. It has been taken out rather
+/// than joined by a second: two named causes is the same fault with more words, and
+/// a host reading this for something to say would find one true of half the set. The
+/// only thing true of every member is that something this scan asked about did not
+/// answer.
+/// </param>
+/// <param name="RegistrationIdentityReads">
+/// What the file-identity reader answered when the scan asked which file each
+/// registration's recorded path names. See
+/// <see cref="FileIdentityReadTally"/>; <see cref="FileIdentityReadTally.RefusedTotal"/>
+/// above zero is one of the conditions behind
+/// <see cref="WalkOfferWithheldWholesale"/>.
+/// </param>
+/// <param name="CandidateIdentityReads">
+/// The same for the other side of that comparison, one read per candidate the
+/// registration side left anything to compare against.
+///
+/// ITS REFUSALS DO NOT EMPTY THE OFFER AND THE ASYMMETRY IS THE POINT. A
+/// registration nobody could identify might name any candidate in the list, so none
+/// of them can be offered. A candidate nobody could identify is one file: every
+/// other candidate was compared against the registrations by a read that answered,
+/// so that one is kept back and the rest stand.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
@@ -355,7 +379,9 @@ public record ScanResult(
     int SupersededRegistrationCount = 0,
     int ObsoletedRegistrationCount = 0,
     IReadOnlyList<OrphanedFile>? WithheldFiles = null,
-    bool WalkOfferWithheldWholesale = false)
+    bool WalkOfferWithheldWholesale = false,
+    FileIdentityReadTally RegistrationIdentityReads = default,
+    FileIdentityReadTally CandidateIdentityReads = default)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk; the sum of the two
@@ -370,6 +396,83 @@ public record ScanResult(
     /// <summary>Total bytes of the files this scan declined to offer.</summary>
     public long WithheldTotalBytes =>
         WithheldFiles?.Sum(f => f.SizeBytes) ?? 0;
+}
+
+/// <summary>
+/// What the file-identity reader answered over one side of the scan's identity
+/// comparison, with the five ways it can fail kept apart. One instance per side;
+/// the sides are counted separately because they are asked different questions
+/// about different populations and only one of them can empty an offer.
+///
+/// SUCCESSFUL READS ARE NOT CARRIED. They are <see cref="AttemptCount"/> less the
+/// five, and a stored copy could disagree with its own parts.
+///
+/// A ZERO ATTEMPT COUNT IS ORDINARY AND SAYS NOTHING WENT WRONG. The comparison is
+/// skipped where the walk produced no candidates, where the records hold no
+/// registrations, and on the candidate side where no registration yielded an
+/// identity to compare against. Five zero failures on a side that was never asked
+/// look identical on the wire to five clean answers, which is what this count is
+/// for.
+/// </summary>
+/// <param name="AttemptCount">
+/// Paths put to the reader on this side, counted whether it answered or not.
+/// </param>
+/// <param name="NamesNothingCount">
+/// Of those, the ones with no file at the path.
+///
+/// THE ONE FAILURE THAT IS NOT A GIVE-UP, and it is deliberately not in
+/// <see cref="RefusedTotal"/>. On the registration side it is a cached file that
+/// has already gone, which is ordinary and common: such a registration claims none
+/// of the walked files, so nothing was lost by failing to identify it. Counting it
+/// as a refusal would empty the offer on every machine holding one missing cached
+/// file. On the candidate side it is a file that went between the walk and this
+/// read, which no registration's identity could have matched either.
+/// </param>
+/// <param name="NotAPathCount">
+/// Of those, the ones with no string to open at all. Neither side can produce this
+/// today and a report carrying it says something nobody has seen.
+/// </param>
+/// <param name="OpenRefusedCount">
+/// Of those, where something is at the path and no handle could be opened on it.
+/// </param>
+/// <param name="IdentityUnavailableCount">
+/// Of those, where the handle opened and the filesystem would not give the file's
+/// id: a volume or a Windows build that does not answer that class.
+/// </param>
+/// <param name="FaultedCount">
+/// Of those, where the attempt threw rather than answering.
+/// </param>
+public readonly record struct FileIdentityReadTally(
+    int AttemptCount = 0,
+    int NamesNothingCount = 0,
+    int NotAPathCount = 0,
+    int OpenRefusedCount = 0,
+    int IdentityUnavailableCount = 0,
+    int FaultedCount = 0)
+{
+    /// <summary>
+    /// Reads that gave up a withholding: the four failures that leave a file
+    /// unidentified while it is still there.
+    ///
+    /// A MIXED SET, SO NOTHING MAY STATE A CAUSE FOR IT. The four are four
+    /// different facts about a machine and the only thing true of every member is
+    /// that the reader was asked which file a path names and did not say.
+    ///
+    /// SPELLED HERE AND NOWHERE ELSE. Both sides read this one expression, and the
+    /// membership it defines is the same one <c>FileIdentityRead.GivesUpAWithholding</c>
+    /// acts on; a copy of either would be a second, quieter version of a rule that
+    /// already exists, able to answer differently after any edit to the enum.
+    /// </summary>
+    public int RefusedTotal =>
+        NotAPathCount + OpenRefusedCount + IdentityUnavailableCount + FaultedCount;
+
+    /// <summary>
+    /// Whether this side met a path it could not identify. What the wholesale
+    /// withholding asks of the registration side, and the reason it is a bool: the
+    /// counts are carried apart for the report, which reads them apart, and the
+    /// rule needs only whether anything failed.
+    /// </summary>
+    public bool AnyUnestablished => RefusedTotal > 0;
 }
 
 /// <summary>

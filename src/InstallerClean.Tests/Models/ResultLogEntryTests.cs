@@ -55,7 +55,8 @@ public class ResultLogEntryTests
         UnclaimedProductFileCount: 0,
         UnclaimedPatchFileCount: 0,
         RecoveredProductCount: 0,
-        UnansweredProductCount: 0);
+        UnansweredProductCount: 0,
+        WithheldCandidateCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -85,7 +86,19 @@ public class ResultLogEntryTests
         PathNormalisationRefusedAtPrefixStripCount: 0,
         PathNormalisationRefusedAtFullPathCount: 0,
         PathNormalisationRefusedAtEmbeddedNullCount: 0,
-        PathFlaggedSpellingCount: 0);
+        PathFlaggedSpellingCount: 0,
+        RegistrationIdentityAttemptCount: 0,
+        RegistrationIdentityNamesNothingCount: 0,
+        RegistrationIdentityNotAPathCount: 0,
+        RegistrationIdentityOpenRefusedCount: 0,
+        RegistrationIdentityUnavailableCount: 0,
+        RegistrationIdentityFaultedCount: 0,
+        CandidateIdentityAttemptCount: 0,
+        CandidateIdentityNamesNothingCount: 0,
+        CandidateIdentityNotAPathCount: 0,
+        CandidateIdentityOpenRefusedCount: 0,
+        CandidateIdentityUnavailableCount: 0,
+        CandidateIdentityFaultedCount: 0);
 
     private static ResultLogEntry SampleEntry() => new(
         SchemaVersion: ResultLogEntry.CurrentSchemaVersion,
@@ -172,11 +185,31 @@ public class ResultLogEntryTests
                 // among them would re-point every argument after it and the build
                 // would not notice; appending is the arrangement that cannot.
                 "pathNormalisationRefusedAtEmbeddedNullCount",
-                // Last, not beside its parts: it is a derived property rather than a
-                // constructor parameter, so that a total contradicting its own
-                // breakdown inside one object is impossible rather than merely
-                // unlikely. The serialiser emits the positional members first.
-                "pathNormalisationRefusedCount",
+                // What a recorded value LOOKED like rather than what happened to it,
+                // and the only member of that group which is not an outcome.
+                "pathFlaggedSpellingCount",
+                // The identity comparison, one group per side. The two sides are
+                // asked the same five questions and the answers are acted on
+                // differently, which is in MachineInfo's own notes.
+                "registrationIdentityAttemptCount", "registrationIdentityNamesNothingCount",
+                "registrationIdentityNotAPathCount", "registrationIdentityOpenRefusedCount",
+                "registrationIdentityUnavailableCount", "registrationIdentityFaultedCount",
+                "candidateIdentityAttemptCount", "candidateIdentityNamesNothingCount",
+                "candidateIdentityNotAPathCount", "candidateIdentityOpenRefusedCount",
+                "candidateIdentityUnavailableCount", "candidateIdentityFaultedCount",
+                // THE DERIVED TOTALS COME LAST AS A BLOCK, not beside their parts:
+                // each is a property rather than a constructor parameter, so a total
+                // contradicting its own breakdown inside one object is impossible
+                // rather than merely unlikely. The serialiser emits the positional
+                // members first and these in declaration order.
+                //
+                // TWO OF THEM WERE MISSING FROM THIS PIN AND THE TEST WAS RED, which
+                // is what this list is for: pathFlaggedSpellingCount and
+                // pathResolverRefusedCount both reached the payload without being
+                // named here, and a key the receiver has not allowlisted is a 400 for
+                // the whole report rather than one dropped field.
+                "pathNormalisationRefusedCount", "pathResolverRefusedCount",
+                "registrationIdentityRefusedCount", "candidateIdentityRefusedCount",
             ],
             root.GetProperty("machine").EnumerateObject().Select(p => p.Name));
 
@@ -187,6 +220,10 @@ public class ResultLogEntryTests
                 "missingNeededCount", "withheldPatchCount", "unreadableProductCount",
                 "skippedProductRowCount", "unclaimedProductFileCount", "unclaimedPatchFileCount",
                 "recoveredProductCount", "unansweredProductCount",
+                // Appended, and it is a different population from withheldPatchCount
+                // three keys above it: files the walk found and the scan declined to
+                // offer, where that one counts superseded registrations.
+                "withheldCandidateCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 

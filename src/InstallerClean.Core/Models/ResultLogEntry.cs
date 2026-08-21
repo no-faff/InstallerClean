@@ -397,6 +397,74 @@ public sealed record AppInfo(string Version, string Language)
 /// four are <c>int</c>, so a member inserted among the others would re-point every
 /// argument after it with nothing in the build to say so.
 /// </param>
+/// <param name="RegistrationIdentityAttemptCount">
+/// Recorded paths this scan asked the filesystem to identify, so that a registration
+/// written in a spelling the folder walk never produces is still matched to its file.
+///
+/// READ THE FIVE BELOW AGAINST IT OR NOT AT ALL, on the same rule as the resolver's
+/// attempts count. The comparison is skipped where the walk found no candidates and
+/// where the records hold no registrations, and five zeros from a machine that never
+/// asked are indistinguishable on the wire from five clean answers.
+/// </param>
+/// <param name="RegistrationIdentityNamesNothingCount">
+/// Of those, the ones with no file at the path: a registration whose cached file has
+/// already gone.
+///
+/// IT IS THE ONE FAILURE HERE THAT IS NOT A FAILURE OF THE MACHINE, and it is
+/// deliberately outside <see cref="RegistrationIdentityRefusedCount"/>. Such a
+/// registration claims none of the walked files, so nothing was given up by not
+/// identifying it, and a machine reporting a high figure here is a machine that has
+/// uninstalled things rather than one with anything wrong.
+/// </param>
+/// <param name="RegistrationIdentityNotAPathCount">
+/// Of those, the ones with no string to open at all. Nothing either side of this
+/// comparison can produce today, so a report carrying it says something nobody has
+/// seen.
+/// </param>
+/// <param name="RegistrationIdentityOpenRefusedCount">
+/// Of those, where something is at the path and no handle could be opened on it.
+/// </param>
+/// <param name="RegistrationIdentityUnavailableCount">
+/// Of those, where the handle opened and the filesystem would not give the file's id.
+/// A volume or a Windows build that does not answer that information class, which on
+/// the volume this folder sits on has never been observed and would take a machine's
+/// whole offer with it.
+/// </param>
+/// <param name="RegistrationIdentityFaultedCount">
+/// Of those, where the attempt threw rather than answering.
+/// </param>
+/// <param name="CandidateIdentityAttemptCount">
+/// Walked files this scan asked the filesystem to identify, one per candidate the
+/// registration side left an identity to compare against. Zero where no registration
+/// yielded one, which is ordinary on a machine with nothing to compare.
+/// </param>
+/// <param name="CandidateIdentityNamesNothingCount">
+/// Of those, the ones that were no longer there: a file that went between the walk
+/// and this read. Outside the refused total for the same reason as its opposite
+/// number, a file that is not there being one no registration's identity could have
+/// matched either.
+/// </param>
+/// <param name="CandidateIdentityNotAPathCount">
+/// Of those, the ones with no string to open. Unreachable, as above.
+/// </param>
+/// <param name="CandidateIdentityOpenRefusedCount">
+/// Of those, where the file is there and no handle could be opened on it. A candidate
+/// has already had a handle opened on it once, by the containment guard, so this is a
+/// race or a volume that answers one call and not the other.
+/// </param>
+/// <param name="CandidateIdentityUnavailableCount">
+/// Of those, where the handle opened and the filesystem would not name the file.
+/// </param>
+/// <param name="CandidateIdentityFaultedCount">
+/// Of those, where the attempt threw.
+///
+/// SUCCESSFUL READS ARE NOT SENT ON EITHER SIDE. They are the attempts less the five,
+/// and a stored copy could disagree with its own parts.
+///
+/// APPENDED, LIKE EVERY GROUP BEFORE THEM, for the reason the embedded-null note
+/// above gives: these are positional <c>int</c> parameters and an insertion re-points
+/// every argument after it with nothing in the build to say so.
+/// </param>
 public sealed record MachineInfo(
     string ShortNameCreation,
     int LongFileNameCount,
@@ -425,7 +493,19 @@ public sealed record MachineInfo(
     int PathNormalisationRefusedAtPrefixStripCount,
     int PathNormalisationRefusedAtFullPathCount,
     int PathNormalisationRefusedAtEmbeddedNullCount,
-    int PathFlaggedSpellingCount)
+    int PathFlaggedSpellingCount,
+    int RegistrationIdentityAttemptCount,
+    int RegistrationIdentityNamesNothingCount,
+    int RegistrationIdentityNotAPathCount,
+    int RegistrationIdentityOpenRefusedCount,
+    int RegistrationIdentityUnavailableCount,
+    int RegistrationIdentityFaultedCount,
+    int CandidateIdentityAttemptCount,
+    int CandidateIdentityNamesNothingCount,
+    int CandidateIdentityNotAPathCount,
+    int CandidateIdentityOpenRefusedCount,
+    int CandidateIdentityUnavailableCount,
+    int CandidateIdentityFaultedCount)
 {
     public static MachineInfo From(ScanResult scan) =>
         new(
@@ -456,7 +536,23 @@ public sealed record MachineInfo(
             scan.Census.PathNormalisationRefusedAtPrefixStripCount,
             scan.Census.PathNormalisationRefusedAtFullPathCount,
             scan.Census.PathNormalisationRefusedAtEmbeddedNullCount,
-            scan.Census.PathFlaggedSpellingCount);
+            scan.Census.PathFlaggedSpellingCount,
+            // The two identity tallies, and they come off the SCAN rather than off
+            // the census: the census is what the enumeration measured about the
+            // machine's records, and these are what the scan measured about its
+            // files.
+            scan.RegistrationIdentityReads.AttemptCount,
+            scan.RegistrationIdentityReads.NamesNothingCount,
+            scan.RegistrationIdentityReads.NotAPathCount,
+            scan.RegistrationIdentityReads.OpenRefusedCount,
+            scan.RegistrationIdentityReads.IdentityUnavailableCount,
+            scan.RegistrationIdentityReads.FaultedCount,
+            scan.CandidateIdentityReads.AttemptCount,
+            scan.CandidateIdentityReads.NamesNothingCount,
+            scan.CandidateIdentityReads.NotAPathCount,
+            scan.CandidateIdentityReads.OpenRefusedCount,
+            scan.CandidateIdentityReads.IdentityUnavailableCount,
+            scan.CandidateIdentityReads.FaultedCount);
 
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
@@ -509,6 +605,48 @@ public sealed record MachineInfo(
         + PathResolverOpenRefusedCount
         + PathResolverNoFinalNameCount
         + PathResolverFaultedCount;
+
+    /// <summary>
+    /// Recorded paths the filesystem would not identify, whichever way the read
+    /// failed. Derived here for the same reason as the two totals above, so it
+    /// cannot be sent disagreeing with its own parts.
+    ///
+    /// A THIRD POPULATION AND NEVER PART OF EITHER OTHER TOTAL. Those two are about
+    /// what Windows wrote down: a value that could not be turned into a path, and a
+    /// path whose spelling the filesystem would not settle. This one is about the
+    /// file: the path was settled and the file at the end of it could not be named.
+    ///
+    /// A MIXED SET, SO NOTHING MAY STATE A CAUSE FOR IT. The only thing true of every
+    /// member is that the reader was asked which file a path names and did not say.
+    /// The count of paths naming no file at all is outside it and is where an
+    /// ordinary machine's failures go.
+    ///
+    /// AND THE APPLICATION ACTS ON IT. Above zero, the scan withheld its whole
+    /// walk-derived offer, on the same rule as the other two totals: rather than name
+    /// a file it cannot say is spare. So a report carrying a figure here is a report
+    /// from a machine that was offered nothing from the folder walk.
+    /// </summary>
+    public int RegistrationIdentityRefusedCount =>
+        RegistrationIdentityNotAPathCount
+        + RegistrationIdentityOpenRefusedCount
+        + RegistrationIdentityUnavailableCount
+        + RegistrationIdentityFaultedCount;
+
+    /// <summary>
+    /// The same over the other side of that comparison, and the application acts on
+    /// it DIFFERENTLY, which is the one thing to know before reading the two
+    /// together.
+    ///
+    /// A registration nobody could identify might name any walked file, so the whole
+    /// offer goes. A candidate nobody could identify is one file, every other
+    /// candidate having been compared by a read that answered, so this figure is a
+    /// count of files kept back one at a time and the offer around them stands.
+    /// </summary>
+    public int CandidateIdentityRefusedCount =>
+        CandidateIdentityNotAPathCount
+        + CandidateIdentityOpenRefusedCount
+        + CandidateIdentityUnavailableCount
+        + CandidateIdentityFaultedCount;
 }
 
 /// <summary>
@@ -609,6 +747,27 @@ public sealed record MachineInfo(
 /// They travel because how far a real machine's registry runs ahead of its
 /// enumeration is a fact only these reports can establish.
 /// </param>
+/// <param name="WithheldCandidateCount">
+/// Files the folder walk found, that no registration's recorded path claimed, and
+/// that this scan then declined to offer. <c>ScanResult.WithheldFiles</c>, which is
+/// the list the Details window shows and the main window's left-alone line counts.
+///
+/// IT IS NOT <paramref name="WithheldPatchCount"/> AND THE TWO COUNT DIFFERENT
+/// POPULATIONS. That one is superseded registrations the scan would have offered and
+/// did not; this one never came from the registered set at all. A third figure,
+/// <c>ScanResult.RegisteredWithheldCount</c>, is different again and is on no wire.
+/// Nothing may add any two of them.
+///
+/// IT WAS INVISIBLE TO THESE REPORTS UNTIL 3.0.0 AND THAT WAS AN OVERSIGHT RATHER
+/// THAN A DECISION. The population is what the app's own withholding costs a machine,
+/// and it is the figure that answers whether a machine got nothing because its folder
+/// was clean or because the scan could not settle it.
+///
+/// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Three separate conditions put
+/// files on that list and they are different facts about a machine; a sentence naming
+/// any one of them would be false of the others. <c>machine</c>'s counts are where
+/// the conditions are counted apart.
+/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -625,7 +784,8 @@ public sealed record ScanInfo(
     int UnclaimedProductFileCount,
     int UnclaimedPatchFileCount,
     int RecoveredProductCount,
-    int UnansweredProductCount)
+    int UnansweredProductCount,
+    int WithheldCandidateCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -659,7 +819,13 @@ public sealed record ScanInfo(
             scan.Census.UnclaimedProductFiles,
             scan.Census.UnclaimedPatchFiles,
             scan.Census.RecoveredProductCount,
-            scan.Census.UnansweredProductCount);
+            scan.Census.UnansweredProductCount,
+            // Off the list rather than tallied, so the number sent and the rows the
+            // Details window shows cannot come apart: both are read off the same
+            // list. Null is a scan that never reached the decision, which reads as
+            // zero here and is not the same thing as a scan that kept nothing back;
+            // no run that produces a report can leave it null.
+            scan.WithheldFiles?.Count ?? 0);
     }
 }
 

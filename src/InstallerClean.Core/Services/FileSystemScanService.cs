@@ -250,6 +250,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // reached having withheld nothing wholesale.
         var walkOfferWithheldWholesale = false;
 
+        // And these for the same reason once more. A default tally is zero attempts,
+        // which reads as a comparison that never ran rather than as one that ran
+        // clean, and a scan leaving before the identity pass is exactly that.
+        var registrationIdentityReads = default(FileIdentityReadTally);
+        var candidateIdentityReads = default(FileIdentityReadTally);
+
         // The closing entry is owed on every exit, not just the clean one: a
         // cancel and the correlation gate both leave through here, and the gate
         // in particular fires on exactly the kind of broken machine that makes
@@ -313,12 +319,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // left: bounded by the candidate count on one side and the registration
         // count on the other, both small on every machine anybody has measured.
         //
-        // A DROPPED CANDIDATE IS NOT COUNTED ANYWHERE, and that is deliberate
+        // A CLAIMED CANDIDATE IS NOT COUNTED ANYWHERE, and that is deliberate
         // rather than an omission. A file the string comparison matched has never
-        // been counted either; it is simply claimed, and so is this one. A file
-        // dropped here is not kept back at all: a registration names it, which is
-        // the ordinary answer, and a count of it would invite a sentence about
-        // files the app was unsure of that was false of every one of them.
+        // been counted either; it is simply claimed, and so is this one. Such a
+        // file is not kept back at all: a registration names it, which is the
+        // ordinary answer, and a count of it would invite a sentence about files
+        // the app was unsure of that was false of every one of them.
+        //
+        // A CANDIDATE THIS PASS CANNOT IDENTIFY IS A DIFFERENT THING AND IS KEPT
+        // BACK. It leaves the candidate list as well, so the two lists still
+        // account for every file the walk found, but it goes onto the withheld
+        // list rather than out of the reckoning. What was read on each side is
+        // counted, in the two tallies this returns.
         //
         // THE THREE GATES BELOW ARE MEASURED BEFORE IT RUNS, and before the
         // declared-product screen too. Each of them reads an empty candidate list
@@ -330,8 +342,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // do the same to a machine whose candidates were all kept back.
         candidatesFromWalk = unclaimedByPath.Count;
 
-        DropCandidatesRegisteredUnderAnotherSpelling(
-            unclaimedByPath, registered, cancellationToken);
+        (registrationIdentityReads, candidateIdentityReads) =
+            DropCandidatesRegisteredUnderAnotherSpelling(
+                unclaimedByPath, withheld, registered, cancellationToken);
 
         // WHAT DECIDES THIS HALF OF THE OFFER: TWO COMPARISONS AND ONE SCREEN, and
         // the difference between them is which end they start at. The path
@@ -443,14 +456,33 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // result is reported. The hosts need to know that this branch was taken, and
         // a second reading of the census further down would be a copy of this rule
         // able to answer differently from it after any edit to either.
-        walkOfferWithheldWholesale = query.Census.AnyRecordedPathUnestablished;
+        //
+        // AND THE SIXTH, WHICH IS THE SAME ARGUMENT ABOUT THE OTHER HALF OF THE
+        // COMPARISON. A recorded path can be settled and the file it names still not
+        // be identifiable: the handle is refused, or the volume will not answer for
+        // it. Such a registration claims nothing through the identity pass either,
+        // so once again a cached file that is needed is sitting in this candidate
+        // list and WHICH ONE cannot be established. It is the same conclusion for a
+        // different reason, which is why the two are asked separately here and never
+        // added into one number anywhere.
+        //
+        // TWO RECORDS, EACH ASKED ITS OWN QUESTION, AND NO MEMBER NAMED IN THIS
+        // FILE. That is the rule the paragraph above earned: a cause added to either
+        // population is acted on because the question is spelled where the members
+        // are declared, and this line only says that a failure on either side
+        // withholds.
+        walkOfferWithheldWholesale =
+            query.Census.AnyRecordedPathUnestablished
+            || registrationIdentityReads.AnyUnestablished;
 
         if (walkOfferWithheldWholesale)
         {
-            // Every candidate is already kept back on a fact about the machine's
-            // records, so the per-file screen below could only reach the same
-            // answer at the cost of opening every one of them. Skipped rather
-            // than run and thrown away.
+            // Every candidate is already kept back on a fact about the machine, so
+            // the per-file screen below could only reach the same answer at the cost
+            // of opening every one of them. Skipped rather than run and thrown away.
+            //
+            // Candidates the identity pass already withheld one at a time are on the
+            // withheld list and off this one, so nothing lands on it twice.
             withheld.AddRange(unclaimedByPath);
         }
         else
@@ -850,11 +882,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
-        // NO SCAN NOW REPORTS A FILE IT KEPT BACK, because it keeps none back per
-        // file. Everything the walk offered the comparison and the comparison did
-        // not claim is offered; there is no fourth population and no count of one,
-        // and the three identity counts that used to travel here went with the pass
-        // that produced them.
+        // THE PROGRESS LINE COUNTS WHAT IS OFFERED AND NAMES NOTHING KEPT BACK, and
+        // the three identity counts that used to travel here went with the pass that
+        // produced them. Files ARE kept back per file, by the declared-product screen
+        // and by the identity comparison, and they go on the withheld list rather
+        // than into this sentence: what put them there differs between them, and one
+        // running count over the lot could only be described by a cause false of some
+        // of its members.
         //
         // WHAT REPLACED THEM AS THE QUESTION THIS SCAN CAN ANSWER ABOUT ITSELF is
         // in query.Census, which carries the enumeration's own failures per
@@ -893,7 +927,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // somebody. Carried as a bool with no cause attached, because several
             // conditions reach that branch and a sentence naming one would be false
             // on the others.
-            walkOfferWithheldWholesale);
+            walkOfferWithheldWholesale,
+            // What the identity comparison was told, per side. The registration
+            // side's refusals are one of the conditions behind the bool above; the
+            // candidate side's are the files it kept back one at a time.
+            registrationIdentityReads,
+            candidateIdentityReads);
     }
 
     /// <summary>
@@ -922,12 +961,60 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// costs one handle per registration and nothing more. Nothing is opened at all
     /// where there are no candidates, or where no registration yielded an identity.
     ///
-    /// EVERY FAILURE LEAVES THE CANDIDATE WHERE IT WAS. A registration path that
-    /// will not open contributes no identity and so claims nothing extra; a
-    /// candidate that will not open is compared against nothing and stays a
-    /// candidate, decided by everything downstream exactly as it would have been.
-    /// That is the direction the whole mechanism has to fail in, and it is why this
-    /// could be added without re-arguing anything downstream of it.
+    /// A FAILED READ IS A WITHHOLDING GIVEN UP, AND UNTIL 3.0.0 THIS NOTE SAID THE
+    /// OPPOSITE. It read "every failure leaves the candidate where it was": a
+    /// registration path that will not open contributes no identity and claims
+    /// nothing extra, a candidate that will not open is compared against nothing and
+    /// carries on being judged by everything downstream. That is sound about a pass
+    /// that only subtracts and false about the machine. The registration this pass
+    /// could not identify is one whose cached file is sitting in the candidate list
+    /// unclaimed, and it was being offered. Both reads are now counted, and both
+    /// answers are acted on.
+    ///
+    /// THE TWO SIDES ACT DIFFERENTLY AND THE ASYMMETRY IS THE WHOLE DESIGN. A
+    /// registration nobody could identify might name ANY candidate in the list, and
+    /// which one cannot be established, so its tally withholds the walk-derived
+    /// offer entire, at the branch below the caller. A candidate nobody could
+    /// identify is one file: every other candidate was compared against the
+    /// registrations by a read that answered, so this one is moved to
+    /// <paramref name="withheld"/> and the rest stand. Emptying an offer over one
+    /// unidentifiable file would cost a machine everything for a fact about one of
+    /// its files.
+    ///
+    /// A FILE THAT IS NOT THERE IS NOT A FAILURE OF EITHER KIND. See
+    /// <c>FileIdentityRead.NamesNothing</c>: a registration whose cached file has
+    /// gone claims none of the walked files, and reading that as a give-up would
+    /// empty the offer on most machines that have ever uninstalled anything.
+    ///
+    /// EVERY REGISTRATION IS READ, INCLUDING THE ONES THE TEXT COMPARISON ALREADY
+    /// MATCHED, so a single registration this cannot identify costs the scan its
+    /// whole walk-derived offer on an otherwise ordinary machine. That is the cost
+    /// and it is deliberate. The obvious narrowing is to read only the registrations
+    /// whose recorded path failed to match the walk by text, on the reasoning that a
+    /// matched one has already claimed its file and can claim nothing extra.
+    ///
+    /// WHAT ACTUALLY REFUSES IS NOT A FILE SOMETHING ELSE HAS OPEN, and getting that
+    /// wrong makes the cost sound both commoner and smaller than it is. The read
+    /// asks for no access bits, so there is nothing for another opener's share mode
+    /// to exclude. Once absence is carved out, what is left is an ACL refusing an
+    /// already-elevated process, a call that threw, and a volume or Windows build
+    /// that will not answer <c>FileIdInfo</c>.
+    ///
+    /// THAT LAST ONE IS A PROPERTY OF THE VOLUME RATHER THAN OF A FILE, so it does
+    /// not cost such a machine one scan. Every registration fails on it, every time,
+    /// and that machine is offered nothing from the folder walk until something
+    /// about it changes. A whole class of machines told sorry is a defensible thing
+    /// to say and a different thing from one unlucky file, so say the one that is
+    /// true.
+    ///
+    /// THE COUNTER-EXAMPLE THAT KILLS IT, recorded here because it is not
+    /// reconstructible from anything else: take registration R whose recorded path
+    /// matches walked file W by text, so W is off the candidate list and R looks
+    /// harmless. If R's path is a reparse point resolving to candidate C, then a
+    /// successful identity read would have returned C's identity and dropped C. A
+    /// failed read leaves C on the offer, and C is the data behind a registered
+    /// package. The narrow version therefore leaves a route to a needed file open,
+    /// and holding files back is this app working.
     ///
     /// A HARD LINK IS DROPPED AND THAT IS THE RIGHT ANSWER HERE, though it is a
     /// stricter one than strictly necessary. Two names for one file share an
@@ -938,28 +1025,94 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// 2026-08-11 held one (every cached file's link count read 1). The date is part
     /// of the reading: it says what had been looked at, not what every machine holds.
     /// </summary>
-    private void DropCandidatesRegisteredUnderAnotherSpelling(
-        List<OrphanedFile> candidates,
-        IReadOnlyList<RegisteredPackage> registered,
-        CancellationToken cancellationToken)
+    private (FileIdentityReadTally Registrations, FileIdentityReadTally Candidates)
+        DropCandidatesRegisteredUnderAnotherSpelling(
+            List<OrphanedFile> candidates,
+            List<OrphanedFile> withheld,
+            IReadOnlyList<RegisteredPackage> registered,
+            CancellationToken cancellationToken)
     {
-        if (_fileIds is null || candidates.Count == 0 || registered.Count == 0) return;
+        var registrations = new IdentityReadTally();
+        var candidateReads = new IdentityReadTally();
+
+        // Nothing was asked, so nothing was given up: the tallies leave here at zero
+        // attempts, which is what tells a report the pass was skipped rather than
+        // that it answered cleanly.
+        if (_fileIds is null || candidates.Count == 0 || registered.Count == 0)
+            return (registrations.Taken(), candidateReads.Taken());
 
         var registeredIds = new HashSet<FileIdentity>();
         foreach (var pkg in registered)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (_fileIds.TryRead(pkg.LocalPackagePath, out var id))
+            if (registrations.Record(_fileIds.ReadOutcome(pkg.LocalPackagePath, out var id))
+                == FileIdentityRead.Read)
                 registeredIds.Add(id);
         }
 
-        if (registeredIds.Count == 0) return;
+        // No identity to compare against, so the candidate side is not asked and its
+        // tally says so. A give-up on the registration side has already been counted
+        // and is about to withhold the whole offer whichever way this returns.
+        if (registeredIds.Count == 0) return (registrations.Taken(), candidateReads.Taken());
 
         candidates.RemoveAll(c =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return _fileIds.TryRead(c.FullPath, out var id) && registeredIds.Contains(id);
+            var outcome = candidateReads.Record(_fileIds.ReadOutcome(c.FullPath, out var id));
+
+            // Claimed: a registration names this file, whatever either of them was
+            // spelled as. Dropped rather than withheld, and not counted anywhere,
+            // because the pass working is not a file anybody was unsure about.
+            if (outcome == FileIdentityRead.Read) return registeredIds.Contains(id);
+
+            // Kept back rather than left on the offer, which is the fix. Removed
+            // from the candidate list in the same step so the two lists still
+            // account for every file the walk found.
+            if (!outcome.GivesUpAWithholding()) return false;
+            withheld.Add(c);
+            return true;
         });
+
+        return (registrations.Taken(), candidateReads.Taken());
+    }
+
+    /// <summary>
+    /// One side's running count of what the identity reader answered, folded into
+    /// the immutable <see cref="FileIdentityReadTally"/> the result carries.
+    ///
+    /// <see cref="Record"/> hands the outcome straight back so that counting it and
+    /// acting on it are one expression at both call sites, rather than two
+    /// statements a later edit can separate. A give-up nothing counted is the fault
+    /// this whole pass exists to close.
+    /// </summary>
+    internal sealed class IdentityReadTally
+    {
+        private int _attempts;
+        private int _namesNothing;
+        private int _notAPath;
+        private int _openRefused;
+        private int _identityUnavailable;
+        private int _faulted;
+
+        internal FileIdentityRead Record(FileIdentityRead outcome)
+        {
+            _attempts++;
+            switch (outcome)
+            {
+                case FileIdentityRead.NamesNothing: _namesNothing++; break;
+                case FileIdentityRead.NotAPath: _notAPath++; break;
+                case FileIdentityRead.OpenRefused: _openRefused++; break;
+                case FileIdentityRead.IdentityUnavailable: _identityUnavailable++; break;
+                case FileIdentityRead.Faulted: _faulted++; break;
+                    // Read is not counted: it is the attempts less the five, and a
+                    // stored copy could disagree with them.
+            }
+
+            return outcome;
+        }
+
+        internal FileIdentityReadTally Taken() => new(
+            _attempts, _namesNothing, _notAPath, _openRefused, _identityUnavailable, _faulted);
     }
 
     /// <summary>

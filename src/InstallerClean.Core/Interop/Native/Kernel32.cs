@@ -165,4 +165,12 @@ internal static partial class Kernel32
     // which callers strip (InstallerCacheHelpers.StripLongPathPrefix) to
     // get back a path comparable to a user-typed one.
     public const uint VOLUME_NAME_DOS = 0x0;
+
+    // The two codes CreateFile reports for an absence, and the only two a caller
+    // may read as "nothing is at this path": the leaf is missing, or a component
+    // above it is. Every other failure means the open was refused rather than that
+    // there was nothing to open, which is the distinction FileIdentityReader turns
+    // into two quite different answers.
+    public const int ERROR_FILE_NOT_FOUND = 2;
+    public const int ERROR_PATH_NOT_FOUND = 3;
 }

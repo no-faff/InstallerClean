@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Services;
@@ -10,17 +11,17 @@ namespace InstallerClean.Services;
 /// two containment guards and for a related but not identical reason. Theirs is
 /// that a fake must not be able to make an out-of-bounds path look safe. This
 /// one's is simpler: a file identity is a fact about a volume, and there is no
-/// abstraction over it to inject. The safety argument is different in kind and is
-/// in <see cref="IFileIdentityReader"/>: a wrong answer here can only ever cost an
-/// offer, never a file, so a fake in a test cannot make anything unsafe look safe.
+/// abstraction over it to inject. What a fake in a test can do here is hold a
+/// scan's whole offer back, which is the direction <see cref="IFileIdentityReader"/>
+/// says every fault in this class runs in.
 /// </summary>
 internal sealed class FileIdentityReader : IFileIdentityReader
 {
     /// <inheritdoc />
-    public bool TryRead(string path, out FileIdentity identity)
+    public FileIdentityRead ReadOutcome(string path, out FileIdentity identity)
     {
         identity = default;
-        if (string.IsNullOrEmpty(path)) return false;
+        if (string.IsNullOrEmpty(path)) return FileIdentityRead.NotAPath;
 
         try
         {
@@ -31,7 +32,8 @@ internal sealed class FileIdentityReader : IFileIdentityReader
             //
             // FILE_SHARE_ALL for the other half of that: an installer holding its
             // own cached package must not make this call fail, because a failure
-            // here silently gives up a withholding.
+            // here is a withholding given up and now costs the scan its whole
+            // walk-derived offer.
             //
             // NO FILE_FLAG_OPEN_REPARSE_POINT, which is the whole point: links are
             // followed so a registration that reaches its package through a
@@ -48,7 +50,24 @@ internal sealed class FileIdentityReader : IFileIdentityReader
                 Kernel32.FILE_FLAG_BACKUP_SEMANTICS,
                 IntPtr.Zero);
 
-            if (handle.IsInvalid) return false;
+            if (handle.IsInvalid)
+            {
+                // Read before anything else can overwrite it, and read ONLY on the
+                // failing branch: the value after a successful call is whatever the
+                // last failure anywhere left behind.
+                //
+                // THE TWO ABSENCE CODES ARE THE WHOLE OF THE EXEMPTION AND
+                // EVERYTHING ELSE WITHHOLDS. A registration whose cached file has
+                // gone is ordinary, and on a large share of machines it is common,
+                // so treating it as a give-up would empty those machines' offers
+                // over a file that was not there to be claimed. Any other code
+                // means something IS there and this call did not get to it, which
+                // is the case the app cannot be sure about.
+                var error = Marshal.GetLastWin32Error();
+                return error is Kernel32.ERROR_FILE_NOT_FOUND or Kernel32.ERROR_PATH_NOT_FOUND
+                    ? FileIdentityRead.NamesNothing
+                    : FileIdentityRead.OpenRefused;
+            }
 
             if (!Kernel32.GetFileInformationByHandleEx(
                     handle,
@@ -56,25 +75,25 @@ internal sealed class FileIdentityReader : IFileIdentityReader
                     out var info,
                     (uint)System.Runtime.CompilerServices.Unsafe.SizeOf<Kernel32.FILE_ID_INFO>()))
             {
-                // A volume or a Windows build that will not answer this class
-                // leaves the caller where it was. There is no weaker call to fall
-                // back to: the 64-bit index from GetFileInformationByHandle can
-                // collide on ReFS, and a comparison that can collide would claim
-                // two files are one, which is the one error direction that costs a
-                // file rather than an offer.
-                return false;
+                // A volume or a Windows build that will not answer this class.
+                // There is no weaker call to fall back to: the 64-bit index from
+                // GetFileInformationByHandle can collide on ReFS, and a comparison
+                // that can collide would claim two files are one, which is the one
+                // error direction that costs a file rather than an offer.
+                return FileIdentityRead.IdentityUnavailable;
             }
 
             identity = new FileIdentity(
                 info.VolumeSerialNumber, info.FileIdLow, info.FileIdHigh);
-            return true;
+            return FileIdentityRead.Read;
         }
         catch
         {
-            // Every failure is the same answer. The path is one the app is about to
-            // decide the fate of, so anything unexpected here has to leave the
-            // decision exactly where it was rather than move it.
-            return false;
+            // Kept apart from the answers above rather than folded into one of
+            // them: this is the call failing to complete, and a machine reporting
+            // it is reporting something different from a machine whose handles are
+            // refused. Both withhold.
+            return FileIdentityRead.Faulted;
         }
     }
 }
