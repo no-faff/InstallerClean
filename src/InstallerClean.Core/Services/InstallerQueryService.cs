@@ -909,6 +909,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
             for (var i = 0; i < packages.Count; i++)
                 if (packages[i].IsRemovable)
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
+                // AND IT ALSO SPEAKS OVER A ROW SOMETHING ELSE ALREADY WITHHELD, which
+                // is not the same statement and is why this arm exists. Withholding the
+                // class is one job and it is done above. Clearing the marker is the
+                // other: the marker asserts that an unread patch file was the ONLY
+                // reason this row lost its verdict, and on a run that came up short of
+                // a product that is no longer true. Left standing, it would tell the
+                // missing-files split to read the absence as established harmless on
+                // exactly the run whose enumeration is known to be incomplete.
+                //
+                // IT IS REACHED ON EVERY MISSING SUPERSEDED PATCH RATHER THAN RARELY.
+                // The confirmation pass reads the patch file, a file that has gone
+                // cannot be read, so such a row arrives here downgraded already and the
+                // arm above passes over it. Without this one, a missing superseded row
+                // on a run that lost a claim would be reported harmless again, by a
+                // different route from the one that was closed.
+                else if (packages[i].WithheldOnUnreadableFile)
+                    packages[i] = packages[i] with { WithheldOnUnreadableFile = false };
 
         // The run's whole path census: this loop's, plus the fallback's own.
         var paths = new PathCensus();
@@ -1239,7 +1256,26 @@ public sealed class InstallerQueryService : IInstallerQueryService
             var fromFile = DeclaredTargetsFor(path);
             if (fromFile.Unreadable || fromFile.Unaskable)
             {
-                Downgrade(claimed, path, withheld: true);
+                // WHICH OF THE TWO IT WAS IS RECORDED, AND RECORDING IT CHANGES
+                // NOTHING HERE. Both still take the verdict away and both still keep
+                // the file. The flag is read much later, by the missing-files split,
+                // and only ever for a row whose file turned out not to be there.
+                //
+                // IT HAS TO BE RECORDED RATHER THAN WORKED OUT LATER, because an
+                // unread declaration carries two meanings and this is the only place
+                // that knows which was met. A file that is THERE and will not give up
+                // an identity is the app unable to establish something it could have
+                // established. A file that is NOT THERE cannot be read by anybody, so
+                // the same withholding is a tautology and says nothing about the
+                // machine. This class cannot tell them apart, having no filesystem to
+                // ask, and must not guess: FileSystemScanService stamps FileExists
+                // against the same filesystem it walks, and the two facts meet there.
+                //
+                // WHAT IT COST WHILE THEY WERE ONE THING. The app offered a superseded
+                // patch, removed it, and the next scan warned that a repair could fail
+                // on that very file, because this read had failed for the only reason
+                // it could: the file was the one the app had just taken away.
+                Downgrade(claimed, path, withheld: true, unreadableFile: fromFile.Unreadable);
                 continue;
             }
             toAsk.AddRange(fromFile.Installed);
@@ -1427,11 +1463,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// machine, which is the thinnest thing either route stands on.
     /// </summary>
     /// <param name="unreadable">
-    /// True where the file exists and would not yield an identity. A patch whose
-    /// own declaration cannot be read has not been shown to be unneeded by
-    /// anybody, so the caller withholds rather than proceeding on the other two
-    /// routes alone. An absent file is not unreadable: there is nothing there to
-    /// remove and nothing to withhold.
+    /// True where the file did not yield an identity, WHICH INCLUDES A FILE THAT IS
+    /// NOT THERE. This said the opposite until 2026-08-21, and the sentence it carried
+    /// ("an absent file is not unreadable: there is nothing there to remove and nothing
+    /// to withhold") described an intention the code has never had: the read below is
+    /// the only test, and a path naming no file fails it like any other. A patch whose
+    /// own declaration cannot be read has not been shown to be unneeded by anybody, so
+    /// the caller withholds rather than proceeding on the other two routes alone, and
+    /// it does that for an absent file too.
+    ///
+    /// THE ABSENT CASE IS SEPARATED BY THE CALLER AND NOT HERE, because separating it
+    /// here would need a filesystem this class does not have, and asking the real one
+    /// would answer about a different machine from the one the scan is walking.
     /// </param>
     private IReadOnlyList<string> TargetsDeclaredByPatchFile(string path, out bool unreadable)
     {
@@ -1442,13 +1485,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (!path.EndsWith(".msp", StringComparison.OrdinalIgnoreCase))
             return Array.Empty<string>();
 
-        // A file that is not there is left to the read below rather than tested
-        // for, and the outcome is the same either way: a row that is withheld and
-        // whose file has gone, and a row that is removable and whose file has
-        // gone, both reach the scan's benign missing-removable count and neither
-        // is offered or reported. Testing for it here would put a real-filesystem
-        // question inside a decision that has no other, for no difference anybody
-        // can observe.
+        // A FILE THAT IS NOT THERE IS LEFT TO THE READ BELOW AND FAILS IT. The
+        // paragraph that stood here said the outcome was the same either way and that
+        // no difference could be observed, and both halves held until the missing-files
+        // split began reading the withheld flag. After that the difference was a
+        // warning on the main window naming the program whose patch this app had just
+        // correctly removed. Nothing is tested for here still: the caller records WHICH
+        // failure this was, and the scan, which is holding the filesystem, decides what
+        // it meant.
         var identity = _identityReader.Read(path, isPatch: true, out _);
         if (identity is null)
         {
@@ -1534,11 +1578,25 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// apart: false is a product's live claim on the file, true is a read that
     /// established nothing.
     /// </summary>
+    /// <param name="unreadableFile">
+    /// Records that the read which established nothing was the patch file's own
+    /// declaration. A cause and not a second verdict: every caller passing it also
+    /// passes <paramref name="withheld"/> true, and the file is kept either way. It
+    /// travels because that one cause is a real inability for a file that is present
+    /// and a tautology for one that is not, and only a reader holding the filesystem
+    /// can say which. See <see cref="RegisteredPackage.WithheldOnUnreadableFile"/>.
+    /// </param>
     private static void Downgrade(
-        Dictionary<string, RegisteredPackage> claimed, string path, bool withheld)
+        Dictionary<string, RegisteredPackage> claimed, string path, bool withheld,
+        bool unreadableFile = false)
     {
         if (!claimed.TryGetValue(path, out var row) || !row.IsRemovable) return;
-        claimed[path] = row with { IsRemovable = false, RemovableWithheld = withheld };
+        claimed[path] = row with
+        {
+            IsRemovable = false,
+            RemovableWithheld = withheld,
+            WithheldOnUnreadableFile = unreadableFile,
+        };
     }
 
     /// <summary>

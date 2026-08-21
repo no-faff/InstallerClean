@@ -61,6 +61,35 @@ namespace InstallerClean.Models;
 /// of a positive as a reason to act cautiously: to withhold on the offer, and to raise
 /// the alarm on a missing file.
 /// </param>
+/// <param name="WithheldOnUnreadableFile">
+/// The row's removable verdict was taken away for one reason and one only: the pass
+/// that reads a patch file to ask what products it declares could not read the file the
+/// record names. A cause, and nothing besides. It settles nothing on its own and it is
+/// not a claim that the file is absent.
+///
+/// IT EXISTS BECAUSE THAT ONE CAUSE CARRIES TWO MEANINGS AND THE ENUMERATION CANNOT TELL
+/// THEM APART. A file that is THERE and will not give up an identity is the app unable to
+/// establish something it could have established, and the withholding is a finding worth
+/// acting on. A file that is NOT THERE cannot be read by anybody, so the withholding is a
+/// tautology and says nothing at all about the machine. The enumeration has no filesystem
+/// to ask which it met; the scan has, and stamps <paramref name="FileExists"/> against the
+/// same filesystem it walks. So the cause is recorded here and the two meanings are
+/// separated at the one place holding both facts, <c>MissingFilesReport.Affected</c>.
+///
+/// IT MEANS THAT WAS THE ONLY REASON, AND THE ONLY REASON IS WHAT MAKES IT READABLE.
+/// One half of that comes free: every downgrade is one-way and the first one wins, so a
+/// row already withheld is skipped by the confirmation loop and no earlier cause can be
+/// joined by this one. The other half had to be built. The scan-wide withholding runs
+/// after that loop and only touches rows still carrying <paramref name="IsRemovable"/>,
+/// so it would pass silently over a row this flag had already taken; it therefore has a
+/// second arm that CLEARS this flag on a run that came up short of a product. A run whose
+/// enumeration is known to be incomplete has a reason to withhold that is nothing to do
+/// with an unread file, and the flag must stop saying otherwise.
+///
+/// SO A ROW CARRYING IT CARRIES NO OTHER WITHHOLDING CAUSE, and that is a property two
+/// places maintain rather than one the type enforces. Anything new that withholds a row
+/// already withheld has to decide the same question.
+/// </param>
 public record RegisteredPackage(
     string LocalPackagePath,
     string ProductName,
@@ -71,7 +100,8 @@ public record RegisteredPackage(
     bool VerdictUnreadable = false,
     ProductPatchSet ProductPatchSetVerdict = ProductPatchSet.Unestablished,
     long FileSizeBytes = 0,
-    bool FileExists = true)
+    bool FileExists = true,
+    bool WithheldOnUnreadableFile = false)
 {
     /// <summary>
     /// Windows holds a record naming this file and the file is not there. The one

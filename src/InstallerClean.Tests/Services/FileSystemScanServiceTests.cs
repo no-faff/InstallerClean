@@ -721,42 +721,118 @@ public class FileSystemScanServiceTests
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
+    private const string ProductFile = @"C:\Windows\Installer\product.msi";
+    private const string PatchFile = @"C:\Windows\Installer\superseded-lost.msp";
+
     /// <summary>
-    /// Builds the state a scan reaches when it LOST A CLAIM, through the real
-    /// enumeration rather than by writing the row out here, because the row's shape is
-    /// the whole subject: superseded, withheld, and carrying a CLEAN per-product
-    /// verdict at the same time. A hand-built row would let a later reader assume the
-    /// combination is hypothetical. It is what the query service emits.
+    /// An identity reader backed by the filesystem the scan is given, so a file that is
+    /// there yields an identity and a file that is not yields null. What the production
+    /// reader does, in one line.
+    ///
+    /// IT IS HERE BECAUSE THE DEFAULT ANSWERS A QUESTION THE REAL ONE CANNOT.
+    /// InstallerQueryService binds NoPackageIdentity when no reader is given, and that
+    /// returns a NON-NULL identity declaring no targets. Its own parameter documentation
+    /// called that "the same as the file being absent", and it is the opposite: an absent
+    /// file yields null, which sets the unread-file flag and withholds the row. So a
+    /// fixture that builds a MISSING patch row without a reader is describing a machine
+    /// that cannot exist, and every assertion taken on it is about that machine. That is
+    /// how a warning about a file the app had just correctly removed reached the main
+    /// window with a green suite behind it.
+    ///
+    /// MATCHED ON THE LEAF, because the service normalises a recorded path before the
+    /// reader ever sees it and normalisation does different things on different hosts.
+    /// The set it is matched against is still the filesystem's own, so removing the file
+    /// from the fixture is what removes the answer: the indirection is in the spelling
+    /// and not in the fact.
     /// </summary>
-    private static async Task<InstallerQueryResult> EnumerateWithSupersededPatch(bool aClaimWasLost)
+    private sealed class IdentitiesFromTheFilesystem : IPackageIdentityReader
+    {
+        private readonly MockFileSystem _fs;
+        private readonly HashSet<string> _presentButUnreadable = new(StringComparer.OrdinalIgnoreCase);
+
+        internal IdentitiesFromTheFilesystem(MockFileSystem fs) => _fs = fs;
+
+        /// <summary>A file that is on the disk and still will not say what it is.</summary>
+        internal void WillNotBeRead(string path) => _presentButUnreadable.Add(Path.GetFileName(path));
+
+        public PackageIdentity? Read(string filePath, bool isPatch, out string detail)
+        {
+            detail = string.Empty;
+            var leaf = Path.GetFileName(filePath);
+            if (_presentButUnreadable.Contains(leaf)) return null;
+            var onDisk = _fs.AllFiles.Any(f =>
+                Path.GetFileName(f).Equals(leaf, StringComparison.OrdinalIgnoreCase));
+            return onDisk ? new PackageIdentity(string.Empty, isPatch, Array.Empty<string>()) : null;
+        }
+    }
+
+    private static void PutOnDisk(MockFileSystem fs, string path)
+    {
+        if (!fs.File.Exists(path)) fs.AddFile(path, new MockFileData("x"));
+    }
+
+    /// <summary>Removes every spelling of one leaf, which is what the app's own Move does.</summary>
+    private static void TakeOffDisk(MockFileSystem fs, string path)
+    {
+        var leaf = Path.GetFileName(path);
+        foreach (var f in fs.AllFiles
+            .Where(f => Path.GetFileName(f).Equals(leaf, StringComparison.OrdinalIgnoreCase))
+            .ToList())
+            fs.RemoveFile(f);
+    }
+
+    /// <summary>
+    /// Builds the state a scan reaches, through the real enumeration rather than by
+    /// writing the row out here, because the row's shape is the whole subject:
+    /// superseded, withheld, and carrying a CLEAN per-product verdict at the same time.
+    /// A hand-built row would let a later reader assume the combination is hypothetical.
+    /// It is what the query service emits.
+    ///
+    /// THE READER IS PASSED IN AND IS NOT OPTIONAL, for the reason its own summary gives:
+    /// the default one answers about a machine that cannot exist, and the file's presence
+    /// is the single lever every test below pulls.
+    /// </summary>
+    private static async Task<InstallerQueryResult> EnumerateWithSupersededPatch(
+        bool aClaimWasLost, IPackageIdentityReader reader)
     {
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
-        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\product.msi");
+        msi.SetProductProperty("{A}", "LocalPackage", ProductFile);
         msi.SetProductProperty("{A}", "ProductName", "Test Product");
-        msi.AddPatch("{A}", "{P}", @"C:\Windows\Installer\superseded-lost.msp",
-            state: "2", uninstallable: "0");
+        msi.AddPatch("{A}", "{P}", PatchFile, state: "2", uninstallable: "0");
 
         var sets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase)
         {
             ["{A}"] = ProductPatchSet.AllNonRemovable,
         };
         return await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(
-                0, 0, UnclaimedProductFiles: aClaimWasLost ? 1 : 0, ProductPatchSets: sets))
+                0, 0, UnclaimedProductFiles: aClaimWasLost ? 1 : 0, ProductPatchSets: sets),
+                crashLogSink: null, identityReader: reader)
             .GetRegisteredPackagesAsync();
     }
 
     /// <summary>
-    /// The scan that goes with it: every registered file present except the patch,
-    /// whose row is the one under test. Paths are read back off the rows rather than
-    /// spelled again, so the fixture says the same thing whatever the normalisation
-    /// made of them.
+    /// The machine these run against: the product's own package on the disk and the
+    /// superseded patch's file gone, which is where a scan finds itself the moment after
+    /// this app has done what it offered to do.
     /// </summary>
-    private static Task<ScanResult> ScanWithThePatchFileGone(InstallerQueryResult enumerated)
+    private static (MockFileSystem Fs, IdentitiesFromTheFilesystem Reader) MachineWithThePatchFileGone()
     {
         var fs = new MockFileSystem();
+        PutOnDisk(fs, ProductFile);
+        return (fs, new IdentitiesFromTheFilesystem(fs));
+    }
+
+    /// <summary>
+    /// The scan that goes with it: every registered file present except the patch, whose
+    /// row is the one under test. Paths are put on disk from the rows rather than spelled
+    /// again, so the fixture says the same thing whatever the normalisation made of them.
+    /// </summary>
+    private static Task<ScanResult> ScanWithThePatchFileGone(
+        InstallerQueryResult enumerated, MockFileSystem fs)
+    {
         foreach (var row in enumerated.Packages)
-            if (row.PatchState != 2) fs.AddFile(row.LocalPackagePath, new MockFileData("x"));
+            if (row.PatchState != 2) PutOnDisk(fs, row.LocalPackagePath);
         return new FileSystemScanService(
             QueryReturning(enumerated), fs, Array.Empty<string>(), null).ScanAsync();
     }
@@ -773,7 +849,8 @@ public class FileSystemScanServiceTests
         // The withholding fired because the enumeration was short of a product, and
         // that product is exactly the one that could have held a patch able to roll
         // back onto this file.
-        var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: true);
+        var (fs, reader) = MachineWithThePatchFileGone();
+        var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: true, reader);
 
         // THE FIXTURE IS THE SUBJECT HERE, so it is asserted before the behaviour. A
         // change that stopped producing this combination would otherwise leave the
@@ -782,8 +859,23 @@ public class FileSystemScanServiceTests
         Assert.True(row.RemovableWithheld);
         Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
         Assert.False(row.IsRemovable);
+        // AND THE UNREAD-FILE MARKER IS CLEARED. THIS LINE IS NOT BELT AND BRACES AND MUST
+        // NOT BE DELETED AS SUCH: it exists because the first version of the carve-out
+        // above it silenced this whole test's case by a second route, and this assertion
+        // is what caught it.
+        //
+        // The confirmation pass reads the patch file, a file that has gone cannot be
+        // read, so a missing superseded row is ALREADY withheld by the time the
+        // scan-wide withholding runs, and that pass only touches rows still carrying
+        // IsRemovable. It would pass straight over this row. The marker would stand,
+        // saying an unread file was the only reason, on the one run whose enumeration is
+        // known to be short of a product, and the notice below would not appear at all.
+        //
+        // Measured rather than argued: with the clearing arm taken out and this line
+        // taken out with it, the affected count below comes back 0 where it must be 1.
+        Assert.False(row.WithheldOnUnreadableFile);
 
-        var result = await ScanWithThePatchFileGone(enumerated);
+        var result = await ScanWithThePatchFileGone(enumerated, fs);
 
         Assert.Equal(1, result.MissingFromDiskCount);
         Assert.Equal(1, result.MissingAffectedCount);
@@ -804,18 +896,116 @@ public class FileSystemScanServiceTests
         // registration on every machine would be named in a notice the app cannot
         // support. That is the direction this split was built to avoid, and holding
         // the pair together is what keeps both from drifting.
-        var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: false);
+        var (fs, reader) = MachineWithThePatchFileGone();
+        var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: false, reader);
 
         var row = enumerated.Packages.Single(p => p.PatchState == 2);
-        Assert.False(row.RemovableWithheld);
+        // THE FIXTURE ASSERTION HERE READ THE OTHER WAY UNTIL 2026-08-21 AND WAS FALSE
+        // OF EVERY REAL MACHINE. It said this row was not withheld, which held only
+        // because the default identity reader answered for a file that is not there. The
+        // row IS withheld: the confirmation pass could not read the patch file, because
+        // the patch file has gone. What the pair below says is that the app knows the
+        // difference between a withholding that found something out and one that could
+        // not have found anything out.
+        Assert.True(row.RemovableWithheld);
+        Assert.True(row.WithheldOnUnreadableFile);
         Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
 
-        var result = await ScanWithThePatchFileGone(enumerated);
+        var result = await ScanWithThePatchFileGone(enumerated, fs);
 
         Assert.Equal(1, result.MissingFromDiskCount);
         Assert.Equal(0, result.MissingAffectedCount);
         Assert.Equal(1, result.MissingUnaffectedCount);
         Assert.Empty(MissingFilesReport.Products(result.RegisteredPackages));
+    }
+
+    [Fact]
+    public async Task The_scan_after_a_superseded_patch_is_removed_says_nothing_about_it()
+    {
+        // THE FAULT THIS EXISTS FOR NEEDS TWO SCANS AND CANNOT BE SEEN IN ONE, which is
+        // the whole reason it reached a shipped screenshot. The app offered a superseded
+        // patch, the file was removed, and the next scan warned that a repair could fail
+        // on it: the claim the offer's own condition exists to rule out. Every instrument
+        // looked at one scan. The tests built one, the audits read the code that builds
+        // one, and the eye-verify list asked for a scan and a Move and not for a scan
+        // after it.
+        //
+        // ONE FILESYSTEM AND ONE READER ACROSS BOTH SCANS, because the fixture has to
+        // change in exactly the way the machine does: a file leaves the disk and every
+        // question about it answers differently afterwards.
+        var fs = new MockFileSystem();
+        var reader = new IdentitiesFromTheFilesystem(fs);
+        PutOnDisk(fs, ProductFile);
+        PutOnDisk(fs, PatchFile);
+
+        // SCAN ONE, AND ITS ASSERTIONS ARE THE CONTROL RATHER THAN THE SUBJECT. Without
+        // them a fixture that never offered anything would pass every assertion below by
+        // having nothing to report, and zero findings over an empty set reads exactly
+        // like a clean result.
+        var before = await EnumerateWithSupersededPatch(aClaimWasLost: false, reader);
+        var offered = before.Packages.Single(p => p.PatchState == 2);
+        Assert.True(offered.IsRemovable);
+        Assert.False(offered.RemovableWithheld);
+        Assert.False(offered.WithheldOnUnreadableFile);
+        Assert.Equal(ProductPatchSet.AllNonRemovable, offered.ProductPatchSetVerdict);
+
+        // THE ACT. Move and Delete differ only in where the file goes, and nothing from
+        // here on reads a destination.
+        TakeOffDisk(fs, PatchFile);
+
+        // SCAN TWO, through the same production enumeration rather than a re-served
+        // result, because the row's flags are what move and only the real service moves
+        // them.
+        var after = await EnumerateWithSupersededPatch(aClaimWasLost: false, reader);
+        var row = after.Packages.Single(p => p.PatchState == 2);
+        Assert.True(row.RemovableWithheld);
+        Assert.True(row.WithheldOnUnreadableFile);
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+
+        var result = await ScanWithThePatchFileGone(after, fs);
+
+        Assert.Equal(1, result.MissingFromDiskCount);
+        Assert.Equal(0, result.MissingAffectedCount);
+        Assert.Equal(1, result.MissingUnaffectedCount);
+        // And no program is named, which is the half a count cannot see: what was on the
+        // screen was a sentence carrying the program's name.
+        Assert.Empty(MissingFilesReport.Products(result.RegisteredPackages));
+    }
+
+    [Fact]
+    public async Task A_patch_file_that_is_there_and_will_not_be_read_is_withheld_and_marked()
+    {
+        // THE CONTROL THAT PINS THE DISTINCTION THE WHOLE CARVE-OUT TURNS ON, and it is
+        // the one a fix could most easily lose. A file that is ABSENT tells the app
+        // nothing because there is nothing to open, and no machine anywhere can ever
+        // answer that read. A file that is PRESENT and will not give up an identity is
+        // the app unable to establish something it could have established, on this
+        // machine, today. Only the first is a tautology. A fix that stopped withholding
+        // on both would put a file whose own declaration was never read back on the
+        // silent side, and that is a claim of harmlessness nothing supports.
+        var fs = new MockFileSystem();
+        var reader = new IdentitiesFromTheFilesystem(fs);
+        PutOnDisk(fs, ProductFile);
+        PutOnDisk(fs, PatchFile);
+        reader.WillNotBeRead(PatchFile);
+
+        var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: false, reader);
+
+        var row = enumerated.Packages.Single(p => p.PatchState == 2);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.True(row.WithheldOnUnreadableFile);
+
+        // AND THE FILE IS STILL ON THE DISK, so nothing here reaches the missing-files
+        // split at all. That is the whole of what this test claims.
+        //
+        // WHAT IT DELIBERATELY DOES NOT CLAIM, because nobody has ruled on it: what the
+        // split should say if this file then went missing between the enumeration and
+        // the scan's own stat of it. The marker would stand, the row would be missing,
+        // and the split would read it as established harmless on the strength of a read
+        // that failed for a reason that was NOT the file's absence. A test pinning that
+        // would pin behaviour nobody has decided.
+        Assert.True(fs.File.Exists(PatchFile));
     }
 
     [Fact]

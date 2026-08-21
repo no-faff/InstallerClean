@@ -78,9 +78,12 @@ internal static class MissingFilesReport
     /// direction from the offer. Both refuse to claim what the app has not shown: there
     /// that the file is spare, here that its absence is harmless.
     ///
-    /// AND A WITHHELD ROW IS AFFECTED WHATEVER ITS VERDICT SAYS, which is the third
-    /// conjunct and the one that is easy to leave out. A row reaches the flag by two
-    /// routes. The per-product pass sets it while downgrading a row whose patch set
+    /// AND A WITHHELD ROW IS AFFECTED WHATEVER ITS VERDICT SAYS, WITH ONE CARVE-OUT SET
+    /// OUT BELOW. A row reaches the flag by THREE routes. This account named two until
+    /// 2026-08-21, and that was not a simplification: the third was not known, and reading
+    /// it as one of the other two put a warning on the main window about a file the app
+    /// had just correctly removed. The per-product pass sets the flag while
+    /// downgrading a row whose patch set
     /// could not be established, and such a row's verdict is Unestablished, so the
     /// clause above already reports it. The scan-wide withholding sets it when the run
     /// lost a claim anywhere, on a row the per-product pass had already judged
@@ -96,12 +99,36 @@ internal static class MissingFilesReport
     /// staying quiet, precisely what it has just refused to trust for the purpose of
     /// acting. The flag is the app's own record that it declined to rely on the
     /// verdict, so it is read here rather than the verdict alone.
+    ///
+    /// THE THIRD ROUTE IS THE CARVE-OUT, AND IT IS A TAUTOLOGY RATHER THAN A FINDING. The
+    /// confirmation pass withholds a row whose patch file will not say which products it
+    /// declares. For a row that has REACHED THIS PREDICATE, the read it failed is a read
+    /// of the very file whose absence is the subject: there is nothing there to open.
+    /// Nobody can perform it, on any machine, ever again, and it fails for a file this app
+    /// removed exactly as it fails for one anything else removed. Read as a reason to
+    /// warn, it had the app offer a file, remove it, and then report it as a thing a
+    /// repair could fail on, which is the claim the offer's own condition exists to rule
+    /// out. So a row whose ONLY withholding cause is that unread file keeps the verdict it
+    /// was positively given, and the app stays quiet about an absence it established.
+    ///
+    /// AND THE STANDARD IS THE OFFER'S, WHICH IS WHY THAT IS NOT A WEAKENING. The evidence
+    /// that the absence is harmless is the same evidence the app acted on when it offered
+    /// the file for permanent removal, and offering is by far the more consequential of
+    /// the two. A rule strict enough to distrust that evidence here would have had to
+    /// refuse the offer first, and nothing says the offer was wrong. Nor can this line
+    /// cover an offer either way: it speaks only about a file that has already gone.
+    ///
+    /// THE FLAG NAMES A CAUSE AND THIS LINE DECIDES WHAT THE CAUSE MEANT, because it
+    /// carries two meanings and only one is a tautology. A file that is THERE and will not
+    /// give up an identity is a real inability; such a row is not missing, so it never
+    /// reaches this expression at all. See
+    /// <see cref="RegisteredPackage.WithheldOnUnreadableFile"/>.
     /// </summary>
     internal static bool Affected(RegisteredPackage row) =>
         row.IsMissingFromDisk
         && !(row.IsSupersededOrObsoleted
              && row.ProductPatchSetVerdict == ProductPatchSet.AllNonRemovable
-             && !row.RemovableWithheld);
+             && (!row.RemovableWithheld || row.WithheldOnUnreadableFile));
 
     internal static IReadOnlyList<AffectedProduct> Products(IEnumerable<RegisteredPackage> registered)
     {
