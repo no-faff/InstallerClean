@@ -317,6 +317,23 @@ jobs:
         if: '!cancelled()'
         run: node scripts/check-still-english.mjs
 
+      # The one thing about a translation nothing else asks: whether it has
+      # fallen behind its English. The gate above fires when a satellite value
+      # equals the CURRENT neutral, resx parity compares key presence and
+      # numeric placeholder arity, and cross-key rules enforce named tokens. A
+      # satellite holding the PREVIOUS English of a rewritten key matches
+      # nothing any of them compares it against, and fifteen languages were in
+      # that state before 80aff73a.
+      #
+      # INERT UNTIL THE TRANSLATION ROUND SEEDS THE LEDGER, and its zero is not
+      # coverage. With no entries it reports every key-slot as one it makes no
+      # claim about, says so in a NOTE line and exits 0. It is wired now rather
+      # than after the seed because the fault it exists to catch is a tool that
+      # was never run, and a gate that is never wired fails the same way.
+      - name: Check no translation has fallen behind its English
+        if: '!cancelled()'
+        run: node scripts/check-translation-freshness.mjs
+
       # docs/translations/*.md carry the same "generated, never hand-edited"
       # contract as the resx guards above and had no guard at all, which is how
       # all fourteen reached HEAD in 47a00f5 still quoting two strings that
