@@ -1,0 +1,14 @@
+{
+  "_readme": [
+    "Which English value each satellite translation was made from. Read by check-translation-freshness.mjs.",
+    "DELIBERATELY UNSEEDED AT THE MOMENT IT WAS ADDED, and that is the honest state rather than an oversight.",
+    "The information this file wants does not exist anywhere: a generator MAP entry is 'Key': `translation` and",
+    "records no source English. Any seed taken today would stamp the assumption that every satellite was",
+    "translated from the current neutral, which is FALSE for exactly the seventeen keys that assumption would",
+    "certify as clean. Seeding after the translation round makes it a record instead of a guess.",
+    "A key with no entry here is one this check makes NO claim about, and it says so on every run.",
+    "A key whose entry is the literal string 'unverified' is reported as unverified and never as a pass.",
+    "Seed with: node scripts/check-translation-freshness.mjs --record-all-current"
+  ],
+  "keys": {}
+}
