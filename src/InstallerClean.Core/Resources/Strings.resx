@@ -527,16 +527,31 @@
        otherwise have been offered, never everything in the folder: the folder total
        there would tell somebody that much was going spare.
 
-       UNRESOLVED AND NOT TO BE TRANSLATED ROUND: THE BODY READS "all 1 files" AT A
-       COUNT OF ONE, and one is reachable, being a folder holding a single unclaimed
-       file. The wording here is the drafted English and has not been ruled on, so it
-       is recorded rather than quietly corrected. The fix this project already uses
-       elsewhere is a pluralised noun in a slot of its own, as Cli.FoundOrphans does,
-       fed by DisplayHelpers.PluraliseFile: "all {0} {2}". Whoever settles the English
-       settles that with it, and the satellites are written once against the settled
-       form rather than twice. -->
+       SINGULAR AND PLURAL, BECAUSE A COUNT SLOT ALONE READS "all 1 files" AND A COUNT
+       OF ONE IS REACHABLE, being a folder holding a single unclaimed file. A pluralised
+       noun in a slot of its own, the shape Cli.FoundOrphans uses, would give "all 1
+       file": grammatical, and still not what a person says. The one-form drops the
+       numeral and names the size alone.
+
+       SO THIS IS THE ONE Singular/Plural PAIR HERE WHOSE {N} SETS DIFFER, the singular
+       carrying {1} and not {0}, and that is deliberate rather than a dropped
+       placeholder. The arity check compares each key against its own satellite and
+       never against its sibling, so it is legal. A language that does want the numeral
+       in its one-form adds a satellite-only Completion.NothingOfferedBody.One override,
+       whose arity is checked against the .Plural and may therefore carry {0}.
+
+       FOUR THINGS WERE CUT FROM THE DRAFTED BODY AND THE REASONS ARE THE OWNER'S, so do
+       not put them back. "Nothing is wrong with your PC" cannot be known, and it is
+       false in the worst direction: the conditions that reach this screen include a
+       malformed registration, a drive that is not attached and a permission refusal, so
+       the screen can be the one sign that something IS wrong. "Nothing was removed or
+       changed" plants the worry it settles, this screen appearing straight after a scan
+       and before anything has been pressed. "Sorry to send you away empty-handed" went
+       with them. And "rather than guess" describes something the app never does, which
+       raises a possibility that was never on the table. -->
   <data name="Completion.NothingOffered" xml:space="preserve"><value>Nothing offered on this PC</value></data>
-  <data name="Completion.NothingOfferedBody" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs on this PC. It has held back all {0} files it might otherwise have offered, {1}, rather than guess. Sorry to send you away empty-handed. Nothing is wrong with your PC.</value></data>
+  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.</value></data>
+  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
        retired list with the four that follow, and why the retired strings are kept
        rather than deleted is written out there rather than repeated here.

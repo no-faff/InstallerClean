@@ -305,8 +305,15 @@ public partial class CompletionViewModel : ObservableObject
         Heading = Strings.Completion_NothingOffered;
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
+        // The one-form names the size and not the numeral ("the one file"), so it
+        // spends {1} and leaves {0} unused. Both arguments are passed on either
+        // branch so the two forms cannot disagree about which index is which.
         Summary = string.Format(
-            Strings.Completion_NothingOfferedBody,
+            DisplayHelpers.Pluralise(
+                withheldCount,
+                Strings.Completion_NothingOfferedBody_Singular,
+                Strings.Completion_NothingOfferedBody_Plural,
+                "Completion.NothingOfferedBody"),
             withheldCount,
             DisplayHelpers.FormatSize(withheldBytes));
         Restore = string.Format(

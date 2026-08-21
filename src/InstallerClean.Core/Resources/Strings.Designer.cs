@@ -246,7 +246,8 @@ public static class Strings
     public static string Completion_NothingDeleted => Get("Completion.NothingDeleted");
     public static string Completion_NothingMoved => Get("Completion.NothingMoved");
     public static string Completion_NothingOffered => Get("Completion.NothingOffered");
-    public static string Completion_NothingOfferedBody => Get("Completion.NothingOfferedBody");
+    public static string Completion_NothingOfferedBody_Plural => Get("Completion.NothingOfferedBody.Plural");
+    public static string Completion_NothingOfferedBody_Singular => Get("Completion.NothingOfferedBody.Singular");
     public static string Completion_NothingRemoved => Get("Completion.NothingRemoved");
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");

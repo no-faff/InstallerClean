@@ -73,8 +73,9 @@ const ALLOWLIST = new Set([
   'Completion.ReverifyIdentityClaimed',
   'Completion.ReverifyIdentityUnreadable',
 
-  // Completion.NothingOffered and .NothingOfferedBody STOOD HERE AND ARE IN SERVICE
-  // AGAIN FROM 3.0.0, read by CompletionViewModel.ShowNothingOffered. Their entries
+  // Completion.NothingOffered and its body STOOD HERE AND ARE IN SERVICE AGAIN FROM
+  // 3.0.0, read by CompletionViewModel.ShowNothingOffered. The body is now a
+  // .Singular/.Plural pair rather than the single key that stood here. Their entries
   // are gone because the stale-entry check below would have failed on them, which is
   // that check doing exactly what it was added for: the revival made the entries
   // allow nothing, and an entry that allows nothing reads as a checked decision and

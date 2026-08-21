@@ -343,10 +343,12 @@ public class CompletionViewModelTests
     [Fact]
     public void The_wholesale_screen_says_what_was_held_back_and_shows_the_scan_receipt()
     {
-        // THE FIGURES ARE THE WITHHELD SET AND NEVER THE FOLDER. "It has held back all
-        // N files it might otherwise have offered" is a claim about what the scan
-        // would have listed; a folder total there would tell somebody that much was
-        // going spare, which nothing established.
+        // THE FIGURES ARE THE WITHHELD SET AND NEVER THE FOLDER. The body says the app
+        // held back what it might otherwise have OFFERED, which is a claim about what
+        // the scan would have listed; a folder total there would tell somebody that
+        // much was going spare, which nothing established. The sentence is not quoted
+        // here, because a quotation of a value that is still being worded goes stale
+        // in a comment nothing checks.
         var vm = new CompletionViewModel();
 
         vm.ShowNothingOffered(
@@ -357,7 +359,7 @@ public class CompletionViewModelTests
         Assert.False(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingOffered, vm.Heading);
         Assert.Equal(
-            string.Format(Strings.Completion_NothingOfferedBody, 3, DisplayHelpers.FormatSize(3072)),
+            string.Format(Strings.Completion_NothingOfferedBody_Plural, 3, DisplayHelpers.FormatSize(3072)),
             vm.Summary);
 
         // THE RECEIPT IS NOT DECORATION. A heading and a body with no evidence that a
@@ -375,6 +377,28 @@ public class CompletionViewModelTests
         Assert.False(vm.ShowDonate);
         Assert.True(vm.LastResultFreedNothing);
         Assert.Equal(Strings.Tooltip_SendResultLog_NothingFound, vm.SendResultLogTooltip);
+    }
+
+    [Fact]
+    public void The_wholesale_screen_at_one_file_does_not_say_all_1_files()
+    {
+        // A COUNT OF ONE IS REACHABLE, being a folder holding a single unclaimed file,
+        // and the plural form renders "held back all 1 files" for it. The one-form
+        // drops the numeral and names the size alone. The literal assertion below is
+        // the control: formatting the right key with the wrong argument, or selecting
+        // the plural at a count of one, both still satisfy a key-level assertion.
+        var vm = new CompletionViewModel();
+
+        vm.ShowNothingOffered(
+            withheldCount: 1, withheldBytes: 1024,
+            installedProductCount: 5, scanDurationMs: 10);
+
+        Assert.Equal(
+            string.Format(Strings.Completion_NothingOfferedBody_Singular, 1, DisplayHelpers.FormatSize(1024)),
+            vm.Summary);
+        Assert.Contains("the one file", vm.Summary);
+        Assert.Contains(DisplayHelpers.FormatSize(1024), vm.Summary);
+        Assert.DoesNotContain("1 files", vm.Summary);
     }
 
     [Fact]
