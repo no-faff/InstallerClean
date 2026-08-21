@@ -288,4 +288,57 @@ public class RegisteredFilesViewModelTests
         Assert.Equal("Product A", vm.SelectedProduct?.ProductName);
         Assert.False(vm.ShowMissing);
     }
+    [Fact]
+    public void A_missing_patch_is_marked_on_its_own_row_and_the_product_row_is_not()
+    {
+        // WHAT THIS WINDOW SHOWED BEFORE, AND IT WAS NOT A BLANK. A product row takes
+        // its missing state from the product's own cached package, so a product whose
+        // package is present and one of whose patches has gone was not marked, and the
+        // patch appeared in the list below carrying a formatted size built from a byte
+        // count of zero. So the window painted a plausible "0 B" for a file that is not
+        // there, and said the same to a screen reader.
+        //
+        // It matters because the missing-files notice on the main window ends "Open
+        // Details for what to do", and this is where it sends people.
+        var packages = new List<RegisteredPackage>
+        {
+            Pkg(@"C:\Windows\Installer\present.msi", "Test Product", "{AAA}"),
+            new(@"C:\Windows\Installer\gone.msp", "Test Product", "{AAA}",
+                PatchState: 2, FileExists: false),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService());
+        var product = Assert.Single(vm.Products);
+
+        // THE PRODUCT ROW STAYS UNMARKED, WHICH IS THE HALF THAT IS EASY TO GET WRONG.
+        // Rolling the patch's absence up to here would print "missing" where this row's
+        // own size goes, and this row's own file is on the disk. That would be false of
+        // it, so the flag lives on the patch row instead.
+        Assert.False(product.IsMissing);
+
+        var patch = Assert.Single(product.Patches);
+        Assert.True(patch.IsMissing);
+        Assert.Equal("gone.msp, missing", patch.AccessibleName);
+        Assert.DoesNotContain("0 B", patch.AccessibleName);
+    }
+
+    [Fact]
+    public void A_patch_that_is_on_the_disk_keeps_its_size()
+    {
+        // THE MUST-MISS CONTROL, and the two fixtures differ in one thing only. Without
+        // it a change that marked every patch row would pass the test above, and every
+        // patch in the window would read "missing" whatever the folder holds.
+        var packages = new List<RegisteredPackage>
+        {
+            Pkg(@"C:\Windows\Installer\present.msi", "Test Product", "{AAA}"),
+            new(@"C:\Windows\Installer\there.msp", "Test Product", "{AAA}",
+                PatchState: 2, FileSizeBytes: 1_048_576),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService());
+        var patch = Assert.Single(Assert.Single(vm.Products).Patches);
+
+        Assert.False(patch.IsMissing);
+        Assert.Equal("there.msp, 1.0 MB", patch.AccessibleName);
+    }
 }

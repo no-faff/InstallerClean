@@ -290,10 +290,21 @@
                                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
                                                             <Setter Property="Foreground" Value="{StaticResource Text.Body}"/>
                                                         </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsMissing}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
+                                        <!-- Missing patch: the file is gone, so it has no
+                                             size, and a zero byte count reads as an ordinary
+                                             one. Same word, same colour and same substitution
+                                             the products list above makes for a missing
+                                             package, so one window says it one way. -->
+                                        <TextBlock Text="{loc:Translate Field.Missing}" Foreground="{StaticResource Status.Warning}"
+                                                   FontSize="{DynamicResource Type.Caption}"
+                                                   Visibility="{Binding IsMissing, Converter={StaticResource BoolToVis}}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

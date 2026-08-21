@@ -110,7 +110,8 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                 .Select(p => new PatchRow(
                     Path.GetFileName(p.LocalPackagePath),
                     p.LocalPackagePath,
-                    DisplayHelpers.FormatSize(p.FileSizeBytes)))
+                    DisplayHelpers.FormatSize(p.FileSizeBytes),
+                    IsMissing: p.IsMissingFromDisk))
                 .ToList();
 
             if (msi is null && patches.Count == 0) continue;
