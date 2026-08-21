@@ -217,14 +217,19 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// receiver would take the second reading. <see cref="ResolverAttempts"/> is
     /// what separates them.
     ///
-    /// THE TWO GROUPS ARE READ DIFFERENTLY AND THE DIFFERENCE IS NOT A DETAIL. The
-    /// resolver's attempts and its five outcomes are read by nothing: they exist to
-    /// size a failure nobody has measured, before anything is designed around it,
-    /// which is the step two withdrawn designs skipped. The normalisation refusals
-    /// are not in that position any more. <see cref="NormalisationRefusedTotal"/>
-    /// acquired a consumer in this release, and it is one rule in one place rather
-    /// than a second quiet copy of one: FileSystemScanService withholds the whole
-    /// walk-derived offer on it.
+    /// BOTH GROUPS NOW DECIDE THE OFFER, AND THE OLD NOTE HERE SAID THE OPPOSITE.
+    /// It said the resolver's five outcomes were read by nothing and existed to size
+    /// a failure before anything was designed around it. That was true for one
+    /// release. From 3.0.0 the five withhold exactly as the four normalisation
+    /// refusals do, on one rule in one place rather than a second quiet copy of one:
+    /// FileSystemScanService withholds the whole walk-derived offer where
+    /// <c>EnumerationCensus.AnyRecordedPathUnestablished</c> answers true, and that
+    /// property is where every population is added to the question.
+    ///
+    /// THE ATTEMPTS COUNT IS STILL MEASUREMENT AND NOT A RULE. Nothing withholds on
+    /// it. It is what makes the five readable, since a machine flagging no path at
+    /// all reports five zeros that are indistinguishable on the wire from five clean
+    /// answers.
     /// </summary>
     internal sealed class PathCensus
     {
@@ -1617,13 +1622,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// from. Handing the resolver the Win32 spelling is what stops the resolution
     /// answering about a path assembled out of the running process's location.
     ///
-    /// WHAT THIS DOES NOT DO, because a comment claiming a closed hole is worse
-    /// than none: a flagged path the kernel declines to RESOLVE is kept in the
-    /// spelling Windows gave, so its claim still fails to match the walk and its
-    /// file is still offered. That is what happened before any resolution existed
-    /// and is no worse; what is new is only that the residue is a claim known to
-    /// be unspellable rather than one nobody asked about, with nothing downstream
-    /// told about it. (Resolve, not expand: two different operations are in this
+    /// WHAT THIS STILL DOES NOT DO, and what stopped following from it. A flagged
+    /// path the kernel declines to RESOLVE is still kept in the spelling Windows
+    /// gave, and its claim still fails to match anything the walk produces. That much
+    /// is unchanged and cannot be improved here. What no longer follows is that its
+    /// file is offered: from 3.0.0 the refusal is counted, and
+    /// <c>EnumerationCensus.AnyRecordedPathUnestablished</c> withholds the whole
+    /// walk-derived offer on it, because the app cannot say WHICH candidate the
+    /// unresolved claim meant and so cannot hold back a narrower set. This paragraph
+    /// used to end "and its file is still offered", which was true when it was
+    /// written and is the sentence to check against the code rather than against its
+    /// own reasoning. (Resolve, not expand: two different operations are in this
     /// method and the one word was doing for both. The kernel resolving a final
     /// path is <see cref="InstallerCacheHelpers.TryResolveFinalPath"/>, which
     /// answers yes or no; expanding an environment variable is the paragraph above,

@@ -317,24 +317,27 @@ public record InstallerQueryResult(
 /// Recorded paths this scan put to the final-path resolver: the ones carrying a
 /// long-path or NT object prefix, or an 8dot3 alias, and no others.
 ///
-/// THE FIVE OUTCOME COUNTS BELOW CANNOT BE READ WITHOUT IT, which is the only
-/// reason it exists. Most machines flag no path at all, so the resolver is never
-/// asked and its five failures all read zero: identical, on the wire, to a machine
-/// that asked and got five clean answers. This is what tells those two apart, and a
-/// receiver reading any of the five without it is reading a number that cannot mean
-/// what it appears to.
+/// THE FIVE OUTCOME COUNTS BELOW CANNOT BE READ WITHOUT IT. Most machines flag no
+/// path at all, so the resolver is never asked and its five failures all read zero:
+/// identical, on the wire, to a machine that asked and got five clean answers. This
+/// is what tells those two apart, and a receiver reading any of the five without it
+/// is reading a number that cannot mean what it appears to.
+///
+/// IT IS NO LONGER THE ONLY REASON THIS EXISTS, and the sentence saying so has been
+/// taken out rather than qualified. The five below were carried to size a failure
+/// before anything was designed around it; from 3.0.0 they also decide something,
+/// and <see cref="AnyRecordedPathUnestablished"/> is where.
 /// </param>
 /// <param name="PathResolverNotAPathCount">
 /// Of those, the ones the resolver refused outright as not a path.
 /// </param>
 /// <param name="PathResolverNoAncestorCount">
 /// Of those, the ones with no existing component anywhere up to the root: an
-/// unattached drive, an unmapped share, a detached virtual disk. An ordinary
-/// machine state that says nothing about whether the path could be handled.
+/// unattached drive, an unmapped share, a detached virtual disk.
 /// </param>
 /// <param name="PathResolverOpenRefusedCount">
 /// Of those, the ones an ancestor existed for and no handle could be opened on.
-/// Most often an ACL, and the second of the two ordinary states.
+/// Most often an ACL.
 /// </param>
 /// <param name="PathResolverNoFinalNameCount">
 /// Of those, the ones whose final name came back empty from an opened handle.
@@ -344,6 +347,12 @@ public record InstallerQueryResult(
 ///
 /// THE RESOLVED COUNT IS NOT CARRIED. It is the attempts less these five, and a
 /// stored copy could disagree with its own parts.
+///
+/// THE FIVE USED TO BE SPLIT INTO TWO ORDINARY MACHINE STATES AND THREE THAT COULD
+/// NOT BE PRODUCED BY AN ABSENCE OR A PERMISSION, and that split has gone from these
+/// notes because nothing reads it any more. It was there to argue that a count over
+/// all five together could not be acted on. All five are now acted on alike, on the
+/// one thing true of every member: the resolver was asked and did not answer.
 /// </param>
 /// <param name="PathNormalisationRefusedAtExpansionCount">
 /// Recorded values refused while expanding an environment variable.
@@ -356,9 +365,10 @@ public record InstallerQueryResult(
 /// over their sum, is that the recorded path could not be turned into a path at all.
 ///
 /// WHAT THE SUM MEANS, since it is the one that matters: such a claim is kept in
-/// the raw spelling Windows gave, so it matches nothing the folder walk produces
-/// and the cached file it names is offered as unclaimed. It cannot be caused by a
-/// missing file, a missing drive or a permission.
+/// the raw spelling Windows gave, so it matches nothing the folder walk produces and
+/// the cached file it names sits in the folder unclaimed. It cannot be caused by a
+/// missing file, a missing drive or a permission, which is what keeps it a separate
+/// population from the resolver's five, where two of the causes can.
 /// </param>
 /// <param name="PathNormalisationRefusedAtPrefixStripCount">
 /// The same, refused while taking a prefix off or preparing the resolver's ask.
@@ -435,4 +445,50 @@ public readonly record struct EnumerationCensus(
         + PathNormalisationRefusedAtPrefixStripCount
         + PathNormalisationRefusedAtFullPathCount
         + PathNormalisationRefusedAtEmbeddedNullCount;
+
+    /// <summary>
+    /// Every recorded value the final-path resolver was asked about and did not
+    /// resolve, whichever way it failed: the sum of the five outcome counts above.
+    ///
+    /// A SECOND POPULATION BESIDE THE ONE ABOVE, NOT A PART OF IT. The four above
+    /// are values that could not be turned into a path at all; these are values that
+    /// ARE paths and whose spelling the filesystem would not settle. A value can
+    /// appear in both, the resolver refusing it and the closing
+    /// <c>GetFullPath</c> then refusing it too, so the two totals must never be added
+    /// and called a count of anything. <see cref="AnyRecordedPathUnestablished"/> is
+    /// the only thing that reads them together, and it asks a question a double count
+    /// cannot distort.
+    ///
+    /// A MIXED SET, SO NOTHING MAY STATE A CAUSE FOR IT, on the same rule as the
+    /// total above. The only thing true of all five is that the resolver was asked
+    /// and did not answer.
+    /// </summary>
+    public int PathResolverRefusedTotal =>
+        PathResolverNotAPathCount
+        + PathResolverNoAncestorCount
+        + PathResolverOpenRefusedCount
+        + PathResolverNoFinalNameCount
+        + PathResolverFaultedCount;
+
+    /// <summary>
+    /// Whether this scan met any recorded path it could not settle, over every
+    /// population above. THE ONE THING THE WITHHOLDING ASKS, and the reason it is
+    /// here rather than in the service that acts on it.
+    ///
+    /// A rule that named the populations itself would be one edit away from silently
+    /// not acting on a population added later: the build stays green, the new counter
+    /// still reports, and the withholding simply does not fire for the new cause.
+    /// That is the failure this release found once already, in the count above, and
+    /// it is why the question is asked where the members are declared. Anything added
+    /// to this record that means "a recorded path this scan could not settle" belongs
+    /// in this expression in the same edit.
+    ///
+    /// A BOOL RATHER THAN A SUM, deliberately. The populations can double-count one
+    /// value between them, so their sum is a count of refusals and not of paths, and a
+    /// figure that reads as a file count and is not one would be quoted as one. The
+    /// counts are carried apart for the report, which reads them apart; the rule needs
+    /// only whether anything failed.
+    /// </summary>
+    public bool AnyRecordedPathUnestablished =>
+        PathNormalisationRefusedTotal > 0 || PathResolverRefusedTotal > 0;
 }

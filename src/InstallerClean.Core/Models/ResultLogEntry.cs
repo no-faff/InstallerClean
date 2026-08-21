@@ -319,13 +319,11 @@ public sealed record AppInfo(string Version, string Language)
 /// </param>
 /// <param name="PathResolverNoAncestorCount">
 /// Of those, with no existing component up to the root: an unattached drive, an
-/// unmapped share, a detached virtual disk. An ordinary machine state.
+/// unmapped share, a detached virtual disk.
 /// </param>
 /// <param name="PathResolverOpenRefusedCount">
 /// Of those, where an ancestor existed and no handle could be opened on it, most often
-/// an ACL. The second ordinary state, and the pair is why these are not one number: a
-/// count folding all five together could not be acted on, and acting on such a count
-/// was designed twice and withdrawn twice.
+/// an ACL.
 /// </param>
 /// <param name="PathResolverNoFinalNameCount">
 /// Of those, where an opened handle yielded an empty final name.
@@ -334,6 +332,15 @@ public sealed record AppInfo(string Version, string Language)
 /// Of those, where the attempt threw rather than answering. The resolved count is not
 /// sent: it is the attempts less these five, and a stored copy could disagree with its
 /// own parts.
+///
+/// THESE FIVE ARE SENT APART AND ACTED ON TOGETHER, and the note here used to say the
+/// opposite: that two were ordinary machine states, that a count folding all five
+/// together could not be acted on, and that acting on such a count had been designed
+/// twice and withdrawn twice. The withdrawals happened and the reasoning was sound on
+/// the trade-off it was making. From 3.0.0 the owner has ruled that trade-off away and
+/// all five withhold alike, so the split survives here as five numbers a receiver can
+/// read separately and no longer as an argument about what may be acted on.
+/// See <see cref="PathResolverRefusedCount"/>.
 /// </param>
 /// <param name="PathNormalisationRefusedCount">
 /// Recorded values this scan could not turn into a path at all, whatever refused them.
@@ -341,10 +348,10 @@ public sealed record AppInfo(string Version, string Language)
 /// the total and its parts cannot come apart.
 ///
 /// WHAT IT MEANS, and it is the figure this group exists for: such a claim is kept in
-/// the raw spelling Windows gave, matches nothing the folder walk produces, and the
-/// cached file it names is offered as unclaimed. It cannot be produced by a missing
-/// file, a missing drive or a permission, which is what separates it from the two
-/// ordinary states above.
+/// the raw spelling Windows gave and matches nothing the folder walk produces, so the
+/// cached file it names sits in the folder unclaimed. It cannot be produced by a
+/// missing file, a missing drive or a permission, and the resolver's own total can.
+/// The two are separate populations for that reason and are never added.
 ///
 /// AND THE APPLICATION ACTS ON IT. Above zero, the scan withholds its whole
 /// walk-derived offer rather than name a file it cannot say is spare. So this number
@@ -447,14 +454,43 @@ public sealed record MachineInfo(
     /// IT IS THE ONLY MEMBER OF THIS GROUP A SENTENCE MAY BE BUILT ON, the four
     /// parts being four different facts about a machine. What it means is that the
     /// recorded path could not be turned into a path at all, so the claim is kept in
-    /// the raw spelling Windows gave, matches nothing the folder walk produces, and
-    /// the cached file it names is offered as unclaimed.
+    /// the raw spelling Windows gave and matches nothing the folder walk produces.
+    /// The cached file it names was OFFERED as unclaimed until 3.0.0 and is now
+    /// withheld with the rest of the walk-derived offer, which is what this figure
+    /// says about the machine it came from.
     /// </summary>
     public int PathNormalisationRefusedCount =>
         PathNormalisationRefusedAtExpansionCount
         + PathNormalisationRefusedAtPrefixStripCount
         + PathNormalisationRefusedAtFullPathCount
         + PathNormalisationRefusedAtEmbeddedNullCount;
+
+    /// <summary>
+    /// Recorded values the final-path resolver was asked about and did not resolve,
+    /// whichever way it failed: the sum of the five resolver outcomes. Derived here
+    /// for the same reason as the total above, so it cannot be sent disagreeing with
+    /// its own parts.
+    ///
+    /// A SECOND POPULATION BESIDE THAT TOTAL AND NEVER A PART OF IT. Those are values
+    /// that could not be turned into a path at all; these are values that ARE paths
+    /// and whose spelling the filesystem would not settle. One value can appear in
+    /// both, so the two must not be added and the sum called a count of anything.
+    ///
+    /// AND THE APPLICATION ACTS ON IT, on the same rule as the other total: above
+    /// zero on either, the scan withholds its whole walk-derived offer rather than
+    /// name a file it cannot say is spare. So a report carrying a figure here is a
+    /// report from a machine that was offered nothing from the folder walk.
+    ///
+    /// THE ONLY SENTENCE TRUE OF EVERY MEMBER is that the resolver was asked and did
+    /// not answer. The five parts are five different facts about a machine and a
+    /// sentence naming any one of them is false of the other four.
+    /// </summary>
+    public int PathResolverRefusedCount =>
+        PathResolverNotAPathCount
+        + PathResolverNoAncestorCount
+        + PathResolverOpenRefusedCount
+        + PathResolverNoFinalNameCount
+        + PathResolverFaultedCount;
 }
 
 /// <summary>

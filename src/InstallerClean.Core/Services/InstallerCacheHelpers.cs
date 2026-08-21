@@ -10,28 +10,36 @@ namespace InstallerClean.Services;
 /// with the five ways it can fail kept apart rather than collapsed into one
 /// <c>false</c>.
 ///
-/// TWO OF THEM ARE ORDINARY MACHINE STATES AND THREE ARE NOT, and that is the
-/// whole reason the distinction is carried rather than a preference for detail.
-/// <see cref="NoExistingAncestor"/> is an unattached drive, an unmapped share or a
-/// detached virtual disk; <see cref="OpenRefused"/> is most often an ACL. Neither
-/// says anything about whether the recorded path could have been handled.
-/// <see cref="NotAPath"/>, <see cref="FinalNameUnavailable"/> and
-/// <see cref="Faulted"/> cannot be produced by an absence or by a permission. A
-/// count over all five together cannot be acted on, and acting on one was
-/// designed twice and withdrawn twice, the second time by the session that
-/// proposed it: it would have emptied a machine's whole offer because a USB drive
-/// was unplugged.
+/// ALL FIVE WITHHOLD, ON THE ONE THING TRUE OF EVERY MEMBER: the resolver was asked
+/// about a recorded path and did not answer. A registration whose spelling the
+/// filesystem would not settle is compared in a form the folder walk never produces,
+/// so the cached file it names sits in the candidate list unclaimed, and which
+/// candidate it is cannot be established. That is the whole argument and it does not
+/// distinguish between the members.
+///
+/// THIS OVERTURNS A DECISION TAKEN TWICE, AND THE REASONING IT OVERTURNS WAS SOUND
+/// ON ITS OWN TERMS. Acting on <see cref="NoExistingAncestor"/> was designed twice
+/// and withdrawn twice, the second time by the session that proposed it, because it
+/// would empty a machine's whole offer because a USB drive was unplugged. That was a
+/// trade-off between an offer and a certainty, and the owner has since ruled the
+/// trade-off away rather than resolved it: where the app can detect that one of its
+/// own checks did not answer, it offers nothing that scan. How often a condition
+/// arises is not admissible in that decision, so the two ordinary machine states
+/// here, an unattached drive and a refused handle, withhold exactly as the other
+/// three do. The old note split the five on that distinction and the split is gone,
+/// because nothing reads it.
 ///
 /// A REGISTRATION WHOSE FILE IS SIMPLY GONE REACHES NONE OF THESE, which is the
-/// first objection anybody raises and the thing that separates this from that
-/// withdrawn design. The walk climbs to an existing ancestor and reattaches the
-/// missing suffix as text, so a missing file resolves normally and answers
-/// <see cref="Resolved"/>.
+/// first objection anybody raises and is what keeps the rule off ordinary machines.
+/// The walk climbs to an existing ancestor and reattaches the missing suffix as text,
+/// so a missing file resolves normally and answers <see cref="Resolved"/>.
 ///
-/// NOTHING IN THE APPLICATION BRANCHES ON WHICH MEMBER IT IS. Every gate asks the
-/// bool question. These travel to the opt-in report so the shape of this failure
-/// on real machines can be measured before anything is designed around it, which
-/// is the step both withdrawn designs skipped.
+/// NOTHING IN THE APPLICATION BRANCHES ON WHICH MEMBER IT IS, and that is still true
+/// of the gates: every containment gate asks the bool question. What changed is that
+/// the counts are no longer carried for measurement alone. They travel to the opt-in
+/// report AND they decide the offer, through
+/// <c>EnumerationCensus.AnyRecordedPathUnestablished</c>, which is the single place
+/// the question is asked.
 /// </summary>
 internal enum PathResolution
 {
@@ -238,10 +246,11 @@ internal static class InstallerCacheHelpers
     ///
     /// THE BOOL IS THE WHOLE OF WHAT ANY GATE ASKS, and this stays the entry
     /// every one of them takes. <see cref="ResolveFinalPathOutcome"/> is the same
-    /// call with the failure named rather than collapsed, and it exists for the
-    /// opt-in report alone. Routing the gates through the outcome and comparing
-    /// members would put a containment decision one mistyped member away from
-    /// treating a refusal as a proof.
+    /// call with the failure named rather than collapsed, and the naming is read by
+    /// the census and by the opt-in report; the offer is decided on the same
+    /// not-<see cref="PathResolution.Resolved"/> question this bool asks. Routing
+    /// the gates through the outcome and comparing members would put a containment
+    /// decision one mistyped member away from treating a refusal as a proof.
     /// </summary>
     internal static bool TryResolveFinalPath(string path, out string resolved) =>
         ResolveFinalPathOutcome(path, out resolved) == PathResolution.Resolved;

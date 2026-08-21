@@ -385,46 +385,55 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // version, so treating any one of them as redundant cover for the others is
         // the mistake this comment exists to prevent.
         //
-        // AND THE FIFTH IS HERE: A CLAIM NOBODY CAN SPELL WITHHOLDS THIS WHOLE HALF.
-        // Where any registration's recorded path could not be turned into a path at
-        // all, that claim is kept in the raw spelling Windows gave and matches nothing
-        // the walk produces, so the cached file it names is sitting in this candidate
-        // list right now, unclaimed. WHICH ONE cannot be established: the claim will
-        // not resolve, and the identity match immediately above cannot reach it
-        // either, because a value the path API refuses is a value CreateFile refuses
-        // too and there is nothing to open and compare. Every candidate is therefore
-        // one that claim could have meant, so none of them can be offered.
+        // AND THE FIFTH IS HERE: A CLAIM THIS SCAN COULD NOT SETTLE WITHHOLDS THIS
+        // WHOLE HALF. Where any registration's recorded path could not be turned into
+        // a path at all, or could be but the filesystem would not settle its spelling,
+        // that claim is compared in a form that matches nothing the walk produces, so
+        // the cached file it names is sitting in this candidate list right now,
+        // unclaimed. WHICH ONE cannot be established: the claim did not resolve, and
+        // the identity match immediately above cannot be relied on to have reached it,
+        // since the reasons a path will not resolve are largely the reasons a handle on
+        // it will not open. Every candidate is therefore one that claim could have
+        // meant, so none of them can be offered.
         //
         // THE WHOLE SET, WHICH IS THE COST AND IS NOT AN ARGUMENT AGAINST IT. Holding
         // a file back is this app working. The alternative is offering a file it
         // cannot say is spare, and the two are not comparable.
         //
-        // IT CANNOT BE CAUSED BY AN ABSENCE OR BY A PERMISSION, which is what
-        // separates this from two designs that were withdrawn. A registration whose
-        // file is simply gone resolves normally, the resolver climbing to an existing
-        // ancestor and reattaching the missing suffix as text; an unattached drive and
-        // a refused handle are counted apart and act on nothing. What fires here is
-        // only a value that is not a path: an embedded null, a device name, a length
-        // past the API's limit.
+        // IT CAN NOW BE CAUSED BY AN ABSENCE OR BY A PERMISSION, AND THAT IS THE
+        // CHANGE 3.0.0 MAKES. This comment used to say the opposite, and said it as
+        // the thing separating this rule from two designs that were withdrawn: those
+        // acted on an unattached drive, and emptying a machine's whole offer because a
+        // USB stick was unplugged was judged too much to pay. The owner has since ruled
+        // that trade-off away. Where the app can detect that one of its own checks did
+        // not answer, it offers nothing that scan, and no weighing of how often the
+        // condition arises enters it. So an unattached drive, an unmapped share and a
+        // refused handle now withhold alongside a value that is not a path.
+        //
+        // A REGISTRATION WHOSE FILE IS SIMPLY GONE STILL REACHES NONE OF THIS, which is
+        // the first objection anybody raises and remains the answer to it. The resolver
+        // climbs to an existing ancestor and reattaches the missing suffix as text, so
+        // a missing file resolves normally and this rule never sees it. What fires here
+        // is a value that is not a path, or one the filesystem declined to settle.
         //
         // THE SUPERSEDED HALF OF THE OFFER IS NOT WITHHELD WITH IT. Those rows are
         // judged on products, through registry keys read by product code and patch
         // code, and nothing on that path reads a cached-package path at all; measured
         // with a planted unspellable value against an ordinary-value control, the
         // sibling patch's offer did not move. What is unobserved rather than ruled out
-        // is an unspellable registration naming the very same file an offered
+        // is an unsettled registration naming the very same file an offered
         // superseded row names, which would be a second claim on that path that the
         // merge cannot see.
-        // THE SUM COMES FROM THE CENSUS RATHER THAN BEING ADDED UP HERE. This line
+        //
+        // THE QUESTION IS ASKED OF THE CENSUS RATHER THAN ASSEMBLED HERE. This line
         // used to name the members one by one, which was correct and was one edit
         // away from not being: a cause added to the split is a cause this rule would
         // silently not act on, with a green build, a counter still reporting it and
         // nothing to show for it but files still being offered. The release that
-        // added a fourth cause is the release that would have walked into it, so the
-        // addition is spelled once, where the members are.
-        var unspellableClaims = query.Census.PathNormalisationRefusedTotal;
-
-        if (unspellableClaims > 0)
+        // added a fourth cause is the release that would have walked into it, and the
+        // release that added a second POPULATION is this one. So the question is
+        // spelled once, where the members are.
+        if (query.Census.AnyRecordedPathUnestablished)
         {
             // Every candidate is already kept back on a fact about the machine's
             // records, so the per-file screen below could only reach the same

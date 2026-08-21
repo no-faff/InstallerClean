@@ -103,6 +103,76 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         Assert.Single(result.WithheldFiles!);
     }
 
+    [Theory]
+    [InlineData(1, 0, 0, 0, 0)]
+    [InlineData(0, 1, 0, 0, 0)]
+    [InlineData(0, 0, 1, 0, 0)]
+    [InlineData(0, 0, 0, 1, 0)]
+    [InlineData(0, 0, 0, 0, 1)]
+    public async Task Any_of_the_five_resolver_refusals_withholds(
+        int notAPath, int noAncestor, int openRefused, int noFinalName, int faulted)
+    {
+        // THE SECOND POPULATION, ADDED IN 3.0.0, AND IT IS NOT A WIDER READING OF THE
+        // FIRST. These are values that ARE paths and whose spelling the filesystem
+        // would not settle, so the claim is compared in a form the walk never
+        // produces and the file it means sits in this candidate list unclaimed,
+        // exactly as an unspellable claim's does.
+        //
+        // TWO OF THE FIVE ARE ORDINARY MACHINE STATES and they are in this theory on
+        // purpose. An unattached drive and a refused handle were counted apart and
+        // acted on nothing until this release, on a trade-off the owner has since
+        // ruled away: where the app can detect that one of its own checks did not
+        // answer, it offers nothing that scan.
+        //
+        // A CASE PER MEMBER RATHER THAN ONE CASE OVER THE SUM, on the same reasoning
+        // as the four above. A rule keyed on the members it happened to be written
+        // for lets the rest through with a green build and a counter still reporting.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new List<RegisteredPackage>().AsReadOnly(),
+                Census: new EnumerationCensus(
+                    // The attempts count travels with them and is not itself a
+                    // reason to withhold; the control below holds it to that.
+                    PathResolverAttemptCount: 1,
+                    PathResolverNotAPathCount: notAPath,
+                    PathResolverNoAncestorCount: noAncestor,
+                    PathResolverOpenRefusedCount: openRefused,
+                    PathResolverNoFinalNameCount: noFinalName,
+                    PathResolverFaultedCount: faulted)));
+
+        var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
+
+        Assert.Empty(result.RemovableFiles);
+        Assert.Single(result.WithheldFiles!);
+    }
+
+    [Fact]
+    public async Task A_resolver_that_was_asked_and_answered_withholds_nothing()
+    {
+        // THE MUST-MISS CONTROL FOR THE THEORY ABOVE, and the one that matters most
+        // of any control in this file. A machine whose recorded paths carry an 8dot3
+        // spelling puts them to the resolver and gets clean answers, so its attempts
+        // count is positive with five zeros behind it. A withholding that read the
+        // attempts would empty the offer on precisely the machines the resolution
+        // exists to help, and every case in the theory above would still pass.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new List<RegisteredPackage>().AsReadOnly(),
+                Census: new EnumerationCensus(PathResolverAttemptCount: 3)));
+
+        var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+        Assert.Equal("one.msi", result.RemovableFiles[0].FileName);
+        Assert.Empty(result.WithheldFiles!);
+    }
+
     [Fact]
     public async Task A_clean_census_withholds_nothing_and_the_offer_stands()
     {
