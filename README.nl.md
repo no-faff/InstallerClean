@@ -252,7 +252,7 @@ Zit iets je hier in de weg, [open dan een issue](../../issues). Toegankelijkheid
 **Ga ik echt GB's aan ruimte vrijmaken?** Dat hangt van je machine af. Een schone Windows 11-installatie zonder extra software heeft niets te verwijderen. Een ontwikkelwerkstation dat al jaren meegaat, of elke machine met veel MSI-software (Acrobat, Office, LibreOffice, grote ontwikkeltools), kan tientallen GB's hebben. Hoe dan ook zie je precies hoeveel op het moment dat je het draait.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Sinds v1.8.0 kun je een kort anoniem rapport over de uitkomst insturen. Er zijn er tot nu toe 206 binnengekomen (dank jullie wel 🙏) en van de 61% machines die iets op te ruimen hadden, is de mediaan van de vrijgemaakte ruimte 16,8 GB. Eén machine haalde er maar liefst 462 GB uit. Hier is een samenvatting van de resultaten.
+Sinds v1.8.0 kun je een kort anoniem rapport over de uitkomst insturen. Er zijn er tot nu toe 207 binnengekomen (dank jullie wel 🙏) en van de 61% machines die iets op te ruimen hadden, is de mediaan van de vrijgemaakte ruimte 16,8 GB. Eén machine haalde er maar liefst 462 GB uit. Hier is een samenvatting van de resultaten.
 
 <p align="center">
   <picture>
