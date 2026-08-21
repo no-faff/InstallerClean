@@ -59,7 +59,11 @@ const MAP = {
   'Window.Orphaned.Title': `File tidak diperlukan yang aman dihapus`,
 
   // Section headings
-  'Section.Registered.Products': `PRODUK`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `PATCH`,
   'Section.Registered.Details': `DETAIL PRODUK`,
   'Section.Backup.Folder': `BACKUP FOLDER`,
@@ -139,7 +143,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini.`,
   'Automation.Licence.HelpText': `Membuka file lisensi di github.com melalui browser Anda.`,
   'Automation.Section.BackupFolder': `Backup folder`,
-  'Automation.Section.Products': `Produk`,
   'Automation.Section.Patches': `Patch`,
   'Automation.Section.ProductDetails': `Detail produk`,
   'Automation.BackupFolder': `Backup folder`,

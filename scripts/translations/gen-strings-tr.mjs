@@ -51,7 +51,11 @@ const MAP = {
   'Window.About.Title': `Hakkında`,
   'Window.Registered.Title': `Silinmemesi gereken kayıtlı dosyalar`,
   'Window.Orphaned.Title': `Silinmesi güvenli, gereksiz dosyalar`,
-  'Section.Registered.Products': `ÜRÜNLER`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `YAMALAR`,
   'Section.Registered.Details': `ÜRÜN AYRINTILARI`,
   'Section.Backup.Folder': `BACKUP FOLDER`,
@@ -113,7 +117,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `Daha yeni sürümü indirmek için sürüm sayfasını açın ya da geçerli sürümü korumak için iptal edin.`,
   'Automation.Licence.HelpText': `github.com üzerindeki lisans dosyasını tarayıcınızda açar.`,
   'Automation.Section.BackupFolder': `Backup folder`,
-  'Automation.Section.Products': `Ürünler`,
   'Automation.Section.Patches': `Yamalar`,
   'Automation.Section.ProductDetails': `Ürün ayrıntıları`,
   'Automation.BackupFolder': `Backup folder`,

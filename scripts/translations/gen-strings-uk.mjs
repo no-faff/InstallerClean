@@ -68,7 +68,11 @@ const MAP = {
   'Window.Orphaned.Title': `Непотрібні файли, які можна безпечно видалити`,
 
   // Section headings
-  'Section.Registered.Products': `ПРОДУКТИ`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `ВИПРАВЛЕННЯ`,
   'Section.Registered.Details': `ДЕТАЛІ ПРОДУКТУ`,
   'Section.Backup.Folder': `BACKUP FOLDER`,
@@ -143,7 +147,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `Відкрийте сторінку випуску, щоб завантажити новішу версію, або скасуйте, щоб лишити поточну версію.`,
   'Automation.Licence.HelpText': `Відкриває файл ліцензії на github.com у вашому браузері.`,
   'Automation.Section.BackupFolder': `Backup folder`,
-  'Automation.Section.Products': `Продукти`,
   'Automation.Section.Patches': `Виправлення`,
   'Automation.Section.ProductDetails': `Деталі продукту`,
   'Automation.BackupFolder': `Backup folder`,

@@ -84,7 +84,11 @@ const MAP = {
   'Window.Orphaned.Title': `Overbodige bestanden die veilig kunnen worden verwijderd`,
 
   // Section headings
-  'Section.Registered.Products': `PRODUCTEN`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `PATCHES`,
   'Section.Registered.Details': `PRODUCTGEGEVENS`,
   'Section.Backup.Folder': `BACK-UPMAP`,
@@ -158,7 +162,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `Open de releasepagina om de nieuwere versie te downloaden, of annuleer om de huidige versie te behouden.`,
   'Automation.Licence.HelpText': `Opent het licentiebestand op github.com in je browser.`,
   'Automation.Section.BackupFolder': `Back-upmap`,
-  'Automation.Section.Products': `Producten`,
   'Automation.Section.Patches': `Patches`,
   'Automation.Section.ProductDetails': `Productgegevens`,
   'Automation.BackupFolder': `Back-upmap`,

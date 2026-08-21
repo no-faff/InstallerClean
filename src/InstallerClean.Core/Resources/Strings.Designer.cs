@@ -161,7 +161,6 @@ public static class Strings
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
     public static string Cli_EventLogHardError_NoLog => Get("Cli.EventLogHardError.NoLog");
     public static string Cli_EventLogInstallerLockUnavailable => Get("Cli.EventLogInstallerLockUnavailable");
-    public static string Cli_EventLogInstanceRefusal => Get("Cli.EventLogInstanceRefusal");
     public static string Cli_EventLogMissingFromDisk => Get("Cli.EventLogMissingFromDisk");
     public static string Cli_EventLogMoveAborted => Get("Cli.EventLogMoveAborted");
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
@@ -172,7 +171,6 @@ public static class Strings
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");
     public static string Cli_EventLogMutexBlocked => Get("Cli.EventLogMutexBlocked");
     public static string Cli_EventLogNoArguments => Get("Cli.EventLogNoArguments");
-    public static string Cli_EventLogNothingOfferedInstance => Get("Cli.EventLogNothingOfferedInstance");
     public static string Cli_EventLogPendingRebootBlocked => Get("Cli.EventLogPendingRebootBlocked");
     public static string Cli_EventLogReason_InstallerInProgress => Get("Cli.EventLogReason.InstallerInProgress");
     public static string Cli_EventLogReason_MsiExecuteMutex => Get("Cli.EventLogReason.MsiExecuteMutex");
@@ -205,7 +203,6 @@ public static class Strings
     public static string Cli_Help_Usage => Get("Cli.Help.Usage");
     public static string Cli_Help_Version => Get("Cli.Help.Version");
     public static string Cli_InstallerLockUnavailable => Get("Cli.InstallerLockUnavailable");
-    public static string Cli_InstanceRefusal => Get("Cli.InstanceRefusal");
     public static string Cli_MissingFromDisk_Plural => Get("Cli.MissingFromDisk.Plural");
     public static string Cli_MissingFromDisk_Singular => Get("Cli.MissingFromDisk.Singular");
     public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
@@ -217,7 +214,6 @@ public static class Strings
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
-    public static string Cli_NothingOfferedInstance => Get("Cli.NothingOfferedInstance");
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
     public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
     public static string Cli_PendingRebootBlocked_Other => Get("Cli.PendingRebootBlocked.Other");
@@ -234,7 +230,6 @@ public static class Strings
     public static string Completion_FailedCount_Plural => Get("Completion.FailedCount.Plural");
     public static string Completion_FailedCount_Singular => Get("Completion.FailedCount.Singular");
     public static string Completion_Freed => Get("Completion.Freed");
-    public static string Completion_InstanceRefusal => Get("Completion.InstanceRefusal");
     public static string Completion_MoveCancelledSummary => Get("Completion.MoveCancelledSummary");
     public static string Completion_Moved => Get("Completion.Moved");
     public static string Completion_MoveRestoreHint_Plural => Get("Completion.MoveRestoreHint.Plural");

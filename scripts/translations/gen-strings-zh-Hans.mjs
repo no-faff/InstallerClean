@@ -53,7 +53,11 @@ const MAP = {
   'Window.About.Title': `关于`,
   'Window.Registered.Title': `不应删除的已注册文件`,
   'Window.Orphaned.Title': `不需要的文件，可安全删除`,
-  'Section.Registered.Products': `产品`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `补丁`,
   'Section.Registered.Details': `产品详情`,
   'Section.Backup.Folder': `BACKUP FOLDER`,
@@ -115,7 +119,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `打开发布页面以下载更新版本，或取消以保留当前版本。`,
   'Automation.Licence.HelpText': `在浏览器中打开 github.com 上的许可证文件。`,
   'Automation.Section.BackupFolder': `Backup folder`,
-  'Automation.Section.Products': `产品`,
   'Automation.Section.Patches': `补丁`,
   'Automation.Section.ProductDetails': `产品详情`,
   'Automation.BackupFolder': `Backup folder`,

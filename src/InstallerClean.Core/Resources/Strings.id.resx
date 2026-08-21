@@ -90,7 +90,6 @@
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>File tidak diperlukan yang aman dihapus</value></data>
 
   <!-- Section headings -->
-  <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUK</value></data>
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCH</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>DETAIL PRODUK</value></data>
   <data name="Section.Backup.Folder" xml:space="preserve"><value>BACKUP FOLDER</value></data>
@@ -257,7 +256,6 @@
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
   <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
-  <data name="Automation.Section.Products" xml:space="preserve"><value>Produk</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Patch</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Detail produk</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as

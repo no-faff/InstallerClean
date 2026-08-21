@@ -90,7 +90,6 @@
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Arquivos desnecessários que podem ser excluídos com segurança</value></data>
 
   <!-- Section headings -->
-  <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUTOS</value></data>
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCHES</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>DETALHES DO PRODUTO</value></data>
   <data name="Section.Backup.Folder" xml:space="preserve"><value>BACKUP FOLDER</value></data>
@@ -257,7 +256,6 @@
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
   <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
-  <data name="Automation.Section.Products" xml:space="preserve"><value>Produtos</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Patches</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Detalhes do produto</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as

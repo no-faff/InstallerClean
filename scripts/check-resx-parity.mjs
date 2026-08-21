@@ -85,6 +85,16 @@ let failed = false;
 const nonCli = [...neutral.keys()].filter((k) => !isCliKey(k)).length;
 const humanCli = [...neutral.keys()].filter(isHumanCliKey).length;
 
+// A COUNT OF WHAT WAS REPORTED, PRINTED BESIDE THE LIST AND NOT INSTEAD OF IT.
+// Everything this gate says is a filtered list, and a filtered read of a list cannot
+// be checked against anything: a grep that matches nothing and a run that found
+// nothing produce the same empty output, and the second is the answer everybody
+// hopes for. The totals below are what a reader compares their own count against.
+//
+// ADDITIVE ONLY. This changes nothing about what passes or fails. The exit code is
+// still decided by `failed`, set exactly where it always was.
+const tally = { files: 0, missing: 0, placeholder: 0, stray: 0, override: 0 };
+
 for (const file of satellites) {
   const sat = parse(file);
   const errors = [];
@@ -124,6 +134,14 @@ for (const file of satellites) {
 
   if (errors.length) {
     failed = true;
+    tally.files += 1;
+    for (const e of errors) {
+      const kind = e.startsWith('MISSING') ? 'missing'
+        : e.startsWith('STRAY') ? 'stray'
+        : e.startsWith('PLACEHOLDER override') ? 'override'
+        : 'placeholder';
+      tally[kind] += 1;
+    }
     console.error(`resx parity FAILED for ${file}:\n  ${errors.join('\n  ')}`);
   } else {
     const detail = shipsCli
@@ -132,5 +150,10 @@ for (const file of satellites) {
     console.log(`${file}: OK (${detail}, placeholder arity matches)`);
   }
 }
+
+console.log(
+  `TOTALS: ${satellites.length} satellite(s) checked, ${tally.files} failed, `
+  + `${tally.missing} missing, ${tally.placeholder} placeholder mismatch(es), `
+  + `${tally.stray} stray, ${tally.override} placeholder override(s).`);
 
 process.exit(failed ? 1 : 0);

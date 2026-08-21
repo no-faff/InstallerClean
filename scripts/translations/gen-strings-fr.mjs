@@ -73,7 +73,11 @@ const MAP = {
   'Window.Orphaned.Title': `Fichiers inutiles que vous pouvez supprimer sans risque`,
 
   // Section headings
-  'Section.Registered.Products': `PRODUITS`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `CORRECTIFS`,
   'Section.Registered.Details': `DÉTAILS DU PRODUIT`,
   'Section.Backup.Folder': `BACKUP FOLDER`,
@@ -142,7 +146,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `Ouvrez la page de la version pour télécharger la version plus récente, ou annulez pour conserver la version actuelle.`,
   'Automation.Licence.HelpText': `Ouvre le fichier de licence sur github.com dans votre navigateur.`,
   'Automation.Section.BackupFolder': `Backup folder`,
-  'Automation.Section.Products': `Produits`,
   'Automation.Section.Patches': `Correctifs`,
   'Automation.Section.ProductDetails': `Détails du produit`,
   'Automation.BackupFolder': `Backup folder`,

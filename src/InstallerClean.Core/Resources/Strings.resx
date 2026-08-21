@@ -561,7 +561,6 @@
        had to explain a button press that did nothing, where those explained an empty
        list. It went with the cached-package identity check and did not come back with
        them: nothing refuses a confirmed batch that way now. -->
-  <data name="Completion.InstanceRefusal" xml:space="preserve"><value>Since the scan, a program on this PC has been installed as a second copy of itself. InstallerClean can no longer be certain which cached files belong to it, so it hasn't moved or deleted anything. Re-scan to check again.</value></data>
   <!-- The line under the post-Move summary, in its four forms: the backup
        folder is on another drive or on the same one, at one file or at more.
        Delete has no counterpart, and deliberately: it makes no safety claim on
@@ -1261,18 +1260,14 @@ The crash log could not be written.</value></data>
        said "a second copy of itself": this audience knows the term and that one does
        not, and the split was deliberate. The event-log line carried no
        registered-package tail, unlike Cli.EventLogScanNoOrphans above. -->
-  <data name="Cli.NothingOfferedInstance" xml:space="preserve"><value>A product on this PC has a second instance installed, so InstallerClean can't be certain which cached files belong to it. Nothing offered. {0} files held back.</value></data>
-  <data name="Cli.EventLogNothingOfferedInstance" xml:space="preserve"><value>{0} mode: nothing offered. A product on this PC has a second instance installed, so InstallerClean could not be certain which cached files belong to it. {1} files held back.</value></data>
   <!-- Retired and unread with the two above. The act-time refusal. It could tell nobody
        to press anything, this surface having no button, so it ends "Run it again." where
        the window's Completion.InstanceRefusal ends "Re-scan to check again." -->
-  <data name="Cli.InstanceRefusal" xml:space="preserve"><value>Since the scan, a program on this PC has been installed as a second copy of itself. InstallerClean can no longer be certain which cached files belong to it, so it hasn't moved or deleted anything. Run it again.</value></data>
   <!-- Retired and unread with the three above. The act-time audit line. It did NOT
        reuse Cli.EventLogNothingOfferedInstance, whose "nothing offered" would have been
        false here: those files were offered and the run then refused to act on them. "No
        action taken" is the vocabulary Cli.EventLogScanFound still ends with, so a filter
        watching the Application channel met one phrase rather than two. -->
-  <data name="Cli.EventLogInstanceRefusal" xml:space="preserve"><value>{0} mode: no action taken. Since the scan, a product on this PC has been installed as a second instance, so InstallerClean could not be certain which cached files belong to it. {1} files left untouched.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
   <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} unneeded {2} found, {3}. No action taken.</value></data>
   <!-- 0 = how many files, 1 = the programs they belong to

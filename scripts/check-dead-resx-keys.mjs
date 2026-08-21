@@ -59,13 +59,12 @@ const ALLOWLIST = new Set([
   // uniquely reached is one case nobody has ever observed. Every key below was a
   // surface for that check or for the machine condition inside it.
   //
-  // They are kept rather than deleted, and kept in all fifteen satellites with
-  // them, because whether the app should say anything at all about a file it
-  // declines to touch is an OPEN question the owner has not ruled on: it waits on
-  // scan-time counts that do not exist yet. Deleting the English would throw away
-  // fifteen translations of the only wording this project has ever had for it.
-  // Each line below says what the string was for and what removed it, so a later
-  // reader can tell a retired string from an oversight.
+  // THE TWO BELOW ARE KEPT AND THEY ARE IN ALL FIFTEEN SATELLITES, which is what
+  // makes keeping them worth something: deleting the English would throw away
+  // fifteen translations of the only wording this project has ever had for the
+  // condition. Whether the app should say anything at all about a file it declines
+  // to touch is an open question, and if the answer is ever yes, these are a
+  // starting point somebody was paid for.
 
   // Two of the five held-back causes on the completion overlay, both produced only
   // by the identity re-check at action time: a record existing under the code the
@@ -81,20 +80,27 @@ const ALLOWLIST = new Set([
   // allow nothing, and an entry that allows nothing reads as a checked decision and
   // is not one. Named here rather than silently dropped so the next reader can see
   // that the pair left this list deliberately and is not missing from it.
-  //
-  // The same condition arriving between the scan and the click, which refused the
-  // whole batch rather than dropping files from it with per-file causes. It did not
-  // come back with the pair: nothing refuses a confirmed batch that way now.
-  'Completion.InstanceRefusal',
-
-  // The command line's counterparts: its third scan outcome and that outcome's
-  // Application-channel line, then its act-time refusal and that refusal's own
-  // audit line. No exit code changed when these went.
-  'Cli.NothingOfferedInstance',
-  'Cli.EventLogNothingOfferedInstance',
-  'Cli.InstanceRefusal',
-  'Cli.EventLogInstanceRefusal',
 ]);
+
+// FIVE INSTANCE-REFUSAL KEYS STOOD IN THAT LIST UNTIL 2026-08-21 AND THEY ARE GONE
+// FROM THE RESX, NOT FROM THIS LIST ONLY. Completion.InstanceRefusal,
+// Cli.NothingOfferedInstance, Cli.EventLogNothingOfferedInstance, Cli.InstanceRefusal
+// and Cli.EventLogInstanceRefusal, all surfaces for the second-instance condition.
+//
+// THE REASON THIS LIST GAVE FOR KEEPING THEM WAS FALSE AND NOBODY HAD CHECKED IT.
+// It said they were kept in all fifteen satellites and that deleting the English
+// would throw away fifteen translations. Measured across all sixteen resx files:
+// every one of the five was in the neutral and in NONE of the satellites. There
+// were no translations to lose, so the sentence that justified keeping them was
+// arguing from a thing that did not exist, and it read as a checked decision.
+//
+// AND THE OTHER REASON DOES NOT REACH THEM EITHER. All five NAME A CAUSE. A
+// cause-naming string for a mechanism that has left the tree cannot be brought
+// back into service, only re-read as licence to name that cause again: this
+// release proved it when Completion.NothingOffered returned and its heading was
+// reusable while its body had to be thrown away and written afresh, the old body
+// having named the identity check. A heading can wait for a new condition. A
+// sentence about a condition cannot outlive it.
 
 // Every .cs / .xaml under src/, minus bin/ and obj/ (build output mirrors source)
 // and minus the generated Designer (it defines an accessor for every key).

@@ -57,7 +57,11 @@ const MAP = {
   'Window.About.Title': `InstallerClean について`,
   'Window.Registered.Title': `削除すべきでない登録済みファイル`,
   'Window.Orphaned.Title': `削除しても安全な不要ファイル`,
-  'Section.Registered.Products': `製品`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `パッチ`,
   'Section.Registered.Details': `製品詳細`,
   'Section.Backup.Folder': `BACKUP FOLDER`,
@@ -119,7 +123,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `リリースページを開いて新しいバージョンをダウンロードするか、キャンセルして現在のバージョンを維持します。`,
   'Automation.Licence.HelpText': `ブラウザで github.com のライセンスファイルを開きます。`,
   'Automation.Section.BackupFolder': `Backup folder`,
-  'Automation.Section.Products': `製品`,
   'Automation.Section.Patches': `パッチ`,
   'Automation.Section.ProductDetails': `製品詳細`,
   'Automation.BackupFolder': `Backup folder`,

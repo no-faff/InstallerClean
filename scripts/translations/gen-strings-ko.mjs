@@ -50,7 +50,11 @@ const MAP = {
   'Window.Orphaned.Title': `안전하게 삭제할 수 있는 불필요한 파일`,
 
   // Section headings
-  'Section.Registered.Products': `제품`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `패치`,
   'Section.Registered.Details': `제품 세부 정보`,
   'Section.Backup.Folder': `BACKUP FOLDER`,
@@ -120,7 +124,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요.`,
   'Automation.Licence.HelpText': `브라우저에서 github.com의 라이선스 파일을 엽니다.`,
   'Automation.Section.BackupFolder': `Backup folder`,
-  'Automation.Section.Products': `제품`,
   'Automation.Section.Patches': `패치`,
   'Automation.Section.ProductDetails': `제품 세부 정보`,
   'Automation.BackupFolder': `Backup folder`,

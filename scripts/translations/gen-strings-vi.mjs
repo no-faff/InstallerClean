@@ -54,7 +54,11 @@ const MAP = {
   'Window.Orphaned.Title': `Tệp không cần thiết, có thể xóa an toàn`,
 
   // Section headings
-  'Section.Registered.Products': `SẢN PHẨM`,
+  // Section.Registered.Products and Automation.Section.Products were removed from
+  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
+  // registered-files window stopped having a products group of its own, and stayed
+  // here and in all fifteen satellites, so every round regenerated two keys the app
+  // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `BẢN VÁ`,
   'Section.Registered.Details': `CHI TIẾT SẢN PHẨM`,
   'Section.Backup.Folder': `BACKUP FOLDER`,
@@ -124,7 +128,6 @@ const MAP = {
   'Automation.UpdateAvailable.HelpText': `Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại.`,
   'Automation.Licence.HelpText': `Mở tệp giấy phép trên github.com trong trình duyệt của bạn.`,
   'Automation.Section.BackupFolder': `Backup folder`,
-  'Automation.Section.Products': `Sản phẩm`,
   'Automation.Section.Patches': `Bản vá`,
   'Automation.Section.ProductDetails': `Chi tiết sản phẩm`,
   'Automation.BackupFolder': `Backup folder`,
