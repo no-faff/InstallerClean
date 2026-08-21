@@ -46,7 +46,7 @@ const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `정보`,
-  'Window.Registered.Title': `삭제하지 말아야 할 등록된 파일`,
+  'Window.Registered.Title': `Files left alone`,
   'Window.Orphaned.Title': `안전하게 삭제할 수 있는 불필요한 파일`,
 
   // Section headings
@@ -133,7 +133,7 @@ const MAP = {
   'Automation.StartupScanProgress': `시작 검사 진행 상황`,
   'Automation.ViewOrphanedFiles': `세부 정보, 불필요한 파일`,
   'Automation.ViewOrphanedFiles.HelpText': `정리할 수 있습니다.`,
-  'Automation.ViewRegisteredFiles': `세부 정보, 등록된 파일`,
+  'Automation.ViewRegisteredFiles': `Details, files left alone`,
   'Automation.ViewRegisteredFiles.HelpText': `읽기 전용 목록입니다.`,
   'Automation.SortStatus.Ascending': `{0} 기준 오름차순 정렬됨`,
   'Automation.SortStatus.Descending': `{0} 기준 내림차순 정렬됨`,
@@ -160,8 +160,8 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `이 파일들은 {InstallerFolder}에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다.`,
-  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
   'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
   'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
@@ -255,11 +255,11 @@ const MAP = {
 
   // Orphaned-window footer. 0 = orphaned count, 1 = superseded count,
   // 2 = obsoleted count, 3 = size display.
-  'Summary.OrphanedWindow': `고립됨 {0}개, 대체됨 {1}개, 폐기됨 {2}개 ({3})`,
+  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
 
   // Registered-window footer. 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
 
   // Confirmation dialogs
 
@@ -491,6 +491,9 @@ const MAP = {
   'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
   'Completion.NothingRemoved': `Nothing removed`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Completion.NothingOffered': `Nothing offered on this PC`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

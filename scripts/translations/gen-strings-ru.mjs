@@ -41,7 +41,7 @@ const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `О программе`,
-  'Window.Registered.Title': `Зарегистрированные файлы, которые не стоит удалять`,
+  'Window.Registered.Title': `Files left alone`,
   'Window.Orphaned.Title': `Ненужные файлы, которые можно безопасно удалить`,
 
   // Section headings
@@ -142,7 +142,7 @@ const MAP = {
   'Automation.StartupScanProgress': `Ход сканирования при запуске`,
   'Automation.ViewOrphanedFiles': `Подробности, ненужные файлы`,
   'Automation.ViewOrphanedFiles.HelpText': `Доступны для очистки.`,
-  'Automation.ViewRegisteredFiles': `Подробности, зарегистрированные файлы`,
+  'Automation.ViewRegisteredFiles': `Details, files left alone`,
   'Automation.ViewRegisteredFiles.HelpText': `Список только для чтения.`,
   'Automation.SortStatus.Ascending': `Сортировка по столбцу «{0}», по возрастанию`,
   'Automation.SortStatus.Descending': `Сортировка по столбцу «{0}», по убыванию`,
@@ -169,8 +169,8 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `Они лежат в {InstallerFolder} и остаются после того, как программа была удалена ({0}), более новое исправление заменило одно из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими.`,
-  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
   'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
   'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
@@ -268,9 +268,9 @@ const MAP = {
   // (0 = count, 1 = size); Russian adds .Few in OVERRIDES, and .Plural serves CLDR
   // Many (ru integers never resolve to Other), so no .Many key, matching the GUI's
   // Summary.RegisteredStillUsed shape.
-  'Summary.OrphanedWindow': `{0} бесхозных, {1} замещённых, {2} устаревших ({3})`,
-  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
+  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
+  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
 
   // Confirmation dialogs
 
@@ -448,6 +448,9 @@ const MAP = {
   'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
   'Completion.NothingRemoved': `Nothing removed`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Completion.NothingOffered': `Nothing offered on this PC`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -476,7 +479,7 @@ const OVERRIDES = {
   'Summary.MissingFromDisk.Few': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
   // 2-4 takes the accusative-plural "установленные программы"; the base Plural
   // key carries the 5+ genitive "установленных программ".
-  'Summary.RegisteredWindow.Few': `{0} registered files left alone ({1})`,
+  'Summary.RegisteredWindow.Few': `{0} files left alone ({1})`,
   'Completion.PermanentDeleteSummary.Few': `{0} {1} permanently deleted`,
   // ReverifySkipped's flat base carries the 2-4/5+ agreement ("оставлено ... они
   // ... понадобились"); .One restores the singular-masculine agreement a single

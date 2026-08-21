@@ -59,7 +59,7 @@ const OVERRIDES = {
   'Plural.Patch.Few': `poprawki`,
   'Summary.RegisteredStillUsed.Few': `{0} files left alone`,
   'Summary.OrphanedToCleanUp.Few': `{0} niepotrzebne pliki do wyczyszczenia`,
-  'Summary.RegisteredWindow.Few': `{0} registered files left alone ({1})`,
+  'Summary.RegisteredWindow.Few': `{0} files left alone ({1})`,
   'Completion.PermanentDeleteSummary.Few': `{0} {1} permanently deleted`,
   'Completion.ReverifySkipped.One': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
   'Status.RegisteredPackagesFound.One': `Znaleziono {0} zarejestrowany {1}.`,
@@ -70,7 +70,7 @@ const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `O programie`,
-  'Window.Registered.Title': `Zarejestrowane pliki, których nie należy usuwać`,
+  'Window.Registered.Title': `Files left alone`,
   'Window.Orphaned.Title': `Niepotrzebne pliki, które można bezpiecznie usunąć`,
 
   // Section headings
@@ -157,7 +157,7 @@ const MAP = {
   'Automation.StartupScanProgress': `Postęp skanowania startowego`,
   'Automation.ViewOrphanedFiles': `Szczegóły, niepotrzebne pliki`,
   'Automation.ViewOrphanedFiles.HelpText': `Dostępne do wyczyszczenia.`,
-  'Automation.ViewRegisteredFiles': `Szczegóły, zarejestrowane pliki`,
+  'Automation.ViewRegisteredFiles': `Details, files left alone`,
   'Automation.ViewRegisteredFiles.HelpText': `Lista tylko do odczytu.`,
   'Automation.SortStatus.Ascending': `Posortowano według {0}, rosnąco`,
   'Automation.SortStatus.Descending': `Posortowano według {0}, malejąco`,
@@ -184,8 +184,8 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `Leżą w {InstallerFolder}, pozostawione po odinstalowaniu programu ({0}), gdy nowsza poprawka zastąpiła jedną z nich ({1}) lub gdy wydawca ją wycofał ({2}). InstallerClean wymienia wyłącznie pliki, które sam Windows zgłasza jako już niepotrzebne.`,
-  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
   'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
   'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
@@ -279,11 +279,11 @@ const MAP = {
 
   // Orphaned-window footer: removable causes. Reason stems in the genitive-plural
   // elliptical form (invariant across counts). 0/1/2 = counts, 3 = size.
-  'Summary.OrphanedWindow': `{0} osieroconych, {1} zastąpionych, {2} przestarzałych ({3})`,
+  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
 
   // Registered-window footer; split singular/plural, .Few in OVERRIDES. 0 = count, 1 = size.
-  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
 
   // Confirmation dialogs
 
@@ -518,6 +518,9 @@ const MAP = {
   'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
   'Completion.NothingRemoved': `Nothing removed`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Completion.NothingOffered': `Nothing offered on this PC`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

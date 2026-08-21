@@ -55,7 +55,7 @@ const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `Tentang`,
-  'Window.Registered.Title': `File terdaftar yang sebaiknya tidak dihapus`,
+  'Window.Registered.Title': `Files left alone`,
   'Window.Orphaned.Title': `File tidak diperlukan yang aman dihapus`,
 
   // Section headings
@@ -152,7 +152,7 @@ const MAP = {
   'Automation.StartupScanProgress': `Kemajuan pemindaian awal`,
   'Automation.ViewOrphanedFiles': `Detail, file yang tidak diperlukan`,
   'Automation.ViewOrphanedFiles.HelpText': `Tersedia untuk dibersihkan.`,
-  'Automation.ViewRegisteredFiles': `Detail, file terdaftar`,
+  'Automation.ViewRegisteredFiles': `Details, files left alone`,
   'Automation.ViewRegisteredFiles.HelpText': `Daftar baca-saja.`,
   'Automation.SortStatus.Ascending': `Diurutkan berdasarkan {0}, menaik`,
   'Automation.SortStatus.Descending': `Diurutkan berdasarkan {0}, menurun`,
@@ -179,8 +179,8 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `File-file ini berada di {InstallerFolder}, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai.`,
-  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
   'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
   'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
@@ -274,11 +274,11 @@ const MAP = {
 
   // Orphaned-window footer. 0 = orphaned count, 1 = superseded count,
   // 2 = obsoleted count, 3 = size display.
-  'Summary.OrphanedWindow': `{0} terisolasi, {1} digantikan, {2} usang ({3})`,
+  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
 
   // Registered-window footer. 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
 
   // Confirmation dialogs
 
@@ -510,6 +510,9 @@ const MAP = {
   'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
   'Completion.NothingRemoved': `Nothing removed`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Completion.NothingOffered': `Nothing offered on this PC`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

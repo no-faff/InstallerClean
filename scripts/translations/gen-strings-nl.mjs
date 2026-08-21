@@ -80,7 +80,7 @@ const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `Over`,
-  'Window.Registered.Title': `Geregistreerde bestanden die beter niet kunnen worden verwijderd`,
+  'Window.Registered.Title': `Files left alone`,
   'Window.Orphaned.Title': `Overbodige bestanden die veilig kunnen worden verwijderd`,
 
   // Section headings
@@ -171,7 +171,7 @@ const MAP = {
   'Automation.StartupScanProgress': `Voortgang van de opstartscan`,
   'Automation.ViewOrphanedFiles': `Details, overbodige bestanden`,
   'Automation.ViewOrphanedFiles.HelpText': `Beschikbaar om op te ruimen.`,
-  'Automation.ViewRegisteredFiles': `Details, geregistreerde bestanden`,
+  'Automation.ViewRegisteredFiles': `Details, files left alone`,
   'Automation.ViewRegisteredFiles.HelpText': `Alleen-lezen overzicht.`,
   'Automation.SortStatus.Ascending': `Gesorteerd op {0}, oplopend`,
   'Automation.SortStatus.Descending': `Gesorteerd op {0}, aflopend`,
@@ -198,8 +198,8 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Overbodige bestanden hieronder zijn [veilig te verwijderen].`,
-  'Body.MainExplanation.Why': `Ze staan in {InstallerFolder}, achtergebleven toen een programma werd verwijderd ({0}), een nieuwere patch een oudere verving ({1}) of de uitgever hem introk ({2}). InstallerClean toont uitsluitend bestanden waarvan Windows zelf aangeeft dat het ermee klaar is.`,
-  'Body.MainExplanation.Action': `Verwijder ze definitief, of verplaats ze naar een back-upmap tot je zeker weet dat niets ze nodig heeft. Zet je ze terug in {InstallerFolder}, dan is alles weer zoals het was.`,
+  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
   'Body.NotScanned.Lead': `Nog niets gescand.`,
   'Body.NotScanned.Why': `Klik op Opnieuw scannen om {InstallerFolder} te doorzoeken op installatiebestanden die geen enkel programma nog nodig heeft.`,
   'Body.PendingReboot.Lead': `Deze bestanden kunnen op dit moment niet worden opgeruimd.`,
@@ -276,9 +276,9 @@ const MAP = {
   'Summary.MissingFromDisk.Singular': `{0} geregistreerd bestand ontbreekt. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Open Details voor meer informatie over wat je moet doen.`,
   'Summary.MissingFromDisk.Plural': `{0} geregistreerde bestanden ontbreken. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma's zou kunnen mislukken. Open Details voor meer informatie over wat je moet doen.`,
   'Summary.OperationFiles': `{0} van {1} {2}`,
-  'Summary.OrphanedWindow': `{0} verweesd, {1} vervangen, {2} verouderd ({3})`,
-  'Summary.RegisteredWindow.Singular': `{0} geregistreerd bestand ongemoeid gelaten ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} geregistreerde bestanden ongemoeid gelaten ({1})`,
+  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
+  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
 
   // Confirmation dialogs
   'Confirm.MoveTitle': `{0} {1} verplaatsen ({2})?`,
@@ -471,6 +471,9 @@ const MAP = {
   'Completion.ReverifyIdentityUnreadable': `{0} {1} behouden, omdat InstallerClean geen programma kon vinden dat erin genoemd wordt.`,
   'Completion.NothingRemoved': `Niets verwijderd`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.`,
+  'Completion.NothingOffered': `Nothing offered on this PC`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

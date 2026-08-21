@@ -113,7 +113,7 @@ const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `About`,
-  'Window.Registered.Title': `Registered files that should not be deleted`,
+  'Window.Registered.Title': `Files left alone`,
   'Window.Orphaned.Title': `Unneeded files that are safe to delete`,
 
   // Section headings
@@ -206,7 +206,7 @@ const MAP = {
   'Automation.StartupScanProgress': `Startup scan progress`,
   'Automation.ViewOrphanedFiles': `Details, unneeded files`,
   'Automation.ViewOrphanedFiles.HelpText': `Available for cleanup.`,
-  'Automation.ViewRegisteredFiles': `Details, registered files`,
+  'Automation.ViewRegisteredFiles': `Details, files left alone`,
   'Automation.ViewRegisteredFiles.HelpText': `Read-only inventory.`,
   'Automation.SortStatus.Ascending': `Sorted by {0}, ascending`,
   'Automation.SortStatus.Descending': `Sorted by {0}, descending`,
@@ -234,8 +234,8 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with.`,
-  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
   'Body.NotScanned.Lead': `Nothing scanned yet.`,
   'Body.NotScanned.Why': `Press Re-scan to look through {InstallerFolder} for installer files that no program still needs.`,
   'Body.PendingReboot.Lead': `These files can't be cleaned up right now.`,
@@ -345,12 +345,12 @@ const MAP = {
   // (true orphans, superseded patches, obsoleted patches). 0 = orphaned count,
   // 1 = superseded count, 2 = obsoleted count, 3 = size display. No trailing
   // noun, so it agrees at any count.
-  'Summary.OrphanedWindow': `{0} orphaned, {1} superseded, {2} obsoleted ({3})`,
+  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
 
   // Registered-window footer, split singular/plural so the noun and verb agree at
   // one file ("file ... is" vs "files ... are"). 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
 
   // Confirmation dialogs
 

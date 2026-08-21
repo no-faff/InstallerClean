@@ -51,7 +51,7 @@ const ALSO_KEEP = [];
 const MAP = {
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `关于`,
-  'Window.Registered.Title': `不应删除的已注册文件`,
+  'Window.Registered.Title': `Files left alone`,
   'Window.Orphaned.Title': `不需要的文件，可安全删除`,
   // Section.Registered.Products and Automation.Section.Products were removed from
   // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
@@ -128,7 +128,7 @@ const MAP = {
   'Automation.StartupScanProgress': `启动扫描进度`,
   'Automation.ViewOrphanedFiles': `详情，不需要的文件`,
   'Automation.ViewOrphanedFiles.HelpText': `可供清理。`,
-  'Automation.ViewRegisteredFiles': `详情，已注册文件`,
+  'Automation.ViewRegisteredFiles': `Details, files left alone`,
   'Automation.ViewRegisteredFiles.HelpText': `只读清单。`,
   'Automation.SortStatus.Ascending': `已按{0}升序排序`,
   'Automation.SortStatus.Descending': `已按{0}降序排序`,
@@ -151,8 +151,8 @@ const MAP = {
   'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `来自内嵌 Authenticode 证书的使用者名称。未验证证书链。`,
   'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `它们位于 {InstallerFolder}，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。`,
-  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
   'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
   'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
@@ -217,9 +217,9 @@ const MAP = {
   'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
   'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
   'Summary.OperationFiles': `{1} 个{2}中的 {0} 个`,
-  'Summary.OrphanedWindow': `孤立 {0} 个，被取代 {1} 个，已废弃 {2} 个（{3}）`,
-  'Summary.RegisteredWindow.Singular': `{0} registered file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} registered files left alone ({1})`,
+  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
+  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
   'Confirm.MoveTitle': `移动 {0} 个{1}（{2}）？`,
   'Confirm.MoveDestination': `Move to:`,
   'Confirm.DeleteTitle': `删除 {0} 个{1}（{2}）？`,
@@ -406,6 +406,9 @@ const MAP = {
   'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
   'Completion.NothingRemoved': `Nothing removed`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Completion.NothingOffered': `Nothing offered on this PC`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
