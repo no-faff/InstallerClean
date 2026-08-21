@@ -174,6 +174,49 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task The_scan_reports_WHICH_BRANCH_emptied_the_offer_and_not_merely_that_it_is_empty()
+    {
+        // A HOST CANNOT RECOVER THIS FROM THE LISTS, which is why the flag exists. An
+        // empty offer means either that the folder held nothing to offer or that a
+        // rule about the records emptied it, and those are opposite things to tell
+        // somebody. The completion screen picks its heading off this.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new List<RegisteredPackage>().AsReadOnly(),
+                Census: new EnumerationCensus(PathNormalisationRefusedAtFullPathCount: 1)));
+
+        var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
+
+        Assert.True(result.WalkOfferWithheldWholesale);
+        Assert.Empty(result.RemovableFiles);
+        Assert.Single(result.WithheldFiles!);
+        Assert.Equal(1, result.WithheldTotalBytes);
+    }
+
+    [Fact]
+    public async Task A_scan_that_withheld_nothing_wholesale_says_so()
+    {
+        // THE MUST-MISS CONTROL FOR THE FLAG, and without it a flag hard-wired to true
+        // would satisfy the test above. This is the ordinary machine: a census with
+        // nothing wrong on it, one candidate, and an offer.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(
+                new List<RegisteredPackage>().AsReadOnly(),
+                Census: new EnumerationCensus()));
+
+        var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
+
+        Assert.False(result.WalkOfferWithheldWholesale);
+        Assert.Single(result.RemovableFiles);
+    }
+
+    [Fact]
     public async Task A_clean_census_withholds_nothing_and_the_offer_stands()
     {
         // THE CONTROL FOR THE FOUR ABOVE. Identical fixture with every refusal count

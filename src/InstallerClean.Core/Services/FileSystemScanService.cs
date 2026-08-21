@@ -244,6 +244,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // candidates for anything to have judged.
         var candidatesFromWalk = 0;
 
+        // Declared out here for the same reason again: it is decided inside the try
+        // and read by the result built after it. FALSE is the honest starting value
+        // in the same way zero is above, a scan that leaves before the branch is
+        // reached having withheld nothing wholesale.
+        var walkOfferWithheldWholesale = false;
+
         // The closing entry is owed on every exit, not just the clean one: a
         // cancel and the correlation gate both leave through here, and the gate
         // in particular fires on exactly the kind of broken machine that makes
@@ -433,7 +439,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // added a fourth cause is the release that would have walked into it, and the
         // release that added a second POPULATION is this one. So the question is
         // spelled once, where the members are.
-        if (query.Census.AnyRecordedPathUnestablished)
+        // ASKED ONCE AND KEPT, rather than asked here and asked again where the
+        // result is reported. The hosts need to know that this branch was taken, and
+        // a second reading of the census further down would be a copy of this rule
+        // able to answer differently from it after any edit to either.
+        walkOfferWithheldWholesale = query.Census.AnyRecordedPathUnestablished;
+
+        if (walkOfferWithheldWholesale)
         {
             // Every candidate is already kept back on a fact about the machine's
             // records, so the per-file screen below could only reach the same
@@ -873,7 +885,15 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registeredSupersededBytes,
             supersededRegistrations,
             obsoletedRegistrations,
-            withheld.AsReadOnly());
+            withheld.AsReadOnly(),
+            // WHICH BRANCH WAS TAKEN, not what the offer ended up holding. A host
+            // cannot recover this from the lists: an empty offer means either that
+            // the folder held nothing to offer or that the scan could not establish
+            // enough to offer anything, and those are opposite things to tell
+            // somebody. Carried as a bool with no cause attached, because several
+            // conditions reach that branch and a sentence naming one would be false
+            // on the others.
+            walkOfferWithheldWholesale);
     }
 
     /// <summary>

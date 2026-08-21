@@ -254,18 +254,76 @@ public partial class CompletionViewModel : ObservableObject
         IsComplete = true;
     }
 
-    // A SECOND EMPTY-OFFER SCREEN STOOD HERE UNTIL 3.0.0 and is worth naming so
-    // nobody reinvents it from the same reasoning. It existed because two different
-    // findings both end with an empty offer, and showing them alike had told a
-    // machine full of files the app could not vouch for that there was nothing to
-    // vouch for: ShowAllClear says the folder holds nothing to remove, and this said
-    // the app could not tell. What made the app unable to tell was the identity
-    // pass, and specifically a machine installing a product as a second instance of
-    // itself, on which the pass withheld the entire offer. Nothing withholds an
-    // offer that way now, so an empty offer has one meaning again and ShowAllClear
-    // is true of every machine that reaches it. The distinction was right while it
-    // had a subject; if anything ever empties an offer wholesale again it needs its
-    // own screen back, and not ShowAllClear.
+    /// <summary>
+    /// The second empty-offer screen, for a machine where a rule about the RECORDS
+    /// emptied the walk-derived offer in one go rather than each candidate being
+    /// judged and kept.
+    ///
+    /// TWO FINDINGS BOTH END WITH AN EMPTY OFFER AND THEY ARE OPPOSITE THINGS TO TELL
+    /// SOMEBODY. <see cref="ShowAllClear"/> says the folder holds nothing to remove.
+    /// This says the app could not establish enough to offer anything, on a machine
+    /// whose folder may be full of files nobody has vouched for. Showing the first
+    /// where the second is true is a claim about somebody's disk that the scan never
+    /// made.
+    ///
+    /// THIS SCREEN WAS RETIRED FOR ONE RELEASE AND THE HOLE THAT LEFT IS THE REASON
+    /// IT IS BACK. It was written for the cached-package identity check; that check
+    /// left the tree, a comment here recorded that an empty offer had one meaning
+    /// again, and the unspellable-claims rule then took the retired check's place in
+    /// the same release without anybody re-reading it. So the screen was gone and the
+    /// condition was not. 3.0.0 adds a third such condition. The comment ended "if
+    /// anything ever empties an offer wholesale again it needs its own screen back,
+    /// and not ShowAllClear", which was right, and this is that.
+    ///
+    /// THE BODY NAMES NO CAUSE AND MAY NOT ACQUIRE ONE. Several conditions reach
+    /// <c>ScanResult.WalkOfferWithheldWholesale</c>, they are different facts about a
+    /// machine, and a sentence naming one is false on the others.
+    ///
+    /// THE RECEIPT LINE STAYS, and it is the same one the all-clear carries. A screen
+    /// with a heading and a body and no evidence that a scan ran reads as a failure
+    /// rather than as a result, which is the opposite of what it has to say.
+    /// </summary>
+    /// <param name="withheldCount">
+    /// How many files were held back, and <paramref name="withheldBytes"/> their
+    /// size. Both come from the WHOLE withheld list rather than from the wholesale
+    /// set alone, so this screen and the main window's left-alone line cannot
+    /// disagree about one machine.
+    ///
+    /// THE TWO READINGS COINCIDE TODAY AND WILL NOT AUTOMATICALLY GO ON DOING SO.
+    /// They are the same list right now only because the per-file declared-product
+    /// screen is SKIPPED on the branch that sets the flag, so nothing else can have
+    /// put a file in that list. The moment a wholesale branch runs alongside a
+    /// per-file one, the whole list will hold files this screen did not withhold, and
+    /// this text will still be true of them: they were held back and they would
+    /// otherwise have been offered. What would stop being true is any sentence about
+    /// WHY, which is why there is none.
+    /// </param>
+    public void ShowNothingOffered(
+        int withheldCount, long withheldBytes, int installedProductCount, long scanDurationMs)
+    {
+        HeadingIsWarning = false;
+        Heading = Strings.Completion_NothingOffered;
+        FailedCount = string.Empty;
+        SummaryDestination = string.Empty;
+        Summary = string.Format(
+            Strings.Completion_NothingOfferedBody,
+            withheldCount,
+            DisplayHelpers.FormatSize(withheldBytes));
+        Restore = string.Format(
+            Strings.Completion_NothingToCleanUpReceipt,
+            installedProductCount,
+            DisplayHelpers.PluraliseProduct(installedProductCount),
+            DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
+        Errors = string.Empty;
+        Skipped = string.Empty;
+        ResultLogStatusMessage = string.Empty;
+        // Nothing was freed, so the Send button's tooltip takes its
+        // please-send-anyway form. This cohort is the one the aggregate most needs
+        // and the one least likely to press it.
+        LastResultFreedNothing = true;
+        ShowDonate = false;
+        IsComplete = true;
+    }
 
     /// <summary>
     /// The "N files kept in place" block for a completion overlay, or empty when

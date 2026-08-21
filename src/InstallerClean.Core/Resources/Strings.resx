@@ -505,25 +505,47 @@
        + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Scanned {0} {1} in {2}</value></data>
-  <!-- RETIRED WITH THE CACHED PACKAGE IDENTITY CHECK, AND NOTHING SHOWS THEM. No code
-       reads either key. Both sit on check-dead-resx-keys.mjs's retired list with the
-       five that follow, and why they are kept rather than deleted is written out there
-       rather than repeated here, in a note that turns on an open question and on the
-       fifteen satellite translations that would go with the English.
+  <!-- THE SCREEN FOR A MACHINE WHOSE WHOLE OFFER A RULE EMPTIED, which is a different
+       finding from a folder with nothing in it to remove and must not share a screen
+       with one. Completion.AllClean over Completion.NothingToCleanUp says the folder is
+       clear; this pair says the app could not establish enough to offer anything, on a
+       machine whose folder may be full.
 
-       WHAT THEY WERE FOR. The pair stood instead of Completion.AllClean and
-       Completion.NothingToCleanUp where the identity check had held the whole offer
-       back: "nothing to clean up" says the folder is clear and this said the app could
-       not tell, and the two are different claims that must not share a screen. {0} was
-       the count of files held back and {1} their size, which is the set that would
-       otherwise have been offered rather than everything in the folder: printing the
-       folder total there would have implied that much was going spare. -->
+       RETIRED FOR ONE RELEASE AND BACK IN SERVICE IN 3.0.0. The pair was written for
+       the cached-package identity check, that check left the tree, and the heading came
+       back unchanged while the body was rewritten: the old one named the identity check
+       as the cause, and naming a cause is the one thing this body may not do.
+
+       NO CAUSE, AND IT IS A RULE RATHER THAN A PREFERENCE. Several conditions can empty
+       an offer wholesale, they are different facts about a machine, and a sentence
+       naming one of them is false on the others. A precedence chain is not a fix and
+       neither is picking the most cautious cause. What every condition shares, and the
+       whole of what this may say, is that the app could not be certain which cached
+       files belong to the programs installed.
+
+       0 = the count of files held back, 1 = their size. That is the set that would
+       otherwise have been offered, never everything in the folder: the folder total
+       there would tell somebody that much was going spare.
+
+       UNRESOLVED AND NOT TO BE TRANSLATED ROUND: THE BODY READS "all 1 files" AT A
+       COUNT OF ONE, and one is reachable, being a folder holding a single unclaimed
+       file. The wording here is the drafted English and has not been ruled on, so it
+       is recorded rather than quietly corrected. The fix this project already uses
+       elsewhere is a pluralised noun in a slot of its own, as Cli.FoundOrphans does,
+       fed by DisplayHelpers.PluraliseFile: "all {0} {2}". Whoever settles the English
+       settles that with it, and the satellites are written once against the settled
+       form rather than twice. -->
   <data name="Completion.NothingOffered" xml:space="preserve"><value>Nothing offered on this PC</value></data>
-  <data name="Completion.NothingOfferedBody" xml:space="preserve"><value>A program here is installed as a second copy of itself, so InstallerClean can't be certain which cached files belong to it. It has held back all {0} files it might otherwise have offered, {1}, rather than guess. Sorry to send you away empty-handed. Nothing is wrong with your PC and there's nothing for you to do.</value></data>
-  <!-- Retired and unread with the pair above; see the note at Completion.NothingOffered.
-       The act-time twin, in the pending-reboot gate's shape: the batch was confirmed and
-       nothing ran. It was separate from the scan-time pair because it had to explain a
-       button press that did nothing, where those explained an empty list. -->
+  <data name="Completion.NothingOfferedBody" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs on this PC. It has held back all {0} files it might otherwise have offered, {1}, rather than guess. Sorry to send you away empty-handed. Nothing is wrong with your PC.</value></data>
+  <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
+       retired list with the four that follow, and why the retired strings are kept
+       rather than deleted is written out there rather than repeated here.
+
+       The act-time twin of the pair above, in the pending-reboot gate's shape: the batch
+       was confirmed and nothing ran. It was separate from the scan-time pair because it
+       had to explain a button press that did nothing, where those explained an empty
+       list. It went with the cached-package identity check and did not come back with
+       them: nothing refuses a confirmed batch that way now. -->
   <data name="Completion.InstanceRefusal" xml:space="preserve"><value>Since the scan, a program on this PC has been installed as a second copy of itself. InstallerClean can no longer be certain which cached files belong to it, so it hasn't moved or deleted anything. Re-scan to check again.</value></data>
   <!-- The line under the post-Move summary, in its four forms: the backup
        folder is on another drive or on the same one, at one file or at more.
@@ -1219,7 +1241,7 @@ The crash log could not be written.</value></data>
        opens "{0} mode:", and a filter for delete runs has to find this one.
        1 = registered package count, 2 = pluralised "package"/"packages". -->
   <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>{0} mode: no unneeded files. Installer database has {1} registered {2}.</value></data>
-  <!-- Retired and unread; see the note at Completion.NothingOffered. The command line's
+  <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does
        not, and the split was deliberate. The event-log line carried no

@@ -340,6 +340,65 @@ public class CompletionViewModelTests
         Assert.Equal(string.Empty, vm.FailedCount);
     }
 
+    [Fact]
+    public void The_wholesale_screen_says_what_was_held_back_and_shows_the_scan_receipt()
+    {
+        // THE FIGURES ARE THE WITHHELD SET AND NEVER THE FOLDER. "It has held back all
+        // N files it might otherwise have offered" is a claim about what the scan
+        // would have listed; a folder total there would tell somebody that much was
+        // going spare, which nothing established.
+        var vm = new CompletionViewModel();
+
+        vm.ShowNothingOffered(
+            withheldCount: 3, withheldBytes: 3072,
+            installedProductCount: 5, scanDurationMs: 10);
+
+        Assert.True(vm.IsComplete);
+        Assert.False(vm.HeadingIsWarning);
+        Assert.Equal(Strings.Completion_NothingOffered, vm.Heading);
+        Assert.Equal(
+            string.Format(Strings.Completion_NothingOfferedBody, 3, DisplayHelpers.FormatSize(3072)),
+            vm.Summary);
+
+        // THE RECEIPT IS NOT DECORATION. A heading and a body with no evidence that a
+        // scan ran reads as a failure rather than as a result, which is the opposite
+        // of what this screen has to say. It is the same line the all-clear carries.
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingToCleanUpReceipt,
+                5, DisplayHelpers.PluraliseProduct(5),
+                DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(10))),
+            vm.Restore);
+
+        // Nothing was freed, so no donate prompt and the Send tooltip takes its
+        // please-send-anyway form: this cohort is the one the aggregate most needs.
+        Assert.False(vm.ShowDonate);
+        Assert.True(vm.LastResultFreedNothing);
+        Assert.Equal(Strings.Tooltip_SendResultLog_NothingFound, vm.SendResultLogTooltip);
+    }
+
+    [Fact]
+    public void The_wholesale_screen_and_the_all_clear_do_not_share_a_sentence()
+    {
+        // THE WHOLE POINT OF THE SECOND SCREEN, pinned so that a later tidy cannot
+        // collapse them back into one. One says the folder holds nothing to remove;
+        // the other says the app could not establish enough to offer anything, on a
+        // machine whose folder may be full. Showing the first where the second is true
+        // is a claim about somebody's disk the scan never made.
+        var allClear = new CompletionViewModel();
+        var nothingOffered = new CompletionViewModel();
+
+        allClear.ShowAllClear(installedProductCount: 5, scanDurationMs: 10);
+        nothingOffered.ShowNothingOffered(
+            withheldCount: 3, withheldBytes: 3072,
+            installedProductCount: 5, scanDurationMs: 10);
+
+        Assert.NotEqual(allClear.Heading, nothingOffered.Heading);
+        Assert.NotEqual(allClear.Summary, nothingOffered.Summary);
+        // The receipt IS shared, deliberately, and is the one thing that should match.
+        Assert.Equal(allClear.Restore, nothingOffered.Restore);
+    }
+
     // The kept-back block. Its rule is that no sentence on it is false of any file
     // it counts, which a single cause chosen for the batch cannot keep.
 

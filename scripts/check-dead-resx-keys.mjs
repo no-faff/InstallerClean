@@ -73,14 +73,17 @@ const ALLOWLIST = new Set([
   'Completion.ReverifyIdentityClaimed',
   'Completion.ReverifyIdentityUnreadable',
 
-  // The completion screen for a machine whose entire offer the identity pass had
-  // emptied because a product was installed as a second instance of itself. It
-  // existed so that "the app could not tell" was not shown as "nothing to remove".
-  'Completion.NothingOffered',
-  'Completion.NothingOfferedBody',
-
+  // Completion.NothingOffered and .NothingOfferedBody STOOD HERE AND ARE IN SERVICE
+  // AGAIN FROM 3.0.0, read by CompletionViewModel.ShowNothingOffered. Their entries
+  // are gone because the stale-entry check below would have failed on them, which is
+  // that check doing exactly what it was added for: the revival made the entries
+  // allow nothing, and an entry that allows nothing reads as a checked decision and
+  // is not one. Named here rather than silently dropped so the next reader can see
+  // that the pair left this list deliberately and is not missing from it.
+  //
   // The same condition arriving between the scan and the click, which refused the
-  // whole batch rather than dropping files from it with per-file causes.
+  // whole batch rather than dropping files from it with per-file causes. It did not
+  // come back with the pair: nothing refuses a confirmed batch that way now.
   'Completion.InstanceRefusal',
 
   // The command line's counterparts: its third scan outcome and that outcome's

@@ -129,6 +129,81 @@ public class MainViewModelTests
         Assert.Equal("All clean", vm.Completion.Heading);
     }
 
+    // AN EMPTY OFFER HAS TWO MEANINGS AND THE THREE TESTS BELOW ARE THE PARTITION.
+    // Read what each one SETS UP rather than what it asserts: they differ only in the
+    // wholesale flag and the withheld list, which is exactly the pair the branch
+    // reads, and any two of them passing while the third fails names the mistake.
+
+    [Fact]
+    public async Task A_wholesale_withholding_gets_its_own_screen_rather_than_the_all_clear()
+    {
+        // The offer is empty because a rule about the machine's records emptied it,
+        // not because the folder held nothing. "Nothing to clean up in your Installer
+        // folder" is a claim about that disk the scan never made.
+        var vm = CreateViewModel();
+        var withheld = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2048, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                WithheldFiles: withheld, WalkOfferWithheldWholesale: true));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal(Strings.Completion_NothingOffered, vm.Completion.Heading);
+        Assert.NotEqual(Strings.Completion_AllClean, vm.Completion.Heading);
+        // The figures are the withheld set, never the folder: printing a folder total
+        // would tell somebody that much was going spare.
+        Assert.Contains("2", vm.Completion.Summary);
+        Assert.Contains(DisplayHelpers.FormatSize(3072), vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task A_wholesale_withholding_that_held_nothing_back_still_shows_the_all_clear()
+    {
+        // THE FLAG SAYS WHICH BRANCH THE SCAN TOOK, NOT THAT ANYTHING WAS WITHHELD. A
+        // walk that produced no candidates sets it and holds nothing back, and the
+        // second screen would then say it had held back all 0 files, which is absurd
+        // and untrue. Nothing in that folder went unclaimed, so the all-clear is right.
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                WithheldFiles: Array.Empty<OrphanedFile>(), WalkOfferWithheldWholesale: true));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(Strings.Completion_AllClean, vm.Completion.Heading);
+    }
+
+    [Fact]
+    public async Task Files_withheld_one_at_a_time_do_not_reach_the_wholesale_screen()
+    {
+        // THE MUST-MISS CONTROL, and it is the one that proves the branch reads the
+        // FLAG rather than the withheld list. Files kept back by the per-file
+        // declared-product screen fill the same list, and the wholesale screen's body
+        // would be false of the half of them whose declared product Windows still
+        // holds a record of: for those the app was certain, and certainty is the
+        // opposite of what that screen says.
+        var vm = CreateViewModel();
+        var withheld = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                WithheldFiles: withheld, WalkOfferWithheldWholesale: false));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(Strings.Completion_AllClean, vm.Completion.Heading);
+    }
+
     [Fact]
     public async Task ScanAsync_does_not_show_completion_when_orphans_exist()
     {

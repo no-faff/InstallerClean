@@ -247,12 +247,13 @@ namespace InstallerClean.Models;
 /// AND THEY ARE NOT ONE THING, so they are listed rather than covered by a sentence
 /// that would be false of one of them:
 ///
-/// At least one registration's recorded path could not be turned into a path at all,
-/// which withholds the whole walk-derived set at once; or the candidate is an
-/// installation package whose own declared product Windows still holds a record of,
-/// or whose declaration this scan could not settle, which withholds that one file.
-/// A run can hold files put here by either, and a reader of this list may assume
-/// neither.
+/// At least one registration's recorded path could not be settled, either because it
+/// could not be turned into a path at all or because the filesystem would not resolve
+/// its spelling, which withholds the whole walk-derived set at once
+/// (<see cref="WalkOfferWithheldWholesale"/>); or the candidate is an installation
+/// package whose own declared product Windows still holds a record of, or whose
+/// declaration this scan could not settle, which withholds that one file. A run can
+/// hold files put here by either, and a reader of this list may assume neither.
 ///
 /// NO SURFACE STATES A CAUSE OVER IT AND NONE MAY START. The main window counts these
 /// into its left-alone line. The Details window lists them among the registrations, in
@@ -309,6 +310,32 @@ namespace InstallerClean.Models;
 /// answers the question that was going to be answered by offering them, and puts
 /// nothing on anyone's list.
 /// </param>
+/// <param name="WalkOfferWithheldWholesale">
+/// True where a rule about the machine's RECORDS emptied the walk-derived offer in one
+/// go, rather than each candidate being judged and kept.
+///
+/// IT IS NOT "THE OFFER IS EMPTY" AND THE TWO MUST NOT BE CONFLATED, which is the
+/// whole reason this exists rather than the hosts asking
+/// <see cref="RemovableFiles"/> whether it is empty. An empty offer has two quite
+/// different meanings: the folder holds nothing this scan can offer, and the scan
+/// could not establish enough to offer anything. The first is a clean machine and the
+/// second is a machine full of files nobody has vouched for, and a screen saying
+/// "nothing to clean up in your Installer folder" is true of the first and false of
+/// the second.
+///
+/// IT CAN BE TRUE WHILE THE OFFER IS NOT EMPTY. The rule covers the walk-derived half
+/// only; a superseded registration that survived every withholding is offered beside
+/// it, so a host reading this must still ask what the offer holds.
+///
+/// AND IT CAN BE TRUE WITH <see cref="WithheldFiles"/> EMPTY, on a machine whose walk
+/// produced no candidates to withhold. Nothing was kept back there, so a host counting
+/// files held back must check that too rather than assume this implies any.
+///
+/// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Several conditions can empty an
+/// offer wholesale and they are different facts about a machine, so a bool is the
+/// whole of what may be carried: any sentence naming one cause would be false on the
+/// others. The census is where the causes are counted apart.
+/// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
@@ -327,7 +354,8 @@ public record ScanResult(
     long RegisteredSupersededBytes = 0,
     int SupersededRegistrationCount = 0,
     int ObsoletedRegistrationCount = 0,
-    IReadOnlyList<OrphanedFile>? WithheldFiles = null)
+    IReadOnlyList<OrphanedFile>? WithheldFiles = null,
+    bool WalkOfferWithheldWholesale = false)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk; the sum of the two
@@ -338,6 +366,10 @@ public record ScanResult(
 
     /// <summary>Total bytes of the files this scan is offering for removal.</summary>
     public long RemovableTotalBytes => RemovableFiles.Sum(f => f.SizeBytes);
+
+    /// <summary>Total bytes of the files this scan declined to offer.</summary>
+    public long WithheldTotalBytes =>
+        WithheldFiles?.Sum(f => f.SizeBytes) ?? 0;
 }
 
 /// <summary>

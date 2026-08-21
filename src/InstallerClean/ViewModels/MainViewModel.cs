@@ -306,15 +306,40 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
                 return;
 
-            // ONE FINDING AND ONE SCREEN. An empty offer has one meaning, that the
-            // scan found nothing it could offer, and this is the screen that says
-            // so. A second stood here for as long as the cached package identity
-            // check was in the tree, for a machine whose whole offer that check had
-            // held back because a product was installed as a second instance of
-            // itself, which is not the same as a scan that found nothing; it was
-            // shown as the first until it had a screen of its own. No release ever
-            // carried it, and its strings sit retired in the resx.
-            Completion.ShowAllClear(result.RegisteredPackages.Count, Scan.LastScanDurationMs);
+            // TWO FINDINGS AND TWO SCREENS, and which one is shown turns on a fact
+            // the lists cannot carry. An empty offer means EITHER that the scan found
+            // nothing it could offer, which is a clean folder, OR that a rule about
+            // the machine's records emptied the walk-derived offer in one go, which
+            // is a folder that may be full of files nobody has vouched for. Telling
+            // the second machine there is nothing to clean up in its Installer folder
+            // is a claim about that disk the scan never made.
+            //
+            // THE SECOND SCREEN WAS RETIRED IN THE SAME RELEASE THAT REPLACED ITS
+            // CONDITION. It was written for the cached-package identity check, and a
+            // comment recorded that with the check gone an empty offer had one
+            // meaning again. The unspellable-claims rule then took the same shape in
+            // that release and nobody re-read the comment, so the screen was gone
+            // while the condition was not. 3.0.0 adds a third such condition.
+            //
+            // THE COUNT CLAUSE IS NOT BELT AND BRACES. The flag says which branch the
+            // scan took, not that anything was withheld, and a walk that produced no
+            // candidates at all sets it while holding nothing back. The second screen
+            // says "it has held back all N files it might otherwise have offered",
+            // which at zero is both absurd and untrue, and for that machine the
+            // all-clear is right: nothing in the folder went unclaimed.
+            var withheld = result.WithheldFiles ?? Array.Empty<OrphanedFile>();
+            if (result.WalkOfferWithheldWholesale && withheld.Count > 0)
+            {
+                Completion.ShowNothingOffered(
+                    withheld.Count,
+                    result.WithheldTotalBytes,
+                    result.RegisteredPackages.Count,
+                    Scan.LastScanDurationMs);
+            }
+            else
+            {
+                Completion.ShowAllClear(result.RegisteredPackages.Count, Scan.LastScanDurationMs);
+            }
 
             if (suppress) return;
             // Either lock (the prior-session persisted flag or the
