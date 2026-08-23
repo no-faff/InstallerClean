@@ -1655,6 +1655,8 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Ошибка: недостаточно места в {0}. Для перемещения этих файлов нужно {1}, а свободно {2}. Ничего не перемещено.</value></data>
   <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Ошибка: у Windows Installer что-то выполняется, поэтому /m и /d заблокированы. InstallerClean не будет трогать {InstallerFolder}, пока она меняется. Попробуйте снова, когда всё закончится.</value></data>
   <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Ненужных файлов не найдено.</value></data>
+  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.</value></data>
+  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.</value></data>
   <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean больше не смог подтвердить папку назначения и остановился, чтобы не записать не туда. Проверьте {0}, затем запустите команду снова.</value></data>
   <data name="Cli.Help.Summary" xml:space="preserve"><value>Убирает файлы .msi и .msp из кэша, не нужные ни одной программе.</value></data>
   <data name="Cli.Help.Elevation" xml:space="preserve"><value>Нужна командная строка администратора; иначе Windows её не запустит.</value></data>

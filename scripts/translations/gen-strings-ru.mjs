@@ -586,6 +586,13 @@ const CLI = {
   'Cli.MoveNotEnoughSpace': `Ошибка: недостаточно места в {0}. Для перемещения этих файлов нужно {1}, а свободно {2}. Ничего не перемещено.`,
   'Cli.PendingRebootBlocked.Other': `Ошибка: у Windows Installer что-то выполняется, поэтому /m и /d заблокированы. InstallerClean не будет трогать {InstallerFolder}, пока она меняется. Попробуйте снова, когда всё закончится.`,
   'Cli.FoundNoOrphans': `Ненужных файлов не найдено.`,
+  // Added 2026-08-24 by the translation round, holding the English while the
+  // wording settles. Russian's command-line block is a separate object, so a
+  // key added to the neutral reaches the other fourteen MAPs and never this
+  // one, and the key goes missing from the Russian resx rather than merely
+  // untranslated. Translate both when the English is ruled.
+  'Cli.NothingOffered.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.`,
+  'Cli.NothingOffered.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean больше не смог подтвердить папку назначения и остановился, чтобы не записать не туда. Проверьте {0}, затем запустите команду снова.`,
   'Cli.Help.Summary': `Убирает файлы .msi и .msp из кэша, не нужные ни одной программе.`,
   'Cli.Help.Elevation': `Нужна командная строка администратора; иначе Windows её не запустит.`,

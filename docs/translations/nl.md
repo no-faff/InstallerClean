@@ -12,14 +12,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | InstallerClean | InstallerClean |
 | About | Over |
-| Registered files that should not be deleted | Geregistreerde bestanden die beter niet kunnen worden verwijderd |
+| Files left alone | Ongemoeid gelaten bestanden |
 | Unneeded files that are safe to delete | Overbodige bestanden die veilig kunnen worden verwijderd |
 
 ## Section headings
 
 | English | Nederlands |
 | --- | --- |
-| PRODUCTS | PRODUCTEN |
 | PATCHES | PATCHES |
 | PRODUCT DETAILS | PRODUCTGEGEVENS |
 | BACKUP FOLDER | BACK-UPMAP |
@@ -117,8 +116,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Nederlands |
 | --- | --- |
 | Any unneeded files below are [safe to delete]. | Overbodige bestanden hieronder zijn [veilig te verwijderen]. |
-| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Ze staan in {InstallerFolder}, achtergebleven toen een programma werd verwijderd ({0}), een nieuwere patch een oudere verving ({1}) of de uitgever hem introk ({2}). InstallerClean toont uitsluitend bestanden waarvan Windows zelf aangeeft dat het ermee klaar is. |
-| Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored. | Verwijder ze definitief, of verplaats ze naar een back-upmap tot je zeker weet dat niets ze nodig heeft. Zet je ze terug in {InstallerFolder}, dan is alles weer zoals het was. |
+| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | Ze staan in {InstallerFolder}. InstallerClean vraagt Windows naar elk geïnstalleerd programma: een bestand komt in de lijst wanneer geen enkel programma het opeist ({0}), of wanneer een nieuwere patch het heeft vervangen en geen enkel programma erop kan terugvallen ({1}). |
+| Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | Verplaats ze naar een back-upmap die je zelf kiest en verwijder die map zodra je hebt gezien dat je programma's zich gewoon laten bijwerken, repareren en verwijderen. Terugzetten in {InstallerFolder} herstelt alles. Of verwijder ze nu definitief. |
 | Nothing scanned yet. | Nog niets gescand. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Klik op Opnieuw scannen om {InstallerFolder} te doorzoeken op installatiebestanden die geen enkel programma nog nodig heeft. |
 | These files can't be cleaned up right now. | Deze bestanden kunnen op dit moment niet worden opgeruimd. |
@@ -149,6 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing removed | Niets verwijderd |
 | Nothing to clean up in {InstallerFolder} | Niets op te ruimen in {InstallerFolder} |
 | Scanned {0} {1} in {2} | {0} {1} gescand in {2} |
+| Nothing offered on this PC | Niets aangeboden op deze pc |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered. | InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom het ene bestand ({1}) achtergehouden dat het anders had aangeboden. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered. | InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom alle {0} bestanden ({1}) achtergehouden die het anders had aangeboden. |
 | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | Het bestand in die map is [veilig te verwijderen], dus gooi de map weg wanneer je wilt. Tot die tijd kun je het terugzetten in {InstallerFolder} als een programma het ooit toch nodig blijkt te hebben (uiterst onwaarschijnlijk). |
 | The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | De bestanden in die map zijn [veilig te verwijderen], dus gooi de map weg wanneer je wilt. Tot die tijd kun je ze terugzetten in {InstallerFolder} als een programma er ooit toch een nodig blijkt te hebben (uiterst onwaarschijnlijk). |
 | The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | Het bestand in die map is [veilig te verwijderen], dus verwijder de map of verplaats hem naar een andere schijf wanneer je de ruimte echt wilt terugkrijgen. Tot die tijd kun je het terugzetten in {InstallerFolder} als een programma het ooit toch nodig blijkt te hebben (uiterst onwaarschijnlijk). |
@@ -166,6 +168,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} kept in place, because the records now claim what the scan flagged. | {0} {1} behouden, omdat de records nu aanspraak maken op wat de scan had aangemerkt. |
 | {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} behouden, omdat de Windows Installer-records bij de laatste controle waren veranderd. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} behouden, omdat de Windows Installer-records bij de laatste controle niet volledig konden worden gelezen. |
+| {0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here. | {0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here. |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} behouden, omdat Windows een registratie heeft van het programma dat erin genoemd wordt. |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} behouden, omdat InstallerClean geen programma kon vinden dat erin genoemd wordt. |
 | Moved {0} of {1} {2} before you cancelled. | {0} van {1} {2} verplaatst voordat je annuleerde. |
@@ -182,13 +185,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} files left alone | {0} bestanden ongemoeid gelaten |
 | {0} unneeded file to clean up | {0} overbodig bestand om op te ruimen |
 | {0} unneeded files to clean up | {0} overbodige bestanden om op te ruimen |
-| {0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} geregistreerd bestand ontbreekt. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Open Details voor meer informatie over wat je moet doen. |
-| {0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} geregistreerde bestanden ontbreken. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma's zou kunnen mislukken. Open Details voor meer informatie over wat je moet doen. |
-| InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen, dus deze scan heeft de vervangen en verouderde patches buiten beschouwing gelaten. Alles wat er staat, is nog steeds veilig te verwijderen, maar er kunnen er meer zijn die niet worden getoond. Klik op Opnieuw scannen om het nog eens te proberen. |
+| Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Open Details for what to do. | Windows heeft een record voor {0} bestand dat niet in {InstallerFolder} staat: {1}. In het dagelijks gebruik levert dat geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Open Details voor wat je kunt doen. |
+| Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Open Details for what to do. | Windows heeft records voor {0} bestanden die niet in {InstallerFolder} staan: {1}. In het dagelijks gebruik leveren die geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Open Details voor wat je kunt doen. |
+| {0} other program | {0} ander programma |
+| {0} other programs | {0} andere programma's |
+| {0} file with no program named in the records | {0} bestand waarbij de records geen programma noemen |
+| {0} files with no program named in the records | {0} bestanden waarbij de records geen programma noemen |
+| InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. The unneeded files above are unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Re-scan to try again. | InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen en heeft ze daarom niet allemaal gelezen. De overbodige bestanden hierboven zijn hierdoor niet beïnvloed, maar wat er staat over bestanden die in {InstallerFolder} ontbreken, kan onvolledig zijn. Klik op Opnieuw scannen om het nog eens te proberen. |
 | {0} of {1} {2} | {0} van {1} {2} |
-| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} verweesd, {1} vervangen, {2} verouderd ({3}) |
-| {0} registered file left alone ({1}) | {0} geregistreerd bestand ongemoeid gelaten ({1}) |
-| {0} registered files left alone ({1}) | {0} geregistreerde bestanden ongemoeid gelaten ({1}) |
+| {0} unneeded {1} ({2}) | {0} {1} om op te ruimen ({2}) |
+| {0} file left alone ({1}) | {0} bestand ongemoeid gelaten ({1}) |
+| {0} files left alone ({1}) | {0} bestanden ongemoeid gelaten ({1}) |
 
 ## Confirmation dialogs
 
@@ -349,7 +356,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Open the release page to download the newer version, or cancel to keep the current version. | Open de releasepagina om de nieuwere versie te downloaden, of annuleer om de huidige versie te behouden. |
 | Opens the licence file on github.com in your browser. | Opent het licentiebestand op github.com in je browser. |
 | Backup folder | Back-upmap |
-| Products | Producten |
 | Patches | Patches |
 | Product details | Productgegevens |
 | Backup folder | Back-upmap |
@@ -359,7 +365,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Startup scan progress | Voortgang van de opstartscan |
 | Details, unneeded files | Details, overbodige bestanden |
 | Available for cleanup. | Beschikbaar om op te ruimen. |
-| Details, registered files | Details, geregistreerde bestanden |
+| Details, files left alone | Details, ongemoeid gelaten bestanden |
 | Read-only inventory. | Alleen-lezen overzicht. |
 | Sorted by {0}, ascending | Gesorteerd op {0}, oplopend |
 | Sorted by {0}, descending | Gesorteerd op {0}, aflopend |
@@ -406,6 +412,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Nederlands |
 | --- | --- |
+| ,  | ,  |
 | {0:F2} GB | {0:F2} GB |
 | {0:F1} MB | {0:F1} MB |
 | {0:F1} KB | {0:F1} KB |
@@ -429,9 +436,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | {InstallerFolder} scannen... |
 | Found {0} unneeded {1} to clean up ({2}). | {0} overbodige {1} gevonden om op te ruimen ({2}). |
 | Found no unneeded files. | Geen overbodige bestanden gevonden. |
-| {0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it. | {0} geregistreerd bestand ontbreekt in {InstallerFolder}. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van dat programma zou kunnen mislukken. Door het installatieprogramma van dat programma opnieuw uit te voeren, bij voorkeur dezelfde versie, zou het bestand teruggezet moeten worden. |
-| {0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them. | {0} geregistreerde bestanden ontbreken in {InstallerFolder}. Op dit moment levert dit geen problemen op, maar een toekomstige reparatie, update of verwijdering van die programma's zou kunnen mislukken. Door het installatieprogramma van elk programma opnieuw uit te voeren, bij voorkeur dezelfde versie, zouden deze bestanden teruggezet moeten worden. |
-| InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. | InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen, dus deze scan heeft de vervangen en verouderde patches buiten beschouwing gelaten. Wat wel is gevonden, is nog steeds veilig te verwijderen, maar er kunnen er meer zijn die niet worden getoond. Opnieuw uitvoeren pikt ze misschien op. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. |
+| Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Running that program's installer again, preferably the same version, usually restores the file. | Windows heeft een record voor {0} bestand dat niet in {InstallerFolder} staat: {1}. In het dagelijks gebruik levert dat geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Het installatieprogramma van dat programma opnieuw uitvoeren, bij voorkeur dezelfde versie, herstelt het bestand meestal. |
+| Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Running each program's installer again, preferably the same version, usually restores the files. | Windows heeft records voor {0} bestanden die niet in {InstallerFolder} staan: {1}. In het dagelijks gebruik leveren die geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Het installatieprogramma van elk programma opnieuw uitvoeren, bij voorkeur dezelfde versie, herstelt de bestanden meestal. |
+| InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. What it found is unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Running it again may pick up more. | InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen en heeft ze daarom niet allemaal gelezen. Wat er is gevonden, is hierdoor niet beïnvloed, maar wat er staat over bestanden die in {InstallerFolder} ontbreken, kan onvolledig zijn. Opnieuw uitvoeren levert misschien meer op. |
 | Deleting {0} unneeded {1}... | {0} overbodige {1} verwijderen... |
 | Permanently deleted {0} unneeded {1}. | {0} overbodige {1} definitief verwijderd. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Fout: er is geen bestemming voor het verplaatsen opgegeven. Gebruik /m PAD. (Een standaard die in de GUI is ingesteld, geldt per gebruiker en niet voor geplande taken of serviceaccounts.) |
@@ -463,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli blokkeert de prompt tot het klaar is, zodat een script<br>of geplande taak erop kan wachten. |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Die map geldt per gebruiker; geplande of SYSTEM-taken vereisen /m PAD. |
 | Exit codes: | Afsluitcodes: |
-|   0   success: the run finished with nothing left to do |   0   geslaagd: de uitvoering is klaar en er is niets meer te doen |
+|   0   success: the run did what it was asked and nothing failed |   0   geslaagd: de uitvoering deed wat gevraagd was, zonder fouten |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   mislukt: niets verwerkt (verkeerde argumenten, een verkeerde<br>       bestemming, een mislukte scan of elk bestand mislukt) |
 |   2   partial: some processed, some not (a failure or a Ctrl+C part way) |   2   gedeeltelijk: een deel verwerkt, een deel niet (een fout of Ctrl+C) |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  tijdelijk: iets tijdelijks blokkeerde de uitvoering (zie de melding) |

@@ -12,17 +12,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | InstallerClean | InstallerClean |
 | About | 关于 |
-| Registered files that should not be deleted | 不应删除的已注册文件 |
+| Files left alone | 原样保留的文件 |
 | Unneeded files that are safe to delete | 不需要的文件，可安全删除 |
 
 ## Section headings
 
 | English | 简体中文 |
 | --- | --- |
-| PRODUCTS | 产品 |
 | PATCHES | 补丁 |
 | PRODUCT DETAILS | 产品详情 |
-| BACKUP FOLDER | BACKUP FOLDER |
+| BACKUP FOLDER | 目标文件夹 |
 | SAY THANKS | 道声谢 |
 
 ## Buttons and actions
@@ -45,7 +44,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a _star on GitHub | 在 GitHub 上点个星(_S) |
 | Apache 2.0 licence | Apache 2.0 许可证 |
 | _Move | 移动(_M) |
-| Path to folder if you move rather than delete. | Path to folder if you move rather than delete. |
+| Path to folder if you move rather than delete. | 若选择移动而非删除，此处填写文件夹路径。 |
 | Open _release page | 打开发布页面(_R) |
 | _Re-scan | 重新扫描(_R) |
 | _Scan again | 再次扫描(_S) |
@@ -97,8 +96,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | 正在扫描本地程序包… |
 | Found {0} {1} you can safely delete. | 找到 {0} 个{1}，可安全删除。 |
 | Preparing destination folder... | 正在准备目标文件夹… |
-| Moving unneeded files... | Moving unneeded files... |
-| Deleting unneeded files... | Deleting unneeded files... |
+| Moving unneeded files... | 正在移动不需要的文件… |
+| Deleting unneeded files... | 正在删除不需要的文件… |
 | Move cancelled. {0} of {1} {2} processed. | 移动已取消。{1} 个{2}中已处理 {0} 个。 |
 | Delete cancelled. {0} of {1} {2} processed. | 删除已取消。{1} 个{2}中已处理 {0} 个。 |
 | Move failed ({0}). Details in {1}. | 移动失败（{0}）。详情见 {1}。 |
@@ -116,20 +115,20 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 简体中文 |
 | --- | --- |
-| Any unneeded files below are [safe to delete]. | Any unneeded files below are [safe to delete]. |
-| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 它们位于 {InstallerFolder}，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。 |
-| Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored. | Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored. |
+| Any unneeded files below are [safe to delete]. | 下面这些不需要的文件都[可以安全删除]。 |
+| They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | 它们位于 {InstallerFolder} 中。InstallerClean 会就每个已安装的程序询问 Windows：当没有任何程序认领某个文件时（{0}），或者当更新的补丁已经取代了它、并且没有任何程序能够回退到它时（{1}），该文件才会列出。 |
+| Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | 把它们移动到您自己选择的目标文件夹，等确认程序照常更新、修复和卸载之后，再删除那个文件夹。把它们放回 {InstallerFolder} 就能恢复一切。或者现在就永久删除。 |
 | Nothing scanned yet. | 尚未扫描。 |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 点击“重新扫描”，在 {InstallerFolder} 中查找没有任何程序仍然需要的安装程序文件。 |
 | These files can't be cleaned up right now. | 这些文件现在无法清理。 |
-| Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. | Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. |
-| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. |
-| Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. |
-| Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. |
+| Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. | 此刻有程序正在使用 Windows Installer，比如 Windows 更新，或者某个正在后台安装的程序。在此期间，移动和删除会暂停，这样 InstallerClean 就不会在 {InstallerFolder} 变动时去碰它。等结束后重新扫描，两者就会恢复。 |
+| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | 这台计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚那次安装（或重启 Windows），再清理 {InstallerFolder}。 |
+| Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows 已把一次文件重命名排入下次重启的队列，且会影响 {InstallerFolder}。请先重启 Windows 再清理。 |
+| Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer 有操作正在进行，因此移动和删除已暂停。InstallerClean 不会在 {InstallerFolder} 变动时去碰它。等结束后重新扫描，两者就会恢复。 |
 | Select a file to view details. | 选择一个文件以查看详情。 |
 | Select a product to view details. | 选择一个产品以查看详情。 |
 | No metadata available. | 没有可用的元数据。 |
-| This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program. | This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program. |
+| This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program. | 这个安装程序文件缺失了。目前不会造成任何麻烦，直到有一天您要修复、更新或卸载它所属的程序为止。那一步可能会失败，因为 Windows 会去找这个文件，而它不在。<br><br>想要修复，请从该程序的厂商处下载它的安装程序，并在现有安装之上运行（不要先卸载：卸载本身就是需要这个文件的步骤）。如果能拿到，请使用您已安装的那个版本，因为 Windows 可能会拒绝其他版本。这通常能恢复该文件并保留您的设置，但 Microsoft 并不保证，而它自己的最后手段是重新安装该程序。 |
 | The README [explains this folder], and how to recover a file, in Microsoft's own words. | README 用 Microsoft 自己的原话[解释了这个文件夹]，以及如何恢复文件。 |
 | (none) | （无） |
 
@@ -146,13 +145,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | All clean | 全部干净 |
-| Nothing removed | Nothing removed |
+| Nothing removed | 没有移除任何内容 |
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder} 中没有需要清理的内容 |
 | Scanned {0} {1} in {2} | 扫描了 {0} 个{1}，用时 {2} |
-| The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
-| The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). |
-| The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
-| The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). |
+| Nothing offered on this PC | 在这台电脑上没有提供任何内容 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的那 1 个文件（{1}）。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的全部 {0} 个文件（{1}）。 |
+| The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 那个文件夹里的文件[可以安全移除]，所以您想什么时候删除文件夹都可以。在那之前，万一有程序确实需要它，您可以把它放回 {InstallerFolder}（可能性极小）。 |
+| The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 那个文件夹里的文件[可以安全移除]，所以您想什么时候删除它都可以。在那之前，万一有程序确实需要其中某一个，您可以把它们放回 {InstallerFolder}（可能性极小）。 |
+| The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 那个文件夹里的文件[可以安全移除]，所以当您真的想收回空间时，删除该文件夹或把它移到另一个驱动器都可以。在那之前，万一有程序确实需要它，您可以把它放回 {InstallerFolder}（可能性极小）。 |
+| The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 那个文件夹里的文件[可以安全移除]，所以当您真的想收回空间时，删除该文件夹或把它移到另一个驱动器都可以。在那之前，万一有程序确实需要其中某一个，您可以把它们放回 {InstallerFolder}（可能性极小）。 |
 | {0} freed | 已释放 {0} |
 | {0} moved | 已移动 {0} |
 | Nothing was moved | 没有移动任何文件 |
@@ -163,43 +165,48 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} of {1} could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
-| {0} {1} kept in place, because the records now claim what the scan flagged. | {0} {1} kept in place, because the records now claim what the scan flagged. |
-| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} {1} kept in place, because the Windows Installer records had changed by the final check. |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. |
-| {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} kept in place, because Windows has a record of the program named inside. |
-| {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. |
+| {0} {1} kept in place, because the records now claim what the scan flagged. | 有 {0} 个{1}保持原位，因为记录现在认领了扫描标记出来的内容。 |
+| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | 有 {0} 个{1}保持原位，因为到最终检查时 Windows Installer 记录已经变了。 |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | 有 {0} 个{1}保持原位，因为最终检查时无法完整读取 Windows Installer 记录。 |
+| {0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here. | {0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here. |
+| {0} {1} kept in place, because Windows has a record of the program named inside. | 有 {0} 个{1}保持原位，因为 Windows 有文件内所标示程序的记录。 |
+| {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | 有 {0} 个{1}保持原位，因为 InstallerClean 没能在文件内找到程序名。 |
 | Moved {0} of {1} {2} before you cancelled. | 在您取消前，已移动 {1} 个{2}中的 {0} 个。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
-| {0} {1} permanently deleted | {0} {1} permanently deleted |
-| {0} {1} permanently deleted | {0} {1} permanently deleted |
+| {0} {1} permanently deleted | 已永久删除 {0} 个{1} |
+| {0} {1} permanently deleted | 已永久删除 {0} 个{1} |
 | Glad to help. There's a tip jar if you're feeling kind. | 很高兴帮上忙。您若有心，这里可以打赏。 |
 
 ## Summaries and counts
 
 | English | 简体中文 |
 | --- | --- |
-| {0} file left alone | {0} file left alone |
-| {0} files left alone | {0} files left alone |
+| {0} file left alone | {0} 个文件原样保留 |
+| {0} files left alone | {0} 个文件原样保留 |
 | {0} unneeded file to clean up | {0} 个不需要的文件可清理 |
 | {0} unneeded files to clean up | {0} 个不需要的文件可清理 |
-| {0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. |
-| {0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. |
-| InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again. |
+| Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Open Details for what to do. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。请打开“详情”了解该怎么做。 |
+| Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Open Details for what to do. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。请打开“详情”了解该怎么做。 |
+| {0} other program | 另外 {0} 个程序 |
+| {0} other programs | 另外 {0} 个程序 |
+| {0} file with no program named in the records | {0} 个在记录中没有标明程序的文件 |
+| {0} files with no program named in the records | {0} 个在记录中没有标明程序的文件 |
+| InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. The unneeded files above are unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Re-scan to try again. | InstallerClean 未能把 Windows 记录中的每一项都对应上，因此没有全部读取。上面那些不需要的文件不受影响，但关于 {InstallerFolder} 中缺失文件的说明可能不完整。请重新扫描再试一次。 |
 | {0} of {1} {2} | {1} 个{2}中的 {0} 个 |
-| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 孤立 {0} 个，被取代 {1} 个，已废弃 {2} 个（{3}） |
-| {0} registered file left alone ({1}) | {0} registered file left alone ({1}) |
-| {0} registered files left alone ({1}) | {0} registered files left alone ({1}) |
+| {0} unneeded {1} ({2}) | {0} 个不需要的{1}（{2}） |
+| {0} file left alone ({1}) | {0} 个文件原样保留（{1}） |
+| {0} files left alone ({1}) | {0} 个文件原样保留（{1}） |
 
 ## Confirmation dialogs
 
 | English | 简体中文 |
 | --- | --- |
 | Move {0} {1} ({2})? | 移动 {0} 个{1}（{2}）？ |
-| Move to: | Move to: |
+| Move to: | 移动到： |
 | Delete {0} {1} ({2})? | 删除 {0} 个{1}（{2}）？ |
-| This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. | This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. |
-| Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. | Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. |
-| That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. | That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. |
+| This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. | 此文件将被永久删除。它[可以安全删除]，但如果您想要备份，请改用“移动”按钮。 |
+| Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. | 这些文件将被永久删除。它们[可以安全删除]，但如果您想要备份，请改用“移动”按钮。 |
+| That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. | 那个文件夹在同一个驱动器上，所以在您删除它之前空间不会回来。如果想立刻拿回空间，请改选另一个驱动器上的文件夹。 |
 
 ## Error messages
 
@@ -214,14 +221,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer 无法向 InstallerClean 提供一份可读的已安装程序清单：连续 {0} 个条目返回时无法读取（最后的错误代码为 {1}）。InstallerClean 没有基于只读到一半的清单继续，而是停了下来。没有删除任何内容。 |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer 始终没有发出已安装程序清单结束的信号：InstallerClean 在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。 |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer 始终没有发出某个程序补丁清单结束的信号：InstallerClean 在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。 |
-| InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. |
-| InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. |
+| InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。记录所指向的内容几乎都不在那里，而那里的内容几乎都没有被任何记录标明，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。 |
+| InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。文件夹里有文件，但没有任何一条记录指向其中的任何内容，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。 |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean 未能读取到足够的 Windows Installer 记录，无法确定哪些内容仍然需要：已安装程序的清单返回时并不完整，而直接从注册表读取同样的记录也遇到了错误。一个文件可能仅仅因为指明它的那条记录属于读不到的记录之一，就显得像是孤立的，因此 InstallerClean 停了下来。没有删除任何内容。 |
-| InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. |
+| InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean 未能让 Windows 解析出 {InstallerFolder} 的真实路径，因此无法证明任何文件位于其中，也没有提供任何文件供清理。这次扫描一无所获是因为那项检查失败，而不是因为文件夹是干净的。没有移除任何内容。 |
 | Nothing was deleted | 没有删除任何文件 |
-| Nothing was moved | Nothing was moved |
-| InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. |
-| InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. |
+| Nothing was moved | 没有移动任何文件 |
+| InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有删除任何内容。请重试，若一直如此请重启 Windows。 |
+| InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有移动任何内容。请重试，若一直如此请重启 Windows。 |
 | Invalid destination | 目标无效 |
 | Could not write to destination | 无法写入目标 |
 | Move failed | 移动失败 |
@@ -229,7 +236,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Setting not saved | 设置未保存 |
 | The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | 无法保存此更改。下次启动时，InstallerClean 将恢复为之前的设置。 |
 | The destination cannot be inside the Windows Installer folder. | 目标不能位于 Windows Installer 文件夹内。 |
-| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. |
+| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | 目标 {0} 解析到了 Windows 系统文件夹之下。请选择 %SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)% 和 %ProgramData% 之外的路径。 |
 | Not enough space | 空间不足 |
 | Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | {0} 上的空间不足<br><br>所需：{1}<br>可用：{2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | 您没有写入 {0} 的权限。<br>请尝试您的用户配置文件中的文件夹，或您拥有的驱动器。 |
@@ -244,15 +251,15 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is not directly inside the Windows Installer folder; refused for safety. | 此文件不直接位于 Windows Installer 文件夹内；为安全起见已拒绝。 |
 | Windows refused access to this file; it was left in place. | Windows 拒绝了对此文件的访问；该文件已留在原处。 |
 | Windows refused access to these files; they were left in place. | Windows 拒绝了对这些文件的访问；这些文件已留在原处。 |
-| This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later. | This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later. |
-| These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later. | These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later. |
+| This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later. | 此文件正被另一个程序打开或锁定，因此暂时无法移除。它已保持原位；请稍后再试。 |
+| These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later. | 这些文件正被另一个程序打开或锁定，因此暂时无法移除。它们已保持原位；请稍后再试。 |
 | Windows reported a file error; the file was left in place. | Windows 报告了一个文件错误；该文件已留在原处。 |
 | Windows reported file errors; these files were left in place. | Windows 报告了文件错误；这些文件已留在原处。 |
 | Something went wrong with this file; it was left in place. | 此文件出了点问题；该文件已留在原处。 |
 | Something went wrong with these files; they were left in place. | 这些文件出了点问题；它们已留在原处。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | 拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。 |
-| The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
+| The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | 目标文件夹必须是指向某个文件夹的完整路径，以驱动器盘符或网络共享开头（例如 D:\Backup，或 \\server\backup）。InstallerClean 无法使用这个：{0} |
+| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean 已无法确认目标文件夹，因此停了下来，而不是写到错误的位置。请检查 {0}，然后重新扫描并再试一次。 |
 | Cannot write to {0}. | 无法写入 {0}。 |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | 尝试 10,000 次后仍无法为“{0}”找到唯一的文件名。 |
 
@@ -303,7 +310,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Startup error | 启动错误 |
 | Failed to start ({0}). Details written to:<br>{1} | 启动失败（{0}）。详情已写入：<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | 启动失败（{0}）。无法写入崩溃日志。 |
-| # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Entries about unreadable Windows Installer records can include a<br># Windows account SID (S-1-5-21-...) and the product codes of<br># installed software.<br># Redact all three classes of detail before attaching this file to<br># a public bug report.<br> | # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Entries about unreadable Windows Installer records can include a<br># Windows account SID (S-1-5-21-...) and the product codes of<br># installed software.<br># Redact all three classes of detail before attaching this file to<br># a public bug report.<br> |
+| # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Entries about unreadable Windows Installer records can include a<br># Windows account SID (S-1-5-21-...) and the product codes of<br># installed software.<br># Redact all three classes of detail before attaching this file to<br># a public bug report.<br> | # crash.log 记录 InstallerClean 未处理的异常。<br># 在提升权限的情况下，框架的异常消息可能包含当前会话中的文件路径<br>#（包括 Windows Installer 查询所枚举的其他用户的配置文件）。更新<br># 检查或结果日志上传的网络故障消息，可能包含目标 URL 以及解析出的<br># IP 或代理地址。关于无法读取的 Windows Installer 记录的条目，可能<br># 包含 Windows 账户 SID（S-1-5-21-...）以及已安装软件的产品代码。<br># 把此文件附到公开的错误报告之前，请先删除这三类信息。<br> |
 
 ## Tooltips (hover text)
 
@@ -316,10 +323,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Minimise | 最小化 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。 |
-| Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them. | Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them. |
-| Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them. | Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them. |
-| Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them. | Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them. |
-| Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away. | Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away. |
+| Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them. | 把不需要的文件移动到目标文件夹。等您确信没有任何东西需要它们时，再删除那个文件夹。 |
+| Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them. | 把不需要的文件移动到一个目标文件夹。您接下来会选择它。等您确信没有任何东西需要它们时，再删除那个文件夹。 |
+| Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them. | 把不需要的文件移动到目标文件夹。它在同一个驱动器上，所以要等您删除那个文件夹、或把它移到另一个驱动器，才会收回空间。等您确信没有任何东西需要它们时就可以这么做。 |
+| Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away. | 永久删除不需要的文件。它们可以安全移除，而且空间会立刻回来。 |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | 来自内嵌 Authenticode 证书的使用者名称。未验证证书链。 |
 | Change language. The program will restart. | 更改语言。程序会重启。 |
 
@@ -337,7 +344,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close result and return to main window | 关闭结果并返回主窗口 |
 | Leave a star on github | 在 github 上点个星 |
 | Minimise | 最小化 |
-| Delete permanently removes the unneeded files. Cancel closes without deleting. | Delete permanently removes the unneeded files. Cancel closes without deleting. |
+| Delete permanently removes the unneeded files. Cancel closes without deleting. | 永久删除会移除这些不需要的文件。取消则不删除任何内容并关闭。 |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 移动会将不需要的文件放入所选的目标文件夹。取消则让它们留在原处。 |
 | Say thanks | 道声谢 |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 发送会将所示报告提交给 No Faff。取消则不发送任何内容。 |
@@ -348,25 +355,24 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | If ticked, InstallerClean checks github for a newer version when you run it. | 勾选后，InstallerClean 运行时会在 github 上检查是否有更新版本。 |
 | Open the release page to download the newer version, or cancel to keep the current version. | 打开发布页面以下载更新版本，或取消以保留当前版本。 |
 | Opens the licence file on github.com in your browser. | 在浏览器中打开 github.com 上的许可证文件。 |
-| Backup folder | Backup folder |
-| Products | 产品 |
+| Backup folder | 目标文件夹 |
 | Patches | 补丁 |
 | Product details | 产品详情 |
-| Backup folder | Backup folder |
+| Backup folder | 目标文件夹 |
 | Operation progress | 操作进度 |
 | Scan {InstallerFolder} again | 重新扫描 {InstallerFolder} |
 | Scanning progress | 扫描进度 |
 | Startup scan progress | 启动扫描进度 |
 | Details, unneeded files | 详情，不需要的文件 |
 | Available for cleanup. | 可供清理。 |
-| Details, registered files | 详情，已注册文件 |
+| Details, files left alone | 详情，原样保留的文件 |
 | Read-only inventory. | 只读清单。 |
 | Sorted by {0}, ascending | 已按{0}升序排序 |
 | Sorted by {0}, descending | 已按{0}降序排序 |
 | Scan results | 扫描结果 |
 | Result details | 结果详情 |
 | File details | 文件详情 |
-| Product details | Product details |
+| Product details | 产品详情 |
 | Dialog text | 对话框文本 |
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | 无法处理的文件 |
@@ -406,6 +412,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 简体中文 |
 | --- | --- |
+| ,  | 、 |
 | {0:F2} GB | {0:F2} GB |
 | {0:F1} MB | {0:F1} MB |
 | {0:F1} KB | {0:F1} KB |
@@ -419,52 +426,54 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 简体中文 |
 | --- | --- |
-| Error: unknown argument '{0}' | Error: unknown argument '{0}' |
+| Error: unknown argument '{0}' | 错误：未知参数“{0}” |
 | Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | 错误：出现意外的多余参数“{0}”。如果移动文件夹的路径中含有空格，请给整个路径加上引号：/m "D:\My Backup" |
-| Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. |
+| Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | 错误：出现意外的多余参数“{0}”。/s 和 /d 不接受其他参数，每次运行也只能使用一个开关。 |
 | Cancelling... | 正在取消… |
 | Cancelled. | 已取消。 |
-| Error: unexpected failure ({0}). Details written to {1}. | Error: unexpected failure ({0}). Details written to {1}. |
-| Error: unexpected failure ({0}). The crash log could not be written. | Error: unexpected failure ({0}). The crash log could not be written. |
+| Error: unexpected failure ({0}). Details written to {1}. | 错误：意外故障（{0}）。详情已写入 {1}。 |
+| Error: unexpected failure ({0}). The crash log could not be written. | 错误：意外故障（{0}）。崩溃日志无法写入。 |
 | Scanning {InstallerFolder}... | 正在扫描 {InstallerFolder}… |
-| Found {0} unneeded {1} to clean up ({2}). | Found {0} unneeded {1} to clean up ({2}). |
-| Found no unneeded files. | Found no unneeded files. |
-| {0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it. | {0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it. |
-| {0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them. | {0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them. |
-| InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. | InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. |
-| Deleting {0} unneeded {1}... | Deleting {0} unneeded {1}... |
-| Permanently deleted {0} unneeded {1}. | Permanently deleted {0} unneeded {1}. |
+| Found {0} unneeded {1} to clean up ({2}). | 找到 {0} 个可清理的、不需要的{1}（{2}）。 |
+| Found no unneeded files. | 未找到不需要的文件。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. |
+| Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Running that program's installer again, preferably the same version, usually restores the file. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。重新运行该程序的安装程序，最好是同一版本，通常能恢复这个文件。 |
+| Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Running each program's installer again, preferably the same version, usually restores the files. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。重新运行各个程序的安装程序，最好是同一版本，通常能恢复这些文件。 |
+| InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. What it found is unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Running it again may pick up more. | InstallerClean 未能把 Windows 记录中的每一项都对应上，因此没有全部读取。已找到的内容不受影响，但关于 {InstallerFolder} 中缺失文件的说明可能不完整。再运行一次也许能找到更多。 |
+| Deleting {0} unneeded {1}... | 正在删除 {0} 个不需要的{1}… |
+| Permanently deleted {0} unneeded {1}. | 已永久删除 {0} 个不需要的{1}。 |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 错误：未指定移动目标位置。请使用 /m 路径。（在 GUI 中设置的默认位置是按用户保存的，不适用于计划任务或服务账户下的运行。） |
 | Error: destination cannot be inside the Windows Installer folder. | 错误：目标位置不能位于 Windows Installer 文件夹内。 |
 | Error: destination must be a fully qualified path. Got: {0} | 错误：目标位置必须是完整路径。收到：{0} |
-| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. |
-| Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. | Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. |
-| Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. |
-| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. |
-| Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. |
-| Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. |
-| Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. |
-| Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. |
-| Moving {0} unneeded {1} to {2}... | Moving {0} unneeded {1} to {2}... |
-| Moved {0} unneeded {1}. | Moved {0} unneeded {1}. |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | 错误：目标 {0} 解析到了 Windows 系统文件夹之下。请选择 %SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)% 和 %ProgramData% 之外的路径。 |
+| Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. | 错误：{0} 上的空间不足。移动这些文件需要 {1}，而可用空间为 {2}。没有移动任何内容。 |
+| Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | 错误：此刻有程序正在使用 Windows Installer，比如 Windows 更新，或者某个正在后台安装的程序。在此期间 /m 和 /d 会被阻止。等结束后再试。 |
+| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | 错误：这台计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚那次安装（或重启 Windows），再清理 {InstallerFolder}。 |
+| Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | 错误：一项排在重启之后的文件操作指向 {InstallerFolder}（{0}）。请先重启 Windows 让该操作完成，再进行清理。 |
+| Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | 错误：Windows Installer 有操作正在进行，因此 /m 和 /d 会被阻止。InstallerClean 不会在 {InstallerFolder} 变动时去碰它。等结束后再试。 |
+| Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | 错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有删除任何内容。请重试，若一直如此请重启 Windows。 |
+| Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | 错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有移动任何内容。请重试，若一直如此请重启 Windows。 |
+| Moving {0} unneeded {1} to {2}... | 正在把 {0} 个不需要的{1}移动到 {2}… |
+| Moved {0} unneeded {1}. | 已移动 {0} 个不需要的{1}。 |
+| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean 已无法确认目标文件夹，因此停了下来，而不是写到错误的位置。请检查 {0}，然后重新运行该命令。 |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 另一个 InstallerClean 进程正持有单实例锁（GUI 或另一次 CLI 运行）。退出代码 75（暂时性）；稍后可安全重试。 |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：事件日志写入失败。请检查应用程序日志的权限或组策略。 |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - 清理 {InstallerFolder} |
-| Removes cached .msi and .msp files that no installed program still needs. | Removes cached .msi and .msp files that no installed program still needs. |
-| Needs an elevated (administrator) prompt; Windows will not start it. | Needs an elevated (administrator) prompt; Windows will not start it. |
+| Removes cached .msi and .msp files that no installed program still needs. | 移除没有任何已安装程序仍然需要的 .msi 和 .msp 缓存文件。 |
+| Needs an elevated (administrator) prompt; Windows will not start it. | 需要管理员命令提示符，否则 Windows 不会启动它。 |
 | Usage: | 用法： |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     显示此帮助（也接受 /?、-h） |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  显示版本号（也接受 -v） |
-|   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Scan only - list unneeded files |
-|   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Delete unneeded files permanently |
-|   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Move to the saved backup folder |
+|   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         仅扫描 - 列出不需要的文件 |
+|   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         永久删除不需要的文件 |
+|   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         移动到已保存的目标文件夹 |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 路径    移动到指定路径 |
-| installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
+| installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli 会占住命令提示符直到结束，因此脚本或计划任务<br>可以等待它完成。 |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | 该文件夹按用户保存；计划任务或 SYSTEM 运行需要 /m 路径。 |
 | Exit codes: | 退出代码： |
-|   0   success: the run finished with nothing left to do |   0   success: the run finished with nothing left to do |
-|   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |
-|   2   partial: some processed, some not (a failure or a Ctrl+C part way) |   2   partial: some processed, some not (a failure or a Ctrl+C part way) |
+|   0   success: the run did what it was asked and nothing failed |   0   成功：本次运行做了要求的事，并且没有任何失败 |
+|   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   失败：没有处理任何内容（参数或目标有误、扫描失败，<br>       或者每个文件都失败） |
+|   2   partial: some processed, some not (a failure or a Ctrl+C part way) |   2   部分：部分已处理，部分未处理（失败或 Ctrl+C） |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  暂时性：临时状况阻止了本次运行（见相关消息） |
 |   130 cancelled (Ctrl+C) |   130 已取消（Ctrl+C） |
