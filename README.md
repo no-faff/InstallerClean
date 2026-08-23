@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.0-blue" alt="GitHub Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-58k-brightgreen" alt="Total downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-59k-brightgreen" alt="Total downloads"></a>
 </p>
 
 ![Screenshot of InstallerClean after a successful clean-up: 1.28 GB cleaned up, 68 files moved to the Recycle Bin](docs/screenshots/en/07-success-done.webp)
@@ -163,7 +163,7 @@ After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer`
 <a id="is-it-safe"></a>
 ## Is it safe?
 
-Yes. InstallerClean doesn't guess from filenames, dates or sizes. It asks Windows, twice over: once through the Windows Installer API and once by reading the registry directly. And it asks about each file's own identity rather than about where the file sits, so a registration written in a form it doesn't recognise can't make a needed file look removable. Anything it can't get a clear answer about stays where it is. Nothing has been reported broken after <!-- downloads-start -->58,000+<!-- downloads-end --> downloads.
+Yes. InstallerClean doesn't guess from filenames, dates or sizes. It asks Windows, twice over: once through the Windows Installer API and once by reading the registry directly. And it asks about each file's own identity rather than about where the file sits, so a registration written in a form it doesn't recognise can't make a needed file look removable. Anything it can't get a clear answer about stays where it is. Nothing has been reported broken after <!-- downloads-start -->59,000+<!-- downloads-end --> downloads.
 
 **About Delete and Move.** Delete permanently removes the files. Move takes them out of `C:\Windows\Installer` to a folder you choose; put that folder on another drive and you get the space back on C: straight away and still have the files. Copy them back and you are exactly where you started.
 
@@ -177,7 +177,7 @@ The scan, query, move, delete, settings and pending-reboot services are covered 
 - VirusTotal: every build is scanned, with the full per-engine results linked on its release page so you can see how each file scored and re-scan it yourself. A false positive that's live when a release goes out is named and explained on that release's page, and the page is updated once the vendor clears it.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
 - Release builds are deterministic: the compiler settings make the same source and SDK produce the same bytes, and the release process refuses to tag a version unless the shipped exes were built from a clean tree at exactly that tag. So you can check out the tag, build it yourself and compare hashes with the published ones: the portable and the command-line downloads provably match the public source. The setup is compiled by Inno Setup rather than by the SDK and stamps the build year into itself, so reproducing its hash needs the same Inno version and the same calendar year as well. Match the SDK version first (each release's notes say which it was built with); a different SDK patch produces different bytes, which looks like a mismatch and isn't.
-- <!-- downloads-start -->58,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
+- <!-- downloads-start -->59,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks certified 100% clean" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
