@@ -905,27 +905,46 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Only the removable class moves, and the cost is bounded by that: this
         // withholds superseded-patch cleanup, not orphan cleanup, and only on a
         // scan that lost a row or is short against the registry's own count.
+        //
+        // AND IT TOUCHES NOTHING ELSE, WHICH IS A DECISION RATHER THAN THE ABSENCE OF
+        // ONE. It ran a second arm until 3.0.0 that cleared the unread-file marker on
+        // a row something else had already withheld, so that the missing-files split
+        // would treat such a row as unaccounted for. That arm is gone and must not
+        // come back by a different name.
+        //
+        // WHAT THE MARKER MEANS IS WHY. It records that the ONLY reason the row lost
+        // its verdict was that the pass reading the patch file could not read it, and
+        // the split reads it for one population: rows whose file has GONE. For those
+        // the failed read is the read of the very file whose absence is the subject.
+        // Nobody can perform it, on any machine, ever, and it fails identically
+        // whatever removed the file. Clearing it turned that tautology into a reason
+        // to warn, so a run that came up short somewhere ELSE printed an alarm about a
+        // file this scan had positively established nothing could reach for.
+        //
+        // AND THE COUNT IT FIRED ON DOES NOT NAME THAT ROW'S RISK. Its three terms are
+        // a read that failed on a product this loop DID return, a product the registry
+        // saw and the enumeration did not whose own file is present, and a registry key
+        // Windows would not answer about. None of them is "a holder of this patch went
+        // unseen", which is the condition that would bear on this file. The count is a
+        // proxy for a degraded machine and the arm applied it as a per-file verdict.
+        //
+        // WHAT ANSWERS THE RESIDUAL IS THE WITHHOLDING ABOVE, AND IT IS UNTOUCHED. The
+        // machine may indeed be short of a product that could roll back onto a cached
+        // patch, and on this run the app therefore removes no superseded patch at all.
+        // That protects every file where protecting one is still possible. The file
+        // already gone is not one of them, and printing a sentence about it is not a
+        // second line of defence.
+        //
+        // THE SPLIT IS NOT LEFT WITHOUT A ROUTE TO THIS STATE. A run whose machine-wide
+        // patch enumeration did not answer downgrades every removable path with no
+        // marker set (see ConfirmRemovableAgainstEveryProduct), so a missing superseded
+        // row on such a run reaches the split withheld and unmarked and is reported.
+        // That is the run where the app really did fail to establish something about
+        // this patch, rather than the run where something else on the machine failed.
         if (withheldProducts > 0)
             for (var i = 0; i < packages.Count; i++)
                 if (packages[i].IsRemovable)
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
-                // AND IT ALSO SPEAKS OVER A ROW SOMETHING ELSE ALREADY WITHHELD, which
-                // is not the same statement and is why this arm exists. Withholding the
-                // class is one job and it is done above. Clearing the marker is the
-                // other: the marker asserts that an unread patch file was the ONLY
-                // reason this row lost its verdict, and on a run that came up short of
-                // a product that is no longer true. Left standing, it would tell the
-                // missing-files split to read the absence as established harmless on
-                // exactly the run whose enumeration is known to be incomplete.
-                //
-                // IT IS REACHED ON EVERY MISSING SUPERSEDED PATCH RATHER THAN RARELY.
-                // The confirmation pass reads the patch file, a file that has gone
-                // cannot be read, so such a row arrives here downgraded already and the
-                // arm above passes over it. Without this one, a missing superseded row
-                // on a run that lost a claim would be reported harmless again, by a
-                // different route from the one that was closed.
-                else if (packages[i].WithheldOnUnreadableFile)
-                    packages[i] = packages[i] with { WithheldOnUnreadableFile = false };
 
         // The run's whole path census: this loop's, plus the fallback's own.
         var paths = new PathCensus();

@@ -619,31 +619,36 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // silence that should have been an alarm costs them a failure months later
             // with nothing pointing back at this.
             //
-            // AND RemovableWithheld IS THE CLEAREST CASE RATHER THAN THE BORDERLINE ONE,
-            // though v2.3.0 put it on the benign side. What changed is what the flag
-            // means. There it meant one thing: the enumeration was short of a product,
-            // so the whole class was withheld. From 3.0.0 it ALSO means this product's
-            // patch set could not be established, which is exactly the case where the
-            // app cannot say that nothing could reach for the file. Putting that on the
-            // benign side would be the app calling an absence harmless in the one case
-            // where it explicitly failed to establish harmlessness.
+            // AND A WITHHELD ROW FIRES TOO, WITH ONE EXCEPTION, though v2.3.0 put every
+            // withheld row on the benign side. What changed is what the flag means.
+            // There it meant one thing: the enumeration was short of a product, so the
+            // whole class was withheld. From 3.0.0 it ALSO means this product's patch
+            // set could not be established, which is exactly the case where the app
+            // cannot say that nothing could reach for the file, so putting it on the
+            // benign side would call an absence harmless in the one case where the app
+            // explicitly failed to establish harmlessness.
             //
-            // THE FLAG IS REACHED BY TWO ROUTES AND THE CONJUNCTION BELOW ANSWERS THEM
-            // THE SAME, WHICH TOOK A FIX. The per-product pass sets it while
-            // downgrading a row whose patch set could not be established, and such a
-            // row's verdict is Unestablished, so the state-and-verdict test alone
-            // reports it. The scan-wide withholding sets it when the run lost a claim
-            // anywhere, on a row the per-product pass had already judged
-            // AllNonRemovable and left alone, so that row arrives carrying a CLEAN
-            // verdict and the state-and-verdict test alone read its absence as
-            // harmless. It was measured rather than argued: driven through the query
-            // service with a claim lost, the row reaches this point flagged,
-            // superseded and AllNonRemovable, and the banner said nothing about it.
+            // THE EXCEPTION IS A ROW WITHHELD ONLY BECAUSE ITS PATCH FILE COULD NOT BE
+            // READ, and for a row that has reached this branch the file is GONE, so that
+            // read is a read of the very file whose absence is the subject. It could not
+            // have succeeded for anybody, and it fails identically whatever removed the
+            // file, so treating it as a reason to warn had the app raise an alarm about a
+            // file the same scan had positively established nothing could reach for.
             //
-            // The predicate now reads the flag as well, so the silent side means the
-            // app positively established harmlessness in both routes rather than in
-            // one. See MissingFilesReport.Affected for why the flag rather than the
-            // verdict is the thing to read there.
+            // THAT EXCEPTION HOLDS ON A RUN THAT CAME UP SHORT ELSEWHERE, WHICH IS THE
+            // WHOLE OF WHAT 3.0.0 SETTLED HERE. The scan-wide withholding used to clear
+            // that marker on any run that lost a claim, which put the row back under the
+            // banner on the strength of a count whose terms are all about OTHER products.
+            // The residual it was reaching for is real and is answered where answering
+            // still changes an outcome: such a run removes no superseded patch at all.
+            //
+            // WHAT STILL FIRES FROM THE WITHHELD SIDE. A row whose patch set could not be
+            // established carries an Unestablished verdict, so the state-and-verdict test
+            // reports it without the flag being consulted. And a run whose machine-wide
+            // patch enumeration did not answer downgrades every removable path with no
+            // marker set, so such a row reaches here withheld and unmarked and is
+            // reported. See MissingFilesReport.Affected, which owns the expression; this
+            // comment explains the branch and must never grow a second copy of it.
             if (exists)
             {
                 stillUsedBytes += size;

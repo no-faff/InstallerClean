@@ -46,22 +46,6 @@ internal static class MissingFilesReport
     internal readonly record struct AffectedProduct(string ProductName, int FileCount);
 
     /// <summary>
-    /// The programs behind a scan's missing registrations, most-affected first,
-    /// then alphabetical so two runs of one machine agree. Rows carrying no
-    /// product name are folded into a single unnamed entry at the end, because
-    /// several of them are not several programs: the registry fallback names none
-    /// of its rows, so counting them as one program each would invent a headcount.
-    ///
-    /// IT NAMES THE SAME POPULATION THE BANNER COUNTS, WHICH IS NARROWER THAN "EVERY
-    /// MISSING REGISTRATION" FROM 3.0.0. The banner fires where something could still
-    /// reach for a file that is gone, so a registration whose absence the app has
-    /// positively established to be harmless is not one of the programs it should name:
-    /// listing it would put a program in front of somebody as affected when the same
-    /// scan had just decided it is not. The two filters are the same expression and must
-    /// stay that way; see <see cref="Affected"/> for why the conjunction
-    /// and not either half.
-    /// </summary>
-    /// <summary>
     /// ONE EXPRESSION FOR THE BANNER'S POPULATION, NAMED SO THE SURFACES CANNOT DRIFT.
     /// A missing registration is affected unless the app has positively established that
     /// nothing could reach for the file: the state is superseded or obsoleted AND every
@@ -78,45 +62,45 @@ internal static class MissingFilesReport
     /// direction from the offer. Both refuse to claim what the app has not shown: there
     /// that the file is spare, here that its absence is harmless.
     ///
-    /// AND A WITHHELD ROW IS AFFECTED WHATEVER ITS VERDICT SAYS, WITH ONE CARVE-OUT SET
-    /// OUT BELOW. A row reaches the flag by THREE routes. This account named two until
-    /// 2026-08-21, and that was not a simplification: the third was not known, and reading
-    /// it as one of the other two put a warning on the main window about a file the app
-    /// had just correctly removed. The per-product pass sets the flag while
-    /// downgrading a row whose patch set
-    /// could not be established, and such a row's verdict is Unestablished, so the
-    /// clause above already reports it. The scan-wide withholding sets it when the run
-    /// lost a claim anywhere, on a row the per-product pass had already judged
-    /// AllNonRemovable and left alone, so that row arrives here flagged and carrying a
-    /// clean verdict. Without this conjunct it lands on the silent side, and the silent
-    /// side means the app has established that nothing could reach for the file.
+    /// AND A WITHHELD ROW IS AFFECTED WHATEVER ITS VERDICT SAYS, EXCEPT WHERE THE ONLY
+    /// CAUSE WAS THE UNREAD PATCH FILE. That exception is the last conjunct, and it is a
+    /// tautology rather than a concession. The pass that confirms a removable verdict
+    /// reads the patch file to ask which products it declares, and withholds where it
+    /// cannot. For a row that has REACHED THIS PREDICATE the file is GONE, so the read it
+    /// failed is a read of the very file whose absence is the subject: there is nothing
+    /// there to open, nobody can perform it on any machine ever, and it fails for a file
+    /// this app removed exactly as it fails for one anything else removed. Read as a
+    /// reason to warn, it had the app offer a file, remove it, and then report it as a
+    /// thing a repair could fail on, which is the claim the offer's own condition exists
+    /// to rule out.
     ///
-    /// IT HAS ESTABLISHED NOTHING OF THE KIND IN THAT STATE. The withholding fired
-    /// because the enumeration was short of a product, and the product it lost is
-    /// exactly the one that could have held a patch able to roll back onto this file.
-    /// The offer distrusts that verdict and keeps the file; reading the same verdict
-    /// here as proof of harmlessness would have the scan trust, for the purpose of
-    /// staying quiet, precisely what it has just refused to trust for the purpose of
-    /// acting. The flag is the app's own record that it declined to rely on the
-    /// verdict, so it is read here rather than the verdict alone.
-    ///
-    /// THE THIRD ROUTE IS THE CARVE-OUT, AND IT IS A TAUTOLOGY RATHER THAN A FINDING. The
-    /// confirmation pass withholds a row whose patch file will not say which products it
-    /// declares. For a row that has REACHED THIS PREDICATE, the read it failed is a read
-    /// of the very file whose absence is the subject: there is nothing there to open.
-    /// Nobody can perform it, on any machine, ever again, and it fails for a file this app
-    /// removed exactly as it fails for one anything else removed. Read as a reason to
-    /// warn, it had the app offer a file, remove it, and then report it as a thing a
-    /// repair could fail on, which is the claim the offer's own condition exists to rule
-    /// out. So a row whose ONLY withholding cause is that unread file keeps the verdict it
-    /// was positively given, and the app stays quiet about an absence it established.
+    /// SO THE ROW KEEPS THE VERDICT IT WAS POSITIVELY GIVEN, and it keeps it on a run that
+    /// came up short elsewhere as much as on one that did not. Until 3.0.0 the scan-wide
+    /// withholding cleared this marker whenever the run lost a claim anywhere, which put
+    /// exactly this row back under the banner. What that fired on was a machine-level
+    /// count whose three terms are a failed read on a product the enumeration DID return,
+    /// a product the registry saw and the enumeration did not, and a registry key Windows
+    /// would not answer about. None of them is "a holder of this patch went unseen", so
+    /// none of them bears on this file. The residual it was reaching for is real and is
+    /// answered where answering still changes an outcome: on such a run the app removes no
+    /// superseded patch at all.
     ///
     /// AND THE STANDARD IS THE OFFER'S, WHICH IS WHY THAT IS NOT A WEAKENING. The evidence
-    /// that the absence is harmless is the same evidence the app acted on when it offered
-    /// the file for permanent removal, and offering is by far the more consequential of
-    /// the two. A rule strict enough to distrust that evidence here would have had to
-    /// refuse the offer first, and nothing says the offer was wrong. Nor can this line
-    /// cover an offer either way: it speaks only about a file that has already gone.
+    /// that the absence is harmless is evidence of the same kind the app acts on when it
+    /// offers a file for permanent removal, and offering is by far the more consequential
+    /// of the two. A rule strict enough to distrust that evidence here would have had to
+    /// refuse the offer first. It is not the app remembering that it removed the file:
+    /// nothing here has any memory, and the verdict is re-established from the machine's
+    /// own records on the run that goes quiet. Nor can this line cover an offer either
+    /// way: it speaks only about a file that has already gone.
+    ///
+    /// THE ROUTE THAT STILL DEFEATS THE CARVE-OUT, AND IT IS THE ONE THAT SHOULD. Where
+    /// the machine-wide patch enumeration did not answer, the confirmation pass downgrades
+    /// every removable path with no marker set, so such a row arrives here withheld and
+    /// unmarked and is reported. That is the run on which the app really did fail to
+    /// establish something about THIS patch, rather than the run on which something else
+    /// about the machine failed. A row downgraded because its patch set could not be
+    /// established is reported too, by the verdict clause above rather than by this one.
     ///
     /// THE FLAG NAMES A CAUSE AND THIS LINE DECIDES WHAT THE CAUSE MEANT, because it
     /// carries two meanings and only one is a tautology. A file that is THERE and will not
@@ -130,6 +114,29 @@ internal static class MissingFilesReport
              && row.ProductPatchSetVerdict == ProductPatchSet.AllNonRemovable
              && (!row.RemovableWithheld || row.WithheldOnUnreadableFile));
 
+    /// <summary>
+    /// The programs behind a scan's missing registrations, most-affected first, then
+    /// alphabetical so two runs of one machine agree. Rows carrying no product name are
+    /// folded into a single unnamed entry at the end, because several of them are not
+    /// several programs: the registry fallback names none of its rows, so counting them as
+    /// one program each would invent a headcount.
+    ///
+    /// IT NAMES THE SAME POPULATION THE BANNER COUNTS, WHICH IS NARROWER THAN "EVERY
+    /// MISSING REGISTRATION" FROM 3.0.0. The banner fires where something could still reach
+    /// for a file that is gone, so a registration whose absence the app has positively
+    /// established to be harmless is not one of the programs it should name: listing it
+    /// would put a program in front of somebody as affected when the same scan had just
+    /// decided it is not. The two filters are the same expression and must stay that way;
+    /// see <see cref="Affected"/> for why the conjunction and not either half.
+    /// </summary>
+    /// <remarks>
+    /// THIS DOCUMENTATION SAT ON <see cref="Affected"/> FROM 2026-08-17 TO 2026-08-23 and
+    /// described this method from there. The commit that introduced the predicate put its
+    /// summary directly beneath this one, so one member carried two summary blocks and this
+    /// one carried none, and the orphaned text told its reader to "see Affected" from inside
+    /// what had become Affected's own documentation. Nothing about either method changed
+    /// when it was moved back.
+    /// </remarks>
     internal static IReadOnlyList<AffectedProduct> Products(IEnumerable<RegisteredPackage> registered)
     {
         var named = new List<AffectedProduct>();

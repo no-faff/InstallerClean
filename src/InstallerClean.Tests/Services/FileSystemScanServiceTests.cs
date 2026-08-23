@@ -792,14 +792,22 @@ public class FileSystemScanServiceTests
     /// the default one answers about a machine that cannot exist, and the file's presence
     /// is the single lever every test below pulls.
     /// </summary>
+    /// <param name="routeARefusesWith">
+    /// A return code for the machine-wide patch enumeration, the call made about no product
+    /// in particular. Null leaves it answering as it does on a healthy machine. It is here
+    /// because that call not answering is the one remaining way a MISSING row can be
+    /// withheld without the unread-file marker, and therefore the only thing that still
+    /// separates the two sides of the missing-files split for this fixture.
+    /// </param>
     private static async Task<InstallerQueryResult> EnumerateWithSupersededPatch(
-        bool aClaimWasLost, IPackageIdentityReader reader)
+        bool aClaimWasLost, IPackageIdentityReader reader, uint? routeARefusesWith = null)
     {
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.SetProductProperty("{A}", "LocalPackage", ProductFile);
         msi.SetProductProperty("{A}", "ProductName", "Test Product");
         msi.AddPatch("{A}", "{P}", PatchFile, state: "2", uninstallable: "0");
+        if (routeARefusesWith is { } routeA) msi.RouteAResult = routeA;
 
         var sets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase)
         {
@@ -838,17 +846,25 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
-    public async Task A_superseded_patch_withheld_for_a_lost_claim_is_missing_and_affected()
+    public async Task A_superseded_patch_the_scan_accounted_for_is_unaffected_even_on_a_run_that_lost_a_claim()
     {
-        // THE STATE THIS EXISTS FOR, AND IT IS NOT THE OBVIOUS ONE. A run that loses a
-        // claim anywhere withholds the whole removable class, and it does that to rows
-        // the per-product pass has already judged clean, so the row carries the
-        // withheld flag AND an AllNonRemovable verdict at once. Read on the verdict
-        // alone, its absence was called harmless and nothing was said: no count, no
-        // notice, and no program named. The app had established nothing of the kind.
-        // The withholding fired because the enumeration was short of a product, and
-        // that product is exactly the one that could have held a patch able to roll
-        // back onto this file.
+        // THE QUESTION THIS SETTLES, IN THE OWNER'S WORDS: what is the point of the app
+        // deleting a file that it is going to say is missing next time it runs. Until
+        // 3.0.0 the answer was that it did, on any later run that came up short of a
+        // product anywhere on the machine. It does not now, and this is that row.
+        //
+        // A run that loses a claim withholds the whole removable class, and it used to do
+        // one more thing: clear the unread-file marker on rows the per-product pass had
+        // already judged clean and left alone. That put this row back under a banner
+        // saying a repair, update or uninstall could fail on the file, which is the exact
+        // claim the offer's own condition had ruled out before the file was ever offered.
+        //
+        // WHAT FIRED IT WAS NOTHING TO DO WITH THIS FILE. The count has three terms: a
+        // failed read on a product the enumeration DID return, a product the registry saw
+        // and the enumeration did not, and a registry key Windows would not answer about.
+        // None of them is "a holder of this patch went unseen". The residual behind them
+        // is real and is answered where it can still change an outcome: this run removes
+        // no superseded patch at all, which the sibling test below pins.
         var (fs, reader) = MachineWithThePatchFileGone();
         var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: true, reader);
 
@@ -859,64 +875,93 @@ public class FileSystemScanServiceTests
         Assert.True(row.RemovableWithheld);
         Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
         Assert.False(row.IsRemovable);
-        // AND THE UNREAD-FILE MARKER IS CLEARED. THIS LINE IS NOT BELT AND BRACES AND MUST
-        // NOT BE DELETED AS SUCH: it exists because the first version of the carve-out
-        // above it silenced this whole test's case by a second route, and this assertion
-        // is what caught it.
-        //
-        // The confirmation pass reads the patch file, a file that has gone cannot be
-        // read, so a missing superseded row is ALREADY withheld by the time the
-        // scan-wide withholding runs, and that pass only touches rows still carrying
-        // IsRemovable. It would pass straight over this row. The marker would stand,
-        // saying an unread file was the only reason, on the one run whose enumeration is
-        // known to be short of a product, and the notice below would not appear at all.
-        //
-        // Measured rather than argued: with the clearing arm taken out and this line
-        // taken out with it, the affected count below comes back 0 where it must be 1.
-        Assert.False(row.WithheldOnUnreadableFile);
-
-        var result = await ScanWithThePatchFileGone(enumerated, fs);
-
-        Assert.Equal(1, result.MissingFromDiskCount);
-        Assert.Equal(1, result.MissingAffectedCount);
-        Assert.Equal(0, result.MissingUnaffectedCount);
-        // And the program is named, which is the half a count assertion cannot see:
-        // the notice carries the program's name and it was that sentence, whole, that
-        // did not appear.
-        var named = Assert.Single(MissingFilesReport.Products(result.RegisteredPackages));
-        Assert.Equal("Test Product", named.ProductName);
-    }
-
-    [Fact]
-    public async Task A_superseded_patch_on_a_run_that_lost_nothing_is_missing_and_unaffected()
-    {
-        // THE MUST-MISS CONTROL, and the two fixtures differ in one thing only:
-        // whether the run lost a claim. Without it, a predicate that had lost its
-        // benign half entirely would pass the test above, and every missing superseded
-        // registration on every machine would be named in a notice the app cannot
-        // support. That is the direction this split was built to avoid, and holding
-        // the pair together is what keeps both from drifting.
-        var (fs, reader) = MachineWithThePatchFileGone();
-        var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: false, reader);
-
-        var row = enumerated.Packages.Single(p => p.PatchState == 2);
-        // THE FIXTURE ASSERTION HERE READ THE OTHER WAY UNTIL 2026-08-21 AND WAS FALSE
-        // OF EVERY REAL MACHINE. It said this row was not withheld, which held only
-        // because the default identity reader answered for a file that is not there. The
-        // row IS withheld: the confirmation pass could not read the patch file, because
-        // the patch file has gone. What the pair below says is that the app knows the
-        // difference between a withholding that found something out and one that could
-        // not have found anything out.
-        Assert.True(row.RemovableWithheld);
+        // AND THE MARKER STANDS, WHICH IS THE WHOLE CHANGE AND IS NOT BELT AND BRACES.
+        // This line read False until 3.0.0. The confirmation pass reads the patch file, a
+        // file that has gone cannot be read by anybody on any machine ever, so a missing
+        // superseded row arrives here already withheld and already marked. The marker says
+        // that unread file was the only reason, and for this row that is a tautology
+        // rather than a finding.
         Assert.True(row.WithheldOnUnreadableFile);
-        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
 
         var result = await ScanWithThePatchFileGone(enumerated, fs);
 
         Assert.Equal(1, result.MissingFromDiskCount);
         Assert.Equal(0, result.MissingAffectedCount);
         Assert.Equal(1, result.MissingUnaffectedCount);
+        // And no program is named, which is the half a count assertion cannot see: what
+        // reached the main window was a sentence carrying the program's name.
         Assert.Empty(MissingFilesReport.Products(result.RegisteredPackages));
+    }
+
+    [Fact]
+    public async Task The_same_row_on_a_run_that_lost_a_claim_is_still_not_offered()
+    {
+        // THE HALF THAT MUST NOT MOVE, PINNED SEPARATELY BECAUSE THE TEST ABOVE CANNOT SEE
+        // IT. Silencing the banner for that row is only defensible while the run it
+        // happens on is still withholding everything it could act on. This is the same
+        // machine with the file PRESENT, so there is something to offer, and the run that
+        // lost a claim must refuse to offer it.
+        //
+        // Without this, a change that took the scan-wide withholding out altogether would
+        // leave the test above green: the row would be unaffected for the wrong reason,
+        // and the app would be removing superseded patches on exactly the runs where it
+        // has least reason to trust its own product set.
+        var fs = new MockFileSystem();
+        var reader = new IdentitiesFromTheFilesystem(fs);
+        PutOnDisk(fs, ProductFile);
+        PutOnDisk(fs, PatchFile);
+
+        var lostAClaim = await EnumerateWithSupersededPatch(aClaimWasLost: true, reader);
+        var withheld = lostAClaim.Packages.Single(p => p.PatchState == 2);
+        Assert.False(withheld.IsRemovable);
+        Assert.True(withheld.RemovableWithheld);
+
+        // THE MUST-HIT BESIDE IT: the same machine losing nothing DOES offer the file, so
+        // a fixture that could never offer anything cannot pass for a withholding.
+        var lostNothing = await EnumerateWithSupersededPatch(aClaimWasLost: false, reader);
+        Assert.True(lostNothing.Packages.Single(p => p.PatchState == 2).IsRemovable);
+    }
+
+    [Fact]
+    public async Task A_superseded_patch_is_affected_when_the_machine_wide_enumeration_did_not_answer()
+    {
+        // THE CONTROL THAT KEEPS THE TWO SIDES OF THE SPLIT APART, and it had to be built
+        // because 3.0.0 took away the old one. The pair used to be "a run that lost a
+        // claim" against "a run that lost nothing", and those two now answer the same, so
+        // the pair stopped being a pair the moment the clearing arm went. A split with
+        // nothing left to separate it would collapse to one answer and every test would
+        // still pass.
+        //
+        // THIS IS THE ONE REMAINING WAY A MISSING ROW IS WITHHELD WITHOUT THE MARKER. When
+        // the machine-wide patch enumeration does not answer, the confirmation pass
+        // downgrades every removable path with no marker set, so the row reaches the split
+        // withheld, unmarked, and carrying a clean per-product verdict. That is the run on
+        // which the app really did fail to establish something about THIS patch, rather
+        // than the run on which something else about the machine failed, and it is the
+        // difference the split exists to draw.
+        //
+        // ERROR_ACCESS_DENIED is one of the returns that call can make. Nothing here turns
+        // on which: the code treats any answer that is not a clean end as a refusal.
+        var (fs, reader) = MachineWithThePatchFileGone();
+        var enumerated = await EnumerateWithSupersededPatch(
+            aClaimWasLost: false, reader, routeARefusesWith: 5);
+
+        var row = enumerated.Packages.Single(p => p.PatchState == 2);
+        Assert.True(row.RemovableWithheld);
+        Assert.False(row.WithheldOnUnreadableFile);
+        // The verdict is CLEAN, which is what makes this row the one that matters: the
+        // state test and the verdict test both pass it to the benign side, and the last
+        // conjunct is the only thing standing between it and silence.
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+
+        var result = await ScanWithThePatchFileGone(enumerated, fs);
+
+        Assert.Equal(1, result.MissingFromDiskCount);
+        Assert.Equal(1, result.MissingAffectedCount);
+        Assert.Equal(0, result.MissingUnaffectedCount);
+        // And the program IS named here, which is the half a count cannot see.
+        var named = Assert.Single(MissingFilesReport.Products(result.RegisteredPackages));
+        Assert.Equal("Test Product", named.ProductName);
     }
 
     [Fact]
