@@ -1518,10 +1518,37 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// It is read from the FILE, so it does not care what any enumeration
     /// returned, which is what makes it the answer to route A's documented blind
-    /// spot. Its own limit is the other way round: it names the products the
-    /// patch may target rather than the products that hold it, and the evidence
-    /// that the Template is complete for this purpose is two files on one
-    /// machine, which is the thinnest thing either route stands on.
+    /// spot.
+    ///
+    /// THIS NOTE USED TO CALL THAT COVER THIN AND THE DIRECTION OF ITS DOUBT WAS
+    /// BACKWARDS. It said the Template names the products the patch MAY TARGET
+    /// rather than the products that HOLD it, and that the evidence it is
+    /// complete for this purpose was two files on one machine. The first half is
+    /// true and is the safe direction rather than the dangerous one. Microsoft
+    /// documents the Template of a patch package as "a semicolon-delimited list
+    /// of the product codes that can accept the patch" and as required; and a
+    /// patch physically carries two transforms per target database, each tied to
+    /// a specific ProductCode, so a patch can only have been applied to a product
+    /// it carries a transform for. The products holding a patch are therefore a
+    /// SUBSET of what its Template names. A Template naming MORE than holds it
+    /// only ever adds products to the judged set, and adding one can only withhold.
+    ///
+    /// WHAT THAT COSTS IF IT IS EVER WRONG, because it is a claim about a file
+    /// format rather than about this code. A product that holds the patch and is
+    /// absent from the Template would be invisible to route B, and if route A's
+    /// documented blind spot also hid it and the product enumeration never
+    /// returned it, nothing would put it into the per-product condition's product
+    /// set and its removable patch could not overturn a clean verdict. That is a
+    /// route to a needed file being offered. It has no mechanism in anything
+    /// Microsoft publishes about the format and no observed instance: read
+    /// against one machine's cache, every .msp carried a well-formed Template, none
+    /// was empty, and every registered holder was declared.
+    ///
+    /// AND NO GUARD HERE COULD ASSERT IT, which is why this is written down rather
+    /// than checked. The only thing to compare a Template against is the set of
+    /// products the machine says hold the patch, and that set is read from the same
+    /// enumerations whose blind spot is the condition being worried about. A check
+    /// would agree with itself on exactly the machine where it needed to disagree.
     /// </summary>
     /// <param name="unreadable">
     /// True where the file did not yield an identity, WHICH INCLUDES A FILE THAT IS
@@ -1580,6 +1607,28 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <c>Unaskable</c>, which withholds. Which returns say "not installed" is
     /// <see cref="IsProductNotInstalled"/>'s, and there is more than one of them.
     /// </returns>
+    /// <remarks>
+    /// THE "NOT INSTALLED" ANSWER DEPENDS ON THE PROCESS BEING ELEVATED, AND THAT
+    /// DEPENDENCY LIVES IN A FILE NOTHING HERE REFERENCES. Both hosts declare
+    /// <c>requireAdministrator</c> in their app manifests, and the question is put with
+    /// the Everyone SID across all contexts. An administrator may query product and
+    /// patch data for any instance and any user on the computer; a caller who may not
+    /// is told ERROR_UNKNOWN_PRODUCT about a per-user product belonging to another
+    /// account, which this method reads as a positive "the machine does not hold it".
+    ///
+    /// THAT IS THE ONE PLACE A FALSE NEGATIVE HERE BECOMES A FILE ON THE OFFER. A
+    /// product dropped from the per-product condition's set cannot contribute its
+    /// removable patch, so a cached patch it could still reach for can be judged clean.
+    /// The manifests carry the other half of this note.
+    ///
+    /// NO GUARD ASSERTS IT AND ONE WOULD NOT HELP MUCH. Checking elevation at startup
+    /// is easy and would catch a manifest change, but elevation is not the property
+    /// that matters: what matters is whether this call answered completely, and nothing
+    /// distinguishes "not installed" from "not visible to you" in the return. A machine
+    /// with no per-user product of another account is unaffected either way, and there
+    /// is no way to ask whether such a product exists without the visibility in
+    /// question.
+    /// </remarks>
     /// <remarks>
     /// STATIC AND SHARED RATHER THAN COPIED, because
     /// <see cref="DeclaredProductCheck"/> has to put the identical question about

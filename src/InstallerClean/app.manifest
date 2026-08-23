@@ -15,6 +15,22 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+      <!-- requireAdministrator IS LOAD-BEARING FOR A SAFETY CONDITION AND NOT ONLY
+           FOR WRITE ACCESS, which is the half nobody would guess from here. The scan
+           asks Windows Installer whether a product a patch file declares is installed,
+           and treats ERROR_UNKNOWN_PRODUCT as a positive answer of "this machine does
+           not hold it", which is correct and is what stops an irrelevant declared target
+           withholding the whole class. A caller that cannot see a per-user product
+           belonging to another account is told exactly that about a product that IS
+           there. The query is made with the Everyone SID across all contexts, and an
+           administrator may query product and patch data for any instance and any user
+           on the computer; a non-administrator may not.
+
+           So dropping this to asInvoker would not merely fail a write later on. It would
+           turn a positive answer into a false one inside the condition that decides
+           whether a cached patch is still needed, with a green build and no test going
+           red. The other end of this is commented at
+           InstallerQueryService.ResolveProductInstance. -->
         <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
       </requestedPrivileges>
     </security>
