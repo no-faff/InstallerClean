@@ -247,10 +247,9 @@ namespace InstallerClean.Models;
 /// AND THEY ARE NOT ONE THING, so they are listed rather than covered by a sentence
 /// that would be false of one of them:
 ///
-/// At least one registration's recorded path could not be settled, either because it
-/// could not be turned into a path at all or because the filesystem would not resolve
-/// its spelling, which withholds the whole walk-derived set at once
-/// (<see cref="WalkOfferWithheldWholesale"/>); or the candidate is an installation
+/// The scan could not establish which cached files belong to which programs, which
+/// withholds the whole walk-derived set at once (<see cref="WalkOfferWithheldWholesale"/>,
+/// and see it for the three findings that reach it); or the candidate is an installation
 /// package whose own declared product Windows still holds a record of, or whose
 /// declaration this scan could not settle, which withholds that one file. A run can
 /// hold files put here by either, and a reader of this list may assume neither.
@@ -267,14 +266,18 @@ namespace InstallerClean.Models;
 /// groups are now one list and that heading has gone with them, which weakens nothing
 /// here: a surface that says nothing about these rows cannot state a cause over them.
 ///
-/// WHY THE FIRST CAUSE TAKES THE WHOLE WALK-DERIVED SET AND NOT ONE FILE. Such a
-/// registration's claim is kept in the raw spelling Windows gave, so it matches
-/// nothing the walk produces, and the cached file it names is one the walk saw and
-/// nothing claimed. Which file that is cannot be established: the claim cannot be
-/// resolved, and the identity match cannot help either, because a value the path API
-/// refuses is a value CreateFile refuses too, so there is nothing to open and
-/// compare. Every unclaimed file is therefore one the unspellable claim could have
-/// meant, and the app cannot say of any of them that nothing needs it.
+/// WHY THE FIRST CAUSE TAKES THE WHOLE WALK-DERIVED SET AND NOT ONE FILE, and the
+/// answer is the same shape for all three findings behind it: the app knows a needed
+/// file may be sitting in the candidate list and cannot say WHICH. For an unspellable
+/// claim, the claim is kept in the raw spelling Windows gave, so it matches nothing the
+/// walk produces, and the identity match cannot help either, because a value the path
+/// API refuses is a value CreateFile refuses too and there is nothing to open and
+/// compare. For a second copy of one program, the cached package registered to it
+/// declares the base product code, so the per-file screen can be told there is no such
+/// record while the second copy's own registration still needs the file, and nothing in
+/// the scan can work out which cached file belongs to that copy. Every unclaimed file is
+/// therefore one that could have been meant, and the app cannot say of any of them that
+/// nothing needs it.
 ///
 /// THE SUPERSEDED HALF OF THE OFFER IS NOT IN HERE, under either cause. Those rows
 /// are judged on products, through registry keys read by product code and patch code,
@@ -312,7 +315,17 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="WalkOfferWithheldWholesale">
 /// True where this scan emptied its walk-derived offer in one go, rather than judging
-/// each candidate and keeping it.
+/// each candidate and keeping it, AND that emptying actually took a file off a list it
+/// would otherwise have made.
+///
+/// THE SECOND HALF OF THAT IS NEW AND IS THE WHOLE OF WHAT THIS FLAG IS FOR. It used to
+/// report only which branch the scan took, so it was true on a machine whose walk found
+/// no unclaimed candidates and therefore held nothing back, and the window had to check
+/// <see cref="WithheldFiles"/> itself before showing the screen that reads this. That
+/// gate was a host counting a list two different decisions contribute to: the moment
+/// either one's membership changes, the gate changes meaning and nothing fails. The
+/// question is now answered where the withholding happens, which is the only place that
+/// knows what that withholding took.
 ///
 /// IT IS NOT "THE OFFER IS EMPTY" AND THE TWO MUST NOT BE CONFLATED, which is the
 /// whole reason this exists rather than the hosts asking
@@ -327,9 +340,11 @@ namespace InstallerClean.Models;
 /// only; a superseded registration that survived every withholding is offered beside
 /// it, so a host reading this must still ask what the offer holds.
 ///
-/// AND IT CAN BE TRUE WITH <see cref="WithheldFiles"/> EMPTY, on a machine whose walk
-/// produced no candidates to withhold. Nothing was kept back there, so a host counting
-/// files held back must check that too rather than assume this implies any.
+/// IT CANNOT BE TRUE WITH <see cref="WithheldFiles"/> EMPTY, which is a change and not
+/// a coincidence: see above. A machine that took the branch and had nothing to withhold
+/// reads false here, and the all-clear is right for it, nothing in its folder having
+/// gone unclaimed. The reverse does not hold, and no host may assume it: the other
+/// decision puts files in that list on runs where this is false.
 ///
 /// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Several conditions can empty an
 /// offer wholesale and they are different facts about a machine, so a bool is the

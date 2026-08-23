@@ -165,15 +165,24 @@ public class MainViewModelTests
     [Fact]
     public async Task A_wholesale_withholding_that_held_nothing_back_still_shows_the_all_clear()
     {
-        // THE FLAG SAYS WHICH BRANCH THE SCAN TOOK, NOT THAT ANYTHING WAS WITHHELD. A
-        // walk that produced no candidates sets it and holds nothing back, and the
-        // second screen would then say it had held back all 0 files, which is absurd
-        // and untrue. Nothing in that folder went unclaimed, so the all-clear is right.
+        // A walk that produced no candidates holds nothing back, and the second screen
+        // would then say it had held back all 0 files, which is absurd and untrue.
+        // Nothing in that folder went unclaimed, so the all-clear is right.
+        //
+        // WHICH LAYER ANSWERS THAT MOVED IN 3.0.0 AND THE FIXTURE IS WHERE TO SEE IT.
+        // The flag used to say only which branch the scan took, so this window had to
+        // check the withheld list itself before showing the screen. That made the gate
+        // a host counting a list that TWO separate decisions write to, and the moment
+        // either one's membership changed the gate would have changed meaning with it,
+        // silently. The flag now says the withholding took something, so this machine
+        // arrives with it false and the fixture below sets it false. The scan service's
+        // own test is what pins that it does; see
+        // FileSystemScanServiceSecondInstanceTests.
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: Array.Empty<OrphanedFile>(), WalkOfferWithheldWholesale: true));
+                WithheldFiles: Array.Empty<OrphanedFile>(), WalkOfferWithheldWholesale: false));
 
         await vm.Scan.ScanWithProgressAsync(null);
 

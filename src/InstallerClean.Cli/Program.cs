@@ -396,33 +396,66 @@ internal static class Program
             // commonest output this tool produces, and somebody reading a
             // scheduled task's log wants the state of the machine rather than
             // the tool's intention towards it.
-            // Two outcomes, and an empty offer has one meaning: the scan found
-            // nothing it could offer. A third stood here for as long as the cached
-            // package identity check was in the tree, for a machine whose whole
-            // offer that check had held back, which is not the same as a scan that
-            // found nothing; it printed as the clean line until it had one of its
-            // own. No release ever carried it, so nothing shipped has printed more
-            // than these two, and its strings sit retired in the resx. The window
-            // makes the same two-way split; the two hosts must not diverge on it.
-            Console.WriteLine(count == 0
-                ? Strings.Cli_FoundNoOrphans
-                : string.Format(
+            // THREE OUTCOMES, AND THE THIRD IS BACK BECAUSE THE LINE ABOVE IT WAS
+            // BEING PRINTED TO MACHINES IT IS FALSE OF. An empty offer has two
+            // meanings: the folder holds nothing this scan can offer, and the scan
+            // could not establish enough to offer anything. "Found no unneeded
+            // files" is a statement about the folder and only the first machine has
+            // earned it.
+            //
+            // A THIRD LINE STOOD HERE UNTIL 3.0.0 AND ITS REMOVAL LEFT A HOLE THAT
+            // OUTLIVED IT. It was written for the cached-package identity check;
+            // that check left the tree and this branch went back to two, on the
+            // reasoning that nothing emptied an offer that way any more. Something
+            // did, in the same release, and the window got a screen of its own for
+            // it while this host kept printing the clean line. The comment that
+            // stood here said "the window makes the same two-way split; the two
+            // hosts must not diverge on it", which was true when written and was
+            // the sentence a reader would have checked the window against.
+            //
+            // The count and the size are the whole withheld set rather than this
+            // condition's share of it, exactly as the window's screen uses, so the
+            // two hosts cannot disagree about one machine.
+            var withheldCount = scanResult.WithheldFiles?.Count ?? 0;
+            Console.WriteLine(count > 0
+                ? string.Format(
                     DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
-                    count, DisplayHelpers.PluraliseFile(count), size));
+                    count, DisplayHelpers.PluraliseFile(count), size)
+                : scanResult.WalkOfferWithheldWholesale
+                    // The one-form names the size and not the numeral ("the one file"),
+                    // so it spends {2} and leaves {0} and {1} unused; both are passed on
+                    // either branch so the two forms cannot disagree about which index is
+                    // which. The window's own body is built the same way.
+                    ? string.Format(
+                        DisplayHelpers.Pluralise(withheldCount,
+                            Strings.Cli_NothingOffered_Singular,
+                            Strings.Cli_NothingOffered_Plural, "Cli.NothingOffered"),
+                        withheldCount, DisplayHelpers.PluraliseFile(withheldCount),
+                        DisplayHelpers.FormatSize(scanResult.WithheldTotalBytes))
+                    : Strings.Cli_FoundNoOrphans);
 
             ReportScanSignals(arg, scanResult);
 
             if (count == 0)
             {
-                // The audit line follows the same split as stdout, which is now the
-                // two-way one: it carried a third arm for the machine the app could
-                // not judge, so an RMM filtering the Application channel could tell
-                // that from a clean machine, and that arm went with the condition
-                // behind it.
+                // The audit line follows the same split as stdout, so a monitoring
+                // tool watching the Application channel is not told a machine is
+                // clean when the scan could not judge it.
+                //
+                // ONE EVENT CLASS FOR BOTH, WHICH IS A LIMIT AND NOT AN OVERSIGHT.
+                // The run did its job either way, so both belong in the outcome
+                // band, and telling the two apart means reading the message rather
+                // than filtering on the number. Splitting them would put a new Event
+                // ID on the wire, which is a change to the machine contract and a
+                // decision of its own; the alternative, leaving the clean line to
+                // cover both, is the false statement this branch exists to stop.
                 MachineContract.WriteEventLog(CliEventClass.Ok,
-                    () => string.Format(Strings.Cli_EventLogScanNoOrphans,
-                        arg, scanResult.RegisteredPackages.Count,
-                        DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
+                    () => scanResult.WalkOfferWithheldWholesale
+                        ? string.Format(Strings.Cli_EventLogNothingOffered,
+                            arg, withheldCount, DisplayHelpers.PluraliseFile(withheldCount))
+                        : string.Format(Strings.Cli_EventLogScanNoOrphans,
+                            arg, scanResult.RegisteredPackages.Count,
+                            DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
                 return ExitOk;
             }
 
@@ -866,6 +899,30 @@ internal static class Program
     /// </remarks>
     private static void ReportScanSignals(string arg, ScanResult scanResult)
     {
+        // THE WALK OFFER WAS EMPTIED WHOLESALE. An audit line and no stdout line,
+        // which is the one asymmetry in this method and is deliberate: where nothing
+        // at all was offered the stdout branch above has already said this in the
+        // line it printed instead of the clean one, and where a superseded
+        // registration WAS offered beside it the human surfaces say nothing yet.
+        //
+        // IT IS HERE RATHER THAN INSIDE THAT BRANCH SO IT REACHES BOTH MACHINES.
+        // Written where the offer is empty, it would miss the machine whose walk
+        // offer went while a superseded row survived, and that is a machine a
+        // monitoring tool most needs to be able to see: its "Found N unneeded files"
+        // is true and says nothing at all about the half that was withheld.
+        //
+        // A NOTICE AND NOT AN OUTCOME. The run scanned, judged, withheld correctly
+        // and reported, so its outcome entry stays in the 1000 band; what the band
+        // cannot carry is the difference between this machine and a clean one, which
+        // is what a number in the 3000 band is for. See CliEventClass.
+        if (scanResult.WalkOfferWithheldWholesale)
+        {
+            var heldBack = scanResult.WithheldFiles?.Count ?? 0;
+            MachineContract.WriteEventLog(CliEventClass.ScanNothingOfferedNotice,
+                () => string.Format(Strings.Cli_EventLogNothingOfferedNotice,
+                    arg, heldBack, DisplayHelpers.PluraliseFile(heldBack)));
+        }
+
         if (scanResult.UnaccountedProductCount > 0)
         {
             // The command line's own sentence, not the window's Summary.* one.

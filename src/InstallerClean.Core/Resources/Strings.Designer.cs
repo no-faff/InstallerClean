@@ -171,6 +171,8 @@ public static class Strings
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");
     public static string Cli_EventLogMutexBlocked => Get("Cli.EventLogMutexBlocked");
     public static string Cli_EventLogNoArguments => Get("Cli.EventLogNoArguments");
+    public static string Cli_EventLogNothingOffered => Get("Cli.EventLogNothingOffered");
+    public static string Cli_EventLogNothingOfferedNotice => Get("Cli.EventLogNothingOfferedNotice");
     public static string Cli_EventLogPendingRebootBlocked => Get("Cli.EventLogPendingRebootBlocked");
     public static string Cli_EventLogReason_InstallerInProgress => Get("Cli.EventLogReason.InstallerInProgress");
     public static string Cli_EventLogReason_MsiExecuteMutex => Get("Cli.EventLogReason.MsiExecuteMutex");
@@ -214,6 +216,8 @@ public static class Strings
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
+    public static string Cli_NothingOffered_Plural => Get("Cli.NothingOffered.Plural");
+    public static string Cli_NothingOffered_Singular => Get("Cli.NothingOffered.Singular");
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
     public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
     public static string Cli_PendingRebootBlocked_Other => Get("Cli.PendingRebootBlocked.Other");
@@ -252,6 +256,7 @@ public static class Strings
     public static string Completion_ReverifyIdentityClaimed => Get("Completion.ReverifyIdentityClaimed");
     public static string Completion_ReverifyIdentityUnreadable => Get("Completion.ReverifyIdentityUnreadable");
     public static string Completion_ReverifyIncomplete => Get("Completion.ReverifyIncomplete");
+    public static string Completion_ReverifyOwnershipUnestablished => Get("Completion.ReverifyOwnershipUnestablished");
     public static string Completion_ReverifyRecordsChanged => Get("Completion.ReverifyRecordsChanged");
     public static string Completion_ReverifySkipped => Get("Completion.ReverifySkipped");
     public static string Confirm_DeletePermanently_Plural => Get("Confirm.DeletePermanently.Plural");

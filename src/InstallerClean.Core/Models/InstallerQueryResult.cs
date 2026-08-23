@@ -244,15 +244,22 @@ public record InstallerQueryResult(
 /// instance of themselves under an instance transform. PRODUCTS, not files, and
 /// not a count of anything held back.
 ///
-/// IT DECIDES NOTHING, WHICH IS THE POINT OF IT. Up to 3.0.0 this condition
-/// emptied the whole offer, on the reading that a keyed question about the product
-/// code written inside a cached package can answer "no record" while a
-/// registration under a transform-generated code still needs the file. Nothing
-/// reads inside a file any more, so that reading has no subject and the condition
-/// picks out no risk this machine does not carry for every other product. What
-/// remains is a fact about machines that nobody anywhere has measured: whether a
-/// machine carrying such a product exists in the field at all. Counted and sent;
-/// acted on nowhere.
+/// IT DECIDES, AND THIS NOTE SAID FOR A WEEK THAT IT DECIDED NOTHING. That was true
+/// when it was written and stopped being true the following day, which is the more
+/// dangerous half: the sentence stayed well argued and specific while its subject
+/// moved. It read that the condition emptied the whole offer until 3.0.0, on the
+/// reading that a keyed question about the product code written inside a cached
+/// package can answer "no record" while a registration under a transform-generated
+/// code still needs the file, and that "nothing reads inside a file any more", so
+/// the reading had no subject. Something reads a product code out of a cached file
+/// again (<see cref="Services.DeclaredProductCheck"/>), and it is the last pass
+/// standing between an unclaimed candidate and the offer. The subject came back and
+/// nobody re-read the sentence.
+///
+/// What acts on it is <see cref="SecondInstanceNotRuledOut"/>, which reads this
+/// count together with the one below and never on its own. This member is still
+/// carried and sent apart, because how often a machine ANSWERS the question and how
+/// often it REFUSES to are different facts and nobody has measured either.
 ///
 /// A POSITIVE READING IS THE ONLY THING COUNTED. A value that will not parse is
 /// not a positive, and neither is an absent property, which Microsoft documents as
@@ -269,11 +276,18 @@ public record InstallerQueryResult(
 /// three-valued verdict could say complete, incomplete or unreadable and could not
 /// say how many products it failed on, which is the number a receiver comparing
 /// machines needs. A count beside a count is the shape every other member here
-/// uses, and it composes with them: a complete negative is a zero here AND a zero
-/// in <see cref="UnreadableProducts"/>, <see cref="UnansweredProductCount"/> and
-/// <see cref="UnparseableProductKeyNames"/>, because a product the walk never
-/// reached was never asked this question either. Any of those non-zero makes the
-/// count above a floor.
+/// uses.
+///
+/// WHICH PRODUCTS WERE ASKED AT ALL, and the answer moved in 3.0.0. Both counts
+/// cover the products the enumeration returned AND the products it lost that the
+/// registry named and the recovery pass resolved as installed
+/// (<see cref="RecoveredProductCount"/>), which are asked one keyed read each. This
+/// note used to say that a product the walk never reached was never asked, and that
+/// is now true only of the two states the recovery cannot settle: a code Windows
+/// would not answer about (<see cref="UnansweredProductCount"/>) and a registry key
+/// whose name yielded no code (<see cref="UnparseableProductKeyNames"/>). Either of
+/// those non-zero, or <see cref="UnreadableProducts"/> on a run where no fallback
+/// named the lost product, makes both counts a floor.
 /// </param>
 /// <param name="ProductPatchKeyCount">
 /// Products whose registry <c>Patches</c> key opened, from the per-product patch
@@ -512,4 +526,48 @@ public readonly record struct EnumerationCensus(
     /// </summary>
     public bool AnyRecordedPathUnestablished =>
         PathNormalisationRefusedTotal > 0 || PathResolverRefusedTotal > 0;
+
+    /// <summary>
+    /// Whether this scan failed to establish that every product it could ask about is
+    /// an ordinary single-instance installation. THE ONE THING THE SECOND-INSTANCE
+    /// WITHHOLDING ASKS, and it is here rather than in the service that acts on it for
+    /// the reason <see cref="AnyRecordedPathUnestablished"/> is: a rule that named the
+    /// members itself would be one edit away from silently not acting on a member added
+    /// later, with a green build and a counter still reporting.
+    ///
+    /// THE TWO MEMBERS ARE OPPOSITE FINDINGS AND THE SUPERORDINATE IS EXACT.
+    /// <see cref="InstanceProductCount"/> is a positive answer that a product IS a second
+    /// instance of itself; <see cref="InstanceTypeUnreadableCount"/> is a question that was
+    /// put and not answered. The only thing true of both is the one this property is named
+    /// for: the scan cannot say that no installed product is a second instance of itself.
+    /// Nothing may state a cause over the pair, here or on any surface.
+    ///
+    /// WHY EITHER WITHHOLDS. A product installed under an instance transform registers
+    /// under a product code the transform produced, while the package cached for it
+    /// declares the base code. So the one pass that reads a product code OUT OF A CACHED
+    /// FILE and puts it to Windows (<see cref="Services.DeclaredProductCheck"/>) can be
+    /// told there is no such record while a live registration still needs that file, and
+    /// that pass is the last thing standing between a candidate nothing claimed and the
+    /// offer. It cannot be made to work: the app has no way to tell WHICH cached file
+    /// belongs to the second copy, which is the whole condition.
+    ///
+    /// AND NOT KNOWING WITHHOLDS ON THE SAME TERMS AS KNOWING. A read that failed leaves
+    /// the machine in exactly the state the positive reading describes as far as this rule
+    /// can tell, and a rule that acted on the positive alone would be armed by the machines
+    /// that answer and disarmed by the machines that do not.
+    ///
+    /// A BOOL RATHER THAN A SUM. The two count different things and adding them would
+    /// produce a figure that reads as a product count and is not one. The counts are
+    /// carried apart for the report, which reads them apart; the rule needs only whether
+    /// either is above zero.
+    ///
+    /// WHAT IT DOES NOT REACH, stated because the boundary is a decision and not an
+    /// oversight. A product that is installed and that this scan could not name at all,
+    /// neither from the enumeration nor from the registry, is never asked and cannot be.
+    /// That is the limit of every question the scan puts rather than of this one, and
+    /// extending the rule to it would make it fire on the possibility that any enumeration
+    /// anywhere is short, which is true of every scan and leaves the rule no floor.
+    /// </summary>
+    public bool SecondInstanceNotRuledOut =>
+        InstanceProductCount > 0 || InstanceTypeUnreadableCount > 0;
 }

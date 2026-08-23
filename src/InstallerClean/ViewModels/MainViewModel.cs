@@ -321,14 +321,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // that release and nobody re-read the comment, so the screen was gone
             // while the condition was not. 3.0.0 adds a third such condition.
             //
-            // THE COUNT CLAUSE IS NOT BELT AND BRACES. The flag says which branch the
-            // scan took, not that anything was withheld, and a walk that produced no
-            // candidates at all sets it while holding nothing back. The second screen
-            // says "it has held back all N files it might otherwise have offered",
-            // which at zero is both absurd and untrue, and for that machine the
-            // all-clear is right: nothing in the folder went unclaimed.
+            // THE COUNT CLAUSE THAT USED TO BE HERE HAS MOVED INTO THE SCAN, and it is
+            // worth knowing why rather than putting it back. The flag once said only
+            // which branch the scan took, so a walk that produced no candidates at all
+            // set it while holding nothing back, and this line guarded against that by
+            // counting WithheldFiles. But that list is filled by two separate decisions,
+            // so the guard was a host inferring one decision's outcome from a list the
+            // other also writes to: the moment either one's membership moves, this line
+            // means something different and nothing fails. The flag now answers the
+            // question the screen actually asks, decided where the withholding happens.
             var withheld = result.WithheldFiles ?? Array.Empty<OrphanedFile>();
-            if (result.WalkOfferWithheldWholesale && withheld.Count > 0)
+            if (result.WalkOfferWithheldWholesale)
             {
                 Completion.ShowNothingOffered(
                     withheld.Count,

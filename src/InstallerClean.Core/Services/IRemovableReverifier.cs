@@ -155,9 +155,13 @@ public readonly record struct UnderLeaseClaims(
 }
 
 /// <summary>
-/// Why one file was kept back. Three states rather than two because they are
-/// three different things to have found out, and the report the user reads names
-/// the cause: a confirmed positive, an inability, and neither.
+/// Why one file was kept back. Four states, because they are four different things
+/// to have found out and the report the user reads names the cause: a confirmed
+/// positive, an inability, neither, and one that is not about the file at all.
+///
+/// THE FIRST THREE ARE ABOUT THE REGISTRATION THAT NAMES THIS PATH. The fourth is
+/// about the machine, and it is reached without reading anything about the path, so
+/// no sentence covers all four. That is what the partition is for.
 /// </summary>
 public enum HeldBackReason
 {
@@ -221,6 +225,35 @@ public enum HeldBackReason
     /// this list.
     /// </summary>
     RecordsUnreadable,
+
+    /// <summary>
+    /// The re-enumeration met a condition under which the scan itself offers no
+    /// walk-derived file at all, so a file this batch carries is one the app would
+    /// no longer put on a list.
+    ///
+    /// IT IS ABOUT THE MACHINE AND NOT ABOUT THE FILE, which is what separates it
+    /// from the three above and is why it could not fold into any of them. Those
+    /// are findings about the registration that names this path: a live claim, a
+    /// registration that has gone, a read that failed. This one is reached without
+    /// looking at the path at all, and the sentence it carries has to say so.
+    ///
+    /// WHAT REACHES IT is asked of the census where the members live
+    /// (<see cref="Models.EnumerationCensus.AnyRecordedPathUnestablished"/> and
+    /// <see cref="Models.EnumerationCensus.SecondInstanceNotRuledOut"/>), on the
+    /// same rule as the scan's own withholding: a condition added to either is
+    /// acted on here without this file being edited. Two different findings reach
+    /// it today and neither may be named in the copy.
+    ///
+    /// IT DROPS THE WALK-DERIVED HALF OF A BATCH AND NOT THE WHOLE OF IT, which
+    /// matches what the scan does rather than what the removed version did. The
+    /// version taken out in 3.0.0 refused the entire batch, and that was right when
+    /// the whole offer was walk-derived; a superseded registration is offered beside
+    /// it now, and those rows are judged by product code and are not touched by
+    /// either condition, so refusing them here would keep back files the scan would
+    /// still offer on the same machine a moment later. A path no registration names
+    /// is the walk-derived half, and that is the test used.
+    /// </summary>
+    OwnershipUnestablished,
 }
 
 /// <summary>
@@ -236,18 +269,39 @@ public enum HeldBackReason
 public readonly record struct HeldBackReasons(
     int Reclaimed = 0,
     int RecordsChanged = 0,
-    int RecordsUnreadable = 0)
+    int RecordsUnreadable = 0,
+    int OwnershipUnestablished = 0)
 {
     /// <summary>Files kept back for any cause. Equals the accompanying path list's count.</summary>
     public int Total =>
-        Reclaimed + RecordsChanged + RecordsUnreadable;
+        Reclaimed + RecordsChanged + RecordsUnreadable + OwnershipUnestablished;
 
-    /// <summary>This tally with one more file counted against <paramref name="reason"/>.</summary>
+    /// <summary>
+    /// This tally with one more file counted against <paramref name="reason"/>.
+    ///
+    /// EVERY MEMBER IS NAMED AND THE DEFAULT THROWS, which is a change and is the
+    /// point of it. The default arm used to be <see cref="HeldBackReason.RecordsUnreadable"/>,
+    /// so a cause added to the enum and forgotten here compiled, built green and was
+    /// counted and reported as a read that failed: a file kept back under a sentence
+    /// naming a cause that did not occur, with nothing anywhere to see. This project
+    /// has shipped that shape once already, in a rename that would have made every
+    /// delete-failure report unreadable. A member added to the enum now fails at the
+    /// first file that reaches it, loudly, rather than being absorbed.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// A cause with no counter, which is a defect in this type and not a machine
+    /// state: the enum and this switch are edited together or not at all.
+    /// </exception>
     public HeldBackReasons Plus(HeldBackReason reason) => reason switch
     {
         HeldBackReason.Reclaimed => this with { Reclaimed = Reclaimed + 1 },
         HeldBackReason.RecordsChanged => this with { RecordsChanged = RecordsChanged + 1 },
-        _ => this with { RecordsUnreadable = RecordsUnreadable + 1 },
+        HeldBackReason.RecordsUnreadable => this with { RecordsUnreadable = RecordsUnreadable + 1 },
+        HeldBackReason.OwnershipUnestablished =>
+            this with { OwnershipUnestablished = OwnershipUnestablished + 1 },
+        _ => throw new ArgumentOutOfRangeException(nameof(reason), reason,
+            "A held-back cause with no counter. Add it to HeldBackReasons and to "
+            + "HeldBackReport.Lines in the same edit as the enum member."),
     };
 
     /// <summary>
@@ -259,7 +313,8 @@ public readonly record struct HeldBackReasons(
     public static HeldBackReasons operator +(HeldBackReasons a, HeldBackReasons b) =>
         new(a.Reclaimed + b.Reclaimed,
             a.RecordsChanged + b.RecordsChanged,
-            a.RecordsUnreadable + b.RecordsUnreadable);
+            a.RecordsUnreadable + b.RecordsUnreadable,
+            a.OwnershipUnestablished + b.OwnershipUnestablished);
 }
 
 /// <summary>
@@ -271,7 +326,7 @@ public readonly record struct HeldBackReasons(
 /// <param name="Reasons">
 /// How many of <paramref name="HeldBack"/> fell to each cause, for exactly the
 /// reason <see cref="ReverifyResult.Reasons"/> carries it: the report the user
-/// reads names a cause, one re-read can meet all three, and a file's own cause is
+/// reads names a cause, one re-read can meet more than one of them, and a file's own cause is
 /// the only thing that is true of it. A read that could not be made has not shown
 /// the file to be removable, so it is held back whichever cause it fell to; what
 /// it has not shown is that a program wants it back.

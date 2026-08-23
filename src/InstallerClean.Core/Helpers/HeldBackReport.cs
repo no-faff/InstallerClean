@@ -53,13 +53,21 @@ internal static class HeldBackReport
     {
         if (reasons.Total == 0) return Array.Empty<string>();
 
-        var lines = new List<string>(3);
+        var lines = new List<string>(4);
         Add(lines, reasons.Reclaimed,
             Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped");
         Add(lines, reasons.RecordsChanged,
             Strings.Completion_ReverifyRecordsChanged, "Completion.ReverifyRecordsChanged");
         Add(lines, reasons.RecordsUnreadable,
             Strings.Completion_ReverifyIncomplete, "Completion.ReverifyIncomplete");
+        // LAST, AND THE ORDER RULE ABOVE PUTS IT THERE RATHER THAN HABIT. The three
+        // above are findings about the registration naming that file, strongest
+        // first. This one says nothing about the file at all: the app could not
+        // establish which cached files belong to which programs, so it left this one
+        // where it was. It establishes least about the file, so it reads last.
+        Add(lines, reasons.OwnershipUnestablished,
+            Strings.Completion_ReverifyOwnershipUnestablished,
+            "Completion.ReverifyOwnershipUnestablished");
         return lines.AsReadOnly();
     }
 

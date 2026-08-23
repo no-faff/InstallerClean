@@ -189,6 +189,29 @@ internal enum CliEventClass
     /// included up to v2.3.0.
     /// </summary>
     ScanMissingFilesNotice,
+
+    /// <summary>
+    /// Notice: the scan could not establish which cached files belong to the
+    /// programs installed here, so it offered none of the files it walked.
+    ///
+    /// IT IS THE DISTINCTION THE OUTCOME BAND CANNOT CARRY. The run did its job
+    /// and its outcome entry is <see cref="Ok"/> for that reason, so a machine
+    /// nothing could be judged on and a machine that is genuinely clean sit inside
+    /// one number, and the band exists precisely so a filter need not read the
+    /// English to tell outcomes apart. This is the notice that separates them, and
+    /// it changes no existing number's meaning.
+    ///
+    /// WARNING RATHER THAN INFORMATION, on the rule stated at
+    /// <see cref="CliContract.EntryTypeFor"/>: Warning means THIS RUN fell short of
+    /// its job. The sibling notice at 3000 is Warning because "that run's list
+    /// genuinely was short", and this run's list was empty for the same kind of
+    /// reason. It is not the missing-files case, which is a standing property of a
+    /// machine and repeats nightly for ever.
+    ///
+    /// IT NAMES NO CAUSE AND MAY NOT ACQUIRE ONE. Several different findings empty
+    /// a walk-derived offer this way; the message says what is true of all of them.
+    /// </summary>
+    ScanNothingOfferedNotice,
 }
 
 /// <summary>The exit code and Event-log class chosen for a finished file operation.</summary>
@@ -298,6 +321,7 @@ internal static class CliContract
         CliEventClass.HardError => 4000,
         CliEventClass.ScanRecordsIncompleteNotice => 3000,
         CliEventClass.ScanMissingFilesNotice => 3001,
+        CliEventClass.ScanNothingOfferedNotice => 3002,
         _ => 0,
     };
 
@@ -311,7 +335,11 @@ internal static class CliContract
     ///
     /// Hence a clean success Information, partial / transient-skip / hard-error
     /// Warning, and the withheld notice Warning because that run's list genuinely
-    /// was short. The missing-files notice is the one that is not about the run:
+    /// was short. The nothing-offered notice is Warning on that same reading and
+    /// not on the missing-files one: that run's list was not merely short, it was
+    /// empty, and it will be empty again on the next run only for as long as the
+    /// condition holds rather than for as long as some files are absent. The
+    /// missing-files notice is the one that is not about the run:
     /// it is true whether or not the run worked and repeats for as long as the
     /// files are gone, so at Warning a machine with nothing wrong with it posts
     /// one nightly for ever, and the operator's answer to that is a suppression

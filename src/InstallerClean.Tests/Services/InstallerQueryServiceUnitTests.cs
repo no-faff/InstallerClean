@@ -1900,7 +1900,17 @@ public class InstallerQueryServiceUnitTests
         Assert.True(row.VerdictUnreadable);
     }
 
-    // ---- The instance-product count, which decides nothing ----
+    // ---- The instance-product reading, which decides the walk-derived offer ----
+    //
+    // THIS HEADING SAID "WHICH DECIDES NOTHING" AND WAS TRUE FOR A WEEK. The condition
+    // emptied the offer until the check that detected it was removed, on the ground that
+    // nothing read a product code out of a cached file any more; something does again,
+    // and it is the last pass between an unclaimed candidate and the offer. What acts on
+    // these two counts is EnumerationCensus.SecondInstanceNotRuledOut, which reads them
+    // together and never one on its own. The tests below are about the READING and are
+    // unchanged by that: what a positive is, what an absence is, and what a failure is.
+    // The population these cover is the products the enumeration returned; the ones it
+    // lost are in InstallerQueryServiceSecondInstanceTests.
 
     [Theory]
     // Microsoft's documented positive. 1 is the value an instance transform writes.

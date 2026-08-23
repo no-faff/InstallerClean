@@ -156,6 +156,96 @@ public class EnumerationCensusTests
     }
 
     /// <summary>
+    /// The census members the second-instance withholding fires on. Two, and they are
+    /// opposite findings rather than two of a kind: one is a product that positively
+    /// answered that it is a second instance of itself, the other a product that was
+    /// asked and would not answer.
+    ///
+    /// <see cref="EnumerationCensus.RecoveredProductCount"/> IS DELIBERATELY ABSENT and
+    /// is this list's trap, for the reason the attempts count is the other list's. A
+    /// product the enumeration lost and the registry named is ASKED the question, one
+    /// keyed read each, so a machine with recovered products and clean answers is a
+    /// machine that answered. A property that read the recovered count would empty the
+    /// offer on exactly the machines the recovery pass exists to rescue.
+    /// </summary>
+    private static readonly string[] SecondInstanceMembers =
+    [
+        "InstanceProductCount",
+        "InstanceTypeUnreadableCount",
+    ];
+
+    [Fact]
+    public void Exactly_the_two_second_instance_members_make_a_scan_withhold()
+    {
+        // THE SAME WALK AS ABOVE AND FOR THE SAME REASON. The rule is a hand-written
+        // expression over a positional record of ints that has grown twice already, and
+        // a member added to the record and forgotten in the expression compiles, builds
+        // green, reports its count and simply does not withhold. Writing the names out
+        // again in the property would leave the next one exactly as forgettable.
+        //
+        // AND THE MUST-MISS HALF IS CARRIED BY THE SAME COMPARISON, which is the point
+        // of an equality rather than a set of assertions: every other member on the
+        // record is in this run and is required NOT to fire.
+        var ctor = Primary();
+        var parameters = ctor.GetParameters();
+
+        // The denominator, printed as an assertion rather than assumed: a walk that
+        // found the wrong constructor would report nothing fired, which reads exactly
+        // like a property that answers false for everything.
+        Assert.True(parameters.Length >= SecondInstanceMembers.Length + 15,
+            $"The census constructor has {parameters.Length} parameters, which is too few for this "
+            + "walk to be measuring what it claims.");
+
+        var fired = new List<string>();
+        foreach (var parameter in parameters)
+        {
+            var args = new object[parameters.Length];
+            for (var i = 0; i < args.Length; i++) args[i] = 0;
+            args[parameter.Position] = 1;
+
+            var census = (EnumerationCensus)ctor.Invoke(args);
+            if (census.SecondInstanceNotRuledOut) fired.Add(parameter.Name!);
+        }
+
+        var expected = SecondInstanceMembers.OrderBy(n => n, StringComparer.Ordinal).ToArray();
+        var actual = fired.OrderBy(n => n, StringComparer.Ordinal).ToArray();
+
+        Assert.True(expected.SequenceEqual(actual, StringComparer.Ordinal),
+            "SecondInstanceNotRuledOut fires on a different set of members than the withholding "
+            + "was written for.\n"
+            + $"  expected: {string.Join(", ", expected)}\n"
+            + $"  actual  : {string.Join(", ", actual)}\n"
+            + $"  missing : {string.Join(", ", expected.Except(actual, StringComparer.Ordinal))}\n"
+            + $"  extra   : {string.Join(", ", actual.Except(expected, StringComparer.Ordinal))}\n"
+            + "A MISSING member is a machine the scan reads as ordinary and cannot show to be, "
+            + "which is files offered that it meant to keep back. An EXTRA member is the scan "
+            + "emptying an offer on a fact that is not the second-instance question. Neither is a "
+            + "test to relax.");
+    }
+
+    [Fact]
+    public void A_census_with_nothing_wrong_rules_the_second_instance_question_out()
+    {
+        // The floor under the walk above, and the one that keeps this rule off every
+        // ordinary machine: an absent InstanceType is documented as meaning an ordinary
+        // installation and reaches the census as neither count.
+        Assert.False(new EnumerationCensus().SecondInstanceNotRuledOut);
+    }
+
+    [Fact]
+    public void Recovering_a_product_the_enumeration_lost_is_not_by_itself_a_reason_to_withhold()
+    {
+        // THE MEMBER MOST LIKELY TO BE FOLDED IN BY MISTAKE, pinned by name as well as
+        // by the walk. It is tempting because a recovered product was not in the loop
+        // that reads the property, and the answer is that it is asked separately rather
+        // than assumed unanswerable. A machine whose registry named two products the
+        // enumeration missed, both of which answered, is entitled to its offer.
+        var recovered = new EnumerationCensus(RecoveredProductCount: 2);
+
+        Assert.False(recovered.SecondInstanceNotRuledOut);
+    }
+
+    /// <summary>
     /// The record's own constructor, chosen by arity rather than by position in the
     /// reflection result, so a compiler-generated parameterless one cannot be picked
     /// up and walked instead.

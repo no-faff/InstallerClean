@@ -224,6 +224,7 @@ public class CliContractTests
     {
         Assert.Equal(3000, CliContract.EventIdFor(CliEventClass.ScanRecordsIncompleteNotice));
         Assert.Equal(3001, CliContract.EventIdFor(CliEventClass.ScanMissingFilesNotice));
+        Assert.Equal(3002, CliContract.EventIdFor(CliEventClass.ScanNothingOfferedNotice));
     }
 
     [Fact]
@@ -240,6 +241,31 @@ public class CliContractTests
 
         Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanRecordsIncompleteNotice), outcomes);
         Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanMissingFilesNotice), outcomes);
+        Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanNothingOfferedNotice), outcomes);
+    }
+
+    [Fact]
+    public void EventId_no_two_classes_share_a_number()
+    {
+        // A DUPLICATE IS THE ONE FAULT THE TWO TESTS ABOVE CANNOT SEE, and it is
+        // the likeliest: adding a class means typing a number next to a column of
+        // near-identical ones, and a second 3001 would put two different findings
+        // under one filter with nothing failing. Enumerated rather than listed, so
+        // the next class is covered without anybody remembering to add it here.
+        //
+        // The denominator is asserted rather than assumed: a walk that found no
+        // members would report no duplicates, which reads exactly like a clean map.
+        var classes = Enum.GetValues<CliEventClass>();
+        Assert.True(classes.Length >= 7,
+            $"CliEventClass has {classes.Length} members, which is too few for this walk to be "
+            + "measuring what it claims.");
+
+        var ids = classes.Select(CliContract.EventIdFor).ToArray();
+        var duplicated = ids.GroupBy(id => id).Where(g => g.Count() > 1).Select(g => g.Key).ToArray();
+
+        Assert.True(duplicated.Length == 0,
+            "Two event classes share an Event ID, so a filter selecting one selects both: "
+            + string.Join(", ", duplicated));
     }
 
     [Fact]
@@ -266,5 +292,18 @@ public class CliContractTests
         // Every other class is Warning, so this is the arm a tidy-up folds away.
         Assert.Equal(EventLogEntryType.Information,
             CliContract.EntryTypeFor(CliEventClass.ScanMissingFilesNotice));
+    }
+
+    [Fact]
+    public void EntryType_the_nothing_offered_notice_is_warning()
+    {
+        // IT SITS ON THE OTHER SIDE OF THAT SAME SPLIT AND THE PAIR IS WHY THIS IS
+        // PINNED. Warning means THIS RUN fell short of its job, and this run offered
+        // nothing at all where it would otherwise have offered something. The
+        // missing-files notice is a standing property of a machine and repeats
+        // nightly for ever, which is what earns it Information; this one stops the
+        // moment the condition does.
+        Assert.Equal(EventLogEntryType.Warning,
+            CliContract.EntryTypeFor(CliEventClass.ScanNothingOfferedNotice));
     }
 }

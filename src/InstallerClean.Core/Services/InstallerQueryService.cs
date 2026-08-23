@@ -643,9 +643,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unreadablePatchStates = 0;
 
         // Products installed as a second instance of themselves, and the products
-        // that would not answer the question. Both decide nothing at all: see
-        // EnumerationCensus.InstanceProductCount for what the pair is for and why
-        // neither may be read without the other.
+        // that would not answer the question. NEITHER MAY BE READ WITHOUT THE OTHER,
+        // and from 3.0.0 there is a rule that obeys that rather than a note saying it:
+        // EnumerationCensus.SecondInstanceNotRuledOut asks them together and the walk's
+        // offer is withheld wholesale on the answer. See that property for what the
+        // pair means and InstanceProductCount for what a positive reading rests on.
+        //
+        // FED FROM TWO PLACES AND NOT ONE. The loop below asks every product the
+        // enumeration returned; the pass after it asks every product the enumeration
+        // lost and the registry named. A product in neither is a product nothing on
+        // this machine can name, which is the limit of the whole scan and not of this
+        // rule.
         var instanceProducts = 0;
         var instanceTypeUnreadable = 0;
 
@@ -709,16 +717,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // the shape the question needs, so asking here costs one call per
             // product and nothing per machine.
             //
-            // IT REACHES NO VERDICT AND MUST NOT ACQUIRE ONE. A failed read does
-            // not count as an instance product, does not count as an ordinary one,
-            // and above all does not feed recordsShort: the whole class the other
-            // reads in this loop withhold for is about a CLAIM that never reached
-            // the merge, and this property carries no claim on any file. Counting
-            // it there would withhold the removable class over a diagnostic.
-            var instanceType = GetProductProperty(productCode, userSid, context, MsiInstallProperty.InstanceType);
-            if (instanceType.Unreadable) instanceTypeUnreadable++;
-            else if (int.TryParse(instanceType.Value.TrimEnd('\0').Trim(), out var instanceTypeValue)
-                     && instanceTypeValue != 0) instanceProducts++;
+            // IT DOES NOT FEED recordsShort AND MUST NOT START. The class the other
+            // reads in this loop withhold for is about a CLAIM that never reached the
+            // merge, and this property carries no claim on any file, so counting it
+            // there would withhold the superseded class on a fact about the machine
+            // rather than on a lost claim. What it DOES feed is a separate rule, and
+            // where the two counts are read together is EnumerationCensus.
+            switch (ReadInstanceType(productCode, userSid, context))
+            {
+                case InstanceReading.SecondInstance: instanceProducts++; break;
+                case InstanceReading.Unreadable: instanceTypeUnreadable++; break;
+            }
 
             // LocalPackage is the one property whose failed read DELETES this
             // product's claim rather than degrading it. An unreadable State
@@ -869,6 +878,39 @@ public sealed class InstallerQueryService : IInstallerQueryService
             throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
 
         var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, ct);
+
+        // THE SAME QUESTION, PUT TO THE PRODUCTS THE ENUMERATION LOST. Without this
+        // the second-instance reading covers only the products the enumeration
+        // returned, and a product it lost is recovered by name a few lines above and
+        // asked about everything EXCEPT this: ResolveProductInstance asks whether the
+        // code is installed and walks no list, so it establishes an account and a
+        // context and reads no property at all. That leaves the one population most
+        // likely to hold the condition the one population never asked.
+        //
+        // ASKED RATHER THAN ASSUMED UNANSWERABLE, and the alternative was real: a
+        // recovered product could have been folded into the unreadable count on the
+        // ground that nothing had asked it. That would empty the offer on exactly the
+        // machines the recovery pass exists to rescue, which is the opposite of what it
+        // is for. Recovery closes a gap by asking, and this is one more question to the
+        // products it recovered.
+        //
+        // IT COSTS ONE KEYED PROPERTY READ PER RECOVERED PRODUCT, on a set that is
+        // empty on a machine whose enumeration came back whole, and it fails in the
+        // safe direction by construction: the read that will not answer reaches the
+        // unreadable count, which withholds, and a positive reaches the count that
+        // withholds for the other reason.
+        //
+        // The account and context are the ones the recovery established, because a
+        // per-user product answers in its own account and nowhere else.
+        foreach (var (recoveredCode, recoveredSid, recoveredContext) in missed.Recovered)
+        {
+            ct.ThrowIfCancellationRequested();
+            switch (ReadInstanceType(recoveredCode, recoveredSid, recoveredContext))
+            {
+                case InstanceReading.SecondInstance: instanceProducts++; break;
+                case InstanceReading.Unreadable: instanceTypeUnreadable++; break;
+            }
+        }
 
         ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered,
             fallback.Reach, fallback.ProductPatchSets, apiPatchSets, ct);
@@ -3874,6 +3916,55 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private static bool IsProductNotInstalled(uint error) =>
         error is MsiError.NoMoreItems or MsiError.UnknownProduct;
+
+    /// <summary>
+    /// What one product answered when asked whether it is installed as a second
+    /// instance of itself. Three states, because the question has three answers and
+    /// collapsing the third into either of the others is the fault this whole rule
+    /// exists to avoid: a product that would not answer has NOT been shown to be
+    /// ordinary.
+    /// </summary>
+    private enum InstanceReading
+    {
+        /// <summary>An ordinary single-instance installation, positively established.</summary>
+        Ordinary,
+
+        /// <summary>Installed under an instance transform as a second instance of itself.</summary>
+        SecondInstance,
+
+        /// <summary>The question was put and not answered. Neither of the above.</summary>
+        Unreadable,
+    }
+
+    /// <summary>
+    /// Puts the second-instance question to one product.
+    ///
+    /// ONE COPY OF THE CLASSIFICATION, FOR THE REASON <see cref="IsProductNotInstalled"/>
+    /// IS SHARED RATHER THAN COPIED. Two call sites ask it, the product enumeration's own
+    /// loop and the products that loop lost and the registry named, and what is worth
+    /// sharing is not the property read: it is which readings count as an answer. A second
+    /// copy of that is a second place for a spelling to be handled, or not handled, and the
+    /// direction it fails in is a machine wrongly reported ordinary.
+    ///
+    /// A POSITIVE READING IS THE ONLY THING THAT REPORTS <see cref="InstanceReading.SecondInstance"/>.
+    /// An absent property is documented as meaning an ordinary installation, and
+    /// <see cref="IsBenignPropertyRead"/> already puts ERROR_UNKNOWN_PROPERTY on the benign
+    /// side, so a record that never carried the property arrives here as a readable empty
+    /// value and is Ordinary rather than Unreadable. That is what keeps the rule off every
+    /// machine in the world: a value that will not parse is not a positive either.
+    ///
+    /// The value is compared as a NUMBER rather than against the string "1", because
+    /// nothing documents the spelling the API returns and a machine answering "01" or "1 "
+    /// would read as ordinary on a string test.
+    /// </summary>
+    private InstanceReading ReadInstanceType(string productCode, string? userSid, MsiInstallContext context)
+    {
+        var read = GetProductProperty(productCode, userSid, context, MsiInstallProperty.InstanceType);
+        if (read.Unreadable) return InstanceReading.Unreadable;
+        return int.TryParse(read.Value.TrimEnd('\0').Trim(), out var instanceType) && instanceType != 0
+            ? InstanceReading.SecondInstance
+            : InstanceReading.Ordinary;
+    }
 
     /// <summary>
     /// Retrieves a product property using the double-call buffer pattern,

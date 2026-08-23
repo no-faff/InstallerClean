@@ -444,6 +444,20 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // superseded row names, which would be a second claim on that path that the
         // merge cannot see.
         //
+        // AND IT IS NOT WITHHELD WITH THE SECOND-INSTANCE CONDITION EITHER, which was
+        // put to fixtures rather than argued because the blunter rule was the obvious
+        // one to write. A second copy is registered under its own product code and is
+        // therefore asked by the per-product condition like any other product, so a
+        // patch it still holds takes the offer away; measured with the cached patch's
+        // own Template naming ONLY the base code, which is the instance transform's
+        // whole peculiarity, and the offer still went, against a twin in which the same
+        // second copy is finished with the patch and the file is offered. The one shape
+        // in which such a file IS wrongly offered is a holder neither the enumeration
+        // nor the registry can name, and on that machine the condition is undetectable,
+        // so a blanket refusal would not have saved the file either: measured on a pair
+        // that differs only in whether an unrelated product reads as a second instance,
+        // where the same file is wrongly offered both times.
+        //
         // THE QUESTION IS ASKED OF THE CENSUS RATHER THAN ASSEMBLED HERE. This line
         // used to name the members one by one, which was correct and was one edit
         // away from not being: a cause added to the split is a cause this rule would
@@ -471,11 +485,25 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // population is acted on because the question is spelled where the members
         // are declared, and this line only says that a failure on either side
         // withholds.
-        walkOfferWithheldWholesale =
+        //
+        // AND THE THIRD, WHICH IS A POSITIVE FINDING RATHER THAN A FAILURE TO READ, so
+        // the sentence above is now true of two of the three and the superordinate over
+        // all of them is one step wider: something this scan established or could not
+        // establish leaves it unable to say which cached files belong to which programs.
+        // A product installed as a second instance of itself registers under a code the
+        // instance transform produced while its cached package declares the base code,
+        // and the per-file screen below is the one pass that reads a code out of a file
+        // and asks Windows about it. On such a machine that screen can be told there is
+        // no record while a live registration still needs the file, and no part of this
+        // scan can work out WHICH cached file belongs to the second copy. So the screen
+        // is not run and nothing walk-derived is offered. The question is asked of the
+        // census, where its two members live, on the same rule as the other two.
+        var withholdWalkOfferWholesale =
             query.Census.AnyRecordedPathUnestablished
-            || registrationIdentityReads.AnyUnestablished;
+            || registrationIdentityReads.AnyUnestablished
+            || query.Census.SecondInstanceNotRuledOut;
 
-        if (walkOfferWithheldWholesale)
+        if (withholdWalkOfferWholesale)
         {
             // Every candidate is already kept back on a fact about the machine, so
             // the per-file screen below could only reach the same answer at the cost
@@ -484,6 +512,21 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // Candidates the identity pass already withheld one at a time are on the
             // withheld list and off this one, so nothing lands on it twice.
             withheld.AddRange(unclaimedByPath);
+
+            // WHAT THE HOSTS ARE TOLD IS THAT THE WITHHOLDING CAUGHT SOMETHING, AND NOT
+            // MERELY THAT THIS BRANCH WAS TAKEN. A walk that produced no unclaimed
+            // candidates reaches here having held nothing back, and the screen that
+            // reads this flag says the app "has held back all N files it might otherwise
+            // have offered", which at zero is both absurd and untrue; for that machine
+            // the all-clear is right, nothing in the folder having gone unclaimed.
+            //
+            // IT IS DECIDED HERE BECAUSE THE HOST CANNOT DECIDE IT SAFELY. The window
+            // used to reach the same answer by counting ScanResult.WithheldFiles, which
+            // is a list two different decisions contribute to, so the moment either
+            // one's membership changes the screen's gate changes meaning with it and
+            // nothing fails. This branch is the only thing that knows what THIS
+            // withholding took, so this is where the question is answered.
+            walkOfferWithheldWholesale = unclaimedByPath.Count > 0;
         }
         else
         {
