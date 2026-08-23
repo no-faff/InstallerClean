@@ -252,7 +252,7 @@ Burada bir şey size engel oluyorsa, [bir konu açın](../../issues). Erişilebi
 **Gerçekten GB'larca yer açar mıyım?** Bu makinenize bağlı. Ek yazılımı olmayan temiz bir Windows 11 kurulumunda kaldırılacak bir şey yoktur. Uzun süredir kullanılan bir geliştirici iş istasyonu ya da çok sayıda MSI tabanlı yazılımı (Acrobat, Office, LibreOffice, büyük geliştirme araçları) olan herhangi bir makine, onlarca GB barındırabilir. Her hâlükârda, çalıştırdığınız anda tam olarak ne kadar olduğunu görürsünüz.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-v1.8.0'dan beri sonucu kısa ve anonim bir raporla gönderme seçeneği var. Şimdiye dek 208 rapor geldi (herkese teşekkürler 🙏); temizlenecek bir şeyi olan makinelerin oranı %62 ve bunlarda kurtarılan alanın ortancası 16,8 GB. Bir makine tam tamına 462 GB geri kazandı. Sonuçların özeti şöyle.
+v1.8.0'dan beri sonucu kısa ve anonim bir raporla gönderme seçeneği var. Şimdiye dek 209 rapor geldi (herkese teşekkürler 🙏); temizlenecek bir şeyi olan makinelerin oranı %62 ve bunlarda kurtarılan alanın ortancası 16,8 GB. Bir makine tam tamına 462 GB geri kazandı. Sonuçların özeti şöyle.
 
 <p align="center">
   <picture>

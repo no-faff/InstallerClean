@@ -252,7 +252,7 @@ Si algo aquí te estorba, [abre un issue](../../issues). Los problemas de accesi
 **¿Realmente voy a liberar GB de espacio?** Depende de tu equipo. Una instalación limpia de Windows 11 sin software adicional no tiene nada que eliminar. Una estación de trabajo de desarrollo de larga vida, o cualquier equipo con mucho software basado en MSI (Acrobat, Office, LibreOffice, grandes herramientas de desarrollo), puede tener decenas de GB. En cualquier caso, verás exactamente cuánto en cuanto lo ejecutes.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Desde la v1.8.0 se puede enviar un breve informe anónimo del resultado. Han llegado 208 hasta ahora (gracias a todos 🙏) y, del 62 % de equipos que tenían algo que limpiar, la mediana liberada es de 16,8 GB. Un equipo recuperó nada menos que 462 GB. Este es el resumen de los resultados.
+Desde la v1.8.0 se puede enviar un breve informe anónimo del resultado. Han llegado 209 hasta ahora (gracias a todos 🙏) y, del 62 % de equipos que tenían algo que limpiar, la mediana liberada es de 16,8 GB. Un equipo recuperó nada menos que 462 GB. Este es el resumen de los resultados.
 
 <p align="center">
   <picture>
