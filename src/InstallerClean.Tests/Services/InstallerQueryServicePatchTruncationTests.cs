@@ -127,6 +127,13 @@ public class InstallerQueryServicePatchTruncationTests
             claims,
             msi.WalkedProductInstances.ToList(),
             recovered.Select(p => (ProductCode: p, Sid: (string?)null, Context: MsiInstallContext.Machine)).ToList(),
+            // NOTHING ESTABLISHED ABOUT WHAT THE RECOVERED PRODUCTS HOLD, which is
+            // deliberate and is what these tests want. A default reach judges every
+            // recovered product against every path, so the narrowing is out of the
+            // picture entirely and these assertions turn on route A and the
+            // confirmation pass, which is their subject. The narrowing has its own
+            // tests, and they supply a reach.
+            default,
             patchSets,
             patchSets,
             CancellationToken.None);
@@ -772,6 +779,52 @@ public class InstallerQueryServicePatchTruncationTests
         // Not withheld: a product said it still holds the patch. The scan knows
         // why this file is being kept and could say so.
         Assert.False(row.RemovableWithheld);
+        // AND THE RECOVERED PRODUCT IS WHAT SAID SO, WHICH IS THE WHOLE GAIN OVER A
+        // HEADCOUNT AND IS WHAT THIS ASSERTION NOW PINS. The other product on this
+        // machine holds the same patch and holds nothing uninstallable, so its own
+        // verdict is AllNonRemovable; this value is reachable only by the recovered
+        // product having entered the judged set and been asked what it holds.
+        //
+        // IT USED TO PIN THE CONFIRMATION ASK AND THAT ASK NO LONGER HAPPENS HERE.
+        // The per-product condition now receives the recovered products, sees that this
+        // one holds something uninstallable, and settles the path before the per-pairing
+        // pass runs; that pass skips a path already settled, so nothing asks the pairing
+        // and the record of asks is empty. The row's two flags are what they always
+        // were, and the same answer is now reached one pass earlier and for a reason
+        // that is true of this machine. The ask itself is still what establishes a claim
+        // wherever the per-product condition does NOT settle the path, which is the
+        // ordinary case and is the test below.
+        Assert.Equal(ProductPatchSet.RemovablePatchPresent, row.ProductPatchSetVerdict);
+    }
+
+    /// <summary>
+    /// The same machine with the recovered product holding nothing uninstallable, which
+    /// is the ordinary shape of it: a second copy of a program carrying the same patch,
+    /// with no removable patch of its own.
+    ///
+    /// WHY IT IS HERE. The per-product condition cannot settle this path, every product
+    /// sharing the patch being clean, so the claim can only stand because the recovered
+    /// product was ASKED about the pairing and answered that it still holds it. That is
+    /// the property the test above was written for and can no longer show, and losing it
+    /// silently is how a suite ends up pinning nothing it is named for.
+    /// </summary>
+    [Fact]
+    public void A_recovered_product_holding_nothing_uninstallable_is_still_asked()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.HiddenFromWalk.Add(StillApplied);
+        msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "0");
+
+        var row = TheSharedPatch(Confirm(msi, null, StillApplied));
+
+        Assert.False(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+        // The condition ran and found nothing on any product to withhold for, so it
+        // left the path alone. Asserted rather than assumed: if it settled the path
+        // instead, the ask below would be skipped and would pass for the wrong reason.
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
         Assert.Contains((Patch, StillApplied), msi.ConfirmationAsks);
     }
 

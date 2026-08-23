@@ -26,6 +26,22 @@ public class ProductPatchSetTests
 {
     private const string Product = "0000000000000000000000000000AAAA";
 
+    // TWO REAL PATCH KEY NAMES AND THE CODES THEY UNPACK TO, taken from the pairs
+    // measured off one elevated machine's hive and pinned in
+    // InstallerQueryServiceProductCodeUnpackTests. Real ones rather than invented
+    // ones, because these fixtures are about what the reader makes of a name and an
+    // expectation composed by applying the same reading of the format the code
+    // applies would pass on a shared misunderstanding.
+    //
+    // THE OTHER FIXTURES IN THIS FILE STILL NAME THEIR PATCHES p1 AND p2, and that is
+    // deliberate rather than an oversight: those tests are about the verdict, which
+    // never parses a name, and their unparseable names now also exercise the arm where
+    // the listing cannot be established while the verdict still reads clean.
+    private const string PackedPatchOne = "4D54076CED4F5BA32BBD3E5FAD1CD4C9";
+    private const string PatchOne = "{C67045D4-F4DE-3AB5-B2DB-E3F5DAC14D9C}";
+    private const string PackedPatchTwo = "2D0058F6F08A743309184BE1178C95B2";
+    private const string PatchTwo = "{6F8500D2-A80F-3347-9081-B41E71C8592B}";
+
     [Fact]
     public void Every_patch_declaring_a_zero_is_the_only_clean_answer()
     {
@@ -34,7 +50,7 @@ public class ProductPatchSetTests
             Patch(products, "p1", uninstallable: 0);
             Patch(products, "p2", uninstallable: 0);
 
-            var (set, keys, registrations) = Read(products);
+            var (set, keys, registrations, _) = Read(products);
 
             Assert.Equal(ProductPatchSet.AllNonRemovable, set);
             Assert.Equal(1, keys);
@@ -54,7 +70,7 @@ public class ProductPatchSetTests
             Patch(products, "p2", uninstallable: 1);
             Patch(products, "p3", uninstallable: 0);
 
-            var (set, _, _) = Read(products);
+            var (set, _, _, _) = Read(products);
 
             Assert.Equal(ProductPatchSet.RemovablePatchPresent, set);
         });
@@ -76,7 +92,7 @@ public class ProductPatchSetTests
             using var patches = products.CreateSubKey($@"{Product}\Patches\p1", writable: true)!;
             patches.SetValue("Uninstallable", value, kind);
 
-            var (set, _, registrations) = Read(products);
+            var (set, _, registrations, _) = Read(products);
 
             Assert.Equal(ProductPatchSet.Unestablished, set);
             // Counted anyway: the registration exists and was seen, which is what the
@@ -93,7 +109,7 @@ public class ProductPatchSetTests
             using var patch = products.CreateSubKey($@"{Product}\Patches\p1", writable: true)!;
             patch.SetValue("State", 2, RegistryValueKind.DWord);
 
-            var (set, _, _) = Read(products);
+            var (set, _, _, _) = Read(products);
 
             Assert.Equal(ProductPatchSet.Unestablished, set);
         });
@@ -111,7 +127,7 @@ public class ProductPatchSetTests
             using var broken = products.CreateSubKey($@"{Product}\Patches\p2", writable: true)!;
             broken.SetValue("Uninstallable", "nonsense", RegistryValueKind.String);
 
-            var (set, _, _) = Read(products);
+            var (set, _, _, _) = Read(products);
 
             Assert.Equal(ProductPatchSet.RemovablePatchPresent, set);
         });
@@ -140,9 +156,19 @@ public class ProductPatchSetTests
         {
             using var _ = products.CreateSubKey($@"{Product}\InstallProperties", writable: true)!;
 
-            var (set, keys, registrations) = Read(products);
+            var (set, keys, registrations, codes) = Read(products);
 
             Assert.Equal(ProductPatchSet.AllNonRemovable, set);
+            // AND THE SAME SENTENCE ABOUT THE LISTING, WHICH IS A SEPARATE ANSWER AND
+            // NOT A RESTATEMENT. A product holding no registered patch holds a
+            // complete, empty list of them, and the caller may act on that: a
+            // recovered product whose list is empty can reach for no cached file at
+            // all. NotNull is the assertion that matters. Null here would mean "nobody
+            // established what this product holds", which is what every unreadable
+            // reading returns, and it would keep every file back on this machine
+            // rather than none.
+            Assert.NotNull(codes);
+            Assert.Empty(codes);
             // NOT COUNTED, AND THAT IS WHAT KEEPS THIS FIXTURE DISTINGUISHABLE FROM THE
             // NEXT ONE. The two now agree on the verdict, deliberately, because they
             // say the same thing about the machine. The counter is the only thing left
@@ -173,11 +199,78 @@ public class ProductPatchSetTests
         {
             using var _ = products.CreateSubKey($@"{Product}\Patches", writable: true)!;
 
-            var (set, keys, registrations) = Read(products);
+            var (set, keys, registrations, codes) = Read(products);
 
             Assert.Equal(ProductPatchSet.AllNonRemovable, set);
             Assert.Equal(1, keys);
             Assert.Equal(0, registrations);
+            // A listing that was taken and named nothing, which is the same answer the
+            // absent key gives and reached the other way about. Empty rather than
+            // null, for the same reason it is empty there.
+            Assert.NotNull(codes);
+            Assert.Empty(codes);
+        });
+    }
+
+    [Fact]
+    public void The_listing_names_every_patch_even_where_the_verdict_stops_at_the_first()
+    {
+        // WHAT THIS FIXTURE MAKES TRUE: a product holding two registered patches,
+        // BOTH of them declaring themselves uninstallable, so the verdict loop returns
+        // at whichever the enumeration reaches first and never sees the other. The
+        // listing must still name both.
+        //
+        // WHY BOTH ARE REMOVABLE RATHER THAN ONE. Key enumeration order is not
+        // something a test may assume, and with one removable patch this would prove
+        // the property only when the enumeration happened to reach that one first. With
+        // both removable the loop returns early whichever it reaches, so the fixture
+        // cannot pass by luck.
+        //
+        // WHAT IT IS GUARDING. The listing is what lets a product recovered by name be
+        // judged against the files it can reach rather than against all of them, and a
+        // listing built inside the verdict loop would come back SHORT exactly on the
+        // products that hold something uninstallable, which is to say on the products
+        // that can cost somebody a file. That version of this code would still pass
+        // every other test in this file.
+        WithProductsKey(products =>
+        {
+            Patch(products, PackedPatchOne, uninstallable: 1);
+            Patch(products, PackedPatchTwo, uninstallable: 1);
+
+            var (set, _, _, codes) = Read(products);
+
+            Assert.Equal(ProductPatchSet.RemovablePatchPresent, set);
+            Assert.NotNull(codes);
+            Assert.Equal(
+                new[] { PatchOne, PatchTwo }.OrderBy(c => c, StringComparer.OrdinalIgnoreCase),
+                codes.OrderBy(c => c, StringComparer.OrdinalIgnoreCase));
+        });
+    }
+
+    [Fact]
+    public void One_patch_name_that_is_not_a_packed_guid_leaves_the_whole_listing_unestablished()
+    {
+        // WHAT THIS FIXTURE MAKES TRUE: two registered patches, one named in the packed
+        // form and one whose name is not a packed GUID at all. The registry is saying
+        // this product holds a patch and nothing here can turn that name into a code to
+        // compare, so what the product holds is not established and it is judged against
+        // every cached file rather than against the one code that did unpack.
+        //
+        // THE VERDICT IS THE CONTROL AND IT IS THE POINT OF ASSERTING IT. It reads
+        // clean, exactly as it does without the unparseable name, so nothing else in
+        // the reading has been disturbed and the listing is the only thing that changed.
+        // A reader that skipped the bad name and returned the one good code would pass
+        // the verdict assertion and fail here.
+        WithProductsKey(products =>
+        {
+            Patch(products, PackedPatchOne, uninstallable: 0);
+            Patch(products, "not-a-packed-guid", uninstallable: 0);
+
+            var (set, _, registrations, codes) = Read(products);
+
+            Assert.Equal(ProductPatchSet.AllNonRemovable, set);
+            Assert.Equal(2, registrations);
+            Assert.Null(codes);
         });
     }
 
@@ -202,7 +295,7 @@ public class ProductPatchSetTests
             Patch(products, "p1", uninstallable: 0);
             Patch(products, "p2", uninstallable: 1);
 
-            var (set, _, registrations) = Read(products);
+            var (set, _, registrations, _) = Read(products);
 
             Assert.Equal(ProductPatchSet.RemovablePatchPresent, set);
             Assert.Equal(2, registrations);
@@ -243,13 +336,14 @@ public class ProductPatchSetTests
         patch.SetValue("State", 2, RegistryValueKind.DWord);
     }
 
-    private static (ProductPatchSet Set, int Keys, int Registrations) Read(
-        RegistryKey products)
+    private static (ProductPatchSet Set, int Keys, int Registrations, IReadOnlyCollection<string>? Codes)
+        Read(RegistryKey products)
     {
         var keys = 0;
         var registrations = 0;
-        var set = InstallerQueryService.ReadProductPatchSet(products, Product, ref keys, ref registrations);
-        return (set, keys, registrations);
+        var set = InstallerQueryService.ReadProductPatchSet(
+            products, Product, ref keys, ref registrations, out var codes);
+        return (set, keys, registrations, codes);
     }
 
     /// <summary>

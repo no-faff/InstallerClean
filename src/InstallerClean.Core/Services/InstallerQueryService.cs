@@ -166,6 +166,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// the same question, and the one that separates "the condition found a reason"
     /// from "the condition could not look".
     /// </param>
+    /// <param name="Reach">
+    /// What this read established about which cached files a product's own patches
+    /// could reach for, which is what lets a product recovered by name be judged
+    /// against the files it can actually touch instead of against all of them. See
+    /// <see cref="EstablishedPatchReach"/>; its default establishes nothing and is
+    /// read as "judge this product against every path".
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -179,7 +186,116 @@ public sealed class InstallerQueryService : IInstallerQueryService
         int ProductPatchRegistrations = 0,
         int ProductsWithRemovablePatch = 0,
         int ProductsWithPatchSetUnestablished = 0,
-        PathCensus? Paths = null);
+        PathCensus? Paths = null,
+        EstablishedPatchReach Reach = default);
+
+    /// <summary>
+    /// The two registry listings that together say which cached files one product's
+    /// patches could reach for: the patch codes a product holds, and the cached path
+    /// each of those patch codes records for itself.
+    ///
+    /// WHAT IT IS FOR. A product the machine-wide enumeration never returned is
+    /// recovered by name and has to be judged against the cached patch files it could
+    /// roll back onto. Judging it against every one of them is always correct and
+    /// keeps back files it demonstrably cannot touch. These two listings are what
+    /// make the narrower answer available, and <see cref="MustJudge"/> is the only
+    /// place they are read.
+    ///
+    /// NOT KNOWING IS THE DEFAULT AND IT IS STRUCTURAL. Both members are null on a
+    /// default value, and null at any step of <see cref="MustJudge"/> means the
+    /// product is judged against the path. So a caller that never fills this in gets
+    /// the wide answer rather than a silently narrow one, which is the same discipline
+    /// that puts <c>Unestablished</c> at the zero of <see cref="ProductPatchSet"/>.
+    ///
+    /// AN EMPTY LISTING AND AN ABSENT ONE ARE NOT THE SAME THING AND MUST NEVER BE
+    /// MADE ONE. An empty collection says the registry was read and this product holds
+    /// no patch, or this patch records no cached file. A null says nobody could
+    /// establish either. The first can exclude a path; the second never can.
+    /// </summary>
+    /// <param name="PatchCodesByProduct">
+    /// Per product code, the patch codes its own <c>Patches</c> key lists, or null
+    /// where that listing was not established. See <see cref="ReadProductPatchSet"/>,
+    /// which takes it on the same call that reduces it to a verdict.
+    /// </param>
+    /// <param name="CachedPathsByPatchCode">
+    /// Per patch code, the cached paths its own registrations record in
+    /// <c>LocalPackage</c>, or null where no registration of it yielded one. A patch
+    /// registered under two SID subtrees can record two, so it is a set rather than a
+    /// path, and a registration whose value would not read leaves the whole entry
+    /// null.
+    /// </param>
+    internal readonly record struct EstablishedPatchReach(
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>?>? PatchCodesByProduct = null,
+        IReadOnlyDictionary<string, IReadOnlyCollection<string>?>? CachedPathsByPatchCode = null)
+    {
+        /// <summary>
+        /// Whether a product recovered by name has to be judged against a given cached
+        /// patch file.
+        ///
+        /// THE WIDE ANSWER IS THE FIRST STATEMENT RATHER THAN THE LAST. No listing at
+        /// all, no entry for this product, or an entry that is null all mean the same
+        /// thing: nothing establishes which patches this product holds, so it may hold
+        /// any of them, so it is judged against every path exactly as if none of this
+        /// existed. Only a listing that positively finished can exclude a path, and it
+        /// excludes one only by naming neither the path's own patch codes nor the path.
+        ///
+        /// WHY A LISTING MAY BE TRUSTED WHERE AN ENUMERATION MAY NOT, which is half of
+        /// the safety argument: <c>GetSubKeyNames</c> either returns every name under
+        /// the key or throws. There is no index and no early end, so a listing cannot
+        /// come back short while looking complete, which is the fault every other
+        /// source of a patch set has. See <see cref="ReadProductPatchSet"/>, where that
+        /// same property is the reason this source was chosen at all.
+        ///
+        /// AND THE OTHER HALF IS WHY THE PATH IS ASKED ABOUT TWICE. The codes naming a
+        /// path come from the claims, and a claim carries the path one registration
+        /// recorded for one patch code. That is enough while a registration's recorded
+        /// path is its own patch's file, and this file's own notes say twice that a
+        /// corrupt <c>LocalPackage</c> can aim a patch row at a file that is not that
+        /// patch's at all. On such a machine a product could hold the patch whose file
+        /// this really is while the claims name the path under somebody else's code, so
+        /// the codes alone would exclude a product that can reach the file. The second
+        /// question closes that: every patch code this product holds is asked where its
+        /// own cached file is, and a code that records this path, or records nothing,
+        /// judges. So the narrowing rests on the product's OWN registrations rather
+        /// than on another product's claim being right about which file it named.
+        ///
+        /// WHAT IT STILL RESTS ON, STATED RATHER THAN BURIED: that a product's own
+        /// registry records say which patches it holds and where their cached files
+        /// are. A machine whose records are complete, open cleanly and are simply WRONG
+        /// about that is one this cannot see, and it is not a new doubt: the same wrong
+        /// records produce the wrong per-product verdict one step later, which the wide
+        /// answer would then be resting on too.
+        /// </summary>
+        internal bool MustJudge(
+            string productCode, string path, HashSet<string> patchCodesNamingThePath)
+        {
+            if (PatchCodesByProduct is null
+                || !PatchCodesByProduct.TryGetValue(productCode, out var held)
+                || held is null)
+                return true;
+
+            foreach (var code in held)
+            {
+                // The claims say this code is registered against this path, so a
+                // rollback of anything on this product can reach for it.
+                if (patchCodesNamingThePath.Contains(code)) return true;
+
+                // And where this code's own registration says its cached file is.
+                // Absent, unreadable or naming this path: judge. Only a positively
+                // read set of paths, none of which is this one, lets the path go.
+                if (CachedPathsByPatchCode is null
+                    || !CachedPathsByPatchCode.TryGetValue(code, out var cached)
+                    || cached is null)
+                    return true;
+
+                foreach (var cachedPath in cached)
+                    if (string.Equals(cachedPath, path, StringComparison.OrdinalIgnoreCase))
+                        return true;
+            }
+
+            return false;
+        }
+    }
 
     /// <summary>
     /// Which step of <see cref="NormaliseLocalPackagePath"/> a recorded path was
@@ -755,7 +871,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, ct);
 
         ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered,
-            fallback.ProductPatchSets, apiPatchSets, ct);
+            fallback.Reach, fallback.ProductPatchSets, apiPatchSets, ct);
 
         // Both sources degraded at once: refuse the scan outright rather than
         // report a shorter one.
@@ -1166,6 +1282,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// recovered by name can answer for the patches it holds, where a product
     /// merely inferred from a headcount could only ever have withheld.
     /// </param>
+    /// <param name="reach">
+    /// What the registry established about which cached files each product's own
+    /// patches record. Read for the recovered products alone, and only to narrow the
+    /// paths each is judged against; its default narrows nothing. See
+    /// <see cref="EstablishedPatchReach"/>.
+    /// </param>
     /// <remarks>
     /// INTERNAL RATHER THAN PRIVATE SO ITS TESTS CAN REACH IT, which is the same
     /// reason <see cref="IsRemovablePatch"/> and <see cref="MergeClaim"/> are.
@@ -1181,6 +1303,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         List<PatchClaim> patchClaims,
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
         List<(string ProductCode, string? Sid, MsiInstallContext Context)> recovered,
+        EstablishedPatchReach reach,
         IReadOnlyDictionary<string, ProductPatchSet>? registryPatchSets,
         IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets,
         CancellationToken ct)
@@ -1287,7 +1410,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // this asks whether anything on a product sharing the patch could be
         // uninstalled and reach for its file.
         JudgeAndWithholdAgainstEveryProductPatchSet(
-            claimed, patchClaims, holders, registryPatchSets, apiPatchSets,
+            claimed, patchClaims, holders, recovered, reach, registryPatchSets, apiPatchSets,
             DeclaredTargetsFor, ct);
 
         // NOW the empty work list settles it. Everything below is per-pairing and there
@@ -2175,6 +2298,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var productPatchKeys = 0;
         var productPatchRegistrations = 0;
         var patchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
+        var patchCodesByProduct = new Dictionary<string, IReadOnlyCollection<string>?>(
+            StringComparer.OrdinalIgnoreCase);
+        var cachedPathsByPatchCode = new Dictionary<string, IReadOnlyCollection<string>?>(
+            StringComparer.OrdinalIgnoreCase);
         var pathCensus = new PathCensus();
 
         // Budgeted, because every catch below sits inside a loop bounded by the
@@ -2218,6 +2345,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
                             patchSets[code] = patchSets.TryGetValue(code, out var seen)
                                 ? Worse(seen, set)
                                 : set;
+
+                    // The two listings merge on the same rule and for the same reason:
+                    // one subtree's complete listing does not make another subtree's
+                    // failed one complete, so a reading that established nothing
+                    // anywhere leaves the whole entry establishing nothing.
+                    if (sidRead.Reach.PatchCodesByProduct is not null)
+                        foreach (var (code, held) in sidRead.Reach.PatchCodesByProduct)
+                            patchCodesByProduct[code] =
+                                patchCodesByProduct.TryGetValue(code, out var seenHeld)
+                                    ? MergeEstablishedNames(seenHeld, held)
+                                    : held;
+
+                    if (sidRead.Reach.CachedPathsByPatchCode is not null)
+                        foreach (var (code, paths) in sidRead.Reach.CachedPathsByPatchCode)
+                            cachedPathsByPatchCode[code] =
+                                cachedPathsByPatchCode.TryGetValue(code, out var seenPaths)
+                                    ? MergeEstablishedNames(seenPaths, paths)
+                                    : paths;
                 }
             }
         }
@@ -2247,7 +2392,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // subtrees is one product here and two increments there.
             patchSets.Values.Count(v => v == ProductPatchSet.RemovablePatchPresent),
             patchSets.Values.Count(v => v == ProductPatchSet.Unestablished),
-            pathCensus);
+            pathCensus,
+            new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode));
     }
 
     /// <summary>
@@ -2298,6 +2444,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var productPatchKeys = 0;
         var productPatchRegistrations = 0;
         var patchSets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase);
+        // The two halves of EstablishedPatchReach for this subtree, filled by the two
+        // loops below. Both hold null for anything the read could not establish, and
+        // a code absent from either is read the same way by the consumer.
+        var patchCodesByProduct = new Dictionary<string, IReadOnlyCollection<string>?>(
+            StringComparer.OrdinalIgnoreCase);
+        var cachedPathsByPatchCode = new Dictionary<string, IReadOnlyCollection<string>?>(
+            StringComparer.OrdinalIgnoreCase);
 
         try
         {
@@ -2349,10 +2502,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         try
                         {
                             var set = ReadProductPatchSet(productsKey, prodGuid,
-                                ref productPatchKeys, ref productPatchRegistrations);
+                                ref productPatchKeys, ref productPatchRegistrations,
+                                out var heldCodes);
                             patchSets[unpacked] = patchSets.TryGetValue(unpacked, out var existing)
                                 ? Worse(existing, set)
                                 : set;
+                            patchCodesByProduct[unpacked] =
+                                patchCodesByProduct.TryGetValue(unpacked, out var seenCodes)
+                                    ? MergeEstablishedNames(seenCodes, heldCodes)
+                                    : heldCodes;
                         }
                         catch (Exception ex) when (ex is not OperationCanceledException)
                         {
@@ -2363,6 +2521,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                             // entry and an unestablished one must not be the same
                             // thing to a caller.
                             patchSets[unpacked] = ProductPatchSet.Unestablished;
+                            // AND THE CODE LIST GOES WITH IT. A read that threw
+                            // established nothing about which patches this product
+                            // holds, so as far as anything downstream may assume it
+                            // holds any of them.
+                            patchCodesByProduct[unpacked] = null;
                             failureLog.Record(ex, cause: "product-patches");
                         }
                     }
@@ -2414,6 +2577,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 foreach (var patchGuid in patchesKey.GetSubKeyNames())
                 {
                     ct.ThrowIfCancellationRequested();
+
+                    // WHICH PATCH THIS IS, TAKEN BEFORE ANYTHING INSIDE THE KEY IS
+                    // READ, so a registration whose value will not read is still a
+                    // registration this code can name and record its not-knowing
+                    // against. A name that will not unpack names no patch to record
+                    // anything about, and the consumer's own default answers it: a
+                    // code it holds no entry for is a code whose cached file is
+                    // unestablished.
+                    var patchCode = UnpackRegistryProductCode(patchGuid);
+
+                    // NOT ESTABLISHED UNTIL A PATH IS ACTUALLY READ. Declared here and
+                    // set in one branch below, so every other way through this read,
+                    // the throw included, leaves it saying nothing.
+                    string? recordedPath = null;
+
                     try
                     {
                         using var patchKey = patchesKey.OpenSubKey(patchGuid);
@@ -2426,6 +2604,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         else if (!string.IsNullOrEmpty(localPkg))
                         {
                             var path = NormaliseLocalPackagePath(localPkg, pathCensus);
+                            // THE PATH THIS PATCH RECORDS FOR ITSELF, which is what
+                            // lets a recovered product be judged against the files its
+                            // own patches name rather than against every cached file.
+                            // Normalised first, because the consumer compares it
+                            // against a claimed path and those are normalised too.
+                            //
+                            // AN ABSENT OR UNREADABLE VALUE DOES NOT REACH THIS LINE
+                            // and leaves the path unestablished, which is the safe
+                            // direction: a patch whose cached path nobody could read
+                            // may be recording any path, this one included.
+                            recordedPath = path;
                             if (MergeClaim(claimed, new RegisteredPackage(path, "", ""),
                                     ClaimSource.RegistryFallback)
                                 && File.Exists(path))
@@ -2436,6 +2625,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     {
                         failures++;
                         failureLog.Record(ex, cause: "patch-entry");
+                    }
+
+                    // RECORDED ON EVERY WAY OUT OF THAT READ AND NOT ONLY ON THE ONE
+                    // THAT WORKED, so a registration that threw is on record as
+                    // unestablished rather than as a patch nobody asked about. The two
+                    // are the same answer to the consumer, and writing it is what keeps
+                    // them the same answer if that ever stops being true.
+                    if (patchCode is not null)
+                    {
+                        IReadOnlyCollection<string>? read =
+                            recordedPath is null ? null : new[] { recordedPath };
+                        cachedPathsByPatchCode[patchCode] =
+                            cachedPathsByPatchCode.TryGetValue(patchCode, out var seenPaths)
+                                ? MergeEstablishedNames(seenPaths, read)
+                                : read;
                     }
                 }
             }
@@ -2449,7 +2653,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         return new FallbackRead(failures, productKeys, unclaimedProductFiles, unclaimedPatchFiles,
             nonStringValues, null, unparseableKeyNames, patchSets,
             productPatchKeys, productPatchRegistrations,
-            Paths: pathCensus);
+            Paths: pathCensus,
+            Reach: new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode));
     }
 
     /// <summary>
@@ -2515,8 +2720,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// THE PRODUCTS ARE UNIONED TOO, not just the patches. The claims name the
     /// products the enumeration reached; route A names products it never returned;
     /// the patch file's own declared targets name products no enumeration on the
-    /// machine has to have mentioned at all. A product any of the three names is a
-    /// product the condition has to hold for.
+    /// machine has to have mentioned at all; and the fourth source is the products the
+    /// enumeration lost and the registry comparison then recovered by name. A product
+    /// any of the four names is a product the condition has to hold for.
     ///
     /// THE THIRD SOURCE IS THE ONE THAT COVERS ROUTE A'S DOCUMENTED BLIND SPOT, and
     /// it reached the per-pairing pass first and this condition second. While it was
@@ -2527,6 +2733,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// the patch and be told, truthfully, that it holds it and cannot uninstall it,
     /// which is an answer to a different question.
     ///
+    /// THE FOURTH SOURCE IS THE SAME GAP ONE STEP FURTHER OUT, and it stood open while
+    /// the third was being closed. A product the machine-wide enumeration never
+    /// returned and the registry comparison recovered by name has always been handed to
+    /// the per-pairing pass, and was never handed to this condition, so on a machine
+    /// holding the same program twice with a patch applied to the second copy by name,
+    /// the copy that could roll back onto the file was the one product nobody asked.
+    /// The per-pairing pass then asked it whether it held the patch and could uninstall
+    /// it, was told truthfully that it could not, and the file was offered.
+    ///
+    /// AND THAT SOURCE IS THE ONE THAT IS NARROWED, which none of the other three is.
+    /// The other three name a product BECAUSE of this path: a claim on it, a route A
+    /// pairing for one of its codes, or the patch file naming the product as a target.
+    /// The recovered products are named by the machine and not by the path, so unioning
+    /// them everywhere keeps back every superseded patch on such a machine rather than
+    /// the files at risk on it. <see cref="EstablishedPatchReach"/> is where a recovered
+    /// product's own registry records are asked which files it could reach for, and
+    /// where anything unestablished puts it back into every path.
+    ///
     /// WHAT IT CANNOT PROMISE, so no copy may say otherwise: the condition is read
     /// here and re-read at act time, and neither is a statement about the future. A
     /// patch that is non-removable today can be replaced tomorrow by one that is not.
@@ -2536,6 +2760,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         Dictionary<string, RegisteredPackage> claimed,
         List<PatchClaim> patchClaims,
         Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? holders,
+        IReadOnlyList<(string ProductCode, string? Sid, MsiInstallContext Context)> recovered,
+        EstablishedPatchReach reach,
         IReadOnlyDictionary<string, ProductPatchSet>? registryPatchSets,
         IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets,
         Func<string, DeclaredTargets> declaredTargets,
@@ -2600,6 +2826,26 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     if (holders.TryGetValue(code, out var named))
                         foreach (var (productCode, _, _) in named)
                             productsByPath[path].Add(productCode);
+
+        // THE FOURTH SOURCE: THE PRODUCTS THE ENUMERATION LOST AND THE REGISTRY
+        // COMPARISON RECOVERED BY NAME. The per-pairing pass below has always been
+        // handed these; this condition never was, and the two ask different questions.
+        // That one asks a product whether it holds THIS patch and can uninstall it,
+        // and is answered truthfully that it cannot. This one asks whether the product
+        // holds ANYTHING ELSE that could be uninstalled and roll back onto this file,
+        // and a product nobody puts into the set is never asked it at all.
+        //
+        // JUDGED AGAINST THE FILES ITS OWN RECORDS SAY IT COULD REACH FOR, AND AGAINST
+        // EVERY FILE WHEREVER THAT CANNOT BE ESTABLISHED. A product that positively
+        // holds neither this patch nor any patch whose cached file this is cannot roll
+        // back onto it, and keeping the file from it would keep it back for a reason
+        // that is not true of it. MustJudge is where the two cases are told apart and
+        // its default is the whole set; nothing here may infer completeness from the
+        // shape of what came back.
+        foreach (var (path, codes) in codesByPath)
+            foreach (var (productCode, _, _) in recovered)
+                if (reach.MustJudge(productCode, path, codes))
+                    productsByPath[path].Add(productCode);
 
         foreach (var (path, products) in productsByPath)
         {
@@ -2722,12 +2968,33 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// read: the condition asks about every registered patch whatever state it
     /// carries, so filtering by state could only ever narrow the set and offer more.
     /// </summary>
+    /// <param name="patchCodes">
+    /// The patch codes this product holds, unpacked out of the same subkey names the
+    /// verdict is reduced from, or NULL where that listing was not established.
+    ///
+    /// TAKEN FROM THE NAME LISTING AND NOT FROM THE LOOP, which is what makes it
+    /// complete on a product the loop returns early on. The loop stops at the first
+    /// removable patch it finds, so a list built inside it would come back short
+    /// exactly on the products that matter most.
+    ///
+    /// NULL ON EVERY PATH THAT DOES NOT POSITIVELY FINISH, and an empty collection is
+    /// not the same answer: empty says this product holds no registered patch, null
+    /// says nobody established what it holds. The caller reads the second as "this
+    /// product may hold any patch on the machine".
+    /// </param>
     internal static ProductPatchSet ReadProductPatchSet(
         Microsoft.Win32.RegistryKey productsKey,
         string packedProductCode,
         ref int patchKeys,
-        ref int patchRegistrations)
+        ref int patchRegistrations,
+        out IReadOnlyCollection<string>? patchCodes)
     {
+        // NOT ESTABLISHED UNTIL IT IS, and this line rather than a failure path is
+        // where that is decided: a path added below that forgets to set it leaves the
+        // caller not knowing, which withholds, rather than holding an empty listing,
+        // which offers.
+        patchCodes = null;
+
         using var patchesKey = productsKey.OpenSubKey($@"{packedProductCode}\Patches");
 
         // AN ABSENT KEY IS AN ANSWER AND NOT AN INABILITY, and the difference decides
@@ -2748,7 +3015,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // catch writes Unestablished for that product with its own failure cause. A
         // key that is not there returns null and arrives on this line. So this branch
         // carries the absent case alone and does not have to hedge for the other.
-        if (patchesKey is null) return ProductPatchSet.AllNonRemovable;
+        if (patchesKey is null)
+        {
+            // AND IT IS AN ANSWER ABOUT THE CODE LIST TOO. This product holds no
+            // registered patch, so the complete list of the patches it holds is the
+            // empty one, which is a positive statement and not the absence of one.
+            patchCodes = Array.Empty<string>();
+            return ProductPatchSet.AllNonRemovable;
+        }
 
         // COUNTED WHERE THE KEY OPENED AND NOWHERE ELSE, unchanged by the line above.
         // The count answers how usual it is for a product to carry a Patches key at
@@ -2759,8 +3033,36 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // quietly changes meaning is worse than one that is missing.
         patchKeys++;
 
+        // THE NAME LISTING, TAKEN ONCE AND USED TWICE. The code list is built from
+        // these names and not from the loop below, which is what leaves it complete
+        // even where that loop returns early. A key listing cannot be truncated the
+        // way an enumeration can: GetSubKeyNames returns every name under the key or
+        // throws, and the caller's catch turns a throw into the null set above.
+        var patchNames = patchesKey.GetSubKeyNames();
+
+        // A NAME THAT WILL NOT UNPACK LEAVES THE LISTING UNESTABLISHED, because the
+        // registry is saying this product holds a patch and nothing here can turn that
+        // name into a code to compare. It is the same treatment, in the same
+        // direction, that a product key name already gets one level up: what cannot be
+        // named cannot be excluded.
+        //
+        // THE UNPACKING IS THE SAME TRANSFORM WHETHER THE GUID NAMES A PRODUCT OR A
+        // PATCH. These keys are named in the packed form the installer writes for any
+        // code it puts in a key name, and the reader is named for the caller that
+        // needed it first rather than for the only thing it can read.
+        var codes = new List<string>(patchNames.Length);
+        var everyNameUnpacked = true;
+        foreach (var patchName in patchNames)
+        {
+            var unpackedPatchCode = UnpackRegistryProductCode(patchName);
+            if (unpackedPatchCode is null) { everyNameUnpacked = false; break; }
+            codes.Add(unpackedPatchCode);
+        }
+
+        if (everyNameUnpacked) patchCodes = codes;
+
         var unestablished = false;
-        foreach (var patchName in patchesKey.GetSubKeyNames())
+        foreach (var patchName in patchNames)
         {
             patchRegistrations++;
 
@@ -2799,6 +3101,27 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (a == ProductPatchSet.Unestablished || b == ProductPatchSet.Unestablished)
             return ProductPatchSet.Unestablished;
         return ProductPatchSet.AllNonRemovable;
+    }
+
+    /// <summary>
+    /// Merges two readings of one registry listing, which happens for the same reason
+    /// <see cref="Worse"/> exists: one code can be registered under more than one SID
+    /// subtree. It serves both listings in
+    /// <see cref="EstablishedPatchReach"/>, the patch codes a product holds and the
+    /// cached paths a patch records.
+    ///
+    /// NOT ESTABLISHED WINS, on the same rule the verdicts use: a subtree whose listing
+    /// could not be taken is not made complete by another subtree's listing that could.
+    /// Only where BOTH readings finished is the union of them a complete statement, and
+    /// only a complete statement may exclude anything.
+    /// </summary>
+    internal static IReadOnlyCollection<string>? MergeEstablishedNames(
+        IReadOnlyCollection<string>? a, IReadOnlyCollection<string>? b)
+    {
+        if (a is null || b is null) return null;
+        var union = new HashSet<string>(a, StringComparer.OrdinalIgnoreCase);
+        foreach (var name in b) union.Add(name);
+        return union;
     }
 
     /// <summary>
