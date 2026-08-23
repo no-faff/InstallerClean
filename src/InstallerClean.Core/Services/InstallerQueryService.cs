@@ -124,11 +124,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <see cref="ProductPatchSet"/> for what the three values mean and
     /// <see cref="ReadProductPatchSet"/> for how each is reached.
     ///
-    /// IT DECIDES NOTHING YET AND IS SENT NOWHERE YET. The reading lands ahead of
-    /// both the rule that consumes it and the payload fields that will carry it, so
-    /// that the three can be reviewed and reverted apart. The four counts beside it
-    /// reach <see cref="EnumerationCensus"/> and stop there; wiring them to the wire
-    /// is a payload change and lands with the rule.
+    /// IT DECIDES WHETHER A CACHED PATCH IS OFFERED, AND THIS NOTE SAID THE OPPOSITE.
+    /// It read "IT DECIDES NOTHING YET AND IS SENT NOWHERE YET", which was true while
+    /// the reading was landing ahead of the rule that consumes it, and stayed on the
+    /// file after that rule landed. Both halves are now false. This dictionary is
+    /// passed to <see cref="ConfirmRemovableAgainstEveryProduct"/>, reaches
+    /// <c>JudgeAndWithholdAgainstEveryProductPatchSet</c>, and is read per product by
+    /// <see cref="ProductVerdict"/>, which is what stamps the verdict the offer and the
+    /// missing-file split both consult. The two counts beside it travel in the opt-in
+    /// report through <c>EnumerationCensus</c> and <c>ResultLogEntry</c>.
+    ///
+    /// LEAVING IT SAYING OTHERWISE WAS NOT A COSMETIC FAULT. The registry is the half of
+    /// this verdict that has no index and no early end to be blind to, which is the
+    /// whole reason it is read at all; a reader who believed this note would discount it
+    /// as machinery waiting to be wired up, and with it the one source that cannot be
+    /// silently truncated.
     /// </param>
     /// <param name="ProductPatchKeys">
     /// Products whose <c>Patches</c> key opened. Against
@@ -1520,29 +1530,33 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// returned, which is what makes it the answer to route A's documented blind
     /// spot.
     ///
-    /// THIS NOTE USED TO CALL THAT COVER THIN AND THE DIRECTION OF ITS DOUBT WAS
-    /// BACKWARDS. It said the Template names the products the patch MAY TARGET
-    /// rather than the products that HOLD it, and that the evidence it is
-    /// complete for this purpose was two files on one machine. The first half is
-    /// true and is the safe direction rather than the dangerous one. Microsoft
-    /// documents the Template of a patch package as "a semicolon-delimited list
-    /// of the product codes that can accept the patch" and as required; and a
-    /// patch physically carries two transforms per target database, each tied to
-    /// a specific ProductCode, so a patch can only have been applied to a product
-    /// it carries a transform for. The products holding a patch are therefore a
-    /// SUBSET of what its Template names. A Template naming MORE than holds it
-    /// only ever adds products to the judged set, and adding one can only withhold.
+    /// ITS OWN LIMIT IS THE OTHER WAY ROUND AND IT IS REAL: it names the products
+    /// the patch MAY TARGET rather than the products that HOLD it. A product
+    /// holding this patch and absent from the Template is invisible to this route,
+    /// and if the machine-wide enumeration's blind spot also hides it and the
+    /// product enumeration never returned it, nothing puts it into the per-product
+    /// condition's set, so its removable patch cannot overturn a clean verdict.
     ///
-    /// WHAT THAT COSTS IF IT IS EVER WRONG, because it is a claim about a file
-    /// format rather than about this code. A product that holds the patch and is
-    /// absent from the Template would be invisible to route B, and if route A's
-    /// documented blind spot also hid it and the product enumeration never
-    /// returned it, nothing would put it into the per-product condition's product
-    /// set and its removable patch could not overturn a clean verdict. That is a
-    /// route to a needed file being offered. It has no mechanism in anything
-    /// Microsoft publishes about the format and no observed instance: read
-    /// against one machine's cache, every .msp carried a well-formed Template, none
-    /// was empty, and every registered holder was declared.
+    /// AND THERE IS A DOCUMENTED PRODUCER FOR EXACTLY THAT, which a version of this
+    /// note asserted did not exist and which was on this project's own register of
+    /// such routes three weeks before that was written. <c>MsiApplyPatchW</c> with
+    /// <c>INSTALLTYPE_SINGLE_INSTANCE</c>: "the installer applies the patch to the
+    /// product specified by szInstallPackage. In this case, other eligible products
+    /// listed in the patch package are ignored and the szInstallPackage parameter
+    /// contains the null-terminated string representing the product code of the
+    /// instance to patch." A second INSTANCE of a product carries a ProductCode of
+    /// its own, which the patch author had no reason to list. So the holders of a
+    /// patch are NOT guaranteed to be a subset of what its Template names.
+    ///
+    /// WHAT IS TRUE AND IS WORTH KEEPING. Microsoft documents the Template as
+    /// required and as "a semicolon-delimited list of the product codes that can
+    /// accept the patch", so it is a real list rather than a hint, and a Template
+    /// naming MORE products than hold the patch is harmless here: every extra
+    /// product is added to the judged set, and adding one can only withhold. Only
+    /// the Template naming FEWER opens anything. Read against one machine's whole
+    /// cache, every cached patch carried a well-formed Template, none was empty and
+    /// every registered holder was declared, which says something about how often
+    /// and nothing about whether.
     ///
     /// AND NO GUARD HERE COULD ASSERT IT, which is why this is written down rather
     /// than checked. The only thing to compare a Template against is the set of
