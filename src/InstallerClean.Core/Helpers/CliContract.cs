@@ -70,7 +70,28 @@ internal readonly record struct CliInvocation(
 /// </summary>
 internal static class CliExitCode
 {
-    /// <summary>0: every file the scan flagged was processed.</summary>
+    /// <summary>
+    /// 0: the run did what it was asked and nothing in it failed.
+    ///
+    /// IT SAID "every file the scan flagged was processed" AND THAT IS FALSE OF
+    /// THREE OF THE FIVE RUNS THAT REACH IT. <c>/?</c> and <c>/version</c> print and
+    /// stop, and a scan-only run processes nothing at all, whether it listed
+    /// sixty-eight files or none. Only a delete or a move batch processes anything,
+    /// and it takes this code when no file in it errored
+    /// (<see cref="CliContract.ClassifyFileOperation"/>).
+    ///
+    /// SO IT IS A SUPERORDINATE AND NOT A CAUSE, on the standing rule that no
+    /// sentence may state a cause false of any member of the set it describes. What
+    /// the five share is the whole of what may be said about them together.
+    ///
+    /// AND IT IS NOT A STATEMENT THAT NO WORK IS LEFT, which is the reading a
+    /// scheduled task is likeliest to take from a zero. A scan that lists
+    /// sixty-eight files has left an administrator plenty to do and still succeeded:
+    /// it did what it was asked. The help text says the same thing in the same terms
+    /// and the two must not drift apart, one being what a sysadmin reads and this
+    /// being what a reader of the contract believes; see <c>Cli.Help.ExitCodeOk</c>,
+    /// whose own note names the same five.
+    /// </summary>
     public const int Ok = 0;
 
     /// <summary>
