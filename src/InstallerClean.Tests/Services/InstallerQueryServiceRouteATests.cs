@@ -181,6 +181,83 @@ public class InstallerQueryServiceRouteATests
         Assert.False(MissingFilesReport.Affected(row with { FileExists = false }));
     }
 
+    /// <summary>
+    /// A machine carrying a missing OBSOLETED registration whose product reads clean, and
+    /// nothing offer-eligible anywhere unless a second, wholly unrelated product is added.
+    /// The two halves differ in that one thing, and it is a thing that has nothing to do
+    /// with the row under test: a different product, a different patch, a different file.
+    /// </summary>
+    private static async Task<RegisteredPackage> EnumerateObsoletedRow(bool anUnrelatedProductOffersSomething)
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct(Enumerated);
+        msi.SetProductProperty(Enumerated, "LocalPackage", ProductFile);
+        msi.SetProductProperty(Enumerated, "ProductName", "Test Product");
+        // Obsoleted and never offer-eligible, so it contributes nothing to the work list.
+        msi.AddPatch(Enumerated, "{OBS}", ObsoletedFile, state: "4", uninstallable: "0");
+
+        var sets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase)
+        {
+            [Enumerated] = ProductPatchSet.AllNonRemovable,
+        };
+
+        if (anUnrelatedProductOffersSomething)
+        {
+            msi.AddProduct("{OTHER}");
+            msi.SetProductProperty("{OTHER}", "LocalPackage", @"C:\Windows\Installer\route-a-other.msi");
+            msi.SetProductProperty("{OTHER}", "ProductName", "Some Other Program");
+            msi.AddPatch("{OTHER}", "{SUP}", PatchFile, state: "2", uninstallable: "0");
+            sets["{OTHER}"] = ProductPatchSet.AllNonRemovable;
+        }
+
+        var result = await new InstallerQueryService(msi,
+                (_, _) => new InstallerQueryService.FallbackRead(0, sets.Count, ProductPatchSets: sets),
+                crashLogSink: null, identityReader: new DeclaringReader())
+            .GetRegisteredPackagesAsync();
+
+        return result.Packages.Single(p => p.PatchState == 4);
+    }
+
+    [Fact]
+    public async Task An_obsoleted_row_is_judged_on_a_machine_with_nothing_to_offer()
+    {
+        // WHAT THIS SETTLES. The pass that stamps the per-product verdict lives inside the
+        // method that confirms removable verdicts, and that method used to return before
+        // reaching it when nothing on the machine was offer-eligible. So every patch row
+        // kept the type's default, Unestablished, and the missing-files split reports an
+        // unestablished row.
+        //
+        // THE CONSEQUENCE WAS ABSURD RATHER THAN MERELY WRONG: whether somebody was warned
+        // about a file an earlier release removed turned on whether some unrelated program
+        // on the machine happened to hold an offer-eligible superseded patch that day.
+        // Nothing about the file, the registration or the risk.
+        //
+        // AND THE CLASS IS EXACTLY THE ONE THAT MATTERS. A superseded row with a positive
+        // zero is provisionally removable at enumeration time, because the enumeration has
+        // no filesystem and does not yet know its file has gone, so it populates the work
+        // list itself and the pass runs. The only row whose outcome the early return moved
+        // is an obsoleted one, which is precisely what every release up to v2.3.0 offered
+        // and removed.
+        var row = await EnumerateObsoletedRow(anUnrelatedProductOffersSomething: false);
+
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+        Assert.False(MissingFilesReport.Affected(row with { FileExists = false }));
+    }
+
+    [Fact]
+    public async Task The_same_obsoleted_row_answers_the_same_when_something_else_is_offer_eligible()
+    {
+        // THE OTHER HALF OF THE PAIR, AND IT IS AN EQUALITY RATHER THAN A CONTRAST. This
+        // half always answered correctly; the point is that the half above now agrees with
+        // it. Keeping both is what stops the two drifting apart again, since the whole
+        // fault was that one machine answered differently from another for a reason
+        // neither row knows anything about.
+        var row = await EnumerateObsoletedRow(anUnrelatedProductOffersSomething: true);
+
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+        Assert.False(MissingFilesReport.Affected(row with { FileExists = false }));
+    }
+
     [Fact]
     public async Task The_same_machine_without_that_row_offers_the_patch()
     {

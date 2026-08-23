@@ -1120,8 +1120,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// WHAT IT COSTS, stated because it is the one thing here that scales with
     /// the machine rather than with the fault: enumerated products multiplied by
     /// removable candidates. Most pairings are settled by a single property read
-    /// returning ERROR_UNKNOWN_PATCH, and a machine with nothing removable pays
-    /// nothing at all, the method returning before it asks anything.
+    /// returning ERROR_UNKNOWN_PATCH. A machine with nothing removable pays for
+    /// the machine-wide enumeration and the per-product condition and nothing
+    /// else, both of which it needs: the condition's second consumer is the
+    /// missing-file split, and a machine with nothing to offer is exactly the
+    /// machine where that is the only consumer there is.
     ///
     /// The two outcomes use the two meanings the row already has, so this adds no
     /// vocabulary. A product that holds the patch and still needs it makes the row
@@ -1136,6 +1139,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// is offered only where this pass has asked every product it knows of and
     /// none of them still holds it. Emptiness here is a machine with nothing
     /// removable, never a mechanism that is not needed.
+    ///
+    /// AND EMPTINESS NO LONGER RETURNS AT THE TOP, which is a separate statement
+    /// and the one most likely to be undone by somebody restoring an obvious
+    /// saving. The per-product condition this method hosts is read by the offer
+    /// AND by the missing-file split, and on a machine with nothing to offer the
+    /// split is its only reader. Returning before it left every patch row at the
+    /// type's default, which the split reports, so a missing obsoleted
+    /// registration was named or not according to whether an unrelated program
+    /// happened to hold an offer-eligible patch that day.
     /// </summary>
     /// <param name="recovered">
     /// Products the enumeration never returned and the registry comparison then
@@ -1175,8 +1187,34 @@ public sealed class InstallerQueryService : IInstallerQueryService
             if (claimed.TryGetValue(claim.LocalPackagePath, out var row) && row.IsRemovable)
                 toConfirm.Add((claim.LocalPackagePath, claim.PatchCode));
 
-        if (toConfirm.Count == 0) return;
-
+        // AN EMPTY WORK LIST USED TO RETURN HERE, and the guard has moved below the
+        // per-product pass rather than being deleted. Everything from here to that pass
+        // is what the pass needs; everything after it is the per-pairing work, which an
+        // empty list really does make pointless.
+        //
+        // WHY IT COULD NOT STAY. The pass has two consumers and only one of them is the
+        // offer. The other is the missing-files split, which reads the verdict for rows
+        // whose file has gone, and those two sets are disjoint: a missing file is never
+        // offered. So a machine with nothing to offer is precisely a machine where the
+        // split is the only reader, and returning here left every row at the type's
+        // default of Unestablished, which the split reports.
+        //
+        // WHAT THAT DID, and it is why this is a fix rather than a tidy. Whether a past
+        // user was warned about a file an earlier release removed turned on whether some
+        // UNRELATED program on the machine happened to hold an offer-eligible superseded
+        // patch that day. Nothing to do with the file, the registration or the risk. The
+        // class it moved is exactly one: an obsoleted patch whose Uninstallable read a
+        // positive zero, which is precisely what every release up to v2.3.0 offered and
+        // removed.
+        //
+        // AND IT IS CHEAPER THAN THE GUARD MADE IT LOOK. The expensive half of this
+        // method is the per-pairing property reads and the patch-file reads, and neither
+        // happens on such a machine: the pairing loop is below the moved guard, and the
+        // pass reads a patch file only for a row that is still removable, of which there
+        // are none. The two patch-set maps are built before this method is called at all.
+        // What is left is the machine-wide enumeration below, which reads no file and
+        // which every machine that offers anything already pays for on every scan.
+        //
         // The pairings the product loop already read. Re-asking them would get the
         // same answer for the same reason, so they are skipped: what this pass is
         // for is the pairings no enumeration produced.
@@ -1241,6 +1279,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         JudgeAndWithholdAgainstEveryProductPatchSet(
             claimed, patchClaims, holders, registryPatchSets, apiPatchSets,
             DeclaredTargetsFor, ct);
+
+        // NOW the empty work list settles it. Everything below is per-pairing and there
+        // are no pairings to ask about; see the note where this guard used to sit.
+        if (toConfirm.Count == 0) return;
 
         foreach (var (path, patchCode) in toConfirm)
         {
