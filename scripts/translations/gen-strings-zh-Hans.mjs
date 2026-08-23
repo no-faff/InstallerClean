@@ -214,6 +214,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} 个文件原样保留`,
   'Summary.OrphanedToCleanUp.Singular': `{0} 个不需要的文件可清理`,
   'Summary.OrphanedToCleanUp.Plural': `{0} 个不需要的文件可清理`,
+  'Summary.NothingListed.Singular': `在这台电脑上，InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了唯一的那个文件，没有把它列出来。`,
+  'Summary.NothingListed.Plural': `在这台电脑上，InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了 {0} 个{1}，没有把它们列出来。`,
   'Summary.MissingFromDisk.Singular': `Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。请打开“详情”了解该怎么做。`,
   'Summary.MissingFromDisk.Plural': `Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。请打开“详情”了解该怎么做。`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `另外 {0} 个程序`,

@@ -289,6 +289,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} fichiers laissés de côté`,
   'Summary.OrphanedToCleanUp.Singular': `{0} fichier inutile à nettoyer`,
   'Summary.OrphanedToCleanUp.Plural': `{0} fichiers inutiles à nettoyer`,
+  'Summary.NothingListed.Singular': `Sur ce PC, InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu le seul fichier au lieu de le lister.`,
+  'Summary.NothingListed.Plural': `Sur ce PC, InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu {0} {1} au lieu de les lister.`,
   'Summary.MissingFromDisk.Singular': `Windows a un enregistrement pour {0} fichier qui n'est pas dans {InstallerFolder} : {1}. Cela ne gêne pas au quotidien, mais une réparation, une mise à jour ou une désinstallation peut échouer à cause de lui. Ouvrez Détails pour savoir quoi faire.`,
   'Summary.MissingFromDisk.Plural': `Windows a des enregistrements pour {0} fichiers qui ne sont pas dans {InstallerFolder} : {1}. Cela ne gêne pas au quotidien, mais une réparation, une mise à jour ou une désinstallation peut échouer à cause d'eux. Ouvrez Détails pour savoir quoi faire.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} autre programme`,

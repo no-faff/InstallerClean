@@ -277,6 +277,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} bestanden ongemoeid gelaten`,
   'Summary.OrphanedToCleanUp.Singular': `{0} overbodig bestand om op te ruimen`,
   'Summary.OrphanedToCleanUp.Plural': `{0} overbodige bestanden om op te ruimen`,
+  'Summary.NothingListed.Singular': `Op deze pc kon InstallerClean niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom het ene bestand achtergehouden in plaats van het te tonen.`,
+  'Summary.NothingListed.Plural': `Op deze pc kon InstallerClean niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom {0} {1} achtergehouden in plaats van ze te tonen.`,
   'Summary.MissingFromDisk.Singular': `Windows heeft een record voor {0} bestand dat niet in {InstallerFolder} staat: {1}. In het dagelijks gebruik levert dat geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Open Details voor wat je kunt doen.`,
   'Summary.MissingFromDisk.Plural': `Windows heeft records voor {0} bestanden die niet in {InstallerFolder} staan: {1}. In het dagelijks gebruik leveren die geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Open Details voor wat je kunt doen.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} ander programma`,

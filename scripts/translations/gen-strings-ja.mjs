@@ -218,6 +218,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} 個のファイルをそのままにしました`,
   'Summary.OrphanedToCleanUp.Singular': `クリーンアップ対象の不要ファイルが {0} 個`,
   'Summary.OrphanedToCleanUp.Plural': `クリーンアップ対象の不要ファイルが {0} 個`,
+  'Summary.NothingListed.Singular': `この PC では、InstallerClean はキャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、唯一のファイルを一覧に載せずそのままにしました。`,
+  'Summary.NothingListed.Plural': `この PC では、InstallerClean はキャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、{0} 個の {1} を一覧に載せずそのままにしました。`,
   'Summary.MissingFromDisk.Singular': `{InstallerFolder} にない {0} 個のファイルについて、Windows に登録情報があります：{1}。日常的には支障ありませんが、修復・更新・アンインストールがこれで失敗することがあります。どうすればよいかは「詳細」を開いてください。`,
   'Summary.MissingFromDisk.Plural': `{InstallerFolder} にない {0} 個のファイルについて、Windows に登録情報があります：{1}。日常的には支障ありませんが、修復・更新・アンインストールがこれで失敗することがあります。どうすればよいかは「詳細」を開いてください。`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `他に {0} 個のプログラム`,

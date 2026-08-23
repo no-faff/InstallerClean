@@ -217,6 +217,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} dosya olduğu gibi bırakıldı`,
   'Summary.OrphanedToCleanUp.Singular': `temizlenecek {0} gereksiz dosya`,
   'Summary.OrphanedToCleanUp.Plural': `temizlenecek {0} gereksiz dosya`,
+  'Summary.NothingListed.Singular': `Bu bilgisayarda InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tek dosyayı listelemek yerine tuttu.`,
+  'Summary.NothingListed.Plural': `Bu bilgisayarda InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden {0} {1} listelemek yerine tuttu.`,
   'Summary.MissingFromDisk.Singular': `Windows'ta {InstallerFolder} içinde bulunmayan {0} dosya için kayıt var: {1}. Gündelik kullanımda sorun çıkarmaz, ama bir onarım, güncelleme ya da kaldırma işlemi bu yüzden başarısız olabilir. Ne yapmanız gerektiği için Ayrıntılar'ı açın.`,
   'Summary.MissingFromDisk.Plural': `Windows'ta {InstallerFolder} içinde bulunmayan {0} dosya için kayıt var: {1}. Gündelik kullanımda sorun çıkarmazlar, ama bir onarım, güncelleme ya da kaldırma işlemi bu yüzden başarısız olabilir. Ne yapmanız gerektiği için Ayrıntılar'ı açın.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} program daha`,

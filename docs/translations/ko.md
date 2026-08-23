@@ -191,8 +191,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 다른 프로그램 {0}개 |
 | {0} file with no program named in the records | 기록에 프로그램 이름이 없는 파일 {0}개 |
 | {0} files with no program named in the records | 기록에 프로그램 이름이 없는 파일 {0}개 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | 이 PC에서는 InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 그 파일 하나를 목록에 올리지 않고 그대로 두었습니다. |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | 이 PC에서는 InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, {1} {0}개를 목록에 올리지 않고 그대로 두었습니다. |
 | InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. The unneeded files above are unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Re-scan to try again. | InstallerClean이 Windows 기록에 있는 모든 것을 대조하지 못해서 전부 읽지는 못했습니다. 위의 불필요한 파일은 영향을 받지 않지만, {InstallerFolder}에서 빠진 파일에 대한 설명은 전체를 담고 있지 않을 수 있습니다. 다시 검사해서 한 번 더 시도해 보세요. |
 | {0} of {1} {2} | {2} {1}개 중 {0}개 |
 | {0} unneeded {1} ({2}) | 불필요한 {1} {0}개 ({2}) |

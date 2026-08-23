@@ -862,8 +862,8 @@
        "Rather than listing them" and not "rather than offering them", because the
        list is what the reader is looking at. The one-form spends neither placeholder
        and names the file instead of the numeral, as the other one-forms here do. -->
-  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it.</value></data>
-  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them.</value></data>
+  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>Di PC ini InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file itu ditahan dan tidak dicantumkan.</value></data>
+  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>Di PC ini InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi {0} {1} ditahan dan tidak dicantumkan.</value></data>
   <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean tidak bisa mencocokkan semua yang ada dalam catatan Windows, jadi tidak semuanya dibaca. File yang tidak diperlukan di atas tidak terpengaruh, tapi keterangan tentang file yang hilang dari {InstallerFolder} bisa jadi belum lengkap. Pindai ulang untuk mencoba lagi.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} dari {1} {2}</value></data>

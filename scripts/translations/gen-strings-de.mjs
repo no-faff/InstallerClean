@@ -273,6 +273,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} Dateien unangetastet`,
   'Summary.OrphanedToCleanUp.Singular': `{0} nicht benötigte Datei zum Aufräumen`,
   'Summary.OrphanedToCleanUp.Plural': `{0} nicht benötigte Dateien zum Aufräumen`,
+  'Summary.NothingListed.Singular': `Auf diesem PC konnte InstallerClean nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei zurückgehalten, statt sie aufzuführen.`,
+  'Summary.NothingListed.Plural': `Auf diesem PC konnte InstallerClean nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb {0} {1} zurückgehalten, statt sie aufzuführen.`,
   'Summary.MissingFromDisk.Singular': `Windows hat einen Eintrag für {0} Datei, die nicht in {InstallerFolder} liegt: {1}. Im Alltag macht das keine Probleme, aber eine Reparatur, ein Update oder eine Deinstallation kann daran scheitern. Öffne Details, um zu erfahren, was zu tun ist.`,
   'Summary.MissingFromDisk.Plural': `Windows hat Einträge für {0} Dateien, die nicht in {InstallerFolder} liegen: {1}. Im Alltag machen sie keine Probleme, aber eine Reparatur, ein Update oder eine Deinstallation kann daran scheitern. Öffne Details, um zu erfahren, was zu tun ist.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} weiteres Programm`,

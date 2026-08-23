@@ -862,8 +862,8 @@
        "Rather than listing them" and not "rather than offering them", because the
        list is what the reader is looking at. The one-form spends neither placeholder
        and names the file instead of the numeral, as the other one-forms here do. -->
-  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it.</value></data>
-  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them.</value></data>
+  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>在这台电脑上，InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了唯一的那个文件，没有把它列出来。</value></data>
+  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>在这台电脑上，InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了 {0} 个{1}，没有把它们列出来。</value></data>
   <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean 未能把 Windows 记录中的每一项都对应上，因此没有全部读取。上面那些不需要的文件不受影响，但关于 {InstallerFolder} 中缺失文件的说明可能不完整。请重新扫描再试一次。</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{1} 个{2}中的 {0} 个</value></data>

@@ -252,6 +252,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `파일 {0}개 그대로 둠`,
   'Summary.OrphanedToCleanUp.Singular': `정리할 불필요한 파일 {0}개`,
   'Summary.OrphanedToCleanUp.Plural': `정리할 불필요한 파일 {0}개`,
+  'Summary.NothingListed.Singular': `이 PC에서는 InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 그 파일 하나를 목록에 올리지 않고 그대로 두었습니다.`,
+  'Summary.NothingListed.Plural': `이 PC에서는 InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, {1} {0}개를 목록에 올리지 않고 그대로 두었습니다.`,
   'Summary.MissingFromDisk.Singular': `{InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 무엇을 해야 하는지는 세부 정보를 열어 확인하세요.`,
   'Summary.MissingFromDisk.Plural': `{InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 무엇을 해야 하는지는 세부 정보를 열어 확인하세요.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `다른 프로그램 {0}개`,

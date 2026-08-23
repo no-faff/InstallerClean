@@ -862,8 +862,8 @@
        "Rather than listing them" and not "rather than offering them", because the
        list is what the reader is looking at. The one-form spends neither placeholder
        and names the file instead of the numeral, as the other one-forms here do. -->
-  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it.</value></data>
-  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them.</value></data>
+  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>Su questo PC InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file invece di elencarlo.</value></data>
+  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>Su questo PC InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto {0} {1} invece di elencarli.</value></data>
   <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean non è riuscito a far corrispondere tutto ciò che sta nei record di Windows, quindi non li ha letti tutti. I file non necessari qui sopra non ne risentono, ma quanto dice sui file che mancano da {InstallerFolder} può essere incompleto. Ripeti la scansione per riprovare.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} di {1} {2}</value></data>

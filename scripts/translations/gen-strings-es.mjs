@@ -241,6 +241,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} archivos dejados en paz`,
   'Summary.OrphanedToCleanUp.Singular': `{0} archivo innecesario para limpiar`,
   'Summary.OrphanedToCleanUp.Plural': `{0} archivos innecesarios para limpiar`,
+  'Summary.NothingListed.Singular': `En este PC InstallerClean no pudo determinar con certeza qué archivos almacenados en caché pertenecen a los programas instalados aquí, así que ha retenido el único archivo en lugar de mostrarlo en la lista.`,
+  'Summary.NothingListed.Plural': `En este PC InstallerClean no pudo determinar con certeza qué archivos almacenados en caché pertenecen a los programas instalados aquí, así que ha retenido {0} {1} en lugar de mostrarlos en la lista.`,
   'Summary.MissingFromDisk.Singular': `Windows tiene un registro de {0} archivo que no está en {InstallerFolder}: {1}. En el día a día no causa problemas, pero una reparación, una actualización o una desinstalación pueden fallar por él. Abre Detalles para saber qué hacer.`,
   'Summary.MissingFromDisk.Plural': `Windows tiene registros de {0} archivos que no están en {InstallerFolder}: {1}. En el día a día no causan problemas, pero una reparación, una actualización o una desinstalación pueden fallar por ellos. Abre Detalles para saber qué hacer.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} programa más`,

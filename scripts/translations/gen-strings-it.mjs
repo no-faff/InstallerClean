@@ -235,6 +235,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} file lasciati stare`,
   'Summary.OrphanedToCleanUp.Singular': `{0} file non necessario da eliminare`,
   'Summary.OrphanedToCleanUp.Plural': `{0} file non necessari da eliminare`,
+  'Summary.NothingListed.Singular': `Su questo PC InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file invece di elencarlo.`,
+  'Summary.NothingListed.Plural': `Su questo PC InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto {0} {1} invece di elencarli.`,
   'Summary.MissingFromDisk.Singular': `Windows ha un record per {0} file che non si trova in {InstallerFolder}: {1}. Nell'uso quotidiano non crea problemi, ma una riparazione, un aggiornamento o una disinstallazione possono non riuscire a causa sua. Apri Dettagli per sapere cosa fare.`,
   'Summary.MissingFromDisk.Plural': `Windows ha record per {0} file che non si trovano in {InstallerFolder}: {1}. Nell'uso quotidiano non creano problemi, ma una riparazione, un aggiornamento o una disinstallazione possono non riuscire a causa loro. Apri Dettagli per sapere cosa fare.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} altro programma`,

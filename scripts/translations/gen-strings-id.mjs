@@ -274,6 +274,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} file dibiarkan apa adanya`,
   'Summary.OrphanedToCleanUp.Singular': `{0} file tidak diperlukan untuk dibersihkan`,
   'Summary.OrphanedToCleanUp.Plural': `{0} file tidak diperlukan untuk dibersihkan`,
+  'Summary.NothingListed.Singular': `Di PC ini InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file itu ditahan dan tidak dicantumkan.`,
+  'Summary.NothingListed.Plural': `Di PC ini InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi {0} {1} ditahan dan tidak dicantumkan.`,
   'Summary.MissingFromDisk.Singular': `Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak merepotkan, tapi perbaikan, pembaruan atau pencopotan bisa gagal karenanya. Buka Detail untuk tahu apa yang harus dilakukan.`,
   'Summary.MissingFromDisk.Plural': `Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak merepotkan, tapi perbaikan, pembaruan atau pencopotan bisa gagal karenanya. Buka Detail untuk tahu apa yang harus dilakukan.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} program lain`,

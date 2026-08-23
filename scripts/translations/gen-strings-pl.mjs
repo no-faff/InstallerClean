@@ -292,6 +292,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} plików pozostawionych bez zmian`,
   'Summary.OrphanedToCleanUp.Singular': `{0} niepotrzebny plik do wyczyszczenia`,
   'Summary.OrphanedToCleanUp.Plural': `{0} niepotrzebnych plików do wyczyszczenia`,
+  'Summary.NothingListed.Singular': `Na tym komputerze InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał jedyny plik zamiast pokazać go na liście.`,
+  'Summary.NothingListed.Plural': `Na tym komputerze InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał {0} {1} zamiast pokazać je na liście.`,
   'Summary.MissingFromDisk.Singular': `Windows ma rekord dla {0} pliku, którego nie ma w {InstallerFolder}: {1}. Na co dzień nie sprawia to kłopotu, ale naprawa, aktualizacja lub odinstalowanie może się przez niego nie powieść. Otwórz Szczegóły, aby dowiedzieć się, co zrobić.`,
   'Summary.MissingFromDisk.Plural': `Windows ma rekordy dla {0} plików, których nie ma w {InstallerFolder}: {1}. Na co dzień nie sprawiają one kłopotu, ale naprawa, aktualizacja lub odinstalowanie może się przez nie nie powieść. Otwórz Szczegóły, aby dowiedzieć się, co zrobić.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `jeszcze {0} program`,

@@ -191,8 +191,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 另外 {0} 个程序 |
 | {0} file with no program named in the records | {0} 个在记录中没有标明程序的文件 |
 | {0} files with no program named in the records | {0} 个在记录中没有标明程序的文件 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | 在这台电脑上，InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了唯一的那个文件，没有把它列出来。 |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | 在这台电脑上，InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了 {0} 个{1}，没有把它们列出来。 |
 | InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. The unneeded files above are unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Re-scan to try again. | InstallerClean 未能把 Windows 记录中的每一项都对应上，因此没有全部读取。上面那些不需要的文件不受影响，但关于 {InstallerFolder} 中缺失文件的说明可能不完整。请重新扫描再试一次。 |
 | {0} of {1} {2} | {1} 个{2}中的 {0} 个 |
 | {0} unneeded {1} ({2}) | {0} 个不需要的{1}（{2}） |

@@ -191,8 +191,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 他に {0} 個のプログラム |
 | {0} file with no program named in the records | 登録情報にプログラム名がない {0} 個のファイル |
 | {0} files with no program named in the records | 登録情報にプログラム名がない {0} 個のファイル |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | この PC では、InstallerClean はキャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、唯一のファイルを一覧に載せずそのままにしました。 |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | この PC では、InstallerClean はキャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、{0} 個の {1} を一覧に載せずそのままにしました。 |
 | InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. The unneeded files above are unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Re-scan to try again. | InstallerClean は Windows の登録情報にあるものすべてを突き合わせられなかったため、そのすべては読み取っていません。上の不要ファイルは影響を受けませんが、{InstallerFolder} にないファイルについての記載は全体を示していないことがあります。再スキャンしてもう一度お試しください。 |
 | {0} of {1} {2} | {2} {1} 個中 {0} 個 |
 | {0} unneeded {1} ({2}) | {0} 個の不要な {1} ({2}) |

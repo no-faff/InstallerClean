@@ -256,6 +256,8 @@ const MAP = {
   'Summary.RegisteredStillUsed.Plural': `{0} tệp được để nguyên`,
   'Summary.OrphanedToCleanUp.Singular': `{0} tệp không cần thiết để dọn`,
   'Summary.OrphanedToCleanUp.Plural': `{0} tệp không cần thiết để dọn`,
+  'Summary.NothingListed.Singular': `Trên máy này, InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất thay vì liệt kê nó.`,
+  'Summary.NothingListed.Plural': `Trên máy này, InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại {0} {1} thay vì liệt kê chúng.`,
   'Summary.MissingFromDisk.Singular': `Windows có bản ghi cho {0} tệp không nằm trong {InstallerFolder}: {1}. Hằng ngày điều này không gây rắc rối, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt có thể thất bại vì nó. Hãy mở Chi tiết để biết phải làm gì.`,
   'Summary.MissingFromDisk.Plural': `Windows có bản ghi cho {0} tệp không nằm trong {InstallerFolder}: {1}. Hằng ngày điều này không gây rắc rối, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt có thể thất bại vì chúng. Hãy mở Chi tiết để biết phải làm gì.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} chương trình khác`,
