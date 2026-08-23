@@ -490,6 +490,8 @@ const MAP = {
   'Cli.MoveNotEnoughSpace': `Erro: espaço insuficiente em {0}. Mover estes arquivos precisa de {1} e há {2} livres. Nada foi movido.`,
   'Cli.PendingRebootBlocked.Other': `Erro: o Windows Installer tem algo em andamento, então /m e /d ficam bloqueados. O InstallerClean não vai tocar em {InstallerFolder} enquanto ela muda. Tente de novo quando terminar.`,
   'Cli.FoundNoOrphans': `Nenhum arquivo desnecessário encontrado.`,
+  'Cli.NothingOffered.Singular': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({2}) que poderia ter oferecido.`,
+  'Cli.NothingOffered.Plural': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve todos os {0} {1} ({2}) que poderia ter oferecido.`,
   'Cli.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de destino, então parou em vez de gravar no lugar errado. Verifique {0} e execute o comando de novo.`,
   'Cli.Help.Summary': `Remove arquivos .msi e .msp em cache que nenhum programa ainda precisa.`,
   'Cli.Help.Elevation': `Exige um prompt como administrador; o Windows não vai iniciá-lo.`,
@@ -504,6 +506,7 @@ const MAP = {
   'Cli.RecordsNotMatched': `O InstallerClean não conseguiu casar tudo o que há nos registros do Windows, então não leu todos eles. O que ele encontrou não é afetado, mas o que ele diz sobre arquivos que faltam em {InstallerFolder} pode ficar aquém do quadro completo. Executá-lo de novo pode detectar mais.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} mantidos no lugar, porque o Windows tem um registro do programa nomeado lá dentro.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} mantidos no lugar, porque o InstallerClean não encontrou nenhum programa nomeado lá dentro.`,
+  'Completion.ReverifyOwnershipUnestablished': `{0} {1} mantidos no lugar, porque até a verificação final o InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui.`,
   'Completion.NothingRemoved': `Nada foi removido`,
   'Error.ScanNoRegisteredFileInFolder': `O InstallerClean não conseguiu casar os registros do Windows Installer com o conteúdo de {InstallerFolder}. A pasta tem arquivos, mas nenhum registro aponta para nada lá dentro, então não foi possível mostrar que algum arquivo fosse desnecessário. Nada foi oferecido e nada foi removido.`,
   'Completion.NothingOffered': `Nada oferecido neste PC`,
@@ -534,8 +537,13 @@ const OVERRIDES = {
   'Completion.ReverifyRecordsChanged.One': `{0} {1} mantido no lugar, porque os registros do Windows Installer haviam mudado até a verificação final.`,
   // Participle agreement only: "mantido" for a single file.
   'Completion.ReverifyIncomplete.One': `{0} {1} mantido no lugar, porque os registros do Windows Installer não puderam ser lidos por completo na verificação final.`,
-  'Completion.ReverifyIdentityClaimed.One': `{0} {1} mantido no lugar, porque o Windows tem um registro do programa nomeado lá dentro.`,
-  'Completion.ReverifyIdentityUnreadable.One': `{0} {1} mantido no lugar, porque o InstallerClean não encontrou nenhum programa nomeado lá dentro.`,
+  'Completion.ReverifyOwnershipUnestablished.One': `{0} {1} mantido no lugar, porque até a verificação final o InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui.`,
+  // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
+  // one of the two retired identity causes: no code reads it, so nothing passes
+  // the prefix to Pluralise and the override could never be selected.
+  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
+  // what says so. The base string itself stays translated, which is the point of
+  // keeping those two keys at all.
 };
 
 let text = readFileSync(BASE, 'utf8');

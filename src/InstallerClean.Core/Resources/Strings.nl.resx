@@ -694,7 +694,7 @@
        something changed between the scan and the click, only that the check it makes
        before acting did not establish it. Two different findings reach this line and
        neither may be named in it. -->
-  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here.</value></data>
+  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} behouden, omdat InstallerClean bij de laatste controle niet met zekerheid kon vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -838,6 +838,32 @@
        may recast "match up" into its own idiom for reconciling two sets of
        records; what must not come back is a number, or a noun meaning "installed
        program". -->
+  <!-- THE LINE THAT SAYS THE WALK-DERIVED LIST IS NOT THE ANSWER TO THE QUESTION
+       ABOVE IT. Body.MainExplanation.Why states two criteria for listing a file,
+       and on this machine the first one did not run: files no program claims are
+       sitting in the folder and were held back rather than listed. Without this
+       line a user reads a rule the scan suspended, sees none of the first kind and
+       concludes there were none, which is the same fault as the command line's old
+       "Found no unneeded files" and gets the same answer.
+
+       0 = files held back, 1 = pluralised "file"/"files".
+
+       WHERE NOTHING AT ALL IS OFFERED THE USER NEVER SEES THIS, because the
+       completion screen replaces the whole surface and says the honest thing there.
+       This is for the machine that IS offered something, where that screen never
+       shows: a superseded registration surviving every withholding is offered
+       beside a walk-derived half that was emptied.
+
+       IT NAMES NO CAUSE. Several different findings empty a walk offer this way and
+       any sentence naming one is false on the others; the opening clause is what is
+       true of all of them, and it is the clause both the completion screen and the
+       command line already use.
+
+       "Rather than listing them" and not "rather than offering them", because the
+       list is what the reader is looking at. The one-form spends neither placeholder
+       and names the file instead of the numeral, as the other one-forms here do. -->
+  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it.</value></data>
+  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them.</value></data>
   <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen en heeft ze daarom niet allemaal gelezen. De overbodige bestanden hierboven zijn hierdoor niet beïnvloed, maar wat er staat over bestanden die in {InstallerFolder} ontbreken, kan onvolledig zijn. Klik op Opnieuw scannen om het nog eens te proberen.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} van {1} {2}</value></data>
@@ -1296,8 +1322,8 @@ Het crashlog kon niet worden weggeschreven.</value></data>
        a conclusion the reader has not reached. The tense also differs from the
        window's ("held back" here, "has held back" there) and that is deliberate,
        each being right in its own register. -->
-  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.</value></data>
-  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.</value></data>
+  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom het ene bestand ({2}) achtergehouden dat het anders had aangeboden.</value></data>
+  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom alle {0} {1} ({2}) achtergehouden die het anders had aangeboden.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel

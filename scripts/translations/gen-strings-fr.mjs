@@ -76,8 +76,13 @@ const OVERRIDES = {
   // Participle agreement only: "laissé" for a single file. The reason clause
   // is about the records, not the files, so it does not inflect.
   'Completion.ReverifyIncomplete.One': `{0} {1} laissé en place, parce que les enregistrements de Windows Installer n'ont pas pu être lus entièrement lors de la vérification finale.`,
-  'Completion.ReverifyIdentityClaimed.One': `{0} {1} laissé en place, parce que Windows a un enregistrement du programme nommé à l'intérieur.`,
-  'Completion.ReverifyIdentityUnreadable.One': `{0} {1} laissé en place, parce qu'InstallerClean n'a trouvé aucun programme nommé à l'intérieur.`,
+  'Completion.ReverifyOwnershipUnestablished.One': `{0} {1} laissé en place, parce qu'au moment de la vérification finale InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici.`,
+  // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
+  // one of the two retired identity causes: no code reads it, so nothing passes
+  // the prefix to Pluralise and the override could never be selected.
+  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
+  // what says so. The base string itself stays translated, which is the point of
+  // keeping those two keys at all.
 };
 
 const MAP = {
@@ -513,6 +518,8 @@ const MAP = {
   'Cli.MoveNotEnoughSpace': `Erreur : espace insuffisant dans {0}. Déplacer ces fichiers nécessite {1} et {2} sont libres. Rien n'a été déplacé.`,
   'Cli.PendingRebootBlocked.Other': `Erreur : Windows Installer a quelque chose en cours, donc /m et /d sont bloqués. InstallerClean ne touchera pas à {InstallerFolder} pendant qu'il change. Réessayez une fois terminé.`,
   'Cli.FoundNoOrphans': `Aucun fichier inutile trouvé.`,
+  'Cli.NothingOffered.Singular': `InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu le seul fichier ({2}) qu'il aurait pu proposer.`,
+  'Cli.NothingOffered.Plural': `InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu l'ensemble des {0} {1} ({2}) qu'il aurait pu proposer.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de destination, il s'est donc arrêté plutôt que d'écrire au mauvais endroit. Vérifiez {0}, puis relancez la commande.`,
   'Cli.Help.Summary': `Retire les fichiers .msi et .msp en cache dont aucun programme n'a besoin.`,
   'Cli.Help.Elevation': `Exige une invite de commandes administrateur ; Windows ne le lancera pas.`,
@@ -527,6 +534,7 @@ const MAP = {
   'Cli.RecordsNotMatched': `InstallerClean n'a pas pu faire correspondre tout ce que contiennent les enregistrements de Windows, il ne les a donc pas tous lus. Ce qu'il a trouvé n'est pas concerné, mais ce qu'il dit des fichiers absents de {InstallerFolder} peut être incomplet. Le relancer permettra peut-être d'en détecter davantage.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} laissés en place, parce que Windows a un enregistrement du programme nommé à l'intérieur.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} laissés en place, parce qu'InstallerClean n'a trouvé aucun programme nommé à l'intérieur.`,
+  'Completion.ReverifyOwnershipUnestablished': `{0} {1} laissés en place, parce qu'au moment de la vérification finale InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici.`,
   'Completion.NothingRemoved': `Rien n'a été retiré`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean n'a pas pu faire correspondre les enregistrements de Windows Installer avec le contenu de {InstallerFolder}. Le dossier contient des fichiers, mais pas un seul enregistrement ne désigne quoi que ce soit dedans, donc aucun fichier n'a pu être montré comme inutile. Rien n'a été proposé et rien n'a été retiré.`,
   'Completion.NothingOffered': `Rien proposé sur ce PC`,

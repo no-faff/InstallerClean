@@ -694,7 +694,7 @@
        something changed between the scan and the click, only that the check it makes
        before acting did not establish it. Two different findings reach this line and
        neither may be named in it. -->
-  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here.</value></data>
+  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>Оставлено на месте {0} {1}, потому что к итоговой проверке InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -838,6 +838,32 @@
        may recast "match up" into its own idiom for reconciling two sets of
        records; what must not come back is a number, or a noun meaning "installed
        program". -->
+  <!-- THE LINE THAT SAYS THE WALK-DERIVED LIST IS NOT THE ANSWER TO THE QUESTION
+       ABOVE IT. Body.MainExplanation.Why states two criteria for listing a file,
+       and on this machine the first one did not run: files no program claims are
+       sitting in the folder and were held back rather than listed. Without this
+       line a user reads a rule the scan suspended, sees none of the first kind and
+       concludes there were none, which is the same fault as the command line's old
+       "Found no unneeded files" and gets the same answer.
+
+       0 = files held back, 1 = pluralised "file"/"files".
+
+       WHERE NOTHING AT ALL IS OFFERED THE USER NEVER SEES THIS, because the
+       completion screen replaces the whole surface and says the honest thing there.
+       This is for the machine that IS offered something, where that screen never
+       shows: a superseded registration surviving every withholding is offered
+       beside a walk-derived half that was emptied.
+
+       IT NAMES NO CAUSE. Several different findings empty a walk offer this way and
+       any sentence naming one is false on the others; the opening clause is what is
+       true of all of them, and it is the clause both the completion screen and the
+       command line already use.
+
+       "Rather than listing them" and not "rather than offering them", because the
+       list is what the reader is looking at. The one-form spends neither placeholder
+       and names the file instead of the numeral, as the other one-forms here do. -->
+  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it.</value></data>
+  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them.</value></data>
   <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean не смог сопоставить всё, что есть в записях Windows, поэтому прочитал их не полностью. Ненужных файлов выше это не касается, но сказанное о файлах, отсутствующих в {InstallerFolder}, может быть неполным. Повторите сканирование, чтобы попробовать снова.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
@@ -1601,8 +1627,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что записи теперь заявляют то, что отметило сканирование.</value></data>
   <data name="Completion.ReverifyRecordsChanged.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что к итоговой проверке записи Windows Installer изменились.</value></data>
   <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что при итоговой проверке записи Windows Installer не удалось прочитать полностью.</value></data>
-  <data name="Completion.ReverifyIdentityClaimed.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что у Windows есть запись о программе, названной внутри.</value></data>
-  <data name="Completion.ReverifyIdentityUnreadable.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что InstallerClean не нашёл внутри названия программы.</value></data>
+  <data name="Completion.ReverifyOwnershipUnestablished.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что к итоговой проверке InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
   <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Найден {0} ненужный {1} для очистки ({2}).</value></data>
   <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Удаление {0} ненужного {1}...</value></data>
@@ -1655,8 +1680,8 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Ошибка: недостаточно места в {0}. Для перемещения этих файлов нужно {1}, а свободно {2}. Ничего не перемещено.</value></data>
   <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Ошибка: у Windows Installer что-то выполняется, поэтому /m и /d заблокированы. InstallerClean не будет трогать {InstallerFolder}, пока она меняется. Попробуйте снова, когда всё закончится.</value></data>
   <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Ненужных файлов не найдено.</value></data>
-  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.</value></data>
-  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.</value></data>
+  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл ({2}), который иначе предложил бы.</value></data>
+  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} {1} ({2}), которые иначе предложил бы.</value></data>
   <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean больше не смог подтвердить папку назначения и остановился, чтобы не записать не туда. Проверьте {0}, затем запустите команду снова.</value></data>
   <data name="Cli.Help.Summary" xml:space="preserve"><value>Убирает файлы .msi и .msp из кэша, не нужные ни одной программе.</value></data>
   <data name="Cli.Help.Elevation" xml:space="preserve"><value>Нужна командная строка администратора; иначе Windows её не запустит.</value></data>

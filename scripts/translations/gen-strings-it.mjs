@@ -60,8 +60,13 @@ const OVERRIDES = {
   'Completion.ReverifyRecordsChanged.One': `{0} {1} lasciato al suo posto, perché i record di Windows Installer erano cambiati al momento del controllo finale.`,
   // Participle and possessive agreement: "lasciato al suo posto" for one file.
   'Completion.ReverifyIncomplete.One': `{0} {1} lasciato al suo posto, perché i record di Windows Installer non si sono potuti leggere per intero nel controllo finale.`,
-  'Completion.ReverifyIdentityClaimed.One': `{0} {1} lasciato al suo posto, perché Windows ha un record del programma nominato all'interno.`,
-  'Completion.ReverifyIdentityUnreadable.One': `{0} {1} lasciato al suo posto, perché InstallerClean non ha trovato alcun programma nominato all'interno.`,
+  'Completion.ReverifyOwnershipUnestablished.One': `{0} {1} lasciato al suo posto, perché al momento del controllo finale InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui.`,
+  // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
+  // one of the two retired identity causes: no code reads it, so nothing passes
+  // the prefix to Pluralise and the override could never be selected.
+  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
+  // what says so. The base string itself stays translated, which is the point of
+  // keeping those two keys at all.
 };
 
 const MAP = {
@@ -411,6 +416,8 @@ const MAP = {
   'Cli.MoveNotEnoughSpace': `Errore: spazio insufficiente in {0}. Spostare questi file richiede {1} e ne sono liberi {2}. Non è stato spostato nulla.`,
   'Cli.PendingRebootBlocked.Other': `Errore: Windows Installer ha qualcosa in corso, quindi /m e /d sono bloccati. InstallerClean non tocca {InstallerFolder} mentre cambia. Riprova quando ha finito.`,
   'Cli.FoundNoOrphans': `Nessun file non necessario trovato.`,
+  'Cli.NothingOffered.Singular': `InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file ({2}) che altrimenti avrebbe proposto.`,
+  'Cli.NothingOffered.Plural': `InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto tutti i {0} {1} ({2}) che altrimenti avrebbe proposto.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean non è più riuscito a confermare la cartella di destinazione, quindi si è fermato anziché scrivere nel posto sbagliato. Controlla {0}, poi esegui di nuovo il comando.`,
   'Cli.Help.Summary': `Rimuove i file .msi e .msp in cache che nessun programma usa più.`,
   'Cli.Help.Elevation': `Richiede un prompt come amministratore; Windows non lo avvierà.`,
@@ -425,6 +432,7 @@ const MAP = {
   'Cli.RecordsNotMatched': `InstallerClean non è riuscito a far corrispondere tutto ciò che sta nei record di Windows, quindi non li ha letti tutti. Quanto ha trovato non ne risente, ma quanto dice sui file che mancano da {InstallerFolder} può essere incompleto. Eseguirlo di nuovo potrebbe rilevarne altri.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} lasciati al loro posto, perché Windows ha un record del programma nominato all'interno.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} lasciati al loro posto, perché InstallerClean non ha trovato alcun programma nominato all'interno.`,
+  'Completion.ReverifyOwnershipUnestablished': `{0} {1} lasciati al loro posto, perché al momento del controllo finale InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui.`,
   'Completion.NothingRemoved': `Nessun file rimosso`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean non è riuscito a far corrispondere i record di Windows Installer con il contenuto di {InstallerFolder}. La cartella contiene file, ma nemmeno un record indica qualcosa al suo interno, quindi non si è potuto dimostrare che qualche file fosse non necessario. Non è stato proposto nulla e non è stato rimosso nulla.`,
   'Completion.NothingOffered': `Nulla proposto su questo PC`,

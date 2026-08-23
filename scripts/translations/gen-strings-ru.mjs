@@ -456,6 +456,7 @@ const MAP = {
   'Summary.RecordsNotMatched': `InstallerClean не смог сопоставить всё, что есть в записях Windows, поэтому прочитал их не полностью. Ненужных файлов выше это не касается, но сказанное о файлах, отсутствующих в {InstallerFolder}, может быть неполным. Повторите сканирование, чтобы попробовать снова.`,
   'Completion.ReverifyIdentityClaimed': `Оставлено на месте {0} {1}, потому что у Windows есть запись о программе, названной внутри.`,
   'Completion.ReverifyIdentityUnreadable': `Оставлено на месте {0} {1}, потому что InstallerClean не нашёл внутри названия программы.`,
+  'Completion.ReverifyOwnershipUnestablished': `Оставлено на месте {0} {1}, потому что к итоговой проверке InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше.`,
   'Completion.NothingRemoved': `Ничего не убрано`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. В папке есть файлы, но ни одна запись не указывает ни на что внутри неё, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.`,
   'Completion.NothingOffered': `На этом ПК ничего не предложено`,
@@ -508,8 +509,13 @@ const OVERRIDES = {
   // As ReverifySkipped.One: the base's "Оставлено" is the impersonal form that
   // 2-4 and 5+ both take; n==1 needs the masculine singular "Оставлен".
   'Completion.ReverifyIncomplete.One': `Оставлен на месте {0} {1}, потому что при итоговой проверке записи Windows Installer не удалось прочитать полностью.`,
-  'Completion.ReverifyIdentityClaimed.One': `Оставлен на месте {0} {1}, потому что у Windows есть запись о программе, названной внутри.`,
-  'Completion.ReverifyIdentityUnreadable.One': `Оставлен на месте {0} {1}, потому что InstallerClean не нашёл внутри названия программы.`,
+  'Completion.ReverifyOwnershipUnestablished.One': `Оставлен на месте {0} {1}, потому что к итоговой проверке InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше.`,
+  // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
+  // one of the two retired identity causes: no code reads it, so nothing passes
+  // the prefix to Pluralise and the override could never be selected.
+  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
+  // what says so. The base string itself stays translated, which is the point of
+  // keeping those two keys at all.
   // The flat template «Найдено зарегистрированных {1}: {0}.» mis-agrees for counts
   // where the numeral is not adjacent to the noun. .One restores nominative agreement
   // for the One category (1, 21, ...): {1} is nominative singular "пакет" while the
@@ -591,8 +597,8 @@ const CLI = {
   // key added to the neutral reaches the other fourteen MAPs and never this
   // one, and the key goes missing from the Russian resx rather than merely
   // untranslated. Translate both when the English is ruled.
-  'Cli.NothingOffered.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.`,
-  'Cli.NothingOffered.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.`,
+  'Cli.NothingOffered.Singular': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл ({2}), который иначе предложил бы.`,
+  'Cli.NothingOffered.Plural': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} {1} ({2}), которые иначе предложил бы.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean больше не смог подтвердить папку назначения и остановился, чтобы не записать не туда. Проверьте {0}, затем запустите команду снова.`,
   'Cli.Help.Summary': `Убирает файлы .msi и .msp из кэша, не нужные ни одной программе.`,
   'Cli.Help.Elevation': `Нужна командная строка администратора; иначе Windows её не запустит.`,
