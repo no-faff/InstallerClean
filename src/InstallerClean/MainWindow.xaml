@@ -312,6 +312,42 @@
                             AutomationProperties.HelpText="{loc:Translate Automation.ViewRegisteredFiles.HelpText}"/>
                 </Grid>
 
+                <!-- FIRST OF THE THREE FOOTNOTES, AND THE ORDER IS THE POINT RATHER
+                     THAN THE HISTORY. This one is about the LIST the reader is looking
+                     at and it qualifies the two counts directly above it; the two below
+                     are about the Windows records and about files that are not in the
+                     folder, which is a different subject. It read last until somebody
+                     rendered the whole block together and saw that it did not belong
+                     there.
+
+                     WHAT IT SAYS AND WHY IT HAS TO. The explanation at the top of this
+                     window states two criteria for listing a file, and on this machine
+                     the first one did not run: files no program claims are in that
+                     folder and were held back rather than listed, so a reader taking
+                     that explanation as the rule behind the list concludes there were
+                     none of them.
+
+                     AND THE ADJACENCY BELOW IS KNOWN AND ACCEPTED. The records line two
+                     footnotes down opens "InstallerClean couldn't match up everything in
+                     the Windows records" and then says the unneeded files above are
+                     unaffected, which is scoped by its own opening clause to that
+                     problem and says what it means. That pair was rewritten and settled
+                     in August and is not reopened for how it reads beside this one.
+
+                     Same low-emphasis treatment as the two below and the same Polite
+                     live setting, being a fact about the scan rather than something to
+                     act on. It cannot appear on the all-clear: with nothing offered the
+                     completion screen replaces this surface and carries the same
+                     sentence in its own words. -->
+                <TextBlock x:Name="NothingListedText"
+                           Visibility="{Binding Scan.HasNothingListed, Converter={StaticResource BoolToVis}}"
+                           Text="{Binding Scan.NothingListedText}"
+                           Foreground="{StaticResource Text.Muted}"
+                           FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
+                           TextWrapping="Wrap"
+                           Margin="{StaticResource GapTop.Sm}"
+                           AutomationProperties.LiveSetting="Polite"/>
+
                 <!-- Registered files missing from disk. Sits as a footnote
                      under the left-alone count: a missing file is one of the
                      needed files, Windows still expects it, it just isn't on
@@ -346,27 +382,6 @@
                            Margin="{StaticResource GapTop.Sm}"
                            AutomationProperties.LiveSetting="Polite"/>
 
-                <!-- The walk-derived half of the offer was emptied and something is
-                     still on the list. It earns a line because the explanation at the
-                     top of this window states two criteria for listing a file and on
-                     this machine the first one did not run: files no program claims
-                     are in that folder and were held back rather than listed, so a
-                     reader taking that explanation as the rule behind the list
-                     concludes there were none of them.
-
-                     Same low-emphasis treatment as the two lines above, and the same
-                     Polite live setting, because it is a fact about the scan rather
-                     than something to act on. It cannot appear beside them on the
-                     all-clear: with nothing offered the completion screen replaces
-                     this surface and carries the same sentence in its own words. -->
-                <TextBlock x:Name="NothingListedText"
-                           Visibility="{Binding Scan.HasNothingListed, Converter={StaticResource BoolToVis}}"
-                           Text="{Binding Scan.NothingListedText}"
-                           Foreground="{StaticResource Text.Muted}"
-                           FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
-                           TextWrapping="Wrap"
-                           Margin="{StaticResource GapTop.Sm}"
-                           AutomationProperties.LiveSetting="Polite"/>
 
             </StackPanel>
             </ScrollViewer>

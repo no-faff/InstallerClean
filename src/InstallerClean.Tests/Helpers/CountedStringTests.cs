@@ -34,26 +34,36 @@ public class CountedStringTests
     /// <summary>
     /// Every keyPrefix the app passes to <see cref="DisplayHelpers.Pluralise(int, string, string, string)"/>,
     /// taken from the call sites rather than from the resx, because the prefix
-    /// is what the lookup is built from. Five of them reach Pluralise through
+    /// is what the lookup is built from. Four of them reach Pluralise through
     /// HeldBackReport's flat overload, where the key arrives in a local and a
     /// search of the call expression alone does not see it.
+    ///
+    /// THAT SENTENCE SAID FIVE AND THE COUNT HAD BEEN STALE SINCE THE RELEASE THAT
+    /// CUT TWO CAUSES AND ADDED ONE. It is corrected here rather than dropped
+    /// because it is the warning that matters: a sweep of the call expressions
+    /// misses exactly those, which is how this list went four prefixes short
+    /// without anything failing. The three added alongside this note were found by
+    /// walking the resx for Singular and Plural pairs instead, and one of the four
+    /// had been missing since the empty-offer screen came back.
     /// </summary>
     private static readonly string[] CountedPrefixes =
     {
         "Cli.DeletedFiles", "Cli.DeletingFiles", "Cli.FoundOrphans", "Cli.MissingFromDisk",
-        "Cli.MovedFiles", "Cli.MovingFiles",
+        "Cli.MovedFiles", "Cli.MovingFiles", "Cli.NothingOffered",
         "Completion.FailedCount", "Completion.FailedCountDelete",
         "Completion.MoveCancelledSummary", "Completion.MoveRestoreHint",
         "Completion.MoveRestoreHintSameDrive", "Completion.MoveSummary",
+        "Completion.NothingOfferedBody",
         "Completion.PermanentDeleteCancelledSummary", "Completion.PermanentDeleteSummary",
-        "Completion.ReverifyIncomplete", "Completion.ReverifyRecordsChanged",
-        "Completion.ReverifySkipped",
+        "Completion.ReverifyIncomplete", "Completion.ReverifyOwnershipUnestablished",
+        "Completion.ReverifyRecordsChanged", "Completion.ReverifySkipped",
         "Confirm.DeletePermanently",
         "Error.AccessDenied", "Error.FileInUse", "Error.IOFailure", "Error.UnknownError",
         "Plural.Error", "Plural.File", "Plural.Package", "Plural.Patch", "Plural.Product",
         "Status.RegisteredPackagesFound",
         "Summary.MissingFromDisk", "Summary.MissingFromDisk.OtherPrograms",
         "Summary.MissingFromDisk.Unnamed",
+        "Summary.NothingListed",
         "Summary.OrphanedToCleanUp", "Summary.RegisteredStillUsed",
         "Summary.RegisteredWindow",
     };
@@ -66,12 +76,15 @@ public class CountedStringTests
     {
         "Cli.DeletedFiles", "Cli.DeletingFiles", "Cli.FoundOrphans", "Cli.MissingFromDisk",
         "Cli.MovedFiles", "Cli.MovingFiles",
+        "Cli.NothingOffered",
         "Completion.MoveRestoreHint", "Completion.MoveRestoreHintSameDrive",
+        "Completion.NothingOfferedBody",
         "Completion.PermanentDeleteSummary",
-        "Completion.ReverifyIncomplete", "Completion.ReverifyRecordsChanged",
-        "Completion.ReverifySkipped",
+        "Completion.ReverifyIncomplete", "Completion.ReverifyOwnershipUnestablished",
+        "Completion.ReverifyRecordsChanged", "Completion.ReverifySkipped",
         "Confirm.DeletePermanently", "Error.FileInUse",
         "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
+        "Summary.NothingListed",
         "Summary.RegisteredStillUsed", "Summary.RegisteredWindow",
     };
 
