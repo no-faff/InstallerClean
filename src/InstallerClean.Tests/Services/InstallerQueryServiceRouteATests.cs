@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
@@ -106,6 +107,78 @@ public class InstallerQueryServiceRouteATests
         // Established rather than unestablished: the app did not fail to find out, it found
         // out. The two withhold alike and they are not the same finding.
         Assert.False(row.RemovableWithheld);
+    }
+
+    private const string ObsoletedFile = @"C:\Windows\Installer\route-a-obsoleted.msp";
+
+    /// <summary>
+    /// A machine carrying an OBSOLETED registration whose file has gone, alongside a
+    /// superseded patch that is offer-eligible so the judging pass runs at all. The
+    /// obsoleted row is the subject: it is never offer-eligible in 3.0.0, so nothing
+    /// downstream can take a verdict away from it and the verdict this pass stamps is the
+    /// only one it will ever carry.
+    /// </summary>
+    private static async Task<RegisteredPackage> EnumerateWithMissingObsoletedPatch(bool routeARefuses)
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct(Enumerated);
+        msi.SetProductProperty(Enumerated, "LocalPackage", ProductFile);
+        msi.SetProductProperty(Enumerated, "ProductName", "Test Product");
+        msi.AddPatch(Enumerated, "{OBS}", ObsoletedFile, state: "4", uninstallable: "0");
+        msi.AddPatch(Enumerated, "{P}", PatchFile, state: "2", uninstallable: "0");
+
+        var sets = new Dictionary<string, ProductPatchSet>(StringComparer.OrdinalIgnoreCase)
+        {
+            [Enumerated] = ProductPatchSet.AllNonRemovable,
+        };
+
+        if (routeARefuses) msi.RouteAResult = 5;   // ERROR_ACCESS_DENIED
+
+        var result = await new InstallerQueryService(msi,
+                (_, _) => new InstallerQueryService.FallbackRead(0, 1, ProductPatchSets: sets),
+                crashLogSink: null, identityReader: new DeclaringReader())
+            .GetRegisteredPackagesAsync();
+
+        return result.Packages.Single(p => p.PatchState == 4);
+    }
+
+    [Fact]
+    public async Task An_obsoleted_row_is_not_judged_clean_when_the_machine_wide_enumeration_refused()
+    {
+        // THE ROW NOTHING DOWNSTREAM PROTECTS. When the machine-wide enumeration does not
+        // answer, the confirmation pass withholds every still-removable path, and that is
+        // what keeps a missing SUPERSEDED registration under the banner on such a run.
+        // Downgrade takes a removable verdict away and returns at once where there is
+        // none, so it never reaches a row that was never removable. An obsoleted
+        // registration is never removable in 3.0.0, for a policy reason rather than a
+        // dangerous one.
+        //
+        // SO THIS ROW READ ITS VERDICT OFF A PRODUCT SET THE APP HAD JUST BEEN TOLD WAS
+        // SHORT, and read it as positively clean, and the missing-files split then took
+        // that for the app having established the absence was harmless. Route A is the
+        // only source that can name a product no enumeration returned, so losing it does
+        // not narrow the set by a knowable margin; it removes the only means of finding
+        // out. The verdict has to say so.
+        var row = await EnumerateWithMissingObsoletedPatch(routeARefuses: true);
+
+        Assert.Equal(4, row.PatchState);
+        Assert.Equal(ProductPatchSet.Unestablished, row.ProductPatchSetVerdict);
+        // And the split reports it, which is the half the verdict assertion cannot see.
+        Assert.True(MissingFilesReport.Affected(row with { FileExists = false }));
+    }
+
+    [Fact]
+    public async Task The_same_obsoleted_row_stays_quiet_when_the_enumeration_answered()
+    {
+        // THE MUST-MISS CONTROL, differing in one field. Without it, a change that simply
+        // stopped stamping clean verdicts anywhere would satisfy the test above while
+        // putting every missing obsoleted registration on every machine under a banner
+        // about files this app itself removed, which is the direction the whole carve-out
+        // exists to avoid.
+        var row = await EnumerateWithMissingObsoletedPatch(routeARefuses: false);
+
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+        Assert.False(MissingFilesReport.Affected(row with { FileExists = false }));
     }
 
     [Fact]

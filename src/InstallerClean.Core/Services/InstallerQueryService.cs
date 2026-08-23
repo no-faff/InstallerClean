@@ -2471,9 +2471,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (codesByPath.Count == 0) return;
 
         // The products each path's codes are registered to, from the claims and from
-        // route A. Route A being null is already answered by the caller, which
-        // withholds every path on it, so this pass adds nothing there and does not
-        // second-guess it.
+        // route A.
+        //
+        // THIS NOTE SAID ROUTE A BEING NULL WAS "ALREADY ANSWERED BY THE CALLER, WHICH
+        // WITHHOLDS EVERY PATH ON IT", AND THAT WAS TRUE OF ONLY HALF THE ROWS. The
+        // caller's downgrade takes a removable verdict away and skips a row that has
+        // none, so it never reaches a row that was never removable. An obsoleted
+        // registration is exactly that. Those rows read their verdict from this pass and
+        // from nowhere else, so a null route A has to be answered here as well; see where
+        // the verdict is seeded below.
         var productsByPath = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
         foreach (var claim in patchClaims)
         {
@@ -2525,7 +2531,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // whichever was reached first, so reading the verdict off the row's own code
             // would answer about one product of several and let enumeration order decide
             // what the app says about a file.
-            var verdict = ProductPatchSet.AllNonRemovable;
+            //
+            // AND IT STARTS UNESTABLISHED WHERE ROUTE A DID NOT ANSWER, because the set it
+            // is about to be worsened across is then short by an unknown amount. Route A
+            // is the only source that can name a product no enumeration returned, so
+            // losing it does not narrow the product set by a knowable margin: it removes
+            // the app's only way of finding out. Reading a clean verdict off what remains
+            // is the scan trusting, for the purpose of a claim, exactly the completeness
+            // it has just been told it does not have.
+            //
+            // THE OFFER DOES NOT MOVE BY ONE ROW, and that is why this is safe to do here
+            // rather than only at the consumer. The caller already downgrades every
+            // removable path when route A returns null, so a removable row is withheld
+            // either way and arrives at the split carrying the same two flags; all this
+            // changes is which pass got there first. What it DOES change is the row that
+            // was never removable, chiefly an obsoleted registration, which the caller's
+            // downgrade cannot touch because Downgrade takes a verdict away and there is
+            // none to take. Such a row used to keep a positively clean verdict off a
+            // product set route A had refused to complete, and the missing-files split
+            // then read that as the app having established the absence was harmless.
+            //
+            // IT IS THE SAME MISTAKE THE SPLIT'S OWN NOTE WARNS ABOUT, arriving where that
+            // note was not looking: trusting for the purpose of staying quiet what the
+            // scan refused to trust for the purpose of acting.
+            var verdict = holders is null
+                ? ProductPatchSet.Unestablished
+                : ProductPatchSet.AllNonRemovable;
             foreach (var productCode in products)
                 verdict = Worse(verdict, ProductVerdict(productCode, registryPatchSets, apiPatchSets));
 

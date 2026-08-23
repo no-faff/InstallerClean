@@ -721,6 +721,48 @@ public class FileSystemScanServiceTests
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
+    /// <summary>
+    /// THE LAST CONJUNCT OF THE SPLIT, TESTED DIRECTLY ON THE PREDICATE, because after
+    /// 3.0.0 no machine reaches it as the deciding term any more. A run whose machine-wide
+    /// patch enumeration refused now also carries an Unestablished verdict, so such a row
+    /// fails the verdict test as well and would be reported with this conjunct deleted.
+    ///
+    /// THAT IS A REASON TO PIN IT HERE AND NOT A REASON TO DROP IT. The conjunct is the
+    /// marker's contract rather than a route: it says a row withheld for some cause OTHER
+    /// than its own unread file is reported, whatever its verdict says. Delete it and the
+    /// app depends on one other mechanism continuing to make the verdict honest, with
+    /// nothing going red if that ever stops.
+    ///
+    /// THESE TWO BUILD THEIR ROWS BY HAND, WHICH THE INTEGRATION TESTS ABOVE DELIBERATELY
+    /// DO NOT. They are about the expression and make no claim that a scan produces either
+    /// combination; the tests above are where the machine is the subject.
+    /// </summary>
+    [Fact]
+    public void A_missing_row_withheld_for_something_other_than_its_unread_file_is_affected()
+    {
+        var row = new RegisteredPackage(
+            @"C:\Windows\Installer\hand-built.msp", "Test Product", "{A}",
+            PatchState: 2, IsRemovable: false, RemovableWithheld: true,
+            ProductPatchSetVerdict: ProductPatchSet.AllNonRemovable,
+            FileExists: false, WithheldOnUnreadableFile: false);
+
+        Assert.True(MissingFilesReport.Affected(row));
+    }
+
+    [Fact]
+    public void The_same_row_marked_as_withheld_only_on_its_unread_file_is_unaffected()
+    {
+        // THE MUST-MISS CONTROL, differing in that one field. Without it, a predicate that
+        // had lost its benign half entirely would satisfy the test above.
+        var row = new RegisteredPackage(
+            @"C:\Windows\Installer\hand-built.msp", "Test Product", "{A}",
+            PatchState: 2, IsRemovable: false, RemovableWithheld: true,
+            ProductPatchSetVerdict: ProductPatchSet.AllNonRemovable,
+            FileExists: false, WithheldOnUnreadableFile: true);
+
+        Assert.False(MissingFilesReport.Affected(row));
+    }
+
     private const string ProductFile = @"C:\Windows\Installer\product.msi";
     private const string PatchFile = @"C:\Windows\Installer\superseded-lost.msp";
 
@@ -949,10 +991,14 @@ public class FileSystemScanServiceTests
         var row = enumerated.Packages.Single(p => p.PatchState == 2);
         Assert.True(row.RemovableWithheld);
         Assert.False(row.WithheldOnUnreadableFile);
-        // The verdict is CLEAN, which is what makes this row the one that matters: the
-        // state test and the verdict test both pass it to the benign side, and the last
-        // conjunct is the only thing standing between it and silence.
-        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+        // AND THE VERDICT SAYS UNESTABLISHED RATHER THAN CLEAN, which is the judging pass
+        // refusing to read a clean answer off a product set it has just been told is short
+        // by an unknown amount. It said AllNonRemovable until that was fixed, so this row
+        // was reported by the withheld clause alone; it is now reported by both, and the
+        // two are not the same statement. This assertion is what stops the fix being
+        // quietly undone: a verdict that went back to clean here would leave the test
+        // green, because the row is still reported either way.
+        Assert.Equal(ProductPatchSet.Unestablished, row.ProductPatchSetVerdict);
 
         var result = await ScanWithThePatchFileGone(enumerated, fs);
 
