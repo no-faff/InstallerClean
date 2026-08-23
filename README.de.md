@@ -252,7 +252,7 @@ Wenn dir hier etwas im Weg ist, [erstelle ein Issue](../../issues). Barrierefrei
 **Werde ich wirklich GB an Speicher freigeben?** Das hängt von deinem Rechner ab. Eine saubere Windows-11-Installation ohne zusätzliche Software hat nichts zu entfernen. Eine lange genutzte Entwickler-Workstation oder jeder Rechner mit viel MSI-basierter Software (Acrobat, Office, LibreOffice, große Entwicklungswerkzeuge) kann zig GB haben. So oder so siehst du genau wie viel, sobald du es ausführst.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Seit v1.8.0 gibt es die Möglichkeit, einen kurzen anonymen Bericht über das Ergebnis einzusenden. Bisher sind 210 eingegangen (danke euch allen 🙏), und bei den 62 % der Rechner, die etwas aufzuräumen hatten, liegt der Median des Freigegebenen bei 16,9 GB. Ein Rechner hat sage und schreibe 462 GB zurückgeholt. Hier eine Zusammenfassung der Ergebnisse.
+Seit v1.8.0 gibt es die Möglichkeit, einen kurzen anonymen Bericht über das Ergebnis einzusenden. Bisher sind 212 eingegangen (danke euch allen 🙏), und bei den 62 % der Rechner, die etwas aufzuräumen hatten, liegt der Median des Freigegebenen bei 16,9 GB. Ein Rechner hat sage und schreibe 462 GB zurückgeholt. Hier eine Zusammenfassung der Ergebnisse.
 
 <p align="center">
   <picture>
