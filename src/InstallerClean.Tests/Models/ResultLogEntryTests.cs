@@ -37,7 +37,8 @@ public class ResultLogEntryTests
         MoveDestinationKind: MoveDestinationKinds.SameDrive,
         HeldBackReclaimed: 0,
         HeldBackRecordsChanged: 0,
-        HeldBackRecordsUnreadable: 0);
+        HeldBackRecordsUnreadable: 0,
+        HeldBackOwnershipUnestablished: 0);
 
     private static ScanInfo SampleScan() => new(
         DurationMs: 100,
@@ -232,6 +233,11 @@ public class ResultLogEntryTests
                 "kind", "outcome", "durationMs", "filesProcessed", "filesFailed", "bytesFreed",
                 "errors", "moveDestinationKind", "heldBackReclaimed", "heldBackRecordsChanged",
                 "heldBackRecordsUnreadable",
+                // Appended, and it is a different KIND of finding from the three
+                // before it rather than a fourth of the same: those name what the
+                // records said about the file that was dropped, and this one is
+                // reached without reading anything about the file at all.
+                "heldBackOwnershipUnestablished",
             ],
             root.GetProperty("operation").EnumerateObject().Select(p => p.Name));
     }
@@ -338,16 +344,22 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void All_three_held_back_causes_reach_the_payload_and_are_not_summed()
+    public void Every_held_back_cause_reaches_the_payload_and_they_are_not_summed()
     {
         // A batch can meet several causes at once, and one cause named for the set
         // would be false of some of its members. THAT IS WHY THERE ARE SEVERAL COUNTS
-        // RATHER THAN ONE, and it is as true of three causes as it was of five.
+        // RATHER THAN ONE, and it has been as true at three as it was at five.
         // Distinct values so a transposition between two of them fails rather than
-        // cancelling out. It carried five until 3.0.0; the identity re-check's two
-        // went with the check.
+        // cancelling out.
+        //
+        // THE NAME NO LONGER CARRIES THE COUNT, and that is the point of this edit
+        // rather than tidiness. It read "all three" while the fourth cause was being
+        // added, so the test would have gone on passing over three of four with its
+        // own name saying it covered the lot: the count in a name is a claim nothing
+        // checks. The tally's own Total is the only figure here, and it is asserted
+        // against the sum of what was set rather than against a literal.
         var reasons = new HeldBackReasons(
-            Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3);
+            Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3, OwnershipUnestablished: 4);
 
         var op = OperationInfo.FromDelete(
             new DeleteResult(0, Array.Empty<FileOperationError>()),
@@ -356,12 +368,46 @@ public class ResultLogEntryTests
         Assert.Equal(1, op.HeldBackReclaimed);
         Assert.Equal(2, op.HeldBackRecordsChanged);
         Assert.Equal(3, op.HeldBackRecordsUnreadable);
+        Assert.Equal(4, op.HeldBackOwnershipUnestablished);
 
         // The tally knows its own total and the payload deliberately does not
-        // carry it: a total invites one sentence over causes that need three.
-        Assert.Equal(6, reasons.Total);
+        // carry it: a total invites one sentence over causes that need one each.
+        Assert.Equal(10, reasons.Total);
         var json = JsonSerializer.Serialize(op, JsonOptions);
         Assert.DoesNotContain("heldBackTotal", json);
+    }
+
+    [Fact]
+    public void The_tally_totals_every_cause_it_carries()
+    {
+        // THE DENOMINATOR, ENUMERATED, because Total is a hand-written sum over a
+        // record that has now moved twice and a member left out of it reads as a
+        // batch that lost fewer files than it did. One member at 1 and the rest at
+        // their default, so what each contributes is attributable to it alone.
+        var members = typeof(HeldBackReasons).GetConstructors()
+            .OrderByDescending(c => c.GetParameters().Length).First().GetParameters();
+
+        Assert.True(members.Length >= 4,
+            $"HeldBackReasons has {members.Length} parameters, which is too few for this walk "
+            + "to be measuring what it claims.");
+        Assert.All(members, p => Assert.Equal(typeof(int), p.ParameterType));
+
+        var missing = new List<string>();
+        foreach (var member in members)
+        {
+            var args = new object[members.Length];
+            for (var i = 0; i < args.Length; i++) args[i] = 0;
+            args[member.Position] = 1;
+
+            var tally = (HeldBackReasons)members[0].Member
+                .DeclaringType!.GetConstructors()
+                .OrderByDescending(c => c.GetParameters().Length).First().Invoke(args);
+            if (tally.Total != 1) missing.Add(member.Name!);
+        }
+
+        Assert.True(missing.Count == 0,
+            "HeldBackReasons.Total does not count every cause it carries, so a batch reports "
+            + "fewer files kept back than it kept: " + string.Join(", ", missing));
     }
 
     [Fact]

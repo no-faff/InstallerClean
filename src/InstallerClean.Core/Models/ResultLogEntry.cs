@@ -847,12 +847,23 @@ public sealed record ScanInfo(
 /// to sit through is not otherwise knowable. Zero on a scan-only run, where no
 /// operation ran to time.
 ///
-/// The five held-back counts are the act-time re-verify's, and they are NOT the
-/// scan's withholding: this is what stopped qualifying between the list appearing
-/// and the button being pressed, where <c>scan.withheldPatchCount</c> is what
-/// never reached the list at all. They are five numbers rather than one because a
-/// single batch can meet several causes and one cause named for the set would be
-/// false of some of its members; they are not summed here for the same reason.
+/// The held-back counts are the act-time re-verify's, and they are NOT the scan's
+/// withholding: this is what stopped qualifying between the list appearing and the
+/// button being pressed, where <c>scan.withheldPatchCount</c> is what never reached
+/// the list at all. They are several numbers rather than one because a single batch
+/// can meet more than one cause and a cause named for the set would be false of some
+/// of its members; they are not summed here for the same reason.
+///
+/// THE COUNT IS DELIBERATELY NOT WRITTEN HERE. This note said "the five held-back
+/// counts" while there were three, having been correct before two of them left with
+/// the check that produced them, and a figure in prose beside a list that moves is a
+/// figure that goes stale silently. The list below is the count.
+///
+/// THE FOURTH ARRIVED AS A REQUIRED KEY RATHER THAN AN OPTIONAL ONE, and the window
+/// for that closes at the tag. The receiver may only start requiring a key while no
+/// schema-4 client has shipped; after that, requiring it would reject the very
+/// version that introduced it, so it could never be required at all and a machine
+/// could stop sending it with nothing to see. Receiver deployed first, client second.
 /// </summary>
 public sealed record OperationInfo(
     string Kind,
@@ -865,11 +876,12 @@ public sealed record OperationInfo(
     string? MoveDestinationKind,
     int HeldBackReclaimed,
     int HeldBackRecordsChanged,
-    int HeldBackRecordsUnreadable)
+    int HeldBackRecordsUnreadable,
+    int HeldBackOwnershipUnestablished)
 {
     public static OperationInfo ScanOnly() =>
         new(OperationKinds.Scan, OperationOutcomes.NoFiles, 0, 0, 0, 0,
-            Array.Empty<ErrorBucket>(), null, 0, 0, 0);
+            Array.Empty<ErrorBucket>(), null, 0, 0, 0, 0);
 
     public static OperationInfo FromMove(MoveResult result, long bytesFreed, long durationMs,
         string moveDestinationKind, HeldBackReasons heldBack) =>
@@ -884,7 +896,8 @@ public sealed record OperationInfo(
             moveDestinationKind,
             heldBack.Reclaimed,
             heldBack.RecordsChanged,
-            heldBack.RecordsUnreadable);
+            heldBack.RecordsUnreadable,
+            heldBack.OwnershipUnestablished);
 
     public static OperationInfo FromDelete(DeleteResult result, long bytesFreed, long durationMs,
         HeldBackReasons heldBack) =>
@@ -899,7 +912,8 @@ public sealed record OperationInfo(
             null,
             heldBack.Reclaimed,
             heldBack.RecordsChanged,
-            heldBack.RecordsUnreadable);
+            heldBack.RecordsUnreadable,
+            heldBack.OwnershipUnestablished);
 
     /// <summary>
     /// The outcome label, decided from the two counts the finished batch

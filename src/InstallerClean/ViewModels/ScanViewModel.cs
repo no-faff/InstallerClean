@@ -137,6 +137,21 @@ public partial class ScanViewModel : ObservableObject
     private int _missingFromDiskCount;
 
     /// <summary>
+    /// How many files this scan held back after emptying its walk-derived offer in
+    /// one go, or zero on any other run. Both the flag and the line below are read
+    /// off it, so a machine cannot show the sentence and no number or the reverse.
+    ///
+    /// IT IS NOT THE WHOLE WITHHELD COUNT and must not be pointed at it. The
+    /// left-alone line above counts every file the scan declined to offer, from two
+    /// separate decisions; this counts the ones the wholesale branch took, which is
+    /// the population the sentence is about.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasNothingListed))]
+    [NotifyPropertyChangedFor(nameof(NothingListedText))]
+    private int _nothingListedCount;
+
+    /// <summary>
     /// The programs those files belong to, as the one phrase the line names them
     /// in, already capped and joined by <see cref="MissingFilesReport"/> so the
     /// window and the command line say the same thing. Empty when there are none.
@@ -254,6 +269,45 @@ public partial class ScanViewModel : ObservableObject
 
     public string RecordsNotMatchedText => Strings.Summary_RecordsNotMatched;
 
+    /// <summary>
+    /// True where this scan emptied its walk-derived offer in one go and something
+    /// IS still on the list, which is the only machine that reads this sentence.
+    ///
+    /// WHY THE COUNT GATES IT AS WELL AS CARRYING THE NUMBER. A run that took that
+    /// branch and found no unclaimed candidates held nothing back, and a line saying
+    /// it held back none of them would be absurd on a machine that is simply tidy.
+    /// The scan already answers that question, so this reads its answer rather than
+    /// asking a second time.
+    ///
+    /// AND THE OTHER MACHINE THIS DOES NOT COVER IS COVERED ELSEWHERE. Where nothing
+    /// at all is offered the user never reaches this window's list: the completion
+    /// screen replaces the surface and says the same thing in its own words.
+    ///
+    /// ONE SOURCE, WHICH IS WHY THE OFFER'S OWN STATE IS FOLDED INTO THE COUNT RATHER
+    /// THAN READ HERE. A predicate over two observable properties has to be notified
+    /// from both, and this one is set before the flag that would notify it: it would
+    /// have been computed once, while the offer still read empty, and never asked
+    /// again. The line would then never appear on the one machine it is for, with a
+    /// green build and nothing to see.
+    /// </summary>
+    public bool HasNothingListed => NothingListedCount > 0;
+
+    /// <summary>
+    /// The sentence, and it exists because the explanation above the list states two
+    /// criteria for listing a file and on this machine the first one did not run.
+    /// Files no program claims are in that folder and were held back rather than
+    /// listed, so a reader taking that explanation as the rule behind the list would
+    /// conclude there were none. It names no cause, several findings reaching the
+    /// same branch.
+    /// </summary>
+    public string NothingListedText =>
+        string.Format(
+            DisplayHelpers.Pluralise(NothingListedCount,
+                Strings.Summary_NothingListed_Singular,
+                Strings.Summary_NothingListed_Plural,
+                "Summary.NothingListed"),
+            NothingListedCount, DisplayHelpers.PluraliseFile(NothingListedCount));
+
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));
 
@@ -333,6 +387,17 @@ public partial class ScanViewModel : ObservableObject
             MissingFromDiskCount = result.MissingAffectedCount;
             MissingFromDiskPrograms = missingPrograms;
             UnaccountedProductCount = result.UnaccountedProductCount;
+            // Off the flag rather than off the withheld list's own length: that list
+            // is filled by two separate decisions and only one of them is what this
+            // sentence is about. The flag is false on a run whose wholesale branch
+            // caught nothing, which is what keeps the line off a tidy machine.
+            //
+            // AND ZERO WHERE NOTHING IS OFFERED, because that machine gets the
+            // completion screen instead and never reads this window's list. Folded in
+            // here rather than into the predicate so the property has one input; see
+            // its own note for what a second input would have cost.
+            NothingListedCount =
+                result.WalkOfferWithheldWholesale && orphanedCount > 0 ? withheld.Count : 0;
             HasScanned = true;
         }
         finally

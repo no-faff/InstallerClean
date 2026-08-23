@@ -405,6 +405,8 @@ public static class Strings
     public static string Summary_MissingFromDisk_Singular => Get("Summary.MissingFromDisk.Singular");
     public static string Summary_MissingFromDisk_Unnamed_Plural => Get("Summary.MissingFromDisk.Unnamed.Plural");
     public static string Summary_MissingFromDisk_Unnamed_Singular => Get("Summary.MissingFromDisk.Unnamed.Singular");
+    public static string Summary_NothingListed_Plural => Get("Summary.NothingListed.Plural");
+    public static string Summary_NothingListed_Singular => Get("Summary.NothingListed.Singular");
     public static string Summary_OperationFiles => Get("Summary.OperationFiles");
     public static string Summary_OrphanedToCleanUp_Plural => Get("Summary.OrphanedToCleanUp.Plural");
     public static string Summary_OrphanedToCleanUp_Singular => Get("Summary.OrphanedToCleanUp.Singular");

@@ -346,6 +346,28 @@
                            Margin="{StaticResource GapTop.Sm}"
                            AutomationProperties.LiveSetting="Polite"/>
 
+                <!-- The walk-derived half of the offer was emptied and something is
+                     still on the list. It earns a line because the explanation at the
+                     top of this window states two criteria for listing a file and on
+                     this machine the first one did not run: files no program claims
+                     are in that folder and were held back rather than listed, so a
+                     reader taking that explanation as the rule behind the list
+                     concludes there were none of them.
+
+                     Same low-emphasis treatment as the two lines above, and the same
+                     Polite live setting, because it is a fact about the scan rather
+                     than something to act on. It cannot appear beside them on the
+                     all-clear: with nothing offered the completion screen replaces
+                     this surface and carries the same sentence in its own words. -->
+                <TextBlock x:Name="NothingListedText"
+                           Visibility="{Binding Scan.HasNothingListed, Converter={StaticResource BoolToVis}}"
+                           Text="{Binding Scan.NothingListedText}"
+                           Foreground="{StaticResource Text.Muted}"
+                           FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
+                           TextWrapping="Wrap"
+                           Margin="{StaticResource GapTop.Sm}"
+                           AutomationProperties.LiveSetting="Polite"/>
+
             </StackPanel>
             </ScrollViewer>
 
