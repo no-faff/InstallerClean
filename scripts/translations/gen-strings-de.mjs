@@ -502,7 +502,7 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `Windows hat Einträge für {0} Dateien, die nicht in {InstallerFolder} liegen: {1}. Im Alltag machen sie keine Probleme, aber eine Reparatur, ein Update oder eine Deinstallation kann daran scheitern. Das Installationsprogramm des jeweiligen Programms noch einmal auszuführen, möglichst in derselben Version, stellt die Dateien meist wieder her.`,
   'Cli.MoveNotEnoughSpace': `Fehler: nicht genügend Speicherplatz unter {0}. Das Verschieben dieser Dateien braucht {1}, frei sind {2}. Es wurde nichts verschoben.`,
   'Cli.PendingRebootBlocked.Other': `Fehler: Windows Installer hat etwas in Arbeit, deshalb sind /m und /d blockiert. InstallerClean fasst {InstallerFolder} nicht an, während sich der Ordner ändert. Versuche es erneut, sobald es fertig ist.`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.FoundNoOrphans': `Keine nicht benötigten Dateien gefunden.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean konnte den Sicherungsordner nicht mehr bestätigen und hat deshalb angehalten, statt an die falsche Stelle zu schreiben. Prüfe {0} und führe den Befehl dann erneut aus.`,
   'Cli.Help.Summary': `Entfernt .msi-/.msp-Dateien, die kein installiertes Programm mehr braucht.`,
   'Cli.Help.Elevation': `Nur mit Administratorrechten; Windows startet es sonst gar nicht.`,

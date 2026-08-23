@@ -40,13 +40,18 @@ const KEEP_ENGLISH = new Set([
 
 // Per-language keeps: empty for Korean. 패치 is a Hangul translation of "patch",
 // not an English keep.
-const ALSO_KEEP = [];
+const ALSO_KEEP = [
+  // The list separator Korean uses is the one English uses. A punctuation
+  // mark rather than a word, so there is nothing to translate and nothing to
+  // get wrong; only ja and zh-Hans differ, taking the ideographic comma.
+  'Display.ListSeparator',       // ", "
+];
 
 const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `정보`,
-  'Window.Registered.Title': `Files left alone`,
+  'Window.Registered.Title': `그대로 둔 파일`,
   'Window.Orphaned.Title': `안전하게 삭제할 수 있는 불필요한 파일`,
 
   // Section headings
@@ -57,7 +62,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `패치`,
   'Section.Registered.Details': `제품 세부 정보`,
-  'Section.Backup.Folder': `BACKUP FOLDER`,
+  'Section.Backup.Folder': `대상 폴더`,
   'Section.SayThanks': `감사 인사`,
 
   // Field labels (used in detail panels)
@@ -97,7 +102,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `GitHub에 별 남기기(_S)`,
   'Action.Licence': `Apache 2.0 라이선스`,
   'Action.Move': `이동(_M)`,
-  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
+  'Action.BackupFolderPlaceholder': `삭제하지 않고 이동할 경우 사용할 폴더 경로입니다.`,
   'Action.OpenReleasePage': `릴리스 페이지 열기(_R)`,
   'Action.Rescan': `다시 검사(_R)`,
   'Action.ScanAgain': `다시 검사(_S)`,
@@ -115,7 +120,7 @@ const MAP = {
   'Automation.CloseResult': `결과를 닫고 메인 창으로 돌아가기`,
   'Automation.LeaveStarOnGitHub.About': `github에 별 남기기`,
   'Automation.Minimise': `최소화`,
-  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
+  'Automation.ConfirmDelete': `영구 삭제하면 불필요한 파일이 제거됩니다. 취소하면 아무것도 삭제하지 않고 닫습니다.`,
   'Automation.ConfirmMove': `이동하면 불필요한 파일이 선택한 대상 폴더에 들어갑니다. 취소하면 파일은 있던 자리에 그대로 남습니다.`,
   'Automation.SayThanks': `감사 인사`,
   'Automation.ConfirmSendResultLog': `보내기를 누르면 표시된 보고서가 No Faff에 전송됩니다. 취소하면 아무것도 보내지 않습니다.`,
@@ -123,17 +128,17 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `github의 릴리스 페이지에서 새 버전이 있는지 확인합니다.`,
   'Automation.UpdateAvailable.HelpText': `새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요.`,
   'Automation.Licence.HelpText': `브라우저에서 github.com의 라이선스 파일을 엽니다.`,
-  'Automation.Section.BackupFolder': `Backup folder`,
+  'Automation.Section.BackupFolder': `대상 폴더`,
   'Automation.Section.Patches': `패치`,
   'Automation.Section.ProductDetails': `제품 세부 정보`,
-  'Automation.BackupFolder': `Backup folder`,
+  'Automation.BackupFolder': `대상 폴더`,
   'Automation.OperationProgress': `작업 진행 상황`,
   'Automation.RescanInstaller': `{InstallerFolder} 다시 검사`,
   'Automation.ScanningProgress': `검사 진행 상황`,
   'Automation.StartupScanProgress': `시작 검사 진행 상황`,
   'Automation.ViewOrphanedFiles': `세부 정보, 불필요한 파일`,
   'Automation.ViewOrphanedFiles.HelpText': `정리할 수 있습니다.`,
-  'Automation.ViewRegisteredFiles': `Details, files left alone`,
+  'Automation.ViewRegisteredFiles': `세부 정보, 그대로 둔 파일`,
   'Automation.ViewRegisteredFiles.HelpText': `읽기 전용 목록입니다.`,
   'Automation.SortStatus.Ascending': `{0} 기준 오름차순 정렬됨`,
   'Automation.SortStatus.Descending': `{0} 기준 내림차순 정렬됨`,
@@ -153,22 +158,22 @@ const MAP = {
   'Tooltip.Minimise': `최소화`,
   'Tooltip.SendResultLog': `보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.`,
   'Tooltip.SendResultLog.NothingFound': `보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.`,
-  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
+  'Tooltip.Move': `불필요한 파일을 대상 폴더로 옮깁니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.`,
+  'Tooltip.MoveNeedsDestination': `불필요한 파일을 대상 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.`,
+  'Tooltip.Delete': `불필요한 파일을 영구히 삭제합니다. 안전하게 제거할 수 있으며 공간은 바로 돌아옵니다.`,
   'Tooltip.SigningCertificate': `내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
-  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
-  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
+  'Body.MainExplanation.Lead': `아래에 있는 불필요한 파일은 모두 [안전하게 삭제할 수 있습니다].`,
+  'Body.MainExplanation.Why': `이 파일들은 {InstallerFolder}에 있습니다. InstallerClean은 설치된 모든 프로그램에 대해 Windows에 문의합니다. 어떤 프로그램도 자기 것이라고 하지 않거나({0}), 더 새로운 패치가 그 파일을 대체했고 어떤 프로그램도 그 파일로 되돌아갈 수 없을 때({1}) 목록에 오릅니다.`,
+  'Body.MainExplanation.Action': `직접 고른 대상 폴더로 옮긴 다음, 프로그램들이 여전히 평소처럼 업데이트되고 복구되고 제거되는 것을 확인하면 그 폴더를 삭제하세요. {InstallerFolder}에 다시 넣으면 모든 것이 원래대로 돌아옵니다. 아니면 지금 바로 영구 삭제하세요.`,
+  'Body.PendingReboot.MsiExecuteMutex': `지금 무언가가 Windows Installer를 사용하고 있습니다. Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램일 수 있습니다. 그동안 이동과 삭제는 일시 중지되어, InstallerClean이 변경 중인 {InstallerFolder}를 건드리지 않습니다. 끝나면 다시 검사하면 두 기능이 돌아옵니다.`,
+  'Body.PendingReboot.InstallerInProgress': `이 컴퓨터에 이전 Windows Installer 트랜잭션이 중단된 채 남아 있습니다. {InstallerFolder}를 정리하기 전에 그 설치를 계속하거나 되돌리세요(또는 Windows를 다시 시작하세요).`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows가 다음 재시작 때 처리할 파일 이름 변경을 대기열에 넣어 두었고, 그 대상이 {InstallerFolder}입니다. 정리하기 전에 Windows를 다시 시작하세요.`,
   'Body.NoFileSelected': `세부 정보를 보려면 파일을 선택하세요.`,
   'Body.NoProductSelected': `세부 정보를 보려면 제품을 선택하세요.`,
   'Body.NoMetadata': `사용할 수 있는 메타데이터가 없습니다.`,
-  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.`,
+  'Body.RegisteredMissingFromDisk': `이 설치 관리자 파일이 없습니다. 지금은 아무 문제도 일으키지 않으며, 이 파일이 속한 프로그램을 복구하거나 업데이트하거나 제거하려는 날이 오기 전까지는 문제가 되지 않습니다. 그때는 Windows가 이 파일을 찾는데 파일이 없으므로 그 단계가 실패할 수 있습니다.&#10;&#10;해결을 시도하려면 해당 프로그램의 설치 관리자를 제조사에서 내려받아 기존 설치본 위에 실행하세요(먼저 제거하지 마세요. 제거 자체가 이 파일을 필요로 하는 단계입니다). 구할 수 있다면 설치되어 있는 것과 같은 버전을 사용하세요. Windows가 다른 버전을 거부할 수 있습니다. 이렇게 하면 파일이 복구되고 설정은 그대로 유지되는 것이 보통이지만 Microsoft가 보장하지는 않으며, Microsoft의 최후 수단은 프로그램을 다시 설치하는 것입니다.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README에는 Microsoft의 표현 그대로 [이 폴더에 대한 설명]과 파일을 복구하는 방법이 담겨 있습니다.`,
   'Body.NoPatches': `(없음)`,
 
@@ -198,8 +203,8 @@ const MAP = {
   'Status.PreparingDestination': `대상 폴더를 준비하는 중...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Moving unneeded files...`,
-  'Status.Deleting': `Deleting unneeded files...`,
+  'Status.Moving': `불필요한 파일 이동 중...`,
+  'Status.Deleting': `불필요한 파일 삭제 중...`,
   'Status.MoveCancelled.Partial': `이동이 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.`,
   'Status.DeleteCancelled.Partial': `삭제가 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.`,
   'Status.MoveFailed': `이동 실패 ({0}). 자세한 내용은 {1}에 있습니다.`,
@@ -239,27 +244,31 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Singular': `{1} {0}개 영구 삭제됨`,
+  'Completion.PermanentDeleteSummary.Plural': `{1} {0}개 영구 삭제됨`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
-  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
+  'Summary.RegisteredStillUsed.Singular': `파일 {0}개 그대로 둠`,
+  'Summary.RegisteredStillUsed.Plural': `파일 {0}개 그대로 둠`,
   'Summary.OrphanedToCleanUp.Singular': `정리할 불필요한 파일 {0}개`,
   'Summary.OrphanedToCleanUp.Plural': `정리할 불필요한 파일 {0}개`,
-  'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
-  'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Singular': `{InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 무엇을 해야 하는지는 세부 정보를 열어 확인하세요.`,
+  'Summary.MissingFromDisk.Plural': `{InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 무엇을 해야 하는지는 세부 정보를 열어 확인하세요.`,
+  'Summary.MissingFromDisk.OtherPrograms.Singular': `다른 프로그램 {0}개`,
+  'Summary.MissingFromDisk.OtherPrograms.Plural': `다른 프로그램 {0}개`,
+  'Summary.MissingFromDisk.Unnamed.Singular': `기록에 프로그램 이름이 없는 파일 {0}개`,
+  'Summary.MissingFromDisk.Unnamed.Plural': `기록에 프로그램 이름이 없는 파일 {0}개`,
 
   // 0 = current file count, 1 = total count, 2 = pluralised noun.
   'Summary.OperationFiles': `{2} {1}개 중 {0}개`,
 
   // Orphaned-window footer. 0 = orphaned count, 1 = superseded count,
   // 2 = obsoleted count, 3 = size display.
-  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
+  'Summary.OrphanedWindow': `불필요한 {1} {0}개 ({2})`,
 
   // Registered-window footer. 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
+  'Summary.RegisteredWindow.Singular': `파일 {0}개 그대로 둠 ({1})`,
+  'Summary.RegisteredWindow.Plural': `파일 {0}개 그대로 둠 ({1})`,
 
   // Confirmation dialogs
 
@@ -267,7 +276,7 @@ const MAP = {
   'Confirm.MoveTitle': `{1} {0}개를 이동하시겠습니까? ({2})`,
 
   // 0 = destination path
-  'Confirm.MoveDestination': `Move to:`,
+  'Confirm.MoveDestination': `이동할 위치:`,
   'Confirm.DeleteTitle': `{1} {0}개를 삭제하시겠습니까? ({2})`,
 
   // Error messages
@@ -287,7 +296,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `대상은 Windows Installer 폴더 안에 있을 수 없습니다.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `대상 {0}이(가) Windows 시스템 폴더 아래로 확인됩니다. %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%, %ProgramData% 바깥의 경로를 선택하세요.`,
   'Error.NotEnoughSpaceTitle': `공간 부족`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -307,8 +316,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows가 이 파일에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다.`,
   'Error.AccessDenied.Plural': `Windows가 이 파일들에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다.`,
-  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
-  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
+  'Error.FileInUse.Singular': `이 파일은 다른 프로그램이 열어 두었거나 잠가 두어서 지금은 어떤 것도 제거할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도하세요.`,
+  'Error.FileInUse.Plural': `이 파일들은 다른 프로그램이 열어 두었거나 잠가 두어서 지금은 어떤 것도 제거할 수 없습니다. 파일들은 그대로 두었습니다. 나중에 다시 시도하세요.`,
   'Error.IOFailure.Singular': `Windows가 파일 오류를 알렸습니다. 파일은 그대로 두었습니다.`,
   'Error.IOFailure.Plural': `Windows가 파일 오류를 알렸습니다. 이 파일들은 그대로 두었습니다.`,
   'Error.UnknownError.Singular': `이 파일에서 문제가 발생했습니다. 파일은 그대로 두었습니다.`,
@@ -320,7 +329,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
+  'Error.DestinationNotFullyQualified': `대상 폴더는 드라이브 문자나 네트워크 공유로 시작하는 폴더의 전체 경로여야 합니다(예: D:\\Backup 또는 \\\\server\\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0}`,
   'BrowserLaunch.FailedTitle': `브라우저를 열 수 없음`,
   'UpdateCheck.Title': `업데이트 확인`,
   'UpdateCheck.Status.Checking': `확인 중...`,
@@ -340,7 +349,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean이 브라우저를 열지 못했고, 링크를 클립보드에 복사하지도 못했습니다. 링크는 다음과 같습니다:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean이 대상 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `{0}에 쓸 수 없습니다.`,
@@ -390,9 +399,10 @@ const MAP = {
   'Display.Size.B': `{0} B`,
   'Display.Elapsed.Ms': `{0:F0}ms`,
   'Display.Elapsed.S': `{0:F1}s`,
+  'Display.ListSeparator': `, `,
   'Display.ElapsedLong.LessThanASecond': `1초 미만`,
   'Display.ElapsedLong.Seconds': `{0:F1}초`,
-  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log에는 InstallerClean의 처리되지 않은 예외가 기록됩니다.\n# 권한이 상승된 상태에서는 프레임워크의 예외 메시지에 실행 중인\n# 세션의 파일 경로가 포함될 수 있습니다(Windows Installer 쿼리가\n# 열거한 다른 사용자의 프로필 포함). 업데이트 확인이나 결과 로그\n# 전송의 네트워크 실패 메시지에는 대상 URL과 확인된 IP 또는 프록시\n# 주소가 포함될 수 있습니다. 읽을 수 없는 Windows Installer 기록에\n# 대한 항목에는 Windows 계정 SID(S-1-5-21-...)와 설치된 소프트웨어의\n# 제품 코드가 포함될 수 있습니다.\n# 이 파일을 공개 버그 신고에 첨부하기 전에 세 가지 정보를 모두\n# 지우세요.\n`,
   'Tooltip.ChangeLanguage': `언어를 변경합니다. 프로그램이 다시 시작됩니다.`,
   'Automation.ChangeLanguage': `언어 변경`,
   'Automation.ChangeLanguage.HelpText': `프로그램이 다시 시작됩니다.`,
@@ -401,53 +411,53 @@ const MAP = {
   // Descriptions translated; command tokens, flags, the {InstallerFolder} token
   // and the exit-code numbers verbatim; leading spaces kept (the screen is
   // column-aligned for a monospace terminal); PATH metavariable -> 경로.
-  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
+  'Cli.UnknownArgument': `오류: 알 수 없는 인수 '{0}'`,
   'Cli.Cancelling': `취소 중...`,
   'Cli.Cancelled': `취소되었습니다.`,
-  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
-  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
+  'Cli.GenericError': `오류: 예상치 못한 실패({0}). 자세한 내용을 {1}에 기록했습니다.`,
+  'Cli.GenericError.NoLog': `오류: 예상치 못한 실패({0}). 크래시 로그를 기록하지 못했습니다.`,
   'Cli.ScanningInstaller': `{InstallerFolder} 검사 중...`,
-  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
-  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
+  'Cli.FoundOrphans': `정리할 불필요한 {1} {0}개를 찾았습니다 ({2}).`,
+  'Cli.DeletingFiles': `불필요한 {1} {0}개 삭제 중...`,
+  'Cli.DeletedFiles': `불필요한 {1} {0}개를 영구 삭제했습니다.`,
   'Cli.NoMoveDestination': `오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.)`,
   'Cli.MoveDestinationInsideInstaller': `오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다.`,
   'Cli.MoveDestinationRelative': `오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
-  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
+  'Cli.MoveDestinationInSystemFolder': `오류: 대상 {0}이(가) Windows 시스템 폴더 아래로 확인됩니다. %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%, %ProgramData% 바깥의 경로를 선택하세요.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `오류: 지금 무언가가 Windows Installer를 사용하고 있습니다. Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램일 수 있습니다. 그동안 /m과 /d는 차단됩니다. 끝나면 다시 시도하세요.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `오류: 이 컴퓨터에 이전 Windows Installer 트랜잭션이 중단된 채 남아 있습니다. {InstallerFolder}를 정리하기 전에 그 설치를 계속하거나 되돌리세요(또는 Windows를 다시 시작하세요).`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `오류: 재시작 후에 처리하도록 대기열에 든 파일 작업이 {InstallerFolder}를 대상으로 합니다({0}). 정리하기 전에 Windows를 다시 시작해 그 작업을 끝내세요.`,
+  'Cli.MovingFiles': `불필요한 {1} {0}개를 {2}(으)로 이동 중...`,
+  'Cli.MovedFiles': `불필요한 {1} {0}개를 이동했습니다.`,
   'Cli.MutexBlocked': `다른 InstallerClean 프로세스가 단일 인스턴스 잠금을 보유하고 있습니다(GUI 또는 다른 CLI 실행). 종료 코드 75(일시적); 나중에 다시 시도해도 안전합니다.`,
   'Cli.EventLogUnavailable': `참고: 이벤트 로그 쓰기에 실패했습니다. 응용 프로그램 로그 권한 또는 그룹 정책을 확인하세요.`,
   'Cli.Help.Header': `InstallerClean - {InstallerFolder} 정리`,
   'Cli.Help.Usage': `사용법:`,
   'Cli.Help.Help': `  installerclean-cli --help     이 도움말 표시 (/?, -h도 사용 가능)`,
   'Cli.Help.Version': `  installerclean-cli --version  버전 출력 (-v도 사용 가능)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         검사만 - 불필요한 파일 나열`,
+  'Cli.Help.Delete': `  installerclean-cli /d         불필요한 파일 영구 삭제`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         저장된 대상 폴더로 이동`,
   'Cli.Help.MovePath': `  installerclean-cli /m 경로    지정한 경로로 이동`,
-  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
+  'Cli.Help.NoteLine1': `installerclean-cli는 끝날 때까지 프롬프트를 붙잡고 있으므로 스크립트나&#10;예약 작업이 이를 기다릴 수 있습니다.`,
   'Cli.Help.ExitCodesHeader': `종료 코드:`,
-  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
-  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
-  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
+  'Cli.Help.ExitCodeOk': `  0   성공: 요청한 일을 했고 실패한 것이 없음`,
+  'Cli.Help.ExitCodeError': `  1   실패: 아무것도 처리되지 않음 (잘못된 인수나 대상,&#10;       검사 실패 또는 모든 파일 실패)`,
+  'Cli.Help.ExitCodePartial': `  2   부분: 일부는 처리되고 일부는 안 됨 (실패 또는 Ctrl+C)`,
   'Cli.Help.ExitCodeTransient': `  75  일시적: 일시적인 상황으로 실행이 차단됨 (메시지 참고)`,
   'Cli.Help.ExitCodeCancelled': `  130 취소됨 (Ctrl+C)`,
   'Body.NotScanned.Lead': `아직 검사하지 않았습니다.`,
   'Body.NotScanned.Why': `다시 검사를 눌러 {InstallerFolder}에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요.`,
-  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Confirm.MoveSameDrive': `그 폴더는 같은 드라이브에 있어서, 폴더를 삭제하기 전까지는 공간이 돌아오지 않습니다. 공간을 바로 확보하려면 다른 드라이브의 폴더를 선택하세요.`,
+  'Error.ScanCorrelationFailed': `InstallerClean이 Windows Installer 기록을 {InstallerFolder}의 내용과 대조하지 못했습니다. 기록이 가리키는 것 중 실제로 그곳에 있는 것이 거의 없고, 그곳에 있는 것 중 어떤 기록에도 이름이 없는 것이 거의 전부여서, 어떤 파일도 불필요하다고 밝힐 수 없었습니다. 아무것도 제시하지 않았고 아무것도 제거하지 않았습니다.`,
   'Error.CandidateOutsideCache': `이 파일은 Windows Installer 폴더 바로 아래에 있지 않습니다. 안전을 위해 거부했습니다.`,
-  'Completion.ReverifySkipped': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
+  'Completion.ReverifySkipped': `{1} {0}개를 그대로 두었습니다. 기록이 이제 검사에서 표시한 것을 자기 것이라고 하기 때문입니다.`,
   'Completion.MoveCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다.`,
   'Completion.PermanentDeleteCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다.`,
   'Body.PendingReboot.Lead': `지금은 이 파일들을 정리할 수 없습니다.`,
   'Cli.TooManyArguments': `오류: 예상치 못한 추가 인수 '{0}'. 이동 폴더 경로에 공백이 있으면 전체 경로를 큰따옴표로 묶으세요: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
-  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
+  'Cli.Help.MoveScheduledNote': `폴더는 사용자별로 저장되며, 예약 실행에는 /m 경로가 필요합니다.`,
+  'Completion.ReverifyIncomplete': `{1} {0}개를 그대로 두었습니다. 마지막 확인에서 Windows Installer 기록을 전부 읽지 못했기 때문입니다.`,
   'Error.ScanRecordsUnreadable': `InstallerClean이 무엇이 아직 필요한지 확신할 만큼 Windows Installer 기록을 읽지 못했습니다. 설치된 프로그램 목록이 일부 빠진 채로 돌아왔고, 같은 기록을 레지스트리에서 직접 읽는 것도 오류를 만났습니다. 어떤 파일을 가리키는 기록이 읽을 수 없는 것 중 하나였다는 이유만으로 그 파일이 고립된 것처럼 보일 수 있으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
@@ -459,41 +469,41 @@ const MAP = {
   'Automation.About.Guide.HelpText': `브라우저에서 github의 readme를 엽니다.`,
   'Automation.About.ReportProblem.HelpText': `브라우저에서 github.com의 이슈 트래커를 엽니다.`,
   'Automation.AutoUpdateCheck.HelpText': `선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다.`,
-  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
-  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
-  'Automation.Scroll.ProductDetails': `Product details`,
-  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
-  'Cli.TooManyArgumentsNoPath': `Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.`,
-  'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.`,
-  'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.`,
-  'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
-  'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.`,
-  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
-  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
+  'Tooltip.MoveSameDrive': `불필요한 파일을 대상 폴더로 옮깁니다. 그 폴더가 같은 드라이브에 있어서, 폴더를 삭제하거나 다른 드라이브로 옮기기 전까지는 공간을 되찾지 못합니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그렇게 하시면 됩니다.`,
+  'Completion.MoveRestoreHint.Singular': `그 폴더에 있는 파일은 [안전하게 제거할 수 있으므로], 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
+  'Completion.MoveRestoreHint.Plural': `그 폴더에 있는 파일들은 [안전하게 제거할 수 있으므로], 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `그 폴더에 있는 파일은 [안전하게 제거할 수 있으므로], 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `그 폴더에 있는 파일들은 [안전하게 제거할 수 있으므로], 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
+  'Confirm.DeletePermanently.Singular': `이 파일은 영구히 삭제됩니다. [안전하게 삭제할 수 있지만], 백업을 원하시면 대신 이동 단추를 사용하세요.`,
+  'Confirm.DeletePermanently.Plural': `파일들이 영구히 삭제됩니다. [안전하게 삭제할 수 있지만], 백업을 원하시면 대신 이동 단추를 사용하세요.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean이 Windows로부터 {InstallerFolder}의 실제 경로를 확인받지 못해서, 어떤 파일도 그 안에 있다고 밝힐 수 없었고 정리 대상으로 제시된 파일도 없습니다. 이번 검사가 아무것도 찾지 못한 것은 폴더가 깨끗해서가 아니라 그 확인이 실패했기 때문입니다. 아무것도 제거하지 않았습니다.`,
+  'Automation.Scroll.ProductDetails': `제품 세부 정보`,
+  'Body.PendingReboot.Other': `Windows Installer가 진행 중인 작업이 있어 이동과 삭제가 일시 중지되었습니다. InstallerClean은 변경 중인 {InstallerFolder}를 건드리지 않습니다. 끝나면 다시 검사하면 두 기능이 돌아옵니다.`,
+  'Cli.TooManyArgumentsNoPath': `오류: 예상치 못한 추가 인수 '{0}'. /s와 /d는 다른 인수를 받지 않으며, 한 번 실행에 플래그는 하나만 쓸 수 있습니다.`,
+  'Cli.MissingFromDisk.Singular': `{InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 그 프로그램의 설치 관리자를, 되도록 같은 버전으로 다시 실행하면 대개 파일이 복구됩니다.`,
+  'Cli.MissingFromDisk.Plural': `{InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 각 프로그램의 설치 관리자를, 되도록 같은 버전으로 다시 실행하면 대개 파일이 복구됩니다.`,
+  'Cli.MoveNotEnoughSpace': `오류: {0}에 공간이 부족합니다. 이 파일들을 옮기려면 {1}이(가) 필요한데 {2}만 남아 있습니다. 아무것도 이동하지 않았습니다.`,
+  'Cli.PendingRebootBlocked.Other': `오류: Windows Installer가 진행 중인 작업이 있어 /m과 /d가 차단되었습니다. InstallerClean은 변경 중인 {InstallerFolder}를 건드리지 않습니다. 끝나면 다시 시도하세요.`,
+  'Cli.FoundNoOrphans': `불필요한 파일을 찾지 못했습니다.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean이 대상 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요.`,
+  'Cli.Help.Summary': `설치된 어떤 프로그램도 더는 필요로 하지 않는 .msi/.msp 파일을 제거합니다.`,
+  'Cli.Help.Elevation': `관리자 명령 프롬프트가 필요하며, 아니면 Windows가 실행하지 않습니다.`,
   'Error.InstallerLockUnavailableTitle': `삭제된 파일 없음`,
-  'Error.MoveInstallerLockUnavailableTitle': `Nothing was moved`,
-  'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
-  'Error.MoveInstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
-  'Cli.MoveInstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
-  'Summary.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
-  'Cli.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
-  'Completion.ReverifyIdentityClaimed': `{0} {1} kept in place, because Windows has a record of the program named inside.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
-  'Completion.NothingRemoved': `Nothing removed`,
-  'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
-  'Completion.NothingOffered': `Nothing offered on this PC`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
+  'Error.MoveInstallerLockUnavailableTitle': `이동된 파일 없음`,
+  'Error.InstallerLockUnavailable': `두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 Windows Installer가 사용하는 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었고 아무것도 삭제하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.`,
+  'Error.MoveInstallerLockUnavailable': `두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 Windows Installer가 사용하는 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었고 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.`,
+  'Cli.InstallerLockUnavailable': `오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 삭제하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.`,
+  'Cli.MoveInstallerLockUnavailable': `오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.`,
+  'Completion.ReverifyRecordsChanged': `{1} {0}개를 그대로 두었습니다. 마지막 확인 시점에는 Windows Installer 기록이 이미 바뀌어 있었기 때문입니다.`,
+  'Summary.RecordsNotMatched': `InstallerClean이 Windows 기록에 있는 모든 것을 대조하지 못해서 전부 읽지는 못했습니다. 위의 불필요한 파일은 영향을 받지 않지만, {InstallerFolder}에서 빠진 파일에 대한 설명은 전체를 담고 있지 않을 수 있습니다. 다시 검사해서 한 번 더 시도해 보세요.`,
+  'Cli.RecordsNotMatched': `InstallerClean이 Windows 기록에 있는 모든 것을 대조하지 못해서 전부 읽지는 못했습니다. 찾아낸 것은 영향을 받지 않지만, {InstallerFolder}에서 빠진 파일에 대한 설명은 전체를 담고 있지 않을 수 있습니다. 다시 실행하면 더 찾아낼 수도 있습니다.`,
+  'Completion.ReverifyIdentityClaimed': `{1} {0}개를 그대로 두었습니다. 파일 안에 이름이 적힌 프로그램의 기록을 Windows가 가지고 있기 때문입니다.`,
+  'Completion.ReverifyIdentityUnreadable': `{1} {0}개를 그대로 두었습니다. InstallerClean이 파일 안에서 프로그램 이름을 찾지 못했기 때문입니다.`,
+  'Completion.NothingRemoved': `제거된 것 없음`,
+  'Error.ScanNoRegisteredFileInFolder': `InstallerClean이 Windows Installer 기록을 {InstallerFolder}의 내용과 대조하지 못했습니다. 폴더에 파일은 있지만 그 안의 어떤 것도 가리키는 기록이 하나도 없어서, 어떤 파일도 불필요하다고 밝힐 수 없었습니다. 아무것도 제시하지 않았고 아무것도 제거하지 않았습니다.`,
+  'Completion.NothingOffered': `이 PC에서는 아무것도 제시하지 않았습니다`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 하나({1})를 그대로 두었습니다.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 {0}개({1}) 전부를 그대로 두었습니다.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

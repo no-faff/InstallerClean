@@ -40,7 +40,12 @@ const KEEP_ENGLISH = new Set([
 
 // Per-language keeps: empty for Vietnamese, which translates every translatable
 // token (patch -> bản vá), so nothing beyond KEEP_ENGLISH stays English.
-const ALSO_KEEP = [];
+const ALSO_KEEP = [
+  // The list separator Vietnamese uses is the one English uses. A punctuation
+  // mark rather than a word, so there is nothing to translate and nothing to
+  // get wrong; only ja and zh-Hans differ, taking the ideographic comma.
+  'Display.ListSeparator',       // ", "
+];
 
 // Satellite-only plural overrides: empty. Vietnamese takes PluralCategory.Other
 // at every count, so the neutral's one/other pair covers every form the UI needs.
@@ -50,7 +55,7 @@ const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `Giới thiệu`,
-  'Window.Registered.Title': `Files left alone`,
+  'Window.Registered.Title': `Tệp được để nguyên`,
   'Window.Orphaned.Title': `Tệp không cần thiết, có thể xóa an toàn`,
 
   // Section headings
@@ -61,7 +66,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `BẢN VÁ`,
   'Section.Registered.Details': `CHI TIẾT SẢN PHẨM`,
-  'Section.Backup.Folder': `BACKUP FOLDER`,
+  'Section.Backup.Folder': `THƯ MỤC ĐÍCH`,
   'Section.SayThanks': `LỜI CẢM ƠN`,
 
   // Field labels (used in detail panels)
@@ -101,7 +106,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Gắn _sao trên GitHub`,
   'Action.Licence': `Giấy phép Apache 2.0`,
   'Action.Move': `_Chuyển`,
-  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
+  'Action.BackupFolderPlaceholder': `Đường dẫn thư mục nếu bạn chuyển thay vì xóa.`,
   'Action.OpenReleasePage': `_Mở trang phát hành`,
   'Action.Rescan': `_Quét lại`,
   'Action.ScanAgain': `Quét _lại`,
@@ -119,7 +124,7 @@ const MAP = {
   'Automation.CloseResult': `Đóng kết quả và quay lại cửa sổ chính`,
   'Automation.LeaveStarOnGitHub.About': `Gắn sao trên github`,
   'Automation.Minimise': `Thu nhỏ`,
-  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
+  'Automation.ConfirmDelete': `Xóa vĩnh viễn sẽ bỏ đi các tệp không cần thiết. Hủy sẽ đóng lại mà không xóa gì.`,
   'Automation.ConfirmMove': `Chuyển sẽ đặt các tệp không cần thiết vào thư mục đích đã chọn. Hủy sẽ để chúng nguyên chỗ cũ.`,
   'Automation.SayThanks': `Lời cảm ơn`,
   'Automation.ConfirmSendResultLog': `Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì.`,
@@ -127,17 +132,17 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Kiểm tra trang phát hành của github xem có phiên bản mới hơn không.`,
   'Automation.UpdateAvailable.HelpText': `Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại.`,
   'Automation.Licence.HelpText': `Mở tệp giấy phép trên github.com trong trình duyệt của bạn.`,
-  'Automation.Section.BackupFolder': `Backup folder`,
+  'Automation.Section.BackupFolder': `Thư mục đích`,
   'Automation.Section.Patches': `Bản vá`,
   'Automation.Section.ProductDetails': `Chi tiết sản phẩm`,
-  'Automation.BackupFolder': `Backup folder`,
+  'Automation.BackupFolder': `Thư mục đích`,
   'Automation.OperationProgress': `Tiến trình thao tác`,
   'Automation.RescanInstaller': `Quét lại {InstallerFolder}`,
   'Automation.ScanningProgress': `Tiến trình quét`,
   'Automation.StartupScanProgress': `Tiến trình quét khi khởi động`,
   'Automation.ViewOrphanedFiles': `Chi tiết, tệp không cần thiết`,
   'Automation.ViewOrphanedFiles.HelpText': `Có thể dọn dẹp.`,
-  'Automation.ViewRegisteredFiles': `Details, files left alone`,
+  'Automation.ViewRegisteredFiles': `Chi tiết, tệp được để nguyên`,
   'Automation.ViewRegisteredFiles.HelpText': `Danh sách chỉ đọc.`,
   'Automation.SortStatus.Ascending': `Đã sắp xếp theo {0}, tăng dần`,
   'Automation.SortStatus.Descending': `Đã sắp xếp theo {0}, giảm dần`,
@@ -157,22 +162,22 @@ const MAP = {
   'Tooltip.Minimise': `Thu nhỏ`,
   'Tooltip.SendResultLog': `Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.`,
   'Tooltip.SendResultLog.NothingFound': `Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.`,
-  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
+  'Tooltip.Move': `Chuyển các tệp không cần thiết vào thư mục đích. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
+  'Tooltip.MoveNeedsDestination': `Chuyển các tệp không cần thiết vào một thư mục đích. Bạn sẽ chọn thư mục ngay sau đây. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
+  'Tooltip.Delete': `Xóa vĩnh viễn các tệp không cần thiết. Chúng có thể bỏ đi an toàn, và bạn lấy lại dung lượng ngay lập tức.`,
   'Tooltip.SigningCertificate': `Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
-  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
-  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
+  'Body.MainExplanation.Lead': `Mọi tệp không cần thiết bên dưới đều [có thể xóa an toàn].`,
+  'Body.MainExplanation.Why': `Chúng nằm trong {InstallerFolder}. InstallerClean hỏi Windows về từng chương trình đã cài: một tệp được liệt kê khi không chương trình nào nhận nó ({0}), hoặc khi một bản vá mới hơn đã thay thế nó và không chương trình nào có thể quay lại dùng nó ({1}).`,
+  'Body.MainExplanation.Action': `Hãy chuyển chúng vào một thư mục đích do bạn chọn, rồi xóa thư mục đó khi bạn thấy các chương trình của mình vẫn cập nhật, sửa chữa và gỡ cài đặt như thường. Đặt chúng trở lại {InstallerFolder} sẽ khôi phục mọi thứ. Hoặc xóa vĩnh viễn ngay bây giờ.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Có thứ gì đó đang dùng Windows Installer ngay lúc này, chẳng hạn một bản cập nhật Windows hoặc một chương trình đang cài trong nền. Chuyển và Xóa tạm dừng trong lúc đó, để InstallerClean không đụng vào {InstallerFolder} khi thư mục đang thay đổi. Xong rồi thì quét lại, hai nút sẽ trở lại.`,
+  'Body.PendingReboot.InstallerInProgress': `Máy này có một giao dịch Windows Installer trước đó đang bị treo. Hãy tiếp tục hoặc hoàn tác lần cài đặt ấy (hoặc khởi động lại Windows) trước khi dọn {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows đã xếp hàng một thao tác đổi tên tệp cho lần khởi động tới, có ảnh hưởng tới {InstallerFolder}. Hãy khởi động lại Windows trước khi dọn.`,
   'Body.NoFileSelected': `Chọn một tệp để xem chi tiết.`,
   'Body.NoProductSelected': `Chọn một sản phẩm để xem chi tiết.`,
   'Body.NoMetadata': `Không có siêu dữ liệu.`,
-  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.`,
+  'Body.RegisteredMissingFromDisk': `Tệp cài đặt này bị thiếu. Hiện giờ nó không gây rắc rối gì, và sẽ không gây cho tới ngày bạn thử sửa chữa, cập nhật hoặc gỡ cài đặt chương trình mà nó thuộc về. Bước đó khi ấy có thể thất bại, vì Windows tìm tệp này mà không thấy.&#10;&#10;Để thử khắc phục, hãy tải bộ cài của chương trình đó từ nhà sản xuất và chạy đè lên bản bạn đang có (đừng gỡ cài đặt trước: việc gỡ cài đặt tự nó cũng là một bước cần tệp này). Nếu lấy được, hãy dùng đúng phiên bản bạn đã cài, vì Windows có thể từ chối một phiên bản khác. Cách này thường khôi phục được tệp và không đụng tới cài đặt của bạn, nhưng Microsoft không đảm bảo điều đó, và cách cuối cùng của chính họ là cài lại chương trình.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README [giải thích thư mục này], và cách khôi phục một tệp, bằng chính lời của Microsoft.`,
   'Body.NoPatches': `(không có)`,
 
@@ -202,8 +207,8 @@ const MAP = {
   'Status.PreparingDestination': `Đang chuẩn bị thư mục đích...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Moving unneeded files...`,
-  'Status.Deleting': `Deleting unneeded files...`,
+  'Status.Moving': `Đang chuyển các tệp không cần thiết...`,
+  'Status.Deleting': `Đang xóa các tệp không cần thiết...`,
   'Status.MoveCancelled.Partial': `Đã hủy chuyển. Đã xử lý {0}/{1} {2}.`,
   'Status.DeleteCancelled.Partial': `Đã hủy xóa. Đã xử lý {0}/{1} {2}.`,
   'Status.MoveFailed': `Chuyển thất bại ({0}). Chi tiết trong {1}.`,
@@ -243,16 +248,20 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Singular': `Đã xóa vĩnh viễn {0} {1}`,
+  'Completion.PermanentDeleteSummary.Plural': `Đã xóa vĩnh viễn {0} {1}`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
-  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
+  'Summary.RegisteredStillUsed.Singular': `{0} tệp được để nguyên`,
+  'Summary.RegisteredStillUsed.Plural': `{0} tệp được để nguyên`,
   'Summary.OrphanedToCleanUp.Singular': `{0} tệp không cần thiết để dọn`,
   'Summary.OrphanedToCleanUp.Plural': `{0} tệp không cần thiết để dọn`,
-  'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
-  'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Singular': `Windows có bản ghi cho {0} tệp không nằm trong {InstallerFolder}: {1}. Hằng ngày điều này không gây rắc rối, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt có thể thất bại vì nó. Hãy mở Chi tiết để biết phải làm gì.`,
+  'Summary.MissingFromDisk.Plural': `Windows có bản ghi cho {0} tệp không nằm trong {InstallerFolder}: {1}. Hằng ngày điều này không gây rắc rối, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt có thể thất bại vì chúng. Hãy mở Chi tiết để biết phải làm gì.`,
+  'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} chương trình khác`,
+  'Summary.MissingFromDisk.OtherPrograms.Plural': `{0} chương trình khác`,
+  'Summary.MissingFromDisk.Unnamed.Singular': `{0} tệp không có chương trình nào được nêu tên trong bản ghi`,
+  'Summary.MissingFromDisk.Unnamed.Plural': `{0} tệp không có chương trình nào được nêu tên trong bản ghi`,
 
   // 0 = current file count, 1 = total count, 2 = pluralised noun.
   'Summary.OperationFiles': `{0}/{1} {2}`,
@@ -261,12 +270,12 @@ const MAP = {
   // (true orphans, superseded patches, obsoleted patches). 0 = orphaned count,
   // 1 = superseded count, 2 = obsoleted count, 3 = size display. No trailing
   // noun, so it agrees at any count.
-  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
+  'Summary.OrphanedWindow': `{0} {1} không cần thiết ({2})`,
 
   // Registered-window footer, split singular/plural so the noun and verb agree at
   // one file ("file ... is" vs "files ... are"). 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} tệp được để nguyên ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} tệp được để nguyên ({1})`,
 
   // Confirmation dialogs
 
@@ -274,7 +283,7 @@ const MAP = {
   'Confirm.MoveTitle': `Chuyển {0} {1} ({2})?`,
 
   // 0 = destination path
-  'Confirm.MoveDestination': `Move to:`,
+  'Confirm.MoveDestination': `Chuyển tới:`,
   'Confirm.DeleteTitle': `Xóa {0} {1} ({2})?`,
 
   // Error messages
@@ -294,7 +303,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `Đích không thể nằm bên trong thư mục Windows Installer.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `Đích {0} phân giải vào bên trong một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% và %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Không đủ dung lượng`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -314,8 +323,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows từ chối truy cập tệp này; tệp được giữ nguyên tại chỗ.`,
   'Error.AccessDenied.Plural': `Windows từ chối truy cập các tệp này; các tệp được giữ nguyên tại chỗ.`,
-  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
-  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
+  'Error.FileInUse.Singular': `Tệp này đang được một chương trình khác mở hoặc khóa, nên lúc này không gì bỏ đi được. Nó đã được để nguyên; hãy thử lại sau.`,
+  'Error.FileInUse.Plural': `Các tệp này đang được một chương trình khác mở hoặc khóa, nên lúc này không gì bỏ đi được. Chúng đã được để nguyên; hãy thử lại sau.`,
   'Error.IOFailure.Singular': `Windows báo một lỗi tệp; tệp được giữ nguyên tại chỗ.`,
   'Error.IOFailure.Plural': `Windows báo lỗi tệp; các tệp này được giữ nguyên tại chỗ.`,
   'Error.UnknownError.Singular': `Đã có trục trặc với tệp này; tệp được giữ nguyên tại chỗ.`,
@@ -327,7 +336,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
+  'Error.DestinationNotFullyQualified': `Thư mục đích phải là một đường dẫn đầy đủ tới một thư mục, bắt đầu bằng ký tự ổ đĩa hoặc một chia sẻ mạng (ví dụ D:\\Backup, hoặc \\\\server\\backup). InstallerClean không dùng được cái này: {0}`,
   'BrowserLaunch.FailedTitle': `Không thể mở trình duyệt của bạn`,
   'UpdateCheck.Title': `Kiểm tra cập nhật`,
   'UpdateCheck.Status.Checking': `Đang kiểm tra...`,
@@ -347,7 +356,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng tạm. Liên kết là:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục đích, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lần nữa.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Không thể ghi vào {0}.`,
@@ -397,61 +406,62 @@ const MAP = {
   'Display.Size.B': `{0} B`,
   'Display.Elapsed.Ms': `{0:F0}ms`,
   'Display.Elapsed.S': `{0:F1}s`,
+  'Display.ListSeparator': `, `,
   'Display.ElapsedLong.LessThanASecond': `chưa đến một giây`,
   'Display.ElapsedLong.Seconds': `{0:F1} giây`,
-  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log ghi lại các ngoại lệ chưa xử lý của InstallerClean.\n# Khi chạy với quyền nâng cao, thông báo ngoại lệ của framework có thể\n# chứa đường dẫn tệp trong phiên đang chạy (kể cả hồ sơ của người dùng\n# khác do các truy vấn Windows Installer liệt kê). Thông báo lỗi mạng\n# từ việc kiểm tra cập nhật hoặc gửi nhật ký kết quả có thể chứa URL\n# đích và địa chỉ IP hoặc proxy đã phân giải. Các mục về bản ghi\n# Windows Installer không đọc được có thể chứa SID tài khoản Windows\n# (S-1-5-21-...) và mã sản phẩm của phần mềm đã cài.\n# Hãy xóa cả ba loại thông tin này trước khi đính kèm tệp này vào một\n# báo cáo lỗi công khai.\n`,
   'Tooltip.ChangeLanguage': `Thay đổi ngôn ngữ. Chương trình sẽ khởi động lại.`,
   'Automation.ChangeLanguage': `Thay đổi ngôn ngữ`,
   'Automation.ChangeLanguage.HelpText': `Chương trình sẽ khởi động lại.`,
 
   // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys.
-  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
+  'Cli.UnknownArgument': `Lỗi: đối số không rõ '{0}'`,
   'Cli.Cancelling': `Đang hủy...`,
   'Cli.Cancelled': `Đã hủy.`,
-  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
-  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
+  'Cli.GenericError': `Lỗi: sự cố không mong đợi ({0}). Chi tiết đã ghi vào {1}.`,
+  'Cli.GenericError.NoLog': `Lỗi: sự cố không mong đợi ({0}). Không ghi được nhật ký sự cố.`,
   'Cli.ScanningInstaller': `Đang quét {InstallerFolder}...`,
-  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
-  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
+  'Cli.FoundOrphans': `Đã tìm thấy {0} {1} không cần thiết để dọn ({2}).`,
+  'Cli.DeletingFiles': `Đang xóa {0} {1} không cần thiết...`,
+  'Cli.DeletedFiles': `Đã xóa vĩnh viễn {0} {1} không cần thiết.`,
   'Cli.NoMoveDestination': `Lỗi: chưa chỉ định đích để chuyển. Dùng /m ĐƯỜNG_DẪN. (Mặc định đặt trong GUI là theo từng người dùng và không áp dụng cho các lần chạy theo lịch hoặc bằng tài khoản dịch vụ.)`,
   'Cli.MoveDestinationInsideInstaller': `Lỗi: đích không thể nằm bên trong thư mục Windows Installer.`,
   'Cli.MoveDestinationRelative': `Lỗi: đích phải là một đường dẫn đầy đủ. Nhận được: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
-  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
+  'Cli.MoveDestinationInSystemFolder': `Lỗi: đích {0} phân giải vào bên trong một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% và %ProgramData%.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Lỗi: có thứ gì đó đang dùng Windows Installer ngay lúc này, chẳng hạn một bản cập nhật Windows hoặc một chương trình đang cài trong nền. /m và /d bị chặn trong lúc đó. Hãy thử lại khi xong.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Lỗi: máy này có một giao dịch Windows Installer trước đó đang bị treo. Hãy tiếp tục hoặc hoàn tác lần cài đặt ấy (hoặc khởi động lại Windows) trước khi dọn {InstallerFolder}.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Lỗi: một thao tác tệp đã xếp hàng sau khi khởi động lại có nhắm vào {InstallerFolder} ({0}). Hãy khởi động lại Windows để hoàn tất thao tác đó trước khi dọn.`,
+  'Cli.MovingFiles': `Đang chuyển {0} {1} không cần thiết tới {2}...`,
+  'Cli.MovedFiles': `Đã chuyển {0} {1} không cần thiết.`,
   'Cli.MutexBlocked': `Một tiến trình InstallerClean khác đang giữ khóa một-thực-thể (GUI hoặc một lần chạy CLI khác). Mã thoát 75 (tạm thời); có thể thử lại sau.`,
   'Cli.EventLogUnavailable': `Lưu ý: ghi vào Nhật ký sự kiện thất bại. Hãy kiểm tra quyền của nhật ký Ứng dụng hoặc Chính sách nhóm.`,
   'Cli.Help.Header': `InstallerClean - dọn dẹp {InstallerFolder}`,
   'Cli.Help.Usage': `Cách dùng:`,
   'Cli.Help.Help': `  installerclean-cli --help        Hiển thị trợ giúp (cũng nhận /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version     In ra phiên bản (cũng nhận -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s            Chỉ quét - liệt kê tệp không cần`,
+  'Cli.Help.Delete': `  installerclean-cli /d            Xóa vĩnh viễn tệp không cần thiết`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m            Chuyển tới thư mục đích đã lưu`,
   'Cli.Help.MovePath': `  installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định`,
-  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
+  'Cli.Help.NoteLine1': `installerclean-cli giữ dấu nhắc cho tới khi xong, để một tập lệnh hoặc&#10;một tác vụ theo lịch có thể chờ nó.`,
   'Cli.Help.ExitCodesHeader': `Mã thoát:`,
-  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
-  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
-  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
+  'Cli.Help.ExitCodeOk': `  0   thành công: đã làm đúng việc được yêu cầu, không có gì hỏng`,
+  'Cli.Help.ExitCodeError': `  1   thất bại: không xử lý gì (đối số hoặc đích sai, quét thất bại&#10;       hoặc mọi tệp đều lỗi)`,
+  'Cli.Help.ExitCodePartial': `  2   một phần: xử lý được một phần (một lỗi hoặc một Ctrl+C)`,
   'Cli.Help.ExitCodeTransient': `  75  tạm thời: một điều kiện tạm thời đã chặn lần chạy (xem thông báo)`,
   'Cli.Help.ExitCodeCancelled': `  130 đã hủy (Ctrl+C)`,
   'Body.NotScanned.Lead': `Chưa quét gì cả.`,
   'Body.NotScanned.Why': `Nhấn Quét lại để tìm trong {InstallerFolder} những tệp cài đặt mà không chương trình nào còn cần.`,
-  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Confirm.MoveSameDrive': `Thư mục đó nằm trên cùng một ổ đĩa, nên dung lượng chưa trở lại cho tới khi bạn xóa nó. Hãy chọn một thư mục trên ổ đĩa khác nếu bạn muốn có dung lượng ngay.`,
+  'Error.ScanCorrelationFailed': `InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Gần như không có thứ gì các bản ghi trỏ tới thực sự nằm ở đó, và gần như không có thứ gì ở đó được bản ghi nào nêu tên, nên không tệp nào có thể được chứng tỏ là không cần thiết. Không có gì được đề xuất và không có gì bị bỏ đi.`,
   'Error.CandidateOutsideCache': `Tệp này không nằm trực tiếp trong thư mục Windows Installer; bị từ chối vì lý do an toàn.`,
-  'Completion.ReverifySkipped': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
+  'Completion.ReverifySkipped': `Đã giữ nguyên {0} {1}, vì các bản ghi giờ đây nhận phần mà lần quét đã đánh dấu.`,
   'Completion.MoveCancelledSummary': `Đã chuyển {0}/{1} {2} trước khi bạn hủy.`,
   'Completion.PermanentDeleteCancelledSummary': `Đã xóa vĩnh viễn {0}/{1} {2} trước khi bạn hủy.`,
   'Body.PendingReboot.Lead': `Hiện chưa thể dọn những tệp này.`,
   'Cli.TooManyArguments': `Lỗi: có thêm đối số không mong đợi '{0}'. Nếu thư mục đích của bạn có dấu cách, hãy đặt cả đường dẫn trong dấu ngoặc kép: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
-  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
+  'Cli.Help.MoveScheduledNote': `Thư mục lưu theo từng người dùng; tác vụ theo lịch cần /m ĐƯỜNG_DẪN.`,
+  'Completion.ReverifyIncomplete': `Đã giữ nguyên {0} {1}, vì ở lần kiểm tra cuối, không đọc được đầy đủ các bản ghi Windows Installer.`,
   'Error.ScanRecordsUnreadable': `InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
@@ -463,41 +473,41 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Mở readme trên github trong trình duyệt của bạn.`,
   'Automation.About.ReportProblem.HelpText': `Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn.`,
   'Automation.AutoUpdateCheck.HelpText': `Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó.`,
-  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
-  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
-  'Automation.Scroll.ProductDetails': `Product details`,
-  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
-  'Cli.TooManyArgumentsNoPath': `Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.`,
-  'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.`,
-  'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.`,
-  'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
-  'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.`,
-  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
-  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
+  'Tooltip.MoveSameDrive': `Chuyển các tệp không cần thiết vào thư mục đích. Thư mục đó nằm trên cùng một ổ đĩa, nên bạn chỉ lấy lại dung lượng sau khi xóa nó hoặc chuyển nó sang ổ đĩa khác. Bạn có thể làm vậy khi đã yên tâm rằng không gì cần đến chúng.`,
+  'Completion.MoveRestoreHint.Singular': `Tệp trong thư mục đó [có thể bỏ đi an toàn], nên bạn cứ xóa thư mục bất cứ lúc nào. Cho tới lúc ấy, bạn có thể đặt nó trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến (cực kỳ khó xảy ra).`,
+  'Completion.MoveRestoreHint.Plural': `Các tệp trong thư mục đó [có thể bỏ đi an toàn], nên bạn cứ xóa thư mục bất cứ lúc nào. Cho tới lúc ấy, bạn có thể đặt chúng trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến một tệp trong số đó (cực kỳ khó xảy ra).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `Tệp trong thư mục đó [có thể bỏ đi an toàn], nên khi nào bạn thực sự muốn lấy lại dung lượng thì cứ xóa thư mục hoặc chuyển nó sang ổ đĩa khác. Cho tới lúc ấy, bạn có thể đặt nó trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến (cực kỳ khó xảy ra).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `Các tệp trong thư mục đó [có thể bỏ đi an toàn], nên khi nào bạn thực sự muốn lấy lại dung lượng thì cứ xóa thư mục hoặc chuyển nó sang ổ đĩa khác. Cho tới lúc ấy, bạn có thể đặt chúng trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến một tệp trong số đó (cực kỳ khó xảy ra).`,
+  'Confirm.DeletePermanently.Singular': `Tệp này sẽ bị xóa vĩnh viễn. Nó [có thể xóa an toàn], nhưng nếu bạn muốn có bản sao lưu thì hãy dùng nút Chuyển.`,
+  'Confirm.DeletePermanently.Plural': `Các tệp này sẽ bị xóa vĩnh viễn. Chúng [có thể xóa an toàn], nhưng nếu bạn muốn có bản sao lưu thì hãy dùng nút Chuyển.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean không khiến được Windows phân giải đường dẫn thật của {InstallerFolder}, nên không tệp nào có thể được chứng tỏ là nằm bên trong và không tệp nào được đề xuất để dọn. Lần quét này không tìm thấy gì vì phép kiểm tra ấy thất bại, chứ không phải vì thư mục đã sạch. Không có gì bị bỏ đi.`,
+  'Automation.Scroll.ProductDetails': `Chi tiết sản phẩm`,
+  'Body.PendingReboot.Other': `Windows Installer đang có việc dở dang, nên Chuyển và Xóa tạm dừng. InstallerClean sẽ không đụng vào {InstallerFolder} khi thư mục đang thay đổi. Xong rồi thì quét lại, hai nút sẽ trở lại.`,
+  'Cli.TooManyArgumentsNoPath': `Lỗi: đối số thừa không mong đợi '{0}'. /s và /d không nhận thêm đối số nào, và mỗi lần chạy chỉ dùng được một cờ.`,
+  'Cli.MissingFromDisk.Singular': `Windows có bản ghi cho {0} tệp không nằm trong {InstallerFolder}: {1}. Hằng ngày điều này không gây rắc rối, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt có thể thất bại vì nó. Chạy lại bộ cài của chương trình đó, tốt nhất là đúng phiên bản, thường sẽ khôi phục tệp.`,
+  'Cli.MissingFromDisk.Plural': `Windows có bản ghi cho {0} tệp không nằm trong {InstallerFolder}: {1}. Hằng ngày điều này không gây rắc rối, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt có thể thất bại vì chúng. Chạy lại bộ cài của từng chương trình, tốt nhất là đúng phiên bản, thường sẽ khôi phục các tệp.`,
+  'Cli.MoveNotEnoughSpace': `Lỗi: không đủ dung lượng tại {0}. Chuyển các tệp này cần {1} mà chỉ còn trống {2}. Không có gì được chuyển.`,
+  'Cli.PendingRebootBlocked.Other': `Lỗi: Windows Installer đang có việc dở dang, nên /m và /d bị chặn. InstallerClean sẽ không đụng vào {InstallerFolder} khi thư mục đang thay đổi. Hãy thử lại khi xong.`,
+  'Cli.FoundNoOrphans': `Không tìm thấy tệp không cần thiết nào.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục đích, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi chạy lại lệnh.`,
+  'Cli.Help.Summary': `Bỏ đi các tệp .msi và .msp trong bộ đệm mà không chương trình nào còn cần.`,
+  'Cli.Help.Elevation': `Cần dấu nhắc quản trị viên; nếu không Windows sẽ không khởi chạy.`,
   'Error.InstallerLockUnavailableTitle': `Không có tệp nào bị xóa`,
-  'Error.MoveInstallerLockUnavailableTitle': `Nothing was moved`,
-  'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
-  'Error.MoveInstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
-  'Cli.MoveInstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
-  'Summary.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
-  'Cli.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
-  'Completion.ReverifyIdentityClaimed': `{0} {1} kept in place, because Windows has a record of the program named inside.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
-  'Completion.NothingRemoved': `Nothing removed`,
-  'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
-  'Completion.NothingOffered': `Nothing offered on this PC`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
+  'Error.MoveInstallerLockUnavailableTitle': `Không có tệp nào được chuyển`,
+  'Error.InstallerLockUnavailable': `InstallerClean không lấy được khóa mà Windows Installer dùng để ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng, và không có gì bị xóa. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn.`,
+  'Error.MoveInstallerLockUnavailable': `InstallerClean không lấy được khóa mà Windows Installer dùng để ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng, và không có gì được chuyển. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn.`,
+  'Cli.InstallerLockUnavailable': `Lỗi: InstallerClean không lấy được khóa Windows Installer vốn ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng. Không có gì bị xóa. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn.`,
+  'Cli.MoveInstallerLockUnavailable': `Lỗi: InstallerClean không lấy được khóa Windows Installer vốn ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng. Không có gì được chuyển. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn.`,
+  'Completion.ReverifyRecordsChanged': `Đã giữ nguyên {0} {1}, vì tới lần kiểm tra cuối, các bản ghi Windows Installer đã thay đổi.`,
+  'Summary.RecordsNotMatched': `InstallerClean không khớp được hết mọi thứ trong các bản ghi Windows, nên đã không đọc hết chúng. Các tệp không cần thiết ở trên không bị ảnh hưởng, nhưng những gì nói về các tệp thiếu khỏi {InstallerFolder} có thể chưa đầy đủ. Hãy quét lại để thử lần nữa.`,
+  'Cli.RecordsNotMatched': `InstallerClean không khớp được hết mọi thứ trong các bản ghi Windows, nên đã không đọc hết chúng. Những gì tìm được không bị ảnh hưởng, nhưng những gì nói về các tệp thiếu khỏi {InstallerFolder} có thể chưa đầy đủ. Chạy lại có thể tìm thấy thêm.`,
+  'Completion.ReverifyIdentityClaimed': `Đã giữ nguyên {0} {1}, vì Windows có bản ghi về chương trình được nêu tên bên trong.`,
+  'Completion.ReverifyIdentityUnreadable': `Đã giữ nguyên {0} {1}, vì InstallerClean không tìm thấy tên chương trình nào bên trong.`,
+  'Completion.NothingRemoved': `Không có gì bị bỏ đi`,
+  'Error.ScanNoRegisteredFileInFolder': `InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Thư mục có tệp bên trong, nhưng không một bản ghi nào trỏ tới bất cứ thứ gì trong đó, nên không tệp nào có thể được chứng tỏ là không cần thiết. Không có gì được đề xuất và không có gì bị bỏ đi.`,
+  'Completion.NothingOffered': `Không có gì được đề xuất trên máy này`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({1}) mà lẽ ra nó có thể đề xuất.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} tệp ({1}) mà lẽ ra nó có thể đề xuất.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

@@ -679,6 +679,22 @@
        check was repeated": the repetition is an implementation detail and the
        user has never been told there was a first one. -->
   <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} laissés en place, parce que les enregistrements de Windows Installer n'ont pas pu être lus entièrement lors de la vérification finale.</value></data>
+  <!-- The fourth held-back cause, read by both hosts through HeldBackReport.
+
+       0 = files kept back, 1 = pluralised "file"/"files", as in the three above.
+
+       IT IS THE ONE THAT SAYS NOTHING ABOUT THE FILE. The other three are findings
+       about the registration naming that path: a live claim, a registration that has
+       gone, a read that failed. This one is reached without looking at the path, so
+       the sentence has to be about the machine, and "which cached files belong to
+       which programs" is the phrasing the window's own empty-offer screen already
+       uses for the same fact (Completion.NothingOfferedBody.*).
+
+       "By the final check" rather than "any more": the app is not asserting that
+       something changed between the scan and the click, only that the check it makes
+       before acting did not establish it. Two different findings reach this line and
+       neither may be named in it. -->
+  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -1248,12 +1264,97 @@ Le crash.log n'a pas pu être écrit.</value></data>
        commonest output this tool produces. It states what was found rather than
        what the tool intends to do about it, which is the question somebody
        reading a scheduled task's log ran the scan to ask. -->
-  <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Found no unneeded files.</value></data>
+  <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Aucun fichier inutile trouvé.</value></data>
+  <!-- The THIRD outcome, and the line above is why it has to exist: "Found no
+       unneeded files" is a statement about the folder, and on this machine the
+       scan never established one. Somebody reading a scheduled task's log would
+       otherwise be told a folder full of files nobody vouched for was clean.
+
+       0 = files held back, 1 = pluralised "file"/"files", 2 = their size.
+
+       IT NAMES NO CAUSE AND MUST NOT ACQUIRE ONE. Several different findings
+       empty an offer this way and they are different facts about a machine, so
+       any sentence naming one of them is false on the others. What is true of
+       every one of them is the opening clause, which is the same clause the
+       window's own screen opens with (Completion.NothingOfferedBody.*): the app
+       could not be certain which cached files belong to which programs.
+
+       "Might otherwise have offered" keeps its hedge for the same reason the
+       window's does: some of those files would have been kept back anyway by the
+       per-file screen this branch skips, so "would have offered" claims more than
+       the run established.
+
+       A PAIR AND NOT A FLAT KEY, because it shipped as one for an afternoon and
+       read "held back all 1 file" at a count of one. The one-form names the size
+       and not the numeral, exactly as the window's body does, so it spends {2} and
+       leaves {0} and {1} unused; both are passed on either branch so the two forms
+       cannot disagree about which index is which.
+
+       IT CLOSED ON "That is not the same as finding nothing to clean up" AND THAT
+       SENTENCE WAS TAKEN OUT. The first sentence already says what happened in
+       full, so the second added no fact: what it added was the app arguing against
+       a conclusion the reader has not reached. The tense also differs from the
+       window's ("held back" here, "has held back" there) and that is deliberate,
+       each being right in its own register. -->
+  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.</value></data>
+  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel
        opens "{0} mode:", and a filter for delete runs has to find this one.
        1 = registered package count, 2 = pluralised "package"/"packages". -->
+  <!-- The audit line for the outcome above, so the Application channel splits the
+       same three ways stdout does and a monitoring tool is not told a machine is
+       clean when the scan could not judge it.
+
+       0 = mode arg, whichever of /s, /d and /m was run, as in the entry above:
+       the no-files branch is common to all three. 1 = files held back,
+       2 = pluralised "file"/"files".
+
+       IT SHARES EVENT ID 1000 WITH THE ENTRY ABOVE, which is a real limit and is
+       recorded rather than designed around: the run did its job, so it belongs in
+       the outcome band, and a tool that needs to tell this machine from a clean
+       one has to read the message. Splitting the band would put a new ID on the
+       wire, which is a contract change and not this line's to make.
+
+       "No action taken" rather than a phrase of its own: Cli.EventLogScanFound
+       already ends that way, so a filter watching this channel meets one phrase
+       and not two.
+
+       IT HELD BACK {1} {2} RATHER THAN "{1} {2} were held back", AND THE WORD ORDER
+       IS THE PLURALISATION. This line is machine-read and forced English at the
+       emit site, so it takes no .Singular/.Plural pair and the passive form read
+       "so 1 file were held back" at a count of one. Putting the app back in as the
+       subject makes one shape correct at every count, which is what a matched
+       surface needs. -->
+  <!-- THE NOTICE BESIDE THAT OUTCOME, Event ID 3002, and it exists because the
+       outcome band cannot carry the distinction. The entry above sits at 1000 with
+       the clean-machine line, since the run did its job either way, so a filter
+       selecting by number cannot tell a machine nothing could be judged on from a
+       machine that is genuinely clean. This is what separates them, and it changes
+       no existing number's meaning.
+
+       0 = mode arg, 1 = files held back.
+
+       IT NAMES NO FOLDER, WHICH IS THE RULE ON THIS CHANNEL AND NOT A PREFERENCE.
+       It carried {InstallerFolder} for an afternoon and was the only Cli.EventLog*
+       string that did. The one entry here that names the folder,
+       Cli.EventLogMoveDestinationInsideInstaller, spells it as a LITERAL, because a
+       token resolves per machine and a line that varies by machine is the opposite
+       of what a matched shape is for. This notice does not need to name it at all.
+
+       AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", which is
+       where the sibling above and this one part company: that one is unpluralised
+       on purpose, matching the always-plural "errors:" header the same audience
+       scrapes, and it can be, because its count is of records rather than files and
+       the word never stands alone next to a numeral here. This one reads "1 file" at
+       a count of one and is correct at every other.
+
+       IT FIRES ON MORE MACHINES THAN THE OUTCOME LINE DOES. That one is written
+       only where nothing at all was offered; this is written beside the other scan
+       notices, so it also reaches a machine whose walk offer was emptied while a
+       superseded registration was still offered beside it. Naming no cause matters
+       more here for that reason, not less. -->
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does

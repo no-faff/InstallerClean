@@ -506,7 +506,7 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak merepotkan, tapi perbaikan, pembaruan atau pencopotan bisa gagal karenanya. Menjalankan lagi penginstal masing-masing program, sebaiknya versi yang sama, biasanya memulihkan file-filenya.`,
   'Cli.MoveNotEnoughSpace': `Kesalahan: ruang tidak cukup di {0}. Memindahkan file-file ini perlu {1} sedangkan yang tersedia {2}. Tidak ada yang dipindahkan.`,
   'Cli.PendingRebootBlocked.Other': `Kesalahan: Windows Installer sedang mengerjakan sesuatu, jadi /m dan /d diblokir. InstallerClean tidak akan menyentuh {InstallerFolder} selagi berubah. Coba lagi setelah selesai.`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.FoundNoOrphans': `Tidak ditemukan file yang tidak diperlukan.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder tujuan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu jalankan perintahnya lagi.`,
   'Cli.Help.Summary': `Menyingkirkan file .msi dan .msp singgahan yang tak lagi diperlukan.`,
   'Cli.Help.Elevation': `Perlu prompt administrator; Windows tidak akan menjalankannya.`,

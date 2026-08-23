@@ -512,7 +512,7 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `Windows a des enregistrements pour {0} fichiers qui ne sont pas dans {InstallerFolder} : {1}. Cela ne gêne pas au quotidien, mais une réparation, une mise à jour ou une désinstallation peut échouer à cause d'eux. Réexécuter le programme d'installation de chaque logiciel, de préférence dans la même version, restaure généralement les fichiers.`,
   'Cli.MoveNotEnoughSpace': `Erreur : espace insuffisant dans {0}. Déplacer ces fichiers nécessite {1} et {2} sont libres. Rien n'a été déplacé.`,
   'Cli.PendingRebootBlocked.Other': `Erreur : Windows Installer a quelque chose en cours, donc /m et /d sont bloqués. InstallerClean ne touchera pas à {InstallerFolder} pendant qu'il change. Réessayez une fois terminé.`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.FoundNoOrphans': `Aucun fichier inutile trouvé.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de destination, il s'est donc arrêté plutôt que d'écrire au mauvais endroit. Vérifiez {0}, puis relancez la commande.`,
   'Cli.Help.Summary': `Retire les fichiers .msi et .msp en cache dont aucun programme n'a besoin.`,
   'Cli.Help.Elevation': `Exige une invite de commandes administrateur ; Windows ne le lancera pas.`,

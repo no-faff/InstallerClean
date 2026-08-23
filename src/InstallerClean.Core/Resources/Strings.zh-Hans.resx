@@ -86,13 +86,13 @@
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Window.About.Title" xml:space="preserve"><value>关于</value></data>
-  <data name="Window.Registered.Title" xml:space="preserve"><value>Files left alone</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>原样保留的文件</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>不需要的文件，可安全删除</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Patches" xml:space="preserve"><value>补丁</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>产品详情</value></data>
-  <data name="Section.Backup.Folder" xml:space="preserve"><value>BACKUP FOLDER</value></data>
+  <data name="Section.Backup.Folder" xml:space="preserve"><value>目标文件夹</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>道声谢</value></data>
 
   <!-- Field labels (used in detail panels) -->
@@ -116,7 +116,7 @@
        not a hard-coded ", " because the mark is not the same everywhere: a
        language that separates list items with something other than a comma, or
        that wants no space after it, says so here. -->
-  <data name="Display.ListSeparator" xml:space="preserve"><value>, </value></data>
+  <data name="Display.ListSeparator" xml:space="preserve"><value>、</value></data>
   <data name="Field.PatchesOnly" xml:space="preserve"><value>（仅补丁）</value></data>
   <data name="Field.Missing" xml:space="preserve"><value>缺失</value></data>
 
@@ -151,7 +151,7 @@
        because the capitals made the two words button names. "Rather than"
        takes both verbs in the same form, so they stay parallel. The button
        carries "permanently"; repeating it here would dangle on the clause. -->
-  <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>Path to folder if you move rather than delete.</value></data>
+  <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>若选择移动而非删除，此处填写文件夹路径。</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>打开发布页面(_R)</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>重新扫描(_R)</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>再次扫描(_S)</value></data>
@@ -200,7 +200,7 @@
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete permanently removes the unneeded files. Cancel closes without deleting.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>永久删除会移除这些不需要的文件。取消则不删除任何内容并关闭。</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>移动会将不需要的文件放入所选的目标文件夹。取消则让它们留在原处。</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>道声谢</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>发送会将所示报告提交给 No Faff。取消则不发送任何内容。</value></data>
@@ -261,7 +261,7 @@
        DETAILS). Narrator at default verbosity spells short uppercase
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
-  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
+  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>目标文件夹</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>补丁</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>产品详情</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as
@@ -269,14 +269,14 @@
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
        Automation.Section.BackupFolder in every language. -->
-  <data name="Automation.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
+  <data name="Automation.BackupFolder" xml:space="preserve"><value>目标文件夹</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>操作进度</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>重新扫描 {InstallerFolder}</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>扫描进度</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>启动扫描进度</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>详情，不需要的文件</value></data>
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>可供清理。</value></data>
-  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Details, files left alone</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>详情，原样保留的文件</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>只读清单。</value></data>
   <!-- Screen-reader sort state for the detail-window lists, set in
        UpdateSortIndicators as the sorted column header's accessible
@@ -297,7 +297,7 @@
        own key so that a screen reader does not meet one string twice, once as
        static text and once as a pane. Its pair in the orphaned window is
        Automation.Scroll.FileDetails. -->
-  <data name="Automation.Scroll.ProductDetails" xml:space="preserve"><value>Product details</value></data>
+  <data name="Automation.Scroll.ProductDetails" xml:space="preserve"><value>产品详情</value></data>
   <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>对话框文本</value></data>
   <!-- Composes the announced outcome of a scan that found files:
        0 = the "N unneeded files to clean up" line, 1 = the total size. -->
@@ -333,14 +333,14 @@
        the folder is what finishes the job, because the screen never said so
        and a real user moved his files, watched nothing break for weeks and
        still did not know he was done. -->
-  <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>把不需要的文件移动到目标文件夹。等您确信没有任何东西需要它们时，再删除那个文件夹。</value></data>
   <!-- The Move button's tooltip while the backup folder box is empty. The
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
        for one to be set first. "A" and not "the" because there is no folder
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>把不需要的文件移动到一个目标文件夹。您接下来会选择它。等您确信没有任何东西需要它们时，再删除那个文件夹。</value></data>
   <!-- The same-drive state. It exists to give a matched pair with
        Tooltip.Delete on the one trade the user is actually making: hover
        Delete and the space comes back at once, hover Move with a folder on
@@ -348,25 +348,25 @@
        same promise, different timing, both readable before either button is
        pressed. Distinct from Confirm.MoveSameDrive, which says a related
        thing after the choice has been made. -->
-  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.</value></data>
+  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>把不需要的文件移动到目标文件夹。它在同一个驱动器上，所以要等您删除那个文件夹、或把它移到另一个驱动器，才会收回空间。等您确信没有任何东西需要它们时就可以这么做。</value></data>
   <!-- The Delete button's tooltip and its screen-reader help text, one
        value feeding both. "Reclaim" rather than a synonym because it is
        already the app's word for this: the reports chart says "Space
        reclaimed from C:\Windows\Installer". -->
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>永久删除不需要的文件。它们可以安全移除，而且空间会立刻回来。</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>来自内嵌 Authenticode 证书的使用者名称。未验证证书链。</value></data>
 
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
-    <value>Any unneeded files below are [safe to delete].</value>
+    <value>下面这些不需要的文件都[可以安全删除]。</value>
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause. The bracketed phrase becomes a hyperlink into the README's "Is it safe?" section (rendered in MainWindow.xaml.cs BuildIntroLeadLine); the brackets are the delimiter and are not shown. This is the screen's strongest safety claim and the only link on it, so keep the brackets on whatever phrase carries that claim in this language.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).</value>
+    <value>它们位于 {InstallerFolder} 中。InstallerClean 会就每个已安装的程序询问 Windows：当没有任何程序认领某个文件时（{0}），或者当更新的补丁已经取代了它、并且没有任何程序能够回退到它时（{1}），该文件才会列出。</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). TWO PLACEHOLDERS, ONE PER CAUSE THE OFFER CAN CONTAIN: {0} is Reason.Orphaned and {1} is Reason.Superseded, the only two labels the scan sets (FileSystemScanService, the walked-file branch and the superseded-patch branch). Reason.Obsoleted is still passed as {2} by MainViewModel and is deliberately unused here: an obsoleted registration is counted at scan time and never offered, so naming that cause on this screen would describe a file the list cannot hold. Carrying the labels as placeholders means a translator edits each one in a single place and this sentence follows. THE OPENING CLAUSE CARRIES THE EPISTEMICS FOR BOTH HALVES: it says what the app asked, so what follows is read as the answer it got and not as an assertion about the machine. IT PARTITIONS BECAUSE THE SET HAS TWO CAUSES, and a sentence naming one of them is false of the other half: an orphan is offered because no registration claims its file, and a superseded patch is offered BECAUSE a registration does claim it and reports the patch replaced. THE SECOND CLAUSE'S ROLLBACK HALF IS NOT A RESTATEMENT OF ITS FIRST and must not be dropped as one in any language: replaced is not finished with, since uninstalling whatever replaced the patch can roll back onto it and reach for this exact file, which is the condition that decides whether a superseded patch is offered at all. The single-cause sentence this replaces was true only while the superseded class was withheld, which is a state no released version was ever in. BOTH CLAUSES ARE ABOUT THE ANSWER THE APP RECEIVED AND NOT ABOUT THE STATE OF THE MACHINE, which is the weaker claim and the one that stays true whatever an enumeration cannot see, so it is kept rather than tightened. The wording this replaces gave two reasons for that framing and neither survives at 3.0.0: the instance-code reading lost its subject once nothing read inside a cached file any more (see InstanceProductCount, which says so in its own words), and a recorded path spelled in a form the folder walk never produces is expanded and handled from 3.0.0 rather than guarded against (see NormaliseLocalPackagePath). The framing outlives its old reasons. Translations must keep both clauses statements about what came back; a rendering that says outright that Windows has no record of the file makes a claim about the machine that this wording exists to avoid.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.</value>
+    <value>把它们移动到您自己选择的目标文件夹，等确认程序照常更新、修复和卸载之后，再删除那个文件夹。把它们放回 {InstallerFolder} 就能恢复一切。或者现在就永久删除。</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND ALL THREE OPERATIONS ARE NAMED ON PURPOSE: update, repair and uninstall are what a cached package is kept for, so somebody who has done all three and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. The restore sentence covers BOTH actions and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and putting a file back at that path under the same name is what restores it. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README, which the bracketed phrase in the lead links to. The button order is a separate matter and does not govern this line.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -386,9 +386,9 @@
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
        and introduced nowhere. -->
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
-  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>此刻有程序正在使用 Windows Installer，比如 Windows 更新，或者某个正在后台安装的程序。在此期间，移动和删除会暂停，这样 InstallerClean 就不会在 {InstallerFolder} 变动时去碰它。等结束后重新扫描，两者就会恢复。</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>这台计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚那次安装（或重启 Windows），再清理 {InstallerFolder}。</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows 已把一次文件重命名排入下次重启的队列，且会影响 {InstallerFolder}。请先重启 Windows 再清理。</value></data>
   <!-- The fourth arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -397,12 +397,12 @@
        something is in progress and the buttons come back afterwards, and says
        nothing it cannot know. Names the folder with the token like its three
        siblings. -->
-  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.</value></data>
+  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer 有操作正在进行，因此移动和删除已暂停。InstallerClean 不会在 {InstallerFolder} 变动时去碰它。等结束后重新扫描，两者就会恢复。</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>选择一个文件以查看详情。</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>选择一个产品以查看详情。</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>没有可用的元数据。</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.</value>
+    <value>这个安装程序文件缺失了。目前不会造成任何麻烦，直到有一天您要修复、更新或卸载它所属的程序为止。那一步可能会失败，因为 Windows 会去找这个文件，而它不在。&#10;&#10;想要修复，请从该程序的厂商处下载它的安装程序，并在现有安装之上运行（不要先卸载：卸载本身就是需要这个文件的步骤）。如果能拿到，请使用您已安装的那个版本，因为 Windows 可能会拒绝其他版本。这通常能恢复该文件并保留您的设置，但 Microsoft 并不保证，而它自己的最后手段是重新安装该程序。</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -457,8 +457,8 @@
        line that can be right. "Unneeded" is the app's own word for them and is
        what makes the heading say something once the count has gone.
        No placeholder: do not reintroduce one. -->
-  <data name="Status.Moving" xml:space="preserve"><value>Moving unneeded files...</value></data>
-  <data name="Status.Deleting" xml:space="preserve"><value>Deleting unneeded files...</value></data>
+  <data name="Status.Moving" xml:space="preserve"><value>正在移动不需要的文件…</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>正在删除不需要的文件…</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>移动已取消。{1} 个{2}中已处理 {0} 个。</value></data>
@@ -494,7 +494,7 @@
        and that screen previously read "All clean" over a summary that named the
        causes. States what happened and claims nothing about why; the causes are
        the lines underneath, one per cause with its own count. -->
-  <data name="Completion.NothingRemoved" xml:space="preserve"><value>Nothing removed</value></data>
+  <data name="Completion.NothingRemoved" xml:space="preserve"><value>没有移除任何内容</value></data>
   <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>{InstallerFolder} 中没有需要清理的内容</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
@@ -549,9 +549,9 @@
        and before anything has been pressed. "Sorry to send you away empty-handed" went
        with them. And "rather than guess" describes something the app never does, which
        raises a possibility that was never on the table. -->
-  <data name="Completion.NothingOffered" xml:space="preserve"><value>Nothing offered on this PC</value></data>
-  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.</value></data>
-  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.</value></data>
+  <data name="Completion.NothingOffered" xml:space="preserve"><value>在这台电脑上没有提供任何内容</value></data>
+  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的那 1 个文件（{1}）。</value></data>
+  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的全部 {0} 个文件（{1}）。</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
        retired list with the four that follow, and why the retired strings are kept
        rather than deleted is written out there rather than repeated here.
@@ -583,15 +583,15 @@
        plural, "delete it" can only mean the folder, because "the files" cannot
        be "it"; at one file that disambiguation is gone, so the singular names
        the folder outright. -->
-  <data name="Completion.MoveRestoreHint.Singular" xml:space="preserve"><value>The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).</value></data>
-  <data name="Completion.MoveRestoreHint.Plural" xml:space="preserve"><value>The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).</value></data>
+  <data name="Completion.MoveRestoreHint.Singular" xml:space="preserve"><value>那个文件夹里的文件[可以安全移除]，所以您想什么时候删除文件夹都可以。在那之前，万一有程序确实需要它，您可以把它放回 {InstallerFolder}（可能性极小）。</value></data>
+  <data name="Completion.MoveRestoreHint.Plural" xml:space="preserve"><value>那个文件夹里的文件[可以安全移除]，所以您想什么时候删除它都可以。在那之前，万一有程序确实需要其中某一个，您可以把它们放回 {InstallerFolder}（可能性极小）。</value></data>
   <!-- The same line where the backup folder is on the drive the files came
        from. A same-drive move is a rename, so it reclaims nothing until the
        folder goes or moves; that is the one fact this variant adds, and it is
        the only completion line in the app that has to explain why the disk did
        not get emptier. -->
-  <data name="Completion.MoveRestoreHintSameDrive.Singular" xml:space="preserve"><value>The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).</value></data>
-  <data name="Completion.MoveRestoreHintSameDrive.Plural" xml:space="preserve"><value>The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).</value></data>
+  <data name="Completion.MoveRestoreHintSameDrive.Singular" xml:space="preserve"><value>那个文件夹里的文件[可以安全移除]，所以当您真的想收回空间时，删除该文件夹或把它移到另一个驱动器都可以。在那之前，万一有程序确实需要它，您可以把它放回 {InstallerFolder}（可能性极小）。</value></data>
+  <data name="Completion.MoveRestoreHintSameDrive.Plural" xml:space="preserve"><value>那个文件夹里的文件[可以安全移除]，所以当您真的想收回空间时，删除该文件夹或把它移到另一个驱动器都可以。在那之前，万一有程序确实需要其中某一个，您可以把它们放回 {InstallerFolder}（可能性极小）。</value></data>
   <!-- Headline size figures. "freed" is used where space is genuinely
        reclaimed at that instant: a Delete, and a Move to another volume, which
        frees the system drive. A same-volume Move reads "moved", a rename
@@ -651,7 +651,7 @@
        reintroduce a verb of returning; a claim that HOLDS now is the whole of it.
        The two siblings below say what this one does not: this is a live claim, one
        is a registration that has gone, one is a read that failed. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, because the records now claim what the scan flagged.</value></data>
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>有 {0} 个{1}保持原位，因为记录现在认领了扫描标记出来的内容。</value></data>
   <!-- The third state the final check can find, and the one that is neither of
        its siblings: the records were read perfectly well and no longer hold the
        registration that claimed the file. Nothing has gone back to needing it
@@ -667,7 +667,7 @@
        to fall back on, and a "them" reads wrongly at a count of one. The three
        sentences can appear together, one per cause, so they are deliberately
        parallel from "kept in place, because" onwards. -->
-  <data name="Completion.ReverifyRecordsChanged" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records had changed by the final check.</value></data>
+  <data name="Completion.ReverifyRecordsChanged" xml:space="preserve"><value>有 {0} 个{1}保持原位，因为到最终检查时 Windows Installer 记录已经变了。</value></data>
   <!-- The third reason the pre-action re-check keeps files back: a read of the
        Windows Installer records failed, so nothing was established either way and
        the file is kept for want of a verdict rather than on one. Distinct from
@@ -678,7 +678,23 @@
        override for its count grammar. "The final check" rather than "when the
        check was repeated": the repetition is an implementation detail and the
        user has never been told there was a first one. -->
-  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.</value></data>
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>有 {0} 个{1}保持原位，因为最终检查时无法完整读取 Windows Installer 记录。</value></data>
+  <!-- The fourth held-back cause, read by both hosts through HeldBackReport.
+
+       0 = files kept back, 1 = pluralised "file"/"files", as in the three above.
+
+       IT IS THE ONE THAT SAYS NOTHING ABOUT THE FILE. The other three are findings
+       about the registration naming that path: a live claim, a registration that has
+       gone, a read that failed. This one is reached without looking at the path, so
+       the sentence has to be about the machine, and "which cached files belong to
+       which programs" is the phrasing the window's own empty-offer screen already
+       uses for the same fact (Completion.NothingOfferedBody.*).
+
+       "By the final check" rather than "any more": the app is not asserting that
+       something changed between the scan and the click, only that the check it makes
+       before acting did not establish it. Two different findings reach this line and
+       neither may be named in it. -->
+  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -706,7 +722,7 @@
        Completion.ReverifyIdentityClaimed.One/.Few/.Many override for its count
        grammar. Parallel to its siblings from "kept in place, because" onwards,
        because all of them can appear together, one per cause. -->
-  <data name="Completion.ReverifyIdentityClaimed" xml:space="preserve"><value>{0} {1} kept in place, because Windows has a record of the program named inside.</value></data>
+  <data name="Completion.ReverifyIdentityClaimed" xml:space="preserve"><value>有 {0} 个{1}保持原位，因为 Windows 有文件内所标示程序的记录。</value></data>
   <!-- The fifth state, and the only one about the FILE rather than about the
        records. The candidate yielded nothing that could be asked about: it would
        not open, it declares no code, or a patch names no product it targets.
@@ -724,7 +740,7 @@
        why neither may assert a change. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifyIdentityUnreadable.One/.Few/.Many override. -->
-  <data name="Completion.ReverifyIdentityUnreadable" xml:space="preserve"><value>{0} {1} kept in place, because InstallerClean couldn't find a program named inside.</value></data>
+  <data name="Completion.ReverifyIdentityUnreadable" xml:space="preserve"><value>有 {0} 个{1}保持原位，因为 InstallerClean 没能在文件内找到程序名。</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -739,8 +755,8 @@
        how to reinstall a program would be the app hedging against the thing it
        has just said will not happen. Split singular/plural for the languages
        that inflect the noun and the participle. -->
-  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
-  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>已永久删除 {0} 个{1}</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>已永久删除 {0} 个{1}</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
     <value>很高兴帮上忙。您若有心，这里可以打赏。</value>
     <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
@@ -758,8 +774,8 @@
   <!-- Main-window count of the registered set. "Left alone" rather than "still
        needed" because that set is three populations and only one of them makes
        "needed" true; Summary.RegisteredWindow below carries the detail. -->
-  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file left alone</value></data>
-  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files left alone</value></data>
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} 个文件原样保留</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} 个文件原样保留</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} 个不需要的文件可清理</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} 个不需要的文件可清理</value></data>
   <!-- The main window's missing-files line. 0 = how many files, 1 = the programs
@@ -781,8 +797,8 @@
        trouble day to day" and "can fail", never "will". Microsoft guarantees
        nothing here. Details carries the recovery step, which is why this closes
        by sending the reader there rather than trying to give it. -->
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。请打开“详情”了解该怎么做。</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。请打开“详情”了解该怎么做。</value></data>
   <!-- The two tails of that program list, and they are SEPARATE because they are
        different findings. The first is a program this app can name and had no
        room for; the second is a registration nothing named at all, which is the
@@ -790,10 +806,10 @@
        into one "and N more" would put both under a sentence false of half of
        them. 0 = the count in each case, programs for the first and files for the
        second, which is why each says its own noun. -->
-  <data name="Summary.MissingFromDisk.OtherPrograms.Singular" xml:space="preserve"><value>{0} other program</value></data>
-  <data name="Summary.MissingFromDisk.OtherPrograms.Plural" xml:space="preserve"><value>{0} other programs</value></data>
-  <data name="Summary.MissingFromDisk.Unnamed.Singular" xml:space="preserve"><value>{0} file with no program named in the records</value></data>
-  <data name="Summary.MissingFromDisk.Unnamed.Plural" xml:space="preserve"><value>{0} files with no program named in the records</value></data>
+  <data name="Summary.MissingFromDisk.OtherPrograms.Singular" xml:space="preserve"><value>另外 {0} 个程序</value></data>
+  <data name="Summary.MissingFromDisk.OtherPrograms.Plural" xml:space="preserve"><value>另外 {0} 个程序</value></data>
+  <data name="Summary.MissingFromDisk.Unnamed.Singular" xml:space="preserve"><value>{0} 个在记录中没有标明程序的文件</value></data>
+  <data name="Summary.MissingFromDisk.Unnamed.Plural" xml:space="preserve"><value>{0} 个在记录中没有标明程序的文件</value></data>
   <!-- Informational line shown when the scan could not account for everything the
        Windows Installer records hold. Nothing is wrong with the machine and there
        is nothing to do about it, so the line says what to expect rather than
@@ -822,7 +838,7 @@
        may recast "match up" into its own idiom for reconciling two sets of
        records; what must not come back is a number, or a noun meaning "installed
        program". -->
-  <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
+  <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean 未能把 Windows 记录中的每一项都对应上，因此没有全部读取。上面那些不需要的文件不受影响，但关于 {InstallerFolder} 中缺失文件的说明可能不完整。请重新扫描再试一次。</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{1} 个{2}中的 {0} 个</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -834,7 +850,7 @@
        vary is furniture rather than information. The noun is passed in already
        pluralised (the Plural.File pair) rather than inflected here, so the one
        string serves every count in every language. -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} unneeded {1} ({2})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} 个不需要的{1}（{2}）</value></data>
   <!-- Registered-window footer summary, over the same set the main window counts.
        Says what the scan did, not what the files are: that set is three
        populations (a live registration claims it; the records called it
@@ -844,12 +860,12 @@
        Still split singular/plural though the verb has gone, for the noun and for
        the .Few overrides pl, ru and uk declare on this key.
        0 = count, 1 = size display. -->
-  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file left alone ({1})</value></data>
-  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} files left alone ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} 个文件原样保留（{1}）</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} 个文件原样保留（{1}）</value></data>
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>移动 {0} 个{1}（{2}）？</value></data>
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Move to:</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>移动到：</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>删除 {0} 个{1}（{2}）？</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
@@ -863,8 +879,8 @@
        "But" and not "and": offering the backup concedes something to the
        sentence before it. "The Move button", not bare "Move", so "use Move"
        is read as a button and not as a second verb in the same sentence. -->
-  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
-  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
+  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>此文件将被永久删除。它[可以安全删除]，但如果您想要备份，请改用“移动”按钮。</value></data>
+  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>这些文件将被永久删除。它们[可以安全删除]，但如果您想要备份，请改用“移动”按钮。</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only
@@ -875,7 +891,7 @@
        Flat at any count, unlike its neighbours: it talks about the folder and
        the space rather than about files, so it has no count-dependent noun to
        agree. -->
-  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.</value></data>
+  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>那个文件夹在同一个驱动器上，所以在您删除它之前空间不会回来。如果想立刻拿回空间，请改选另一个驱动器上的文件夹。</value></data>
 
   <!-- Error messages -->
   <!-- Both manifests declare requireAdministrator, so the process is
@@ -924,7 +940,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。记录所指向的内容几乎都不在那里，而那里的内容几乎都没有被任何记录标明，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -936,7 +952,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。文件夹里有文件，但没有任何一条记录指向其中的任何内容，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -952,7 +968,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean 未能让 Windows 解析出 {InstallerFolder} 的真实路径，因此无法证明任何文件位于其中，也没有提供任何文件供清理。这次扫描一无所获是因为那项检查失败，而不是因为文件夹是干净的。没有移除任何内容。</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -977,7 +993,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <!-- The move half of the heading above, and it takes the same wording as
        Completion.NothingMoved for the same reason its sibling takes
        Completion.NothingDeleted's. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Nothing was moved</value></data>
+  <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>没有移动任何文件</value></data>
   <!-- Shown when a Delete could not take Global\_MSIExecute and nothing else
        was shown to be holding it (a DACL that refuses the object, or any other
        non-fatal failure to acquire). Without that hold nothing stops a program
@@ -987,13 +1003,13 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        Error.ScanCacheRootUnresolved above, which supplies the middle step of
        its own causal chain: what the app could not do, what followed from it,
        and that nothing has been removed. No placeholders. -->
-  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.</value></data>
+  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有删除任何内容。请重试，若一直如此请重启 Windows。</value></data>
   <!-- The move half of the sentence above. Move refuses on the same condition
        because its exposure to it is the delete's: a file moved out of the cache
        is as absent from it as a deleted one, so a transaction starting part-way
        through fails to find it either way, and the recovery a move leaves the
        user does not make the batch safer to run. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
+  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有移动任何内容。请重试，若一直如此请重启 Windows。</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>目标无效</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>无法写入目标</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>移动失败</value></data>
@@ -1007,7 +1023,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>无法保存此更改。下次启动时，InstallerClean 将恢复为之前的设置。</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>目标不能位于 Windows Installer 文件夹内。</value></data>
   <!-- 0 = the destination path the user typed -->
-  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.</value></data>
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>目标 {0} 解析到了 Windows 系统文件夹之下。请选择 %SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)% 和 %ProgramData% 之外的路径。</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>空间不足</value></data>
   <!-- 0 = destination, 1 = required size, 2 = available size -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} 上的空间不足
@@ -1056,8 +1072,8 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        (the detail goes to crash.log). -->
   <data name="Error.AccessDenied.Singular" xml:space="preserve"><value>Windows 拒绝了对此文件的访问；该文件已留在原处。</value></data>
   <data name="Error.AccessDenied.Plural" xml:space="preserve"><value>Windows 拒绝了对这些文件的访问；这些文件已留在原处。</value></data>
-  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.</value></data>
-  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.</value></data>
+  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>此文件正被另一个程序打开或锁定，因此暂时无法移除。它已保持原位；请稍后再试。</value></data>
+  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>这些文件正被另一个程序打开或锁定，因此暂时无法移除。它们已保持原位；请稍后再试。</value></data>
   <data name="Error.IOFailure.Singular" xml:space="preserve"><value>Windows 报告了一个文件错误；该文件已留在原处。</value></data>
   <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows 报告了文件错误；这些文件已留在原处。</value></data>
   <data name="Error.UnknownError.Singular" xml:space="preserve"><value>此文件出了点问题；该文件已留在原处。</value></data>
@@ -1070,7 +1086,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>目标文件夹必须是指向某个文件夹的完整路径，以驱动器盘符或网络共享开头（例如 D:\Backup，或 \\server\backup）。InstallerClean 无法使用这个：{0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>无法打开您的浏览器</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>检查更新</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>正在检查…</value></data>
@@ -1109,7 +1125,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        different question and a different string: they went wherever the folder
        pointed then, which is what the completion summary names, so this copy must
        not claim it. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean 已无法确认目标文件夹，因此停了下来，而不是写到错误的位置。请检查 {0}，然后重新扫描并再试一次。</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -1217,7 +1233,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <!-- 0 = the offending token (original case). Carries the "Error:" prefix every
        other message that ends the run in failure carries; the one message with no
        prefix is Cli.MutexBlocked, which ends it on the transient code instead. -->
-  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Error: unknown argument '{0}'</value></data>
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>错误：未知参数“{0}”</value></data>
   <!-- 0 = the extra (unexpected) token. Shown for /m only, where the extra
        token is most often an unquoted move path with a space, so the message
        names the quoting fix. The literal " quotes and the \ in the example are
@@ -1227,7 +1243,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        take no path at all, so the quoting advice above would answer about a flag
        the user did not type. The way in is combining flags ("/s /d"), which is
        what the second sentence addresses. -->
-  <data name="Cli.TooManyArgumentsNoPath" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.</value></data>
+  <data name="Cli.TooManyArgumentsNoPath" xml:space="preserve"><value>错误：出现意外的多余参数“{0}”。/s 和 /d 不接受其他参数，每次运行也只能使用一个开关。</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>正在取消…</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>已取消。</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -1237,23 +1253,108 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        the words around it are what make it a sentence rather than an artefact
        of the runtime; both forms carry them, the pair being chosen by nothing
        but whether the crash log got written. -->
-  <data name="Cli.GenericError" xml:space="preserve"><value>Error: unexpected failure ({0}). Details written to {1}.</value></data>
-  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Error: unexpected failure ({0}). The crash log could not be written.</value></data>
+  <data name="Cli.GenericError" xml:space="preserve"><value>错误：意外故障（{0}）。详情已写入 {1}。</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>错误：意外故障（{0}）。崩溃日志无法写入。</value></data>
   <data name="Cli.ScanningInstaller" xml:space="preserve"><value>正在扫描 {InstallerFolder}…</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display. Never reached with
        a count of zero: that run prints Cli.FoundNoOrphans instead, so this one
        does not have to read sensibly at "0 ... (0 B)". -->
-  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} unneeded {1} to clean up ({2}).</value></data>
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>找到 {0} 个可清理的、不需要的{1}（{2}）。</value></data>
   <!-- The whole of what a clean machine prints after the scanning line, and the
        commonest output this tool produces. It states what was found rather than
        what the tool intends to do about it, which is the question somebody
        reading a scheduled task's log ran the scan to ask. -->
-  <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Found no unneeded files.</value></data>
+  <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>未找到不需要的文件。</value></data>
+  <!-- The THIRD outcome, and the line above is why it has to exist: "Found no
+       unneeded files" is a statement about the folder, and on this machine the
+       scan never established one. Somebody reading a scheduled task's log would
+       otherwise be told a folder full of files nobody vouched for was clean.
+
+       0 = files held back, 1 = pluralised "file"/"files", 2 = their size.
+
+       IT NAMES NO CAUSE AND MUST NOT ACQUIRE ONE. Several different findings
+       empty an offer this way and they are different facts about a machine, so
+       any sentence naming one of them is false on the others. What is true of
+       every one of them is the opening clause, which is the same clause the
+       window's own screen opens with (Completion.NothingOfferedBody.*): the app
+       could not be certain which cached files belong to which programs.
+
+       "Might otherwise have offered" keeps its hedge for the same reason the
+       window's does: some of those files would have been kept back anyway by the
+       per-file screen this branch skips, so "would have offered" claims more than
+       the run established.
+
+       A PAIR AND NOT A FLAT KEY, because it shipped as one for an afternoon and
+       read "held back all 1 file" at a count of one. The one-form names the size
+       and not the numeral, exactly as the window's body does, so it spends {2} and
+       leaves {0} and {1} unused; both are passed on either branch so the two forms
+       cannot disagree about which index is which.
+
+       IT CLOSED ON "That is not the same as finding nothing to clean up" AND THAT
+       SENTENCE WAS TAKEN OUT. The first sentence already says what happened in
+       full, so the second added no fact: what it added was the app arguing against
+       a conclusion the reader has not reached. The tense also differs from the
+       window's ("held back" here, "has held back" there) and that is deliberate,
+       each being right in its own register. -->
+  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.</value></data>
+  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel
        opens "{0} mode:", and a filter for delete runs has to find this one.
        1 = registered package count, 2 = pluralised "package"/"packages". -->
+  <!-- The audit line for the outcome above, so the Application channel splits the
+       same three ways stdout does and a monitoring tool is not told a machine is
+       clean when the scan could not judge it.
+
+       0 = mode arg, whichever of /s, /d and /m was run, as in the entry above:
+       the no-files branch is common to all three. 1 = files held back,
+       2 = pluralised "file"/"files".
+
+       IT SHARES EVENT ID 1000 WITH THE ENTRY ABOVE, which is a real limit and is
+       recorded rather than designed around: the run did its job, so it belongs in
+       the outcome band, and a tool that needs to tell this machine from a clean
+       one has to read the message. Splitting the band would put a new ID on the
+       wire, which is a contract change and not this line's to make.
+
+       "No action taken" rather than a phrase of its own: Cli.EventLogScanFound
+       already ends that way, so a filter watching this channel meets one phrase
+       and not two.
+
+       IT HELD BACK {1} {2} RATHER THAN "{1} {2} were held back", AND THE WORD ORDER
+       IS THE PLURALISATION. This line is machine-read and forced English at the
+       emit site, so it takes no .Singular/.Plural pair and the passive form read
+       "so 1 file were held back" at a count of one. Putting the app back in as the
+       subject makes one shape correct at every count, which is what a matched
+       surface needs. -->
+  <!-- THE NOTICE BESIDE THAT OUTCOME, Event ID 3002, and it exists because the
+       outcome band cannot carry the distinction. The entry above sits at 1000 with
+       the clean-machine line, since the run did its job either way, so a filter
+       selecting by number cannot tell a machine nothing could be judged on from a
+       machine that is genuinely clean. This is what separates them, and it changes
+       no existing number's meaning.
+
+       0 = mode arg, 1 = files held back.
+
+       IT NAMES NO FOLDER, WHICH IS THE RULE ON THIS CHANNEL AND NOT A PREFERENCE.
+       It carried {InstallerFolder} for an afternoon and was the only Cli.EventLog*
+       string that did. The one entry here that names the folder,
+       Cli.EventLogMoveDestinationInsideInstaller, spells it as a LITERAL, because a
+       token resolves per machine and a line that varies by machine is the opposite
+       of what a matched shape is for. This notice does not need to name it at all.
+
+       AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", which is
+       where the sibling above and this one part company: that one is unpluralised
+       on purpose, matching the always-plural "errors:" header the same audience
+       scrapes, and it can be, because its count is of records rather than files and
+       the word never stands alone next to a numeral here. This one reads "1 file" at
+       a count of one and is correct at every other.
+
+       IT FIRES ON MORE MACHINES THAN THE OUTCOME LINE DOES. That one is written
+       only where nothing at all was offered; this is written beside the other scan
+       notices, so it also reaches a machine whose walk offer was emptied while a
+       superseded registration was still offered beside it. Naming no cause matters
+       more here for that reason, not less. -->
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does
@@ -1279,8 +1380,8 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
 
        "Can fail" and "usually restores" are the verified positions and neither
        may harden: Microsoft guarantees nothing here. -->
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.</value></data>
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。重新运行该程序的安装程序，最好是同一版本，通常能恢复这个文件。</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有麻烦，但修复、更新或卸载可能因此失败。重新运行各个程序的安装程序，最好是同一版本，通常能恢复这些文件。</value></data>
   <!-- The command line's own wording of Summary.RecordsNotMatched, whose remarks
        carry why there is no count and no placeholder in either. The window's
        version closes on Re-scan and opens its second sentence on "Everything
@@ -1288,7 +1389,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        on a /d or an /m, which is the whole of the difference. "Running it again"
        keeps its pronoun because the tool is already established as "it" in the
        sentence before. -->
-  <data name="Cli.RecordsNotMatched" xml:space="preserve"><value>InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.</value></data>
+  <data name="Cli.RecordsNotMatched" xml:space="preserve"><value>InstallerClean 未能把 Windows 记录中的每一项都对应上，因此没有全部读取。已找到的内容不受影响，但关于 {InstallerFolder} 中缺失文件的说明可能不完整。再运行一次也许能找到更多。</value></data>
   <!-- 0 = mode arg, 1 = entries in the Windows Installer records the scan could
        not match up. A notice beside the run's summary, not a summary itself
        (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
@@ -1328,12 +1429,12 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        there. It says "unneeded" for the same reason Cli.DeletedFiles below
        does: it is the last thing printed before a permanent delete that
        nothing confirms and nobody is watching. -->
-  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Deleting {0} unneeded {1}...</value></data>
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>正在删除 {0} 个不需要的{1}…</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun. It says "permanently" because
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
-  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Permanently deleted {0} unneeded {1}.</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>已永久删除 {0} 个不需要的{1}。</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
@@ -1348,38 +1449,38 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        (x86) path that is refused again. Error.DestinationInSystemFolder is the
        window's copy of the same list and moves with it. "and", not "or": outside
        A, B, C and D means outside all four, where "or" offers a choice. -->
-  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>错误：目标 {0} 解析到了 Windows 系统文件夹之下。请选择 %SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)% 和 %ProgramData% 之外的路径。</value></data>
   <!-- 0 = destination, 1 = size the move needs, 2 = size free there. The window
        refuses the same move with Error.NotEnoughSpaceBody; this says it in one
        sentence because a command line has no dialog to lay out. The last clause
        is the one a scheduled task's log needs: the refusal happens before the
        destination folder is created, so the cache is untouched. -->
-  <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.</value></data>
+  <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>错误：{0} 上的空间不足。移动这些文件需要 {1}，而可用空间为 {2}。没有移动任何内容。</value></data>
   <!-- 0 = mode, 1 = destination -->
   <!-- 0 = mode, 1 = destination, 2 = size free there, 3 = size the move needs -->
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>错误：此刻有程序正在使用 Windows Installer，比如 Windows 更新，或者某个正在后台安装的程序。在此期间 /m 和 /d 会被阻止。等结束后再试。</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>错误：这台计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚那次安装（或重启 Windows），再清理 {InstallerFolder}。</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>错误：一项排在重启之后的文件操作指向 {InstallerFolder}（{0}）。请先重启 Windows 让该操作完成，再进行清理。</value></data>
   <!-- What a blocking reason with no line of its own gets, so a reason added
        later cannot leave the command line reporting an unexpected crash for a
        run that was merely held. The command-line twin of Body.PendingReboot.Other,
        adapted the way its three siblings are: the flags rather than the window's
        button names, "blocked" rather than "paused" to match them, and no Re-scan,
        there being nothing to re-scan on a command line. -->
-  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
+  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>错误：Windows Installer 有操作正在进行，因此 /m 和 /d 会被阻止。InstallerClean 不会在 {InstallerFolder} 变动时去碰它。等结束后再试。</value></data>
   <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
        string rather than a shared one because this whole family is: all four
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
        it, which is the console's shape and not the window's. Same condition,
        same refusal, /d. No placeholders. -->
-  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.</value></data>
+  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有删除任何内容。请重试，若一直如此请重启 Windows。</value></data>
   <!-- The /m half of the line above, the pair matching the two Error.* pairs in
        the window's family. No placeholders. -->
-  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
+  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有移动任何内容。请重试，若一直如此请重启 Windows。</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1400,19 +1501,19 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        the other. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
-  <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} unneeded {1} to {2}...</value></data>
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>正在把 {0} 个不需要的{1}移动到 {2}…</value></data>
   <!-- 0 = moved count, 1 = pluralised noun. "Unneeded" describes the files, not
        the operation, so it does not depend on which of Move and Delete was run:
        making it would imply the word meant something about deleting. All four
        run lines carry it. -->
-  <data name="Cli.MovedFiles" xml:space="preserve"><value>Moved {0} unneeded {1}.</value></data>
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>已移动 {0} 个不需要的{1}。</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,
        and there is no Re-scan here. It names the folder immediately before, so
        this one cannot close on "run it again" the way Cli.RecordsNotMatched does;
        "it" would reach back past the folder and take that instead of the tool. -->
-  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.</value></data>
+  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean 已无法确认目标文件夹，因此停了下来，而不是写到错误的位置。请检查 {0}，然后重新运行该命令。</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <!-- Same eight slots as Cli.EventLogMoveSummary, for a batch one of the
@@ -1467,17 +1568,13 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        that skip comment lines (less, grep -v, jq pipelines) skip
        the header. Stored as one multi-line block; the C# side reads
        it verbatim and normalises line endings to the host platform. -->
-  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log captures unhandled exceptions from InstallerClean.
-# Under elevation the framework's exception messages can include
-# file paths from the running session (including other users'
-# profiles enumerated by Windows Installer queries). Network-
-# failure messages from the update check or result-log POST can
-# include the destination URL and the resolved IP / proxy address.
-# Entries about unreadable Windows Installer records can include a
-# Windows account SID (S-1-5-21-...) and the product codes of
-# installed software.
-# Redact all three classes of detail before attaching this file to
-# a public bug report.
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log 记录 InstallerClean 未处理的异常。
+# 在提升权限的情况下，框架的异常消息可能包含当前会话中的文件路径
+#（包括 Windows Installer 查询所枚举的其他用户的配置文件）。更新
+# 检查或结果日志上传的网络故障消息，可能包含目标 URL 以及解析出的
+# IP 或代理地址。关于无法读取的 Windows Installer 记录的条目，可能
+# 包含 Windows 账户 SID（S-1-5-21-...）以及已安装软件的产品代码。
+# 把此文件附到公开的错误报告之前，请先删除这三类信息。
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
@@ -1487,18 +1584,18 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        Windows system folder; without this line the only statement that it
        touches nothing anything needs is an adjective inside two of the six
        usage rows, which is not the same as saying it. -->
-  <data name="Cli.Help.Summary" xml:space="preserve"><value>Removes cached .msi and .msp files that no installed program still needs.</value></data>
+  <data name="Cli.Help.Summary" xml:space="preserve"><value>移除没有任何已安装程序仍然需要的 .msi 和 .msp 缓存文件。</value></data>
   <!-- Running it from an ordinary prompt is the commonest way to get this wrong,
        and the tool cannot say so at the time: Windows refuses to start a process
        that requires administrator, so nothing of this program runs. The help is
        the only place it can be said. -->
-  <data name="Cli.Help.Elevation" xml:space="preserve"><value>Needs an elevated (administrator) prompt; Windows will not start it.</value></data>
+  <data name="Cli.Help.Elevation" xml:space="preserve"><value>需要管理员命令提示符，否则 Windows 不会启动它。</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>用法：</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     显示此帮助（也接受 /?、-h）</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  显示版本号（也接受 -v）</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         仅扫描 - 列出不需要的文件</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         永久删除不需要的文件</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         移动到已保存的目标文件夹</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 路径    移动到指定路径</value></data>
   <!-- ONE value carrying TWO printed lines, and the &#10; is where the English
        breaks rather than where every language must. It was three keys
@@ -1509,8 +1606,8 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        What went with the other two lines: how to redirect and pipe, which this
        reader has been doing for twenty years, and that the GUI sits alongside
        in InstallerClean.exe, which is untrue of the command-line download. -->
-  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli 会占住命令提示符直到结束，因此脚本或计划任务&#10;可以等待它完成。</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>该文件夹按用户保存；计划任务或 SYSTEM 运行需要 /m 路径。</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>退出代码：</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT, and this line said the second until 3.0.0. Five runs exit 0: /? and
@@ -1521,15 +1618,15 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        error. The sentence has to be true of all five, so it says what they share,
        which is that the run did what it was asked and nothing in it failed.
        Anyone tightening it has to check it against the five again. -->
-  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: the run finished with nothing left to do</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   成功：本次运行做了要求的事，并且没有任何失败</value></data>
   <!-- Two printed lines from one value; see Cli.Help.NoteLine1 for why the break
        is inside the value. The destination causes are named because they are
        what a scheduled /m actually hits (none given, relative, inside a system
        folder, not enough room) and all four exit 1. -->
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   失败：没有处理任何内容（参数或目标有误、扫描失败，&#10;       或者每个文件都失败）</value></data>
   <!-- A Ctrl+C part way through exits 2 with nothing failed at all, so this
        cannot say that some files failed. -->
-  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some processed, some not (a failure or a Ctrl+C part way)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   部分：部分已处理，部分未处理（失败或 Ctrl+C）</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  暂时性：临时状况阻止了本次运行（见相关消息）</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 已取消（Ctrl+C）</value></data>
   <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>更改语言。程序会重启。</value></data>

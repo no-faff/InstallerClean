@@ -410,7 +410,7 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `Windows ha record per {0} file che non si trovano in {InstallerFolder}: {1}. Nell'uso quotidiano non creano problemi, ma una riparazione, un aggiornamento o una disinstallazione possono non riuscire a causa loro. Rieseguire il programma di installazione di ciascun software, preferibilmente nella stessa versione, di solito ripristina i file.`,
   'Cli.MoveNotEnoughSpace': `Errore: spazio insufficiente in {0}. Spostare questi file richiede {1} e ne sono liberi {2}. Non è stato spostato nulla.`,
   'Cli.PendingRebootBlocked.Other': `Errore: Windows Installer ha qualcosa in corso, quindi /m e /d sono bloccati. InstallerClean non tocca {InstallerFolder} mentre cambia. Riprova quando ha finito.`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.FoundNoOrphans': `Nessun file non necessario trovato.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean non è più riuscito a confermare la cartella di destinazione, quindi si è fermato anziché scrivere nel posto sbagliato. Controlla {0}, poi esegui di nuovo il comando.`,
   'Cli.Help.Summary': `Rimuove i file .msi e .msp in cache che nessun programma usa più.`,
   'Cli.Help.Elevation': `Richiede un prompt come amministratore; Windows non lo avvierà.`,

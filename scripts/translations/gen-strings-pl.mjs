@@ -527,7 +527,7 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `Windows ma rekordy dla {0} plików, których nie ma w {InstallerFolder}: {1}. Na co dzień nie sprawiają one kłopotu, ale naprawa, aktualizacja lub odinstalowanie może się przez nie nie powieść. Ponowne uruchomienie instalatora każdego z tych programów, najlepiej w tej samej wersji, zwykle przywraca pliki.`,
   'Cli.MoveNotEnoughSpace': `Błąd: za mało miejsca w {0}. Przeniesienie tych plików wymaga {1}, a wolne jest {2}. Niczego nie przeniesiono.`,
   'Cli.PendingRebootBlocked.Other': `Błąd: Instalator Windows ma coś w toku, więc /m i /d są zablokowane. InstallerClean nie ruszy {InstallerFolder} w trakcie zmian. Spróbuj ponownie, gdy się skończy.`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.FoundNoOrphans': `Nie znaleziono niepotrzebnych plików.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu docelowego, więc zatrzymał się, zamiast zapisać w złym miejscu. Sprawdź {0}, a potem uruchom polecenie ponownie.`,
   'Cli.Help.Summary': `Usuwa pliki .msi i .msp z pamięci podręcznej, zbędne każdemu programowi.`,
   'Cli.Help.Elevation': `Wymaga wiersza polecenia administratora; inaczej Windows go nie uruchomi.`,

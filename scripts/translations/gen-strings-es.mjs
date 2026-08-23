@@ -416,7 +416,7 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `Windows tiene registros de {0} archivos que no están en {InstallerFolder}: {1}. En el día a día no causan problemas, pero una reparación, una actualización o una desinstalación pueden fallar por ellos. Volver a ejecutar el instalador de cada programa, preferiblemente la misma versión, suele restaurar los archivos.`,
   'Cli.MoveNotEnoughSpace': `Error: espacio insuficiente en {0}. Mover estos archivos necesita {1} y hay {2} libres. No se ha movido nada.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer tiene algo en curso, así que /m y /d están bloqueados. InstallerClean no tocará {InstallerFolder} mientras cambia. Inténtalo de nuevo cuando termine.`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.FoundNoOrphans': `No se encontraron archivos innecesarios.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean ya no pudo confirmar la carpeta de destino, así que se detuvo en lugar de escribir en el sitio equivocado. Comprueba {0} y vuelve a ejecutar el comando.`,
   'Cli.Help.Summary': `Quita archivos .msi y .msp en caché que ningún programa necesita ya.`,
   'Cli.Help.Elevation': `Requiere símbolo del sistema como administrador; Windows no lo iniciará.`,
