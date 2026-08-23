@@ -2449,17 +2449,42 @@ public class MainViewModelTests
     public void MainExplanationWhyText_claims_only_what_the_scan_established()
     {
         // The sentence is about the ANSWER the app got, not about the state of the
-        // world, and the difference is load-bearing rather than a hedge. "Windows
-        // has no record of them" would be an assertion the app cannot make: a
-        // product installed as a second instance registers under its instance
-        // code, and a recorded path can be spelled in a form the folder walk never
-        // produces, so a file it offers can in principle be one Windows does hold
-        // a record for. What it did establish is that it asked and the answer came
-        // back empty.
-        var vm = CreateViewModel();
+        // world, and the difference is load-bearing rather than a hedge. Saying
+        // outright that Windows has no record of these files would be an assertion
+        // the app cannot make. What it did establish is that it asked.
+        //
+        // IT USED TO PIN THE PHRASE "no record" AND THE COPY MOVED OUT FROM UNDER
+        // IT. The sentence was rewritten to stop naming one cause for a list that
+        // has two, which is a standing rule and a correct fix, and it says "no
+        // program claims it" where it used to say "no record". The copy is right
+        // and this assertion was stale. What follows guards the same property
+        // against the wording that ships, and against a rewrite of it.
+        //
+        // THE THREE THINGS IT HOLDS. The opening clause carries the epistemics for
+        // both halves, so the sentence has to say that the app ASKED. The two
+        // causes the offer can contain are both named, so a rewrite cannot collapse
+        // back to one cause for a set that has two. And the third label must not
+        // appear: an obsoleted registration is counted at scan time and never
+        // offered, so naming it here would describe a file this list cannot hold.
+        //
+        // WHAT IT WOULD LET THROUGH, SAID PLAINLY BECAUSE A PHRASE MATCH IS WHAT
+        // FAILED HERE. It is a frame check and not a truth check. A sentence that
+        // said the app asked, named both causes, avoided that one phrase and then
+        // asserted something false about the machine in different words would pass
+        // it. Nothing in a test can settle whether a sentence is true; that is a
+        // copy review, and the resx comment beside this string is where the standard
+        // for it lives.
+        var text = CreateViewModel().MainExplanationWhyText;
 
-        Assert.Contains("no record", vm.MainExplanationWhyText, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("Windows has no record", vm.MainExplanationWhyText, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("ask", text, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Windows has no record", text, StringComparison.OrdinalIgnoreCase);
+
+        // Through the resx labels rather than through English, so the partition is
+        // pinned in whatever language the run renders and a label edit moves the
+        // test with the copy.
+        Assert.Contains(Strings.Reason_Orphaned, text, StringComparison.Ordinal);
+        Assert.Contains(Strings.Reason_Superseded, text, StringComparison.Ordinal);
+        Assert.DoesNotContain(Strings.Reason_Obsoleted, text, StringComparison.Ordinal);
     }
 
     [Fact]

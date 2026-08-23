@@ -290,7 +290,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         Assert.Equal(1, enumerated.Census.PathNormalisationRefusedTotal);
 
         var result = await new FileSystemScanService(
-            QueryReturning(enumerated), null, _fakeInstallerDir).ScanAsync();
+            QueryReturning(OnARealMachine(enumerated)), null, _fakeInstallerDir).ScanAsync();
 
         Assert.Empty(result.RemovableFiles);
         Assert.Equal(2, result.WithheldFiles!.Count);
@@ -311,10 +311,48 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         Assert.Equal(0, enumerated.Census.PathNormalisationRefusedTotal);
 
         var result = await new FileSystemScanService(
-            QueryReturning(enumerated), null, _fakeInstallerDir).ScanAsync();
+            QueryReturning(OnARealMachine(enumerated)), null, _fakeInstallerDir).ScanAsync();
 
         Assert.Equal(2, result.RemovableFiles.Count);
         Assert.Empty(result.WithheldFiles!);
+    }
+
+    /// <summary>
+    /// The enumeration's own answer, on a machine that could exist: one registration
+    /// naming a file that really is in the folder this scan walks.
+    ///
+    /// WHY BOTH TESTS ABOVE NEED IT, AND WHY THEY FAILED FOR YEARS OF NIGHTS WITHOUT
+    /// IT. Each drives a real enumeration holding ONE registration, whose recorded
+    /// path is a real Windows path, and then scans a temp folder holding files. So no
+    /// registration named anything in the walked folder while the walk still yielded
+    /// candidates, which is exactly the machine the first correlation gate refuses:
+    /// what Windows says it has and what the folder holds describe different places,
+    /// and the scan is stopped rather than offering the folder as orphans. The guard
+    /// is right and it was the fixture that could not exist, because on a real machine
+    /// the folder being walked IS the cache those registrations name.
+    ///
+    /// THE ROW IS BUILT HERE RATHER THAN ENUMERATED, and that is deliberate rather
+    /// than a shortcut. What these tests are about is the wire between the census a
+    /// real enumeration builds and the withholding rule that reads it, and that census
+    /// is the real one either way. What the extra row must do is name the walked folder
+    /// in the SPELLING THAT FOLDER IS WALKED IN: a path taken through the enumeration
+    /// is resolved against the filesystem, and a temp folder can be reached through an
+    /// 8.3 alias, so an enumerated row could name the same folder in a spelling that
+    /// does not compare equal to it and would fire the gate again on some machines and
+    /// not others.
+    /// </summary>
+    private InstallerQueryResult OnARealMachine(InstallerQueryResult enumerated)
+    {
+        var claimed = Path.Combine(_fakeInstallerDir, "claimed.msi");
+        File.WriteAllBytes(claimed, new byte[] { 4 });
+
+        return enumerated with
+        {
+            Packages = enumerated.Packages
+                .Append(new RegisteredPackage(claimed, "Another Program", "{B}"))
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 
     /// <summary>
