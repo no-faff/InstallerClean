@@ -49,13 +49,21 @@ const KEEP_ENGLISH = new Set([
 // Per-language keeps: "file"/"patch" (and the Field.File label) are identical to
 // the English, a deliberate keep (Indonesian uses the same loanword "file", and
 // Windows id keeps "File"), not a missed value.
-const ALSO_KEEP = ['Plural.File.Singular', 'Plural.Patch.Singular', 'Field.File'];
+const ALSO_KEEP = [
+  'Plural.File.Singular',
+  'Plural.Patch.Singular',
+  'Field.File',
+  // The list separator Indonesian uses is the one English uses. A punctuation
+  // mark rather than a word, so there is nothing to translate and nothing to
+  // get wrong; only ja and zh-Hans differ, taking the ideographic comma.
+  'Display.ListSeparator',       // ", "
+];
 
 const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `Tentang`,
-  'Window.Registered.Title': `Files left alone`,
+  'Window.Registered.Title': `File yang dibiarkan apa adanya`,
   'Window.Orphaned.Title': `File tidak diperlukan yang aman dihapus`,
 
   // Section headings
@@ -66,7 +74,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `PATCH`,
   'Section.Registered.Details': `DETAIL PRODUK`,
-  'Section.Backup.Folder': `BACKUP FOLDER`,
+  'Section.Backup.Folder': `FOLDER TUJUAN`,
   'Section.SayThanks': `UCAPKAN TERIMA KASIH`,
 
   // Field labels (used in detail panels)
@@ -106,7 +114,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Beri _bintang di GitHub`,
   'Action.Licence': `Lisensi Apache 2.0`,
   'Action.Move': `_Pindahkan`,
-  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
+  'Action.BackupFolderPlaceholder': `Jalur ke folder jika Anda memindahkan, bukan menghapus.`,
   'Action.OpenReleasePage': `Buka halaman _rilis`,
   'Action.Rescan': `Pindai _ulang`,
   'Action.ScanAgain': `Pindai _lagi`,
@@ -134,7 +142,7 @@ const MAP = {
   'Automation.CloseResult': `Tutup hasil dan kembali ke jendela utama`,
   'Automation.LeaveStarOnGitHub.About': `Beri bintang di github`,
   'Automation.Minimise': `Kecilkan`,
-  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
+  'Automation.ConfirmDelete': `Hapus permanen menyingkirkan file yang tidak diperlukan. Batal menutup jendela tanpa menghapus apa pun.`,
   'Automation.ConfirmMove': `Pindahkan menaruh file yang tidak diperlukan di folder tujuan yang dipilih. Batal membiarkannya di tempatnya.`,
   'Automation.SayThanks': `Ucapkan terima kasih`,
   'Automation.ConfirmSendResultLog': `Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun.`,
@@ -142,17 +150,17 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Memeriksa halaman rilis github untuk mencari versi yang lebih baru.`,
   'Automation.UpdateAvailable.HelpText': `Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini.`,
   'Automation.Licence.HelpText': `Membuka file lisensi di github.com melalui browser Anda.`,
-  'Automation.Section.BackupFolder': `Backup folder`,
+  'Automation.Section.BackupFolder': `Folder tujuan`,
   'Automation.Section.Patches': `Patch`,
   'Automation.Section.ProductDetails': `Detail produk`,
-  'Automation.BackupFolder': `Backup folder`,
+  'Automation.BackupFolder': `Folder tujuan`,
   'Automation.OperationProgress': `Kemajuan operasi`,
   'Automation.RescanInstaller': `Pindai ulang {InstallerFolder}`,
   'Automation.ScanningProgress': `Kemajuan pemindaian`,
   'Automation.StartupScanProgress': `Kemajuan pemindaian awal`,
   'Automation.ViewOrphanedFiles': `Detail, file yang tidak diperlukan`,
   'Automation.ViewOrphanedFiles.HelpText': `Tersedia untuk dibersihkan.`,
-  'Automation.ViewRegisteredFiles': `Details, files left alone`,
+  'Automation.ViewRegisteredFiles': `Detail, file yang dibiarkan apa adanya`,
   'Automation.ViewRegisteredFiles.HelpText': `Daftar baca-saja.`,
   'Automation.SortStatus.Ascending': `Diurutkan berdasarkan {0}, menaik`,
   'Automation.SortStatus.Descending': `Diurutkan berdasarkan {0}, menurun`,
@@ -172,22 +180,22 @@ const MAP = {
   'Tooltip.Minimise': `Kecilkan`,
   'Tooltip.SendResultLog': `Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan orang-orang. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.`,
   'Tooltip.SendResultLog.NothingFound': `Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.`,
-  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
+  'Tooltip.Move': `Memindahkan file yang tidak diperlukan ke folder tujuan. Hapus folder itu setelah Anda yakin tidak ada yang membutuhkannya.`,
+  'Tooltip.MoveNeedsDestination': `Memindahkan file yang tidak diperlukan ke sebuah folder tujuan. Anda akan memilihnya sebentar lagi. Hapus folder itu setelah Anda yakin tidak ada yang membutuhkannya.`,
+  'Tooltip.Delete': `Menghapus permanen file yang tidak diperlukan. File-file itu aman disingkirkan, dan ruangnya langsung kembali.`,
   'Tooltip.SigningCertificate': `Nama subjek dari sertifikat Authenticode yang disematkan. Rantai sertifikat tidak diverifikasi.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
-  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
-  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
+  'Body.MainExplanation.Lead': `File apa pun yang tidak diperlukan di bawah ini [aman dihapus].`,
+  'Body.MainExplanation.Why': `File-file itu ada di {InstallerFolder}. InstallerClean menanyakan setiap program yang terpasang kepada Windows: sebuah file masuk daftar jika tidak ada program yang mengakuinya ({0}), atau jika sebuah patch yang lebih baru telah menggantikannya dan tidak ada program yang bisa kembali kepadanya ({1}).`,
+  'Body.MainExplanation.Action': `Pindahkan ke folder tujuan pilihan Anda, lalu hapus folder itu setelah Anda yakin program-program Anda tetap bisa diperbarui, diperbaiki dan dicopot seperti biasa. Mengembalikannya ke {InstallerFolder} memulihkan semuanya. Atau hapus permanen sekarang juga.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Ada yang sedang memakai Windows Installer saat ini, misalnya pembaruan Windows atau program yang memasang diri di latar belakang. Pindahkan dan Hapus dijeda selama itu berjalan, sehingga InstallerClean tidak menyentuh {InstallerFolder} selagi berubah. Setelah selesai, pindai ulang dan keduanya kembali aktif.`,
+  'Body.PendingReboot.InstallerInProgress': `Ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan pemasangan itu (atau mulai ulang Windows) sebelum membersihkan {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows mengantrekan penggantian nama file untuk mulai ulang berikutnya yang memengaruhi {InstallerFolder}. Mulai ulang Windows sebelum membersihkan.`,
   'Body.NoFileSelected': `Pilih file untuk melihat detail.`,
   'Body.NoProductSelected': `Pilih produk untuk melihat detail.`,
   'Body.NoMetadata': `Tidak ada metadata yang tersedia.`,
-  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.`,
+  'Body.RegisteredMissingFromDisk': `File penginstal ini hilang. Sekarang ini tidak menimbulkan masalah, dan tidak akan sampai hari ketika Anda mencoba memperbaiki, memperbarui atau mencopot program pemiliknya. Langkah itu bisa gagal, karena Windows mencari file ini dan file itu tidak ada.&#10;&#10;Untuk mencoba memperbaikinya, unduh penginstal program itu dari pembuatnya dan jalankan di atas salinan yang sudah ada (jangan copot dulu: mencopot sendiri adalah langkah yang membutuhkan file ini). Gunakan versi yang terpasang jika Anda bisa mendapatkannya, karena Windows mungkin menolak versi lain. Ini seharusnya memulihkan file dan membiarkan pengaturan Anda utuh, tetapi Microsoft tidak menjaminnya, dan jalan terakhir mereka sendiri adalah memasang ulang program itu.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README [menjelaskan folder ini], dan cara memulihkan file, dengan kata-kata Microsoft sendiri.`,
   'Body.NoPatches': `(tidak ada)`,
 
@@ -217,8 +225,8 @@ const MAP = {
   'Status.PreparingDestination': `Menyiapkan folder tujuan...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Moving unneeded files...`,
-  'Status.Deleting': `Deleting unneeded files...`,
+  'Status.Moving': `Memindahkan file yang tidak diperlukan...`,
+  'Status.Deleting': `Menghapus file yang tidak diperlukan...`,
   'Status.MoveCancelled.Partial': `Pemindahan dibatalkan. {0} dari {1} {2} diproses.`,
   'Status.DeleteCancelled.Partial': `Penghapusan dibatalkan. {0} dari {1} {2} diproses.`,
   'Status.MoveFailed': `Pemindahan gagal ({0}). Detail di {1}.`,
@@ -258,27 +266,31 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} dihapus permanen`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} dihapus permanen`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
-  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
+  'Summary.RegisteredStillUsed.Singular': `{0} file dibiarkan apa adanya`,
+  'Summary.RegisteredStillUsed.Plural': `{0} file dibiarkan apa adanya`,
   'Summary.OrphanedToCleanUp.Singular': `{0} file tidak diperlukan untuk dibersihkan`,
   'Summary.OrphanedToCleanUp.Plural': `{0} file tidak diperlukan untuk dibersihkan`,
-  'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
-  'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Singular': `Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak merepotkan, tapi perbaikan, pembaruan atau pencopotan bisa gagal karenanya. Buka Detail untuk tahu apa yang harus dilakukan.`,
+  'Summary.MissingFromDisk.Plural': `Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak merepotkan, tapi perbaikan, pembaruan atau pencopotan bisa gagal karenanya. Buka Detail untuk tahu apa yang harus dilakukan.`,
+  'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} program lain`,
+  'Summary.MissingFromDisk.OtherPrograms.Plural': `{0} program lain`,
+  'Summary.MissingFromDisk.Unnamed.Singular': `{0} file tanpa nama program dalam catatan`,
+  'Summary.MissingFromDisk.Unnamed.Plural': `{0} file tanpa nama program dalam catatan`,
 
   // 0 = current file count, 1 = total count, 2 = pluralised noun.
   'Summary.OperationFiles': `{0} dari {1} {2}`,
 
   // Orphaned-window footer. 0 = orphaned count, 1 = superseded count,
   // 2 = obsoleted count, 3 = size display.
-  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
+  'Summary.OrphanedWindow': `{0} {1} tidak diperlukan ({2})`,
 
   // Registered-window footer. 0 = count, 1 = size display.
-  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} file dibiarkan apa adanya ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} file dibiarkan apa adanya ({1})`,
 
   // Confirmation dialogs
 
@@ -286,7 +298,7 @@ const MAP = {
   'Confirm.MoveTitle': `Pindahkan {0} {1} ({2})?`,
 
   // 0 = destination path
-  'Confirm.MoveDestination': `Move to:`,
+  'Confirm.MoveDestination': `Pindahkan ke:`,
   'Confirm.DeleteTitle': `Hapus {0} {1} ({2})?`,
 
   // Error messages
@@ -306,7 +318,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `Tujuan tidak boleh berada di dalam folder Windows Installer.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `Tujuan {0} teruraikan di bawah folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% dan %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Ruang tidak cukup`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -326,8 +338,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows menolak akses ke file ini; file dibiarkan di tempatnya.`,
   'Error.AccessDenied.Plural': `Windows menolak akses ke file-file ini; semuanya dibiarkan di tempatnya.`,
-  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
-  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
+  'Error.FileInUse.Singular': `File ini sedang dibuka atau dikunci program lain, jadi untuk saat ini tidak ada yang bisa menyingkirkannya. File itu dibiarkan di tempatnya; coba lagi nanti.`,
+  'Error.FileInUse.Plural': `File-file ini sedang dibuka atau dikunci program lain, jadi untuk saat ini tidak ada yang bisa menyingkirkannya. Semuanya dibiarkan di tempatnya; coba lagi nanti.`,
   'Error.IOFailure.Singular': `Windows melaporkan kesalahan file; file dibiarkan di tempatnya.`,
   'Error.IOFailure.Plural': `Windows melaporkan kesalahan file; file-file ini dibiarkan di tempatnya.`,
   'Error.UnknownError.Singular': `Ada yang tidak beres dengan file ini; file dibiarkan di tempatnya.`,
@@ -339,7 +351,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Menolak memindahkan file ke dalam folder Windows Installer (tujuan: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
+  'Error.DestinationNotFullyQualified': `Folder tujuan harus berupa jalur lengkap ke sebuah folder, diawali huruf drive atau berbagi jaringan (misalnya D:\\Backup, atau \\\\server\\backup). InstallerClean tidak bisa memakai yang ini: {0}`,
   'BrowserLaunch.FailedTitle': `Tidak bisa membuka browser Anda`,
   'UpdateCheck.Title': `Periksa pembaruan`,
   'UpdateCheck.Status.Checking': `Memeriksa...`,
@@ -359,7 +371,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean tidak bisa membuka browser Anda, dan juga tidak bisa menyalin tautan ke clipboard. Tautannya:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder tujuan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Tidak bisa menulis ke {0}.`,
@@ -409,9 +421,10 @@ const MAP = {
   'Display.Size.B': `{0} B`,
   'Display.Elapsed.Ms': `{0:F0}ms`,
   'Display.Elapsed.S': `{0:F1}s`,
+  'Display.ListSeparator': `, `,
   'Display.ElapsedLong.LessThanASecond': `kurang dari satu detik`,
   'Display.ElapsedLong.Seconds': `{0:F1} detik`,
-  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log merekam eksepsi tak tertangani dari InstallerClean.\n# Dengan hak tinggi, pesan eksepsi framework bisa memuat jalur file\n# dari sesi yang berjalan (termasuk profil pengguna lain yang didata\n# oleh kueri Windows Installer). Pesan kegagalan jaringan dari\n# pemeriksaan pembaruan atau pengiriman log hasil bisa memuat URL\n# tujuan serta alamat IP atau proksi yang teruraikan. Entri tentang\n# catatan Windows Installer yang tak terbaca bisa memuat SID akun\n# Windows (S-1-5-21-...) dan kode produk perangkat lunak terpasang.\n# Hapus ketiga jenis rincian itu sebelum melampirkan berkas ini ke\n# laporan bug publik.\n`,
   'Tooltip.ChangeLanguage': `Ganti bahasa. Program akan dimulai ulang.`,
   'Automation.ChangeLanguage': `Ganti bahasa`,
   'Automation.ChangeLanguage.HelpText': `Program akan dimulai ulang.`,
@@ -420,53 +433,53 @@ const MAP = {
   // Descriptions translated; command tokens, flags, the {InstallerFolder} token
   // and the exit-code numbers verbatim; leading spaces kept (the screen is
   // column-aligned for a monospace terminal); PATH metavariable -> JALUR.
-  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
+  'Cli.UnknownArgument': `Kesalahan: argumen tidak dikenal '{0}'`,
   'Cli.Cancelling': `Membatalkan...`,
   'Cli.Cancelled': `Dibatalkan.`,
-  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
-  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
+  'Cli.GenericError': `Kesalahan: kegagalan tak terduga ({0}). Rincian ditulis ke {1}.`,
+  'Cli.GenericError.NoLog': `Kesalahan: kegagalan tak terduga ({0}). Log kerusakan tidak bisa ditulis.`,
   'Cli.ScanningInstaller': `Memindai {InstallerFolder}...`,
-  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
-  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
+  'Cli.FoundOrphans': `Ditemukan {0} {1} tidak diperlukan untuk dibersihkan ({2}).`,
+  'Cli.DeletingFiles': `Menghapus {0} {1} yang tidak diperlukan...`,
+  'Cli.DeletedFiles': `Menghapus permanen {0} {1} yang tidak diperlukan.`,
   'Cli.NoMoveDestination': `Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR. (Default yang diatur di GUI bersifat per-pengguna dan tidak berlaku untuk tugas terjadwal atau proses akun layanan.)`,
   'Cli.MoveDestinationInsideInstaller': `Kesalahan: tujuan tidak boleh berada di dalam folder Windows Installer.`,
   'Cli.MoveDestinationRelative': `Kesalahan: tujuan harus berupa jalur absolut lengkap. Diterima: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
-  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
+  'Cli.MoveDestinationInSystemFolder': `Kesalahan: tujuan {0} teruraikan di bawah folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% dan %ProgramData%.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Kesalahan: ada yang sedang memakai Windows Installer saat ini, misalnya pembaruan Windows atau program yang memasang diri di latar belakang. /m dan /d diblokir selama itu berjalan. Coba lagi setelah selesai.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Kesalahan: ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan pemasangan itu (atau mulai ulang Windows) sebelum membersihkan {InstallerFolder}.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Kesalahan: operasi file yang diantrekan setelah mulai ulang menyasar {InstallerFolder} ({0}). Mulai ulang Windows untuk menyelesaikan operasi itu sebelum membersihkan.`,
+  'Cli.MovingFiles': `Memindahkan {0} {1} yang tidak diperlukan ke {2}...`,
+  'Cli.MovedFiles': `Memindahkan {0} {1} yang tidak diperlukan.`,
   'Cli.MutexBlocked': `Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Kode keluar 75 (sementara); aman untuk dicoba lagi nanti.`,
   'Cli.EventLogUnavailable': `Catatan: penulisan ke Log Peristiwa gagal. Periksa izin log Aplikasi atau Kebijakan Grup.`,
   'Cli.Help.Header': `InstallerClean - pembersihan {InstallerFolder}`,
   'Cli.Help.Usage': `Penggunaan:`,
   'Cli.Help.Help': `  installerclean-cli --help     Tampilkan bantuan ini (juga /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version  Cetak versi (juga -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Pindai saja - daftar yang tak dipakai`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Hapus permanen yang tidak diperlukan`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         Pindahkan ke folder tujuan tersimpan`,
   'Cli.Help.MovePath': `  installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan`,
-  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
+  'Cli.Help.NoteLine1': `installerclean-cli menahan prompt sampai selesai, sehingga skrip atau&#10;tugas terjadwal bisa menunggunya.`,
   'Cli.Help.ExitCodesHeader': `Kode keluar:`,
-  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
-  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
-  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
+  'Cli.Help.ExitCodeOk': `  0   berhasil: menjalankan yang diminta dan tidak ada yang gagal`,
+  'Cli.Help.ExitCodeError': `  1   gagal: tidak ada yang diproses (argumen atau tujuan salah,&#10;       pemindaian gagal, atau semua file gagal)`,
+  'Cli.Help.ExitCodePartial': `  2   sebagian: sebagian diproses, sebagian tidak (gagal atau Ctrl+C)`,
   'Cli.Help.ExitCodeTransient': `  75  sementara: kondisi sementara memblokir proses (lihat pesannya)`,
   'Cli.Help.ExitCodeCancelled': `  130 dibatalkan (Ctrl+C)`,
   'Body.NotScanned.Lead': `Belum ada yang dipindai.`,
   'Body.NotScanned.Why': `Tekan Pindai ulang untuk menelusuri {InstallerFolder} mencari file penginstal yang tidak lagi diperlukan program mana pun.`,
-  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Confirm.MoveSameDrive': `Folder itu ada di drive yang sama, jadi ruangnya belum kembali sampai Anda menghapusnya. Pilih folder di drive lain kalau Anda ingin ruangnya langsung kembali.`,
+  'Error.ScanCorrelationFailed': `InstallerClean tidak bisa mencocokkan catatan Windows Installer dengan isi {InstallerFolder}. Hampir tidak ada yang ditunjuk catatan itu benar-benar ada di sana, dan hampir tidak ada yang ada di sana disebut oleh catatan mana pun, jadi tidak ada file yang bisa ditunjukkan tidak diperlukan. Tidak ada yang ditawarkan dan tidak ada yang disingkirkan.`,
   'Error.CandidateOutsideCache': `File ini tidak berada langsung di dalam folder Windows Installer; ditolak demi keamanan.`,
-  'Completion.ReverifySkipped': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
+  'Completion.ReverifySkipped': `{0} {1} dibiarkan di tempatnya, karena catatan kini mengakui apa yang ditandai pemindaian.`,
   'Completion.MoveCancelledSummary': `{0} dari {1} {2} dipindahkan sebelum Anda membatalkan.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} dari {1} {2} dihapus permanen sebelum Anda membatalkan.`,
   'Body.PendingReboot.Lead': `File-file ini tidak bisa dibersihkan sekarang.`,
   'Cli.TooManyArguments': `Kesalahan: argumen tambahan yang tidak terduga '{0}'. Jika folder pemindahan Anda mengandung spasi, apit seluruh jalur dengan tanda kutip: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
-  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
+  'Cli.Help.MoveScheduledNote': `Folder itu disimpan per pengguna; tugas terjadwal perlu /m JALUR.`,
+  'Completion.ReverifyIncomplete': `{0} {1} dibiarkan di tempatnya, karena catatan Windows Installer tidak bisa dibaca seluruhnya pada pemeriksaan terakhir.`,
   'Error.ScanRecordsUnreadable': `InstallerClean tidak bisa membaca cukup banyak catatan Windows Installer untuk memastikan apa yang masih diperlukan: daftar program terpasang kembali tidak lengkap, dan membaca catatan yang sama langsung dari registri juga menemui kesalahan. Sebuah file bisa tampak terisolasi hanya karena catatan yang menyebutkannya termasuk yang tidak terbaca, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar program terpasang: InstallerClean menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar patch sebuah program: InstallerClean menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
@@ -478,41 +491,41 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Membuka readme di github melalui browser Anda.`,
   'Automation.About.ReportProblem.HelpText': `Membuka pelacak masalah (Issues) di github.com melalui browser Anda.`,
   'Automation.AutoUpdateCheck.HelpText': `Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya.`,
-  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
-  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
-  'Automation.Scroll.ProductDetails': `Product details`,
-  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
-  'Cli.TooManyArgumentsNoPath': `Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.`,
-  'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.`,
-  'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.`,
-  'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
-  'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
+  'Tooltip.MoveSameDrive': `Memindahkan file yang tidak diperlukan ke folder tujuan. Folder itu ada di drive yang sama, jadi ruangnya baru kembali setelah Anda menghapus folder itu atau memindahkannya ke drive lain. Anda bisa melakukannya setelah yakin tidak ada yang membutuhkannya.`,
+  'Completion.MoveRestoreHint.Singular': `File di folder itu [aman disingkirkan], jadi hapus foldernya kapan saja Anda mau. Sampai saat itu, Anda bisa mengembalikannya ke {InstallerFolder} kalau suatu program ternyata membutuhkannya (sangat kecil kemungkinannya).`,
+  'Completion.MoveRestoreHint.Plural': `File di folder itu [aman disingkirkan], jadi hapus foldernya kapan saja Anda mau. Sampai saat itu, Anda bisa mengembalikannya ke {InstallerFolder} kalau suatu program ternyata membutuhkan salah satunya (sangat kecil kemungkinannya).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `File di folder itu [aman disingkirkan], jadi hapus foldernya atau pindahkan ke drive lain kapan pun Anda benar-benar ingin mendapatkan kembali ruangnya. Sampai saat itu, Anda bisa mengembalikannya ke {InstallerFolder} kalau suatu program ternyata membutuhkannya (sangat kecil kemungkinannya).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `File di folder itu [aman disingkirkan], jadi hapus foldernya atau pindahkan ke drive lain kapan pun Anda benar-benar ingin mendapatkan kembali ruangnya. Sampai saat itu, Anda bisa mengembalikannya ke {InstallerFolder} kalau suatu program ternyata membutuhkan salah satunya (sangat kecil kemungkinannya).`,
+  'Confirm.DeletePermanently.Singular': `File ini akan dihapus permanen. File ini [aman dihapus], tapi kalau Anda ingin cadangan, gunakan tombol Pindahkan saja.`,
+  'Confirm.DeletePermanently.Plural': `File-file ini akan dihapus permanen. Semuanya [aman dihapus], tapi kalau Anda ingin cadangan, gunakan tombol Pindahkan saja.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean tidak berhasil membuat Windows menguraikan jalur sebenarnya dari {InstallerFolder}, jadi tidak ada file yang bisa ditunjukkan berada di dalamnya dan tidak ada yang ditawarkan untuk dibersihkan. Pemindaian ini tidak menemukan apa pun karena pemeriksaan itu gagal, bukan karena foldernya bersih. Tidak ada yang disingkirkan.`,
+  'Automation.Scroll.ProductDetails': `Detail produk`,
+  'Body.PendingReboot.Other': `Windows Installer sedang mengerjakan sesuatu, jadi Pindahkan dan Hapus dijeda. InstallerClean tidak akan menyentuh {InstallerFolder} selagi berubah. Setelah selesai, pindai ulang dan keduanya kembali aktif.`,
+  'Cli.TooManyArgumentsNoPath': `Kesalahan: argumen tambahan tak terduga '{0}'. /s dan /d tidak menerima argumen lain, dan hanya satu flag yang bisa dipakai per proses.`,
+  'Cli.MissingFromDisk.Singular': `Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak merepotkan, tapi perbaikan, pembaruan atau pencopotan bisa gagal karenanya. Menjalankan lagi penginstal program itu, sebaiknya versi yang sama, biasanya memulihkan filenya.`,
+  'Cli.MissingFromDisk.Plural': `Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak merepotkan, tapi perbaikan, pembaruan atau pencopotan bisa gagal karenanya. Menjalankan lagi penginstal masing-masing program, sebaiknya versi yang sama, biasanya memulihkan file-filenya.`,
+  'Cli.MoveNotEnoughSpace': `Kesalahan: ruang tidak cukup di {0}. Memindahkan file-file ini perlu {1} sedangkan yang tersedia {2}. Tidak ada yang dipindahkan.`,
+  'Cli.PendingRebootBlocked.Other': `Kesalahan: Windows Installer sedang mengerjakan sesuatu, jadi /m dan /d diblokir. InstallerClean tidak akan menyentuh {InstallerFolder} selagi berubah. Coba lagi setelah selesai.`,
   'Cli.FoundNoOrphans': `Found no unneeded files.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.`,
-  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
-  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder tujuan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu jalankan perintahnya lagi.`,
+  'Cli.Help.Summary': `Menyingkirkan file .msi dan .msp singgahan yang tak lagi diperlukan.`,
+  'Cli.Help.Elevation': `Perlu prompt administrator; Windows tidak akan menjalankannya.`,
   'Error.InstallerLockUnavailableTitle': `Tidak ada yang dihapus`,
-  'Error.MoveInstallerLockUnavailableTitle': `Nothing was moved`,
-  'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
-  'Error.MoveInstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
-  'Cli.MoveInstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
-  'Summary.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
-  'Cli.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
-  'Completion.ReverifyIdentityClaimed': `{0} {1} kept in place, because Windows has a record of the program named inside.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
-  'Completion.NothingRemoved': `Nothing removed`,
-  'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
-  'Completion.NothingOffered': `Nothing offered on this PC`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
+  'Error.MoveInstallerLockUnavailableTitle': `Tidak ada yang dipindahkan`,
+  'Error.InstallerLockUnavailable': `InstallerClean tidak bisa mengambil kunci yang dipakai Windows Installer untuk mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan, dan tidak ada yang dihapus. Coba lagi, dan mulai ulang Windows kalau terus terjadi.`,
+  'Error.MoveInstallerLockUnavailable': `InstallerClean tidak bisa mengambil kunci yang dipakai Windows Installer untuk mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan, dan tidak ada yang dipindahkan. Coba lagi, dan mulai ulang Windows kalau terus terjadi.`,
+  'Cli.InstallerLockUnavailable': `Kesalahan: InstallerClean tidak bisa mengambil kunci Windows Installer yang mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan. Tidak ada yang dihapus. Coba lagi, dan mulai ulang Windows kalau terus terjadi.`,
+  'Cli.MoveInstallerLockUnavailable': `Kesalahan: InstallerClean tidak bisa mengambil kunci Windows Installer yang mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan. Tidak ada yang dipindahkan. Coba lagi, dan mulai ulang Windows kalau terus terjadi.`,
+  'Completion.ReverifyRecordsChanged': `{0} {1} dibiarkan di tempatnya, karena catatan Windows Installer sudah berubah pada pemeriksaan terakhir.`,
+  'Summary.RecordsNotMatched': `InstallerClean tidak bisa mencocokkan semua yang ada dalam catatan Windows, jadi tidak semuanya dibaca. File yang tidak diperlukan di atas tidak terpengaruh, tapi keterangan tentang file yang hilang dari {InstallerFolder} bisa jadi belum lengkap. Pindai ulang untuk mencoba lagi.`,
+  'Cli.RecordsNotMatched': `InstallerClean tidak bisa mencocokkan semua yang ada dalam catatan Windows, jadi tidak semuanya dibaca. Yang ditemukan tidak terpengaruh, tapi keterangan tentang file yang hilang dari {InstallerFolder} bisa jadi belum lengkap. Menjalankannya lagi mungkin menemukan lebih banyak.`,
+  'Completion.ReverifyIdentityClaimed': `{0} {1} dibiarkan di tempatnya, karena Windows punya catatan tentang program yang disebutkan di dalamnya.`,
+  'Completion.ReverifyIdentityUnreadable': `{0} {1} dibiarkan di tempatnya, karena InstallerClean tidak menemukan nama program di dalamnya.`,
+  'Completion.NothingRemoved': `Tidak ada yang disingkirkan`,
+  'Error.ScanNoRegisteredFileInFolder': `InstallerClean tidak bisa mencocokkan catatan Windows Installer dengan isi {InstallerFolder}. Folder itu berisi file, tapi tidak satu pun catatan menunjuk apa pun di dalamnya, jadi tidak ada file yang bisa ditunjukkan tidak diperlukan. Tidak ada yang ditawarkan dan tidak ada yang disingkirkan.`,
+  'Completion.NothingOffered': `Tidak ada yang ditawarkan di PC ini`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({1}) yang mungkin ditawarkannya ditahan.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} file ({1}) yang mungkin ditawarkannya ditahan.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

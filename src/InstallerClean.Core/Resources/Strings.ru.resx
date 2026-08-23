@@ -86,13 +86,13 @@
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Window.About.Title" xml:space="preserve"><value>О программе</value></data>
-  <data name="Window.Registered.Title" xml:space="preserve"><value>Files left alone</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Файлы, оставленные без изменений</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Ненужные файлы, которые можно безопасно удалить</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Patches" xml:space="preserve"><value>ИСПРАВЛЕНИЯ</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>СВЕДЕНИЯ О ПРОДУКТЕ</value></data>
-  <data name="Section.Backup.Folder" xml:space="preserve"><value>BACKUP FOLDER</value></data>
+  <data name="Section.Backup.Folder" xml:space="preserve"><value>ПАПКА НАЗНАЧЕНИЯ</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>ПОБЛАГОДАРИТЬ</value></data>
 
   <!-- Field labels (used in detail panels) -->
@@ -151,7 +151,7 @@
        because the capitals made the two words button names. "Rather than"
        takes both verbs in the same form, so they stay parallel. The button
        carries "permanently"; repeating it here would dangle on the clause. -->
-  <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>Path to folder if you move rather than delete.</value></data>
+  <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>Путь к папке, если вы перемещаете, а не удаляете.</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Открыть страницу _выпуска</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>По_вторить сканирование</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Сканировать снова</value></data>
@@ -200,7 +200,7 @@
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete permanently removes the unneeded files. Cancel closes without deleting.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>«Удалить безвозвратно» убирает ненужные файлы. «Отмена» закрывает окно, ничего не удаляя.</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>«Переместить» помещает ненужные файлы в выбранную папку назначения. «Отмена» оставляет их на месте.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Поблагодарить</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>«Отправить» передаёт показанный отчёт в No Faff. «Отмена» не отправляет ничего.</value></data>
@@ -261,7 +261,7 @@
        DETAILS). Narrator at default verbosity spells short uppercase
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
-  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
+  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Папка назначения</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Исправления</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Сведения о продукте</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as
@@ -269,14 +269,14 @@
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
        Automation.Section.BackupFolder in every language. -->
-  <data name="Automation.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
+  <data name="Automation.BackupFolder" xml:space="preserve"><value>Папка назначения</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Ход операции</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Сканировать {InstallerFolder} заново</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Ход сканирования</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Ход сканирования при запуске</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Подробности, ненужные файлы</value></data>
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Доступны для очистки.</value></data>
-  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Details, files left alone</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Подробности, файлы, оставленные без изменений</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Список только для чтения.</value></data>
   <!-- Screen-reader sort state for the detail-window lists, set in
        UpdateSortIndicators as the sorted column header's accessible
@@ -297,7 +297,7 @@
        own key so that a screen reader does not meet one string twice, once as
        static text and once as a pane. Its pair in the orphaned window is
        Automation.Scroll.FileDetails. -->
-  <data name="Automation.Scroll.ProductDetails" xml:space="preserve"><value>Product details</value></data>
+  <data name="Automation.Scroll.ProductDetails" xml:space="preserve"><value>Сведения о продукте</value></data>
   <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>Текст диалогового окна</value></data>
   <!-- Composes the announced outcome of a scan that found files:
        0 = the "N unneeded files to clean up" line, 1 = the total size. -->
@@ -333,14 +333,14 @@
        the folder is what finishes the job, because the screen never said so
        and a real user moved his files, watched nothing break for weeks and
        still did not know he was done. -->
-  <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>Перемещает ненужные файлы в папку назначения. Удалите эту папку, когда убедитесь, что они никому не нужны.</value></data>
   <!-- The Move button's tooltip while the backup folder box is empty. The
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
        for one to be set first. "A" and not "the" because there is no folder
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Перемещает ненужные файлы в папку назначения. Вы выберете её следующим шагом. Удалите эту папку, когда убедитесь, что они никому не нужны.</value></data>
   <!-- The same-drive state. It exists to give a matched pair with
        Tooltip.Delete on the one trade the user is actually making: hover
        Delete and the space comes back at once, hover Move with a folder on
@@ -348,25 +348,25 @@
        same promise, different timing, both readable before either button is
        pressed. Distinct from Confirm.MoveSameDrive, which says a related
        thing after the choice has been made. -->
-  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.</value></data>
+  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Перемещает ненужные файлы в папку назначения. Она на том же диске, поэтому место вернётся только после того, как вы удалите эту папку или переместите её на другой диск. Это можно сделать, когда убедитесь, что они никому не нужны.</value></data>
   <!-- The Delete button's tooltip and its screen-reader help text, one
        value feeding both. "Reclaim" rather than a synonym because it is
        already the app's word for this: the reports chart says "Space
        reclaimed from C:\Windows\Installer". -->
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Безвозвратно удаляет ненужные файлы. Их можно безопасно убрать, и место вернётся сразу.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Имя субъекта из встроенного сертификата Authenticode. Цепочка не проверялась.</value></data>
 
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
-    <value>Any unneeded files below are [safe to delete].</value>
+    <value>Любые ненужные файлы ниже [можно безопасно удалить].</value>
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause. The bracketed phrase becomes a hyperlink into the README's "Is it safe?" section (rendered in MainWindow.xaml.cs BuildIntroLeadLine); the brackets are the delimiter and are not shown. This is the screen's strongest safety claim and the only link on it, so keep the brackets on whatever phrase carries that claim in this language.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).</value>
+    <value>Они лежат в {InstallerFolder}. InstallerClean спрашивает Windows о каждой установленной программе: файл попадает в список, когда его не заявляет ни одна программа ({0}) или когда его заменило более новое исправление и ни одна программа не смогла бы к нему откатиться ({1}).</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). TWO PLACEHOLDERS, ONE PER CAUSE THE OFFER CAN CONTAIN: {0} is Reason.Orphaned and {1} is Reason.Superseded, the only two labels the scan sets (FileSystemScanService, the walked-file branch and the superseded-patch branch). Reason.Obsoleted is still passed as {2} by MainViewModel and is deliberately unused here: an obsoleted registration is counted at scan time and never offered, so naming that cause on this screen would describe a file the list cannot hold. Carrying the labels as placeholders means a translator edits each one in a single place and this sentence follows. THE OPENING CLAUSE CARRIES THE EPISTEMICS FOR BOTH HALVES: it says what the app asked, so what follows is read as the answer it got and not as an assertion about the machine. IT PARTITIONS BECAUSE THE SET HAS TWO CAUSES, and a sentence naming one of them is false of the other half: an orphan is offered because no registration claims its file, and a superseded patch is offered BECAUSE a registration does claim it and reports the patch replaced. THE SECOND CLAUSE'S ROLLBACK HALF IS NOT A RESTATEMENT OF ITS FIRST and must not be dropped as one in any language: replaced is not finished with, since uninstalling whatever replaced the patch can roll back onto it and reach for this exact file, which is the condition that decides whether a superseded patch is offered at all. The single-cause sentence this replaces was true only while the superseded class was withheld, which is a state no released version was ever in. BOTH CLAUSES ARE ABOUT THE ANSWER THE APP RECEIVED AND NOT ABOUT THE STATE OF THE MACHINE, which is the weaker claim and the one that stays true whatever an enumeration cannot see, so it is kept rather than tightened. The wording this replaces gave two reasons for that framing and neither survives at 3.0.0: the instance-code reading lost its subject once nothing read inside a cached file any more (see InstanceProductCount, which says so in its own words), and a recorded path spelled in a form the folder walk never produces is expanded and handled from 3.0.0 rather than guarded against (see NormaliseLocalPackagePath). The framing outlives its old reasons. Translations must keep both clauses statements about what came back; a rendering that says outright that Windows has no record of the file makes a claim about the machine that this wording exists to avoid.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.</value>
+    <value>Переместите их в выбранную вами папку назначения, а затем удалите эту папку, когда убедитесь, что ваши программы по-прежнему обновляются, восстанавливаются и удаляются как обычно. Возврат их в {InstallerFolder} восстанавливает всё. Или удалите их безвозвратно прямо сейчас.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND ALL THREE OPERATIONS ARE NAMED ON PURPOSE: update, repair and uninstall are what a cached package is kept for, so somebody who has done all three and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. The restore sentence covers BOTH actions and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and putting a file back at that path under the same name is what restores it. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README, which the bracketed phrase in the lead links to. The button order is a separate matter and does not govern this line.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -386,9 +386,9 @@
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
        and introduced nowhere. -->
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
-  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Сейчас что-то использует Windows Installer, например обновление Windows или программа, устанавливающаяся в фоне. «Переместить» и «Удалить» приостановлены на это время, чтобы InstallerClean не трогал {InstallerFolder}, пока она меняется. Когда всё закончится, повторите сканирование, и они вернутся.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>На этом компьютере приостановлена предыдущая транзакция Windows Installer. Возобновите или откатите эту установку (либо перезагрузите Windows), прежде чем очищать {InstallerFolder}.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows поставила в очередь на следующую перезагрузку переименование файла, которое затрагивает {InstallerFolder}. Перезагрузите Windows, прежде чем очищать.</value></data>
   <!-- The fourth arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -397,12 +397,12 @@
        something is in progress and the buttons come back afterwards, and says
        nothing it cannot know. Names the folder with the token like its three
        siblings. -->
-  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.</value></data>
+  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>У Windows Installer что-то выполняется, поэтому «Переместить» и «Удалить» приостановлены. InstallerClean не будет трогать {InstallerFolder}, пока она меняется. Когда всё закончится, повторите сканирование, и они вернутся.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Выберите файл, чтобы посмотреть сведения.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Выберите продукт, чтобы посмотреть сведения.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Метаданные недоступны.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.</value>
+    <value>Этот файл установщика отсутствует. Сейчас это не создаёт никаких трудностей и не создаст до того дня, когда вы попробуете восстановить, обновить или удалить программу, которой он принадлежит. Тогда этот шаг может завершиться неудачей, потому что Windows ищет этот файл, а его нет.&#10;&#10;Чтобы попробовать это исправить, скачайте установщик той программы у её разработчика и запустите его поверх имеющейся у вас копии (не удаляйте программу сначала: удаление само по себе является шагом, которому нужен этот файл). По возможности возьмите ту версию, которая у вас установлена, так как Windows может отклонить другую. Это должно восстановить файл и не затронуть ваши настройки, но Microsoft этого не гарантирует, и её собственное последнее средство - переустановка программы.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -457,8 +457,8 @@
        line that can be right. "Unneeded" is the app's own word for them and is
        what makes the heading say something once the count has gone.
        No placeholder: do not reintroduce one. -->
-  <data name="Status.Moving" xml:space="preserve"><value>Moving unneeded files...</value></data>
-  <data name="Status.Deleting" xml:space="preserve"><value>Deleting unneeded files...</value></data>
+  <data name="Status.Moving" xml:space="preserve"><value>Перемещение ненужных файлов...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Удаление ненужных файлов...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Перемещение отменено. Обработано {0}/{1} {2}.</value></data>
@@ -494,7 +494,7 @@
        and that screen previously read "All clean" over a summary that named the
        causes. States what happened and claims nothing about why; the causes are
        the lines underneath, one per cause with its own count. -->
-  <data name="Completion.NothingRemoved" xml:space="preserve"><value>Nothing removed</value></data>
+  <data name="Completion.NothingRemoved" xml:space="preserve"><value>Ничего не убрано</value></data>
   <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>В {InstallerFolder} нечего очищать</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
@@ -549,9 +549,9 @@
        and before anything has been pressed. "Sorry to send you away empty-handed" went
        with them. And "rather than guess" describes something the app never does, which
        raises a possibility that was never on the table. -->
-  <data name="Completion.NothingOffered" xml:space="preserve"><value>Nothing offered on this PC</value></data>
-  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.</value></data>
-  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.</value></data>
+  <data name="Completion.NothingOffered" xml:space="preserve"><value>На этом ПК ничего не предложено</value></data>
+  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл ({1}), который иначе предложил бы.</value></data>
+  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} файлов ({1}), которые иначе предложил бы.</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
        retired list with the four that follow, and why the retired strings are kept
        rather than deleted is written out there rather than repeated here.
@@ -583,15 +583,15 @@
        plural, "delete it" can only mean the folder, because "the files" cannot
        be "it"; at one file that disambiguation is gone, so the singular names
        the folder outright. -->
-  <data name="Completion.MoveRestoreHint.Singular" xml:space="preserve"><value>The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).</value></data>
-  <data name="Completion.MoveRestoreHint.Plural" xml:space="preserve"><value>The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).</value></data>
+  <data name="Completion.MoveRestoreHint.Singular" xml:space="preserve"><value>Файл в этой папке [можно безопасно убрать], так что удаляйте папку когда захотите. До тех пор вы можете вернуть его в {InstallerFolder}, если какой-нибудь программе он всё же понадобится (крайне маловероятно).</value></data>
+  <data name="Completion.MoveRestoreHint.Plural" xml:space="preserve"><value>Файлы в этой папке [можно безопасно убрать], так что удаляйте её когда захотите. До тех пор вы можете вернуть их в {InstallerFolder}, если какой-нибудь программе понадобится один из них (крайне маловероятно).</value></data>
   <!-- The same line where the backup folder is on the drive the files came
        from. A same-drive move is a rename, so it reclaims nothing until the
        folder goes or moves; that is the one fact this variant adds, and it is
        the only completion line in the app that has to explain why the disk did
        not get emptier. -->
-  <data name="Completion.MoveRestoreHintSameDrive.Singular" xml:space="preserve"><value>The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).</value></data>
-  <data name="Completion.MoveRestoreHintSameDrive.Plural" xml:space="preserve"><value>The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).</value></data>
+  <data name="Completion.MoveRestoreHintSameDrive.Singular" xml:space="preserve"><value>Файл в этой папке [можно безопасно убрать], так что удалите папку или переместите её на другой диск, когда действительно захотите вернуть место. До тех пор вы можете вернуть его в {InstallerFolder}, если какой-нибудь программе он всё же понадобится (крайне маловероятно).</value></data>
+  <data name="Completion.MoveRestoreHintSameDrive.Plural" xml:space="preserve"><value>Файлы в этой папке [можно безопасно убрать], так что удалите её или переместите на другой диск, когда действительно захотите вернуть место. До тех пор вы можете вернуть их в {InstallerFolder}, если какой-нибудь программе понадобится один из них (крайне маловероятно).</value></data>
   <!-- Headline size figures. "freed" is used where space is genuinely
        reclaimed at that instant: a Delete, and a Move to another volume, which
        frees the system drive. A same-volume Move reads "moved", a rename
@@ -651,7 +651,7 @@
        reintroduce a verb of returning; a claim that HOLDS now is the whole of it.
        The two siblings below say what this one does not: this is a live claim, one
        is a registration that has gone, one is a read that failed. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, because the records now claim what the scan flagged.</value></data>
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Оставлено на месте {0} {1}, потому что записи теперь заявляют то, что отметило сканирование.</value></data>
   <!-- The third state the final check can find, and the one that is neither of
        its siblings: the records were read perfectly well and no longer hold the
        registration that claimed the file. Nothing has gone back to needing it
@@ -667,7 +667,7 @@
        to fall back on, and a "them" reads wrongly at a count of one. The three
        sentences can appear together, one per cause, so they are deliberately
        parallel from "kept in place, because" onwards. -->
-  <data name="Completion.ReverifyRecordsChanged" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records had changed by the final check.</value></data>
+  <data name="Completion.ReverifyRecordsChanged" xml:space="preserve"><value>Оставлено на месте {0} {1}, потому что к итоговой проверке записи Windows Installer изменились.</value></data>
   <!-- The third reason the pre-action re-check keeps files back: a read of the
        Windows Installer records failed, so nothing was established either way and
        the file is kept for want of a verdict rather than on one. Distinct from
@@ -678,7 +678,7 @@
        override for its count grammar. "The final check" rather than "when the
        check was repeated": the repetition is an implementation detail and the
        user has never been told there was a first one. -->
-  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.</value></data>
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>Оставлено на месте {0} {1}, потому что при итоговой проверке записи Windows Installer не удалось прочитать полностью.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -706,7 +706,7 @@
        Completion.ReverifyIdentityClaimed.One/.Few/.Many override for its count
        grammar. Parallel to its siblings from "kept in place, because" onwards,
        because all of them can appear together, one per cause. -->
-  <data name="Completion.ReverifyIdentityClaimed" xml:space="preserve"><value>{0} {1} kept in place, because Windows has a record of the program named inside.</value></data>
+  <data name="Completion.ReverifyIdentityClaimed" xml:space="preserve"><value>Оставлено на месте {0} {1}, потому что у Windows есть запись о программе, названной внутри.</value></data>
   <!-- The fifth state, and the only one about the FILE rather than about the
        records. The candidate yielded nothing that could be asked about: it would
        not open, it declares no code, or a patch names no product it targets.
@@ -724,7 +724,7 @@
        why neither may assert a change. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifyIdentityUnreadable.One/.Few/.Many override. -->
-  <data name="Completion.ReverifyIdentityUnreadable" xml:space="preserve"><value>{0} {1} kept in place, because InstallerClean couldn't find a program named inside.</value></data>
+  <data name="Completion.ReverifyIdentityUnreadable" xml:space="preserve"><value>Оставлено на месте {0} {1}, потому что InstallerClean не нашёл внутри названия программы.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -739,8 +739,8 @@
        how to reinstall a program would be the app hedging against the thing it
        has just said will not happen. Split singular/plural for the languages
        that inflect the noun and the participle. -->
-  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
-  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>Безвозвратно удалён {0} {1}</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>Безвозвратно удалено {0} {1}</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
     <value>Рад, что пригодилось. Если захочется проявить щедрость, есть куда оставить на чай.</value>
     <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
@@ -758,8 +758,8 @@
   <!-- Main-window count of the registered set. "Left alone" rather than "still
        needed" because that set is three populations and only one of them makes
        "needed" true; Summary.RegisteredWindow below carries the detail. -->
-  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file left alone</value></data>
-  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files left alone</value></data>
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} файл оставлен без изменений</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} файлов оставлено без изменений</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} ненужный файл для очистки</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} ненужных файлов для очистки</value></data>
   <!-- The main window's missing-files line. 0 = how many files, 1 = the programs
@@ -781,8 +781,8 @@
        trouble day to day" and "can fail", never "will". Microsoft guarantees
        nothing here. Details carries the recovery step, which is why this closes
        by sending the reader there rather than trying to give it. -->
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>У Windows есть запись о {0} файле, которого нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за него может не удаться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>У Windows есть записи о {0} файлах, которых нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за них может не удаться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
   <!-- The two tails of that program list, and they are SEPARATE because they are
        different findings. The first is a program this app can name and had no
        room for; the second is a registration nothing named at all, which is the
@@ -790,10 +790,10 @@
        into one "and N more" would put both under a sentence false of half of
        them. 0 = the count in each case, programs for the first and files for the
        second, which is why each says its own noun. -->
-  <data name="Summary.MissingFromDisk.OtherPrograms.Singular" xml:space="preserve"><value>{0} other program</value></data>
-  <data name="Summary.MissingFromDisk.OtherPrograms.Plural" xml:space="preserve"><value>{0} other programs</value></data>
-  <data name="Summary.MissingFromDisk.Unnamed.Singular" xml:space="preserve"><value>{0} file with no program named in the records</value></data>
-  <data name="Summary.MissingFromDisk.Unnamed.Plural" xml:space="preserve"><value>{0} files with no program named in the records</value></data>
+  <data name="Summary.MissingFromDisk.OtherPrograms.Singular" xml:space="preserve"><value>ещё {0} программа</value></data>
+  <data name="Summary.MissingFromDisk.OtherPrograms.Plural" xml:space="preserve"><value>ещё {0} программ</value></data>
+  <data name="Summary.MissingFromDisk.Unnamed.Singular" xml:space="preserve"><value>{0} файл, для которого в записях не названа программа</value></data>
+  <data name="Summary.MissingFromDisk.Unnamed.Plural" xml:space="preserve"><value>{0} файлов, для которых в записях не названа программа</value></data>
   <!-- Informational line shown when the scan could not account for everything the
        Windows Installer records hold. Nothing is wrong with the machine and there
        is nothing to do about it, so the line says what to expect rather than
@@ -822,7 +822,7 @@
        may recast "match up" into its own idiom for reconciling two sets of
        records; what must not come back is a number, or a noun meaning "installed
        program". -->
-  <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
+  <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean не смог сопоставить всё, что есть в записях Windows, поэтому прочитал их не полностью. Ненужных файлов выше это не касается, но сказанное о файлах, отсутствующих в {InstallerFolder}, может быть неполным. Повторите сканирование, чтобы попробовать снова.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -834,7 +834,7 @@
        vary is furniture rather than information. The noun is passed in already
        pluralised (the Plural.File pair) rather than inflected here, so the one
        string serves every count in every language. -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} unneeded {1} ({2})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} для очистки ({2})</value></data>
   <!-- Registered-window footer summary, over the same set the main window counts.
        Says what the scan did, not what the files are: that set is three
        populations (a live registration claims it; the records called it
@@ -844,12 +844,12 @@
        Still split singular/plural though the verb has gone, for the noun and for
        the .Few overrides pl, ru and uk declare on this key.
        0 = count, 1 = size display. -->
-  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file left alone ({1})</value></data>
-  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} files left alone ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} файл оставлен без изменений ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} файлов оставлено без изменений ({1})</value></data>
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Переместить {0} {1} ({2})?</value></data>
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Move to:</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Переместить в:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Удалить {0} {1} ({2})?</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
@@ -863,8 +863,8 @@
        "But" and not "and": offering the backup concedes something to the
        sentence before it. "The Move button", not bare "Move", so "use Move"
        is read as a button and not as a second verb in the same sentence. -->
-  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
-  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
+  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>Этот файл будет удалён безвозвратно. Его [можно безопасно удалить], но если хотите резервную копию, воспользуйтесь кнопкой «Переместить».</value></data>
+  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>Файлы будут удалены безвозвратно. Их [можно безопасно удалить], но если хотите резервную копию, воспользуйтесь кнопкой «Переместить».</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only
@@ -875,7 +875,7 @@
        Flat at any count, unlike its neighbours: it talks about the folder and
        the space rather than about files, so it has no count-dependent noun to
        agree. -->
-  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.</value></data>
+  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>Эта папка на том же диске, поэтому место не вернётся, пока вы её не удалите. Выберите папку на другом диске, если хотите получить место сразу.</value></data>
 
   <!-- Error messages -->
   <!-- Both manifests declare requireAdministrator, so the process is
@@ -924,7 +924,7 @@ InstallerClean уже был запущен от имени администра
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. Почти ничего из того, на что указывают записи, там нет, и почти ничто из того, что там есть, не названо ни одной записью, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -936,7 +936,7 @@ InstallerClean уже был запущен от имени администра
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. В папке есть файлы, но ни одна запись не указывает ни на что внутри неё, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -952,7 +952,7 @@ InstallerClean уже был запущен от имени администра
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean не смог добиться от Windows разрешения настоящего пути к {InstallerFolder}, поэтому ни про один файл не удалось показать, что он находится внутри, и ни один не был предложен для очистки. Это сканирование ничего не нашло из-за неудачи этой проверки, а не потому, что папка чиста. Ничего не убрано.</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -977,7 +977,7 @@ InstallerClean уже был запущен от имени администра
   <!-- The move half of the heading above, and it takes the same wording as
        Completion.NothingMoved for the same reason its sibling takes
        Completion.NothingDeleted's. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Nothing was moved</value></data>
+  <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Ничего не перемещено</value></data>
   <!-- Shown when a Delete could not take Global\_MSIExecute and nothing else
        was shown to be holding it (a DACL that refuses the object, or any other
        non-fatal failure to acquire). Without that hold nothing stops a program
@@ -987,13 +987,13 @@ InstallerClean уже был запущен от имени администра
        Error.ScanCacheRootUnresolved above, which supplies the middle step of
        its own causal chain: what the app could not do, what followed from it,
        and that nothing has been removed. No placeholders. -->
-  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.</value></data>
+  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не удалено. Попробуйте ещё раз, а если повторяется - перезагрузите Windows.</value></data>
   <!-- The move half of the sentence above. Move refuses on the same condition
        because its exposure to it is the delete's: a file moved out of the cache
        is as absent from it as a deleted one, so a transaction starting part-way
        through fails to find it either way, and the recovery a move leaves the
        user does not make the batch safer to run. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
+  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не перемещено. Попробуйте ещё раз, а если повторяется - перезагрузите Windows.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недопустимая папка назначения</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не удалось записать в папку назначения</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Сбой перемещения</value></data>
@@ -1007,7 +1007,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Не удалось сохранить изменение. При следующем запуске InstallerClean вернётся к прежней настройке.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Папка назначения не может находиться внутри папки Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
-  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.</value></data>
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Назначение {0} разрешается внутри системной папки Windows. Выберите путь вне %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% и %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Недостаточно места</value></data>
   <!-- 0 = destination, 1 = required size, 2 = available size -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Недостаточно места в {0}
@@ -1056,8 +1056,8 @@ InstallerClean уже был запущен от имени администра
        (the detail goes to crash.log). -->
   <data name="Error.AccessDenied.Singular" xml:space="preserve"><value>Windows отказал в доступе к этому файлу; он оставлен на месте.</value></data>
   <data name="Error.AccessDenied.Plural" xml:space="preserve"><value>Windows отказал в доступе к этим файлам; они оставлены на месте.</value></data>
-  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.</value></data>
-  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.</value></data>
+  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>Этот файл открыт или заблокирован другой программой, поэтому сейчас его ничем не убрать. Он оставлен на месте; попробуйте позже.</value></data>
+  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>Эти файлы открыты или заблокированы другой программой, поэтому сейчас их ничем не убрать. Они оставлены на месте; попробуйте позже.</value></data>
   <data name="Error.IOFailure.Singular" xml:space="preserve"><value>Windows сообщил об ошибке файла; файл оставлен на месте.</value></data>
   <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows сообщил об ошибках файлов; эти файлы оставлены на месте.</value></data>
   <data name="Error.UnknownError.Singular" xml:space="preserve"><value>С этим файлом что-то пошло не так; он оставлен на месте.</value></data>
@@ -1070,7 +1070,7 @@ InstallerClean уже был запущен от имени администра
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Папка назначения должна быть полным путём к папке, начинающимся с буквы диска или сетевого ресурса (например, D:\Backup или \\server\backup). InstallerClean не может использовать этот: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Не удалось открыть браузер</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Проверка обновлений</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Проверка...</value></data>
@@ -1109,7 +1109,7 @@ InstallerClean уже был запущен от имени администра
        different question and a different string: they went wherever the folder
        pointed then, which is what the completion summary names, so this copy must
        not claim it. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean больше не смог подтвердить папку назначения и остановился, чтобы не записать не туда. Проверьте {0}, затем «Повторить сканирование» и попробуйте снова.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -1239,11 +1239,46 @@ InstallerClean уже был запущен от имени администра
        commonest output this tool produces. It states what was found rather than
        what the tool intends to do about it, which is the question somebody
        reading a scheduled task's log ran the scan to ask. -->
+  <!-- The THIRD outcome, and the line above is why it has to exist: "Found no
+       unneeded files" is a statement about the folder, and on this machine the
+       scan never established one. Somebody reading a scheduled task's log would
+       otherwise be told a folder full of files nobody vouched for was clean.
+
+       0 = files held back, 1 = pluralised "file"/"files", 2 = their size.
+
+       IT NAMES NO CAUSE AND MUST NOT ACQUIRE ONE. Several different findings
+       empty an offer this way and they are different facts about a machine, so
+       any sentence naming one of them is false on the others. What is true of
+       every one of them is the opening clause, which is the same clause the
+       window's own screen opens with (Completion.NothingOfferedBody.*): the app
+       could not be certain which cached files belong to which programs.
+
+       "Might otherwise have offered" keeps its hedge for the same reason the
+       window's does: some of those files would have been kept back anyway by the
+       per-file screen this branch skips, so "would have offered" claims more than
+       the run established. -->
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel
        opens "{0} mode:", and a filter for delete runs has to find this one.
        1 = registered package count, 2 = pluralised "package"/"packages". -->
+  <!-- The audit line for the outcome above, so the Application channel splits the
+       same three ways stdout does and a monitoring tool is not told a machine is
+       clean when the scan could not judge it.
+
+       0 = mode arg, whichever of /s, /d and /m was run, as in the entry above:
+       the no-files branch is common to all three. 1 = files held back,
+       2 = pluralised "file"/"files".
+
+       IT SHARES EVENT ID 1000 WITH THE ENTRY ABOVE, which is a real limit and is
+       recorded rather than designed around: the run did its job, so it belongs in
+       the outcome band, and a tool that needs to tell this machine from a clean
+       one has to read the message. Splitting the band would put a new ID on the
+       wire, which is a contract change and not this line's to make.
+
+       "No action taken" rather than a phrase of its own: Cli.EventLogScanFound
+       already ends that way, so a filter watching this channel meets one phrase
+       and not two. -->
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does
@@ -1436,17 +1471,17 @@ InstallerClean уже был запущен от имени администра
        that skip comment lines (less, grep -v, jq pipelines) skip
        the header. Stored as one multi-line block; the C# side reads
        it verbatim and normalises line endings to the host platform. -->
-  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log captures unhandled exceptions from InstallerClean.
-# Under elevation the framework's exception messages can include
-# file paths from the running session (including other users'
-# profiles enumerated by Windows Installer queries). Network-
-# failure messages from the update check or result-log POST can
-# include the destination URL and the resolved IP / proxy address.
-# Entries about unreadable Windows Installer records can include a
-# Windows account SID (S-1-5-21-...) and the product codes of
-# installed software.
-# Redact all three classes of detail before attaching this file to
-# a public bug report.
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log собирает необработанные исключения InstallerClean.
+# При повышенных правах сообщения исключений платформы могут
+# содержать пути к файлам текущего сеанса (в том числе профили
+# других пользователей, перечисленные запросами Windows Installer).
+# Сообщения о сетевых сбоях при проверке обновлений или отправке
+# журнала результатов могут содержать URL назначения и разрешённый
+# IP-адрес или адрес прокси. Записи о нечитаемых записях Windows
+# Installer могут содержать SID учётной записи Windows
+# (S-1-5-21-...) и коды продуктов установленного ПО.
+# Удалите все три вида сведений, прежде чем прикладывать этот файл
+# к публичному сообщению об ошибке.
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
@@ -1496,64 +1531,70 @@ InstallerClean уже был запущен от имени администра
   <data name="Plural.Product.Few" xml:space="preserve"><value>продукта</value></data>
   <data name="Plural.Error.Few" xml:space="preserve"><value>ошибки</value></data>
   <data name="Plural.Patch.Few" xml:space="preserve"><value>исправления</value></data>
-  <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} files left alone</value></data>
+  <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} файла оставлено без изменений</value></data>
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} ненужных файла для очистки</value></data>
-  <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.</value></data>
-  <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} files left alone ({1})</value></data>
-  <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
-  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} kept in place, because the records now claim what the scan flagged.</value></data>
-  <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.</value></data>
+  <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} файла оставлено без изменений ({1})</value></data>
+  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что записи теперь заявляют то, что отметило сканирование.</value></data>
+  <data name="Completion.ReverifyRecordsChanged.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что к итоговой проверке записи Windows Installer изменились.</value></data>
+  <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что при итоговой проверке записи Windows Installer не удалось прочитать полностью.</value></data>
+  <data name="Completion.ReverifyIdentityClaimed.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что у Windows есть запись о программе, названной внутри.</value></data>
+  <data name="Completion.ReverifyIdentityUnreadable.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что InstallerClean не нашёл внутри названия программы.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
+  <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Найден {0} ненужный {1} для очистки ({2}).</value></data>
+  <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Удаление {0} ненужного {1}...</value></data>
+  <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Безвозвратно удалён {0} ненужный {1}.</value></data>
+  <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Перемещение {0} ненужного {1} в {2}...</value></data>
+  <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Перемещён {0} ненужный {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Найдено {0} зарегистрированных {1}.</value></data>
 
   <!-- Human-facing CLI keys; the machine Cli.EventLog* keys are forced English at the emit site and omitted -->
-  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Error: unknown argument '{0}'</value></data>
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Ошибка: неизвестный аргумент «{0}»</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Отмена...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Отменено.</value></data>
-  <data name="Cli.GenericError" xml:space="preserve"><value>Error: unexpected failure ({0}). Details written to {1}.</value></data>
-  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Error: unexpected failure ({0}). The crash log could not be written.</value></data>
+  <data name="Cli.GenericError" xml:space="preserve"><value>Ошибка: непредвиденный сбой ({0}). Подробности записаны в {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Ошибка: непредвиденный сбой ({0}). Журнал сбоя записать не удалось.</value></data>
   <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Сканирование {InstallerFolder}...</value></data>
-  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} unneeded {1} to clean up ({2}).</value></data>
-  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Deleting {0} unneeded {1}...</value></data>
-  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Permanently deleted {0} unneeded {1}.</value></data>
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Найдено {0} ненужных {1} для очистки ({2}).</value></data>
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Удаление {0} ненужных {1}...</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Безвозвратно удалено {0} ненужных {1}.</value></data>
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Ошибка: не указана папка назначения для перемещения. Используйте /m ПУТЬ. (Значение по умолчанию, заданное в графическом интерфейсе, действует только для текущего пользователя и не применяется при запуске по расписанию или от имени служебной учётной записи.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Ошибка: папка назначения не может находиться внутри папки Windows Installer.</value></data>
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Ошибка: папка назначения должна быть полным путём. Получено: {0}</value></data>
-  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.</value></data>
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
-  <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} unneeded {1} to {2}...</value></data>
-  <data name="Cli.MovedFiles" xml:space="preserve"><value>Moved {0} unneeded {1}.</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Ошибка: назначение {0} разрешается внутри системной папки Windows. Выберите путь вне %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% и %ProgramData%.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Ошибка: сейчас что-то использует Windows Installer, например обновление Windows или программа, устанавливающаяся в фоне. /m и /d заблокированы на это время. Попробуйте снова, когда всё закончится.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Ошибка: на этом компьютере приостановлена предыдущая транзакция Windows Installer. Возобновите или откатите эту установку (либо перезагрузите Windows), прежде чем очищать {InstallerFolder}.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Ошибка: поставленная в очередь после перезагрузки операция с файлом затрагивает {InstallerFolder} ({0}). Перезагрузите Windows, чтобы завершить эту операцию, прежде чем очищать.</value></data>
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Перемещение {0} ненужных {1} в {2}...</value></data>
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Перемещено {0} ненужных {1}.</value></data>
   <data name="Cli.MutexBlocked" xml:space="preserve"><value>Другой процесс InstallerClean удерживает блокировку единственного экземпляра (GUI или другой запуск CLI). Код выхода 75 (временное состояние); можно повторить попытку позже.</value></data>
   <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Примечание: не удалось выполнить запись в журнал событий. Проверьте разрешения журнала «Приложение» или групповую политику.</value></data>
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - очистка {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Использование:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help       Показать эту справку (также /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version    Показать версию (также -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s           Только сканировать - список ненужных</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d           Безвозвратно удалить ненужные файлы</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m           Переместить в сохранённую папку</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ПУТЬ      Переместить в указанный путь</value></data>
-  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli удерживает командную строку до конца работы, чтобы&#10;скрипт или запланированная задача могли его дождаться.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Коды выхода:</value></data>
-  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: the run finished with nothing left to do</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)</value></data>
-  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some processed, some not (a failure or a Ctrl+C part way)</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   успех: запуск сделал то, о чём просили, и ничего не сбоило</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   сбой: ничего не обработано (неверные аргументы или&#10;       назначение, неудачное сканирование или все файлы с ошибкой)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   частично: часть обработана, часть нет (сбой или Ctrl+C)</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  временно: запуск заблокирован временным состоянием (см. сообщение)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 отменено (Ctrl+C)</value></data>
   <data name="Cli.TooManyArguments" xml:space="preserve"><value>Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке для перемещения есть пробел, возьмите весь путь в кавычки: /m "D:\My Backup"</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
-  <data name="Cli.TooManyArgumentsNoPath" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.</value></data>
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.</value></data>
-  <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.</value></data>
-  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Папка хранится для каждого пользователя; заданиям нужен /m ПУТЬ.</value></data>
+  <data name="Cli.TooManyArgumentsNoPath" xml:space="preserve"><value>Ошибка: непредвиденный лишний аргумент «{0}». /s и /d не принимают других аргументов, и за один запуск можно использовать только один ключ.</value></data>
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>У Windows есть запись о {0} файле, которого нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за него может не удаться. Повторный запуск установщика той программы, желательно той же версии, обычно возвращает файл.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>У Windows есть записи о {0} файлах, которых нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за них может не удаться. Повторный запуск установщика каждой программы, желательно той же версии, обычно возвращает файлы.</value></data>
+  <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Ошибка: недостаточно места в {0}. Для перемещения этих файлов нужно {1}, а свободно {2}. Ничего не перемещено.</value></data>
+  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Ошибка: у Windows Installer что-то выполняется, поэтому /m и /d заблокированы. InstallerClean не будет трогать {InstallerFolder}, пока она меняется. Попробуйте снова, когда всё закончится.</value></data>
   <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Found no unneeded files.</value></data>
-  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.</value></data>
-  <data name="Cli.Help.Summary" xml:space="preserve"><value>Removes cached .msi and .msp files that no installed program still needs.</value></data>
-  <data name="Cli.Help.Elevation" xml:space="preserve"><value>Needs an elevated (administrator) prompt; Windows will not start it.</value></data>
-  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.</value></data>
-  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
-  <data name="Cli.RecordsNotMatched" xml:space="preserve"><value>InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.</value></data>
+  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean больше не смог подтвердить папку назначения и остановился, чтобы не записать не туда. Проверьте {0}, затем запустите команду снова.</value></data>
+  <data name="Cli.Help.Summary" xml:space="preserve"><value>Убирает файлы .msi и .msp из кэша, не нужные ни одной программе.</value></data>
+  <data name="Cli.Help.Elevation" xml:space="preserve"><value>Нужна командная строка администратора; иначе Windows её не запустит.</value></data>
+  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не удалено. Попробуйте ещё раз, а если повторяется - перезагрузите Windows.</value></data>
+  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не перемещено. Попробуйте ещё раз, а если повторяется - перезагрузите Windows.</value></data>
+  <data name="Cli.RecordsNotMatched" xml:space="preserve"><value>InstallerClean не смог сопоставить всё, что есть в записях Windows, поэтому прочитал их не полностью. Найденного это не касается, но сказанное о файлах, отсутствующих в {InstallerFolder}, может быть неполным. Повторный запуск, возможно, найдёт больше.</value></data>
 </root>
