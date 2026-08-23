@@ -1468,8 +1468,15 @@ InstallerClean уже был запущен от имени администра
        What went with the other two lines: how to redirect and pipe, which this
        reader has been doing for twenty years, and that the GUI sits alongside
        in InstallerClean.exe, which is untrue of the command-line download. -->
-  <!-- 0 is not a statement that work happened: a /s scan processes nothing and
-       exits 0, and so does a run that finds nothing to clean. -->
+  <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
+       LEFT, and this line said the second until 3.0.0. Five runs exit 0: /? and
+       /version, which print and stop; a /s scan that found files and listed them,
+       which is the one the old wording was false of, since a scan that lists
+       sixty-eight files has left an administrator plenty to do; a /s scan that
+       found none; and a /d or /m batch in which every file was processed without
+       error. The sentence has to be true of all five, so it says what they share,
+       which is that the run did what it was asked and nothing in it failed.
+       Anyone tightening it has to check it against the five again. -->
   <!-- Two printed lines from one value; see Cli.Help.NoteLine1 for why the break
        is inside the value. The destination causes are named because they are
        what a scheduled /m actually hits (none given, relative, inside a system

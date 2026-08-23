@@ -67,14 +67,25 @@ const KEEP_ENGLISH = new Set([
 // Per-language keeps: a word a language deliberately renders identically to
 // English (a naturalised loanword such as German "Patches" or "Details"). Mirrors
 // each generator's ALSO_KEEP. Languages with an empty ALSO_KEEP are omitted.
+// Display.ListSeparator is the odd one and is in thirteen of them: it is ", ",
+// a punctuation mark rather than a word, and thirteen languages separate a list
+// exactly as English does. It could neither be translated nor left failing, so
+// it is a keep everywhere except ja and zh-Hans, which take the ideographic
+// comma and have a real value.
 const ALSO_KEEP = {
-  de: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Version.Display'],
-  fr: ['Field.Application', 'Version.Display'],
-  id: ['Plural.File.Singular', 'Plural.Patch.Singular', 'Field.File'],
-  es: ['Plural.Error.Singular'],
-  it: ['Field.File', 'Plural.File.Singular', 'Plural.Patch.Singular'],
-  nl: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Plural.Product.Singular', 'Plural.Patch.Singular', 'Plural.Patch.Plural'],
-  'pt-BR': ['Plural.Patch.Singular', 'Plural.Patch.Plural', 'Field.Patches', 'Section.Registered.Patches', 'Automation.Section.Patches'],
+  de: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Version.Display', 'Display.ListSeparator'],
+  es: ['Plural.Error.Singular', 'Display.ListSeparator'],
+  fr: ['Field.Application', 'Version.Display', 'Display.ListSeparator'],
+  id: ['Plural.File.Singular', 'Plural.Patch.Singular', 'Field.File', 'Display.ListSeparator'],
+  it: ['Field.File', 'Plural.File.Singular', 'Plural.Patch.Singular', 'Display.ListSeparator'],
+  ko: ['Display.ListSeparator'],
+  nl: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Plural.Product.Singular', 'Plural.Patch.Singular', 'Plural.Patch.Plural', 'Display.ListSeparator'],
+  pl: ['Display.ListSeparator'],
+  'pt-BR': ['Plural.Patch.Singular', 'Plural.Patch.Plural', 'Field.Patches', 'Section.Registered.Patches', 'Automation.Section.Patches', 'Display.ListSeparator'],
+  ru: ['Display.ListSeparator'],
+  tr: ['Display.ListSeparator'],
+  uk: ['Display.ListSeparator'],
+  vi: ['Display.ListSeparator'],
 };
 
 const neutral = parse('Strings.resx');

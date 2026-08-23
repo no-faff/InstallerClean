@@ -52,6 +52,10 @@ const ALSO_KEEP = [
   'Automation.Section.Patches',  // Patches
   'Action.Details',              // Details
   'Version.Display',             // Version {0}
+  // The list separator German uses is the one English uses. A punctuation
+  // mark rather than a word, so there is nothing to translate and nothing to
+  // get wrong; only ja and zh-Hans differ, taking the ideographic comma.
+  'Display.ListSeparator',       // ", "
 ];
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.
@@ -59,15 +63,15 @@ const ALSO_KEEP = [
 // the neutral. The value's {N} set matches the base key's set.
 const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `{0} registriertes {1} gefunden.`,
-  'Cli.DeletingFiles.One': `Deleting {0} unneeded {1}...`,
-  'Cli.MovingFiles.One': `Moving {0} unneeded {1} to {2}...`,
+  'Cli.DeletingFiles.One': `{0} nicht benötigte {1} wird gelöscht...`,
+  'Cli.MovingFiles.One': `{0} nicht benötigte {1} wird nach {2} verschoben...`,
 };
 
 const MAP = {
   // Window titles
   'Window.Main.Title': `InstallerClean`,
   'Window.About.Title': `Über`,
-  'Window.Registered.Title': `Files left alone`,
+  'Window.Registered.Title': `Unangetastete Dateien`,
   'Window.Orphaned.Title': `Nicht benötigte Dateien, die bedenkenlos gelöscht werden können`,
 
   // Section headings
@@ -78,7 +82,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `PATCHES`,
   'Section.Registered.Details': `PRODUKTDETAILS`,
-  'Section.Backup.Folder': `BACKUP FOLDER`,
+  'Section.Backup.Folder': `SICHERUNGSORDNER`,
   'Section.SayThanks': `DANKE SAGEN`,
 
   // Field labels (used in detail panels)
@@ -118,7 +122,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Einen Stern auf _GitHub hinterlassen`,
   'Action.Licence': `Apache-2.0-Lizenz`,
   'Action.Move': `_Verschieben`,
-  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
+  'Action.BackupFolderPlaceholder': `Pfad zum Ordner, falls du verschiebst statt zu löschen.`,
   'Action.OpenReleasePage': `_Release-Seite öffnen`,
   'Action.Rescan': `_Neu scannen`,
   'Action.ScanAgain': `Erneut _scannen`,
@@ -136,7 +140,7 @@ const MAP = {
   'Automation.CloseResult': `Ergebnis schließen und zum Hauptfenster zurückkehren`,
   'Automation.LeaveStarOnGitHub.About': `Einen Stern auf github hinterlassen`,
   'Automation.Minimise': `Minimieren`,
-  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
+  'Automation.ConfirmDelete': `Endgültig löschen entfernt die nicht benötigten Dateien. Abbrechen schließt das Fenster, ohne zu löschen.`,
   'Automation.ConfirmMove': `Verschieben legt die nicht benötigten Dateien in den gewählten Zielordner. Abbrechen lässt sie, wo sie sind.`,
   'Automation.SayThanks': `Danke sagen`,
   'Automation.ConfirmSendResultLog': `Senden übermittelt den angezeigten Bericht an No Faff. Abbrechen sendet nichts.`,
@@ -144,17 +148,17 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Sucht auf der Release-Seite von github nach einer neueren Version.`,
   'Automation.UpdateAvailable.HelpText': `Öffne die Release-Seite, um die neuere Version herunterzuladen, oder brich ab, um die aktuelle Version zu behalten.`,
   'Automation.Licence.HelpText': `Öffnet die Lizenzdatei auf github.com in deinem Browser.`,
-  'Automation.Section.BackupFolder': `Backup folder`,
+  'Automation.Section.BackupFolder': `Sicherungsordner`,
   'Automation.Section.Patches': `Patches`,
   'Automation.Section.ProductDetails': `Produktdetails`,
-  'Automation.BackupFolder': `Backup folder`,
+  'Automation.BackupFolder': `Sicherungsordner`,
   'Automation.OperationProgress': `Vorgangsfortschritt`,
   'Automation.RescanInstaller': `{InstallerFolder} erneut scannen`,
   'Automation.ScanningProgress': `Scan-Fortschritt`,
   'Automation.StartupScanProgress': `Fortschritt des Start-Scans`,
   'Automation.ViewOrphanedFiles': `Details, nicht benötigte Dateien`,
   'Automation.ViewOrphanedFiles.HelpText': `Zum Aufräumen verfügbar.`,
-  'Automation.ViewRegisteredFiles': `Details, files left alone`,
+  'Automation.ViewRegisteredFiles': `Details, unangetastete Dateien`,
   'Automation.ViewRegisteredFiles.HelpText': `Schreibgeschützte Übersicht.`,
   'Automation.SortStatus.Ascending': `Sortiert nach {0}, aufsteigend`,
   'Automation.SortStatus.Descending': `Sortiert nach {0}, absteigend`,
@@ -174,22 +178,22 @@ const MAP = {
   'Tooltip.Minimise': `Minimieren`,
   'Tooltip.SendResultLog': `Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert und wie viel Platz die Leute freigeben. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird.`,
   'Tooltip.SendResultLog.NothingFound': `Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird.`,
-  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
+  'Tooltip.Move': `Verschiebt die nicht benötigten Dateien in den Sicherungsordner. Lösche diesen Ordner, sobald du sicher bist, dass sie niemand braucht.`,
+  'Tooltip.MoveNeedsDestination': `Verschiebt die nicht benötigten Dateien in einen Sicherungsordner. Den wählst du gleich aus. Lösche diesen Ordner, sobald du sicher bist, dass sie niemand braucht.`,
+  'Tooltip.Delete': `Löscht die nicht benötigten Dateien endgültig. Sie lassen sich bedenkenlos entfernen, und du bekommst den Platz sofort zurück.`,
   'Tooltip.SigningCertificate': `Antragstellername aus dem eingebetteten Authenticode-Zertifikat. Die Zertifikatskette wurde nicht geprüft.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
-  'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
-  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
-  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
+  'Body.MainExplanation.Lead': `Alle nicht benötigten Dateien unten kannst du [bedenkenlos löschen].`,
+  'Body.MainExplanation.Why': `Sie liegen in {InstallerFolder}. InstallerClean fragt Windows nach jedem installierten Programm: Eine Datei wird aufgeführt, wenn kein Programm sie beansprucht ({0}) oder wenn ein neuerer Patch sie ersetzt hat und kein Programm auf sie zurückgehen könnte ({1}).`,
+  'Body.MainExplanation.Action': `Verschiebe sie in einen Sicherungsordner deiner Wahl und lösche diesen Ordner, sobald du sicher bist, dass deine Programme sich weiterhin wie gewohnt aktualisieren, reparieren und deinstallieren lassen. Wenn du sie zurück nach {InstallerFolder} legst, ist alles wiederhergestellt. Oder lösche sie jetzt endgültig.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Etwas nutzt gerade Windows Installer, etwa ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. Verschieben und Löschen pausieren, solange das läuft, damit InstallerClean {InstallerFolder} nicht anfasst, während sich der Ordner ändert. Danach einmal neu scannen, und sie sind wieder da.`,
+  'Body.PendingReboot.InstallerInProgress': `Auf diesem Rechner ist eine frühere Windows-Installer-Transaktion angehalten. Setze diese Installation fort oder mache sie rückgängig (oder starte Windows neu), bevor du {InstallerFolder} aufräumst.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows hat für den nächsten Neustart eine Dateiumbenennung eingeplant, die {InstallerFolder} betrifft. Starte Windows neu, bevor du aufräumst.`,
   'Body.NoFileSelected': `Wähle eine Datei, um Details anzuzeigen.`,
   'Body.NoProductSelected': `Wähle ein Produkt, um Details anzuzeigen.`,
   'Body.NoMetadata': `Keine Metadaten verfügbar.`,
-  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.`,
+  'Body.RegisteredMissingFromDisk': `Diese Installationsdatei fehlt. Das macht jetzt keine Probleme und wird es auch nicht tun, bis du eines Tages das zugehörige Programm reparieren, aktualisieren oder deinstallieren willst. Dieser Schritt kann dann fehlschlagen, weil Windows nach dieser Datei sucht und sie nicht da ist.&#10;&#10;Um das zu beheben, lade das Installationsprogramm beim Hersteller herunter und führe es über deiner vorhandenen Installation aus (deinstalliere nicht zuerst, denn das Deinstallieren ist selbst ein Schritt, der diese Datei braucht). Nimm nach Möglichkeit genau die Version, die du installiert hast, da Windows eine andere ablehnen kann. Das sollte die Datei wiederherstellen und deine Einstellungen unangetastet lassen, garantiert wird es von Microsoft aber nicht, und dessen eigenes letztes Mittel ist, das Programm neu zu installieren.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `Das README [erklärt diesen Ordner], und wie sich eine Datei wiederherstellen lässt, mit Microsofts eigenen Worten.`,
   'Body.NoPatches': `(keine)`,
 
@@ -220,8 +224,8 @@ const MAP = {
 
   // 0 = file count, 1 = pluralised noun. Routed through Pluralise: base is the
   // werden-form (n != 1), the .One override carries the wird-form.
-  'Status.Moving': `Moving unneeded files...`,
-  'Status.Deleting': `Deleting unneeded files...`,
+  'Status.Moving': `Nicht benötigte Dateien werden verschoben...`,
+  'Status.Deleting': `Nicht benötigte Dateien werden gelöscht...`,
   'Status.MoveCancelled.Partial': `Verschieben abgebrochen. {0} von {1} {2} verarbeitet.`,
   'Status.DeleteCancelled.Partial': `Löschen abgebrochen. {0} von {1} {2} verarbeitet.`,
   'Status.MoveFailed': `Verschieben fehlgeschlagen ({0}). Details in {1}.`,
@@ -261,27 +265,31 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} endgültig gelöscht`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} endgültig gelöscht`,
 
   // Summaries
-  'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
-  'Summary.RegisteredStillUsed.Plural': `{0} files left alone`,
+  'Summary.RegisteredStillUsed.Singular': `{0} Datei unangetastet`,
+  'Summary.RegisteredStillUsed.Plural': `{0} Dateien unangetastet`,
   'Summary.OrphanedToCleanUp.Singular': `{0} nicht benötigte Datei zum Aufräumen`,
   'Summary.OrphanedToCleanUp.Plural': `{0} nicht benötigte Dateien zum Aufräumen`,
-  'Summary.MissingFromDisk.Singular': `{0} registered file is missing. No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.`,
-  'Summary.MissingFromDisk.Plural': `{0} registered files are missing. No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Singular': `Windows hat einen Eintrag für {0} Datei, die nicht in {InstallerFolder} liegt: {1}. Im Alltag macht das keine Probleme, aber eine Reparatur, ein Update oder eine Deinstallation kann daran scheitern. Öffne Details, um zu erfahren, was zu tun ist.`,
+  'Summary.MissingFromDisk.Plural': `Windows hat Einträge für {0} Dateien, die nicht in {InstallerFolder} liegen: {1}. Im Alltag machen sie keine Probleme, aber eine Reparatur, ein Update oder eine Deinstallation kann daran scheitern. Öffne Details, um zu erfahren, was zu tun ist.`,
+  'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} weiteres Programm`,
+  'Summary.MissingFromDisk.OtherPrograms.Plural': `{0} weitere Programme`,
+  'Summary.MissingFromDisk.Unnamed.Singular': `{0} Datei, zu der die Einträge kein Programm nennen`,
+  'Summary.MissingFromDisk.Unnamed.Plural': `{0} Dateien, zu denen die Einträge kein Programm nennen`,
 
   // 0 = current file count, 1 = total count, 2 = pluralised noun.
   'Summary.OperationFiles': `{0} von {1} {2}`,
 
   // Orphaned-window footer. 0 = orphaned count, 1 = superseded count,
   // 2 = obsoleted count, 3 = size display. Predicative adjectives, invariant.
-  'Summary.OrphanedWindow': `{0} unneeded {1} ({2})`,
+  'Summary.OrphanedWindow': `{0} nicht benötigte {1} ({2})`,
 
   // Registered-window footer, split so noun and verb agree. 0 = count, 1 = size.
-  'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
-  'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
+  'Summary.RegisteredWindow.Singular': `{0} Datei unangetastet ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} Dateien unangetastet ({1})`,
 
   // Confirmation dialogs
 
@@ -289,7 +297,7 @@ const MAP = {
   'Confirm.MoveTitle': `{0} {1} verschieben ({2})?`,
 
   // 0 = destination path
-  'Confirm.MoveDestination': `Move to:`,
+  'Confirm.MoveDestination': `Verschieben nach:`,
   'Confirm.DeleteTitle': `{0} {1} löschen ({2})?`,
 
   // Error messages
@@ -309,7 +317,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `Das Ziel darf nicht im Windows-Installer-Ordner liegen.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `Das Ziel {0} liegt unterhalb eines Windows-Systemordners. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% und %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Nicht genügend Speicherplatz`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -329,8 +337,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows hat den Zugriff auf diese Datei verweigert; sie wurde an ihrem Platz belassen.`,
   'Error.AccessDenied.Plural': `Windows hat den Zugriff auf diese Dateien verweigert; sie wurden an ihrem Platz belassen.`,
-  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
-  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
+  'Error.FileInUse.Singular': `Diese Datei ist von einem anderen Programm geöffnet oder gesperrt, deshalb kann sie gerade nicht entfernt werden. Sie wurde an Ort und Stelle belassen; versuche es später noch einmal.`,
+  'Error.FileInUse.Plural': `Diese Dateien sind von einem anderen Programm geöffnet oder gesperrt, deshalb können sie gerade nicht entfernt werden. Sie wurden an Ort und Stelle belassen; versuche es später noch einmal.`,
   'Error.IOFailure.Singular': `Windows hat einen Dateifehler gemeldet; die Datei wurde an ihrem Platz belassen.`,
   'Error.IOFailure.Plural': `Windows hat Dateifehler gemeldet; diese Dateien wurden an ihrem Platz belassen.`,
   'Error.UnknownError.Singular': `Bei dieser Datei ist etwas schiefgelaufen; sie wurde an ihrem Platz belassen.`,
@@ -342,7 +350,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
+  'Error.DestinationNotFullyQualified': `Der Sicherungsordner muss ein vollständiger Pfad zu einem Ordner sein, beginnend mit einem Laufwerksbuchstaben oder einer Netzwerkfreigabe (zum Beispiel D:\\Backup oder \\\\server\\backup). InstallerClean kann diesen hier nicht verwenden: {0}`,
   'BrowserLaunch.FailedTitle': `Browser konnte nicht geöffnet werden`,
   'UpdateCheck.Title': `Nach Updates suchen`,
   'UpdateCheck.Status.Checking': `Wird geprüft...`,
@@ -362,7 +370,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean konnte deinen Browser nicht öffnen und den Link auch nicht in die Zwischenablage kopieren. Der Link lautet:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean konnte den Sicherungsordner nicht mehr bestätigen und hat deshalb angehalten, statt an die falsche Stelle zu schreiben. Prüfe {0}, dann Neu scannen und noch einmal versuchen.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Schreiben in {0} nicht möglich.`,
@@ -412,61 +420,62 @@ const MAP = {
   'Display.Size.B': `{0} B`,
   'Display.Elapsed.Ms': `{0:F0}ms`,
   'Display.Elapsed.S': `{0:F1}s`,
+  'Display.ListSeparator': `, `,
   'Display.ElapsedLong.LessThanASecond': `weniger als eine Sekunde`,
   'Display.ElapsedLong.Seconds': `{0:F1} Sekunden`,
-  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log erfasst unbehandelte Ausnahmen von InstallerClean.\n# Mit erhöhten Rechten können die Ausnahmemeldungen des Frameworks\n# Dateipfade aus der laufenden Sitzung enthalten (auch Profile\n# anderer Benutzer, die Windows-Installer-Abfragen aufzählen).\n# Meldungen über Netzwerkfehler bei der Updateprüfung oder beim\n# Senden des Ergebnisprotokolls können die Ziel-URL und die\n# aufgelöste IP- oder Proxyadresse enthalten. Einträge über\n# unlesbare Windows-Installer-Einträge können eine Windows-Konto-SID\n# (S-1-5-21-...) und die Produktcodes installierter Software\n# enthalten.\n# Entferne alle drei Arten von Angaben, bevor du diese Datei an\n# einen öffentlichen Fehlerbericht anhängst.\n`,
   'Tooltip.ChangeLanguage': `Sprache ändern. Das Programm wird neu gestartet.`,
   'Automation.ChangeLanguage': `Sprache ändern`,
   'Automation.ChangeLanguage.HelpText': `Das Programm wird neu gestartet.`,
 
   // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys.
-  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
+  'Cli.UnknownArgument': `Fehler: unbekanntes Argument '{0}'`,
   'Cli.Cancelling': `Wird abgebrochen...`,
   'Cli.Cancelled': `Abgebrochen.`,
-  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
-  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
+  'Cli.GenericError': `Fehler: unerwarteter Ausfall ({0}). Details in {1} geschrieben.`,
+  'Cli.GenericError.NoLog': `Fehler: unerwarteter Ausfall ({0}). Das Absturzprotokoll konnte nicht geschrieben werden.`,
   'Cli.ScanningInstaller': `{InstallerFolder} wird gescannt...`,
-  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
-  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
+  'Cli.FoundOrphans': `{0} nicht benötigte {1} zum Aufräumen gefunden ({2}).`,
+  'Cli.DeletingFiles': `{0} nicht benötigte {1} werden gelöscht...`,
+  'Cli.DeletedFiles': `{0} nicht benötigte {1} endgültig gelöscht.`,
   'Cli.NoMoveDestination': `Fehler: Kein Zielordner zum Verschieben angegeben. Nutze /m PFAD. (Ein in der GUI gesetztes Standardziel gilt pro Benutzer und greift nicht bei geplanten oder Dienstkonto-Läufen.)`,
   'Cli.MoveDestinationInsideInstaller': `Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen.`,
   'Cli.MoveDestinationRelative': `Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
-  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
+  'Cli.MoveDestinationInSystemFolder': `Fehler: das Ziel {0} liegt unterhalb eines Windows-Systemordners. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% und %ProgramData%.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Fehler: etwas nutzt gerade Windows Installer, etwa ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. /m und /d sind blockiert, solange das läuft. Versuche es erneut, sobald es fertig ist.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Fehler: auf diesem Rechner ist eine frühere Windows-Installer-Transaktion angehalten. Setze diese Installation fort oder mache sie rückgängig (oder starte Windows neu), bevor du {InstallerFolder} aufräumst.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Fehler: ein für den Neustart eingeplanter Dateivorgang betrifft {InstallerFolder} ({0}). Starte Windows neu, damit dieser Vorgang abgeschlossen wird, bevor du aufräumst.`,
+  'Cli.MovingFiles': `{0} nicht benötigte {1} werden nach {2} verschoben...`,
+  'Cli.MovedFiles': `{0} nicht benötigte {1} verschoben.`,
   'Cli.MutexBlocked': `Ein anderer InstallerClean-Prozess hält die Einzelinstanz-Sperre (die GUI oder ein anderer CLI-Lauf). Exit-Code 75 (vorübergehend); ein späterer Wiederholungsversuch ist sicher.`,
   'Cli.EventLogUnavailable': `Hinweis: Das Schreiben in das Ereignisprotokoll ist fehlgeschlagen. Prüfe die Berechtigungen des Anwendungsprotokolls oder die Gruppenrichtlinie.`,
   'Cli.Help.Header': `InstallerClean - {InstallerFolder} aufräumen`,
   'Cli.Help.Usage': `Verwendung:`,
   'Cli.Help.Help': `  installerclean-cli --help     Diese Hilfe anzeigen (auch /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version  Die Version ausgeben (auch -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Nur scannen - nicht benötigte Dateien`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Nicht benötigte Dateien endgültig löschen`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         In den gespeicherten Sicherungsordner`,
   'Cli.Help.MovePath': `  installerclean-cli /m PFAD    An den angegebenen Pfad`,
-  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
+  'Cli.Help.NoteLine1': `installerclean-cli blockiert die Eingabeaufforderung bis zum Ende,&#10;damit ein Skript oder eine geplante Aufgabe darauf warten kann.`,
   'Cli.Help.ExitCodesHeader': `Exit-Codes:`,
-  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
-  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
-  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
+  'Cli.Help.ExitCodeOk': `  0   Erfolg: Der Lauf hat getan, worum gebeten wurde, ohne Fehler`,
+  'Cli.Help.ExitCodeError': `  1   Fehler: nichts verarbeitet (falsche Argumente, falsches Ziel,&#10;       fehlgeschlagener Scan oder jede Datei fehlgeschlagen)`,
+  'Cli.Help.ExitCodePartial': `  2   teilweise: einiges verarbeitet, anderes nicht (Fehler oder Strg+C)`,
   'Cli.Help.ExitCodeTransient': `  75  vorübergehend: etwas hat den Lauf blockiert (siehe Meldung)`,
   'Cli.Help.ExitCodeCancelled': `  130 abgebrochen (Strg+C)`,
   'Body.NotScanned.Lead': `Noch nichts gescannt.`,
   'Body.NotScanned.Why': `Klicke auf „Neu scannen“, um {InstallerFolder} nach Installer-Dateien zu durchsuchen, die kein Programm mehr braucht.`,
-  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
+  'Confirm.MoveSameDrive': `Dieser Ordner liegt auf demselben Laufwerk, der Platz kommt also erst zurück, wenn du ihn löschst. Wähle stattdessen einen Ordner auf einem anderen Laufwerk, wenn du den Platz sofort haben willst.`,
+  'Error.ScanCorrelationFailed': `InstallerClean konnte die Windows-Installer-Einträge nicht mit dem Inhalt von {InstallerFolder} abgleichen. Fast nichts, worauf die Einträge zeigen, ist tatsächlich da, und fast nichts, was da ist, wird von einem Eintrag benannt, deshalb ließ sich für keine Datei zeigen, dass sie nicht benötigt wird. Es wurde nichts angeboten und nichts entfernt.`,
   'Error.CandidateOutsideCache': `Diese Datei liegt nicht direkt im Windows-Installer-Ordner; aus Sicherheitsgründen abgelehnt.`,
-  'Completion.ReverifySkipped': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
+  'Completion.ReverifySkipped': `{0} {1} an Ort und Stelle belassen, weil die Einträge jetzt beanspruchen, was der Scan markiert hatte.`,
   'Completion.MoveCancelledSummary': `{0} von {1} {2} verschoben, bevor du abgebrochen hast.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} von {1} {2} endgültig gelöscht, bevor du abgebrochen hast.`,
   'Body.PendingReboot.Lead': `Diese Dateien können gerade nicht aufgeräumt werden.`,
   'Cli.TooManyArguments': `Fehler: Unerwartetes zusätzliches Argument '{0}'. Wenn dein Zielordner ein Leerzeichen enthält, setze den ganzen Pfad in Anführungszeichen: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
-  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
+  'Cli.Help.MoveScheduledNote': `Der Ordner gilt pro Benutzer; geplante Läufe brauchen /m PFAD.`,
+  'Completion.ReverifyIncomplete': `{0} {1} an Ort und Stelle belassen, weil die Windows-Installer-Einträge bei der letzten Prüfung nicht vollständig gelesen werden konnten.`,
   'Error.ScanRecordsUnreadable': `InstallerClean konnte nicht genug von den Einträgen von Windows Installer lesen, um sicher zu sein, was noch gebraucht wird: Die Liste der installierten Programme kam unvollständig zurück, und dieselben Einträge direkt aus der Registrierung zu lesen führte ebenfalls zu Fehlern. Eine Datei könnte allein deshalb verwaist wirken, weil der Eintrag, der sie nennt, zu den unlesbaren gehörte, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer hat das Ende der Liste der installierten Programme nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer hat das Ende der Patch-Liste eines Programms nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
@@ -478,41 +487,41 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Öffnet das readme auf github in deinem Browser.`,
   'Automation.About.ReportProblem.HelpText': `Öffnet den Issue-Tracker auf github.com in deinem Browser.`,
   'Automation.AutoUpdateCheck.HelpText': `Wenn aktiviert, sucht InstallerClean beim Start auf github nach einer neueren Version.`,
-  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
-  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
-  'Automation.Scroll.ProductDetails': `Product details`,
-  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
-  'Cli.TooManyArgumentsNoPath': `Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.`,
-  'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, preferably the same version, should restore it.`,
-  'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder}. No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, preferably the same version, should restore them.`,
-  'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
-  'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
+  'Tooltip.MoveSameDrive': `Verschiebt die nicht benötigten Dateien in den Sicherungsordner. Er liegt auf demselben Laufwerk, du bekommst den Platz also erst zurück, wenn du diesen Ordner löschst oder auf ein anderes Laufwerk verschiebst. Das kannst du tun, sobald du sicher bist, dass sie niemand braucht.`,
+  'Completion.MoveRestoreHint.Singular': `Die Datei in diesem Ordner ist [bedenkenlos entfernbar], du kannst den Ordner also löschen, wann immer du magst. Bis dahin kannst du sie zurück nach {InstallerFolder} legen, falls ein Programm sie doch einmal braucht (äußerst unwahrscheinlich).`,
+  'Completion.MoveRestoreHint.Plural': `Die Dateien in diesem Ordner sind [bedenkenlos entfernbar], du kannst ihn also löschen, wann immer du magst. Bis dahin kannst du sie zurück nach {InstallerFolder} legen, falls ein Programm doch einmal eine davon braucht (äußerst unwahrscheinlich).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `Die Datei in diesem Ordner ist [bedenkenlos entfernbar], du kannst den Ordner also löschen oder auf ein anderes Laufwerk verschieben, wann immer du den Platz wirklich zurückhaben willst. Bis dahin kannst du sie zurück nach {InstallerFolder} legen, falls ein Programm sie doch einmal braucht (äußerst unwahrscheinlich).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `Die Dateien in diesem Ordner sind [bedenkenlos entfernbar], du kannst ihn also löschen oder auf ein anderes Laufwerk verschieben, wann immer du den Platz wirklich zurückhaben willst. Bis dahin kannst du sie zurück nach {InstallerFolder} legen, falls ein Programm doch einmal eine davon braucht (äußerst unwahrscheinlich).`,
+  'Confirm.DeletePermanently.Singular': `Diese Datei wird endgültig gelöscht. Sie lässt sich [bedenkenlos löschen], aber wenn du eine Sicherung möchtest, nimm stattdessen die Schaltfläche Verschieben.`,
+  'Confirm.DeletePermanently.Plural': `Die Dateien werden endgültig gelöscht. Sie lassen sich [bedenkenlos löschen], aber wenn du eine Sicherung möchtest, nimm stattdessen die Schaltfläche Verschieben.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean konnte Windows nicht dazu bringen, den echten Pfad von {InstallerFolder} aufzulösen, deshalb ließ sich für keine Datei zeigen, dass sie darin liegt, und keine wurde zum Aufräumen angeboten. Dieser Scan hat nichts gefunden, weil diese Prüfung fehlschlug, nicht weil der Ordner sauber ist. Es wurde nichts entfernt.`,
+  'Automation.Scroll.ProductDetails': `Produktdetails`,
+  'Body.PendingReboot.Other': `Windows Installer hat etwas in Arbeit, deshalb pausieren Verschieben und Löschen. InstallerClean fasst {InstallerFolder} nicht an, während sich der Ordner ändert. Danach einmal neu scannen, und sie sind wieder da.`,
+  'Cli.TooManyArgumentsNoPath': `Fehler: unerwartetes zusätzliches Argument '{0}'. /s und /d nehmen keine weiteren Argumente, und pro Lauf ist nur ein Schalter möglich.`,
+  'Cli.MissingFromDisk.Singular': `Windows hat einen Eintrag für {0} Datei, die nicht in {InstallerFolder} liegt: {1}. Im Alltag macht das keine Probleme, aber eine Reparatur, ein Update oder eine Deinstallation kann daran scheitern. Das Installationsprogramm dieses Programms noch einmal auszuführen, möglichst in derselben Version, stellt die Datei meist wieder her.`,
+  'Cli.MissingFromDisk.Plural': `Windows hat Einträge für {0} Dateien, die nicht in {InstallerFolder} liegen: {1}. Im Alltag machen sie keine Probleme, aber eine Reparatur, ein Update oder eine Deinstallation kann daran scheitern. Das Installationsprogramm des jeweiligen Programms noch einmal auszuführen, möglichst in derselben Version, stellt die Dateien meist wieder her.`,
+  'Cli.MoveNotEnoughSpace': `Fehler: nicht genügend Speicherplatz unter {0}. Das Verschieben dieser Dateien braucht {1}, frei sind {2}. Es wurde nichts verschoben.`,
+  'Cli.PendingRebootBlocked.Other': `Fehler: Windows Installer hat etwas in Arbeit, deshalb sind /m und /d blockiert. InstallerClean fasst {InstallerFolder} nicht an, während sich der Ordner ändert. Versuche es erneut, sobald es fertig ist.`,
   'Cli.FoundNoOrphans': `Found no unneeded files.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.`,
-  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
-  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean konnte den Sicherungsordner nicht mehr bestätigen und hat deshalb angehalten, statt an die falsche Stelle zu schreiben. Prüfe {0} und führe den Befehl dann erneut aus.`,
+  'Cli.Help.Summary': `Entfernt .msi-/.msp-Dateien, die kein installiertes Programm mehr braucht.`,
+  'Cli.Help.Elevation': `Nur mit Administratorrechten; Windows startet es sonst gar nicht.`,
   'Error.InstallerLockUnavailableTitle': `Nichts gelöscht`,
-  'Error.MoveInstallerLockUnavailableTitle': `Nothing was moved`,
-  'Error.InstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
-  'Error.MoveInstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
-  'Cli.MoveInstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
-  'Summary.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
-  'Cli.RecordsNotMatched': `InstallerClean couldn't match up everything in the Windows records, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
-  'Completion.ReverifyIdentityClaimed': `{0} {1} kept in place, because Windows has a record of the program named inside.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
-  'Completion.NothingRemoved': `Nothing removed`,
-  'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
-  'Completion.NothingOffered': `Nothing offered on this PC`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
+  'Error.MoveInstallerLockUnavailableTitle': `Nichts verschoben`,
+  'Error.InstallerLockUnavailable': `InstallerClean konnte die Sperre nicht übernehmen, mit der Windows Installer verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts gelöscht. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.`,
+  'Error.MoveInstallerLockUnavailable': `InstallerClean konnte die Sperre nicht übernehmen, mit der Windows Installer verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts verschoben. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.`,
+  'Cli.InstallerLockUnavailable': `Fehler: InstallerClean konnte die Windows-Installer-Sperre nicht übernehmen, die verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts gelöscht. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.`,
+  'Cli.MoveInstallerLockUnavailable': `Fehler: InstallerClean konnte die Windows-Installer-Sperre nicht übernehmen, die verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts verschoben. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.`,
+  'Completion.ReverifyRecordsChanged': `{0} {1} an Ort und Stelle belassen, weil sich die Windows-Installer-Einträge bis zur letzten Prüfung geändert hatten.`,
+  'Summary.RecordsNotMatched': `InstallerClean konnte nicht alles in den Windows-Einträgen zuordnen und hat sie deshalb nicht vollständig gelesen. Die nicht benötigten Dateien oben sind davon unberührt, aber was hier zu Dateien steht, die in {InstallerFolder} fehlen, kann unvollständig sein. Scanne neu, um es noch einmal zu versuchen.`,
+  'Cli.RecordsNotMatched': `InstallerClean konnte nicht alles in den Windows-Einträgen zuordnen und hat sie deshalb nicht vollständig gelesen. Das Gefundene ist davon unberührt, aber was hier zu Dateien steht, die in {InstallerFolder} fehlen, kann unvollständig sein. Ein erneuter Lauf findet vielleicht mehr.`,
+  'Completion.ReverifyIdentityClaimed': `{0} {1} an Ort und Stelle belassen, weil Windows einen Eintrag zu dem darin genannten Programm hat.`,
+  'Completion.ReverifyIdentityUnreadable': `{0} {1} an Ort und Stelle belassen, weil InstallerClean darin kein Programm benannt fand.`,
+  'Completion.NothingRemoved': `Nichts entfernt`,
+  'Error.ScanNoRegisteredFileInFolder': `InstallerClean konnte die Windows-Installer-Einträge nicht mit dem Inhalt von {InstallerFolder} abgleichen. Der Ordner enthält Dateien, aber kein einziger Eintrag zeigt auf irgendetwas darin, deshalb ließ sich für keine Datei zeigen, dass sie nicht benötigt wird. Es wurde nichts angeboten und nichts entfernt.`,
+  'Completion.NothingOffered': `Auf diesem PC nichts angeboten`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei ({1}) zurückgehalten, die es sonst angeboten hätte.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb alle {0} Dateien ({1}) zurückgehalten, die es sonst angeboten hätte.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
