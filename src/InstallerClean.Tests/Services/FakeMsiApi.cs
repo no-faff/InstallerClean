@@ -32,6 +32,41 @@ internal sealed class FakeMsiApi : IMsiApi
     public Dictionary<string, uint> PatchEnumResult { get; } = new();
 
     /// <summary>
+    /// ROUTE A: what the machine-wide patch enumeration returns. That call is the one made
+    /// with NO product code, and until these three members existed no fixture could reach
+    /// it: every other knob here is keyed by a product code, route A passes none, and the
+    /// call fell through to the "this product holds no patches" branch and answered
+    /// NoMoreItems whatever the fixture said. So every test in this suite ran against a
+    /// route A that succeeded and named nothing, and the production behaviour that depends
+    /// on it could not be pinned in either direction.
+    ///
+    /// A forced return code. Null leaves route A walking <see cref="RouteAHolders"/>, which
+    /// is empty unless a fixture fills it, so the default is exactly what the fake answered
+    /// before and no existing fixture moves.
+    /// </summary>
+    public uint? RouteAResult { get; set; }
+
+    /// <summary>
+    /// The (patch, target product) pairs route A names, in enumeration order. Route A is
+    /// the only call that can name a product the PRODUCT enumeration never returned, so
+    /// this is the only way a fixture can build the product the rest of the machine is
+    /// blind to. Both GUID buffers are written, because the production code refuses a row
+    /// that names one and not the other.
+    /// </summary>
+    public List<(string PatchCode, string TargetProductCode)> RouteAHolders { get; } = new();
+
+    /// <summary>
+    /// Product codes a KEYED product query answers ERROR_UNKNOWN_PRODUCT for. Without it
+    /// every code this fake is asked about resolves as installed, because the product
+    /// enumeration ignores the code it is given and answers from its own list. That is a
+    /// machine that cannot exist, and it hides the branch that matters most to the
+    /// per-product condition: a product a patch file DECLARES that this machine does not
+    /// hold, which is a positive answer of "nothing here can reach the file" rather than a
+    /// failure to establish one.
+    /// </summary>
+    public HashSet<string> NotInstalled { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
     /// Fails ONE row of a product's patch enumeration, keyed by (product,
     /// index). Distinct from <see cref="PatchEnumResult"/>, which refuses the
     /// product's enumeration outright: this is the scattered-failure case the
@@ -107,6 +142,14 @@ internal sealed class FakeMsiApi : IMsiApi
             WriteCode(installedProductCode, "{FFFFFFFF-0000-0000-0000-000000000000}");
             return Success;
         }
+        // A KEYED QUERY THE FIXTURE HAS DECLARED ABSENT. It is answered before the index is
+        // consulted because a keyed query is a question about that code and not a walk:
+        // ResolveProductInstance asks about one product at index 0, and falling through to
+        // the list would answer Success from whichever product happened to be first.
+        // The production constant rather than a local copy, so the fake cannot drift from
+        // the allowlist that decides which returns may be read as absence.
+        if (productCode is not null && NotInstalled.Contains(productCode))
+            return MsiError.UnknownProduct;
         if (index >= Products.Count) return NoMoreItems;
         if (ProductSidRetryResult.TryGetValue(index, out var afterRetry))
         {
@@ -128,6 +171,19 @@ internal sealed class FakeMsiApi : IMsiApi
         char[]? targetUserSid, ref uint targetUserSidLength)
     {
         targetProductContext = MsiInstallContext.Machine;
+        // ROUTE A, WHICH IS THE CALL WITH NO PRODUCT CODE. Everything below this branch is
+        // keyed by a product, so route A used to reach the "no patches for this product"
+        // return and answer NoMoreItems on every fixture. With both members left alone it
+        // still does, which is why nothing already written moves.
+        if (productCode is null)
+        {
+            if (RouteAResult is { } forcedRouteA) return forcedRouteA;
+            if (index >= RouteAHolders.Count) return NoMoreItems;
+            var (heldCode, heldTarget) = RouteAHolders[(int)index];
+            WriteCode(patchCode, heldCode);
+            WriteCode(targetProductCode, heldTarget);
+            return Success;
+        }
         if (productCode is not null && productCode == NeverEndPatchesFor)
         {
             WriteCode(patchCode, "{FFFFFFFF-0000-0000-0000-000000000001}");
