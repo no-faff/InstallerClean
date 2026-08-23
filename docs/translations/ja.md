@@ -168,7 +168,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} kept in place, because the records now claim what the scan flagged. | {0} 個の {1} をそのままにしました。登録情報が、スキャンで印を付けたものを現在は自分のものだと示しているためです。 |
 | {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {0} 個の {1} をそのままにしました。最終確認の時点で Windows Installer の登録情報が変わっていたためです。 |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {0} 個の {1} をそのままにしました。最終確認で Windows Installer の登録情報をすべて読み取れなかったためです。 |
-| {0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here. | {0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here. |
+| {0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here. | {0} 個の {1} をそのままにしました。最終確認の時点まで、InstallerClean はキャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったためです。 |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | {0} 個の {1} をそのままにしました。ファイル内に記されたプログラムの登録情報が Windows にあるためです。 |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} 個の {1} をそのままにしました。InstallerClean がファイル内にプログラム名を見つけられなかったためです。 |
 | Moved {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を移動しました。 |
@@ -191,6 +191,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 他に {0} 個のプログラム |
 | {0} file with no program named in the records | 登録情報にプログラム名がない {0} 個のファイル |
 | {0} files with no program named in the records | 登録情報にプログラム名がない {0} 個のファイル |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. |
 | InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. The unneeded files above are unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Re-scan to try again. | InstallerClean は Windows の登録情報にあるものすべてを突き合わせられなかったため、そのすべては読み取っていません。上の不要ファイルは影響を受けませんが、{InstallerFolder} にないファイルについての記載は全体を示していないことがあります。再スキャンしてもう一度お試しください。 |
 | {0} of {1} {2} | {2} {1} 個中 {0} 個 |
 | {0} unneeded {1} ({2}) | {0} 個の不要な {1} ({2}) |
@@ -436,8 +438,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | {InstallerFolder} をスキャン中... |
 | Found {0} unneeded {1} to clean up ({2}). | クリーンアップ対象の不要な {1} が {0} 個見つかりました ({2})。 |
 | Found no unneeded files. | 不要なファイルは見つかりませんでした。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの 1 個のファイル({2})をそのままにしました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの {0} 個の {1}({2})をすべてそのままにしました。 |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Running that program's installer again, preferably the same version, usually restores the file. | {InstallerFolder} にない {0} 個のファイルについて、Windows に登録情報があります：{1}。日常的には支障ありませんが、修復・更新・アンインストールがこれで失敗することがあります。そのプログラムのインストーラーを、できれば同じバージョンで実行し直すと、たいていファイルが復元されます。 |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Running each program's installer again, preferably the same version, usually restores the files. | {InstallerFolder} にない {0} 個のファイルについて、Windows に登録情報があります：{1}。日常的には支障ありませんが、修復・更新・アンインストールがこれで失敗することがあります。各プログラムのインストーラーを、できれば同じバージョンで実行し直すと、たいていファイルが復元されます。 |
 | InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. What it found is unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Running it again may pick up more. | InstallerClean は Windows の登録情報にあるものすべてを突き合わせられなかったため、そのすべては読み取っていません。見つかったものは影響を受けませんが、{InstallerFolder} にないファイルについての記載は全体を示していないことがあります。もう一度実行すると、さらに見つかることがあります。 |
