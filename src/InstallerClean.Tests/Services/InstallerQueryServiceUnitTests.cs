@@ -1652,6 +1652,11 @@ public class InstallerQueryServiceUnitTests
             + census.PathResolverOpenRefusedCount
             + census.PathResolverNoFinalNameCount
             + census.PathResolverFaultedCount);
+        // AND THE SPELLING IS RECOGNISED AS ONE ONLY THE DISK COULD SETTLE, which is
+        // this fixture's own subject and no longer follows from the attempt count. Every
+        // recorded value is resolved from 3.0.0, so the attempts figure above is now 1
+        // for an ordinary path too and cannot tell this value apart from any other.
+        Assert.Equal(1, census.PathFlaggedSpellingCount);
     }
 
     /// <summary>
@@ -1672,29 +1677,47 @@ public class InstallerQueryServiceUnitTests
         var census = (await Run(msi)).Census;
 
         Assert.Equal(1, census.PathResolverAttemptCount);
+        // THE HALF THAT IS ABOUT THIS VALUE RATHER THAN ABOUT EVERY VALUE. The ask
+        // widened to every recorded path in 3.0.0, so the count above says only that a
+        // registration was read; the 8.3 alias is what this fixture is for, and the
+        // character scan that recognises it is what the count below reports.
+        Assert.Equal(1, census.PathFlaggedSpellingCount);
     }
 
     [Fact]
-    public async Task An_ordinary_recorded_value_asks_the_resolver_nothing()
+    public async Task An_ordinary_recorded_value_is_asked_about_too_and_carries_no_flagged_spelling()
     {
-        // THE MUST-MISS CONTROL FOR BOTH TESTS ABOVE. Every path on a healthy machine
-        // has this shape, and a trigger that fired on all of them would open a handle
-        // per registration over a folder that reaches millions of files, while
-        // satisfying every assertion above. It also pins the reading of a clean
-        // census: five zeros UNDER a zero denominator say nothing was asked, which is
-        // a different fact from five zeros under a positive one.
+        // IT USED TO ASSERT THAT AN ORDINARY VALUE ASKED THE RESOLVER NOTHING, and that
+        // was the must-miss control for a gate that no longer exists. Until 3.0.0 the
+        // character scan below decided whether a handle was opened at all, so an
+        // ordinary path, which is nearly every path on a healthy machine, was normalised
+        // as a string and compared as text. Every recorded path is resolved now, and the
+        // invariant that buys is that a claim leaving normalisation is either a location
+        // the kernel proved or one whose failure to resolve has been counted and is
+        // already withholding the whole walk-derived offer.
+        //
+        // SO THE MUST-MISS MOVED WITH THE SCAN RATHER THAN GOING AWAY. The scan still
+        // exists and still selects exactly what it did; what changed is that it counts
+        // instead of deciding. An ordinary value must not be counted as carrying a
+        // spelling only the disk can settle, and that figure is what tells this fixture
+        // apart from the two above it. The attempts count cannot: it now reads 1 for
+        // every recorded value on every machine.
+        //
+        // NOTHING HERE ASSERTS THE OUTCOME OF THE RESOLUTION, for the reason the 8.3
+        // fixture gives: whether this path resolves depends on the machine the test runs
+        // on, and the ask being counted does not.
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\ordinary.msi");
 
         var census = (await Run(msi)).Census;
 
-        Assert.Equal(0, census.PathResolverAttemptCount);
-        Assert.Equal(0, census.PathResolverNotAPathCount);
-        Assert.Equal(0, census.PathResolverNoAncestorCount);
-        Assert.Equal(0, census.PathResolverOpenRefusedCount);
-        Assert.Equal(0, census.PathResolverNoFinalNameCount);
-        Assert.Equal(0, census.PathResolverFaultedCount);
+        Assert.Equal(1, census.PathResolverAttemptCount);
+        Assert.Equal(0, census.PathFlaggedSpellingCount);
+        // One registration, one ask, and at most one outcome recorded against it. A
+        // refusal total ABOVE the attempts count would mean an outcome was recorded
+        // without an ask, which is the reading that makes the five counters meaningless.
+        Assert.InRange(census.PathResolverRefusedTotal, 0, census.PathResolverAttemptCount);
     }
 
     // ---- The superseded-patch condition: every product, every patch ----

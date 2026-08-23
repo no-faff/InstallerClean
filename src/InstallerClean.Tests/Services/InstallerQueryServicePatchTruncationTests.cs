@@ -514,17 +514,32 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     [Fact]
-    public void A_machine_with_nothing_removable_never_runs_the_machine_wide_enumeration()
+    public void A_machine_with_nothing_removable_walks_the_machine_wide_enumeration_once()
     {
-        // It is the one call in this pass that scales with the whole machine, so
-        // the ordinary machine must not pay for it.
+        // IT USED TO ASSERT THAT THIS MACHINE NEVER RAN THE ENUMERATION AT ALL, and that
+        // saving was given up deliberately rather than lost. The pass that stamps the
+        // per-product verdict has two consumers, the offer and the missing-files split,
+        // and on a machine with nothing to offer the split is the only one there is. The
+        // pass used to be skipped on exactly those machines, so a row whose file had gone
+        // was reported or not according to whether some unrelated program happened to
+        // hold an offer-eligible patch that day. The guard moved below the pass, and this
+        // enumeration is what the pass reads to find a product no other source can name,
+        // so it now runs where it once did not. Its own tests are the obsoleted-row pair
+        // in the route A file.
+        //
+        // WHAT IS STILL WORTH PINNING IS THE SHAPE OF THE COST AND NOT ITS ABSENCE. This
+        // is the one call in the pass that scales with the whole machine, and it is
+        // walked ONCE per scan: one row served for the one pairing this machine holds. A
+        // change that asked it per product, per path or per pairing would leave every
+        // other assertion in this file green and would multiply the only expensive thing
+        // here by the size of the machine.
         var msi = new FakeApi();
         msi.AddProduct(Superseding);
         msi.HoldPatch(Superseding, Patch, Shared, state: "1", uninstallable: "1");
 
         Confirm(msi);
 
-        Assert.Equal(0, msi.MachineWideRowsServed);
+        Assert.Equal(1, msi.MachineWideRowsServed);
     }
 
     [Fact]
