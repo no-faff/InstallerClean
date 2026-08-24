@@ -682,6 +682,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // moves this does. The measurement is the pre-flight's, taken off the
         // dispatcher with the rest of the destination work; what MoveSpaceCheck
         // adds is which measurements are worth acting on.
+        //
+        // IT ASKS ITS OWN SAME-VOLUME QUESTION HERE, ON THIS THREAD, and that is
+        // deliberate rather than an oversight in a class that otherwise keeps
+        // volume work off it. Handing it the answer the pre-flight already has
+        // would mean a second way of reaching that verdict, and the two hosts
+        // agreeing about it is the reason the rule lives in Core at all. It is
+        // safe on this thread for a reason that does not generalise to the
+        // tooltip: the pre-flight above has just created this folder, written a
+        // file into it and deleted that file, so a destination that could stall
+        // has already stalled, behind the overlay and its working Cancel, and
+        // nothing awaits between there and here.
         if (MoveSpaceCheck.RefusalFreeSpace(dest, totalBytes, preFlight.AvailableFreeSpace)
             is long free)
         {
