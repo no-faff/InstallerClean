@@ -429,7 +429,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | Error: unknown argument '{0}' | Hata: bilinmeyen argüman '{0}' |
-| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Hata: beklenmeyen fazladan argüman '{0}'. Taşıma klasörünüzün adında boşluk varsa tüm yolu tırnak içine alın: /m "D:\My Backup" |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Hata: beklenmeyen fazladan argüman '{0}'. Hedef klasörünüzün adında boşluk varsa tüm yolu tırnak içine alın: /m "D:\My Backup" |
 | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | Hata: beklenmeyen fazladan argüman '{0}'. /s ve /d başka argüman almaz ve her çalıştırmada yalnızca bir bayrak kullanılabilir. |
 | Cancelling... | İptal ediliyor... |
 | Cancelled. | İptal edildi. |
@@ -439,7 +439,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found {0} unneeded {1} to clean up ({2}). | Temizlenecek {0} gereksiz {1} bulundu ({2}). |
 | Found no unneeded files. | Gereksiz dosya bulunamadı. |
 | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği tek dosyayı ({2}) tuttu. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği {0} {1} ({2}) tamamını tuttu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği {0} {1} ({2}) geri tutuldu. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Running that program's installer again, preferably the same version, usually restores the file. | Windows'ta {InstallerFolder} içinde bulunmayan {0} dosya için kayıt var: {1}. Gündelik kullanımda sorun çıkarmaz, ama bir onarım, güncelleme ya da kaldırma işlemi bu yüzden başarısız olabilir. O programın yükleyicisini, tercihen aynı sürümü, yeniden çalıştırmak dosyayı genellikle geri getirir. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Running each program's installer again, preferably the same version, usually restores the files. | Windows'ta {InstallerFolder} içinde bulunmayan {0} dosya için kayıt var: {1}. Gündelik kullanımda sorun çıkarmazlar, ama bir onarım, güncelleme ya da kaldırma işlemi bu yüzden başarısız olabilir. Her programın yükleyicisini, tercihen aynı sürümü, yeniden çalıştırmak dosyaları genellikle geri getirir. |
 | InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. What it found is unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Running it again may pick up more. | InstallerClean, Windows kayıtlarındaki her şeyi eşleştiremedi, bu yüzden hepsini okumadı. Bulduklarını bu etkilemez, ama {InstallerFolder} içinde eksik olan dosyalar hakkında söyledikleri tam tabloyu vermiyor olabilir. Yeniden çalıştırmak daha fazlasını bulabilir. |
@@ -472,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Kayıtlı hedef klasöre taşı |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m YOL     Belirtilen yola taşı |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli bitene kadar komut istemini tutar, böylece bir betik<br>ya da zamanlanmış görev onu bekleyebilir. |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Klasör kullanıcıya özel kaydedilir; zamanlanmış çalıştırma /m YOL ister. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Klasör kullanıcıya özeldir; zamanlanmış veya SYSTEM: /m YOL. |
 | Exit codes: | Çıkış kodları: |
 |   0   success: the run did what it was asked and nothing failed |   0   başarılı: isteneni yaptı ve hiçbir şey başarısız olmadı |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   başarısız: hiçbir şey işlenmedi (hatalı argüman, hatalı hedef,<br>       başarısız tarama ya da her dosyanın başarısız olması) |

@@ -390,7 +390,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。`,
   'Body.PendingReboot.Lead': `これらのファイルは今はクリーンアップできません。`,
   'Cli.TooManyArguments': `エラー：予期しない余分な引数 '{0}' があります。移動先フォルダーにスペースが含まれる場合は、パス全体を引用符で囲んでください：/m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `このフォルダーはユーザーごとに保存され、予約実行には /m PATH が必要です。`,
+  'Cli.Help.MoveScheduledNote': `フォルダーはユーザーごと。予約実行や SYSTEM には /m PATH が必要。`,
   'Completion.ReverifyIncomplete': `{0} 個の {1} をそのままにしました。最終確認で Windows Installer の登録情報をすべて読み取れなかったためです。`,
   'Error.ScanRecordsUnreadable': `InstallerClean は、何がまだ必要かを確かめられるだけの Windows Installer の登録情報を読み取れませんでした。インストール済みプログラムの一覧が不足した状態で返され、同じ登録情報をレジストリから直接読み取る方法でもエラーが発生しました。あるファイルを指し示す登録情報が読み取れなかったものの一つだったというだけで、そのファイルが孤立しているように見えてしまうことがあるため、InstallerClean は中止しました。何も削除していません。`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer がインストール済みプログラムの一覧の終わりを最後まで知らせませんでした。InstallerClean は {0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。`,

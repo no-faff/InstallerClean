@@ -550,8 +550,8 @@
        with them. And "rather than guess" describes something the app never does, which
        raises a possibility that was never on the table. -->
   <data name="Completion.NothingOffered" xml:space="preserve"><value>Tidak ada yang ditawarkan di PC ini</value></data>
-  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({1}) yang mungkin ditawarkannya ditahan.</value></data>
-  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} file ({1}) yang mungkin ditawarkannya ditahan.</value></data>
+  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({1}) yang mungkin ditawarkannya ditahan.</value></data>
+  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} file ({1}) yang mungkin ditawarkannya ditahan.</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
        retired list with the four that follow, and why the retired strings are kept
        rather than deleted is written out there rather than repeated here.
@@ -694,7 +694,7 @@
        something changed between the scan and the click, only that the check it makes
        before acting did not establish it. Two different findings reach this line and
        neither may be named in it. -->
-  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} dibiarkan di tempatnya, karena sampai pemeriksaan terakhir InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini.</value></data>
+  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} dibiarkan di tempatnya, karena sampai pemeriksaan terakhir InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -862,8 +862,8 @@
        "Rather than listing them" and not "rather than offering them", because the
        list is what the reader is looking at. The one-form spends neither placeholder
        and names the file instead of the numeral, as the other one-forms here do. -->
-  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>Di PC ini InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file itu ditahan dan tidak dicantumkan.</value></data>
-  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>Di PC ini InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi {0} {1} ditahan dan tidak dicantumkan.</value></data>
+  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>Di PC ini InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file itu ditahan dan tidak dicantumkan.</value></data>
+  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>Di PC ini InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi {0} {1} ditahan dan tidak dicantumkan.</value></data>
   <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean tidak bisa mencocokkan semua yang ada dalam catatan Windows, jadi tidak semuanya dibaca. File yang tidak diperlukan di atas tidak terpengaruh, tapi keterangan tentang file yang hilang dari {InstallerFolder} bisa jadi belum lengkap. Pindai ulang untuk mencoba lagi.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} dari {1} {2}</value></data>
@@ -1049,7 +1049,7 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
   <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Perubahan tidak dapat disimpan. Saat berikutnya dijalankan, InstallerClean akan kembali ke pengaturan sebelumnya.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Tujuan tidak boleh berada di dalam folder Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
-  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Tujuan {0} teruraikan di bawah folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% dan %ProgramData%.</value></data>
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% dan %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Ruang tidak cukup</value></data>
   <!-- 0 = destination, 1 = required size, 2 = available size -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Ruang tidak cukup di {0}
@@ -1264,7 +1264,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        token is most often an unquoted move path with a space, so the message
        names the quoting fix. The literal " quotes and the \ in the example are
        part of the sentence the user copies. -->
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Kesalahan: argumen tambahan yang tidak terduga '{0}'. Jika folder pemindahan Anda mengandung spasi, apit seluruh jalur dengan tanda kutip: /m "D:\My Backup"</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Kesalahan: argumen tambahan yang tidak terduga '{0}'. Jika folder tujuan Anda mengandung spasi, apit seluruh jalur dengan tanda kutip: /m "D:\My Backup"</value></data>
   <!-- 0 = the extra (unexpected) token. The same condition for /s and /d, which
        take no path at all, so the quoting advice above would answer about a flag
        the user did not type. The way in is combining flags ("/s /d"), which is
@@ -1322,8 +1322,8 @@ Log kerusakan tidak bisa ditulis.</value></data>
        a conclusion the reader has not reached. The tense also differs from the
        window's ("held back" here, "has held back" there) and that is deliberate,
        each being right in its own register. -->
-  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) yang mungkin ditawarkannya ditahan.</value></data>
-  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean tidak bisa memastikan file mana dalam singgahan yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) yang mungkin ditawarkannya ditahan.</value></data>
+  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) yang mungkin ditawarkannya ditahan.</value></data>
+  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) yang mungkin ditawarkannya ditahan.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel
@@ -1460,7 +1460,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
-  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Menghapus permanen {0} {1} yang tidak diperlukan.</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>{0} {1} yang tidak diperlukan telah dihapus permanen.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
@@ -1475,7 +1475,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        (x86) path that is refused again. Error.DestinationInSystemFolder is the
        window's copy of the same list and moves with it. "and", not "or": outside
        A, B, C and D means outside all four, where "or" offers a choice. -->
-  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Kesalahan: tujuan {0} teruraikan di bawah folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% dan %ProgramData%.</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Kesalahan: tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% dan %ProgramData%.</value></data>
   <!-- 0 = destination, 1 = size the move needs, 2 = size free there. The window
        refuses the same move with Error.NotEnoughSpaceBody; this says it in one
        sentence because a command line has no dialog to lay out. The last clause
@@ -1532,7 +1532,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        the operation, so it does not depend on which of Move and Delete was run:
        making it would imply the word meant something about deleting. All four
        run lines carry it. -->
-  <data name="Cli.MovedFiles" xml:space="preserve"><value>Memindahkan {0} {1} yang tidak diperlukan.</value></data>
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>{0} {1} yang tidak diperlukan telah dipindahkan.</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,
@@ -1613,7 +1613,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        Windows system folder; without this line the only statement that it
        touches nothing anything needs is an adjective inside two of the six
        usage rows, which is not the same as saying it. -->
-  <data name="Cli.Help.Summary" xml:space="preserve"><value>Menyingkirkan file .msi dan .msp singgahan yang tak lagi diperlukan.</value></data>
+  <data name="Cli.Help.Summary" xml:space="preserve"><value>Menghapus file .msi/.msp cache yang tak lagi dibutuhkan program terpasang.</value></data>
   <!-- Running it from an ordinary prompt is the commonest way to get this wrong,
        and the tool cannot say so at the time: Windows refuses to start a process
        that requires administrator, so nothing of this program runs. The help is
@@ -1636,7 +1636,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        reader has been doing for twenty years, and that the GUI sits alongside
        in InstallerClean.exe, which is untrue of the command-line download. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli menahan prompt sampai selesai, sehingga skrip atau&#10;tugas terjadwal bisa menunggunya.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Folder itu disimpan per pengguna; tugas terjadwal perlu /m JALUR.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Folder disimpan per pengguna; tugas terjadwal atau SYSTEM: /m JALUR.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kode keluar:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT, and this line said the second until 3.0.0. Five runs exit 0: /? and

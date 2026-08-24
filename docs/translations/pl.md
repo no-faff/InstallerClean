@@ -429,7 +429,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Polski |
 | --- | --- |
 | Error: unknown argument '{0}' | Błąd: nieznany argument „{0}” |
-| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Błąd: nieoczekiwany dodatkowy argument „{0}”. Jeśli ścieżka folderu przenoszenia zawiera spację, ujmij całą ścieżkę w cudzysłów: /m "D:\My Backup" |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Błąd: nieoczekiwany dodatkowy argument „{0}”. Jeśli ścieżka folderu docelowego zawiera spację, ujmij całą ścieżkę w cudzysłów: /m "D:\My Backup" |
 | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | Błąd: nieoczekiwany dodatkowy argument „{0}”. /s i /d nie przyjmują dalszych argumentów, a w jednym uruchomieniu można użyć tylko jednego przełącznika. |
 | Cancelling... | Anulowanie... |
 | Cancelled. | Anulowano. |
@@ -452,7 +452,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. | Błąd: za mało miejsca w {0}. Przeniesienie tych plików wymaga {1}, a wolne jest {2}. Niczego nie przeniesiono. |
 | Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | Błąd: coś właśnie korzysta z Instalatora Windows, na przykład aktualizacja systemu albo program instalujący się w tle. /m i /d są zablokowane, dopóki to trwa. Spróbuj ponownie, gdy się skończy. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Błąd: na tym komputerze jest wstrzymana wcześniejsza transakcja Instalatora Windows. Wznów ją lub wycofaj tę instalację (albo uruchom system ponownie), zanim wyczyścisz {InstallerFolder}. |
-| Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Błąd: zakolejkowana na po ponownym uruchomieniu operacja na pliku dotyczy {InstallerFolder} ({0}). Uruchom system ponownie, aby ją dokończyć, zanim wyczyścisz. |
+| Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Błąd: operacja na pliku zakolejkowana na czas po ponownym uruchomieniu dotyczy {InstallerFolder} ({0}). Uruchom system ponownie, aby ją dokończyć, zanim wyczyścisz. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Błąd: Instalator Windows ma coś w toku, więc /m i /d są zablokowane. InstallerClean nie ruszy {InstallerFolder} w trakcie zmian. Spróbuj ponownie, gdy się skończy. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | Błąd: InstallerClean nie zdołał przejąć blokady Instalatora Windows, która powstrzymuje dwa programy przed jednoczesną zmianą zainstalowanego oprogramowania, więc nie mógł wykluczyć, że plik stanie się potrzebny w połowie pracy. Niczego nie usunięto. Spróbuj ponownie, a jeśli to się powtarza, uruchom system ponownie. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | Błąd: InstallerClean nie zdołał przejąć blokady Instalatora Windows, która powstrzymuje dwa programy przed jednoczesną zmianą zainstalowanego oprogramowania, więc nie mógł wykluczyć, że plik stanie się potrzebny w połowie pracy. Niczego nie przeniesiono. Spróbuj ponownie, a jeśli to się powtarza, uruchom system ponownie. |
@@ -462,7 +462,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Inny proces InstallerClean trzyma blokadę pojedynczej instancji (GUI lub inne uruchomienie CLI). Kod zakończenia 75 (stan przejściowy); można bezpiecznie spróbować ponownie później. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Uwaga: zapis do dziennika zdarzeń nie powiódł się. Sprawdź uprawnienia dziennika „Aplikacja” lub zasady grupy. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - oczyszczanie {InstallerFolder} |
-| Removes cached .msi and .msp files that no installed program still needs. | Usuwa pliki .msi i .msp z pamięci podręcznej, zbędne każdemu programowi. |
+| Removes cached .msi and .msp files that no installed program still needs. | Usuwa .msi i .msp z cache, zbędne każdemu zainstalowanemu programowi. |
 | Needs an elevated (administrator) prompt; Windows will not start it. | Wymaga wiersza polecenia administratora; inaczej Windows go nie uruchomi. |
 | Usage: | Sposób użycia: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Pokaż tę pomoc (akceptuje też /?, -h) |
@@ -472,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m          Przenieś do zapisanego folderu |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ŚCIEŻKA  Przenieś do wskazanej ścieżki |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli blokuje wiersz polecenia aż do końca, więc skrypt<br>albo zadanie zaplanowane może na niego zaczekać. |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Folder zapisuje się per użytkownik; zadania wymagają /m ŚCIEŻKA. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Folder dla każdego użytkownika; zaplanowane lub SYSTEM: /m ŚCIEŻKA. |
 | Exit codes: | Kody zakończenia: |
 |   0   success: the run did what it was asked and nothing failed |   0   sukces: zrobił to, o co poproszono, i nic nie zawiodło |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   niepowodzenie: nic nie przetworzono (złe argumenty, złe miejsce<br>       docelowe, nieudane skanowanie albo każdy plik z błędem) |

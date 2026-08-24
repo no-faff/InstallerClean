@@ -549,7 +549,7 @@
        and before anything has been pressed. "Sorry to send you away empty-handed" went
        with them. And "rather than guess" describes something the app never does, which
        raises a possibility that was never on the table. -->
-  <data name="Completion.NothingOffered" xml:space="preserve"><value>Rien proposé sur ce PC</value></data>
+  <data name="Completion.NothingOffered" xml:space="preserve"><value>Rien n'a été proposé sur ce PC</value></data>
   <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu le seul fichier ({1}) qu'il aurait pu proposer.</value></data>
   <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu l'ensemble des {0} fichiers ({1}) qu'il aurait pu proposer.</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
@@ -1264,7 +1264,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
        token is most often an unquoted move path with a space, so the message
        names the quoting fix. The literal " quotes and the \ in the example are
        part of the sentence the user copies. -->
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Erreur : argument supplémentaire inattendu « {0} ». Si votre dossier de déplacement contient un espace, mettez le chemin entier entre guillemets : /m "D:\My Backup"</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Erreur : argument supplémentaire inattendu « {0} ». Si votre dossier de destination contient un espace, mettez le chemin entier entre guillemets : /m "D:\My Backup"</value></data>
   <!-- 0 = the extra (unexpected) token. The same condition for /s and /d, which
        take no path at all, so the quoting advice above would answer about a flag
        the user did not type. The way in is combining flags ("/s /d"), which is
@@ -1285,7 +1285,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display. Never reached with
        a count of zero: that run prints Cli.FoundNoOrphans instead, so this one
        does not have to read sensibly at "0 ... (0 B)". -->
-  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Trouvé {0} {1} inutiles à nettoyer ({2}).</value></data>
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>{0} {1} inutiles à nettoyer ont été trouvés ({2}).</value></data>
   <!-- The whole of what a clean machine prints after the scanning line, and the
        commonest output this tool produces. It states what was found rather than
        what the tool intends to do about it, which is the question somebody
@@ -1460,7 +1460,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
-  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Supprimé définitivement {0} {1} inutiles.</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>{0} {1} inutiles ont été supprimés définitivement.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
@@ -1532,7 +1532,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
        the operation, so it does not depend on which of Move and Delete was run:
        making it would imply the word meant something about deleting. All four
        run lines carry it. -->
-  <data name="Cli.MovedFiles" xml:space="preserve"><value>Déplacé {0} {1} inutiles.</value></data>
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>{0} {1} inutiles ont été déplacés.</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,
@@ -1615,7 +1615,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
        Windows system folder; without this line the only statement that it
        touches nothing anything needs is an adjective inside two of the six
        usage rows, which is not the same as saying it. -->
-  <data name="Cli.Help.Summary" xml:space="preserve"><value>Retire les fichiers .msi et .msp en cache dont aucun programme n'a besoin.</value></data>
+  <data name="Cli.Help.Summary" xml:space="preserve"><value>Retire les .msi et .msp en cache dont aucun programme installé n'a besoin.</value></data>
   <!-- Running it from an ordinary prompt is the commonest way to get this wrong,
        and the tool cannot say so at the time: Windows refuses to start a process
        that requires administrator, so nothing of this program runs. The help is
@@ -1638,7 +1638,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
        reader has been doing for twenty years, and that the GUI sits alongside
        in InstallerClean.exe, which is untrue of the command-line download. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli bloque l'invite jusqu'à la fin, pour qu'un script ou&#10;une tâche planifiée puisse l'attendre.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Dossier propre à l'utilisateur ; les tâches planifiées exigent /m CHEMIN.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Dossier propre à l'utilisateur ; tâches planifiées ou SYSTEM : /m CHEMIN.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codes de sortie :</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT, and this line said the second until 3.0.0. Five runs exit 0: /? and
@@ -1665,11 +1665,11 @@ Le crash.log n'a pas pu être écrit.</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Le programme redémarrera.</value></data>
 
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Trouvé {0} {1} enregistré.</value></data>
-  <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Trouvé {0} {1} inutile à nettoyer ({2}).</value></data>
+  <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>{0} {1} inutile à nettoyer a été trouvé ({2}).</value></data>
   <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Suppression de {0} {1} inutile...</value></data>
-  <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Supprimé définitivement {0} {1} inutile.</value></data>
+  <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>{0} {1} inutile a été supprimé définitivement.</value></data>
   <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Déplacement de {0} {1} inutile vers {2}...</value></data>
-  <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Déplacé {0} {1} inutile.</value></data>
+  <data name="Cli.MovedFiles.One" xml:space="preserve"><value>{0} {1} inutile a été déplacé.</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} laissé en place, parce que les enregistrements revendiquent maintenant ce que l'analyse avait signalé.</value></data>
   <data name="Completion.ReverifyRecordsChanged.One" xml:space="preserve"><value>{0} {1} laissé en place, parce que les enregistrements de Windows Installer avaient changé au moment de la vérification finale.</value></data>
   <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>{0} {1} laissé en place, parce que les enregistrements de Windows Installer n'ont pas pu être lus entièrement lors de la vérification finale.</value></data>

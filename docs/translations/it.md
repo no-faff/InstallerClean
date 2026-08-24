@@ -121,10 +121,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing scanned yet. | Ancora nessuna scansione. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Premi Ripeti scansione per cercare in {InstallerFolder} i file di installazione che nessun programma usa più. |
 | These files can't be cleaned up right now. | Al momento questi file non si possono ripulire. |
-| Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. | Qualcosa sta usando Windows Installer in questo momento, ad esempio un aggiornamento di Windows o un programma che si installa in background. 'Sposta' ed 'Elimina' sono in pausa mentre accade, così InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili. |
+| Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. | Qualcosa sta usando Windows Installer in questo momento, ad esempio un aggiornamento di Windows o un programma che si installa in background. Sposta ed Elimina sono in pausa mentre accade, così InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Su questo computer c'è una transazione di Windows Installer sospesa. Riprendi o annulla quell'installazione (o riavvia Windows) prima di ripulire {InstallerFolder}. |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows ha in coda per il prossimo riavvio una ridenominazione di file che riguarda {InstallerFolder}. Riavvia Windows prima di ripulire. |
-| Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer ha qualcosa in corso, quindi 'Sposta' ed 'Elimina' sono in pausa. InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili. |
+| Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer ha qualcosa in corso, quindi Sposta ed Elimina sono in pausa. InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili. |
 | Select a file to view details. | Seleziona un file per vederne i dettagli. |
 | Select a product to view details. | Seleziona un prodotto per vederne i dettagli. |
 | No metadata available. | Nessun metadato disponibile. |
@@ -346,7 +346,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close result and return to main window | Chiudi finestra risultato e torna alla finestra principale |
 | Leave a star on github | Lascia una stella su github |
 | Minimise | Riduci a icona |
-| Delete permanently removes the unneeded files. Cancel closes without deleting. | 'Elimina definitivamente' rimuove i file non necessari. 'Annulla' chiude senza eliminare nulla. |
+| Delete permanently removes the unneeded files. Cancel closes without deleting. | Elimina definitivamente rimuove i file non necessari. Annulla chiude senza eliminare nulla. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 'Sposta' colloca i file non necessari nella cartella destinazione scelta. 'Annulla' li lascia dove sono. |
 | Say thanks | Per ringraziarmi |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla. |
@@ -433,8 +433,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | Errore: argomento aggiuntivo inatteso '{0}'. /s e /d non accettano altri argomenti, e si può usare una sola opzione per esecuzione. |
 | Cancelling... | Annullamento... |
 | Cancelled. | Operazione annullata. |
-| Error: unexpected failure ({0}). Details written to {1}. | Errore: guasto inatteso ({0}). Dettagli scritti in {1}. |
-| Error: unexpected failure ({0}). The crash log could not be written. | Errore: guasto inatteso ({0}). Non è stato possibile scrivere il registro dei crash. |
+| Error: unexpected failure ({0}). Details written to {1}. | Errore: crash inatteso ({0}). Dettagli scritti in {1}. |
+| Error: unexpected failure ({0}). The crash log could not be written. | Errore: crash inatteso ({0}). Non è stato possibile scrivere il registro dei crash. |
 | Scanning {InstallerFolder}... | Scansione di {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Trovati {0} {1} non necessari da eliminare ({2}). |
 | Found no unneeded files. | Nessun file non necessario trovato. |
@@ -462,7 +462,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Un altro processo InstallerClean mantiene il blocco a istanza singola (la GUI o un'altra esecuzione della CLI). Codice di uscita 75 (transitorio); è sicuro riprovare più tardi. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Nota: scrittura nel registro eventi non riuscita. Controlla i permessi del registro Applicazione o i Criteri di gruppo. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - pulizia di {InstallerFolder} |
-| Removes cached .msi and .msp files that no installed program still needs. | Rimuove i file .msi e .msp in cache che nessun programma usa più. |
+| Removes cached .msi and .msp files that no installed program still needs. | Rimuove i file .msi/.msp in cache che nessun programma installato usa più. |
 | Needs an elevated (administrator) prompt; Windows will not start it. | Richiede un prompt come amministratore; Windows non lo avvierà. |
 | Usage: | Utilizzo: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help       Mostra questa guida (anche /?, -h) |
@@ -472,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m           Sposta nella cartella salvata |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PERCORSO  Sposta nel percorso specificato |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli blocca il prompt finché non termina, così uno script<br>o un'operazione pianificata può attenderlo. |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | La cartella è per utente; le esecuzioni pianificate usano /m PERCORSO. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Cartella per utente; esecuzioni pianificate o SYSTEM: /m PERCORSO. |
 | Exit codes: | Codici di uscita: |
 |   0   success: the run did what it was asked and nothing failed |   0   riuscito: ha fatto quanto richiesto e nulla è fallito |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   errore: nulla elaborato (argomenti o destinazione errati,<br>       scansione fallita o tutti i file falliti) |

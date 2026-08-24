@@ -388,7 +388,7 @@
        and introduced nowhere. -->
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Сейчас что-то использует Windows Installer, например обновление Windows или программа, устанавливающаяся в фоне. «Переместить» и «Удалить» приостановлены на это время, чтобы InstallerClean не трогал {InstallerFolder}, пока она меняется. Когда всё закончится, повторите сканирование, и они вернутся.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>На этом компьютере приостановлена предыдущая транзакция Windows Installer. Возобновите или откатите эту установку (либо перезагрузите Windows), прежде чем очищать {InstallerFolder}.</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows поставила в очередь на следующую перезагрузку переименование файла, которое затрагивает {InstallerFolder}. Перезагрузите Windows, прежде чем очищать.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows поставил в очередь на следующую перезагрузку переименование файла, которое затрагивает {InstallerFolder}. Перезагрузите Windows, прежде чем очищать.</value></data>
   <!-- The fourth arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -402,7 +402,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Выберите продукт, чтобы посмотреть сведения.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Метаданные недоступны.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>Этот файл установщика отсутствует. Сейчас это не создаёт никаких трудностей и не создаст до того дня, когда вы попробуете восстановить, обновить или удалить программу, которой он принадлежит. Тогда этот шаг может завершиться неудачей, потому что Windows ищет этот файл, а его нет.&#10;&#10;Чтобы попробовать это исправить, скачайте установщик той программы у её разработчика и запустите его поверх имеющейся у вас копии (не удаляйте программу сначала: удаление само по себе является шагом, которому нужен этот файл). По возможности возьмите ту версию, которая у вас установлена, так как Windows может отклонить другую. Это должно восстановить файл и не затронуть ваши настройки, но Microsoft этого не гарантирует, и её собственное последнее средство - переустановка программы.</value>
+    <value>Этот файл установщика отсутствует. Сейчас это не создаёт никаких трудностей и не создаст до того дня, когда вы попробуете восстановить, обновить или удалить программу, которой он принадлежит. Тогда этот шаг может завершиться неудачей, потому что Windows ищет этот файл, а его нет.&#10;&#10;Чтобы попробовать это исправить, скачайте установщик той программы у её разработчика и запустите его поверх имеющейся у вас копии (не удаляйте программу сначала: удаление само по себе является шагом, которому нужен этот файл). По возможности возьмите ту версию, которая у вас установлена, так как Windows может отклонить другую. Это должно восстановить файл и не затронуть ваши настройки, но Microsoft этого не гарантирует, и её собственное последнее средство — переустановка программы.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -994,7 +994,7 @@ InstallerClean уже был запущен от имени администра
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean не смог добиться от Windows разрешения настоящего пути к {InstallerFolder}, поэтому ни про один файл не удалось показать, что он находится внутри, и ни один не был предложен для очистки. Это сканирование ничего не нашло из-за неудачи этой проверки, а не потому, что папка чиста. Ничего не убрано.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean не смог получить от Windows настоящий путь к {InstallerFolder}, поэтому ни про один файл не удалось показать, что он находится внутри, и ни один не был предложен для очистки. Это сканирование ничего не нашло из-за неудачи этой проверки, а не потому, что папка чиста. Ничего не убрано.</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -1029,13 +1029,13 @@ InstallerClean уже был запущен от имени администра
        Error.ScanCacheRootUnresolved above, which supplies the middle step of
        its own causal chain: what the app could not do, what followed from it,
        and that nothing has been removed. No placeholders. -->
-  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не удалено. Попробуйте ещё раз, а если повторяется - перезагрузите Windows.</value></data>
+  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.</value></data>
   <!-- The move half of the sentence above. Move refuses on the same condition
        because its exposure to it is the delete's: a file moved out of the cache
        is as absent from it as a deleted one, so a transaction starting part-way
        through fails to find it either way, and the recovery a move leaves the
        user does not make the batch safer to run. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не перемещено. Попробуйте ещё раз, а если повторяется - перезагрузите Windows.</value></data>
+  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недопустимая папка назначения</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не удалось записать в папку назначения</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Сбой перемещения</value></data>
@@ -1629,10 +1629,13 @@ InstallerClean уже был запущен от имени администра
   <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что при итоговой проверке записи Windows Installer не удалось прочитать полностью.</value></data>
   <data name="Completion.ReverifyOwnershipUnestablished.One" xml:space="preserve"><value>Оставлен на месте {0} {1}, потому что к итоговой проверке InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
+  <data name="Summary.MissingFromDisk.Unnamed.Few" xml:space="preserve"><value>{0} файла, для которых в записях не названа программа</value></data>
+  <data name="Summary.MissingFromDisk.OtherPrograms.Few" xml:space="preserve"><value>ещё {0} программы</value></data>
+  <data name="Completion.NothingOfferedBody.Few" xml:space="preserve"><value>InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} файла ({1}), которые иначе предложил бы.</value></data>
   <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Найден {0} ненужный {1} для очистки ({2}).</value></data>
-  <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Удаление {0} ненужного {1}...</value></data>
+  <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Идёт удаление: {0} ненужный {1}...</value></data>
   <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Безвозвратно удалён {0} ненужный {1}.</value></data>
-  <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Перемещение {0} ненужного {1} в {2}...</value></data>
+  <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Идёт перемещение в {2}: {0} ненужный {1}...</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Перемещён {0} ненужный {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Найдено {0} зарегистрированных {1}.</value></data>
 
@@ -1644,7 +1647,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Ошибка: непредвиденный сбой ({0}). Журнал сбоя записать не удалось.</value></data>
   <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Сканирование {InstallerFolder}...</value></data>
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Найдено {0} ненужных {1} для очистки ({2}).</value></data>
-  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Удаление {0} ненужных {1}...</value></data>
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Идёт удаление: {0} ненужных {1}...</value></data>
   <data name="Cli.DeletedFiles" xml:space="preserve"><value>Безвозвратно удалено {0} ненужных {1}.</value></data>
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Ошибка: не указана папка назначения для перемещения. Используйте /m ПУТЬ. (Значение по умолчанию, заданное в графическом интерфейсе, действует только для текущего пользователя и не применяется при запуске по расписанию или от имени служебной учётной записи.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Ошибка: папка назначения не может находиться внутри папки Windows Installer.</value></data>
@@ -1653,7 +1656,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Ошибка: сейчас что-то использует Windows Installer, например обновление Windows или программа, устанавливающаяся в фоне. /m и /d заблокированы на это время. Попробуйте снова, когда всё закончится.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Ошибка: на этом компьютере приостановлена предыдущая транзакция Windows Installer. Возобновите или откатите эту установку (либо перезагрузите Windows), прежде чем очищать {InstallerFolder}.</value></data>
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Ошибка: поставленная в очередь после перезагрузки операция с файлом затрагивает {InstallerFolder} ({0}). Перезагрузите Windows, чтобы завершить эту операцию, прежде чем очищать.</value></data>
-  <data name="Cli.MovingFiles" xml:space="preserve"><value>Перемещение {0} ненужных {1} в {2}...</value></data>
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Идёт перемещение в {2}: {0} ненужных {1}...</value></data>
   <data name="Cli.MovedFiles" xml:space="preserve"><value>Перемещено {0} ненужных {1}.</value></data>
   <data name="Cli.MutexBlocked" xml:space="preserve"><value>Другой процесс InstallerClean удерживает блокировку единственного экземпляра (GUI или другой запуск CLI). Код выхода 75 (временное состояние); можно повторить попытку позже.</value></data>
   <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Примечание: не удалось выполнить запись в журнал событий. Проверьте разрешения журнала «Приложение» или групповую политику.</value></data>
@@ -1672,8 +1675,8 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   частично: часть обработана, часть нет (сбой или Ctrl+C)</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  временно: запуск заблокирован временным состоянием (см. сообщение)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 отменено (Ctrl+C)</value></data>
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке для перемещения есть пробел, возьмите весь путь в кавычки: /m "D:\My Backup"</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Папка хранится для каждого пользователя; заданиям нужен /m ПУТЬ.</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке назначения есть пробел, возьмите весь путь в кавычки: /m "D:\My Backup"</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Папка своя у каждого пользователя; запланированным и SYSTEM: /m ПУТЬ.</value></data>
   <data name="Cli.TooManyArgumentsNoPath" xml:space="preserve"><value>Ошибка: непредвиденный лишний аргумент «{0}». /s и /d не принимают других аргументов, и за один запуск можно использовать только один ключ.</value></data>
   <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>У Windows есть запись о {0} файле, которого нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за него может не удаться. Повторный запуск установщика той программы, желательно той же версии, обычно возвращает файл.</value></data>
   <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>У Windows есть записи о {0} файлах, которых нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за них может не удаться. Повторный запуск установщика каждой программы, желательно той же версии, обычно возвращает файлы.</value></data>
@@ -1683,9 +1686,9 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл ({2}), который иначе предложил бы.</value></data>
   <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} {1} ({2}), которые иначе предложил бы.</value></data>
   <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean больше не смог подтвердить папку назначения и остановился, чтобы не записать не туда. Проверьте {0}, затем запустите команду снова.</value></data>
-  <data name="Cli.Help.Summary" xml:space="preserve"><value>Убирает файлы .msi и .msp из кэша, не нужные ни одной программе.</value></data>
+  <data name="Cli.Help.Summary" xml:space="preserve"><value>Убирает .msi и .msp из кэша, не нужные ни одной установленной программе.</value></data>
   <data name="Cli.Help.Elevation" xml:space="preserve"><value>Нужна командная строка администратора; иначе Windows её не запустит.</value></data>
-  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не удалено. Попробуйте ещё раз, а если повторяется - перезагрузите Windows.</value></data>
-  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не перемещено. Попробуйте ещё раз, а если повторяется - перезагрузите Windows.</value></data>
+  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.</value></data>
+  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.</value></data>
   <data name="Cli.RecordsNotMatched" xml:space="preserve"><value>InstallerClean не смог сопоставить всё, что есть в записях Windows, поэтому прочитал их не полностью. Найденного это не касается, но сказанное о файлах, отсутствующих в {InstallerFolder}, может быть неполным. Повторный запуск, возможно, найдёт больше.</value></data>
 </root>

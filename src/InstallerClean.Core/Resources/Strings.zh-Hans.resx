@@ -402,7 +402,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>选择一个产品以查看详情。</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>没有可用的元数据。</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>这个安装程序文件缺失了。目前不会造成任何麻烦，直到有一天您要修复、更新或卸载它所属的程序为止。那一步可能会失败，因为 Windows 会去找这个文件，而它不在。&#10;&#10;想要修复，请从该程序的厂商处下载它的安装程序，并在现有安装之上运行（不要先卸载：卸载本身就是需要这个文件的步骤）。如果能拿到，请使用您已安装的那个版本，因为 Windows 可能会拒绝其他版本。这通常能恢复该文件并保留您的设置，但 Microsoft 并不保证，而它自己的最后手段是重新安装该程序。</value>
+    <value>这个安装程序文件缺失了。目前不会造成任何麻烦，直到有一天您要修复、更新或卸载它所属的程序为止。那一步可能会失败，因为 Windows 会去找这个文件，而它不在。&#10;&#10;想要修复，请从该程序的厂商处下载它的安装程序，并在现有安装之上运行（不要先卸载：卸载本身就是需要这个文件的步骤）。如果能拿到，请使用您已安装的那个版本，因为 Windows 可能会拒绝其他版本。这应该能恢复该文件并保留您的设置，但 Microsoft 并不保证，而它自己的最后手段是重新安装该程序。</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -1264,7 +1264,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        token is most often an unquoted move path with a space, so the message
        names the quoting fix. The literal " quotes and the \ in the example are
        part of the sentence the user copies. -->
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>错误：出现意外的多余参数“{0}”。如果移动文件夹的路径中含有空格，请给整个路径加上引号：/m "D:\My Backup"</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>错误：出现意外的多余参数“{0}”。如果目标文件夹的路径中含有空格，请给整个路径加上引号：/m "D:\My Backup"</value></data>
   <!-- 0 = the extra (unexpected) token. The same condition for /s and /d, which
        take no path at all, so the quoting advice above would answer about a flag
        the user did not type. The way in is combining flags ("/s /d"), which is

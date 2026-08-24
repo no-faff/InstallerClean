@@ -472,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         保存済みの移動先フォルダーへ移動 |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PATH    指定されたパスに移動 |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli は終了までプロンプトを占有するため、スクリプトや<br>スケジュールされたタスクが完了を待てます。 |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | このフォルダーはユーザーごとに保存され、予約実行には /m PATH が必要です。 |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | フォルダーはユーザーごと。予約実行や SYSTEM には /m PATH が必要。 |
 | Exit codes: | 終了コード： |
 |   0   success: the run did what it was asked and nothing failed |   0   成功：求められた処理を行い、失敗は何もなかった |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   失敗：何も処理されなかった (引数や移動先の誤り、<br>       スキャンの失敗、または全ファイルの失敗) |

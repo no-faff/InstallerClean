@@ -128,7 +128,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Select a file to view details. | 选择一个文件以查看详情。 |
 | Select a product to view details. | 选择一个产品以查看详情。 |
 | No metadata available. | 没有可用的元数据。 |
-| This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program. | 这个安装程序文件缺失了。目前不会造成任何麻烦，直到有一天您要修复、更新或卸载它所属的程序为止。那一步可能会失败，因为 Windows 会去找这个文件，而它不在。<br><br>想要修复，请从该程序的厂商处下载它的安装程序，并在现有安装之上运行（不要先卸载：卸载本身就是需要这个文件的步骤）。如果能拿到，请使用您已安装的那个版本，因为 Windows 可能会拒绝其他版本。这通常能恢复该文件并保留您的设置，但 Microsoft 并不保证，而它自己的最后手段是重新安装该程序。 |
+| This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program. | 这个安装程序文件缺失了。目前不会造成任何麻烦，直到有一天您要修复、更新或卸载它所属的程序为止。那一步可能会失败，因为 Windows 会去找这个文件，而它不在。<br><br>想要修复，请从该程序的厂商处下载它的安装程序，并在现有安装之上运行（不要先卸载：卸载本身就是需要这个文件的步骤）。如果能拿到，请使用您已安装的那个版本，因为 Windows 可能会拒绝其他版本。这应该能恢复该文件并保留您的设置，但 Microsoft 并不保证，而它自己的最后手段是重新安装该程序。 |
 | The README [explains this folder], and how to recover a file, in Microsoft's own words. | README 用 Microsoft 自己的原话[解释了这个文件夹]，以及如何恢复文件。 |
 | (none) | （无） |
 
@@ -429,7 +429,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | Error: unknown argument '{0}' | 错误：未知参数“{0}” |
-| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | 错误：出现意外的多余参数“{0}”。如果移动文件夹的路径中含有空格，请给整个路径加上引号：/m "D:\My Backup" |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | 错误：出现意外的多余参数“{0}”。如果目标文件夹的路径中含有空格，请给整个路径加上引号：/m "D:\My Backup" |
 | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | 错误：出现意外的多余参数“{0}”。/s 和 /d 不接受其他参数，每次运行也只能使用一个开关。 |
 | Cancelling... | 正在取消… |
 | Cancelled. | 已取消。 |

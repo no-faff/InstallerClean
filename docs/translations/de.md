@@ -433,8 +433,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | Fehler: unerwartetes zusätzliches Argument '{0}'. /s und /d nehmen keine weiteren Argumente, und pro Lauf ist nur ein Schalter möglich. |
 | Cancelling... | Wird abgebrochen... |
 | Cancelled. | Abgebrochen. |
-| Error: unexpected failure ({0}). Details written to {1}. | Fehler: unerwarteter Ausfall ({0}). Details in {1} geschrieben. |
-| Error: unexpected failure ({0}). The crash log could not be written. | Fehler: unerwarteter Ausfall ({0}). Das Absturzprotokoll konnte nicht geschrieben werden. |
+| Error: unexpected failure ({0}). Details written to {1}. | Fehler: unerwarteter Absturz ({0}). Details in {1} geschrieben. |
+| Error: unexpected failure ({0}). The crash log could not be written. | Fehler: unerwarteter Absturz ({0}). Das Absturzprotokoll konnte nicht geschrieben werden. |
 | Scanning {InstallerFolder}... | {InstallerFolder} wird gescannt... |
 | Found {0} unneeded {1} to clean up ({2}). | {0} nicht benötigte {1} zum Aufräumen gefunden ({2}). |
 | Found no unneeded files. | Keine nicht benötigten Dateien gefunden. |
@@ -472,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         In den gespeicherten Sicherungsordner |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PFAD    An den angegebenen Pfad |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli blockiert die Eingabeaufforderung bis zum Ende,<br>damit ein Skript oder eine geplante Aufgabe darauf warten kann. |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Der Ordner gilt pro Benutzer; geplante Läufe brauchen /m PFAD. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Der Ordner gilt pro Benutzer; geplante Läufe und SYSTEM brauchen /m PFAD. |
 | Exit codes: | Exit-Codes: |
 |   0   success: the run did what it was asked and nothing failed |   0   Erfolg: Der Lauf hat getan, worum gebeten wurde, ohne Fehler |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   Fehler: nichts verarbeitet (falsche Argumente, falsches Ziel,<br>       fehlgeschlagener Scan oder jede Datei fehlgeschlagen) |

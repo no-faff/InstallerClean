@@ -462,7 +462,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Outro processo do InstallerClean mantém o bloqueio de instância única (a GUI ou outra execução da CLI). Código de saída 75 (transitório); seguro tentar novamente mais tarde. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Observação: falha ao gravar no Log de Eventos. Verifique as permissões do log de Aplicativo ou a Diretiva de Grupo. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - limpeza de {InstallerFolder} |
-| Removes cached .msi and .msp files that no installed program still needs. | Remove arquivos .msi e .msp em cache que nenhum programa ainda precisa. |
+| Removes cached .msi and .msp files that no installed program still needs. | Remove arquivos .msi/.msp em cache que nenhum programa instalado precisa. |
 | Needs an elevated (administrator) prompt; Windows will not start it. | Exige um prompt como administrador; o Windows não vai iniciá-lo. |
 | Usage: | Uso: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Mostra esta ajuda (aceita também /?, -h) |
@@ -472,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m          Move para a pasta de destino salva |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m CAMINHO  Move para o caminho especificado |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | O installerclean-cli bloqueia o prompt até terminar, para que um script<br>ou uma tarefa agendada possa esperar por ele. |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | A pasta é salva por usuário; execuções agendadas usam /m CAMINHO. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Pasta salva por usuário; execuções agendadas ou SYSTEM: /m CAMINHO. |
 | Exit codes: | Códigos de saída: |
 |   0   success: the run did what it was asked and nothing failed |   0   êxito: a execução fez o que foi pedido e nada falhou |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   falha: nada processado (argumentos ou destino inválidos, uma<br>       análise com falha ou todos os arquivos com falha) |

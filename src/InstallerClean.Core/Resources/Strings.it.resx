@@ -200,7 +200,7 @@
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>'Elimina definitivamente' rimuove i file non necessari. 'Annulla' chiude senza eliminare nulla.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Elimina definitivamente rimuove i file non necessari. Annulla chiude senza eliminare nulla.</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>'Sposta' colloca i file non necessari nella cartella destinazione scelta. 'Annulla' li lascia dove sono.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Per ringraziarmi</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla.</value></data>
@@ -386,7 +386,7 @@
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
        and introduced nowhere. -->
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Qualcosa sta usando Windows Installer in questo momento, ad esempio un aggiornamento di Windows o un programma che si installa in background. 'Sposta' ed 'Elimina' sono in pausa mentre accade, così InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Qualcosa sta usando Windows Installer in questo momento, ad esempio un aggiornamento di Windows o un programma che si installa in background. Sposta ed Elimina sono in pausa mentre accade, così InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Su questo computer c'è una transazione di Windows Installer sospesa. Riprendi o annulla quell'installazione (o riavvia Windows) prima di ripulire {InstallerFolder}.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows ha in coda per il prossimo riavvio una ridenominazione di file che riguarda {InstallerFolder}. Riavvia Windows prima di ripulire.</value></data>
   <!-- The fourth arm, for a reason the app can detect but has no line of its
@@ -397,7 +397,7 @@
        something is in progress and the buttons come back afterwards, and says
        nothing it cannot know. Names the folder with the token like its three
        siblings. -->
-  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer ha qualcosa in corso, quindi 'Sposta' ed 'Elimina' sono in pausa. InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili.</value></data>
+  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer ha qualcosa in corso, quindi Sposta ed Elimina sono in pausa. InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Seleziona un file per vederne i dettagli.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Seleziona un prodotto per vederne i dettagli.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Nessun metadato disponibile.</value></data>
@@ -1279,8 +1279,8 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        the words around it are what make it a sentence rather than an artefact
        of the runtime; both forms carry them, the pair being chosen by nothing
        but whether the crash log got written. -->
-  <data name="Cli.GenericError" xml:space="preserve"><value>Errore: guasto inatteso ({0}). Dettagli scritti in {1}.</value></data>
-  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Errore: guasto inatteso ({0}). Non è stato possibile scrivere il registro dei crash.</value></data>
+  <data name="Cli.GenericError" xml:space="preserve"><value>Errore: crash inatteso ({0}). Dettagli scritti in {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Errore: crash inatteso ({0}). Non è stato possibile scrivere il registro dei crash.</value></data>
   <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Scansione di {InstallerFolder}...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display. Never reached with
        a count of zero: that run prints Cli.FoundNoOrphans instead, so this one
@@ -1614,7 +1614,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        Windows system folder; without this line the only statement that it
        touches nothing anything needs is an adjective inside two of the six
        usage rows, which is not the same as saying it. -->
-  <data name="Cli.Help.Summary" xml:space="preserve"><value>Rimuove i file .msi e .msp in cache che nessun programma usa più.</value></data>
+  <data name="Cli.Help.Summary" xml:space="preserve"><value>Rimuove i file .msi/.msp in cache che nessun programma installato usa più.</value></data>
   <!-- Running it from an ordinary prompt is the commonest way to get this wrong,
        and the tool cannot say so at the time: Windows refuses to start a process
        that requires administrator, so nothing of this program runs. The help is
@@ -1637,7 +1637,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        reader has been doing for twenty years, and that the GUI sits alongside
        in InstallerClean.exe, which is untrue of the command-line download. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli blocca il prompt finché non termina, così uno script&#10;o un'operazione pianificata può attenderlo.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>La cartella è per utente; le esecuzioni pianificate usano /m PERCORSO.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Cartella per utente; esecuzioni pianificate o SYSTEM: /m PERCORSO.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codici di uscita:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT, and this line said the second until 3.0.0. Five runs exit 0: /? and

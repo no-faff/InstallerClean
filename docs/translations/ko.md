@@ -128,7 +128,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Select a file to view details. | 세부 정보를 보려면 파일을 선택하세요. |
 | Select a product to view details. | 세부 정보를 보려면 제품을 선택하세요. |
 | No metadata available. | 사용할 수 있는 메타데이터가 없습니다. |
-| This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program. | 이 설치 관리자 파일이 없습니다. 지금은 아무 문제도 일으키지 않으며, 이 파일이 속한 프로그램을 복구하거나 업데이트하거나 제거하려는 날이 오기 전까지는 문제가 되지 않습니다. 그때는 Windows가 이 파일을 찾는데 파일이 없으므로 그 단계가 실패할 수 있습니다.<br><br>해결을 시도하려면 해당 프로그램의 설치 관리자를 제조사에서 내려받아 기존 설치본 위에 실행하세요(먼저 제거하지 마세요. 제거 자체가 이 파일을 필요로 하는 단계입니다). 구할 수 있다면 설치되어 있는 것과 같은 버전을 사용하세요. Windows가 다른 버전을 거부할 수 있습니다. 이렇게 하면 파일이 복구되고 설정은 그대로 유지되는 것이 보통이지만 Microsoft가 보장하지는 않으며, Microsoft의 최후 수단은 프로그램을 다시 설치하는 것입니다. |
+| This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program. | 이 설치 관리자 파일이 없습니다. 지금은 아무 문제도 일으키지 않으며, 이 파일이 속한 프로그램을 복구하거나 업데이트하거나 제거하려는 날이 오기 전까지는 문제가 되지 않습니다. 그때는 Windows가 이 파일을 찾는데 파일이 없으므로 그 단계가 실패할 수 있습니다.<br><br>해결을 시도하려면 해당 프로그램의 설치 관리자를 제조사에서 내려받아 기존 설치본 위에 실행하세요(먼저 제거하지 마세요. 제거 자체가 이 파일을 필요로 하는 단계입니다). 구할 수 있다면 설치되어 있는 것과 같은 버전을 사용하세요. Windows가 다른 버전을 거부할 수 있습니다. 이렇게 하면 파일이 복구되고 설정은 그대로 유지될 것입니다. 다만 Microsoft가 보장하지는 않으며, Microsoft의 최후 수단은 프로그램을 다시 설치하는 것입니다. |
 | The README [explains this folder], and how to recover a file, in Microsoft's own words. | README에는 Microsoft의 표현 그대로 [이 폴더에 대한 설명]과 파일을 복구하는 방법이 담겨 있습니다. |
 | (none) | (없음) |
 
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing offered on this PC | 이 PC에서는 아무것도 제시하지 않았습니다 |
 | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered. | InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 하나({1})를 그대로 두었습니다. |
 | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered. | InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 {0}개({1}) 전부를 그대로 두었습니다. |
-| The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 그 폴더에 있는 파일은 [안전하게 제거할 수 있으므로], 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
-| The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 그 폴더에 있는 파일들은 [안전하게 제거할 수 있으므로], 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
-| The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 그 폴더에 있는 파일은 [안전하게 제거할 수 있으므로], 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
-| The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 그 폴더에 있는 파일들은 [안전하게 제거할 수 있으므로], 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
+| The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 그 폴더에 있는 파일은 [안전하게 제거할 수 있습니다]. 그러니 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
+| The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 그 폴더에 있는 파일들은 [안전하게 제거할 수 있습니다]. 그러니 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
+| The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 그 폴더에 있는 파일은 [안전하게 제거할 수 있습니다]. 그러니 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
+| The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 그 폴더에 있는 파일들은 [안전하게 제거할 수 있습니다]. 그러니 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
 | {0} freed | {0} 확보 |
 | {0} moved | {0} 이동 |
 | Nothing was moved | 이동된 파일 없음 |
@@ -206,8 +206,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | {1} {0}개를 이동하시겠습니까? ({2}) |
 | Move to: | 이동할 위치: |
 | Delete {0} {1} ({2})? | {1} {0}개를 삭제하시겠습니까? ({2}) |
-| This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. | 이 파일은 영구히 삭제됩니다. [안전하게 삭제할 수 있지만], 백업을 원하시면 대신 이동 단추를 사용하세요. |
-| Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. | 파일들이 영구히 삭제됩니다. [안전하게 삭제할 수 있지만], 백업을 원하시면 대신 이동 단추를 사용하세요. |
+| This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. | 이 파일은 영구히 삭제됩니다. [안전하게 삭제할 수 있습니다]. 다만 백업을 원하시면 대신 이동 단추를 사용하세요. |
+| Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. | 파일들이 영구히 삭제됩니다. [안전하게 삭제할 수 있습니다]. 다만 백업을 원하시면 대신 이동 단추를 사용하세요. |
 | That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. | 그 폴더는 같은 드라이브에 있어서, 폴더를 삭제하기 전까지는 공간이 돌아오지 않습니다. 공간을 바로 확보하려면 다른 드라이브의 폴더를 선택하세요. |
 
 ## Error messages
@@ -238,7 +238,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Setting not saved | 설정 저장 실패 |
 | The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | 변경 내용을 저장하지 못했습니다. 다음에 실행할 때 InstallerClean은 이전 설정으로 돌아갑니다. |
 | The destination cannot be inside the Windows Installer folder. | 대상은 Windows Installer 폴더 안에 있을 수 없습니다. |
-| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | 대상 {0}이(가) Windows 시스템 폴더 아래로 확인됩니다. %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%, %ProgramData% 바깥의 경로를 선택하세요. |
+| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | 대상 {0}이(가) Windows 시스템 폴더 아래를 가리킵니다. %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%, %ProgramData% 바깥의 경로를 선택하세요. |
 | Not enough space | 공간 부족 |
 | Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | {0}에 공간이 부족합니다<br><br>필요: {1}<br>사용 가능: {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | {0}에 쓸 권한이 없습니다.<br>사용자 프로필 안의 폴더나 본인 소유의 드라이브를 사용해 보세요. |
@@ -429,7 +429,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | Error: unknown argument '{0}' | 오류: 알 수 없는 인수 '{0}' |
-| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | 오류: 예상치 못한 추가 인수 '{0}'. 이동 폴더 경로에 공백이 있으면 전체 경로를 큰따옴표로 묶으세요: /m "D:\My Backup" |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | 오류: 예상치 못한 추가 인수 '{0}'. 대상 폴더 경로에 공백이 있으면 전체 경로를 큰따옴표로 묶으세요: /m "D:\My Backup" |
 | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | 오류: 예상치 못한 추가 인수 '{0}'. /s와 /d는 다른 인수를 받지 않으며, 한 번 실행에 플래그는 하나만 쓸 수 있습니다. |
 | Cancelling... | 취소 중... |
 | Cancelled. | 취소되었습니다. |
@@ -448,7 +448,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.) |
 | Error: destination cannot be inside the Windows Installer folder. | 오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다. |
 | Error: destination must be a fully qualified path. Got: {0} | 오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0} |
-| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | 오류: 대상 {0}이(가) Windows 시스템 폴더 아래로 확인됩니다. %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%, %ProgramData% 바깥의 경로를 선택하세요. |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | 오류: 대상 {0}이(가) Windows 시스템 폴더 아래를 가리킵니다. %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%, %ProgramData% 바깥의 경로를 선택하세요. |
 | Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. | 오류: {0}에 공간이 부족합니다. 이 파일들을 옮기려면 {1}이(가) 필요한데 {2}만 남아 있습니다. 아무것도 이동하지 않았습니다. |
 | Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | 오류: 지금 무언가가 Windows Installer를 사용하고 있습니다. Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램일 수 있습니다. 그동안 /m과 /d는 차단됩니다. 끝나면 다시 시도하세요. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | 오류: 이 컴퓨터에 이전 Windows Installer 트랜잭션이 중단된 채 남아 있습니다. {InstallerFolder}를 정리하기 전에 그 설치를 계속하거나 되돌리세요(또는 Windows를 다시 시작하세요). |
@@ -472,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         저장된 대상 폴더로 이동 |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 경로    지정한 경로로 이동 |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli는 끝날 때까지 프롬프트를 붙잡고 있으므로 스크립트나<br>예약 작업이 이를 기다릴 수 있습니다. |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | 폴더는 사용자별로 저장되며, 예약 실행에는 /m 경로가 필요합니다. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | 폴더는 사용자별 저장. 예약 또는 SYSTEM 실행에는 /m 경로 필요. |
 | Exit codes: | 종료 코드: |
 |   0   success: the run did what it was asked and nothing failed |   0   성공: 요청한 일을 했고 실패한 것이 없음 |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   실패: 아무것도 처리되지 않음 (잘못된 인수나 대상,<br>       검사 실패 또는 모든 파일 실패) |

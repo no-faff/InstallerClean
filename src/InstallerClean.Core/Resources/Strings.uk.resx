@@ -388,7 +388,7 @@
        and introduced nowhere. -->
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Зараз щось використовує Windows Installer, наприклад оновлення Windows або програма, що встановлюється у фоні. «Перемістити» і «Видалити» призупинено на цей час, щоб InstallerClean не чіпав {InstallerFolder}, доки вона змінюється. Коли все завершиться, повторіть сканування, і вони повернуться.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>На цьому комп'ютері призупинено попередню транзакцію Windows Installer. Відновіть або скасуйте те встановлення (чи перезавантажте Windows), перш ніж очищати {InstallerFolder}.</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows поставила в чергу на наступне перезавантаження перейменування файлу, що стосується {InstallerFolder}. Перезавантажте Windows, перш ніж очищати.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows поставив в чергу на наступне перезавантаження перейменування файлу, що стосується {InstallerFolder}. Перезавантажте Windows, перш ніж очищати.</value></data>
   <!-- The fourth arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -402,7 +402,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Виберіть продукт, щоб переглянути деталі.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Метадані недоступні.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>Цього файлу інсталятора немає. Зараз це не створює жодних труднощів і не створюватиме до того дня, коли ви спробуєте відновити, оновити або видалити програму, якій він належить. Тоді цей крок може завершитися невдало, бо Windows шукає цей файл, а його немає.&#10;&#10;Щоб спробувати це виправити, завантажте інсталятор тієї програми в її розробника і запустіть його поверх наявної копії (не видаляйте програму спершу: видалення саме по собі є кроком, якому потрібен цей файл). За змоги візьміть саме ту версію, яку встановлено, бо Windows може відхилити іншу. Це має відновити файл і не зачепити ваші налаштування, але Microsoft цього не гарантує, і її власний останній засіб - перевстановлення програми.</value>
+    <value>Цього файлу інсталятора немає. Зараз це не створює жодних труднощів і не створюватиме до того дня, коли ви спробуєте відновити, оновити або видалити програму, якій він належить. Тоді цей крок може завершитися невдало, бо Windows шукає цей файл, а його немає.&#10;&#10;Щоб спробувати це виправити, завантажте інсталятор тієї програми в її розробника і запустіть його поверх наявної копії (не видаляйте програму спершу: видалення саме по собі є кроком, якому потрібен цей файл). За змоги візьміть саме ту версію, яку встановлено, бо Windows може відхилити іншу. Це має відновити файл і не зачепити ваші налаштування, але Microsoft цього не гарантує, і її власний останній засіб — перевстановлення програми.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -994,7 +994,7 @@ InstallerClean уже працював від імені адміністрат�
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean не зміг домогтися від Windows розв'язання справжнього шляху до {InstallerFolder}, тож про жоден файл не вдалося показати, що він усередині, і жоден не було запропоновано для очищення. Це сканування нічого не знайшло через невдачу тієї перевірки, а не тому, що папка чиста. Нічого не прибрано.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean не зміг отримати від Windows справжній шлях до {InstallerFolder}, тож про жоден файл не вдалося показати, що він усередині, і жоден не було запропоновано для очищення. Це сканування нічого не знайшло через невдачу тієї перевірки, а не тому, що папка чиста. Нічого не прибрано.</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -1029,13 +1029,13 @@ InstallerClean уже працював від імені адміністрат�
        Error.ScanCacheRootUnresolved above, which supplies the middle step of
        its own causal chain: what the app could not do, what followed from it,
        and that nothing has been removed. No placeholders. -->
-  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не зміг узяти блокування, яким Windows Installer не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі, і нічого не видалено. Спробуйте ще раз, а якщо повторюється - перезавантажте Windows.</value></data>
+  <data name="Error.InstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не зміг узяти блокування, яким Windows Installer не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі, і нічого не видалено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows.</value></data>
   <!-- The move half of the sentence above. Move refuses on the same condition
        because its exposure to it is the delete's: a file moved out of the cache
        is as absent from it as a deleted one, so a transaction starting part-way
        through fails to find it either way, and the recovery a move leaves the
        user does not make the batch safer to run. No placeholders. -->
-  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не зміг узяти блокування, яким Windows Installer не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі, і нічого не переміщено. Спробуйте ще раз, а якщо повторюється - перезавантажте Windows.</value></data>
+  <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean не зміг узяти блокування, яким Windows Installer не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі, і нічого не переміщено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недійсне призначення</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не вдалося записати в призначення</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Не вдалося перемістити</value></data>
@@ -1049,7 +1049,7 @@ InstallerClean уже працював від імені адміністрат�
   <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Не вдалося зберегти зміну. Під час наступного запуску InstallerClean повернеться до попереднього налаштування.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Призначення не може бути всередині папки Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
-  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Призначення {0} розв'язується всередині системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% і %ProgramData%.</value></data>
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% і %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Недостатньо місця</value></data>
   <!-- 0 = destination, 1 = required size, 2 = available size -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Недостатньо місця в {0}
@@ -1264,7 +1264,7 @@ InstallerClean уже працював від імені адміністрат�
        token is most often an unquoted move path with a space, so the message
        names the quoting fix. The literal " quotes and the \ in the example are
        part of the sentence the user copies. -->
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Помилка: неочікуваний зайвий аргумент «{0}». Якщо в назві папки для переміщення є пробіл, візьміть увесь шлях у лапки: /m "D:\My Backup"</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Помилка: неочікуваний зайвий аргумент «{0}». Якщо в шляху до папки призначення є пробіл, візьміть увесь шлях у лапки: /m "D:\My Backup"</value></data>
   <!-- 0 = the extra (unexpected) token. The same condition for /s and /d, which
        take no path at all, so the quoting advice above would answer about a flag
        the user did not type. The way in is combining flags ("/s /d"), which is
@@ -1455,7 +1455,7 @@ InstallerClean уже працював від імені адміністрат�
        there. It says "unneeded" for the same reason Cli.DeletedFiles below
        does: it is the last thing printed before a permanent delete that
        nothing confirms and nobody is watching. -->
-  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Видалення {0} непотрібних {1}...</value></data>
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Триває видалення: {0} непотрібних {1}...</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun. It says "permanently" because
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
@@ -1475,7 +1475,7 @@ InstallerClean уже працював від імені адміністрат�
        (x86) path that is refused again. Error.DestinationInSystemFolder is the
        window's copy of the same list and moves with it. "and", not "or": outside
        A, B, C and D means outside all four, where "or" offers a choice. -->
-  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Помилка: призначення {0} розв'язується всередині системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% і %ProgramData%.</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Помилка: призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% і %ProgramData%.</value></data>
   <!-- 0 = destination, 1 = size the move needs, 2 = size free there. The window
        refuses the same move with Error.NotEnoughSpaceBody; this says it in one
        sentence because a command line has no dialog to lay out. The last clause
@@ -1503,10 +1503,10 @@ InstallerClean уже працював від імені адміністрат�
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
        it, which is the console's shape and not the window's. Same condition,
        same refusal, /d. No placeholders. -->
-  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Помилка: InstallerClean не зміг узяти блокування Windows Installer, яке не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі. Нічого не видалено. Спробуйте ще раз, а якщо повторюється - перезавантажте Windows.</value></data>
+  <data name="Cli.InstallerLockUnavailable" xml:space="preserve"><value>Помилка: InstallerClean не зміг узяти блокування Windows Installer, яке не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі. Нічого не видалено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows.</value></data>
   <!-- The /m half of the line above, the pair matching the two Error.* pairs in
        the window's family. No placeholders. -->
-  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Помилка: InstallerClean не зміг узяти блокування Windows Installer, яке не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі. Нічого не переміщено. Спробуйте ще раз, а якщо повторюється - перезавантажте Windows.</value></data>
+  <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Помилка: InstallerClean не зміг узяти блокування Windows Installer, яке не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі. Нічого не переміщено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1527,7 +1527,7 @@ InstallerClean уже працював від імені адміністрат�
        the other. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
-  <data name="Cli.MovingFiles" xml:space="preserve"><value>Переміщення {0} непотрібних {1} до {2}...</value></data>
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Триває переміщення до {2}: {0} непотрібних {1}...</value></data>
   <!-- 0 = moved count, 1 = pluralised noun. "Unneeded" describes the files, not
        the operation, so it does not depend on which of Move and Delete was run:
        making it would imply the word meant something about deleting. All four
@@ -1614,7 +1614,7 @@ InstallerClean уже працював від імені адміністрат�
        Windows system folder; without this line the only statement that it
        touches nothing anything needs is an adjective inside two of the six
        usage rows, which is not the same as saying it. -->
-  <data name="Cli.Help.Summary" xml:space="preserve"><value>Прибирає файли .msi і .msp з кешу, не потрібні жодній програмі.</value></data>
+  <data name="Cli.Help.Summary" xml:space="preserve"><value>Прибирає .msi і .msp з кешу, не потрібні жодній встановленій програмі.</value></data>
   <!-- Running it from an ordinary prompt is the commonest way to get this wrong,
        and the tool cannot say so at the time: Windows refuses to start a process
        that requires administrator, so nothing of this program runs. The help is
@@ -1637,7 +1637,7 @@ InstallerClean уже працював від імені адміністрат�
        reader has been doing for twenty years, and that the GUI sits alongside
        in InstallerClean.exe, which is untrue of the command-line download. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli утримує командний рядок до кінця роботи, щоб&#10;скрипт або запланована задача могли на нього зачекати.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Папка зберігається для кожного користувача; задачам потрібен /m ШЛЯХ.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Папка своя в кожного користувача; запланованим і SYSTEM: /m ШЛЯХ.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Коди виходу:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT, and this line said the second until 3.0.0. Five runs exit 0: /? and
@@ -1675,12 +1675,17 @@ InstallerClean уже працював від імені адміністрат�
   <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Windows має записи про {0} файли, яких немає в {InstallerFolder}: {1}. У повсякденній роботі це не заважає, але відновлення, оновлення чи видалення програми через них може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} файли залишено без змін ({1})</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Знайдено {0} зареєстрований {1}.</value></data>
+  <data name="Summary.MissingFromDisk.Unnamed.Few" xml:space="preserve"><value>{0} файли, для яких у записах не названо програми</value></data>
+  <data name="Summary.MissingFromDisk.OtherPrograms.Few" xml:space="preserve"><value>ще {0} програми</value></data>
+  <data name="Completion.NothingOfferedBody.Few" xml:space="preserve"><value>InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав усі {0} файли ({1}), які інакше запропонував би.</value></data>
   <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Знайдено {0} непотрібний {1} для очищення ({2}).</value></data>
   <data name="Cli.FoundOrphans.Few" xml:space="preserve"><value>Знайдено {0} непотрібні {1} для очищення ({2}).</value></data>
-  <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Видалення {0} непотрібного {1}...</value></data>
+  <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Триває видалення: {0} непотрібний {1}...</value></data>
+  <data name="Cli.DeletingFiles.Few" xml:space="preserve"><value>Триває видалення: {0} непотрібні {1}...</value></data>
   <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Остаточно видалено {0} непотрібний {1}.</value></data>
   <data name="Cli.DeletedFiles.Few" xml:space="preserve"><value>Остаточно видалено {0} непотрібні {1}.</value></data>
-  <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Переміщення {0} непотрібного {1} до {2}...</value></data>
+  <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Триває переміщення до {2}: {0} непотрібний {1}...</value></data>
+  <data name="Cli.MovingFiles.Few" xml:space="preserve"><value>Триває переміщення до {2}: {0} непотрібні {1}...</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Переміщено {0} непотрібний {1}.</value></data>
   <data name="Cli.MovedFiles.Few" xml:space="preserve"><value>Переміщено {0} непотрібні {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Знайдено {0} зареєстровані {1}.</value></data>

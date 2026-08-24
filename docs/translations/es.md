@@ -462,7 +462,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Otro proceso de InstallerClean mantiene el bloqueo de instancia única (la GUI u otra ejecución de la CLI). Código de salida 75 (transitorio); es seguro reintentar más tarde. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Nota: error al escribir en el registro de eventos. Comprueba los permisos del registro Aplicación o las directivas de grupo. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - limpiar {InstallerFolder} |
-| Removes cached .msi and .msp files that no installed program still needs. | Quita archivos .msi y .msp en caché que ningún programa necesita ya. |
+| Removes cached .msi and .msp files that no installed program still needs. | Quita archivos .msi/.msp en caché que ningún programa instalado necesita. |
 | Needs an elevated (administrator) prompt; Windows will not start it. | Requiere símbolo del sistema como administrador; Windows no lo iniciará. |
 | Usage: | Uso: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Muestra esta ayuda (acepta también /?, -h) |
@@ -472,7 +472,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Mueve a la carpeta de destino guardada |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m RUTA    Mueve a la ruta especificada |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli bloquea el símbolo del sistema hasta terminar, para<br>que un script o una tarea programada pueda esperarlo. |
-| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Se guarda por usuario; las ejecuciones programadas o SYSTEM usan /m RUTA. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | Carpeta por usuario; ejecuciones programadas o SYSTEM: /m RUTA. |
 | Exit codes: | Códigos de salida: |
 |   0   success: the run did what it was asked and nothing failed |   0   correcto: hizo lo que se le pidió y nada falló |
 |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   fallo: no se procesó nada (argumentos o destino incorrectos,<br>       análisis fallido o todos los archivos fallaron) |
