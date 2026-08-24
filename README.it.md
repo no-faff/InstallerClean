@@ -252,7 +252,7 @@ Se qualcosa qui ti ostacola, [apri un issue](../../issues). I problemi di access
 **Libererò davvero GB di spazio?** Dipende dal tuo computer. Un'installazione pulita di Windows 11 senza software aggiuntivo non ha nulla da rimuovere. Una postazione di sviluppo usata da tempo, o qualunque computer con molto software basato su MSI (Acrobat, Office, LibreOffice, grandi strumenti di sviluppo), può averne decine di GB. In ogni caso, vedrai esattamente quanto nel momento in cui la esegui.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Dalla v1.8.0 c'è l'opzione di inviare un breve rapporto anonimo sull'esito. Finora ne sono arrivati 223 (grazie a tutti 🙏) e, sul 63% dei computer che avevano qualcosa da pulire, la mediana liberata è di 16,8 GB. Un computer ha recuperato ben 462 GB. Ecco un riepilogo dei risultati.
+Dalla v1.8.0 c'è l'opzione di inviare un breve rapporto anonimo sull'esito. Finora ne sono arrivati 224 (grazie a tutti 🙏) e, sul 63% dei computer che avevano qualcosa da pulire, la mediana liberata è di 16,8 GB. Un computer ha recuperato ben 462 GB. Ecco un riepilogo dei risultati.
 
 <p align="center">
   <picture>

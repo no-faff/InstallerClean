@@ -252,7 +252,7 @@ Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../..
 **Tôi có thật sự giải phóng được hàng GB dung lượng không?** Còn tùy máy của bạn. Một bản Windows 11 cài mới không có phần mềm nào thêm thì chẳng có gì để loại bỏ. Một máy trạm của lập trình viên dùng lâu năm, hoặc bất kỳ máy nào có nhiều phần mềm dựa trên MSI (Acrobat, Office, LibreOffice, các công cụ phát triển lớn), có thể có hàng chục GB. Dù sao đi nữa, bạn sẽ thấy chính xác là bao nhiêu ngay khi chạy nó.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Từ v1.8.0 đã có tùy chọn gửi về một báo cáo ẩn danh ngắn gọn về kết quả. Đến nay đã nhận được 223 báo cáo (cảm ơn mọi người 🙏), và trong 63% số máy có thứ để dọn, trung vị giải phóng được là 16,8 GB. Một máy đã thu hồi tận 462 GB. Dưới đây là tóm tắt kết quả.
+Từ v1.8.0 đã có tùy chọn gửi về một báo cáo ẩn danh ngắn gọn về kết quả. Đến nay đã nhận được 224 báo cáo (cảm ơn mọi người 🙏), và trong 63% số máy có thứ để dọn, trung vị giải phóng được là 16,8 GB. Một máy đã thu hồi tận 462 GB. Dưới đây là tóm tắt kết quả.
 
 <p align="center">
   <picture>
