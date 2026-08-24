@@ -194,6 +194,256 @@ public class CountedStringTests
             + $"so they can never be selected: {string.Join(", ", orphans)}");
     }
 
+    /// <summary>
+    /// The five noun slots, and the only part of the classification that cannot be
+    /// read off the strings. Every other counted prefix declares itself: a one-form
+    /// with a <c>{0}</c> in it shows the reader a numeral and has to agree with it,
+    /// one without asserts oneness in words. These five carry no numeral and are
+    /// still grammatical, because they ARE the noun a numeral elsewhere governs.
+    /// PluraliseFile(21) is "файл" in Russian and that is right.
+    /// </summary>
+    private static readonly string[] NounSlots =
+    {
+        "Plural.Error", "Plural.File", "Plural.Package", "Plural.Patch", "Plural.Product",
+    };
+
+    /// <summary>
+    /// The counted prefixes whose chosen string reaches a screen without being handed
+    /// to string.Format, so a satellite override carrying a numeric placeholder would
+    /// render the placeholder itself. Taken from the call sites: ConfirmDeleteWindow
+    /// uses the returned string raw, CompletionViewModel returns MoveRestoreText
+    /// straight out, and FileOperationError.LocalisedGroupHeading returns what
+    /// Pluralise gave it.
+    /// </summary>
+    private static readonly string[] UnformattedPrefixes =
+    {
+        "Completion.MoveRestoreHint", "Completion.MoveRestoreHintSameDrive",
+        "Confirm.DeletePermanently",
+        "Error.AccessDenied", "Error.FileInUse", "Error.IOFailure", "Error.UnknownError",
+    };
+
+    [Theory]
+    [MemberData(nameof(AllPrefixes))]
+    public void Every_counted_prefix_has_a_class(string prefix)
+    {
+        // QuestionFor has no default arm, so this is the whole test: an unclassified
+        // prefix throws here rather than being absorbed into one class or the other.
+        // Without it the inventory would have the shape that has caught this project
+        // out repeatedly, a list that is silently short and reports success anyway.
+        var question = DisplayHelpers.QuestionFor(prefix);
+
+        Assert.True(Enum.IsDefined(question), $"{prefix}: classified as {(int)question}");
+    }
+
+    [Fact]
+    public void A_counted_prefix_with_no_class_throws_rather_than_taking_one()
+    {
+        // The control on the test above. Were there a default arm, every prefix would
+        // "have a class" and that theory would pass over a list of any length.
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(
+            () => DisplayHelpers.QuestionFor("Summary.NoSuchCountedStringAsThis"));
+
+        Assert.Contains("QuestionFor", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [MemberData(nameof(AllPrefixes))]
+    public void The_class_of_a_counted_prefix_is_the_one_its_one_form_implies(string prefix)
+    {
+        // Derived from the shipped neutral rather than listed twice, so a new counted
+        // string whose singular asserts oneness in words cannot be classified as
+        // grammatical without this failing and somebody having to think about it.
+        using var scope = new LocalisationScope(British);
+        var (singular, _) = Forms(prefix);
+
+        var expected =
+            NounSlots.Contains(prefix) || singular.Contains("{0}", StringComparison.Ordinal)
+                ? DisplayHelpers.CountQuestion.Grammatical
+                : DisplayHelpers.CountQuestion.Cardinality;
+
+        Assert.Equal(expected, DisplayHelpers.QuestionFor(prefix));
+    }
+
+    [Theory]
+    [MemberData(nameof(CardinalityPrefixInEveryLanguage))]
+    public void A_cardinality_string_takes_its_singular_at_one_and_at_no_other_count(
+        string cultureName, string prefix)
+    {
+        // The two faults this file could not see, in every language at once. Before
+        // the split, id/tr/vi/ko/ja/zh-Hans could never reach the singular at all and
+        // read "these files will be permanently deleted" over a single file, while
+        // ru/uk reached it at 21, 31 and 41 and told the reader one file was going
+        // when twenty-one were.
+        using var scope = new LocalisationScope(CultureInfo.GetCultureInfo(cultureName));
+        var (singular, plural) = Forms(prefix);
+
+        // Guards the test itself. A language whose two forms are byte-identical would
+        // pass every assertion below without rendering anything, and a cardinality
+        // string that cannot say "one" in that language is a finding, not a pass.
+        Assert.NotEqual(singular, plural);
+
+        var atOne = Strings.Find($"{prefix}.One") ?? singular;
+        Assert.Equal(atOne, DisplayHelpers.Pluralise(1, singular, plural, prefix));
+
+        foreach (var count in new[] { 0, 2, 3, 5, 11, 21, 22, 31, 41, 101, 121 })
+        {
+            Assert.False(
+                DisplayHelpers.Pluralise(count, singular, plural, prefix) == singular,
+                $"{cultureName} {prefix}: the one-form, which asserts there is a single "
+                + $"file, rendered at a count of {count}");
+        }
+    }
+
+    [Theory]
+    [InlineData("ru")]
+    [InlineData("uk")]
+    public void At_twenty_one_East_Slavic_takes_the_plural_sentence_and_the_singular_noun(
+        string cultureName)
+    {
+        // The fix and the thing the fix must not break, pinned side by side, because
+        // the tempting way to fix the sentence is to change CategoryFor, and that
+        // would render "21 файлов" where the language wants "21 файл".
+        using var scope = new LocalisationScope(CultureInfo.GetCultureInfo(cultureName));
+
+        foreach (var prefix in CountedPrefixes.Where(IsCardinality))
+        {
+            var (singular, plural) = Forms(prefix);
+            Assert.Equal(plural, DisplayHelpers.Pluralise(21, singular, plural, prefix));
+            Assert.Equal(singular, DisplayHelpers.Pluralise(1, singular, plural, prefix));
+        }
+
+        var noun = Forms("Plural.File");
+        Assert.Equal(noun.Singular, DisplayHelpers.PluraliseFile(21));
+        Assert.Equal(noun.Singular, DisplayHelpers.PluraliseFile(1));
+        Assert.Equal(Strings.Find("Plural.File.Few"), DisplayHelpers.PluraliseFile(3));
+    }
+
+    [Theory]
+    [InlineData("pl")]
+    [InlineData("ru")]
+    [InlineData("uk")]
+    public void A_Few_override_on_a_cardinality_string_still_reads_in_its_own_band(
+        string cultureName)
+    {
+        // THE GUARD ON THE ONE THING IN THIS CHANGE THAT LOOKS LIKE IT COULD BE
+        // SIMPLIFIED. A cardinality string answers a yes-or-no question, so collapsing
+        // everything that is not One into Other reads as the tidier version of it.
+        // Three of these strings carry a numeral in their PLURAL and none in their
+        // singular, and their paucal band is live: this override is what stops Polish,
+        // Russian and Ukrainian reading the five-and-up form of the noun at two, three
+        // and four files. The tidier version kills it in three languages, silently.
+        using var scope = new LocalisationScope(CultureInfo.GetCultureInfo(cultureName));
+
+        const string Prefix = "Completion.NothingOfferedBody";
+        Assert.Equal(DisplayHelpers.CountQuestion.Cardinality, DisplayHelpers.QuestionFor(Prefix));
+
+        var few = Strings.Find($"{Prefix}.Few");
+        var (singular, plural) = Forms(Prefix);
+        Assert.NotNull(few);                // guards the test itself
+        Assert.NotEqual(plural, few);       // and again: the two must differ
+
+        Assert.Equal(few, DisplayHelpers.Pluralise(3, singular, plural, Prefix));
+        Assert.Equal(few, DisplayHelpers.Pluralise(22, singular, plural, Prefix));
+    }
+
+    [Theory]
+    [MemberData(nameof(EveryCulture))]
+    public void The_two_selectors_differ_at_exactly_the_counts_the_language_says(string cultureName)
+    {
+        // The whole change, characterised rather than sampled: every count from 0 to
+        // 200, and the complete list of the ones where asking "is it exactly one"
+        // parts company with asking "what form does the noun take".
+        //
+        // Polish is the control and it is the empty case. Its CLDR one is already
+        // strictly n == 1, so the split must not move it at any count, and if it ever
+        // does this reads as a difference where the language expects none.
+        var culture = CultureInfo.GetCultureInfo(cultureName);
+        var counts = Enumerable.Range(0, 201).ToList();
+
+        var differing = counts
+            .Where(n => DisplayHelpers.CardinalCategoryFor(culture, n)
+                        != DisplayHelpers.CategoryFor(culture, n))
+            .ToList();
+
+        // The default arm FAILS rather than absorbs: a language added later whose one
+        // form is not n == 1 lands here with a non-empty difference and an empty
+        // expectation, and says so.
+        IEnumerable<int> expected = culture.TwoLetterISOLanguageName switch
+        {
+            // 21, 31, 41 ... are CLDR "one" in East Slavic and are not one file.
+            "ru" or "uk" => counts.Where(n => n != 1 && n % 10 == 1 && n % 100 != 11),
+            // French and Portuguese take the singular at zero, which is a rule about a
+            // numeral in front of a noun and not about there being one of something.
+            "fr" or "pt" => new[] { 0 },
+            // No count inflection at all, so the one-form was unreachable at every
+            // count, one included.
+            "id" or "ja" or "ko" or "tr" or "vi" or "zh" => new[] { 1 },
+            _ => Array.Empty<int>(),
+        };
+
+        Assert.Equal(expected.ToList(), differing);
+    }
+
+    [Theory]
+    [MemberData(nameof(SatelliteCultures))]
+    public void No_override_on_an_unformatted_string_carries_a_numeric_placeholder(
+        string cultureName)
+    {
+        // These seven reach a screen without going through string.Format, so an
+        // override written with a {0} in it would put the braces themselves in front
+        // of a reader. Nothing carries one today, and that is currently an accident of
+        // nobody having written one; this is what makes it a rule.
+        var satellite = Strings.ResourceManager.GetResourceSet(
+            CultureInfo.GetCultureInfo(cultureName), createIfNotExists: true, tryParents: false);
+        Assert.NotNull(satellite);
+
+        var offenders = satellite!.Cast<DictionaryEntry>()
+            .Where(e => CategorySuffixes.Any(suffix =>
+                ((string)e.Key).EndsWith(suffix, StringComparison.Ordinal)))
+            .Where(e => UnformattedPrefixes.Contains(
+                ((string)e.Key)[..((string)e.Key).LastIndexOf('.')], StringComparer.Ordinal))
+            .Where(e => HasNumericPlaceholder(e.Value as string ?? string.Empty))
+            .Select(e => (string)e.Key)
+            .OrderBy(k => k, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.True(offenders.Count == 0,
+            $"{cultureName}: {offenders.Count} override(s) on a string whose call site "
+            + $"never formats it, so the placeholder would reach the screen as braces: "
+            + string.Join(", ", offenders));
+    }
+
+    private static bool HasNumericPlaceholder(string value)
+    {
+        for (int i = 0; i + 1 < value.Length; i++)
+            if (value[i] == '{' && char.IsAsciiDigit(value[i + 1])) return true;
+
+        return false;
+    }
+
+    private static bool IsCardinality(string prefix) =>
+        DisplayHelpers.QuestionFor(prefix) == DisplayHelpers.CountQuestion.Cardinality;
+
+    /// <summary>
+    /// Every cardinality prefix in every shipped language. The prefixes are read back
+    /// out of <see cref="DisplayHelpers.QuestionFor"/> rather than listed here, so the
+    /// theory covers whatever the app actually classifies that way and the two cannot
+    /// drift apart.
+    /// </summary>
+    public static TheoryData<string, string> CardinalityPrefixInEveryLanguage()
+    {
+        var data = new TheoryData<string, string>();
+        foreach (var culture in SupportedLanguages.CultureNames)
+        {
+            foreach (var prefix in CountedPrefixes.Where(IsCardinality))
+                data.Add(culture, prefix);
+        }
+
+        return data;
+    }
+
+    public static TheoryData<string> EveryCulture() => Data(SupportedLanguages.CultureNames);
+
     public static TheoryData<string> SatelliteCultures()
     {
         var data = new TheoryData<string>();

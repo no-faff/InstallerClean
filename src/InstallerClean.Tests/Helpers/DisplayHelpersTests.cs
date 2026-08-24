@@ -45,8 +45,17 @@ public class DisplayHelpersTests
         // exactly like the three-string form called with that string twice. A
         // prefix with no resx overrides makes every plural category fall back to
         // the flat string, so this holds in any UI culture.
+        //
+        // A REAL PREFIX RATHER THAN A MADE-UP ONE, AND THAT IS NOT TIDINESS.
+        // DisplayHelpers.QuestionFor has no default arm: a prefix nobody has
+        // classified throws rather than being absorbed, which is what stops the
+        // inventory being silently short. "Test.FlatOverload" was invented here and
+        // could never have exercised the override lookup this test describes, since
+        // no satellite has ever held a key by that name in any form. This one is
+        // passed by the app, carries no override in any of the fifteen languages,
+        // and so falls back in every category exactly as the comment above says.
         const string flat = "Found {0} registered {1}.";
-        const string prefix = "Test.FlatOverload";
+        const string prefix = "Completion.MoveCancelledSummary";
         Assert.Equal(
             DisplayHelpers.Pluralise(count, flat, flat, prefix),
             DisplayHelpers.Pluralise(count, flat, prefix));
