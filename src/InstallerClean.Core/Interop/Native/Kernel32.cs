@@ -64,6 +64,74 @@ internal static partial class Kernel32
         out ulong lpTotalNumberOfFreeBytes);
 
     /// <summary>
+    /// The mount point of the volume hosting <paramref name="lpszFileName"/>:
+    /// <c>C:\</c> for an ordinary path on the system drive, and the mount
+    /// directory itself for a path under a volume mounted into a folder.
+    ///
+    /// IT IS THE ONLY THING THAT SEPARATES A DRIVE LETTER FROM A VOLUME.
+    /// <c>Path.GetPathRoot</c> answers <c>C:\</c> for both, so a destination
+    /// under a mount point compares equal to the system drive while sitting on
+    /// different storage. Everything a Move needs to know, whether the space
+    /// comes back and whether there is room, turns on the volume rather than on
+    /// the letter.
+    ///
+    /// THE PATH NEED NOT EXIST, which is what lets a caller ask about a folder
+    /// the Move is about to create. Win32 documents that trailing path elements
+    /// which are invalid are ignored, and that a valid volume with an invalid
+    /// directory name under it still succeeds and returns that volume; its own
+    /// example gives <c>G:\invalid</c> returning <c>G:\</c>. So this needs none
+    /// of the walk up to the nearest existing ancestor that
+    /// GetDiskFreeSpaceEx does need, and must not be given one: a second
+    /// implementation of that walk could only diverge from this one.
+    ///
+    /// A REMOTE PATH IS VALIDATED OVER THE NETWORK. Win32: "If a network share
+    /// is specified, GetVolumePathName returns the shortest path for which
+    /// GetDriveType returns DRIVE_REMOTE, which means that the path is
+    /// validated as a remote drive that exists, which the current user can
+    /// access." That is a round trip, and on a share that is not answering it
+    /// is an SMB timeout, so no caller may make this call on the dispatcher.
+    /// <see cref="StorageHelpers.IsRemotePath"/> is what keeps the shapes that
+    /// can do it away from here.
+    ///
+    /// <c>CountElementName</c> and not <c>ConstantElementCount</c>, which is the
+    /// opposite of the rule the <c>MsiEnum*</c> buffers follow and is right for
+    /// the same reason: those take no count parameter, so naming one injects a
+    /// phantom argument. This function takes <paramref name="cchBufferLength"/>
+    /// and must be told the size, exactly as GetFinalPathNameByHandle above is.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "GetVolumePathNameW", SetLastError = true,
+                   StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetVolumePathName(
+        string lpszFileName,
+        [MarshalUsing(CountElementName = nameof(cchBufferLength))] char[] lpszVolumePathName,
+        uint cchBufferLength);
+
+    /// <summary>
+    /// Whether the volume mounted at <paramref name="lpRootPathName"/> is fixed,
+    /// removable, remote or something else. A TRAILING BACKSLASH IS REQUIRED,
+    /// which Win32 states outright and which
+    /// <see cref="GetVolumePathName"/>'s output already carries.
+    ///
+    /// TAKEN OVER <c>DriveInfo</c> BECAUSE A MOUNTED FOLDER HAS NO DRIVE LETTER
+    /// TO GIVE IT. DriveInfo is constructed from a drive-letter root, so
+    /// classifying a destination through it means classifying the letter the
+    /// mount point hangs off rather than the volume the files land on, and a
+    /// removable volume mounted into a folder on C: is then reported as a fixed
+    /// drive. This call takes a mount point directly. Win32 pairs the two
+    /// itself: GetVolumePathName's own contract for a share is defined as the
+    /// shortest path for which this function answers DRIVE_REMOTE.
+    ///
+    /// No SetLastError: Win32 documents no extended error information for this
+    /// function, and the failure is a return value
+    /// (<see cref="DRIVE_UNKNOWN"/> or <see cref="DRIVE_NO_ROOT_DIR"/>) rather
+    /// than a zero with a code behind it.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "GetDriveTypeW",
+                   StringMarshalling = StringMarshalling.Utf16)]
+    public static partial uint GetDriveType(string lpRootPathName);
+
+    /// <summary>
     /// Reads basic file metadata (attributes, size, timestamps) from an
     /// open handle. Used to detect whether a CreateFile-with-OPEN_REPARSE_POINT
     /// handle is pointing at a reparse point or a real file.
@@ -158,6 +226,18 @@ internal static partial class Kernel32
     public const uint FILE_FLAG_OPEN_REPARSE_POINT  = 0x00200000;
 
     public const uint FILE_ATTRIBUTE_REPARSE_POINT  = 0x00000400;
+
+    // GetDriveType's return values. Numbered here rather than cast to
+    // System.IO.DriveType at the call site: the two happen to share their
+    // numbering today, and a mapping that rests on that is a mapping nobody can
+    // see break. StorageHelpers.GetDriveKind writes the correspondence out.
+    public const uint DRIVE_UNKNOWN     = 0;
+    public const uint DRIVE_NO_ROOT_DIR = 1;
+    public const uint DRIVE_REMOVABLE   = 2;
+    public const uint DRIVE_FIXED       = 3;
+    public const uint DRIVE_REMOTE      = 4;
+    public const uint DRIVE_CDROM       = 5;
+    public const uint DRIVE_RAMDISK     = 6;
 
     // GetFinalPathNameByHandle flags. VOLUME_NAME_DOS names the volume by
     // its drive letter, giving "\\?\X:\Folder\...", where VOLUME_NAME_GUID

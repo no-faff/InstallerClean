@@ -4,15 +4,24 @@ using InstallerClean.ViewModels;
 namespace InstallerClean.Tests.ViewModels;
 
 /// <summary>
-/// The static answer <see cref="CleanupViewModel"/> gives about a destination,
-/// pure string work with no service behind it.
+/// The static answer <see cref="CleanupViewModel"/> gives about a destination.
 /// <see cref="CompletionViewModelTests"/> covers what the completion screen does
 /// with a <see cref="MoveSpaceOutcome"/>; this covers the half that decides
 /// which one it gets, which is the half that can be got wrong without anything
-/// looking different until somebody moves files to a share. The same-drive
-/// predicate underneath it is Core's and is covered by
-/// <c>MoveSpaceCheckTests</c>.
+/// looking different until somebody moves files to a share.
 /// </summary>
+/// <remarks>
+/// ONLY THE ARMS THAT ASK NOTHING OF A VOLUME ARE HERE. From 3.0.0
+/// ClassifyMoveDestination reads the volume a folder is on rather than the
+/// letter its path starts with, so its fixed / removable / same-drive arms need
+/// real storage: the same-drive one is covered end to end by
+/// <c>CleanupPreFlightTests.A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space</c>
+/// and the predicate underneath it by
+/// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c>. What is testable
+/// here is the pair of answers it reaches on spelling alone, and those are worth
+/// pinning because they are the ones that run BEFORE anything goes to the
+/// network.
+/// </remarks>
 public class CleanupViewModelLogicTests
 {
     [Theory]
@@ -32,4 +41,23 @@ public class CleanupViewModelLogicTests
     [InlineData("a kind nothing has ever emitted", MoveSpaceOutcome.Unclassified)]
     public void ClassifySpaceOutcome_maps_every_destination_kind(string kind, MoveSpaceOutcome expected) =>
         Assert.Equal(expected, CleanupViewModel.ClassifySpaceOutcome(kind));
+
+    [Theory]
+    [InlineData(@"\\server\backup")]
+    // Both separators and both device prefixes, for the reason
+    // StorageHelpersRemotePathTests gives at length: a share that reads as local
+    // here is a share sent to a call Win32 validates over the network. The
+    // classifier runs inside the pre-flight, off the dispatcher, so the cost is
+    // not the hazard; the wrong LABEL in the result log is, because that field
+    // is one of the few things this project knows about real machines.
+    [InlineData("//server/backup")]
+    [InlineData(@"\\?\UNC\server\backup")]
+    public void ClassifyMoveDestination_calls_a_share_a_share(string dest) =>
+        Assert.Equal(MoveDestinationKinds.UncShare, CleanupViewModel.ClassifyMoveDestination(dest));
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void ClassifyMoveDestination_says_unknown_when_there_is_nothing_to_classify(string dest) =>
+        Assert.Equal(MoveDestinationKinds.Unknown, CleanupViewModel.ClassifyMoveDestination(dest));
 }

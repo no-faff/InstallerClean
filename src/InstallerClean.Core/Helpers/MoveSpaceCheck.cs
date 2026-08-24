@@ -14,42 +14,105 @@ namespace InstallerClean.Helpers;
 internal static class MoveSpaceCheck
 {
     /// <summary>
-    /// Whether <paramref name="destination"/> resolves to the same drive as the
+    /// Whether <paramref name="destination"/> is on the same VOLUME as the
     /// installer cache, which is the system drive. A move there is a rename, so
     /// it consumes nothing and frees nothing.
+    /// </summary>
+    /// <remarks>
+    /// IT COMPARED PATH ROOTS UNTIL 3.0.0, AND A REAL MACHINE SHAPE MADE THAT
+    /// ANSWER WRONG. Windows lets a volume be mounted into an empty folder
+    /// instead of being given a letter, so a second disk can sit at
+    /// <c>C:\Data</c>. <c>Path.GetPathRoot</c> answers <c>C:\</c> for a
+    /// destination under it, and a mounted volume at <c>C:\Data</c> and an
+    /// ordinary folder at <c>C:\Data</c> cannot be told apart from the path
+    /// alone, which is why no amount of path arithmetic could have settled it.
     ///
-    /// Path arithmetic with no drive query, because the Move button's tooltip
-    /// re-reads it on every keystroke, and that is also the limit of it. A
-    /// destination under a mount point inside the system drive compares equal on
-    /// GetPathRoot while sitting on a separate volume, so this answers same-drive
-    /// for a move that is really a copy and a delete across a boundary, and
-    /// <see cref="RefusalFreeSpace(string, long, long?)"/> then passes it without
-    /// measuring anything. GetVolumePathName is what would settle it, at a volume
-    /// query per keystroke. The rest of the codebase already knows the case:
+    /// FOUR SURFACES TOOK THAT ANSWER AND TWO OF THEM ACTED ON IT. The
+    /// confirmation dialog told the user the space would not come back until
+    /// they deleted the folder, which is false there and is a statement about
+    /// somebody's own disk that nothing had established; the Move button's
+    /// tooltip and the completion screen's restore line said the same; and
+    /// <see cref="RefusalFreeSpace(string, long, long?)"/> returned on its first
+    /// line, so the free-space check did not run at all. That last is the exact
+    /// fault this file exists for, arriving through the one destination it could
+    /// not see.
+    ///
+    /// THE REASON GIVEN FOR LEAVING IT COVERED ONE OF THE FOUR. It was cost: the
+    /// tooltip re-read this on every keystroke. The other three are once per
+    /// operation and already sit inside a pre-flight that does two path
+    /// resolutions and a write probe, so nothing was being bought there. And the
+    /// stated cost was not the real hazard either. The hazard is that
+    /// GetVolumePathName validates a REMOTE path over the network, so the call
+    /// belongs off the dispatcher whatever it costs;
+    /// <see cref="StorageHelpers.IsRemotePath"/> answers those without asking,
+    /// and the window resolves the tooltip's copy on a background hop.
+    ///
+    /// NOTHING IS CACHED PER DESTINATION, WHICH IS A DECISION AND NOT AN
+    /// OMISSION. A mount point can be created or removed under a path while the
+    /// app is open, and a cached same-volume answer surviving that would skip
+    /// the free-space check on a volume nothing had measured, which is this
+    /// change's own fault reintroduced by the thing meant to make it cheap.
+    ///
+    /// The rest of the file already knew the case, which is what made this one
+    /// method out of step rather than the app declining an exotic machine:
     /// <see cref="AvailableFreeSpaceForDestination"/> walks from the destination
-    /// rather than the path root so a mount point answers for its own volume, and
-    /// MoveFilesService's ReconcileMove says a mount point falls back to
+    /// rather than the path root so a mount point answers for its own volume,
+    /// and MoveFilesService's ReconcileMove says a mount point falls back to
     /// copy-and-delete like any other volume boundary.
     ///
-    /// Anything it cannot resolve is not the same drive, which is the safe way
-    /// round: a caller then omits a claim rather than making a wrong one.
-    /// </summary>
+    /// Anything it cannot resolve is not the same volume, which is the safe way
+    /// round in both directions: a caller omits a claim rather than making a
+    /// wrong one, and the free-space measurement runs rather than being skipped.
+    /// </remarks>
     internal static bool IsOnInstallerCacheDrive(string destination)
     {
         if (string.IsNullOrWhiteSpace(destination)) return false;
+
+        // Asked before anything is resolved, and true on its own terms rather
+        // than as a guard: a share is not a local volume, so it is not this one.
+        if (StorageHelpers.IsRemotePath(destination)) return false;
+
         try
         {
-            var destRoot = Path.GetPathRoot(Path.GetFullPath(destination));
-            if (string.IsNullOrEmpty(destRoot)) return false;
-            var systemRoot = Path.GetPathRoot(
-                Environment.GetFolderPath(Environment.SpecialFolder.System));
-            return string.Equals(destRoot, systemRoot, StringComparison.OrdinalIgnoreCase);
+            var systemVolume = SystemVolumeMountPoint();
+            if (systemVolume is null) return false;
+
+            var destinationVolume =
+                StorageHelpers.GetVolumeMountPoint(Path.GetFullPath(destination));
+            if (destinationVolume is null) return false;
+
+            return string.Equals(destinationVolume, systemVolume, StringComparison.OrdinalIgnoreCase);
         }
         catch
         {
             return false;
         }
     }
+
+    /// <summary>
+    /// The volume the running Windows is on, answered once and kept.
+    /// </summary>
+    /// <remarks>
+    /// SAFE TO KEEP FOR THE LIFE OF THE PROCESS in a way the destination's
+    /// answer is not: the volume hosting the running system cannot be unmounted
+    /// or remounted underneath it. That asymmetry is the whole reason one side
+    /// is held and the other is asked every time.
+    ///
+    /// A FAILURE IS NOT KEPT. Storing one would leave the app answering "not the
+    /// same volume" for the rest of the session on a single transient refusal:
+    /// the safe direction, and permanently degraded, with no same-drive warning
+    /// where one is due and a free-space check on a move that needs none.
+    /// Leaving the field null retries on the next read and self-heals.
+    ///
+    /// Two threads racing here both do the same query and store the same string.
+    /// The loser's work is wasted and nothing else happens, which is why there is
+    /// no lock around a value that cannot change.
+    /// </remarks>
+    private static string? _systemVolume;
+
+    private static string? SystemVolumeMountPoint() =>
+        _systemVolume ??= StorageHelpers.GetVolumeMountPoint(
+            Environment.GetFolderPath(Environment.SpecialFolder.System));
 
     /// <summary>
     /// Decides whether a Move of <paramref name="totalBytes"/> has room at

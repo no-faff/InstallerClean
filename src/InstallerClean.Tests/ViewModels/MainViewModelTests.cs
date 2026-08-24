@@ -899,7 +899,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void MoveButtonTooltip_answers_from_the_box_and_changes_as_it_is_typed_in()
+    public async Task MoveButtonTooltip_answers_from_the_box_and_changes_as_it_is_typed_in()
     {
         var vm = CreateViewModel();
         var systemRoot = Path.GetPathRoot(
@@ -909,19 +909,55 @@ public class MainViewModelTests
         // than naming a step that is missing.
         Assert.Equal(Strings.Tooltip_MoveNeedsDestination, vm.Cleanup.MoveButtonTooltip);
 
-        // A folder on the drive the files are already on: a rename, so it says
+        // A folder on the volume the files are already on: a rename, so it says
         // when the space actually comes back. This is the state that pairs the
         // button with Delete beside it.
+        //
+        // THE WAIT IS THE BEHAVIOUR, NOT A TEST WORKAROUND. From 3.0.0 the
+        // same-volume question goes to Windows, and Win32 validates a remote
+        // path over the network, so it cannot be asked on the dispatcher for
+        // every keystroke. It is asked on the debounce the destination's own
+        // write-back already uses, and until it answers the tooltip shows the
+        // plain wording, which claims nothing about any drive.
         vm.Cleanup.MoveDestination = Path.Combine(systemRoot, "ic-test-backup");
+        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
+        await Task.Delay(DebounceWait);
         Assert.Equal(Strings.Tooltip_MoveSameDrive, vm.Cleanup.MoveButtonTooltip);
 
-        // Anywhere else, including a share, takes the plain wording.
+        // Anywhere else, including a share, takes the plain wording. Asserted
+        // straight away AND after the window, because the answer this replaces
+        // has to be dropped on the keystroke rather than only on the reply: a
+        // share left reading "same drive" for a debounce would be the old fault
+        // in a new place.
         vm.Cleanup.MoveDestination = @"\\server\backup";
+        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
+        await Task.Delay(DebounceWait);
         Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
 
         // Back to empty, because the box is a TextBox and a user can clear it.
         vm.Cleanup.MoveDestination = string.Empty;
         Assert.Equal(Strings.Tooltip_MoveNeedsDestination, vm.Cleanup.MoveButtonTooltip);
+    }
+
+    [Fact]
+    public async Task MoveButtonTooltip_drops_a_stale_answer_when_the_box_moves_on()
+    {
+        // The resolve is started per edit and belongs to the path that started
+        // it. Typing a folder on the cache volume and then a share, faster than
+        // the debounce, must leave the share's answer standing: if the first
+        // resolve could land late it would tell the user a folder on another
+        // volume was on this one, which is the fault this change removes,
+        // reintroduced by the machinery that made it cheap.
+        var vm = CreateViewModel();
+        var systemRoot = Path.GetPathRoot(
+            Environment.GetFolderPath(Environment.SpecialFolder.System))!;
+
+        vm.Cleanup.MoveDestination = Path.Combine(systemRoot, "ic-test-backup");
+        vm.Cleanup.MoveDestination = @"\\server\backup";
+
+        await Task.Delay(DebounceWait);
+
+        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
     }
 
     [Fact]

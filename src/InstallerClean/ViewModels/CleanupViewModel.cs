@@ -32,6 +32,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
     private CancellationTokenSource? _operationCts;
     private CancellationTokenSource? _moveDestinationSaveCts;
+    private CancellationTokenSource? _destinationVolumeCts;
     private AppSettings _settings;
 
     /// <summary>
@@ -50,6 +51,21 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
     private string _moveDestination = string.Empty;
+
+    /// <summary>
+    /// Whether the folder named in the box is on the volume the installer cache
+    /// is on. Read by <see cref="MoveButtonTooltip"/> and by nothing else.
+    /// </summary>
+    /// <remarks>
+    /// FALSE MEANS "NOT ESTABLISHED" AS WELL AS "ESTABLISHED OTHERWISE", and
+    /// the tooltip is written so that both take the same wording: false picks
+    /// Tooltip.Move, which says nothing about which drive the folder is on and
+    /// is therefore true of every destination. So the window between a keystroke
+    /// and the answer landing asserts nothing, and needs no third state.
+    /// </remarks>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
+    private bool _destinationIsOnCacheVolume;
 
     // Reveals the operating overlay. It is not the "work is underway" flag:
     // it goes false during the confirm-dialog window between the pre-flight
@@ -200,7 +216,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // The Move button works from any of the three states, so this says what
     // pressing it will do rather than naming a missing step: with no folder set
     // it warns that a browser opens first, so the browser is expected rather
-    // than a surprise, and with a folder on the drive the files are already on
+    // than a surprise, and with a folder on the volume the files are already on
     // it says when the space actually comes back.
     //
     // The same-drive state is what pairs this with the Delete button's tooltip:
@@ -209,28 +225,134 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // is the Move confirmation's same-drive warning, which arrives after the
     // choice is made.
     //
-    // Recomputed on every keystroke in the box (NotifyPropertyChangedFor on
-    // MoveDestination), so the same-drive test has to be cheap: it is a string
-    // comparison of two path roots and touches no drive. The fuller
-    // classification in ClassifyMoveDestination queries DriveInfo and belongs
-    // off the dispatcher, which is where the confirmation dialog's copy of this
-    // question is answered.
+    // IT ASKED THE QUESTION HERE UNTIL 3.0.0 AND NOW READS AN ANSWER SOMEBODY
+    // ELSE FETCHED. This property is recomputed on every keystroke in the box
+    // (NotifyPropertyChangedFor on MoveDestination) and it runs on the
+    // dispatcher, and the only call that can settle which volume a folder is on
+    // validates a remote path over the network. On a half-typed \\server, or on
+    // a mapped letter whose share has gone away, that is the SMB stall this
+    // class already refuses to take on the dispatcher for the Move pre-flight.
+    // So the call happens on a background hop and lands in
+    // DestinationIsOnCacheVolume, and this property only reads a bool.
+    //
+    // WHAT THAT COSTS, SET AGAINST WHAT IT REPLACED, because a reader meeting
+    // an async flag and a staleness window should see the trade rather than
+    // half of it. The answer here can be briefly out of date: it is taken once
+    // the box settles, so a mount point created or removed while nobody is
+    // typing leaves the last answer standing. The answer it replaced was not
+    // stale, it was WRONG, and permanently so on that machine, because a path
+    // root cannot tell a mounted volume from a folder. And nothing acts on this
+    // one: the confirmation dialog, the free-space refusal and the completion
+    // line all re-ask inside the pre-flight at the moment of action.
     public string MoveButtonTooltip =>
         string.IsNullOrWhiteSpace(MoveDestination) ? Strings.Tooltip_MoveNeedsDestination
-        : MoveSpaceCheck.IsOnInstallerCacheDrive(MoveDestination) ? Strings.Tooltip_MoveSameDrive
+        : DestinationIsOnCacheVolume ? Strings.Tooltip_MoveSameDrive
         : Strings.Tooltip_Move;
 
     partial void OnMoveDestinationChanged(string value)
     {
+        // ABOVE THE EARLY RETURN BELOW, DELIBERATELY, AND THE CONSTRUCTOR IS
+        // WHY. It restores the saved destination through this property, and on
+        // that pass the new value already equals settings, so the return fires
+        // and anything scheduled after it would never run for a folder the user
+        // had chosen in an earlier session. The tooltip would then never say
+        // same-drive for the commonest destination in the app.
+        //
+        // The flag goes false first and unconditionally: it describes a path,
+        // and the path has just changed, so it has nothing to say until the
+        // resolve lands. Tooltip.Move covers that window and is true whatever
+        // the volume.
+        //
+        // Resolved from the TRIMMED value, because that is the string the Move
+        // itself uses (MoveAllAsync takes MoveDestination.Trim()), and a tooltip
+        // answering for a different string from the one the button acts on is
+        // the whole class of fault being fixed here.
+
         // settings.json holds the trimmed string so a reader (CLI /m,
         // next session start) gets a normalised path. The TextBox
         // binding keeps the typed value mid-session.
         var normalised = value?.Trim() ?? string.Empty;
+
+        DestinationIsOnCacheVolume = false;
+        ScheduleDestinationVolumeResolve(normalised);
+
         if (string.Equals(_settings.MoveDestination, normalised, StringComparison.Ordinal))
             return;
 
         _settings.MoveDestination = normalised;
         ScheduleMoveDestinationSave();
+    }
+
+    /// <summary>
+    /// Starts the background resolve of which volume
+    /// <paramref name="destination"/> is on, cancelling any resolve still in
+    /// flight for the path this one replaces.
+    /// </summary>
+    /// <remarks>
+    /// The same debounce as the settings write-back, and the same constant: a
+    /// typist should fire one volume query when they stop, not one per
+    /// character. Sharing <see cref="MoveDestinationSaveDelay"/> rather than
+    /// adding a second constant keeps the two from drifting apart for no reason
+    /// anybody could later name.
+    ///
+    /// THE CANCEL IS THE PART THAT MATTERS, more than the debounce. A resolve
+    /// in flight belongs to the path that started it; if it landed after the box
+    /// had moved on it would publish an answer about a folder nobody is looking
+    /// at. Cancelling here and re-checking the token on the way back are the two
+    /// halves of that, and the second is needed as well because a token cancelled
+    /// after the delay has already elapsed does not stop the work.
+    /// </remarks>
+    private void ScheduleDestinationVolumeResolve(string? destination)
+    {
+        var previous = _destinationVolumeCts;
+        _destinationVolumeCts = null;
+        previous?.Cancel();
+        previous?.Dispose();
+
+        // An empty box needs no answer: MoveButtonTooltip tests it first and
+        // never reaches the flag. Cancelling above is what the clear case is
+        // really for, so a resolve started for the path just deleted cannot
+        // land on the emptied box.
+        if (string.IsNullOrWhiteSpace(destination)) return;
+
+        var cts = new CancellationTokenSource();
+        _destinationVolumeCts = cts;
+        _ = ResolveDestinationVolumeAsync(destination, cts.Token);
+    }
+
+    private async Task ResolveDestinationVolumeAsync(string destination, CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(MoveDestinationSaveDelay, token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        // OFF THE DISPATCHER, AND THAT IS THE WHOLE POINT OF THIS METHOD.
+        // MoveSpaceCheck.IsOnInstallerCacheDrive reaches GetVolumePathName,
+        // which Win32 documents as validating a remote path over the network;
+        // IsRemotePath turns away the shapes that say so in their spelling, and
+        // a mapped drive letter does not. ConfigureAwait(true) to come back and
+        // publish on the thread the binding is read from.
+        //
+        // No token on the Task.Run: the debounce is the cancellable part and it
+        // is over, the body is a single query with nothing to interrupt, and the
+        // token check below is what decides whether the answer is still wanted.
+        var onCacheVolume = await Task
+            .Run(() => MoveSpaceCheck.IsOnInstallerCacheDrive(destination))
+            .ConfigureAwait(true);
+
+        // Publish only if this resolve is still the current one. A keystroke
+        // landing during the query installs a fresh CTS, and its own resolve
+        // will answer for the path now in the box.
+        if (_destinationVolumeCts is not { } current || current.Token != token) return;
+
+        DestinationIsOnCacheVolume = onCacheVolume;
+        current.Dispose();
+        _destinationVolumeCts = null;
     }
 
     /// <summary>
@@ -1555,36 +1677,59 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     };
 
     /// <summary>
-    /// Classifies the move destination for the diagnostic log. Returns
-    /// one of <see cref="MoveDestinationKinds"/>: <c>uncShare</c> for
-    /// <c>\\server\share</c>, <c>sameDrive</c> when the destination
-    /// resolves to the same drive letter as the Installer cache (the
-    /// system drive), <c>removableDrive</c> when the destination's
-    /// <see cref="DriveType"/> is Removable, <c>differentFixedDrive</c>
-    /// when it's Fixed but a different letter, and <c>unknown</c> for
-    /// anything <see cref="DriveInfo"/> can't classify (network drive
-    /// the API can't query, mapped path with no drive letter, etc).
+    /// Classifies the move destination for the result log. Returns one of
+    /// <see cref="MoveDestinationKinds"/>: <c>uncShare</c> for a share,
+    /// <c>sameDrive</c> when the destination is on the volume the Installer
+    /// cache is on, <c>removableDrive</c> or <c>differentFixedDrive</c> for
+    /// another volume by what is mounted there, and <c>unknown</c> for anything
+    /// that could not be established.
     /// </summary>
+    /// <remarks>
+    /// ASKED ABOUT THE VOLUME AND NOT THE LETTER, and it did ask about the
+    /// letter until 3.0.0. It took Path.GetPathRoot and handed that to
+    /// DriveInfo, so a destination under a volume mounted into a folder on C:
+    /// was classified by whatever C: is: a removable disk mounted at
+    /// <c>C:\Data</c> was logged as a fixed drive. No sentence the user reads
+    /// changed, because ClassifySpaceOutcome maps fixed, removable and share
+    /// alike to "space was freed". What was wrong was the field itself, in the
+    /// result log and in the opt-in report, and a measurement that is quietly
+    /// wrong is worse than one that is missing: it is the only instrument this
+    /// project has for what happens on real machines, and it reads as an answer.
+    ///
+    /// DriveInfo cannot be asked the right question. It is built from a
+    /// drive-letter root, and a mounted folder has no letter, so
+    /// StorageHelpers.GetDriveKind takes the mount point instead.
+    ///
+    /// TWO VOLUME QUERIES RATHER THAN ONE, ON PURPOSE. The same-drive answer
+    /// comes from MoveSpaceCheck so that this window and the command line cannot
+    /// answer it differently, which is the reason that decision lives in Core at
+    /// all; threading the mount point out of it to save the second query would
+    /// buy back one call per Move and put that back at risk. This runs once per
+    /// operation, inside the pre-flight, off the dispatcher.
+    /// </remarks>
     internal static string ClassifyMoveDestination(string dest)
     {
         if (string.IsNullOrWhiteSpace(dest)) return MoveDestinationKinds.Unknown;
-        if (dest.StartsWith(@"\\", StringComparison.Ordinal) &&
-            !dest.StartsWith(@"\\?\", StringComparison.Ordinal))
-            return MoveDestinationKinds.UncShare;
+
+        // Answered from the spelling, before anything is asked of the network.
+        // The same test MoveSpaceCheck uses, so the two cannot disagree about
+        // what counts as a share.
+        if (StorageHelpers.IsRemotePath(dest)) return MoveDestinationKinds.UncShare;
 
         if (MoveSpaceCheck.IsOnInstallerCacheDrive(dest))
             return MoveDestinationKinds.SameDrive;
 
         try
         {
-            var destRoot = Path.GetPathRoot(Path.GetFullPath(dest));
-            if (string.IsNullOrEmpty(destRoot)) return MoveDestinationKinds.Unknown;
+            var volume = StorageHelpers.GetVolumeMountPoint(Path.GetFullPath(dest));
+            if (volume is null) return MoveDestinationKinds.Unknown;
 
-            var info = new DriveInfo(destRoot);
-            return info.DriveType switch
+            return StorageHelpers.GetDriveKind(volume) switch
             {
                 DriveType.Fixed => MoveDestinationKinds.DifferentFixedDrive,
                 DriveType.Removable => MoveDestinationKinds.RemovableDrive,
+                // A mapped drive letter reaches here rather than the spelling
+                // test above, its path being local in shape and remote in fact.
                 DriveType.Network => MoveDestinationKinds.UncShare,
                 _ => MoveDestinationKinds.Unknown,
             };

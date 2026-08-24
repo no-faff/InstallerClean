@@ -3,40 +3,47 @@ using InstallerClean.Helpers;
 namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
-/// The decision both hosts make before a Move: is there room. Pure path and
-/// arithmetic work here; the ancestor walk that measures a destination which
-/// does not exist yet touches a real volume and is in
-/// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c>.
+/// The decision both hosts make before a Move: is there room.
 /// </summary>
+/// <remarks>
+/// WHAT IS LEFT HERE IS NARROWER THAN IT WAS, AND THE LINE MOVED IN 3.0.0.
+/// <c>IsOnInstallerCacheDrive</c> used to compare two path roots and could be
+/// tested as arithmetic; it now asks Windows which volume a folder is on, so
+/// every case that reaches that question has gone to
+/// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c> along with the
+/// ancestor walk that was already there.
+///
+/// What stays is what still touches nothing: the empty guards, the share that
+/// is turned away on its spelling, and the arithmetic of "is this less than
+/// that". EVERY DESTINATION BELOW IS A SHARE OR A BLANK ON PURPOSE, so the
+/// arithmetic is exercised without a volume query deciding the outcome first,
+/// and so a runner whose letters differ cannot change what these tests mean.
+///
+/// THAT LEAVES ONE SIDE OF A SPLIT UNCOVERED IN THIS FILE and it is said here
+/// rather than left for a reader to notice: nothing below sets up a destination
+/// that IS on the cache volume, which is the arm where RefusalFreeSpace returns
+/// null without consulting the measurement at all. That arm is
+/// <c>RefusalFreeSpace_allows_a_same_drive_move_with_no_room_at_all</c> in the
+/// integration file, where it can be built from a real volume.
+/// </remarks>
 public class MoveSpaceCheckTests
 {
-    [Fact]
-    public void IsOnInstallerCacheDrive_is_true_only_for_the_system_drive()
-    {
-        var systemRoot = Path.GetPathRoot(
-            Environment.GetFolderPath(Environment.SpecialFolder.System))!;
-
-        Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(Path.Combine(systemRoot, "backup")));
-        // Case and separator shape must not change the answer: the box takes
-        // whatever the user typed.
-        Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(
-            Path.Combine(systemRoot.ToLowerInvariant(), "backup") + Path.DirectorySeparatorChar));
-    }
-
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    // A share has no drive letter to compare with, so it has not been shown to
-    // be the system drive. False is the safe way round: a caller then omits a
-    // claim rather than making a wrong one.
+    // A share is not a local volume, so it is not the one the cache is on, and
+    // no query could make it so. Answered from the spelling, which is why this
+    // case is still arithmetic when the rest are not.
     [InlineData(@"\\server\backup")]
+    [InlineData("//server/backup")]
+    [InlineData(@"\\?\UNC\server\backup")]
     public void IsOnInstallerCacheDrive_is_false_when_it_cannot_prove_otherwise(string destination) =>
         Assert.False(MoveSpaceCheck.IsOnInstallerCacheDrive(destination));
 
     [Fact]
     public void RefusalFreeSpace_refuses_and_reports_what_is_there()
     {
-        Assert.Equal(500L, MoveSpaceCheck.RefusalFreeSpace(@"D:\backup", 1_000, 500));
+        Assert.Equal(500L, MoveSpaceCheck.RefusalFreeSpace(@"\\server\backup", 1_000, 500));
     }
 
     [Theory]
@@ -44,7 +51,7 @@ public class MoveSpaceCheckTests
     [InlineData(1_000L)]
     [InlineData(1_001L)]
     public void RefusalFreeSpace_allows_a_destination_with_room(long free) =>
-        Assert.Null(MoveSpaceCheck.RefusalFreeSpace(@"D:\backup", 1_000, free));
+        Assert.Null(MoveSpaceCheck.RefusalFreeSpace(@"\\server\backup", 1_000, free));
 
     [Fact]
     public void RefusalFreeSpace_allows_an_unmeasurable_destination()
@@ -53,18 +60,5 @@ public class MoveSpaceCheckTests
         // no claim in either direction rather than blocking on a number it does
         // not have.
         Assert.Null(MoveSpaceCheck.RefusalFreeSpace(@"\\server\backup", 1_000, null));
-    }
-
-    [Fact]
-    public void RefusalFreeSpace_allows_a_same_drive_move_with_no_room_at_all()
-    {
-        // The case the whole app exists for: a nearly-full system drive. The
-        // move is a rename, so it needs none of the space it is short of, and
-        // refusing it here would refuse the only user who came for this.
-        var systemDrive = Path.Combine(
-            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System))!,
-            "backup");
-
-        Assert.Null(MoveSpaceCheck.RefusalFreeSpace(systemDrive, 1_000, 0));
     }
 }
