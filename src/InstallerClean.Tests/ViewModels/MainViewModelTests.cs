@@ -576,8 +576,12 @@ public class MainViewModelTests
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
             Arg.Any<UnderLeaseClaims?>());
         Assert.True(vm.Completion.IsComplete);
-        // %TEMP% sits on the system drive, so this is a same-volume move
-        // and the heading claims "moved", not "freed".
+        // %TEMP% and the installer cache are on one volume on every host this
+        // runs on, so this classifies as a same-volume move and the heading
+        // claims "moved", not "freed". It read "%TEMP% sits on the system
+        // drive", which is the same fact under a name the comparison stopped
+        // using: what the destination is measured against is the cache's
+        // volume.
         Assert.Contains("moved", vm.Completion.Heading);
     }
 

@@ -596,8 +596,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             // A same-volume move is a rename and consumes no space, so the
             // free-space check would otherwise refuse exactly the nearly-full
-            // system drive this app exists for; the caller applies the check
-            // only when the move really copies.
+            // drive holding the installer cache, which is the machine this app
+            // exists for; the caller applies the check only when the move really
+            // copies. The cache's drive rather than the system drive, because
+            // that is the volume MoveSpaceCheck compares a destination against,
+            // and the two part wherever a volume is mounted at the cache folder,
+            // which is the case this arm exists for.
             return new DestinationPreFlight(
                 false, false,
                 ClassifyMoveDestination(dest),
@@ -1706,8 +1710,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// Turns the diagnostic-log classification into the two things the
     /// completion card needs: whether to claim freed space, and whether to tell
     /// the user how to get it back. A UNC share counts as freeing space, the
-    /// system drive being genuinely emptier once the files are on it; only an
-    /// unreadable destination declines to say either way.
+    /// volume the cached files came off being genuinely emptier once they are on
+    /// it; only an unreadable destination declines to say either way.
+    ///
+    /// THAT VOLUME IS THE SYSTEM DRIVE ON AN ORDINARY MACHINE AND IS NOT NAMED
+    /// AS ONE HERE. The files come off whatever volume holds
+    /// <c>C:\Windows\Installer</c>, and Windows lets a volume be mounted there.
+    /// Nothing in the mapping below turns on which volume it is, so naming one
+    /// bought nothing and was wrong on the machine where the two differ. The
+    /// mapping itself is unchanged: what a same-volume move's bytes count as is
+    /// settled and is not in question here.
     /// </summary>
     internal static MoveSpaceOutcome ClassifySpaceOutcome(string destinationKind) => destinationKind switch
     {
