@@ -153,7 +153,10 @@ internal static class MoveSpaceCheck
     /// <remarks>
     /// Two cases go ahead without the measurement being consulted. A same-volume
     /// move needs no room, and refusing one on free space would refuse exactly
-    /// the nearly-full system drive this app exists for. An unmeasurable
+    /// the nearly-full drive holding the cache, which is the machine this app
+    /// exists for. That is the system drive on an ordinary one and it is named
+    /// as the cache's here because this is the arm where the two can part. An
+    /// unmeasurable
     /// destination (a share whose caller lacks query rights) has established
     /// nothing, and the same rule covers it: no claim rather than a wrong one.
     /// </remarks>

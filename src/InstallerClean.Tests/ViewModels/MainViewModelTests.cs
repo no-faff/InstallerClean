@@ -902,16 +902,21 @@ public class MainViewModelTests
     public async Task MoveButtonTooltip_answers_from_the_box_and_changes_as_it_is_typed_in()
     {
         var vm = CreateViewModel();
-        var systemRoot = Path.GetPathRoot(
-            Environment.GetFolderPath(Environment.SpecialFolder.System))!;
+        // The CACHE folder's root, which is the volume the tooltip's same-drive
+        // state is actually about. It was the system directory's until the
+        // question stopped being about the system directory, and the two are
+        // the same string on every host this suite runs on, so nothing here
+        // behaves differently and nothing here can tell the two apart. The
+        // comment was the part that had gone wrong.
+        var cacheRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
         // Empty box: the browser opens first, so the tooltip warns of it rather
         // than naming a step that is missing.
         Assert.Equal(Strings.Tooltip_MoveNeedsDestination, vm.Cleanup.MoveButtonTooltip);
 
-        // A folder on the volume the files are already on: a rename, so it says
-        // when the space actually comes back. This is the state that pairs the
-        // button with Delete beside it.
+        // A folder on the volume the cached files are already on: a rename, so
+        // it says when the space actually comes back. This is the state that
+        // pairs the button with Delete beside it.
         //
         // THE WAIT IS THE BEHAVIOUR, NOT A TEST WORKAROUND. From 3.0.0 the
         // same-volume question goes to Windows, and Win32 validates a remote
@@ -919,7 +924,7 @@ public class MainViewModelTests
         // every keystroke. It is asked on the debounce the destination's own
         // write-back already uses, and until it answers the tooltip shows the
         // plain wording, which claims nothing about any drive.
-        vm.Cleanup.MoveDestination = Path.Combine(systemRoot, "ic-test-backup");
+        vm.Cleanup.MoveDestination = Path.Combine(cacheRoot, "ic-test-backup");
         Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
         await Task.Delay(DebounceWait);
         Assert.Equal(Strings.Tooltip_MoveSameDrive, vm.Cleanup.MoveButtonTooltip);
@@ -949,10 +954,13 @@ public class MainViewModelTests
         // volume was on this one, which is the fault this change removes,
         // reintroduced by the machinery that made it cheap.
         var vm = CreateViewModel();
-        var systemRoot = Path.GetPathRoot(
-            Environment.GetFolderPath(Environment.SpecialFolder.System))!;
+        // Built from the cache folder rather than the system directory, which
+        // is what the comment above already said it was and what the code now
+        // asks about. Same string on every host here, so this pins the ordering
+        // and says nothing about which volume is which.
+        var cacheRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
-        vm.Cleanup.MoveDestination = Path.Combine(systemRoot, "ic-test-backup");
+        vm.Cleanup.MoveDestination = Path.Combine(cacheRoot, "ic-test-backup");
         vm.Cleanup.MoveDestination = @"\\server\backup";
 
         await Task.Delay(DebounceWait);

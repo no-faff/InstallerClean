@@ -668,14 +668,24 @@ public class CleanupPreFlightTests
     [Fact]
     public async Task A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space()
     {
-        // Built from the actual system drive rather than %TEMP%, which is what
-        // ClassifyMoveDestination compares the destination against: a move to the
-        // drive the cache is already on is a rename, and frees nothing until the
-        // user deletes the copies parked there. The dialog is the last moment
-        // anyone can tell them that, and it is the whole point of the app.
-        var systemDrive = Path.GetPathRoot(
-            Environment.GetFolderPath(Environment.SpecialFolder.System))!;
-        var sameDriveDestination = Path.Combine(systemDrive, "ic-test-samedrive");
+        // Built from a real volume rather than %TEMP%, because
+        // ClassifyMoveDestination asks Windows which volume the destination is
+        // on and compares that against the installer cache's: a move to the
+        // volume the cache is already on is a rename, and frees nothing until
+        // the user deletes the copies parked there. The dialog is the last
+        // moment anyone can tell them that, and it is the whole point of the
+        // app.
+        //
+        // THE CACHE FOLDER'S ROOT, AND IT WAS THE SYSTEM DIRECTORY'S UNTIL THE
+        // COMPARISON STOPPED BEING ABOUT THE SYSTEM DIRECTORY. Nothing about
+        // this test's behaviour changed with that: the two are the same string
+        // wherever nothing is mounted between them, which is every host this
+        // suite runs on, so it passed before and passes now and cannot tell the
+        // two apart. What changed is that the comment above it named a volume
+        // the code no longer asks about, which is how a reader who never opens
+        // MoveSpaceCheck inherits a wrong account of what is being compared.
+        var cacheRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
+        var sameDriveDestination = Path.Combine(cacheRoot, "ic-test-samedrive");
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(false);

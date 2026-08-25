@@ -101,8 +101,9 @@ public class MoveSpaceCheckIntegrationTests
         // /m C:\Backup names a folder the Move is about to create, and this
         // question is asked before anything creates it. Had GetVolumePathName
         // needed the path to exist, this would answer "a different volume", the
-        // free-space check would then run against a nearly-full system drive,
-        // and the Move this app exists for would be refused. Win32 documents
+        // free-space check would then run against the nearly-full drive the
+        // cache is on, and the Move this app exists for would be refused. Win32
+        // documents
         // trailing path elements that are invalid as ignored; this is that
         // documented behaviour pinned, three levels deep so no single missing
         // component can be doing the work.
