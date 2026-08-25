@@ -486,8 +486,8 @@ const MAP = {
   'Completion.NothingRemoved': `Niets verwijderd`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.`,
   'Completion.NothingOffered': `Niets aangeboden op deze pc`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom het ene bestand ({1}) achtergehouden dat het anders had aangeboden.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom alle {0} bestanden ({1}) achtergehouden die het anders had aangeboden.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom het ene bestand ({2}) achtergehouden dat het anders had aangeboden.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom alle {0} {1} ({2}) achtergehouden die het anders had aangeboden.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

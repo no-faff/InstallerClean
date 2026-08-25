@@ -76,7 +76,6 @@ const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `Znaleziono {0} zarejestrowany {1}.`,
   'Summary.MissingFromDisk.Unnamed.Few': `{0} pliki, dla których rekordy nie wskazują programu`,
   'Summary.MissingFromDisk.OtherPrograms.Few': `jeszcze {0} programy`,
-  'Completion.NothingOfferedBody.Few': `InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał wszystkie {0} pliki ({1}), które inaczej by zaproponował.`,
   'Cli.FoundOrphans.One': `Znaleziono {0} niepotrzebny {1} do wyczyszczenia ({2}).`,
   'Cli.FoundOrphans.Few': `Znaleziono {0} niepotrzebne {1} do wyczyszczenia ({2}).`,
   'Cli.DeletingFiles.One': `Trwa usuwanie: {0} niepotrzebny {1}...`,
@@ -553,8 +552,8 @@ const MAP = {
   'Completion.NothingRemoved': `Niczego nie usunięto`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean nie zdołał dopasować rekordów Instalatora Windows do zawartości {InstallerFolder}. W folderze są pliki, ale ani jeden rekord nie wskazuje niczego w środku, więc o żadnym pliku nie dało się wykazać, że jest niepotrzebny. Niczego nie zaproponowano i niczego nie usunięto.`,
   'Completion.NothingOffered': `Na tym komputerze niczego nie zaproponowano`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał jedyny plik ({1}), który inaczej by zaproponował.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał wszystkie {0} plików ({1}), które inaczej by zaproponował.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał jedyny plik ({2}), który inaczej by zaproponował.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał wszystkie {0} {1} ({2}), które inaczej by zaproponował.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

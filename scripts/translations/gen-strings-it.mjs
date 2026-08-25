@@ -438,8 +438,8 @@ const MAP = {
   'Completion.NothingRemoved': `Nessun file rimosso`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean non è riuscito a far corrispondere i record di Windows Installer con il contenuto di {InstallerFolder}. La cartella contiene file, ma nemmeno un record indica qualcosa al suo interno, quindi non si è potuto dimostrare che qualche file fosse non necessario. Non è stato proposto nulla e non è stato rimosso nulla.`,
   'Completion.NothingOffered': `Nulla proposto su questo PC`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file ({1}) che altrimenti avrebbe proposto.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto tutti i {0} file ({1}) che altrimenti avrebbe proposto.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file ({2}) che altrimenti avrebbe proposto.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto tutti i {0} {1} ({2}) che altrimenti avrebbe proposto.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

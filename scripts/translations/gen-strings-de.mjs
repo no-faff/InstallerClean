@@ -525,8 +525,8 @@ const MAP = {
   'Completion.NothingRemoved': `Nichts entfernt`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean konnte die Windows-Installer-Einträge nicht mit dem Inhalt von {InstallerFolder} abgleichen. Der Ordner enthält Dateien, aber kein einziger Eintrag zeigt auf irgendetwas darin, deshalb ließ sich für keine Datei zeigen, dass sie nicht benötigt wird. Es wurde nichts angeboten und nichts entfernt.`,
   'Completion.NothingOffered': `Auf diesem PC nichts angeboten`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei ({1}) zurückgehalten, die es sonst angeboten hätte.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb alle {0} Dateien ({1}) zurückgehalten, die es sonst angeboten hätte.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei ({2}) zurückgehalten, die es sonst angeboten hätte.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb alle {0} {1} ({2}) zurückgehalten, die es sonst angeboten hätte.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

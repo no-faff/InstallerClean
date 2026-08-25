@@ -186,10 +186,18 @@ internal static class DisplayHelpers
     /// FEW AND MANY ARE LEFT WHERE CLDR PUT THEM, WHICH IS THE PART THAT IS NOT
     /// OBVIOUS AND MUST NOT BE TIDIED AWAY. Three of these strings carry a numeral in
     /// their PLURAL and none in their singular, so their plural side is still a numeral
-    /// governing a noun and still wants its paucal band. Polish, Russian and Ukrainian
-    /// each ship a live Completion.NothingOfferedBody.Few that reads at two to four
-    /// files; collapsing everything that is not One into Other would kill all three the
-    /// day this landed, silently, with every test still green.
+    /// governing a noun and still wants its paucal band.
+    ///
+    /// NO CARDINALITY KEY SHIPS A .Few OR .Many OVERRIDE TODAY, WHICH IS SAID HERE
+    /// RATHER THAN LEFT TO BE DISCOVERED. Polish, Russian and Ukrainian each shipped a
+    /// live Completion.NothingOfferedBody.Few until that key's noun moved into a slot
+    /// Plural.File fills, which left the override character-identical to its own .Plural
+    /// and it was deleted. So collapsing everything that is not One into Other would
+    /// currently change nothing a user sees, and that is the danger rather than the
+    /// reassurance: this arm is correct with no live consumer, which is the state in
+    /// which somebody removes it. A satellite may add such an override at any time and
+    /// the collapse would silently disarm it, so the band is pinned directly, on the
+    /// selector, by CountedStringTests.The_cardinality_selector_keeps_its_paucal_band.
     ///
     /// A CLDR One that is not exactly one becomes Other rather than Many. Nothing
     /// special applies to it, so it wants the plain plural, and a Many override written

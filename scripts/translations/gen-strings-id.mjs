@@ -529,8 +529,8 @@ const MAP = {
   'Completion.NothingRemoved': `Tidak ada yang disingkirkan`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean tidak bisa mencocokkan catatan Windows Installer dengan isi {InstallerFolder}. Folder itu berisi file, tapi tidak satu pun catatan menunjuk apa pun di dalamnya, jadi tidak ada file yang bisa ditunjukkan tidak diperlukan. Tidak ada yang ditawarkan dan tidak ada yang disingkirkan.`,
   'Completion.NothingOffered': `Tidak ada yang ditawarkan di PC ini`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({1}) yang mungkin ditawarkannya ditahan.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} file ({1}) yang mungkin ditawarkannya ditahan.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) yang mungkin ditawarkannya ditahan.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) yang mungkin ditawarkannya ditahan.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

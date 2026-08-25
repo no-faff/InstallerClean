@@ -417,8 +417,8 @@ const MAP = {
   'Completion.NothingRemoved': `没有移除任何内容`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。文件夹里有文件，但没有任何一条记录指向其中的任何内容，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。`,
   'Completion.NothingOffered': `在这台电脑上没有提供任何内容`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的那 1 个文件（{1}）。`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的全部 {0} 个文件（{1}）。`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的那 1 个文件（{2}）。`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的全部 {0} 个{1}（{2}）。`,
 };
 
 let text = readFileSync(BASE, 'utf8');

@@ -462,8 +462,8 @@ const MAP = {
   'Completion.NothingRemoved': `Ничего не убрано`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. В папке есть файлы, но ни одна запись не указывает ни на что внутри неё, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.`,
   'Completion.NothingOffered': `На этом ПК ничего не предложено`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл ({1}), который иначе предложил бы.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} файлов ({1}), которые иначе предложил бы.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл ({2}), который иначе предложил бы.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} {1} ({2}), которые иначе предложил бы.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -528,7 +528,6 @@ const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `Найдено {0} зарегистрированный {1}.`,
   'Summary.MissingFromDisk.Unnamed.Few': `{0} файла, для которых в записях не названа программа`,
   'Summary.MissingFromDisk.OtherPrograms.Few': `ещё {0} программы`,
-  'Completion.NothingOfferedBody.Few': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} файла ({1}), которые иначе предложил бы.`,
   'Cli.FoundOrphans.One': `Найден {0} ненужный {1} для очистки ({2}).`,
   'Cli.DeletingFiles.One': `Идёт удаление: {0} ненужный {1}...`,
   'Cli.DeletedFiles.One': `Безвозвратно удалён {0} ненужный {1}.`,

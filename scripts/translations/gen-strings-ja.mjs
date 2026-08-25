@@ -439,8 +439,8 @@ const MAP = {
   'Completion.NothingRemoved': `何も取り除かれませんでした`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean は Windows Installer の登録情報を {InstallerFolder} の内容と突き合わせられませんでした。フォルダーにはファイルがありますが、その中のどれかを指す登録情報が一つもないため、どのファイルについても不要であることを示せませんでした。何も提示されず、何も取り除かれていません。`,
   'Completion.NothingOffered': `この PC では何も提示されませんでした`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの 1 個のファイル({1})をそのままにしました。`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの {0} 個のファイル({1})をすべてそのままにしました。`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの 1 個のファイル({2})をそのままにしました。`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの {0} 個の{1}({2})をすべてそのままにしました。`,
 };
 
 let text = readFileSync(BASE, 'utf8');

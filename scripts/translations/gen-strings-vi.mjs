@@ -511,8 +511,8 @@ const MAP = {
   'Completion.NothingRemoved': `Không có gì bị bỏ đi`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Thư mục có tệp bên trong, nhưng không một bản ghi nào trỏ tới bất cứ thứ gì trong đó, nên không tệp nào có thể được chứng tỏ là không cần thiết. Không có gì được đề xuất và không có gì bị bỏ đi.`,
   'Completion.NothingOffered': `Không có gì được đề xuất trên máy này`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({1}) mà lẽ ra nó có thể đề xuất.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} tệp ({1}) mà lẽ ra nó có thể đề xuất.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) mà lẽ ra nó có thể đề xuất.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} {1} ({2}) mà lẽ ra nó có thể đề xuất.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

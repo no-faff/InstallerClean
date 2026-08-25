@@ -523,22 +523,47 @@
        whole of what this may say, is that the app could not be certain which cached
        files belong to the programs installed.
 
-       0 = the count of files held back, 1 = their size. That is the set that would
-       otherwise have been offered, never everything in the folder: the folder total
-       there would tell somebody that much was going spare.
+       0 = the count of files held back, 1 = the pluralised noun, 2 = their size. That
+       is the set that would otherwise have been offered, never everything in the
+       folder: the folder total there would tell somebody that much was going spare.
 
-       SINGULAR AND PLURAL, BECAUSE A COUNT SLOT ALONE READS "all 1 files" AND A COUNT
-       OF ONE IS REACHABLE, being a folder holding a single unclaimed file. A pluralised
-       noun in a slot of its own, the shape Cli.FoundOrphans uses, would give "all 1
-       file": grammatical, and still not what a person says. The one-form drops the
-       numeral and names the size alone.
+       THE NOUN IS A SLOT AND NOT A WORD IN THE SENTENCE, because a noun spelled into
+       the value cannot follow the numeral standing in front of it. Russian and
+       Ukrainian take the nominative singular after 21, 31 and 41, so a value carrying
+       its own plural read "21 файлов" where the language wants "21 файл", at every such
+       count, in both. The slot is filled by PluraliseFile, which answers that question
+       per language and per count, and the fault cannot be reached from a value again.
+
+       SINGULAR AND PLURAL SURVIVE THAT, BECAUSE A COUNT SLOT ALONE READS "all 1 files"
+       AND A COUNT OF ONE IS REACHABLE, being a folder holding a single unclaimed file.
+       The noun slot on its own would give "all 1 file": grammatical, and still not what
+       a person says. The one-form drops the numeral and the noun both, and names the
+       size alone.
 
        SO THIS IS THE ONE Singular/Plural PAIR HERE WHOSE {N} SETS DIFFER, the singular
-       carrying {1} and not {0}, and that is deliberate rather than a dropped
-       placeholder. The arity check compares each key against its own satellite and
-       never against its sibling, so it is legal. A language that does want the numeral
-       in its one-form adds a satellite-only Completion.NothingOfferedBody.One override,
-       whose arity is checked against the .Plural and may therefore carry {0}.
+       carrying {2} and neither {0} nor {1}, and that is deliberate rather than a
+       dropped placeholder. The arity check compares each key against its own satellite
+       and never against its sibling, so it is legal. A language that does want the
+       numeral in its one-form adds a satellite-only
+       Completion.NothingOfferedBody.One override, whose arity is checked against the
+       .Plural and may therefore carry {0}.
+
+       Cli.NothingOffered IS THE SAME SENTENCE WITH THE SAME ARGUMENTS AND IT IS THE
+       CONTROL FOR WHERE A LANGUAGE PUTS THE SLOT, never the English. Japanese keeps its
+       classifier between the numeral and the noun, Chinese keeps its full-width
+       brackets, and Korean puts the noun BEFORE the numeral, so {1} precedes {0} there
+       and that is correct. An editor pattern-matching on the English gets all three
+       wrong.
+
+       TURKISH TAKES THE SLOT BY RECASTING, AND THE RECAST IS NOT INVENTED HERE. Its
+       old value read "sunabileceği {0} dosyanın ({1}) tamamını tuttu", whose counted
+       noun is genitive because "tamamını" governs the genitive, while Plural.File
+       supplies the nominative alone. Leaving the noun spelled and skipping {1} was the
+       obvious way out and it is not available: every satellite generator compares a
+       value's placeholder set against the neutral's and fails on a missing index, with
+       no exemption anywhere. So the wording here is its own Cli.NothingOffered's,
+       already shipping, which drops "tamamını" and moves to the passive "geri tutuldu"
+       so the counted noun can stand in the nominative the slot fills.
 
        FOUR THINGS WERE CUT FROM THE DRAFTED BODY AND THE REASONS ARE THE OWNER'S, so do
        not put them back. "Nothing is wrong with your PC" cannot be known, and it is
@@ -550,8 +575,8 @@
        with them. And "rather than guess" describes something the app never does, which
        raises a possibility that was never on the table. -->
   <data name="Completion.NothingOffered" xml:space="preserve"><value>Na tym komputerze niczego nie zaproponowano</value></data>
-  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał jedyny plik ({1}), który inaczej by zaproponował.</value></data>
-  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał wszystkie {0} plików ({1}), które inaczej by zaproponował.</value></data>
+  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał jedyny plik ({2}), który inaczej by zaproponował.</value></data>
+  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał wszystkie {0} {1} ({2}), które inaczej by zaproponował.</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
        retired list with the four that follow, and why the retired strings are kept
        rather than deleted is written out there rather than repeated here.
@@ -1674,7 +1699,6 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Znaleziono {0} zarejestrowany {1}.</value></data>
   <data name="Summary.MissingFromDisk.Unnamed.Few" xml:space="preserve"><value>{0} pliki, dla których rekordy nie wskazują programu</value></data>
   <data name="Summary.MissingFromDisk.OtherPrograms.Few" xml:space="preserve"><value>jeszcze {0} programy</value></data>
-  <data name="Completion.NothingOfferedBody.Few" xml:space="preserve"><value>InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał wszystkie {0} pliki ({1}), które inaczej by zaproponował.</value></data>
   <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Znaleziono {0} niepotrzebny {1} do wyczyszczenia ({2}).</value></data>
   <data name="Cli.FoundOrphans.Few" xml:space="preserve"><value>Znaleziono {0} niepotrzebne {1} do wyczyszczenia ({2}).</value></data>
   <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>Trwa usuwanie: {0} niepotrzebny {1}...</value></data>

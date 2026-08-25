@@ -436,8 +436,8 @@ Ayrıntılar şuraya yazıldı:
   'Completion.NothingRemoved': `Hiçbir şey kaldırılmadı`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean, Windows Installer kayıtlarını {InstallerFolder} içeriğiyle eşleştiremedi. Klasörde dosyalar var, ama tek bir kayıt bile içindeki hiçbir şeye işaret etmiyor, bu yüzden hiçbir dosyanın gereksiz olduğu gösterilemedi. Hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı.`,
   'Completion.NothingOffered': `Bu bilgisayarda hiçbir şey sunulmadı`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği tek dosyayı ({1}) tuttu.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği {0} dosyanın ({1}) tamamını tuttu.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği tek dosyayı ({2}) tuttu.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği {0} {1} ({2}) geri tutuldu.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

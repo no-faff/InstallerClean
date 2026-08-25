@@ -306,8 +306,15 @@ public partial class CompletionViewModel : ObservableObject
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
         // The one-form names the size and not the numeral ("the one file"), so it
-        // spends {1} and leaves {0} unused. Both arguments are passed on either
-        // branch so the two forms cannot disagree about which index is which.
+        // spends {2} and leaves {0} and {1} unused. All three arguments are passed on
+        // either branch so the two forms cannot disagree about which index is which.
+        //
+        // THE NOUN GOES IN AS AN ARGUMENT RATHER THAN STANDING IN THE VALUE, because a
+        // noun spelled into the value cannot agree with the numeral beside it: Russian
+        // and Ukrainian read "21 файлов" where the language wants "21 файл". Pluralise
+        // picks the sentence and PluraliseFile picks the noun, and they answer two
+        // different questions, so both are needed here. See the key's own note in
+        // Strings.resx for which language puts the slot where.
         Summary = string.Format(
             DisplayHelpers.Pluralise(
                 withheldCount,
@@ -315,6 +322,7 @@ public partial class CompletionViewModel : ObservableObject
                 Strings.Completion_NothingOfferedBody_Plural,
                 "Completion.NothingOfferedBody"),
             withheldCount,
+            DisplayHelpers.PluraliseFile(withheldCount),
             DisplayHelpers.FormatSize(withheldBytes));
         Restore = string.Format(
             Strings.Completion_NothingToCleanUpReceipt,

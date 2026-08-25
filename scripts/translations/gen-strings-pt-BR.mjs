@@ -512,8 +512,8 @@ const MAP = {
   'Completion.NothingRemoved': `Nada foi removido`,
   'Error.ScanNoRegisteredFileInFolder': `O InstallerClean não conseguiu casar os registros do Windows Installer com o conteúdo de {InstallerFolder}. A pasta tem arquivos, mas nenhum registro aponta para nada lá dentro, então não foi possível mostrar que algum arquivo fosse desnecessário. Nada foi oferecido e nada foi removido.`,
   'Completion.NothingOffered': `Nada oferecido neste PC`,
-  'Completion.NothingOfferedBody.Singular': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({1}) que poderia ter oferecido.`,
-  'Completion.NothingOfferedBody.Plural': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve todos os {0} arquivos ({1}) que poderia ter oferecido.`,
+  'Completion.NothingOfferedBody.Singular': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({2}) que poderia ter oferecido.`,
+  'Completion.NothingOfferedBody.Plural': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve todos os {0} {1} ({2}) que poderia ter oferecido.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.

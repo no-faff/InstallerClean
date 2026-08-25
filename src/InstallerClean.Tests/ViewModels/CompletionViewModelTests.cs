@@ -359,7 +359,9 @@ public class CompletionViewModelTests
         Assert.False(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingOffered, vm.Heading);
         Assert.Equal(
-            string.Format(Strings.Completion_NothingOfferedBody_Plural, 3, DisplayHelpers.FormatSize(3072)),
+            string.Format(
+                Strings.Completion_NothingOfferedBody_Plural,
+                3, DisplayHelpers.PluraliseFile(3), DisplayHelpers.FormatSize(3072)),
             vm.Summary);
 
         // THE RECEIPT IS NOT DECORATION. A heading and a body with no evidence that a
@@ -394,11 +396,18 @@ public class CompletionViewModelTests
             installedProductCount: 5, scanDurationMs: 10);
 
         Assert.Equal(
-            string.Format(Strings.Completion_NothingOfferedBody_Singular, 1, DisplayHelpers.FormatSize(1024)),
+            string.Format(
+                Strings.Completion_NothingOfferedBody_Singular,
+                1, DisplayHelpers.PluraliseFile(1), DisplayHelpers.FormatSize(1024)),
             vm.Summary);
         Assert.Contains("the one file", vm.Summary);
         Assert.Contains(DisplayHelpers.FormatSize(1024), vm.Summary);
         Assert.DoesNotContain("1 files", vm.Summary);
+
+        // The one-form spends {2} alone, so the noun argument must not reach the
+        // screen: "the one file (file)" is what a wrong index looks like here, and it
+        // is the shape that hid the size while the value still carried {1} for it.
+        Assert.DoesNotContain($"({DisplayHelpers.PluraliseFile(1)})", vm.Summary);
     }
 
     [Fact]

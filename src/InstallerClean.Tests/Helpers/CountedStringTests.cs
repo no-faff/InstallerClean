@@ -322,28 +322,50 @@ public class CountedStringTests
     [InlineData("pl")]
     [InlineData("ru")]
     [InlineData("uk")]
-    public void A_Few_override_on_a_cardinality_string_still_reads_in_its_own_band(
-        string cultureName)
+    public void The_cardinality_selector_keeps_its_paucal_band(string cultureName)
     {
-        // THE GUARD ON THE ONE THING IN THIS CHANGE THAT LOOKS LIKE IT COULD BE
-        // SIMPLIFIED. A cardinality string answers a yes-or-no question, so collapsing
-        // everything that is not One into Other reads as the tidier version of it.
-        // Three of these strings carry a numeral in their PLURAL and none in their
-        // singular, and their paucal band is live: this override is what stops Polish,
-        // Russian and Ukrainian reading the five-and-up form of the noun at two, three
-        // and four files. The tidier version kills it in three languages, silently.
+        // THE GUARD ON THE ONE THING HERE THAT LOOKS LIKE IT COULD BE SIMPLIFIED. A
+        // cardinality string answers a yes-or-no question, so collapsing everything
+        // that is not One into Other reads as the tidier version of it.
+        //
+        // THIS PINS THE SELECTOR AND NO LONGER A RENDERING, AND THE REASON IS THE POINT
+        // OF THE NOTE. It used to assert that Completion.NothingOfferedBody.Few read at
+        // two to four files in these three languages. That override is gone: the key's
+        // noun moved into a slot Plural.File fills, which left the .Few value
+        // character-identical to its own .Plural and therefore a copy waiting to drift.
+        //
+        // SO NO CARDINALITY KEY SHIPS A .Few OR .Many OVERRIDE ANYWHERE TODAY, and the
+        // honest consequence is that collapsing the band would currently change nothing
+        // a user sees. That is exactly why the pin has to sit on the selector: the arm
+        // is now correct-in-principle with no live consumer, which is the state in which
+        // somebody deletes it. A satellite may add such an override at any time, the
+        // key's own resx note invites it, and the collapse would silently disarm it.
+        //
+        // Plural.File.Few is NOT what this guards. That prefix is Grammatical, so it
+        // goes through CategoryFor and never through CardinalCategoryFor, and it would
+        // survive the collapse untouched.
         using var scope = new LocalisationScope(CultureInfo.GetCultureInfo(cultureName));
 
+        var culture = CultureInfo.GetCultureInfo(cultureName);
         const string Prefix = "Completion.NothingOfferedBody";
         Assert.Equal(DisplayHelpers.CountQuestion.Cardinality, DisplayHelpers.QuestionFor(Prefix));
 
-        var few = Strings.Find($"{Prefix}.Few");
-        var (singular, plural) = Forms(Prefix);
-        Assert.NotNull(few);                // guards the test itself
-        Assert.NotEqual(plural, few);       // and again: the two must differ
+        // The override really is absent, so a later reader cannot mistake this for a
+        // test that merely stopped looking at one.
+        Assert.Null(Strings.Find($"{Prefix}.Few"));
 
-        Assert.Equal(few, DisplayHelpers.Pluralise(3, singular, plural, Prefix));
-        Assert.Equal(few, DisplayHelpers.Pluralise(22, singular, plural, Prefix));
+        // The band itself, which is what a collapse into Other would take away.
+        Assert.Equal(DisplayHelpers.PluralCategory.Few, DisplayHelpers.CardinalCategoryFor(culture, 3));
+        Assert.Equal(DisplayHelpers.PluralCategory.Few, DisplayHelpers.CardinalCategoryFor(culture, 22));
+        Assert.Equal(DisplayHelpers.PluralCategory.Many, DisplayHelpers.CardinalCategoryFor(culture, 5));
+
+        // And the two ends, so the band is pinned between them rather than on its own:
+        // One is exactly one in every language, and a CLDR one that is not one file
+        // becomes Other rather than Many.
+        Assert.Equal(DisplayHelpers.PluralCategory.One, DisplayHelpers.CardinalCategoryFor(culture, 1));
+        Assert.Equal(
+            cultureName == "pl" ? DisplayHelpers.PluralCategory.Many : DisplayHelpers.PluralCategory.Other,
+            DisplayHelpers.CardinalCategoryFor(culture, 21));
     }
 
     [Theory]

@@ -574,8 +574,8 @@ const MAP = {
   // values are the neutral's own, as every value here must be.
   'Display.ListSeparator': `, `,
   'Completion.NothingOffered': `Nothing offered on this PC`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered.`,
   'Completion.ReverifyOwnershipUnestablished': `{0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} other program`,
   'Summary.MissingFromDisk.OtherPrograms.Plural': `{0} other programs`,

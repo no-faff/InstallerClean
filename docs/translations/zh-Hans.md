@@ -149,8 +149,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder} 中没有需要清理的内容 |
 | Scanned {0} {1} in {2} | 扫描了 {0} 个{1}，用时 {2} |
 | Nothing offered on this PC | 在这台电脑上没有提供任何内容 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({1}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的那 1 个文件（{1}）。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} files ({1}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的全部 {0} 个文件（{1}）。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的那 1 个文件（{2}）。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的全部 {0} 个{1}（{2}）。 |
 | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 那个文件夹里的文件[可以安全移除]，所以您想什么时候删除文件夹都可以。在那之前，万一有程序确实需要它，您可以把它放回 {InstallerFolder}（可能性极小）。 |
 | The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 那个文件夹里的文件[可以安全移除]，所以您想什么时候删除它都可以。在那之前，万一有程序确实需要其中某一个，您可以把它们放回 {InstallerFolder}（可能性极小）。 |
 | The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 那个文件夹里的文件[可以安全移除]，所以当您真的想收回空间时，删除该文件夹或把它移到另一个驱动器都可以。在那之前，万一有程序确实需要它，您可以把它放回 {InstallerFolder}（可能性极小）。 |

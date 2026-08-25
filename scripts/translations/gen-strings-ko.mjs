@@ -507,8 +507,8 @@ const MAP = {
   'Completion.NothingRemoved': `제거된 것 없음`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean이 Windows Installer 기록을 {InstallerFolder}의 내용과 대조하지 못했습니다. 폴더에 파일은 있지만 그 안의 어떤 것도 가리키는 기록이 하나도 없어서, 어떤 파일도 불필요하다고 밝힐 수 없었습니다. 아무것도 제시하지 않았고 아무것도 제거하지 않았습니다.`,
   'Completion.NothingOffered': `이 PC에서는 아무것도 제시하지 않았습니다`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 하나({1})를 그대로 두었습니다.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 {0}개({1}) 전부를 그대로 두었습니다.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 하나({2})를 그대로 두었습니다.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 {1} {0}개({2}) 전부를 그대로 두었습니다.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

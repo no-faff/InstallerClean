@@ -60,7 +60,6 @@ const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `Знайдено {0} зареєстрований {1}.`,
   'Summary.MissingFromDisk.Unnamed.Few': `{0} файли, для яких у записах не названо програми`,
   'Summary.MissingFromDisk.OtherPrograms.Few': `ще {0} програми`,
-  'Completion.NothingOfferedBody.Few': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав усі {0} файли ({1}), які інакше запропонував би.`,
   'Cli.FoundOrphans.One': `Знайдено {0} непотрібний {1} для очищення ({2}).`,
   'Cli.FoundOrphans.Few': `Знайдено {0} непотрібні {1} для очищення ({2}).`,
   'Cli.DeletingFiles.One': `Триває видалення: {0} непотрібний {1}...`,
@@ -542,8 +541,8 @@ const MAP = {
   'Completion.NothingRemoved': `Нічого не прибрано`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean не зміг зіставити записи Windows Installer із вмістом {InstallerFolder}. У папці є файли, але жоден запис не вказує ні на що всередині неї, тож про жоден файл не вдалося показати, що він непотрібний. Нічого не запропоновано і нічого не прибрано.`,
   'Completion.NothingOffered': `На цьому ПК нічого не запропоновано`,
-  'Completion.NothingOfferedBody.Singular': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав єдиний файл ({1}), який інакше запропонував би.`,
-  'Completion.NothingOfferedBody.Plural': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав усі {0} файлів ({1}), які інакше запропонував би.`,
+  'Completion.NothingOfferedBody.Singular': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав єдиний файл ({2}), який інакше запропонував би.`,
+  'Completion.NothingOfferedBody.Plural': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав усі {0} {1} ({2}), які інакше запропонував би.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
