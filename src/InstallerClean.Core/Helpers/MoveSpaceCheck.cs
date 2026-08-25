@@ -107,12 +107,26 @@ internal static class MoveSpaceCheck
     /// and MoveFilesService's ReconcileMove says a mount point falls back to
     /// copy-and-delete like any other volume boundary.
     ///
-    /// Anything it cannot resolve is not the same volume, which is the safe way
-    /// round in both directions: a caller omits a claim rather than making a
-    /// wrong one, and the free-space measurement runs rather than being skipped.
-    /// That covers a cache side that will not answer as well as a destination
-    /// that will not, and the two failures are not distinguished because nothing
-    /// downstream would do anything different with the distinction.
+    /// Anything it cannot resolve is not the same volume, and for the decision
+    /// this method owns that is the safe way round:
+    /// <see cref="RefusalFreeSpace(string, long, long?)"/> consults the
+    /// measurement instead of skipping it, so a move that really copies is
+    /// measured whichever side of the comparison declined to answer.
+    ///
+    /// THE TWO REFUSALS ARE NOT INTERCHANGEABLE FOR A CALLER THAT CLASSIFIES,
+    /// AND THE DIFFERENCE IS WHICH OF THEM THAT CALLER CAN SEE. One that goes
+    /// on to ask which volume the destination is on is putting the same
+    /// question to the same path, so a destination this method could not
+    /// resolve is one it cannot resolve either: the refusal is reproduced in
+    /// front of it, and it has nothing to classify. No caller has a cache-side
+    /// query of its own, so that refusal is never put a second time and never
+    /// seen. It arrives as a plain false, indistinguishable from a destination
+    /// genuinely on another volume, and a caller classifying from the
+    /// destination alone can report space freed by a move that freed none.
+    /// A bool has no room for "I could not tell", so what that leaves a
+    /// classifying caller to do is a question about that caller rather than
+    /// about this method. It is written down here so the next reader does not
+    /// have to derive it, and it is open.
     /// </remarks>
     internal static bool IsOnInstallerCacheDrive(string destination)
     {
