@@ -22,9 +22,14 @@ public interface IDeleteFilesService
     /// <see cref="OperationCanceledException"/>).
     /// </summary>
     /// <param name="underLeaseClaims">
-    /// The claims naming the paths in <paramref name="filePaths"/>, from the
-    /// caller's pre-act re-verify
-    /// (<see cref="ReverifyResult.SurvivingPatchClaims"/>). Re-read once the
+    /// Both halves of what the under-lease re-read asks about, as one argument: the
+    /// claims naming the paths in <paramref name="filePaths"/>
+    /// (<see cref="ReverifyResult.SurvivingPatchClaims"/>), and the claims on every
+    /// product those name (<see cref="ReverifyResult.SiblingPatchClaims"/>), because
+    /// the offer rests on a fact about the OTHER patches on those products.
+    /// Production builds it with <see cref="UnderLeaseClaims.From"/> out of the
+    /// caller's pre-act re-verify, so the two halves always come from one
+    /// enumeration and from each other. Re-read once the
     /// installer mutex is held and before any file is touched, so a verdict that
     /// moved while the caller's enumeration was running is caught inside the hold
     /// rather than outside it; the paths it condemns come back in
