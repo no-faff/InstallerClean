@@ -676,16 +676,26 @@ public class CleanupPreFlightTests
         // moment anyone can tell them that, and it is the whole point of the
         // app.
         //
-        // THE CACHE FOLDER'S ROOT, AND IT WAS THE SYSTEM DIRECTORY'S UNTIL THE
-        // COMPARISON STOPPED BEING ABOUT THE SYSTEM DIRECTORY. Nothing about
-        // this test's behaviour changed with that: the two are the same string
-        // wherever nothing is mounted between them, which is every host this
-        // suite runs on, so it passed before and passes now and cannot tell the
-        // two apart. What changed is that the comment above it named a volume
-        // the code no longer asks about, which is how a reader who never opens
-        // MoveSpaceCheck inherits a wrong account of what is being compared.
-        var cacheRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
-        var sameDriveDestination = Path.Combine(cacheRoot, "ic-test-samedrive");
+        // THE CACHE FOLDER'S PATH ROOT, WHICH IS NOT THE CACHE'S VOLUME, and it
+        // was the system directory's path root until the comparison stopped
+        // being about the system directory. The name says path root because the
+        // two part on the machine this whole change is for.
+        //
+        // THE ASSERTION AT THE BOTTOM IS FALSE ON THAT MACHINE. With a volume
+        // mounted at C:\Windows\Installer, C:\ic-test-samedrive is on another
+        // volume, ClassifyMoveDestination returns differentFixedDrive, the
+        // dialog is told sameDrive: false and the Received check below fails.
+        // Where nothing is mounted between the root and the cache it passes,
+        // and there it cannot tell the fixed code from the code it replaced
+        // either.
+        //
+        // THE FIXTURE CANNOT BE BUILT UNDER THE CACHE FOLDER TO FIX THAT, which
+        // is the obvious repair and is closed off. Move refuses any destination
+        // resolving inside a Windows system folder, and the cache folder is one,
+        // so the pre-flight would reject it before the classification this test
+        // is about is ever reached.
+        var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
+        var sameDriveDestination = Path.Combine(cachePathRoot, "ic-test-samedrive");
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(false);

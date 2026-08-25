@@ -29,11 +29,13 @@ namespace InstallerClean.Tests.Helpers;
 /// AND WHAT IT IS BUILT FROM THERE MATTERS TO THIS SENTENCE, WHICH IS WHY IT IS
 /// SAID HERE AND NOT ONLY THERE. That test named the system directory's root
 /// until the method stopped asking about the system directory's volume, so this
-/// file was pointing at a test whose subject was the wrong one. It now names the
-/// cache folder's root, and on every host the suite runs on those two are the
-/// same string. So the arm is covered and the VOLUME is not: a destination that
-/// is on the cache's volume and not on the system's needs a volume mounted at
-/// <c>C:\Windows\Installer</c>, which nothing here or there can build.
+/// file was pointing at a test whose subject was the wrong one. It is now built
+/// under the installer cache folder itself, so its destination is on the cache's
+/// volume on any machine rather than only where nothing is mounted between a
+/// path root and the cache. The arm is therefore covered wherever the suite
+/// runs. What is still not covered is the machine: a volume mounted at
+/// <c>C:\Windows\Installer</c> needs a second volume and administrator rights,
+/// which nothing here or there can build.
 /// </remarks>
 public class MoveSpaceCheckTests
 {

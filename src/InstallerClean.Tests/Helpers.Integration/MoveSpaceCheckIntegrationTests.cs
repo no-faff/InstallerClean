@@ -27,30 +27,52 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// under the folder the user names. <c>IsOnInstallerCacheDrive</c> then went on
 /// asking about the system directory's volume rather than the cache's, so the
 /// second shape is a volume mounted at <c>C:\Windows\Installer</c> itself. This
-/// file can build neither, for the same reason, and every assertion below that
-/// reads as "on the cache's volume" is in fact resting on the two coinciding on
-/// the host it runs on. Each one says so where it stands rather than leaving it
-/// to this paragraph.
+/// file can build neither, for the same reason.
+///
+/// WHICH ASSERTIONS REST ON THE TWO COINCIDING IS NOT UNIFORM, AND EACH SAYS SO
+/// WHERE IT STANDS. Of those asking whether something is on the CACHE's volume,
+/// the ones built under the cache folder itself hold on any machine, and the
+/// ones built from a PATH ROOT hold only where nothing is mounted between that
+/// root and the cache folder and are false where something is. The root is kept
+/// in those rather than swapped for the call under test, which would let the
+/// fixture agree with the code by construction.
+///
+/// The tests asking about the SYSTEM directory's own volume are a separate
+/// matter and none of this touches them: a volume mounted at the cache folder
+/// does not sit between <c>C:\</c> and <c>C:\Windows\System32</c>, so a path
+/// root answers for them on that machine as well as on any other.
 /// </remarks>
 public class MoveSpaceCheckIntegrationTests
 {
     [Fact]
-    public void IsOnInstallerCacheDrive_is_true_for_a_folder_on_the_cache_volume()
+    public void IsOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root()
     {
         // THIS TEST WAS NAMED FOR THE SYSTEM DRIVE AND PINNED A FAULT. The
         // method asked which volume the Windows system directory is on, which
         // is not the installer cache's volume where a volume is mounted at
         // C:\Windows\Installer, and the test asserted that behaviour by name.
-        // Its subject is now the cache folder, which is what the method is
-        // called for and what it now asks about.
+        // The subject moved to the cache when the method did.
         //
-        // WHAT A GREEN RUN HERE DOES AND DOES NOT PROVE, because a reader who
-        // does not know will take it as proof of the fix. Nothing is mounted
-        // between C:\ and the cache folder on any host this suite runs on, so
-        // the cache's volume and the system root are the same string and this
-        // assertion passes against the fixed code and against the broken code
-        // alike. It CANNOT distinguish them. Building a host where it could
-        // needs a second volume and administrator rights.
+        // THE FIXTURE COMPUTES A PATH ROOT AND THE METHOD COMPARES VOLUMES, AND
+        // THE NAME NOW SAYS WHICH. Path.GetPathRoot answers C:\ for the cache
+        // folder whatever is mounted there, which is the arithmetic
+        // MoveSpaceCheck exists to have abolished. It is kept here on purpose:
+        // building the fixture from GetVolumeMountPoint would have it compute
+        // its expectation with the call under test, and a fixture that agrees
+        // with the code by construction cannot fail at what its name claims.
+        //
+        // SO THIS ASSERTION IS FALSE ON THE MACHINE THE FIX IS FOR. With a
+        // volume mounted at C:\Windows\Installer the cache's volume is
+        // C:\Windows\Installer\, C:\backup is genuinely not on it, the method
+        // correctly answers false, and this test fails. It holds only where
+        // nothing is mounted between the path root and the cache folder.
+        //
+        // AND WHERE IT DOES HOLD IT CANNOT TELL THE FIXED CODE FROM THE CODE IT
+        // REPLACED, which is a second statement and a weaker one, not the same
+        // one said twice. The cache's volume and the system root are the same
+        // string on every host this suite runs on, so the assertion passes
+        // against both. Building a host where it could tell them apart needs a
+        // second volume and administrator rights.
         //
         // What it does newly pin is that the cache-side query answers at all.
         // Before the fix this method never touched the cache path; it does now,
@@ -68,13 +90,13 @@ public class MoveSpaceCheckIntegrationTests
         // is therefore stronger than production needs, and a red one would have
         // to be shown to survive elevation before it meant anything about the
         // app.
-        var cacheRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
+        var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
-        Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(Path.Combine(cacheRoot, "backup")));
+        Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(Path.Combine(cachePathRoot, "backup")));
         // Case and separator shape must not change the answer: the box takes
         // whatever the user typed.
         Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(
-            Path.Combine(cacheRoot.ToLowerInvariant(), "backup") + Path.DirectorySeparatorChar));
+            Path.Combine(cachePathRoot.ToLowerInvariant(), "backup") + Path.DirectorySeparatorChar));
     }
 
     [Fact]
@@ -103,19 +125,26 @@ public class MoveSpaceCheckIntegrationTests
         // needed the path to exist, this would answer "a different volume", the
         // free-space check would then run against the nearly-full drive the
         // cache is on, and the Move this app exists for would be refused. Win32
-        // documents
-        // trailing path elements that are invalid as ignored; this is that
-        // documented behaviour pinned, three levels deep so no single missing
-        // component can be doing the work.
+        // documents trailing path elements that are invalid as ignored; this is
+        // that documented behaviour pinned, three levels deep so no single
+        // missing component can be doing the work.
         //
-        // Built from the CACHE folder's root rather than the system
-        // directory's, which is the subject the method actually asks about.
-        // The two are the same string on every host this runs on, so this
-        // cannot tell the fixed code from the code it replaced either; what it
-        // pins is the Win32 behaviour above, and that is unaffected by which
-        // volume is being asked about.
+        // BUILT UNDER THE CACHE FOLDER ITSELF RATHER THAN UNDER ITS PATH ROOT,
+        // so the assertion is true on every machine including one with a volume
+        // mounted at C:\Windows\Installer. A path root is C:\ there while the
+        // cache's volume is C:\Windows\Installer\, and this would have failed
+        // for a reason with nothing to do with what it tests.
+        //
+        // That is not the fixture computing its expectation with the call under
+        // test. The cache folder is the constant the app itself is built from,
+        // not GetVolumeMountPoint's answer about it, so this can still fail at
+        // what it is named for: if Win32 stops resolving a missing trailing
+        // component the destination side returns null, the two sides answer
+        // differently, and this goes red.
+        //
+        // Nothing creates the folder. The assertion below is what says so.
         var missing = Path.Combine(
-            Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!,
+            InstallerCacheHelpers.InstallerFolder,
             $"ic-volume-{Guid.NewGuid():N}", "backup", "monthly");
 
         Assert.False(Directory.Exists(missing));
@@ -143,17 +172,21 @@ public class MoveSpaceCheckIntegrationTests
         // short of, and refusing it here would refuse the only user who came
         // for this.
         //
-        // Built from the cache folder's root, and it was built from the system
-        // directory's until that stopped being the question the method asks.
-        // MoveSpaceCheckTests names this test as the one covering the arm where
-        // RefusalFreeSpace returns null without consulting the measurement, so
-        // a wrong subject here would have been inherited by that file's account
-        // of itself as well as sitting in this one. The two roots coincide on
-        // every host this runs on, so this passes either way and pins the arm
-        // rather than the volume.
-        var onCacheVolume = Path.Combine(
-            Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!,
-            "backup");
+        // BUILT UNDER THE CACHE FOLDER ITSELF, so the destination really is on
+        // the cache's volume on every machine, including one with a volume
+        // mounted at C:\Windows\Installer. It was built from the system
+        // directory's path root, then from the cache folder's; both of those are
+        // C:\ on an ordinary machine and neither is the cache's volume on that
+        // one. MoveSpaceCheckTests names this test as the one covering the arm
+        // where RefusalFreeSpace returns null without consulting the
+        // measurement, so a subject that was only accidentally right would have
+        // been inherited by that file's account of itself as well as sitting in
+        // this one.
+        //
+        // Nothing is created or measured: RefusalFreeSpace returns on the
+        // same-volume answer before it reaches the free-space figure at all,
+        // which is the arm being pinned.
+        var onCacheVolume = Path.Combine(InstallerCacheHelpers.InstallerFolder, "backup");
 
         Assert.Null(MoveSpaceCheck.RefusalFreeSpace(onCacheVolume, 1_000, 0));
     }

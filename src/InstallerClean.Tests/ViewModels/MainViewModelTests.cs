@@ -582,6 +582,14 @@ public class MainViewModelTests
         // drive", which is the same fact under a name the comparison stopped
         // using: what the destination is measured against is the cache's
         // volume.
+        //
+        // AND THIS ASSERTION IS FALSE WHERE THOSE TWO PART. With a volume
+        // mounted at C:\Windows\Installer, %TEMP% is not on the cache's volume,
+        // the move genuinely frees space, the heading reads "freed" and this
+        // fails. There is no path arithmetic here to correct: the fixture names
+        // %TEMP% and the coincidence is the machine's rather than the test's.
+        // Nor can it be pointed at the cache folder, which Move refuses as
+        // inside a Windows system folder before the classification is reached.
         Assert.Contains("moved", vm.Completion.Heading);
     }
 
@@ -906,13 +914,24 @@ public class MainViewModelTests
     public async Task MoveButtonTooltip_answers_from_the_box_and_changes_as_it_is_typed_in()
     {
         var vm = CreateViewModel();
-        // The CACHE folder's root, which is the volume the tooltip's same-drive
-        // state is actually about. It was the system directory's until the
-        // question stopped being about the system directory, and the two are
-        // the same string on every host this suite runs on, so nothing here
-        // behaves differently and nothing here can tell the two apart. The
-        // comment was the part that had gone wrong.
-        var cacheRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
+        // THE CACHE FOLDER'S PATH ROOT, WHICH IS NOT THE CACHE'S VOLUME. It was
+        // the system directory's path root until the question stopped being
+        // about the system directory, and on every host this suite runs on all
+        // three are the same string, so nothing here behaves differently and
+        // nothing here can tell them apart.
+        //
+        // THE SAME-DRIVE ASSERTION BELOW IS FALSE WHERE THEY PART. With a
+        // volume mounted at C:\Windows\Installer the folder built from this root
+        // is on another volume, DestinationIsOnCacheVolume stays false, the
+        // tooltip keeps the plain wording and the Tooltip_MoveSameDrive
+        // assertion fails.
+        //
+        // POINTING THE FIXTURE AT THE CACHE FOLDER WOULD MAKE IT TRUE THERE AND
+        // IS STILL WRONG. This path does not run the destination validation the
+        // Move does, so it would answer same-drive for a folder inside a Windows
+        // system folder, which is a destination Move refuses outright, and the
+        // test would pin the wording for a state no user can reach.
+        var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
         // Empty box: the browser opens first, so the tooltip warns of it rather
         // than naming a step that is missing.
@@ -928,7 +947,7 @@ public class MainViewModelTests
         // every keystroke. It is asked on the debounce the destination's own
         // write-back already uses, and until it answers the tooltip shows the
         // plain wording, which claims nothing about any drive.
-        vm.Cleanup.MoveDestination = Path.Combine(cacheRoot, "ic-test-backup");
+        vm.Cleanup.MoveDestination = Path.Combine(cachePathRoot, "ic-test-backup");
         Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
         await Task.Delay(DebounceWait);
         Assert.Equal(Strings.Tooltip_MoveSameDrive, vm.Cleanup.MoveButtonTooltip);
@@ -952,19 +971,33 @@ public class MainViewModelTests
     public async Task MoveButtonTooltip_drops_a_stale_answer_when_the_box_moves_on()
     {
         // The resolve is started per edit and belongs to the path that started
-        // it. Typing a folder on the cache volume and then a share, faster than
-        // the debounce, must leave the share's answer standing: if the first
-        // resolve could land late it would tell the user a folder on another
-        // volume was on this one, which is the fault this change removes,
-        // reintroduced by the machinery that made it cheap.
+        // it. Typing a folder the resolve will call same-drive and then a share,
+        // faster than the debounce, must leave the share's answer standing: if
+        // the first resolve could land late it would tell the user a folder on
+        // another volume was on this one, which is the fault this change
+        // removes, reintroduced by the machinery that made it cheap.
         var vm = CreateViewModel();
-        // Built from the cache folder rather than the system directory, which
-        // is what the comment above already said it was and what the code now
-        // asks about. Same string on every host here, so this pins the ordering
-        // and says nothing about which volume is which.
-        var cacheRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
+        // THE CACHE FOLDER'S PATH ROOT, WHICH IS NOT THE CACHE'S VOLUME. Same
+        // string on every host here, so this pins the ordering and says nothing
+        // about which volume is which.
+        //
+        // AND WHERE THEY PART THIS TEST STOPS EXERCISING ITS OWN SUBJECT
+        // WITHOUT GOING RED, WHICH IS WORSE THAN FAILING. The subject is a
+        // stale SAME-DRIVE answer being dropped when the box moves on. With a
+        // volume mounted at C:\Windows\Installer the folder built from this root
+        // is on another volume, so the first resolve answers false, there is no
+        // same-drive answer for the second to displace, and the assertion below
+        // passes on a run that never exercised the ordering at all. A green here
+        // is evidence about the ordering only where nothing is mounted between
+        // the path root and the cache folder.
+        //
+        // The fixture cannot be moved under the cache folder to fix that: the
+        // tooltip would then answer for a destination Move refuses as inside a
+        // Windows system folder, pinning the wording for a state no user can
+        // reach.
+        var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
-        vm.Cleanup.MoveDestination = Path.Combine(cacheRoot, "ic-test-backup");
+        vm.Cleanup.MoveDestination = Path.Combine(cachePathRoot, "ic-test-backup");
         vm.Cleanup.MoveDestination = @"\\server\backup";
 
         await Task.Delay(DebounceWait);
