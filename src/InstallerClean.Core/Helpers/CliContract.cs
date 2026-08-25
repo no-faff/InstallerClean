@@ -172,10 +172,15 @@ internal enum CliEventClass
     /// files missing from the cache may be short with them.
     ///
     /// It was <c>ScanWithheldNotice</c>, and what it reported was that the run had
-    /// withheld the superseded and obsoleted class wholesale. No run withholds
-    /// that class now, none of it being offered on any run, so the condition
-    /// survives with the other half of its meaning. The Event ID does not move
-    /// with the name: 3000 is the wire contract and the name is this codebase's.
+    /// withheld the superseded and obsoleted class wholesale. The rename is right and
+    /// the reason once given for it is not: a run meeting this condition DOES withhold
+    /// the superseded class wholesale, InstallerQueryService taking the removable
+    /// verdict off every such row, and this member is raised on exactly that condition.
+    /// The justification held only between 2026-08-11 and 2026-08-17, while the class
+    /// was out of the offer altogether. What the rename is actually for is that the
+    /// condition now carries a second meaning, about records this scan never read, and
+    /// the old name claimed only the first. The Event ID does not move with the name:
+    /// 3000 is the wire contract and the name is this codebase's.
     /// </summary>
     ScanRecordsIncompleteNotice,
 

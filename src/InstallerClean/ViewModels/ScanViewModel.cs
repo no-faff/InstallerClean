@@ -256,9 +256,17 @@ public partial class ScanViewModel : ObservableObject
     /// unlike <see cref="HasMissingFromDisk"/>: nothing is wrong with the machine
     /// and there is nothing for the user to do. It is shown because a scan that
     /// saw less than usual without saying so is the fault this line exists to
-    /// avoid, and what it now bears on is the missing-files line rather than the
-    /// offer: a registration this scan never reached is one whose file, had it
-    /// gone, went uncounted.
+    /// avoid.
+    ///
+    /// IT BEARS ON THE OFFER AS WELL AS ON THE MISSING-FILES LINE, AND THE SENTENCE
+    /// SAYING OTHERWISE WAS TRUE FOR SIX DAYS. InstallerQueryService takes the removable
+    /// verdict off every superseded row on this condition, so a run that meets it offers
+    /// no superseded patch at all. That was not so between 2026-08-11 and 2026-08-17,
+    /// when the class was out of the offer entirely and the condition therefore could
+    /// not touch it; the class came back and this line was not re-read. What the
+    /// missing-files half adds, and it is an addition rather than the whole, is that a
+    /// registration this scan never reached is one whose file, had it gone, went
+    /// uncounted.
     ///
     /// The count gates the line and does not appear in it. Four different things
     /// contribute to it and only two are failures to read, so it is an estimate

@@ -82,10 +82,16 @@ public record InstallerQueryResult(
     /// matters is the missing claim, not the mechanism (see
     /// <see cref="UnaccountedProductCount"/> for the four).
     ///
-    /// WHAT IT BEARS ON IS NOW THE MISSING-FILES REPORT rather than the offer. It
-    /// withholds every superseded-patch verdict, which it has always done; and a
+    /// IT BEARS ON THE OFFER AND ON THE MISSING-FILES REPORT, AND ONLY THE SECOND IS
+    /// NEW. It withholds every superseded-patch verdict, which it has always done and
+    /// which is the whole of the superseded offer on a run where it fires; and a
     /// registration this scan never saw is also one whose file, had it gone, went
     /// uncounted. Exposed for the copy that says so.
+    ///
+    /// The opening of this note used to read "what it bears on is NOW the missing-files
+    /// report rather than the offer", which was true only while the superseded class was
+    /// out of the offer altogether, between 2026-08-11 and 2026-08-17. The clause below
+    /// it always said the opposite and was always right.
     /// </summary>
     public bool RecordsIncomplete => UnaccountedProductCount > 0;
 }
