@@ -28,7 +28,7 @@ public interface IMoveFilesService
     /// set (a cancellation before the worker starts still surfaces as
     /// <see cref="OperationCanceledException"/>).
     /// </summary>
-    /// <param name="patchClaims">
+    /// <param name="underLeaseClaims">
     /// The claims naming the paths in <paramref name="filePaths"/>, from the
     /// caller's pre-act re-verify
     /// (<see cref="ReverifyResult.SurvivingPatchClaims"/>). Re-read once the

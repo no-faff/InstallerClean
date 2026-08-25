@@ -186,35 +186,53 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
     /// <inheritdoc />
     /// <remarks>
-    /// IT HAS REAL WORK AGAIN FROM 3.0.0, having returned at its first line while
+    /// IT HAS REAL WORK AGAIN FROM 3.0.0, having returned at its first guard while
     /// nothing registered was offered. Its input is the patch claims naming a
     /// surviving candidate, and a surviving superseded patch is named by every product
     /// it is registered to, so the list is non-empty on any batch containing one. This
     /// is the last check standing in front of a permanent delete.
     ///
-    /// IT RE-READS THE PAIRING AND NOT THE PRODUCT'S WHOLE PATCH SET, SO IT IS NARROWER
-    /// THAN THE RULE THE SCAN APPLIED. This is a known gap and not a considered
-    /// equivalence, and it must not be described as one. The scan withholds unless every
-    /// patch on every product sharing this one positively declares itself
-    /// non-removable; this re-asks only whether THIS pairing is still superseded and
-    /// still declares zero, which is what <c>IsRemovablePatch</c> answers and that is
-    /// half the rule. A SIBLING patch turning removable between the scan and the click
-    /// is therefore not seen here.
+    /// IT RE-ASKS BOTH HALVES OF THE RULE THE OFFER RESTS ON. The loop below re-asks
+    /// the batch's own pairings, and a path survives it only where every claim on it
+    /// comes back as a record that is still there, still readable, still superseded and
+    /// still declaring zero; the last two are what <c>IsRemovablePatch</c> answers and
+    /// they are half the rule. The pass after it re-asks the OTHER patches registered to
+    /// the products those pairings name, which is the other half: a superseded patch is
+    /// offered only where the per-product condition positively established that nothing
+    /// on any product sharing it could be uninstalled and roll back onto its file. The
+    /// offer rests on that fact about other patches, and a re-verify that does not
+    /// re-check the fact the offer rests on is not a re-verify.
     ///
-    /// WHAT COVERS THE GAP TODAY IS THE PRE-LEASE PASS AND NOTHING ELSE. It re-runs the
-    /// whole enumeration moments earlier and does apply the per-product condition, so
-    /// the uncovered window is between that enumeration and this re-read rather than
-    /// between the scan and the click.
+    /// THE SECOND HALF IS KEYED READS AND NEVER AN ENUMERATION, which is what makes it
+    /// affordable with the machine-wide lease held. The pre-lease pass has already
+    /// worked out which pairings to look at, so this asks about records by name, and
+    /// every answer is about the record named, or reports there is no such record, or is
+    /// a read that failed. None of the three can pass for another, which is the property
+    /// an enumeration cannot offer.
     ///
-    /// THE DESIGNED FIX IS NOT BUILT. It is to carry the sibling patch codes forward
-    /// from the pre-lease pass, which already knows exactly which they are, and re-read
-    /// them here by key: a bounded set of keyed reads rather than an enumeration, and a
-    /// keyed read either answers about the record named or says there is no such record.
-    /// The reason for building it is that the offer now rests on a fact about OTHER
-    /// patches, and a re-verify that does not re-check the fact the offer rests on is
-    /// not a re-verify. Leaving it at the narrower question is explicitly the fallback
-    /// rather than the design, and the ruling that named it says nobody may adopt it
-    /// without measuring the read cost first, which nobody has.
+    /// WHAT IS NARROWER HERE IS THE SET AND NOT THE QUESTION, and that residual is the
+    /// part to know about. The pairings are the ones the pre-lease enumeration recorded
+    /// as claims, so a registration it produced no claim for is not re-read here: a
+    /// patch that enumeration got no cached path for, a product it never returned even
+    /// where the machine-wide patch enumeration names it, a product holding none of the
+    /// batch's own patches that only a patch file's declared targets name, and anything
+    /// registered after the claims were collected. The scan's own condition asks every
+    /// product any of its sources names, against each product's registered patch set as
+    /// the registry lists it and worsened by what the enumeration read, which no list of
+    /// claims can match. A holder only that pass can see is covered up to its enumeration
+    /// and no further.
+    ///
+    /// SO THE PRE-LEASE PASS IS STILL THE WIDER CHECK AND IS NO LONGER THE ONLY ONE. It
+    /// re-runs the whole enumeration moments earlier and applies that condition at its
+    /// full width, and a path it condemns never arrives here at all. What it cannot do
+    /// is run again inside the hold, and that is what this adds: the same two questions,
+    /// put about a bounded set of records, in the window its own enumeration leaves open.
+    ///
+    /// NARROWING THIS BACK TO THE BATCH'S OWN PAIRINGS WAS EXPLICITLY THE FALLBACK
+    /// RATHER THAN THE DESIGN, and the ruling that said so is not spent now the design
+    /// is built: it stands against reversing it, and it required the read cost to be
+    /// measured before anybody adopted the narrower question. The measurement it asked
+    /// for is on this method's parameter in the interface.
     /// </remarks>
     public UnderLeaseRecheck RecheckUnderLease(UnderLeaseClaims underLease)
     {
