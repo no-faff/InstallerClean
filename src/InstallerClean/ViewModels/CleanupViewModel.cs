@@ -687,12 +687,43 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // deliberate rather than an oversight in a class that otherwise keeps
         // volume work off it. Handing it the answer the pre-flight already has
         // would mean a second way of reaching that verdict, and the two hosts
-        // agreeing about it is the reason the rule lives in Core at all. It is
-        // safe on this thread for a reason that does not generalise to the
-        // tooltip: the pre-flight above has just created this folder, written a
-        // file into it and deleted that file, so a destination that could stall
-        // has already stalled, behind the overlay and its working Cancel, and
-        // nothing awaits between there and here.
+        // agreeing about it is the reason the rule lives in Core at all.
+        //
+        // THAT IS TWO VOLUME QUERIES NOW AND IT WAS ONE, SO THE ARGUMENT BELOW
+        // COVERS TWO PATHS AND USED TO COVER ONE. The cache side of the question
+        // was a value resolved once for the life of the process, on the ground
+        // that the volume running Windows cannot be remounted underneath it. It
+        // asked about the Windows system directory rather than the installer
+        // cache, which is a different volume wherever one is mounted at
+        // C:\Windows\Installer, and the ground went with the subject when that
+        // was corrected: a volume mounted there is precisely the thing that can
+        // appear or vanish while the app is open. So the cache side is a real
+        // call per operation now and has to earn its place on this thread the
+        // way the destination side does.
+        //
+        // WHAT HAS ALREADY HAPPENED TO EACH PATH BEFORE THIS LINE RUNS, which is
+        // the argument, rather than a claim that neither of them can stall. The
+        // destination: the pre-flight above created this folder, wrote a file
+        // into it and deleted that file, so a destination that could stall has
+        // already stalled, behind the overlay and its working Cancel, and
+        // nothing awaits between there and here. The cache folder: CanMove needs
+        // a scan result with files in it, so the scan has walked that folder
+        // before this button could be pressed, on its own background thread with
+        // its own cancel.
+        //
+        // AND READ Kernel32.GetVolumePathName's PROHIBITION WITH THE CLAUSE IT
+        // HANGS OFF, because it is absolute read alone. It says no caller may
+        // make this call on the dispatcher; the sentence it follows from says
+        // why, which is that a remote path is validated over the network and a
+        // share that is not answering costs an SMB timeout. The cache path is
+        // built from %WINDIR%, so it can be neither a share nor a mapped letter
+        // and nothing it does is a round trip. The destination can be a mapped
+        // letter, which is local in shape and remote in fact and which
+        // IsRemotePath does not turn away, so the guard is not what makes this
+        // side safe: what makes it safe is that the pre-flight has just written
+        // a file to that same path. The rule stands as written. The claim here
+        // is that these two paths sit outside its reason, not that the reason is
+        // loose.
         if (MoveSpaceCheck.RefusalFreeSpace(dest, totalBytes, preFlight.AvailableFreeSpace)
             is long free)
         {

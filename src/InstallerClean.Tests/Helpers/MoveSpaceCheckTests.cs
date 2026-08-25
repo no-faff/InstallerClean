@@ -25,6 +25,15 @@ namespace InstallerClean.Tests.Helpers;
 /// null without consulting the measurement at all. That arm is
 /// <c>RefusalFreeSpace_allows_a_same_drive_move_with_no_room_at_all</c> in the
 /// integration file, where it can be built from a real volume.
+///
+/// AND WHAT IT IS BUILT FROM THERE MATTERS TO THIS SENTENCE, WHICH IS WHY IT IS
+/// SAID HERE AND NOT ONLY THERE. That test named the system directory's root
+/// until the method stopped asking about the system directory's volume, so this
+/// file was pointing at a test whose subject was the wrong one. It now names the
+/// cache folder's root, and on every host the suite runs on those two are the
+/// same string. So the arm is covered and the VOLUME is not: a destination that
+/// is on the cache's volume and not on the system's needs a volume mounted at
+/// <c>C:\Windows\Installer</c>, which nothing here or there can build.
 /// </remarks>
 public class MoveSpaceCheckTests
 {
