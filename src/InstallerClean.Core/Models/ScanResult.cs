@@ -122,17 +122,26 @@ namespace InstallerClean.Models;
 /// earned on such a run.
 /// </param>
 /// <param name="WithheldCount">
-/// What withholding the removable class cost a run: superseded or obsoleted
-/// packages whose file was on disk and which the scan would have offered, had it
-/// been able to say that no installed product still needed them.
+/// What withholding the removable class cost a run: superseded packages whose file
+/// was on disk and which the scan would have offered, had it been able to say that
+/// no installed product still needed them.
 ///
 /// A REAL FIGURE AGAIN, HAVING BEEN A LITERAL ZERO WHILE NOTHING WAS OFFERED. It
 /// counts what the withholding cost this run: rows Windows reports superseded whose
-/// file is on disk and which declared themselves non-removable, held back anyway
-/// because some product sharing the patch holds one that could be uninstalled, or
-/// because that product's patch set could not be established at all. Obsoleted rows
-/// are NOT in it; they are not withheld, they are simply not offered, and they have
-/// their own count.
+/// file is on disk and which declared themselves non-removable, held back because a
+/// read established nothing. Obsoleted rows are NOT in it; they are not withheld,
+/// they are simply not offered, and they have their own count. This paragraph and
+/// the line above it said "superseded or obsoleted" while this one said the
+/// opposite, and the predicate settles it: nothing reaches the flag without having
+/// carried IsRemovable, and IsRemovablePatch requires state 2.
+///
+/// AND A PRODUCT THAT COULD ROLL BACK ONTO THE FILE IS NOT IN IT EITHER, WHICH THIS
+/// NOTE USED TO LIST AS A CONTRIBUTOR. That condition is
+/// <see cref="ProductPatchSet.RemovablePatchPresent"/>, and the downgrade it reaches
+/// passes withheld FALSE, because the scan positively established a live claim
+/// rather than failing to establish anything. Worse() lets it beat Unestablished
+/// where a row meets both, so the mixed case is excluded with it. What is left is
+/// exactly one thing, in Downgrade's own words: a read that established nothing.
 ///
 /// THE ON-DISK QUALIFIER IS THE WHOLE DIFFERENCE FROM
 /// <see cref="RegisteredWithheldCount"/> AND IT IS LOAD-BEARING. A row whose file

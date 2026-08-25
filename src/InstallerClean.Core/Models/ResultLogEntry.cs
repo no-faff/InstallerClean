@@ -686,12 +686,18 @@ public sealed record MachineInfo(
 /// receiver on the other end of it, so the key stays and this note is the record.
 /// </param>
 /// <param name="WithheldPatchCount">
-/// Superseded files a scan would have offered and did not: it could not account for
-/// every installed product, or some product sharing the patch holds one that could be
-/// uninstalled and roll back onto the file, or that product's patch set could not be
-/// established at all. A real figure again from 3.0.0, having been a literal zero
-/// while nothing registered was offered. Obsoleted files are not in it: they are not
-/// withheld, they are simply not offered, and they have their own count.
+/// Superseded files a scan would have offered and did not, on one condition rather
+/// than several: a read established nothing. That covers a scan unable to account for
+/// every installed product, and a product whose patch set could not be established at
+/// all. A real figure again from 3.0.0, having been a literal zero while nothing
+/// registered was offered. Obsoleted files are not in it: they are not withheld, they
+/// are simply not offered, and they have their own count.
+///
+/// A PRODUCT HOLDING A PATCH THAT COULD BE UNINSTALLED AND ROLL BACK ONTO THE FILE IS
+/// NOT IN IT, AND THIS NOTE LISTED IT AS A CONTRIBUTOR. That row is downgraded with
+/// withheld FALSE, the scan having positively established a live claim rather than
+/// having failed to establish anything, so it never reaches this count. Stated here
+/// because this is a wire contract and the receiver cannot see the predicate.
 /// </param>
 /// <param name="UnreadableProductCount">
 /// Products whose records came back short. An exact per-product tally.
