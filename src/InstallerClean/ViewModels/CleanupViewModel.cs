@@ -720,14 +720,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // make this call on the dispatcher; the sentence it follows from says
         // why, which is that a remote path is validated over the network and a
         // share that is not answering costs an SMB timeout. The cache path is
-        // built from %WINDIR%, so it can be neither a share nor a mapped letter
-        // and nothing it does is a round trip. The destination can be a mapped
-        // letter, which is local in shape and remote in fact and which
-        // IsRemotePath does not turn away, so the guard is not what makes this
-        // side safe: what makes it safe is that the pre-flight has just written
-        // a file to that same path. The rule stands as written. The claim here
-        // is that these two paths sit outside its reason, not that the reason is
-        // loose.
+        // the Windows directory with Installer under it, so it can be neither a
+        // share nor a mapped letter and nothing it does is a round trip. The
+        // destination can be a mapped letter, which is local in shape and
+        // remote in fact and which IsRemotePath does not turn away, so the
+        // guard is not what makes this side safe: what makes it safe is that
+        // the pre-flight has just written a file to that same path. The rule
+        // stands as written. The claim here is that these two paths sit outside
+        // its reason, not that the reason is loose.
         if (MoveSpaceCheck.RefusalFreeSpace(dest, totalBytes, preFlight.AvailableFreeSpace)
             is long free)
         {

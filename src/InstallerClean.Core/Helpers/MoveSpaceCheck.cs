@@ -29,76 +29,86 @@ internal static class MoveSpaceCheck
     /// ordinary folder at <c>C:\Data</c> cannot be told apart from the path
     /// alone, which is why no amount of path arithmetic could have settled it.
     ///
-    /// FOUR SURFACES TOOK THAT ANSWER AND TWO OF THEM ACTED ON IT. The
+    /// ONE ANSWER, SEVERAL READERS, AND ONLY ONE OF THEM ACTED ON IT. The
     /// confirmation dialog told the user the space would not come back until
     /// they deleted the folder, which is false there and is a statement about
     /// somebody's own disk that nothing had established; the Move button's
-    /// tooltip and the completion screen's restore line said the same; and
-    /// <see cref="RefusalFreeSpace(string, long, long?)"/> returned on its first
-    /// line, so the free-space check did not run at all. That last is the exact
-    /// fault this file exists for, arriving through the one destination it could
-    /// not see.
+    /// tooltip and the completion screen's restore line said the same; the
+    /// result log and the opt-in report carried it as the destination's kind;
+    /// and <see cref="RefusalFreeSpace(string, long, long?)"/> returned on its
+    /// first line, so the free-space check did not run at all. That last is
+    /// the exact fault this file exists for, arriving through the one
+    /// destination it could not see. The rest tell the user or the record; it
+    /// is the only one that changes what the app does.
     ///
-    /// AND IT FIXED ONE END OF THAT AND LEFT THE OTHER, WHICH IS WHAT THIS
-    /// CHANGE IS. The destination side began asking Windows which volume a
-    /// folder is on. The cache side went on being answered by
-    /// <c>Environment.SpecialFolder.System</c>, which is the volume hosting the
-    /// Windows system directory and not the volume hosting the installer cache.
-    /// Those two are the same wherever nothing is mounted between them, and
-    /// they part exactly where a volume is mounted at <c>C:\Windows\Installer</c>
-    /// itself: the same mount point that motivated the destination fix, with
-    /// the mount at the other end of the comparison. The method's own name said
-    /// cache and its query said system, and the name was the accurate half.
+    /// THE REASON GIVEN FOR LEAVING THE PATH ARITHMETIC COVERED THE TOOLTIP
+    /// AND NOTHING ELSE. It was cost: the tooltip re-read this on every
+    /// keystroke. Every other reader is once per Move, on an operation that
+    /// already resolves the destination twice and writes a probe file into it
+    /// before anything is classified, so nothing was being bought there. And
+    /// the stated cost was not the real hazard either. The hazard is that
+    /// GetVolumePathName validates a REMOTE path over the network, so a call
+    /// that can meet a remote path belongs off the dispatcher whatever it
+    /// costs; <see cref="StorageHelpers.IsRemotePath"/> answers those without
+    /// asking, and the window resolves the tooltip's copy on a background hop.
     ///
-    /// BOTH WRONG ANSWERS ARE AVAILABLE THERE AND ONLY ONE OF THEM COSTS. False
-    /// for a destination that really is on the cache's volume runs a free-space
-    /// check on a move that needs none, which refuses a Move that would have
-    /// worked. True for a destination that is not sends
-    /// <see cref="RefusalFreeSpace(string, long, long?)"/> out on its first line,
-    /// so a move that really copies is never measured, which is this file's own
-    /// fault reached by a second route.
+    /// THE CACHE SIDE WAS NOT FIXED WITH THE DESTINATION SIDE, AND THAT IS
+    /// WHAT THIS CHANGE IS. The destination side began asking Windows which
+    /// volume a folder is on. The cache side went on being answered by
+    /// <c>Environment.SpecialFolder.System</c>, which is the volume hosting
+    /// the Windows system directory and not the volume hosting the installer
+    /// cache. Those two are the same wherever nothing is mounted between them,
+    /// and they part exactly where a volume is mounted at
+    /// <c>C:\Windows\Installer</c> itself: the same mount point that motivated
+    /// the destination fix, with the mount at the other end of the comparison.
+    /// The method's own name said cache and its query said system, and the
+    /// name was the accurate half.
     ///
-    /// THE NAME SAYS DRIVE, THE QUESTION IS ABOUT A VOLUME, AND THAT IS KEPT
-    /// RATHER THAN OVERLOOKED. <c>MoveDestinationKinds.SameDrive</c> is the
-    /// literal <c>sameDrive</c> written into the result log and the opt-in
-    /// report, and the set of values that field may carry is fixed, so it
-    /// cannot follow a rename here. Renaming the method on its own would leave
-    /// the code saying volume and the record it feeds saying drive, which is a
-    /// worse state than one loose word used consistently in both. What was
-    /// actually wrong with the name was never the noun: it said cache while the
-    /// query said system, and that is the half this change fixes.
-    ///
-    /// THE REASON GIVEN FOR LEAVING THE PATH ARITHMETIC COVERED ONE OF THE FOUR
-    /// SURFACES. It was cost: the tooltip re-read this on every keystroke. The
-    /// other three are once per operation and already sit inside a pre-flight
-    /// that does two path resolutions and a write probe, so nothing was being
-    /// bought there. And the stated cost was not the real hazard either. The
-    /// hazard is that GetVolumePathName validates a REMOTE path over the
-    /// network, so a call that can meet a remote path belongs off the
-    /// dispatcher whatever it costs; <see cref="StorageHelpers.IsRemotePath"/>
-    /// answers those without asking, and the window resolves the tooltip's copy
-    /// on a background hop.
+    /// BOTH WRONG ANSWERS WERE AVAILABLE THERE AND NEITHER WAS FREE. True for
+    /// a destination that is not on the cache's volume sent
+    /// <see cref="RefusalFreeSpace(string, long, long?)"/> out on its first
+    /// line, so a move that really copies was never measured, which is this
+    /// file's own fault reached by a second route. False for a destination
+    /// that really is on it cost twice over: the free-space check ran on a
+    /// move needing no room and could refuse one that would have worked, and
+    /// the classification starts from this same answer, so the dialog's
+    /// warning stayed collapsed, the completion claimed freed space and the
+    /// record agreed with it.
     ///
     /// NOTHING IS CACHED ON EITHER SIDE, WHICH IS A DECISION AND NOT AN
-    /// OMISSION. A mount point can be created or removed under a path while the
-    /// app is open, and a cached same-volume answer surviving that would skip
-    /// the free-space check on a volume nothing had measured, which is this
-    /// change's own fault reintroduced by the thing meant to make it cheap.
+    /// OMISSION. A mount point can be created or removed under a path while
+    /// the app is open, and a cached same-volume answer surviving that would
+    /// skip the free-space check on a volume nothing had measured, which is
+    /// this change's own fault reintroduced by the thing meant to make it
+    /// cheap.
     ///
-    /// THE CACHE SIDE WAS HELD FOR THE LIFE OF THE PROCESS AND THE JUSTIFICATION
-    /// DID NOT SURVIVE THE CHANGE OF SUBJECT. It read: the volume hosting the
-    /// running system cannot be unmounted or remounted underneath it, and that
-    /// asymmetry is the whole reason one side is held and the other is asked
-    /// every time. Every word of that is true of the system volume. None of it
-    /// is true of a volume mounted at the installer cache, which is precisely
-    /// the thing that can appear or vanish while the app is open, so the field
-    /// went out with the subject that earned it.
+    /// THE CACHE SIDE WAS HELD FOR THE LIFE OF THE PROCESS AND THE
+    /// JUSTIFICATION DID NOT SURVIVE THE CHANGE OF SUBJECT. It read: the
+    /// volume hosting the running system cannot be unmounted or remounted
+    /// underneath it, and that asymmetry is the whole reason one side is held
+    /// and the other is asked every time. Every word of that is true of the
+    /// system volume. None of it is true of a volume mounted at the installer
+    /// cache, which is precisely the thing that can appear or vanish while the
+    /// app is open, so the field went out with the subject that earned it.
     ///
     /// THE PATH IS STILL HELD AND THE VOLUME IS NOT, WHICH IS NOT THE SAME
     /// DECISION ARRIVING AGAIN. <see cref="InstallerCacheHelpers.InstallerFolder"/>
-    /// is a string built from <c>%WINDIR%</c> once, and no running process can
-    /// see that move. Which volume is mounted at it is a question about the
-    /// machine right now, and it is asked right now.
+    /// is resolved once and kept, and it can be: no running process sees the
+    /// Windows directory move. Which volume is mounted at that path is a
+    /// question about the machine right now, and it is asked right now.
+    ///
+    /// THE NAME SAYS DRIVE, THE QUESTION IS ABOUT A VOLUME, AND THAT IS KEPT
+    /// RATHER THAN OVERLOOKED. <c>MoveDestinationKinds.SameDrive</c> is the
+    /// literal <c>sameDrive</c> that goes into the result log and the opt-in
+    /// report, and the string cannot follow a rename made here: the receiver
+    /// allowlists the value and rejects a report carrying one it does not
+    /// know. Nothing on this side checks a kind against those constants, so a
+    /// reader who goes looking for that guard here finds none and can conclude
+    /// there is none. Renaming the method alone would leave the code
+    /// saying volume and the record it feeds saying drive, which is a worse
+    /// state than one loose word used consistently in both. What was actually
+    /// wrong with the name was never the noun: it said cache while the query
+    /// said system, and that is the half this change fixes.
     ///
     /// The rest of the file already knew the case, which is what made this one
     /// method out of step rather than the app declining an exotic machine:
@@ -122,11 +132,12 @@ internal static class MoveSpaceCheck
     /// query of its own, so that refusal is never put a second time and never
     /// seen. It arrives as a plain false, indistinguishable from a destination
     /// genuinely on another volume, and a caller classifying from the
-    /// destination alone can report space freed by a move that freed none.
-    /// A bool has no room for "I could not tell", so what that leaves a
-    /// classifying caller to do is a question about that caller rather than
-    /// about this method. It is written down here so the next reader does not
-    /// have to derive it, and it is open.
+    /// destination alone can report space freed by a move that freed none,
+    /// which is the misreading above arriving from a refusal rather than from
+    /// a wrong answer. A bool has no room for "I could not tell", so what that
+    /// leaves a classifying caller to do is a question about that caller
+    /// rather than about this method. It is written down here so the next
+    /// reader does not have to derive it, and it is open.
     /// </remarks>
     internal static bool IsOnInstallerCacheDrive(string destination)
     {

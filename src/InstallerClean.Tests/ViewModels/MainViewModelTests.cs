@@ -926,11 +926,13 @@ public class MainViewModelTests
         // tooltip keeps the plain wording and the Tooltip_MoveSameDrive
         // assertion fails.
         //
-        // POINTING THE FIXTURE AT THE CACHE FOLDER WOULD MAKE IT TRUE THERE AND
-        // IS STILL WRONG. This path does not run the destination validation the
-        // Move does, so it would answer same-drive for a folder inside a Windows
-        // system folder, which is a destination Move refuses outright, and the
-        // test would pin the wording for a state no user can reach.
+        // A FIXTURE UNDER THE CACHE FOLDER WOULD ANSWER SAME-DRIVE ON EITHER
+        // HOST, AND WHAT IT WOULD PIN IS A STATE A USER CAN REACH. Nothing on
+        // this path runs the destination validation the Move does, so somebody
+        // who types C:\Windows\Installer\backup gets this tooltip, correctly.
+        // What no user can reach is a MOVE there, which the pre-flight refuses
+        // as inside the installer cache. Which fixture this test should stand
+        // on is open and nothing here settles it.
         var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
         // Empty box: the browser opens first, so the tooltip warns of it rather
@@ -977,24 +979,23 @@ public class MainViewModelTests
         // another volume was on this one, which is the fault this change
         // removes, reintroduced by the machinery that made it cheap.
         var vm = CreateViewModel();
-        // THE CACHE FOLDER'S PATH ROOT, WHICH IS NOT THE CACHE'S VOLUME. Same
-        // string on every host here, so this pins the ordering and says nothing
-        // about which volume is which.
+        // THE FIXTURE'S VOLUME CANNOT AFFECT THIS TEST ON ANY HOST, AND THE
+        // TWO LINES BELOW ARE WHY. They are adjacent synchronous property sets,
+        // so the first resolve is still parked in its debounce when the second
+        // cancels it: the Task.Delay throws, ResolveDestinationVolumeAsync
+        // returns, and IsOnInstallerCacheDrive is never called for that path.
+        // The string is built from the cache folder's path root as in the test
+        // above; here it names a folder nothing asks a question about.
         //
-        // AND WHERE THEY PART THIS TEST STOPS EXERCISING ITS OWN SUBJECT
-        // WITHOUT GOING RED, WHICH IS WORSE THAN FAILING. The subject is a
-        // stale SAME-DRIVE answer being dropped when the box moves on. With a
-        // volume mounted at C:\Windows\Installer the folder built from this root
-        // is on another volume, so the first resolve answers false, there is no
-        // same-drive answer for the second to displace, and the assertion below
-        // passes on a run that never exercised the ordering at all. A green here
-        // is evidence about the ordering only where nothing is mounted between
-        // the path root and the cache folder.
-        //
-        // The fixture cannot be moved under the cache folder to fix that: the
-        // tooltip would then answer for a destination Move refuses as inside a
-        // Windows system folder, pinning the wording for a state no user can
-        // reach.
+        // SO WHAT THIS EXERCISES IS THE CANCEL AND NOT THE LATE LANDING, AND IT
+        // PASSES WITHOUT GOING NEAR ITS OWN NAME. The name is about a stale
+        // SAME-DRIVE answer being dropped when the box moves on, and no
+        // same-drive answer is ever produced here for anything to drop.
+        // ScheduleDestinationVolumeResolve cancels, which is one of the two
+        // halves that keep a stale answer out; the other is the token re-check
+        // on the way back, for a resolve whose debounce had already elapsed,
+        // and nothing here reaches it. That is not a limit of a particular
+        // host. It is every run.
         var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
         vm.Cleanup.MoveDestination = Path.Combine(cachePathRoot, "ic-test-backup");
