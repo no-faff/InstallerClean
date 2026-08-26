@@ -290,10 +290,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </summary>
     /// <remarks>
     /// The same debounce as the settings write-back, and the same constant: a
-    /// typist should fire one volume query when they stop, not one per
-    /// character. Sharing <see cref="MoveDestinationSaveDelay"/> rather than
-    /// adding a second constant keeps the two from drifting apart for no reason
-    /// anybody could later name.
+    /// typist should fire one resolve when they stop, not one per character, and
+    /// a resolve is two volume queries rather than the one it was before the
+    /// cache side started asking. Sharing <see cref="MoveDestinationSaveDelay"/>
+    /// rather than adding a second constant keeps the two from drifting apart
+    /// for no reason anybody could later name.
     ///
     /// THE CANCEL IS THE PART THAT MATTERS, more than the debounce. A resolve
     /// in flight belongs to the path that started it; if it landed after the box
@@ -339,8 +340,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // publish on the thread the binding is read from.
         //
         // No token on the Task.Run: the debounce is the cancellable part and it
-        // is over, the body is a single query with nothing to interrupt, and the
-        // token check below is what decides whether the answer is still wanted.
+        // is over, the body is two volume queries and a token cannot abandon a
+        // Win32 call once it has started, and the token check below is what
+        // decides whether the answer is still wanted.
         var onCacheVolume = await Task
             .Run(() => MoveSpaceCheck.IsOnInstallerCacheDrive(destination))
             .ConfigureAwait(true);
@@ -1754,12 +1756,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// drive-letter root, and a mounted folder has no letter, so
     /// StorageHelpers.GetDriveKind takes the mount point instead.
     ///
-    /// TWO VOLUME QUERIES RATHER THAN ONE, ON PURPOSE. The same-drive answer
-    /// comes from MoveSpaceCheck so that this window and the command line cannot
-    /// answer it differently, which is the reason that decision lives in Core at
-    /// all; threading the mount point out of it to save the second query would
-    /// buy back one call per Move and put that back at risk. This runs once per
-    /// operation, inside the pre-flight, off the dispatcher.
+    /// THREE VOLUME QUERIES RATHER THAN TWO, ON PURPOSE, AND IT WAS TWO RATHER
+    /// THAN ONE BEFORE THE CACHE SIDE STARTED ASKING. The same-drive answer comes
+    /// from MoveSpaceCheck so that this window and the command line cannot answer
+    /// it differently, which is the reason that decision lives in Core at all.
+    /// Two of the three are its own, one for the cache folder and one for the
+    /// destination; threading the destination's mount point out of it to save
+    /// the duplicate below would buy back one call per Move and put that back at
+    /// risk. This runs once per operation, inside the pre-flight, off the
+    /// dispatcher.
     /// </remarks>
     internal static string ClassifyMoveDestination(string dest)
     {

@@ -100,15 +100,15 @@ internal static class MoveSpaceCheck
     /// THE NAME SAYS DRIVE, THE QUESTION IS ABOUT A VOLUME, AND THAT IS KEPT
     /// RATHER THAN OVERLOOKED. <c>MoveDestinationKinds.SameDrive</c> is the
     /// literal <c>sameDrive</c> that goes into the result log and the opt-in
-    /// report, and the string cannot follow a rename made here: the receiver
-    /// allowlists the value and rejects a report carrying one it does not
-    /// know. Nothing on this side checks a kind against those constants, so a
-    /// reader who goes looking for that guard here finds none and can conclude
-    /// there is none. Renaming the method alone would leave the code
-    /// saying volume and the record it feeds saying drive, which is a worse
-    /// state than one loose word used consistently in both. What was actually
-    /// wrong with the name was never the noun: it said cache while the query
-    /// said system, and that is the half this change fixes.
+    /// report, and the string cannot follow a rename made here: it is a wire
+    /// value, matched at the receiving end against a fixed set of names.
+    /// Nothing on this side rejects a value outside them, so a reader who goes
+    /// looking for that guard here finds none and can conclude there is none.
+    /// Renaming the method alone would leave the code saying volume and the
+    /// record it feeds saying drive, which is a worse state than one loose word
+    /// used consistently in both. What was actually wrong with the name was
+    /// never the noun: it said cache while the query said system, and that is
+    /// the half this change fixes.
     ///
     /// The rest of the file already knew the case, which is what made this one
     /// method out of step rather than the app declining an exotic machine:

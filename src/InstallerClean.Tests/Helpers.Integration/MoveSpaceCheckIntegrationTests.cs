@@ -143,6 +143,14 @@ public class MoveSpaceCheckIntegrationTests
         // differently, and this goes red.
         //
         // Nothing creates the folder. The assertion below is what says so.
+        //
+        // AND THE ELEVATION CAVEAT ON
+        // IsOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root
+        // COVERS THIS TEST TOO, and covers both of its queries now the fixture
+        // stands under the cache folder rather than on a path root. The suite
+        // does not ask this question elevated and both hosts do, so a red here
+        // has to be shown to survive elevation before it means anything about
+        // the app.
         var missing = Path.Combine(
             InstallerCacheHelpers.InstallerFolder,
             $"ic-volume-{Guid.NewGuid():N}", "backup", "monthly");
@@ -186,6 +194,12 @@ public class MoveSpaceCheckIntegrationTests
         // Nothing is created or measured: RefusalFreeSpace returns on the
         // same-volume answer before it reaches the free-space figure at all,
         // which is the arm being pinned.
+        //
+        // The elevation caveat on
+        // IsOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root
+        // covers this test too, and covers both of its queries now the fixture
+        // stands under the cache folder. A red here has to be shown to survive
+        // elevation before it means anything about the app.
         var onCacheVolume = Path.Combine(InstallerCacheHelpers.InstallerFolder, "backup");
 
         Assert.Null(MoveSpaceCheck.RefusalFreeSpace(onCacheVolume, 1_000, 0));

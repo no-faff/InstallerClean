@@ -589,7 +589,7 @@ public class MainViewModelTests
         // fails. There is no path arithmetic here to correct: the fixture names
         // %TEMP% and the coincidence is the machine's rather than the test's.
         // Nor can it be pointed at the cache folder, which Move refuses as
-        // inside a Windows system folder before the classification is reached.
+        // inside the installer cache before the classification is reached.
         Assert.Contains("moved", vm.Completion.Heading);
     }
 
@@ -988,14 +988,16 @@ public class MainViewModelTests
         // above; here it names a folder nothing asks a question about.
         //
         // SO WHAT THIS EXERCISES IS THE CANCEL AND NOT THE LATE LANDING, AND IT
-        // PASSES WITHOUT GOING NEAR ITS OWN NAME. The name is about a stale
-        // SAME-DRIVE answer being dropped when the box moves on, and no
+        // PASSES WITHOUT GOING NEAR ITS OWN NAME, WHICH IS WORSE THAN FAILING.
+        // A red would say the subject is broken; a green here says nothing about
+        // the subject at all and reads as though it had. The name is about a
+        // stale SAME-DRIVE answer being dropped when the box moves on, and no
         // same-drive answer is ever produced here for anything to drop.
         // ScheduleDestinationVolumeResolve cancels, which is one of the two
         // halves that keep a stale answer out; the other is the token re-check
         // on the way back, for a resolve whose debounce had already elapsed,
-        // and nothing here reaches it. That is not a limit of a particular
-        // host. It is every run.
+        // and nothing here creates the case it is for. That is not a limit of a
+        // particular host. It is every run.
         var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
         vm.Cleanup.MoveDestination = Path.Combine(cachePathRoot, "ic-test-backup");

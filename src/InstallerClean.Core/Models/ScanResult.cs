@@ -509,6 +509,13 @@ public readonly record struct FileIdentityReadTally(
 ///
 /// THE LABELS INVERT THE REGISTRY VALUE, which disables rather than enables, so
 /// each says where short names are still being made.
+///
+/// WHY THIS APP RECORDS IT AT ALL, without which the labels read as trivia.
+/// <c>Installer</c> is nine characters, so on a volume still making aliases the
+/// cache folder has a short form of its own and a registered path can be spelled
+/// <c>C:\Windows\INSTAL~1\1a2b3c.msi</c>. What that costs, and what settles it,
+/// is <c>InstallerQueryService</c>'s business; this is the reading that says
+/// whether the machine was making them.
 /// </summary>
 public static class ShortNameCreationLabels
 {
@@ -522,8 +529,11 @@ public static class ShortNameCreationLabels
     public const string PerVolume = "perVolume";
 
     /// <summary>
-    /// Setting 3: creation is off everywhere but the system volume, which is the
-    /// volume <c>C:\Windows\Installer</c> is on.
+    /// Setting 3: creation is off everywhere but the system volume. Whether that
+    /// covers the installer cache is a question about the machine rather than
+    /// about the setting: the cache is on the system volume unless a volume is
+    /// mounted at <c>C:\Windows\Installer</c>, and on that machine this setting
+    /// leaves creation OFF for the cache.
     /// </summary>
     public const string SystemVolumeOnly = "systemVolumeOnly";
 

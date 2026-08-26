@@ -691,9 +691,9 @@ public class CleanupPreFlightTests
         //
         // THE FIXTURE CANNOT BE BUILT UNDER THE CACHE FOLDER TO FIX THAT, which
         // is the obvious repair and is closed off. Move refuses any destination
-        // resolving inside a Windows system folder, and the cache folder is one,
-        // so the pre-flight would reject it before the classification this test
-        // is about is ever reached.
+        // resolving inside the installer cache, on the first of the pre-flight's
+        // two path gates, so it would be rejected before the classification this
+        // test is about is ever reached.
         var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
         var sameDriveDestination = Path.Combine(cachePathRoot, "ic-test-samedrive");
         _confirmationService.ConfirmMove(
