@@ -187,10 +187,12 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// <inheritdoc />
     /// <remarks>
     /// IT HAS REAL WORK AGAIN FROM 3.0.0, having returned at its first guard while
-    /// nothing registered was offered. Its input is the patch claims naming a
-    /// surviving candidate, and a surviving superseded patch is named by every product
-    /// it is registered to, so the list is non-empty on any batch containing one. This
-    /// is the last check standing in front of a permanent delete.
+    /// nothing registered was offered. Its input is both halves the rule needs: the
+    /// claims naming a surviving candidate, and the claims on every product those
+    /// name. A surviving superseded patch is named by every product this scan could
+    /// read a cached path from, and the path that put it in the batch is one of those
+    /// reads, so the first half is non-empty on any batch containing one. This is the
+    /// last check standing in front of a permanent delete.
     ///
     /// IT RE-ASKS BOTH HALVES OF THE RULE THE OFFER RESTS ON. The loop below re-asks
     /// the batch's own pairings, and a path survives it only where every claim on it
@@ -206,9 +208,17 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// THE SECOND HALF IS KEYED READS AND NEVER AN ENUMERATION, which is what makes it
     /// affordable with the machine-wide lease held. The pre-lease pass has already
     /// worked out which pairings to look at, so this asks about records by name, and
-    /// every answer is about the record named, or reports there is no such record, or is
-    /// a read that failed. None of the three can pass for another, which is the property
-    /// an enumeration cannot offer.
+    /// every answer is about the record named rather than about the machine, which is
+    /// the property an enumeration cannot offer.
+    ///
+    /// A KEYED READ COMES BACK IN FOUR SHAPES AND THIS PASS TELLS THREE OF THEM APART.
+    /// They are a value, a positive "there is no such record", a read that failed, and
+    /// an answer that came back empty without having failed. The fourth is not yet told
+    /// from the first: an empty value fails the test for a zero, so it is reported as a
+    /// live claim on the rollback, while the scan reading the identical value calls it
+    /// unestablished, an inability rather than a finding. The path is held back on
+    /// either reading, so what the fourth shape costs is the cause named for it and not
+    /// the file.
     ///
     /// WHAT IS NARROWER HERE IS THE SET AND NOT THE QUESTION, and that residual is the
     /// part to know about. The pairings are the ones the pre-lease enumeration recorded
@@ -216,11 +226,20 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// patch that enumeration got no cached path for, a product it never returned even
     /// where the machine-wide patch enumeration names it, a product holding none of the
     /// batch's own patches that only a patch file's declared targets name, and anything
-    /// registered after the claims were collected. The scan's own condition asks every
-    /// product any of its sources names, against each product's registered patch set as
-    /// the registry lists it and worsened by what the enumeration read, which no list of
-    /// claims can match. A holder only that pass can see is covered up to its enumeration
-    /// and no further.
+    /// registered after the claims were collected. The first of those is larger than it
+    /// sounds: the sibling set is built out of the products the surviving claims name,
+    /// so where that pairing would have been a product's only claim on a surviving path
+    /// the whole product drops out of the set, and every other patch registered to it
+    /// goes with it, including one that could have condemned. The scan's own condition
+    /// asks every product any of its sources names, against each product's registered
+    /// patch set as the registry lists it and worsened by what the enumeration read,
+    /// which no list of claims can match. A holder only that pass can see is covered up
+    /// to its enumeration and no further.
+    ///
+    /// AND THE NARROWING IS A GAP AND NOT AN EQUIVALENCE. The question is the same and
+    /// the set is smaller, so nothing may write this up as re-running the scan's own
+    /// condition under the lease: a reading that does turns a bounded re-read of the
+    /// claims into a claim about every product on the machine.
     ///
     /// SO THE PRE-LEASE PASS IS STILL THE WIDER CHECK AND IS NO LONGER THE ONLY ONE. It
     /// re-runs the whole enumeration moments earlier and applies that condition at its
@@ -311,7 +330,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         // Keyed reads and never an enumeration, which is what makes it affordable under
         // the machine-wide lease: the pre-lease pass already worked out exactly which
         // pairings to look at, so this asks about records by name and each answer is
-        // about the record named or says there is no such record.
+        // about the record named rather than about the machine.
         //
         // ONE PRODUCT'S FAILURE CONDEMNS EVERY BATCH PATH ON THAT PRODUCT, which is the
         // shape of the condition rather than a shortcut: the patch's one cached file is
@@ -336,8 +355,8 @@ public sealed class RemovableReverifier : IRemovableReverifier
                     onThisProduct.UserSid, siblingContext,
                     Interop.MsiInstallProperty.Uninstallable);
 
-                // A POSITIVE ZERO IS THE ONLY CLEAN ANSWER, exactly as the scan's own
-                // reading of this has it. A record that is no longer registered is not a
+                // A POSITIVE ZERO IS THE ONLY CLEAN ANSWER, and the scan reads a
+                // zero the same way. A record that is no longer registered is not a
                 // patch that can be rolled back and does not condemn; anything else,
                 // including a read that failed and a value that is absent, does.
                 if (siblingUninstallable.NotRegistered) continue;
