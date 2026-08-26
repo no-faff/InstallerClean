@@ -30,19 +30,23 @@ const dir = 'src/InstallerClean.Core/Resources';
 const BASE = `${dir}/Strings.resx`;            // English source (the "neutral")
 const OUT = `${dir}/Strings.fr.resx`;
 
-// Universal keeps (brand names, pure-placeholder, size/elapsed formats). Do NOT
-// edit per language.
+// Universal keeps: keys whose value is the same in every language, the brand names
+// and the pure-placeholder announcement string. Their still-English value is NOT a
+// miss. Explicit by KEY on purpose: a future brand key then defaults to "flag until
+// someone adds it here", never silently passes. Do NOT translate these values. Do
+// NOT edit this list per language.
+//
+// The four size suffixes and the two elapsed suffixes were in this list until
+// 2026-08-26 and do not belong in it, because they are not universal: French writes
+// Go/Mo/Ko/o, Russian and Ukrainian write ГБ/МБ/КБ/Б and мс/с. Those three carry real
+// values in their MAP; the languages that do abbreviate as English does keep them in
+// ALSO_KEEP, which is the per-language list. Display.ListSeparator is the same shape,
+// for the same reason.
 const KEEP_ENGLISH = new Set([
   'Window.Main.Title',                 // InstallerClean
   'Startup.AlreadyRunningTitle',       // InstallerClean
   'Startup.UnhandledTitle',            // InstallerClean
   'Automation.ScanResultAnnouncement', // {0} ({1})
-  'Display.Size.GB',                   // {0:F2} GB
-  'Display.Size.MB',                   // {0:F1} MB
-  'Display.Size.KB',                   // {0:F1} KB
-  'Display.Size.B',                    // {0} B
-  'Display.Elapsed.Ms',                // {0:F0}ms
-  'Display.Elapsed.S',                 // {0:F1}s
 ]);
 
 // Per-language keeps: French words byte-identical to English. Both are genuine
@@ -55,6 +59,12 @@ const ALSO_KEEP = [
   // mark rather than a word, so there is nothing to translate and nothing to
   // get wrong; only ja and zh-Hans differ, taking the ideographic comma.
   'Display.ListSeparator',       // ", "
+  // The elapsed-time suffixes, which stay English where the four size
+  // suffixes above do not. "ms" and "s" are the SI symbols and French
+  // writes them exactly as English does; Go/Mo/Ko/o are abbreviated French
+  // words, so those are translated. Russian and Ukrainian localise both.
+  'Display.Elapsed.Ms',        // {0:F0}ms
+  'Display.Elapsed.S',         // {0:F1}s
 ];
 
 // Satellite-only CLDR plural overrides: keys absent from the neutral, appended
@@ -431,10 +441,10 @@ const MAP = {
   'Plural.Product.Plural': `produits`,
   'Plural.Patch.Singular': `correctif`,
   'Plural.Patch.Plural': `correctifs`,
-  'Display.Size.GB': `{0:F2} GB`,
-  'Display.Size.MB': `{0:F1} MB`,
-  'Display.Size.KB': `{0:F1} KB`,
-  'Display.Size.B': `{0} B`,
+  'Display.Size.GB': `{0:F2} Go`,
+  'Display.Size.MB': `{0:F1} Mo`,
+  'Display.Size.KB': `{0:F1} Ko`,
+  'Display.Size.B': `{0} o`,
   'Display.Elapsed.Ms': `{0:F0}ms`,
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ListSeparator': `, `,

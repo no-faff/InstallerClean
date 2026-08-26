@@ -31,9 +31,13 @@
 // FOR A NEW LANGUAGE
 //   1. Copy this file to scripts/translations/gen-strings-<code>.mjs.
 //   2. Set OUT (below) to src/InstallerClean.Core/Resources/Strings.<code>.resx.
-//   3. Translate every MAP value into your language. Leave KEEP_ENGLISH values
-//      as they are. If your language deliberately keeps an English word identical
-//      (e.g. some languages keep "Patch"), add that KEY to ALSO_KEEP.
+//   3. Translate every MAP value into your language. Leave the first four
+//      KEEP_ENGLISH values as they are and empty the rest of that list: the six
+//      unit suffixes it carries are a starting point, not a keep, and each one
+//      belongs in MAP if your language abbreviates a size or a duration its own way
+//      and in ALSO_KEEP if it abbreviates as English does. If your language
+//      deliberately keeps any other English word identical (e.g. some languages keep
+//      "Patch"), add that KEY to ALSO_KEEP too.
 //   4. Run from the repo root: node scripts/translations/gen-strings-<code>.mjs
 //      Chase it to GENERATION OK.
 //
@@ -73,16 +77,29 @@ const TEMPLATE_OUT = join(tmpdir(), 'Strings.template-output.resx');
 const OUT = TEMPLATE_OUT;
 const IS_TEMPLATE = OUT === TEMPLATE_OUT;
 
-// Universal keeps: keys whose value is the same in every language (brand names,
-// the pure-placeholder string, the size/elapsed format strings). Their still-
-// English value is NOT a miss. Explicit by KEY on purpose: a future brand/format
-// key then defaults to "flag until someone adds it here", never silently passes.
-// Do NOT translate these values. Do NOT edit this list per language.
+// The English starting point for the two keeps, and it is NOT what a finished
+// language looks like: THIS LIST IS THE ONE PLACE THE TEMPLATE DIFFERS FROM THE
+// FIFTEEN GENERATORS, and it differs on purpose. Only the first four are universal,
+// the brand names and the pure-placeholder announcement string, whose value is the
+// same in every language and whose still-English value is NOT a miss. Explicit by
+// KEY on purpose: a future brand key then defaults to "flag until someone adds it
+// here", never silently passes.
+//
+// The six unit suffixes below are HERE and nowhere else, because this file cannot
+// hold per-language state: ALSO_KEEP has to stay empty in template mode or the
+// self-check fails, and the untranslated gate does not run here, so the list is
+// documentation rather than a gate. In a real language they are not universal and
+// they are not in KEEP_ENGLISH at all. Decide, do not copy: French writes Go/Mo/Ko/o
+// and Russian and Ukrainian write ГБ/МБ/КБ/Б and мс/с, so all three translate them in
+// MAP, while the twelve that abbreviate as English does list them in ALSO_KEEP.
+// Windows Installer's own localised message tables are the authority worth reading
+// before deciding, and CLDR is the second. Display.ListSeparator is the same shape.
 const KEEP_ENGLISH = new Set([
   'Window.Main.Title',                 // InstallerClean
   'Startup.AlreadyRunningTitle',       // InstallerClean
   'Startup.UnhandledTitle',            // InstallerClean
   'Automation.ScanResultAnnouncement', // {0} ({1})
+  // Below this line: decide per language, and move each key to MAP or ALSO_KEEP.
   'Display.Size.GB',                   // {0:F2} GB
   'Display.Size.MB',                   // {0:F1} MB
   'Display.Size.KB',                   // {0:F1} KB

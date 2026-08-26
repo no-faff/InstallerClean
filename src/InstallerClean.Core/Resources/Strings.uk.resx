@@ -1262,12 +1262,12 @@ InstallerClean уже працював від імені адміністрат�
        string.Format with the consumer's CurrentCulture (so 1.5 GB
        becomes 1,5 GB on de-DE etc.); only the unit suffix and the
        sub-second long-form sentence are localisable. -->
-  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} GB</value></data>
-  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} MB</value></data>
-  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} KB</value></data>
-  <data name="Display.Size.B" xml:space="preserve"><value>{0} B</value></data>
-  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0}ms</value></data>
-  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1}s</value></data>
+  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} ГБ</value></data>
+  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} МБ</value></data>
+  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} КБ</value></data>
+  <data name="Display.Size.B" xml:space="preserve"><value>{0} Б</value></data>
+  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0} мс</value></data>
+  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1} с</value></data>
   <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>менш ніж секунду</value></data>
   <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1} секунди</value></data>
 

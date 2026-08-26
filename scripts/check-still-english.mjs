@@ -54,14 +54,20 @@ const parse = (file) => {
 const isMachineCliKey = (key) =>
   key.startsWith('Cli.') && key.includes('EventLog') && key !== 'Cli.EventLogUnavailable';
 
-// Universal keeps: format templates and the product name, byte-identical to
-// English in every language on purpose. Mirrors KEEP_ENGLISH in every
-// gen-strings-<code>.mjs (they are identical across all fifteen).
+// Universal keeps: the product name and the pure-placeholder announcement string,
+// byte-identical to English in every language on purpose. Mirrors KEEP_ENGLISH in
+// every gen-strings-<code>.mjs (they are identical across all fifteen; the template
+// carries six more and says why in its own comment).
+//
+// The four size suffixes and the two elapsed suffixes were in this list until
+// 2026-08-26 and were never universal: French writes Go/Mo/Ko/o and Russian and
+// Ukrainian write ГБ/МБ/КБ/Б and мс/с. They are a per-language keep below now, so a
+// language that abbreviates as English does still passes while a language that has
+// its own forms and has not taken them FAILS, which is what this check is for and
+// what the universal list was suppressing.
 const KEEP_ENGLISH = new Set([
   'Window.Main.Title', 'Startup.AlreadyRunningTitle', 'Startup.UnhandledTitle',
   'Automation.ScanResultAnnouncement',
-  'Display.Size.GB', 'Display.Size.MB', 'Display.Size.KB', 'Display.Size.B',
-  'Display.Elapsed.Ms', 'Display.Elapsed.S',
 ]);
 
 // Per-language keeps: a word a language deliberately renders identically to
@@ -72,20 +78,33 @@ const KEEP_ENGLISH = new Set([
 // exactly as English does. It could neither be translated nor left failing, so
 // it is a keep everywhere except ja and zh-Hans, which take the ideographic
 // comma and have a real value.
+//
+// The unit suffixes joined it on 2026-08-26 in the same shape. Twelve languages
+// abbreviate a size exactly as English does and keep all six; French keeps only
+// the two elapsed ones, "ms" and "s" being the SI symbols it writes unchanged
+// while Go/Mo/Ko/o are abbreviated French words; Russian and Ukrainian keep none,
+// taking ГБ/МБ/КБ/Б and мс/с. So ja and zh-Hans have an entry here where they had
+// none, and ru and uk keep only the separator.
+const SIZE_UNITS = ['Display.Size.GB', 'Display.Size.MB', 'Display.Size.KB', 'Display.Size.B'];
+const ELAPSED_UNITS = ['Display.Elapsed.Ms', 'Display.Elapsed.S'];
+const UNITS = [...SIZE_UNITS, ...ELAPSED_UNITS];
+
 const ALSO_KEEP = {
-  de: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Version.Display', 'Display.ListSeparator'],
-  es: ['Plural.Error.Singular', 'Display.ListSeparator'],
-  fr: ['Field.Application', 'Version.Display', 'Display.ListSeparator'],
-  id: ['Plural.File.Singular', 'Plural.Patch.Singular', 'Field.File', 'Display.ListSeparator'],
-  it: ['Field.File', 'Plural.File.Singular', 'Plural.Patch.Singular', 'Display.ListSeparator'],
-  ko: ['Display.ListSeparator'],
-  nl: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Plural.Product.Singular', 'Plural.Patch.Singular', 'Plural.Patch.Plural', 'Display.ListSeparator'],
-  pl: ['Display.ListSeparator'],
-  'pt-BR': ['Plural.Patch.Singular', 'Plural.Patch.Plural', 'Field.Patches', 'Section.Registered.Patches', 'Automation.Section.Patches', 'Display.ListSeparator'],
+  de: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Version.Display', 'Display.ListSeparator', ...UNITS],
+  es: ['Plural.Error.Singular', 'Display.ListSeparator', ...UNITS],
+  fr: ['Field.Application', 'Version.Display', 'Display.ListSeparator', ...ELAPSED_UNITS],
+  id: ['Plural.File.Singular', 'Plural.Patch.Singular', 'Field.File', 'Display.ListSeparator', ...UNITS],
+  it: ['Field.File', 'Plural.File.Singular', 'Plural.Patch.Singular', 'Display.ListSeparator', ...UNITS],
+  ja: [...UNITS],
+  ko: ['Display.ListSeparator', ...UNITS],
+  nl: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Plural.Product.Singular', 'Plural.Patch.Singular', 'Plural.Patch.Plural', 'Display.ListSeparator', ...UNITS],
+  pl: ['Display.ListSeparator', ...UNITS],
+  'pt-BR': ['Plural.Patch.Singular', 'Plural.Patch.Plural', 'Field.Patches', 'Section.Registered.Patches', 'Automation.Section.Patches', 'Display.ListSeparator', ...UNITS],
   ru: ['Display.ListSeparator'],
-  tr: ['Display.ListSeparator'],
+  tr: ['Display.ListSeparator', ...UNITS],
   uk: ['Display.ListSeparator'],
-  vi: ['Display.ListSeparator'],
+  vi: ['Display.ListSeparator', ...UNITS],
+  'zh-Hans': [...UNITS],
 };
 
 const neutral = parse('Strings.resx');

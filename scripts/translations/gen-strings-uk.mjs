@@ -12,17 +12,23 @@ const dir = 'src/InstallerClean.Core/Resources';
 const BASE = `${dir}/Strings.resx`;            // English source (the "neutral")
 const OUT = `${dir}/Strings.uk.resx`;
 
+// Universal keeps: keys whose value is the same in every language, the brand names
+// and the pure-placeholder announcement string. Their still-English value is NOT a
+// miss. Explicit by KEY on purpose: a future brand key then defaults to "flag until
+// someone adds it here", never silently passes. Do NOT translate these values. Do
+// NOT edit this list per language.
+//
+// The four size suffixes and the two elapsed suffixes were in this list until
+// 2026-08-26 and do not belong in it, because they are not universal: French writes
+// Go/Mo/Ko/o, Russian and Ukrainian write ГБ/МБ/КБ/Б and мс/с. Those three carry real
+// values in their MAP; the languages that do abbreviate as English does keep them in
+// ALSO_KEEP, which is the per-language list. Display.ListSeparator is the same shape,
+// for the same reason.
 const KEEP_ENGLISH = new Set([
   'Window.Main.Title',                 // InstallerClean
   'Startup.AlreadyRunningTitle',       // InstallerClean
   'Startup.UnhandledTitle',            // InstallerClean
   'Automation.ScanResultAnnouncement', // {0} ({1})
-  'Display.Size.GB',                   // {0:F2} GB
-  'Display.Size.MB',                   // {0:F1} MB
-  'Display.Size.KB',                   // {0:F1} KB
-  'Display.Size.B',                    // {0} B
-  'Display.Elapsed.Ms',                // {0:F0}ms
-  'Display.Elapsed.S',                 // {0:F1}s
 ]);
 
 const ALSO_KEEP = [
@@ -432,12 +438,12 @@ const MAP = {
   'Plural.Product.Plural': `продуктів`,
   'Plural.Patch.Singular': `виправлення`,
   'Plural.Patch.Plural': `виправлень`,
-  'Display.Size.GB': `{0:F2} GB`,
-  'Display.Size.MB': `{0:F1} MB`,
-  'Display.Size.KB': `{0:F1} KB`,
-  'Display.Size.B': `{0} B`,
-  'Display.Elapsed.Ms': `{0:F0}ms`,
-  'Display.Elapsed.S': `{0:F1}s`,
+  'Display.Size.GB': `{0:F2} ГБ`,
+  'Display.Size.MB': `{0:F1} МБ`,
+  'Display.Size.KB': `{0:F1} КБ`,
+  'Display.Size.B': `{0} Б`,
+  'Display.Elapsed.Ms': `{0:F0} мс`,
+  'Display.Elapsed.S': `{0:F1} с`,
   'Display.ListSeparator': `, `,
   'Display.ElapsedLong.LessThanASecond': `менш ніж секунду`,
   'Display.ElapsedLong.Seconds': `{0:F1} секунди`,

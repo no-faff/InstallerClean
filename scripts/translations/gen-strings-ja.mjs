@@ -33,24 +33,41 @@ const dir = 'src/InstallerClean.Core/Resources';
 const BASE = `${dir}/Strings.resx`;            // English source (the "neutral")
 const OUT = `${dir}/Strings.ja.resx`;
 
-// Universal keeps (brand names, pure-placeholder, size/elapsed formats).
+// Universal keeps: keys whose value is the same in every language, the brand names
+// and the pure-placeholder announcement string. Their still-English value is NOT a
+// miss. Explicit by KEY on purpose: a future brand key then defaults to "flag until
+// someone adds it here", never silently passes. Do NOT translate these values. Do
+// NOT edit this list per language.
+//
+// The four size suffixes and the two elapsed suffixes were in this list until
+// 2026-08-26 and do not belong in it, because they are not universal: French writes
+// Go/Mo/Ko/o, Russian and Ukrainian write ГБ/МБ/КБ/Б and мс/с. Those three carry real
+// values in their MAP; the languages that do abbreviate as English does keep them in
+// ALSO_KEEP, which is the per-language list. Display.ListSeparator is the same shape,
+// for the same reason.
 const KEEP_ENGLISH = new Set([
   'Window.Main.Title',
   'Startup.AlreadyRunningTitle',
   'Startup.UnhandledTitle',
   'Automation.ScanResultAnnouncement',
-  'Display.Size.GB',
-  'Display.Size.MB',
-  'Display.Size.KB',
-  'Display.Size.B',
-  'Display.Elapsed.Ms',
-  'Display.Elapsed.S',
 ]);
 
 // Per-language keeps: Japanese values byte-identical to English (genuine
 // single-token matches, not misses). The self-check prints these so the keep
 // stays honest.
-const ALSO_KEEP = [];
+const ALSO_KEEP = [
+  // The size and elapsed unit suffixes. Japanese abbreviates them exactly as
+  // English does, so there is nothing to translate and nothing to get wrong.
+  // A per-language keep rather than a universal one because fr, ru and uk do
+  // NOT: French takes Go/Mo/Ko/o, Russian and Ukrainian take ГБ/МБ/КБ/Б and
+  // мс/с, and all three carry real values in their MAP.
+  'Display.Size.GB',           // {0:F2} GB
+  'Display.Size.MB',           // {0:F1} MB
+  'Display.Size.KB',           // {0:F1} KB
+  'Display.Size.B',            // {0} B
+  'Display.Elapsed.Ms',        // {0:F0}ms
+  'Display.Elapsed.S',         // {0:F1}s
+];
 
 const MAP = {
   'Window.Main.Title': `InstallerClean`,

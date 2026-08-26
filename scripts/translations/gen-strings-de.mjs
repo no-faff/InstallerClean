@@ -27,19 +27,23 @@ const dir = 'src/InstallerClean.Core/Resources';
 const BASE = `${dir}/Strings.resx`;            // English source (the "neutral")
 const OUT = `${dir}/Strings.de.resx`;
 
-// Universal keeps: values identical in every language (brand names, the pure-
-// placeholder string, the size/elapsed format strings). Do NOT edit per language.
+// Universal keeps: keys whose value is the same in every language, the brand names
+// and the pure-placeholder announcement string. Their still-English value is NOT a
+// miss. Explicit by KEY on purpose: a future brand key then defaults to "flag until
+// someone adds it here", never silently passes. Do NOT translate these values. Do
+// NOT edit this list per language.
+//
+// The four size suffixes and the two elapsed suffixes were in this list until
+// 2026-08-26 and do not belong in it, because they are not universal: French writes
+// Go/Mo/Ko/o, Russian and Ukrainian write ГБ/МБ/КБ/Б and мс/с. Those three carry real
+// values in their MAP; the languages that do abbreviate as English does keep them in
+// ALSO_KEEP, which is the per-language list. Display.ListSeparator is the same shape,
+// for the same reason.
 const KEEP_ENGLISH = new Set([
   'Window.Main.Title',                 // InstallerClean
   'Startup.AlreadyRunningTitle',       // InstallerClean
   'Startup.UnhandledTitle',            // InstallerClean
   'Automation.ScanResultAnnouncement', // {0} ({1})
-  'Display.Size.GB',                   // {0:F2} GB
-  'Display.Size.MB',                   // {0:F1} MB
-  'Display.Size.KB',                   // {0:F1} KB
-  'Display.Size.B',                    // {0} B
-  'Display.Elapsed.Ms',                // {0:F0}ms
-  'Display.Elapsed.S',                 // {0:F1}s
 ]);
 
 // Per-language keeps: German words that are byte-identical to the English source
@@ -56,6 +60,17 @@ const ALSO_KEEP = [
   // mark rather than a word, so there is nothing to translate and nothing to
   // get wrong; only ja and zh-Hans differ, taking the ideographic comma.
   'Display.ListSeparator',       // ", "
+  // The size and elapsed unit suffixes. German abbreviates them exactly as
+  // English does, so there is nothing to translate and nothing to get wrong.
+  // A per-language keep rather than a universal one because fr, ru and uk do
+  // NOT: French takes Go/Mo/Ko/o, Russian and Ukrainian take ГБ/МБ/КБ/Б and
+  // мс/с, and all three carry real values in their MAP.
+  'Display.Size.GB',           // {0:F2} GB
+  'Display.Size.MB',           // {0:F1} MB
+  'Display.Size.KB',           // {0:F1} KB
+  'Display.Size.B',            // {0} B
+  'Display.Elapsed.Ms',        // {0:F0}ms
+  'Display.Elapsed.S',         // {0:F1}s
 ];
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.
