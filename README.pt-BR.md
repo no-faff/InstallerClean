@@ -252,7 +252,7 @@ Se algo aqui atrapalhar você, [abra uma issue](../../issues). Problemas de aces
 **Vou realmente liberar vários GB de espaço?** Depende da sua máquina. Uma instalação limpa do Windows 11 sem programas extras não tem nada para remover. Uma estação de trabalho de desenvolvimento usada há muito tempo, ou qualquer máquina com muito programa baseado em MSI (Acrobat, Office, LibreOffice, ferramentas de desenvolvimento grandes), pode ter dezenas de GB. De um jeito ou de outro, você vê exatamente quanto no momento em que executa.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Desde a v1.8.0 existe a opção de enviar um breve relatório anônimo do resultado. Chegaram 234 até agora (obrigado a todos 🙏) e, das 63% de máquinas que tinham algo a limpar, a mediana liberada é 16,8 GB. Uma delas recuperou nada menos que 462 GB. Veja um resumo dos resultados.
+Desde a v1.8.0 existe a opção de enviar um breve relatório anônimo do resultado. Chegaram 235 até agora (obrigado a todos 🙏) e, das 63% de máquinas que tinham algo a limpar, a mediana liberada é 16,8 GB. Uma delas recuperou nada menos que 462 GB. Veja um resumo dos resultados.
 
 <p align="center">
   <picture>

@@ -252,7 +252,7 @@ Jeśli cokolwiek tutaj ci przeszkadza, [zgłoś problem](../../issues). Problemy
 **Czy naprawdę zwolnię GB miejsca?** To zależy od twojej maszyny. Czysta instalacja Windows 11 bez dodatkowego oprogramowania nie ma nic do usunięcia. Długo używana stacja robocza dewelopera albo dowolna maszyna z dużą ilością oprogramowania opartego na MSI (Acrobat, Office, LibreOffice, duże narzędzia deweloperskie) może mieć dziesiątki GB. Tak czy inaczej, dokładnie zobaczysz ile, w chwili gdy ją uruchomisz.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Od wersji v1.8.0 można przysłać krótki anonimowy raport z wyniku. Do tej pory przyszło ich 234 (dzięki wszystkim 🙏), a na tych 63% maszyn, które miały coś do wyczyszczenia, mediana zwolnionego miejsca to 16,8 GB. Jedna maszyna odzyskała aż 462 GB. Oto podsumowanie wyników.
+Od wersji v1.8.0 można przysłać krótki anonimowy raport z wyniku. Do tej pory przyszło ich 235 (dzięki wszystkim 🙏), a na tych 63% maszyn, które miały coś do wyczyszczenia, mediana zwolnionego miejsca to 16,8 GB. Jedna maszyna odzyskała aż 462 GB. Oto podsumowanie wyników.
 
 <p align="center">
   <picture>
