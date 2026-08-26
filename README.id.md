@@ -252,7 +252,7 @@ Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues
 **Apakah saya benar-benar akan mengosongkan ruang sebesar GB?** Tergantung mesin Anda. Instalasi Windows 11 yang bersih tanpa perangkat lunak tambahan tidak punya apa pun untuk dihapus. Workstation pengembang yang sudah lama berjalan, atau mesin mana pun dengan banyak perangkat lunak berbasis MSI (Acrobat, Office, LibreOffice, alat pengembangan besar), bisa menyimpan puluhan GB. Apa pun keadaannya, Anda akan melihat persis berapa banyak begitu menjalankannya.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Sejak v1.8.0 ada opsi untuk mengirim laporan anonim singkat tentang hasilnya. Sejauh ini 236 laporan sudah masuk (terima kasih semuanya 🙏), dan dari 64% mesin yang punya sesuatu untuk dibersihkan, median yang dikosongkan adalah 16,8 GB. Satu mesin sampai mengosongkan 462 GB. Berikut ringkasan hasilnya.
+Sejak v1.8.0 ada opsi untuk mengirim laporan anonim singkat tentang hasilnya. Sejauh ini 237 laporan sudah masuk (terima kasih semuanya 🙏), dan dari 64% mesin yang punya sesuatu untuk dibersihkan, median yang dikosongkan adalah 16,8 GB. Satu mesin sampai mengosongkan 462 GB. Berikut ringkasan hasilnya.
 
 <p align="center">
   <picture>

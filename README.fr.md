@@ -252,7 +252,7 @@ Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problème
 **Vais-je vraiment libérer des Go d'espace ?** Ça dépend de votre machine. Une installation neuve de Windows 11 sans logiciel supplémentaire n'a rien à supprimer. Une station de développement utilisée de longue date, ou toute machine chargée de logiciels basés sur MSI (Acrobat, Office, LibreOffice, gros outils de développement), peut en contenir des dizaines de Go. Dans tous les cas, vous verrez exactement combien dès que vous la lancez.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Depuis la v1.8.0, il est possible d'envoyer un bref rapport anonyme du résultat. 236 nous sont parvenus jusqu'ici (merci à tous 🙏) et, sur les 64 % de machines qui avaient quelque chose à nettoyer, la médiane libérée est de 16,8 Go. Une machine a récupéré la bagatelle de 462 Go. Voici un résumé des résultats.
+Depuis la v1.8.0, il est possible d'envoyer un bref rapport anonyme du résultat. 237 nous sont parvenus jusqu'ici (merci à tous 🙏) et, sur les 64 % de machines qui avaient quelque chose à nettoyer, la médiane libérée est de 16,8 Go. Une machine a récupéré la bagatelle de 462 Go. Voici un résumé des résultats.
 
 <p align="center">
   <picture>
