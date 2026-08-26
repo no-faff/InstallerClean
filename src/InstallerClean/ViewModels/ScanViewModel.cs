@@ -161,16 +161,31 @@ public partial class ScanViewModel : ObservableObject
     private string _missingFromDiskPrograms = string.Empty;
 
     /// <summary>
-    /// Installed products the last scan could not account for, straight from
-    /// <see cref="ScanResult.UnaccountedProductCount"/>, whose remarks say what
-    /// goes into it and why it is neither confined to records that failed to read
-    /// nor an exact headcount. Non-zero drives the line saying the records were
-    /// not fully read. Nothing shows the figure itself.
+    /// How many superseded files this scan held back, straight from
+    /// <see cref="ScanResult.WithheldCount"/>: rows the records call superseded
+    /// whose file is on the disk and which the scan would have offered, had it
+    /// been able to say that nothing still needed them. Both the flag and the line
+    /// below are read off it, so a machine cannot show the sentence and no number
+    /// or the reverse.
+    ///
+    /// WHAT THIS REPLACED, BECAUSE THE FIELD IT REPLACED WAS THE FAULT. The line
+    /// was gated on the count of products the scan could not account for, which is
+    /// the trigger for ONE of the six routes into this count rather than a count of
+    /// files at all. A machine meeting that condition with no superseded file on it
+    /// was told something had been kept back when nothing had. The count that the
+    /// sentence prints is the only thing that can gate the sentence.
+    ///
+    /// IT IS NOT THE PARTITION MEMBER and must not be pointed at it.
+    /// <see cref="ScanResult.RegisteredWithheldCount"/> counts the same rows
+    /// whether or not their file is still there, because the registered-files
+    /// window lists them; this one is what the withholding COST, and a row whose
+    /// file has already gone cost nothing. It is the on-disk term that makes this
+    /// read zero on a machine that is simply tidy.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasRecordsNotMatched))]
-    [NotifyPropertyChangedFor(nameof(RecordsNotMatchedText))]
-    private int _unaccountedProductCount;
+    [NotifyPropertyChangedFor(nameof(HasSupersededHeldBack))]
+    [NotifyPropertyChangedFor(nameof(SupersededHeldBackText))]
+    private int _supersededHeldBackCount;
 
     /// <summary>
     /// Cached result of the most recent successful scan. Null until
@@ -251,31 +266,49 @@ public partial class ScanViewModel : ObservableObject
             MissingFromDiskCount, MissingFromDiskPrograms);
 
     /// <summary>
-    /// True when the last scan could not account for everything the Windows
-    /// Installer records hold, so it did not read all of them. Informational,
-    /// unlike <see cref="HasMissingFromDisk"/>: nothing is wrong with the machine
-    /// and there is nothing for the user to do. It is shown because a scan that
-    /// saw less than usual without saying so is the fault this line exists to
-    /// avoid.
+    /// True where this scan held back a superseded file it might otherwise have
+    /// offered. Informational, unlike <see cref="HasMissingFromDisk"/>: nothing is
+    /// wrong with the machine and there is nothing for the user to do. It is shown
+    /// because withholding is this app working and saying nothing about it is not,
+    /// and because the offer above is the only thing the reader can see.
     ///
-    /// IT BEARS ON THE OFFER AS WELL AS ON THE MISSING-FILES LINE, AND THE SENTENCE
-    /// SAYING OTHERWISE WAS TRUE FOR SIX DAYS. InstallerQueryService takes the removable
-    /// verdict off every superseded row on this condition, so a run that meets it offers
-    /// no superseded patch at all. That was not so between 2026-08-11 and 2026-08-17,
-    /// when the class was out of the offer entirely and the condition therefore could
-    /// not touch it; the class came back and this line was not re-read. What the
-    /// missing-files half adds, and it is an addition rather than the whole, is that a
-    /// registration this scan never reached is one whose file, had it gone, went
-    /// uncounted.
+    /// GATED ON THE COUNT IT PRINTS, exactly as <see cref="HasNothingListed"/> is,
+    /// and the two are the same sentence about two populations. What it used to be
+    /// gated on was the machine-wide refusal, which is one of six routes into this
+    /// count rather than the count itself; see <see cref="SupersededHeldBackCount"/>
+    /// for what that cost. THAT ROUTE IS STILL THE ONE THAT MATTERS MOST TO THIS
+    /// LINE, WHICH IS WHY LOSING THE GATE IS NOT LOSING THE SUBJECT: it is the only
+    /// one of the six that reaches the whole population at once, taking the removable
+    /// verdict off every superseded row, so it is what makes this sentence report a
+    /// large number rather than a handful. Its own account, and the six days in
+    /// August when the opposite was true, are on
+    /// <see cref="InstallerQueryResult.UnaccountedProductCount"/> and on
+    /// <c>CliEventClass.ScanRecordsIncompleteNotice</c>.
     ///
-    /// The count gates the line and does not appear in it. Four different things
-    /// contribute to it and only two are failures to read, so it is an estimate
-    /// that can come out high as well as low; a figure on screen would be a
-    /// precision the scan has not got.
+    /// NO SECOND TERM, AND THAT IS A DECISION RATHER THAN AN OMISSION. The line
+    /// above folds "something was offered" into its own count, because where
+    /// nothing is offered the completion screen carries that sentence in its own
+    /// words. There is no such copy for this population: a machine whose walk was
+    /// fine and whose every superseded row was withheld reaches ShowAllClear, which
+    /// says the folder is clean. Fold the same term in here and that machine is
+    /// told nothing, anywhere, once the overlay is dismissed.
     /// </summary>
-    public bool HasRecordsNotMatched => UnaccountedProductCount > 0;
+    public bool HasSupersededHeldBack => SupersededHeldBackCount > 0;
 
-    public string RecordsNotMatchedText => Strings.Summary_RecordsNotMatched;
+    /// <summary>
+    /// The sentence, and it is the pair of <see cref="NothingListedText"/> rather
+    /// than a different kind of line: one rule reaching two populations, which is
+    /// why both open the same way. It names no cause, six separate findings
+    /// reaching this count and no sentence naming one of them being true of the
+    /// files the other five contribute.
+    /// </summary>
+    public string SupersededHeldBackText =>
+        string.Format(
+            DisplayHelpers.Pluralise(SupersededHeldBackCount,
+                Strings.Summary_SupersededHeldBack_Singular,
+                Strings.Summary_SupersededHeldBack_Plural,
+                "Summary.SupersededHeldBack"),
+            SupersededHeldBackCount);
 
     /// <summary>
     /// True where this scan emptied its walk-derived offer in one go and something
@@ -394,7 +427,12 @@ public partial class ScanViewModel : ObservableObject
             // payload, where a public chart reads it with no version gate.
             MissingFromDiskCount = result.MissingAffectedCount;
             MissingFromDiskPrograms = missingPrograms;
-            UnaccountedProductCount = result.UnaccountedProductCount;
+            // OFF THE SCAN'S OWN COST FIGURE, not off the machine-wide trigger the
+            // line used to read. ScanResult.UnaccountedProductCount is untouched and
+            // still travels in the opt-in report and the command line's event log; it
+            // simply no longer decides what this window says, being the trigger for
+            // one of six routes into the count rather than a count of files.
+            SupersededHeldBackCount = result.WithheldCount;
             // Off the flag rather than off the withheld list's own length: that list
             // is filled by two separate decisions and only one of them is what this
             // sentence is about. The flag is false on a run whose wholesale branch

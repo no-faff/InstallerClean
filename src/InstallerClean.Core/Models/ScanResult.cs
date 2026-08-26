@@ -133,7 +133,10 @@ namespace InstallerClean.Models;
 /// they are simply not offered, and they have their own count. This paragraph and
 /// the line above it said "superseded or obsoleted" while this one said the
 /// opposite, and the predicate settles it: nothing reaches the flag without having
-/// carried IsRemovable, and IsRemovablePatch requires state 2.
+/// carried IsRemovable, and IsRemovablePatch requires state 2. THAT IS A
+/// USER-FACING CLAIM NOW RATHER THAN AN INTERNAL ONE: both hosts name the class in
+/// as many words (<c>Summary.SupersededHeldBack</c>, <c>Cli.SupersededHeldBack</c>),
+/// so this count and that noun have to agree.
 ///
 /// AND A PRODUCT THAT COULD ROLL BACK ONTO THE FILE IS NOT IN IT EITHER, WHICH THIS
 /// NOTE USED TO LIST AS A CONTRIBUTOR. That condition is

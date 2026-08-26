@@ -923,22 +923,43 @@ internal static class Program
                     arg, heldBack, DisplayHelpers.PluraliseFile(heldBack)));
         }
 
+        // SUPERSEDED FILES HELD BACK. Word for word the sentence the window prints,
+        // which it did not used to be: the window's old version closed on Re-scan and
+        // this surface has no such button, and the clause that would still have forced
+        // them apart came off both. It names no cause, six separate findings reaching
+        // this count and no sentence naming one of them being true of the files the
+        // other five contribute; the string's own remarks carry that and why
+        // "superseded" is earned.
+        if (scanResult.WithheldCount > 0)
+            Console.WriteLine(string.Format(
+                DisplayHelpers.Pluralise(scanResult.WithheldCount,
+                    Strings.Cli_SupersededHeldBack_Singular,
+                    Strings.Cli_SupersededHeldBack_Plural,
+                    "Cli.SupersededHeldBack"),
+                scanResult.WithheldCount));
+
+        // AND THE NOTICE IS ITS OWN CONDITION NOW, WHICH IS THE WHOLE POINT OF THE
+        // SPLIT. The two sat in one branch for as long as the human line was gated on
+        // this figure. That line has moved onto the count of files held back and this
+        // has not moved at all, deliberately: Event ID 3000 is a machine surface with
+        // an RMM filter downstream and this figure is its payload, so re-gating it
+        // would have changed which machines log it with every test still green. A
+        // measurement that goes quiet reads exactly like nothing being wrong.
+        //
+        // THEY ARE NOT TWO VIEWS OF ONE QUANTITY. This counts entries in the records
+        // that could not be matched up, which is the trigger for ONE of the six routes
+        // into the count above. A machine can meet either condition without the other,
+        // and the commonest is meeting this one with no superseded file to hold back.
+        //
+        // The count does not appear in the human line and does appear here. Four
+        // different things contribute to it and only two are failures to read, so it
+        // is an estimate that can come out high as well as low: a precision a sentence
+        // must not claim, and a number an RMM needs to hang a filter on. See
+        // MachineContract for what that figure is worth.
         if (scanResult.UnaccountedProductCount > 0)
-        {
-            // The command line's own sentence, not the window's Summary.* one.
-            // That closes on Re-scan, which is a button this surface has not got.
-            //
-            // The count gates the line and does not appear in it. Five different
-            // things contribute to it and the total is an estimate rather than a
-            // headcount, so any figure printed here would be a precision the app
-            // has not got; the event-log line below keeps its own copy because an
-            // RMM needs a number to hang a filter on, and the machine contract
-            // records what that figure is worth.
-            Console.WriteLine(Strings.Cli_RecordsNotMatched);
             MachineContract.WriteEventLog(CliEventClass.ScanRecordsIncompleteNotice,
                 () => string.Format(Strings.Cli_EventLogScanWithheld,
                     arg, scanResult.UnaccountedProductCount));
-        }
 
         // THE AFFECTED HALF, and the two hosts must not diverge on which population
         // this is. A registration whose absence the app positively established to be

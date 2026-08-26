@@ -322,33 +322,37 @@
                             AutomationProperties.HelpText="{loc:Translate Automation.ViewRegisteredFiles.HelpText}"/>
                 </Grid>
 
-                <!-- FIRST OF THE THREE FOOTNOTES, AND THE ORDER IS THE POINT RATHER
-                     THAN THE HISTORY. This one is about the LIST the reader is looking
-                     at and it qualifies the two counts directly above it; the two below
+                <!-- FIRST OF THE THREE FOOTNOTES, AND THE ORDER IS AN OPEN QUESTION
+                     RATHER THAN A SETTLED ONE. It was settled on the ground that this
+                     line is about the LIST the reader is looking at while the two below
                      are about the Windows records and about files that are not in the
-                     folder, which is a different subject. It read last until somebody
-                     rendered the whole block together and saw that it did not belong
-                     there.
+                     folder, a different subject. HALF OF THAT PREMISE HAS GONE. The
+                     third footnote used to report that the records could not all be
+                     read; it now reports that superseded files were held back, which is
+                     this line's own subject reaching the other half of the scan. The
+                     two are a pair and the warning sits between them.
 
-                     WHAT IT SAYS AND WHY IT HAS TO. The explanation at the top of this
-                     window states two criteria for listing a file, and on this machine
-                     the first one did not run: files no program claims are in that
-                     folder and were held back rather than listed, so a reader taking
-                     that explanation as the rule behind the list concludes there were
-                     none of them.
+                     SO THE ARGUMENT FOR THE ORDER IS NOT RESTATED HERE, having rested
+                     on a distinction that no longer separates them; a settlement
+                     resting on withdrawn wording is worse than none. Nothing about the
+                     order has been shown to be wrong. It has not been looked at since
+                     the pair existed, and whoever looks is deciding whether the two
+                     held-back lines belong together with the warning under them or
+                     apart as they are.
 
-                     AND THE ADJACENCY BELOW IS KNOWN AND ACCEPTED. The records line two
-                     footnotes down opens "InstallerClean couldn't match up everything in
-                     the Windows records" and then says the unneeded files above are
-                     unaffected, which is scoped by its own opening clause to that
-                     problem and says what it means. That pair was rewritten and settled
-                     in August and is not reopened for how it reads beside this one.
+                     WHAT THIS ONE SAYS AND WHY IT HAS TO. The explanation at the top of
+                     this window states two criteria for listing a file, and on this
+                     machine the first one did not run: files no program claims are in
+                     that folder and were held back rather than listed, so a reader
+                     taking that explanation as the rule behind the list concludes there
+                     were none of them.
 
                      Same low-emphasis treatment as the two below and the same Polite
                      live setting, being a fact about the scan rather than something to
-                     act on. It cannot appear on the all-clear: with nothing offered the
-                     completion screen replaces this surface and carries the same
-                     sentence in its own words. -->
+                     act on. It cannot appear on the all-clear, and its own count is
+                     what does that rather than the screen in front of it: the
+                     completion screen is dismissible, so a line left switched on would
+                     be read on the window underneath. -->
                 <TextBlock x:Name="NothingListedText"
                            Visibility="{Binding Scan.HasNothingListed, Converter={StaticResource BoolToVis}}"
                            Text="{Binding Scan.NothingListedText}"
@@ -384,16 +388,26 @@
                                AutomationProperties.LiveSetting="Polite"/>
                 </DockPanel>
 
-                <!-- Programs the scan could not read (informational). Their
-                     records were unreadable, so this scan kept every superseded
-                     patch rather than judge one on an incomplete picture. Same
-                     low-emphasis treatment as the stale-entries line above and
-                     for the same reason: nothing is wrong with the machine and
-                     there is nothing to do. It earns a line because without one
-                     the only symptom is a quietly shorter list. -->
-                <TextBlock x:Name="RecordsNotMatchedText"
-                           Visibility="{Binding Scan.HasRecordsNotMatched, Converter={StaticResource BoolToVis}}"
-                           Text="{Binding Scan.RecordsNotMatchedText}"
+                <!-- Superseded files this scan held back (informational), and the
+                     pair of the first footnote rather than a different kind of line:
+                     the same sentence about the other half of the scan. The app could
+                     not establish that nothing still needed them, so it kept them.
+                     Same low-emphasis treatment as the line above and for the same
+                     reason, nothing being wrong with the machine and there being
+                     nothing for the user to do.
+
+                     IT NAMES NO CAUSE, AND THE STRING'S OWN REMARKS CARRY WHY: six
+                     separate findings reach this count, so a sentence naming one of
+                     them is false of the files the other five contribute.
+
+                     GATED ON THE COUNT IT PRINTS. It was gated on the count of
+                     products the scan could not account for, which is the trigger for
+                     one of those six routes rather than a count of files at all, so it
+                     could appear on a machine that had held nothing back and tell its
+                     owner otherwise. -->
+                <TextBlock x:Name="SupersededHeldBackText"
+                           Visibility="{Binding Scan.HasSupersededHeldBack, Converter={StaticResource BoolToVis}}"
+                           Text="{Binding Scan.SupersededHeldBackText}"
                            Foreground="{StaticResource Text.Muted}"
                            FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
                            TextWrapping="Wrap"

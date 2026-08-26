@@ -170,6 +170,7 @@ internal static class DisplayHelpers
             or "Confirm.DeletePermanently"
             or "Error.AccessDenied" or "Error.FileInUse" or "Error.IOFailure"
             or "Error.UnknownError" or "Summary.NothingListed"
+            or "Cli.SupersededHeldBack" or "Summary.SupersededHeldBack"
             => CountQuestion.Cardinality,
 
         _ => throw new ArgumentOutOfRangeException(nameof(keyPrefix), keyPrefix,

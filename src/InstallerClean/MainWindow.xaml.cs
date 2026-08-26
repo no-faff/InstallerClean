@@ -600,8 +600,8 @@ public partial class MainWindow : Window
             AnnounceLiveRegions(PendingRebootBannerText);
         if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
             AnnounceLiveRegions(MissingFromDiskBannerText);
-        if (e.PropertyName == nameof(ScanViewModel.HasRecordsNotMatched) && _vm.Scan.HasRecordsNotMatched)
-            AnnounceLiveRegions(RecordsNotMatchedText);
+        if (e.PropertyName == nameof(ScanViewModel.HasSupersededHeldBack) && _vm.Scan.HasSupersededHeldBack)
+            AnnounceLiveRegions(SupersededHeldBackText);
     }
 
     // Routes focus to the move-destination field, the entry point of the Move

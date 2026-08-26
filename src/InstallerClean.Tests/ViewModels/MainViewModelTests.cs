@@ -2317,38 +2317,55 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task ScanViewModel_HasRecordsNotMatched_tracks_UnaccountedProductCount()
+    public async Task ScanViewModel_HasSupersededHeldBack_tracks_WithheldCount()
     {
-        // A scan that could not account for everything the records hold kept its
-        // superseded patches back. Without this line the only symptom is a quietly
-        // shorter list, so the line is the whole point of the count reaching the VM.
+        // A scan that held a superseded file back says so, and says how many. The
+        // count both gates the line and appears in it, which is the whole of why it
+        // reaches the VM at all.
         var vm = CreateViewModel();
 
         var scan = new ScanResult(
             RemovableFiles: Array.Empty<OrphanedFile>(),
             RegisteredPackages: Array.Empty<RegisteredPackage>(),
             RegisteredTotalBytes: 0,
-            UnaccountedProductCount: 3);
+            WithheldCount: 3);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        Assert.True(vm.Scan.HasRecordsNotMatched);
-        Assert.Equal(3, vm.Scan.UnaccountedProductCount);
-        // The count gates the line and stays out of it. Four different things feed
-        // that number, only two are failures to read, and a registry key an
-        // uninstall left behind is one of them with no installed program answering
-        // to it, so a figure on screen would be a precision the scan has not got.
-        // Pinned as a negative because the count reaching the VM and the count
-        // reaching the user are now different questions, and the assertion that
-        // used to stand here was the second one answering yes.
-        Assert.Equal(Strings.Summary_RecordsNotMatched, vm.Scan.RecordsNotMatchedText);
-        Assert.DoesNotContain("3", vm.Scan.RecordsNotMatchedText);
+        Assert.True(vm.Scan.HasSupersededHeldBack);
+        Assert.Equal(3, vm.Scan.SupersededHeldBackCount);
+        Assert.Equal(
+            string.Format(Strings.Summary_SupersededHeldBack_Plural, 3),
+            vm.Scan.SupersededHeldBackText);
+        Assert.Contains("3", vm.Scan.SupersededHeldBackText, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task ScanViewModel_HasRecordsNotMatched_is_false_on_a_healthy_scan()
+    public async Task ScanViewModel_SupersededHeldBackText_asserts_oneness_in_words_at_one()
+    {
+        // The one-form carries no numeral, which is what makes the prefix a
+        // cardinality string rather than a grammatical one (DisplayHelpers.
+        // QuestionFor). Pinned here as well as in CountedStringTests because this is
+        // the surface that renders it, and the two questions are answered by
+        // different code.
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                RemovableFiles: Array.Empty<OrphanedFile>(),
+                RegisteredPackages: Array.Empty<RegisteredPackage>(),
+                RegisteredTotalBytes: 0,
+                WithheldCount: 1));
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.Equal(Strings.Summary_SupersededHeldBack_Singular, vm.Scan.SupersededHeldBackText);
+        Assert.DoesNotContain("1", vm.Scan.SupersededHeldBackText, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ScanViewModel_HasSupersededHeldBack_is_false_on_a_healthy_scan()
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -2357,7 +2374,32 @@ public class MainViewModelTests
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        Assert.False(vm.Scan.HasRecordsNotMatched);
+        Assert.False(vm.Scan.HasSupersededHeldBack);
+    }
+
+    [Fact]
+    public async Task ScanViewModel_says_nothing_was_held_back_where_the_records_did_not_read_and_none_was()
+    {
+        // THE FAULT THIS CHANGE EXISTS TO CLOSE, AND THE FIXTURE IS THE TEST. The
+        // line was gated on UnaccountedProductCount, which is the trigger for one of
+        // the six routes into the withheld count rather than a count of files, so a
+        // machine meeting that condition with no superseded file on it was told
+        // something had been kept back when nothing had. The two counts are set
+        // apart here on purpose: the old gate is high and the new one is zero, and
+        // no assertion below can pass if the gate goes back to reading the first.
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                RemovableFiles: Array.Empty<OrphanedFile>(),
+                RegisteredPackages: Array.Empty<RegisteredPackage>(),
+                RegisteredTotalBytes: 0,
+                UnaccountedProductCount: 3,
+                WithheldCount: 0));
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.False(vm.Scan.HasSupersededHeldBack);
+        Assert.Equal(0, vm.Scan.SupersededHeldBackCount);
     }
 
     [Fact]
