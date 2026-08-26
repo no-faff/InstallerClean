@@ -253,18 +253,18 @@ public sealed class RemovableReverifier : IRemovableReverifier
     /// measured before anybody adopted the narrower question. The measurement it asked
     /// for is on this method's parameter in the interface.
     /// </remarks>
-    public UnderLeaseRecheck RecheckUnderLease(UnderLeaseClaims underLease)
+    public UnderLeaseRecheck RecheckUnderLease(UnderLeaseClaims claims)
     {
-        var claims = underLease.Batch;
-        var siblingClaims = underLease.Siblings;
-        if (claims.Count == 0) return new UnderLeaseRecheck(Array.Empty<string>());
+        var batchClaims = claims.Batch;
+        var siblingClaims = claims.Siblings;
+        if (batchClaims.Count == 0) return new UnderLeaseRecheck(Array.Empty<string>());
 
         var heldBack = new List<string>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var reasons = default(HeldBackReasons);
 
 
-        foreach (var claim in claims)
+        foreach (var claim in batchClaims)
         {
             // Any one claim turning non-removable settles the path, so once a path
             // is condemned its remaining claims are not queried. A path that has
@@ -369,7 +369,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
                     ? HeldBackReason.RecordsUnreadable
                     : HeldBackReason.Reclaimed;
 
-                foreach (var batchClaim in claims)
+                foreach (var batchClaim in batchClaims)
                 {
                     if (!string.Equals(batchClaim.ProductCode, sibling.ProductCode,
                             StringComparison.OrdinalIgnoreCase))
