@@ -443,7 +443,43 @@ const MAP = {
   'Error.ScanStoppedDetails': `这也会记录在 {0} 中。`,
 };
 
+// PARSE CONTROL. About the READING and not about the content, and it exits 2,
+// which is a code no ordinary run of this generator can produce: a generator is
+// red by intent for the whole gap between a string landing in English and its
+// translation round, so its verdict lines and its exit 0 are load-bearing in
+// ci.yml and are deliberately untouched here. This says something different from
+// "the translation is not done". It says the file could not be read.
+//
+// BOTH LEGS. raw === 0 catches a file that declares no entry at all, which the
+// equality cannot see on its own because 0 === 0 holds. parsed !== raw catches
+// entries the reader dropped, which one <comment> moved above its <value> does to
+// any regex wanting <value> on the same whitespace run, and the Visual Studio resx
+// editor writes that shape. Counted with <data\b so a tab after the tag name is
+// not read as an empty file, and neither figure is written down, so a string added
+// to the resx cannot make this go stale.
+//
+// WHY IT IS HERE WHEN THE SELF-CHECK BELOW ALREADY REDDENS. The self-check reaches
+// the right verdict through what it happens to compare, not through knowing it
+// read anything: with the neutral's attribute order changed, this generator wrote a
+// 389-entry file and its own self-check parsed THREE entries out of it, said
+// GENERATION HAS ISSUES, and was right for a reason with nothing to do with the
+// truth. A tool reasoning over three entries of a 389-entry artefact should say so.
+const parseControl = (where, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${where}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('Refusing to report on a file this generator cannot show it read.');
+  process.exit(2);
+};
+
 let text = readFileSync(BASE, 'utf8');
+// The transform below reaches every entry through '<data name="', one space and no
+// \s+, which is NOT the spelling the self-check's parse() uses further down. A
+// control that exercises a pattern the reader does not use proves the file has
+// structure and proves nothing about whether this reader can reach it, so the
+// source is controlled in its own spelling before a single value is replaced.
+parseControl(BASE, text,
+  [...text.matchAll(/<data name="([^"]+)"[^>]*>\s*<value>/g)].length);
 
 // Remove ONLY the machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable).
@@ -471,20 +507,21 @@ writeFileSync(OUT, text, 'utf8');
 
 // ---------------- self-check the written file against the neutral ----------------
 const placeholders = (s) => new Set([...s.matchAll(/\{(\d+)(?::[^}]*)?\}/g)].map((p) => p[1]));
-const parse = (xml) => {
+const parse = (xml, where) => {
   const map = new Map();
   const re = /<data\s+name="([^"]+)"[^>]*>\s*<value>([\s\S]*?)<\/value>/g;
   let m;
   while ((m = re.exec(xml)) !== null) map.set(m[1], m[2]);
+  parseControl(where, xml, map.size);
   return map;
 };
-const neutral = parse(readFileSync(BASE, 'utf8'));
+const neutral = parse(readFileSync(BASE, 'utf8'), BASE);
 // Derived, never pinned: the machine set grows whenever the command line
 // gains an event-log string, and a literal here would fail every generator
 // at once while asserting nothing about what was actually stripped.
 const cliMachineExpected = [...neutral.keys()].filter(isMachineCliKey).length;
 const written = readFileSync(OUT, 'utf8');
-const output = parse(written);
+const output = parse(written, OUT);
 const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 
 const missingFromMap = neutralRequired.filter((k) => !(k in MAP));
