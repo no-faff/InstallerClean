@@ -366,8 +366,8 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). TWO PLACEHOLDERS, ONE PER CAUSE THE OFFER CAN CONTAIN: {0} is Reason.Orphaned and {1} is Reason.Superseded, the only two labels the scan sets (FileSystemScanService, the walked-file branch and the superseded-patch branch). Reason.Obsoleted is still passed as {2} by MainViewModel and is deliberately unused here: an obsoleted registration is counted at scan time and never offered, so naming that cause on this screen would describe a file the list cannot hold. Carrying the labels as placeholders means a translator edits each one in a single place and this sentence follows. THE OPENING CLAUSE CARRIES THE EPISTEMICS FOR BOTH HALVES: it says what the app asked, so what follows is read as the answer it got and not as an assertion about the machine. IT PARTITIONS BECAUSE THE SET HAS TWO CAUSES, and a sentence naming one of them is false of the other half: an orphan is offered because no registration claims its file, and a superseded patch is offered BECAUSE a registration does claim it and reports the patch replaced. THE SECOND CLAUSE'S ROLLBACK HALF IS NOT A RESTATEMENT OF ITS FIRST and must not be dropped as one in any language: replaced is not finished with, since uninstalling whatever replaced the patch can roll back onto it and reach for this exact file, which is the condition that decides whether a superseded patch is offered at all. The single-cause sentence this replaces was true only while the superseded class was withheld, which is a state no released version was ever in. BOTH CLAUSES ARE ABOUT THE ANSWER THE APP RECEIVED AND NOT ABOUT THE STATE OF THE MACHINE, which is the weaker claim and the one that stays true whatever an enumeration cannot see, so it is kept rather than tightened. The wording this replaces gave two reasons for that framing and neither survives at 3.0.0: the instance-code reading lost its subject once nothing read inside a cached file any more (see InstanceProductCount, which says so in its own words), and a recorded path spelled in a form the folder walk never produces is expanded and handled from 3.0.0 rather than guarded against (see NormaliseLocalPackagePath). The framing outlives its old reasons. Translations must keep both clauses statements about what came back; a rendering that says outright that Windows has no record of the file makes a claim about the machine that this wording exists to avoid.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.</value>
-    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND ALL THREE OPERATIONS ARE NAMED ON PURPOSE: update, repair and uninstall are what a cached package is kept for, so somebody who has done all three and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. The restore sentence covers BOTH actions and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and putting a file back at that path under the same name is what restores it. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README, which the bracketed phrase in the lead links to. The button order is a separate matter and does not govern this line.</comment>
+    <value>Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND ALL THREE OPERATIONS ARE NAMED ON PURPOSE: update, repair and uninstall are what a cached package is kept for, so somebody who has done all three and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. THE THIRD SENTENCE IS AN INSTRUCTION AND NOT A PROMISE, WHICH IS A CORRECTION RATHER THAN A HEDGE. It read "Putting them back into {InstallerFolder} restores everything", and that is false of a move whose destination already held a file of the same name: MoveFilesService.GetUniqueDestPath renames a colliding name.msi to name (1).msi and no surface anywhere says so, so a user who follows the old sentence and puts THAT back has restored nothing. A cached package counts as present if and only if its recorded LocalPackage path exists, so the name is the whole of what makes a restore work, and "under the names they had" covers the renamed case without making anybody read about the rename. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README, which the bracketed phrase in the lead links to. The button order is a separate matter and does not govern this line.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
     <value>Nothing scanned yet.</value>
@@ -402,7 +402,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>No metadata available.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program.</value>
+    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program or even Windows.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -942,9 +942,21 @@
 
        "But" and not "and": offering the backup concedes something to the
        sentence before it. "The Move button", not bare "Move", so "use Move"
-       is read as a button and not as a second verb in the same sentence. -->
+       is read as a button and not as a second verb in the same sentence.
+
+       "THESE FILES" AND NOT A BARE "FILES", WHICH IS WHAT THE PLURAL CARRIED.
+       The singular was written fresh in the same commit and says "This file";
+       the plural is the older flat sentence with its verb swapped, and what
+       came through the swap was an articleless subject reading as files in
+       general rather than as the ones on the list behind the dialog.
+
+       NEITHER FORM TAKES A PLACEHOLDER AND THE PLURAL MUST NOT GAIN ONE.
+       DisplayHelpers.Pluralise hands the chosen string to ConfirmDeleteWindow
+       raw and it never reaches string.Format, so a {0} written here is painted
+       on the dialog. CountedStringTests holds this prefix in its unformatted
+       set for that reason. -->
   <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
-  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
+  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only
@@ -1442,14 +1454,32 @@ The crash log could not be written.</value></data>
 
        The window says the same thing in Summary.MissingFromDisk.*, which closes
        on "Open Details for what to do"; there is no Details window here, so the
-       last sentence carries the recovery step itself. Both count every
+       last sentences carry the recovery step itself. Both count every
        registration naming a file that is not there, and neither names a cause:
        see the window's remarks for why on both points.
 
-       "Can fail" and "usually restores" are the verified positions and neither
-       may harden: Microsoft guarantees nothing here. -->
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Running that program's installer again, preferably the same version, usually restores the file.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Running each program's installer again, preferably the same version, usually restores the files.</value></data>
+       IT USED TO CARRY LESS THAN THE WINDOW AND ONE OF THE MISSING PIECES WAS THE
+       ONE THAT STOPS HARM. "Don't uninstall first" was absent here entirely, on
+       the host whose reader is likeliest to be scripting the recovery, and
+       uninstalling is itself a step that needs the file. A host may carry less
+       detail than the other; it may not drop the instruction that prevents a
+       reader making the problem worse. Two smaller omissions went with it: the
+       old wording said "preferably the same version" for something Windows
+       refuses outright, and "usually restores" travelled here without the
+       companion hedge it has in the window.
+
+       "Can fail", "usually", "may" and "doesn't guarantee" are the verified
+       positions and none may harden: Microsoft guarantees nothing here. The
+       version IS knowable, being the program's own and printed in Settings and
+       in Programs and Features; what is hard is OBTAINING it, makers usually
+       publishing only the current one, which is what "if you can get it" carries
+       and why it is not a hedge about knowing.
+
+       THE COLON IS NEW AND FRENCH NEEDS A NARROW NO-BREAK SPACE BEFORE IT
+       (U+202F), which the Edit tool silently flattens; check-french-spacing
+       holds it. -->
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. To fix it, run that program's installer over your existing copy, and don't uninstall first: uninstalling is itself a step that needs this file. Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, but Microsoft doesn't guarantee it.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. To fix them, run each program's installer over your existing copy, and don't uninstall first: uninstalling is itself a step that needs these files. Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the files, but Microsoft doesn't guarantee it.</value></data>
   <!-- The command line's own copy of Summary.SupersededHeldBack, whose remarks
        carry the placeholder, why no cause is named, why "superseded" is earned and
        why neither host closes on a clause about listing.
