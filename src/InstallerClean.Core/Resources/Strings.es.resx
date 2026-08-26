@@ -654,8 +654,8 @@
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the
        same technique the move-confirmation dialog uses. -->
-  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} en: {2}</value></data>
-  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} en: {2}</value></data>
+  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} movido a: {2}</value></data>
+  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} movidos a: {2}</value></data>
   <!-- Shown when the pre-action re-check found a registered product's live claim
        on candidates the scan had left removable, so they were left out of the
        batch. 0 = the count kept, 1 = pluralised "file"/"files". Flat string; a
