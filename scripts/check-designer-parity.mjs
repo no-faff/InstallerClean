@@ -29,9 +29,34 @@ const designerPath = 'src/InstallerClean.Core/Resources/Strings.Designer.cs';
 const resx = readFileSync(resxPath, 'utf8');
 const designer = readFileSync(designerPath, 'utf8');
 
+// PARSE CONTROL. About the READING and not about the content: a regex that has
+// stopped matching yields an empty set, and a silent zero over an empty set reads
+// exactly like a clean result. BOTH legs are load-bearing. raw === 0 catches a
+// file that declares no entry at all, which the equality cannot see on its own
+// because 0 === 0 holds; parsed !== raw catches entries the reader dropped, which
+// one <comment> moved above its <value> does to every regex wanting <value> on the
+// same whitespace run as <data>, and the Visual Studio resx editor writes that
+// shape. Counted with <data\b rather than '<data ' so a tab after the tag name is
+// not read as an empty file. Neither figure is written down here, so adding a
+// string to the resx cannot make this go stale.
+//
+// The accessors.length === 0 test further down is this file's existing control and
+// it holds the DESIGNER side only. On the resx side an unreadable file reaches exit
+// 1 the wrong way round, as 386 complaints that Strings.Designer.cs names keys the
+// resx does not define: a true statement about the comparison, pointing at the
+// wrong file, in a message telling the reader to regenerate the one that is fine.
+const parseControl = (file, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${file}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('Refusing to report on a file this check cannot show it read.');
+  process.exit(2);
+};
+
 const resxKeys = new Set(
     [...resx.matchAll(/<data\s+name="([^"]+)"/g)].map((m) => m[1]),
 );
+parseControl(resxPath, resx, resxKeys.size);
 
 // The generated accessor shape, and the only one this guard recognises:
 //     public static string Action_About => Get("Action.About");
@@ -58,11 +83,26 @@ for (const { property, key } of accessors) {
         problems.push(`${key}: accessor is named ${property}, expected ${expected}`);
 }
 
+// The Designer side of the parse control, and it is the same two legs the resx
+// side carries rather than a second idea. The zero test below was here already and
+// is only the first of them: a shape change that costs SOME accessors and not all
+// leaves a non-zero count, and every key whose accessor was dropped then reads as
+// an accessor the resx has no counterpart for. Every 'public static string' in this
+// file is an accessor, checked, so it is an independent count of what the file
+// declares to compare the matched set against. Neither figure is written down, so
+// regenerating cannot make this go stale.
+const declared = (designer.match(/public\s+static\s+string\b/g) || []).length;
 if (accessors.length === 0)
     problems.push(
         'No accessors matched in Strings.Designer.cs. Either the file is truncated ' +
         '(the regenerate script was interrupted) or the generated shape changed and ' +
         'this guard needs updating with it.',
+    );
+else if (accessors.length !== declared)
+    problems.push(
+        `PARSE CONTROL: Strings.Designer.cs declares ${declared} 'public static string' ` +
+        `member(s) and this guard matched ${accessors.length} accessor(s). The generated ` +
+        'shape has changed and everything below is a report on a partial read.',
     );
 
 if (problems.length > 0) {

@@ -119,8 +119,34 @@ const xamlFiles = collect(SRC, ['.xaml']);
 // One corpus, joined by newline so a file boundary is also a token boundary.
 const corpus = [...csFiles, ...xamlFiles].map((f) => readFileSync(f, 'utf8')).join('\n');
 
-const keys = [...readFileSync(RESX, 'utf8')
+// PARSE CONTROL. About the READING and not about the content: a regex that has
+// stopped matching yields an empty set, and a silent zero over an empty set reads
+// exactly like a clean result. BOTH legs are load-bearing. raw === 0 catches a
+// file that declares no entry at all, which the equality cannot see on its own
+// because 0 === 0 holds; parsed !== raw catches entries the reader dropped, which
+// one <comment> moved above its <value> does to every regex wanting <value> on the
+// same whitespace run as <data>, and the Visual Studio resx editor writes that
+// shape. Counted with <data\b rather than '<data ' so a tab after the tag name is
+// not read as an empty file. Neither figure is written down here, so adding a
+// string to the resx cannot make this go stale.
+//
+// The key pattern here is NARROWER than the one every other reader in this
+// directory uses: it requires a leading letter and at least two characters, so a
+// key outside that shape is dropped rather than reported, and a key this guard
+// never saw can never be named an orphan. The control is what turns that silent
+// drop into a stop.
+const parseControl = (file, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${file}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('Refusing to report on a file this check cannot show it read.');
+  process.exit(2);
+};
+
+const resxXml = readFileSync(RESX, 'utf8');
+const keys = [...resxXml
   .matchAll(/<data\s+name="([A-Za-z][A-Za-z0-9._]+)"/g)].map((m) => m[1]);
+parseControl(RESX, resxXml, new Set(keys).size);
 
 // Keys contain only letters, digits, dots and underscores, so the dot is the only
 // ERE metacharacter to escape.

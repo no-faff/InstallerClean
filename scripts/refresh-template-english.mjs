@@ -51,19 +51,27 @@ const esc = (v) => v
   .replace(/\\/g, '\\\\').replace(/`/g, '\\`')
   .replace(/\$/g, () => '\\$').replace(/\r/g, '\\r').replace(/\n/g, '\\n');
 
-// Parse control: a regex requiring <value> on the same line as <data> silently
-// drops every multi-line entry and the neutral has 19 of them. Refuse rather
-// than report on a partial read.
+// Parse control: this file's regex wants <value> on the same whitespace run as
+// <data>, so a <comment> moved above its <value> drops that entry silently. Refuse
+// rather than act on a partial read, which matters more here than in a gate: this
+// script WRITES to the template.
+//
+// TWO LEGS, AND IT ONLY HAD ONE. `neutral.size !== rawCount` cannot fire when both
+// are zero, so this reported "0 neutral key(s); 0 template entr(ies) differ" over a
+// neutral truncated to its XML header and exited 0. `rawCount === 0` is the missing
+// half. Counted with <data\b rather than '<data ' so a tab after the tag name is
+// not read as an empty file, and neither figure is written down anywhere, so adding
+// a string cannot make either go stale.
 const neutralXml = readFileSync(NEUTRAL, 'utf8');
-const rawCount = (neutralXml.match(/<data /g) || []).length;
+const rawCount = (neutralXml.match(/<data\b/g) || []).length;
 const neutral = new Map();
 {
   const re = /<data name="([^"]+)"[^>]*>\s*<value>([\s\S]*?)<\/value>/g;
   let m;
   while ((m = re.exec(neutralXml)) !== null) neutral.set(m[1], m[2]);
 }
-if (neutral.size !== rawCount) {
-  console.error(`PARSE CONTROL FAILED for ${NEUTRAL}: ${rawCount} '<data ' occurrences, ${neutral.size} parsed. Refusing to act on a partial read.`);
+if (rawCount === 0 || neutral.size !== rawCount) {
+  console.error(`PARSE CONTROL FAILED for ${NEUTRAL}: ${rawCount} '<data' occurrence(s), ${neutral.size} parsed. Refusing to act on a partial read.`);
   process.exit(2);
 }
 

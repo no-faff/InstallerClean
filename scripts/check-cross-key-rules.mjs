@@ -303,11 +303,44 @@ const RAW_READ_ALLOWED = [
 
 // ---------------------------------------------------------------------------
 
-const values = (xml) => {
+// PARSE CONTROL. About the READING and not about the content: a regex that has
+// stopped matching yields an empty set, and a silent zero over an empty set reads
+// exactly like a clean result. BOTH legs are load-bearing. raw === 0 catches a
+// file that declares no entry at all, which the equality cannot see on its own
+// because 0 === 0 holds; parsed !== raw catches entries the reader dropped, which
+// one <comment> moved above its <value> does to every regex wanting <value> on the
+// same whitespace run as <data>, and the Visual Studio resx editor writes that
+// shape. Counted with <data\b rather than '<data ' so a tab after the tag name is
+// not read as an empty file. Neither figure is written down here, so adding a
+// string to the resx cannot make this go stale.
+//
+// The stale-declaration block below fails on an unreadable neutral, but only
+// because this file hard-codes key names to check against it, and it says in its
+// own message that a stop there leaves the per-language pass unrun. A control that
+// names the file is the better answer than a stale-declaration report that sends
+// the reader to the wrong place entirely.
+const parseControl = (file, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${file}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('Refusing to report on a file this check cannot show it read.');
+  process.exit(2);
+};
+// Reads the file itself rather than taking its text, so the control can name the
+// path in its message: a failure here is about one file and the reader needs to
+// be told which.
+const values = (path) => {
+  const xml = readFileSync(path, 'utf8');
   const map = new Map();
   const re = /<data\s+name="([^"]+)"[^>]*>\s*<value>([\s\S]*?)<\/value>/g;
   let m;
   while ((m = re.exec(xml)) !== null) map.set(m[1], m[2]);
+  // The RETAINED size rather than a match counter, and the difference is real: two
+  // entries sharing a key name both match, and the second silently overwrites the
+  // first, so the check would go on to reason about one value fewer than the file
+  // declares. Comparing what survives against what the file declares catches the
+  // dropped entry and the overwritten one in one comparison.
+  parseControl(path, xml, map.size);
   return map;
 };
 
@@ -514,7 +547,7 @@ for (const file of [...rawAllowed.keys()].sort())
 const sourceShapeProblems = problems.length;
 
 // --- Rules 1 and 3 to 6, per language.
-const neutral = values(readFileSync(`${RESX_DIR}/Strings.resx`, 'utf8'));
+const neutral = values(`${RESX_DIR}/Strings.resx`);
 const declaredKeys = [
   ...MUST_AGREE.flatMap((p) => [p.label, p.name]),
   ...ELABORATES_A_LABEL.flatMap((p) => [p.label, p.name]),
@@ -555,7 +588,7 @@ for (const lang of LANGS) {
     problems.push(`${lang}: ${path} is missing.`);
     continue;
   }
-  const map = values(readFileSync(path, 'utf8'));
+  const map = values(path);
   const failures = [];
 
   // A satellite short of a key is check-resx-parity's finding, not this one.

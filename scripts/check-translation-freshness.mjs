@@ -39,12 +39,19 @@
 // read, never a gate. flag-retranslation.mjs is destructive with no undo.
 //
 // THE PARSE CONTROL ABOVE readResx IS NOT DEFENSIVE PROGRAMMING AND MUST NOT BE
-// SIMPLIFIED INTO A WARNING. A regex requiring <value> on the same line as
-// <data> silently drops every multi-line entry, and the neutral has 19 of them
-// out of 379. A planted malformed value proved the point: without the control
-// the gate reads 348 of 349 entries and reports the file clean, and a silent
-// zero over an incomplete set is indistinguishable from a clean result. That
-// shape has cost this project twice. Refusing with exit 2 is the correct answer.
+// SIMPLIFIED INTO A WARNING. This file's regex wants <value> on the same
+// whitespace run as <data>, so anything else landing between them drops that
+// entry silently: a <comment> moved above its <value> is valid resx, is what the
+// Visual Studio editor emits, and costs one entry of the 386. A silent zero over
+// an incomplete set is indistinguishable from a clean result, and that shape has
+// cost this project twice. Refusing with exit 2 is the correct answer.
+//
+// IT HAS TWO LEGS AND IT ONLY HAD ONE. `parsed !== raw` cannot fire when both are
+// zero, so this gate read a neutral truncated to its XML header, reported
+// "0 neutral key(s) ... 0 STALE" and exited 0: the exact shape it exists to catch,
+// in the check that catches it. `raw === 0` is the missing half and is not implied
+// by the other. Neither figure is written down, so adding a string cannot make
+// either go stale.
 //
 // AND THE LEDGER IS TRACKED, IN THE REPOSITORY, DELIBERATELY. The obvious home
 // for it is the working record at non-repo-files/1-evidence/standing/
@@ -73,13 +80,15 @@ const digest = (s) => createHash('sha256').update(s, 'utf8').digest('hex').slice
 // <data> silently drops every multi-line entry and this file has 19 of them.
 function readResx(path) {
   const xml = readFileSync(path, 'utf8');
-  const raw = (xml.match(/<data /g) || []).length;
+  // <data\b rather than '<data ' so a tab after the tag name is not counted as a
+  // file with no entries, which would fail the raw === 0 leg over a readable file.
+  const raw = (xml.match(/<data\b/g) || []).length;
   const out = new Map();
   const re = /<data name="([^"]+)"[^>]*>\s*<value>([\s\S]*?)<\/value>/g;
   let m;
   while ((m = re.exec(xml)) !== null) out.set(m[1], m[2]);
-  if (out.size !== raw) {
-    console.error(`PARSE CONTROL FAILED for ${path}: ${raw} '<data ' occurrences, ${out.size} parsed. Refusing to report on a partial read.`);
+  if (raw === 0 || out.size !== raw) {
+    console.error(`PARSE CONTROL FAILED for ${path}: ${raw} '<data' occurrence(s), ${out.size} parsed. Refusing to report on a partial read.`);
     process.exit(2);
   }
   return out;

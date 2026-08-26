@@ -47,16 +47,36 @@ const drift = process.argv.includes('--drift');
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 1 << 28 });
 
+// The parse control's two legs, applied to one historical revision. Separate from
+// parse() below only because a revision is named by commit as well as by path, and
+// because the message has to say which commit so the reader can go and look at it.
+const historyControl = (where, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${where}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('The value history this gate compares against would be incomplete, and an');
+  console.error('incomplete history reports every satellite clean. Refusing to report on it.');
+  process.exit(2);
+};
+
 // Parse control, the same one refresh-template-english.mjs carries: a regex that
-// misses the multi-line entries reports a clean sweep over a partial read.
+// has stopped matching reports a clean sweep over a read that never happened.
+//
+// TWO LEGS, AND IT ONLY HAD ONE UNTIL 3.0.0. `map.size !== raw` cannot fire when
+// both are zero, so this gate read a neutral truncated to its XML header and
+// printed "Superseded-English gate: clean. No satellite holds a wording the English
+// has replaced." over a file with nothing in it, exit 0. The word clean, over
+// nothing. `raw === 0` is the missing half. Counted with <data\b rather than
+// '<data ' so a tab after the tag name is not read as an empty file, and neither
+// figure is written down, so adding a string cannot make either go stale.
 const parse = (xml, where) => {
-  const raw = (xml.match(/<data /g) || []).length;
+  const raw = (xml.match(/<data\b/g) || []).length;
   const map = new Map();
   const re = /<data\s+name="([^"]+)"[^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>/g;
   let m;
   while ((m = re.exec(xml)) !== null) map.set(m[1], m[2]);
-  if (map.size !== raw) {
-    console.error(`PARSE CONTROL FAILED for ${where}: ${raw} '<data ' occurrences, ${map.size} parsed.`);
+  if (raw === 0 || map.size !== raw) {
+    console.error(`PARSE CONTROL FAILED for ${where}: ${raw} '<data' occurrence(s), ${map.size} parsed.`);
     process.exit(2);
   }
   return map;
@@ -72,17 +92,34 @@ const isMachineCliKey = (key) =>
 const neutral = parse(readFileSync(NEUTRAL, 'utf8'), NEUTRAL);
 
 // Every value each key has ever held in the neutral, oldest commit to newest.
+//
+// CONTROLLED PER REVISION, and it is the same control parse() carries rather than a
+// second idea. A revision read as empty contributes no former wording, so no
+// satellite value can match one, so this gate prints "clean" for the same reason it
+// would over a resx it never opened. The whole finding rests on this map being
+// complete.
+//
+// THE catch BELOW IS WHAT MAKES THE CONTROL SAFE AND IT IS LOAD-BEARING. A revision
+// from before this file existed makes `git show` fail, and that revision is skipped
+// without ever reaching the control: absent at this commit and present-but-read-as-
+// empty are different things and only the second is a fault. Measured before this
+// was added, over every revision of all sixteen resx: 1,521 revisions read, raw and
+// parsed agreeing on every one, never zero. So it is provably safe rather than
+// presumed safe, and a red here is a real change of shape.
 const revs = git('rev-list', 'HEAD', '--', NEUTRAL).split('\n').filter(Boolean);
 const history = new Map();
 for (const rev of revs) {
   let xml;
   try { xml = git('show', `${rev}:${NEUTRAL}`); } catch { continue; }
   const re = /<data\s+name="([^"]+)"[^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>/g;
+  const seen = new Set();
   let m;
   while ((m = re.exec(xml)) !== null) {
+    seen.add(m[1]);
     if (!history.has(m[1])) history.set(m[1], new Set());
     history.get(m[1]).add(m[2]);
   }
+  historyControl(`${NEUTRAL} at ${rev.slice(0, 8)}`, xml, seen.size);
 }
 
 const satellites = readdirSync(dir)
@@ -138,6 +175,10 @@ if (drift) {
       const re = /<data\s+name="([^"]+)"[^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>/g;
       let m;
       while ((m = re.exec(xml)) !== null) cur.set(m[1], m[2]);
+      // Controlled per revision like the history above. --drift is triage rather than
+      // a gate, but a reading list built from a partial read is a reading list with
+      // entries missing, and nothing about it would look wrong.
+      historyControl(`${path} at ${rev.slice(0, 8)}`, xml, cur.size);
       for (const [k, v] of cur) if (prev.get(k) !== v) out.set(k, order.get(rev));
       prev = cur;
     }

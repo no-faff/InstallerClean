@@ -27,6 +27,29 @@ import { readdirSync, readFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';
 
+// PARSE CONTROL. About the READING and not about the content: a regex that has
+// stopped matching yields an empty set, and a silent zero over an empty set reads
+// exactly like a clean result. BOTH legs are load-bearing. raw === 0 catches a
+// file that declares no entry at all, which the equality cannot see on its own
+// because 0 === 0 holds; parsed !== raw catches entries the reader dropped, which
+// one <comment> moved above its <value> does to every regex wanting <value> on the
+// same whitespace run as <data>, and the Visual Studio resx editor writes that
+// shape. Counted with <data\b rather than '<data ' so a tab after the tag name is
+// not read as an empty file. Neither figure is written down here, so adding a
+// string to the resx cannot make this go stale.
+//
+// This gate catches an unreadable file through its own comparison in every case
+// but ONE, and the exception is the reason the control is here rather than left
+// to luck: when all sixteen files go together an empty set is in parity with an
+// empty set, and it reported every satellite OK and exited 0.
+const parseControl = (file, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${file}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('Refusing to report on a file this check cannot show it read.');
+  process.exit(2);
+};
+
 const parse = (file) => {
   const xml = readFileSync(`${dir}/${file}`, 'utf8');
   const map = new Map();
@@ -36,6 +59,12 @@ const parse = (file) => {
     const placeholders = new Set([...m[2].matchAll(/\{(\d+)\}/g)].map((p) => p[1]));
     map.set(m[1], placeholders);
   }
+  // The RETAINED size rather than a match counter, and the difference is real: two
+  // entries sharing a key name both match, and the second silently overwrites the
+  // first, so the check would go on to reason about one value fewer than the file
+  // declares. Comparing what survives against what the file declares catches the
+  // dropped entry and the overwritten one in one comparison.
+  parseControl(`${dir}/${file}`, xml, map.size);
   return map;
 };
 

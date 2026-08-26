@@ -85,13 +85,40 @@ const printed = (value) => value
   .replace(/&amp;/g, '&')
   .replaceAll('{InstallerFolder}', FOLDER);
 
+// PARSE CONTROL. About the READING and not about the content: a regex that has
+// stopped matching yields an empty set, and a silent zero over an empty set reads
+// exactly like a clean result. BOTH legs are load-bearing. raw === 0 catches a
+// file that declares no entry at all, which the equality cannot see on its own
+// because 0 === 0 holds; parsed !== raw catches entries the reader dropped, which
+// one <comment> moved above its <value> does to every regex wanting <value> on the
+// same whitespace run as <data>, and the Visual Studio resx editor writes that
+// shape. Counted with <data\b rather than '<data ' so a tab after the tag name is
+// not read as an empty file. Neither figure is written down here, so adding a
+// string to the resx cannot make this go stale.
+//
+// Cli.Help lines are a SUBSET of what is parsed, so the control counts every entry
+// read and the return stays filtered. Without it this script printed "CLI help
+// width OK" over fifteen satellites it had not read a byte of, its own line count
+// falling from 320 to 20 with nothing gating on the figure.
+const parseControl = (file, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${file}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('Refusing to report on a file this check cannot show it read.');
+  process.exit(2);
+};
+
 const parse = (file) => {
   const xml = readFileSync(`${dir}/${file}`, 'utf8');
   const re = /<data\s+name="([^"]+)"[^>]*>\s*<value>([\s\S]*?)<\/value>/g;
   const out = [];
+  let entries = 0;
   let m;
-  while ((m = re.exec(xml)) !== null)
+  while ((m = re.exec(xml)) !== null) {
+    entries++;
     if (m[1].startsWith('Cli.Help.')) out.push([m[1], printed(m[2])]);
+  }
+  parseControl(`${dir}/${file}`, xml, entries);
   return out;
 };
 

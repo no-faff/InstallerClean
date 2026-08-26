@@ -64,15 +64,40 @@ const BASE = `${dir}/Strings.resx`;             // English neutral
 // Same <data><value> capture the generator and its self-check use: the key name,
 // then the inner value (non-greedy to the first </value>). The captured value is RAW,
 // with its XML entities intact.
-const parse = (xml) => {
+// PARSE CONTROL. About the READING and not about the content: a regex that has
+// stopped matching yields an empty set, and a silent zero over an empty set reads
+// exactly like a clean result. BOTH legs are load-bearing. raw === 0 catches a
+// file that declares no entry at all, which the equality cannot see on its own
+// because 0 === 0 holds; parsed !== raw catches entries the reader dropped, which
+// one <comment> moved above its <value> does to every regex wanting <value> on the
+// same whitespace run as <data>, and the Visual Studio resx editor writes that
+// shape. Counted with <data\b rather than '<data ' so a tab after the tag name is
+// not read as an empty file. Neither figure is written down here, so adding a
+// string to the resx cannot make this go stale.
+//
+// It gates the WRITE as well as the report, which is the half that mattered: this
+// script is the only reader here that produces a public artefact. Reading the file
+// in here rather than at the call site is what puts the control ahead of every
+// writeFileSync, buildTable having to parse both files before it can return a page.
+const parseControl = (file, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${file}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('Refusing to act on a file this script cannot show it read.');
+  process.exit(2);
+};
+
+const parse = (path) => {
+  const xml = readFileSync(path, 'utf8');
   const map = new Map();
   const re = /<data\s+name="([^"]+)"[^>]*>\s*<value>([\s\S]*?)<\/value>/g;
   let m;
   while ((m = re.exec(xml)) !== null) map.set(m[1], m[2]);
+  parseControl(path, xml, map.size);
   return map;
 };
 
-const neutral = parse(readFileSync(BASE, 'utf8'));
+const neutral = parse(BASE);
 
 // Groups in the order a user meets them: visible UI first, then the hover/tooltip and
 // screen-reader text, then internals. A key joins the FIRST group whose prefix it
@@ -127,7 +152,7 @@ const keys = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 // --check cannot drift from what a write would produce.
 const buildTable = (c) => {
   const lang = LANGS[c];
-  const target = parse(readFileSync(`${dir}/Strings.${c}.resx`, 'utf8'));
+  const target = parse(`${dir}/Strings.${c}.resx`);
   const buckets = GROUPS.map(() => []);
   for (const k of keys) buckets[groupOf(k)].push(k);
 

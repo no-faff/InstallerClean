@@ -53,6 +53,38 @@ const neutralValue = (key) => {
   return m ? m[1] : null;
 };
 
+// PARSE CONTROL. About the READING and not about the content: a regex that has
+// stopped matching yields an empty set, and a silent zero over an empty set reads
+// exactly like a clean result. BOTH legs are load-bearing. raw === 0 catches a
+// file that declares no entry at all, which the equality cannot see on its own
+// because 0 === 0 holds; parsed !== raw catches entries the reader dropped, which
+// one <comment> moved above its <value> does to every regex wanting <value> on the
+// same whitespace run as <data>, and the Visual Studio resx editor writes that
+// shape. Counted with <data\b rather than '<data ' so a tab after the tag name is
+// not read as an empty file. Neither figure is written down here, so adding a
+// string to the resx cannot make this go stale.
+//
+// THE PROBE BELOW USES THIS SCRIPT'S OWN SHAPE, '<data name="' with one space and
+// no \s+, rather than the shape its neighbours use. A control that exercises a
+// pattern the reader does not use proves the file has structure and proves nothing
+// about whether this reader can reach it.
+//
+// The unknown-key refusal below is not this and does not cover it: it is per-key,
+// so it stops a key that could not be found and stays silent about every key the
+// run did not ask for. This tool rewrites fifteen generators with no undo, so a
+// neutral it cannot wholly read is one it must not act on at all.
+const parseControl = (file, xml, parsed) => {
+  const raw = (xml.match(/<data\b/g) || []).length;
+  if (raw !== 0 && parsed === raw) return;
+  console.error(`PARSE CONTROL FAILED for ${file}: ${raw} '<data' occurrence(s), ${parsed} parsed.`);
+  console.error('Refusing to act on a file this script cannot show it read.');
+  process.exit(2);
+};
+
+const readable = new Set(
+  [...neutralXml.matchAll(/<data name="([^"]+)"[^>]*>\s*<value>/g)].map((m) => m[1]));
+parseControl(NEUTRAL, neutralXml, readable.size);
+
 const unknown = keys.filter((k) => neutralValue(k) === null);
 if (unknown.length) {
   console.error('Not found in the neutral resx (typo?): ' + unknown.join(', '));
