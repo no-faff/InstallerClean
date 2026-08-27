@@ -160,9 +160,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// at the first patch declaring itself removable, so the count stopped there
     /// too. A REPORT FROM AN EARLIER VERSION CARRIES THE OTHER QUANTITY: the two are
     /// not comparable and must not be summed, and the envelope's app version and
-    /// schema version each separate them. The two dated figures above are
-    /// unaffected, re-read from that machine's hive on 2026-08-28: across its 147
-    /// products carrying a Patches key the read stops early on none of them.
+    /// schema version each separate them.
+    ///
+    /// THE TWO DATED FIGURES ABOVE ARE UNAFFECTED, AND NOT FOR THE REASON THIS NOTE
+    /// GAVE. It said the read stops early on none of that machine's 147 products
+    /// carrying a Patches key. It stops early on one of them. Read out of that hive on
+    /// 2026-08-28 by two readers taking different routes to the same three numbers: 147
+    /// products carry the key, they hold three patch registrations between them, and one
+    /// of the three declares itself removable, so the loop returns on that product. The
+    /// truncation cost that machine nothing because the product concerned holds exactly
+    /// one registration, which the old code counted before returning. THE FAULT NEEDS A
+    /// PRODUCT WITH A REMOVABLE PATCH AND MORE THAN ONE REGISTRATION, and that machine
+    /// has not got one, which is also why it sat here unseen.
     /// </param>
     /// <param name="ProductsWithRemovablePatch">
     /// Products where at least one registered patch positively declared itself
@@ -1583,14 +1592,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// removable verdict would otherwise be blind to exactly the registration
     /// that would overturn it.
     ///
-    /// IT HAS A DOCUMENTED BLIND SPOT AND IT IS WHY THIS IS NOT THE ONLY ROUTE.
-    /// In the per-user-unmanaged context, "only patches installed with Windows
-    /// Installer version 3.0 are enumerated for users that are not the current
-    /// user". A patch applied under another account by an installer older than
-    /// that is invisible here, whatever else is working. The patch file's own
-    /// declared targets are read alongside for that reason, and the keyed reads
-    /// both routes feed carry no such limitation: the administrator group may
-    /// query patch data for any product instance and any user on the computer.
+    /// THE DOCUMENTED BLIND SPOT IS ON THE SID PARAMETER, SO IT IS NOT THIS ROUTE'S
+    /// ALONE, AND THIS NOTE READ AS THOUGH IT WERE. Microsoft prints the limitation on
+    /// <c>szUserSid</c>: "When enumerating for a user other than current user, any
+    /// patches that were applied in a per-user-unmanaged context using a version less
+    /// than Windows Installer version 3.0, are not enumerated". The per-product
+    /// <see cref="EnumeratePatches"/> passes that product's own SID and context into
+    /// the same export, so it carries the same limitation. "Invisible here" invited a
+    /// reader to take the per-product loop as the complete half, and
+    /// <c>MergeClaim</c>'s downgrade-only rule is argued from that loop producing
+    /// every product's claims.
+    ///
+    /// WHAT COVERS BOTH IS THE KEYED READ, AND THAT IS WHY THIS IS NOT THE ONLY ROUTE.
+    /// The patch file's own declared targets are read alongside, and the keyed
+    /// <c>MsiGetPatchInfoEx</c> reads both routes feed carry no such limitation: the
+    /// administrator group may query patch data for any product instance and any user
+    /// on the computer.
     ///
     /// NULL MEANS THE ANSWER IS NOT AVAILABLE AND EVERY REMOVABLE VERDICT IS
     /// WITHHELD, which is deliberate and is the more expensive direction. A short
@@ -3395,9 +3412,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Enumerates every installed product across all contexts. <c>UnreadableRows</c>
     /// counts the rows this loop had to skip (a non-success return, or a Success
     /// that wrote no GUID): each one is an installed product whose patches will
-    /// never be enumerated. It is one of the three losses
-    /// <see cref="InstallerQueryResult.RecordsIncomplete"/> is built from, the
-    /// others being a skipped patch row and an unreadable LocalPackage value.
+    /// never be enumerated.
+    ///
+    /// IT IS ONE WAY INTO ONE SUMMAND, AND THIS NOTE PRESENTED IT AS ONE LOSS OF
+    /// THREE. It reaches <c>unreadableProducts</c>, which the API loop also raises
+    /// per product on an unreadable LocalPackage, on a patch enumeration that came
+    /// back incomplete, and on an unreadable LocalPackage under one of that product's
+    /// patches. <see cref="InstallerQueryResult.RecordsIncomplete"/> is built from
+    /// that count plus <c>apiNeverClaimed</c> and <c>unresolvedProducts</c>, neither
+    /// of which appeared in the sentence this replaces, and
+    /// <see cref="InstallerQueryResult.UnaccountedProductCount"/> sets out the four
+    /// contributors those three summands carry. Read that note before quoting any of
+    /// this: two of the four are not failures to read at all.
     /// </summary>
     private (List<(string ProductCode, string? UserSid, MsiInstallContext Context)> Products, int UnreadableRows)
         EnumerateProducts(CancellationToken ct)
