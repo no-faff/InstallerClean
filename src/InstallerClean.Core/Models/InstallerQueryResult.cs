@@ -299,13 +299,26 @@ public record InstallerQueryResult(
 /// Products whose registry <c>Patches</c> key opened, from the per-product patch
 /// listing the superseded-patch condition rests on.
 ///
-/// THESE FOUR ARE CARRIED AND NOT YET SENT. They land here ahead of the rule that
-/// consumes the reading and ahead of the payload fields that will report them, so the
-/// three can be reviewed and reverted apart. Nothing outside this record reads them
-/// today, which is deliberate and is not the licence to delete them that an unread
-/// counter usually is. Against
-/// <see cref="ProductCount"/> it says how usual it is for a product to carry one:
-/// one machine reads 138 of 139, and a product with no patches has no reason to.
+/// THESE FOUR ARE READ AND THEY ARE SENT, AND THIS NOTE SAID THE OPPOSITE. It read
+/// "THESE FOUR ARE CARRIED AND NOT YET SENT ... Nothing outside this record reads them
+/// today, which is deliberate", which was true when the counters landed at 61d33b8c and
+/// false from e055f3ff the same day, the commit that added the readers.
+/// <see cref="ResultLogEntry"/> takes all four off this census, declares them as
+/// parameters of its scan record, and that record is the file the Send-result button
+/// POSTs.
+///
+/// THE MISREADING IT INVITED IS THE EXPENSIVE ONE. An unread counter is ordinarily fair
+/// game to drop, to rename or to quietly redefine, and these four are the only
+/// instrument this project has for sizing what the per-product condition withholds on
+/// any machine but the one it was written on. Something is receiving them, so a change
+/// of meaning here is a schema decision and not a tidy-up.
+///
+/// The identical sentence had already been found and corrected once, on
+/// <c>FallbackRead.ProductPatchSets</c> in <c>InstallerQueryService</c>, and that sweep
+/// stopped at the instance it found.
+///
+/// Against <see cref="ProductCount"/> it says how usual it is for a product to carry a
+/// Patches key at all, a product holding no registered patch having no reason to.
 /// </param>
 /// <param name="ProductPatchRegistrationCount">
 /// Patch subkeys under those keys, one per (product, patch) registration rather
