@@ -42,7 +42,9 @@ public class MissingFilesReportTests
         // The 3.0.0 correction in one assertion. A patch Windows has marked
         // superseded whose file has gone is the same condition as any other
         // missing registration: Windows opens every registered patch's cached file
-        // whether superseded or not, and a missing one gives error 1635.
+        // whether superseded or not, so the record is one Windows will act on and
+        // cannot satisfy. RegisteredPackage.IsMissingFromDisk carries the argument
+        // and why no single consequence may be named.
         var products = MissingFilesReport.Products(new[]
         {
             Missing(@"C:\Windows\Installer\superseded.msp", "Contoso Reader") with { PatchState = 2 },

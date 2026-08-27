@@ -1105,9 +1105,10 @@ public class FileSystemScanServiceTests
         // THIS TEST'S CLAIM IS THE REVERSE OF THE ONE IT REPLACES, which asserted
         // that such a row stayed off the missing-files report because the file
         // having gone was its expected end state. Windows opens every registered
-        // patch's cached file whether it has been superseded or not, and a missing
-        // one gives error 1635, so the record is exactly as much of a problem as
-        // any other and the report speaks for it.
+        // patch's cached file whether it has been superseded or not, so the record
+        // is exactly as much of a problem as any other and the report speaks for
+        // it. The argument, and why no single consequence may be named, is on
+        // RegisteredPackage.IsMissingFromDisk.
         const string gone = @"C:\Windows\Installer\superseded-gone.msp";
         var query = QueryReturning(new InstallerQueryResult(
             new List<RegisteredPackage> { Superseded(gone) }.AsReadOnly()));
@@ -1304,9 +1305,10 @@ public class FileSystemScanServiceTests
         // supersedes asserted that a superseded patch appeared in the removable
         // list with Reason "Superseded". Microsoft's own engineer documented in
         // 2008 that Windows opens every patch registered to a product whether or
-        // not it has been superseded, and a missing cached file then gives error
-        // 1635, so a file Windows holds a live registration for is not this app's
-        // to remove whatever state that registration carries.
+        // not it has been superseded, so a file Windows holds a live registration
+        // for is not this app's to remove whatever state that registration
+        // carries. The citation, and why no single consequence may be named, is on
+        // RegisteredPackage.IsMissingFromDisk.
         var registered = new List<RegisteredPackage>
         {
             Registered(@"C:\Windows\Installer\applied.msp"),

@@ -16,10 +16,11 @@ namespace InstallerClean.Helpers;
 /// ONE POPULATION, ONE SENTENCE, AND NO CAUSE NAMED. A registration naming an
 /// absent file is the same condition whether or not Windows has marked the patch
 /// superseded, because Windows opens every patch registered to a product either
-/// way and a missing one gives error 1635
-/// (<see cref="RegisteredPackage.IsMissingFromDisk"/> carries the citations). The
-/// data keeps the split, in <see cref="ScanResult.MissingUnaffectedCount"/> and
-/// its sibling; the copy does not.
+/// way, so the record is one Windows will act on and cannot satisfy
+/// (<see cref="RegisteredPackage.IsMissingFromDisk"/> carries the citations and
+/// why no single consequence may be named). The data keeps the split, in
+/// <see cref="ScanResult.MissingUnaffectedCount"/> and its sibling; the copy does
+/// not.
 ///
 /// AND IT SAYS NOTHING ABOUT WHAT REMOVED THEM, which is not a nicety. Every tool
 /// that has ever deleted from this folder leaves an identical record, this one

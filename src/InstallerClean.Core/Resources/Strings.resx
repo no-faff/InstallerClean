@@ -832,9 +832,11 @@ To put it back, you need the installer for the version you already have. Get it 
        ONE LINE OVER ONE POPULATION. It used to count only the registrations that
        carried no superseded or obsoleted state, the rest being read as the
        expected end state of a patch Windows had finished with. Windows opens
-       every patch registered to a product whether superseded or not, and a
-       missing one gives error 1635, so both are the same condition with the same
-       recovery step and one sentence covers them.
+       every patch registered to a product whether superseded or not, so the
+       record is one Windows will act on and cannot satisfy, and both are the same
+       condition with the same recovery step, which one sentence covers. The
+       citations, and why no single consequence may be named, are on
+       RegisteredPackage.IsMissingFromDisk.
 
        The hedges are load-bearing and are the verified position: "causes no
        trouble day to day" and "can fail", never "will". Microsoft guarantees

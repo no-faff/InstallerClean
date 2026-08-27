@@ -121,18 +121,50 @@ public record RegisteredPackage(
     /// the file. It does not. Microsoft's own Windows Installer engineer, on
     /// Microsoft's setup blog on 16 August 2008: "Windows Installer will always
     /// open every patch registered to a product whether or not it has already been
-    /// obsolesced or superseded when opening a product or package handle", and a
-    /// cached file that has gone then gives error 1635. Microsoft's currently
-    /// maintained article on this exact state (KB 971187) tests for it without any
-    /// carve-out: "if the LocalPackage string value or referenced package is
-    /// missing, the product is affected".
+    /// obsolesced or superseded when opening a product or package handle (as long
+    /// as machine state is not ignored)".
     ///
-    /// SO NO SENTENCE MAY GRADE THE TWO. The consequence is the same, the recovery
-    /// step is the same, and the only thing that ever differed is what removed the
-    /// file, which no surface may speak to (any tool that removed one, this one
-    /// included up to v2.3.0, leaves an identical record). The split survives as
-    /// two counts on <see cref="ScanResult"/> so the data keeps it; the copy does
-    /// not.
+    /// WHAT A MISSING FILE THEN COSTS IS NOT ONE OUTCOME, AND THIS NOTE NAMED ONE.
+    /// It said the file having gone "then gives error 1635", which compressed a
+    /// four-step chain into two. The same post states the chain: the handle opens,
+    /// the cached copy is not there, Windows goes looking for a source, and
+    /// "failing to resolve the source location for the patch, Windows Installer
+    /// returns error code 1635". This project then measured the other end of it. On
+    /// ONE machine, Windows 11 build 26200, not reproduced anywhere else, with an
+    /// applied patch's cached file moved away: the first three steps ran exactly as
+    /// described and the fourth did not. The source hunt failed and the patch was
+    /// ORPHANED, a silent registry repair returning 0, Windows deleting the patch
+    /// registration and leaving the patch's installed files untouched at the
+    /// patched version.
+    ///
+    /// WEIGH THAT READING FOR EXACTLY WHAT IT IS. A single machine can kill a claim
+    /// and can never rescue one, so it establishes that the outcome is not always
+    /// 1635 and it says nothing about what the outcome usually is. Neither may be
+    /// written as THE consequence: the post is about an install that needs the
+    /// patch's content and the measurement was a repair that does not, and a
+    /// sentence naming either one is false of the other.
+    ///
+    /// SO WHAT THIS PROPERTY RESTS ON IS THE FIRST SENTENCE AND NOT THE SECOND.
+    /// Windows opens the cached file whatever state the patch carries, so a
+    /// registration naming a file that has gone is a record Windows will act on and
+    /// cannot satisfy. That is enough to report it and no more is claimed here.
+    ///
+    /// KB 971187 IS CITED FOR ITS TEST AND IS NOT AN ARTICLE ABOUT THIS STATE,
+    /// which is what this note called it. It is a Windows Server article whose
+    /// symptom is a MISSING patch registration, whose own logged error is 1612, and
+    /// whose resolution is to re-create or to delete a registration rather than to
+    /// restore a file. Its test is the part that carries, and it carries with no
+    /// carve-out for any patch state: "if the LocalPackage string value or
+    /// referenced package is missing, the product is affected". The number and the
+    /// quotation move together or neither moves, the other candidate article
+    /// containing no LocalPackage text at all.
+    ///
+    /// SO NO SENTENCE MAY GRADE THE THREE STATES. Applied, superseded and obsoleted
+    /// reach this property on the same terms, the recovery step is the same, and the
+    /// only thing that ever differed is what removed the file, which no surface may
+    /// speak to (any tool that removed one, this one included up to v2.3.0, leaves
+    /// an identical record). The split survives as two counts on
+    /// <see cref="ScanResult"/> so the data keeps it; the copy does not.
     /// </summary>
     public bool IsMissingFromDisk => !FileExists;
 
