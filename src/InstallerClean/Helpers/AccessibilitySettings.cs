@@ -81,11 +81,34 @@ public sealed class AccessibilitySettings : INotifyPropertyChanged
         // SystemEvents can raise off the dispatcher thread; marshal so
         // PropertyChanged consumers (live bindings) update where WPF
         // expects them.
+        //
+        // NO DISPATCHER MEANS DROP IT, NOT DO IT HERE, and that is the whole of
+        // what changed. Application.Current is null once WPF has shut down, and
+        // the two subscriptions in the constructor are never removed, so this
+        // method is still reachable then, on the SystemEvents thread. Falling
+        // through to the direct call there would read the settings and raise
+        // PropertyChanged off the dispatcher, which is what the summary at the
+        // top of this file says does not happen, into a handler that writes
+        // the application's resource dictionary. Nothing here catches what that
+        // throws, and the throw would land on the SystemEvents thread.
+        //
+        // NOTHING IS LOST BY DROPPING. The value is read again on the next
+        // setting change, and a process whose dispatcher has gone has no binding
+        // left to tell.
+        //
+        // THE OTHER MARSHALS IN THIS APP DO NOT SETTLE IT AND CONSISTENCY IS NOT
+        // THE ARGUMENT. Some of them drop the work when the dispatcher is gone
+        // and some run it on the calling thread on purpose, MainViewModel having
+        // written down why running it there is right for a test with no
+        // Application at all. What decides it here is what running it here would
+        // do, which is the paragraph above, and not what the neighbours do.
         var dispatcher = Application.Current?.Dispatcher;
-        if (dispatcher is not null && !dispatcher.CheckAccess())
-            dispatcher.BeginInvoke((Action)ReadFromSystem);
-        else
+        if (dispatcher is null) return;
+
+        if (dispatcher.CheckAccess())
             ReadFromSystem();
+        else
+            dispatcher.BeginInvoke((Action)ReadFromSystem);
     }
 
     private void ReadFromSystem()
