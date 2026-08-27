@@ -504,7 +504,8 @@
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
                             AutomationProperties.HelpText="{Binding Cleanup.MoveButtonTooltip}"
                             ToolTip="{Binding Cleanup.MoveButtonTooltip}"
-                            ToolTipService.ShowOnDisabled="True"/>
+                            ToolTipService.ShowOnDisabled="True"
+                            ToolTipService.InitialShowDelay="150"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
                             KeyboardNavigation.TabIndex="1"
@@ -512,6 +513,7 @@
                             AutomationProperties.HelpText="{loc:Translate Tooltip.Delete}"
                             ToolTip="{loc:Translate Tooltip.Delete}"
                             ToolTipService.ShowOnDisabled="True"
+                            ToolTipService.InitialShowDelay="150"
                             Margin="{StaticResource GapRight.Sm}"/>
 
                     <!-- LiveSetting is on the overlay's matching line
