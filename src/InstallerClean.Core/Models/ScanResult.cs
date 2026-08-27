@@ -234,8 +234,8 @@ namespace InstallerClean.Models;
 /// <see cref="RegisteredClaimedCount"/>; one shape falls under
 /// <see cref="RegisteredUnjudgedCount"/> instead, a patch whose State read gave 2
 /// or 4 and whose Uninstallable read then failed, so the two must never be added.
-/// Ones whose file has already gone are not here at all; they are in
-/// <see cref="MissingUnaffectedCount"/>.
+/// Ones whose file has already gone are in one of the two missing counts,
+/// decided by <c>MissingFilesReport.Affected</c> rather than by the state.
 /// </param>
 /// <param name="RegisteredSupersededBytes">
 /// The same population's bytes. It is the figure nobody had: the field data
