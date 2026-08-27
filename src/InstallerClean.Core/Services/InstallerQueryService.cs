@@ -147,13 +147,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// patches has no reason to carry it.
     /// </param>
     /// <param name="ProductPatchRegistrations">
-    /// Patch subkeys seen under those keys, one per (product, patch) registration
-    /// rather than per patch. With <paramref name="ProductPatchKeys"/> it is the
-    /// shape fact the measured machine is least like: it held five when this was
-    /// written on 2026-08-17 and three when its hives were read on 2026-08-18, with
-    /// nothing in this code changing in between. The figure is dated because it is
-    /// one machine's state at one moment, and an undated one reads as current for
-    /// ever.
+    /// Patch subkeys REGISTERED under those keys, one per (product, patch)
+    /// registration rather than per patch, and taken off the key listing rather than
+    /// off what the read went on to examine. With
+    /// <paramref name="ProductPatchKeys"/> it is the shape fact the measured machine
+    /// is least like: it held five when this was written on 2026-08-17 and three
+    /// when its hives were read on 2026-08-18, with nothing in this code changing in
+    /// between. The figure is dated because it is one machine's state at one moment,
+    /// and an undated one reads as current for ever.
+    ///
+    /// IT READ "SEEN" UNTIL 3.0.0, AND THE CODE COUNTED WHAT IT SAW. The read stops
+    /// at the first patch declaring itself removable, so the count stopped there
+    /// too. A REPORT FROM AN EARLIER VERSION CARRIES THE OTHER QUANTITY: the two are
+    /// not comparable and must not be summed, and the envelope's app version and
+    /// schema version each separate them. The two dated figures above are
+    /// unaffected, re-read from that machine's hive on 2026-08-28: across its 147
+    /// products carrying a Patches key the read stops early on none of them.
     /// </param>
     /// <param name="ProductsWithRemovablePatch">
     /// Products where at least one registered patch positively declared itself
@@ -3075,12 +3084,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // quietly changes meaning is worse than one that is missing.
         patchKeys++;
 
-        // THE NAME LISTING, TAKEN ONCE AND USED TWICE. The code list is built from
-        // these names and not from the loop below, which is what leaves it complete
-        // even where that loop returns early. A key listing cannot be truncated the
-        // way an enumeration can: GetSubKeyNames returns every name under the key or
-        // throws, and the caller's catch turns a throw into the null set above.
+        // THE NAME LISTING IS WHAT EVERY COMPLETE ANSWER HERE COMES OFF, and the
+        // loop below is the part that may stop early. Both the code list and the
+        // registration count are taken from these names rather than out of that
+        // loop, which is what leaves them complete where it returns. A key listing
+        // cannot be truncated the way an enumeration can: GetSubKeyNames returns
+        // every name under the key or throws, and the caller's catch turns a throw
+        // into the null set above.
         var patchNames = patchesKey.GetSubKeyNames();
+
+        // COUNTED OFF THE LISTING RATHER THAN INSIDE THE LOOP, and it was inside the
+        // loop until 3.0.0. The loop returns on the first patch declaring itself
+        // removable, so a product holding fifty-eight registrations could contribute
+        // one, and it did so on exactly the products that make
+        // ProductsWithRemovablePatch non-zero. Those two are collected in one walk
+        // and published side by side, so the figure went quiet on the machines it
+        // exists to measure, which reads as good news rather than as a fault.
+        patchRegistrations += patchNames.Length;
 
         // A NAME THAT WILL NOT UNPACK LEAVES THE LISTING UNESTABLISHED, because the
         // registry is saying this product holds a patch and nothing here can turn that
@@ -3106,8 +3126,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unestablished = false;
         foreach (var patchName in patchNames)
         {
-            patchRegistrations++;
-
             using var patchKey = patchesKey.OpenSubKey(patchName);
             if (patchKey is null) { unestablished = true; continue; }
 

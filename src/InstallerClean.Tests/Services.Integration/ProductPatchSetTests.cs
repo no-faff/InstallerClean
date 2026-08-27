@@ -70,9 +70,14 @@ public class ProductPatchSetTests
             Patch(products, "p2", uninstallable: 1);
             Patch(products, "p3", uninstallable: 0);
 
-            var (set, _, _, _) = Read(products);
+            var (set, _, registrations, _) = Read(products);
 
             Assert.Equal(ProductPatchSet.RemovablePatchPresent, set);
+            // AND THE COUNT, WHICH THIS FIXTURE COULD CATCH AND DISCARDED. p2 ends
+            // the read with p3 still unexamined, which is the shape the count can be
+            // wrong on: until 3.0.0 the counter lived inside the loop and stopped at
+            // 2. A registration is registered whether or not the read reached it.
+            Assert.Equal(3, registrations);
         });
     }
 
@@ -95,8 +100,9 @@ public class ProductPatchSetTests
             var (set, _, registrations, _) = Read(products);
 
             Assert.Equal(ProductPatchSet.Unestablished, set);
-            // Counted anyway: the registration exists and was seen, which is what the
-            // shape figure is for. Only the verdict withholds.
+            // Counted anyway: the registration is registered whatever the read made
+            // of its value, which is what the shape figure is for. Only the verdict
+            // withholds.
             Assert.Equal(1, registrations);
         });
     }
