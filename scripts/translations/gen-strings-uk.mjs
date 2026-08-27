@@ -57,7 +57,7 @@ const OVERRIDES = {
   // Sentence-level count keys: the 2-4 form (nominative plural noun/adjective).
   'Summary.RegisteredStillUsed.Few': `{0} файли залишено без змін`,
   'Summary.OrphanedToCleanUp.Few': `{0} непотрібні файли для очищення`,
-  'Summary.MissingFromDisk.Few': `Windows має записи про {0} файли, яких немає в {InstallerFolder}: {1}. У повсякденній роботі це не заважає, але відновлення, оновлення чи видалення програми через них може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
+  'Summary.MissingFromDisk.Few': `Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do.`,
   // 2-4 takes "встановлені програми"; the base Plural key carries the 5+
   // genitive "встановлених програм".
   'Summary.RegisteredWindow.Few': `{0} файли залишено без змін ({1})`,
@@ -209,14 +209,14 @@ const MAP = {
   // Body copy
   'Body.MainExplanation.Lead': `Будь-які непотрібні файли нижче [можна безпечно видалити].`,
   'Body.MainExplanation.Why': `Вони лежать у {InstallerFolder}. InstallerClean запитує Windows про кожну встановлену програму: файл потрапляє до списку, коли на нього не претендує жодна програма ({0}) або коли його замінило новіше виправлення і жодна програма не змогла б до нього повернутися ({1}).`,
-  'Body.MainExplanation.Action': `Перемістіть їх до вибраної вами папки призначення, а потім видаліть цю папку, коли переконаєтеся, що ваші програми, як і раніше, оновлюються, відновлюються та видаляються. Повернення їх до {InstallerFolder} відновлює все. Або видаліть їх назавжди просто зараз.`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.`,
   'Body.PendingReboot.MsiExecuteMutex': `Зараз щось використовує Windows Installer, наприклад оновлення Windows або програма, що встановлюється у фоні. «Перемістити» і «Видалити» призупинено на цей час, щоб InstallerClean не чіпав {InstallerFolder}, доки вона змінюється. Коли все завершиться, повторіть сканування, і вони повернуться.`,
   'Body.PendingReboot.InstallerInProgress': `На цьому комп'ютері призупинено попередню транзакцію Windows Installer. Відновіть або скасуйте те встановлення (чи перезавантажте Windows), перш ніж очищати {InstallerFolder}.`,
   'Body.PendingReboot.PendingRenameInCache': `Windows поставив в чергу на наступне перезавантаження перейменування файлу, що стосується {InstallerFolder}. Перезавантажте Windows, перш ніж очищати.`,
   'Body.NoFileSelected': `Виберіть файл, щоб переглянути деталі.`,
   'Body.NoProductSelected': `Виберіть продукт, щоб переглянути деталі.`,
   'Body.NoMetadata': `Метадані недоступні.`,
-  'Body.RegisteredMissingFromDisk': `Цього файлу інсталятора немає. Зараз це не створює жодних труднощів і не створюватиме до того дня, коли ви спробуєте відновити, оновити або видалити програму, якій він належить. Тоді цей крок може завершитися невдало, бо Windows шукає цей файл, а його немає.&#10;&#10;Щоб спробувати це виправити, завантажте інсталятор тієї програми в її розробника і запустіть його поверх наявної копії (не видаляйте програму спершу: видалення саме по собі є кроком, якому потрібен цей файл). За змоги візьміть саме ту версію, яку встановлено, бо Windows може відхилити іншу. Це має відновити файл і не зачепити ваші налаштування, але Microsoft цього не гарантує, і її власний останній засіб — перевстановлення програми.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.\n\nTo put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README [пояснює цю папку] і як відновити файл, словами самої Microsoft.`,
   'Body.NoPatches': `(немає)`,
 
@@ -297,8 +297,8 @@ const MAP = {
   'Summary.OrphanedToCleanUp.Plural': `{0} непотрібних файлів для очищення`,
   'Summary.NothingListed.Singular': `На цьому ПК InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав єдиний файл, а не показав його в списку.`,
   'Summary.NothingListed.Plural': `На цьому ПК InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав {0} {1}, а не показав їх у списку.`,
-  'Summary.MissingFromDisk.Singular': `Windows має запис про {0} файл, якого немає в {InstallerFolder}: {1}. У повсякденній роботі це не заважає, але відновлення, оновлення чи видалення програми через нього може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
-  'Summary.MissingFromDisk.Plural': `Windows має записи про {0} файлів, яких немає в {InstallerFolder}: {1}. У повсякденній роботі це не заважає, але відновлення, оновлення чи видалення програми через них може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
+  'Summary.MissingFromDisk.Singular': `Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Plural': `Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `ще {0} програма`,
   'Summary.MissingFromDisk.OtherPrograms.Plural': `ще {0} програм`,
   'Summary.MissingFromDisk.Unnamed.Singular': `{0} файл, для якого в записах не названо програми`,
@@ -517,13 +517,13 @@ const MAP = {
   'Completion.MoveRestoreHintSameDrive.Singular': `Файл у цій папці [можна безпечно прибрати], тож видаліть папку або перемістіть її на інший диск, коли справді захочете повернути місце. До того часу ви можете повернути його до {InstallerFolder}, якщо якійсь програмі він усе ж знадобиться (украй малоймовірно).`,
   'Completion.MoveRestoreHintSameDrive.Plural': `Файли в цій папці [можна безпечно прибрати], тож видаліть її або перемістіть на інший диск, коли справді захочете повернути місце. До того часу ви можете повернути їх до {InstallerFolder}, якщо якійсь програмі знадобиться один із них (украй малоймовірно).`,
   'Confirm.DeletePermanently.Singular': `Цей файл буде видалено назавжди. Його [можна безпечно видалити], але якщо хочете резервну копію, скористайтеся кнопкою «Перемістити».`,
-  'Confirm.DeletePermanently.Plural': `Файли буде видалено назавжди. Їх [можна безпечно видалити], але якщо хочете резервну копію, скористайтеся кнопкою «Перемістити».`,
+  'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean не зміг отримати від Windows справжній шлях до {InstallerFolder}, тож про жоден файл не вдалося показати, що він усередині, і жоден не було запропоновано для очищення. Це сканування нічого не знайшло через невдачу тієї перевірки, а не тому, що папка чиста. Нічого не прибрано.`,
   'Automation.Scroll.ProductDetails': `Відомості про продукт`,
   'Body.PendingReboot.Other': `У Windows Installer щось виконується, тому «Перемістити» і «Видалити» призупинено. InstallerClean не чіпатиме {InstallerFolder}, доки вона змінюється. Коли все завершиться, повторіть сканування, і вони повернуться.`,
   'Cli.TooManyArgumentsNoPath': `Помилка: неочікуваний зайвий аргумент «{0}». /s і /d не приймають інших аргументів, і за один запуск можна використати лише один ключ.`,
-  'Cli.MissingFromDisk.Singular': `Windows має запис про {0} файл, якого немає в {InstallerFolder}: {1}. У повсякденній роботі це не заважає, але відновлення, оновлення чи видалення програми через нього може не вдатися. Повторний запуск інсталятора тієї програми, бажано тієї самої версії, зазвичай повертає файл.`,
-  'Cli.MissingFromDisk.Plural': `Windows має записи про {0} файлів, яких немає в {InstallerFolder}: {1}. У повсякденній роботі це не заважає, але відновлення, оновлення чи видалення програми через них може не вдатися. Повторний запуск інсталятора кожної програми, бажано тієї самої версії, зазвичай повертає файли.`,
+  'Cli.MissingFromDisk.Singular': `Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.`,
+  'Cli.MissingFromDisk.Plural': `Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.`,
   'Cli.MoveNotEnoughSpace': `Помилка: недостатньо місця в {0}. Для переміщення цих файлів потрібно {1}, а вільно {2}. Нічого не переміщено.`,
   'Cli.PendingRebootBlocked.Other': `Помилка: у Windows Installer щось виконується, тому /m і /d заблоковано. InstallerClean не чіпатиме {InstallerFolder}, доки вона змінюється. Спробуйте ще раз, коли все завершиться.`,
   'Cli.FoundNoOrphans': `Непотрібних файлів не знайдено.`,
@@ -549,6 +549,10 @@ const MAP = {
   'Completion.NothingOffered': `На цьому ПК нічого не запропоновано`,
   'Completion.NothingOfferedBody.Singular': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав єдиний файл ({2}), який інакше запропонував би.`,
   'Completion.NothingOfferedBody.Plural': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав усі {0} {1} ({2}), які інакше запропонував би.`,
+  'Summary.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
+  'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
+  'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

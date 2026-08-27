@@ -178,14 +178,14 @@ const MAP = {
   // Body copy
   'Body.MainExplanation.Lead': `Любые ненужные файлы ниже [можно безопасно удалить].`,
   'Body.MainExplanation.Why': `Они лежат в {InstallerFolder}. InstallerClean спрашивает Windows о каждой установленной программе: файл попадает в список, когда его не заявляет ни одна программа ({0}) или когда его заменило более новое исправление и ни одна программа не смогла бы к нему откатиться ({1}).`,
-  'Body.MainExplanation.Action': `Переместите их в выбранную вами папку назначения, а затем удалите эту папку, когда убедитесь, что ваши программы по-прежнему обновляются, восстанавливаются и удаляются как обычно. Возврат их в {InstallerFolder} восстанавливает всё. Или удалите их безвозвратно прямо сейчас.`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.`,
   'Body.PendingReboot.MsiExecuteMutex': `Сейчас что-то использует Windows Installer, например обновление Windows или программа, устанавливающаяся в фоне. «Переместить» и «Удалить» приостановлены на это время, чтобы InstallerClean не трогал {InstallerFolder}, пока она меняется. Когда всё закончится, повторите сканирование, и они вернутся.`,
   'Body.PendingReboot.InstallerInProgress': `На этом компьютере приостановлена предыдущая транзакция Windows Installer. Возобновите или откатите эту установку (либо перезагрузите Windows), прежде чем очищать {InstallerFolder}.`,
   'Body.PendingReboot.PendingRenameInCache': `Windows поставил в очередь на следующую перезагрузку переименование файла, которое затрагивает {InstallerFolder}. Перезагрузите Windows, прежде чем очищать.`,
   'Body.NoFileSelected': `Выберите файл, чтобы посмотреть сведения.`,
   'Body.NoProductSelected': `Выберите продукт, чтобы посмотреть сведения.`,
   'Body.NoMetadata': `Метаданные недоступны.`,
-  'Body.RegisteredMissingFromDisk': `Этот файл установщика отсутствует. Сейчас это не создаёт никаких трудностей и не создаст до того дня, когда вы попробуете восстановить, обновить или удалить программу, которой он принадлежит. Тогда этот шаг может завершиться неудачей, потому что Windows ищет этот файл, а его нет.&#10;&#10;Чтобы попробовать это исправить, скачайте установщик той программы у её разработчика и запустите его поверх имеющейся у вас копии (не удаляйте программу сначала: удаление само по себе является шагом, которому нужен этот файл). По возможности возьмите ту версию, которая у вас установлена, так как Windows может отклонить другую. Это должно восстановить файл и не затронуть ваши настройки, но Microsoft этого не гарантирует, и её собственное последнее средство — переустановка программы.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.\n\nTo put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README [объясняет эту папку] и то, как восстановить файл, словами самой Microsoft.`,
   'Body.NoPatches': `(нет)`,
 
@@ -266,8 +266,8 @@ const MAP = {
   'Summary.OrphanedToCleanUp.Plural': `{0} ненужных файлов для очистки`,
   'Summary.NothingListed.Singular': `На этом ПК InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл, а не показал его в списке.`,
   'Summary.NothingListed.Plural': `На этом ПК InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал {0} {1}, а не показал их в списке.`,
-  'Summary.MissingFromDisk.Singular': `У Windows есть запись о {0} файле, которого нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за него может не удаться. Откройте «Подробности», чтобы узнать, что делать.`,
-  'Summary.MissingFromDisk.Plural': `У Windows есть записи о {0} файлах, которых нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за них может не удаться. Откройте «Подробности», чтобы узнать, что делать.`,
+  'Summary.MissingFromDisk.Singular': `Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do.`,
+  'Summary.MissingFromDisk.Plural': `Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `ещё {0} программа`,
   'Summary.MissingFromDisk.OtherPrograms.Plural': `ещё {0} программ`,
   'Summary.MissingFromDisk.Unnamed.Singular': `{0} файл, для которого в записях не названа программа`,
@@ -449,7 +449,7 @@ const MAP = {
   'Completion.MoveRestoreHintSameDrive.Singular': `Файл в этой папке [можно безопасно убрать], так что удалите папку или переместите её на другой диск, когда действительно захотите вернуть место. До тех пор вы можете вернуть его в {InstallerFolder}, если какой-нибудь программе он всё же понадобится (крайне маловероятно).`,
   'Completion.MoveRestoreHintSameDrive.Plural': `Файлы в этой папке [можно безопасно убрать], так что удалите её или переместите на другой диск, когда действительно захотите вернуть место. До тех пор вы можете вернуть их в {InstallerFolder}, если какой-нибудь программе понадобится один из них (крайне маловероятно).`,
   'Confirm.DeletePermanently.Singular': `Этот файл будет удалён безвозвратно. Его [можно безопасно удалить], но если хотите резервную копию, воспользуйтесь кнопкой «Переместить».`,
-  'Confirm.DeletePermanently.Plural': `Файлы будут удалены безвозвратно. Их [можно безопасно удалить], но если хотите резервную копию, воспользуйтесь кнопкой «Переместить».`,
+  'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean не смог получить от Windows настоящий путь к {InstallerFolder}, поэтому ни про один файл не удалось показать, что он находится внутри, и ни один не был предложен для очистки. Это сканирование ничего не нашло из-за неудачи этой проверки, а не потому, что папка чиста. Ничего не убрано.`,
   'Automation.Scroll.ProductDetails': `Сведения о продукте`,
   'Body.PendingReboot.Other': `У Windows Installer что-то выполняется, поэтому «Переместить» и «Удалить» приостановлены. InstallerClean не будет трогать {InstallerFolder}, пока она меняется. Когда всё закончится, повторите сканирование, и они вернутся.`,
@@ -467,6 +467,8 @@ const MAP = {
   'Completion.NothingOffered': `На этом ПК ничего не предложено`,
   'Completion.NothingOfferedBody.Singular': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл ({2}), который иначе предложил бы.`,
   'Completion.NothingOfferedBody.Plural': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} {1} ({2}), которые иначе предложил бы.`,
+  'Summary.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
+  'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -594,8 +596,8 @@ const CLI = {
   'Cli.TooManyArguments': `Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке назначения есть пробел, возьмите весь путь в кавычки: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Папка своя у каждого пользователя; запланированным и SYSTEM: /m ПУТЬ.`,
   'Cli.TooManyArgumentsNoPath': `Ошибка: непредвиденный лишний аргумент «{0}». /s и /d не принимают других аргументов, и за один запуск можно использовать только один ключ.`,
-  'Cli.MissingFromDisk.Singular': `У Windows есть запись о {0} файле, которого нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за него может не удаться. Повторный запуск установщика той программы, желательно той же версии, обычно возвращает файл.`,
-  'Cli.MissingFromDisk.Plural': `У Windows есть записи о {0} файлах, которых нет в {InstallerFolder}: {1}. В повседневной работе это не мешает, но восстановление, обновление или удаление программы из-за них может не удаться. Повторный запуск установщика каждой программы, желательно той же версии, обычно возвращает файлы.`,
+  'Cli.MissingFromDisk.Singular': `Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.`,
+  'Cli.MissingFromDisk.Plural': `Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.`,
   'Cli.MoveNotEnoughSpace': `Ошибка: недостаточно места в {0}. Для перемещения этих файлов нужно {1}, а свободно {2}. Ничего не перемещено.`,
   'Cli.PendingRebootBlocked.Other': `Ошибка: у Windows Installer что-то выполняется, поэтому /m и /d заблокированы. InstallerClean не будет трогать {InstallerFolder}, пока она меняется. Попробуйте снова, когда всё закончится.`,
   'Cli.FoundNoOrphans': `Ненужных файлов не найдено.`,
@@ -612,6 +614,8 @@ const CLI = {
   'Cli.InstallerLockUnavailable': `Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Cli.MoveInstallerLockUnavailable': `Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Cli.RecordsNotMatched': `InstallerClean не смог сопоставить всё, что есть в записях Windows, поэтому прочитал их не полностью. Найденного это не касается, но сказанное о файлах, отсутствующих в {InstallerFolder}, может быть неполным. Повторный запуск, возможно, найдёт больше.`,
+  'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
+  'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
