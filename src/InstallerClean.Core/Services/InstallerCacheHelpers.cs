@@ -195,7 +195,30 @@ internal static class InstallerCacheHelpers
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
-        var resolvedInput = ResolveFinalPath(path)
+        return ResolvesInsideSystemFolder(ResolveFinalPath(path));
+    }
+
+    /// <summary>
+    /// The containment comparison itself, over an ALREADY-resolved input, and the
+    /// exact counterpart of <see cref="ResolvesInsideInstallerFolder"/> on the other
+    /// forbidden set. Split out for the same reason that one was: a caller that has
+    /// already resolved a path and is about to act on THAT value needs to ask the
+    /// question of the value rather than of the path, or it is answering about a
+    /// resolution it is not using.
+    ///
+    /// SHAPED TO MATCH ITS SIBLING RATHER THAN TO ITS OWN CONVENIENCE. Same
+    /// already-resolved parameter, same trim of the input, same equality-or-prefix
+    /// test, same treatment of a root that will not resolve. It takes no root
+    /// override, because nothing needs to relocate these roots and a parameter
+    /// nobody passes is a seam nobody is testing.
+    ///
+    /// A DEGRADED INPUT ANSWERS "NOT INSIDE", which is what the destination side
+    /// wants and what the sibling does: a caller refusing on this answer would
+    /// strand a user whose path merely could not be expanded.
+    /// </summary>
+    internal static bool ResolvesInsideSystemFolder(string resolvedInput)
+    {
+        var input = resolvedInput
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
         var systemRoots = new[]
@@ -210,9 +233,9 @@ internal static class InstallerCacheHelpers
         {
             if (string.IsNullOrEmpty(root)) continue;
             var resolvedRoot = ResolveFinalPath(root).TrimEnd(Path.DirectorySeparatorChar);
-            if (resolvedInput.Equals(resolvedRoot, StringComparison.OrdinalIgnoreCase))
+            if (input.Equals(resolvedRoot, StringComparison.OrdinalIgnoreCase))
                 return true;
-            if (resolvedInput.StartsWith(resolvedRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            if (input.StartsWith(resolvedRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
         return false;

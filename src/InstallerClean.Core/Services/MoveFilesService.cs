@@ -249,9 +249,11 @@ public sealed class MoveFilesService : IMoveFilesService
             // per iteration. The per-iteration check catches a junction
             // swap on the destination's parent folder during the loop:
             // without it, a relabelled leaf folder would silently route
-            // the remaining files into the junction's target. The
-            // pre-loop IsInstallerFolderOrChild check covers the
-            // CreateDirectory point; the loop-body check covers each
+            // the remaining files into the junction's target. None of
+            // these checks is redundant on another: each answers for a
+            // moment the others cannot see, the pre-loop pair for the
+            // CreateDirectory point, the pair below for the value this
+            // capture hands the loop, and the loop-body check for every
             // per-file move.
             // The bool is kept, not discarded: it says whether the kernel really
             // expanded this path, and the per-iteration check below compares
@@ -259,6 +261,33 @@ public sealed class MoveFilesService : IMoveFilesService
             var canonicalProven = InstallerCacheHelpers.TryResolveFinalPath(
                 destinationFolder, out var canonicalRaw);
             var canonicalDestination = canonicalRaw.TrimEnd(Path.DirectorySeparatorChar);
+
+            // THE GATES ABOVE APPROVED A DIFFERENT RESOLUTION FROM THE ONE THE
+            // LOOP DEFENDS. They ask about destinationFolder and resolve it
+            // themselves; the line above resolves the same string again, later,
+            // and it is that answer the per-file comparison then holds everything
+            // to. Without the pair below, a junction swapped in between the two
+            // would leave the loop faithfully defending a baseline no gate had
+            // seen, and ClassifyAbort could not notice: it asks whether the
+            // resolution moved and whether proof was lost, and containment is
+            // neither of those questions.
+            //
+            // Asked of the captured value rather than of the path a third time,
+            // which is the point: the question has to be about the string being
+            // defended. A capture whose resolution degraded answers "not inside"
+            // and is let through, exactly as the gates above treat one, because
+            // refusing on a path that merely could not be expanded would strand a
+            // user with nowhere to move to.
+            //
+            // It does not close the hole named at the per-iteration check below,
+            // where a leaf deleted and replaced inside the window compares equal.
+            // That one is open and stays open.
+            if (InstallerCacheHelpers.ResolvesInsideInstallerFolder(canonicalDestination))
+                throw new LocalisedInvalidOperationException(
+                    string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+            if (InstallerCacheHelpers.ResolvesInsideSystemFolder(canonicalDestination))
+                throw new LocalisedInvalidOperationException(
+                    string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
 
             ProbeDestinationWriteable(destinationFolder);
 
