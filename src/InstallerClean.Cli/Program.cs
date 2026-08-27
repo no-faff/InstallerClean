@@ -1271,12 +1271,15 @@ internal static class Program
             _ => Strings.Cli_PendingRebootBlocked_Other,
         };
         Console.WriteLine(stdoutMessage);
-        // The reason label and template are built English: the
-        // Cli.EventLogReason.* labels ARE translated in the satellites, but the
+        // The reason label and template are built English: the Cli.EventLogReason.*
+        // labels are translated in the Japanese satellite and in no other, but the
         // Application channel is sysadmin-facing and an RMM grep on a known phrase
-        // needs a stable English target. The localised stdout sentence above is
-        // what the operator reads; the label switch lives inside the scope so it
-        // resolves en-GB, not the OS language.
+        // needs a stable English target. Those Japanese values are inert rather than
+        // wrong. This note said "the satellites", which sends the next reader hunting
+        // them through fifteen files and then deciding which half of the arrangement
+        // is the mistake. The localised stdout sentence above is what the operator
+        // reads; the label switch lives inside the scope so it resolves en-GB, not the
+        // OS language.
         MachineContract.WriteEventLog(CliEventClass.TransientSkip, () =>
         {
             var reasonLabel = reason switch
