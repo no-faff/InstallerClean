@@ -14,7 +14,7 @@ namespace InstallerClean.Tests.Services;
 /// the service works against actual Windows filesystem behaviour
 /// (case-insensitivity, locked files, junction handling, read-only
 /// destinations); these unit tests prove the per-file error
-/// categorisation, the unique-name fallback logic, and the cancellation
+/// categorisation, the destination-collision refusal, and the cancellation
 /// path without touching the disk at all.
 ///
 /// Deliberately uncovered: the ProbeDestinationWriteable failure
@@ -50,8 +50,13 @@ public class MoveFilesServiceUnitTests
     }
 
     [Fact]
-    public async Task MoveFilesAsync_appends_unique_suffix_on_collision()
+    public async Task MoveFilesAsync_refuses_a_name_already_in_the_destination()
     {
+        // The suffix this used to append made the completion screen's restore line
+        // false for the renamed file: Windows Installer looks for a cached package
+        // by the exact path it recorded, so "dup (1).msi" does not go back as
+        // "dup.msi", and nothing recorded which file had been renamed. Refusing
+        // states the problem and leaves the file recoverable where it is.
         var fs = new MockFileSystem();
         var source = $@"{SourceDir}\dup.msi";
         var existing = $@"{DestDir}\dup.msi";
@@ -61,10 +66,41 @@ public class MoveFilesServiceUnitTests
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
+        Assert.Equal(0, result.MovedCount);
+        var error = Assert.Single(result.Errors);
+        var collision = Assert.IsType<DestinationCollision>(error);
+        Assert.Equal(source, collision.FilePath);
+        Assert.Equal("dup.msi", collision.FileName);
+        // The source is still in the cache, which is what makes the refusal cost
+        // the user nothing they cannot recover: another folder, or an emptied one,
+        // moves it.
+        Assert.True(fs.File.Exists(source));
+        // And nothing was written under a suffixed name.
+        Assert.False(fs.File.Exists($@"{DestDir}\dup (1).msi"));
+        // The file that was already there is untouched, which is the other half of
+        // why this is a refusal rather than an overwrite.
+        Assert.Equal("existing bytes", fs.File.ReadAllText(existing));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_a_refused_collision_does_not_stop_the_rest_of_the_batch()
+    {
+        // The refusal is a per-file outcome and not a batch failure, so a folder
+        // holding one clashing name must not cost the user every other file.
+        var fs = new MockFileSystem();
+        var clash = $@"{SourceDir}\dup.msi";
+        var fine = $@"{SourceDir}\other.msi";
+        fs.AddFile(clash, new MockFileData("source bytes"));
+        fs.AddFile(fine, new MockFileData("other bytes"));
+        fs.AddFile($@"{DestDir}\dup.msi", new MockFileData("existing bytes"));
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { clash, fine }, DestDir, UnderLeaseClaims.None);
+
         Assert.Equal(1, result.MovedCount);
-        Assert.Empty(result.Errors);
-        Assert.True(fs.File.Exists($@"{DestDir}\dup.msi"));      // original
-        Assert.True(fs.File.Exists($@"{DestDir}\dup (1).msi"));  // moved with suffix
+        Assert.IsType<DestinationCollision>(Assert.Single(result.Errors));
+        Assert.True(fs.File.Exists($@"{DestDir}\other.msi"));
+        Assert.True(fs.File.Exists(clash));
     }
 
     [Fact]
@@ -427,8 +463,8 @@ public class MoveFilesServiceUnitTests
 
     /// <summary>
     /// A filesystem whose File.Move throws <paramref name="onMove"/> for the one
-    /// source path, and which reports nothing else as existing so the
-    /// unique-name probe takes the first candidate. MockFileSystem cannot raise
+    /// source path, and which reports nothing else as existing so the destination
+    /// is clear and the move is actually attempted. MockFileSystem cannot raise
     /// an IOException carrying a chosen HRESULT, and the HRESULT is the whole
     /// subject of the tests below.
     /// </summary>

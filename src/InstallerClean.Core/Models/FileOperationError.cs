@@ -65,9 +65,24 @@ public sealed record AccessDenied(string FilePath)
 }
 
 /// <summary>
-/// Move couldn't pick a unique filename in the destination folder
-/// (the unique-suffix pattern was exhausted - thousands of collisions).
-/// Move only.
+/// A file of that name was already in the destination folder, so Move refused
+/// this one and left it where it was. Move only.
+///
+/// IT USED TO MEAN THE OPPOSITE OF WHAT IT MEANS NOW. Move appended " (1)",
+/// " (2)" and so on until it found a free name, and this category was raised
+/// only when 10,000 of those all collided. The renaming made the completion
+/// screen's own restore line false for the file it renamed, Windows Installer
+/// looking for a cached package by the exact path it recorded, so the renaming
+/// went and the first collision is now the refusal.
+///
+/// THE MESSAGE STILL DESCRIBES THE OLD MEANING AND THAT IS DELIBERATE FOR NOW.
+/// <c>Error.NoUniqueFilename</c> names 10,000 attempts, which this can no longer
+/// be, and it is a known-false line logged and left rather than quietly weakened:
+/// the English value and its fifteen translations move together in the
+/// translation round, and changing the English alone would leave every other
+/// language carrying the false sentence on its own.
+///
+/// The key name has the same problem and stays for the same reason.
 /// </summary>
 public sealed record DestinationCollision(string FilePath, string FileName)
     : FileOperationError(FilePath)

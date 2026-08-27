@@ -333,10 +333,12 @@ public sealed class MoveFilesService : IMoveFilesService
                     // no consumer gets control again before the move. It is NOT the
                     // last position the check could occupy. The source Exists test,
                     // the reparse read, the containment guard's real-filesystem
-                    // resolution and GetUniqueDestPath all sit after it, and the
-                    // last of those runs a collision loop bounded at 10,000 probes,
-                    // which on a network destination is 10,000 round trips inside
-                    // the machine-wide mutex. Bounded, and not small.
+                    // resolution and the destination Exists test all sit after it,
+                    // and each of them can go to a network destination inside the
+                    // machine-wide mutex. Small, and not nothing. This used to be
+                    // the worse claim it now is not: the destination test was a
+                    // collision loop bounded at 10,000 probes, so the window it left
+                    // open was up to 10,000 round trips rather than one.
                     //
                     // The ordering is not the reach, and the reach has a hole worth
                     // naming rather than a guarantee. A resolve that DEGRADED is
@@ -456,8 +458,38 @@ public sealed class MoveFilesService : IMoveFilesService
                         continue;
                     }
 
+                    // A NAME ALREADY IN THE DESTINATION IS REFUSED AND NOT WORKED
+                    // AROUND, and what decides that is a promise made on the screen
+                    // the move ends on. It tells the user the parked files can be
+                    // put back into the cache folder if anything ever turns out to
+                    // need one, and Windows Installer looks for a cached package by
+                    // the exact path it recorded. A file parked as "thing (1).msi"
+                    // does not go back as "thing.msi", so the suffix this used to
+                    // append quietly made that sentence false for the file it
+                    // renamed, and nothing anywhere recorded which file that was.
+                    //
+                    // The restore line cannot qualify itself either: it is chosen
+                    // from the moved count and the destination's drive, so it has no
+                    // way to know a rename happened. Refusing the one file keeps the
+                    // promise true for every file that did move, costs the user
+                    // nothing they cannot recover (the file is still in the cache and
+                    // a different folder or an emptied one moves it), and puts the
+                    // refusal on a surface that already exists.
                     var fileName = _fs.Path.GetFileName(sourcePath);
-                    var destPath = GetUniqueDestPath(destinationFolder, fileName);
+                    var destPath = _fs.Path.Combine(destinationFolder, fileName);
+                    if (_fs.File.Exists(destPath))
+                    {
+                        errors.Add(new DestinationCollision(sourcePath, fileName));
+                        continue;
+                    }
+
+                    // Not File.Move with overwrite=true, which would follow a
+                    // reparse point planted at destPath in the window this check
+                    // leaves open. The non-overwriting form refuses an existing
+                    // target, so the race ends in a per-file error rather than in a
+                    // move that follows a link out to somewhere sensitive. The check
+                    // above is what makes the ordinary collision a stated refusal
+                    // rather than that error; it is not what makes the move safe.
                     _fs.File.Move(sourcePath, destPath);
 
                     // A move that returned without throwing has not necessarily
@@ -468,16 +500,12 @@ public sealed class MoveFilesService : IMoveFilesService
                     else
                         errors.Add(halfMove);
                 }
-                // DestinationCollisionException alone is not logged: it is this
-                // class's own control flow, thrown from one place, and its
-                // error entry already states the whole cause. The rest are
-                // framework exceptions whose detail exists nowhere else once
-                // the category has been filed, so without this a move that
-                // failed for an unforeseen reason leaves no trace at all.
-                catch (DestinationCollisionException ex)
-                {
-                    errors.Add(new DestinationCollision(sourcePath, ex.FileName));
-                }
+                // Framework exceptions carry detail that exists nowhere else once
+                // the category has been filed, so without this a move that failed
+                // for an unforeseen reason leaves no trace at all. A destination
+                // collision does not come through here and is not logged: it is an
+                // ordinary per-file outcome refused in the loop above, and its error
+                // entry already states the whole cause.
                 catch (Exception ex)
                 {
                     failureLog.Record(ex);
@@ -780,42 +808,4 @@ public sealed class MoveFilesService : IMoveFilesService
         }
     }
 
-    // File.Move with overwrite=true follows a reparse point planted
-    // at destPath during the unique-name race. The non-overwriting
-    // form refuses existing targets, ending the race in a per-file
-    // error rather than a symlink follow-through to a sensitive
-    // location. Overwrite=true would require a reparse-point check on
-    // destPath immediately before the move.
-    private string GetUniqueDestPath(string folder, string fileName)
-    {
-        var candidate = _fs.Path.Combine(folder, fileName);
-        if (!_fs.File.Exists(candidate)) return candidate;
-
-        var nameWithout = _fs.Path.GetFileNameWithoutExtension(fileName);
-        var ext = _fs.Path.GetExtension(fileName);
-
-        for (int i = 1; i <= 10_000; i++)
-        {
-            candidate = _fs.Path.Combine(folder, $"{nameWithout} ({i}){ext}");
-            if (!_fs.File.Exists(candidate)) return candidate;
-        }
-
-        throw new DestinationCollisionException(fileName);
-    }
-
-    /// <summary>
-    /// Thrown by <see cref="GetUniqueDestPath"/> when 10,000 unique-
-    /// suffix attempts all collide. The MoveFilesAsync loop catches
-    /// it one frame up and folds it into the result as a
-    /// <see cref="DestinationCollision"/> entry so the rest of the
-    /// batch continues; nothing outside this class observes the
-    /// exception type, so the sealed-private scope keeps it from
-    /// leaking into the public surface.
-    /// </summary>
-    private sealed class DestinationCollisionException : Exception
-    {
-        public string FileName { get; }
-        public DestinationCollisionException(string fileName) =>
-            FileName = fileName;
-    }
 }
