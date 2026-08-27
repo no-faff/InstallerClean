@@ -1394,26 +1394,60 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// it names no cause. The per-cause counts survive underneath, for the opt-in
     /// result log, and adding is what keeps those right as well.
     ///
-    /// The claims move with the paths, because the three collections describe one
-    /// set of files and have to agree: a path leaving <c>Surviving</c> for
-    /// <c>Dropped</c> takes every claim naming it, a patch held by several
-    /// products carrying one per product. A claim left behind would make
-    /// <c>SurvivingPatchClaims</c> name a file the same result has just declared
-    /// held back. <see cref="PatchClaim.LocalPackagePath"/> is normalised the way
-    /// the registered rows are, so the one case-insensitive set answers for both.
+    /// The SURVIVING claims move with the paths, because those three collections
+    /// describe one set of files and have to agree: a path leaving
+    /// <c>Surviving</c> for <c>Dropped</c> takes every claim naming it, a patch
+    /// held by several products carrying one per product. A claim left behind
+    /// would make <c>SurvivingPatchClaims</c> name a file the same result has just
+    /// declared held back. <see cref="PatchClaim.LocalPackagePath"/> is normalised
+    /// the way the registered rows are, so the one case-insensitive set answers
+    /// for both.
+    ///
+    /// The SIBLING claims do not, and the body says why. They are the other half
+    /// of what the under-lease re-read is asked, they are keyed by product rather
+    /// than by path, and this is the one place in the app that builds a
+    /// <see cref="ReverifyResult"/> out of another one.
     /// </summary>
-    private static ReverifyResult FoldHeldBack(
+    internal static ReverifyResult FoldHeldBack(
         ReverifyResult reverify, IReadOnlyList<string> heldBack, HeldBackReasons reasons)
     {
         if (heldBack.Count == 0) return reverify;
 
         var condemned = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
-        return new ReverifyResult(
-            reverify.Surviving.Where(p => !condemned.Contains(p)).ToList().AsReadOnly(),
-            reverify.Dropped.Concat(heldBack).ToList().AsReadOnly(),
-            reverify.Reasons + reasons,
-            reverify.SurvivingPatchClaims
-                .Where(c => !condemned.Contains(c.LocalPackagePath)).ToList().AsReadOnly());
+        // A with-expression rather than a rebuild, and that is the whole of why
+        // SiblingPatchClaims is still here. The positional form named four of the
+        // record's five members, the fifth defaulted to empty, and the result was a
+        // batch with no siblings: the exact pairing UnderLeaseClaims was created to
+        // make unconstructible, and whose detector was removed on the ground that
+        // it had become so. This form carries whatever the author did not name, so
+        // a member added to ReverifyResult later arrives here without anybody
+        // having to remember it. The fault stops being available rather than being
+        // fixed once.
+        //
+        // AND THE SIBLING LIST PASSES THROUGH UNFILTERED, WHICH IS NOT AN OVERSIGHT
+        // AND IS THE THING TO GET WRONG HERE. The surviving claims are keyed by
+        // PATH, so they leave with their paths, which is what the filter below
+        // does. The siblings are keyed by PRODUCT: the re-read walks them by
+        // product code and condemns every batch path on a product one of them
+        // answers badly for. Filtering them by condemned path would throw away the
+        // row that answers for a product a surviving path is still registered to,
+        // and so narrow the very check this is restoring.
+        //
+        // What unfiltered costs, weighed and accepted rather than unnoticed: a
+        // folded result carries siblings for products no surviving path is left on,
+        // so a re-read handed one would make keyed reads that can condemn nothing,
+        // with the machine-wide installer lease held. It is bounded by the batch's
+        // own products, the reads are keyed rather than an enumeration, and a
+        // narrower list would have to be built by product and never by path. That
+        // saving is not worth a second way of getting this wrong.
+        return reverify with
+        {
+            Surviving = reverify.Surviving.Where(p => !condemned.Contains(p)).ToList().AsReadOnly(),
+            Dropped = reverify.Dropped.Concat(heldBack).ToList().AsReadOnly(),
+            Reasons = reverify.Reasons + reasons,
+            SurvivingPatchClaims = reverify.SurvivingPatchClaims
+                .Where(c => !condemned.Contains(c.LocalPackagePath)).ToList().AsReadOnly(),
+        };
     }
 
     /// <summary>
