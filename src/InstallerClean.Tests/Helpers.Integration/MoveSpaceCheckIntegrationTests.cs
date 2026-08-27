@@ -42,16 +42,18 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// does not sit between <c>C:\</c> and <c>C:\Windows\System32</c>, so a path
 /// root answers for them on that machine as well as on any other.
 ///
-/// AND ONE ASSERTION RESTS ON NEITHER AND IS THE ONLY ONE HERE THAT
-/// DISCRIMINATES. <c>IsOnInstallerCacheDrive</c> takes a test-only cache-root
-/// override, so a fixture can put the cache root where the system directory is
-/// not without owning a second disk.
+/// AND AN ASSERTION RESTS ON NEITHER WHEN IT MOVES THE CACHE ROOT ITSELF,
+/// WHICH IS THE PROPERTY A READER SHOULD APPLY RATHER THAN A LIST TO TRUST.
+/// <c>IsOnInstallerCacheDrive</c> takes a test-only cache-root override, so a
+/// fixture can put the cache root where the system directory is not without
+/// owning a second disk. That is what lets an assertion here go red against the
+/// code this change replaced: leave the cache root alone and the two are the
+/// same string, so the fixture answers the same whichever version is underneath.
 /// <see cref="IsOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory"/>
-/// is that test, and it is the only one in this file that goes red against the
-/// code this change replaced. What it still cannot reach is the arm where two
-/// volumes are compared and found different: its false comes from a cache root
-/// that will not resolve. That arm needs a host with a second volume and is
-/// carried as outstanding rather than pretended to here.
+/// is written for it. What the override still does not reach is the arm where
+/// two volumes are compared and found different: a false from a cache root that
+/// will not resolve is not that. That arm needs a host with a second volume and
+/// is carried as outstanding rather than pretended to here.
 /// </remarks>
 public class MoveSpaceCheckIntegrationTests
 {
@@ -113,10 +115,13 @@ public class MoveSpaceCheckIntegrationTests
     [Fact]
     public void IsOnInstallerCacheDrive_is_true_for_the_cache_folder_itself()
     {
-        // THE ONE ASSERTION IN THIS FILE THAT HOLDS ON EVERY MACHINE, including
-        // the one nothing here can build. The cache folder is on its own volume
-        // whatever is mounted where, so this is true with a volume mounted at
-        // C:\Windows\Installer and true without one. Under the code this
+        // MACHINE-INDEPENDENT BECAUSE THE FIXTURE IS THE CACHE FOLDER AND NOT
+        // ITS PATH ROOT, which is the property rather than a tally: an assertion
+        // built under the cache folder holds whatever is mounted where, and one
+        // built from a path root holds only where nothing is mounted between the
+        // root and the folder. The cache folder is on its own volume, so this is
+        // true with a volume mounted at C:\Windows\Installer and true without
+        // one, including on the machine nothing here can build. Under the code this
         // replaced it was true only where the cache and the system directory
         // shared a volume, and false on the machine the fix is for.
         //
@@ -130,14 +135,13 @@ public class MoveSpaceCheckIntegrationTests
     [Fact]
     public void IsOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory()
     {
-        // THE ONLY ASSERTION IN THIS FILE THAT CAN TELL THIS METHOD FROM THE ONE
-        // IT REPLACED, and the reason the override parameter exists. Every other
-        // test here passes against the code that asked
-        // Environment.SpecialFolder.System, because the cache's volume and the
-        // system directory's are the same string on every host this suite runs
-        // on. This one moves the cache root off that volume, which is what no
-        // fixture can do to the real cache folder without a second disk and
-        // administrator rights.
+        // WHAT LETS AN ASSERTION TELL THIS METHOD FROM THE ONE IT REPLACED, and
+        // the reason the override parameter exists. A fixture that leaves the
+        // cache root alone cannot: the cache's volume and the system directory's
+        // are the same string on every host this suite runs on, so it answers the
+        // same whichever version is underneath. This one moves the cache root off
+        // that volume, which is what no fixture can do to the real cache folder
+        // without a second disk and administrator rights.
         //
         // AN UNMOUNTED LETTER, so it asks nothing of the host but a free one.
         // GetVolumePathName cannot answer for it, the cache side returns null and
