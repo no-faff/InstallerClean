@@ -1,6 +1,4 @@
 using System.Buffers;
-using System.IO.Abstractions;
-using System.Security;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Services;
@@ -418,73 +416,6 @@ internal static class InstallerCacheHelpers
     /// </summary>
     private static bool HasDriveRoot(ReadOnlySpan<char> path) =>
         path.Length >= 2 && char.IsAsciiLetter(path[0]) && path[1] == ':';
-
-    /// <summary>
-    /// Deletes empty subdirectories inside C:\Windows\Installer. Sorted
-    /// by descending path length, which puts every directory after its
-    /// own descendants (a child's path is strictly longer than its
-    /// parent's), so a nested empty tree collapses in one pass.
-    /// Cancellable because a deeply nested Installer tree can take
-    /// several seconds to walk.
-    /// </summary>
-    /// <remarks>
-    /// Goes through the caller's <paramref name="fileSystem"/> rather than
-    /// System.IO, unlike the two gates it runs after, which reach the real
-    /// filesystem so that a MockFileSystem cannot defeat them:
-    /// <see cref="CandidateGuard.CheckSafeToRemove"/> on every source file (a
-    /// three-state <see cref="Helpers.StorageHelpers.ReparseCheck"/> plus a
-    /// resolved comparison against the run's <see cref="InstallerCacheRoot"/>)
-    /// and <see cref="IsInstallerFolderOrChild"/> on a Move's destination. This
-    /// is cleanup, running once both have passed. Injected, a test's
-    /// MockFileSystem has no C:\Windows\Installer, so the prune returns at the
-    /// Exists check instead of walking the host's real cache folder.
-    /// The folder is NOT a parameter, so no caller can aim the prune anywhere
-    /// else.
-    /// </remarks>
-    internal static void PruneEmptySubdirectories(
-        IFileSystem fileSystem,
-        CancellationToken cancellationToken = default)
-    {
-        if (!fileSystem.Directory.Exists(InstallerFolder)) return;
-
-        // Match FileSystemScanService: skip reparse points so a junction
-        // planted inside the Installer folder cannot redirect the prune
-        // pass to delete empty directories outside the cache.
-        var options = new EnumerationOptions
-        {
-            RecurseSubdirectories = true,
-            AttributesToSkip = FileAttributes.ReparsePoint,
-            IgnoreInaccessible = true,
-        };
-
-        // Best-effort: the prune runs after a move or delete has already
-        // committed, so a failure here must not undo that success.
-        try
-        {
-            foreach (var dir in fileSystem.Directory.EnumerateDirectories(InstallerFolder, "*", options)
-                .OrderByDescending(d => d.Length))
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                try
-                {
-                    if (!fileSystem.Directory.EnumerateFileSystemEntries(dir).Any())
-                        fileSystem.Directory.Delete(dir);
-                }
-                catch (IOException) { /* directory not empty by the time Delete fires, or filesystem busy */ }
-                catch (UnauthorizedAccessException) { /* DACL refuses the elevated process; rare but possible */ }
-                catch (SecurityException) { /* permission denied at a higher tier */ }
-            }
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            // A failure enumerating or sorting the tree (the folder vanishing
-            // mid-walk, or a share violation surfaced by the enumerator itself
-            // rather than by a per-directory Delete) is swallowed: it would
-            // otherwise propagate into a caller's generic catch and flip an
-            // already-committed delete or move to a hard error. Cancellation is
-            // excluded so the caller still sees a requested stop.
-        }
-    }
 
     // 520 chars covers any practical Windows long path (260 standard +
     // headroom for the \\?\ prefix and the not-yet-created suffix the

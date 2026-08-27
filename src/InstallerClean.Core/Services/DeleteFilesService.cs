@@ -98,19 +98,16 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // because the alternative is msiexec writing the cache in the middle
             // of a delete, which costs a needed file rather than a wait.
             //
-            // What it is NOT is bounded by the batch's file count, and the two
-            // things that break that bound are both already inside it. The
-            // progress callback hands control to a consumer that can run for as
-            // long as it likes, which is the property the destination re-check in
-            // MoveFilesService is ordered around; in this host's command-line
-            // sibling that consumer is a console write, and a console in QuickEdit
-            // selection blocks one until the operator clears it. The prune below
-            // is a full recursive enumeration of a folder this project has
-            // measured at 6.4 million entries, materialised by OrderByDescending,
-            // and its duration has nothing to do with how many files the batch
-            // held. Both predate the range that wrote this block. Whether either
-            // belongs inside the hold is an open behaviour question and is not
-            // settled by anything here.
+            // What it is NOT is bounded by the batch's file count, and the one
+            // thing inside the hold that breaks that bound is not a file
+            // operation at all. The progress callback hands control to a consumer
+            // that can run for as long as it likes, which is the property the
+            // destination re-check in MoveFilesService is ordered around; in this
+            // host's command-line sibling that consumer is a console write, and a
+            // console in QuickEdit selection blocks one until the operator clears
+            // it. It predates the range that wrote this block. Whether it belongs
+            // inside the hold is an open behaviour question and is not settled by
+            // anything here.
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var shownHeldByAnother);
             if (lease is null && shownHeldByAnother)
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
@@ -349,9 +346,6 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // accounts for what its failures cost the log.
             failureLog.WriteClosingEntry();
 
-            // CancellationToken.None: best-effort cleanup. See the
-            // matching comment in MoveFilesService for the rationale.
-            InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
             return new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled, HeldBack: heldBack, HeldBackReasons: recheck.Reasons);
             }
             finally

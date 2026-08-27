@@ -438,8 +438,10 @@ public class MoveFilesServiceUnitTests
         // MockFileSystem's Path is a working implementation; a bare substitute
         // would return null from Combine and GetRandomFileName.
         fs.Path.Returns(new MockFileSystem().Path);
-        // A substituted IDirectory reports the cache folder as absent, which
-        // returns the post-batch empty-subdirectory prune at its first line.
+        // The service creates the destination folder through IFileSystem.Directory
+        // before the loop. A bare IFileSystem substitute returns null there, so the
+        // batch would die on a NullReferenceException before reaching File.Move,
+        // and the HRESULT these tests are named for would never be raised.
         fs.Directory.Returns(Substitute.For<IDirectory>());
 
         var file = Substitute.For<IFile>();
