@@ -86,6 +86,17 @@ internal static class MachineContract
     /// runs means counting the summary bands, and each repeats for as long as its
     /// own condition holds, so a machine can emit one on every run for weeks.
     ///
+    /// "NEVER THE RUN'S OUTCOME" IS ABOUT COUNTING RUNS AND IS NOT THE OTHER SENSE
+    /// OF THE SAME WORDS. <see cref="CliContract.EntryTypeFor"/> separates a
+    /// standing property of the machine from a run that fell short of its job, and
+    /// on that question 3001 is the standing property while 3000 and 3002 are about
+    /// the run, which is why 3001 is Information and the other two are Warning.
+    /// Nothing here contradicts that: this paragraph says only that a notice is not
+    /// the run's SUMMARY entry, which is what a consumer counting runs is asking.
+    /// Two questions, near-identical wording, and the sense that travels between
+    /// them is the one that would put two Event IDs on the wrong side of an
+    /// entry-type decision.
+    ///
     /// THE LIST HELD TWO AND ONE OF THEM NAMED THE WRONG CLASS. It gave 3000 as the
     /// scan withholding "its superseded and obsoleted verdicts" and left 3002 out
     /// altogether. Nothing withholds an obsoleted registration, because none is ever
