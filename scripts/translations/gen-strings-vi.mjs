@@ -176,7 +176,7 @@ const MAP = {
   'Tooltip.SendResultLog.NothingFound': `Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.`,
   'Tooltip.Move': `Chuyển các tệp không cần thiết vào thư mục sao lưu. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
   'Tooltip.MoveNeedsDestination': `Chuyển các tệp không cần thiết vào một thư mục sao lưu. Bạn sẽ chọn thư mục ngay sau đây. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
-  'Tooltip.Delete': `Xóa vĩnh viễn các tệp không cần thiết. Chúng có thể bỏ đi an toàn, và bạn lấy lại dung lượng ngay lập tức.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi.`,
 
   // Body copy
@@ -487,10 +487,10 @@ const MAP = {
   'Automation.About.ReportProblem.HelpText': `Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn.`,
   'Automation.AutoUpdateCheck.HelpText': `Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó.`,
   'Tooltip.MoveSameDrive': `Chuyển các tệp không cần thiết vào thư mục sao lưu. Thư mục đó nằm trên cùng một ổ đĩa, nên bạn chỉ lấy lại dung lượng sau khi xóa nó hoặc chuyển nó sang ổ đĩa khác. Bạn có thể làm vậy khi đã yên tâm rằng không gì cần đến chúng.`,
-  'Completion.MoveRestoreHint.Singular': `Tệp trong thư mục đó [có thể bỏ đi an toàn], nên bạn cứ xóa thư mục bất cứ lúc nào. Cho tới lúc ấy, bạn có thể đặt nó trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến (cực kỳ khó xảy ra).`,
-  'Completion.MoveRestoreHint.Plural': `Các tệp trong thư mục đó [có thể bỏ đi an toàn], nên bạn cứ xóa thư mục bất cứ lúc nào. Cho tới lúc ấy, bạn có thể đặt chúng trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến một tệp trong số đó (cực kỳ khó xảy ra).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `Tệp trong thư mục đó [có thể bỏ đi an toàn], nên khi nào bạn thực sự muốn lấy lại dung lượng thì cứ xóa thư mục hoặc chuyển nó sang ổ đĩa khác. Cho tới lúc ấy, bạn có thể đặt nó trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến (cực kỳ khó xảy ra).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `Các tệp trong thư mục đó [có thể bỏ đi an toàn], nên khi nào bạn thực sự muốn lấy lại dung lượng thì cứ xóa thư mục hoặc chuyển nó sang ổ đĩa khác. Cho tới lúc ấy, bạn có thể đặt chúng trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến một tệp trong số đó (cực kỳ khó xảy ra).`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to delete], so remove it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `Tệp này sẽ bị xóa vĩnh viễn. Nó [có thể xóa an toàn], nhưng nếu bạn muốn có bản sao lưu thì hãy dùng nút Chuyển.`,
   'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean không khiến được Windows phân giải đường dẫn thật của {InstallerFolder}, nên không tệp nào có thể được chứng tỏ là nằm bên trong và không tệp nào được đề xuất để dọn. Lần quét này không tìm thấy gì vì phép kiểm tra ấy thất bại, chứ không phải vì thư mục đã sạch. Không có gì bị bỏ đi.`,

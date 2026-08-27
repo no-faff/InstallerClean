@@ -173,7 +173,7 @@ const MAP = {
   'Tooltip.SendResultLog.NothingFound': `보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.`,
   'Tooltip.Move': `불필요한 파일을 백업 폴더로 옮깁니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.`,
   'Tooltip.MoveNeedsDestination': `불필요한 파일을 백업 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.`,
-  'Tooltip.Delete': `불필요한 파일을 영구히 삭제합니다. 안전하게 제거할 수 있으며 공간은 바로 돌아옵니다.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다.`,
 
   // Body copy
@@ -484,10 +484,10 @@ const MAP = {
   'Automation.About.ReportProblem.HelpText': `브라우저에서 github.com의 이슈 트래커를 엽니다.`,
   'Automation.AutoUpdateCheck.HelpText': `선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다.`,
   'Tooltip.MoveSameDrive': `불필요한 파일을 백업 폴더로 옮깁니다. 그 폴더가 같은 드라이브에 있어서, 폴더를 삭제하거나 다른 드라이브로 옮기기 전까지는 공간을 되찾지 못합니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그렇게 하시면 됩니다.`,
-  'Completion.MoveRestoreHint.Singular': `그 폴더에 있는 파일은 [안전하게 제거할 수 있습니다]. 그러니 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
-  'Completion.MoveRestoreHint.Plural': `그 폴더에 있는 파일들은 [안전하게 제거할 수 있습니다]. 그러니 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `그 폴더에 있는 파일은 [안전하게 제거할 수 있습니다]. 그러니 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `그 폴더에 있는 파일들은 [안전하게 제거할 수 있습니다]. 그러니 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to delete], so remove it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `이 파일은 영구히 삭제됩니다. [안전하게 삭제할 수 있습니다]. 다만 백업을 원하시면 대신 이동 단추를 사용하세요.`,
   'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean이 Windows로부터 {InstallerFolder}의 실제 경로를 확인받지 못해서, 어떤 파일도 그 안에 있다고 밝힐 수 없었고 정리 대상으로 제시된 파일도 없습니다. 이번 검사가 아무것도 찾지 못한 것은 폴더가 깨끗해서가 아니라 그 확인이 실패했기 때문입니다. 아무것도 제거하지 않았습니다.`,

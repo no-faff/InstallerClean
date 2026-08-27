@@ -207,7 +207,7 @@ const MAP = {
   'Tooltip.SendResultLog.NothingFound': `Comme vous voulez, mais c'est apprécié. Envoie un résumé anonyme qui me dit juste si l'outil fonctionne. L'écran suivant vous montre ce qui sera envoyé avant que vous confirmiez.`,
   'Tooltip.Move': `Déplace les fichiers inutiles vers le dossier de sauvegarde. Supprimez ce dossier dès que vous serez convaincu que rien n'en a besoin.`,
   'Tooltip.MoveNeedsDestination': `Déplace les fichiers inutiles vers un dossier de sauvegarde. Vous le choisirez juste après. Supprimez ce dossier dès que vous serez convaincu que rien n'en a besoin.`,
-  'Tooltip.Delete': `Supprime définitivement les fichiers inutiles. Ils sont retirables sans risque, et vous récupérerez l'espace tout de suite.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Nom du titulaire du certificat Authenticode incorporé. Chaîne non vérifiée.`,
 
   // Body copy
@@ -514,10 +514,10 @@ const MAP = {
   'Automation.About.ReportProblem.HelpText': `Ouvre le suivi des problèmes (Issues) sur github.com dans votre navigateur.`,
   'Automation.AutoUpdateCheck.HelpText': `Si la case est cochée, InstallerClean recherche une version plus récente sur github à son lancement.`,
   'Tooltip.MoveSameDrive': `Déplace les fichiers inutiles vers le dossier de sauvegarde. Il est sur le même lecteur, vous ne récupérerez donc l'espace qu'une fois ce dossier supprimé ou déplacé sur un autre lecteur. Vous pourrez le faire dès que vous serez convaincu que rien n'en a besoin.`,
-  'Completion.MoveRestoreHint.Singular': `Le fichier de ce dossier est [retirable sans risque], vous pouvez donc supprimer le dossier quand vous voulez. D'ici là, vous pouvez le remettre dans {InstallerFolder} si un programme s'avérait en avoir besoin (extrêmement improbable).`,
-  'Completion.MoveRestoreHint.Plural': `Les fichiers de ce dossier sont [retirables sans risque], vous pouvez donc le supprimer quand vous voulez. D'ici là, vous pouvez les remettre dans {InstallerFolder} si un programme s'avérait avoir besoin de l'un d'eux (extrêmement improbable).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `Le fichier de ce dossier est [retirable sans risque], vous pouvez donc supprimer le dossier ou le déplacer sur un autre lecteur quand vous voudrez vraiment récupérer l'espace. D'ici là, vous pouvez le remettre dans {InstallerFolder} si un programme s'avérait en avoir besoin (extrêmement improbable).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `Les fichiers de ce dossier sont [retirables sans risque], vous pouvez donc le supprimer ou le déplacer sur un autre lecteur quand vous voudrez vraiment récupérer l'espace. D'ici là, vous pouvez les remettre dans {InstallerFolder} si un programme s'avérait avoir besoin de l'un d'eux (extrêmement improbable).`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to delete], so remove it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `Ce fichier sera supprimé définitivement. Il est [supprimable sans risque], mais si vous voulez une sauvegarde, utilisez plutôt le bouton Déplacer.`,
   'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean n'a pas pu obtenir de Windows qu'il résolve le vrai chemin de {InstallerFolder}, donc aucun fichier n'a pu être montré comme s'y trouvant et aucun n'a été proposé au nettoyage. Cette analyse n'a rien trouvé parce que cette vérification a échoué, pas parce que le dossier est propre. Rien n'a été retiré.`,

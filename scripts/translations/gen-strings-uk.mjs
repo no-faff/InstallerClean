@@ -203,7 +203,7 @@ const MAP = {
   'Tooltip.SendResultLog.NothingFound': `На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.`,
   'Tooltip.Move': `Переміщує непотрібні файли до папки резервних копій. Видаліть цю папку, коли переконаєтеся, що вони нікому не потрібні.`,
   'Tooltip.MoveNeedsDestination': `Переміщує непотрібні файли до папки резервних копій. Ви виберете її наступним кроком. Видаліть цю папку, коли переконаєтеся, що вони нікому не потрібні.`,
-  'Tooltip.Delete': `Видаляє непотрібні файли назавжди. Їх можна безпечно прибрати, і місце повернеться одразу.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Назва суб'єкта з вбудованого сертифіката Authenticode. Ланцюжок не перевірено.`,
 
   // Body copy
@@ -511,10 +511,10 @@ const MAP = {
   'Automation.About.ReportProblem.HelpText': `Відкриває список проблем (Issues) на github.com у вашому браузері.`,
   'Automation.AutoUpdateCheck.HelpText': `Якщо позначено, InstallerClean під час запуску перевіряє на github наявність новішої версії.`,
   'Tooltip.MoveSameDrive': `Переміщує непотрібні файли до папки резервних копій. Вона на тому самому диску, тож місце повернеться лише після того, як ви видалите цю папку або перемістите її на інший диск. Це можна зробити, коли переконаєтеся, що вони нікому не потрібні.`,
-  'Completion.MoveRestoreHint.Singular': `Файл у цій папці [можна безпечно прибрати], тож видаляйте папку коли завгодно. До того часу ви можете повернути його до {InstallerFolder}, якщо якійсь програмі він усе ж знадобиться (украй малоймовірно).`,
-  'Completion.MoveRestoreHint.Plural': `Файли в цій папці [можна безпечно прибрати], тож видаляйте її коли завгодно. До того часу ви можете повернути їх до {InstallerFolder}, якщо якійсь програмі знадобиться один із них (украй малоймовірно).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `Файл у цій папці [можна безпечно прибрати], тож видаліть папку або перемістіть її на інший диск, коли справді захочете повернути місце. До того часу ви можете повернути його до {InstallerFolder}, якщо якійсь програмі він усе ж знадобиться (украй малоймовірно).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `Файли в цій папці [можна безпечно прибрати], тож видаліть її або перемістіть на інший диск, коли справді захочете повернути місце. До того часу ви можете повернути їх до {InstallerFolder}, якщо якійсь програмі знадобиться один із них (украй малоймовірно).`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to delete], so remove it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `Цей файл буде видалено назавжди. Його [можна безпечно видалити], але якщо хочете резервну копію, скористайтеся кнопкою «Перемістити».`,
   'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean не зміг отримати від Windows справжній шлях до {InstallerFolder}, тож про жоден файл не вдалося показати, що він усередині, і жоден не було запропоновано для очищення. Це сканування нічого не знайшло через невдачу тієї перевірки, а не тому, що папка чиста. Нічого не прибрано.`,

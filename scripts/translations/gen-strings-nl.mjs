@@ -212,7 +212,7 @@ const MAP = {
   'Tooltip.SendResultLog.NothingFound': `Dat is aan jou, maar ik zou het op prijs stellen. Er wordt een anonieme samenvatting verstuurd die me alleen laat weten of het werkt. Op het volgende scherm kun je zien wat er wordt verstuurd voordat je het bevestigt.`,
   'Tooltip.Move': `De overbodige bestanden naar de back-upmap verplaatsen. Verwijder die map zodra je zeker weet dat niets ze nodig heeft.`,
   'Tooltip.MoveNeedsDestination': `De overbodige bestanden naar een back-upmap verplaatsen. Die kies je hierna. Verwijder die map zodra je zeker weet dat niets ze nodig heeft.`,
-  'Tooltip.Delete': `De overbodige bestanden definitief verwijderen. Ze kunnen veilig weg en je krijgt de ruimte meteen terug.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Naam van het onderwerp uit het ingebedde Authenticode-certificaat. Niet via de certificaatketen geverifieerd.`,
 
   // Body copy
@@ -466,10 +466,10 @@ const MAP = {
   'Cli.Help.ExitCodeTransient': `  75  tijdelijk: iets tijdelijks blokkeerde de uitvoering (zie de melding)`,
   'Cli.Help.ExitCodeCancelled': `  130 geannuleerd (Ctrl+C)`,
   'Tooltip.MoveSameDrive': `De overbodige bestanden naar de back-upmap verplaatsen. Die staat op dezelfde schijf, dus je krijgt de ruimte pas terug als je die map verwijdert of naar een andere schijf verplaatst. Dat kun je doen zodra je zeker weet dat niets ze nodig heeft.`,
-  'Completion.MoveRestoreHint.Singular': `Het bestand in die map is [veilig te verwijderen], dus gooi de map weg wanneer je wilt. Tot die tijd kun je het terugzetten in {InstallerFolder} als een programma het ooit toch nodig blijkt te hebben (uiterst onwaarschijnlijk).`,
-  'Completion.MoveRestoreHint.Plural': `De bestanden in die map zijn [veilig te verwijderen], dus gooi de map weg wanneer je wilt. Tot die tijd kun je ze terugzetten in {InstallerFolder} als een programma er ooit toch een nodig blijkt te hebben (uiterst onwaarschijnlijk).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `Het bestand in die map is [veilig te verwijderen], dus verwijder de map of verplaats hem naar een andere schijf wanneer je de ruimte echt wilt terugkrijgen. Tot die tijd kun je het terugzetten in {InstallerFolder} als een programma het ooit toch nodig blijkt te hebben (uiterst onwaarschijnlijk).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `De bestanden in die map zijn [veilig te verwijderen], dus verwijder de map of verplaats hem naar een andere schijf wanneer je de ruimte echt wilt terugkrijgen. Tot die tijd kun je ze terugzetten in {InstallerFolder} als een programma er ooit toch een nodig blijkt te hebben (uiterst onwaarschijnlijk).`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to delete], so remove it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `Dit bestand wordt definitief verwijderd. Het is [veilig te verwijderen], maar wil je een back-up, gebruik dan de knop Verplaatsen.`,
   'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean kreeg Windows niet zover het echte pad van {InstallerFolder} te bepalen, dus van geen enkel bestand kon worden aangetoond dat het erin staat en er is niets voor opruimen aangeboden. Deze scan vond niets omdat die controle mislukte, niet omdat de map schoon is. Er is niets verwijderd.`,
