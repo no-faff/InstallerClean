@@ -510,20 +510,41 @@ public partial class CompletionViewModel : ObservableObject
     /// through. <paramref name="movedCount"/> of <paramref name="totalCount"/>
     /// files were moved before the stop, and <paramref name="movedBytes"/> is the
     /// size of just those. The heading states what was accomplished, not the
-    /// "some files could not be processed" of a partial FAILURE (a cancel is not
-    /// one); the summary line says it was a cancel, and the moved files still get
-    /// the restore reassurance because they are the ones that reached the
+    /// "some files could not be processed" of a partial FAILURE, because a cancel
+    /// is not one; the summary line says it was a cancel, and the moved files still
+    /// get the restore reassurance because they are the ones that reached the
     /// destination.
+    ///
+    /// THE ONE EXCEPTION IS A CANCEL THAT ACCOMPLISHED NOTHING AND HIT AN ERROR,
+    /// and it is the same exception <see cref="ShowMoveSummary"/> makes. There is
+    /// no accomplishment to state, so the size heading would be reporting "0 B
+    /// freed" as a result over a line saying a file could not be processed. That is
+    /// the only shape that takes the warning heading here: a cancel on its own
+    /// never does, however little it moved.
     /// </summary>
     public void ShowMoveCancelledSummary(int movedCount, int totalCount, long movedBytes,
         IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null)
     {
-        HeadingIsWarning = false;
-        Heading = string.Format(
-            space == MoveSpaceOutcome.FreedSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
-            DisplayHelpers.FormatSize(movedBytes));
+        // The same test ShowMoveSummary applies, and for the same reason: a cancel
+        // that reached no file and hit an error has nothing to put in a size
+        // heading, so "0 B freed" in the success colour states a result over a line
+        // saying a file could not be processed. A cancel with no errors is not a
+        // failure and keeps its heading whatever it moved, which is what the
+        // errors conjunct is for.
+        HeadingIsWarning = errors.Count > 0 && movedCount == 0;
+        Heading = HeadingIsWarning
+            ? Strings.Completion_NothingMoved
+            : string.Format(
+                space == MoveSpaceOutcome.FreedSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
+                DisplayHelpers.FormatSize(movedBytes));
         FailedCount = FailedCountText(movedCount, errors.Count, deleting: false);
         SummaryDestination = string.Empty;
+        // AND THE SUMMARY STAYS, WHICH IS WHERE THIS PARTS COMPANY WITH
+        // ShowMoveSummary. That method blanks its summary under the warning heading
+        // because "0 files moved to: D:\Backup" describes files arriving somewhere
+        // none of them reached. This sentence says something else: that the user
+        // stopped the run. It is the only thing on the screen that does, so
+        // blanking it here would trade one wrong screen for another.
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_MoveCancelledSummary, "Completion.MoveCancelledSummary"),
             movedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
@@ -547,12 +568,23 @@ public partial class CompletionViewModel : ObservableObject
     /// accomplished rather than reading as a failure, because a cancel is not
     /// one, and the screen carries no restore line for the same reason
     /// <see cref="ShowDeleteSummary"/> does not.
+    ///
+    /// The exception is <see cref="ShowMoveCancelledSummary"/>'s, on the same
+    /// terms: a cancel that reached no file and hit an error has no accomplishment
+    /// to state, so it takes the warning heading rather than reporting "0 B freed"
+    /// over a line saying a file could not be processed.
     /// </summary>
     public void ShowDeleteCancelledSummary(int deletedCount, int totalCount, long deletedBytes,
         IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)
     {
-        HeadingIsWarning = false;
-        Heading = string.Format(Strings.Completion_Freed, DisplayHelpers.FormatSize(deletedBytes));
+        // See ShowMoveCancelledSummary, which this mirrors line for line: the
+        // warning heading only where the cancel reached no file AND something
+        // failed, and the cancelled summary sentence kept either way because it is
+        // the only line saying the run was stopped.
+        HeadingIsWarning = errors.Count > 0 && deletedCount == 0;
+        Heading = HeadingIsWarning
+            ? Strings.Completion_NothingDeleted
+            : string.Format(Strings.Completion_Freed, DisplayHelpers.FormatSize(deletedBytes));
         FailedCount = FailedCountText(deletedCount, errors.Count, deleting: true);
         SummaryDestination = string.Empty;
         Summary = string.Format(

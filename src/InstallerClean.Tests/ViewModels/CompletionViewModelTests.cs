@@ -264,27 +264,50 @@ public class CompletionViewModelTests
         // batch, which is its own job.
         Assert.Equal("2 of 5 could not be moved.", vm.FailedCount);
         Assert.Contains("71", vm.Summary);
-        // A cancel is not a failure, so the heading stays as it was.
+        // A cancel is not a failure, so the heading stays as it was. This is the
+        // control on the pair below: three files really did move and the size
+        // heading is stating what they freed, so errors alone must not warn.
         Assert.False(vm.HeadingIsWarning);
     }
 
+    // A cancel that reached no file and hit an error, on both paths. Until 3.0.0
+    // the heading was "0 B freed" in the success colour over a line saying a file
+    // could not be processed, and the delete test below asserted exactly that, in
+    // its name as well as its body. The size heading has nothing to state here, so
+    // it gives way to the same string the completed paths use.
+
     [Fact]
-    public void A_cancelled_delete_that_deleted_nothing_still_keeps_its_heading()
+    public void A_cancelled_delete_that_deleted_nothing_and_hit_an_error_warns()
     {
         var vm = new CompletionViewModel();
         vm.ShowDeleteCancelledSummary(deletedCount: 0, totalCount: 40, deletedBytes: 0,
             errors: Failures(1));
 
-        Assert.False(vm.HeadingIsWarning);
+        Assert.True(vm.HeadingIsWarning);
+        Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
         Assert.Equal("1 of 1 could not be deleted.", vm.FailedCount);
+        // And the cancelled sentence survives the warning, which is where these two
+        // part company with ShowMoveSummary and ShowDeleteSummary. It is the only
+        // line on the screen saying the run was stopped rather than that it failed.
+        Assert.NotEqual(string.Empty, vm.Summary);
+    }
+
+    [Fact]
+    public void A_cancelled_move_that_moved_nothing_and_hit_an_error_warns()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveCancelledSummary(movedCount: 0, totalCount: 40, movedBytes: 0,
+            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
+
+        Assert.True(vm.HeadingIsWarning);
+        Assert.Equal(Strings.Completion_NothingMoved, vm.Heading);
         Assert.NotEqual(string.Empty, vm.Summary);
     }
 
     // The three cancelled paths reach the same nothing-was-acted-on state the
     // completed paths guard against, by a different route: a cancel pressed
     // after the first few files failed. The advice is about files that arrived
-    // somewhere, so it is as false here as it is there. The heading is the one
-    // thing that stays, per the test above.
+    // somewhere, so it is as false here as it is there.
 
     [Fact]
     public void A_cancelled_move_that_moved_nothing_drops_its_restore_hint()
