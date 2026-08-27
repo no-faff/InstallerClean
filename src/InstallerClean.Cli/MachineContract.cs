@@ -76,13 +76,23 @@ internal static class MachineContract
     /// most tooling watching for them. Every <c>/s</c>, <c>/d</c> or <c>/m</c>
     /// run writes exactly ONE summary entry, and its Event ID is in the 1000,
     /// 2000 or 4000 band (<see cref="CliContract.EventIdFor"/>). Beside it a run
-    /// may write NOTICES, in the 3000 band, which report a condition of the
-    /// machine the scan found rather than the outcome of the run: 3000 that the
-    /// scan withheld its superseded and obsoleted verdicts, 3001 that packages
-    /// Windows still references have no file on disk. A notice never replaces the
-    /// summary and never stands in for one, so counting runs means counting the
-    /// summary bands; and a machine can emit a notice on every run for weeks,
-    /// both conditions being properties of the machine rather than of the run.
+    /// may write NOTICES, in the 3000 band, which are conditions the scan found and
+    /// never the run's outcome. THERE ARE THREE. 3000: entries in the records could
+    /// not be matched up, so no superseded patch was offered and the count of files
+    /// missing from the cache may be short. 3001: packages Windows still references
+    /// have no file on disk. 3002: the scan could not establish which cached files
+    /// belong to the programs installed here, so it offered nothing it walked. A
+    /// notice never replaces the summary and never stands in for one, so counting
+    /// runs means counting the summary bands, and each repeats for as long as its
+    /// own condition holds, so a machine can emit one on every run for weeks.
+    ///
+    /// THE LIST HELD TWO AND ONE OF THEM NAMED THE WRONG CLASS. It gave 3000 as the
+    /// scan withholding "its superseded and obsoleted verdicts" and left 3002 out
+    /// altogether. Nothing withholds an obsoleted registration, because none is ever
+    /// offered on any run and so there is no verdict to hold back: the wire text names
+    /// the superseded class alone (<c>Cli.EventLogScanWithheld</c>) and
+    /// <c>ScanResult.WithheldCount</c> says the same in its own words. A tool built
+    /// from this paragraph as the band's contents was watching two IDs of three.
     ///
     /// ONE FIGURE IN THE 3000 NOTICE IS AN ESTIMATE AND NOTHING HAS EVER SAID SO.
     /// Its count of installed products is assembled from four contributors, two
