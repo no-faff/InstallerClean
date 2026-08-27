@@ -41,6 +41,17 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// matter and none of this touches them: a volume mounted at the cache folder
 /// does not sit between <c>C:\</c> and <c>C:\Windows\System32</c>, so a path
 /// root answers for them on that machine as well as on any other.
+///
+/// AND ONE ASSERTION RESTS ON NEITHER AND IS THE ONLY ONE HERE THAT
+/// DISCRIMINATES. <c>IsOnInstallerCacheDrive</c> takes a test-only cache-root
+/// override, so a fixture can put the cache root where the system directory is
+/// not without owning a second disk.
+/// <see cref="IsOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory"/>
+/// is that test, and it is the only one in this file that goes red against the
+/// code this change replaced. What it still cannot reach is the arm where two
+/// volumes are compared and found different: its false comes from a cache root
+/// that will not resolve. That arm needs a host with a second volume and is
+/// carried as outstanding rather than pretended to here.
 /// </remarks>
 public class MoveSpaceCheckIntegrationTests
 {
@@ -114,6 +125,47 @@ public class MoveSpaceCheckIntegrationTests
         // cache path, or this is false rather than trivially true. The test
         // above says what to make of that and what elevation does to it.
         Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(InstallerCacheHelpers.InstallerFolder));
+    }
+
+    [Fact]
+    public void IsOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory()
+    {
+        // THE ONLY ASSERTION IN THIS FILE THAT CAN TELL THIS METHOD FROM THE ONE
+        // IT REPLACED, and the reason the override parameter exists. Every other
+        // test here passes against the code that asked
+        // Environment.SpecialFolder.System, because the cache's volume and the
+        // system directory's are the same string on every host this suite runs
+        // on. This one moves the cache root off that volume, which is what no
+        // fixture can do to the real cache folder without a second disk and
+        // administrator rights.
+        //
+        // AN UNMOUNTED LETTER, so it asks nothing of the host but a free one.
+        // GetVolumePathName cannot answer for it, the cache side returns null and
+        // the method answers false. The code this replaced never read the cache
+        // root at all: it asked the system directory, which does answer, so it
+        // returns true for both destinations below and this goes red against it.
+        // The first does that on any machine; the second does it on one where
+        // nothing is mounted at the cache.
+        //
+        // WHAT IT DOES NOT PIN, said here rather than left to be discovered. The
+        // false comes from the cache side failing to resolve, not from two
+        // volumes being compared and found different. That arm needs a cache root
+        // on a real second volume and a host that has one, and no assertion here
+        // reaches it.
+        var unmounted = TestHost.FirstUnmountedDriveLetter();
+        if (unmounted is null)
+            return; // every letter is in use on this host
+
+        Assert.False(MoveSpaceCheck.IsOnInstallerCacheDrive(
+            Environment.GetFolderPath(Environment.SpecialFolder.System),
+            installerCacheRoot: $@"{unmounted}:\nope"));
+
+        // The path the test above answers TRUE for, answered false here because
+        // the cache root moved and nothing else did. One destination, two cache
+        // roots, two answers, which is the whole of what the parameter buys.
+        Assert.False(MoveSpaceCheck.IsOnInstallerCacheDrive(
+            InstallerCacheHelpers.InstallerFolder,
+            installerCacheRoot: $@"{unmounted}:\nope"));
     }
 
     [Fact]

@@ -139,7 +139,26 @@ internal static class MoveSpaceCheck
     /// rather than about this method. It is written down here so the next
     /// reader does not have to derive it, and it is open.
     /// </remarks>
-    internal static bool IsOnInstallerCacheDrive(string destination)
+    /// <param name="installerCacheRoot">
+    /// Test-only real-folder override for the cache root (null in production,
+    /// which asks about the real <see cref="InstallerCacheHelpers.InstallerFolder"/>).
+    /// The volume question still goes to Windows about a real path, so this
+    /// relocates WHICH path is asked about and nothing else; it cannot let a
+    /// MockFileSystem answer it, the whole file being outside
+    /// <c>System.IO.Abstractions</c> for that reason. It mirrors
+    /// <see cref="InstallerCacheHelpers.IsInstallerFolderOrChild"/>'s own
+    /// override on the neighbouring safety gate.
+    ///
+    /// WITHOUT IT NO ASSERTION ON THIS METHOD CAN TELL IT FROM THE ONE IT
+    /// REPLACED. The cache's volume and the system directory's are the same
+    /// string on every host this suite can run on, so every fixture answers the
+    /// same against the fixed code and against the code that asked
+    /// <c>Environment.SpecialFolder.System</c>. Moving the cache root off that
+    /// volume is the one thing a test cannot do to the real cache folder without
+    /// a second disk and administrator rights, and this is the parameter that
+    /// does it instead.
+    /// </param>
+    internal static bool IsOnInstallerCacheDrive(string destination, string? installerCacheRoot = null)
     {
         if (string.IsNullOrWhiteSpace(destination)) return false;
 
@@ -153,8 +172,8 @@ internal static class MoveSpaceCheck
             // than remembered. The two are the same until something is mounted
             // between them, and this method exists for the machine where
             // something is.
-            var cacheVolume =
-                StorageHelpers.GetVolumeMountPoint(InstallerCacheHelpers.InstallerFolder);
+            var cacheVolume = StorageHelpers.GetVolumeMountPoint(
+                installerCacheRoot ?? InstallerCacheHelpers.InstallerFolder);
             if (cacheVolume is null) return false;
 
             var destinationVolume =
