@@ -340,6 +340,13 @@ public sealed class MoveFilesService : IMoveFilesService
                     // collision loop bounded at 10,000 probes, so the window it left
                     // open was up to 10,000 round trips rather than one.
                     //
+                    // THAT LIST OF FOUR IS A SPECIFICATION AND NOT A DESCRIPTION. It
+                    // is what makes the size of the window a stated figure rather
+                    // than whatever the code happens to do, so a fifth statement
+                    // added between here and File.Move widens the window and nothing
+                    // in the build will say so. Anything going in there belongs in
+                    // this list, or it belongs before the capture.
+                    //
                     // The ordering is not the reach, and the reach has a hole worth
                     // naming rather than a guarantee. A resolve that DEGRADED is
                     // exactly a path whose reparse points went UNexpanded, which is
@@ -475,6 +482,18 @@ public sealed class MoveFilesService : IMoveFilesService
                     // nothing they cannot recover (the file is still in the cache and
                     // a different folder or an emptied one moves it), and puts the
                     // refusal on a surface that already exists.
+                    //
+                    // AND IT SITS AFTER THE CONTAINMENT GUARD DELIBERATELY, which
+                    // nothing but the ordering itself records, so it is written down
+                    // here rather than left to be inferred. Moving this cheap Exists
+                    // test above the guard looks tidier and saves a syscall on the
+                    // files that clash, and it changes what the app tells somebody
+                    // about a source that does not resolve inside the cache: such a
+                    // path would be reported as a name clash in the backup folder,
+                    // which is a cause nobody has shown, instead of as the
+                    // out-of-bounds or unresolvable path the guard established it to
+                    // be. A refusal has to name the reason it was refused for, and
+                    // the guard's reason outranks this one wherever both apply.
                     var fileName = _fs.Path.GetFileName(sourcePath);
                     var destPath = _fs.Path.Combine(destinationFolder, fileName);
                     if (_fs.File.Exists(destPath))
