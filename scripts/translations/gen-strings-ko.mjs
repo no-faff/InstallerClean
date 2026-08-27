@@ -75,7 +75,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `패치`,
   'Section.Registered.Details': `제품 세부 정보`,
-  'Section.Backup.Folder': `대상 폴더`,
+  'Section.Backup.Folder': `백업 폴더`,
   'Section.SayThanks': `감사 인사`,
 
   // Field labels (used in detail panels)
@@ -141,10 +141,10 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `github의 릴리스 페이지에서 새 버전이 있는지 확인합니다.`,
   'Automation.UpdateAvailable.HelpText': `새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요.`,
   'Automation.Licence.HelpText': `브라우저에서 github.com의 라이선스 파일을 엽니다.`,
-  'Automation.Section.BackupFolder': `대상 폴더`,
+  'Automation.Section.BackupFolder': `백업 폴더`,
   'Automation.Section.Patches': `패치`,
   'Automation.Section.ProductDetails': `제품 세부 정보`,
-  'Automation.BackupFolder': `대상 폴더`,
+  'Automation.BackupFolder': `백업 폴더`,
   'Automation.OperationProgress': `작업 진행 상황`,
   'Automation.RescanInstaller': `{InstallerFolder} 다시 검사`,
   'Automation.ScanningProgress': `검사 진행 상황`,
@@ -171,8 +171,8 @@ const MAP = {
   'Tooltip.Minimise': `최소화`,
   'Tooltip.SendResultLog': `보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.`,
   'Tooltip.SendResultLog.NothingFound': `보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.`,
-  'Tooltip.Move': `불필요한 파일을 대상 폴더로 옮깁니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.`,
-  'Tooltip.MoveNeedsDestination': `불필요한 파일을 대상 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.`,
+  'Tooltip.Move': `불필요한 파일을 백업 폴더로 옮깁니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.`,
+  'Tooltip.MoveNeedsDestination': `불필요한 파일을 백업 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.`,
   'Tooltip.Delete': `불필요한 파일을 영구히 삭제합니다. 안전하게 제거할 수 있으며 공간은 바로 돌아옵니다.`,
   'Tooltip.SigningCertificate': `내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다.`,
 
@@ -344,7 +344,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `대상 폴더는 드라이브 문자나 네트워크 공유로 시작하는 폴더의 전체 경로여야 합니다(예: D:\\Backup 또는 \\\\server\\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0}`,
+  'Error.DestinationNotFullyQualified': `백업 폴더는 드라이브 문자나 네트워크 공유로 시작하는 폴더의 전체 경로여야 합니다(예: D:\\Backup 또는 \\\\server\\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0}`,
   'BrowserLaunch.FailedTitle': `브라우저를 열 수 없음`,
   'UpdateCheck.Title': `업데이트 확인`,
   'UpdateCheck.Status.Checking': `확인 중...`,
@@ -364,8 +364,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean이 브라우저를 열지 못했고, 링크를 클립보드에 복사하지도 못했습니다. 링크는 다음과 같습니다:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean이 대상 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요.`,
-
+  'Error.DestinationChangedMidBatch': `InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `{0}에 쓸 수 없습니다.`,
 
@@ -452,7 +451,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version  버전 출력 (-v도 사용 가능)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s         검사만 - 불필요한 파일 나열`,
   'Cli.Help.Delete': `  installerclean-cli /d         불필요한 파일 영구 삭제`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         저장된 대상 폴더로 이동`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         저장된 백업 폴더로 이동`,
   'Cli.Help.MovePath': `  installerclean-cli /m 경로    지정한 경로로 이동`,
   'Cli.Help.NoteLine1': `installerclean-cli는 끝날 때까지 프롬프트를 붙잡고 있으므로 스크립트나&#10;예약 작업이 이를 기다릴 수 있습니다.`,
   'Cli.Help.ExitCodesHeader': `종료 코드:`,
@@ -484,7 +483,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `브라우저에서 github의 readme를 엽니다.`,
   'Automation.About.ReportProblem.HelpText': `브라우저에서 github.com의 이슈 트래커를 엽니다.`,
   'Automation.AutoUpdateCheck.HelpText': `선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다.`,
-  'Tooltip.MoveSameDrive': `불필요한 파일을 대상 폴더로 옮깁니다. 그 폴더가 같은 드라이브에 있어서, 폴더를 삭제하거나 다른 드라이브로 옮기기 전까지는 공간을 되찾지 못합니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그렇게 하시면 됩니다.`,
+  'Tooltip.MoveSameDrive': `불필요한 파일을 백업 폴더로 옮깁니다. 그 폴더가 같은 드라이브에 있어서, 폴더를 삭제하거나 다른 드라이브로 옮기기 전까지는 공간을 되찾지 못합니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그렇게 하시면 됩니다.`,
   'Completion.MoveRestoreHint.Singular': `그 폴더에 있는 파일은 [안전하게 제거할 수 있습니다]. 그러니 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
   'Completion.MoveRestoreHint.Plural': `그 폴더에 있는 파일들은 [안전하게 제거할 수 있습니다]. 그러니 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `그 폴더에 있는 파일은 [안전하게 제거할 수 있습니다]. 그러니 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다).`,
@@ -502,7 +501,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `불필요한 파일을 찾지 못했습니다.`,
   'Cli.NothingOffered.Singular': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 하나({2})를 그대로 두었습니다.`,
   'Cli.NothingOffered.Plural': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 {1} {0}개({2}) 전부를 그대로 두었습니다.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean이 대상 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요.`,
   'Cli.Help.Summary': `설치된 어떤 프로그램도 더는 필요로 하지 않는 .msi/.msp 파일을 제거합니다.`,
   'Cli.Help.Elevation': `관리자 명령 프롬프트가 필요하며, 아니면 Windows가 실행하지 않습니다.`,
   'Error.InstallerLockUnavailableTitle': `삭제된 파일 없음`,

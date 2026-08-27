@@ -87,7 +87,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `PATCH`,
   'Section.Registered.Details': `DETAIL PRODUK`,
-  'Section.Backup.Folder': `FOLDER TUJUAN`,
+  'Section.Backup.Folder': `FOLDER CADANGAN`,
   'Section.SayThanks': `UCAPKAN TERIMA KASIH`,
 
   // Field labels (used in detail panels)
@@ -163,10 +163,10 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Memeriksa halaman rilis github untuk mencari versi yang lebih baru.`,
   'Automation.UpdateAvailable.HelpText': `Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini.`,
   'Automation.Licence.HelpText': `Membuka file lisensi di github.com melalui browser Anda.`,
-  'Automation.Section.BackupFolder': `Folder tujuan`,
+  'Automation.Section.BackupFolder': `Folder cadangan`,
   'Automation.Section.Patches': `Patch`,
   'Automation.Section.ProductDetails': `Detail produk`,
-  'Automation.BackupFolder': `Folder tujuan`,
+  'Automation.BackupFolder': `Folder cadangan`,
   'Automation.OperationProgress': `Kemajuan operasi`,
   'Automation.RescanInstaller': `Pindai ulang {InstallerFolder}`,
   'Automation.ScanningProgress': `Kemajuan pemindaian`,
@@ -193,8 +193,8 @@ const MAP = {
   'Tooltip.Minimise': `Kecilkan`,
   'Tooltip.SendResultLog': `Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan orang-orang. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.`,
   'Tooltip.SendResultLog.NothingFound': `Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.`,
-  'Tooltip.Move': `Memindahkan file yang tidak diperlukan ke folder tujuan. Hapus folder itu setelah Anda yakin tidak ada yang membutuhkannya.`,
-  'Tooltip.MoveNeedsDestination': `Memindahkan file yang tidak diperlukan ke sebuah folder tujuan. Anda akan memilihnya sebentar lagi. Hapus folder itu setelah Anda yakin tidak ada yang membutuhkannya.`,
+  'Tooltip.Move': `Memindahkan file yang tidak diperlukan ke folder cadangan. Hapus folder itu setelah Anda yakin tidak ada yang membutuhkannya.`,
+  'Tooltip.MoveNeedsDestination': `Memindahkan file yang tidak diperlukan ke sebuah folder cadangan. Anda akan memilihnya sebentar lagi. Hapus folder itu setelah Anda yakin tidak ada yang membutuhkannya.`,
   'Tooltip.Delete': `Menghapus permanen file yang tidak diperlukan. File-file itu aman disingkirkan, dan ruangnya langsung kembali.`,
   'Tooltip.SigningCertificate': `Nama subjek dari sertifikat Authenticode yang disematkan. Rantai sertifikat tidak diverifikasi.`,
 
@@ -366,7 +366,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Menolak memindahkan file ke dalam folder Windows Installer (tujuan: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `Folder tujuan harus berupa jalur lengkap ke sebuah folder, diawali huruf drive atau berbagi jaringan (misalnya D:\\Backup, atau \\\\server\\backup). InstallerClean tidak bisa memakai yang ini: {0}`,
+  'Error.DestinationNotFullyQualified': `Folder cadangan harus berupa jalur lengkap ke sebuah folder, diawali huruf drive atau berbagi jaringan (misalnya D:\\Backup, atau \\\\server\\backup). InstallerClean tidak bisa memakai yang ini: {0}`,
   'BrowserLaunch.FailedTitle': `Tidak bisa membuka browser Anda`,
   'UpdateCheck.Title': `Periksa pembaruan`,
   'UpdateCheck.Status.Checking': `Memeriksa...`,
@@ -386,8 +386,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean tidak bisa membuka browser Anda, dan juga tidak bisa menyalin tautan ke clipboard. Tautannya:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder tujuan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi.`,
-
+  'Error.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Tidak bisa menulis ke {0}.`,
 
@@ -474,7 +473,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version  Cetak versi (juga -v)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s         Pindai saja - daftar yang tak dipakai`,
   'Cli.Help.Delete': `  installerclean-cli /d         Hapus permanen yang tidak diperlukan`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         Pindahkan ke folder tujuan tersimpan`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         Pindahkan ke folder cadangan tersimpan`,
   'Cli.Help.MovePath': `  installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan`,
   'Cli.Help.NoteLine1': `installerclean-cli menahan prompt sampai selesai, sehingga skrip atau&#10;tugas terjadwal bisa menunggunya.`,
   'Cli.Help.ExitCodesHeader': `Kode keluar:`,
@@ -506,7 +505,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Membuka readme di github melalui browser Anda.`,
   'Automation.About.ReportProblem.HelpText': `Membuka pelacak masalah (Issues) di github.com melalui browser Anda.`,
   'Automation.AutoUpdateCheck.HelpText': `Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya.`,
-  'Tooltip.MoveSameDrive': `Memindahkan file yang tidak diperlukan ke folder tujuan. Folder itu ada di drive yang sama, jadi ruangnya baru kembali setelah Anda menghapus folder itu atau memindahkannya ke drive lain. Anda bisa melakukannya setelah yakin tidak ada yang membutuhkannya.`,
+  'Tooltip.MoveSameDrive': `Memindahkan file yang tidak diperlukan ke folder cadangan. Folder itu ada di drive yang sama, jadi ruangnya baru kembali setelah Anda menghapus folder itu atau memindahkannya ke drive lain. Anda bisa melakukannya setelah yakin tidak ada yang membutuhkannya.`,
   'Completion.MoveRestoreHint.Singular': `File di folder itu [aman disingkirkan], jadi hapus foldernya kapan saja Anda mau. Sampai saat itu, Anda bisa mengembalikannya ke {InstallerFolder} kalau suatu program ternyata membutuhkannya (sangat kecil kemungkinannya).`,
   'Completion.MoveRestoreHint.Plural': `File di folder itu [aman disingkirkan], jadi hapus foldernya kapan saja Anda mau. Sampai saat itu, Anda bisa mengembalikannya ke {InstallerFolder} kalau suatu program ternyata membutuhkan salah satunya (sangat kecil kemungkinannya).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `File di folder itu [aman disingkirkan], jadi hapus foldernya atau pindahkan ke drive lain kapan pun Anda benar-benar ingin mendapatkan kembali ruangnya. Sampai saat itu, Anda bisa mengembalikannya ke {InstallerFolder} kalau suatu program ternyata membutuhkannya (sangat kecil kemungkinannya).`,
@@ -524,7 +523,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Tidak ditemukan file yang tidak diperlukan.`,
   'Cli.NothingOffered.Singular': `InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) yang mungkin ditawarkannya ditahan.`,
   'Cli.NothingOffered.Plural': `InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) yang mungkin ditawarkannya ditahan.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder tujuan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu jalankan perintahnya lagi.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu jalankan perintahnya lagi.`,
   'Cli.Help.Summary': `Menghapus file .msi/.msp cache yang tak lagi dibutuhkan program terpasang.`,
   'Cli.Help.Elevation': `Perlu prompt administrator; Windows tidak akan menjalankannya.`,
   'Error.InstallerLockUnavailableTitle': `Tidak ada yang dihapus`,

@@ -110,7 +110,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `CORRECTIFS`,
   'Section.Registered.Details': `DÉTAILS DU PRODUIT`,
-  'Section.Backup.Folder': `DOSSIER DE DESTINATION`,
+  'Section.Backup.Folder': `DOSSIER DE SAUVEGARDE`,
   'Section.SayThanks': `DIRE MERCI`,
 
   // Field labels (used in detail panels)
@@ -175,10 +175,10 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Vérifie sur la page des versions de github s'il existe une version plus récente.`,
   'Automation.UpdateAvailable.HelpText': `Ouvrez la page de la version pour télécharger la version plus récente, ou annulez pour conserver la version actuelle.`,
   'Automation.Licence.HelpText': `Ouvre le fichier de licence sur github.com dans votre navigateur.`,
-  'Automation.Section.BackupFolder': `Dossier de destination`,
+  'Automation.Section.BackupFolder': `Dossier de sauvegarde`,
   'Automation.Section.Patches': `Correctifs`,
   'Automation.Section.ProductDetails': `Détails du produit`,
-  'Automation.BackupFolder': `Dossier de destination`,
+  'Automation.BackupFolder': `Dossier de sauvegarde`,
   'Automation.OperationProgress': `Progression de l'opération`,
   'Automation.RescanInstaller': `Analyser à nouveau {InstallerFolder}`,
   'Automation.ScanningProgress': `Progression de l'analyse`,
@@ -205,8 +205,8 @@ const MAP = {
   'Tooltip.Minimise': `Réduire`,
   'Tooltip.SendResultLog': `Comme vous voulez, mais c'est apprécié. Envoie un résumé anonyme qui me dit juste si l'outil fonctionne et combien d'espace les gens libèrent. L'écran suivant vous montre ce qui sera envoyé avant que vous confirmiez.`,
   'Tooltip.SendResultLog.NothingFound': `Comme vous voulez, mais c'est apprécié. Envoie un résumé anonyme qui me dit juste si l'outil fonctionne. L'écran suivant vous montre ce qui sera envoyé avant que vous confirmiez.`,
-  'Tooltip.Move': `Déplace les fichiers inutiles vers le dossier de destination. Supprimez ce dossier dès que vous serez convaincu que rien n'en a besoin.`,
-  'Tooltip.MoveNeedsDestination': `Déplace les fichiers inutiles vers un dossier de destination. Vous le choisirez juste après. Supprimez ce dossier dès que vous serez convaincu que rien n'en a besoin.`,
+  'Tooltip.Move': `Déplace les fichiers inutiles vers le dossier de sauvegarde. Supprimez ce dossier dès que vous serez convaincu que rien n'en a besoin.`,
+  'Tooltip.MoveNeedsDestination': `Déplace les fichiers inutiles vers un dossier de sauvegarde. Vous le choisirez juste après. Supprimez ce dossier dès que vous serez convaincu que rien n'en a besoin.`,
   'Tooltip.Delete': `Supprime définitivement les fichiers inutiles. Ils sont retirables sans risque, et vous récupérerez l'espace tout de suite.`,
   'Tooltip.SigningCertificate': `Nom du titulaire du certificat Authenticode incorporé. Chaîne non vérifiée.`,
 
@@ -377,7 +377,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Refus de déplacer des fichiers dans le dossier Windows Installer (destination : {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `Le dossier de destination doit être un chemin complet vers un dossier, commençant par une lettre de lecteur ou un partage réseau (par exemple D:\\Backup, ou \\\\serveur\\backup). InstallerClean ne peut pas utiliser celui-ci : {0}`,
+  'Error.DestinationNotFullyQualified': `Le dossier de sauvegarde doit être un chemin complet vers un dossier, commençant par une lettre de lecteur ou un partage réseau (par exemple D:\\Backup, ou \\\\serveur\\backup). InstallerClean ne peut pas utiliser celui-ci : {0}`,
   'BrowserLaunch.FailedTitle': `Impossible d'ouvrir votre navigateur`,
   'UpdateCheck.Title': `Rechercher des mises à jour`,
   'UpdateCheck.Status.Checking': `Vérification...`,
@@ -397,8 +397,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean n'a pas pu ouvrir votre navigateur, ni copier le lien dans le presse-papiers. Voici le lien :&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de destination, il s'est donc arrêté plutôt que d'écrire au mauvais endroit. Vérifiez {0}, puis Réanalyser et réessayez.`,
-
+  'Error.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de sauvegarde, il s'est donc arrêté plutôt que d'écrire au mauvais endroit. Vérifiez {0}, puis Réanalyser et réessayez.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Impossible d'écrire dans {0}.`,
 
@@ -514,7 +513,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Ouvre le readme sur github dans votre navigateur.`,
   'Automation.About.ReportProblem.HelpText': `Ouvre le suivi des problèmes (Issues) sur github.com dans votre navigateur.`,
   'Automation.AutoUpdateCheck.HelpText': `Si la case est cochée, InstallerClean recherche une version plus récente sur github à son lancement.`,
-  'Tooltip.MoveSameDrive': `Déplace les fichiers inutiles vers le dossier de destination. Il est sur le même lecteur, vous ne récupérerez donc l'espace qu'une fois ce dossier supprimé ou déplacé sur un autre lecteur. Vous pourrez le faire dès que vous serez convaincu que rien n'en a besoin.`,
+  'Tooltip.MoveSameDrive': `Déplace les fichiers inutiles vers le dossier de sauvegarde. Il est sur le même lecteur, vous ne récupérerez donc l'espace qu'une fois ce dossier supprimé ou déplacé sur un autre lecteur. Vous pourrez le faire dès que vous serez convaincu que rien n'en a besoin.`,
   'Completion.MoveRestoreHint.Singular': `Le fichier de ce dossier est [retirable sans risque], vous pouvez donc supprimer le dossier quand vous voulez. D'ici là, vous pouvez le remettre dans {InstallerFolder} si un programme s'avérait en avoir besoin (extrêmement improbable).`,
   'Completion.MoveRestoreHint.Plural': `Les fichiers de ce dossier sont [retirables sans risque], vous pouvez donc le supprimer quand vous voulez. D'ici là, vous pouvez les remettre dans {InstallerFolder} si un programme s'avérait avoir besoin de l'un d'eux (extrêmement improbable).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `Le fichier de ce dossier est [retirable sans risque], vous pouvez donc supprimer le dossier ou le déplacer sur un autre lecteur quand vous voudrez vraiment récupérer l'espace. D'ici là, vous pouvez le remettre dans {InstallerFolder} si un programme s'avérait en avoir besoin (extrêmement improbable).`,
@@ -532,7 +531,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Aucun fichier inutile trouvé.`,
   'Cli.NothingOffered.Singular': `InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu le seul fichier ({2}) qu'il aurait pu proposer.`,
   'Cli.NothingOffered.Plural': `InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu l'ensemble des {0} {1} ({2}) qu'il aurait pu proposer.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de destination, il s'est donc arrêté plutôt que d'écrire au mauvais endroit. Vérifiez {0}, puis relancez la commande.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de sauvegarde, il s'est donc arrêté plutôt que d'écrire au mauvais endroit. Vérifiez {0}, puis relancez la commande.`,
   'Cli.Help.Summary': `Retire les .msi et .msp en cache dont aucun programme installé n'a besoin.`,
   'Cli.Help.Elevation': `Exige une invite de commandes administrateur ; Windows ne le lancera pas.`,
   'Error.InstallerLockUnavailableTitle': `Rien n'a été supprimé`,

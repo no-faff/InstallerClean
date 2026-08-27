@@ -92,7 +92,7 @@
   <!-- Section headings -->
   <data name="Section.Registered.Patches" xml:space="preserve"><value>YAMALAR</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>ÜRÜN AYRINTILARI</value></data>
-  <data name="Section.Backup.Folder" xml:space="preserve"><value>HEDEF KLASÖR</value></data>
+  <data name="Section.Backup.Folder" xml:space="preserve"><value>YEDEK KLASÖRÜ</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>TEŞEKKÜR ETMEK İÇİN</value></data>
 
   <!-- Field labels (used in detail panels) -->
@@ -261,7 +261,7 @@
        DETAILS). Narrator at default verbosity spells short uppercase
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
-  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Hedef klasör</value></data>
+  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Yedek klasörü</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Yamalar</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Ürün ayrıntıları</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as
@@ -269,7 +269,7 @@
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
        Automation.Section.BackupFolder in every language. -->
-  <data name="Automation.BackupFolder" xml:space="preserve"><value>Hedef klasör</value></data>
+  <data name="Automation.BackupFolder" xml:space="preserve"><value>Yedek klasörü</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>İşlem ilerlemesi</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>{InstallerFolder}'ı yeniden tara</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Tarama ilerlemesi</value></data>
@@ -333,14 +333,14 @@
        the folder is what finishes the job, because the screen never said so
        and a real user moved his files, watched nothing break for weeks and
        still did not know he was done. -->
-  <data name="Tooltip.Move" xml:space="preserve"><value>Gereksiz dosyaları hedef klasöre taşır. Hiçbir şeyin onlara ihtiyacı olmadığına kanaat getirdiğinizde o klasörü silin.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>Gereksiz dosyaları yedek klasörüne taşır. Hiçbir şeyin onlara ihtiyacı olmadığına kanaat getirdiğinizde o klasörü silin.</value></data>
   <!-- The Move button's tooltip while the backup folder box is empty. The
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
        for one to be set first. "A" and not "the" because there is no folder
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Gereksiz dosyaları bir hedef klasöre taşır. Klasörü hemen ardından seçeceksiniz. Hiçbir şeyin onlara ihtiyacı olmadığına kanaat getirdiğinizde o klasörü silin.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Gereksiz dosyaları bir yedek klasörüne taşır. Klasörü hemen ardından seçeceksiniz. Hiçbir şeyin onlara ihtiyacı olmadığına kanaat getirdiğinizde o klasörü silin.</value></data>
   <!-- The same-drive state. It exists to give a matched pair with
        Tooltip.Delete on the one trade the user is actually making: hover
        Delete and the space comes back at once, hover Move with a folder on
@@ -348,7 +348,7 @@
        same promise, different timing, both readable before either button is
        pressed. Distinct from Confirm.MoveSameDrive, which says a related
        thing after the choice has been made. -->
-  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Gereksiz dosyaları hedef klasöre taşır. Klasör aynı sürücüde olduğu için, onu silene ya da başka bir sürücüye taşıyana kadar yeri geri kazanamazsınız. Bunu, hiçbir şeyin onlara ihtiyacı olmadığına kanaat getirdiğinizde yapabilirsiniz.</value></data>
+  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Gereksiz dosyaları yedek klasörüne taşır. Klasör aynı sürücüde olduğu için, onu silene ya da başka bir sürücüye taşıyana kadar yeri geri kazanamazsınız. Bunu, hiçbir şeyin onlara ihtiyacı olmadığına kanaat getirdiğinizde yapabilirsiniz.</value></data>
   <!-- The Delete button's tooltip and its screen-reader help text, one
        value feeding both. "Reclaim" rather than a synonym because it is
        already the app's word for this: the reports chart says "Space
@@ -1164,7 +1164,7 @@ Ayrıntılar {1} içinde.</value></data>
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Hedef klasör, bir sürücü harfi ya da ağ paylaşımıyla başlayan, bir klasöre giden tam bir yol olmalıdır (örneğin D:\Backup ya da \\sunucu\backup). InstallerClean bunu kullanamaz: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Yedek klasörü, bir sürücü harfi ya da ağ paylaşımıyla başlayan, bir klasöre giden tam bir yol olmalıdır (örneğin D:\Backup ya da \\sunucu\backup). InstallerClean bunu kullanamaz: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Tarayıcınız açılamadı</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Güncelleştirmeleri denetle</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Denetleniyor...</value></data>
@@ -1203,7 +1203,7 @@ Ayrıntılar {1} içinde.</value></data>
        different question and a different string: they went wherever the folder
        pointed then, which is what the completion summary names, so this copy must
        not claim it. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean hedef klasörü artık doğrulayamadı, bu yüzden yanlış yere yazmak yerine durdu. {0} konumunu denetleyin, sonra Yeniden tara deyip tekrar deneyin.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean yedek klasörünü artık doğrulayamadı, bu yüzden yanlış yere yazmak yerine durdu. {0} konumunu denetleyin, sonra Yeniden tara deyip tekrar deneyin.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -1621,7 +1621,7 @@ Ayrıntılar şuraya yazıldı:
        and there is no Re-scan here. It names the folder immediately before, so
        this one cannot close on "run it again" the way a line naming no folder can;
        "it" would reach back past the folder and take that instead of the tool. -->
-  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean hedef klasörü artık doğrulayamadı, bu yüzden yanlış yere yazmak yerine durdu. {0} konumunu denetleyin, sonra komutu yeniden çalıştırın.</value></data>
+  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean yedek klasörünü artık doğrulayamadı, bu yüzden yanlış yere yazmak yerine durdu. {0} konumunu denetleyin, sonra komutu yeniden çalıştırın.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <!-- Same eight slots as Cli.EventLogMoveSummary, for a batch one of the
@@ -1707,7 +1707,7 @@ Ayrıntılar şuraya yazıldı:
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Sürümü yazdır (-v de kabul edilir)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Yalnızca tara - gereksizleri listele</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Gereksiz dosyaları kalıcı olarak sil</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Kayıtlı hedef klasöre taşı</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Kayıtlı yedek klasörüne taşı</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m YOL     Belirtilen yola taşı</value></data>
   <!-- ONE value carrying TWO printed lines, and the &#10; is where the English
        breaks rather than where every language must. It was three keys

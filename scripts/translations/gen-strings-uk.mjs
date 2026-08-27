@@ -100,7 +100,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `ВИПРАВЛЕННЯ`,
   'Section.Registered.Details': `ДЕТАЛІ ПРОДУКТУ`,
-  'Section.Backup.Folder': `ПАПКА ПРИЗНАЧЕННЯ`,
+  'Section.Backup.Folder': `ПАПКА РЕЗЕРВНИХ КОПІЙ`,
   'Section.SayThanks': `ПОДЯКУВАТИ`,
 
   // Field labels (used in detail panels)
@@ -171,10 +171,10 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Перевіряє на сторінці випусків github, чи є новіша версія.`,
   'Automation.UpdateAvailable.HelpText': `Відкрийте сторінку випуску, щоб завантажити новішу версію, або скасуйте, щоб лишити поточну версію.`,
   'Automation.Licence.HelpText': `Відкриває файл ліцензії на github.com у вашому браузері.`,
-  'Automation.Section.BackupFolder': `Папка призначення`,
+  'Automation.Section.BackupFolder': `Папка резервних копій`,
   'Automation.Section.Patches': `Виправлення`,
   'Automation.Section.ProductDetails': `Деталі продукту`,
-  'Automation.BackupFolder': `Папка призначення`,
+  'Automation.BackupFolder': `Папка резервних копій`,
   'Automation.OperationProgress': `Перебіг операції`,
   'Automation.RescanInstaller': `Просканувати {InstallerFolder} ще раз`,
   'Automation.ScanningProgress': `Перебіг сканування`,
@@ -201,8 +201,8 @@ const MAP = {
   'Tooltip.Minimise': `Згорнути`,
   'Tooltip.SendResultLog': `На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма і скільки місця люди звільняють. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.`,
   'Tooltip.SendResultLog.NothingFound': `На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.`,
-  'Tooltip.Move': `Переміщує непотрібні файли до папки призначення. Видаліть цю папку, коли переконаєтеся, що вони нікому не потрібні.`,
-  'Tooltip.MoveNeedsDestination': `Переміщує непотрібні файли до папки призначення. Ви виберете її наступним кроком. Видаліть цю папку, коли переконаєтеся, що вони нікому не потрібні.`,
+  'Tooltip.Move': `Переміщує непотрібні файли до папки резервних копій. Видаліть цю папку, коли переконаєтеся, що вони нікому не потрібні.`,
+  'Tooltip.MoveNeedsDestination': `Переміщує непотрібні файли до папки резервних копій. Ви виберете її наступним кроком. Видаліть цю папку, коли переконаєтеся, що вони нікому не потрібні.`,
   'Tooltip.Delete': `Видаляє непотрібні файли назавжди. Їх можна безпечно прибрати, і місце повернеться одразу.`,
   'Tooltip.SigningCertificate': `Назва суб'єкта з вбудованого сертифіката Authenticode. Ланцюжок не перевірено.`,
 
@@ -374,7 +374,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Відмова перемістити файли до папки Windows Installer (призначення: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `Папка призначення має бути повним шляхом до папки, що починається з літери диска або мережевого ресурсу (наприклад, D:\\Backup або \\\\server\\backup). InstallerClean не може використати цей: {0}`,
+  'Error.DestinationNotFullyQualified': `Папка резервних копій має бути повним шляхом до папки, що починається з літери диска або мережевого ресурсу (наприклад, D:\\Backup або \\\\server\\backup). InstallerClean не може використати цей: {0}`,
   'BrowserLaunch.FailedTitle': `Не вдалося відкрити ваш браузер`,
   'UpdateCheck.Title': `Перевірити оновлення`,
   'UpdateCheck.Status.Checking': `Перевірка...`,
@@ -394,8 +394,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean не зміг відкрити ваш браузер і не зміг скопіювати посилання до буфера обміну. Ось воно:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку призначення і зупинився, щоб не записати не туди. Перевірте {0}, потім «Повторити сканування» і спробуйте ще раз.`,
-
+  'Error.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку резервних копій і зупинився, щоб не записати не туди. Перевірте {0}, потім «Повторити сканування» і спробуйте ще раз.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Не вдається записати в {0}.`,
 
@@ -511,7 +510,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Відкриває readme на github у вашому браузері.`,
   'Automation.About.ReportProblem.HelpText': `Відкриває список проблем (Issues) на github.com у вашому браузері.`,
   'Automation.AutoUpdateCheck.HelpText': `Якщо позначено, InstallerClean під час запуску перевіряє на github наявність новішої версії.`,
-  'Tooltip.MoveSameDrive': `Переміщує непотрібні файли до папки призначення. Вона на тому самому диску, тож місце повернеться лише після того, як ви видалите цю папку або перемістите її на інший диск. Це можна зробити, коли переконаєтеся, що вони нікому не потрібні.`,
+  'Tooltip.MoveSameDrive': `Переміщує непотрібні файли до папки резервних копій. Вона на тому самому диску, тож місце повернеться лише після того, як ви видалите цю папку або перемістите її на інший диск. Це можна зробити, коли переконаєтеся, що вони нікому не потрібні.`,
   'Completion.MoveRestoreHint.Singular': `Файл у цій папці [можна безпечно прибрати], тож видаляйте папку коли завгодно. До того часу ви можете повернути його до {InstallerFolder}, якщо якійсь програмі він усе ж знадобиться (украй малоймовірно).`,
   'Completion.MoveRestoreHint.Plural': `Файли в цій папці [можна безпечно прибрати], тож видаляйте її коли завгодно. До того часу ви можете повернути їх до {InstallerFolder}, якщо якійсь програмі знадобиться один із них (украй малоймовірно).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `Файл у цій папці [можна безпечно прибрати], тож видаліть папку або перемістіть її на інший диск, коли справді захочете повернути місце. До того часу ви можете повернути його до {InstallerFolder}, якщо якійсь програмі він усе ж знадобиться (украй малоймовірно).`,
@@ -529,7 +528,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Непотрібних файлів не знайдено.`,
   'Cli.NothingOffered.Singular': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав єдиний файл ({2}), який інакше запропонував би.`,
   'Cli.NothingOffered.Plural': `InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав усі {0} {1} ({2}), які інакше запропонував би.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку призначення і зупинився, щоб не записати не туди. Перевірте {0}, потім запустіть команду ще раз.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку резервних копій і зупинився, щоб не записати не туди. Перевірте {0}, потім запустіть команду ще раз.`,
   'Cli.Help.Summary': `Прибирає .msi і .msp з кешу, не потрібні жодній встановленій програмі.`,
   'Cli.Help.Elevation': `Потрібен командний рядок адміністратора; інакше Windows не запустить.`,
   'Error.InstallerLockUnavailableTitle': `Нічого не видалено`,

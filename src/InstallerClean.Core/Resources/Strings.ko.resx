@@ -92,7 +92,7 @@
   <!-- Section headings -->
   <data name="Section.Registered.Patches" xml:space="preserve"><value>패치</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>제품 세부 정보</value></data>
-  <data name="Section.Backup.Folder" xml:space="preserve"><value>대상 폴더</value></data>
+  <data name="Section.Backup.Folder" xml:space="preserve"><value>백업 폴더</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>감사 인사</value></data>
 
   <!-- Field labels (used in detail panels) -->
@@ -261,7 +261,7 @@
        DETAILS). Narrator at default verbosity spells short uppercase
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
-  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>대상 폴더</value></data>
+  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>백업 폴더</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>패치</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>제품 세부 정보</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as
@@ -269,7 +269,7 @@
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
        Automation.Section.BackupFolder in every language. -->
-  <data name="Automation.BackupFolder" xml:space="preserve"><value>대상 폴더</value></data>
+  <data name="Automation.BackupFolder" xml:space="preserve"><value>백업 폴더</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>작업 진행 상황</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>{InstallerFolder} 다시 검사</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>검사 진행 상황</value></data>
@@ -333,14 +333,14 @@
        the folder is what finishes the job, because the screen never said so
        and a real user moved his files, watched nothing break for weeks and
        still did not know he was done. -->
-  <data name="Tooltip.Move" xml:space="preserve"><value>불필요한 파일을 대상 폴더로 옮깁니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>불필요한 파일을 백업 폴더로 옮깁니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.</value></data>
   <!-- The Move button's tooltip while the backup folder box is empty. The
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
        for one to be set first. "A" and not "the" because there is no folder
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>불필요한 파일을 대상 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>불필요한 파일을 백업 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.</value></data>
   <!-- The same-drive state. It exists to give a matched pair with
        Tooltip.Delete on the one trade the user is actually making: hover
        Delete and the space comes back at once, hover Move with a folder on
@@ -348,7 +348,7 @@
        same promise, different timing, both readable before either button is
        pressed. Distinct from Confirm.MoveSameDrive, which says a related
        thing after the choice has been made. -->
-  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>불필요한 파일을 대상 폴더로 옮깁니다. 그 폴더가 같은 드라이브에 있어서, 폴더를 삭제하거나 다른 드라이브로 옮기기 전까지는 공간을 되찾지 못합니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그렇게 하시면 됩니다.</value></data>
+  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>불필요한 파일을 백업 폴더로 옮깁니다. 그 폴더가 같은 드라이브에 있어서, 폴더를 삭제하거나 다른 드라이브로 옮기기 전까지는 공간을 되찾지 못합니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그렇게 하시면 됩니다.</value></data>
   <!-- The Delete button's tooltip and its screen-reader help text, one
        value feeding both. "Reclaim" rather than a synonym because it is
        already the app's word for this: the reports chart says "Space
@@ -1164,7 +1164,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>대상 폴더는 드라이브 문자나 네트워크 공유로 시작하는 폴더의 전체 경로여야 합니다(예: D:\Backup 또는 \\server\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>백업 폴더는 드라이브 문자나 네트워크 공유로 시작하는 폴더의 전체 경로여야 합니다(예: D:\Backup 또는 \\server\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>브라우저를 열 수 없음</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>업데이트 확인</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>확인 중...</value></data>
@@ -1203,7 +1203,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        different question and a different string: they went wherever the folder
        pointed then, which is what the completion summary names, so this copy must
        not claim it. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean이 대상 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -1621,7 +1621,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        and there is no Re-scan here. It names the folder immediately before, so
        this one cannot close on "run it again" the way a line naming no folder can;
        "it" would reach back past the folder and take that instead of the tool. -->
-  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean이 대상 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요.</value></data>
+  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <!-- Same eight slots as Cli.EventLogMoveSummary, for a batch one of the
@@ -1706,7 +1706,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  버전 출력 (-v도 사용 가능)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         검사만 - 불필요한 파일 나열</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         불필요한 파일 영구 삭제</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         저장된 대상 폴더로 이동</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         저장된 백업 폴더로 이동</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 경로    지정한 경로로 이동</value></data>
   <!-- ONE value carrying TWO printed lines, and the &#10; is where the English
        breaks rather than where every language must. It was three keys

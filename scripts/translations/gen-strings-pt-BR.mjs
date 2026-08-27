@@ -84,7 +84,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `PATCHES`,
   'Section.Registered.Details': `DETALHES DO PRODUTO`,
-  'Section.Backup.Folder': `PASTA DE DESTINO`,
+  'Section.Backup.Folder': `PASTA DE BACKUP`,
   'Section.SayThanks': `AGRADEÇA`,
 
   // Field labels (used in detail panels)
@@ -150,10 +150,10 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Consulta a página de versões do github em busca de uma versão mais recente.`,
   'Automation.UpdateAvailable.HelpText': `Abra a página da versão para baixar a versão mais recente, ou cancele para manter a versão atual.`,
   'Automation.Licence.HelpText': `Abre o arquivo da licença em github.com no seu navegador.`,
-  'Automation.Section.BackupFolder': `Pasta de destino`,
+  'Automation.Section.BackupFolder': `Pasta de backup`,
   'Automation.Section.Patches': `Patches`,
   'Automation.Section.ProductDetails': `Detalhes do produto`,
-  'Automation.BackupFolder': `Pasta de destino`,
+  'Automation.BackupFolder': `Pasta de backup`,
   'Automation.OperationProgress': `Progresso da operação`,
   'Automation.RescanInstaller': `Analisar {InstallerFolder} novamente`,
   'Automation.ScanningProgress': `Progresso da análise`,
@@ -180,8 +180,8 @@ const MAP = {
   'Tooltip.Minimise': `Minimizar`,
   'Tooltip.SendResultLog': `Você decide, mas eu agradeço. Envia um resumo anônimo que só me diz se está funcionando e quanto espaço as pessoas estão liberando. A próxima tela mostra o que será enviado antes de você confirmar.`,
   'Tooltip.SendResultLog.NothingFound': `Você decide, mas eu agradeço. Envia um resumo anônimo que só me diz se está funcionando. A próxima tela mostra o que será enviado antes de você confirmar.`,
-  'Tooltip.Move': `Move os arquivos desnecessários para a pasta de destino. Exclua essa pasta quando estiver convencido de que nada precisa deles.`,
-  'Tooltip.MoveNeedsDestination': `Move os arquivos desnecessários para uma pasta de destino. Você a escolhe em seguida. Exclua essa pasta quando estiver convencido de que nada precisa deles.`,
+  'Tooltip.Move': `Move os arquivos desnecessários para a pasta de backup. Exclua essa pasta quando estiver convencido de que nada precisa deles.`,
+  'Tooltip.MoveNeedsDestination': `Move os arquivos desnecessários para uma pasta de backup. Você a escolhe em seguida. Exclua essa pasta quando estiver convencido de que nada precisa deles.`,
   'Tooltip.Delete': `Exclui permanentemente os arquivos desnecessários. Eles são seguros para remover, e você recupera o espaço na hora.`,
   'Tooltip.SigningCertificate': `Nome do titular do certificado Authenticode incorporado. Cadeia não verificada.`,
 
@@ -351,7 +351,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Recusando mover arquivos para a pasta do Windows Installer (destino: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `A pasta de destino precisa ser um caminho completo até uma pasta, começando por uma letra de unidade ou um compartilhamento de rede (por exemplo D:\\Backup, ou \\\\servidor\\backup). O InstallerClean não pode usar esta: {0}`,
+  'Error.DestinationNotFullyQualified': `A pasta de backup precisa ser um caminho completo até uma pasta, começando por uma letra de unidade ou um compartilhamento de rede (por exemplo D:\\Backup, ou \\\\servidor\\backup). O InstallerClean não pode usar esta: {0}`,
   'BrowserLaunch.FailedTitle': `Não foi possível abrir o navegador`,
   'UpdateCheck.Title': `Verificar atualizações`,
   'UpdateCheck.Status.Checking': `Verificando...`,
@@ -371,8 +371,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `O InstallerClean não conseguiu abrir o seu navegador, e também não conseguiu copiar o link para a área de transferência. O link é:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de destino, então parou em vez de gravar no lugar errado. Verifique {0}, depois Reanalisar e tente de novo.`,
-
+  'Error.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de backup, então parou em vez de gravar no lugar errado. Verifique {0}, depois Reanalisar e tente de novo.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Não é possível gravar em {0}.`,
 
@@ -458,7 +457,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version   Mostra a versão (aceita também -v)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s          Somente analisar - lista os supérfluos`,
   'Cli.Help.Delete': `  installerclean-cli /d          Exclui permanentemente os supérfluos`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m          Move para a pasta de destino salva`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m          Move para a pasta de backup salva`,
   'Cli.Help.MovePath': `  installerclean-cli /m CAMINHO  Move para o caminho especificado`,
   'Cli.Help.NoteLine1': `O installerclean-cli bloqueia o prompt até terminar, para que um script&#10;ou uma tarefa agendada possa esperar por ele.`,
   'Cli.Help.ExitCodesHeader': `Códigos de saída:`,
@@ -490,7 +489,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Abre o readme no github no seu navegador.`,
   'Automation.About.ReportProblem.HelpText': `Abre o rastreador de problemas (Issues) em github.com no seu navegador.`,
   'Automation.AutoUpdateCheck.HelpText': `Se marcada, o InstallerClean consulta o github em busca de uma versão mais recente quando você o executa.`,
-  'Tooltip.MoveSameDrive': `Move os arquivos desnecessários para a pasta de destino. Ela está na mesma unidade, então você só recupera o espaço quando excluir essa pasta ou movê-la para outra unidade. Pode fazer isso quando estiver convencido de que nada precisa deles.`,
+  'Tooltip.MoveSameDrive': `Move os arquivos desnecessários para a pasta de backup. Ela está na mesma unidade, então você só recupera o espaço quando excluir essa pasta ou movê-la para outra unidade. Pode fazer isso quando estiver convencido de que nada precisa deles.`,
   'Completion.MoveRestoreHint.Singular': `O arquivo nessa pasta pode ser [removido com segurança], então exclua a pasta quando quiser. Até lá, você pode devolvê-lo a {InstallerFolder} se algum programa vier a precisar dele (extremamente improvável).`,
   'Completion.MoveRestoreHint.Plural': `Os arquivos nessa pasta podem ser [removidos com segurança], então exclua-a quando quiser. Até lá, você pode devolvê-los a {InstallerFolder} se algum programa vier a precisar de um deles (extremamente improvável).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `O arquivo nessa pasta pode ser [removido com segurança], então exclua a pasta ou mova-a para outra unidade quando quiser recuperar o espaço de verdade. Até lá, você pode devolvê-lo a {InstallerFolder} se algum programa vier a precisar dele (extremamente improvável).`,
@@ -508,7 +507,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Nenhum arquivo desnecessário encontrado.`,
   'Cli.NothingOffered.Singular': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({2}) que poderia ter oferecido.`,
   'Cli.NothingOffered.Plural': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve todos os {0} {1} ({2}) que poderia ter oferecido.`,
-  'Cli.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de destino, então parou em vez de gravar no lugar errado. Verifique {0} e execute o comando de novo.`,
+  'Cli.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de backup, então parou em vez de gravar no lugar errado. Verifique {0} e execute o comando de novo.`,
   'Cli.Help.Summary': `Remove arquivos .msi/.msp em cache que nenhum programa instalado precisa.`,
   'Cli.Help.Elevation': `Exige um prompt como administrador; o Windows não vai iniciá-lo.`,
   'Error.InstallerLockUnavailableTitle': `Nada foi excluído`,

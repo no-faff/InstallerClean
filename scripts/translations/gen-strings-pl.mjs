@@ -118,7 +118,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `POPRAWKI`,
   'Section.Registered.Details': `SZCZEGÓŁY PRODUKTU`,
-  'Section.Backup.Folder': `FOLDER DOCELOWY`,
+  'Section.Backup.Folder': `FOLDER KOPII ZAPASOWEJ`,
   'Section.SayThanks': `PODZIĘKUJ`,
 
   // Field labels (used in detail panels)
@@ -184,10 +184,10 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Sprawdza na stronie wydań githuba, czy jest nowsza wersja.`,
   'Automation.UpdateAvailable.HelpText': `Otwórz stronę wydania, aby pobrać nowszą wersję, lub anuluj, aby zachować bieżącą.`,
   'Automation.Licence.HelpText': `Otwiera plik licencji na github.com w twojej przeglądarce.`,
-  'Automation.Section.BackupFolder': `Folder docelowy`,
+  'Automation.Section.BackupFolder': `Folder kopii zapasowej`,
   'Automation.Section.Patches': `Poprawki`,
   'Automation.Section.ProductDetails': `Szczegóły produktu`,
-  'Automation.BackupFolder': `Folder docelowy`,
+  'Automation.BackupFolder': `Folder kopii zapasowej`,
   'Automation.OperationProgress': `Postęp operacji`,
   'Automation.RescanInstaller': `Skanuj ponownie {InstallerFolder}`,
   'Automation.ScanningProgress': `Postęp skanowania`,
@@ -214,8 +214,8 @@ const MAP = {
   'Tooltip.Minimise': `Minimalizuj`,
   'Tooltip.SendResultLog': `Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa i ile miejsca ludzie zwalniają. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz.`,
   'Tooltip.SendResultLog.NothingFound': `Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz.`,
-  'Tooltip.Move': `Przenosi niepotrzebne pliki do folderu docelowego. Skasuj ten folder, gdy nabierzesz pewności, że nic ich nie potrzebuje.`,
-  'Tooltip.MoveNeedsDestination': `Przenosi niepotrzebne pliki do folderu docelowego. Wybierzesz go za chwilę. Skasuj ten folder, gdy nabierzesz pewności, że nic ich nie potrzebuje.`,
+  'Tooltip.Move': `Przenosi niepotrzebne pliki do folderu kopii zapasowej. Skasuj ten folder, gdy nabierzesz pewności, że nic ich nie potrzebuje.`,
+  'Tooltip.MoveNeedsDestination': `Przenosi niepotrzebne pliki do folderu kopii zapasowej. Wybierzesz go za chwilę. Skasuj ten folder, gdy nabierzesz pewności, że nic ich nie potrzebuje.`,
   'Tooltip.Delete': `Trwale usuwa niepotrzebne pliki. Można je bezpiecznie skasować, a miejsce odzyskasz od razu.`,
   'Tooltip.SigningCertificate': `Nazwa podmiotu z osadzonego certyfikatu Authenticode. Łańcuch nie został zweryfikowany.`,
 
@@ -387,7 +387,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Odmowa przeniesienia plików do folderu Windows Installer (cel: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `Folder docelowy musi być pełną ścieżką do folderu, zaczynającą się od litery dysku albo udziału sieciowego (na przykład D:\\Backup albo \\\\serwer\\backup). InstallerClean nie może użyć tej: {0}`,
+  'Error.DestinationNotFullyQualified': `Folder kopii zapasowej musi być pełną ścieżką do folderu, zaczynającą się od litery dysku albo udziału sieciowego (na przykład D:\\Backup albo \\\\serwer\\backup). InstallerClean nie może użyć tej: {0}`,
   'BrowserLaunch.FailedTitle': `Nie udało się otworzyć przeglądarki`,
   'UpdateCheck.Title': `Sprawdź aktualizacje`,
   'UpdateCheck.Status.Checking': `Sprawdzanie...`,
@@ -407,8 +407,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean nie mógł otworzyć przeglądarki ani skopiować linku do schowka. Oto link:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu docelowego, więc zatrzymał się, zamiast zapisać w złym miejscu. Sprawdź {0}, potem Skanuj ponownie i spróbuj jeszcze raz.`,
-
+  'Error.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu kopii zapasowej, więc zatrzymał się, zamiast zapisać w złym miejscu. Sprawdź {0}, potem Skanuj ponownie i spróbuj jeszcze raz.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Nie można zapisać w {0}.`,
 
@@ -530,7 +529,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Otwiera readme na githubie w twojej przeglądarce.`,
   'Automation.About.ReportProblem.HelpText': `Otwiera listę zgłoszeń (Issues) na github.com w twojej przeglądarce.`,
   'Automation.AutoUpdateCheck.HelpText': `Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na githubie, czy jest nowsza wersja.`,
-  'Tooltip.MoveSameDrive': `Przenosi niepotrzebne pliki do folderu docelowego. Jest on na tym samym dysku, więc miejsce odzyskasz dopiero po skasowaniu tego folderu albo przeniesieniu go na inny dysk. Możesz to zrobić, gdy nabierzesz pewności, że nic ich nie potrzebuje.`,
+  'Tooltip.MoveSameDrive': `Przenosi niepotrzebne pliki do folderu kopii zapasowej. Jest on na tym samym dysku, więc miejsce odzyskasz dopiero po skasowaniu tego folderu albo przeniesieniu go na inny dysk. Możesz to zrobić, gdy nabierzesz pewności, że nic ich nie potrzebuje.`,
   'Completion.MoveRestoreHint.Singular': `Plik w tym folderze [można bezpiecznie usunąć], więc skasuj folder, kiedy zechcesz. Do tego czasu możesz umieścić go z powrotem w {InstallerFolder}, gdyby jakiś program okazał się go potrzebować (skrajnie mało prawdopodobne).`,
   'Completion.MoveRestoreHint.Plural': `Pliki w tym folderze [można bezpiecznie usunąć], więc skasuj go, kiedy zechcesz. Do tego czasu możesz umieścić je z powrotem w {InstallerFolder}, gdyby jakiś program okazał się potrzebować któregoś z nich (skrajnie mało prawdopodobne).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `Plik w tym folderze [można bezpiecznie usunąć], więc skasuj folder albo przenieś go na inny dysk, kiedy naprawdę zechcesz odzyskać miejsce. Do tego czasu możesz umieścić go z powrotem w {InstallerFolder}, gdyby jakiś program okazał się go potrzebować (skrajnie mało prawdopodobne).`,
@@ -548,7 +547,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Nie znaleziono niepotrzebnych plików.`,
   'Cli.NothingOffered.Singular': `InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał jedyny plik ({2}), który inaczej by zaproponował.`,
   'Cli.NothingOffered.Plural': `InstallerClean nie zdołał ustalić z pewnością, do których zainstalowanych tu programów należą pliki w pamięci podręcznej, więc zatrzymał wszystkie {0} {1} ({2}), które inaczej by zaproponował.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu docelowego, więc zatrzymał się, zamiast zapisać w złym miejscu. Sprawdź {0}, a potem uruchom polecenie ponownie.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu kopii zapasowej, więc zatrzymał się, zamiast zapisać w złym miejscu. Sprawdź {0}, a potem uruchom polecenie ponownie.`,
   'Cli.Help.Summary': `Usuwa .msi i .msp z cache, zbędne każdemu zainstalowanemu programowi.`,
   'Cli.Help.Elevation': `Wymaga wiersza polecenia administratora; inaczej Windows go nie uruchomi.`,
   'Error.InstallerLockUnavailableTitle': `Niczego nie usunięto`,

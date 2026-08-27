@@ -78,7 +78,7 @@ const MAP = {
   // cannot use and check-resx-parity reported them as strays in every language.
   'Section.Registered.Patches': `BẢN VÁ`,
   'Section.Registered.Details': `CHI TIẾT SẢN PHẨM`,
-  'Section.Backup.Folder': `THƯ MỤC ĐÍCH`,
+  'Section.Backup.Folder': `THƯ MỤC SAO LƯU`,
   'Section.SayThanks': `LỜI CẢM ƠN`,
 
   // Field labels (used in detail panels)
@@ -144,10 +144,10 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Kiểm tra trang phát hành của github xem có phiên bản mới hơn không.`,
   'Automation.UpdateAvailable.HelpText': `Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại.`,
   'Automation.Licence.HelpText': `Mở tệp giấy phép trên github.com trong trình duyệt của bạn.`,
-  'Automation.Section.BackupFolder': `Thư mục đích`,
+  'Automation.Section.BackupFolder': `Thư mục sao lưu`,
   'Automation.Section.Patches': `Bản vá`,
   'Automation.Section.ProductDetails': `Chi tiết sản phẩm`,
-  'Automation.BackupFolder': `Thư mục đích`,
+  'Automation.BackupFolder': `Thư mục sao lưu`,
   'Automation.OperationProgress': `Tiến trình thao tác`,
   'Automation.RescanInstaller': `Quét lại {InstallerFolder}`,
   'Automation.ScanningProgress': `Tiến trình quét`,
@@ -174,8 +174,8 @@ const MAP = {
   'Tooltip.Minimise': `Thu nhỏ`,
   'Tooltip.SendResultLog': `Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.`,
   'Tooltip.SendResultLog.NothingFound': `Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.`,
-  'Tooltip.Move': `Chuyển các tệp không cần thiết vào thư mục đích. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
-  'Tooltip.MoveNeedsDestination': `Chuyển các tệp không cần thiết vào một thư mục đích. Bạn sẽ chọn thư mục ngay sau đây. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
+  'Tooltip.Move': `Chuyển các tệp không cần thiết vào thư mục sao lưu. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
+  'Tooltip.MoveNeedsDestination': `Chuyển các tệp không cần thiết vào một thư mục sao lưu. Bạn sẽ chọn thư mục ngay sau đây. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
   'Tooltip.Delete': `Xóa vĩnh viễn các tệp không cần thiết. Chúng có thể bỏ đi an toàn, và bạn lấy lại dung lượng ngay lập tức.`,
   'Tooltip.SigningCertificate': `Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi.`,
 
@@ -350,7 +350,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `Thư mục đích phải là một đường dẫn đầy đủ tới một thư mục, bắt đầu bằng ký tự ổ đĩa hoặc một chia sẻ mạng (ví dụ D:\\Backup, hoặc \\\\server\\backup). InstallerClean không dùng được cái này: {0}`,
+  'Error.DestinationNotFullyQualified': `Thư mục sao lưu phải là một đường dẫn đầy đủ tới một thư mục, bắt đầu bằng ký tự ổ đĩa hoặc một chia sẻ mạng (ví dụ D:\\Backup, hoặc \\\\server\\backup). InstallerClean không dùng được cái này: {0}`,
   'BrowserLaunch.FailedTitle': `Không thể mở trình duyệt của bạn`,
   'UpdateCheck.Title': `Kiểm tra cập nhật`,
   'UpdateCheck.Status.Checking': `Đang kiểm tra...`,
@@ -370,8 +370,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng tạm. Liên kết là:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục đích, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lần nữa.`,
-
+  'Error.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lần nữa.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Không thể ghi vào {0}.`,
 
@@ -455,7 +454,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version     In ra phiên bản (cũng nhận -v)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s            Chỉ quét - liệt kê tệp không cần`,
   'Cli.Help.Delete': `  installerclean-cli /d            Xóa vĩnh viễn tệp không cần thiết`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m            Chuyển tới thư mục đích đã lưu`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m            Chuyển tới thư mục sao lưu`,
   'Cli.Help.MovePath': `  installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định`,
   'Cli.Help.NoteLine1': `installerclean-cli giữ dấu nhắc cho tới khi xong, để một tập lệnh hoặc&#10;một tác vụ theo lịch có thể chờ nó.`,
   'Cli.Help.ExitCodesHeader': `Mã thoát:`,
@@ -487,7 +486,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Mở readme trên github trong trình duyệt của bạn.`,
   'Automation.About.ReportProblem.HelpText': `Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn.`,
   'Automation.AutoUpdateCheck.HelpText': `Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó.`,
-  'Tooltip.MoveSameDrive': `Chuyển các tệp không cần thiết vào thư mục đích. Thư mục đó nằm trên cùng một ổ đĩa, nên bạn chỉ lấy lại dung lượng sau khi xóa nó hoặc chuyển nó sang ổ đĩa khác. Bạn có thể làm vậy khi đã yên tâm rằng không gì cần đến chúng.`,
+  'Tooltip.MoveSameDrive': `Chuyển các tệp không cần thiết vào thư mục sao lưu. Thư mục đó nằm trên cùng một ổ đĩa, nên bạn chỉ lấy lại dung lượng sau khi xóa nó hoặc chuyển nó sang ổ đĩa khác. Bạn có thể làm vậy khi đã yên tâm rằng không gì cần đến chúng.`,
   'Completion.MoveRestoreHint.Singular': `Tệp trong thư mục đó [có thể bỏ đi an toàn], nên bạn cứ xóa thư mục bất cứ lúc nào. Cho tới lúc ấy, bạn có thể đặt nó trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến (cực kỳ khó xảy ra).`,
   'Completion.MoveRestoreHint.Plural': `Các tệp trong thư mục đó [có thể bỏ đi an toàn], nên bạn cứ xóa thư mục bất cứ lúc nào. Cho tới lúc ấy, bạn có thể đặt chúng trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến một tệp trong số đó (cực kỳ khó xảy ra).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `Tệp trong thư mục đó [có thể bỏ đi an toàn], nên khi nào bạn thực sự muốn lấy lại dung lượng thì cứ xóa thư mục hoặc chuyển nó sang ổ đĩa khác. Cho tới lúc ấy, bạn có thể đặt nó trở lại {InstallerFolder} nếu hóa ra có chương trình nào cần đến (cực kỳ khó xảy ra).`,
@@ -505,7 +504,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Không tìm thấy tệp không cần thiết nào.`,
   'Cli.NothingOffered.Singular': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) mà lẽ ra nó có thể đề xuất.`,
   'Cli.NothingOffered.Plural': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} {1} ({2}) mà lẽ ra nó có thể đề xuất.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục đích, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi chạy lại lệnh.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi chạy lại lệnh.`,
   'Cli.Help.Summary': `Bỏ các tệp .msi và .msp trong bộ đệm mà không chương trình đã cài nào cần.`,
   'Cli.Help.Elevation': `Cần dấu nhắc quản trị viên; nếu không Windows sẽ không khởi chạy.`,
   'Error.InstallerLockUnavailableTitle': `Không có tệp nào bị xóa`,
