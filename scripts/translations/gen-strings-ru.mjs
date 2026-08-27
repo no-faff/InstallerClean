@@ -463,8 +463,8 @@ const MAP = {
   'Completion.NothingOfferedBody.Plural': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} {1} ({2}), которые иначе предложил бы.`,
   'Summary.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
-  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
-  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Singular': `{0} file held back. The scan said it was unneeded. The final check didn't agree.`,
+  'Completion.HeldBack.Plural': `{0} files held back. The scan said these were unneeded. The final check didn't agree.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT

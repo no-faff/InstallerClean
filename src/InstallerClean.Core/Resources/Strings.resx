@@ -674,15 +674,15 @@ To put it back, you need the installer for the version you already have. Get it 
        same technique the move-confirmation dialog uses. -->
   <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} moved to: {2}</value></data>
   <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} moved to: {2}</value></data>
-  <!-- What a Move or Delete kept back, on the completion overlay and on stdout.
+  <!-- What a Move or Delete held back, on the completion overlay and on stdout.
        HeldBackReport is the single source and both hosts render from it, so
        there is one sentence and neither host can answer differently.
 
-       0 = files kept back. A PAIR RATHER THAN A FLAT STRING because the second
+       0 = files held back. A PAIR RATHER THAN A FLAT STRING because the second
        sentence inflects with the count as well as the noun does ("it was"
        against "these were"), which one string cannot carry. Grammatical rather
        than Cardinality (DisplayHelpers.QuestionFor): the one-form spends {0} and
-       reads "1 file kept back", a numeral governing a noun. A language may add a
+       reads "1 file held back", a numeral governing a noun. A language may add a
        satellite-only Completion.HeldBack.One/.Few/.Many override for its own
        count grammar.
 
@@ -700,8 +700,8 @@ To put it back, you need the installer for the version you already have. Get it 
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file kept back. The scan said it was unneeded. The final check said otherwise.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files kept back. The scan said these were unneeded. The final check said otherwise.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file held back. The scan said it was unneeded. The final check didn't agree.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files held back. The scan said these were unneeded. The final check didn't agree.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
