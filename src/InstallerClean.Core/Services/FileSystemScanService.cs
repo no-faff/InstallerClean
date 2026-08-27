@@ -200,9 +200,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // candidate per file against it (see InstallerCacheRoot).
         var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
 
-        // The folder the walk enumerated, in the spelling it enumerated it in,
-        // for the two correlation counts below and for nothing else. Deliberately
-        // NOT cacheRoot.Resolved: see NamesFileDirectlyIn.
+        // The folder the walk enumerated, in the spelling it enumerated it in, and
+        // read by nothing but the three counts NamesFileDirectlyIn feeds: the two
+        // correlation counts below, and missingInFolder, which is the other term in
+        // the proportional clause that throws Error_ScanCorrelationFailed.
+        // Deliberately NOT cacheRoot.Resolved: see NamesFileDirectlyIn.
         var walkedFolder = (_installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder)
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
@@ -1232,8 +1234,16 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
     /// <summary>
     /// Whether a registered path names a file sitting DIRECTLY in the folder the
-    /// walk enumerated, judged on the string alone. Feeds the two correlation
-    /// counts and decides nothing about any file.
+    /// walk enumerated, judged on the string alone.
+    ///
+    /// IT FEEDS THREE COUNTS, AND THROUGH ONE OF THEM IT CAN REFUSE THE WHOLE SCAN.
+    /// <c>registeredNamingFolder</c> and <c>registeredInFolderPresent</c> are the two
+    /// correlation counts. <c>missingInFolder</c> is the third and this note left it
+    /// out: it is the other term in the proportional clause that throws
+    /// <c>Error_ScanCorrelationFailed</c>, so an audit of what that gate rests on has
+    /// to be able to reach it from the predicate the gate is built on. No individual
+    /// file's fate turns on any of the three, which is what "decides nothing about any
+    /// file" was reaching for and is worth keeping in those narrower words.
     ///
     /// NOT A GATE, and the distance from <see cref="CandidateGuard.CheckSafeToRemove"/>
     /// is why it exists rather than borrowing that. The guard asks the kernel
