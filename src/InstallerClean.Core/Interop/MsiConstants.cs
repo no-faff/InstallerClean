@@ -97,7 +97,19 @@ public enum MsiPatchFilter : uint
 /// </summary>
 public static class MsiInstallProperty
 {
-    /// <summary>Local cached package path in %windir%\Installer.</summary>
+    /// <summary>
+    /// Path to the cached package. That is the whole of what Microsoft states for
+    /// INSTALLPROPERTY_LOCALPACKAGE, and this line named a location on no source:
+    /// "%windir%\Installer".
+    ///
+    /// DO NOT NARROW A PATH TEST ON IT. FileSystemScanService is written for values
+    /// that fall outside that folder, which is why NamesFileDirectlyIn exists to
+    /// separate the in-folder registrations from the rest and why the
+    /// missing-from-disk counts deliberately cover every registration whose file has
+    /// gone wherever it pointed. Read out of one machine's hive on 2026-08-28, all 147
+    /// of its values are inside the folder in three spellings, and one machine cannot
+    /// make the stronger claim true.
+    /// </summary>
     public const string LocalPackage = "LocalPackage";
 
     /// <summary>Display name of the installed product.</summary>
