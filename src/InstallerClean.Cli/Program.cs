@@ -303,23 +303,26 @@ internal static class Program
     }
 
     /// <summary>
-    /// Prints what a re-check kept back, in the operator's language: one line per
-    /// cause that occurred, each carrying its own count. Both the pre-act
-    /// re-verify and the action services' under-lease re-read report through this,
-    /// because which side of the installer mutex a file was condemned on is a fact
-    /// about the check rather than about the file, and neither earns a wording of
-    /// its own.
+    /// Prints what a run held back, in the operator's language: ONE counted
+    /// sentence naming no cause, from <see cref="HeldBackReport.Line"/>, which the
+    /// window renders from as well. The two hosts must not answer differently for
+    /// one machine state and they share no printing code, so the sentence is Core's
+    /// and neither host composes anything.
     ///
-    /// The sentences and the order they come in are Core's
-    /// (<see cref="HeldBackReport.Lines"/>). The window prints the same partition
-    /// from the same helper, which is the point: the two hosts must not answer
-    /// differently for one machine state, and they share no printing code.
+    /// CALLED ONCE PER RUN, ON A TALLY THE CALLER HAS ALREADY FOLDED. Both the
+    /// pre-act re-verify and the action services' under-lease re-read hold files
+    /// back, and which side of the installer mutex a file was condemned on is a
+    /// fact about how the check is built rather than about the file. They were
+    /// reported separately until the four cause-specific sentences became one, at
+    /// which point two printings stopped reading as two findings and started
+    /// reading as a repeat. ADD THE TALLIES AND CALL THIS ONCE; a second call in
+    /// one run is the fault rather than the wording.
     ///
     /// Takes the tally and not the path list, though every caller holds both. The
-    /// tally already answers how many files and how many lines, so a second
-    /// argument here would be one that has to agree with it and could stop doing
-    /// so. A run that kept nothing back prints nothing, which is the commonest run
-    /// by far and the reason a count of zero must never reach a sentence.
+    /// tally already answers how many files there are, so a second argument here
+    /// would be one that has to agree with it and could stop doing so. A run that
+    /// held nothing back prints nothing, which is the commonest run by far and the
+    /// reason a count of zero must never reach a sentence.
     ///
     /// Deliberately not a machine-read line. The Application-channel summary
     /// already carries what the run did in English, and an RMM reads that.
@@ -515,16 +518,26 @@ internal static class Program
             var survivingFiles = scanResult.RemovableFiles
                 .Where(f => survivingSet.Contains(f.FullPath)).ToList();
 
-            // Anything the re-verify kept back is reported with its reasons (human
-            // stdout, OS language; deliberately NOT a machine-read line). One line
-            // per cause that occurred: a re-verify that could not read the records
-            // keeps files back without any program having reclaimed them, so a
-            // batch that met both causes and printed either alone would name a
-            // cause that did not happen to some of the files. Through the same
-            // helper as the under-lease report below, so the run cannot describe
-            // one condition two ways. The counts and byte figures further down are
-            // recomputed from the survivor subset so "X of Y" and the freed-space
-            // total describe what was acted on, not the pre-reverify scan.
+            // The counts and byte figures further down are recomputed from the
+            // survivor subset, so "X of Y" and the freed-space total describe what
+            // was acted on rather than the pre-reverify scan.
+            //
+            // NOTHING IS PRINTED HERE, AND THAT IS THE FOLD. What this pass held
+            // back and what the action service's own re-read holds back are one
+            // account of one batch, so the tally is carried down in heldBack and
+            // printed ONCE beside the service's, which is what the window does when
+            // it folds both into a single ReverifyResult before the completion
+            // overlay reads it. Printing here as well put two sentences on stdout
+            // for one batch, and since the four cause-specific sentences became one
+            // they are the SAME sentence, so a run meeting both read as a repeat
+            // with nothing to tell the two numbers apart.
+            //
+            // THE PATHS THAT NOW PRINT NOTHING ARE THE ONES THE WINDOW IS ALSO
+            // SILENT ON, which is the point rather than a loss: an installer-busy
+            // refusal, an unavailable lock and a free-space refusal all return
+            // before the print, and on each of them the service touched nothing, so
+            // there is no count for the sentence to account for. The window shows a
+            // dialog and no completion screen on all three.
             // A WHOLE-BATCH REFUSAL STOOD HERE UNTIL 3.0.0 and its shape is worth
             // keeping in mind rather than rediscovering. It fired when the machine
             // gained a product installed as a second instance of itself between the
@@ -536,7 +549,7 @@ internal static class Program
             // retry-on-transient policy would have come back nightly to be refused
             // every time. It went with the identity check that detected it. No exit
             // code changed: ExitError is still 1 and every other route to it stands.
-            ReportHeldBack(reverify.Reasons);
+            var heldBack = reverify.Reasons;
 
             var filePaths = survivingFiles.Select(f => f.FullPath).ToList();
             count = survivingFiles.Count;
@@ -610,20 +623,22 @@ internal static class Program
                 if (result.InstallerLockUnavailable)
                     return EmitInstallerLockUnavailable(arg);
 
-                // Reported after the batch rather than beside the pre-act
-                // re-verify's own line above, because it happened after that line
-                // was printed: the service takes the installer mutex and re-reads
-                // the batch's patch claims inside it, and anything reclaimed in
-                // between is kept back there. Same condition and therefore the
-                // same sentence; what differs is only when it was read.
+                // THE RUN'S ONE HELD-BACK LINE, printed here because this is the
+                // last of the two producers to answer: the service takes the
+                // installer mutex and re-reads the batch's patch claims inside it,
+                // so anything condemned there is condemned after the pre-act pass
+                // has already finished. Adding rather than replacing, because the
+                // two hold back DIFFERENT files and the number on the line is every
+                // file the run held back.
                 //
                 // Ahead of the "deleted N" line, so the run reads in the order it
-                // happened: what was intended, what was kept back, what was done.
+                // happened: what was intended, what was held back, what was done.
                 // Ahead of the cancel re-entry below for a harder reason than
                 // order: that re-entry leaves this method, so a run that held
                 // files back and was then cancelled used to say nothing at all
                 // about them, where the window reports them on both paths.
-                ReportHeldBack(result.HeldBackReasons);
+                heldBack += result.HeldBackReasons;
+                ReportHeldBack(heldBack);
                 // Held-back files were never touched, so they leave the tally the
                 // same way the errors below do. Without this they would be counted
                 // as freed bytes, the byte sum discounting errors alone.
@@ -747,7 +762,8 @@ internal static class Program
                 // and drops real ones off the end. Not a wrong total, the wrong
                 // rows. The count goes the same way, being the "of N" in the
                 // Application-log line an RMM audits.
-                ReportHeldBack(ex.Partial.HeldBackReasons);
+                heldBack += ex.Partial.HeldBackReasons;
+                ReportHeldBack(heldBack);
                 if (ex.Partial.HeldBack.Count > 0)
                 {
                     survivingFiles = FoldHeldBack(survivingFiles, ex.Partial.HeldBack);
@@ -767,10 +783,11 @@ internal static class Program
             if (moveResult.InstallerLockUnavailable)
                 return EmitInstallerLockUnavailable(arg);
 
-            // See the /d branch for why this is reported here and not beside the
-            // pre-act re-verify's line, and for why it comes ahead of the cancel
-            // re-entry rather than after it.
-            ReportHeldBack(moveResult.HeldBackReasons);
+            // The run's one held-back line. See the /d branch for why the two
+            // producers' tallies are added and printed here rather than one each,
+            // and for why this comes ahead of the cancel re-entry.
+            heldBack += moveResult.HeldBackReasons;
+            ReportHeldBack(heldBack);
             if (moveResult.HeldBack.Count > 0)
             {
                 survivingFiles = FoldHeldBack(survivingFiles, moveResult.HeldBack);
