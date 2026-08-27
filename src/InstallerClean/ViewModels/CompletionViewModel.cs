@@ -572,15 +572,34 @@ public partial class CompletionViewModel : ObservableObject
     /// candidate back, so nothing was moved or deleted. No freed-size heading
     /// (nothing was freed); the summary IS the "N kept in place" message, and it
     /// names the same reason the per-operation line would have.
+    /// <paramref name="deleting"/> picks the heading, on the same rule as
+    /// <see cref="FailedCountText"/>: this screen only ever follows one of the two
+    /// buttons, so it says which one.
     /// </summary>
-    public void ShowReverifyAllSkipped(ReverifyResult reverify)
+    public void ShowReverifyAllSkipped(ReverifyResult reverify, bool deleting)
     {
+        // Every candidate being kept back is the check working, not the run
+        // failing, so this heading is not a warning however it reads. That is the
+        // one thing this screen does NOT share with the two above, where the same
+        // two strings mean a Move or a Delete that got nowhere.
         HeadingIsWarning = false;
+        // THE HEADING ANSWERS TWO QUESTIONS AND BOTH HAVE TO BE IN IT. The second
+        // went unanswered here for a release because the first was answered well.
+        //
         // Not Completion_AllClean, which ShowAllClear uses correctly for a machine
         // with nothing to do. Here everything the user confirmed was kept back,
         // which is not the same as there having been nothing to remove, and the
         // screen previously read "All clean" over a summary naming the causes.
-        Heading = Strings.Completion_NothingRemoved;
+        //
+        // And per button rather than one word for both, because the user pressed
+        // Move or pressed Delete and a heading naming neither is a word they never
+        // asked for. It read "Nothing removed" whichever was pressed. The pass that
+        // took "All clean" off this screen invented that string with both of these
+        // already in the file and already picked between by ShowMoveSummary and
+        // ShowDeleteSummary above, because it was aimed at the word that was wrong
+        // rather than at the choice behind it. A comment justifying half a decision
+        // is how the other half gets lost, so this one carries both.
+        Heading = deleting ? Strings.Completion_NothingDeleted : Strings.Completion_NothingMoved;
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
         // EVERY CAUSE REACHES THE COUNT AND NO CONDITION OVERRIDES IT. One did until

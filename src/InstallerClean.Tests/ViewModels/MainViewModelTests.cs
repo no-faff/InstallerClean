@@ -1517,7 +1517,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task DeleteAllAsync_a_batch_the_service_empties_reports_nothing_removed_and_logs_nothing()
+    public async Task DeleteAllAsync_a_batch_the_service_empties_reports_nothing_deleted_and_logs_nothing()
     {
         // One condition, one screen, one record. The re-read taking the whole
         // batch back is the same machine state as the pre-act re-verify taking it
@@ -1531,6 +1531,11 @@ public class MainViewModelTests
         // to do. Here everything the user confirmed was kept back, which is the
         // opposite finding, and saying "All clean" over a summary naming the causes
         // said the opposite of what had happened.
+        //
+        // AND THE DELETE HEADING RATHER THAN A WORD COVERING BOTH BUTTONS, which
+        // this test's own name asserted for a second release after the first fault
+        // was corrected. The Move twin below asserts the other one, so a change
+        // collapsing the two back into one string cannot leave both green.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1551,7 +1556,7 @@ public class MainViewModelTests
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
-        Assert.Equal(Strings.Completion_NothingRemoved, vm.Completion.Heading);
+        Assert.Equal(Strings.Completion_NothingDeleted, vm.Completion.Heading);
         Assert.Equal(
             string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Summary);
@@ -1560,13 +1565,19 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task MoveAllAsync_a_batch_the_service_empties_reports_nothing_removed_and_logs_nothing()
+    public async Task MoveAllAsync_a_batch_the_service_empties_reports_nothing_moved_and_logs_nothing()
     {
         // The Move twin, which had two more things wrong with it: the summary read
         // "0 files moved to: <folder>" and the restore line told the user how to
-        // put back files that never left. Same heading as the Delete twin above and
-        // for the same reason, which is why it is one string and not two: the two
-        // hosts are describing one machine state and must not drift apart on it.
+        // put back files that never left.
+        //
+        // AND ITS OWN HEADING RATHER THAN THE DELETE TWIN'S, which is the third
+        // thing that was wrong with it. The argument for one string was that the
+        // two are describing one machine state, and the machine state is not what
+        // the heading is about: the user pressed Move, and a screen that answers
+        // with a word from neither button is answering somebody else's click. It
+        // costs nothing to say so, both strings having been in the file and in
+        // every language since before the collapsed one was written.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1589,7 +1600,7 @@ public class MainViewModelTests
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
-        Assert.Equal(Strings.Completion_NothingRemoved, vm.Completion.Heading);
+        Assert.Equal(Strings.Completion_NothingMoved, vm.Completion.Heading);
         Assert.Equal(string.Empty, vm.Completion.Restore);
         Assert.Equal(string.Empty, vm.Completion.SummaryDestination);
         await _resultLogService.DidNotReceive().WriteAsync(

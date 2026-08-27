@@ -512,15 +512,41 @@ public class CompletionViewModelTests
         var vm = new CompletionViewModel();
 
         vm.ShowReverifyAllSkipped(new ReverifyResult([], ["a.msp", "b.msp"],
-            new HeldBackReasons(Reclaimed: 1, RecordsUnreadable: 1)));
+            new HeldBackReasons(Reclaimed: 1, RecordsUnreadable: 1)), deleting: false);
 
         Assert.Equal(Line(2), vm.Summary);
         Assert.DoesNotContain(Environment.NewLine, vm.Summary, System.StringComparison.Ordinal);
         // The heading beside the block, because a summary naming causes under a
         // heading saying there were none is the state this screen was rewritten out
         // of. Completion_AllClean is right for a machine with nothing to do and
-        // wrong here, where everything was kept back.
-        Assert.Equal(Strings.Completion_NothingRemoved, vm.Heading);
+        // wrong here, where everything was kept back. Which of the two per-button
+        // headings appears is the theory below's question, not this one's.
+        Assert.Equal(Strings.Completion_NothingMoved, vm.Heading);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void The_all_skipped_screen_names_the_button_that_was_pressed(bool deleting)
+    {
+        // The screen only ever follows Move or Delete, so a heading naming neither
+        // is a word the user never pressed. It read "Nothing removed" both ways
+        // until 3.0.0, with both of these strings already in the file and already
+        // picked between by ShowMoveSummary and ShowDeleteSummary.
+        var vm = new CompletionViewModel();
+
+        vm.ShowReverifyAllSkipped(
+            new ReverifyResult([], ["a.msp"], new HeldBackReasons(Reclaimed: 1)), deleting);
+
+        Assert.Equal(
+            deleting ? Strings.Completion_NothingDeleted : Strings.Completion_NothingMoved,
+            vm.Heading);
+        // And not in the warning colour on either branch, which is what separates
+        // this screen from the two it borrows the strings from. There they mean an
+        // operation that got nowhere; here they mean the check ahead of the batch
+        // doing its job, and painting that as a failure would contradict the one
+        // rule the app is built on.
+        Assert.False(vm.HeadingIsWarning);
     }
 
     // The donate heart's gate. The ask is only ever made after the app has

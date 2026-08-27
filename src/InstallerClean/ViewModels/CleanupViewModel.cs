@@ -837,7 +837,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // The re-verify kept every candidate back. Act on nothing and
                 // report it, with the re-verify's own reason for keeping them.
                 await RefreshAfterBatchAsync();
-                _completion.ShowReverifyAllSkipped(reverify);
+                _completion.ShowReverifyAllSkipped(reverify, deleting: false);
                 OperationProgress = string.Empty;
                 if (createdDestination) await RemoveCreatedDestinationAsync(dest);
                 return;
@@ -954,7 +954,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // to return before creating anything. The destination folder the
                 // PRE-FLIGHT made is still there, and nothing was ever put in it.
                 await RefreshAfterBatchAsync();
-                _completion.ShowReverifyAllSkipped(reverify);
+                _completion.ShowReverifyAllSkipped(reverify, deleting: false);
                 OperationProgress = string.Empty;
                 if (createdDestination) await RemoveCreatedDestinationAsync(dest);
                 return;
@@ -1201,7 +1201,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // The re-verify kept every candidate back. Act on nothing and
                 // report it, with the re-verify's own reason for keeping them.
                 await RefreshAfterBatchAsync();
-                _completion.ShowReverifyAllSkipped(reverify);
+                _completion.ShowReverifyAllSkipped(reverify, deleting: true);
                 OperationProgress = string.Empty;
                 return;
             }
@@ -1268,7 +1268,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // happen, and a bytesFreed of zero reached the result log, where
                 // it is a run that freed nothing rather than a run that never was.
                 await RefreshAfterBatchAsync();
-                _completion.ShowReverifyAllSkipped(reverify);
+                _completion.ShowReverifyAllSkipped(reverify, deleting: true);
                 OperationProgress = string.Empty;
                 return;
             }
