@@ -31,7 +31,7 @@ public class MoveFilesServiceTests : IDisposable
         // real file is not refused. The destination is a separate temp folder,
         // outside the sandbox, so its own gates pass.
         var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), _sourceDir);
-        var results = await svc.MoveFilesAsync(new[] { file }, _destDir);
+        var results = await svc.MoveFilesAsync(new[] { file }, _destDir, UnderLeaseClaims.None);
 
         Assert.Empty(results.Errors);
         Assert.False(File.Exists(file));
@@ -56,7 +56,7 @@ public class MoveFilesServiceTests : IDisposable
 
         var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(),
             $@"{unmounted}:\Windows\Installer");
-        var result = await svc.MoveFilesAsync(new[] { file }, _destDir);
+        var result = await svc.MoveFilesAsync(new[] { file }, _destDir, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.MovedCount);
         Assert.True(File.Exists(file), "An unproven verdict keeps the file exactly as a refusal does");
@@ -122,7 +122,7 @@ public class MoveFilesServiceTests : IDisposable
         try
         {
             var ex = await Assert.ThrowsAsync<MoveAbortedException>(() =>
-                svc.MoveFilesAsync(new[] { first, second }, _destDir, progress));
+                svc.MoveFilesAsync(new[] { first, second }, _destDir, UnderLeaseClaims.None, progress));
 
             Assert.Equal(1, ex.Partial.MovedCount);
             Assert.Empty(ex.Partial.Errors);
@@ -164,7 +164,7 @@ public class MoveFilesServiceTests : IDisposable
         var mutex = new Tests.Helpers.FakeMutexProbe(Tests.Helpers.FakeMutexProbe.Mode.RefusedNotHeld);
 
         var result = await new MoveFilesService(fs, mutex, installerFolderOverride: null)
-            .MoveFilesAsync(new[] { source }, _destDir);
+            .MoveFilesAsync(new[] { source }, _destDir, UnderLeaseClaims.None);
 
         // Refused, and distinguishably so: nothing was shown to hold the mutex, so
         // the pending-reboot gate the busy case is answered by can account for this

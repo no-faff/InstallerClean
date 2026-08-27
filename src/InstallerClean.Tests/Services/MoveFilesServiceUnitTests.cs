@@ -41,7 +41,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.MovedCount);
         Assert.Empty(result.Errors);
@@ -59,7 +59,7 @@ public class MoveFilesServiceUnitTests
         fs.AddFile(existing, new MockFileData("existing bytes"));
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.MovedCount);
         Assert.Empty(result.Errors);
@@ -75,7 +75,7 @@ public class MoveFilesServiceUnitTests
         var ghost = $@"{SourceDir}\ghost.msi";
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { ghost }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { ghost }, DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.MovedCount);
         var error = Assert.Single(result.Errors);
@@ -95,7 +95,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { ok1, missing, ok2 }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { ok1, missing, ok2 }, DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(2, result.MovedCount);
         var error = Assert.Single(result.Errors);
@@ -115,7 +115,7 @@ public class MoveFilesServiceUnitTests
         // service's directory-create path.
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.MovedCount);
         Assert.True(fs.Directory.Exists(DestDir));
@@ -134,7 +134,7 @@ public class MoveFilesServiceUnitTests
         var progress = new Helpers.SyncProgress<OperationProgress>(reports.Add);
 
         var svc = new MoveFilesService(fs);
-        await svc.MoveFilesAsync(sources, DestDir, progress);
+        await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress);
 
         Assert.Equal(3, reports.Count);
         Assert.Equal(1, reports[0].CurrentFile);
@@ -157,7 +157,7 @@ public class MoveFilesServiceUnitTests
         });
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(sources, DestDir, progress);
+        var result = await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress);
 
         // The report is inside the per-file try, so a consumer that throws is
         // categorised like any other per-file failure and the batch carries on.
@@ -185,7 +185,7 @@ public class MoveFilesServiceUnitTests
         var progress = new Helpers.SyncProgress<OperationProgress>(reports.Add);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { present, ghost }, DestDir, progress);
+        var result = await svc.MoveFilesAsync(new[] { present, ghost }, DestDir, UnderLeaseClaims.None, progress);
 
         // Pins the half of the report's placement that moving it inside the try
         // had to preserve: it runs ahead of the skip checks, so a file the batch
@@ -216,7 +216,7 @@ public class MoveFilesServiceUnitTests
 
         // No throw on a mid-batch cancel: the accumulated result comes back with
         // Cancelled set and the count of what completed before the stop.
-        var result = await svc.MoveFilesAsync(sources, DestDir, progress, cts.Token);
+        var result = await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress, cts.Token);
 
         Assert.True(result.Cancelled);
         Assert.Equal(1, result.MovedCount);
@@ -240,7 +240,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { outside }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { outside }, DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.MovedCount);
         Assert.IsType<CandidateOutsideCache>(Assert.Single(result.Errors));
@@ -257,7 +257,7 @@ public class MoveFilesServiceUnitTests
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.HeldByAnother);
 
         var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         Assert.True(result.InstallerBusy);
         Assert.Equal(0, result.MovedCount);
@@ -275,7 +275,7 @@ public class MoveFilesServiceUnitTests
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
 
         var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         Assert.False(result.InstallerBusy);
         Assert.Equal(1, result.MovedCount);
@@ -297,7 +297,7 @@ public class MoveFilesServiceUnitTests
         var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.RefusedNotHeld);
 
         var svc = new MoveFilesService(fs, mutex, installerFolderOverride: null);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // Without the hold nothing stops a program registering a package part-way
         // through, so the act-time proof can go stale under the batch. A file this
@@ -328,7 +328,7 @@ public class MoveFilesServiceUnitTests
         var reverifier = new Helpers.FakeReclaimingReverifier(new[] { source }, mutex);
         var svc = new MoveFilesService(fs, mutex, null, reverifier);
 
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(1, reverifier.LeasesHeldWhenCalled);
         Assert.Equal(0, reverifier.LeasesReleasedWhenCalled);
@@ -354,7 +354,7 @@ public class MoveFilesServiceUnitTests
         var svc = new MoveFilesService(fs, mutex, null, reverifier);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
-            () => svc.MoveFilesAsync(new[] { source }, DestDir));
+            () => svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None));
 
         Assert.Equal(1, mutex.Acquired);
         Assert.Equal(1, mutex.Released);
@@ -377,7 +377,7 @@ public class MoveFilesServiceUnitTests
         var svc = new MoveFilesService(fs, mutex, null,
             new Helpers.FakeReclaimingReverifier(new[] { keep }));
 
-        var result = await svc.MoveFilesAsync(new[] { keep, go }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { keep, go }, DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.MovedCount);
         Assert.Equal(new[] { keep }, result.HeldBack);
@@ -407,7 +407,7 @@ public class MoveFilesServiceUnitTests
         var reverifier = new Helpers.FakeReclaimingReverifier(Array.Empty<string>(), mutex);
         var svc = new MoveFilesService(fs, mutex, null, reverifier);
 
-        await svc.MoveFilesAsync(new[] { source }, DestDir, underLeaseClaims: new UnderLeaseClaims(claims, claims));
+        await svc.MoveFilesAsync(new[] { source }, DestDir, new UnderLeaseClaims(claims, claims));
 
         Assert.Equal(claims, reverifier.ClaimsSeen);
     }
@@ -419,7 +419,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(Array.Empty<string>(), DestDir);
+        var result = await svc.MoveFilesAsync(Array.Empty<string>(), DestDir, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.MovedCount);
         Assert.Empty(result.Errors);
@@ -481,7 +481,7 @@ public class MoveFilesServiceUnitTests
         var (fs, file) = FileSystemReporting(source);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // UnknownError, NOT SourceIsReparsePoint: that entry tells the user the
         // file IS a symlink, which a read that could not be made has not shown.
@@ -505,7 +505,7 @@ public class MoveFilesServiceUnitTests
         var (fs, file) = FileSystemReporting(source);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // UnknownError rather than CandidateOutsideCache, for the same reason
         // as the test above: the check did not place the file anywhere, so the
@@ -525,7 +525,7 @@ public class MoveFilesServiceUnitTests
             new IOException("held open") { HResult = unchecked((int)hresult) });
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // The one IO failure with a cause the user can act on, so it must not
         // be flattened into the generic "Windows reported a file error".
@@ -543,7 +543,7 @@ public class MoveFilesServiceUnitTests
             new IOException("disk full") { HResult = unchecked((int)0x80070070) });
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         var error = Assert.Single(result.Errors);
         Assert.IsType<IOFailure>(error);
@@ -562,7 +562,7 @@ public class MoveFilesServiceUnitTests
         fs.AddDirectory(DestDir);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // The file the user asked to move has moved: one copy, in the
         // destination, and nothing left in the cache folder.
@@ -584,7 +584,7 @@ public class MoveFilesServiceUnitTests
             new IOException("held open") { HResult = unchecked((int)0x80070020) };
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // Reported as failed, and true: the user has exactly one copy of the
         // file, where it started. A duplicate in the backup folder would be the
@@ -607,7 +607,7 @@ public class MoveFilesServiceUnitTests
         fs.DeleteFailures[destPath] = new UnauthorizedAccessException("destination refused");
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // Needs a destination that took a create and refuses a delete, which
         // the write probe has already passed once. The file is still reported
@@ -629,7 +629,7 @@ public class MoveFilesServiceUnitTests
             new IOException("held open") { HResult = unchecked((int)0x80070020) };
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // CopyFile carries the source's attributes to the copy, so the copy of
         // a read-only source is read-only and the discard's own delete is
@@ -658,7 +658,7 @@ public class MoveFilesServiceUnitTests
         fs.VanishOnAttributeRead.Add(source);
 
         var svc = new MoveFilesService(fs);
-        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
 
         // Source gone and the copy in place is what a completed move leaves, so
         // this is one, however it got there. Treating the attribute read's

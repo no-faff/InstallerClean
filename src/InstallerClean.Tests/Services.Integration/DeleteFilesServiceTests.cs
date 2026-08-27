@@ -40,7 +40,7 @@ public class DeleteFilesServiceTests : IDisposable
         await File.WriteAllTextAsync(file, "content");
 
         var svc = NewService();
-        var result = await svc.DeleteFilesAsync(new[] { file });
+        var result = await svc.DeleteFilesAsync(new[] { file }, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.DeletedCount);
         Assert.Empty(result.Errors);
@@ -53,7 +53,7 @@ public class DeleteFilesServiceTests : IDisposable
         var file = Path.Combine(_tempDir, "nonexistent.msi");
 
         var svc = NewService();
-        var result = await svc.DeleteFilesAsync(new[] { file });
+        var result = await svc.DeleteFilesAsync(new[] { file }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.Single(result.Errors);
@@ -74,7 +74,7 @@ public class DeleteFilesServiceTests : IDisposable
         await File.WriteAllTextAsync(ok2, "content");
 
         var svc = NewService();
-        var result = await svc.DeleteFilesAsync(new[] { ok1, missing, ok2 });
+        var result = await svc.DeleteFilesAsync(new[] { ok1, missing, ok2 }, UnderLeaseClaims.None);
 
         Assert.Equal(2, result.DeletedCount);
         Assert.Single(result.Errors);
@@ -104,7 +104,7 @@ public class DeleteFilesServiceTests : IDisposable
         }
 
         var svc = NewService();
-        var result = await svc.DeleteFilesAsync(new[] { link });
+        var result = await svc.DeleteFilesAsync(new[] { link }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<SourceIsReparsePoint>(Assert.Single(result.Errors));
@@ -128,7 +128,7 @@ public class DeleteFilesServiceTests : IDisposable
         var svc = NewService();
         // A mid-batch cancel returns the partial result with Cancelled set rather
         // than throwing; some files remain, having been stopped before deletion.
-        var result = await svc.DeleteFilesAsync(files, progress: progress, cancellationToken: cts.Token);
+        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress, cancellationToken: cts.Token);
 
         Assert.True(result.Cancelled);
         var remaining = Directory.GetFiles(_tempDir).Length;
@@ -147,7 +147,7 @@ public class DeleteFilesServiceTests : IDisposable
         await File.WriteAllTextAsync(file, "content");
         File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.ReadOnly);
 
-        var result = await NewService().DeleteFilesAsync(new[] { file });
+        var result = await NewService().DeleteFilesAsync(new[] { file }, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.DeletedCount);
         Assert.Empty(result.Errors);
@@ -179,7 +179,7 @@ public class DeleteFilesServiceTests : IDisposable
         fs.AddFile(source, new MockFileData("payload"));
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.RefusedNotHeld);
 
-        var result = await new DeleteFilesService(fs, mutex, installerFolderOverride: null).DeleteFilesAsync(new[] { source });
+        var result = await new DeleteFilesService(fs, mutex, installerFolderOverride: null).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         // Refused, and distinguishably so: nothing was shown to hold the mutex, so
         // the pending-reboot gate the busy case is answered by can account for this

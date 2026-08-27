@@ -56,9 +56,9 @@ public sealed class MoveFilesService : IMoveFilesService
     public Task<MoveResult> MoveFilesAsync(
         IEnumerable<string> filePaths,
         string destinationFolder,
+        UnderLeaseClaims underLeaseClaims,
         IProgress<OperationProgress>? progress = null,
-        CancellationToken cancellationToken = default,
-        UnderLeaseClaims? underLeaseClaims = null)
+        CancellationToken cancellationToken = default)
     {
         return Task.Run(() =>
         {
@@ -216,8 +216,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // Synchronous on the acquiring thread by necessity, not by taste: the
             // lease is released by the thread that took it, so nothing between the
             // acquire and the release may await.
-            var recheck = _reverifier.RecheckUnderLease(
-                underLeaseClaims ?? UnderLeaseClaims.None);
+            var recheck = _reverifier.RecheckUnderLease(underLeaseClaims);
             var heldBack = recheck.HeldBack;
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             if (heldBack.Count > 0)

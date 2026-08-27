@@ -33,18 +33,29 @@ public interface IDeleteFilesService
     /// installer mutex is held and before any file is touched, so a verdict that
     /// moved while the caller's enumeration was running is caught inside the hold
     /// rather than outside it; the paths it condemns come back in
-    /// <see cref="DeleteResult.HeldBack"/>. Null or empty means nothing to
-    /// re-read, which is the ordinary case: a true orphan carries no claim.
+    /// <see cref="DeleteResult.HeldBack"/>. An empty batch means nothing to
+    /// re-read, which is the ordinary case: a true orphan carries no claim, and a
+    /// caller that has none passes <see cref="UnderLeaseClaims.None"/>.
     ///
-    /// Last in the parameter list rather than beside
-    /// <paramref name="filePaths"/>, where it belongs by meaning, because every
-    /// existing caller passes the two after it positionally or by name.
+    /// REQUIRED, AND ITS POSITION FOLLOWS FROM THAT RATHER THAN BEING A CHOICE.
+    /// It was optional and last, and an omitted argument became
+    /// <see cref="UnderLeaseClaims.None"/>, which the re-read answers at its first
+    /// line. So the last check standing in front of the act passed without asking
+    /// anything, and nothing could say so: the files go either way, and the only
+    /// difference is whether a verdict that moved under the lease was looked for.
+    /// A required parameter cannot follow optional ones, so removing the omission
+    /// moved this beside <paramref name="filePaths"/>, which is where it belongs
+    /// by meaning. Passing <see cref="UnderLeaseClaims.None"/> is the statement
+    /// that there are none, and that is a different act from forgetting to look.
+    /// A <c>default</c> value is not a substitute for it: the two lists are then
+    /// null rather than empty and the re-read throws on the first of them, which
+    /// is loud and is meant to be.
     /// </param>
     Task<DeleteResult> DeleteFilesAsync(
         IEnumerable<string> filePaths,
+        UnderLeaseClaims underLeaseClaims,
         IProgress<OperationProgress>? progress = null,
-        CancellationToken cancellationToken = default,
-        UnderLeaseClaims? underLeaseClaims = null);
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>

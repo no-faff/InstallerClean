@@ -66,9 +66,8 @@ public class ScanMoveCompletionTests
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<UnderLeaseClaims?>())
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
 
         var vm = CreateMain();
@@ -121,9 +120,8 @@ public class ScanMoveCompletionTests
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<UnderLeaseClaims?>())
+                Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
 
         var vm = CreateMain();
@@ -262,9 +260,8 @@ public class ScanMoveCompletionTests
             new MissingSourceFile(@"C:\Windows\Installer\c.msi"),
         };
         _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
-                Arg.Any<UnderLeaseClaims?>())
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, errors));
 
         var vm = CreateMain();

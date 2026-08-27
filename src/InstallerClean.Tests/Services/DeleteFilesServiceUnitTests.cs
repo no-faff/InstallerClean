@@ -34,7 +34,7 @@ public class DeleteFilesServiceUnitTests
         var b = AddFile(fs, "b.msi");
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { a, b });
+        var result = await svc.DeleteFilesAsync(new[] { a, b }, UnderLeaseClaims.None);
 
         Assert.Equal(2, result.DeletedCount);
         Assert.Empty(result.Errors);
@@ -49,7 +49,7 @@ public class DeleteFilesServiceUnitTests
         var ghost = $@"{Dir}\ghost.msi"; // never added to the mock filesystem
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { ghost });
+        var result = await svc.DeleteFilesAsync(new[] { ghost }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         var err = Assert.Single(result.Errors);
@@ -66,7 +66,7 @@ public class DeleteFilesServiceUnitTests
         var ok2 = AddFile(fs, "ok2.msi");
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { ok1, missing, ok2 });
+        var result = await svc.DeleteFilesAsync(new[] { ok1, missing, ok2 }, UnderLeaseClaims.None);
 
         Assert.Equal(2, result.DeletedCount);
         var err = Assert.Single(result.Errors);
@@ -83,7 +83,7 @@ public class DeleteFilesServiceUnitTests
         var progress = new SyncProgress<OperationProgress>(reports.Add);
         var svc = new DeleteFilesService(fs);
 
-        await svc.DeleteFilesAsync(files, progress: progress);
+        await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress);
 
         Assert.Equal(3, reports.Count);
         Assert.Equal(1, reports[0].CurrentFile);
@@ -102,7 +102,7 @@ public class DeleteFilesServiceUnitTests
         });
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(files, progress: progress);
+        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress);
 
         // The report is inside the per-file try, so a consumer that throws is
         // categorised like any other per-file failure and the batch carries on.
@@ -127,7 +127,7 @@ public class DeleteFilesServiceUnitTests
         var progress = new SyncProgress<OperationProgress>(reports.Add);
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { present, ghost }, progress: progress);
+        var result = await svc.DeleteFilesAsync(new[] { present, ghost }, UnderLeaseClaims.None, progress: progress);
 
         // Pins the half of the report's placement that moving it inside the try
         // had to preserve: it runs ahead of the File.Exists skip, so a file the
@@ -148,7 +148,7 @@ public class DeleteFilesServiceUnitTests
 
         // No throw on a mid-batch cancel: the partial result comes back with
         // Cancelled set and the tally of what was deleted before the stop.
-        var result = await svc.DeleteFilesAsync(files, progress: progress, cancellationToken: cts.Token);
+        var result = await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress, cancellationToken: cts.Token);
 
         Assert.True(result.Cancelled);
         Assert.Equal(1, result.DeletedCount);
@@ -170,7 +170,7 @@ public class DeleteFilesServiceUnitTests
         fs.AddFile(outside, new MockFileData("payload"));
         var svc = new DeleteFilesService(fs);
 
-        var result = await svc.DeleteFilesAsync(new[] { outside });
+        var result = await svc.DeleteFilesAsync(new[] { outside }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<CandidateOutsideCache>(Assert.Single(result.Errors));
@@ -240,7 +240,7 @@ public class DeleteFilesServiceUnitTests
         var source = $@"{Dir}\readonly.msi";
         var fs = FileSystemHoldingAReadOnlyFile(source, out var file);
 
-        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source });
+        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.DeletedCount);
         Assert.Empty(result.Errors);
@@ -259,7 +259,7 @@ public class DeleteFilesServiceUnitTests
         var fs = FileSystemReporting(source, new UnauthorizedAccessException("refused"));
         fs.File.GetAttributes(source).Returns(FileAttributes.Normal);
 
-        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source });
+        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
@@ -273,7 +273,7 @@ public class DeleteFilesServiceUnitTests
         var fs = FileSystemHoldingAReadOnlyFile(
             source, out var file, clearThrows: new UnauthorizedAccessException("refused"));
 
-        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source });
+        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
@@ -294,7 +294,7 @@ public class DeleteFilesServiceUnitTests
         var fs = FileSystemHoldingAReadOnlyFile(source, out var file,
             retryThrows: new UnauthorizedAccessException("refused after the clear"));
 
-        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source });
+        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
@@ -314,7 +314,7 @@ public class DeleteFilesServiceUnitTests
         var source = $"{Dir}\\unreadable\0.msi";
 
         var svc = new DeleteFilesService(FileSystemReporting(source));
-        var result = await svc.DeleteFilesAsync(new[] { source });
+        var result = await svc.DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         // UnknownError, NOT SourceIsReparsePoint: a read that could not be made
         // has not shown the file is a symlink.
@@ -335,7 +335,7 @@ public class DeleteFilesServiceUnitTests
         var source = $@"{unmounted}:\Windows\Installer\unresolvable.msi";
 
         var svc = new DeleteFilesService(FileSystemReporting(source));
-        var result = await svc.DeleteFilesAsync(new[] { source });
+        var result = await svc.DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         Assert.IsType<UnknownError>(Assert.Single(result.Errors));
         Assert.Equal(0, result.DeletedCount);
@@ -357,7 +357,7 @@ public class DeleteFilesServiceUnitTests
         var svc = new DeleteFilesService(
             FileSystemReporting(source, new IOException("held", hresult)));
 
-        var result = await svc.DeleteFilesAsync(new[] { source });
+        var result = await svc.DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType(expected, Assert.Single(result.Errors));
@@ -370,7 +370,7 @@ public class DeleteFilesServiceUnitTests
         var svc = new DeleteFilesService(
             FileSystemReporting(source, new UnauthorizedAccessException("refused")));
 
-        var result = await svc.DeleteFilesAsync(new[] { source });
+        var result = await svc.DeleteFilesAsync(new[] { source }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
@@ -384,7 +384,7 @@ public class DeleteFilesServiceUnitTests
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.HeldByAnother);
         var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
-        var result = await svc.DeleteFilesAsync(new[] { a });
+        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
 
         Assert.True(result.InstallerBusy);
         Assert.Equal(0, result.DeletedCount);
@@ -400,7 +400,7 @@ public class DeleteFilesServiceUnitTests
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.RefusedNotHeld);
         var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
-        var result = await svc.DeleteFilesAsync(new[] { a });
+        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
 
         // A delete without the hold has nothing stopping a program registering a
         // package part-way through it, and no bin to fetch a wrongly-removed file
@@ -425,7 +425,7 @@ public class DeleteFilesServiceUnitTests
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
         var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
-        var result = await svc.DeleteFilesAsync(new[] { a });
+        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.DeletedCount);
         Assert.False(result.InstallerBusy);
@@ -448,7 +448,7 @@ public class DeleteFilesServiceUnitTests
             atRecheck: () => sourcePresentAtRecheck = fs.File.Exists(a));
         var svc = new DeleteFilesService(fs, mutex, null, reverifier);
 
-        var result = await svc.DeleteFilesAsync(new[] { a });
+        var result = await svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None);
 
         Assert.Equal(1, reverifier.LeasesHeldWhenCalled);
         Assert.Equal(0, reverifier.LeasesReleasedWhenCalled);
@@ -480,7 +480,7 @@ public class DeleteFilesServiceUnitTests
         var svc = new DeleteFilesService(fs, mutex, null, reverifier);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
-            () => svc.DeleteFilesAsync(new[] { a }));
+            () => svc.DeleteFilesAsync(new[] { a }, UnderLeaseClaims.None));
 
         Assert.Equal(1, mutex.Acquired);
         Assert.Equal(1, mutex.Released);
@@ -498,7 +498,7 @@ public class DeleteFilesServiceUnitTests
         var svc = new DeleteFilesService(fs, mutex, null,
             new FakeReclaimingReverifier(new[] { keep }));
 
-        var result = await svc.DeleteFilesAsync(new[] { keep, go });
+        var result = await svc.DeleteFilesAsync(new[] { keep, go }, UnderLeaseClaims.None);
 
         Assert.Equal(1, result.DeletedCount);
         Assert.Equal(new[] { keep }, result.HeldBack);
@@ -518,7 +518,7 @@ public class DeleteFilesServiceUnitTests
         var svc = new DeleteFilesService(fs, mutex, null,
             new FakeReclaimingReverifier(new[] { only }));
 
-        var result = await svc.DeleteFilesAsync(new[] { only });
+        var result = await svc.DeleteFilesAsync(new[] { only }, UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.Empty(result.Errors);
@@ -543,7 +543,7 @@ public class DeleteFilesServiceUnitTests
         var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex);
         var svc = new DeleteFilesService(fs, mutex, null, reverifier);
 
-        await svc.DeleteFilesAsync(new[] { a }, underLeaseClaims: new UnderLeaseClaims(claims, claims));
+        await svc.DeleteFilesAsync(new[] { a }, new UnderLeaseClaims(claims, claims));
 
         Assert.Equal(claims, reverifier.ClaimsSeen);
     }
@@ -555,7 +555,7 @@ public class DeleteFilesServiceUnitTests
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
         var svc = new DeleteFilesService(fs, mutex, installerFolderOverride: null);
 
-        var result = await svc.DeleteFilesAsync(Array.Empty<string>());
+        var result = await svc.DeleteFilesAsync(Array.Empty<string>(), UnderLeaseClaims.None);
 
         Assert.Equal(0, result.DeletedCount);
         Assert.Empty(result.Errors);
