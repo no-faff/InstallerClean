@@ -422,11 +422,27 @@ To put it back, you need the installer for the version you already have. Get it 
   <data name="Reason.Superseded" xml:space="preserve"><value>Superseded</value></data>
   <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
        (superseded): superseded means a newer patch has replaced
-       this one, obsoleted means the patch has been withdrawn /
-       deprecated by the publisher independent of a replacement.
-       The user-visible outcome (the patch is removable) is the
-       same; the Reason column distinguishes them for users who
-       want the MSI-state precision. -->
+       this one, obsoleted means the publisher has withdrawn it
+       independent of a replacement.
+
+       THE TWO DO NOT SHARE AN OUTCOME AND THIS LABEL REACHES NO
+       SCREEN. This note said the user-visible outcome is the same
+       and that the Reason column tells them apart. IsRemovablePatch
+       admits state 2 only, so an obsoleted patch is never offered,
+       and the scan sets two Reason labels rather than three:
+       Reason.Orphaned on the walked-file branch and
+       Reason.Superseded on the superseded-patch branch. Nothing
+       sets this one.
+
+       IT IS STILL TRANSLATED, AND ON PURPOSE. MainViewModel passes
+       it as a third argument to Body.MainExplanation.Why, where no
+       language's sentence spends that slot, so it is kept against a
+       sentence that one day might rather than because a user will
+       read it.
+
+       DO NOT READ THE THREE STATES AS THE SET THE OFFER ADMITS. A
+       user-facing sentence naming a class the offer cannot contain
+       has already been written once from exactly that reading. -->
   <data name="Reason.Obsoleted" xml:space="preserve"><value>Obsoleted</value></data>
 
   <!-- Status / progress text -->
