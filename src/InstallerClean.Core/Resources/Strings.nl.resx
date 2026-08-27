@@ -366,8 +366,8 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). TWO PLACEHOLDERS, ONE PER CAUSE THE OFFER CAN CONTAIN: {0} is Reason.Orphaned and {1} is Reason.Superseded, the only two labels the scan sets (FileSystemScanService, the walked-file branch and the superseded-patch branch). Reason.Obsoleted is still passed as {2} by MainViewModel and is deliberately unused here: an obsoleted registration is counted at scan time and never offered, so naming that cause on this screen would describe a file the list cannot hold. Carrying the labels as placeholders means a translator edits each one in a single place and this sentence follows. THE OPENING CLAUSE CARRIES THE EPISTEMICS FOR BOTH HALVES: it says what the app asked, so what follows is read as the answer it got and not as an assertion about the machine. IT PARTITIONS BECAUSE THE SET HAS TWO CAUSES, and a sentence naming one of them is false of the other half: an orphan is offered because no registration claims its file, and a superseded patch is offered BECAUSE a registration does claim it and reports the patch replaced. THE SECOND CLAUSE'S ROLLBACK HALF IS NOT A RESTATEMENT OF ITS FIRST and must not be dropped as one in any language: replaced is not finished with, since uninstalling whatever replaced the patch can roll back onto it and reach for this exact file, which is the condition that decides whether a superseded patch is offered at all. The single-cause sentence this replaces was true only while the superseded class was withheld, which is a state no released version was ever in. BOTH CLAUSES ARE ABOUT THE ANSWER THE APP RECEIVED AND NOT ABOUT THE STATE OF THE MACHINE, which is the weaker claim and the one that stays true whatever an enumeration cannot see, so it is kept rather than tightened. The wording this replaces gave two reasons for that framing and neither survives at 3.0.0: the instance-code reading lost its subject once nothing read inside a cached file any more (see InstanceProductCount, which says so in its own words), and a recorded path spelled in a form the folder walk never produces is expanded and handled from 3.0.0 rather than guarded against (see NormaliseLocalPackagePath). The framing outlives its old reasons. Translations must keep both clauses statements about what came back; a rendering that says outright that Windows has no record of the file makes a claim about the machine that this wording exists to avoid.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Verplaats ze naar een back-upmap die je zelf kiest en verwijder die map zodra je hebt gezien dat je programma's zich gewoon laten bijwerken, repareren en verwijderen. Terugzetten in {InstallerFolder} herstelt alles. Of verwijder ze nu definitief.</value>
-    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND ALL THREE OPERATIONS ARE NAMED ON PURPOSE: update, repair and uninstall are what a cached package is kept for, so somebody who has done all three and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. The restore sentence covers BOTH actions and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and putting a file back at that path under the same name is what restores it. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README, which the bracketed phrase in the lead links to. The button order is a separate matter and does not govern this line.</comment>
+    <value>Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND BOTH OPERATIONS ARE NAMED ON PURPOSE: update and uninstall are what a cached package is kept for, so somebody who has done both and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. REPAIR WAS THE THIRD AND CAME OUT ON A MEASUREMENT RATHER THAN ON CAUTION. A repair does not read the cached file: on one real machine seven of eight products failed a repair with the file present and one succeeded with it absent. So the check established nothing about what this app had done, and it fails often for reasons that predate the app entirely. Somebody following the old instruction, meeting a failed repair and concluding InstallerClean had broken their machine, is the worst thing this sentence could have produced. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. THE THIRD SENTENCE IS AN INSTRUCTION AND NOT A PROMISE, WHICH IS A CORRECTION RATHER THAN A HEDGE. It read "Putting them back into {InstallerFolder} restores everything", and that is false of a move whose destination already held a file of the same name: MoveFilesService.GetUniqueDestPath renames a colliding name.msi to name (1).msi and no surface anywhere says so, so a user who follows the old sentence and puts THAT back has restored nothing. A cached package counts as present if and only if its recorded LocalPackage path exists, so the name is the whole of what makes a restore work, and "under the names they had" covers the renamed case without making anybody read about the rename. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README, which the bracketed phrase in the lead links to. The button order is a separate matter and does not govern this line.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
     <value>Nog niets gescand.</value>
@@ -402,7 +402,9 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Selecteer een product om de details te bekijken.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Geen metadata beschikbaar.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>Dit installatiebestand ontbreekt. Dit levert nu geen problemen op, en dat zal ook zo blijven totdat je het programma waartoe het behoort probeert te herstellen, bij te werken of te verwijderen. Die stap kan dan mislukken, omdat Windows naar dit bestand zoekt en het er niet is.&#10;&#10;Om te proberen dit te verhelpen, download je het installatieprogramma van de maker en voer je het uit over je bestaande exemplaar heen (verwijder het programma niet eerst, want het verwijderen is zelf een stap waarvoor dit bestand nodig is). Gebruik de versie die je hebt geïnstalleerd als je die kunt vinden, aangezien Windows een andere versie mogelijk afwijst. Dit zou het bestand moeten herstellen zonder je instellingen te wijzigen, maar Microsoft garandeert dit niet, en hun eigen laatste redmiddel is het programma opnieuw te installeren.</value>
+    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.
+
+To put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -822,8 +824,8 @@
        trouble day to day" and "can fail", never "will". Microsoft guarantees
        nothing here. Details carries the recovery step, which is why this closes
        by sending the reader there rather than trying to give it. -->
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Windows heeft een record voor {0} bestand dat niet in {InstallerFolder} staat: {1}. In het dagelijks gebruik levert dat geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Open Details voor wat je kunt doen.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>Windows heeft records voor {0} bestanden die niet in {InstallerFolder} staan: {1}. In het dagelijks gebruik leveren die geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Open Details voor wat je kunt doen.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do.</value></data>
   <!-- The two tails of that program list, and they are SEPARATE because they are
        different findings. The first is a program this app can name and had no
        room for; the second is a registration nothing named at all, which is the
@@ -835,34 +837,6 @@
   <data name="Summary.MissingFromDisk.OtherPrograms.Plural" xml:space="preserve"><value>{0} andere programma's</value></data>
   <data name="Summary.MissingFromDisk.Unnamed.Singular" xml:space="preserve"><value>{0} bestand waarbij de records geen programma noemen</value></data>
   <data name="Summary.MissingFromDisk.Unnamed.Plural" xml:space="preserve"><value>{0} bestanden waarbij de records geen programma noemen</value></data>
-  <!-- Informational line shown when the scan could not account for everything the
-       Windows Installer records hold. Nothing is wrong with the machine and there
-       is nothing to do about it, so the line says what to expect rather than
-       warning.
-
-       WHAT IT REPORTS CHANGED IN 3.0.0 AND THE OLD SENTENCE WAS RETIRED WITH THE
-       BEHAVIOUR. It used to say the scan had left out the superseded and
-       obsoleted patches, which every scan now does for a different reason, and
-       that there might be more removable files not shown, which there are not:
-       the list of unneeded files does not move on this condition. What does move
-       is the OTHER report. A product whose records did not fully read is a
-       product whose registrations this scan may not have seen, so the count of
-       files Windows has a record for and the folder does not have can be short,
-       and "none missing" and "none that could be seen" are different claims.
-
-       NO COUNT AND NO PLACEHOLDER, and neither is an omission. Four different
-       things put an entry into the number the app has, only two of them are
-       failures to read, and the number is an estimate that can come out high as
-       well as low: a registry key left behind by an uninstall that failed is
-       counted, and no installed program answers to it. So the line says neither
-       how many nor that they are programs. What is true on every one of those
-       paths, and the whole of what is claimed, is that something in the records
-       could not be matched up.
-
-       "Records" is the Windows Installer records, not files on disk. Any language
-       may recast "match up" into its own idiom for reconciling two sets of
-       records; what must not come back is a number, or a noun meaning "installed
-       program". -->
   <!-- THE LINE THAT SAYS THE WALK-DERIVED LIST IS NOT THE ANSWER TO THE QUESTION
        ABOVE IT. Body.MainExplanation.Why states two criteria for listing a file,
        and on this machine the first one did not run: files no program claims are
@@ -873,11 +847,15 @@
 
        0 = files held back, 1 = pluralised "file"/"files".
 
-       WHERE NOTHING AT ALL IS OFFERED THE USER NEVER SEES THIS, because the
-       completion screen replaces the whole surface and says the honest thing there.
-       This is for the machine that IS offered something, where that screen never
-       shows: a superseded registration surviving every withholding is offered
-       beside a walk-derived half that was emptied.
+       WHERE NOTHING AT ALL IS OFFERED THIS LINE DOES NOT APPEAR, AND THE COUNT IS
+       WHAT DOES THAT RATHER THAN THE SCREEN IN FRONT OF IT. The completion screen
+       replaces the surface and says the honest thing there, but it is dismissible
+       (CompletionViewModel.Dismiss), so the window underneath is reachable and a
+       line left switched on would be read there. What keeps it off is the term in
+       ScanViewModel that zeroes the number this line prints when nothing was
+       offered. This is for the machine that IS offered something: a superseded
+       registration surviving every withholding, offered beside a walk-derived half
+       that was emptied.
 
        IT NAMES NO CAUSE. Several different findings empty a walk offer this way and
        any sentence naming one is false on the others; the opening clause is what is
@@ -889,7 +867,44 @@
        and names the file instead of the numeral, as the other one-forms here do. -->
   <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>Op deze pc kon InstallerClean niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom het ene bestand achtergehouden in plaats van het te tonen.</value></data>
   <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>Op deze pc kon InstallerClean niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom {0} {1} achtergehouden in plaats van ze te tonen.</value></data>
-  <data name="Summary.RecordsNotMatched" xml:space="preserve"><value>InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen en heeft ze daarom niet allemaal gelezen. De overbodige bestanden hierboven zijn hierdoor niet beïnvloed, maar wat er staat over bestanden die in {InstallerFolder} ontbreken, kan onvolledig zijn. Klik op Opnieuw scannen om het nog eens te proberen.</value></data>
+  <!-- THE SECOND HELD-BACK LINE, AND IT IS THE PAIR OF THE ONE ABOVE RATHER THAN
+       A DIFFERENT KIND OF SENTENCE. Summary.NothingListed reports what the
+       walk-derived half of the scan held back; this reports what the superseded
+       half held back. One rule reaching two populations, which is why both open
+       the same way. That opening is a frame rather than a shortage of words, so do
+       not vary it in any language.
+
+       0 = files held back. The one-form spends no placeholder and names the file
+       instead of the numeral, as the other one-forms here do.
+
+       IT NAMES NO CAUSE, AND THE SUPERORDINATE WAS CHECKED AGAINST EVERY ROUTE
+       RATHER THAN ASSUMED. Six separate findings set RemovableWithheld, five of
+       them about one patch and one a sweep over the whole machine, so a sentence
+       naming any one of them is false of the files the other five put in the
+       count. What is true on all six is that the app could not establish that
+       nothing still needs the file, which is the rule the whole app runs on and so
+       does not read as a phrase invented to cover a gap. Do not narrow it, do not
+       name a mechanism and do not add a cause in any language.
+
+       "SUPERSEDED" IS EARNED AND THE COUNT CANNOT HOLD AN OBSOLETED ROW. Every
+       route to RemovableWithheld guards on IsRemovable, the only grant of which is
+       IsRemovablePatch, and that reads a patch state of 2. An obsoleted patch is
+       never offered, so it is never withheld either.
+
+       NO CLOSING CLAUSE, AND BOTH HOSTS SAY THE SAME SENTENCE. Line one closes on
+       "rather than listing them" because the list is what its reader is looking
+       at. Stacked, the two then ended on the same four words in the same grey
+       italic four rows apart, each spending a second row on a two-word tail;
+       without the clause each sits on one row. There is no list at all on a /d or
+       an /m, so the command line could not have carried it either.
+
+       THE GATE IS THE COUNT THIS LINE PRINTS. It used to be the machine-wide
+       refusal, which is one of the six routes into that count rather than the
+       count itself, so the line could appear on a machine holding back no
+       superseded file at all and tell its owner something had been kept back. See
+       ScanViewModel.HasSupersededHeldBack. -->
+  <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
+  <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} van {1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -929,9 +944,21 @@
 
        "But" and not "and": offering the backup concedes something to the
        sentence before it. "The Move button", not bare "Move", so "use Move"
-       is read as a button and not as a second verb in the same sentence. -->
+       is read as a button and not as a second verb in the same sentence.
+
+       "THESE FILES" AND NOT A BARE "FILES", WHICH IS WHAT THE PLURAL CARRIED.
+       The singular was written fresh in the same commit and says "This file";
+       the plural is the older flat sentence with its verb swapped, and what
+       came through the swap was an articleless subject reading as files in
+       general rather than as the ones on the list behind the dialog.
+
+       NEITHER FORM TAKES A PLACEHOLDER AND THE PLURAL MUST NOT GAIN ONE.
+       DisplayHelpers.Pluralise hands the chosen string to ConfirmDeleteWindow
+       raw and it never reaches string.Format, so a {0} written here is painted
+       on the dialog. CountedStringTests holds this prefix in its unformatted
+       set for that reason. -->
   <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>Dit bestand wordt definitief verwijderd. Het is [veilig te verwijderen], maar wil je een back-up, gebruik dan de knop Verplaatsen.</value></data>
-  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>Bestanden worden definitief verwijderd. Ze zijn [veilig te verwijderen], maar wil je een back-up, gebruik dan de knop Verplaatsen.</value></data>
+  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only
@@ -1425,22 +1452,49 @@ Het crashlog kon niet worden weggeschreven.</value></data>
 
        The window says the same thing in Summary.MissingFromDisk.*, which closes
        on "Open Details for what to do"; there is no Details window here, so the
-       last sentence carries the recovery step itself. Both count every
+       last sentences carry the recovery step itself. Both count every
        registration naming a file that is not there, and neither names a cause:
        see the window's remarks for why on both points.
 
-       "Can fail" and "usually restores" are the verified positions and neither
-       may harden: Microsoft guarantees nothing here. -->
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows heeft een record voor {0} bestand dat niet in {InstallerFolder} staat: {1}. In het dagelijks gebruik levert dat geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Het installatieprogramma van dat programma opnieuw uitvoeren, bij voorkeur dezelfde versie, herstelt het bestand meestal.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows heeft records voor {0} bestanden die niet in {InstallerFolder} staan: {1}. In het dagelijks gebruik leveren die geen problemen op, maar een reparatie, update of verwijdering kan erdoor mislukken. Het installatieprogramma van elk programma opnieuw uitvoeren, bij voorkeur dezelfde versie, herstelt de bestanden meestal.</value></data>
-  <!-- The command line's own wording of Summary.RecordsNotMatched, whose remarks
-       carry why there is no count and no placeholder in either. The window's
-       version closes on Re-scan and opens its second sentence on "Everything
-       listed", and there is no Re-scan on a command line and nothing listed at all
-       on a /d or an /m, which is the whole of the difference. "Running it again"
-       keeps its pronoun because the tool is already established as "it" in the
-       sentence before. -->
-  <data name="Cli.RecordsNotMatched" xml:space="preserve"><value>InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen en heeft ze daarom niet allemaal gelezen. Wat er is gevonden, is hierdoor niet beïnvloed, maar wat er staat over bestanden die in {InstallerFolder} ontbreken, kan onvolledig zijn. Opnieuw uitvoeren levert misschien meer op.</value></data>
+       IT USED TO CARRY LESS THAN THE WINDOW AND ONE OF THE MISSING PIECES WAS THE
+       ONE THAT STOPS HARM. "Don't uninstall first" was absent here entirely, on
+       the host whose reader is likeliest to be scripting the recovery, and
+       uninstalling is itself a step that needs the file. A host may carry less
+       detail than the other; it may not drop the instruction that prevents a
+       reader making the problem worse. Two smaller omissions went with it: the
+       old wording said "preferably the same version" for something Windows
+       refuses outright, and "usually restores" travelled here without the
+       companion hedge it has in the window.
+
+       "Can fail", "usually", "may" and "doesn't guarantee" are the verified
+       positions and none may harden: Microsoft guarantees nothing here. The
+       version IS knowable, being the program's own and printed in Settings and
+       in Programs and Features; what is hard is OBTAINING it, makers usually
+       publishing only the current one, which is what "if you can get it" carries
+       and why it is not a hedge about knowing.
+
+       THE COLON IS NEW AND FRENCH NEEDS A NARROW NO-BREAK SPACE BEFORE IT
+       (U+202F), which the Edit tool silently flattens; check-french-spacing
+       holds it. -->
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.</value></data>
+  <!-- The command line's own copy of Summary.SupersededHeldBack, whose remarks
+       carry the placeholder, why no cause is named, why "superseded" is earned and
+       why neither host closes on a clause about listing.
+
+       IT IS THE SAME SENTENCE WORD FOR WORD, WHICH IS NEW. The window's old
+       version closed on "Re-scan to try again", a button this surface has not got,
+       so the two had to differ; the replacement closes on what the app did, which
+       is true wherever it is read. The clause that would still have forced them
+       apart came off both, there being no list at all on a /d or an /m.
+
+       WHAT DOES NOT FOLLOW IS THAT THE TWO HOSTS REPORT THE SAME THINGS. This
+       sentence is for a person. The notice in the 3000 band keeps its own
+       condition and its own figure, on records that could not be matched up rather
+       than on files held back, and the two counts are not the same quantity: see
+       Cli.EventLogScanWithheld and ReportScanSignals. -->
+  <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
+  <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
   <!-- 0 = mode arg, 1 = entries in the Windows Installer records the scan could
        not match up. A notice beside the run's summary, not a summary itself
        (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
@@ -1462,9 +1516,12 @@ Het crashlog kon niet worden weggeschreven.</value></data>
 
        That figure is an estimate that can come out high as well as low, which
        MachineContract's remarks set out: it is sound to alert on and to trend,
-       and it is not a headcount of programs. The window's
-       Summary.RecordsNotMatched drops it entirely for that reason and this line
-       keeps it, an RMM having a filter to hang on a number. -->
+       and it is not a headcount of programs. The window says nothing about it at
+       all, for that reason and then for a larger one, and this line keeps it, an
+       RMM having a filter to hang on a number. THE WINDOW'S LINE IS NOT THIS
+       FIGURE IN OTHER WORDS: Summary.SupersededHeldBack replaced the sentence that
+       used to sit there and counts files held back, which is a different
+       quantity reached by six routes, of which the count here is one. -->
   <!-- 0 = mode arg, 1 = registrations naming a file that is not in the cache. The
        second notice (Event ID 3001), and the actionable one. Unpluralised, as
        above.
@@ -1562,7 +1619,7 @@ Het crashlog kon niet worden weggeschreven.</value></data>
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,
        and there is no Re-scan here. It names the folder immediately before, so
-       this one cannot close on "run it again" the way Cli.RecordsNotMatched does;
+       this one cannot close on "run it again" the way a line naming no folder can;
        "it" would reach back past the folder and take that instead of the tool. -->
   <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean kon de back-upmap niet meer bevestigen en is gestopt in plaats van op de verkeerde plek te schrijven. Controleer {0} en voer de opdracht opnieuw uit.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,

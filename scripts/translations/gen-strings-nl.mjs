@@ -218,7 +218,7 @@ const MAP = {
   // Body copy
   'Body.MainExplanation.Lead': `Overbodige bestanden hieronder zijn [veilig te verwijderen].`,
   'Body.MainExplanation.Why': `Ze staan in {InstallerFolder}. InstallerClean vraagt Windows naar elk geïnstalleerd programma: een bestand komt in de lijst wanneer geen enkel programma het opeist ({0}), of wanneer een nieuwere patch het heeft vervangen en geen enkel programma erop kan terugvallen ({1}).`,
-  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.`,
   'Body.NotScanned.Lead': `Nog niets gescand.`,
   'Body.NotScanned.Why': `Klik op Opnieuw scannen om {InstallerFolder} te doorzoeken op installatiebestanden die geen enkel programma nog nodig heeft.`,
   'Body.PendingReboot.Lead': `Deze bestanden kunnen op dit moment niet worden opgeruimd.`,
@@ -493,8 +493,6 @@ const MAP = {
   'Cli.InstallerLockUnavailable': `Fout: InstallerClean kon de Windows Installer-vergrendeling niet krijgen die voorkomt dat twee programma's tegelijk geïnstalleerde software wijzigen, en kon dus niet uitsluiten dat een bestand halverwege alsnog nodig werd. Er is niets verwijderd. Probeer het opnieuw, en herstart Windows als het zich blijft voordoen.`,
   'Cli.MoveInstallerLockUnavailable': `Fout: InstallerClean kon de Windows Installer-vergrendeling niet krijgen die voorkomt dat twee programma's tegelijk geïnstalleerde software wijzigen, en kon dus niet uitsluiten dat een bestand halverwege alsnog nodig werd. Er is niets verplaatst. Probeer het opnieuw, en herstart Windows als het zich blijft voordoen.`,
   'Completion.ReverifyRecordsChanged': `{0} {1} behouden, omdat de Windows Installer-records bij de laatste controle waren veranderd.`,
-  'Summary.RecordsNotMatched': `InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen en heeft ze daarom niet allemaal gelezen. De overbodige bestanden hierboven zijn hierdoor niet beïnvloed, maar wat er staat over bestanden die in {InstallerFolder} ontbreken, kan onvolledig zijn. Klik op Opnieuw scannen om het nog eens te proberen.`,
-  'Cli.RecordsNotMatched': `InstallerClean kon niet alles in de Windows-records met elkaar in verband brengen en heeft ze daarom niet allemaal gelezen. Wat er is gevonden, is hierdoor niet beïnvloed, maar wat er staat over bestanden die in {InstallerFolder} ontbreken, kan onvolledig zijn. Opnieuw uitvoeren levert misschien meer op.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} behouden, omdat Windows een registratie heeft van het programma dat erin genoemd wordt.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} behouden, omdat InstallerClean geen programma kon vinden dat erin genoemd wordt.`,
   'Completion.ReverifyOwnershipUnestablished': `{0} {1} behouden, omdat InstallerClean bij de laatste controle niet met zekerheid kon vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen.`,

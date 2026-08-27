@@ -178,7 +178,7 @@ const MAP = {
   // Body copy
   'Body.MainExplanation.Lead': `Любые ненужные файлы ниже [можно безопасно удалить].`,
   'Body.MainExplanation.Why': `Они лежат в {InstallerFolder}. InstallerClean спрашивает Windows о каждой установленной программе: файл попадает в список, когда его не заявляет ни одна программа ({0}) или когда его заменило более новое исправление и ни одна программа не смогла бы к нему откатиться ({1}).`,
-  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.`,
   'Body.PendingReboot.MsiExecuteMutex': `Сейчас что-то использует Windows Installer, например обновление Windows или программа, устанавливающаяся в фоне. «Переместить» и «Удалить» приостановлены на это время, чтобы InstallerClean не трогал {InstallerFolder}, пока она меняется. Когда всё закончится, повторите сканирование, и они вернутся.`,
   'Body.PendingReboot.InstallerInProgress': `На этом компьютере приостановлена предыдущая транзакция Windows Installer. Возобновите или откатите эту установку (либо перезагрузите Windows), прежде чем очищать {InstallerFolder}.`,
   'Body.PendingReboot.PendingRenameInCache': `Windows поставил в очередь на следующую перезагрузку переименование файла, которое затрагивает {InstallerFolder}. Перезагрузите Windows, прежде чем очищать.`,
@@ -458,7 +458,6 @@ const MAP = {
   'Error.InstallerLockUnavailable': `InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Error.MoveInstallerLockUnavailable': `InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Completion.ReverifyRecordsChanged': `Оставлено на месте {0} {1}, потому что к итоговой проверке записи Windows Installer изменились.`,
-  'Summary.RecordsNotMatched': `InstallerClean не смог сопоставить всё, что есть в записях Windows, поэтому прочитал их не полностью. Ненужных файлов выше это не касается, но сказанное о файлах, отсутствующих в {InstallerFolder}, может быть неполным. Повторите сканирование, чтобы попробовать снова.`,
   'Completion.ReverifyIdentityClaimed': `Оставлено на месте {0} {1}, потому что у Windows есть запись о программе, названной внутри.`,
   'Completion.ReverifyIdentityUnreadable': `Оставлено на месте {0} {1}, потому что InstallerClean не нашёл внутри названия программы.`,
   'Completion.ReverifyOwnershipUnestablished': `Оставлено на месте {0} {1}, потому что к итоговой проверке InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше.`,
@@ -613,7 +612,6 @@ const CLI = {
   'Cli.Help.Elevation': `Нужна командная строка администратора; иначе Windows её не запустит.`,
   'Cli.InstallerLockUnavailable': `Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Cli.MoveInstallerLockUnavailable': `Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
-  'Cli.RecordsNotMatched': `InstallerClean не смог сопоставить всё, что есть в записях Windows, поэтому прочитал их не полностью. Найденного это не касается, но сказанное о файлах, отсутствующих в {InstallerFolder}, может быть неполным. Повторный запуск, возможно, найдёт больше.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
 };
