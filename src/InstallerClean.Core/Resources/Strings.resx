@@ -1414,7 +1414,7 @@ The crash log could not be written.</value></data>
        machine that is genuinely clean. This is what separates them, and it changes
        no existing number's meaning.
 
-       0 = mode arg, 1 = files held back.
+       0 = mode arg, 1 = files held back, 2 = pluralised "file"/"files".
 
        IT NAMES NO FOLDER, WHICH IS THE RULE ON THIS CHANNEL AND NOT A PREFERENCE.
        It carried {InstallerFolder} for an afternoon and was the only Cli.EventLog*
@@ -1423,12 +1423,15 @@ The crash log could not be written.</value></data>
        token resolves per machine and a line that varies by machine is the opposite
        of what a matched shape is for. This notice does not need to name it at all.
 
-       AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", which is
-       where the sibling above and this one part company: that one is unpluralised
-       on purpose, matching the always-plural "errors:" header the same audience
-       scrapes, and it can be, because its count is of records rather than files and
-       the word never stands alone next to a numeral here. This one reads "1 file" at
-       a count of one and is correct at every other.
+       AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", so it reads
+       "1 file" at a count of one and is correct at every other. THE SIBLING ABOVE
+       DOES THE SAME, AND THIS NOTE SAID THE TWO PART COMPANY THERE:
+       Cli.EventLogNothingOffered spends {2} as well and Program.cs passes it
+       DisplayHelpers.PluraliseFile on the same count. The unpluralised line on this
+       channel is Cli.EventLogScanWithheld, a different key answering a different
+       question: its count is of records rather than files, and it matches the
+       always-plural "errors:" header the same audience scrapes, so its grammar is
+       the price of holding one shape.
 
        IT FIRES ON MORE MACHINES THAN THE OUTCOME LINE DOES. That one is written
        only where nothing at all was offered; this is written beside the other scan
