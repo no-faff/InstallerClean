@@ -225,15 +225,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// so each reads at its own text tier; only this one ever interpolated, which
     /// is why only it binds to the view-model.
     ///
-    /// THE SENTENCE TAKES TWO ARGUMENTS AND THREE ARE STILL PASSED. It carries a
-    /// slot per Reason label so that a translator edits the column labels in one
-    /// place and the copy follows. Two kinds of file reach the list, orphaned and
-    /// superseded, so the sentence itself uses only the first two slots.
-    /// Reason.Obsoleted is passed for the translations that still carry the older
-    /// three-slot sentence, and string.Format ignores a surplus argument, so
-    /// passing it costs nothing here and is the difference between such a
-    /// translation rendering its old sentence and rendering its own placeholder
-    /// markers on screen.
+    /// THE SENTENCE TAKES TWO ARGUMENTS AND THREE ARE PASSED, AGAINST A WORDING
+    /// THAT MIGHT SPEND THE THIRD RATHER THAN FOR ONE THAT DOES. It carries a slot
+    /// per Reason label so that a translator edits the column labels in one place
+    /// and the copy follows. Two kinds of file reach the list, orphaned and
+    /// superseded, so the neutral spends the first two slots and no satellite
+    /// spends the third: read out of the neutral and all fifteen, not one contains
+    /// {2}. This note used to say the argument was passed for the translations that
+    /// still carry an older three-slot sentence, which named an empty set.
+    ///
+    /// IT STAYS, AND WHAT IT GUARDS IS THE OTHER DIRECTION. string.Format ignores a
+    /// surplus argument and throws on a missing one, so a translator who writes a
+    /// three-slot sentence into a satellite gets it rendered, where dropping this
+    /// argument would hand them a FormatException on the main window instead. Its
+    /// cost is nothing and the cost of removing it is paid by somebody who cannot
+    /// see this line.
     /// </summary>
     public string MainExplanationWhyText =>
         string.Format(Strings.Body_MainExplanation_Why,
