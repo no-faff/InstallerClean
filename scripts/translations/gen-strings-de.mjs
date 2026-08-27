@@ -486,13 +486,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `Dieser Ordner liegt auf demselben Laufwerk, der Platz kommt also erst zurück, wenn du ihn löschst. Wähle stattdessen einen Ordner auf einem anderen Laufwerk, wenn du den Platz sofort haben willst.`,
   'Error.ScanCorrelationFailed': `InstallerClean konnte die Windows-Installer-Einträge nicht mit dem Inhalt von {InstallerFolder} abgleichen. Fast nichts, worauf die Einträge zeigen, ist tatsächlich da, und fast nichts, was da ist, wird von einem Eintrag benannt, deshalb ließ sich für keine Datei zeigen, dass sie nicht benötigt wird. Es wurde nichts angeboten und nichts entfernt.`,
   'Error.CandidateOutsideCache': `Diese Datei liegt nicht direkt im Windows-Installer-Ordner; aus Sicherheitsgründen abgelehnt.`,
-  'Completion.ReverifySkipped': `{0} {1} an Ort und Stelle belassen, weil die Einträge jetzt beanspruchen, was der Scan markiert hatte.`,
   'Completion.MoveCancelledSummary': `{0} von {1} {2} verschoben, bevor du abgebrochen hast.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} von {1} {2} endgültig gelöscht, bevor du abgebrochen hast.`,
   'Body.PendingReboot.Lead': `Diese Dateien können gerade nicht aufgeräumt werden.`,
   'Cli.TooManyArguments': `Fehler: Unerwartetes zusätzliches Argument '{0}'. Wenn dein Zielordner ein Leerzeichen enthält, setze den ganzen Pfad in Anführungszeichen: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Der Ordner gilt pro Benutzer; geplante Läufe und SYSTEM brauchen /m PFAD.`,
-  'Completion.ReverifyIncomplete': `{0} {1} an Ort und Stelle belassen, weil die Windows-Installer-Einträge bei der letzten Prüfung nicht vollständig gelesen werden konnten.`,
   'Error.ScanRecordsUnreadable': `InstallerClean konnte nicht genug von den Einträgen von Windows Installer lesen, um sicher zu sein, was noch gebraucht wird: Die Liste der installierten Programme kam unvollständig zurück, und dieselben Einträge direkt aus der Registrierung zu lesen führte ebenfalls zu Fehlern. Eine Datei könnte allein deshalb verwaist wirken, weil der Eintrag, der sie nennt, zu den unlesbaren gehörte, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer hat das Ende der Liste der installierten Programme nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer hat das Ende der Patch-Liste eines Programms nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
@@ -531,10 +529,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean konnte die Sperre nicht übernehmen, mit der Windows Installer verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts verschoben. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.`,
   'Cli.InstallerLockUnavailable': `Fehler: InstallerClean konnte die Windows-Installer-Sperre nicht übernehmen, die verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts gelöscht. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.`,
   'Cli.MoveInstallerLockUnavailable': `Fehler: InstallerClean konnte die Windows-Installer-Sperre nicht übernehmen, die verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts verschoben. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} an Ort und Stelle belassen, weil sich die Windows-Installer-Einträge bis zur letzten Prüfung geändert hatten.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} an Ort und Stelle belassen, weil Windows einen Eintrag zu dem darin genannten Programm hat.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} an Ort und Stelle belassen, weil InstallerClean darin kein Programm benannt fand.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} an Ort und Stelle belassen, weil InstallerClean bis zur letzten Prüfung nicht sicher feststellen konnte, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören.`,
   'Completion.NothingRemoved': `Nichts entfernt`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean konnte die Windows-Installer-Einträge nicht mit dem Inhalt von {InstallerFolder} abgleichen. Der Ordner enthält Dateien, aber kein einziger Eintrag zeigt auf irgendetwas darin, deshalb ließ sich für keine Datei zeigen, dass sie nicht benötigt wird. Es wurde nichts angeboten und nichts entfernt.`,
   'Completion.NothingOffered': `Auf diesem PC nichts angeboten`,
@@ -544,6 +540,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

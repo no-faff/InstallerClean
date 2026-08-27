@@ -402,13 +402,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `そのフォルダーは同じドライブにあるため、削除するまで容量は戻りません。すぐに容量が必要な場合は、別のドライブのフォルダーを選んでください。`,
   'Error.ScanCorrelationFailed': `InstallerClean は Windows Installer の登録情報を {InstallerFolder} の内容と突き合わせられませんでした。登録情報が指しているもののほとんどがそこになく、そこにあるもののほとんどがどの登録情報にも名指しされていないため、どのファイルについても不要であることを示せませんでした。何も提示されず、何も取り除かれていません。`,
   'Error.CandidateOutsideCache': `このファイルは Windows Installer フォルダーの直下にありません。安全のために拒否されました。`,
-  'Completion.ReverifySkipped': `{0} 個の {1} をそのままにしました。登録情報が、スキャンで印を付けたものを現在は自分のものだと示しているためです。`,
   'Completion.MoveCancelledSummary': `キャンセルするまでに、{1} 個中 {0} 個の {2} を移動しました。`,
   'Completion.PermanentDeleteCancelledSummary': `キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。`,
   'Body.PendingReboot.Lead': `これらのファイルは今はクリーンアップできません。`,
   'Cli.TooManyArguments': `エラー：予期しない余分な引数 '{0}' があります。移動先フォルダーにスペースが含まれる場合は、パス全体を引用符で囲んでください：/m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `フォルダーはユーザーごと。予約実行や SYSTEM には /m PATH が必要。`,
-  'Completion.ReverifyIncomplete': `{0} 個の {1} をそのままにしました。最終確認で Windows Installer の登録情報をすべて読み取れなかったためです。`,
   'Error.ScanRecordsUnreadable': `InstallerClean は、何がまだ必要かを確かめられるだけの Windows Installer の登録情報を読み取れませんでした。インストール済みプログラムの一覧が不足した状態で返され、同じ登録情報をレジストリから直接読み取る方法でもエラーが発生しました。あるファイルを指し示す登録情報が読み取れなかったものの一つだったというだけで、そのファイルが孤立しているように見えてしまうことがあるため、InstallerClean は中止しました。何も削除していません。`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer がインストール済みプログラムの一覧の終わりを最後まで知らせませんでした。InstallerClean は {0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer があるプログラムのパッチ一覧の終わりを最後まで知らせませんでした。InstallerClean は {0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。`,
@@ -447,10 +445,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `二つのプログラムが同時にインストール済みソフトウェアを変更しないよう Windows Installer が使うロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できず、何も移動していません。もう一度お試しください。繰り返す場合は Windows を再起動してください。`,
   'Cli.InstallerLockUnavailable': `エラー：二つのプログラムが同時にインストール済みソフトウェアを変更しないようにする Windows Installer のロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も削除されていません。もう一度お試しください。繰り返す場合は Windows を再起動してください。`,
   'Cli.MoveInstallerLockUnavailable': `エラー：二つのプログラムが同時にインストール済みソフトウェアを変更しないようにする Windows Installer のロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も移動されていません。もう一度お試しください。繰り返す場合は Windows を再起動してください。`,
-  'Completion.ReverifyRecordsChanged': `{0} 個の {1} をそのままにしました。最終確認の時点で Windows Installer の登録情報が変わっていたためです。`,
   'Completion.ReverifyIdentityClaimed': `{0} 個の {1} をそのままにしました。ファイル内に記されたプログラムの登録情報が Windows にあるためです。`,
   'Completion.ReverifyIdentityUnreadable': `{0} 個の {1} をそのままにしました。InstallerClean がファイル内にプログラム名を見つけられなかったためです。`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} 個の {1} をそのままにしました。最終確認の時点まで、InstallerClean はキャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったためです。`,
   'Completion.NothingRemoved': `何も取り除かれませんでした`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean は Windows Installer の登録情報を {InstallerFolder} の内容と突き合わせられませんでした。フォルダーにはファイルがありますが、その中のどれかを指す登録情報が一つもないため、どのファイルについても不要であることを示せませんでした。何も提示されず、何も取り除かれていません。`,
   'Completion.NothingOffered': `この PC では何も提示されませんでした`,
@@ -460,6 +456,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

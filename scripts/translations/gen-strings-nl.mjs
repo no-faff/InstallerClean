@@ -23,10 +23,11 @@
 // geregistreerde pakketten": indefinite singular before a het-word drops the
 // -e, and both counted nouns, pakket and product, are het-words), and the
 // counted CLI lines interpolate the file noun after "overbodig", which inflects
-// the same way. Hence the six .One overrides below. Completion.ReverifySkipped
-// carried a seventh for a pronoun (het at one file, ze at many); the reworded
-// English has no pronoun and the Dutch no finite verb, so it was retired rather
-// than left duplicating its own base.
+// the same way. Hence the .One overrides below, and count the block rather than
+// this paragraph. A held-back key carried one more for a pronoun (het at one file,
+// ze at many); that override was retired when the English lost its pronoun, and the
+// key itself went in the 3.0.0 round that replaced four held-back sentences with
+// one Completion.HeldBack pair.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';
@@ -279,8 +280,6 @@ const MAP = {
   'Completion.FailedCountDelete.Plural': `{0} van {1} konden niet worden verwijderd.`,
   'Completion.MoveSummary.Singular': `{0} {1} verplaatst naar: {2}`,
   'Completion.MoveSummary.Plural': `{0} {1} verplaatst naar: {2}`,
-  'Completion.ReverifySkipped': `{0} {1} behouden, omdat de records nu aanspraak maken op wat de scan had aangemerkt.`,
-  'Completion.ReverifyIncomplete': `{0} {1} behouden, omdat de Windows Installer-records bij de laatste controle niet volledig konden worden gelezen.`,
   'Completion.MoveCancelledSummary': `{0} van {1} {2} verplaatst voordat je annuleerde.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} van {1} {2} definitief verwijderd voordat je annuleerde.`,
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} definitief verwijderd`,
@@ -492,10 +491,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean kon de vergrendeling niet krijgen waarmee Windows Installer voorkomt dat twee programma's tegelijk geïnstalleerde software wijzigen, en kon dus niet uitsluiten dat een bestand halverwege alsnog nodig werd, dus er is niets verplaatst. Probeer het opnieuw, en herstart Windows als het zich blijft voordoen.`,
   'Cli.InstallerLockUnavailable': `Fout: InstallerClean kon de Windows Installer-vergrendeling niet krijgen die voorkomt dat twee programma's tegelijk geïnstalleerde software wijzigen, en kon dus niet uitsluiten dat een bestand halverwege alsnog nodig werd. Er is niets verwijderd. Probeer het opnieuw, en herstart Windows als het zich blijft voordoen.`,
   'Cli.MoveInstallerLockUnavailable': `Fout: InstallerClean kon de Windows Installer-vergrendeling niet krijgen die voorkomt dat twee programma's tegelijk geïnstalleerde software wijzigen, en kon dus niet uitsluiten dat een bestand halverwege alsnog nodig werd. Er is niets verplaatst. Probeer het opnieuw, en herstart Windows als het zich blijft voordoen.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} behouden, omdat de Windows Installer-records bij de laatste controle waren veranderd.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} behouden, omdat Windows een registratie heeft van het programma dat erin genoemd wordt.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} behouden, omdat InstallerClean geen programma kon vinden dat erin genoemd wordt.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} behouden, omdat InstallerClean bij de laatste controle niet met zekerheid kon vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen.`,
   'Completion.NothingRemoved': `Niets verwijderd`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.`,
   'Completion.NothingOffered': `Niets aangeboden op deze pc`,
@@ -505,6 +502,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

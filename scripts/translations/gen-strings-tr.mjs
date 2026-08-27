@@ -394,13 +394,11 @@ Ayrıntılar şuraya yazıldı:
   'Confirm.MoveSameDrive': `O klasör aynı sürücüde, bu yüzden siz onu silene kadar yer geri gelmez. Yeri hemen istiyorsanız başka bir sürücüde bir klasör seçin.`,
   'Error.ScanCorrelationFailed': `InstallerClean, Windows Installer kayıtlarını {InstallerFolder} içeriğiyle eşleştiremedi. Kayıtların işaret ettiklerinin neredeyse hiçbiri orada değil ve orada olanların neredeyse hiçbirinin adı hiçbir kayıtta geçmiyor, bu yüzden hiçbir dosyanın gereksiz olduğu gösterilemedi. Hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı.`,
   'Error.CandidateOutsideCache': `Bu dosya doğrudan Windows Installer klasörünün içinde değil; güvenlik için reddedildi.`,
-  'Completion.ReverifySkipped': `{0} {1} yerinde bırakıldı, çünkü kayıtlar artık taramanın işaretlediğini sahipleniyor.`,
   'Completion.MoveCancelledSummary': `İptal etmeden önce {1} {2} içinden {0} tanesi taşındı.`,
   'Completion.PermanentDeleteCancelledSummary': `İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi.`,
   'Body.PendingReboot.Lead': `Bu dosyalar şu anda temizlenemez.`,
   'Cli.TooManyArguments': `Hata: beklenmeyen fazladan argüman '{0}'. Hedef klasörünüzün adında boşluk varsa tüm yolu tırnak içine alın: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Klasör kullanıcıya özeldir; zamanlanmış veya SYSTEM: /m YOL.`,
-  'Completion.ReverifyIncomplete': `{0} {1} yerinde bırakıldı, çünkü son denetimde Windows Installer kayıtları tümüyle okunamadı.`,
   'Error.ScanRecordsUnreadable': `InstallerClean, neyin hâlâ gerekli olduğundan emin olmaya yetecek kadar Windows Installer kaydını okuyamadı: yüklü programların listesi eksik döndü, aynı kayıtları doğrudan kayıt defterinden okumak da hatalarla karşılaştı. Bir dosya, yalnızca onu adlandıran kayıt okunamayanlardan biri olduğu için sahipsiz görünebilirdi, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer, yüklü programlar listesinin sonunu hiç bildirmedi: InstallerClean {0} kayıttan sonra vazgeçti (son hata kodu {1}). Sonu gelmeyen bir listeye güvenilemez, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer, bir programın yama listesinin sonunu hiç bildirmedi: InstallerClean {0} kayıttan sonra vazgeçti (son hata kodu {1}). Sonu gelmeyen bir listeye güvenilemez, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.`,
@@ -439,10 +437,8 @@ Ayrıntılar şuraya yazıldı:
   'Error.MoveInstallerLockUnavailable': `InstallerClean, Windows Installer'ın iki programın yüklü yazılımı aynı anda değiştirmesini engellemek için kullandığı kilidi alamadı, bu yüzden bir dosyanın işin ortasında gerekli hale gelmeyeceğini kesinleştiremedi ve hiçbir şey taşınmadı. Yeniden deneyin, sürerse Windows'u yeniden başlatın.`,
   'Cli.InstallerLockUnavailable': `Hata: InstallerClean, iki programın yüklü yazılımı aynı anda değiştirmesini engelleyen Windows Installer kilidini alamadı, bu yüzden bir dosyanın işin ortasında gerekli hale gelmeyeceğini kesinleştiremedi. Hiçbir şey silinmedi. Yeniden deneyin, sürerse Windows'u yeniden başlatın.`,
   'Cli.MoveInstallerLockUnavailable': `Hata: InstallerClean, iki programın yüklü yazılımı aynı anda değiştirmesini engelleyen Windows Installer kilidini alamadı, bu yüzden bir dosyanın işin ortasında gerekli hale gelmeyeceğini kesinleştiremedi. Hiçbir şey taşınmadı. Yeniden deneyin, sürerse Windows'u yeniden başlatın.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} yerinde bırakıldı, çünkü son denetime kadar Windows Installer kayıtları değişmişti.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} yerinde bırakıldı, çünkü Windows'ta içeride adı geçen programın kaydı var.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} yerinde bırakıldı, çünkü InstallerClean içeride adı geçen bir program bulamadı.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} yerinde bırakıldı, çünkü son denetime kadar InstallerClean önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı.`,
   'Completion.NothingRemoved': `Hiçbir şey kaldırılmadı`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean, Windows Installer kayıtlarını {InstallerFolder} içeriğiyle eşleştiremedi. Klasörde dosyalar var, ama tek bir kayıt bile içindeki hiçbir şeye işaret etmiyor, bu yüzden hiçbir dosyanın gereksiz olduğu gösterilemedi. Hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı.`,
   'Completion.NothingOffered': `Bu bilgisayarda hiçbir şey sunulmadı`,
@@ -452,6 +448,8 @@ Ayrıntılar şuraya yazıldı:
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

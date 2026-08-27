@@ -15,15 +15,16 @@
 //     (tip jar), journal des événements / journal Application / stratégie de
 //     groupe (Cli.EventLogUnavailable). All anchored to the README, the
 //     native-reviewed Italian and Windows-FR.
-//   - Plurals: fr = 0 and 1 singular (already in DisplayHelpers.CategoryFor). Two
+//   - Plurals: fr = 0 and 1 singular (already in DisplayHelpers.CategoryFor). The
 //     satellite-only .One overrides live in the OVERRIDES block below, each because
-//     a post-nominal adjective/participle has to agree with the count:
-//     Status.RegisteredPackagesFound.One (the adjective "enregistré") and
-//     Completion.ReverifySkipped.One ("laissé ... redevenu nécessaire"). The block is
-//     injected before </root> so a re-run reproduces the file exactly. The CLI count
-//     lines and the cancelled-summary lines use an invariable leading participle
-//     (Trouvé/Supprimé/Déplacé precede their object, so they do not inflect) and
-//     need no .One.
+//     a post-nominal adjective or participle has to agree with the count:
+//     Status.RegisteredPackagesFound.One is the adjective "enregistré". A held-back
+//     override lived there too and went with the four sentences the 3.0.0 round
+//     replaced with one Completion.HeldBack pair. The block is injected before
+//     </root> so a re-run reproduces the file exactly.
+//     COUNT THE BLOCK RATHER THAN THIS PARAGRAPH, which said two while the block
+//     held more. The cancelled-summary lines are the ones that genuinely take no
+//     .One: their leading participle precedes its object and does not inflect.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';
@@ -81,12 +82,8 @@ const OVERRIDES = {
   'Cli.DeletedFiles.One': `{0} {1} inutile a été supprimé définitivement.`,
   'Cli.MovingFiles.One': `Déplacement de {0} {1} inutile vers {2}...`,
   'Cli.MovedFiles.One': `{0} {1} inutile a été déplacé.`,
-  'Completion.ReverifySkipped.One': `{0} {1} laissé en place, parce que les enregistrements revendiquent maintenant ce que l'analyse avait signalé.`,
-  'Completion.ReverifyRecordsChanged.One': `{0} {1} laissé en place, parce que les enregistrements de Windows Installer avaient changé au moment de la vérification finale.`,
   // Participle agreement only: "laissé" for a single file. The reason clause
   // is about the records, not the files, so it does not inflect.
-  'Completion.ReverifyIncomplete.One': `{0} {1} laissé en place, parce que les enregistrements de Windows Installer n'ont pas pu être lus entièrement lors de la vérification finale.`,
-  'Completion.ReverifyOwnershipUnestablished.One': `{0} {1} laissé en place, parce qu'au moment de la vérification finale InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici.`,
   // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
   // one of the two retired identity causes: no code reads it, so nothing passes
   // the prefix to Pluralise and the override could never be selected.
@@ -495,13 +492,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `Ce dossier est sur le même lecteur, l'espace ne reviendra donc pas tant que vous ne l'aurez pas supprimé. Choisissez plutôt un dossier sur un autre lecteur si vous voulez l'espace tout de suite.`,
   'Error.ScanCorrelationFailed': `InstallerClean n'a pas pu faire correspondre les enregistrements de Windows Installer avec le contenu de {InstallerFolder}. Presque rien de ce que désignent les enregistrements ne s'y trouve réellement, et presque rien de ce qui s'y trouve n'est nommé par un enregistrement, donc aucun fichier n'a pu être montré comme inutile. Rien n'a été proposé et rien n'a été retiré.`,
   'Error.CandidateOutsideCache': `Ce fichier ne se trouve pas directement dans le dossier Windows Installer ; refusé par sécurité.`,
-  'Completion.ReverifySkipped': `{0} {1} laissés en place, parce que les enregistrements revendiquent maintenant ce que l'analyse avait signalé.`,
   'Completion.MoveCancelledSummary': `Déplacé {0} sur {1} {2} avant votre annulation.`,
   'Completion.PermanentDeleteCancelledSummary': `Supprimé définitivement {0} sur {1} {2} avant votre annulation.`,
   'Body.PendingReboot.Lead': `Ces fichiers ne peuvent pas être nettoyés pour le moment.`,
   'Cli.TooManyArguments': `Erreur : argument supplémentaire inattendu « {0} ». Si votre dossier de destination contient un espace, mettez le chemin entier entre guillemets : /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Dossier propre à l'utilisateur ; tâches planifiées ou SYSTEM : /m CHEMIN.`,
-  'Completion.ReverifyIncomplete': `{0} {1} laissés en place, parce que les enregistrements de Windows Installer n'ont pas pu être lus entièrement lors de la vérification finale.`,
   'Error.ScanRecordsUnreadable': `InstallerClean n'a pas pu lire assez des enregistrements de Windows Installer pour savoir avec certitude ce qui sert encore : la liste des programmes installés est revenue incomplète, et lire ces mêmes enregistrements directement dans le registre a également donné des erreurs. Un fichier pourrait sembler orphelin uniquement parce que l'enregistrement qui le nomme faisait partie des illisibles, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer n'a jamais signalé la fin de la liste des programmes installés : InstallerClean a renoncé après {0} entrées (dernier code d'erreur {1}). Une liste sans fin n'est pas fiable, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer n'a jamais signalé la fin de la liste des correctifs d'un programme : InstallerClean a renoncé après {0} entrées (dernier code d'erreur {1}). Une liste sans fin n'est pas fiable, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
@@ -540,10 +535,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean n'a pas pu prendre le verrou que Windows Installer utilise pour empêcher deux programmes de modifier les logiciels installés en même temps, il n'a donc pas pu exclure qu'un fichier devienne nécessaire en cours de route, et rien n'a été déplacé. Réessayez, et redémarrez Windows si cela persiste.`,
   'Cli.InstallerLockUnavailable': `Erreur : InstallerClean n'a pas pu prendre le verrou Windows Installer qui empêche deux programmes de modifier les logiciels installés en même temps, il n'a donc pas pu exclure qu'un fichier devienne nécessaire en cours de route. Rien n'a été supprimé. Réessayez, et redémarrez Windows si cela persiste.`,
   'Cli.MoveInstallerLockUnavailable': `Erreur : InstallerClean n'a pas pu prendre le verrou Windows Installer qui empêche deux programmes de modifier les logiciels installés en même temps, il n'a donc pas pu exclure qu'un fichier devienne nécessaire en cours de route. Rien n'a été déplacé. Réessayez, et redémarrez Windows si cela persiste.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} laissés en place, parce que les enregistrements de Windows Installer avaient changé au moment de la vérification finale.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} laissés en place, parce que Windows a un enregistrement du programme nommé à l'intérieur.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} laissés en place, parce qu'InstallerClean n'a trouvé aucun programme nommé à l'intérieur.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} laissés en place, parce qu'au moment de la vérification finale InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici.`,
   'Completion.NothingRemoved': `Rien n'a été retiré`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean n'a pas pu faire correspondre les enregistrements de Windows Installer avec le contenu de {InstallerFolder}. Le dossier contient des fichiers, mais pas un seul enregistrement ne désigne quoi que ce soit dedans, donc aucun fichier n'a pu être montré comme inutile. Rien n'a été proposé et rien n'a été retiré.`,
   'Completion.NothingOffered': `Rien n'a été proposé sur ce PC`,
@@ -553,6 +546,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

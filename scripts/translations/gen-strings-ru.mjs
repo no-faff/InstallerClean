@@ -426,11 +426,9 @@ const MAP = {
   'Confirm.MoveSameDrive': `Эта папка на том же диске, поэтому место не вернётся, пока вы её не удалите. Выберите папку на другом диске, если хотите получить место сразу.`,
   'Error.ScanCorrelationFailed': `InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. Почти ничего из того, на что указывают записи, там нет, и почти ничто из того, что там есть, не названо ни одной записью, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.`,
   'Error.CandidateOutsideCache': `Этот файл находится не в самой папке Windows Installer; отклонено в целях безопасности.`,
-  'Completion.ReverifySkipped': `Оставлено на месте {0} {1}, потому что записи теперь заявляют то, что отметило сканирование.`,
   'Completion.MoveCancelledSummary': `Перемещено {0}/{1} {2} до отмены.`,
   'Completion.PermanentDeleteCancelledSummary': `Удалено безвозвратно {0}/{1} {2} до отмены.`,
   'Body.PendingReboot.Lead': `Эти файлы сейчас нельзя очистить.`,
-  'Completion.ReverifyIncomplete': `Оставлено на месте {0} {1}, потому что при итоговой проверке записи Windows Installer не удалось прочитать полностью.`,
   'Error.ScanRecordsUnreadable': `InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
@@ -456,10 +454,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailableTitle': `Ничего не перемещено`,
   'Error.InstallerLockUnavailable': `InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Error.MoveInstallerLockUnavailable': `InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
-  'Completion.ReverifyRecordsChanged': `Оставлено на месте {0} {1}, потому что к итоговой проверке записи Windows Installer изменились.`,
   'Completion.ReverifyIdentityClaimed': `Оставлено на месте {0} {1}, потому что у Windows есть запись о программе, названной внутри.`,
   'Completion.ReverifyIdentityUnreadable': `Оставлено на месте {0} {1}, потому что InstallerClean не нашёл внутри названия программы.`,
-  'Completion.ReverifyOwnershipUnestablished': `Оставлено на месте {0} {1}, потому что к итоговой проверке InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше.`,
   'Completion.NothingRemoved': `Ничего не убрано`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. В папке есть файлы, но ни одна запись не указывает ни на что внутри неё, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.`,
   'Completion.NothingOffered': `На этом ПК ничего не предложено`,
@@ -467,6 +463,8 @@ const MAP = {
   'Completion.NothingOfferedBody.Plural': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} {1} ({2}), которые иначе предложил бы.`,
   'Summary.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -506,15 +504,6 @@ const OVERRIDES = {
   // the 5+ band, and the noun inflects through Plural.File, so the .Few form came
   // out byte-identical to the base and was the same sentence twice. An absent
   // override falls back to the base, which is the form wanted here.
-  // ReverifySkipped's flat base carries the 2-4/5+ agreement ("оставлено ... они
-  // ... понадобились"); .One restores the singular-masculine agreement a single
-  // file needs ("Оставлен 1 файл ... он ... понадобился").
-  'Completion.ReverifySkipped.One': `Оставлен на месте {0} {1}, потому что записи теперь заявляют то, что отметило сканирование.`,
-  'Completion.ReverifyRecordsChanged.One': `Оставлен на месте {0} {1}, потому что к итоговой проверке записи Windows Installer изменились.`,
-  // As ReverifySkipped.One: the base's "Оставлено" is the impersonal form that
-  // 2-4 and 5+ both take; n==1 needs the masculine singular "Оставлен".
-  'Completion.ReverifyIncomplete.One': `Оставлен на месте {0} {1}, потому что при итоговой проверке записи Windows Installer не удалось прочитать полностью.`,
-  'Completion.ReverifyOwnershipUnestablished.One': `Оставлен на месте {0} {1}, потому что к итоговой проверке InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше.`,
   // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
   // one of the two retired identity causes: no code reads it, so nothing passes
   // the prefix to Pluralise and the override could never be selected.

@@ -674,70 +674,34 @@ To put it back, you need the installer for the version you already have. Get it 
        same technique the move-confirmation dialog uses. -->
   <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} moved to: {2}</value></data>
   <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} moved to: {2}</value></data>
-  <!-- Shown when the pre-action re-check found a registered product's live claim
-       on candidates the scan had left removable, so they were left out of the
-       batch. 0 = the count kept, 1 = pluralised "file"/"files". Flat string; a
-       language may add a satellite-only Completion.ReverifySkipped.One/.Few/.Many
-       override for its count grammar. The English names no pronoun for the files
-       on purpose. One flat string serves every count here, and the neutral carries
-       no .One form for the English to fall back on, so a "them" read wrongly at a
-       count of one; the eight satellites whose grammar forced the issue had each
-       added an override for it. "What the scan flagged" is number-blind and needs
-       none.
+  <!-- What a Move or Delete kept back, on the completion overlay and on stdout.
+       HeldBackReport is the single source and both hosts render from it, so
+       there is one sentence and neither host can answer differently.
 
-       IT STATES THE PRESENT STATE OF THE RECORDS AND NEVER A RETURN. Two
-       situations reach this line: a superseded patch whose claim now says needed,
-       and a file no claim named at all when the scan ran. Of the second, "went
-       back to needing" is false twice over, because nothing this app saw ever
-       held that file, and because whether the claim is new cannot be told apart
-       from the app's own earlier reading having missed one. Translations must not
-       reintroduce a verb of returning; a claim that HOLDS now is the whole of it.
-       The two siblings below say what this one does not: this is a live claim, one
-       is a registration that has gone, one is a read that failed. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, because the records now claim what the scan flagged.</value></data>
-  <!-- The third state the final check can find, and the one that is neither of
-       its siblings: the records were read perfectly well and no longer hold the
-       registration that claimed the file. Nothing has gone back to needing it
-       (Completion.ReverifySkipped), and nothing failed to be read
-       (Completion.ReverifyIncomplete), so both of those would name a cause that
-       did not occur. The file is kept in place because an answer of "not there"
-       is only ever "not there in what was asked", and what was asked was settled
-       before the button was pressed. 0 = the count kept, 1 = pluralised
-       "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifyRecordsChanged.One/.Few/.Many override for its count
-       grammar. The English names no pronoun for the files on purpose: one flat
-       string serves every count, the neutral carries no .One form for the English
-       to fall back on, and a "them" reads wrongly at a count of one. The three
-       sentences can appear together, one per cause, so they are deliberately
-       parallel from "kept in place, because" onwards. -->
-  <data name="Completion.ReverifyRecordsChanged" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records had changed by the final check.</value></data>
-  <!-- The third reason the pre-action re-check keeps files back: a read of the
-       Windows Installer records failed, so nothing was established either way and
-       the file is kept for want of a verdict rather than on one. Distinct from
-       Completion.ReverifySkipped, which names a program needing the file again,
-       and from Completion.ReverifyRecordsChanged, where the read succeeded.
-       0 = the count kept, 1 = pluralised "file"/"files". Flat string; a language
-       may add a satellite-only Completion.ReverifyIncomplete.One/.Few/.Many
-       override for its count grammar. "The final check" rather than "when the
-       check was repeated": the repetition is an implementation detail and the
-       user has never been told there was a first one. -->
-  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.</value></data>
-  <!-- The fourth held-back cause, read by both hosts through HeldBackReport.
+       0 = files kept back. A PAIR RATHER THAN A FLAT STRING because the second
+       sentence inflects with the count as well as the noun does ("it was"
+       against "these were"), which one string cannot carry. Grammatical rather
+       than Cardinality (DisplayHelpers.QuestionFor): the one-form spends {0} and
+       reads "1 file kept back", a numeral governing a noun. A language may add a
+       satellite-only Completion.HeldBack.One/.Few/.Many override for its own
+       count grammar.
 
-       0 = files kept back, 1 = pluralised "file"/"files", as in the three above.
+       IT NAMES NO CAUSE AND MUST NOT ACQUIRE ONE. It replaced four sentences,
+       one per cause, and the four counts still travel in the result log for
+       anyone working out what happened on a machine. What is true of every file
+       on this line, by construction rather than by choosing a superordinate
+       over four causes: the scan offered it, and the check the app makes
+       immediately before acting did not confirm it. Nothing narrower is true of
+       all of them.
 
-       IT IS THE ONE THAT SAYS NOTHING ABOUT THE FILE. The other three are findings
-       about the registration naming that path: a live claim, a registration that has
-       gone, a read that failed. This one is reached without looking at the path, so
-       the sentence has to be about the machine, and "which cached files belong to
-       which programs" is the phrasing the window's own empty-offer screen already
-       uses for the same fact (Completion.NothingOfferedBody.*).
-
-       "By the final check" rather than "any more": the app is not asserting that
-       something changed between the scan and the click, only that the check it makes
-       before acting did not establish it. Two different findings reach this line and
-       neither may be named in it. -->
-  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here.</value></data>
+       NOBODY READS THIS WHO HAS NOT PRESSED THE BUTTON, and its whole job is
+       that the overlay's numbers add up: the heading says 26 deleted where the
+       user selected 29. It is not here to teach anybody about Windows Installer
+       and there is nothing for the reader to do. Press Done and the kept-back
+       files are on the rebuilt main list, judged fresh by the rescan the app
+       runs before the overlay appears. -->
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file kept back. The scan said it was unneeded. The final check said otherwise.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files kept back. The scan said these were unneeded. The final check said otherwise.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record

@@ -1302,12 +1302,13 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task MoveAllAsync_a_degraded_reverify_reports_the_unread_records_not_a_reclaim()
+    public async Task MoveAllAsync_a_degraded_reverify_reports_what_it_kept_back()
     {
         // A re-verify that could not read the records keeps files back without any
-        // program having reclaimed them. Reporting the reclaim reason there would
-        // state a specific cause that did not happen, which is a false statement
-        // about the user's machine rather than a wording preference.
+        // program having reclaimed them. The screen names no cause either way since
+        // 3.0.0, so what is pinned here is that the file reaches the count at all:
+        // a re-verify that kept a file back and reported nothing would leave the
+        // batch's own numbers not adding up.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1333,12 +1334,12 @@ public class MainViewModelTests
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>(),
             Arg.Any<UnderLeaseClaims?>());
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Summary);
     }
 
     [Fact]
-    public async Task MoveAllAsync_a_healthy_reverify_still_reports_the_reclaim_reason()
+    public async Task MoveAllAsync_a_healthy_reverify_still_reports_what_it_kept_back()
     {
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
@@ -1367,7 +1368,7 @@ public class MainViewModelTests
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Skipped);
     }
 
@@ -1536,7 +1537,7 @@ public class MainViewModelTests
         // screen is the service's, folded into the same tally and the same
         // sentence.
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Skipped);
         // 3.0 MB, not 7.0: the held-back file's 4 MB is not freed space.
         Assert.Equal(
@@ -1585,7 +1586,7 @@ public class MainViewModelTests
         Assert.True(vm.Completion.IsComplete);
         Assert.Equal(Strings.Completion_NothingRemoved, vm.Completion.Heading);
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Summary);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
@@ -1660,7 +1661,7 @@ public class MainViewModelTests
 
         Assert.True(vm.Completion.IsComplete);
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Skipped);
         // One file deleted out of the TWO the batch still had, and its 1 MB is the
         // freed figure. The held-back file is neither in the total nor in the sum.
@@ -1708,7 +1709,7 @@ public class MainViewModelTests
 
         Assert.True(vm.Completion.IsComplete);
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Skipped);
         // b.msi's 1 MB, the first file of the folded list. Held back is a.msp at
         // 4 MB, which is first in the unfolded one, so a fold that did not happen
@@ -1790,12 +1791,12 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task DeleteAllAsync_a_hold_back_the_records_could_not_read_names_that_reason()
+    public async Task DeleteAllAsync_a_hold_back_the_records_could_not_read_reaches_the_screen()
     {
         // The tallies are added across the two halves of the check, because either
-        // can fail to read a record and the causes have different copy. Here the
-        // pre-act re-verify was healthy and the under-lease re-read was not, so the
-        // only cause present is the one that must reach the screen.
+        // can fail to read a record. Here the pre-act re-verify was healthy and the
+        // under-lease re-read was not, so the file is kept back by the second half
+        // alone and the screen has to account for it.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1818,19 +1819,19 @@ public class MainViewModelTests
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Skipped);
     }
 
     [Fact]
-    public async Task DeleteAllAsync_a_batch_held_back_two_ways_names_both_causes_with_their_own_counts()
+    public async Task DeleteAllAsync_a_batch_held_back_two_ways_counts_both_in_one_line()
     {
-        // The state neither half of the check can describe on its own, and the one
-        // the fold used to destroy: the pre-act re-verify kept a file back because
-        // a program reclaimed it, and the under-lease re-read kept a DIFFERENT file
-        // back because a read failed. Merging those into one cause put a sentence
-        // over files it was false of, whichever cause won. Two files, two causes,
-        // two lines, one count each.
+        // The state neither half of the check can describe on its own: the pre-act
+        // re-verify kept one file back and the under-lease re-read kept a DIFFERENT
+        // one back. Two files, two causes, ONE line, and the number on it is two.
+        // The regression this now catches is a fold that loses a side, which would
+        // print "1 file kept back" over a batch that kept back two and leave the
+        // overlay's own arithmetic wrong.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1859,25 +1860,24 @@ public class MainViewModelTests
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1))
-                + Environment.NewLine
-                + string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Plural, 2),
             vm.Completion.Skipped);
-        // And the counts stay each cause's own rather than the batch's: a line
-        // reading "2 files" against either sentence would be the collapse in a
-        // different disguise.
+        // And it is one line rather than two, which is what the collapse changed.
+        Assert.DoesNotContain(Environment.NewLine, vm.Completion.Skipped, StringComparison.Ordinal);
+        // A fold that dropped either half would count one and read as the singular.
         Assert.DoesNotContain(
-            string.Format(Strings.Completion_ReverifySkipped, 2, DisplayHelpers.PluraliseFile(2)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Skipped);
     }
 
     [Fact]
-    public async Task DeleteAllAsync_a_record_that_changed_says_so_rather_than_naming_a_reclaim()
+    public async Task DeleteAllAsync_a_record_that_changed_is_counted_like_any_other_hold_back()
     {
-        // The third cause reaching the screen. The under-lease re-read found the
-        // records no longer hold the registration the claim named, which is neither
-        // a program taking the file back nor a read that failed, and until this
-        // sentence existed the file was released to the delete instead.
+        // The cause that once had no sentence because it had no outcome: the
+        // under-lease re-read found the records no longer hold the registration the
+        // claim named, and the file was released to the delete instead of kept. It
+        // is kept now, and it reaches the same count as every other cause; the
+        // per-cause tally survives in the result log for anyone asking which.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1900,7 +1900,7 @@ public class MainViewModelTests
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         Assert.Equal(
-            string.Format(Strings.Completion_ReverifyRecordsChanged, 1, DisplayHelpers.PluraliseFile(1)),
+            string.Format(Strings.Completion_HeldBack_Singular, 1),
             vm.Completion.Skipped);
     }
 

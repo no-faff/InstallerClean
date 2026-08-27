@@ -471,13 +471,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `Essa pasta está na mesma unidade, então o espaço não volta enquanto você não excluí-la. Escolha uma pasta em outra unidade se quiser o espaço na hora.`,
   'Error.ScanCorrelationFailed': `O InstallerClean não conseguiu casar os registros do Windows Installer com o conteúdo de {InstallerFolder}. Quase nada do que os registros apontam está de fato lá, e quase nada do que está lá é nomeado por algum registro, então não foi possível mostrar que algum arquivo fosse desnecessário. Nada foi oferecido e nada foi removido.`,
   'Error.CandidateOutsideCache': `Este arquivo não está diretamente dentro da pasta do Windows Installer; recusado por segurança.`,
-  'Completion.ReverifySkipped': `{0} {1} mantidos no lugar, porque os registros agora reivindicam o que a análise havia sinalizado.`,
   'Completion.MoveCancelledSummary': `Movimentação cancelada após mover {0} de {1} {2}.`,
   'Completion.PermanentDeleteCancelledSummary': `Exclusão permanente cancelada após remover {0} de {1} {2}.`,
   'Body.PendingReboot.Lead': `Estes arquivos não podem ser limpos agora.`,
   'Cli.TooManyArguments': `Erro: argumento extra inesperado '{0}'. Se a sua pasta de destino tiver um espaço no nome, coloque aspas em todo o caminho: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Pasta salva por usuário; execuções agendadas ou SYSTEM: /m CAMINHO.`,
-  'Completion.ReverifyIncomplete': `{0} {1} mantidos no lugar, porque os registros do Windows Installer não puderam ser lidos por completo na verificação final.`,
   'Error.ScanRecordsUnreadable': `O InstallerClean não conseguiu ler o suficiente dos registros do Windows Installer para ter certeza do que ainda é necessário: a lista de programas instalados voltou incompleta, e ler esses mesmos registros direto do registro do Windows também deu erros. Um arquivo poderia parecer órfão só porque o registro que o nomeia era um dos ilegíveis, então o InstallerClean parou. Nada foi removido.`,
   'Error.MsiEnumerationNeverEnded': `O Windows Installer nunca sinalizou o fim da lista de programas instalados: o InstallerClean desistiu depois de {0} entradas (último código de erro {1}). Não dá para confiar em uma lista sem fim, então o InstallerClean parou. Nada foi removido.`,
   'Error.MsiPatchEnumerationNeverEnded': `O Windows Installer nunca sinalizou o fim da lista de patches de um programa: o InstallerClean desistiu depois de {0} entradas (último código de erro {1}). Não dá para confiar em uma lista sem fim, então o InstallerClean parou. Nada foi removido.`,
@@ -516,10 +514,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `O InstallerClean não conseguiu obter o bloqueio que o Windows Installer usa para impedir que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho, e nada foi movido. Tente de novo, e reinicie o Windows se continuar acontecendo.`,
   'Cli.InstallerLockUnavailable': `Erro: o InstallerClean não conseguiu obter o bloqueio do Windows Installer que impede que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho. Nada foi excluído. Tente de novo, e reinicie o Windows se continuar acontecendo.`,
   'Cli.MoveInstallerLockUnavailable': `Erro: o InstallerClean não conseguiu obter o bloqueio do Windows Installer que impede que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho. Nada foi movido. Tente de novo, e reinicie o Windows se continuar acontecendo.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} mantidos no lugar, porque os registros do Windows Installer haviam mudado até a verificação final.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} mantidos no lugar, porque o Windows tem um registro do programa nomeado lá dentro.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} mantidos no lugar, porque o InstallerClean não encontrou nenhum programa nomeado lá dentro.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} mantidos no lugar, porque até a verificação final o InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui.`,
   'Completion.NothingRemoved': `Nada foi removido`,
   'Error.ScanNoRegisteredFileInFolder': `O InstallerClean não conseguiu casar os registros do Windows Installer com o conteúdo de {InstallerFolder}. A pasta tem arquivos, mas nenhum registro aponta para nada lá dentro, então não foi possível mostrar que algum arquivo fosse desnecessário. Nada foi oferecido e nada foi removido.`,
   'Completion.NothingOffered': `Nada oferecido neste PC`,
@@ -529,6 +525,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.
@@ -537,8 +535,9 @@ const MAP = {
 // pt counts 0 and 1 as "one" (CategoryFor's fr/pt branch), so .One fires at 0 and 1.
 // The three Cli completion lines inflect the past participle at one; the attributive
 // Status.RegisteredPackagesFound agrees too. Progress gerunds (Deleting/Moving) do not.
-// Completion.ReverifySkipped is chosen on the very count it prints, so its participle
-// (mantido/mantidos) and the dele/deles pronoun both take a singular .One. The three
+// A held-back key took a singular .One for its mantido/mantidos participle and its
+// dele/deles pronoun, and went with the four sentences the 3.0.0 round replaced with
+// one Completion.HeldBack pair. The three
 // *CancelledSummary keys do NOT get an override: their form is selected on the total
 // ({1}) but any participle would have to agree with the acted-on count ({0}), a
 // different number, so they use a count-invariant "X cancelada apos <infinitive>
@@ -550,11 +549,7 @@ const OVERRIDES = {
   'Cli.DeletedFiles.One': `Foi excluído permanentemente {0} {1} desnecessário.`,
   'Cli.MovingFiles.One': `Movendo {0} {1} desnecessário para {2}...`,
   'Cli.MovedFiles.One': `Foi movido {0} {1} desnecessário.`,
-  'Completion.ReverifySkipped.One': `{0} {1} mantido no lugar, porque os registros agora reivindicam o que a análise havia sinalizado.`,
-  'Completion.ReverifyRecordsChanged.One': `{0} {1} mantido no lugar, porque os registros do Windows Installer haviam mudado até a verificação final.`,
   // Participle agreement only: "mantido" for a single file.
-  'Completion.ReverifyIncomplete.One': `{0} {1} mantido no lugar, porque os registros do Windows Installer não puderam ser lidos por completo na verificação final.`,
-  'Completion.ReverifyOwnershipUnestablished.One': `{0} {1} mantido no lugar, porque até a verificação final o InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui.`,
   // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
   // one of the two retired identity causes: no code reads it, so nothing passes
   // the prefix to Pluralise and the override could never be selected.

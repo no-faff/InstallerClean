@@ -326,8 +326,8 @@ internal static class Program
     /// </summary>
     internal static void ReportHeldBack(HeldBackReasons reasons)
     {
-        foreach (var line in HeldBackReport.Lines(reasons))
-            Console.WriteLine(line);
+        var line = HeldBackReport.Line(reasons);
+        if (line.Length > 0) Console.WriteLine(line);
     }
 
     /// <summary>

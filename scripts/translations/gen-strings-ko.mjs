@@ -465,13 +465,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `그 폴더는 같은 드라이브에 있어서, 폴더를 삭제하기 전까지는 공간이 돌아오지 않습니다. 공간을 바로 확보하려면 다른 드라이브의 폴더를 선택하세요.`,
   'Error.ScanCorrelationFailed': `InstallerClean이 Windows Installer 기록을 {InstallerFolder}의 내용과 대조하지 못했습니다. 기록이 가리키는 것 중 실제로 그곳에 있는 것이 거의 없고, 그곳에 있는 것 중 어떤 기록에도 이름이 없는 것이 거의 전부여서, 어떤 파일도 불필요하다고 밝힐 수 없었습니다. 아무것도 제시하지 않았고 아무것도 제거하지 않았습니다.`,
   'Error.CandidateOutsideCache': `이 파일은 Windows Installer 폴더 바로 아래에 있지 않습니다. 안전을 위해 거부했습니다.`,
-  'Completion.ReverifySkipped': `{1} {0}개를 그대로 두었습니다. 기록이 이제 검사에서 표시한 것을 자기 것이라고 하기 때문입니다.`,
   'Completion.MoveCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다.`,
   'Completion.PermanentDeleteCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다.`,
   'Body.PendingReboot.Lead': `지금은 이 파일들을 정리할 수 없습니다.`,
   'Cli.TooManyArguments': `오류: 예상치 못한 추가 인수 '{0}'. 대상 폴더 경로에 공백이 있으면 전체 경로를 큰따옴표로 묶으세요: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `폴더는 사용자별 저장. 예약 또는 SYSTEM 실행에는 /m 경로 필요.`,
-  'Completion.ReverifyIncomplete': `{1} {0}개를 그대로 두었습니다. 마지막 확인에서 Windows Installer 기록을 전부 읽지 못했기 때문입니다.`,
   'Error.ScanRecordsUnreadable': `InstallerClean이 무엇이 아직 필요한지 확신할 만큼 Windows Installer 기록을 읽지 못했습니다. 설치된 프로그램 목록이 일부 빠진 채로 돌아왔고, 같은 기록을 레지스트리에서 직접 읽는 것도 오류를 만났습니다. 어떤 파일을 가리키는 기록이 읽을 수 없는 것 중 하나였다는 이유만으로 그 파일이 고립된 것처럼 보일 수 있으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
@@ -510,10 +508,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 Windows Installer가 사용하는 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었고 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.`,
   'Cli.InstallerLockUnavailable': `오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 삭제하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.`,
   'Cli.MoveInstallerLockUnavailable': `오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요.`,
-  'Completion.ReverifyRecordsChanged': `{1} {0}개를 그대로 두었습니다. 마지막 확인 시점에는 Windows Installer 기록이 이미 바뀌어 있었기 때문입니다.`,
   'Completion.ReverifyIdentityClaimed': `{1} {0}개를 그대로 두었습니다. 파일 안에 이름이 적힌 프로그램의 기록을 Windows가 가지고 있기 때문입니다.`,
   'Completion.ReverifyIdentityUnreadable': `{1} {0}개를 그대로 두었습니다. InstallerClean이 파일 안에서 프로그램 이름을 찾지 못했기 때문입니다.`,
-  'Completion.ReverifyOwnershipUnestablished': `{1} {0}개를 그대로 두었습니다. 마지막 확인 시점까지 InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없었기 때문입니다.`,
   'Completion.NothingRemoved': `제거된 것 없음`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean이 Windows Installer 기록을 {InstallerFolder}의 내용과 대조하지 못했습니다. 폴더에 파일은 있지만 그 안의 어떤 것도 가리키는 기록이 하나도 없어서, 어떤 파일도 불필요하다고 밝힐 수 없었습니다. 아무것도 제시하지 않았고 아무것도 제거하지 않았습니다.`,
   'Completion.NothingOffered': `이 PC에서는 아무것도 제시하지 않았습니다`,
@@ -523,6 +519,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

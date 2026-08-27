@@ -356,17 +356,13 @@ public partial class CompletionViewModel : ObservableObject
     /// same partition and the two must not answer differently for one machine
     /// state.
     ///
-    /// Joined the way <see cref="FormatErrorBreakdown"/> joins its own rows, and
-    /// read by the same kind of wrapping TextBlock. The all-skipped overlay routes
-    /// this through <see cref="Summary"/> instead, whose inlines are composed in
-    /// the window's code-behind, and that is where the line breaks are made
-    /// explicit.
+    /// One sentence since 3.0.0, so there is nothing left to join: it is read by a
+    /// wrapping TextBlock as it comes. The all-skipped overlay routes this through
+    /// <see cref="Summary"/> instead, whose inlines are composed in the window's
+    /// code-behind; that path splits on newlines and one line simply yields one Run.
     /// </summary>
-    private static string SkippedText(ReverifyResult? reverify)
-    {
-        if (reverify is null) return string.Empty;
-        return string.Join(Environment.NewLine, HeldBackReport.Lines(reverify.Reasons));
-    }
+    private static string SkippedText(ReverifyResult? reverify) =>
+        reverify is null ? string.Empty : HeldBackReport.Line(reverify.Reasons);
 
     /// <summary>
     /// The failure count line for a completion overlay, or empty when nothing

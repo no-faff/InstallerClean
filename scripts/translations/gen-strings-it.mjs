@@ -72,11 +72,7 @@ const OVERRIDES = {
   'Cli.DeletedFiles.One': `Eliminato definitivamente {0} {1} non necessario.`,
   'Cli.MovingFiles.One': `Spostamento di {0} {1} non necessario in {2}...`,
   'Cli.MovedFiles.One': `Spostato {0} {1} non necessario.`,
-  'Completion.ReverifySkipped.One': `{0} {1} lasciato al suo posto, perché i record ora rivendicano ciò che la scansione aveva segnalato.`,
-  'Completion.ReverifyRecordsChanged.One': `{0} {1} lasciato al suo posto, perché i record di Windows Installer erano cambiati al momento del controllo finale.`,
   // Participle and possessive agreement: "lasciato al suo posto" for one file.
-  'Completion.ReverifyIncomplete.One': `{0} {1} lasciato al suo posto, perché i record di Windows Installer non si sono potuti leggere per intero nel controllo finale.`,
-  'Completion.ReverifyOwnershipUnestablished.One': `{0} {1} lasciato al suo posto, perché al momento del controllo finale InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui.`,
   // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
   // one of the two retired identity causes: no code reads it, so nothing passes
   // the prefix to Pluralise and the override could never be selected.
@@ -400,13 +396,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `Quella cartella è sulla stessa unità, quindi lo spazio non torna finché non la elimini. Scegli invece una cartella su un'altra unità se vuoi lo spazio subito.`,
   'Error.ScanCorrelationFailed': `InstallerClean non è riuscito a far corrispondere i record di Windows Installer con il contenuto di {InstallerFolder}. Quasi nulla di ciò che i record indicano si trova davvero lì, e quasi nulla di ciò che è lì è nominato da un record, quindi non si è potuto dimostrare che qualche file fosse non necessario. Non è stato proposto nulla e non è stato rimosso nulla.`,
   'Error.CandidateOutsideCache': `Questo file non si trova direttamente all'interno della cartella di Windows Installer; rifiutato per sicurezza.`,
-  'Completion.ReverifySkipped': `{0} {1} lasciati al loro posto, perché i record ora rivendicano ciò che la scansione aveva segnalato.`,
   'Completion.MoveCancelledSummary': `Spostati {0} di {1} {2} prima dell'annullamento.`,
   'Completion.PermanentDeleteCancelledSummary': `Eliminati definitivamente {0} di {1} {2} prima dell'annullamento.`,
   'Body.PendingReboot.Lead': `Al momento questi file non si possono ripulire.`,
   'Cli.TooManyArguments': `Errore: argomento aggiuntivo imprevisto '{0}'. Se la cartella di destinazione contiene uno spazio, racchiudi l'intero percorso tra virgolette: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Cartella per utente; esecuzioni pianificate o SYSTEM: /m PERCORSO.`,
-  'Completion.ReverifyIncomplete': `{0} {1} lasciati al loro posto, perché i record di Windows Installer non si sono potuti leggere per intero nel controllo finale.`,
   'Error.ScanRecordsUnreadable': `InstallerClean non è riuscito a leggere abbastanza dei record di Windows Installer per essere sicuro di che cosa serva ancora: l'elenco dei programmi installati è tornato incompleto, e leggere gli stessi record direttamente dal registro di sistema ha dato errori a sua volta. Un file potrebbe sembrare orfano solo perché il record che lo nomina era fra quelli illeggibili, quindi InstallerClean si è fermato. Non è stato rimosso nulla.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer non ha mai segnalato la fine dell'elenco dei programmi installati: InstallerClean ha rinunciato dopo {0} voci (ultimo codice di errore {1}). Di un elenco senza fine non ci si può fidare, quindi InstallerClean si è fermato. Non è stato rimosso nulla.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer non ha mai segnalato la fine dell'elenco delle patch di un programma: InstallerClean ha rinunciato dopo {0} voci (ultimo codice di errore {1}). Di un elenco senza fine non ci si può fidare, quindi InstallerClean si è fermato. Non è stato rimosso nulla.`,
@@ -445,10 +439,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean non è riuscito a prendere il blocco che Windows Installer usa per impedire a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada, e non è stato spostato nulla. Riprova, e riavvia Windows se continua a succedere.`,
   'Cli.InstallerLockUnavailable': `Errore: InstallerClean non è riuscito a prendere il blocco di Windows Installer che impedisce a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada. Non è stato eliminato nulla. Riprova, e riavvia Windows se continua a succedere.`,
   'Cli.MoveInstallerLockUnavailable': `Errore: InstallerClean non è riuscito a prendere il blocco di Windows Installer che impedisce a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada. Non è stato spostato nulla. Riprova, e riavvia Windows se continua a succedere.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} lasciati al loro posto, perché i record di Windows Installer erano cambiati al momento del controllo finale.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} lasciati al loro posto, perché Windows ha un record del programma nominato all'interno.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} lasciati al loro posto, perché InstallerClean non ha trovato alcun programma nominato all'interno.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} lasciati al loro posto, perché al momento del controllo finale InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui.`,
   'Completion.NothingRemoved': `Nessun file rimosso`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean non è riuscito a far corrispondere i record di Windows Installer con il contenuto di {InstallerFolder}. La cartella contiene file, ma nemmeno un record indica qualcosa al suo interno, quindi non si è potuto dimostrare che qualche file fosse non necessario. Non è stato proposto nulla e non è stato rimosso nulla.`,
   'Completion.NothingOffered': `Nulla proposto su questo PC`,
@@ -458,6 +450,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

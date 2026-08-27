@@ -422,11 +422,27 @@ To put it back, you need the installer for the version you already have. Get it 
   <data name="Reason.Superseded" xml:space="preserve"><value>Sostituito</value></data>
   <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
        (superseded): superseded means a newer patch has replaced
-       this one, obsoleted means the patch has been withdrawn /
-       deprecated by the publisher independent of a replacement.
-       The user-visible outcome (the patch is removable) is the
-       same; the Reason column distinguishes them for users who
-       want the MSI-state precision. -->
+       this one, obsoleted means the publisher has withdrawn it
+       independent of a replacement.
+
+       THE TWO DO NOT SHARE AN OUTCOME AND THIS LABEL REACHES NO
+       SCREEN. This note said the user-visible outcome is the same
+       and that the Reason column tells them apart. IsRemovablePatch
+       admits state 2 only, so an obsoleted patch is never offered,
+       and the scan sets two Reason labels rather than three:
+       Reason.Orphaned on the walked-file branch and
+       Reason.Superseded on the superseded-patch branch. Nothing
+       sets this one.
+
+       IT IS STILL TRANSLATED, AND ON PURPOSE. MainViewModel passes
+       it as a third argument to Body.MainExplanation.Why, where no
+       language's sentence spends that slot, so it is kept against a
+       sentence that one day might rather than because a user will
+       read it.
+
+       DO NOT READ THE THREE STATES AS THE SET THE OFFER ADMITS. A
+       user-facing sentence naming a class the offer cannot contain
+       has already been written once from exactly that reading. -->
   <data name="Reason.Obsoleted" xml:space="preserve"><value>Obsoleto</value></data>
 
   <!-- Status / progress text -->
@@ -658,70 +674,34 @@ To put it back, you need the installer for the version you already have. Get it 
        same technique the move-confirmation dialog uses. -->
   <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>Spostato {0} {1} in: {2}</value></data>
   <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>Spostati {0} {1} in: {2}</value></data>
-  <!-- Shown when the pre-action re-check found a registered product's live claim
-       on candidates the scan had left removable, so they were left out of the
-       batch. 0 = the count kept, 1 = pluralised "file"/"files". Flat string; a
-       language may add a satellite-only Completion.ReverifySkipped.One/.Few/.Many
-       override for its count grammar. The English names no pronoun for the files
-       on purpose. One flat string serves every count here, and the neutral carries
-       no .One form for the English to fall back on, so a "them" read wrongly at a
-       count of one; the eight satellites whose grammar forced the issue had each
-       added an override for it. "What the scan flagged" is number-blind and needs
-       none.
+  <!-- What a Move or Delete kept back, on the completion overlay and on stdout.
+       HeldBackReport is the single source and both hosts render from it, so
+       there is one sentence and neither host can answer differently.
 
-       IT STATES THE PRESENT STATE OF THE RECORDS AND NEVER A RETURN. Two
-       situations reach this line: a superseded patch whose claim now says needed,
-       and a file no claim named at all when the scan ran. Of the second, "went
-       back to needing" is false twice over, because nothing this app saw ever
-       held that file, and because whether the claim is new cannot be told apart
-       from the app's own earlier reading having missed one. Translations must not
-       reintroduce a verb of returning; a claim that HOLDS now is the whole of it.
-       The two siblings below say what this one does not: this is a live claim, one
-       is a registration that has gone, one is a read that failed. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} lasciati al loro posto, perché i record ora rivendicano ciò che la scansione aveva segnalato.</value></data>
-  <!-- The third state the final check can find, and the one that is neither of
-       its siblings: the records were read perfectly well and no longer hold the
-       registration that claimed the file. Nothing has gone back to needing it
-       (Completion.ReverifySkipped), and nothing failed to be read
-       (Completion.ReverifyIncomplete), so both of those would name a cause that
-       did not occur. The file is kept in place because an answer of "not there"
-       is only ever "not there in what was asked", and what was asked was settled
-       before the button was pressed. 0 = the count kept, 1 = pluralised
-       "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifyRecordsChanged.One/.Few/.Many override for its count
-       grammar. The English names no pronoun for the files on purpose: one flat
-       string serves every count, the neutral carries no .One form for the English
-       to fall back on, and a "them" reads wrongly at a count of one. The three
-       sentences can appear together, one per cause, so they are deliberately
-       parallel from "kept in place, because" onwards. -->
-  <data name="Completion.ReverifyRecordsChanged" xml:space="preserve"><value>{0} {1} lasciati al loro posto, perché i record di Windows Installer erano cambiati al momento del controllo finale.</value></data>
-  <!-- The third reason the pre-action re-check keeps files back: a read of the
-       Windows Installer records failed, so nothing was established either way and
-       the file is kept for want of a verdict rather than on one. Distinct from
-       Completion.ReverifySkipped, which names a program needing the file again,
-       and from Completion.ReverifyRecordsChanged, where the read succeeded.
-       0 = the count kept, 1 = pluralised "file"/"files". Flat string; a language
-       may add a satellite-only Completion.ReverifyIncomplete.One/.Few/.Many
-       override for its count grammar. "The final check" rather than "when the
-       check was repeated": the repetition is an implementation detail and the
-       user has never been told there was a first one. -->
-  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} lasciati al loro posto, perché i record di Windows Installer non si sono potuti leggere per intero nel controllo finale.</value></data>
-  <!-- The fourth held-back cause, read by both hosts through HeldBackReport.
+       0 = files kept back. A PAIR RATHER THAN A FLAT STRING because the second
+       sentence inflects with the count as well as the noun does ("it was"
+       against "these were"), which one string cannot carry. Grammatical rather
+       than Cardinality (DisplayHelpers.QuestionFor): the one-form spends {0} and
+       reads "1 file kept back", a numeral governing a noun. A language may add a
+       satellite-only Completion.HeldBack.One/.Few/.Many override for its own
+       count grammar.
 
-       0 = files kept back, 1 = pluralised "file"/"files", as in the three above.
+       IT NAMES NO CAUSE AND MUST NOT ACQUIRE ONE. It replaced four sentences,
+       one per cause, and the four counts still travel in the result log for
+       anyone working out what happened on a machine. What is true of every file
+       on this line, by construction rather than by choosing a superordinate
+       over four causes: the scan offered it, and the check the app makes
+       immediately before acting did not confirm it. Nothing narrower is true of
+       all of them.
 
-       IT IS THE ONE THAT SAYS NOTHING ABOUT THE FILE. The other three are findings
-       about the registration naming that path: a live claim, a registration that has
-       gone, a read that failed. This one is reached without looking at the path, so
-       the sentence has to be about the machine, and "which cached files belong to
-       which programs" is the phrasing the window's own empty-offer screen already
-       uses for the same fact (Completion.NothingOfferedBody.*).
-
-       "By the final check" rather than "any more": the app is not asserting that
-       something changed between the scan and the click, only that the check it makes
-       before acting did not establish it. Two different findings reach this line and
-       neither may be named in it. -->
-  <data name="Completion.ReverifyOwnershipUnestablished" xml:space="preserve"><value>{0} {1} lasciati al loro posto, perché al momento del controllo finale InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui.</value></data>
+       NOBODY READS THIS WHO HAS NOT PRESSED THE BUTTON, and its whole job is
+       that the overlay's numbers add up: the heading says 26 deleted where the
+       user selected 29. It is not here to teach anybody about Windows Installer
+       and there is nothing for the reader to do. Press Done and the kept-back
+       files are on the rebuilt main list, judged fresh by the rescan the app
+       runs before the overlay appears. -->
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file kept back. The scan said it was unneeded. The final check said otherwise.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files kept back. The scan said these were unneeded. The final check said otherwise.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -816,9 +796,11 @@ To put it back, you need the installer for the version you already have. Get it 
        ONE LINE OVER ONE POPULATION. It used to count only the registrations that
        carried no superseded or obsoleted state, the rest being read as the
        expected end state of a patch Windows had finished with. Windows opens
-       every patch registered to a product whether superseded or not, and a
-       missing one gives error 1635, so both are the same condition with the same
-       recovery step and one sentence covers them.
+       every patch registered to a product whether superseded or not, so the
+       record is one Windows will act on and cannot satisfy, and both are the same
+       condition with the same recovery step, which one sentence covers. The
+       citations, and why no single consequence may be named, are on
+       RegisteredPackage.IsMissingFromDisk.
 
        The hedges are load-bearing and are the verified position: "causes no
        trouble day to day" and "can fail", never "will". Microsoft guarantees
@@ -1412,7 +1394,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        machine that is genuinely clean. This is what separates them, and it changes
        no existing number's meaning.
 
-       0 = mode arg, 1 = files held back.
+       0 = mode arg, 1 = files held back, 2 = pluralised "file"/"files".
 
        IT NAMES NO FOLDER, WHICH IS THE RULE ON THIS CHANNEL AND NOT A PREFERENCE.
        It carried {InstallerFolder} for an afternoon and was the only Cli.EventLog*
@@ -1421,12 +1403,15 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        token resolves per machine and a line that varies by machine is the opposite
        of what a matched shape is for. This notice does not need to name it at all.
 
-       AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", which is
-       where the sibling above and this one part company: that one is unpluralised
-       on purpose, matching the always-plural "errors:" header the same audience
-       scrapes, and it can be, because its count is of records rather than files and
-       the word never stands alone next to a numeral here. This one reads "1 file" at
-       a count of one and is correct at every other.
+       AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", so it reads
+       "1 file" at a count of one and is correct at every other. THE SIBLING ABOVE
+       DOES THE SAME, AND THIS NOTE SAID THE TWO PART COMPANY THERE:
+       Cli.EventLogNothingOffered spends {2} as well and Program.cs passes it
+       DisplayHelpers.PluraliseFile on the same count. The unpluralised line on this
+       channel is Cli.EventLogScanWithheld, a different key answering a different
+       question: its count is of records rather than files, and it matches the
+       always-plural "errors:" header the same audience scrapes, so its grammar is
+       the price of holding one shape.
 
        IT FIRES ON MORE MACHINES THAN THE OUTCOME LINE DOES. That one is written
        only where nothing at all was offered; this is written beside the other scan
@@ -1751,8 +1736,4 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Eliminato definitivamente {0} {1} non necessario.</value></data>
   <data name="Cli.MovingFiles.One" xml:space="preserve"><value>Spostamento di {0} {1} non necessario in {2}...</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Spostato {0} {1} non necessario.</value></data>
-  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} lasciato al suo posto, perché i record ora rivendicano ciò che la scansione aveva segnalato.</value></data>
-  <data name="Completion.ReverifyRecordsChanged.One" xml:space="preserve"><value>{0} {1} lasciato al suo posto, perché i record di Windows Installer erano cambiati al momento del controllo finale.</value></data>
-  <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>{0} {1} lasciato al suo posto, perché i record di Windows Installer non si sono potuti leggere per intero nel controllo finale.</value></data>
-  <data name="Completion.ReverifyOwnershipUnestablished.One" xml:space="preserve"><value>{0} {1} lasciato al suo posto, perché al momento del controllo finale InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui.</value></data>
 </root>

@@ -77,12 +77,6 @@ const OVERRIDES = {
   'Cli.MovedFiles.One': `Переміщено {0} непотрібний {1}.`,
   'Cli.MovedFiles.Few': `Переміщено {0} непотрібні {1}.`,
   'Status.RegisteredPackagesFound.Few': `Знайдено {0} зареєстровані {1}.`,
-
-  // Completion.ReverifySkipped declared a .One here for a pronoun ("він ..."
-  // against "вони ...") that the 3.0.0 wording of the base no longer has. The
-  // participle "Залишено" is impersonal and does not move with the count, and
-  // the noun inflects through Plural.File, so one string is right at every
-  // count and an override would only be the same sentence twice.
 };
 
 const MAP = {
@@ -492,13 +486,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `Ця папка на тому самому диску, тож місце не повернеться, доки ви її не видалите. Виберіть натомість папку на іншому диску, якщо хочете отримати місце одразу.`,
   'Error.ScanCorrelationFailed': `InstallerClean не зміг зіставити записи Windows Installer із вмістом {InstallerFolder}. Майже нічого з того, на що вказують записи, там немає, і майже нічого з того, що там є, не названо жодним записом, тож про жоден файл не вдалося показати, що він непотрібний. Нічого не запропоновано і нічого не прибрано.`,
   'Error.CandidateOutsideCache': `Цей файл не міститься безпосередньо в папці Windows Installer; відмовлено з міркувань безпеки.`,
-  'Completion.ReverifySkipped': `Залишено на місці {0} {1}, бо записи тепер заявляють те, що позначило сканування.`,
   'Completion.MoveCancelledSummary': `Переміщено {0} з {1} {2}, перш ніж ви скасували.`,
   'Completion.PermanentDeleteCancelledSummary': `Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували.`,
   'Body.PendingReboot.Lead': `Ці файли зараз не можна прибрати.`,
   'Cli.TooManyArguments': `Помилка: неочікуваний зайвий аргумент «{0}». Якщо в шляху до папки призначення є пробіл, візьміть увесь шлях у лапки: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Папка своя в кожного користувача; запланованим і SYSTEM: /m ШЛЯХ.`,
-  'Completion.ReverifyIncomplete': `Залишено на місці {0} {1}, бо під час підсумкової перевірки записи Windows Installer не вдалося прочитати повністю.`,
   'Error.ScanRecordsUnreadable': `InstallerClean не зміг прочитати достатньо записів Windows Installer, щоб напевно знати, що ще потрібно: список встановлених програм повернувся неповним, а читання тих самих записів прямо з реєстру теж призвело до помилок. Файл міг видаватися осиротілим лише тому, що запис, який його називає, виявився одним із нечитабельних, тож InstallerClean зупинився. Нічого не було видалено.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer так і не повідомив про кінець списку встановлених програм: InstallerClean припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. Нічого не було видалено.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так і не повідомив про кінець списку виправлень однієї програми: InstallerClean припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. Нічого не було видалено.`,
@@ -537,10 +529,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean не зміг узяти блокування, яким Windows Installer не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі, і нічого не переміщено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows.`,
   'Cli.InstallerLockUnavailable': `Помилка: InstallerClean не зміг узяти блокування Windows Installer, яке не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі. Нічого не видалено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows.`,
   'Cli.MoveInstallerLockUnavailable': `Помилка: InstallerClean не зміг узяти блокування Windows Installer, яке не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі. Нічого не переміщено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows.`,
-  'Completion.ReverifyRecordsChanged': `Залишено на місці {0} {1}, бо до підсумкової перевірки записи Windows Installer змінилися.`,
   'Completion.ReverifyIdentityClaimed': `Залишено на місці {0} {1}, бо Windows має запис про програму, названу всередині.`,
   'Completion.ReverifyIdentityUnreadable': `Залишено на місці {0} {1}, бо InstallerClean не знайшов усередині назви програми.`,
-  'Completion.ReverifyOwnershipUnestablished': `Залишено на місці {0} {1}, бо до підсумкової перевірки InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші.`,
   'Completion.NothingRemoved': `Нічого не прибрано`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean не зміг зіставити записи Windows Installer із вмістом {InstallerFolder}. У папці є файли, але жоден запис не вказує ні на що всередині неї, тож про жоден файл не вдалося показати, що він непотрібний. Нічого не запропоновано і нічого не прибрано.`,
   'Completion.NothingOffered': `На цьому ПК нічого не запропоновано`,
@@ -550,6 +540,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

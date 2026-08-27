@@ -487,13 +487,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `Folder itu ada di drive yang sama, jadi ruangnya belum kembali sampai Anda menghapusnya. Pilih folder di drive lain kalau Anda ingin ruangnya langsung kembali.`,
   'Error.ScanCorrelationFailed': `InstallerClean tidak bisa mencocokkan catatan Windows Installer dengan isi {InstallerFolder}. Hampir tidak ada yang ditunjuk catatan itu benar-benar ada di sana, dan hampir tidak ada yang ada di sana disebut oleh catatan mana pun, jadi tidak ada file yang bisa ditunjukkan tidak diperlukan. Tidak ada yang ditawarkan dan tidak ada yang disingkirkan.`,
   'Error.CandidateOutsideCache': `File ini tidak berada langsung di dalam folder Windows Installer; ditolak demi keamanan.`,
-  'Completion.ReverifySkipped': `{0} {1} dibiarkan di tempatnya, karena catatan kini mengakui apa yang ditandai pemindaian.`,
   'Completion.MoveCancelledSummary': `{0} dari {1} {2} dipindahkan sebelum Anda membatalkan.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} dari {1} {2} dihapus permanen sebelum Anda membatalkan.`,
   'Body.PendingReboot.Lead': `File-file ini tidak bisa dibersihkan sekarang.`,
   'Cli.TooManyArguments': `Kesalahan: argumen tambahan yang tidak terduga '{0}'. Jika folder tujuan Anda mengandung spasi, apit seluruh jalur dengan tanda kutip: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Folder disimpan per pengguna; tugas terjadwal atau SYSTEM: /m JALUR.`,
-  'Completion.ReverifyIncomplete': `{0} {1} dibiarkan di tempatnya, karena catatan Windows Installer tidak bisa dibaca seluruhnya pada pemeriksaan terakhir.`,
   'Error.ScanRecordsUnreadable': `InstallerClean tidak bisa membaca cukup banyak catatan Windows Installer untuk memastikan apa yang masih diperlukan: daftar program terpasang kembali tidak lengkap, dan membaca catatan yang sama langsung dari registri juga menemui kesalahan. Sebuah file bisa tampak terisolasi hanya karena catatan yang menyebutkannya termasuk yang tidak terbaca, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar program terpasang: InstallerClean menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar patch sebuah program: InstallerClean menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
@@ -532,10 +530,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean tidak bisa mengambil kunci yang dipakai Windows Installer untuk mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan, dan tidak ada yang dipindahkan. Coba lagi, dan mulai ulang Windows kalau terus terjadi.`,
   'Cli.InstallerLockUnavailable': `Kesalahan: InstallerClean tidak bisa mengambil kunci Windows Installer yang mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan. Tidak ada yang dihapus. Coba lagi, dan mulai ulang Windows kalau terus terjadi.`,
   'Cli.MoveInstallerLockUnavailable': `Kesalahan: InstallerClean tidak bisa mengambil kunci Windows Installer yang mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan. Tidak ada yang dipindahkan. Coba lagi, dan mulai ulang Windows kalau terus terjadi.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} dibiarkan di tempatnya, karena catatan Windows Installer sudah berubah pada pemeriksaan terakhir.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} dibiarkan di tempatnya, karena Windows punya catatan tentang program yang disebutkan di dalamnya.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} dibiarkan di tempatnya, karena InstallerClean tidak menemukan nama program di dalamnya.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} dibiarkan di tempatnya, karena sampai pemeriksaan terakhir InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini.`,
   'Completion.NothingRemoved': `Tidak ada yang disingkirkan`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean tidak bisa mencocokkan catatan Windows Installer dengan isi {InstallerFolder}. Folder itu berisi file, tapi tidak satu pun catatan menunjuk apa pun di dalamnya, jadi tidak ada file yang bisa ditunjukkan tidak diperlukan. Tidak ada yang ditawarkan dan tidak ada yang disingkirkan.`,
   'Completion.NothingOffered': `Tidak ada yang ditawarkan di PC ini`,
@@ -545,6 +541,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

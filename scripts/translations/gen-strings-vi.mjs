@@ -468,13 +468,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `Thư mục đó nằm trên cùng một ổ đĩa, nên dung lượng chưa trở lại cho tới khi bạn xóa nó. Hãy chọn một thư mục trên ổ đĩa khác nếu bạn muốn có dung lượng ngay.`,
   'Error.ScanCorrelationFailed': `InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Gần như không có thứ gì các bản ghi trỏ tới thực sự nằm ở đó, và gần như không có thứ gì ở đó được bản ghi nào nêu tên, nên không tệp nào có thể được chứng tỏ là không cần thiết. Không có gì được đề xuất và không có gì bị bỏ đi.`,
   'Error.CandidateOutsideCache': `Tệp này không nằm trực tiếp trong thư mục Windows Installer; bị từ chối vì lý do an toàn.`,
-  'Completion.ReverifySkipped': `Đã giữ nguyên {0} {1}, vì các bản ghi giờ đây nhận phần mà lần quét đã đánh dấu.`,
   'Completion.MoveCancelledSummary': `Đã chuyển {0}/{1} {2} trước khi bạn hủy.`,
   'Completion.PermanentDeleteCancelledSummary': `Đã xóa vĩnh viễn {0}/{1} {2} trước khi bạn hủy.`,
   'Body.PendingReboot.Lead': `Hiện chưa thể dọn những tệp này.`,
   'Cli.TooManyArguments': `Lỗi: có thêm đối số không mong đợi '{0}'. Nếu thư mục đích của bạn có dấu cách, hãy đặt cả đường dẫn trong dấu ngoặc kép: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Thư mục theo người dùng; tác vụ theo lịch hoặc SYSTEM: /m ĐƯỜNG_DẪN.`,
-  'Completion.ReverifyIncomplete': `Đã giữ nguyên {0} {1}, vì ở lần kiểm tra cuối, không đọc được đầy đủ các bản ghi Windows Installer.`,
   'Error.ScanRecordsUnreadable': `InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
@@ -513,10 +511,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean không lấy được khóa mà Windows Installer dùng để ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng, và không có gì được chuyển. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn.`,
   'Cli.InstallerLockUnavailable': `Lỗi: InstallerClean không lấy được khóa Windows Installer vốn ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng. Không có gì bị xóa. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn.`,
   'Cli.MoveInstallerLockUnavailable': `Lỗi: InstallerClean không lấy được khóa Windows Installer vốn ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng. Không có gì được chuyển. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn.`,
-  'Completion.ReverifyRecordsChanged': `Đã giữ nguyên {0} {1}, vì tới lần kiểm tra cuối, các bản ghi Windows Installer đã thay đổi.`,
   'Completion.ReverifyIdentityClaimed': `Đã giữ nguyên {0} {1}, vì Windows có bản ghi về chương trình được nêu tên bên trong.`,
   'Completion.ReverifyIdentityUnreadable': `Đã giữ nguyên {0} {1}, vì InstallerClean không tìm thấy tên chương trình nào bên trong.`,
-  'Completion.ReverifyOwnershipUnestablished': `Đã giữ nguyên {0} {1}, vì cho tới lần kiểm tra cuối, InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây.`,
   'Completion.NothingRemoved': `Không có gì bị bỏ đi`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean không khớp được các bản ghi Windows Installer với nội dung trong {InstallerFolder}. Thư mục có tệp bên trong, nhưng không một bản ghi nào trỏ tới bất cứ thứ gì trong đó, nên không tệp nào có thể được chứng tỏ là không cần thiết. Không có gì được đề xuất và không có gì bị bỏ đi.`,
   'Completion.NothingOffered': `Không có gì được đề xuất trên máy này`,
@@ -526,6 +522,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

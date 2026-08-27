@@ -21,7 +21,7 @@ namespace InstallerClean.Tests.Helpers;
 /// first test walks the whole inventory against the shipped resources.
 ///
 /// The mirror of it is an override whose prefix matches nothing the code passes.
-/// A translator writing "Completion.ReverifySkiped.One" adds a key that parity
+/// A translator writing "Completion.HeldBak.One" adds a key that parity
 /// accepts, that nothing reads and that can never be selected. The last test
 /// walks every override in all fifteen satellites back to a prefix in the
 /// inventory, so an orphan names itself.
@@ -34,29 +34,27 @@ public class CountedStringTests
     /// <summary>
     /// Every keyPrefix the app passes to <see cref="DisplayHelpers.Pluralise(int, string, string, string)"/>,
     /// taken from the call sites rather than from the resx, because the prefix
-    /// is what the lookup is built from. Four of them reach Pluralise through
-    /// HeldBackReport's flat overload, where the key arrives in a local and a
-    /// search of the call expression alone does not see it.
+    /// is what the lookup is built from.
     ///
-    /// THAT SENTENCE SAID FIVE AND THE COUNT HAD BEEN STALE SINCE THE RELEASE THAT
-    /// CUT TWO CAUSES AND ADDED ONE. It is corrected here rather than dropped
-    /// because it is the warning that matters: a sweep of the call expressions
-    /// misses exactly those, which is how this list went four prefixes short
-    /// without anything failing. The three added alongside this note were found by
-    /// walking the resx for Singular and Plural pairs instead, and one of the four
-    /// had been missing since the empty-offer screen came back.
+    /// A COUNT OF HOW MANY ARRIVE BY WHICH ROUTE USED TO STAND HERE AND WENT STALE
+    /// TWICE, once when a release cut two held-back causes and added one, and again
+    /// when the four collapsed into Completion.HeldBack. The warning it carried is
+    /// what matters and is kept without the figure: a prefix that reaches Pluralise
+    /// in a LOCAL rather than as a literal at the call site is invisible to a sweep
+    /// of the call expressions, which is how this list once ran four prefixes short
+    /// with nothing failing. Walk the resx for Singular and Plural pairs as well as
+    /// the call sites.
     /// </summary>
     private static readonly string[] CountedPrefixes =
     {
         "Cli.DeletedFiles", "Cli.DeletingFiles", "Cli.FoundOrphans", "Cli.MissingFromDisk",
         "Cli.MovedFiles", "Cli.MovingFiles", "Cli.NothingOffered",
         "Completion.FailedCount", "Completion.FailedCountDelete",
+        "Completion.HeldBack",
         "Completion.MoveCancelledSummary", "Completion.MoveRestoreHint",
         "Completion.MoveRestoreHintSameDrive", "Completion.MoveSummary",
         "Completion.NothingOfferedBody",
         "Completion.PermanentDeleteCancelledSummary", "Completion.PermanentDeleteSummary",
-        "Completion.ReverifyIncomplete", "Completion.ReverifyOwnershipUnestablished",
-        "Completion.ReverifyRecordsChanged", "Completion.ReverifySkipped",
         "Confirm.DeletePermanently",
         "Error.AccessDenied", "Error.FileInUse", "Error.IOFailure", "Error.UnknownError",
         "Plural.Error", "Plural.File", "Plural.Package", "Plural.Patch", "Plural.Product",
@@ -77,11 +75,10 @@ public class CountedStringTests
         "Cli.DeletedFiles", "Cli.DeletingFiles", "Cli.FoundOrphans", "Cli.MissingFromDisk",
         "Cli.MovedFiles", "Cli.MovingFiles",
         "Cli.NothingOffered",
+        "Completion.HeldBack",
         "Completion.MoveRestoreHint", "Completion.MoveRestoreHintSameDrive",
         "Completion.NothingOfferedBody",
         "Completion.PermanentDeleteSummary",
-        "Completion.ReverifyIncomplete", "Completion.ReverifyOwnershipUnestablished",
-        "Completion.ReverifyRecordsChanged", "Completion.ReverifySkipped",
         "Confirm.DeletePermanently", "Error.FileInUse",
         "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
         "Summary.NothingListed",
@@ -129,17 +126,22 @@ public class CountedStringTests
         // The assertion the override mechanism rests on, and the one thing no
         // other test reaches. The Russian base form is the impersonal plural, so
         // without the override a single file reads with the wrong agreement.
+        //
+        // IT WAS WRITTEN AGAINST Completion.ReverifySkipped, WHOSE OVERRIDE WENT
+        // WITH THE HELD-BACK COLLAPSE. Cli.FoundOrphans is the same shape and not a
+        // convenience: a flat key, grammatical, and carrying a Russian .One that
+        // differs from its base form, which is what the assertion below needs.
         using var scope = new LocalisationScope(Russian);
 
-        var overridden = Strings.Find("Completion.ReverifySkipped.One");
-        var flat = Strings.Get("Completion.ReverifySkipped");
+        var overridden = Strings.Find("Cli.FoundOrphans.One");
+        var flat = Strings.Get("Cli.FoundOrphans");
         Assert.NotNull(overridden);
         Assert.NotEqual(flat, overridden); // guards the test itself: the two must differ
 
-        Assert.Equal(overridden, DisplayHelpers.Pluralise(1, flat, "Completion.ReverifySkipped"));
+        Assert.Equal(overridden, DisplayHelpers.Pluralise(1, flat, "Cli.FoundOrphans"));
         // 21 is "one" in East Slavic, which is why the override is read by
         // category rather than by count.
-        Assert.Equal(overridden, DisplayHelpers.Pluralise(21, flat, "Completion.ReverifySkipped"));
+        Assert.Equal(overridden, DisplayHelpers.Pluralise(21, flat, "Cli.FoundOrphans"));
     }
 
     [Fact]

@@ -235,6 +235,8 @@ public static class Strings
     public static string Completion_FailedCount_Plural => Get("Completion.FailedCount.Plural");
     public static string Completion_FailedCount_Singular => Get("Completion.FailedCount.Singular");
     public static string Completion_Freed => Get("Completion.Freed");
+    public static string Completion_HeldBack_Plural => Get("Completion.HeldBack.Plural");
+    public static string Completion_HeldBack_Singular => Get("Completion.HeldBack.Singular");
     public static string Completion_MoveCancelledSummary => Get("Completion.MoveCancelledSummary");
     public static string Completion_Moved => Get("Completion.Moved");
     public static string Completion_MoveRestoreHint_Plural => Get("Completion.MoveRestoreHint.Plural");
@@ -256,10 +258,6 @@ public static class Strings
     public static string Completion_PermanentDeleteSummary_Singular => Get("Completion.PermanentDeleteSummary.Singular");
     public static string Completion_ReverifyIdentityClaimed => Get("Completion.ReverifyIdentityClaimed");
     public static string Completion_ReverifyIdentityUnreadable => Get("Completion.ReverifyIdentityUnreadable");
-    public static string Completion_ReverifyIncomplete => Get("Completion.ReverifyIncomplete");
-    public static string Completion_ReverifyOwnershipUnestablished => Get("Completion.ReverifyOwnershipUnestablished");
-    public static string Completion_ReverifyRecordsChanged => Get("Completion.ReverifyRecordsChanged");
-    public static string Completion_ReverifySkipped => Get("Completion.ReverifySkipped");
     public static string Confirm_DeletePermanently_Plural => Get("Confirm.DeletePermanently.Plural");
     public static string Confirm_DeletePermanently_Singular => Get("Confirm.DeletePermanently.Singular");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");

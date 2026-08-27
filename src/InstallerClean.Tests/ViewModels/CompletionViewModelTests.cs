@@ -432,44 +432,60 @@ public class CompletionViewModelTests
         Assert.Equal(allClear.Restore, nothingOffered.Restore);
     }
 
-    // The kept-back block. Its rule is that no sentence on it is false of any file
-    // it counts, which a single cause chosen for the batch cannot keep.
+    // The kept-back block. One sentence since 3.0.0, naming no cause, carrying the
+    // batch total. What is pinned here is that the mix of causes cannot be read off
+    // it and that the number is every file kept back.
 
-    private static string Line(string flat, int count) =>
-        string.Format(flat, count, DisplayHelpers.PluraliseFile(count));
+    private static string Line(int count) =>
+        string.Format(
+            count == 1 ? Strings.Completion_HeldBack_Singular : Strings.Completion_HeldBack_Plural,
+            count);
 
     [Fact]
-    public void A_batch_kept_back_for_one_cause_carries_that_one_sentence()
+    public void A_batch_kept_back_for_one_cause_carries_the_sentence_at_its_count()
     {
         var vm = new CompletionViewModel();
 
         vm.ShowDeleteSummary(deletedCount: 2, deletedBytes: 4096, errors: [],
             reverify: new ReverifyResult([], ["a.msp"], new HeldBackReasons(Reclaimed: 1)));
 
-        Assert.Equal(Line(Strings.Completion_ReverifySkipped, 1), vm.Skipped);
+        Assert.Equal(Line(1), vm.Skipped);
     }
 
     [Fact]
-    public void A_batch_kept_back_three_ways_carries_three_lines_in_the_settled_order()
+    public void A_batch_kept_back_three_ways_carries_ONE_line_at_the_batch_total()
     {
-        // The order is most specific cause first: what a program was found to
-        // need, then what the records no longer hold, then what could not be read
-        // at all. Nothing collapses and no count is the batch's rather than its
-        // own cause's.
+        // Where three sentences used to print. The four counts still exist on the
+        // tally and travel in the result log; what the user gets is one line whose
+        // number is 2 + 1 + 1 rather than any one cause's.
         var vm = new CompletionViewModel();
 
         vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 4096, errors: [],
             reverify: new ReverifyResult([], ["a.msp", "b.msp", "c.msp", "d.msp"],
                 new HeldBackReasons(Reclaimed: 2, RecordsChanged: 1, RecordsUnreadable: 1)));
 
-        Assert.Equal(
-            new[]
-            {
-                Line(Strings.Completion_ReverifySkipped, 2),
-                Line(Strings.Completion_ReverifyRecordsChanged, 1),
-                Line(Strings.Completion_ReverifyIncomplete, 1),
-            },
-            vm.Skipped.Split(Environment.NewLine));
+        Assert.Equal(new[] { Line(4) }, vm.Skipped.Split(Environment.NewLine));
+    }
+
+    [Fact]
+    public void The_kept_back_line_does_not_say_which_cause_a_batch_met()
+    {
+        // Two batches of the same size reached by different causes, one of them the
+        // cause that is about the machine rather than about any file. The screen
+        // cannot tell them apart, which is the whole of what "names no cause" means
+        // and is worth a test rather than a comment.
+        var perFile = new CompletionViewModel();
+        perFile.ShowDeleteSummary(deletedCount: 1, deletedBytes: 4096, errors: [],
+            reverify: new ReverifyResult([], ["a.msp", "b.msp", "c.msp"],
+                new HeldBackReasons(Reclaimed: 2, RecordsChanged: 1)));
+
+        var machineWide = new CompletionViewModel();
+        machineWide.ShowDeleteSummary(deletedCount: 1, deletedBytes: 4096, errors: [],
+            reverify: new ReverifyResult([], ["a.msp", "b.msp", "c.msp"],
+                new HeldBackReasons(OwnershipUnestablished: 3)));
+
+        Assert.Equal(Line(3), perFile.Skipped);
+        Assert.Equal(perFile.Skipped, machineWide.Skipped);
     }
 
     [Fact]
@@ -486,22 +502,20 @@ public class CompletionViewModelTests
     }
 
     [Fact]
-    public void The_all_skipped_screen_carries_every_cause_in_its_summary()
+    public void The_all_skipped_screen_carries_the_kept_back_line_in_its_summary()
     {
-        // This screen routes the block through Summary instead of Skipped, and
+        // This screen routes the line through Summary instead of Skipped, and
         // Summary is the one completion field with no Text binding: its inlines are
-        // composed in the window's code-behind, which is where the line breaks are
-        // made explicit. The view model's job is only to hand over the whole block.
+        // composed in the window's code-behind. That path splits on newlines, so
+        // one sentence yields one Run and no break, which is why the collapse needs
+        // nothing done to it.
         var vm = new CompletionViewModel();
 
         vm.ShowReverifyAllSkipped(new ReverifyResult([], ["a.msp", "b.msp"],
             new HeldBackReasons(Reclaimed: 1, RecordsUnreadable: 1)));
 
-        Assert.Equal(
-            Line(Strings.Completion_ReverifySkipped, 1)
-                + Environment.NewLine
-                + Line(Strings.Completion_ReverifyIncomplete, 1),
-            vm.Summary);
+        Assert.Equal(Line(2), vm.Summary);
+        Assert.DoesNotContain(Environment.NewLine, vm.Summary, System.StringComparison.Ordinal);
         // The heading beside the block, because a summary naming causes under a
         // heading saying there were none is the state this screen was rewritten out
         // of. Completion_AllClean is right for a machine with nothing to do and

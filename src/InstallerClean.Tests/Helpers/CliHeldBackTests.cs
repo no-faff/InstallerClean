@@ -104,62 +104,43 @@ public class CliHeldBackTests
     }
 
     [Fact]
-    public void ReportHeldBack_prints_the_reclaim_sentence_when_the_records_were_read()
+    public void ReportHeldBack_prints_the_sentence_at_a_count_of_one()
     {
         var written = CaptureStdout(() =>
             Program.ReportHeldBack(new HeldBackReasons(Reclaimed: 1)));
 
-        Assert.Equal(
-            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
-            written.TrimEnd());
+        Assert.Equal(string.Format(Strings.Completion_HeldBack_Singular, 1), written.TrimEnd());
     }
 
     [Fact]
-    public void ReportHeldBack_prints_the_unread_records_sentence_when_they_were_not()
+    public void ReportHeldBack_prints_ONE_line_for_a_batch_that_met_several_causes()
     {
-        // Three causes, three sentences, and saying one where another is true
-        // names a cause that was never shown. The window makes the same
-        // distinction from the same tally, through the same Core helper.
-        var written = CaptureStdout(() =>
-            Program.ReportHeldBack(new HeldBackReasons(RecordsUnreadable: 2)));
-
-        Assert.Equal(
-            string.Format(Strings.Completion_ReverifyIncomplete, 2, DisplayHelpers.PluraliseFile(2)),
-            written.TrimEnd());
-    }
-
-    [Fact]
-    public void ReportHeldBack_prints_the_changed_records_sentence_for_a_registration_that_has_gone()
-    {
-        // The cause that used to have no sentence because it had no outcome: a
-        // pairing the records no longer hold was released to the operation.
-        var written = CaptureStdout(() =>
-            Program.ReportHeldBack(new HeldBackReasons(RecordsChanged: 1)));
-
-        Assert.Equal(
-            string.Format(Strings.Completion_ReverifyRecordsChanged, 1, DisplayHelpers.PluraliseFile(1)),
-            written.TrimEnd());
-    }
-
-    [Fact]
-    public void ReportHeldBack_prints_a_line_per_cause_present_in_the_settled_order()
-    {
-        // A mixed batch, which is the whole reason the tally replaced a flag. Each
-        // line carries its own count, and no line names a cause that did not occur
-        // for the files it counts. The order is fixed in Core so this host and the
-        // window read the same way round.
+        // A mixed batch, which is where four sentences used to print. It is one
+        // line now and the number on it is the batch total, so stdout and the
+        // window's overlay cannot disagree about how many files were kept back.
         var written = CaptureStdout(() =>
             Program.ReportHeldBack(
                 new HeldBackReasons(Reclaimed: 2, RecordsChanged: 1, RecordsUnreadable: 1)));
 
         Assert.Equal(
-            new[]
-            {
-                string.Format(Strings.Completion_ReverifySkipped, 2, DisplayHelpers.PluraliseFile(2)),
-                string.Format(Strings.Completion_ReverifyRecordsChanged, 1, DisplayHelpers.PluraliseFile(1)),
-                string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
-            },
+            new[] { string.Format(Strings.Completion_HeldBack_Plural, 4) },
             written.TrimEnd().Split(Environment.NewLine));
+    }
+
+    [Fact]
+    public void ReportHeldBack_prints_the_same_line_whichever_cause_a_batch_met()
+    {
+        // The line names no cause, pinned on this host too because it is the host
+        // whose reader is likeliest to be scripting against the output. Two
+        // batches of four kept-back files, reached by different causes, one of them
+        // the cause that is about the machine rather than about any file.
+        var perFile = CaptureStdout(() =>
+            Program.ReportHeldBack(new HeldBackReasons(Reclaimed: 3, RecordsUnreadable: 1)));
+        var machineWide = CaptureStdout(() =>
+            Program.ReportHeldBack(new HeldBackReasons(OwnershipUnestablished: 4)));
+
+        Assert.Equal(perFile, machineWide);
+        Assert.Equal(string.Format(Strings.Completion_HeldBack_Plural, 4), perFile.TrimEnd());
     }
 
     [Fact]

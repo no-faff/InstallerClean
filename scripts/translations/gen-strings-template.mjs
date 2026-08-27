@@ -334,11 +334,10 @@ To put it back, you need the installer for the version you already have. Get it 
   // 0 = moved count, 1 = pluralised noun, 2 = destination path
   'Completion.MoveSummary.Singular': `{0} {1} moved to: {2}`,
   'Completion.MoveSummary.Plural': `{0} {1} moved to: {2}`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.ReverifySkipped': `{0} {1} kept in place, because the records now claim what the scan flagged.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} kept in place, because the Windows Installer records had changed by the final check.`,
-  'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read in the final check.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} kept in place, because Windows has a record of the program named inside.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
   'Completion.MoveCancelledSummary': `Moved {0} of {1} {2} before you cancelled.`,
@@ -596,7 +595,6 @@ To put it back, you need the installer for the version you already have. Get it 
   'Completion.NothingOffered': `Nothing offered on this PC`,
   'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered.`,
   'Completion.NothingOfferedBody.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here.`,
   'Summary.MissingFromDisk.OtherPrograms.Singular': `{0} other program`,
   'Summary.MissingFromDisk.OtherPrograms.Plural': `{0} other programs`,
   'Summary.MissingFromDisk.Unnamed.Singular': `{0} file with no program named in the records`,

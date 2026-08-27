@@ -10,9 +10,10 @@
 // eliminado/eliminados, movido/movidos), so the three CLI completion lines carry
 // .One overrides; the gerund progress lines (Moviendo/Eliminando) do not inflect
 // and need none. Status.RegisteredPackagesFound also overrides for the
-// registrado/registrados adjective agreement. Completion.ReverifySkipped carries
-// one too (conservado/conservados plus the necesitarlo/necesitarlos clitic): its
-// count drives both the noun and the .One selection, so the singular agrees. The
+// registrado/registrados adjective agreement. The four held-back sentences carried
+// .One overrides too, for the conservado/conservados participle, and went with the
+// sentences themselves when the 3.0.0 round replaced all four with one
+// Completion.HeldBack pair. The
 // three Completion.*CancelledSummary lines deliberately do NOT: their form is
 // picked by the total while the leading count varies, so they use the
 // count-invariant "Cancelaste tras <infinitive>" frame that reads right at any count.
@@ -77,12 +78,6 @@ const OVERRIDES = {
   'Cli.DeletedFiles.One': `Se eliminó definitivamente {0} {1} innecesario.`,
   'Cli.MovingFiles.One': `Moviendo {0} {1} innecesario a {2}...`,
   'Cli.MovedFiles.One': `Se movió {0} {1} innecesario.`,
-  'Completion.ReverifySkipped.One': `{0} {1} conservado en su sitio, porque los registros ahora reclaman lo que el análisis había marcado.`,
-  'Completion.ReverifyRecordsChanged.One': `{0} {1} conservado en su sitio, porque los registros de Windows Installer habían cambiado para la comprobación final.`,
-  // Same participle agreement as ReverifySkipped.One: "conservado" for a
-  // single file. The reason clause names no file, so nothing else inflects.
-  'Completion.ReverifyIncomplete.One': `{0} {1} conservado en su sitio, porque los registros de Windows Installer no se pudieron leer por completo en la comprobación final.`,
-  'Completion.ReverifyOwnershipUnestablished.One': `{0} {1} conservado en su sitio, porque para la comprobación final InstallerClean no pudo determinar con certeza qué archivos almacenados en caché pertenecen a los programas instalados aquí.`,
   // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
   // one of the two retired identity causes: no code reads it, so nothing passes
   // the prefix to Pluralise and the override could never be selected.
@@ -406,13 +401,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `Esa carpeta está en la misma unidad, así que el espacio no volverá hasta que la elimines. Elige una carpeta en otra unidad si quieres el espacio de inmediato.`,
   'Error.ScanCorrelationFailed': `InstallerClean no pudo hacer coincidir los registros de Windows Installer con el contenido de {InstallerFolder}. Casi nada de lo que señalan los registros está realmente ahí, y casi nada de lo que hay ahí lo nombra ningún registro, así que no se pudo demostrar que ningún archivo fuera innecesario. No se ha ofrecido nada y no se ha quitado nada.`,
   'Error.CandidateOutsideCache': `Este archivo no está directamente dentro de la carpeta de Windows Installer; rechazado por seguridad.`,
-  'Completion.ReverifySkipped': `{0} {1} conservados en su sitio, porque los registros ahora reclaman lo que el análisis había marcado.`,
   'Completion.MoveCancelledSummary': `Cancelaste tras mover {0} de {1} {2}.`,
   'Completion.PermanentDeleteCancelledSummary': `Cancelaste tras eliminar definitivamente {0} de {1} {2}.`,
   'Body.PendingReboot.Lead': `Estos archivos no se pueden limpiar ahora mismo.`,
   'Cli.TooManyArguments': `Error: argumento extra inesperado '{0}'. Si la carpeta de destino tiene un espacio, escribe toda la ruta entre comillas: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Carpeta por usuario; ejecuciones programadas o SYSTEM: /m RUTA.`,
-  'Completion.ReverifyIncomplete': `{0} {1} conservados en su sitio, porque los registros de Windows Installer no se pudieron leer por completo en la comprobación final.`,
   'Error.ScanRecordsUnreadable': `InstallerClean no pudo leer lo suficiente de los registros de Windows Installer para estar seguro de qué sigue haciendo falta: la lista de programas instalados llegó incompleta, y leer esos mismos registros directamente desde el registro de Windows también dio errores. Un archivo podría parecer huérfano solo porque el registro que lo nombra era uno de los ilegibles, así que InstallerClean se detuvo. No se ha eliminado nada.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer nunca señaló el final de la lista de programas instalados: InstallerClean se rindió tras {0} entradas (último código de error {1}). De una lista sin final no hay que fiarse, así que InstallerClean se detuvo. No se ha eliminado nada.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer nunca señaló el final de la lista de parches de un programa: InstallerClean se rindió tras {0} entradas (último código de error {1}). De una lista sin final no hay que fiarse, así que InstallerClean se detuvo. No se ha eliminado nada.`,
@@ -451,10 +444,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean no pudo tomar el bloqueo que usa Windows Installer para impedir que dos programas cambien el software instalado a la vez, así que no pudo descartar que un archivo pasara a ser necesario a mitad de camino, y no se ha movido nada. Inténtalo de nuevo, y reinicia Windows si sigue ocurriendo.`,
   'Cli.InstallerLockUnavailable': `Error: InstallerClean no pudo tomar el bloqueo de Windows Installer que impide que dos programas cambien el software instalado a la vez, así que no pudo descartar que un archivo pasara a ser necesario a mitad de camino. No se ha eliminado nada. Inténtalo de nuevo, y reinicia Windows si sigue ocurriendo.`,
   'Cli.MoveInstallerLockUnavailable': `Error: InstallerClean no pudo tomar el bloqueo de Windows Installer que impide que dos programas cambien el software instalado a la vez, así que no pudo descartar que un archivo pasara a ser necesario a mitad de camino. No se ha movido nada. Inténtalo de nuevo, y reinicia Windows si sigue ocurriendo.`,
-  'Completion.ReverifyRecordsChanged': `{0} {1} conservados en su sitio, porque los registros de Windows Installer habían cambiado para la comprobación final.`,
   'Completion.ReverifyIdentityClaimed': `{0} {1} conservados en su sitio, porque Windows tiene un registro del programa que se nombra dentro.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} conservados en su sitio, porque InstallerClean no encontró ningún programa nombrado dentro.`,
-  'Completion.ReverifyOwnershipUnestablished': `{0} {1} conservados en su sitio, porque para la comprobación final InstallerClean no pudo determinar con certeza qué archivos almacenados en caché pertenecen a los programas instalados aquí.`,
   'Completion.NothingRemoved': `No se quitó nada`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean no pudo hacer coincidir los registros de Windows Installer con el contenido de {InstallerFolder}. La carpeta tiene archivos, pero ni un solo registro señala nada de lo que hay ahí, así que no se pudo demostrar que ningún archivo fuera innecesario. No se ha ofrecido nada y no se ha quitado nada.`,
   'Completion.NothingOffered': `No se ofreció nada en este PC`,
@@ -464,6 +455,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

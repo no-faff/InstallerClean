@@ -377,13 +377,11 @@ const MAP = {
   'Confirm.MoveSameDrive': `那个文件夹在同一个驱动器上，所以在您删除它之前空间不会回来。如果想立刻拿回空间，请改选另一个驱动器上的文件夹。`,
   'Error.ScanCorrelationFailed': `InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。记录所指向的内容几乎都不在那里，而那里的内容几乎都没有被任何记录标明，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。`,
   'Error.CandidateOutsideCache': `此文件不直接位于 Windows Installer 文件夹内；为安全起见已拒绝。`,
-  'Completion.ReverifySkipped': `有 {0} 个{1}保持原位，因为记录现在认领了扫描标记出来的内容。`,
   'Completion.MoveCancelledSummary': `在您取消前，已移动 {1} 个{2}中的 {0} 个。`,
   'Completion.PermanentDeleteCancelledSummary': `在您取消前，已永久删除 {1} 个{2}中的 {0} 个。`,
   'Body.PendingReboot.Lead': `这些文件现在无法清理。`,
   'Cli.TooManyArguments': `错误：出现意外的多余参数“{0}”。如果目标文件夹的路径中含有空格，请给整个路径加上引号：/m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `该文件夹按用户保存；计划任务或 SYSTEM 运行需要 /m 路径。`,
-  'Completion.ReverifyIncomplete': `有 {0} 个{1}保持原位，因为最终检查时无法完整读取 Windows Installer 记录。`,
   'Error.ScanRecordsUnreadable': `InstallerClean 未能读取到足够的 Windows Installer 记录，无法确定哪些内容仍然需要：已安装程序的清单返回时并不完整，而直接从注册表读取同样的记录也遇到了错误。一个文件可能仅仅因为指明它的那条记录属于读不到的记录之一，就显得像是孤立的，因此 InstallerClean 停了下来。没有删除任何内容。`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer 始终没有发出已安装程序清单结束的信号：InstallerClean 在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer 始终没有发出某个程序补丁清单结束的信号：InstallerClean 在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。`,
@@ -422,10 +420,8 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有移动任何内容。请重试，若一直如此请重启 Windows。`,
   'Cli.InstallerLockUnavailable': `错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有删除任何内容。请重试，若一直如此请重启 Windows。`,
   'Cli.MoveInstallerLockUnavailable': `错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有移动任何内容。请重试，若一直如此请重启 Windows。`,
-  'Completion.ReverifyRecordsChanged': `有 {0} 个{1}保持原位，因为到最终检查时 Windows Installer 记录已经变了。`,
   'Completion.ReverifyIdentityClaimed': `有 {0} 个{1}保持原位，因为 Windows 有文件内所标示程序的记录。`,
   'Completion.ReverifyIdentityUnreadable': `有 {0} 个{1}保持原位，因为 InstallerClean 没能在文件内找到程序名。`,
-  'Completion.ReverifyOwnershipUnestablished': `有 {0} 个{1}保持原位，因为直到最终检查，InstallerClean 都无法确定缓存中的哪些文件属于这里安装的程序。`,
   'Completion.NothingRemoved': `没有移除任何内容`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。文件夹里有文件，但没有任何一条记录指向其中的任何内容，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。`,
   'Completion.NothingOffered': `在这台电脑上没有提供任何内容`,
@@ -435,6 +431,8 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Cli.SupersededHeldBack.Singular': `On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.`,
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
+  'Completion.HeldBack.Singular': `{0} file kept back. The scan said it was unneeded. The final check said otherwise.`,
+  'Completion.HeldBack.Plural': `{0} files kept back. The scan said these were unneeded. The final check said otherwise.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
