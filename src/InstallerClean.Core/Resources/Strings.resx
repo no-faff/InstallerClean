@@ -402,7 +402,9 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>No metadata available.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program or even Windows.</value>
+    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.
+
+To put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -822,8 +824,8 @@
        trouble day to day" and "can fail", never "will". Microsoft guarantees
        nothing here. Details carries the recovery step, which is why this closes
        by sending the reader there rather than trying to give it. -->
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Open Details for what to do.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do.</value></data>
   <!-- The two tails of that program list, and they are SEPARATE because they are
        different findings. The first is a program this app can name and had no
        room for; the second is a registration nothing named at all, which is the
@@ -1478,8 +1480,8 @@ The crash log could not be written.</value></data>
        THE COLON IS NEW AND FRENCH NEEDS A NARROW NO-BREAK SPACE BEFORE IT
        (U+202F), which the Edit tool silently flattens; check-french-spacing
        holds it. -->
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. To fix it, run that program's installer over your existing copy, and don't uninstall first: uninstalling is itself a step that needs this file. Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, but Microsoft doesn't guarantee it.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. To fix them, run each program's installer over your existing copy, and don't uninstall first: uninstalling is itself a step that needs these files. Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the files, but Microsoft doesn't guarantee it.</value></data>
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.</value></data>
   <!-- The command line's own copy of Summary.SupersededHeldBack, whose remarks
        carry the placeholder, why no cause is named, why "superseded" is earned and
        why neither host closes on a clause about listing.
@@ -1535,7 +1537,7 @@ The crash log could not be written.</value></data>
        this folder leaves the same record, this one included up to v2.3.0, and the
        entry sitting in a log beside this tool's name is a reason for care rather
        than a licence. -->
-  <data name="Cli.EventLogMissingFromDisk" xml:space="preserve"><value>{0} mode: {1} entries in the Windows records name a file that is not in the Installer cache. A repair, update or uninstall of the affected programs can fail.</value></data>
+  <data name="Cli.EventLogMissingFromDisk" xml:space="preserve"><value>{0} mode: {1} entries in the Windows records name a file that is not in the Installer cache. An update or uninstall of the affected programs can fail.</value></data>
   <!-- 0 = file count, 1 = pluralised noun "file"/"files". Never printed at a
        count of zero (see Program.cs), so it does not have to read sensibly
        there. It says "unneeded" for the same reason Cli.DeletedFiles below
