@@ -675,8 +675,16 @@ To put it back, you need the installer for the version you already have. Get it 
   <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} şu konuma taşındı: {2}</value></data>
   <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} şu konuma taşındı: {2}</value></data>
   <!-- What a Move or Delete held back, on the completion overlay and on stdout.
-       HeldBackReport is the single source and both hosts render from it, so
-       there is one sentence and neither host can answer differently.
+       HeldBackReport is the single source and both hosts render from it, so the
+       sentence itself cannot differ between them.
+
+       AND EACH HOST PRINTS IT ONCE PER RUN, WHICH IS THE OTHER HALF AND WAS NOT
+       TRUE UNTIL 3.0.0. Two producers hold files back, the pre-act re-verify and
+       the action service's re-read under the installer mutex, and each host ADDS
+       their tallies and prints the total. The command line printed one line each
+       for a while, which read as two findings while the sentences named causes and
+       as a repeat once they did not. A second print in one run is the fault rather
+       than the wording.
 
        0 = files held back. A PAIR RATHER THAN A FLAT STRING because the second
        sentence inflects with the count as well as the noun does ("it was"
@@ -711,9 +719,10 @@ To put it back, you need the installer for the version you already have. Get it 
        under the code the FILE declares about ITSELF. It does NOT establish that
        the records name this file, and cannot: the file is a candidate precisely
        because no registration names its path. So "the records claim this file"
-       would be false of every one of them, which is why this cannot reuse
-       Completion.ReverifySkipped, whose own meaning is that a live claim names
-       the file. One product that has cached a fresh package on each of twenty
+       would be false of every one of them, which is why this could not reuse the
+       held-back sentence that meant a live claim names the file. That sentence and
+       its three siblings went in 3.0.0, replaced by one Completion.HeldBack pair
+       naming no cause. One product that has cached a fresh package on each of twenty
        updates leaves nineteen files answering to a live code, so the plural case
        is the ordinary one and not the edge.
 
@@ -727,17 +736,19 @@ To put it back, you need the installer for the version you already have. Get it 
        a change it has not established. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifyIdentityClaimed.One/.Few/.Many override for its count
-       grammar. Parallel to its siblings from "kept in place, because" onwards,
-       because all of them can appear together, one per cause. -->
+       grammar. Its "kept in place, because" opening was parallel to a family of
+       held-back sentences that could appear together, one per cause; that family
+       went in 3.0.0 and this key is retired and unread, so the parallel is history
+       rather than a constraint on anything. -->
   <data name="Completion.ReverifyIdentityClaimed" xml:space="preserve"><value>{0} {1} yerinde bırakıldı, çünkü Windows'ta içeride adı geçen programın kaydı var.</value></data>
   <!-- The fifth state, and the only one about the FILE rather than about the
        records. The candidate yielded nothing that could be asked about: it would
        not open, it declares no code, or a patch names no product it targets.
 
-       THAT IS WHY IT CANNOT FOLD INTO Completion.ReverifyIncomplete, which says
-       the Windows Installer records could not be fully read. The records were
-       fine here and were never reached, so that sentence would be false of every
-       member. "Records" means the registration data everywhere else in this app,
+       THAT IS WHY IT COULD NOT FOLD INTO THE HELD-BACK SENTENCE FOR RECORDS THAT
+       COULD NOT BE READ, which is one of the four that went in 3.0.0. The records
+       were fine here and were never reached, so that sentence would have been false
+       of every member. "Records" means the registration data everywhere else in this app,
        and stretching it to cover a package's own contents would be a reading that
        is defensible and not ordinary.
 

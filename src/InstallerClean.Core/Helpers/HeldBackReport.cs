@@ -4,7 +4,7 @@ using InstallerClean.Services;
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Renders what a Move or Delete kept back, as one counted sentence naming no
+/// Renders what a Move or Delete held back, as one counted sentence naming no
 /// cause.
 ///
 /// It lives in Core rather than in either host because the two must answer
@@ -39,7 +39,7 @@ namespace InstallerClean.Helpers;
 internal static class HeldBackReport
 {
     /// <summary>
-    /// The sentence, or empty when nothing was kept back.
+    /// The sentence, or empty when nothing was held back.
     ///
     /// ONE STRING RATHER THAN A LIST, which is what it returned while there were
     /// four sentences to put in order. Ordering was the only thing the list
@@ -49,7 +49,7 @@ internal static class HeldBackReport
     /// join differently. A second sentence would bring the list back with it, and
     /// with an ordering rule that is alive.
     ///
-    /// A COUNT OF ZERO MUST NEVER REACH THE SENTENCE. A run that kept nothing back
+    /// A COUNT OF ZERO MUST NEVER REACH THE SENTENCE. A run that held nothing back
     /// prints nothing at all, which is the commonest run by far, and that is what
     /// the empty string here is for rather than a "0 files" line.
     /// </summary>

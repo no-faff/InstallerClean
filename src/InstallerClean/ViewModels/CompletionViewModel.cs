@@ -341,25 +341,25 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// The "N files kept in place" block for a completion overlay, or empty when
-    /// the act-time re-verify kept nothing back. Shown alongside the Move/Delete
-    /// summary so the totals still add up (acted on + kept = the scan's
-    /// candidates).
+    /// The held-back line for a completion overlay, or empty when the act-time
+    /// re-verify held nothing back. Shown alongside the Move or Delete summary so
+    /// the totals add up: acted on + held back = what the user selected, and that
+    /// is the whole of what the line is for.
     ///
-    /// The reasons come from the re-verify, never from the count, and there is one
-    /// line per cause that occurred rather than one sentence for the batch. A
-    /// re-verify that could not read the records keeps files back without any
-    /// program having reclaimed them, so a batch that met both causes and reported
-    /// either alone would state a cause that did not occur for some of its files.
-    /// The ordering and the sentences are Core's
-    /// (<see cref="HeldBackReport.Lines"/>), because the command line prints the
-    /// same partition and the two must not answer differently for one machine
-    /// state.
+    /// ONE SENTENCE, NAMING NO CAUSE, AND IT IS CORE'S
+    /// (<see cref="HeldBackReport.Line"/>) because the command line prints the same
+    /// one and the two hosts must not answer differently for one machine state.
+    /// There were four until 3.0.0, one per cause, and this note argued for them on
+    /// the ground that a sentence chosen for the batch would be false of some of
+    /// its files. It is not chosen: every file on the line was offered by the scan
+    /// and not confirmed by the check made immediately before acting, which is true
+    /// of all four causes by construction. The causes survive as counts on
+    /// <see cref="HeldBackReasons"/> and in the opt-in result log.
     ///
-    /// One sentence since 3.0.0, so there is nothing left to join: it is read by a
-    /// wrapping TextBlock as it comes. The all-skipped overlay routes this through
-    /// <see cref="Summary"/> instead, whose inlines are composed in the window's
-    /// code-behind; that path splits on newlines and one line simply yields one Run.
+    /// Nothing left to join, so it is read by a wrapping TextBlock as it comes. The
+    /// all-skipped overlay routes it through <see cref="Summary"/> instead, whose
+    /// inlines are composed in the window's code-behind; that path splits on
+    /// newlines and one sentence yields one Run and no break.
     /// </summary>
     private static string SkippedText(ReverifyResult? reverify) =>
         reverify is null ? string.Empty : HeldBackReport.Line(reverify.Reasons);
@@ -583,13 +583,17 @@ public partial class CompletionViewModel : ObservableObject
         Heading = Strings.Completion_NothingRemoved;
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
-        // EVERY OUTCOME KEEPS ITS LINE AND ITS COUNT, and no condition overrides the
-        // partition any more. One did until 3.0.0: the machine gaining a product
+        // EVERY CAUSE REACHES THE COUNT AND NO CONDITION OVERRIDES IT. One did until
+        // 3.0.0: the machine gaining a product
         // installed as a second instance of itself between the scan and the click,
         // which was not a finding about the files at all, so no file in the batch was
         // at fault and the per-file causes had nothing to say about any of them. It
-        // went with the check that detected it, and if a whole-batch condition ever
-        // returns it needs the same treatment rather than a per-file line.
+        // went with the check that detected it.
+        //
+        // A WHOLE-BATCH CONDITION RETURNING WOULD NOW NEED LESS, NOT THE SAME, which
+        // is why this is not left as it stood: the line names no cause, so such a
+        // condition needs no sentence of its own and no override, only a count that
+        // reaches Total like every other.
         Summary = SkippedText(reverify);
         Restore = string.Empty;
         Errors = string.Empty;

@@ -133,7 +133,9 @@ public sealed class RemovableReverifier : IRemovableReverifier
         {
             // The path's own finding first where there is one, because it is the
             // stronger thing to have found out: a live claim on this file says more
-            // than a fact about the machine, and the report names the cause.
+            // than a fact about the machine. Nothing the user reads names either
+            // since 3.0.0, so what the order decides now is which counter the file
+            // lands in, and the counters are what the opt-in report carries.
             if (nonRemovable.TryGetValue(path, out var reason))
             {
                 dropped.Add(path);

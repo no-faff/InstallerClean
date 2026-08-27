@@ -1830,7 +1830,7 @@ public class MainViewModelTests
         // re-verify kept one file back and the under-lease re-read kept a DIFFERENT
         // one back. Two files, two causes, ONE line, and the number on it is two.
         // The regression this now catches is a fold that loses a side, which would
-        // print "1 file kept back" over a batch that kept back two and leave the
+        // print "1 file held back" over a batch that held back two and leave the
         // overlay's own arithmetic wrong.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>

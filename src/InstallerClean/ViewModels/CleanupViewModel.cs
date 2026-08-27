@@ -1384,12 +1384,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     ///
     /// Which side of the mutex a file was condemned on is a fact about how the
     /// check is built rather than about what happened to the file, so the two
-    /// producers earn no separate lines and no wording of their own. What the file
-    /// was condemned FOR is not: the two producers keep back different files and
-    /// can meet different causes, so the tallies are ADDED rather than merged into
-    /// a single cause for the batch. Adding is what lets one line per cause carry
-    /// its own count; anything that collapsed them would put one sentence over
-    /// files it is false of.
+    /// producers earn no line of their own. The tallies are ADDED rather than
+    /// merged, because the two hold back DIFFERENT files: the one number the user
+    /// reads is every file the run held back, and anything that merged rather than
+    /// added would under-count it.
+    ///
+    /// THAT ARGUMENT USED TO BE ABOUT CAUSES rather than about the total, adding
+    /// keeping one line per cause carrying its own count. There is one line now and
+    /// it names no cause. The per-cause counts survive underneath, for the opt-in
+    /// result log, and adding is what keeps those right as well.
     ///
     /// The claims move with the paths, because the three collections describe one
     /// set of files and have to agree: a path leaving <c>Surviving</c> for

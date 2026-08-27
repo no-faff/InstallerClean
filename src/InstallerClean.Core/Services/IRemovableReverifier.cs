@@ -155,13 +155,22 @@ public readonly record struct UnderLeaseClaims(
 }
 
 /// <summary>
-/// Why one file was kept back. Four states, because they are four different things
-/// to have found out and the report the user reads names the cause: a confirmed
-/// positive, an inability, neither, and one that is not about the file at all.
+/// Why one file was held back. Four states, because they are four different things
+/// to have found out: a confirmed positive, an inability, neither, and one that is
+/// not about the file at all.
+///
+/// NOTHING THE USER READS NAMES ANY OF THEM, WHICH IS A CHANGE FROM 3.0.0 AND IS
+/// WHY THIS COMMENT NO LONGER ARGUES FOR A PARTITION. The screen and stdout carry
+/// one counted sentence naming no cause, on the ground that every file on it was
+/// offered by the scan and not confirmed by the check made immediately before
+/// acting, which is true of all four by construction. These four survive as
+/// COUNTS: they travel in the opt-in result log and are the only place a machine's
+/// causes can still be told apart.
 ///
 /// THE FIRST THREE ARE ABOUT THE REGISTRATION THAT NAMES THIS PATH. The fourth is
-/// about the machine, and it is reached without reading anything about the path, so
-/// no sentence covers all four. That is what the partition is for.
+/// about the machine and is reached without reading anything about the path, which
+/// is why it could not fold into any of them while each had a sentence, and why it
+/// is still worth counting separately now that none has.
 /// </summary>
 public enum HeldBackReason
 {
@@ -235,14 +244,16 @@ public enum HeldBackReason
     /// from the three above and is why it could not fold into any of them. Those
     /// are findings about the registration that names this path: a live claim, a
     /// registration that has gone, a read that failed. This one is reached without
-    /// looking at the path at all, and the sentence it carries has to say so.
+    /// looking at the path at all, which is why it earns a count of its own even
+    /// though no sentence names it.
     ///
     /// WHAT REACHES IT is asked of the census where the members live
     /// (<see cref="Models.EnumerationCensus.AnyRecordedPathUnestablished"/> and
     /// <see cref="Models.EnumerationCensus.SecondInstanceNotRuledOut"/>), on the
     /// same rule as the scan's own withholding: a condition added to either is
     /// acted on here without this file being edited. Two different findings reach
-    /// it today and neither may be named in the copy.
+    /// it today, which is one reason among several that the copy names no cause at
+    /// all.
     ///
     /// IT DROPS THE WALK-DERIVED HALF OF A BATCH AND NOT THE WHOLE OF IT, which
     /// matches what the scan does rather than what the removed version did. The
@@ -257,13 +268,19 @@ public enum HeldBackReason
 }
 
 /// <summary>
-/// How many files were kept back for each cause. Counts rather than one cause for
-/// the set, because a batch can meet more than one and a sentence that is true of
-/// four files out of five is false.
+/// How many files were held back for each cause. Counts rather than one cause for
+/// the set, because a batch can meet more than one.
 ///
-/// The counts are the whole of what the report needs, the paths themselves being
-/// carried alongside by whichever result holds this. Every producer increments at
-/// the point it adds the path, so the two cannot come apart, and
+/// THEY ARE INSTRUMENTATION NOW RATHER THAN COPY. The report reads
+/// <see cref="Total"/> and nothing else, one sentence naming no cause; these four
+/// travel in the opt-in result log, which is the only place the causes can still be
+/// told apart on a real machine. This note used to justify them by a sentence being
+/// false of four files in five, which was the argument for the partition that
+/// replaced them.
+///
+/// The paths themselves are carried alongside by whichever result holds this. Every
+/// producer increments at the point it adds the path, so the two cannot come apart,
+/// and
 /// <see cref="Total"/> is what a test holds them to.
 /// </summary>
 public readonly record struct HeldBackReasons(
@@ -272,7 +289,11 @@ public readonly record struct HeldBackReasons(
     int RecordsUnreadable = 0,
     int OwnershipUnestablished = 0)
 {
-    /// <summary>Files kept back for any cause. Equals the accompanying path list's count.</summary>
+    /// <summary>
+    /// Files held back for any cause, and the ONLY member the report reads: the
+    /// user's sentence counts this and names nothing. Equals the accompanying path
+    /// list's count.
+    /// </summary>
     public int Total =>
         Reclaimed + RecordsChanged + RecordsUnreadable + OwnershipUnestablished;
 
@@ -282,7 +303,7 @@ public readonly record struct HeldBackReasons(
     /// EVERY MEMBER IS NAMED AND THE DEFAULT THROWS, which is a change and is the
     /// point of it. The default arm used to be <see cref="HeldBackReason.RecordsUnreadable"/>,
     /// so a cause added to the enum and forgotten here compiled, built green and was
-    /// counted and reported as a read that failed: a file kept back under a sentence
+    /// counted and reported as a read that failed: a file held back under a sentence
     /// naming a cause that did not occur, with nothing anywhere to see. This project
     /// has shipped that shape once already, in a rename that would have made every
     /// delete-failure report unreadable. A member added to the enum now fails at the
@@ -300,15 +321,20 @@ public readonly record struct HeldBackReasons(
         HeldBackReason.OwnershipUnestablished =>
             this with { OwnershipUnestablished = OwnershipUnestablished + 1 },
         _ => throw new ArgumentOutOfRangeException(nameof(reason), reason,
-            "A held-back cause with no counter. Add it to HeldBackReasons and to "
-            + "HeldBackReport.Lines in the same edit as the enum member."),
+            "A held-back cause with no counter. Add it to HeldBackReasons in the "
+            + "same edit as the enum member. The report needs nothing: it counts "
+            + "Total and names no cause."),
     };
 
     /// <summary>
-    /// Merges two tallies, for the fold that joins what the pre-act re-verify kept
+    /// Merges two tallies, for the fold that joins what the pre-act re-verify held
     /// back to what the under-lease re-read did. Addition rather than an OR of
-    /// flags: the two producers keep back DIFFERENT files, so their causes
+    /// flags: the two producers hold back DIFFERENT files, so their counts
     /// accumulate instead of one standing in for both.
+    ///
+    /// IT IS WHAT MAKES THE RUN'S ONE LINE COUNT THE WHOLE BATCH. Both hosts fold
+    /// through this and print once; anything that merged rather than added would
+    /// under-count the only number on that line.
     /// </summary>
     public static HeldBackReasons operator +(HeldBackReasons a, HeldBackReasons b) =>
         new(a.Reclaimed + b.Reclaimed,
@@ -344,8 +370,9 @@ public record UnderLeaseRecheck(
 /// How many of <see cref="Dropped"/> fell to each cause. Per file rather than per
 /// run: an enumeration that could not read every product withholds the removable
 /// class, so a single batch can hold both a file a live registered product claims
-/// and a file whose verdict was withheld, and one cause for the set would name a
-/// cause that did not occur for some of them.
+/// and a file whose verdict was withheld. Nothing shown to a user distinguishes
+/// them; the split is kept because the opt-in result log carries it, and because a
+/// count per cause is the only way to size what each condition costs in the field.
 /// </param>
 /// <param name="SurvivingPatchClaims">
 /// Every claim naming a path in <see cref="Surviving"/>, for the action service

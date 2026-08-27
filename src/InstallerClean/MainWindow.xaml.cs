@@ -739,12 +739,17 @@ public partial class MainWindow : Window
     /// uses for its hyperlink) is deliberate: the destination is a user-chosen
     /// folder path that could itself contain a literal '[' or ']'.
     ///
-    /// The summary is not always one line: the overlay shown when the act-time
-    /// re-check kept the WHOLE batch back puts the held-back block here, and that
-    /// block carries a line per cause that occurred. Every Run therefore goes
+    /// The summary can be more than one line: the overlay shown when the act-time
+    /// re-check held the WHOLE batch back puts the held-back sentence here, and the
+    /// destination line below is forced onto its own. Every Run therefore goes
     /// through <see cref="AddTextWithLineBreaks"/> rather than straight into
     /// Inlines, so the breaks are ones this method made rather than ones a text
     /// formatter is trusted to find.
+    ///
+    /// THE HELD-BACK BLOCK CARRIED A LINE PER CAUSE UNTIL 3.0.0 AND IS ONE SENTENCE
+    /// NOW, which changes nothing here and is said so nobody removes the splitting
+    /// on that reading: a value with no newline yields exactly one Run and no break,
+    /// which is what the all-skipped overlay renders today.
     /// </summary>
     private void BuildCompletionSummaryLine()
     {

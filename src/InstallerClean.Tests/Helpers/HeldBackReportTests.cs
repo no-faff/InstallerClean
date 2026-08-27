@@ -43,7 +43,7 @@ public class HeldBackReportTests
     public void Several_causes_produce_one_sentence_carrying_the_batch_total()
     {
         // The collapse itself. Four causes occurred; the reader gets one line and
-        // the number on it is every file kept back, not the largest cause's count
+        // the number on it is every file held back, not the largest cause's count
         // and not the number of causes.
         var reasons = new HeldBackReasons(
             Reclaimed: 4, RecordsChanged: 2, RecordsUnreadable: 1, OwnershipUnestablished: 3);
@@ -76,7 +76,7 @@ public class HeldBackReportTests
     [Fact]
     public void The_count_on_the_sentence_accounts_for_every_file_kept_back()
     {
-        // The totals have to add up on screen: acted on + kept back = what the
+        // The totals have to add up on screen: acted on + held back = what the
         // user selected. So the sentence carries Total and nothing narrower.
         var reasons = new HeldBackReasons(Reclaimed: 4, RecordsChanged: 2, RecordsUnreadable: 1);
 

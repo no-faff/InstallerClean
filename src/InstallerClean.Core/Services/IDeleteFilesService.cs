@@ -89,10 +89,15 @@ public interface IDeleteFilesService
 /// </param>
 /// <param name="HeldBackReasons">
 /// How many of the <see cref="HeldBack"/> paths fell to each cause. Carried
-/// through so the caller folds it into <see cref="ReverifyResult.Reasons"/> and
-/// the user is shown one line per cause that occurred: the causes have different
-/// copy, and a single batch can meet more than one, so a sentence chosen for the
-/// set would name a cause that did not happen to some of the files.
+/// through so the caller ADDS it to <see cref="ReverifyResult.Reasons"/>: the two
+/// producers hold back different files, so the run's one held-back line counts
+/// both and neither host prints twice.
+///
+/// THE COUNTS OUTLIVED THE SENTENCES THEY WERE FOR. Until 3.0.0 the user was shown
+/// one line per cause, and this note gave that as the reason for carrying them
+/// through. The line names no cause now, and these are still carried because they
+/// travel in the opt-in result log, which is the only place the causes can still
+/// be told apart on a real machine.
 /// </param>
 public record DeleteResult(
     int DeletedCount,

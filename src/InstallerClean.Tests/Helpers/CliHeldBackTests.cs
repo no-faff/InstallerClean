@@ -117,7 +117,7 @@ public class CliHeldBackTests
     {
         // A mixed batch, which is where four sentences used to print. It is one
         // line now and the number on it is the batch total, so stdout and the
-        // window's overlay cannot disagree about how many files were kept back.
+        // window's overlay cannot disagree about how many files were held back.
         var written = CaptureStdout(() =>
             Program.ReportHeldBack(
                 new HeldBackReasons(Reclaimed: 2, RecordsChanged: 1, RecordsUnreadable: 1)));
