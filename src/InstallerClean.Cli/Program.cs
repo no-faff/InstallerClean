@@ -1138,9 +1138,10 @@ internal static class Program
     /// destination problem and not where those files went.
     /// </summary>
     /// <remarks>
-    /// The summary and the error block come first, in the shape an ordinary
-    /// <c>/m</c> prints them, so a script's <c>\d+ errors:</c> scrape lands where
-    /// it always does; the guard's reason follows.
+    /// The summary, the error block and the line naming the backup folder come
+    /// first, in the shape and the order an ordinary <c>/m</c> prints them, so a
+    /// script's <c>\d+ errors:</c> scrape lands where it always does; the guard's
+    /// reason follows.
     /// </remarks>
     private static int ReportAbortedMove(
         string arg, MoveAbortedException ex, string moveDest, int count,
@@ -1159,6 +1160,19 @@ internal static class Program
             foreach (var err in partial.Errors)
                 Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
         }
+        // IT NAMES ex.Destination AND NOT THE PATH THIS METHOD WAS HANDED, which is
+        // the one difference between this call and the ordinary /m one. The two
+        // folders are the same everywhere else in the host and differ in exactly the
+        // case this method reports, and the files are in the first: the line's whole
+        // job is to name the folder somebody has to go and delete, so naming the
+        // configured path would send them to a folder their backup is not in and
+        // leave the folder holding it unnamed. The sentence below names the
+        // configured path on purpose and for the opposite reason, asking the reader
+        // to go and look at what they set.
+        //
+        // After the error block and only where something moved, as in the /m branch.
+        if (partial.MovedCount > 0)
+            Console.WriteLine(string.Format(Strings.Cli_MoveRestoreHint, ex.Destination));
         // The command line's wording of the guard's sentence rather than
         // ex.Message, which is the window's: that one closes on Re-scan, a button
         // this surface has not got. Substituting it is sound because
