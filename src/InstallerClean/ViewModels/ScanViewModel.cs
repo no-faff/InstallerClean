@@ -511,8 +511,9 @@ public partial class ScanViewModel : ObservableObject
     /// the user-driven Scan command, the startup scan and the re-verify all
     /// diagnose a failure the same way instead of each inventing its own. The
     /// two arms that write the crash log name its path in the message they return,
-    /// and this is called once per failure, so neither writes twice. <see cref="OperationCanceledException"/> is
-    /// handled by its own catch and never reaches here.
+    /// and this is called once per failure, so neither writes twice.
+    /// <see cref="OperationCanceledException"/> is handled by its own catch and
+    /// never reaches here.
     /// </summary>
     internal ScanFailure DescribeScanFailure(Exception ex) => ex switch
     {
@@ -549,8 +550,7 @@ public partial class ScanViewModel : ObservableObject
         var crash = CrashLog.TryWrite(ex);
         var message = crash.Written
             ? ex.Message + Environment.NewLine + Environment.NewLine
-                + string.Format(Strings.Error_ScanStoppedDetails,
-                    CompositionParsing.InsertPathWrapPoints(crash.Path))
+                + string.Format(Strings.Error_ScanStoppedDetails, crash.Path)
             : ex.Message;
         return new ScanFailure(message, Strings.Error_InstallerDbUnavailableTitle,
             IsError: true, Strings.Status_ScanFailedDb);
@@ -563,14 +563,13 @@ public partial class ScanViewModel : ObservableObject
         // another user's profile.
         var crash = CrashLog.TryWrite(ex);
         var typeName = ex.GetType().Name;
-        // THE PATH IS GIVEN WRAP POINTS, and the pane it lands in is why. It is
-        // drawn wrapping, and nothing else here binds this path, so without them a
-        // long one breaks after the drive letter or inside a folder name in the one
-        // sentence telling somebody where to find the file. The other places the app
-        // shows a path do the same.
+        // THE PATH GOES IN RAW AND THE BREAK OPPORTUNITIES ARE ADDED WHERE IT IS
+        // DRAWN, by InstallerPathTextConverter. This string reaches two surfaces: the
+        // intro line, which is laid out, and the scan announcer, which is never drawn
+        // and takes it unbound. Inserting them here would hand a speech engine
+        // invisible format characters for a layout that does not exist.
         var message = crash.Written
-            ? string.Format(Strings.Status_ScanFailedDetails, typeName,
-                CompositionParsing.InsertPathWrapPoints(crash.Path))
+            ? string.Format(Strings.Status_ScanFailedDetails, typeName, crash.Path)
             : string.Format(Strings.Status_ScanFailedDetails_NoLog, typeName);
         return new ScanFailure(message, Strings.Error_ScanFailedTitle, IsError: true, message);
     }

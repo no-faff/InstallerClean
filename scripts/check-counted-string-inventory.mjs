@@ -73,7 +73,7 @@ function inventoryPrefixes(source) {
   const braced = source.indexOf('};', head);
   const bracketed = source.indexOf('];', head);
   const ends = [braced, bracketed].filter((i) => i !== -1);
-  if (ends.length === 0) fail(`{inventoryPath}: CountedPrefixes is not closed, so its end cannot be located.`);
+  if (ends.length === 0) fail(`${inventoryPath}: CountedPrefixes is not closed, so its end cannot be located.`);
   return literals(source.slice(head, Math.min(...ends)));
 }
 

@@ -50,9 +50,15 @@ public class ScanViewModelStoppedScanTests
     {
         // Whether the log can be written is a property of the host: the write goes
         // through Win32, so it succeeds where the app runs and fails where the suite
-        // is being run for convenience. Asking first is what lets both forms be
-        // pinned rather than one of them being skipped past.
+        // is being run for convenience. Asking first is what decides which form to
+        // assert; each host pins one of the two and neither pins both.
         var probe = CrashLog.TryWrite(new InvalidOperationException("probe"));
+
+        // WHERE THE LOG ALREADY ENDS, because the log is appended to and kept until
+        // it reaches half a megabyte. Reading the whole file would find this account
+        // from any earlier run on the same machine, so a method that had stopped
+        // writing would still pass here and pass for ever after the first time.
+        long alreadyThere = probe.Written ? new FileInfo(probe.Path).Length : 0;
 
         var failure = NewViewModel().DescribeScanFailure(AScanThatStopped());
         var added = failure.Message[Strings.Error_InstallerDbEmpty.Length..].Trim();
@@ -65,10 +71,10 @@ public class ScanViewModelStoppedScanTests
 
         Assert.Contains("crash.log", added, StringComparison.OrdinalIgnoreCase);
 
-        // The file itself, not only the sentence about it. Half of what this test is
-        // named for is that the account was written down, and nothing read it back.
-        Assert.Contains(Strings.Error_InstallerDbEmpty, File.ReadAllText(probe.Path),
-            StringComparison.Ordinal);
+        // The file itself, not only the sentence about it, and only what this run
+        // added to it.
+        var appended = File.ReadAllText(probe.Path)[(int)alreadyThere..];
+        Assert.Contains(Strings.Error_InstallerDbEmpty, appended, StringComparison.Ordinal);
     }
 
     [Fact]

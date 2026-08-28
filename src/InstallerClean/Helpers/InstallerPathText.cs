@@ -75,10 +75,73 @@ internal static class InstallerPathText
     // Windows lives elsewhere, so the path would break there and only there.
     private static readonly string InstallerFolder = InstallerCacheHelpers.InstallerFolder;
 
+    // The crash log's own path, resolved for the same reason the folder above is.
+    private static readonly string LogPath = CrashLog.LogPath;
+
+    // Spelled out for the same reason as the joiner below it. A break opportunity
+    // rather than a prohibition: this path is long enough that holding it whole
+    // would push it off the pane instead of wrapping it.
+    private const char ZeroWidthSpace = '\u200B';
+
     // Spelled as an escape rather than typed, so it is visible in the editor
     // and in a diff, and cannot be flattened to a plain space by tooling. The
     // same reason InsertPathWrapPoints spells its zero-width space out.
     private const char WordJoiner = '\u2060';
+
+    /// <summary>
+    /// Returns <paramref name="text"/> with the crash log's path made to break at
+    /// its folders rather than wherever it happens to land, or unchanged when it
+    /// names no such path.
+    ///
+    /// THE OPPOSITE TREATMENT FROM THE ONE ABOVE, AND THE LENGTH IS WHY. The cache
+    /// folder is short enough to hold whole; this path runs through a user profile
+    /// and holding it whole would push it off the pane rather than wrap it. So the
+    /// backslashes gain break opportunities and the drive seam gains the joiner,
+    /// which is the one break UAX #14 allows inside a path and the one this project
+    /// observed happening. Without it a narrow pane can still leave <c>C:</c> alone
+    /// at the end of a line.
+    ///
+    /// <c>CompositionParsing.InsertPathWrapPoints</c> does the backslash half for
+    /// the destination path in two windows that build their text in code-behind.
+    /// This is the same idea at the binding, where it can also close the drive seam.
+    /// </summary>
+    public static string AllowFolderBreaksInLogPath(string? text) =>
+        AllowFolderBreaksIn(text, LogPath);
+
+    /// <summary>
+    /// The whole of the work above, with the path to look for handed in.
+    ///
+    /// SPLIT OUT SO IT CAN BE TESTED AGAINST A PATH RATHER THAN AGAINST THE HOST'S.
+    /// The log lives under the profile, so on a machine that is not Windows it holds
+    /// no backslash and no drive letter at all, and a test driven off the real value
+    /// there counts zero separators against zero insertions and passes whatever the
+    /// method does.
+    /// </summary>
+    internal static string AllowFolderBreaksIn(string? text, string path)
+    {
+        if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(path))
+            return text ?? string.Empty;
+
+        int at = text.IndexOf(path, StringComparison.OrdinalIgnoreCase);
+        if (at < 0)
+            return text;
+
+        var matched = text.AsSpan(at, path.Length);
+        var built = new StringBuilder(text.Length + path.Length);
+        built.Append(text, 0, at);
+
+        for (int i = 0; i < matched.Length; i++)
+        {
+            built.Append(matched[i]);
+            if (matched[i] == '\\')
+                built.Append(ZeroWidthSpace);
+            else if (matched[i] == ':' && i + 1 < matched.Length && matched[i + 1] == '\\')
+                built.Append(WordJoiner);
+        }
+
+        built.Append(text, at + path.Length, text.Length - at - path.Length);
+        return built.ToString();
+    }
 
     /// <summary>
     /// Returns <paramref name="text"/> with every occurrence of the installer
@@ -140,7 +203,8 @@ internal static class InstallerPathText
 internal sealed class InstallerPathTextConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => InstallerPathText.KeepWhole(value as string);
+        => InstallerPathText.AllowFolderBreaksInLogPath(
+            InstallerPathText.KeepWhole(value as string));
 
     // One-way only: the joiners are for the screen, and putting them back into
     // a view model would be a data change rather than a rendering one.

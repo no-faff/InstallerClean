@@ -28,6 +28,14 @@ public static class CrashLog
     private static readonly string ArchiveFile = Path.Combine(LogFolder, "crash.log.old");
 
     /// <summary>
+    /// Where the log lives, for the one caller that needs to recognise the path
+    /// inside a sentence without writing anything: the drawing layer gives it its
+    /// break opportunities, and a hardcoded spelling would match nothing on a
+    /// machine whose profile sits elsewhere.
+    /// </summary>
+    public static string LogPath => LogFile;
+
+    /// <summary>
     /// Appends the exception to crash.log and returns the log path.
     /// Swallows IO errors (a crash handler must never throw); use
     /// <see cref="TryWrite"/> to also learn whether the write
