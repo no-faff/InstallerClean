@@ -910,9 +910,11 @@ public class MainViewModelTests
         //
         // THE SAME-DRIVE ASSERTION BELOW IS FALSE WHERE THEY PART. With a
         // volume mounted at C:\Windows\Installer the folder built from this root
-        // is on another volume, DestinationIsOnCacheVolume stays false, the
-        // tooltip keeps the plain wording and the Tooltip_MoveSameDrive
-        // assertion fails.
+        // is on another volume, so Windows settles the question rather than
+        // declining it, DestinationIsOnCacheVolume lands false, the tooltip
+        // becomes Tooltip_MoveNotSameDrive and the Tooltip_MoveSameDrive
+        // assertion fails. False is an answer here and not an absence, which is
+        // why it names a drive.
         //
         // A FIXTURE UNDER THE CACHE FOLDER WOULD ANSWER SAME-DRIVE ON EITHER
         // HOST, AND WHAT IT WOULD PIN IS A STATE A USER CAN REACH. Nothing on
@@ -990,9 +992,12 @@ public class MainViewModelTests
         vm.Cleanup.DestinationIsOnCacheVolume = false;
         Assert.Equal(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
 
-        // An empty box outranks whatever answer is still standing for the path
-        // that has just gone. It is the fourth state and not a special case.
+        // An empty box outranks a volume answer, and the flag is set AFTER the
+        // box so that there is one to outrank. Clearing the box nulls the flag
+        // on its own, so the order of these two lines is what makes this the
+        // precedence rather than the empty branch standing on its own.
         vm.Cleanup.MoveDestination = string.Empty;
+        vm.Cleanup.DestinationIsOnCacheVolume = true;
         Assert.Equal(Strings.Tooltip_MoveNeedsDestination, vm.Cleanup.MoveButtonTooltip);
     }
 
