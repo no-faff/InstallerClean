@@ -7,11 +7,20 @@ using InstallerClean.Services;
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Keeps the installer cache folder's path whole when the UI draws it, by
-/// binding its punctuation seams with U+2060 WORD JOINER as the text goes to a
-/// control. Wrapped in a paragraph, the path broke after the drive's
-/// <c>C:</c> and carried on <c>\Windows\Installer</c> on the next line, which
-/// reads as two things rather than one.
+/// Two opposite treatments of a path as the text goes to a control, and both are
+/// about where a line is allowed to break.
+///
+/// The installer cache folder's path is held whole, its punctuation seams bound
+/// with U+2060 WORD JOINER. Wrapped in a paragraph, the path broke after the
+/// drive's <c>C:</c> and carried on <c>\Windows\Installer</c> on the next line,
+/// which reads as two things rather than one.
+///
+/// The crash log's path gets the reverse, U+200B at its folder boundaries so that
+/// it breaks there rather than wherever it lands. That one runs through a user
+/// profile, so holding it whole would push it off the pane instead of wrapping it.
+/// Its drive seam still takes the joiner, that being the one break UAX #14 allows
+/// inside a path. <see cref="ForDrawing"/> applies the pair, because a sentence can
+/// name either path and the scan diagnoses name both.
 ///
 /// Why here rather than in the strings: this is presentation, and every resx
 /// value in sixteen languages stays exactly as the translators wrote it. It
