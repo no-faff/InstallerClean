@@ -373,8 +373,8 @@
        IT SAYS NOTHING ABOUT SPACE AND NOTHING ABOUT SAFETY. Both are on the
        main window above these buttons, where they are explained rather than
        asserted in a hover, and the safety claim there carries the link into
-       the README that lets a reader check it. The claim is made once more on
-       the delete confirmation, which is the last surface before the act. -->
+       the README that lets a reader check it. The delete confirmation states it
+       too, and is the last surface before the act. -->
   <data name="Tooltip.Delete" xml:space="preserve"><value>Delete the unneeded files permanently. Use Move instead if you'd like a chance to satisfy yourself all is well.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
 
