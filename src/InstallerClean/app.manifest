@@ -30,7 +30,7 @@
            turn a positive answer into a false one inside the condition that decides
            whether a cached patch is still needed, with a green build and no test going
            red. The other end of this is commented at
-           InstallerQueryService.ResolveProductInstance. -->
+           InstallerQueryService.ResolveProductInstances. -->
         <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
       </requestedPrivileges>
     </security>

@@ -67,6 +67,25 @@ internal sealed class FakeMsiApi : IMsiApi
     public HashSet<string> NotInstalled { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
+    /// The instances a KEYED product query enumerates for one product code, in
+    /// enumeration order. One code can name more than one installation, per machine and
+    /// per user at once or under two accounts, and each is its own row with its own
+    /// account and context, so this is how a fixture builds the machine that has two.
+    ///
+    /// A code with no entry here is one ordinary per-machine instance, which is what
+    /// every fixture that says nothing about instances is describing.
+    /// </summary>
+    public Dictionary<string, List<(string? Sid, MsiInstallContext Context)>> KeyedInstances { get; } =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// What one ROW of a keyed enumeration returns, keyed by (product, index). It wins
+    /// over everything else, which is what builds a walk that reads an instance and then
+    /// meets a return it cannot read.
+    /// </summary>
+    public Dictionary<(string ProductCode, uint Index), uint> KeyedRowResult { get; } = new();
+
+    /// <summary>
     /// Fails ONE row of a product's patch enumeration, keyed by (product,
     /// index). Distinct from <see cref="PatchEnumResult"/>, which refuses the
     /// product's enumeration outright: this is the scattered-failure case the
@@ -101,6 +120,9 @@ internal sealed class FakeMsiApi : IMsiApi
     public uint? RetrySidLengthSeen { get; private set; }
 
     private readonly HashSet<uint> _sidRetried = new();
+
+    private static readonly List<(string? Sid, MsiInstallContext Context)> OneMachineInstance =
+        new() { (null, MsiInstallContext.Machine) };
 
     public Dictionary<(string ProductCode, string Property), uint> ProductPropertyResult { get; } = new();
     public Dictionary<(string PatchCode, string ProductCode, string Property), uint> PatchPropertyResult { get; } = new();
@@ -137,19 +159,39 @@ internal sealed class FakeMsiApi : IMsiApi
         char[]? installedProductCode, out MsiInstallContext installedContext, char[]? sid, ref uint sidLength)
     {
         installedContext = MsiInstallContext.Machine;
+
+        // A KEYED QUERY IS ANSWERED IN FULL HERE, BEFORE THE MACHINE-WIDE LIST IS
+        // CONSULTED, because it is a question about one code rather than a walk:
+        // falling through to that list would answer from whichever product happened to
+        // sit at the index. NotInstalled uses the production constant rather than a
+        // local copy, so the fake cannot drift from the allowlist that decides which
+        // returns may be read as absence.
+        if (productCode is not null)
+        {
+            if (KeyedRowResult.TryGetValue((productCode, index), out var forcedRow)) return forcedRow;
+            if (NotInstalled.Contains(productCode)) return MsiError.UnknownProduct;
+
+            var instances = KeyedInstances.TryGetValue(productCode, out var scripted)
+                ? scripted
+                : OneMachineInstance;
+            if (index >= instances.Count) return NoMoreItems;
+
+            var (keyedSid, keyedContext) = instances[(int)index];
+            WriteCode(installedProductCode, productCode);
+            installedContext = keyedContext;
+            if (keyedSid is not null && sid is not null)
+            {
+                for (var i = 0; i < keyedSid.Length && i < sid.Length; i++) sid[i] = keyedSid[i];
+                sidLength = (uint)keyedSid.Length;
+            }
+            return Success;
+        }
+
         if (NeverEndProducts)
         {
             WriteCode(installedProductCode, "{FFFFFFFF-0000-0000-0000-000000000000}");
             return Success;
         }
-        // A KEYED QUERY THE FIXTURE HAS DECLARED ABSENT. It is answered before the index is
-        // consulted because a keyed query is a question about that code and not a walk:
-        // ResolveProductInstance asks about one product at index 0, and falling through to
-        // the list would answer Success from whichever product happened to be first.
-        // The production constant rather than a local copy, so the fake cannot drift from
-        // the allowlist that decides which returns may be read as absence.
-        if (productCode is not null && NotInstalled.Contains(productCode))
-            return MsiError.UnknownProduct;
         if (index >= Products.Count) return NoMoreItems;
         if (ProductSidRetryResult.TryGetValue(index, out var afterRetry))
         {

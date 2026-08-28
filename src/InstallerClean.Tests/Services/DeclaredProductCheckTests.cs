@@ -225,6 +225,53 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcomes[1]);
     }
 
+    // ---- A product code the machine holds more than once ----
+
+    [Fact]
+    public void A_package_whose_declared_product_is_installed_twice_is_kept_back()
+    {
+        // One code, two installations: per machine and for a user at once. The screen
+        // asks only whether the machine holds the code the file declares, so the
+        // answer is the same as for one installation, and this pins that a walk over
+        // several rows still reaches it.
+        var identities = new ScriptedPackageIdentities();
+        identities.Declares(@"C:\Windows\Installer\a.msi", ProductA);
+
+        var msi = new ScriptedMsiProducts();
+        msi.Installed(ProductA,
+            (null, MsiInstallContext.Machine),
+            ("S-1-5-21-9-9-9-1001", MsiInstallContext.UserUnmanaged));
+
+        var outcomes = new DeclaredProductCheck(msi, identities)
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") });
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcomes[0]);
+        Assert.True(outcomes[0].Withholds());
+    }
+
+    [Fact]
+    public void A_package_whose_declared_product_has_a_row_Windows_will_not_read_is_kept_back()
+    {
+        // The first row says the machine holds the code and the second will not
+        // answer. The file is kept back as unestablished rather than on the first
+        // row's word, because what the rest of the scan does with the answer is put
+        // keyed questions to each instance, and one of them is missing.
+        var identities = new ScriptedPackageIdentities();
+        identities.Declares(@"C:\Windows\Installer\a.msi", ProductA);
+
+        var msi = new ScriptedMsiProducts();
+        msi.Installed(ProductA,
+            (null, MsiInstallContext.Machine),
+            ("S-1-5-21-9-9-9-1001", MsiInstallContext.UserUnmanaged));
+        msi.AnswersAtRow(ProductA, index: 1, MsiError.AccessDenied);
+
+        var outcomes = new DeclaredProductCheck(msi, identities)
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") });
+
+        Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
+        Assert.True(outcomes[0].Withholds());
+    }
+
     // ---- The pass's own contract ----
 
     [Fact]
@@ -450,11 +497,47 @@ internal sealed class ScriptedPackageIdentities : IPackageIdentityReader
 internal sealed class ScriptedMsiProducts : IMsiApi
 {
     private readonly Dictionary<string, uint> _answers = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, (string? Sid, MsiInstallContext Context)[]> _instances =
+        new(StringComparer.Ordinal);
+    private readonly Dictionary<(string ProductCode, uint Index), uint> _rowAnswers = new();
 
-    /// <summary>Every product code this API was asked about, in order, once each.</summary>
+    /// <summary>
+    /// Every product code this API was asked about, in order, once each. Recorded at
+    /// index 0, because the walk over a code's rows is one question about one code.
+    /// </summary>
     public List<string> Asked { get; } = new();
 
-    public void Installed(string productCode) => _answers[productCode] = MsiError.Success;
+    /// <summary>
+    /// Every keyed row this API answered, ending row included, so a test can pin that
+    /// the walk stops where the rows do rather than at a number.
+    /// </summary>
+    public int Rows { get; private set; }
+
+    /// <summary>
+    /// Installed as one ordinary per-machine instance, which is what a fixture with
+    /// nothing to say about instances means.
+    /// </summary>
+    public void Installed(string productCode) =>
+        Installed(productCode, (null, MsiInstallContext.Machine));
+
+    /// <summary>
+    /// Installed as the instances given, in enumeration order. One product code can
+    /// name more than one installation, per machine and per user at once or under two
+    /// accounts, and each is its own row with its own account and context.
+    /// </summary>
+    public void Installed(string productCode, params (string? Sid, MsiInstallContext Context)[] instances)
+    {
+        _answers[productCode] = MsiError.Success;
+        _instances[productCode] = instances;
+    }
+
+    /// <summary>
+    /// What one ROW of a code's enumeration returns, keyed by index. It wins over the
+    /// per-code answer, which is what builds a walk that reads an instance and then
+    /// meets a return it cannot read.
+    /// </summary>
+    public void AnswersAtRow(string productCode, uint index, uint error) =>
+        _rowAnswers[(productCode, index)] = error;
 
     /// <param name="absence">
     /// Which of the returns that mean absence to give. Named by the caller rather
@@ -474,20 +557,39 @@ internal sealed class ScriptedMsiProducts : IMsiApi
             throw new InvalidOperationException(
                 "the fake was asked to walk every product; this area only asks keyed questions");
 
-        Asked.Add(productCode);
+        Rows++;
+        if (index == 0) Asked.Add(productCode);
 
         if (!_answers.TryGetValue(productCode, out var result))
             throw new InvalidOperationException(
                 $"the fake was asked about {productCode}, which no test scripted");
 
+        if (_rowAnswers.TryGetValue((productCode, index), out var row)) return row;
         if (result != MsiError.Success) return result;
 
-        // A machine-context product, so the caller reads no SID back. Written into
-        // the buffer anyway, because the real API does and a fake that leaves it
-        // empty on success is a fake with a shape the code has never met.
+        // A code scripted to succeed with nothing said about instances is one ordinary
+        // per-machine instance, which is what Installed(code) means and what every
+        // fixture that never mentions them is describing.
+        var instances = _instances.TryGetValue(productCode, out var scripted)
+            ? scripted
+            : new[] { ((string?)null, MsiInstallContext.Machine) };
+        if (index >= instances.Length) return MsiError.NoMoreItems;
+
+        // The buffer is written on success because the real API does, and a fake that
+        // leaves it empty is a fake with a shape the code has never met. The caller
+        // reads the SID back only outside the machine context, which is the rule the
+        // real API's own output follows.
         if (installedProductCode is not null)
             for (var i = 0; i < productCode.Length && i < installedProductCode.Length - 1; i++)
                 installedProductCode[i] = productCode[i];
+
+        var (instanceSid, instanceContext) = instances[(int)index];
+        installedContext = instanceContext;
+        if (instanceSid is not null && sid is not null)
+        {
+            for (var i = 0; i < instanceSid.Length && i < sid.Length; i++) sid[i] = instanceSid[i];
+            sidLength = (uint)instanceSid.Length;
+        }
 
         return MsiError.Success;
     }

@@ -927,7 +927,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // THE SAME QUESTION, PUT TO THE PRODUCTS THE ENUMERATION LOST. Without this
         // the second-instance reading covers only the products the enumeration
         // returned, and a product it lost is recovered by name a few lines above and
-        // asked about everything EXCEPT this: ResolveProductInstance asks whether the
+        // asked about everything EXCEPT this: ResolveProductInstances asks whether the
         // code is installed and walks no list, so it establishes an account and a
         // context and reads no property at all. That leaves the one population most
         // likely to hold the condition the one population never asked.
@@ -1229,7 +1229,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// THE REGISTRY NAMES THE MACHINE'S PRODUCTS AND SO DOES THE ENUMERATION, so a
     /// code the first holds and the second never returned is not evidence that
     /// something was missed; it is the thing that was missed, identified. Each one
-    /// is then put to Windows on its own (<see cref="ResolveProductInstance"/>,
+    /// is then put to Windows on its own (<see cref="ResolveProductInstances"/>,
     /// which asks about that code and walks no list), and the answer decides which
     /// of three quite different states this is:
     ///
@@ -1290,9 +1290,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ct.ThrowIfCancellationRequested();
             if (enumerated.Contains(code)) continue;
 
-            var resolved = ResolveProductInstance(_msi, code);
+            var resolved = ResolveProductInstances(_msi, code);
             if (resolved.Unaskable) { unresolved++; continue; }
-            if (resolved.Installed) recovered.Add((code, resolved.Sid, resolved.Context));
+            foreach (var (sid, context) in resolved.Instances)
+                recovered.Add((code, sid, context));
         }
 
         return (recovered, unresolved);
@@ -1484,9 +1485,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // either way, that path being withheld on the flag below, and reading
                 // the rest is what makes one cached answer serve both consumers rather
                 // than depending on which of them asked first.
-                var resolved = ResolveProductInstance(_msi, target);
+                var resolved = ResolveProductInstances(_msi, target);
                 if (resolved.Unaskable) { unaskable = true; continue; }
-                if (resolved.Installed) installed.Add((target, resolved.Sid, resolved.Context));
+                foreach (var (sid, context) in resolved.Instances)
+                    installed.Add((target, sid, context));
             }
 
             return declaredByPath[patchPath] = new DeclaredTargets(installed, unreadable, unaskable);
@@ -1851,21 +1853,39 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
-    /// Where one product code is installed, asked about that code alone.
+    /// Every installation of one product code, asked about that code alone.
     ///
     /// Route B yields a product code and nothing else, and a keyed patch read
     /// needs the account and context the instance lives in. The filtered product
-    /// enumeration answers exactly that for a single code and stops at the first
-    /// row, so it is a question about one product rather than a walk of the
-    /// machine's list.
+    /// enumeration answers exactly that for a single code, a row per index until
+    /// it reports no more, so it is a question about one product rather than a
+    /// walk of the machine's list.
+    ///
+    /// ONE CODE CAN NAME MORE THAN ONE INSTALLATION, WHICH IS WHY EVERY ROW IS
+    /// READ. The same product code is installed per machine and per user at once,
+    /// or under two user accounts, and each of those is its own row with its own
+    /// account and context. A keyed patch read is put in one account and one
+    /// context and answers about that instance alone, so each instance is a
+    /// separate place a cached patch can still be needed and all of them are
+    /// returned.
     /// </summary>
     /// <returns>
-    /// <c>Installed</c> with the instance's account and context; or neither flag,
-    /// meaning the code is positively not installed, which is a clean answer
-    /// because a product that is not there holds no patches; or
-    /// <c>Unaskable</c>, which withholds. Which returns say "not installed" is
-    /// <see cref="IsProductNotInstalled"/>'s, and there is more than one of them.
+    /// <c>Instances</c>, one per installation, each carrying the account and
+    /// context to ask it in; empty with no <c>Unaskable</c>, meaning the code is
+    /// positively not installed, which is a clean answer because a product that is
+    /// not there holds no patches; or <c>Unaskable</c>, which withholds. Which
+    /// returns say "not installed" is <see cref="IsProductNotInstalled"/>'s, and
+    /// there is more than one of them.
     /// </returns>
+    /// <remarks>
+    /// A ROW THIS WALK CANNOT READ MAKES THE WHOLE CODE UNASKABLE RATHER THAN
+    /// SHORTENING THE LIST. A list short by an unknown amount is a set of
+    /// instances nothing asked about, and no caller can tell it from a machine
+    /// holding only the rows it was handed; the answer that withholds is the one
+    /// true of both. The index budget ends the same way and for the same reason:
+    /// the enumeration ran out of it rather than reporting an end, so what is past
+    /// it is unread.
+    /// </remarks>
     /// <remarks>
     /// THE "NOT INSTALLED" ANSWER DEPENDS ON THE PROCESS BEING ELEVATED, AND THAT
     /// DEPENDENCY LIVES IN A FILE NOTHING HERE REFERENCES. Both hosts declare
@@ -1898,46 +1918,64 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// direction it fails in is a file offered on a question that was never
     /// answered.
     /// </remarks>
-    internal static (bool Installed, bool Unaskable, string? Sid, MsiInstallContext Context)
-        ResolveProductInstance(IMsiApi msi, string productCode)
+    internal static (IReadOnlyList<(string? Sid, MsiInstallContext Context)> Instances, bool Unaskable)
+        ResolveProductInstances(IMsiApi msi, string productCode)
     {
         var installedCode = new char[Msi.GuidBufferLength];
-        var sidBuffer = new char[SidBufferLength];
-        uint sidLength = SidBufferLength;
+        var instances = new List<(string? Sid, MsiInstallContext Context)>();
 
-        var error = msi.EnumProducts(
-            productCode: productCode,
-            userSid: AllUsersSid,
-            context: MsiInstallContext.All,
-            index: 0,
-            installedProductCode: installedCode,
-            installedContext: out var context,
-            sid: sidBuffer,
-            sidLength: ref sidLength);
-
-        if (error == MsiError.MoreData)
+        // The same budget the machine-wide enumeration spends, because it is the same
+        // API's index and the number is already argued there. Nothing else is capped
+        // here: what ends the walk on a real machine is the API saying so.
+        for (uint index = 0; index < MaxProductIndex; index++)
         {
-            sidLength++;
-            sidBuffer = new char[sidLength];
-            error = msi.EnumProducts(
+            var sidBuffer = new char[SidBufferLength];
+
+            // pcchSid is reset per row. The API overwrites it with the length it
+            // wrote, so a row carried forward from the last one would size the next
+            // call to whatever the last SID happened to be.
+            uint sidLength = SidBufferLength;
+
+            var error = msi.EnumProducts(
                 productCode: productCode,
                 userSid: AllUsersSid,
                 context: MsiInstallContext.All,
-                index: 0,
+                index: index,
                 installedProductCode: installedCode,
-                installedContext: out context,
+                installedContext: out var context,
                 sid: sidBuffer,
                 sidLength: ref sidLength);
+
+            if (error == MsiError.MoreData)
+            {
+                sidLength++;
+                sidBuffer = new char[sidLength];
+                error = msi.EnumProducts(
+                    productCode: productCode,
+                    userSid: AllUsersSid,
+                    context: MsiInstallContext.All,
+                    index: index,
+                    installedProductCode: installedCode,
+                    installedContext: out context,
+                    sid: sidBuffer,
+                    sidLength: ref sidLength);
+            }
+
+            // AT ANY INDEX THIS IS THE END OF THE ROWS, and at the first it is also
+            // the machine saying it does not hold the code at all. The two are one
+            // return because they are one fact: there is no row here. What separates
+            // them is whether anything was collected before it.
+            if (IsProductNotInstalled(error)) return (instances, false);
+            if (error != MsiError.Success) return (Array.Empty<(string?, MsiInstallContext)>(), true);
+
+            var safeSidLength = (int)Math.Min(sidLength, (uint)sidBuffer.Length);
+            var sid = (context != MsiInstallContext.Machine && safeSidLength > 0)
+                ? new string(sidBuffer, 0, safeSidLength)
+                : null;
+            instances.Add((sid, context));
         }
 
-        if (IsProductNotInstalled(error)) return (false, false, null, default);
-        if (error != MsiError.Success) return (false, true, null, default);
-
-        var safeSidLength = (int)Math.Min(sidLength, (uint)sidBuffer.Length);
-        var sid = (context != MsiInstallContext.Machine && safeSidLength > 0)
-            ? new string(sidBuffer, 0, safeSidLength)
-            : null;
-        return (true, false, sid, context);
+        return (Array.Empty<(string?, MsiInstallContext)>(), true);
     }
 
     /// <summary>

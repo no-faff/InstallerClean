@@ -12,7 +12,7 @@ namespace InstallerClean.Services;
 /// IT COMPOSES TWO THINGS THAT ALREADY EXIST AND ADDS NO THIRD. The reading is
 /// the reader's, which has always been able to take the product reading and has
 /// only ever been asked for the patch one. The asking is
-/// <see cref="InstallerQueryService.ResolveProductInstance"/>, shared rather than
+/// <see cref="InstallerQueryService.ResolveProductInstances"/>, shared rather than
 /// copied because the part of it that decides anything is which returns are
 /// allowed to mean "not installed": that allowlist is the difference between a
 /// file kept and a file offered, and a second copy of it is a second thing to
@@ -106,16 +106,21 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 continue;
             }
 
-            var resolved = InstallerQueryService.ResolveProductInstance(_msi, code);
+            var resolved = InstallerQueryService.ResolveProductInstances(_msi, code);
 
             // THE ORDER OF THE ARMS IS THE WHOLE OF IT, and the unaskable one is
             // first because it is the one that reads as an answer if it is left
             // last. A call that could not be made has not shown the product to be
             // absent, and treating "no answer" as "no product" would offer the
             // file on the strength of a question that was never really put.
+            //
+            // ONE INSTANCE IS AS GOOD AS SEVERAL TO THIS SCREEN, which asks only
+            // whether the machine holds the code the file declares. Where the
+            // instances matter is the keyed patch reads, which are put per account
+            // and per context; this arm needs to know that there is at least one.
             outcomes[i] = resolved.Unaskable
                 ? DeclaredProductOutcome.Unestablished
-                : resolved.Installed
+                : resolved.Instances.Count > 0
                     ? DeclaredProductOutcome.DeclaredProductInstalled
                     : DeclaredProductOutcome.DeclaredProductNotInstalled;
 
