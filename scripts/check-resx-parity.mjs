@@ -3,7 +3,22 @@
 //
 // For each satellite, fails (exit 1) if a required key is missing a translation,
 // if a key is stray (present in the satellite but not the neutral), or if a
-// translated key's {N} placeholder index set differs from the neutral's.
+// translated key uses a {N} index the neutral does not provide.
+//
+// THE PLACEHOLDER RULE IS ONE-WAY, BECAUSE THE RUNTIME IS. A satellite naming an
+// index the neutral does not provide is handed too few arguments and throws
+// FormatException, in that language only, on exactly the screen that uses it. The
+// other way round is harmless: string.Format ignores an argument no placeholder
+// asks for, so the satellite renders its own sentence and the extra fact is simply
+// not in it. That state is the intended one between an English change and the
+// translation round it lands in, so it is reported and not failed.
+//
+// WHAT THIS GATE DOES NOT FAIL ON, AND WHERE THAT GOES INSTEAD. A satellite
+// carrying FEWER indices than the neutral is reported rather than failed, and that
+// covers two things it cannot tell apart: English that has moved ahead of its
+// translation, and a placeholder a translation dropped. Both are listed by key and
+// language under NEUTRAL-ONLY below, and both reach check-translation-freshness the
+// moment the English moves, so the translation round has them either way.
 //
 // CLI keys (Cli.*) follow a two-tier rule. A satellite either ships the CLI
 // surface or it does not: until it carries its first Cli. key it is skipped for
@@ -77,8 +92,17 @@ const isMachineCliKey = (key) =>
   isCliKey(key) && key.includes('EventLog') && key !== 'Cli.EventLogUnavailable';
 const isHumanCliKey = (key) => isCliKey(key) && !isMachineCliKey(key);
 
-const arityMismatch = (neutralPh, satPh) =>
-  neutralPh.size !== satPh.size || [...neutralPh].some((i) => !satPh.has(i));
+// The failing direction: indices the satellite uses and the neutral does not
+// provide. Every one of these is a FormatException waiting for that language.
+const unprovidedIndices = (neutralPh, satPh) =>
+  [...satPh].filter((i) => !neutralPh.has(i)).sort();
+
+// The reporting direction: indices the neutral provides that this satellite's
+// sentence does not use. Harmless at runtime and worth a name, since it is either
+// an English change the round has not reached yet or a placeholder a translation
+// dropped, and this gate cannot tell those apart.
+const unusedIndices = (neutralPh, satPh) =>
+  [...neutralPh].filter((i) => !satPh.has(i)).sort();
 
 // Optional per-language CLDR-category overrides. A language whose plural rules need
 // more than the neutral's one/other pair, or a correct n==1 form for a flat count
@@ -124,6 +148,11 @@ const humanCli = [...neutral.keys()].filter(isHumanCliKey).length;
 // still decided by `failed`, set exactly where it always was.
 const tally = { files: 0, missing: 0, placeholder: 0, stray: 0, override: 0 };
 
+// NAMED, NOT COUNTED. This half is reported rather than failed, so the list is its
+// whole trace, and a number on its own is compatible with the check having answered
+// about nothing. Printed as key and language so it reads as a worklist.
+const neutralOnly = [];
+
 for (const file of satellites) {
   const sat = parse(file);
   const errors = [];
@@ -138,8 +167,11 @@ for (const file of satellites) {
       if (required) errors.push(`MISSING: ${key}`);
       continue;
     }
-    if (arityMismatch(ph, sat.get(key)))
-      errors.push(`PLACEHOLDER mismatch ${key}: neutral {${[...ph].sort()}} vs satellite {${[...sat.get(key)].sort()}}`);
+    const unprovided = unprovidedIndices(ph, sat.get(key));
+    if (unprovided.length)
+      errors.push(`PLACEHOLDER unprovided ${key}: satellite uses {${unprovided}}, neutral provides {${[...ph].sort()}}`);
+    const unused = unusedIndices(ph, sat.get(key));
+    if (unused.length) neutralOnly.push(`${file}  ${key}  neutral provides {${unused}} that this value does not use`);
   }
 
   for (const key of sat.keys()) {
@@ -180,9 +212,18 @@ for (const file of satellites) {
   }
 }
 
+if (neutralOnly.length) {
+  console.log(`\nNEUTRAL-ONLY PLACEHOLDERS (${neutralOnly.length}), reported and not failed:`);
+  for (const line of neutralOnly.sort()) console.log(`  ${line}`);
+  console.log('Each is either English that has moved ahead of its translation, which the round');
+  console.log('clears, or a placeholder a translation dropped. This gate cannot tell them apart,');
+  console.log('so it names every one rather than deciding.');
+}
+
 console.log(
   `TOTALS: ${satellites.length} satellite(s) checked, ${tally.files} failed, `
-  + `${tally.missing} missing, ${tally.placeholder} placeholder mismatch(es), `
-  + `${tally.stray} stray, ${tally.override} placeholder override(s).`);
+  + `${tally.missing} missing, ${tally.placeholder} unprovided placeholder(s), `
+  + `${tally.stray} stray, ${tally.override} placeholder override(s), `
+  + `${neutralOnly.length} neutral-only placeholder(s) reported.`);
 
 process.exit(failed ? 1 : 0);
