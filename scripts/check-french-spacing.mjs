@@ -90,13 +90,10 @@ const describeInner = (ch) =>
 // not read as an empty file. Neither figure is written down here, so adding a
 // string to the resx cannot make this go stale.
 //
-// This check reads ONE file and names it in its own success line, which is what
-// made it the round's worst instance: with every entry of Strings.fr.resx made
-// unreadable it printed "French spacing OK: no plain ASCII space before ! ? : ; in
-// Strings.fr.resx", byte for byte the clean run's output at the time, and exited 0.
-// That is the line as it then read; the one below has since gained the guillemet
-// clause and the counts, and the control is what stops either of them being printed
-// over a file this script cannot show it read.
+// AND IT CARRIES THE WHOLE WEIGHT HERE, BECAUSE THIS CHECK READS ONE FILE AND
+// NAMES IT IN ITS OWN SUCCESS LINE. That line reports the file by name and the
+// counts read from it, so the control is what lets it stand for the file's
+// contents rather than for the reader having reached them.
 const parseControl = (file, xml, parsed) => {
   const raw = (xml.match(/<data\b/g) || []).length;
   if (raw !== 0 && parsed === raw) return;
