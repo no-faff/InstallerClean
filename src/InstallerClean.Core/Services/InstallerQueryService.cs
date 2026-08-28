@@ -709,6 +709,33 @@ public sealed class InstallerQueryService : IInstallerQueryService
             + "up, and that notice names nothing and counts nothing.",
             _crashLogSink);
 
+        // A SECOND BUDGET, BECAUSE THE CLOSING ENTRY'S LAST SENTENCE IS PER CAUSE AND
+        // THESE TWO HAVE DIFFERENT ANSWERS. The one above says the product identity is
+        // written down nowhere else; this one is about a file rather than a product and
+        // the answer for it is different again. Sharing a budget would put one of the
+        // two sentences over entries it is false of.
+        //
+        // WHAT IT RECORDS IS A DISTINCTION WINDOWS DRAWS AND THE APP OTHERWISE DROPS.
+        // Asked to open a patch file's summary stream, Windows answers one code for a
+        // path it could not open at all and another for a file it opened and found not
+        // to be a package. The second can only mean the file is THERE and will not be
+        // read, which is the app unable to establish something it could have
+        // established; the first is also what an absent file gives, which is ordinary.
+        // Both take the verdict away and keep the file, so nothing acts on the
+        // difference. This is where it is written down.
+        //
+        // THE CAUSE KEY IS THE READER'S OWN DETAIL, WHICH IS WHAT MAKES THE BUDGET
+        // WORK FOR THIS. The detail carries the code, so the two answers are two
+        // causes: a machine with thousands of absent patch files still logs the first
+        // file that was present and unreadable, however late it arrives, instead of
+        // losing it behind a storm of the ordinary one.
+        var unreadPatchFileLog = new PerItemFailureLog("Patch file read",
+            "How many patch files would not read, and which of the two ways, is recorded "
+            + "nowhere else: the result log carries no count for it and no surface says "
+            + "anything about it. What the user sees is that some superseded files were "
+            + "kept back, which names no file and no cause.",
+            _crashLogSink);
+
         // The closing entry is owed on every exit: the two gates below both
         // throw, and the both-sources-degraded one in particular fires on
         // exactly the broken registration that makes this storm.
@@ -931,7 +958,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered,
-            fallback.Reach, fallback.ProductPatchSets, apiPatchSets, ct);
+            fallback.Reach, fallback.ProductPatchSets, apiPatchSets, ct, unreadPatchFileLog);
 
         // Both sources degraded at once: refuse the scan outright rather than
         // report a shorter one.
@@ -1191,6 +1218,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         finally
         {
             abandonedLog.WriteClosingEntry();
+            unreadPatchFileLog.WriteClosingEntry();
         }
     }
 
@@ -1366,7 +1394,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         EstablishedPatchReach reach,
         IReadOnlyDictionary<string, ProductPatchSet>? registryPatchSets,
         IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets,
-        CancellationToken ct)
+        CancellationToken ct,
+        PerItemFailureLog? unreadPatchFileLog = null)
     {
         // EVERY patch code naming a still-removable path, not one per path. The
         // merged row carries no patch code, so the codes come from the claims,
@@ -1445,7 +1474,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             if (declaredByPath.TryGetValue(patchPath, out var already)) return already;
 
-            var declared = TargetsDeclaredByPatchFile(patchPath, out var unreadable);
+            var declared = TargetsDeclaredByPatchFile(patchPath, out var unreadable, unreadPatchFileLog);
             var installed = new List<(string ProductCode, string? Sid, MsiInstallContext Context)>();
             var unaskable = false;
             foreach (var target in declared)
@@ -1769,7 +1798,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// here would need a filesystem this class does not have, and asking the real one
     /// would answer about a different machine from the one the scan is walking.
     /// </param>
-    private IReadOnlyList<string> TargetsDeclaredByPatchFile(string path, out bool unreadable)
+    private IReadOnlyList<string> TargetsDeclaredByPatchFile(
+        string path, out bool unreadable, PerItemFailureLog? failureLog = null)
     {
         unreadable = false;
 
@@ -1786,10 +1816,34 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // correctly removed. Nothing is tested for here still: the caller records WHICH
         // failure this was, and the scan, which is holding the filesystem, decides what
         // it meant.
-        var identity = _identityReader.Read(path, isPatch: true, out _);
+        var identity = _identityReader.Read(path, isPatch: true, out var detail);
         if (identity is null)
         {
             unreadable = true;
+
+            // THE READER'S DETAIL IS KEPT HERE, AND THIS IS THE ONLY PLACE IT EXISTS.
+            // It names which of the reader's failures occurred, and for the first of
+            // them it carries the code Windows returned, which separates a path that
+            // would not open from a file that opened and is not a package. Nothing acts
+            // on the difference and nothing should: both withhold and both keep the
+            // file. What it changes is whether anybody can tell, from a report, which
+            // kind of machine they are looking at.
+            //
+            // THE PATH IS NOT NAMED, deliberately and for the reason the reader's own
+            // contract gives: the app runs elevated, and this is read long after a
+            // report about some other file. The class is the diagnostic here; which file
+            // it was is not.
+            //
+            // NULL WHERE THERE IS NO RUN TO BUDGET AGAINST. The budget belongs to the
+            // scan that owns the crash log for the run, so it is handed in rather than
+            // made here; a test calling this pass directly has no run and writes nothing.
+            failureLog?.Record(
+                new InvalidOperationException(
+                    "A registered patch file did not yield the products it declares, so its "
+                    + "own removable verdict is withheld and the file is kept. Reader detail: "
+                    + (detail.Length == 0 ? "none given" : detail) + "."),
+                cause: detail);
+
             return Array.Empty<string>();
         }
 

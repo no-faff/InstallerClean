@@ -76,7 +76,8 @@ public class InstallerQueryServicePatchTruncationTests
     /// concludes from what it is given.
     /// </summary>
     private static Dictionary<string, RegisteredPackage> Confirm(
-        FakeApi msi, IPackageIdentityReader? reader = null, params string[] recovered)
+        FakeApi msi, IPackageIdentityReader? reader = null,
+        PerItemFailureLog? unreadPatchFileLog = null, params string[] recovered)
     {
         var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
         var claims = new List<PatchClaim>();
@@ -136,7 +137,8 @@ public class InstallerQueryServicePatchTruncationTests
             default,
             patchSets,
             patchSets,
-            CancellationToken.None);
+            CancellationToken.None,
+            unreadPatchFileLog);
 
         return claimed;
     }
@@ -200,12 +202,29 @@ public class InstallerQueryServicePatchTruncationTests
     private sealed class FakeReader : IPackageIdentityReader
     {
         private readonly Dictionary<string, PackageIdentity?> _byPath = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _detailByPath = new(StringComparer.OrdinalIgnoreCase);
 
         public PackageIdentity? this[string path] { set => _byPath[path] = value; }
+
+        /// <summary>
+        /// The file yields nothing AND says why, which is the shape the production
+        /// reader has: it returns null for every failure alike and puts the difference,
+        /// including the code Windows returned, in the out-parameter. A fake that only
+        /// returns null can pin what the pass DECIDES and can say nothing about whether
+        /// the reason survives the call.
+        /// </summary>
+        public void YieldsNothingBecause(string path, string detail)
+        {
+            _byPath[path] = null;
+            _detailByPath[path] = detail;
+        }
 
         public PackageIdentity? Read(string filePath, bool isPatch, out string detail)
         {
             detail = string.Empty;
+            foreach (var kv in _detailByPath)
+                if (filePath.EndsWith(System.IO.Path.GetFileName(kv.Key), StringComparison.OrdinalIgnoreCase))
+                    detail = kv.Value;
             // Matched on the leaf, because the service normalises the path before
             // it reaches here and that does different things on different hosts.
             foreach (var kv in _byPath)
@@ -728,6 +747,58 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     /// <summary>
+    /// WHY THE READER'S REASON IS PINNED WHEN NOTHING ACTS ON IT. Windows answers one
+    /// code for a patch file it could not open and another for one it opened and found
+    /// not to be a package, and only the second can mean the file is there and will not
+    /// be read. Both outcomes are the same here, the verdict goes and the file is kept,
+    /// so no assertion about a verdict can tell whether the reason survived the call.
+    /// The out-parameter was discarded at this call site, and a discarded out-parameter
+    /// is invisible to every other test in this file.
+    ///
+    /// THE CASES ARE THE READER'S OWN STRINGS rather than codes on their own, because
+    /// what is being pinned is that the value the reader produced is the value that
+    /// arrives, not that something somewhere mentions a number. A constant would pass a
+    /// test written against one case.
+    ///
+    /// AND THE PATH IS ASSERTED ABSENT, which is a contract rather than a detail: the
+    /// app runs elevated, this is read long after a report about some other file, and
+    /// the reader's own interface says it names no path.
+    ///
+    /// WHAT THIS DOES NOT PIN, said so nobody reads it as more: the reason is also
+    /// passed as the budget's cause key, so two different reasons are two causes and
+    /// the rarer one survives a storm of the common one. That mechanism is pinned in
+    /// PerItemFailureLogTests, and reaching it from here would need a fixture holding
+    /// more patch files than the budget.
+    /// </summary>
+    [Theory]
+    [InlineData("patch summary stream would not open (1619)")]
+    [InlineData("patch summary stream would not open (1620)")]
+    [InlineData("patch declares no target product")]
+    public void The_reason_a_patch_file_would_not_read_reaches_the_run_s_breadcrumbs(string detail)
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+
+        var reader = new FakeReader();
+        reader.YieldsNothingBecause(Shared, detail);
+
+        var written = new List<Exception>();
+        var log = new PerItemFailureLog("Patch file read", "nowhere else", written.Add);
+
+        var row = TheSharedPatch(Confirm(msi, reader, log));
+
+        // The withholding is unchanged and is asserted so a green run here cannot mean
+        // the read never happened.
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+
+        var entry = Assert.Single(written);
+        Assert.Contains(detail, entry.Message);
+        Assert.DoesNotContain(Shared, entry.Message);
+    }
+
+    /// <summary>
     /// A product that is not there holds no patches, so it says nothing either way
     /// and must not withhold. This is the direction that would delete the feature
     /// if it went wrong, and a patch declares mostly products the machine does not
@@ -789,7 +860,7 @@ public class InstallerQueryServicePatchTruncationTests
         // The recovered product is handed in, standing for the registry
         // comparison that finds it and the keyed ask that confirms it installed;
         // that part of the scan is unchanged and has its own tests below.
-        var row = TheSharedPatch(Confirm(msi, null, StillApplied));
+        var row = TheSharedPatch(Confirm(msi, null, null, StillApplied));
         Assert.False(row.IsRemovable);
         // Not withheld: a product said it still holds the patch. The scan knows
         // why this file is being kept and could say so.
@@ -832,7 +903,7 @@ public class InstallerQueryServicePatchTruncationTests
         msi.HiddenFromWalk.Add(StillApplied);
         msi.HoldPatchInvisibleToEnumeration(StillApplied, Patch, state: "1", uninstallable: "0");
 
-        var row = TheSharedPatch(Confirm(msi, null, StillApplied));
+        var row = TheSharedPatch(Confirm(msi, null, null, StillApplied));
 
         Assert.False(row.IsRemovable);
         Assert.False(row.RemovableWithheld);
