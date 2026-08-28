@@ -17,7 +17,10 @@ public partial class ConfirmMoveWindow : Window
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
         MessageText.Text = string.Format(Strings.Confirm_MoveTitle, fileCount, label, sizeDisplay);
-        DestinationLabel.Text = Strings.Confirm_MoveDestination;
+        DestinationLabel.Text = DisplayHelpers.Pluralise(fileCount,
+            Strings.Confirm_MoveDestination_Singular,
+            Strings.Confirm_MoveDestination_Plural,
+            "Confirm.MoveDestination");
         // Insert a zero-width space after every backslash so a long path wraps at
         // a folder boundary (after ...\Installer\, not inside a folder name). The
         // insertion is in Core (CompositionParsing) so a test guards the escape.

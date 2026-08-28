@@ -59,11 +59,10 @@ public class CountedStringTests
         "Cli.MovedFiles", "Cli.MovingFiles", "Cli.NothingOffered",
         "Completion.FailedCount", "Completion.FailedCountDelete",
         "Completion.HeldBack",
-        "Completion.MoveCancelledSummary", "Completion.MoveRestoreHint",
-        "Completion.MoveRestoreHintSameDrive", "Completion.MoveSummary",
+        "Completion.MoveCancelledSummary", "Completion.MoveSummary",
         "Completion.NothingOfferedBody",
         "Completion.PermanentDeleteCancelledSummary", "Completion.PermanentDeleteSummary",
-        "Confirm.DeletePermanently",
+        "Confirm.DeletePermanently", "Confirm.MoveDestination",
         "Error.AccessDenied", "Error.FileInUse", "Error.IOFailure", "Error.UnknownError",
         "Plural.Error", "Plural.File", "Plural.Package", "Plural.Patch", "Plural.Product",
         "Status.RegisteredPackagesFound",
@@ -85,10 +84,9 @@ public class CountedStringTests
         "Cli.MovedFiles", "Cli.MovingFiles",
         "Cli.NothingOffered",
         "Completion.HeldBack",
-        "Completion.MoveRestoreHint", "Completion.MoveRestoreHintSameDrive",
         "Completion.NothingOfferedBody",
         "Completion.PermanentDeleteSummary",
-        "Confirm.DeletePermanently", "Error.FileInUse",
+        "Confirm.DeletePermanently", "Confirm.MoveDestination", "Error.FileInUse",
         "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
         "Summary.NothingListed",
         "Summary.RegisteredStillUsed", "Summary.RegisteredWindow",
@@ -229,8 +227,7 @@ public class CountedStringTests
     /// </summary>
     private static readonly string[] UnformattedPrefixes =
     {
-        "Completion.MoveRestoreHint", "Completion.MoveRestoreHintSameDrive",
-        "Confirm.DeletePermanently",
+        "Confirm.DeletePermanently", "Confirm.MoveDestination",
         "Error.AccessDenied", "Error.FileInUse", "Error.IOFailure", "Error.UnknownError",
     };
 

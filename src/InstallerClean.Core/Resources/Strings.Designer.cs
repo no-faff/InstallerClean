@@ -239,10 +239,8 @@ public static class Strings
     public static string Completion_HeldBack_Singular => Get("Completion.HeldBack.Singular");
     public static string Completion_MoveCancelledSummary => Get("Completion.MoveCancelledSummary");
     public static string Completion_Moved => Get("Completion.Moved");
-    public static string Completion_MoveRestoreHint_Plural => Get("Completion.MoveRestoreHint.Plural");
-    public static string Completion_MoveRestoreHintSameDrive_Plural => Get("Completion.MoveRestoreHintSameDrive.Plural");
-    public static string Completion_MoveRestoreHintSameDrive_Singular => Get("Completion.MoveRestoreHintSameDrive.Singular");
-    public static string Completion_MoveRestoreHint_Singular => Get("Completion.MoveRestoreHint.Singular");
+    public static string Completion_MoveRestoreHint => Get("Completion.MoveRestoreHint");
+    public static string Completion_MoveRestoreHintSameDrive => Get("Completion.MoveRestoreHintSameDrive");
     public static string Completion_MoveSummary_Plural => Get("Completion.MoveSummary.Plural");
     public static string Completion_MoveSummary_Singular => Get("Completion.MoveSummary.Singular");
     public static string Completion_NothingDeleted => Get("Completion.NothingDeleted");
@@ -260,7 +258,8 @@ public static class Strings
     public static string Confirm_DeletePermanently_Plural => Get("Confirm.DeletePermanently.Plural");
     public static string Confirm_DeletePermanently_Singular => Get("Confirm.DeletePermanently.Singular");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
-    public static string Confirm_MoveDestination => Get("Confirm.MoveDestination");
+    public static string Confirm_MoveDestination_Plural => Get("Confirm.MoveDestination.Plural");
+    public static string Confirm_MoveDestination_Singular => Get("Confirm.MoveDestination.Singular");
     public static string Confirm_MoveSameDrive => Get("Confirm.MoveSameDrive");
     public static string Confirm_MoveTitle => Get("Confirm.MoveTitle");
     public static string ConfirmSendResultLog_Reassurance => Get("ConfirmSendResultLog.Reassurance");

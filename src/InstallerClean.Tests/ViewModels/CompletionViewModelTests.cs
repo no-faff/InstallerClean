@@ -122,7 +122,7 @@ public class CompletionViewModelTests
         vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"C:\backup",
             errors: [], space: MoveSpaceOutcome.SameDrive);
         Assert.DoesNotContain("freed", vm.Heading);
-        Assert.Equal(Strings.Completion_MoveRestoreHintSameDrive_Singular, vm.Restore);
+        Assert.Equal(Strings.Completion_MoveRestoreHintSameDrive, vm.Restore);
 
         // A volume the classification could not read claims nothing either way,
         // so it takes the same verb but the line that names no drive. The
@@ -131,7 +131,7 @@ public class CompletionViewModelTests
         vm.ShowMoveSummary(movedCount: 2, movedBytes: 1024 * 1024, destination: @"D:\backup",
             errors: [], space: MoveSpaceOutcome.Unclassified);
         Assert.DoesNotContain("freed", vm.Heading);
-        Assert.Equal(Strings.Completion_MoveRestoreHint_Plural, vm.Restore);
+        Assert.Equal(Strings.Completion_MoveRestoreHint, vm.Restore);
     }
 
     [Fact]
@@ -327,7 +327,7 @@ public class CompletionViewModelTests
         vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 40, movedBytes: 1024,
             errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
-        Assert.Equal(Strings.Completion_MoveRestoreHint_Plural, vm.Restore);
+        Assert.Equal(Strings.Completion_MoveRestoreHint, vm.Restore);
     }
 
     [Fact]

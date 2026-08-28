@@ -397,16 +397,12 @@ public partial class CompletionViewModel : ObservableObject
     /// two things that vary, whether the folder is on the drive the files came
     /// from and whether it holds one file or several.
     /// </summary>
-    private static string MoveRestoreText(int movedCount, MoveSpaceOutcome space) =>
+    // Neither form names the files, so neither agrees with a count and the
+    // moved count is not a parameter here.
+    private static string MoveRestoreText(MoveSpaceOutcome space) =>
         space == MoveSpaceOutcome.SameDrive
-            ? DisplayHelpers.Pluralise(movedCount,
-                Strings.Completion_MoveRestoreHintSameDrive_Singular,
-                Strings.Completion_MoveRestoreHintSameDrive_Plural,
-                "Completion.MoveRestoreHintSameDrive")
-            : DisplayHelpers.Pluralise(movedCount,
-                Strings.Completion_MoveRestoreHint_Singular,
-                Strings.Completion_MoveRestoreHint_Plural,
-                "Completion.MoveRestoreHint");
+            ? Strings.Completion_MoveRestoreHintSameDrive
+            : Strings.Completion_MoveRestoreHint;
 
     /// <summary>
     /// Shows the post-Move summary including any per-file errors.
@@ -454,7 +450,7 @@ public partial class CompletionViewModel : ObservableObject
                 movedCount, movedLabel, destination);
         // No restore line when nothing moved: it is about files sitting in the
         // backup folder, and there are none.
-        Restore = HeadingIsWarning ? string.Empty : MoveRestoreText(movedCount, space);
+        Restore = HeadingIsWarning ? string.Empty : MoveRestoreText(space);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
@@ -552,7 +548,7 @@ public partial class CompletionViewModel : ObservableObject
         // in the backup folder, and a cancel that came before the first file
         // moved put none there. Reachable because a cancel with zero moved and
         // a non-zero error count still raises a summary.
-        Restore = movedCount == 0 ? string.Empty : MoveRestoreText(movedCount, space);
+        Restore = movedCount == 0 ? string.Empty : MoveRestoreText(space);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
