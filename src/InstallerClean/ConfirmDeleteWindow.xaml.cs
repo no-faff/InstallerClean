@@ -35,9 +35,14 @@ public partial class ConfirmDeleteWindow : Window
     }
 
     /// <summary>
-    /// Composes the body, rendering the <c>[ ]</c>-delimited phrase as a
-    /// hyperlink into the README's "Is it safe?" section. Mirrors the main
-    /// window's BuildCompletionRestoreLine, including the URL going through
+    /// Composes the body from whichever count form DisplayHelpers.Pluralise
+    /// picks. A value with no <c>[ ]</c> pair renders verbatim as a single
+    /// Run; a value carrying one renders as a prefix Run, a Hyperlink into the
+    /// README's "Is it safe?" section, then a suffix Run. The value alone
+    /// decides, which is why the split runs over whatever it is handed rather
+    /// than over a list of keys, and the resx entry says why no language's
+    /// sentence here is meant to carry a pair. Mirrors the main window's
+    /// BuildCompletionRestoreLine, including the URL going through
     /// <see cref="UrlLauncher"/> so this elevated process does not launch the
     /// browser as Administrator.
     /// </summary>

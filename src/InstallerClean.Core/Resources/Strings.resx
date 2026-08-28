@@ -1734,9 +1734,11 @@ The crash log could not be written.</value></data>
        THERE IS NO SAME-DRIVE VARIANT, AND THAT IS A DECISION. The window's line
        has one because the window reports what a move reclaimed, so a same-drive
        move has to explain why the disk did not get emptier. Nothing on this host
-       reports that: the three console lines naming space are the destination
-       free-space refusal and its event-log twin, which are about whether the move
-       can start. There is nothing here for a same-drive form to correct. -->
+       reports that. The move summary names no size and the event log's says what
+       was relocated rather than what was freed; the only lines reporting free
+       space are the refusal when the destination has too little and its
+       event-log twin, which are about whether the move can start. There is
+       nothing here for a same-drive form to correct. -->
   <data name="Cli.MoveRestoreHint" xml:space="preserve"><value>Check that your programs still update and uninstall as normal, then delete {0}.</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause

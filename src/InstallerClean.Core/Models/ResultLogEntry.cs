@@ -770,13 +770,12 @@ public sealed record MachineInfo(
 /// IT IS NOT <paramref name="WithheldPatchCount"/> AND THE TWO COUNT DIFFERENT
 /// POPULATIONS. That one is superseded registrations the scan would have offered and
 /// did not; this one never came from the registered set at all. A third figure,
-/// <c>ScanResult.RegisteredWithheldCount</c>, is different again and is on no wire.
-/// Nothing may add any two of them.
+/// <c>ScanResult.RegisteredWithheldCount</c>, is different again and travels as
+/// <paramref name="RegisteredWithheldCount"/> below. Nothing may add any two of them.
 ///
-/// IT WAS INVISIBLE TO THESE REPORTS UNTIL 3.0.0 AND THAT WAS AN OVERSIGHT RATHER
-/// THAN A DECISION. The population is what the app's own withholding costs a machine,
-/// and it is the figure that answers whether a machine got nothing because its folder
-/// was clean or because the scan could not settle it.
+/// IT IS WHAT THE APP'S OWN WITHHOLDING COSTS A MACHINE, AND NOTHING ELSE ON THE WIRE
+/// ANSWERS THAT. It is the figure that says whether a machine got nothing because its
+/// folder was clean or because the scan could not settle it.
 ///
 /// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Three separate conditions put
 /// files on that list and they are different facts about a machine; a sentence naming

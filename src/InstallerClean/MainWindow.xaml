@@ -154,8 +154,8 @@
                          inline Hyperlink at once, so there is no Text binding
                          here. The other three leads (not scanned, scan failed,
                          Windows Installer hold) carry no brackets and render
-                         verbatim. This is the screen's one link, on its
-                         strongest safety claim. -->
+                         verbatim. This is the only link in the window's
+                         content, on its strongest safety claim. -->
                     <TextBlock x:Name="IntroLeadText" TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
                                FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"/>
                     <!-- The converter prepares the line for layout. It binds the
@@ -985,11 +985,14 @@
                          line is the second half of the outcome (where the files
                          went after a Move; the scan receipt on an all-clear).
                          Inlines are composed in code-behind
-                         (BuildCompletionRestoreLine) so the bracketed phrase
-                         renders as a hyperlink to the README's "Is it safe?"
-                         section; a TextBlock cannot bind Text and host an
-                         inline Hyperlink at once, so there is no Text binding
-                         here. The collapse trigger still reads
+                         (BuildCompletionRestoreLine), which renders a
+                         bracketed phrase as a hyperlink to the README's "Is it
+                         safe?" section; a TextBlock cannot bind Text and host
+                         an inline Hyperlink at once, so there is no Text
+                         binding here. Whether a line links is the value's
+                         decision and a translation makes it per language, so
+                         the split reads whatever it is given rather than a
+                         list of keys. The collapse trigger still reads
                          Completion.Restore. -->
                     <TextBlock x:Name="CompletionRestoreText"
                                AutomationProperties.LiveSetting="Polite"

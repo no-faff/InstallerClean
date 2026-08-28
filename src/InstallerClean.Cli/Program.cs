@@ -1161,14 +1161,12 @@ internal static class Program
                 Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
         }
         // IT NAMES ex.Destination AND NOT THE PATH THIS METHOD WAS HANDED, which is
-        // the one difference between this call and the ordinary /m one. The two
-        // folders are the same everywhere else in the host and differ in exactly the
-        // case this method reports, and the files are in the first: the line's whole
-        // job is to name the folder somebody has to go and delete, so naming the
-        // configured path would send them to a folder their backup is not in and
-        // leave the folder holding it unnamed. The sentence below names the
-        // configured path on purpose and for the opposite reason, asking the reader
-        // to go and look at what they set.
+        // the folder the files are actually in and the one thing this call does
+        // differently from the ordinary /m one; the property's own summary says why
+        // the two can differ. The line's whole job is to name the folder somebody
+        // has to go and delete. The sentence below names the configured path on
+        // purpose and for the opposite reason, asking the reader to go and look at
+        // what they set.
         //
         // After the error block and only where something moved, as in the /m branch.
         if (partial.MovedCount > 0)
@@ -1201,12 +1199,9 @@ internal static class Program
     /// <remarks>
     /// It names <see cref="MoveAbortedException.Destination"/> and never the
     /// destination the run was given, which is the one place in this host where
-    /// the two can be different folders. Every file counted here left
-    /// <c>C:\Windows\Installer</c> for the destination as it resolved when the
-    /// batch started, and the whole of what stopped the batch is that the given
-    /// path no longer names that folder. The stdout sentence above keeps the given
-    /// path on purpose, asking the reader to go and check the folder they
-    /// configured.
+    /// the two can be different folders; the property's own summary says why. The
+    /// stdout sentence above keeps the given path on purpose, asking the reader to
+    /// go and check the folder they configured.
     /// </remarks>
     internal static string AbortedMoveEventLogLine(
         string arg, MoveAbortedException ex, int count,

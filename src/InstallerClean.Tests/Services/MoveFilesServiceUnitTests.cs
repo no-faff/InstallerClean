@@ -52,11 +52,13 @@ public class MoveFilesServiceUnitTests
     [Fact]
     public async Task MoveFilesAsync_refuses_a_name_already_in_the_destination()
     {
-        // The suffix this used to append made the completion screen's restore line
-        // false for the renamed file: Windows Installer looks for a cached package
-        // by the exact path it recorded, so "dup (1).msi" does not go back as
-        // "dup.msi", and nothing recorded which file had been renamed. Refusing
-        // states the problem and leaves the file recoverable where it is.
+        // A name already in the destination is refused rather than worked around,
+        // and what decides that is a promise the main window makes before the move:
+        // putting the moved files back into the cache folder restores everything.
+        // Windows Installer looks for a cached package by the exact path it
+        // recorded, so a file parked as "dup (1).msi" does not go back as
+        // "dup.msi". Refusing states the problem and leaves the file recoverable
+        // where it is.
         var fs = new MockFileSystem();
         var source = $@"{SourceDir}\dup.msi";
         var existing = $@"{DestDir}\dup.msi";

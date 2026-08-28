@@ -471,9 +471,9 @@ public sealed class MoveFilesService : IMoveFilesService
                     // moved files back into the cache folder restores everything,
                     // and Windows Installer looks for a cached package by the exact
                     // path it recorded. A file parked as "thing (1).msi" does not go
-                    // back as "thing.msi", so the suffix this used to append quietly
-                    // made that sentence false for the file it renamed, and nothing
-                    // anywhere recorded which file that was.
+                    // back as "thing.msi", so a suffix appended here would quietly
+                    // make that sentence false for the file it renamed, and nothing
+                    // anywhere would record which file that was.
                     //
                     // The promise cannot qualify itself either: it is read before
                     // any folder is chosen and names no file, so there is nowhere in

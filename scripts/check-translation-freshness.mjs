@@ -42,11 +42,11 @@
 // SIMPLIFIED INTO A WARNING. This file's regex wants <value> on the same
 // whitespace run as <data>, so anything else landing between them drops that
 // entry silently: a <comment> moved above its <value> is valid resx, is what the
-// Visual Studio editor emits, and costs one entry of the 386. A silent zero over
-// an incomplete set reads exactly like a clean result, so refusing with exit 2 is
+// Visual Studio editor emits, and costs that entry. A silent zero over an
+// incomplete set reads exactly like a clean result, so refusing with exit 2 is
 // the correct answer.
 //
-// IT HAS TWO LEGS AND BOTH ARE LOAD-BEARING. `parsed !== raw` catches a neutral
+// IT HAS TWO LEGS AND BOTH ARE LOAD-BEARING. `out.size !== raw` catches a file
 // the regex read only part of; `raw === 0` catches one it found no entries in at
 // all, which the first cannot see, both of its counts being zero. Neither figure
 // is written down, so adding a string cannot make either go stale.
