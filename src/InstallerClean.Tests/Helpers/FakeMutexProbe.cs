@@ -30,6 +30,21 @@ internal sealed class FakeMutexProbe : IMutexProbe
     /// </summary>
     public int AcquireAttempts { get; private set; }
 
+    /// <summary>
+    /// The managed thread the last lease was taken on, and the one it was released
+    /// on; null where that has not happened yet. Recorded because the real
+    /// <c>_MSIExecute</c> lease has a rule the counters above cannot see: Win32
+    /// requires the owning thread to release a mutex, and the production
+    /// <c>MutexLease.Dispose</c> swallows the <c>ApplicationException</c> a wrong-thread
+    /// release raises, so a batch that hopped threads mid-hold still reports one
+    /// acquire, one release and no error while leaving the machine-wide installer
+    /// mutex held until the process exits.
+    /// </summary>
+    public int? AcquiredOnThread { get; private set; }
+
+    /// <inheritdoc cref="AcquiredOnThread"/>
+    public int? ReleasedOnThread { get; private set; }
+
     public FakeMutexProbe(Mode mode) => _mode = mode;
 
     public bool IsHeld(string name) => _mode == Mode.HeldByAnother;
@@ -47,6 +62,7 @@ internal sealed class FakeMutexProbe : IMutexProbe
                 return null;
             default:
                 Acquired++;
+                AcquiredOnThread = Environment.CurrentManagedThreadId;
                 return new Lease(this);
         }
     }
@@ -55,6 +71,10 @@ internal sealed class FakeMutexProbe : IMutexProbe
     {
         private readonly FakeMutexProbe _owner;
         public Lease(FakeMutexProbe owner) => _owner = owner;
-        public void Dispose() => _owner.Released++;
+        public void Dispose()
+        {
+            _owner.Released++;
+            _owner.ReleasedOnThread = Environment.CurrentManagedThreadId;
+        }
     }
 }
