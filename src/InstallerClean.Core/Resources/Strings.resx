@@ -986,17 +986,37 @@ InstallerClean was already running as administrator, so starting it again that w
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
-       to look it up). -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.</value></data>
+       to look it up), 2 = how many programs were read cleanly before
+       the run of failures began, 3 = the noun for that count.
+
+       2 AND 3 ARE THE PAIR THAT MAKES THIS ACTIONABLE. The failure
+       count is a fixed threshold and reads the same on every machine
+       that reaches it; how far the enumeration got first does not, and
+       that is what somebody helping needs. Reading none and reading two
+       hundred are different situations with different answers, and this
+       count is what tells them apart. Zero is a real value and reads
+       correctly: "it read 0 programs". -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {2} {3}, then {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- The index cap, which is a different condition from the consecutive
        failures above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
        count) and 1 = the last row's error code, which here is Success (0) when
-       every row read cleanly and the list simply never terminated. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
+       every row read cleanly and the list simply never terminated. 2 = how many
+       programs were read cleanly, 3 = the noun for that count.
+
+       The two strings stay separate and carry the same pair for the same
+       reason: how far the enumeration got is the fact somebody helping needs,
+       and it is as worth having when the budget runs out as when a run of
+       failures stops the walk. -->
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
-       condition and the same two placeholders. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
+       condition and the same four placeholders.
+
+       3 IS A DIFFERENT NOUN HERE AND THAT IS THE WHOLE DIFFERENCE. This loop
+       walks one program's patches, so 2 counts patches read cleanly and 3 is
+       the patch noun. Borrowing the sibling's noun would report a count of
+       patches as a count of programs. -->
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually

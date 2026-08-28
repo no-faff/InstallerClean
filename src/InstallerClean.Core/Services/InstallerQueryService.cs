@@ -3593,7 +3593,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     unreadableRows++;
                     if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                         throw new LocalisedInvalidOperationException(
-                            string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
+                            string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error,
+                                results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)));
                     continue;
                 }
 
@@ -3634,7 +3635,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 unreadableRows++;
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                     throw new LocalisedInvalidOperationException(
-                        string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
+                        string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error,
+                            results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)));
             }
         }
 
@@ -3652,7 +3654,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // that are not true of this condition.
         if (!reachedEnd)
             throw new LocalisedInvalidOperationException(
-                string.Format(Strings.Error_MsiEnumerationNeverEnded, MaxProductIndex, lastError));
+                string.Format(Strings.Error_MsiEnumerationNeverEnded, MaxProductIndex, lastError,
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)));
 
         return (results, unreadableRows);
     }
@@ -3837,7 +3840,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // keep its own message for the reason given there.
         if (!reachedEnd)
             throw new LocalisedInvalidOperationException(
-                string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, MaxPatchIndex, lastError));
+                string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, MaxPatchIndex, lastError,
+                    results.Count, Helpers.DisplayHelpers.PluralisePatch(results.Count)));
 
         return (results, incomplete);
     }

@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.Interop;
 using InstallerClean.Models;
 using InstallerClean.Resources;
@@ -992,8 +993,13 @@ public class InstallerQueryServiceUnitTests
 
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
 
+        // BOTH FIGURES READ 10,000 HERE AND THE FIXTURE IS WHY. Every index answers
+        // with a product, so the count read cleanly runs to the cap and coincides with
+        // the cap itself. That makes this assertion unable to tell the two apart, which
+        // is what The_stop_message_says_how_many_products_were_read_before_it is for.
         Assert.Equal(
-            string.Format(Strings.Error_MsiEnumerationNeverEnded, 10_000, MsiError.Success),
+            string.Format(Strings.Error_MsiEnumerationNeverEnded, 10_000, MsiError.Success,
+                10_000, DisplayHelpers.PluraliseProduct(10_000)),
             ex.Message);
     }
 
@@ -1006,8 +1012,12 @@ public class InstallerQueryServiceUnitTests
 
         var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
 
+        // The patch loop's own count, and its noun is patches rather than products:
+        // this enumeration walks one program's patch list. Same coincidence as above,
+        // every index answering with a patch.
         Assert.Equal(
-            string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, 10_000, MsiError.Success),
+            string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, 10_000, MsiError.Success,
+                10_000, DisplayHelpers.PluralisePatch(10_000)),
             ex.Message);
     }
 
@@ -1042,6 +1052,29 @@ public class InstallerQueryServiceUnitTests
             msi.AddProduct($"{{bad{i}}}", result: 1603);
 
         await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
+    }
+
+    /// <summary>
+    /// HOW FAR THE ENUMERATION GOT IS NOT THE FAILURE COUNT, AND THE TWO ARE MADE
+    /// DIFFERENT NUMBERS HERE SO THE ASSERTION CAN TELL THEM APART. The stop is a
+    /// fixed run of twenty, so that figure is the same on every machine that reaches
+    /// it and says nothing about any of them. How many products came back cleanly
+    /// first does say something, and reading none is a different situation from
+    /// reading two hundred. Three read then twenty failures separates them; the two
+    /// cap tests above cannot, their fixtures driving both figures to 10,000.
+    /// </summary>
+    [Fact]
+    public async Task The_stop_message_says_how_many_products_were_read_before_it()
+    {
+        var msi = new FakeMsiApi();
+        for (int i = 0; i < 3; i++) msi.AddProduct($"{{good{i}}}");
+        for (int i = 0; i < 20; i++) msi.AddProduct($"{{bad{i}}}", result: 1603);
+
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
+
+        Assert.Equal(
+            string.Format(Strings.Error_MsiNonSuccess, 20, 1603u, 3, DisplayHelpers.PluraliseProduct(3)),
+            ex.Message);
     }
 
     // ---- The abandonment breadcrumb is budgeted ----
