@@ -783,6 +783,40 @@ public sealed record MachineInfo(
 /// any one of them would be false of the others. <c>machine</c>'s counts are where
 /// the conditions are counted apart.
 /// </param>
+/// <param name="WithheldTotalBytes">
+/// The bytes of the files behind <paramref name="WithheldCandidateCount"/>, summed
+/// off the same list so the count sent and the size sent cannot come apart.
+///
+/// IT IS THE QUESTION A COUNT CANNOT ANSWER, AND BOTH HOSTS ALREADY SHOW IT. The
+/// command line prints it beside the count and the window's nothing-offered screen
+/// carries it, so a person at the machine can see what the withholding cost where
+/// these reports could not: forty megabytes and forty gigabytes are the same file
+/// count. This release adds conditions that withhold, and a count alone cannot say
+/// what any of them costs.
+///
+/// NO CAUSE TRAVELS WITH IT, on the same rule as the count it belongs to. It is a
+/// long rather than an int because a byte total over a whole cache folder is not
+/// bounded by anything an int holds.
+/// </param>
+/// <param name="RegisteredWithheldCount">
+/// Registered rows whose removable verdict was taken away because a read established
+/// nothing, whether or not the file is still on the disk:
+/// <c>ScanResult.RegisteredWithheldCount</c>, which is the population the
+/// registered-files window lists.
+///
+/// A THIRD POPULATION AND NOT A RESTATEMENT OF EITHER OF THE OTHERS.
+/// <paramref name="WithheldPatchCount"/> answers what the withholding COST, so it
+/// counts only the rows whose file is there; this is a member of a three-way
+/// partition of the kept list, which lists a row whose file has gone like any other.
+/// <paramref name="WithheldCandidateCount"/> never came from the registered set at
+/// all. The two withheld registration figures agree on a machine whose cache is
+/// intact and differ by exactly the rows something else has already removed, which is
+/// a fact about that machine and is why both travel.
+///
+/// NO CAUSE TRAVELS WITH IT EITHER. Six separate findings take a removable verdict
+/// away and they are different facts about a machine, so a sentence naming one would
+/// be false of the rows the others put in the count.
+/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -800,7 +834,9 @@ public sealed record ScanInfo(
     int UnclaimedPatchFileCount,
     int RecoveredProductCount,
     int UnansweredProductCount,
-    int WithheldCandidateCount)
+    int WithheldCandidateCount,
+    long WithheldTotalBytes,
+    int RegisteredWithheldCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -840,7 +876,15 @@ public sealed record ScanInfo(
             // list. Null is a scan that never reached the decision, which reads as
             // zero here and is not the same thing as a scan that kept nothing back;
             // no run that produces a report can leave it null.
-            scan.WithheldFiles?.Count ?? 0);
+            scan.WithheldFiles?.Count ?? 0,
+            // Summed off the same list the count above is read from, so the two are
+            // one reading. A null list reads as zero here for the reason it does
+            // there: a scan that never reached the decision, which no run producing a
+            // report can be.
+            scan.WithheldTotalBytes,
+            // Counted off the kept list by the scan, so the number sent and the rows
+            // the registered-files window shows cannot come apart.
+            scan.RegisteredWithheldCount);
     }
 }
 

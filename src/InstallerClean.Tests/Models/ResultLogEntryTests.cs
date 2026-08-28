@@ -57,7 +57,9 @@ public class ResultLogEntryTests
         UnclaimedPatchFileCount: 0,
         RecoveredProductCount: 0,
         UnansweredProductCount: 0,
-        WithheldCandidateCount: 0);
+        WithheldCandidateCount: 0,
+        WithheldTotalBytes: 0,
+        RegisteredWithheldCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -225,6 +227,13 @@ public class ResultLogEntryTests
                 // three keys above it: files the walk found and the scan declined to
                 // offer, where that one counts superseded registrations.
                 "withheldCandidateCount",
+                // The size of the population the key above counts, so that a report
+                // can say what the withholding cost and not only how many files it
+                // was, and the third withheld population, which is registered rows
+                // whose verdict was taken away whether or not the file is still
+                // there. Three withheld figures over three different populations;
+                // adding any two of them would answer no question.
+                "withheldTotalBytes", "registeredWithheldCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 
