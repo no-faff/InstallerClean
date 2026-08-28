@@ -37,6 +37,16 @@
          unsigned download before running it. Description above is a different
          field, Comments. -->
     <AssemblyTitle>Cleans up unneeded files in C:\Windows\Installer</AssemblyTitle>
+    <!-- Product name on the same Details tab, two rows under File description.
+         Unset it defaults to the assembly name, which reads correctly here and
+         does so by accident: this assembly happens to be called InstallerClean.
+         The command line's is called installerclean-cli, so the same default put
+         a file name in the row where a product name belongs. Stated in both
+         projects rather than hoisted, because the pair either names one product
+         or it does not, and the setup already writes the same value as
+         VersionInfoProductName. One product, two hosts, three places that must
+         agree. -->
+    <Product>InstallerClean</Product>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

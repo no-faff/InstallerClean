@@ -28,6 +28,13 @@
     <!-- See the GUI csproj for why this is set: unset, Windows shows the
          assembly name as the File description, which repeats the filename. -->
     <AssemblyTitle>Cleans up unneeded files in C:\Windows\Installer (command line)</AssemblyTitle>
+    <!-- Product name on the Details tab. Unset it defaults to the assembly name,
+         so this row read "installerclean-cli": the file name, in the one field
+         that is supposed to say which product the file belongs to. Same value as
+         the GUI and as the setup's VersionInfoProductName, deliberately: the
+         face differs and the product does not, and File description one row up
+         already says which of the two binaries this is. See the GUI csproj. -->
+    <Product>InstallerClean</Product>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
