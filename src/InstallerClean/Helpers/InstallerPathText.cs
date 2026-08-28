@@ -121,10 +121,10 @@ internal static class InstallerPathText
     /// The whole of the work above, with the path to look for handed in.
     ///
     /// SPLIT OUT SO IT CAN BE TESTED AGAINST A PATH RATHER THAN AGAINST THE HOST'S.
-    /// The log lives under the profile, so on a machine that is not Windows it holds
-    /// no backslash and no drive letter at all, and a test driven off the real value
-    /// there counts zero separators against zero insertions and passes whatever the
-    /// method does.
+    /// The log lives under the profile, so on a machine that is not Windows the real
+    /// value holds no backslash and no drive letter at all, and there is nothing in
+    /// it for an assertion to count. This overload is what lets a caller hand in a
+    /// path that has both.
     /// </summary>
     internal static string AllowFolderBreaksIn(string? text, string path)
     {

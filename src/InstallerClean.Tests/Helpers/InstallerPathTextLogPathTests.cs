@@ -25,10 +25,9 @@ public class InstallerPathTextLogPathTests
     private const char WordJoiner = '\u2060';
 
     // A path rather than the host's own. The log lives under the profile, so off
-    // Windows it carries no backslash and no drive letter, and a test driven off the
-    // real value there counts zero separators against zero insertions and passes
-    // whatever the method does. Measured: with the transform disabled outright,
-    // every assertion here still held.
+    // Windows the real value carries no backslash and no drive letter, and there is
+    // nothing in it for these assertions to count. Spelling one out here gives them
+    // seven separators and a drive seam on every machine.
     private const string Path = @"C:\Users\U-ser\AppData\Local\NoFaff\InstallerClean\crash.log";
 
     private static string Treat(string text) =>
