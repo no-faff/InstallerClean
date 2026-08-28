@@ -29,8 +29,8 @@
 //
 // DO NOT REPLACE THIS WITH A DATE COMPARISON, AND THE NUMBER IS WHY. The cheap
 // version of this check asks whether a satellite's value last moved before the
-// neutral's did. Measured over the four pre-August keys that comparison flags:
-// ONE genuine key-slot against THIRTEEN false positives. It flags Status.Done in
+// neutral's did. Over the four pre-August keys that comparison flags, it reports
+// one genuine key-slot against thirteen false positives. It flags Status.Done in
 // Spanish and Russian, where the neutral says "Ready" and the satellites say
 // "Listo" and "Готово", which are correct; flagging destroys two good
 // translations for a human to redo. It flags the two Cli.Help lines in seven
@@ -43,21 +43,18 @@
 // whitespace run as <data>, so anything else landing between them drops that
 // entry silently: a <comment> moved above its <value> is valid resx, is what the
 // Visual Studio editor emits, and costs one entry of the 386. A silent zero over
-// an incomplete set is indistinguishable from a clean result, and that shape has
-// cost this project twice. Refusing with exit 2 is the correct answer.
+// an incomplete set reads exactly like a clean result, so refusing with exit 2 is
+// the correct answer.
 //
-// IT HAS TWO LEGS AND IT ONLY HAD ONE. `parsed !== raw` cannot fire when both are
-// zero, so this gate read a neutral truncated to its XML header, reported
-// "0 neutral key(s) ... 0 STALE" and exited 0: the exact shape it exists to catch,
-// in the check that catches it. `raw === 0` is the missing half and is not implied
-// by the other. Neither figure is written down, so adding a string cannot make
-// either go stale.
+// IT HAS TWO LEGS AND BOTH ARE LOAD-BEARING. `parsed !== raw` catches a neutral
+// the regex read only part of; `raw === 0` catches one it found no entries in at
+// all, which the first cannot see, both of its counts being zero. Neither figure
+// is written down, so adding a string cannot make either go stale.
 //
-// AND THE LEDGER IS TRACKED, IN THE REPOSITORY, DELIBERATELY. The obvious home
-// for it is the working record at non-repo-files/1-evidence/standing/
-// translation/PENDING-RETRANSLATION.md, and that file cannot be read by CI:
-// the private tree is not checked out there. Anything in the private tree can
-// be a working record and can never be a gate. Do not move this file into it.
+// AND THE LEDGER IS TRACKED, IN THE REPOSITORY, DELIBERATELY. A gate reads what
+// CI checks out, so the ledger has to sit where CI can read it. Anything kept
+// outside the repository can be a working record and can never be a gate. Do not
+// move this file out of it.
 //
 // Usage (from the repo root):
 //   node scripts/check-translation-freshness.mjs            check, exit 1 on stale
