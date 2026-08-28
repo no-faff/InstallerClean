@@ -84,13 +84,13 @@ public class InstallerPathTextLogPathTests
     public void The_real_log_path_is_what_the_drawing_layer_actually_asks_about()
     {
         // The one thing the tests above cannot say, because they supply their own
-        // path: that the public entry point looks for the log's real location rather
-        // than something else.
+        // path: that the public entry point reaches for the log's real location
+        // rather than for some other string.
         //
-        // IT BITES ON WINDOWS AND IS INERT ANYWHERE ELSE, which is worth knowing
-        // before reading a pass here as evidence. Where the log sits outside a
-        // Windows profile its path holds no separator, so both sides of this are the
-        // identity function and agree whatever the method does.
+        // THAT IS THE WHOLE OF WHAT IT PINS. Both sides break at the separators in
+        // whatever path they are handed, so what varies between them is the path and
+        // nothing else. The transform itself belongs to the tests above, which spell
+        // their path out rather than taking whatever the host gives them.
         var sentence = $"This is also recorded in {CrashLog.LogPath}.";
         Assert.Equal(
             InstallerPathText.AllowFolderBreaksIn(sentence, CrashLog.LogPath),

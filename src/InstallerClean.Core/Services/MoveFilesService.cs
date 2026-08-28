@@ -466,18 +466,18 @@ public sealed class MoveFilesService : IMoveFilesService
                     }
 
                     // A NAME ALREADY IN THE DESTINATION IS REFUSED AND NOT WORKED
-                    // AROUND, and what decides that is a promise made on the screen
-                    // the move ends on. It tells the user the parked files can be
-                    // put back into the cache folder if anything ever turns out to
-                    // need one, and Windows Installer looks for a cached package by
-                    // the exact path it recorded. A file parked as "thing (1).msi"
-                    // does not go back as "thing.msi", so the suffix this used to
-                    // append quietly made that sentence false for the file it
-                    // renamed, and nothing anywhere recorded which file that was.
+                    // AROUND, and what decides that is a promise the main window
+                    // makes before the move. It tells the reader that putting the
+                    // moved files back into the cache folder restores everything,
+                    // and Windows Installer looks for a cached package by the exact
+                    // path it recorded. A file parked as "thing (1).msi" does not go
+                    // back as "thing.msi", so the suffix this used to append quietly
+                    // made that sentence false for the file it renamed, and nothing
+                    // anywhere recorded which file that was.
                     //
-                    // The restore line cannot qualify itself either: it is chosen
-                    // from the moved count and the destination's drive, so it has no
-                    // way to know a rename happened. Refusing the one file keeps the
+                    // The promise cannot qualify itself either: it is read before
+                    // any folder is chosen and names no file, so there is nowhere in
+                    // it for a rename to be declared. Refusing the one file keeps the
                     // promise true for every file that did move, costs the user
                     // nothing they cannot recover (the file is still in the cache and
                     // a different folder or an emptied one moves it), and puts the

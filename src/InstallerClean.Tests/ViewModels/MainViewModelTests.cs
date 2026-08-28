@@ -1005,18 +1005,28 @@ public class MainViewModelTests
         // so the first resolve is still parked in its debounce when the second
         // cancels it: the Task.Delay throws, ResolveDestinationVolumeAsync
         // returns, and IsOnInstallerCacheDrive is never called for that path.
-        // The string is built from the cache folder's path root as in the test
-        // above; here it names a folder nothing asks a question about.
+        // The string is built from the cache folder's path root as in
+        // MoveButtonTooltip_answers_from_the_box_and_changes_as_it_is_typed_in;
+        // here it names a folder nothing asks a question about.
         //
-        // SO THE HALF THIS REACHES IS THE CANCEL. Two things keep a stale answer
-        // out: ScheduleDestinationVolumeResolve cancelling the resolve in flight,
-        // which is what these two lines fire, and the token re-check on the way
-        // back, which belongs to a resolve whose debounce had already elapsed.
-        // Reaching the second needs the first path's answer to be in flight
-        // rather than parked, and two adjacent property sets cannot put it there
-        // on any host. The keystroke half of the same guard is covered by the
-        // test above, which sets a share over a landed same-drive answer and
-        // reads the tooltip before the next resolve can reply.
+        // WHAT THIS SEQUENCE FIRES IS THE CANCEL. Two things keep a stale answer
+        // off the tooltip: ScheduleDestinationVolumeResolve cancelling the resolve
+        // in flight, which is what these two lines fire, and the token re-check on
+        // the way back, which belongs to a resolve whose debounce had already
+        // elapsed. Here the cancelled resolve dies parked in its debounce and
+        // never reaches that re-check; the surviving resolve reaches it and passes
+        // through. Putting an answer in flight rather than parked needs the
+        // resolve interruptible partway, which two adjacent property sets cannot
+        // do on any host.
+        //
+        // A KEYSTROKE ARRIVING AFTER AN ANSWER HAS LANDED IS A DIFFERENT PATH,
+        // and it is the one
+        // MoveButtonTooltip_answers_from_the_box_and_changes_as_it_is_typed_in
+        // takes when it sets a share over a landed same-drive answer and reads the
+        // tooltip before the next resolve can reply. What drops the answer there
+        // is the unconditional DestinationIsOnCacheVolume = null at the top of
+        // OnMoveDestinationChanged: the publish that landed the answer nulled the
+        // token source on its way out, so by then there is nothing to cancel.
         var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
         vm.Cleanup.MoveDestination = Path.Combine(cachePathRoot, "ic-test-backup");

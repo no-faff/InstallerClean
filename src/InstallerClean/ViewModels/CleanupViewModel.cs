@@ -230,11 +230,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // than a surprise, and with a folder Windows has placed on this volume it
     // says when the space actually comes back.
     //
-    // The same-drive state is what pairs this with the Delete button's tooltip:
-    // one says the space returns straight away, the other says when. Both are
-    // readable before either button is pressed, which is the point, and neither
-    // is the Move confirmation's same-drive warning, which arrives after the
-    // choice is made.
+    // The same-drive state earns a string of its own because its outcome is not
+    // what a reader expects of a move: nothing on the disk is reclaimed by it. A
+    // hover is where that belongs, before the button is pressed and while the
+    // destination can still be changed, and it is not the Move confirmation's
+    // same-drive warning, which says a related thing once the choice has been
+    // made.
     //
     // IT ASKED THE QUESTION HERE UNTIL 3.0.0 AND NOW READS AN ANSWER SOMEBODY
     // ELSE FETCHED. This property is recomputed on every keystroke in the box

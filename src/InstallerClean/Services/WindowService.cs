@@ -4,6 +4,17 @@ using InstallerClean.ViewModels;
 
 namespace InstallerClean.Services;
 
+/// <summary>
+/// Opens the windows the main window offers: the two Details windows, About and
+/// the update prompt. Each is owned by the main window and shown with
+/// <c>ShowDialog</c>, so none of them can be reached or used on its own.
+///
+/// That ownership is why each of them carries <c>ShowInTaskbar="False"</c> in its
+/// own XAML, as does every Window in the app bar the main one. Without it a
+/// window opened here would put a second InstallerClean button in the taskbar and
+/// a second entry in Alt+Tab for as long as it was open, offering a switch to a
+/// window that can only be reached through the one already there.
+/// </summary>
 public sealed class WindowService : IWindowService
 {
     private readonly ISettingsService _settingsService;

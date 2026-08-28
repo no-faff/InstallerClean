@@ -392,10 +392,10 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// The line under a Move summary: the backup folder is safe to delete, and
-    /// what deleting it does about the space. Picks between four strings on the
-    /// two things that vary, whether the folder is on the drive the files came
-    /// from and whether it holds one file or several.
+    /// The line under a Move summary: when to delete the backup folder, and for
+    /// a move that stayed on the drive the files came from, why the space has
+    /// not come back yet. Picks between two strings on the one thing that
+    /// varies.
     /// </summary>
     // Neither form names the files, so neither agrees with a count and the
     // moved count is not a parameter here.
@@ -448,8 +448,9 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_MoveSummary_Plural,
                     "Completion.MoveSummary"),
                 movedCount, movedLabel, destination);
-        // No restore line when nothing moved: it is about files sitting in the
-        // backup folder, and there are none.
+        // No restore line when nothing moved: it tells the reader when to delete
+        // the backup folder, and a move that put nothing there has not made one
+        // worth naming.
         Restore = HeadingIsWarning ? string.Empty : MoveRestoreText(space);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
@@ -469,7 +470,7 @@ public partial class CompletionViewModel : ObservableObject
     /// can be undone, it is that these files do not need undoing, so a recovery
     /// line here would be the app hedging against the thing it has just said
     /// will not happen. That also leaves the screen with no safety claim on it,
-    /// which is why it is the one completion state carrying no link.
+    /// and so nothing on it for a link to hang on.
     /// </summary>
     public void ShowDeleteSummary(int deletedCount, long deletedBytes,
         IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)
@@ -544,10 +545,10 @@ public partial class CompletionViewModel : ObservableObject
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_MoveCancelledSummary, "Completion.MoveCancelledSummary"),
             movedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
-        // Same rule as ShowMoveSummary: the restore line is about files sitting
-        // in the backup folder, and a cancel that came before the first file
-        // moved put none there. Reachable because a cancel with zero moved and
-        // a non-zero error count still raises a summary.
+        // Same rule as ShowMoveSummary: the restore line tells the reader when to
+        // delete the backup folder, and a cancel that came before the first file
+        // moved has not made one worth naming. Reachable because a cancel with
+        // zero moved and a non-zero error count still raises a summary.
         Restore = movedCount == 0 ? string.Empty : MoveRestoreText(space);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);

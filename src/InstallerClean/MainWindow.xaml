@@ -507,14 +507,13 @@
                      which is the emphasis this screen now carries on purpose. -->
                 <!-- Each button's help text is its own tooltip, not a second
                      sentence written alongside it. Two sources for one
-                     explanation drift: they did, the pair here having grown
-                     apart into a screen saying one thing and a screen reader
-                     another. One value feeding both cannot, which is the same
-                     reasoning the move-destination box's placeholder carries
-                     above. Move's is the view-model property because its
-                     tooltip has two states, and the state a screen reader
-                     needs most is the one that warns a folder browser opens
-                     first. -->
+                     explanation drift apart, leaving the screen saying one
+                     thing and a screen reader another; one value feeding both
+                     cannot, which is the same reasoning the move-destination
+                     box's placeholder carries above. Move's is the view-model
+                     property because its tooltip has three states, and the
+                     state a screen reader needs most is the one that warns a
+                     folder browser opens first. -->
                 <DockPanel Grid.Row="4" KeyboardNavigation.TabNavigation="Local">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                             KeyboardNavigation.TabIndex="0"

@@ -23,13 +23,6 @@ public partial class OrphanedFilesWindow : Window
         InitializeComponent();
         DataContext = viewModel;
 
-        // The window is opened modally over the main window and owned by it,
-        // so it cannot be reached or used on its own and never wants its own
-        // taskbar button or Alt+Tab entry. ShowInTaskbar is false in the XAML
-        // for that reason, as it is on every other window in the app bar the
-        // main one. Alt+Tab showing two InstallerClean entries at once is what
-        // the pair of them looked like before.
-
         // The window always opens at this computed size; it does not
         // remember a previous one, so the size always suits the current OS
         // text setting and screen (a saved size scales with neither). 1000 x

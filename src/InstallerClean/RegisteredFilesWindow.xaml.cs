@@ -24,13 +24,6 @@ public partial class RegisteredFilesWindow : Window
         InitializeComponent();
         DataContext = viewModel;
 
-        // The window is opened modally over the main window and owned by it,
-        // so it cannot be reached or used on its own and never wants its own
-        // taskbar button or Alt+Tab entry. ShowInTaskbar is false in the XAML
-        // for that reason, as it is on every other window in the app bar the
-        // main one. Alt+Tab showing two InstallerClean entries at once is what
-        // the pair of them looked like before.
-
         // The window always opens at this computed size; it does not
         // remember a previous one. A saved size does not scale with the OS
         // text setting nor adapt to the current screen, so a size kept from

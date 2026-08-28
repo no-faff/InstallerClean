@@ -69,10 +69,11 @@ public sealed record AccessDenied(string FilePath)
 /// this one and left it where it was. Move only.
 ///
 /// Move once appended " (1)", " (2)" and so on until it found a free name, and
-/// this category was raised only when 10,000 of those had all collided. Renaming
-/// made the completion screen's restore line false for the file it renamed,
-/// Windows Installer looking for a cached package by the exact path it recorded,
-/// so the renaming went and the first collision is now the refusal.
+/// this category was raised only when 10,000 of those had all collided. The main
+/// window promises that putting the moved files back into the cache folder
+/// restores everything, and Windows Installer finds a cached package by the exact
+/// path it recorded, so a file put back under an appended name would not be found
+/// at all. The renaming went, and the first collision is now the refusal.
 ///
 /// The key name <c>Error.NoUniqueFilename</c> dates from that arrangement. The
 /// message it holds describes the refusal.

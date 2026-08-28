@@ -805,14 +805,17 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Composes the completion restore line from <see cref="CompletionViewModel.Restore"/>,
-    /// rendering a phrase delimited by <c>[ ]</c> as a hyperlink into the
-    /// README's "Is it safe?" section: a prefix Run, the Hyperlink, then a
-    /// suffix Run. A value with no <c>[ ]</c> pair (the all-clear receipt, the
-    /// permanent-delete reassurance) renders verbatim as a single Run. Mirrors
-    /// <see cref="RegisteredFilesWindow"/>'s BuildSeeAlsoLine; the URL opens
-    /// through <see cref="UrlLauncher"/> so this elevated process does not
-    /// launch the browser as Administrator.
+    /// Composes the completion restore line from <see cref="CompletionViewModel.Restore"/>.
+    /// A value with no <c>[ ]</c> pair renders verbatim as a single Run, which is
+    /// what the scan receipt and both post-Move lines do. A value carrying such a
+    /// pair renders as a prefix Run, a Hyperlink into the README's "Is it safe?"
+    /// section, then a suffix Run.
+    ///
+    /// Whether a line links is the value's decision and a translation makes it
+    /// per language, which is why the split runs over whatever it is handed
+    /// rather than over a list of keys. Mirrors <see cref="RegisteredFilesWindow"/>'s
+    /// BuildSeeAlsoLine; the URL opens through <see cref="UrlLauncher"/> so this
+    /// elevated process does not launch the browser as Administrator.
     /// </summary>
     private void BuildCompletionRestoreLine()
     {
