@@ -329,10 +329,14 @@
 
        "The backup folder", not "your backup folder": one "you're" in the
        sentence is enough and "the" has its referent in the field label
-       directly above. All three end on the same instruction, that deleting
-       the folder is what finishes the job, because the screen never said so
-       and a real user moved his files, watched nothing break for weeks and
-       still did not know he was done.
+       directly above. All three say when to delete the backup folder, that
+       being what finishes the job, and the screen never said so anywhere
+       else. Somebody who moves their files and sees nothing break for a
+       fortnight has done the whole check this app can offer, and the natural
+       next thought is that they will get round to the folder sometime. These
+       lines tell them that is the last step rather than an optional tidy-up.
+       The same-drive state reaches it through the space it is holding on to;
+       the other two state it plainly.
 
        THIS ONE SAYS NOTHING ABOUT SPACE, AND IT IS THE STATE THE BUTTON IS IN
        WHENEVER THE APP HAS NOT BEEN TOLD THE FOLDER IS ON THIS DRIVE. That
@@ -356,7 +360,7 @@
        said the folder is on this volume, never while the question is open.
        Distinct from Confirm.MoveSameDrive, which says a related thing after
        the choice has been made. -->
-  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. Delete it whenever you're satisfied nothing needs them.</value></data>
+  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder, which you can do whenever you're satisfied nothing needs them.</value></data>
   <!-- The Delete button's tooltip and its screen-reader help text, one
        value feeding both.
 
@@ -943,15 +947,19 @@ To put it back, you need the installer for the version you already have. Get it 
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
 
-       It carries the bracketed link even though no confirmation dialog did
-       before, and for a reason particular to this one: the dialog is modal, so
-       the main window's own "safe to delete" link is visible behind it and
-       cannot be clicked. Without a link here the claim is unreachable at the
-       one moment it is load-bearing.
+       THE CLAIM IS HERE AND IS NOT A LINK, WHICH IS THE ONE THING TO KEEP
+       STRAIGHT ABOUT THIS VALUE. The dialog is modal and sits over the main
+       window, which makes the same claim and links it, so linking the phrase
+       here as well put two of them on screen at once, one live and one behind
+       glass that cannot be clicked. The window carries the link into the
+       README and this dialog states the claim plainly at the moment it is
+       load-bearing. A square-bracketed phrase is what CompositionParsing
+       splits into a hyperlink, so the brackets are the link: leaving them off
+       is the whole of what makes this plain text.
 
        "But" and not "and": offering the backup concedes something to the
-       sentence before it. "The Move button", not bare "Move", so "use Move"
-       is read as a button and not as a second verb in the same sentence.
+       sentence before it. The button is named bare, without "the" or
+       "button" after it, which is how every screen in the app names one.
 
        "THESE FILES" AND NOT A BARE "FILES", WHICH IS WHAT THE PLURAL CARRIED.
        The singular was written fresh in the same commit and says "This file";
@@ -964,8 +972,8 @@ To put it back, you need the installer for the version you already have. Get it 
        raw and it never reaches string.Format, so a {0} written here is painted
        on the dialog. CountedStringTests holds this prefix in its unformatted
        set for that reason. -->
-  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
-  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
+  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>This file will be deleted permanently. It's safe to delete, but if you'd like a backup, use Move instead.</value></data>
+  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>These files will be deleted permanently. They're safe to delete, but if you'd like a backup, use Move instead.</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only
