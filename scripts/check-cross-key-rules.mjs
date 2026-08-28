@@ -569,10 +569,26 @@ const tokenKeys = [...neutral].filter(([, v]) => v.includes(FOLDER_TOKEN)).map((
 //
 // Membership is the NEUTRAL's punctuation and not a list of the sites that split
 // a value. Every production split runs unconditionally over whatever value it is
-// handed, so a satellite outside this set has been shown to disagree with the
-// neutral and nothing further, which is what its message says.
+// handed, so a satellite value outside this set has been shown to disagree with
+// the neutral sentence it answers for and nothing further, which is what its
+// message says.
 const linkKeys = new Set(
   [...neutral].filter(([, v]) => v.includes('[') || v.includes(']')).map(([k]) => k));
+
+// The neutral form a satellite-only plural override answers for, or null where the
+// neutral holds no key it is a form of. DisplayHelpers.Pluralise reads
+// {prefix}.One where the singular would have been chosen and {prefix}.Few or
+// {prefix}.Many where the plural would, so an override is measured against that
+// form and not against the other one; a prefix whose neutral entry is flat at any
+// count is itself the form.
+const standsInFor = (key) => {
+  const parts = /^(.*)\.(One|Few|Many)$/.exec(key);
+  if (parts === null) return null;
+  const [, prefix, category] = parts;
+  const form = category === 'One' ? `${prefix}.Singular` : `${prefix}.Plural`;
+  if (neutral.has(form)) return form;
+  return neutral.has(prefix) ? prefix : null;
+};
 
 if (stale.length) {
   console.error(`Cross-key rules FAILED (${stale.length}): the declarations in this file are stale.`);
@@ -657,14 +673,24 @@ for (const lang of LANGS) {
       failures.push(`${key} has lost its ${FOLDER_TOKEN} token, so the sentence names no folder`);
   }
 
+  // A BRACKET IS MEASURED AGAINST A NEUTRAL SENTENCE, so a key the neutral does
+  // not hold has nothing here to disagree with and is check-resx-parity's stray
+  // finding rather than this one. The exception is a plural override, which is a
+  // form of a key the neutral does hold: folding it in with the strays would take
+  // every inflecting language's overridden forms out of this rule with nothing in
+  // the output to say so.
   for (const [key, value] of map) {
+    const against = neutral.has(key) ? key : standsInFor(key);
+    if (against === null) continue;
+
     const { pairs, chars } = bracketCounts(value);
-    if (linkKeys.has(key)) {
+    if (linkKeys.has(against)) {
       if (pairs !== 1 || chars !== 2)
         failures.push(`${key} carries ${pairs} balanced [phrase] in ${chars} bracket(s); `
           + 'exactly one pair is what becomes the link, and none renders the sentence plain');
     } else if (chars > 0) {
-      failures.push(`${key} carries a square bracket and the neutral carries none, `
+      const compared = against === key ? 'the neutral' : `the neutral's ${against}`;
+      failures.push(`${key} carries a square bracket and ${compared} carries none, `
         + 'so this language and the neutral disagree about whether the sentence '
         + 'holds a link phrase');
     }
