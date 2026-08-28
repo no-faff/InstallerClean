@@ -44,6 +44,13 @@ public class CountedStringTests
     /// of the call expressions, which is how this list once ran four prefixes short
     /// with nothing failing. Walk the resx for Singular and Plural pairs as well as
     /// the call sites.
+    ///
+    /// NOTHING IN THE BUILD COMPARES THIS LIST WITH <see cref="DisplayHelpers.QuestionFor"/>,
+    /// because a switch's arms are not enumerable, so the two are kept in step by hand
+    /// and every theory driven off this list covers exactly what the list holds and no
+    /// more. A prefix missing from here is missing from all of them at once, including
+    /// the sixteen-language cardinality theory, and none of them says so. Compare the
+    /// two whenever either moves.
     /// </summary>
     private static readonly string[] CountedPrefixes =
     {
@@ -64,6 +71,7 @@ public class CountedStringTests
         "Summary.NothingListed",
         "Summary.OrphanedToCleanUp", "Summary.RegisteredStillUsed",
         "Summary.RegisteredWindow",
+        "Cli.SupersededHeldBack", "Summary.SupersededHeldBack",
     };
 
     /// <summary>
@@ -83,6 +91,7 @@ public class CountedStringTests
         "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
         "Summary.NothingListed",
         "Summary.RegisteredStillUsed", "Summary.RegisteredWindow",
+        "Cli.SupersededHeldBack", "Summary.SupersededHeldBack",
     };
 
     private static readonly string[] CategorySuffixes = { ".One", ".Few", ".Many" };
