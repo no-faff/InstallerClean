@@ -48,6 +48,14 @@ public class InstallerPathTextLogPathTests
         // original back exactly.
         Assert.Equal($"This is also recorded in {Path}.",
             new string(result.Where(c => c != ZeroWidthSpace && c != WordJoiner).ToArray()));
+
+        // WHERE, not just how many. A transform appending all seven to the end of the
+        // sentence satisfies both assertions above, and a break opportunity is only
+        // worth anything at the seam it belongs to.
+        for (int i = 0; i < result.Length; i++)
+            if (result[i] == ZeroWidthSpace)
+                Assert.True(i > 0 && result[i - 1] == '\\',
+                    $"a break opportunity at index {i} follows '{(i > 0 ? result[i - 1] : ' ')}' rather than a separator");
     }
 
     [Fact]
@@ -78,8 +86,12 @@ public class InstallerPathTextLogPathTests
     {
         // The one thing the tests above cannot say, because they supply their own
         // path: that the public entry point looks for the log's real location rather
-        // than something else. Host-independent, since it compares the two spellings
-        // rather than assuming either.
+        // than something else.
+        //
+        // IT BITES ON WINDOWS AND IS INERT ANYWHERE ELSE, which is worth knowing
+        // before reading a pass here as evidence. Where the log sits outside a
+        // Windows profile its path holds no separator, so both sides of this are the
+        // identity function and agree whatever the method does.
         var sentence = $"This is also recorded in {CrashLog.LogPath}.";
         Assert.Equal(
             InstallerPathText.AllowFolderBreaksIn(sentence, CrashLog.LogPath),

@@ -158,11 +158,14 @@
                          strongest safety claim. -->
                     <TextBlock x:Name="IntroLeadText" TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
                                FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"/>
-                    <!-- The converter binds the installer cache folder's path
-                         together so it cannot wrap mid-path; the line names the
-                         folder in three of its four states. The collapse
-                         trigger below reads the view-model value, not the
-                         converted one, so its empty test is unaffected. -->
+                    <!-- The converter prepares the line for layout. It binds the
+                         installer cache folder's path together so it cannot wrap
+                         mid-path, the line naming the folder in three of its four
+                         states, and gives the crash log's path break points at its
+                         folders so a long one wraps rather than running off the
+                         pane. The collapse trigger below reads the view-model
+                         value, not the converted one, so its empty test is
+                         unaffected. -->
                     <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}"
                                FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Sm}"
                                Text="{Binding IntroDetail, Converter={StaticResource KeepInstallerPathWhole}}">

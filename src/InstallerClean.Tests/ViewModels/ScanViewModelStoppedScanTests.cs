@@ -54,11 +54,17 @@ public class ScanViewModelStoppedScanTests
         // assert; each host pins one of the two and neither pins both.
         var probe = CrashLog.TryWrite(new InvalidOperationException("probe"));
 
-        // WHERE THE LOG ALREADY ENDS, because the log is appended to and kept until
-        // it reaches half a megabyte. Reading the whole file would find this account
+        // WHAT THE LOG ALREADY HELD, because it is appended to and kept until it
+        // reaches half a megabyte. Reading the whole file would find this account
         // from any earlier run on the same machine, so a method that had stopped
         // writing would still pass here and pass for ever after the first time.
-        long alreadyThere = probe.Written ? new FileInfo(probe.Path).Length : 0;
+        //
+        // READ AS A STRING RATHER THAN MEASURED AS A FILE, and the difference is not
+        // cosmetic. A length in bytes is not an index into the text: the file opens
+        // with a UTF-8 preamble and a privacy header that is translated, so on a
+        // Japanese or Russian profile the byte count runs past the end of the string
+        // and the slice throws, while English stays green for ever.
+        string alreadyThere = probe.Written ? File.ReadAllText(probe.Path) : string.Empty;
 
         var failure = NewViewModel().DescribeScanFailure(AScanThatStopped());
         var added = failure.Message[Strings.Error_InstallerDbEmpty.Length..].Trim();
@@ -73,7 +79,7 @@ public class ScanViewModelStoppedScanTests
 
         // The file itself, not only the sentence about it, and only what this run
         // added to it.
-        var appended = File.ReadAllText(probe.Path)[(int)alreadyThere..];
+        var appended = File.ReadAllText(probe.Path)[alreadyThere.Length..];
         Assert.Contains(Strings.Error_InstallerDbEmpty, appended, StringComparison.Ordinal);
     }
 

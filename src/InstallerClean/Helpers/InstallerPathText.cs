@@ -191,20 +191,34 @@ internal static class InstallerPathText
             joined.Append(path[i]);
         }
     }
+    /// <summary>
+    /// Both treatments, for a string that is about to be laid out.
+    ///
+    /// THE TWO ARE OPPOSITES AND BOTH ARE NEEDED. The cache folder is short and gets
+    /// bound so it cannot break at all; the crash log's path runs through a user
+    /// profile and gets break opportunities at its folders instead, or it would push
+    /// the line off the pane rather than wrap it. A sentence can name either, and the
+    /// scan diagnoses name both.
+    ///
+    /// EVERY DRAWN SURFACE CALLS THIS RATHER THAN COMPOSING THE PAIR ITSELF. There are
+    /// two, the converter below and the message dialog's body, and when they each
+    /// composed their own the second was left behind by a change to the first.
+    /// </summary>
+    public static string ForDrawing(string? text) =>
+        AllowFolderBreaksInLogPath(KeepWhole(text));
 }
 
 /// <summary>
-/// <see cref="InstallerPathText.KeepWhole"/> for a binding, where the string
-/// comes from a view model rather than from the resx at parse time. The main
-/// window's intro detail line is the one consumer: it carries the "they sit in"
-/// sentence that names the cache folder, the not-yet-scanned prompt and, on a
-/// failed scan, either of the two diagnoses that name it.
+/// <see cref="ForDrawing"/> for a binding, where the string comes from a view
+/// model rather than from the resx at parse time. The main window's intro detail
+/// line is the one consumer: it carries the "they sit in" sentence that names the
+/// cache folder, the not-yet-scanned prompt and, on a failed scan, either of the
+/// two diagnoses, which name the cache folder and the log's path.
 /// </summary>
 internal sealed class InstallerPathTextConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => InstallerPathText.AllowFolderBreaksInLogPath(
-            InstallerPathText.KeepWhole(value as string));
+        => InstallerPathText.ForDrawing(value as string);
 
     // One-way only: the joiners are for the screen, and putting them back into
     // a view model would be a data change rather than a rendering one.

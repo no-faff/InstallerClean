@@ -16,12 +16,15 @@ public partial class MessageWindow : Window
         InitializeComponent();
 
         CaptionText.Text = caption;
-        // Bound here and nowhere else. Two of the scan diagnoses name the
-        // installer cache folder mid-paragraph, and of the two places the message
-        // goes this is the one that gets laid out, so it is the one with a line
-        // break to protect; the announced title takes the message as it came. The
-        // same split TranslateExtension makes for an automation property.
-        MessageText.Text = InstallerPathText.KeepWhole(message);
+        // Treated here and nowhere else in this window. The scan diagnoses name
+        // the installer cache folder mid-paragraph and, when a scan stops on its
+        // own, the crash log's path as well; the first is bound so it cannot break
+        // and the second is given break opportunities at its folders. Of the two
+        // places the message goes this is the one that gets laid out, so it is the
+        // one with a line break to protect; the announced title takes the message
+        // as it came. The same split TranslateExtension makes for an automation
+        // property.
+        MessageText.Text = InstallerPathText.ForDrawing(message);
         if (kind != MessageKind.Information)
             WarningIcon.Visibility = Visibility.Visible;
 
