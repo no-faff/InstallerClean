@@ -1712,6 +1712,32 @@ The crash log could not be written.</value></data>
        making it would imply the word meant something about deleting. All four
        run lines carry it. -->
   <data name="Cli.MovedFiles" xml:space="preserve"><value>Moved {0} unneeded {1}.</value></data>
+  <!-- 0 = the backup folder the files are in. The line that finishes the job on
+       this host, printed under the move summary and only where something moved,
+       on the silent-at-zero rule the run lines around it already follow.
+
+       IT NAMES THE FOLDER RATHER THAN SAYING "that folder". A line telling
+       somebody to delete something has to say what it means on its own, because
+       this host's output is read in a scheduled task's log and in a pipe, where
+       the line above it may not be beside it.
+
+       IT SAYS WHAT BEING SATISFIED IS, WHICH IS THE PART THIS HOST HAS NEVER
+       CARRIED. The window's reader is told on the main window to check their
+       programs still update and uninstall as normal; a console reader is told
+       nowhere, so the check goes into the line that asks for it. The words are
+       the ones the command line already uses: Cli.MissingFromDisk says an update
+       or uninstall of that program can fail.
+
+       FLAT AT ANY COUNT. It talks about the folder and not about the files, so
+       nothing in it agrees with a number: no Pluralise call, no plural sibling.
+
+       THERE IS NO SAME-DRIVE VARIANT, AND THAT IS A DECISION. The window's line
+       has one because the window reports what a move reclaimed, so a same-drive
+       move has to explain why the disk did not get emptier. Nothing on this host
+       reports that: the three console lines naming space are the destination
+       free-space refusal and its event-log twin, which are about whether the move
+       can start. There is nothing here for a same-drive form to correct. -->
+  <data name="Cli.MoveRestoreHint" xml:space="preserve"><value>Check that your programs still update and uninstall as normal, then delete {0}.</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,

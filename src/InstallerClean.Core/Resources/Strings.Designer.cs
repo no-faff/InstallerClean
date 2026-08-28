@@ -213,6 +213,7 @@ public static class Strings
     public static string Cli_MovedFiles => Get("Cli.MovedFiles");
     public static string Cli_MoveInstallerLockUnavailable => Get("Cli.MoveInstallerLockUnavailable");
     public static string Cli_MoveNotEnoughSpace => Get("Cli.MoveNotEnoughSpace");
+    public static string Cli_MoveRestoreHint => Get("Cli.MoveRestoreHint");
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");

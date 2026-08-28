@@ -818,6 +818,15 @@ internal static class Program
                 foreach (var err in moveResult.Errors)
                     Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
             }
+            // AFTER THE ERROR BLOCK RATHER THAN BETWEEN IT AND THE SUMMARY, so a
+            // script scraping the "\d+ errors:" shape finds it where it has always
+            // been: this line is new and the block above it is not.
+            //
+            // Only where something moved, on the silent-at-zero rule the run lines
+            // above already follow. A move that put no file in the folder has not
+            // made one worth naming.
+            if (moveResult.MovedCount > 0)
+                Console.WriteLine(string.Format(Strings.Cli_MoveRestoreHint, moveDest));
             // Same per-file error exclusion as the /d branch.
             long actualMovedBytes = moveResult.Errors.Count == 0
                 ? totalBytes
