@@ -8,6 +8,7 @@
         Width="1000" Height="620"
         MinWidth="680" MinHeight="380"
         WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
         Background="{StaticResource Surface.Sidebar}"
         Loaded="Window_Loaded">
 
