@@ -30,7 +30,15 @@ jobs:
     runs-on: windows-2025
 
     steps:
+      # fetch-depth: 0 for the superseded-English gate at the end of this job,
+      # which compares every satellite value against every wording the neutral
+      # resx has ever held, and so answers for exactly as much history as it is
+      # given. The default fetch is one commit. That gate refuses to run in a
+      # shallow clone rather than relying on this line, so removing the depth
+      # turns the step red.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
 
       # Source-level satellite contract: key presence, stray keys and {N}
       # placeholder arity across every Strings.<code>.resx. The compiled-
@@ -225,17 +233,29 @@ jobs:
           if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
           & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
 
-      # The five language gates run last, and each runs even when one before it
-      # has failed. ONE of them is red BY DESIGN for the window between a string
-      # landing in English and its translation round: check-still-english. The
-      # other four, the generator reproduction check, check-accelerators,
-      # check-cross-key-rules and gen-translation-table --check, are expected
-      # green at all times and their red means a mistake. Naming all five is the
-      # point, because working the rest out by elimination is what once produced
-      # a note claiming every gate here was deliberate. They sit at the end for
-      # the same reason rather than for one of their own: from the old position
-      # ahead of the build, one red took everything after it down, and the whole
-      # 3.0.0 line of work was written against a suite that had not run anywhere.
+      # The seven language gates run last, and each runs even when one before it
+      # has failed. Every one is named below, because a gate left out of the list
+      # gets read as deliberate by default.
+      #
+      # FOUR ARE KEYED TO THE TRANSLATION PASS and are red for the window between
+      # an English string landing and that pass running, which is most of a
+      # release: check-still-english, check-translation-freshness, the generator
+      # reproduction check (whose diff catches a satellite the generators would
+      # now write differently, and whose TEMPLATE OK holds a template the
+      # reworded neutral has left behind) and gen-translation-table --check,
+      # whose pages are generated from the resx. A red in any of them says the
+      # English has moved, not that somebody made a mistake.
+      #
+      # THREE ARE EXPECTED GREEN AT ALL TIMES and their red means a mistake:
+      # check-accelerators, check-cross-key-rules and check-superseded-english.
+      # The last is not a translation-window gate even though it reads the
+      # satellites: a satellite holding a wording the English has ABANDONED is
+      # never a state the pass is on its way to producing.
+      #
+      # They sit at the end for the same reason rather than for one of their own:
+      # from the old position ahead of the build, one red took everything after
+      # it down, and the whole 3.0.0 line of work was written against a suite
+      # that had not run anywhere.
       #
       # That is not a settled historical argument, and the reproduction check is
       # the receipt. It was left at the front when the other four moved, and a
@@ -244,8 +264,8 @@ jobs:
       # for 38 commits, while the smoke publishes below carried on going green
       # underneath it and the job looked like nothing worse than its usual reds.
       # !cancelled() is what stops that happening inside this block, one red gate
-      # hiding the four behind it, and unlike always() it stands down on a
-      # cancelled job instead of posting five more failures over the cancellation.
+      # hiding the ones behind it, and unlike always() it stands down on a
+      # cancelled job instead of posting six more failures over the cancellation.
       # Nothing is softened by the position: a failure here fails the job exactly
       # as it did from the top.
 
@@ -317,6 +337,22 @@ jobs:
         if: '!cancelled()'
         run: node scripts/check-still-english.mjs
 
+      # A different question from check-still-english's, and the two divide the
+      # subject between them. That gate compares a satellite value against the
+      # CURRENT neutral; this one compares it against every wording the neutral
+      # has ever held, which is what identifies a value holding English the app
+      # has since replaced. Comparing against a history means it answers for
+      # exactly as much of one as it is given, so it needs the full fetch the
+      # checkout at the top of this job asks for, and refuses to run without it.
+      #
+      # A hard gate rather than a translation-window one: a satellite holding a
+      # wording the app has ABANDONED is not a state the translation pass is on
+      # its way to producing. The script's own header sets out why that leaves it
+      # with no false positives to trade against.
+      - name: Check no satellite holds superseded English
+        if: '!cancelled()'
+        run: node scripts/check-superseded-english.mjs
+
       # The one thing about a translation nothing else asks: whether it has
       # fallen behind its English. The gate above fires when a satellite value
       # equals the CURRENT neutral, resx parity compares key presence and
@@ -325,11 +361,12 @@ jobs:
       # nothing any of them compares it against, and fifteen languages were in
       # that state before 80aff73a.
       #
-      # INERT UNTIL THE TRANSLATION ROUND SEEDS THE LEDGER, and its zero is not
-      # coverage. With no entries it reports every key-slot as one it makes no
-      # claim about, says so in a NOTE line and exits 0. It is wired now rather
-      # than after the seed because the fault it exists to catch is a tool that
-      # was never run, and a gate that is never wired fails the same way.
+      # IT WAS WIRED WHILE ITS LEDGER WAS STILL EMPTY, reporting every key-slot
+      # as one it made no claim about and exiting 0, because the fault it exists
+      # to catch is a tool that was never run and a gate that is never wired
+      # fails the same way. The ledger is seeded now, so it reports and it fails;
+      # a key-slot still outside the ledger is named in a NOTE line and remains
+      # one this makes no claim about.
       - name: Check no translation has fallen behind its English
         if: '!cancelled()'
         run: node scripts/check-translation-freshness.mjs

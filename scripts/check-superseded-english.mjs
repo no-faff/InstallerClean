@@ -47,6 +47,30 @@ const drift = process.argv.includes('--drift');
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 1 << 28 });
 
+// SHALLOW CLONE REFUSAL, AND IT IS THE ONE CONTROL THIS GATE CANNOT DO WITHOUT.
+// Every finding here is a satellite value matching a wording the neutral has held,
+// read out of git, so this gate's answer is only as complete as the history it is
+// run against. On a single commit the set of former wordings is the current one, and
+// a comparison against it can only ever come back empty, which is the same output a
+// genuinely clean tree gives.
+//
+// actions/checkout defaults to a one-commit fetch, so a CI workflow has to ask for
+// the history explicitly. The refusal is here rather than left to that line, because
+// a workflow file can be edited and a local clone can be shallow for reasons of its
+// own, and this is the only place that can tell.
+//
+// Exit 2, with the parse controls below, because all three are the same answer:
+// refusing to report rather than reporting nothing.
+if (git('rev-parse', '--is-shallow-repository').trim() === 'true') {
+  console.error('SHALLOW CLONE: this gate reads the neutral resx value history out of git, and a');
+  console.error('shallow clone does not have it. It would find nothing and print "clean", which is');
+  console.error('indistinguishable from a real pass. Refusing to report on it.');
+  console.error('');
+  console.error('Fetch the full history first. In a workflow that is fetch-depth: 0 on the checkout');
+  console.error('step; locally it is `git fetch --unshallow`.');
+  process.exit(2);
+}
+
 // The parse control's two legs, applied to one historical revision. Separate from
 // parse() below only because a revision is named by commit as well as by path, and
 // because the message has to say which commit so the reader can go and look at it.
