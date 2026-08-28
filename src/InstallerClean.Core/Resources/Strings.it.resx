@@ -501,6 +501,11 @@ To put it back, you need the installer for the version you already have. Get it 
        calls can contain paths from another user's profile. 1 = crash
        log path. -->
   <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scansione non riuscita ({0}). Dettagli in {1}.</value></data>
+  <!-- Added under the account a scan gives when it stops on its own. That account
+       is on a card that goes when the window does, so the same text is written to
+       the crash log and this line says where. Only shown where the write
+       succeeded. 0 = the full path of the log file. -->
+  <data name="Error.ScanStoppedDetails" xml:space="preserve"><value>This is also recorded in {0}.</value></data>
   <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Scansione non riuscita ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
 
   <!-- Completion screen -->

@@ -524,10 +524,35 @@ public partial class ScanViewModel : ObservableObject
             new(ex.Message, Strings.Error_AdminRequiredTitle, IsError: false, Strings.Status_ScanAccessDenied),
         UnauthorizedAccessException =>
             new(Strings.Error_AdminRequiredBody, Strings.Error_AdminRequiredTitle, IsError: false, Strings.Status_ScanAccessDenied),
-        LocalisedInvalidOperationException =>
-            new(ex.Message, Strings.Error_InstallerDbUnavailableTitle, IsError: true, Strings.Status_ScanFailedDb),
+        LocalisedInvalidOperationException => DescribeDeliberateStop(ex),
         _ => DescribeUnexpectedScanFailure(ex),
     };
+
+    /// <summary>
+    /// A stop the scan decided on: the installer records came back empty, unreadable,
+    /// or ended in a way nothing could be trusted from. The message is a full account
+    /// of what happened, built from the app's own strings, so it is safe to show.
+    ///
+    /// IT GOES TO THE CRASH LOG AS WELL, WHICH IS THE WHOLE REASON THIS ARM IS A
+    /// METHOD. The account reaches a card, and a card lasts as long as the window
+    /// does, so writing it leaves a file that can be attached to a report and read
+    /// back afterwards. The command line reaches the same condition through its own
+    /// catch and writes the reason to the Windows event log.
+    ///
+    /// The closing sentence is added only where the write succeeded, following the
+    /// generic branch's two forms: a message naming a file that was never written
+    /// sends somebody looking for it.
+    /// </summary>
+    private static ScanFailure DescribeDeliberateStop(Exception ex)
+    {
+        var crash = CrashLog.TryWrite(ex);
+        var message = crash.Written
+            ? ex.Message + Environment.NewLine + Environment.NewLine
+                + string.Format(Strings.Error_ScanStoppedDetails, crash.Path)
+            : ex.Message;
+        return new ScanFailure(message, Strings.Error_InstallerDbUnavailableTitle,
+            IsError: true, Strings.Status_ScanFailedDb);
+    }
 
     private static ScanFailure DescribeUnexpectedScanFailure(Exception ex)
     {
