@@ -1821,7 +1821,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             unreadable = true;
 
-            // THE READER'S DETAIL IS KEPT HERE, AND THIS IS THE ONLY PLACE IT EXISTS.
+            // THE READER'S DETAIL IS KEPT HERE, AS IT IS AT THE PRODUCT SCREEN.
             // It names which of the reader's failures occurred, and for the first of
             // them it carries the code Windows returned, which separates a path that
             // would not open from a file that opened and is not a package. Nothing acts

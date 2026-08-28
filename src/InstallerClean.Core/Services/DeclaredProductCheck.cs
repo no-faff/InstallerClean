@@ -83,14 +83,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 || identity.Value.IsPatch)
             {
                 // ONLY THE NULL ARM HAS A DETAIL TO KEEP. The other two are answers
-                // the reader gave, not failures it had, so there is nothing it wrote
-                // down about them. The detail names which of the reader's refusals
-                // this was, which is the difference between a file that would not open
-                // and a file that opened and is not a package. Nothing acts on it and
-                // nothing should: every one of the three withholds the candidate. What
-                // it changes is whether a report can say which kind of machine it came
-                // from. The path is not named, for the reason the reader's own contract
-                // gives.
+                // the reader gave rather than failures it had, so it wrote nothing down
+                // about them and a note saying the file did not yield a code would be
+                // untrue of one that did. What the detail is for, and why no path goes
+                // with it, is at the sibling site in InstallerQueryService.
                 if (identity is null)
                     recordRefusal?.Invoke(
                         new InvalidOperationException(

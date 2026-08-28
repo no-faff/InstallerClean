@@ -29,7 +29,7 @@ namespace InstallerClean.Tests.Services;
 /// would wait or fail with 1618, and there would be no exception, no log line and
 /// nothing red.
 ///
-/// Two tests hold it, and why each is needed is written at the structural one.
+/// Two kinds of test hold it, and why each is needed is written at the structural one.
 /// </summary>
 public class MutexLeaseThreadTests
 {
