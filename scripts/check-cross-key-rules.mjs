@@ -566,6 +566,11 @@ const tokenKeys = [...neutral].filter(([, v]) => v.includes(FOLDER_TOKEN)).map((
 // The same for the link phrase. Membership is any bracket at all rather than a
 // well-formed pair, so an unbalanced neutral is a finding here and not a key
 // that quietly leaves the rule.
+//
+// Membership is the NEUTRAL's punctuation and not a list of the sites that split
+// a value. Every production split runs unconditionally over whatever value it is
+// handed, so a satellite outside this set has been shown to disagree with the
+// neutral and nothing further, which is what its message says.
 const linkKeys = new Set(
   [...neutral].filter(([, v]) => v.includes('[') || v.includes(']')).map(([k]) => k));
 
@@ -659,8 +664,9 @@ for (const lang of LANGS) {
         failures.push(`${key} carries ${pairs} balanced [phrase] in ${chars} bracket(s); `
           + 'exactly one pair is what becomes the link, and none renders the sentence plain');
     } else if (chars > 0) {
-      failures.push(`${key} carries a square bracket and nothing splits this key, `
-        + 'so the bracket is painted rather than turned into a link');
+      failures.push(`${key} carries a square bracket and the neutral carries none, `
+        + 'so this language and the neutral disagree about whether the sentence '
+        + 'holds a link phrase');
     }
   }
 
