@@ -510,8 +510,8 @@ public partial class ScanViewModel : ObservableObject
     /// the message, dialog title and overlay status line the user should see, so
     /// the user-driven Scan command, the startup scan and the re-verify all
     /// diagnose a failure the same way instead of each inventing its own. The
-    /// generic branch writes the crash log (its message names the log path), so
-    /// this is called once per failure. <see cref="OperationCanceledException"/> is
+    /// two arms that write the crash log name its path in the message they return,
+    /// and this is called once per failure, so neither writes twice. <see cref="OperationCanceledException"/> is
     /// handled by its own catch and never reaches here.
     /// </summary>
     internal ScanFailure DescribeScanFailure(Exception ex) => ex switch
@@ -534,8 +534,9 @@ public partial class ScanViewModel : ObservableObject
     /// of what happened, built from the app's own strings, so it is safe to show.
     ///
     /// IT GOES TO THE CRASH LOG AS WELL, WHICH IS THE WHOLE REASON THIS ARM IS A
-    /// METHOD. The account reaches a card, and a card lasts as long as the window
-    /// does, so writing it leaves a file that can be attached to a report and read
+    /// METHOD. The account is shown and then gone: on the overlay it lasts as long
+    /// as the window, and at the two act-time callers it is a dialog the reader
+    /// dismisses. Writing it leaves a file that can be attached to a report and read
     /// back afterwards. The command line reaches the same condition through its own
     /// catch and writes the reason to the Windows event log.
     ///
@@ -548,7 +549,8 @@ public partial class ScanViewModel : ObservableObject
         var crash = CrashLog.TryWrite(ex);
         var message = crash.Written
             ? ex.Message + Environment.NewLine + Environment.NewLine
-                + string.Format(Strings.Error_ScanStoppedDetails, crash.Path)
+                + string.Format(Strings.Error_ScanStoppedDetails,
+                    CompositionParsing.InsertPathWrapPoints(crash.Path))
             : ex.Message;
         return new ScanFailure(message, Strings.Error_InstallerDbUnavailableTitle,
             IsError: true, Strings.Status_ScanFailedDb);
@@ -561,8 +563,14 @@ public partial class ScanViewModel : ObservableObject
         // another user's profile.
         var crash = CrashLog.TryWrite(ex);
         var typeName = ex.GetType().Name;
+        // THE PATH IS GIVEN WRAP POINTS, and the pane it lands in is why. It is
+        // drawn wrapping, and nothing else here binds this path, so without them a
+        // long one breaks after the drive letter or inside a folder name in the one
+        // sentence telling somebody where to find the file. The other places the app
+        // shows a path do the same.
         var message = crash.Written
-            ? string.Format(Strings.Status_ScanFailedDetails, typeName, crash.Path)
+            ? string.Format(Strings.Status_ScanFailedDetails, typeName,
+                CompositionParsing.InsertPathWrapPoints(crash.Path))
             : string.Format(Strings.Status_ScanFailedDetails_NoLog, typeName);
         return new ScanFailure(message, Strings.Error_ScanFailedTitle, IsError: true, message);
     }

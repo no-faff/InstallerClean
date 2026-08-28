@@ -66,9 +66,15 @@ function classifiedPrefixes(source) {
 function inventoryPrefixes(source) {
   const head = source.indexOf('private static readonly string[] CountedPrefixes =');
   if (head === -1) fail(`${inventoryPath}: could not find CountedPrefixes. Has it been renamed?`);
-  const tail = source.indexOf('};', head);
-  if (tail === -1) fail(`${inventoryPath}: CountedPrefixes is not closed, so its end cannot be located.`);
-  return literals(source.slice(head, tail));
+  // Both closers, because the array's syntax is not this check's to pin: written as
+  // a collection expression it closes with ]; instead, and a reader that knew only
+  // one form would run on into the next array and report its members as duplicates
+  // of nothing. Whichever comes first is this array's end.
+  const braced = source.indexOf('};', head);
+  const bracketed = source.indexOf('];', head);
+  const ends = [braced, bracketed].filter((i) => i !== -1);
+  if (ends.length === 0) fail(`{inventoryPath}: CountedPrefixes is not closed, so its end cannot be located.`);
+  return literals(source.slice(head, Math.min(...ends)));
 }
 
 function fail(message) {

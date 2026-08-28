@@ -326,6 +326,7 @@ public class DeclaredProductCheckTests
         // allocated before anything fills it, so the zero has to keep the file.
         Assert.True(default(DeclaredProductOutcome).Withholds());
     }
+
     [Fact]
     public void A_file_that_yields_no_identity_hands_on_the_reader_s_own_note()
     {
@@ -347,6 +348,29 @@ public class DeclaredProductCheckTests
         // The path is not named, for the reason the reader's own contract gives: the
         // app runs elevated and this is read long after a report about another file.
         Assert.DoesNotContain(@"a.msi", only.Ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void A_reading_that_answers_but_answers_nothing_useful_records_nothing()
+    {
+        // THE DISTINCTION THE ARM'S COMMENT IS ABOUT, and without this nothing held it.
+        // Three refusals share one arm. Only the first is the reader failing; the other
+        // two are answers it gave, so it wrote no note about them and a log entry saying
+        // the file "did not yield the product code it declares" would be untrue of a file
+        // that yielded one. Moving the record outside the null test passes every other
+        // test in this file.
+        var identities = new ScriptedPackageIdentities();
+        identities.Yields(@"C:\Windows\Installer\a.msi",
+            new PackageIdentity(string.Empty, IsPatch: false, Array.Empty<string>()));
+
+        var recorded = new List<Exception>();
+
+        var outcomes = new DeclaredProductCheck(new ScriptedMsiProducts(), identities)
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") },
+                recordRefusal: (ex, _) => recorded.Add(ex));
+
+        Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
+        Assert.Empty(recorded);
     }
 
     [Fact]
@@ -383,6 +407,7 @@ public class DeclaredProductCheckTests
 internal sealed class ScriptedPackageIdentities : IPackageIdentityReader
 {
     private readonly Dictionary<string, PackageIdentity?> _byPath = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _notes = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Every path this reader was asked about, in order.</summary>
     public List<string> Reads { get; } = new();
@@ -402,8 +427,6 @@ internal sealed class ScriptedPackageIdentities : IPackageIdentityReader
         _byPath[path] = null;
         _notes[path] = note;
     }
-
-    private readonly Dictionary<string, string> _notes = new(StringComparer.OrdinalIgnoreCase);
 
     public PackageIdentity? Read(string filePath, bool isPatch, out string detail)
     {

@@ -66,12 +66,8 @@ jobs:
       - name: Check installer language list
         run: node scripts/check-installer-languages.mjs
 
-      # The counted strings are held in two places: the switch classifying each
-      # prefix, and the array the tests walk to render them. The tests cover
-      # exactly what the array holds, so a prefix present in the switch and
-      # absent from the array is rendered by no test and every one of them still
-      # passes. A switch's arms are not enumerable at runtime, so this compares
-      # the two at the source.
+      # The two lists of counted strings, compared at the source because a
+      # switch's arms are not enumerable at runtime. The script says why.
       - name: Check the counted-string inventory
         run: node scripts/check-counted-string-inventory.mjs
 

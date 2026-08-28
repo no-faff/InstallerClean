@@ -52,15 +52,23 @@ public class ScanViewModelStoppedScanTests
         // through Win32, so it succeeds where the app runs and fails where the suite
         // is being run for convenience. Asking first is what lets both forms be
         // pinned rather than one of them being skipped past.
-        var hostCanWrite = CrashLog.TryWrite(new InvalidOperationException("probe")).Written;
+        var probe = CrashLog.TryWrite(new InvalidOperationException("probe"));
 
         var failure = NewViewModel().DescribeScanFailure(AScanThatStopped());
         var added = failure.Message[Strings.Error_InstallerDbEmpty.Length..].Trim();
 
-        if (hostCanWrite)
-            Assert.Contains("crash.log", added, StringComparison.OrdinalIgnoreCase);
-        else
+        if (!probe.Written)
+        {
             Assert.Equal(string.Empty, added);
+            return;
+        }
+
+        Assert.Contains("crash.log", added, StringComparison.OrdinalIgnoreCase);
+
+        // The file itself, not only the sentence about it. Half of what this test is
+        // named for is that the account was written down, and nothing read it back.
+        Assert.Contains(Strings.Error_InstallerDbEmpty, File.ReadAllText(probe.Path),
+            StringComparison.Ordinal);
     }
 
     [Fact]
