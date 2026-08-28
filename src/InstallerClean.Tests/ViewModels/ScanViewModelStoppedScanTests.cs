@@ -61,9 +61,8 @@ public class ScanViewModelStoppedScanTests
         //
         // READ AS A STRING RATHER THAN MEASURED AS A FILE, and the difference is not
         // cosmetic. A length in bytes is not an index into the text: the file opens
-        // with a UTF-8 preamble and a privacy header that is translated, so on a
-        // Japanese or Russian profile the byte count runs past the end of the string
-        // and the slice throws, while English stays green for ever.
+        // with a UTF-8 preamble and a privacy header that is translated, so the two
+        // counts part company by hundreds on a language whose header is not English.
         string alreadyThere = probe.Written ? File.ReadAllText(probe.Path) : string.Empty;
 
         var failure = NewViewModel().DescribeScanFailure(AScanThatStopped());
@@ -79,7 +78,15 @@ public class ScanViewModelStoppedScanTests
 
         // The file itself, not only the sentence about it, and only what this run
         // added to it.
-        var appended = File.ReadAllText(probe.Path)[alreadyThere.Length..];
+        // ROTATION SITS BETWEEN THE TWO READS. The write that follows moves the log
+        // aside once it passes half a megabyte, and the file that comes back is then
+        // shorter than what was there before rather than longer. Where the earlier
+        // content is no longer at the front, the whole of what is there arrived on
+        // this run.
+        var whole = File.ReadAllText(probe.Path);
+        var appended = whole.StartsWith(alreadyThere, StringComparison.Ordinal)
+            ? whole[alreadyThere.Length..]
+            : whole;
         Assert.Contains(Strings.Error_InstallerDbEmpty, appended, StringComparison.Ordinal);
     }
 

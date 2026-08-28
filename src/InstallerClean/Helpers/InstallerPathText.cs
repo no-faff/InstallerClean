@@ -200,9 +200,11 @@ internal static class InstallerPathText
     /// the line off the pane rather than wrap it. A sentence can name either, and the
     /// scan diagnoses name both.
     ///
-    /// EVERY DRAWN SURFACE CALLS THIS RATHER THAN COMPOSING THE PAIR ITSELF. There are
-    /// two, the converter below and the message dialog's body, and when they each
-    /// composed their own the second was left behind by a change to the first.
+    /// EVERY SURFACE THAT CAN DRAW A CRASH-LOG PATH CALLS THIS RATHER THAN COMPOSING
+    /// THE PAIR ITSELF, and there are two: the converter below and the message
+    /// dialog's body. When they each composed their own, a change to the first left
+    /// the second behind. The other drawn surfaces call <see cref="KeepWhole"/>
+    /// directly and are right to, no log path reaching them.
     /// </summary>
     public static string ForDrawing(string? text) =>
         AllowFolderBreaksInLogPath(KeepWhole(text));
