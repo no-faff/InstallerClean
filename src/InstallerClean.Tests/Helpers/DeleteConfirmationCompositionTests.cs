@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Globalization;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
@@ -24,8 +25,9 @@ namespace InstallerClean.Tests.Helpers;
 ///
 /// IntroLeadCompositionTests does this job for the main window's four leads. This
 /// is the same job for the delete confirmation, which is the only value the app
-/// splits that varies by count, so both forms are read rather than whichever one
-/// a count happens to select.
+/// splits that varies by count. None of the four leads goes through
+/// DisplayHelpers.Pluralise and this value does, so the set read here is every
+/// form Pluralise can choose and not only the pair the neutral declares.
 ///
 /// The parse itself is CompositionParsing.SplitAtBracketedPhrase, covered for its
 /// own edge cases in CompositionParsingTests; what is covered here is the shipped
@@ -33,15 +35,45 @@ namespace InstallerClean.Tests.Helpers;
 /// </summary>
 public class DeleteConfirmationCompositionTests
 {
+    /// <summary>The resx key without the form suffix, as Pluralise is handed it.</summary>
+    private const string Prefix = "Confirm.DeletePermanently";
+
     /// <summary>
-    /// Both count forms. Keys rather than typed accessors, because the assertion
-    /// is about what each language ships and the lookup has to name a culture.
+    /// The CLDR categories a language may override, in the spelling
+    /// DisplayHelpers.Pluralise builds the lookup from.
     /// </summary>
-    private static readonly string[] BodyKeys =
+    private static readonly string[] CategorySuffixes = { ".One", ".Few", ".Many" };
+
+    /// <summary>
+    /// Every form the dialog can be handed in this language: the two count forms
+    /// the neutral declares, plus any category override this language defines for
+    /// the same prefix. Pluralise takes an override in preference to the pair, so a
+    /// bracket in one reaches the dialog exactly as a bracket in the pair does.
+    ///
+    /// The overrides are enumerated from the language's own resource set rather
+    /// than named here, because which language defines which is the language's
+    /// decision and a fixed list would answer for the ones it happened to name on
+    /// the day it was written. Keys rather than typed accessors throughout: an
+    /// override has no accessor, and the assertion is about what each language
+    /// ships, so the lookup has to name a culture.
+    /// </summary>
+    private static IEnumerable<string> BodyKeys(CultureInfo culture)
     {
-        "Confirm.DeletePermanently.Singular",
-        "Confirm.DeletePermanently.Plural",
-    };
+        yield return $"{Prefix}.Singular";
+        yield return $"{Prefix}.Plural";
+
+        // tryParents: false, so this is what this language declares and not what it
+        // inherits; an override is satellite-only by definition.
+        var own = Strings.ResourceManager.GetResourceSet(
+            culture, createIfNotExists: true, tryParents: false);
+        if (own is null) yield break;
+
+        var overrides = own.Cast<DictionaryEntry>()
+            .Select(e => (string)e.Key)
+            .Where(k => CategorySuffixes.Any(suffix => k == Prefix + suffix))
+            .OrderBy(k => k, StringComparer.Ordinal);
+        foreach (var key in overrides) yield return key;
+    }
 
     public static TheoryData<string> Cultures()
     {
@@ -56,18 +88,23 @@ public class DeleteConfirmationCompositionTests
     {
         var culture = CultureInfo.GetCultureInfo(cultureName);
 
-        foreach (var key in BodyKeys)
+        foreach (var key in BodyKeys(culture))
         {
             var value = Body(key, culture);
 
-            // No complete pair, so the dialog takes the single-Run arm.
-            Assert.Null(CompositionParsing.SplitAtBracketedPhrase(value));
+            // No complete pair, so the dialog takes the single-Run arm. The key is
+            // named in the message because the set read here varies by language: a
+            // failure that named only the value would leave a reader working out
+            // which form it came from.
+            Assert.True(CompositionParsing.SplitAtBracketedPhrase(value) is null,
+                $"{cultureName}: {key} splits at a bracketed phrase, so the dialog would "
+                + $"render a hyperlink in it: \"{value}\"");
 
             // And no half of a pair either: an unmatched bracket leaves the split
             // returning null exactly as a clean sentence does, so the assertion
             // above cannot see one. It would paint on screen.
-            Assert.DoesNotContain('[', value);
-            Assert.DoesNotContain(']', value);
+            Assert.True(!value.Contains('[') && !value.Contains(']'),
+                $"{cultureName}: {key} carries a square bracket: \"{value}\"");
         }
     }
 
