@@ -186,7 +186,7 @@ const MAP = {
   'Tooltip.SendResultLog.NothingFound': `Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar.`,
   'Tooltip.Move': `Mueve los archivos innecesarios a la carpeta de copia de seguridad. Elimina esa carpeta cuando estés convencido de que nada los necesita.`,
   'Tooltip.MoveNeedsDestination': `Mueve los archivos innecesarios a una carpeta de copia de seguridad. La elegirás a continuación. Elimina esa carpeta cuando estés convencido de que nada los necesita.`,
-  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. Use Move instead if you want a chance to satisfy yourself all is well.`,
   'Tooltip.SigningCertificate': `Nombre del firmante del certificado Authenticode incorporado. La cadena no está verificada.`,
   'Body.MainExplanation.Lead': `Cualquier archivo innecesario de los de abajo se puede [eliminar sin riesgo].`,
   'Body.MainExplanation.Why': `Están en {InstallerFolder}. InstallerClean pregunta a Windows por cada programa instalado: un archivo aparece en la lista cuando ningún programa lo reclama ({0}), o cuando un parche más nuevo lo ha sustituido y ningún programa podría volver atrás hasta él ({1}).`,
@@ -417,7 +417,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Abre el readme en github en tu navegador.`,
   'Automation.About.ReportProblem.HelpText': `Abre el rastreador de problemas (Issues) en github.com en tu navegador.`,
   'Automation.AutoUpdateCheck.HelpText': `Si está marcada, InstallerClean busca en github una versión más reciente cuando lo ejecutas.`,
-  'Tooltip.MoveSameDrive': `Mueve los archivos innecesarios a la carpeta de copia de seguridad. Está en la misma unidad, así que no recuperarás el espacio hasta que elimines esa carpeta o la muevas a otra unidad. Puedes hacerlo cuando estés convencido de que nada los necesita.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. Delete it whenever you're satisfied nothing needs them.`,
   'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
   'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
@@ -457,7 +457,6 @@ const MAP = {
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Completion.HeldBack.Singular': `{0} file held back. The scan said it was unneeded. The final check didn't agree.`,
   'Completion.HeldBack.Plural': `{0} files held back. The scan said these were unneeded. The final check didn't agree.`,
-  'Tooltip.MoveNotSameDrive': `Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

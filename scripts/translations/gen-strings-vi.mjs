@@ -176,7 +176,7 @@ const MAP = {
   'Tooltip.SendResultLog.NothingFound': `Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.`,
   'Tooltip.Move': `Chuyển các tệp không cần thiết vào thư mục sao lưu. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
   'Tooltip.MoveNeedsDestination': `Chuyển các tệp không cần thiết vào một thư mục sao lưu. Bạn sẽ chọn thư mục ngay sau đây. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.`,
-  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. Use Move instead if you want a chance to satisfy yourself all is well.`,
   'Tooltip.SigningCertificate': `Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi.`,
 
   // Body copy
@@ -484,7 +484,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Mở readme trên github trong trình duyệt của bạn.`,
   'Automation.About.ReportProblem.HelpText': `Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn.`,
   'Automation.AutoUpdateCheck.HelpText': `Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó.`,
-  'Tooltip.MoveSameDrive': `Chuyển các tệp không cần thiết vào thư mục sao lưu. Thư mục đó nằm trên cùng một ổ đĩa, nên bạn chỉ lấy lại dung lượng sau khi xóa nó hoặc chuyển nó sang ổ đĩa khác. Bạn có thể làm vậy khi đã yên tâm rằng không gì cần đến chúng.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. Delete it whenever you're satisfied nothing needs them.`,
   'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
   'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
@@ -524,7 +524,6 @@ const MAP = {
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Completion.HeldBack.Singular': `{0} file held back. The scan said it was unneeded. The final check didn't agree.`,
   'Completion.HeldBack.Plural': `{0} files held back. The scan said these were unneeded. The final check didn't agree.`,
-  'Tooltip.MoveNotSameDrive': `Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

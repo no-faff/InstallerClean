@@ -425,7 +425,6 @@ public static class Strings
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_Move => Get("Tooltip.Move");
     public static string Tooltip_MoveNeedsDestination => Get("Tooltip.MoveNeedsDestination");
-    public static string Tooltip_MoveNotSameDrive => Get("Tooltip.MoveNotSameDrive");
     public static string Tooltip_MoveSameDrive => Get("Tooltip.MoveSameDrive");
     public static string Tooltip_SendResultLog => Get("Tooltip.SendResultLog");
     public static string Tooltip_SendResultLog_NothingFound => Get("Tooltip.SendResultLog.NothingFound");

@@ -910,11 +910,9 @@ public class MainViewModelTests
         //
         // THE SAME-DRIVE ASSERTION BELOW IS FALSE WHERE THEY PART. With a
         // volume mounted at C:\Windows\Installer the folder built from this root
-        // is on another volume, so Windows settles the question rather than
-        // declining it, DestinationIsOnCacheVolume lands false, the tooltip
-        // becomes Tooltip_MoveNotSameDrive and the Tooltip_MoveSameDrive
-        // assertion fails. False is an answer here and not an absence, which is
-        // why it names a drive.
+        // is on another volume, so DestinationIsOnCacheVolume lands false, the
+        // tooltip keeps the plain wording and the Tooltip_MoveSameDrive
+        // assertion fails.
         //
         // A FIXTURE UNDER THE CACHE FOLDER WOULD ANSWER SAME-DRIVE ON EITHER
         // HOST, AND WHAT IT WOULD PIN IS A STATE A USER CAN REACH. Nothing on
@@ -939,29 +937,20 @@ public class MainViewModelTests
         // every keystroke. It is asked on the debounce the destination's own
         // write-back already uses, and until it answers the tooltip shows the
         // plain wording, which claims nothing about any drive.
-        //
-        // THE SECOND ASSERTION IN EACH PAIR IS WHAT PINS THAT. The plain wording
-        // and the two placed ones are three separate keys, so a tooltip that
-        // began naming a drive before Windows had named one would show up here
-        // as Tooltip_MoveNotSameDrive rather than as a value this test cannot
-        // tell apart.
         vm.Cleanup.MoveDestination = Path.Combine(cachePathRoot, "ic-test-backup");
         Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
-        Assert.NotEqual(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
         await Task.Delay(DebounceWait);
         Assert.Equal(Strings.Tooltip_MoveSameDrive, vm.Cleanup.MoveButtonTooltip);
 
-        // Anywhere else, including a share, is settled from the spelling, so it
-        // reaches the placed wording once the debounce is over. Asserted straight
-        // away AND after the window, because the answer this replaces has to be
-        // dropped on the keystroke rather than only on the reply: a share left
-        // reading "same drive" for a debounce would be the old fault in a new
-        // place.
+        // Anywhere else, including a share, takes the plain wording. Asserted
+        // straight away AND after the window, because the answer this replaces
+        // has to be dropped on the keystroke rather than only on the reply: a
+        // share left reading "same drive" for a debounce would be the old fault
+        // in a new place.
         vm.Cleanup.MoveDestination = @"\\server\backup";
         Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
-        Assert.NotEqual(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
         await Task.Delay(DebounceWait);
-        Assert.Equal(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
+        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
 
         // Back to empty, because the box is a TextBox and a user can clear it.
         vm.Cleanup.MoveDestination = string.Empty;
@@ -969,13 +958,13 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void MoveButtonTooltip_names_a_drive_only_where_Windows_has_named_one()
+    public void MoveButtonTooltip_speaks_of_the_drive_only_where_Windows_has_named_it()
     {
         // The selector alone, driven from the flag instead of from a real folder,
-        // so all four states are reachable on any host. The two the timing test
-        // above cannot produce are the ones worth pinning: a volume question
-        // still in flight, and one Windows will not answer. Both arrive as null
-        // and neither may name a drive.
+        // so every value of it is reachable on any host. Only true reaches the
+        // wording that mentions space. False, a question still in flight and a
+        // question Windows will not answer all take the plain wording, and the
+        // last two of those three cannot be produced by the timing test above.
         var vm = CreateViewModel();
 
         // A path that exists only as a string here. Setting it schedules a
@@ -990,7 +979,7 @@ public class MainViewModelTests
         Assert.Equal(Strings.Tooltip_MoveSameDrive, vm.Cleanup.MoveButtonTooltip);
 
         vm.Cleanup.DestinationIsOnCacheVolume = false;
-        Assert.Equal(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
+        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
 
         // An empty box outranks a volume answer, and the flag is set AFTER the
         // box so that there is one to outrank. Clearing the box nulls the flag
@@ -1035,7 +1024,7 @@ public class MainViewModelTests
 
         await Task.Delay(DebounceWait);
 
-        Assert.Equal(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
+        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
     }
 
     [Fact]

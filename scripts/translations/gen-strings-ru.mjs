@@ -172,7 +172,7 @@ const MAP = {
   'Tooltip.SendResultLog.NothingFound': `На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.`,
   'Tooltip.Move': `Перемещает ненужные файлы в папку резервных копий. Удалите эту папку, когда убедитесь, что они никому не нужны.`,
   'Tooltip.MoveNeedsDestination': `Перемещает ненужные файлы в папку резервных копий. Вы выберете её следующим шагом. Удалите эту папку, когда убедитесь, что они никому не нужны.`,
-  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. Use Move instead if you want a chance to satisfy yourself all is well.`,
   'Tooltip.SigningCertificate': `Имя субъекта из встроенного сертификата Authenticode. Цепочка не проверялась.`,
 
   // Body copy
@@ -440,7 +440,7 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Открывает readme на github в вашем браузере.`,
   'Automation.About.ReportProblem.HelpText': `Открывает список проблем (Issues) на github.com в вашем браузере.`,
   'Automation.AutoUpdateCheck.HelpText': `Если флажок установлен, InstallerClean при запуске проверяет на github наличие более новой версии.`,
-  'Tooltip.MoveSameDrive': `Перемещает ненужные файлы в папку резервных копий. Она на том же диске, поэтому место вернётся только после того, как вы удалите эту папку или переместите её на другой диск. Это можно сделать, когда убедитесь, что они никому не нужны.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. Delete it whenever you're satisfied nothing needs them.`,
   'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
   'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
@@ -465,7 +465,6 @@ const MAP = {
   'Summary.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Completion.HeldBack.Singular': `{0} file held back. The scan said it was unneeded. The final check didn't agree.`,
   'Completion.HeldBack.Plural': `{0} files held back. The scan said these were unneeded. The final check didn't agree.`,
-  'Tooltip.MoveNotSameDrive': `Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT

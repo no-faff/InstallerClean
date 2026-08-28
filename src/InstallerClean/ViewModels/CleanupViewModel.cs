@@ -66,11 +66,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// neither state asserts anything.
     ///
     /// FALSE IS RESERVED FOR WINDOWS HAVING SAID THE FOLDER IS SOMEWHERE ELSE,
-    /// which is the only answer that earns the sentence about the space coming
-    /// back at once. <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/>
-    /// is what keeps the two apart; its bool sibling folds them together, which
-    /// is right for a caller that acts on the answer and wrong for one that
-    /// says something about it.
+    /// and the tooltip happens to word that state and the two unknown ones
+    /// alike. The distinction is kept anyway, because a reader meeting a plain
+    /// bool here would take false for "another volume" and write the next claim
+    /// on it. <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/> is
+    /// what keeps the three apart, and its bool sibling folds them together,
+    /// which is right for a caller that acts on the answer and wrong for one
+    /// that says something about it.
     /// </remarks>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
@@ -222,11 +224,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     partial void OnIsOperatingChanged(bool value) =>
         CancelOperationCommand.NotifyCanExecuteChanged();
 
-    // The Move button works from any of the four states, so this says what
+    // The Move button works from any of the three states, so this says what
     // pressing it will do rather than naming a missing step: with no folder set
     // it warns that a browser opens first, so the browser is expected rather
-    // than a surprise, and with a folder Windows has placed it says when the
-    // space actually comes back.
+    // than a surprise, and with a folder Windows has placed on this volume it
+    // says when the space actually comes back.
     //
     // The same-drive state is what pairs this with the Delete button's tooltip:
     // one says the space returns straight away, the other says when. Both are
@@ -244,11 +246,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // So the call happens on a background hop and lands in
     // DestinationIsOnCacheVolume, and this property only reads a flag.
     //
-    // TWO OF THE FOUR STATES SAY NOTHING ABOUT SPACE, AND THE SECOND OF THEM IS
-    // WHY THE FLAG IS NULLABLE. An empty box cannot know where the folder will
-    // be. An unanswered volume question cannot know where it is. The claim that
-    // the space comes back at once belongs to the one state where Windows has
-    // said so, and the plain wording carries the rest.
+    // ONLY THE SAME-DRIVE STATE SAYS ANYTHING ABOUT SPACE, AND THE TEST IS
+    // AGAINST true RATHER THAN AGAINST FALSENESS. Windows placing the folder on
+    // this volume is the one answer that earns that sentence; a folder placed
+    // elsewhere, a question still in flight and a question Windows will not
+    // answer all take the plain wording, which claims nothing about any volume
+    // and is true of all three. Where the space goes is explained on the main
+    // window above the buttons.
     //
     // WHAT THAT COSTS, SET AGAINST WHAT IT REPLACED, because a reader meeting
     // an async flag and a staleness window should see the trade rather than
@@ -261,12 +265,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // line all re-ask inside the pre-flight at the moment of action.
     public string MoveButtonTooltip =>
         string.IsNullOrWhiteSpace(MoveDestination) ? Strings.Tooltip_MoveNeedsDestination
-        : DestinationIsOnCacheVolume switch
-        {
-            true => Strings.Tooltip_MoveSameDrive,
-            false => Strings.Tooltip_MoveNotSameDrive,
-            null => Strings.Tooltip_Move,
-        };
+        : DestinationIsOnCacheVolume == true ? Strings.Tooltip_MoveSameDrive
+        : Strings.Tooltip_Move;
 
     partial void OnMoveDestinationChanged(string value)
     {

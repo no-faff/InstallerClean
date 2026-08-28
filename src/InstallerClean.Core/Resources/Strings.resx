@@ -322,25 +322,25 @@
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.</value></data>
-  <!-- The Move button's four tooltip states, chosen by whether the backup
-       folder is set and, once Windows has answered, whether it sits on the
-       drive the files are already on. Each is also the button's screen-reader help text, one value
+  <!-- The Move button's three tooltip states, chosen by whether the backup
+       folder is set and whether it sits on the drive the files are already
+       on. Each is also the button's screen-reader help text, one value
        feeding both, so it has to work spoken as well as hovered.
 
        "The backup folder", not "your backup folder": one "you're" in the
        sentence is enough and "the" has its referent in the field label
-       directly above. All four end on the same instruction, that deleting
+       directly above. All three end on the same instruction, that deleting
        the folder is what finishes the job, because the screen never said so
        and a real user moved his files, watched nothing break for weeks and
        still did not know he was done.
 
-       THIS ONE SAYS NOTHING ABOUT SPACE AND THAT IS WHAT IT IS FOR. Which
-       volume the folder is on is a question for Windows, put on a background
-       hop, so there is a moment before the answer lands, and there are
-       machines where Windows will not answer it at all. This value stands
-       through both and is true of every destination. The completion card
-       takes the same line after the act: a destination it could not read is
-       the one case it declines to say either way. -->
+       THIS ONE SAYS NOTHING ABOUT SPACE, AND IT IS THE STATE THE BUTTON IS IN
+       WHENEVER THE APP HAS NOT BEEN TOLD THE FOLDER IS ON THIS DRIVE. That
+       covers three answers: a folder Windows has placed elsewhere, a volume
+       question still in flight, and one Windows will not answer at all. The
+       value is true of every one of them, which is what lets a single wording
+       serve all three. Where the space goes is explained on the main window
+       above the buttons rather than asserted in a hover. -->
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.</value></data>
   <!-- The Move button's tooltip while the backup folder box is empty. The
        button still works from here: pressing it opens the folder browser
@@ -349,31 +349,28 @@
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.</value></data>
-  <!-- The state where Windows has said the folder is NOT on the volume the
-       files are on, which is the state whose outcome matches Delete's. Those
-       two are the pair a reader is choosing between, so this reuses
-       Tooltip.Delete's own words for the outcome they share.
-
-       It makes no new claim by carrying them: the finished screen already
-       heads such a move with the freed count, so the app was saying this
-       after the act and now says it in time to be acted on.
-
-       "Not on the same drive" rather than "on another drive", because the
-       backup folder may be a network location, which is not a drive. -->
-  <data name="Tooltip.MoveNotSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.</value></data>
-  <!-- The same-drive state. It exists to give a matched pair with
-       Tooltip.Delete on the one trade the user is actually making: hover
-       Delete and the space comes back at once, hover Move with a folder on
-       the same drive and it comes back when that folder goes. Same verb,
-       same promise, different timing, both readable before either button is
-       pressed. Distinct from Confirm.MoveSameDrive, which says a related
-       thing after the choice has been made. -->
-  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.</value></data>
+  <!-- The same-drive state, and the only Move state that says anything about
+       space. It is the one case where the outcome is not what a reader
+       expects of a move, so it is worth saying before the button is pressed
+       rather than only on the finished screen. Shown only once Windows has
+       said the folder is on this volume, never while the question is open.
+       Distinct from Confirm.MoveSameDrive, which says a related thing after
+       the choice has been made. -->
+  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. Delete it whenever you're satisfied nothing needs them.</value></data>
   <!-- The Delete button's tooltip and its screen-reader help text, one
-       value feeding both. "Reclaim" rather than a synonym because it is
-       already the app's word for this: the reports chart says "Space
-       reclaimed from C:\Windows\Installer". -->
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Delete the unneeded files permanently. They're safe to delete, and you'll reclaim the space straight away.</value></data>
+       value feeding both.
+
+       IT POINTS AT THE OTHER BUTTON, WHICH IS THE WHOLE OF WHY IT IS WORDED
+       THIS WAY. Move is the route by which a person can satisfy themselves
+       before anything is permanent, so the tooltip on the irreversible button
+       is where saying so is worth most. "Move" names the button rather than
+       the act, as Confirm.DeletePermanently already does.
+
+       IT SAYS NOTHING ABOUT SPACE AND NOTHING ABOUT SAFETY. Both are on the
+       main window above these buttons, where they are explained rather than
+       asserted in a hover, and the safety claim there carries the link into
+       the README that lets a reader check it. -->
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Delete the unneeded files permanently. Use Move instead if you want a chance to satisfy yourself all is well.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
 
   <!-- Body copy -->

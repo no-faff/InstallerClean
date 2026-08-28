@@ -341,7 +341,6 @@
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>把不需要的文件移动到一个备份文件夹。您接下来会选择它。等您确信没有任何东西需要它们时，再删除那个文件夹。</value></data>
-  <data name="Tooltip.MoveNotSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.</value></data>
   <!-- The same-drive state. It exists to give a matched pair with
        Tooltip.Delete on the one trade the user is actually making: hover
        Delete and the space comes back at once, hover Move with a folder on
