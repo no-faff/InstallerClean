@@ -27,15 +27,14 @@ namespace InstallerClean.Tests.Services;
 /// committed batch must not take the process down. So the machine-wide installer mutex
 /// would stay held until the process exits, every installer on the box that wants it
 /// would wait or fail with 1618, and there would be no exception, no log line and
-/// nothing red. The cost falls on the instruments rather than on the app, which is the
-/// shape that reads exactly like nothing being wrong.
+/// nothing red.
 ///
-/// TWO TESTS, BECAUSE ONE OF THEM CANNOT BE TRUSTED ALONE. The behavioural test below
+/// TWO TESTS, BECAUSE NEITHER SETTLES THE RULE ON ITS OWN. The behavioural test below
 /// runs the real batch and compares the two thread identities, which is the invariant
 /// stated directly. But an await only makes a hop LIKELY: a task that has already
 /// completed by the time it is awaited resumes synchronously, so the continuation stays
-/// where it was, and that test alone can therefore pass with the fault present. A test
-/// that finds a planted fault half the time is not a guard.
+/// where it was, and a comparison of thread identities can therefore pass with the
+/// fault present.
 ///
 /// So the structural test is the deterministic half, and it is what actually holds this
 /// invariant: the regression is a compiler-generated async state machine arising from
@@ -123,6 +122,16 @@ public class MutexLeaseThreadTests
     [MemberData(nameof(LeaseHolders))]
     public void The_lease_holding_method_compiles_to_no_async_state_machine(Type service, string method)
     {
+        // THIS TEST IS NOT REDUNDANT BESIDE THE BEHAVIOURAL PAIR ABOVE, AND IT IS THE ONE
+        // THAT LOOKS IT, being a reflection walk over type names sitting beside two tests
+        // that drive the real batch. Those two compare the thread the lease was taken on
+        // against the thread it was released on, which states the invariant directly, and
+        // an await only makes a continuation hop LIKELY: a task already complete when it
+        // is awaited resumes synchronously, so they can pass with the fault present. This
+        // one asks whether the compiler built a state machine for the lease-holding
+        // method, which either happened or did not. Remove it and the rule is left to a
+        // comparison that fires only when the scheduler happens to move the continuation.
+        //
         // The deterministic half. An await anywhere between the acquire and the release
         // means the compiler built a state machine for the method that holds the lease,
         // and the naming derives from that method: an async lambda in the body yields
