@@ -29,23 +29,7 @@ namespace InstallerClean.Tests.Services;
 /// would wait or fail with 1618, and there would be no exception, no log line and
 /// nothing red.
 ///
-/// TWO TESTS, BECAUSE NEITHER SETTLES THE RULE ON ITS OWN. The behavioural test below
-/// runs the real batch and compares the two thread identities, which is the invariant
-/// stated directly. But an await only makes a hop LIKELY: a task that has already
-/// completed by the time it is awaited resumes synchronously, so the continuation stays
-/// where it was, and a comparison of thread identities can therefore pass with the
-/// fault present.
-///
-/// So the structural test is the deterministic half, and it is what actually holds this
-/// invariant: the regression is a compiler-generated async state machine arising from
-/// the lease-holding method, and that either exists in the assembly or does not.
-/// NEITHER OF THE TWO IS REDUNDANT BESIDE THE OTHER, AND THE STRUCTURAL ONE IS THE ONE
-/// THAT LOOKS IT, being a reflection walk over type names sitting beside a test that
-/// exercises the real batch. Remove it and the invariant is left to a comparison that
-/// only fires when the scheduler happens to move the continuation.
-///
-/// The behavioural one stays because it says the rule in the rule's own terms, it can
-/// never be a false red, and it reaches restructurings the name-keyed walk cannot see.
+/// Two tests hold it, and why each is needed is written at the structural one.
 /// </summary>
 public class MutexLeaseThreadTests
 {
