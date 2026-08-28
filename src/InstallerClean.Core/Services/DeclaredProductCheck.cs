@@ -32,7 +32,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <inheritdoc />
     public IReadOnlyList<DeclaredProductOutcome> Screen(
         IReadOnlyList<OrphanedFile> candidates,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<Exception, string>? recordRefusal = null)
     {
         var outcomes = new DeclaredProductOutcome[candidates.Count];
 
@@ -66,7 +67,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 continue;
             }
 
-            var identity = _identityReader.Read(candidate.FullPath, isPatch: false, out _);
+            var identity = _identityReader.Read(candidate.FullPath, isPatch: false, out var detail);
 
             // THREE REFUSALS UNDER ONE ARM, and each of them is the file failing
             // to give this pass something to ask about. Null is the reader's own
@@ -81,6 +82,23 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 || identity.Value.Code.Length == 0
                 || identity.Value.IsPatch)
             {
+                // ONLY THE NULL ARM HAS A DETAIL TO KEEP. The other two are answers
+                // the reader gave, not failures it had, so there is nothing it wrote
+                // down about them. The detail names which of the reader's refusals
+                // this was, which is the difference between a file that would not open
+                // and a file that opened and is not a package. Nothing acts on it and
+                // nothing should: every one of the three withholds the candidate. What
+                // it changes is whether a report can say which kind of machine it came
+                // from. The path is not named, for the reason the reader's own contract
+                // gives.
+                if (identity is null)
+                    recordRefusal?.Invoke(
+                        new InvalidOperationException(
+                            "A cached package did not yield the product code it declares, so it is "
+                            + "kept rather than offered. Reader detail: "
+                            + (detail.Length == 0 ? "none given" : detail) + "."),
+                        detail);
+
                 outcomes[i] = DeclaredProductOutcome.Unestablished;
                 continue;
             }

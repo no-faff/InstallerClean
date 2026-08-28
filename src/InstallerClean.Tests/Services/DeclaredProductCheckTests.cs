@@ -326,6 +326,48 @@ public class DeclaredProductCheckTests
         // allocated before anything fills it, so the zero has to keep the file.
         Assert.True(default(DeclaredProductOutcome).Withholds());
     }
+    [Fact]
+    public void A_file_that_yields_no_identity_hands_on_the_reader_s_own_note()
+    {
+        var identities = new ScriptedPackageIdentities();
+        identities.YieldsNothing(@"C:\Windows\Installer\a.msi", note: "no Property table");
+
+        var recorded = new List<(Exception Ex, string Cause)>();
+
+        var outcomes = new DeclaredProductCheck(new ScriptedMsiProducts(), identities)
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") },
+                recordRefusal: (ex, cause) => recorded.Add((ex, cause)));
+
+        Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
+
+        var only = Assert.Single(recorded);
+        Assert.Equal("no Property table", only.Cause);
+        Assert.Contains("no Property table", only.Ex.Message, StringComparison.Ordinal);
+
+        // The path is not named, for the reason the reader's own contract gives: the
+        // app runs elevated and this is read long after a report about another file.
+        Assert.DoesNotContain(@"a.msi", only.Ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void A_file_that_yields_an_identity_records_nothing()
+    {
+        // The must-miss control for the test above. A screen that recorded on every
+        // candidate would satisfy it while saying nothing about the refusal path.
+        var identities = new ScriptedPackageIdentities();
+        identities.Declares(@"C:\Windows\Installer\a.msi", ProductA);
+
+        var msi = new ScriptedMsiProducts();
+        msi.Installed(ProductA);
+
+        var recorded = new List<Exception>();
+
+        new DeclaredProductCheck(msi, identities)
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") },
+                recordRefusal: (ex, _) => recorded.Add(ex));
+
+        Assert.Empty(recorded);
+    }
 }
 
 /// <summary>
@@ -350,13 +392,23 @@ internal sealed class ScriptedPackageIdentities : IPackageIdentityReader
 
     public void Yields(string path, PackageIdentity identity) => _byPath[path] = identity;
 
-    /// <summary>The file would not give up an identity at all.</summary>
-    public void YieldsNothing(string path) => _byPath[path] = null;
+    /// <summary>
+    /// The file would not give up an identity at all. The note is what the real
+    /// reader writes to say WHICH of its refusals this was, and it is the thing the
+    /// screen is meant to pass on rather than drop.
+    /// </summary>
+    public void YieldsNothing(string path, string note = "")
+    {
+        _byPath[path] = null;
+        _notes[path] = note;
+    }
+
+    private readonly Dictionary<string, string> _notes = new(StringComparer.OrdinalIgnoreCase);
 
     public PackageIdentity? Read(string filePath, bool isPatch, out string detail)
     {
         Reads.Add(filePath);
-        detail = string.Empty;
+        detail = _notes.TryGetValue(filePath, out var note) ? note : string.Empty;
         if (!_byPath.TryGetValue(filePath, out var identity))
             throw new InvalidOperationException(
                 $"the fake reader was asked to read {filePath}, which no test scripted");

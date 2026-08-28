@@ -61,9 +61,17 @@ public interface IDeclaredProductCheck
     /// <see cref="IPackageIdentityReader.Read"/> for why that is a precondition
     /// and not a courtesy.
     /// </param>
+    /// <param name="recordRefusal">
+    /// Where a reader refusal goes, given the exception to log and the reader's own
+    /// short note on which refusal it was. Handed in by the scan that owns the crash
+    /// log for the run rather than made here, so a test calling this pass directly
+    /// has no run and writes nothing. A delegate rather than the log itself because
+    /// this interface is public and that type is not.
+    /// </param>
     IReadOnlyList<DeclaredProductOutcome> Screen(
         IReadOnlyList<OrphanedFile> candidates,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        Action<Exception, string>? recordRefusal = null);
 }
 
 /// <summary>

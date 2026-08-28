@@ -533,7 +533,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         else
         {
             WithholdCandidatesTheirOwnProductStillClaims(
-                unclaimedByPath, withheld, cancellationToken);
+                unclaimedByPath, withheld, cancellationToken,
+                (ex, cause) => refusalLog.Record(ex, cause));
             removable.AddRange(unclaimedByPath);
         }
 
@@ -1196,11 +1197,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private void WithholdCandidatesTheirOwnProductStillClaims(
         List<OrphanedFile> candidates,
         List<OrphanedFile> withheld,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Action<Exception, string>? recordRefusal = null)
     {
         if (_declaredProducts is null || candidates.Count == 0) return;
 
-        var outcomes = _declaredProducts.Screen(candidates, cancellationToken);
+        var outcomes = _declaredProducts.Screen(candidates, cancellationToken, recordRefusal);
 
         // A screen that answered a different number of candidates than it was
         // given has not answered about these files, and reading it positionally
