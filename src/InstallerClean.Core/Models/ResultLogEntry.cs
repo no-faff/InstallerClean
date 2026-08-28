@@ -667,23 +667,32 @@ public sealed record MachineInfo(
 /// <param name="MissingNeededCount">
 /// The half of <paramref name="MissingFromDiskCount"/> whose absence this scan could
 /// not establish to be harmless. NOT the half carrying no superseded or obsoleted
-/// state, which is what this said and what the axis stopped being in 3.0.0: a row
-/// leaves this count only where the state is superseded or obsoleted AND the
-/// per-product condition positively established that nothing could roll back onto
-/// the file. The key name is on the wire and stays; what was wrong was the
-/// description of what fills it. Added BESIDE the total rather than replacing
-/// it: the total is read by the public chart with no version gate, and replacing
-/// it would split a live series at this release. The other half falls out by
-/// subtraction.
+/// state, which is what this said and what the axis stopped being in 3.0.0. It is
+/// filled from <see cref="ScanResult.MissingAffectedCount"/>, whose own remarks state
+/// the conjunction in full and are the one place it is written down; a second copy
+/// here would be a third statement of a rule that has already drifted once. The key
+/// name is on the wire and stays; what was wrong was the description of what fills
+/// it. Added BESIDE the total rather than replacing it: the total is read by the
+/// public chart with no version gate, and replacing it would split a live series at
+/// this release. The other half falls out by subtraction.
 ///
-/// THE NAME IS NOW WRONG AND THE WIRE SHAPE IS HELD ANYWAY. It says "needed"
-/// because the other half was read as benign, and that reading is what 3.0.0
-/// removes: Windows opens every registered patch's cached file whether superseded
-/// or not, so both halves are registrations naming a file that is not there and
-/// neither is the lesser. The population also shifts slightly at this release,
-/// having previously excluded any patch a scan called removable and now excluding
-/// every superseded or obsoleted one. Renaming a key is a schema decision with a
-/// receiver on the other end of it, so the key stays and this note is the record.
+/// THE NAME SAYS "NEEDED", THE COUNT DOES NOT MEAN IT, AND THE WIRE SHAPE IS HELD
+/// ANYWAY. What lands here is an absence this scan could not establish to be
+/// harmless, which is a fact about what the scan managed to read rather than a
+/// finding that anything wants the file back: a rise in this figure can as easily be
+/// a run that read less. This note used to close by saying the two halves are
+/// registrations naming a file that is not there and "neither is the lesser", which
+/// is the proposition its own first paragraph denies. From 3.0.0 they ARE graded,
+/// positively and narrowly, and both hosts print the graded half rather than the
+/// total. What that sentence was reaching for is true and is worth keeping: the patch
+/// STATE does not grade them, Windows opening every registered patch's cached file
+/// whether superseded or not, so the state is one conjunct of three and settles
+/// nothing on its own. The population did move at this release, so a series crossing
+/// it is not comparable, but not in the way this note said either: through v2.3.0 the
+/// figure excluded every patch a scan called removable and every one whose verdict it
+/// had withheld, and it now excludes only rows meeting that whole conjunction rather
+/// than "every superseded or obsoleted one". Renaming a key is a schema decision with
+/// a receiver on the other end of it, so the key stays and this note is the record.
 /// </param>
 /// <param name="WithheldPatchCount">
 /// Superseded files a scan would have offered and did not, on one condition rather

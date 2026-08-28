@@ -13,14 +13,20 @@ namespace InstallerClean.Helpers;
 /// composing a line for the main screen and the command line writing to stdout.
 /// Rendering the parts here leaves each host only its own joining to do.
 ///
-/// ONE POPULATION, ONE SENTENCE, AND NO CAUSE NAMED. A registration naming an
-/// absent file is the same condition whether or not Windows has marked the patch
-/// superseded, because Windows opens every patch registered to a product either
-/// way, so the record is one Windows will act on and cannot satisfy
+/// ONE POPULATION, ONE SENTENCE, AND NO CAUSE NAMED. The patch STATE settles nothing
+/// on its own: Windows opens every patch registered to a product whether or not it
+/// has been superseded, so a superseded registration naming an absent file is a
+/// record Windows will act on and cannot satisfy exactly as an applied one is
 /// (<see cref="RegisteredPackage.IsMissingFromDisk"/> carries the citations and
 /// why no single consequence may be named). The data keeps the split, in
 /// <see cref="ScanResult.MissingUnaffectedCount"/> and its sibling; the copy does
 /// not.
+///
+/// WHAT THE PREDICATE BELOW GRADES IS ONE CASE, NARROWLY, and it is the only thing
+/// here that does: the state together with two further facts the scan has to
+/// establish positively. A summary sits above the predicate and is read first, so it
+/// states the part that holds either way and leaves the population to the expression
+/// that decides it.
 ///
 /// AND IT SAYS NOTHING ABOUT WHAT REMOVED THEM, which is not a nicety. Every tool
 /// that has ever deleted from this folder leaves an identical record, this one
