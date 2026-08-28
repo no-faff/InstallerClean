@@ -404,7 +404,7 @@
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
     <value>This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.
 
-To put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This usually restores the file and usually leaves your settings alone, but Microsoft doesn't guarantee it.</value>
+To put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -1480,11 +1480,19 @@ The crash log could not be written.</value></data>
        detail than the other; it may not drop the instruction that prevents a
        reader making the problem worse. Two smaller omissions went with it: the
        old wording said "preferably the same version" for something Windows
-       refuses outright, and "usually restores" travelled here without the
-       companion hedge it has in the window.
+       refuses outright.
 
-       "Can fail", "usually", "may" and "doesn't guarantee" are the verified
-       positions and none may harden: Microsoft guarantees nothing here. The
+       "Can fail", "may" and "doesn't guarantee" are the verified positions and
+       none may harden: Microsoft guarantees nothing here.
+
+       THE CLOSING SENTENCE IS SETTLED AND IS NOT TO BE REWORDED, and the word to
+       leave alone is "should". It says what the step is meant to do and claims no
+       rate. "Usually" claims a frequency, and how often the recovery works has
+       never been counted anywhere it can be read off, so it asserts something
+       nothing behind it establishes. Both halves sit under the one hedge on
+       purpose: nothing here knows more about the settings than about the file.
+       The same sentence ends Body.RegisteredMissingFromDisk. It is one claim on
+       three surfaces and they move together or not at all. The
        version IS knowable, being the program's own and printed in Settings and
        in Programs and Features; what is hard is OBTAINING it, makers usually
        publishing only the current one, which is what "if you can get it" carries
@@ -1493,8 +1501,8 @@ The crash log could not be written.</value></data>
        THE COLON IS NEW AND FRENCH NEEDS A NARROW NO-BREAK SPACE BEFORE IT
        (U+202F), which the Edit tool silently flattens; check-french-spacing
        holds it. -->
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This usually restores the file and usually leaves your settings alone, but Microsoft doesn't guarantee it.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This usually restores the file and usually leaves your settings alone, but Microsoft doesn't guarantee it.</value></data>
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.</value></data>
   <!-- The command line's own copy of Summary.SupersededHeldBack, whose remarks
        carry the placeholder, why no cause is named, why "superseded" is earned and
        why neither host closes on a clause about listing.
