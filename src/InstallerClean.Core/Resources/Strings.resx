@@ -332,8 +332,20 @@
        directly above. All three end on the same instruction, that deleting
        the folder is what finishes the job, because the screen never said so
        and a real user moved his files, watched nothing break for weeks and
-       still did not know he was done. -->
-  <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.</value></data>
+       still did not know he was done.
+
+       ALL THREE SAY WHEN THE SPACE COMES BACK, because from where the user
+       stands that is the only thing that differs between them and it is the
+       whole of the choice the button is asking about. Answering it in the
+       tooltip rather than only on the finished screen puts it at the moment
+       of choosing. The cross-drive state makes no new claim by carrying it:
+       the finished screen already heads such a move with the freed count.
+
+       "Not on the same drive" rather than "on another drive", because the
+       backup folder may be a network location, which is not a drive. The
+       clause reuses Tooltip.Delete's own words for the same outcome, those
+       two being the pair a reader is choosing between. -->
+  <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.</value></data>
   <!-- The Move button's tooltip while the backup folder box is empty. The
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
