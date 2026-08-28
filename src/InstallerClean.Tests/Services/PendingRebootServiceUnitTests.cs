@@ -211,6 +211,37 @@ public class PendingRebootServiceUnitTests
         Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
     }
 
+    /// <summary>
+    /// An entry the prefix strip leaves un-rooted is not a path this comparison can
+    /// answer about, and is not turned into one by the process's working directory.
+    ///
+    /// The object manager's own spellings do that: "UNC\server\share\...",
+    /// "Volume{...}\..." and "GLOBALROOT\Device\..." all carry their root inside the
+    /// part the strip leaves behind, so what comes out is a relative string.
+    ///
+    /// THE FIXTURE PUTS THE CACHE WHERE Path.GetFullPath WOULD COMPLETE THAT STRING TO,
+    /// which is what makes this a test rather than a restatement: the Windows root is
+    /// the working directory, so an entry naming "Installer" completes to the very
+    /// folder the comparison is looking for. A comparison reading the completed value
+    /// blocks here; one that requires a rooted path does not. The entry carries no
+    /// separator of its own so that the completion lands on the folder itself.
+    /// </summary>
+    [Fact]
+    public void Pending_rename_left_un_rooted_by_the_prefix_strip_returns_clean()
+    {
+        _registry.LocalMachineMultiStringValue(
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
+            .Returns(new[]
+            {
+                @"\??\Installer", "",
+            });
+
+        var result = Build(windowsRoot: Directory.GetCurrentDirectory()).Check();
+
+        Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
+    }
+
     [Fact]
     public void Empty_pending_file_renames_returns_clean()
     {

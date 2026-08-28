@@ -106,6 +106,18 @@ public sealed class PendingRebootService : IPendingRebootService
                 if (string.IsNullOrEmpty(raw)) continue;
                 var cleaned = StripNtPathPrefix(raw);
 
+                // ONLY A FULLY QUALIFIED PATH IS COMPARED, AND WHAT FOLLOWS THE PREFIX
+                // DECIDES WHETHER THERE IS ONE. A drive-letter path comes out of the
+                // strip rooted; the object manager's other spellings do not, because
+                // "UNC\server\share\...", "Volume{...}\..." and
+                // "GLOBALROOT\Device\..." carry their root inside the part the strip
+                // leaves behind. Path.GetFullPath completes anything that is not
+                // rooted from the process's working directory, so one of those handed
+                // to it becomes a well-formed path that is nobody's queued rename, and
+                // the comparison below would then answer about wherever the app was
+                // started from rather than about the entry.
+                if (!Path.IsPathFullyQualified(cleaned)) continue;
+
                 // Path.GetFullPath resolves \..\ traversal so a poisoned entry like
                 // "C:\Windows\Installer\..\..\Users\Other\secret" cannot pass the prefix
                 // check and reach the Detail field.
