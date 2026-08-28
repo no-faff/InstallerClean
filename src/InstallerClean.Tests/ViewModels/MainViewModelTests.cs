@@ -937,22 +937,61 @@ public class MainViewModelTests
         // every keystroke. It is asked on the debounce the destination's own
         // write-back already uses, and until it answers the tooltip shows the
         // plain wording, which claims nothing about any drive.
+        //
+        // THE SECOND ASSERTION IN EACH PAIR IS WHAT PINS THAT. The plain wording
+        // and the two placed ones are three separate keys, so a tooltip that
+        // began naming a drive before Windows had named one would show up here
+        // as Tooltip_MoveNotSameDrive rather than as a value this test cannot
+        // tell apart.
         vm.Cleanup.MoveDestination = Path.Combine(cachePathRoot, "ic-test-backup");
         Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
+        Assert.NotEqual(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
         await Task.Delay(DebounceWait);
         Assert.Equal(Strings.Tooltip_MoveSameDrive, vm.Cleanup.MoveButtonTooltip);
 
-        // Anywhere else, including a share, takes the plain wording. Asserted
-        // straight away AND after the window, because the answer this replaces
-        // has to be dropped on the keystroke rather than only on the reply: a
-        // share left reading "same drive" for a debounce would be the old fault
-        // in a new place.
+        // Anywhere else, including a share, is settled from the spelling, so it
+        // reaches the placed wording once the debounce is over. Asserted straight
+        // away AND after the window, because the answer this replaces has to be
+        // dropped on the keystroke rather than only on the reply: a share left
+        // reading "same drive" for a debounce would be the old fault in a new
+        // place.
         vm.Cleanup.MoveDestination = @"\\server\backup";
         Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
+        Assert.NotEqual(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
         await Task.Delay(DebounceWait);
-        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
+        Assert.Equal(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
 
         // Back to empty, because the box is a TextBox and a user can clear it.
+        vm.Cleanup.MoveDestination = string.Empty;
+        Assert.Equal(Strings.Tooltip_MoveNeedsDestination, vm.Cleanup.MoveButtonTooltip);
+    }
+
+    [Fact]
+    public void MoveButtonTooltip_names_a_drive_only_where_Windows_has_named_one()
+    {
+        // The selector alone, driven from the flag instead of from a real folder,
+        // so all four states are reachable on any host. The two the timing test
+        // above cannot produce are the ones worth pinning: a volume question
+        // still in flight, and one Windows will not answer. Both arrive as null
+        // and neither may name a drive.
+        var vm = CreateViewModel();
+
+        // A path that exists only as a string here. Setting it schedules a
+        // resolve, which sits in its debounce for the length of this test and
+        // never publishes over the values set below.
+        vm.Cleanup.MoveDestination = @"D:\ic-test-backup";
+
+        vm.Cleanup.DestinationIsOnCacheVolume = null;
+        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
+
+        vm.Cleanup.DestinationIsOnCacheVolume = true;
+        Assert.Equal(Strings.Tooltip_MoveSameDrive, vm.Cleanup.MoveButtonTooltip);
+
+        vm.Cleanup.DestinationIsOnCacheVolume = false;
+        Assert.Equal(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
+
+        // An empty box outranks whatever answer is still standing for the path
+        // that has just gone. It is the fourth state and not a special case.
         vm.Cleanup.MoveDestination = string.Empty;
         Assert.Equal(Strings.Tooltip_MoveNeedsDestination, vm.Cleanup.MoveButtonTooltip);
     }
@@ -993,7 +1032,7 @@ public class MainViewModelTests
 
         await Task.Delay(DebounceWait);
 
-        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
+        Assert.Equal(Strings.Tooltip_MoveNotSameDrive, vm.Cleanup.MoveButtonTooltip);
     }
 
     [Fact]

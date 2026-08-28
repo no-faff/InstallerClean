@@ -124,20 +124,18 @@ internal static class MoveSpaceCheck
     /// measured whichever side of the comparison declined to answer.
     ///
     /// THE TWO REFUSALS ARE NOT INTERCHANGEABLE FOR A CALLER THAT CLASSIFIES,
-    /// AND THE DIFFERENCE IS WHICH OF THEM THAT CALLER CAN SEE. One that goes
-    /// on to ask which volume the destination is on is putting the same
-    /// question to the same path, so a destination this method could not
-    /// resolve is one it cannot resolve either: the refusal is reproduced in
-    /// front of it, and it has nothing to classify. No caller has a cache-side
-    /// query of its own, so that refusal is never put a second time and never
-    /// seen. It arrives as a plain false, indistinguishable from a destination
-    /// genuinely on another volume, and a caller classifying from the
-    /// destination alone can report space freed by a move that freed none,
-    /// which is the misreading above arriving from a refusal rather than from
-    /// a wrong answer. A bool has no room for "I could not tell", so what that
-    /// leaves a classifying caller to do is a question about that caller
-    /// rather than about this method. It is written down here so the next
-    /// reader does not have to derive it, and it is open.
+    /// AND <see cref="ResolveIsOnInstallerCacheDrive"/> IS WHERE SUCH A CALLER
+    /// GOES. A caller that goes on to ask which volume the destination is on is
+    /// putting the same question to the same path, so a destination this method
+    /// could not resolve is one it cannot resolve either: the refusal is
+    /// reproduced in front of it, and it has nothing to classify. The cache side
+    /// is different, no caller having a query of its own for it, so that refusal
+    /// is never put a second time. Through this method both arrive as a plain
+    /// false, indistinguishable from a destination genuinely on another volume,
+    /// and a caller classifying on that can report space freed by a move that
+    /// freed none. A bool has no room for "I could not tell", so the caller that
+    /// needs the difference takes the nullable overload and the caller that wants
+    /// the safe way round takes this one.
     /// </remarks>
     /// <param name="installerCacheRoot">
     /// Test-only real-folder override for the cache root (null in production,
@@ -158,12 +156,40 @@ internal static class MoveSpaceCheck
     /// a second disk and administrator rights, and this is the parameter that
     /// does it instead.
     /// </param>
-    internal static bool IsOnInstallerCacheDrive(string destination, string? installerCacheRoot = null)
-    {
-        if (string.IsNullOrWhiteSpace(destination)) return false;
+    internal static bool IsOnInstallerCacheDrive(string destination, string? installerCacheRoot = null) =>
+        ResolveIsOnInstallerCacheDrive(destination, installerCacheRoot) ?? false;
 
-        // Asked before anything is resolved, and true on its own terms rather
-        // than as a guard: a share is not a local volume, so it is not this one.
+    /// <summary>
+    /// The same question as <see cref="IsOnInstallerCacheDrive"/>, answered in
+    /// three states: true and false where Windows settled it, and null where it
+    /// did not.
+    /// </summary>
+    /// <remarks>
+    /// FOR A CALLER THAT SAYS SOMETHING ABOUT THE ANSWER RATHER THAN ACTING ON
+    /// IT. Telling a person where their space goes, or writing which kind of
+    /// destination it was into the record, is a claim, and a claim needs the
+    /// difference between "another volume" and "Windows would not say". The
+    /// caller that acts takes the bool and gets the safe way round with it.
+    ///
+    /// A REMOTE PATH IS A REAL FALSE AND NOT A REFUSAL. A share is not a local
+    /// volume, so it is not this one, and that is settled from the spelling
+    /// before anything is asked of the network. Null is for the three places
+    /// where the question was put and came back without an answer: either
+    /// volume failing to resolve, and anything thrown on the way.
+    ///
+    /// An empty destination is null rather than false for the same reason. There
+    /// is no path to be on any volume, so there is nothing to report either way.
+    /// </remarks>
+    /// <param name="destination">The folder the move would write into.</param>
+    /// <param name="installerCacheRoot">
+    /// As <see cref="IsOnInstallerCacheDrive"/>'s, which carries the whole of why
+    /// it exists.
+    /// </param>
+    internal static bool? ResolveIsOnInstallerCacheDrive(
+        string destination, string? installerCacheRoot = null)
+    {
+        if (string.IsNullOrWhiteSpace(destination)) return null;
+
         if (StorageHelpers.IsRemotePath(destination)) return false;
 
         try
@@ -174,17 +200,17 @@ internal static class MoveSpaceCheck
             // something is.
             var cacheVolume = StorageHelpers.GetVolumeMountPoint(
                 installerCacheRoot ?? InstallerCacheHelpers.InstallerFolder);
-            if (cacheVolume is null) return false;
+            if (cacheVolume is null) return null;
 
             var destinationVolume =
                 StorageHelpers.GetVolumeMountPoint(Path.GetFullPath(destination));
-            if (destinationVolume is null) return false;
+            if (destinationVolume is null) return null;
 
             return string.Equals(destinationVolume, cacheVolume, StringComparison.OrdinalIgnoreCase);
         }
         catch
         {
-            return false;
+            return null;
         }
     }
 

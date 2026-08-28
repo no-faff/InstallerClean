@@ -524,6 +524,7 @@ const MAP = {
   'Cli.SupersededHeldBack.Plural': `On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.`,
   'Completion.HeldBack.Singular': `{0} file held back. The scan said it was unneeded. The final check didn't agree.`,
   'Completion.HeldBack.Plural': `{0} files held back. The scan said these were unneeded. The final check didn't agree.`,
+  'Tooltip.MoveNotSameDrive': `Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

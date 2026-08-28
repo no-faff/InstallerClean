@@ -341,6 +341,7 @@
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Chuyển các tệp không cần thiết vào một thư mục sao lưu. Bạn sẽ chọn thư mục ngay sau đây. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.</value></data>
+  <data name="Tooltip.MoveNotSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.</value></data>
   <!-- The same-drive state. It exists to give a matched pair with
        Tooltip.Delete on the one trade the user is actually making: hover
        Delete and the space comes back at once, hover Move with a folder on

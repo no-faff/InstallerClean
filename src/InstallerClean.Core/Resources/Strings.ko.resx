@@ -341,6 +341,7 @@
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>불필요한 파일을 백업 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요.</value></data>
+  <data name="Tooltip.MoveNotSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's not on the same drive, so you'll reclaim the space straight away. Delete that folder whenever you're satisfied nothing needs them.</value></data>
   <!-- The same-drive state. It exists to give a matched pair with
        Tooltip.Delete on the one trade the user is actually making: hover
        Delete and the space comes back at once, hover Move with a folder on

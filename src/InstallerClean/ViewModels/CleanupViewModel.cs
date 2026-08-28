@@ -54,18 +54,27 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
     /// <summary>
     /// Whether the folder named in the box is on the volume the installer cache
-    /// is on. Read by <see cref="MoveButtonTooltip"/> and by nothing else.
+    /// is on: true, false, or null where Windows has not answered. Read by
+    /// <see cref="MoveButtonTooltip"/> and by nothing else.
     /// </summary>
     /// <remarks>
-    /// FALSE MEANS "NOT ESTABLISHED" AS WELL AS "ESTABLISHED OTHERWISE", and
-    /// the tooltip is written so that both take the same wording: false picks
-    /// Tooltip.Move, which says nothing about which drive the folder is on and
-    /// is therefore true of every destination. So the window between a keystroke
-    /// and the answer landing asserts nothing, and needs no third state.
+    /// NULL IS ITS OWN STATE AND NOT A SHADE OF FALSE, because two different
+    /// things arrive here knowing nothing. The box changing clears the flag
+    /// before anything is asked, and the volume question itself can come back
+    /// unanswered on a machine where Windows will not resolve one of the two
+    /// paths. Tooltip.Move covers both and says nothing about any volume, so
+    /// neither state asserts anything.
+    ///
+    /// FALSE IS RESERVED FOR WINDOWS HAVING SAID THE FOLDER IS SOMEWHERE ELSE,
+    /// which is the only answer that earns the sentence about the space coming
+    /// back at once. <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/>
+    /// is what keeps the two apart; its bool sibling folds them together, which
+    /// is right for a caller that acts on the answer and wrong for one that
+    /// says something about it.
     /// </remarks>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
-    private bool _destinationIsOnCacheVolume;
+    private bool? _destinationIsOnCacheVolume;
 
     // Reveals the operating overlay. It is not the "work is underway" flag:
     // it goes false during the confirm-dialog window between the pre-flight
@@ -213,11 +222,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     partial void OnIsOperatingChanged(bool value) =>
         CancelOperationCommand.NotifyCanExecuteChanged();
 
-    // The Move button works from any of the three states, so this says what
+    // The Move button works from any of the four states, so this says what
     // pressing it will do rather than naming a missing step: with no folder set
     // it warns that a browser opens first, so the browser is expected rather
-    // than a surprise, and with a folder on the volume the files are already on
-    // it says when the space actually comes back.
+    // than a surprise, and with a folder Windows has placed it says when the
+    // space actually comes back.
     //
     // The same-drive state is what pairs this with the Delete button's tooltip:
     // one says the space returns straight away, the other says when. Both are
@@ -233,7 +242,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // a mapped letter whose share has gone away, that is the SMB stall this
     // class already refuses to take on the dispatcher for the Move pre-flight.
     // So the call happens on a background hop and lands in
-    // DestinationIsOnCacheVolume, and this property only reads a bool.
+    // DestinationIsOnCacheVolume, and this property only reads a flag.
+    //
+    // TWO OF THE FOUR STATES SAY NOTHING ABOUT SPACE, AND THE SECOND OF THEM IS
+    // WHY THE FLAG IS NULLABLE. An empty box cannot know where the folder will
+    // be. An unanswered volume question cannot know where it is. The claim that
+    // the space comes back at once belongs to the one state where Windows has
+    // said so, and the plain wording carries the rest.
     //
     // WHAT THAT COSTS, SET AGAINST WHAT IT REPLACED, because a reader meeting
     // an async flag and a staleness window should see the trade rather than
@@ -246,8 +261,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // line all re-ask inside the pre-flight at the moment of action.
     public string MoveButtonTooltip =>
         string.IsNullOrWhiteSpace(MoveDestination) ? Strings.Tooltip_MoveNeedsDestination
-        : DestinationIsOnCacheVolume ? Strings.Tooltip_MoveSameDrive
-        : Strings.Tooltip_Move;
+        : DestinationIsOnCacheVolume switch
+        {
+            true => Strings.Tooltip_MoveSameDrive,
+            false => Strings.Tooltip_MoveNotSameDrive,
+            null => Strings.Tooltip_Move,
+        };
 
     partial void OnMoveDestinationChanged(string value)
     {
@@ -258,10 +277,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // had chosen in an earlier session. The tooltip would then never say
         // same-drive for the commonest destination in the app.
         //
-        // The flag goes false first and unconditionally: it describes a path,
+        // The flag goes null first and unconditionally: it describes a path,
         // and the path has just changed, so it has nothing to say until the
-        // resolve lands. Tooltip.Move covers that window and is true whatever
-        // the volume.
+        // resolve lands. Tooltip.Move covers that window and says nothing about
+        // any volume, so nothing is asserted while it stands.
         //
         // Resolved from the TRIMMED value, because that is the string the Move
         // itself uses (MoveAllAsync takes MoveDestination.Trim()), and a tooltip
@@ -273,7 +292,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // binding keeps the typed value mid-session.
         var normalised = value?.Trim() ?? string.Empty;
 
-        DestinationIsOnCacheVolume = false;
+        DestinationIsOnCacheVolume = null;
         ScheduleDestinationVolumeResolve(normalised);
 
         if (string.Equals(_settings.MoveDestination, normalised, StringComparison.Ordinal))
@@ -343,8 +362,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // is over, the body is two volume queries and a token cannot abandon a
         // Win32 call once it has started, and the token check below is what
         // decides whether the answer is still wanted.
+        // The three-state answer, so that Windows declining the question is not
+        // published as "somewhere else". The tooltip says something about this
+        // rather than acting on it, and the two refusals are not the same thing
+        // to a sentence a person reads.
         var onCacheVolume = await Task
-            .Run(() => MoveSpaceCheck.IsOnInstallerCacheDrive(destination))
+            .Run(() => MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination))
             .ConfigureAwait(true);
 
         // Publish only if this resolve is still the current one. A keystroke
@@ -1812,8 +1835,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // what counts as a share.
         if (StorageHelpers.IsRemotePath(dest)) return MoveDestinationKinds.UncShare;
 
-        if (MoveSpaceCheck.IsOnInstallerCacheDrive(dest))
-            return MoveDestinationKinds.SameDrive;
+        // Three-state for the same reason the tooltip is: this value goes into
+        // the result log and the opt-in report, and it is read as an answer. A
+        // volume question Windows would not settle is unknown, not another
+        // drive, and calling it another drive is what would let the completion
+        // card head a move with a freed count it had not established.
+        var onCacheVolume = MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(dest);
+        if (onCacheVolume is null) return MoveDestinationKinds.Unknown;
+        if (onCacheVolume.Value) return MoveDestinationKinds.SameDrive;
 
         try
         {
