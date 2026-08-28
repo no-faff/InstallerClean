@@ -242,8 +242,37 @@ internal static class DisplayHelpers
     private static string? Override(string key) => Strings.Find(key);
 
     /// <summary>
-    /// Picks the count fragment for <paramref name="count"/> in the current UI
-    /// language. <paramref name="singular"/>/<paramref name="plural"/> are the resx
+    /// The language the counted sentence is actually being read in, which is the only
+    /// thing a plural rule may be taken from.
+    ///
+    /// IT IS NOT <see cref="Localisation.UiCulture"/>, AND THE DIFFERENCE IS NOT
+    /// COSMETIC. That is the culture the machine is running under, or the one the user
+    /// picked; the TEXT comes from whichever satellite the ResourceManager's fallback
+    /// chain actually reached, and on a culture with no satellite that is the English
+    /// neutral. <see cref="CategoryFor"/> switches on a two-letter code, so taking the
+    /// rule from the requested culture would apply one language's arm to a sentence
+    /// written in another.
+    ///
+    /// TWO FAMILIES SIT ON THAT LINE. Traditional Chinese (zh-TW, zh-HK, zh-MO,
+    /// zh-Hant and bare zh) reaches no satellite and displays English while its code
+    /// stays "zh", whose arm answers Other at every count, so that arm would spell an
+    /// English sentence "1 files". European Portuguese (pt-PT, and bare pt: the
+    /// satellite is pt-BR, which is not on their fallback chain) displays English while
+    /// its arm makes 0 singular as well as 1, which would spell "0 file". Five of the
+    /// counted prefixes are noun slots, so the noun they pick is quoted by other
+    /// sentences and carries any disagreement into them.
+    ///
+    /// <see cref="SupportedLanguages.Active"/> walks the same parent chain the
+    /// ResourceManager probes, which is why it is the right answer and not merely a
+    /// closer one, and it is the reason this is not simply the culture's own parent:
+    /// zh-CN resolves through zh-Hans and does render Chinese.
+    /// </summary>
+    private static CultureInfo DisplayedLanguage =>
+        CultureInfo.GetCultureInfo(SupportedLanguages.Active(Localisation.UiCulture));
+
+    /// <summary>
+    /// Picks the count fragment for <paramref name="count"/> in the language the app
+    /// is displaying. <paramref name="singular"/>/<paramref name="plural"/> are the resx
     /// one/other forms; a language may override a CLDR category with a satellite-only
     /// <c>{keyPrefix}.One</c> / <c>.Few</c> / <c>.Many</c> key, read here by name
     /// (absent ones fall back to <paramref name="singular"/> for One, else
@@ -259,9 +288,15 @@ internal static class DisplayHelpers
     /// words, and that is the only thing the answer turns on. Read
     /// <see cref="CountQuestion"/> before adding a counted string: an unclassified
     /// prefix throws here rather than guessing.
+    ///
+    /// THE RULE IS TAKEN FROM THE LANGUAGE THE SENTENCE IS COMING FROM, which is
+    /// <see cref="DisplayedLanguage"/> and not the culture the user is running under.
+    /// The two part company on any culture the app has no satellite for whose own
+    /// two-letter code <see cref="CategoryFor"/> nonetheless has an arm for, and the
+    /// resx and the rule then answer about different languages.
     /// </summary>
     internal static string Pluralise(int count, string singular, string plural, string keyPrefix) =>
-        CategoryFor(Localisation.UiCulture, count, QuestionFor(keyPrefix)) switch
+        CategoryFor(DisplayedLanguage, count, QuestionFor(keyPrefix)) switch
         {
             PluralCategory.One => Override($"{keyPrefix}.One") ?? singular,
             PluralCategory.Few => Override($"{keyPrefix}.Few") ?? plural,
