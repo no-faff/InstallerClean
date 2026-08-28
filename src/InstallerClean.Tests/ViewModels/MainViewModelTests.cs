@@ -1014,17 +1014,15 @@ public class MainViewModelTests
         // The string is built from the cache folder's path root as in the test
         // above; here it names a folder nothing asks a question about.
         //
-        // SO WHAT THIS EXERCISES IS THE CANCEL AND NOT THE LATE LANDING, AND IT
-        // PASSES WITHOUT GOING NEAR ITS OWN NAME, WHICH IS WORSE THAN FAILING.
-        // A red would say the subject is broken; a green here says nothing about
-        // the subject at all and reads as though it had. The name is about a
-        // stale SAME-DRIVE answer being dropped when the box moves on, and no
-        // same-drive answer is ever produced here for anything to drop.
-        // ScheduleDestinationVolumeResolve cancels, which is one of the two
-        // halves that keep a stale answer out; the other is the token re-check
-        // on the way back, for a resolve whose debounce had already elapsed,
-        // and nothing here creates the case it is for. That is not a limit of a
-        // particular host. It is every run.
+        // SO THE HALF THIS REACHES IS THE CANCEL. Two things keep a stale answer
+        // out: ScheduleDestinationVolumeResolve cancelling the resolve in flight,
+        // which is what these two lines fire, and the token re-check on the way
+        // back, which belongs to a resolve whose debounce had already elapsed.
+        // Reaching the second needs the first path's answer to be in flight
+        // rather than parked, and two adjacent property sets cannot put it there
+        // on any host. The keystroke half of the same guard is covered by the
+        // test above, which sets a share over a landed same-drive answer and
+        // reads the tooltip before the next resolve can reply.
         var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
 
         vm.Cleanup.MoveDestination = Path.Combine(cachePathRoot, "ic-test-backup");
