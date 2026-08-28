@@ -697,4 +697,72 @@ public class ResultLogEntryTests
         Assert.Equal(0, info.SupersededCount);
         Assert.Equal(2, info.ObsoletedCount);
     }
+
+    [Fact]
+    public void ScanInfo_From_maps_every_member_to_the_scan_figure_it_names()
+    {
+        // EVERY SOURCE FIGURE IS DISTINCT, WHICH IS THE WHOLE MECHANISM. ScanInfo is
+        // a positional record and From fills it positionally, so an argument placed
+        // among the others re-points every one after it at its neighbour's value, and
+        // the two being ints is all it takes for that to compile. No two figures below
+        // are equal, so any such shift fails at least one assertion here.
+        var removable = new List<OrphanedFile>
+        {
+            new(@"C:\p1.msp", 100, true, IsRemovablePatch: true, IsObsoleted: true, "Obsoleted"),
+            new(@"C:\p2.msp", 200, true, IsRemovablePatch: true, IsObsoleted: true, "Obsoleted"),
+            new(@"C:\p3.msp", 300, true, IsRemovablePatch: true, IsObsoleted: false, "Superseded"),
+            new(@"C:\p4.msp", 400, true, IsRemovablePatch: true, IsObsoleted: false, "Superseded"),
+            new(@"C:\p5.msp", 500, true, IsRemovablePatch: true, IsObsoleted: false, "Superseded"),
+            new(@"C:\o1.msi", 600, false, IsRemovablePatch: false, IsObsoleted: false, "Orphaned"),
+            new(@"C:\o2.msi", 700, false, IsRemovablePatch: false, IsObsoleted: false, "Orphaned"),
+            new(@"C:\o3.msi", 800, false, IsRemovablePatch: false, IsObsoleted: false, "Orphaned"),
+            new(@"C:\o4.msi", 900, false, IsRemovablePatch: false, IsObsoleted: false, "Orphaned"),
+            new(@"C:\o5.msi", 1000, false, IsRemovablePatch: false, IsObsoleted: false, "Orphaned"),
+        };
+        var withheld = Enumerable.Range(1, 6)
+            .Select(i => new OrphanedFile($@"C:\w{i}.msi", 11, false, false, false, "Withheld"))
+            .ToList();
+        var registered = Enumerable.Range(1, 4)
+            .Select(i => new RegisteredPackage($@"C:\r{i}.msi", $"Product {i}", $"{{code-{i}}}"))
+            .ToList();
+
+        var scan = new ScanResult(
+            removable,
+            registered,
+            RegisteredTotalBytes: 7002,
+            MissingAffectedCount: 11,
+            MissingUnaffectedCount: 20,
+            WithheldCount: 12,
+            Census: new EnumerationCensus(
+                UnreadableProducts: 13,
+                SkippedProductRows: 14,
+                UnclaimedProductFiles: 15,
+                UnclaimedPatchFiles: 16,
+                RecoveredProductCount: 17,
+                UnansweredProductCount: 18),
+            RegisteredWithheldCount: 19,
+            WithheldFiles: withheld);
+
+        var info = ScanInfo.From(scan, 7001);
+
+        Assert.Equal(7001, info.DurationMs);
+        Assert.Equal(4, info.RegisteredCount);
+        Assert.Equal(7002, info.RegisteredBytes);
+        Assert.Equal(5, info.OrphanedCount);
+        Assert.Equal(3, info.SupersededCount);
+        Assert.Equal(2, info.ObsoletedCount);
+        Assert.Equal(5500, info.RemovableBytes);
+        Assert.Equal(31, info.MissingFromDiskCount);
+        Assert.Equal(11, info.MissingNeededCount);
+        Assert.Equal(12, info.WithheldPatchCount);
+        Assert.Equal(13, info.UnreadableProductCount);
+        Assert.Equal(14, info.SkippedProductRowCount);
+        Assert.Equal(15, info.UnclaimedProductFileCount);
+        Assert.Equal(16, info.UnclaimedPatchFileCount);
+        Assert.Equal(17, info.RecoveredProductCount);
+        Assert.Equal(18, info.UnansweredProductCount);
+        Assert.Equal(6, info.WithheldCandidateCount);
+        Assert.Equal(66, info.WithheldTotalBytes);
+        Assert.Equal(19, info.RegisteredWithheldCount);
+    }
 }
