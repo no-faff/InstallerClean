@@ -12,6 +12,7 @@
 // Run from the repo root: node scripts/check-cross-key-rules.mjs
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { standsInFor } from './plural-overrides.mjs';
 
 const RESX_DIR = 'src/InstallerClean.Core/Resources';
 const GUI = 'src/InstallerClean';
@@ -576,21 +577,6 @@ const tokenKeys = new Set(
 const linkKeys = new Set(
   [...neutral].filter(([, v]) => v.includes('[') || v.includes(']')).map(([k]) => k));
 
-// The neutral form a satellite-only plural override answers for, or null where the
-// neutral holds no key it is a form of. DisplayHelpers.Pluralise reads
-// {prefix}.One where the singular would have been chosen and {prefix}.Few or
-// {prefix}.Many where the plural would, so an override is measured against that
-// form and not against the other one; a prefix whose neutral entry is flat at any
-// count is itself the form.
-const standsInFor = (key) => {
-  const parts = /^(.*)\.(One|Few|Many)$/.exec(key);
-  if (parts === null) return null;
-  const [, prefix, category] = parts;
-  const form = category === 'One' ? `${prefix}.Singular` : `${prefix}.Plural`;
-  if (neutral.has(form)) return form;
-  return neutral.has(prefix) ? prefix : null;
-};
-
 if (stale.length) {
   console.error(`Cross-key rules FAILED (${stale.length}): the declarations in this file are stale.`);
   for (const s of stale) console.error(`  ${s}`);
@@ -676,7 +662,7 @@ for (const lang of LANGS) {
   // answers for, so a language's second and third forms are covered by the same
   // rule as its first.
   const overridesOfTokenKeys = [...map.keys()]
-    .filter((key) => !neutral.has(key) && tokenKeys.has(standsInFor(key)));
+    .filter((key) => !neutral.has(key) && tokenKeys.has(standsInFor(key, neutral)));
   for (const key of [...tokenKeys, ...overridesOfTokenKeys]) {
     const value = read(key);
     if (value === null) continue;
@@ -691,7 +677,7 @@ for (const lang of LANGS) {
   // every inflecting language's overridden forms out of this rule with nothing in
   // the output to say so.
   for (const [key, value] of map) {
-    const against = neutral.has(key) ? key : standsInFor(key);
+    const against = neutral.has(key) ? key : standsInFor(key, neutral);
     if (against === null) continue;
 
     const { pairs, chars } = bracketCounts(value);

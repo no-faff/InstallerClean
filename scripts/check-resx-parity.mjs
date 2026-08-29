@@ -32,13 +32,22 @@
 // keys minus Cli.EventLogUnavailable, which despite its prefix is an operator-
 // facing stdout warning and so is human.
 //
-// Exception: a satellite may carry Plural.<Noun>.Few / Plural.<Noun>.Many keys
-// that the neutral lacks. These are the extra CLDR plural categories some
-// languages need (Russian's 2-4 "few" form); they are optional and language-
-// specific, so they are allowed as satellite-only keys rather than flagged stray.
+// Exception: a satellite may carry a plural override the neutral has not got. An
+// override is a key ending .One, .Few or .Many for which the neutral holds the form
+// it inflects: the .Singular sibling for a one-form, the .Plural sibling for a few-
+// or many-form, or the flat key itself where one neutral string serves every count.
+// It can be a noun fragment (Plural.File.Few), a whole count template with its noun
+// baked in (Summary.RegisteredStillUsed.Few), or a one-form override for a flat
+// string (Status.RegisteredPackagesFound.One). These are the extra CLDR categories
+// some languages need, Russian's 2-4 "few" form among them, and a correct n==1 form
+// for a count string the neutral keeps flat; they are optional and language-specific,
+// so they are allowed as satellite-only keys rather than flagged stray. Which form
+// each answers for comes from scripts/lib/plural-overrides.mjs, so this gate and
+// check-cross-key-rules measure an override against the same neutral key.
 //
 // Run from the repo root: node scripts/check-resx-parity.mjs
 import { readdirSync, readFileSync } from 'node:fs';
+import { standsInFor } from './plural-overrides.mjs';
 
 const dir = 'src/InstallerClean.Core/Resources';
 
@@ -104,27 +113,6 @@ const unprovidedIndices = (neutralPh, satPh) =>
 const unusedIndices = (neutralPh, satPh) =>
   [...neutralPh].filter((i) => !satPh.has(i)).sort();
 
-// Optional per-language CLDR-category overrides. A language whose plural rules need
-// more than the neutral's one/other pair, or a correct n==1 form for a flat count
-// string, adds these as satellite-only keys: a noun fragment (Plural.File.Few), a
-// whole count template whose noun is baked in (Summary.RegisteredStillUsed.Few), or
-// a one-form override for a flat string (Status.RegisteredPackagesFound.One). They
-// are read by name via the ResourceManager, never generated into the Designer, so
-// they live only in the satellites that use them. Allowed when the base key (its
-// .Plural sibling, or the flat key itself) is in the neutral, which ties each
-// override to a real string and still catches a typo'd key.
-//
-// Returns the neutral base key an override inflects (its .Plural sibling, else the
-// flat key), or null when the key is not a well-formed override of a real neutral
-// key. The base is what the override's {N} arity is validated against below.
-const overrideBaseKey = (key) => {
-  const m = key.match(/^(.+)\.(?:One|Few|Many)$/);
-  if (m === null) return null;
-  if (neutral.has(`${m[1]}.Plural`)) return `${m[1]}.Plural`;
-  if (neutral.has(m[1])) return m[1];
-  return null;
-};
-const isOptionalPlural = (key) => overrideBaseKey(key) !== null;
 const satellites = readdirSync(dir)
   .filter((f) => /^Strings\.[A-Za-z-]+\.resx$/.test(f) && f !== 'Strings.resx')
   .sort();
@@ -176,7 +164,9 @@ for (const file of satellites) {
 
   for (const key of sat.keys()) {
     if (neutral.has(key)) continue;
-    const base = overrideBaseKey(key);
+    // Tying an override to a form the neutral really holds is what tells one from
+    // a stray, and what still catches a key whose prefix is a typo.
+    const base = standsInFor(key, neutral);
     if (base === null) {
       errors.push(`STRAY (not in neutral): ${key}`);
       continue;
