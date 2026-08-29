@@ -60,6 +60,8 @@
 //   node scripts/check-translation-freshness.mjs            check, exit 1 on stale
 //   node scripts/check-translation-freshness.mjs --record <Key> [<Key> ...]
 //                                                           stamp keys as translated now
+//   node scripts/check-translation-freshness.mjs --record-unverified <Key> [<Key> ...]
+//                                                           stamp keys as never established
 //   node scripts/check-translation-freshness.mjs --record-all-current
 //                                                           seed every key/language pair
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
@@ -98,13 +100,25 @@ const ledger = existsSync(LEDGER) ? JSON.parse(readFileSync(LEDGER, 'utf8')) : {
 
 const args = process.argv.slice(2);
 const recordIdx = args.indexOf('--record');
+const unverifiedIdx = args.indexOf('--record-unverified');
 const recordAll = args.includes('--record-all-current');
 
-if (recordIdx !== -1 || recordAll) {
-  const keys = recordAll ? [...neutral.keys()] : args.slice(recordIdx + 1);
+// A SLOT WRITTEN BY HAND WANTS THE SENTINEL AND NOT A DIGEST. Stamping the
+// current English says a translation was made from it; that is the claim the
+// digest carries and the whole basis of the drift report. Where a satellite was
+// edited directly, the value is there and nothing recorded which English it
+// answers, so the honest entry is the one the check already understands as a
+// claim nobody has made. The two modes write the same slot and differ only in
+// what they write into it. indexOf matches an argument whole, so the longer
+// flag is never read as the shorter one.
+if (recordIdx !== -1 || unverifiedIdx !== -1 || recordAll) {
+  const asUnverified = unverifiedIdx !== -1;
+  const keys = recordAll
+    ? [...neutral.keys()]
+    : args.slice((asUnverified ? unverifiedIdx : recordIdx) + 1);
   const unknown = keys.filter((k) => !neutral.has(k));
   if (!keys.length || unknown.length) {
-    console.error(unknown.length ? `Not in the neutral resx: ${unknown.join(', ')}` : 'Usage: --record <Key> [<Key> ...]');
+    console.error(unknown.length ? `Not in the neutral resx: ${unknown.join(', ')}` : 'Usage: --record <Key> [<Key> ...] | --record-unverified <Key> [<Key> ...]');
     process.exit(2);
   }
   let stamped = 0;
@@ -114,24 +128,36 @@ if (recordIdx !== -1 || recordAll) {
     for (const k of keys) {
       if (!sat.has(k)) continue;
       ledger.keys[k] ??= {};
-      ledger.keys[k][lang] = digest(neutral.get(k));
+      ledger.keys[k][lang] = asUnverified ? UNVERIFIED : digest(neutral.get(k));
       stamped++;
     }
   }
   writeFileSync(LEDGER, JSON.stringify(ledger, null, 2) + '\n', 'utf8');
-  console.log(`RECORDED: ${keys.length} key(s), ${stamped} key-slot(s) stamped against the current neutral, across ${satFiles.length} satellite(s).`);
+  console.log(`RECORDED: ${keys.length} key(s), ${stamped} key-slot(s) stamped ${asUnverified ? 'as never established' : 'against the current neutral'}, across ${satFiles.length} satellite(s).`);
   process.exit(0);
 }
 
 const stale = [];
+const deleted = [];
 let checked = 0, fresh = 0, unverified = 0, absent = 0, notInLedger = 0;
 
 for (const f of satFiles) {
   const lang = langOf(f);
   const sat = readResx(`${RES}/${f}`);
   for (const [key, englishNow] of neutral) {
-    if (!sat.has(key)) { absent++; continue; }
     const recorded = ledger.keys?.[key]?.[lang];
+    // AN ENTRY STANDING OVER A KEY THAT IS NOT THERE IS A TRANSLATION THAT HAS
+    // GONE, and the ledger is what tells the two absences apart. A slot is only
+    // ever stamped while the satellite holds the key, so a stamp with no key
+    // means that language had a translation and no longer does; no stamp means
+    // the key has never been in that file. The value reverts to English, which
+    // is a correct sentence in the wrong language, so nothing else here has
+    // anything to compare.
+    if (!sat.has(key)) {
+      if (recorded !== undefined) deleted.push({ lang, key });
+      absent++;
+      continue;
+    }
     if (recorded === undefined) { notInLedger++; continue; }
     checked++;
     if (recorded === UNVERIFIED) { unverified++; continue; }
@@ -146,16 +172,24 @@ for (const [lang, keys] of [...byLang].sort()) {
   console.log(`${lang}: ${keys.length} stale (the English moved since this was translated): ${keys.sort().join(', ')}`);
 }
 
+// Members and not a count, on both lists, because a number says nothing about
+// which language lost which sentence.
+const goneByLang = new Map();
+for (const d of deleted) goneByLang.set(d.lang, [...(goneByLang.get(d.lang) || []), d.key]);
+for (const [lang, keys] of [...goneByLang].sort()) {
+  console.log(`${lang}: ${keys.length} GONE (translated once, now absent from this satellite): ${keys.sort().join(', ')}`);
+}
+
 // The totals line is printed ALWAYS, beside the filtered list and never instead
 // of it. A silent zero over an empty set reads exactly like a clean result, and
 // this project has been caught by that shape twice.
 console.log(
   `TOTALS: ${satFiles.length} satellite(s), ${neutral.size} neutral key(s); ` +
-  `${checked} key-slot(s) checked, ${fresh} fresh, ${stale.length} STALE, ` +
+  `${checked} key-slot(s) checked, ${fresh} fresh, ${stale.length} STALE, ${deleted.length} GONE, ` +
   `${unverified} unverified (recorded as never established), ` +
   `${notInLedger} not in the ledger (no claim made), ${absent} absent from the satellite.`
 );
 if (notInLedger > 0) {
   console.log(`NOTE: ${notInLedger} key-slot(s) carry no ledger entry, so this run says NOTHING about them. It reports drift from the seed forward and makes no claim about any translation predating it.`);
 }
-process.exit(stale.length ? 1 : 0);
+process.exit(stale.length || deleted.length ? 1 : 0);
