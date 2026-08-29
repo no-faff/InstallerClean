@@ -308,6 +308,14 @@ const RAW_READ_ALLOWED = [
       + 'decision rather than a list this file could hold. Every value it goes on to '
       + 'assert against is read through Strings.Get.',
   },
+  {
+    file: 'src/InstallerClean.Tests/Helpers/LinkPhraseCompositionTests.cs',
+    reason: 'Enumerates the neutral resource set to derive which sentences carry a '
+      + 'link phrase from the English punctuation, the way linkKeys below is built. A '
+      + 'door that answers one named key cannot list a set, and a list written by hand '
+      + 'would answer for the sentences that linked on the day it was written. Every '
+      + 'value it goes on to assert against is read through Strings.Get.',
+  },
 ];
 
 // ---------------------------------------------------------------------------
