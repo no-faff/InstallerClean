@@ -561,7 +561,8 @@ for (const key of [...new Set(declaredKeys)].sort())
 
 // Which keys carry the folder token is the neutral's decision; a satellite that
 // has gained or lost one has drifted from it.
-const tokenKeys = [...neutral].filter(([, v]) => v.includes(FOLDER_TOKEN)).map(([k]) => k);
+const tokenKeys = new Set(
+  [...neutral].filter(([, v]) => v.includes(FOLDER_TOKEN)).map(([k]) => k));
 
 // The same for the link phrase. Membership is any bracket at all rather than a
 // well-formed pair, so an unbalanced neutral is a finding here and not a key
@@ -666,7 +667,17 @@ for (const lang of LANGS) {
         failures.push(`${key} is drawn and writes "${found}" rather than GitHub`);
   }
 
-  for (const key of tokenKeys) {
+  // A key that names the folder goes on naming it in every language, and a plural
+  // override is one of that key's forms rather than a key of its own: Pluralise
+  // hands the overridden form to the same host, so a form carrying no token names
+  // no folder at whichever count selected it. The neutral's own keys go through
+  // read() first, so a satellite that has dropped one is reported rather than
+  // passing for agreement, and the overrides are found by which neutral form each
+  // answers for, so a language's second and third forms are covered by the same
+  // rule as its first.
+  const overridesOfTokenKeys = [...map.keys()]
+    .filter((key) => !neutral.has(key) && tokenKeys.has(standsInFor(key)));
+  for (const key of [...tokenKeys, ...overridesOfTokenKeys]) {
     const value = read(key);
     if (value === null) continue;
     if (!value.includes(FOLDER_TOKEN))
@@ -716,6 +727,6 @@ if (problems.length) {
 
 console.log(`\nCross-key rules OK: ${LANGS.length} languages, ${MUST_AGREE.length} label/name pairs `
   + `and ${ELABORATES_A_LABEL.length} measured by containment, `
-  + `${tokenKeys.length} keys carrying ${FOLDER_TOKEN}, ${linkKeys.size} carrying a [link phrase], `
+  + `${tokenKeys.size} keys carrying ${FOLDER_TOKEN}, ${linkKeys.size} carrying a [link phrase], `
   + `${namedInXaml.size} automation names classified (${NAME_IS_THE_LABEL.size} by key identity), `
   + `${csFiles.length} C# files read through Strings bar ${rawAllowed.size} allowed direct.`);
