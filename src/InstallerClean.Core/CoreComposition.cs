@@ -36,6 +36,10 @@ public static class CoreComposition
         services.AddSingleton<IFileSystem, FileSystem>();
         services.AddSingleton<IRegistryReader, RegistryReader>();
         services.AddSingleton<IMutexProbe, MutexProbe>();
+        // Answers where a volume is mounted, for the pending-reboot gate alone. A
+        // queued rename can name its volume rather than carrying a drive root, and
+        // placing one of those against the cache folder is the only thing this does.
+        services.AddSingleton<IVolumeMountProbe, VolumeMountProbe>();
         services.AddSingleton<Interop.IMsiApi, Interop.MsiApi>();
 
         // Win32 / registry / MSI-API wrappers.

@@ -108,6 +108,97 @@ internal static partial class Kernel32
         uint cchBufferLength);
 
     /// <summary>
+    /// Every path the volume named by <paramref name="lpszVolumeName"/> is
+    /// mounted at: drive roots and directory mount points alike. The volume is
+    /// named in its GUID form, <c>\\?\Volume{...}\</c>, and Win32 requires the
+    /// trailing backslash.
+    ///
+    /// THE OUTPUT IS A DOUBLE-NULL-TERMINATED LIST AND AN EMPTY ONE IS AN
+    /// ANSWER. A volume can be mounted nowhere, which is ordinary rather than
+    /// exceptional: an EFI system partition is the everyday case, and Windows
+    /// writes a device-form path for such a volume precisely because there is no
+    /// mount point to name it by. A caller must therefore tell a call that
+    /// SUCCEEDED with nothing to report from one that FAILED, because the two
+    /// arrive as the same empty result and mean opposite things.
+    ///
+    /// The double-call buffer pattern is the one Win32 documents: a buffer too
+    /// small fails with ERROR_MORE_DATA and writes the required character count
+    /// to <paramref name="lpcchReturnLength"/>, which includes both terminators.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "GetVolumePathNamesForVolumeNameW", SetLastError = true,
+                   StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetVolumePathNamesForVolumeName(
+        string lpszVolumeName,
+        [MarshalUsing(CountElementName = nameof(cchBufferLength))] char[] lpszVolumePathNames,
+        uint cchBufferLength,
+        out uint lpcchReturnLength);
+
+    /// <summary>
+    /// Opens an enumeration of the machine's volumes and writes the first
+    /// volume's GUID name, <c>\\?\Volume{...}\</c>, into the buffer. Returns
+    /// INVALID_HANDLE_VALUE on failure; the handle must be closed with
+    /// <see cref="FindVolumeClose"/>.
+    ///
+    /// IT ENUMERATES VOLUMES AND NOT MS-DOS DEVICE NAMES, WHICH IS THE POINT.
+    /// The alternative for finding the volume behind a device name is to list
+    /// every MS-DOS name and filter, which walks a set holding far more than
+    /// volumes and asks the caller to recognise which entries are which. This
+    /// walks exactly the volumes, so a match cannot be a name that was never a
+    /// volume to begin with.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "FindFirstVolumeW", SetLastError = true,
+                   StringMarshalling = StringMarshalling.Utf16)]
+    public static partial IntPtr FindFirstVolume(
+        [MarshalUsing(CountElementName = nameof(cchBufferLength))] char[] lpszVolumeName,
+        uint cchBufferLength);
+
+    /// <summary>
+    /// The next volume in an enumeration opened by
+    /// <see cref="FindFirstVolume"/>. Returns false at the end of the list, with
+    /// <see cref="ERROR_NO_MORE_FILES"/> as the last error, and false with any
+    /// other code for a real failure. The two are told apart by the code, never
+    /// by the false.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "FindNextVolumeW", SetLastError = true,
+                   StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool FindNextVolume(
+        IntPtr hFindVolume,
+        [MarshalUsing(CountElementName = nameof(cchBufferLength))] char[] lpszVolumeName,
+        uint cchBufferLength);
+
+    /// <summary>Closes a volume enumeration opened by <see cref="FindFirstVolume"/>.</summary>
+    [LibraryImport(Library, EntryPoint = "FindVolumeClose", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool FindVolumeClose(IntPtr hFindVolume);
+
+    /// <summary>
+    /// The NT object the given MS-DOS device name is a symbolic link to:
+    /// <c>C:</c> answers something of the form <c>\Device\HarddiskVolume3</c>,
+    /// and so does a volume's own GUID name with its enclosing backslashes and
+    /// trailing separator removed. Returns the number of characters written, or
+    /// zero on failure.
+    ///
+    /// IT ONLY GOES THIS WAY ROUND. There is no call that takes an NT device
+    /// name and answers which volume it is, so a caller starting from a device
+    /// name walks the volumes and asks this about each one. Trying to reverse it
+    /// by walking the drive letters instead answers nothing for a volume that
+    /// has no letter, and those are common: an EFI system partition and a
+    /// recovery partition both sit on an ordinary machine without one.
+    ///
+    /// The output is a double-null-terminated list, one device name usually but
+    /// not necessarily, so a caller reads the first entry rather than the whole
+    /// buffer as a single string.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "QueryDosDeviceW", SetLastError = true,
+                   StringMarshalling = StringMarshalling.Utf16)]
+    public static partial uint QueryDosDevice(
+        string lpDeviceName,
+        [MarshalUsing(CountElementName = nameof(ucchMax))] char[] lpTargetPath,
+        uint ucchMax);
+
+    /// <summary>
     /// Whether the volume mounted at <paramref name="lpRootPathName"/> is fixed,
     /// removable, remote or something else. A TRAILING BACKSLASH IS REQUIRED,
     /// which Win32 states outright and which
@@ -253,4 +344,12 @@ internal static partial class Kernel32
     // into two quite different answers.
     public const int ERROR_FILE_NOT_FOUND = 2;
     public const int ERROR_PATH_NOT_FOUND = 3;
+
+    // The two the volume enumeration and the mount-point query answer with, and
+    // both are ordinary rather than faults: ERROR_NO_MORE_FILES ends a volume
+    // walk, and ERROR_MORE_DATA is the first half of the double-call buffer
+    // pattern. A caller reading either as a failure would report a machine
+    // problem where Win32 was following its own contract.
+    public const int ERROR_NO_MORE_FILES = 18;
+    public const int ERROR_MORE_DATA = 234;
 }

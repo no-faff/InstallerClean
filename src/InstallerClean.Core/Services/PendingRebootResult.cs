@@ -42,4 +42,21 @@ public enum PendingRebootReason
 
     /// <summary>An entry in HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\PendingFileRenameOperations targets a path under %SystemRoot%\Installer. Source: MS Learn, MoveFileExA.</summary>
     PendingRenameInCache,
+
+    /// <summary>
+    /// An entry in the same value names somewhere the app could not place, so whether
+    /// it is under %SystemRoot%\Installer is not established either way.
+    ///
+    /// IT IS A SEPARATE VERDICT FROM <see cref="PendingRenameInCache"/> BECAUSE ONE
+    /// MESSAGE CANNOT BE TRUE OF BOTH. That one says an operation is queued against the
+    /// cache and names the path it found; this one says only that an operation is
+    /// queued. A single verdict covering the two would put a cause in front of a user
+    /// that is false of one of them.
+    ///
+    /// AND IT IS A SEPARATE THING AGAIN FROM THE GATE'S FAIL-OPEN ON A READ IT COULD NOT
+    /// MAKE, which is deliberate and stays. A failed read leaves the app knowing nothing
+    /// about whether anything is queued at all. This is the opposite: something IS
+    /// queued, and its target is what could not be established.
+    /// </summary>
+    PendingRenameUnresolved,
 }

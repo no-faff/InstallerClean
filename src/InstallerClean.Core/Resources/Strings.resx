@@ -403,7 +403,7 @@
     <value>These files can't be cleaned up right now.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
-  <!-- The three reason-specific banners. Each names the folder with the
+  <!-- The four reason-specific banners. Each names the folder with the
        {InstallerFolder} token, like every other line in the app that names it:
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
@@ -411,6 +411,14 @@
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <!-- The fourth reason-specific banner. Names the folder with the {InstallerFolder}
+       token like its three siblings. It states what the machine holds, a queued file
+       operation, and stops there: nothing here has shown that Windows Installer is
+       running or that an install is suspended, so the two banners that say so would both
+       be untrue, and Body.PendingReboot.Other says something is in progress and would be
+       untrue as well. The restart is the instruction because these operations are carried
+       out at the next boot and not before. -->
+  <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning.</value></data>
   <!-- The fourth arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -1665,6 +1673,11 @@ The crash log could not be written.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
+  <!-- The command-line twin of Body.PendingReboot.PendingRenameUnresolved, adapted the
+       way the rest of this family is: opens "Error: " and goes lower case after it. No
+       placeholder, because the {0} in the PendingRenameInCache line above names a
+       resolved cache path and this arm has none to name. -->
+  <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning.</value></data>
   <!-- What a blocking reason with no line of its own gets, so a reason added
        later cannot leave the command line reporting an unexpected crash for a
        run that was merely held. The command-line twin of Body.PendingReboot.Other,
@@ -1673,7 +1686,7 @@ The crash log could not be written.</value></data>
        there being nothing to re-scan on a command line. -->
   <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
   <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
-       string rather than a shared one because this whole family is: all four
+       string rather than a shared one because this whole family is: all five
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
        it, which is the console's shape and not the window's. Same condition,
        same refusal, /d. No placeholders. -->
@@ -1690,6 +1703,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.EventLogReason.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer mutex held</value></data>
   <data name="Cli.EventLogReason.InstallerInProgress" xml:space="preserve"><value>installer transaction in progress</value></data>
   <data name="Cli.EventLogReason.PendingRenameInCache" xml:space="preserve"><value>queued post-reboot file rename targets the Installer cache</value></data>
+  <data name="Cli.EventLogReason.PendingRenameUnresolved" xml:space="preserve"><value>queued post-reboot file rename could not be resolved</value></data>
   <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
        2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
   <data name="Cli.EventLogPendingRebootBlocked" xml:space="preserve"><value>{0} mode aborted: pending reboot detected, reason: {1}. {2}</value></data>

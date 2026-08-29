@@ -3,12 +3,13 @@ namespace InstallerClean.Services;
 /// <summary>
 /// Returns Block when any of three signals indicates the MSI cache is currently at risk:
 /// the _MSIExecute mutex, the Installer\InProgress key, or any PendingFileRenameOperations
-/// entry, source or destination, resolving under %SystemRoot%\Installer.
+/// entry, source or destination, that names a path under %SystemRoot%\Installer or that
+/// the app cannot place at all.
 /// </summary>
 /// <remarks>
 /// Every entry is checked, not just the sources: a queued rename INTO the cache is as
 /// much a reason to keep out as one moving a file within it, and the destination form
-/// is why <see cref="StripNtPathPrefix"/> has to take the leading '!' off first.
+/// is why the leading '!' comes off before anything else.
 /// </remarks>
 public sealed class PendingRebootService : IPendingRebootService
 {
@@ -26,12 +27,13 @@ public sealed class PendingRebootService : IPendingRebootService
 
     private readonly IRegistryReader _registry;
     private readonly IMutexProbe _mutex;
+    private readonly IVolumeMountProbe _volumes;
 
     /// <summary>Override for %SystemRoot%; null in production.</summary>
     private readonly string? _windowsRootOverride;
 
-    public PendingRebootService(IRegistryReader registry, IMutexProbe mutex)
-        : this(registry, mutex, windowsRootOverride: null)
+    public PendingRebootService(IRegistryReader registry, IMutexProbe mutex, IVolumeMountProbe volumes)
+        : this(registry, mutex, volumes, windowsRootOverride: null)
     {
     }
 
@@ -39,10 +41,12 @@ public sealed class PendingRebootService : IPendingRebootService
     internal PendingRebootService(
         IRegistryReader registry,
         IMutexProbe mutex,
+        IVolumeMountProbe volumes,
         string? windowsRootOverride)
     {
         _registry = registry;
         _mutex = mutex;
+        _volumes = volumes;
         _windowsRootOverride = windowsRootOverride;
     }
 
@@ -82,8 +86,8 @@ public sealed class PendingRebootService : IPendingRebootService
             return PendingRebootResult.Block(PendingRebootReason.InstallerInProgress);
 
         // Bare PendingFileRenameOperations is too broad (any third-party uninstaller
-        // writes to it); refine to "an entry, source or destination, resolving
-        // inside %SystemRoot%\Installer".
+        // writes to it); refine to "an entry, source or destination, that names a path
+        // inside %SystemRoot%\Installer, or that names somewhere this cannot place".
         string[]? renames;
         try
         {
@@ -94,75 +98,302 @@ public sealed class PendingRebootService : IPendingRebootService
         {
             renames = null;
         }
-        if (renames is not null)
+        if (renames is null)
+            return PendingRebootResult.Clean;
+
+        var windowsRoot = _windowsRootOverride
+            ?? Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+        var installerRoot = Path.Combine(windowsRoot, "Installer");
+
+        // AN ENTRY NAMING THE CACHE WINS OVER ONE THAT COULD NOT BE PLACED, WHATEVER
+        // ORDER THEY SIT IN. The first says what is queued and names the path; the
+        // second says only that something is queued somewhere unknown. Returning on
+        // the first cache match is that rule: nothing later can beat it, so the pass
+        // ends there, and an unplaceable entry seen on the way is remembered rather
+        // than acted on until every entry has been read.
+        var anyUnplaceable = false;
+
+        foreach (var raw in renames)
         {
-            var windowsRoot = _windowsRootOverride
-                ?? Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-            var installerRoot = Path.Combine(windowsRoot, "Installer");
-            var installerRootBoundary = installerRoot + Path.DirectorySeparatorChar;
+            if (string.IsNullOrEmpty(raw)) continue;
 
-            foreach (var raw in renames)
+            switch (Locate(raw, installerRoot, out var canonical))
             {
-                if (string.IsNullOrEmpty(raw)) continue;
-                var cleaned = StripNtPathPrefix(raw);
-
-                // ONLY A FULLY QUALIFIED PATH IS COMPARED, AND WHAT FOLLOWS THE PREFIX
-                // DECIDES WHETHER THERE IS ONE. A drive-letter path comes out of the
-                // strip rooted; the object manager's other spellings do not, because
-                // "UNC\server\share\...", "Volume{...}\..." and
-                // "GLOBALROOT\Device\..." carry their root inside the part the strip
-                // leaves behind. Path.GetFullPath completes anything that is not
-                // rooted from the process's working directory, so one of those handed
-                // to it becomes a well-formed path that is nobody's queued rename, and
-                // the comparison below would then answer about wherever the app was
-                // started from rather than about the entry.
-                if (!Path.IsPathFullyQualified(cleaned)) continue;
-
-                // Path.GetFullPath resolves \..\ traversal so a poisoned entry like
-                // "C:\Windows\Installer\..\..\Users\Other\secret" cannot pass the prefix
-                // check and reach the Detail field.
-                string canonical;
-                try
-                {
-                    canonical = Path.GetFullPath(cleaned);
-                }
-                catch (Exception ex) when (ex is ArgumentException
-                                        or PathTooLongException
-                                        or NotSupportedException)
-                {
-                    continue;
-                }
-
-                // Equality OR separator-anchored prefix; bare StartsWith would match a
-                // sibling like C:\Windows\InstallerExtra against C:\Windows\Installer.
-                if (canonical.Equals(installerRoot, StringComparison.OrdinalIgnoreCase) ||
-                    canonical.StartsWith(installerRootBoundary, StringComparison.OrdinalIgnoreCase))
-                {
+                case EntryLocation.InsideCache:
                     return PendingRebootResult.Block(
-                        PendingRebootReason.PendingRenameInCache,
-                        canonical);
-                }
+                        PendingRebootReason.PendingRenameInCache, canonical);
+                case EntryLocation.Unplaceable:
+                    anyUnplaceable = true;
+                    break;
             }
         }
 
-        return PendingRebootResult.Clean;
+        return anyUnplaceable
+            ? PendingRebootResult.Block(PendingRebootReason.PendingRenameUnresolved)
+            : PendingRebootResult.Clean;
+    }
+
+    /// <summary>Where one queued entry points, as far as this can establish it.</summary>
+    private enum EntryLocation
+    {
+        /// <summary>It names the cache folder or something under it.</summary>
+        InsideCache,
+
+        /// <summary>It was placed, and it is somewhere else.</summary>
+        Elsewhere,
+
+        /// <summary>
+        /// It names somewhere, and this could not say where. The entry is a positive
+        /// finding that a file operation is queued whose target cannot be ruled out.
+        /// </summary>
+        Unplaceable,
     }
 
     /// <summary>
-    /// Strips the NT object form (\??\) and long-path (\\?\) prefixes
-    /// used by Session Manager. A destination entry queued with
-    /// MOVEFILE_REPLACE_EXISTING carries a leading '!' before the
-    /// prefix ("!\??\C:\..."); it encodes the replace flag, not the
-    /// path, and must come off first or the prefix never matches and a
-    /// rename INTO the cache slips the gate.
+    /// Places one raw entry against the cache folder.
+    ///
+    /// The leading '!' comes off first: a destination queued with
+    /// MOVEFILE_REPLACE_EXISTING carries one before the prefix ("!\??\C:\..."), and it
+    /// encodes the replace flag rather than any part of the path, so leaving it on
+    /// means no prefix ever matches and a rename INTO the cache slips the gate.
+    ///
+    /// WHAT SURVIVES <see cref="InstallerCacheHelpers.StripLongPathPrefix"/> STILL
+    /// CARRYING ITS PREFIX IS THE WHOLE OF WHAT THE VOLUME LOOKUPS ARE FOR, and that is
+    /// what makes the two compose. That helper takes the prefix off a drive-rooted path
+    /// and turns the UNC form into an ordinary \\server\share path, which are the two
+    /// remainders that are already paths this can compare. It leaves everything else
+    /// whole, and everything else is a volume named some other way.
     /// </summary>
-    private static string StripNtPathPrefix(string s)
+    private EntryLocation Locate(string raw, string installerRoot, out string? canonical)
     {
-        if (s.StartsWith("!", StringComparison.Ordinal))
-            s = s[1..];
-        return
-            s.StartsWith(@"\??\", StringComparison.Ordinal) ? s[4..] :
-            s.StartsWith(@"\\?\", StringComparison.Ordinal) ? s[4..] :
-            s;
+        canonical = null;
+
+        var entry = raw.StartsWith('!') ? raw[1..] : raw;
+        var cleaned = InstallerCacheHelpers.StripLongPathPrefix(entry);
+
+        foreach (var prefix in NtPathPrefixes)
+        {
+            if (cleaned.StartsWith(prefix, StringComparison.Ordinal))
+                return LocateOnNamedVolume(cleaned[prefix.Length..], installerRoot, out canonical);
+        }
+
+        return LocateOrdinaryPath(cleaned, installerRoot, out canonical);
     }
+
+    /// <summary>
+    /// An entry the prefix strip left as an ordinary path: the drive-letter form and
+    /// the UNC form. A UNC path is compared like any other and simply never matches,
+    /// %SystemRoot%\Installer being local on any machine that can boot.
+    ///
+    /// ANYTHING NOT FULLY QUALIFIED IS UNPLACEABLE RATHER THAN SKIPPED. Path.GetFullPath
+    /// completes a value that is not rooted from the process's working directory, so
+    /// reading one would answer about wherever the app was started from rather than
+    /// about the entry. A bare "\Windows\Installer\9f05cba.msi" is the cache path
+    /// without its volume, which is a queued operation this cannot place rather than one
+    /// it can dismiss.
+    /// </summary>
+    private static EntryLocation LocateOrdinaryPath(string cleaned, string installerRoot, out string? canonical)
+    {
+        canonical = null;
+        if (!Path.IsPathFullyQualified(cleaned))
+            return EntryLocation.Unplaceable;
+
+        if (!TryCanonicalise(cleaned, out var resolved))
+            return EntryLocation.Unplaceable;
+
+        return Place(resolved, installerRoot, out canonical);
+    }
+
+    /// <summary>
+    /// An entry still carrying its prefix, which is a volume named in one of the two
+    /// forms that survive the strip. Anything else that reaches here names something
+    /// this cannot place; there is no reading on which such a value is safe to dismiss,
+    /// because nothing establishes that it is not a form the app does not understand.
+    /// </summary>
+    private EntryLocation LocateOnNamedVolume(string rest, string installerRoot, out string? canonical)
+    {
+        canonical = null;
+
+        if (rest.StartsWith(VolumeGuidPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            var separator = rest.IndexOf('\\');
+            var name = separator < 0 ? rest : rest[..separator];
+            var remainder = separator < 0 ? string.Empty : rest[(separator + 1)..];
+            return PlaceOnVolume($@"\\?\{name}\", remainder, installerRoot, out canonical);
+        }
+
+        if (rest.StartsWith(GlobalRootPrefix, StringComparison.OrdinalIgnoreCase))
+            return PlaceByDeviceName(rest[GlobalRootPrefix.Length..], installerRoot, out canonical);
+
+        return EntryLocation.Unplaceable;
+    }
+
+    /// <summary>
+    /// Finds the volume behind an NT device name and places the entry on it.
+    ///
+    /// THE MATCH IS AGAINST THE WHOLE HEAD OF THE ENTRY RATHER THAN A FIXED NUMBER OF
+    /// COMPONENTS, because a device name is not always two of them: "\Device\Harddisk0\
+    /// Partition3" names a volume exactly as "\Device\HarddiskVolume1" does. So each
+    /// volume's own device name is tested as a prefix of the entry, and what follows it
+    /// is the path on that volume.
+    ///
+    /// The volumes are walked rather than the drive letters. Asking which letter maps to
+    /// a device answers nothing for a volume that has no letter, and those are ordinary:
+    /// an EFI system partition and a recovery partition both sit on a healthy machine
+    /// without one, and it is precisely such a volume that gets named this way in the
+    /// first place. A gate that could not place them would refuse to run on any machine
+    /// part-way through servicing its own boot files.
+    /// </summary>
+    private EntryLocation PlaceByDeviceName(string deviceAndPath, string installerRoot, out string? canonical)
+    {
+        canonical = null;
+
+        var target = @"\" + deviceAndPath;
+        var volumes = VolumeGuidPaths();
+        if (volumes is null)
+            return EntryLocation.Unplaceable;
+
+        foreach (var volumeGuidPath in volumes)
+        {
+            var device = DosDeviceTarget(
+                volumeGuidPath.Trim('\\').TrimStart('?').Trim('\\'));
+            if (string.IsNullOrEmpty(device))
+                continue;
+
+            string remainder;
+            if (target.Equals(device, StringComparison.OrdinalIgnoreCase))
+                remainder = string.Empty;
+            else if (target.StartsWith(device + '\\', StringComparison.OrdinalIgnoreCase))
+                remainder = target[(device.Length + 1)..];
+            else
+                continue;
+
+            return PlaceOnVolume(volumeGuidPath, remainder, installerRoot, out canonical);
+        }
+
+        return EntryLocation.Unplaceable;
+    }
+
+    /// <summary>
+    /// Places a path that is relative to a volume's own root by asking where that volume
+    /// is mounted and joining each answer to it.
+    ///
+    /// A VOLUME MOUNTED NOWHERE IS PLACED RATHER THAN UNPLACEABLE, and the difference is
+    /// the whole reason <see cref="VolumeMountPoints.Answered"/> exists. Nothing on such
+    /// a volume can be inside %SystemRoot%\Installer, that path reaching its files
+    /// through a mount point, so an empty answer settles the question. An empty result
+    /// from a query that failed settles nothing and looks identical.
+    /// </summary>
+    private EntryLocation PlaceOnVolume(
+        string volumeGuidPath, string remainder, string installerRoot, out string? canonical)
+    {
+        canonical = null;
+
+        var mounts = MountPointsFor(volumeGuidPath);
+        if (!mounts.Answered)
+            return EntryLocation.Unplaceable;
+
+        foreach (var mount in mounts.Paths)
+        {
+            if (!TryCanonicalise(Path.Combine(mount, remainder), out var resolved))
+                return EntryLocation.Unplaceable;
+
+            if (Place(resolved, installerRoot, out canonical) == EntryLocation.InsideCache)
+                return EntryLocation.InsideCache;
+        }
+
+        return EntryLocation.Elsewhere;
+    }
+
+    /// <summary>
+    /// The containment comparison, and every arm above ends here so that none of them
+    /// grows one of its own. Equality OR a separator-anchored prefix: a bare StartsWith
+    /// would match a sibling like C:\Windows\InstallerExtra against C:\Windows\Installer.
+    /// </summary>
+    private static EntryLocation Place(string resolved, string installerRoot, out string? canonical)
+    {
+        var inside = resolved.Equals(installerRoot, StringComparison.OrdinalIgnoreCase)
+            || resolved.StartsWith(
+                installerRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+
+        canonical = inside ? resolved : null;
+        return inside ? EntryLocation.InsideCache : EntryLocation.Elsewhere;
+    }
+
+    /// <summary>
+    /// Resolves \..\ traversal so a poisoned entry like
+    /// "C:\Windows\Installer\..\..\Users\Other\secret" cannot pass the containment check
+    /// and reach the Detail field. False where the value is not a path this can complete,
+    /// which leaves the entry unplaceable.
+    /// </summary>
+    private static bool TryCanonicalise(string path, out string resolved)
+    {
+        try
+        {
+            resolved = Path.GetFullPath(path);
+            return true;
+        }
+        catch (Exception ex) when (ex is ArgumentException
+                                or PathTooLongException
+                                or NotSupportedException)
+        {
+            resolved = string.Empty;
+            return false;
+        }
+    }
+
+    // THE THREE PROBE CALLS GO THROUGH THESE AND NOT DIRECTLY, so that Check keeps
+    // the "never throws" contract IPendingRebootService states, exactly as the
+    // registry and mutex reads above are wrapped. A throw out of a volume query is
+    // that query failing, and a failed query is the app not knowing where an entry
+    // points, which is the condition this gate refuses on. Answering "nothing
+    // established" is therefore the same answer the call's own failure return gives,
+    // and it reaches the user as a blocked run rather than as a crash.
+
+    private VolumeMountPoints MountPointsFor(string volumeGuidPath)
+    {
+        try
+        {
+            return _volumes.MountPointsFor(volumeGuidPath);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            return VolumeMountPoints.NoAnswer;
+        }
+    }
+
+    private IReadOnlyList<string>? VolumeGuidPaths()
+    {
+        try
+        {
+            return _volumes.VolumeGuidPaths();
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            return null;
+        }
+    }
+
+    private string? DosDeviceTarget(string dosDeviceName)
+    {
+        try
+        {
+            return _volumes.DosDeviceTarget(dosDeviceName);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// The two prefixes Session Manager writes: the NT object form, and the long-path
+    /// form the kernel adds. Either one still on the front after the strip means the
+    /// remainder names its volume rather than carrying a drive root.
+    /// </summary>
+    private static readonly string[] NtPathPrefixes = { @"\??\", @"\\?\" };
+
+    private const string VolumeGuidPrefix = "Volume{";
+
+    private const string GlobalRootPrefix = @"GLOBALROOT\";
 }

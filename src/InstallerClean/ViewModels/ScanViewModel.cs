@@ -96,8 +96,8 @@ public partial class ScanViewModel : ObservableObject
     /// it through a binding and swallows anything it throws as a binding error,
     /// so the user would meet a blank banner over greyed buttons with nothing on
     /// screen saying why. A generic sentence that is true of the whole family
-    /// beats that. It is unreachable while the enum has three members, all of
-    /// which are handled above. Adding a fourth is a failing test rather than a
+    /// beats that. It is unreachable while every member of the enum is handled
+    /// above, and a member added without a banner is a failing test rather than a
     /// silent gap because Every_reason_has_a_banner_of_its_own walks the enum,
     /// and A_reason_with_no_banner_of_its_own_still_says_something covers this
     /// arm (ScanViewModelPendingRebootTests).
@@ -107,6 +107,7 @@ public partial class ScanViewModel : ObservableObject
         PendingRebootReason.MsiExecuteMutexHeld => Strings.Body_PendingReboot_MsiExecuteMutex,
         PendingRebootReason.InstallerInProgress => Strings.Body_PendingReboot_InstallerInProgress,
         PendingRebootReason.PendingRenameInCache => Strings.Body_PendingReboot_PendingRenameInCache,
+        PendingRebootReason.PendingRenameUnresolved => Strings.Body_PendingReboot_PendingRenameUnresolved,
         null => string.Empty,
         _ => Strings.Body_PendingReboot_Other,
     };

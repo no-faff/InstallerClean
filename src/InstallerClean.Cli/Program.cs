@@ -1285,9 +1285,18 @@ internal static class Program
         return ExitTransient;
     }
 
-    private static int EmitPendingRebootBlocked(string arg, PendingRebootReason reason, string? detail)
-    {
-        var stdoutMessage = reason switch
+    /// <summary>
+    /// The sentence a blocked run prints, one per reason.
+    ///
+    /// Its own method rather than an expression inside the emitter because the emitter
+    /// writes to the console and to the Application channel, so nothing could read this
+    /// back without doing both. CliPendingRebootStringsTests walks the enum against it,
+    /// which is what keeps the fallback below unreachable; the window's banner is held
+    /// to the same standard by ScanViewModelPendingRebootTests and is testable already,
+    /// being a bound property.
+    /// </summary>
+    internal static string PendingRebootBlockedMessage(PendingRebootReason reason, string? detail) =>
+        reason switch
         {
             PendingRebootReason.MsiExecuteMutexHeld =>
                 Strings.Cli_PendingRebootBlocked_MsiExecuteMutex,
@@ -1297,15 +1306,47 @@ internal static class Program
                 string.Format(
                     Strings.Cli_PendingRebootBlocked_PendingRenameInCache,
                     detail ?? string.Empty),
+            PendingRebootReason.PendingRenameUnresolved =>
+                Strings.Cli_PendingRebootBlocked_PendingRenameUnresolved,
             // What a reason with no line of its own gets. It threw before, which
             // landed in the generic catch and reported an unexpected crash with
             // exit 1, where a blocked run wants the 75 a scheduler retries on.
-            // Unreachable while the enum has three members, all handled above, and
-            // it cannot fire for a null reason either: PendingRebootResult.Block
+            // It cannot fire for a null reason either: PendingRebootResult.Block
             // takes a non-nullable one.
             _ => Strings.Cli_PendingRebootBlocked_Other,
         };
-        Console.WriteLine(stdoutMessage);
+
+    /// <summary>
+    /// The short label the Application channel carries for a blocked run, one per
+    /// reason. English by design, as every Cli.EventLogReason.* value is: the channel is
+    /// sysadmin-facing and an RMM grep needs a stable target whatever the OS UI culture.
+    ///
+    /// The fallback is the enum member's own name, so a reason added without a label
+    /// still leaves something greppable rather than a blank. That is a floor and not a
+    /// substitute for the label, which is why the same test walks this too.
+    ///
+    /// CALL IT FROM INSIDE THE EVENT-LOG SCOPE. It reads through the ordinary door, so
+    /// what it returns follows whatever culture is current when it runs; hoisted out of
+    /// that scope it would answer in the OS language and quietly undo the arrangement
+    /// its caller's comment describes.
+    /// </summary>
+    internal static string PendingRebootEventLogReason(PendingRebootReason reason) =>
+        reason switch
+        {
+            PendingRebootReason.MsiExecuteMutexHeld =>
+                Strings.Cli_EventLogReason_MsiExecuteMutex,
+            PendingRebootReason.InstallerInProgress =>
+                Strings.Cli_EventLogReason_InstallerInProgress,
+            PendingRebootReason.PendingRenameInCache =>
+                Strings.Cli_EventLogReason_PendingRenameInCache,
+            PendingRebootReason.PendingRenameUnresolved =>
+                Strings.Cli_EventLogReason_PendingRenameUnresolved,
+            _ => reason.ToString(),
+        };
+
+    private static int EmitPendingRebootBlocked(string arg, PendingRebootReason reason, string? detail)
+    {
+        Console.WriteLine(PendingRebootBlockedMessage(reason, detail));
         // The reason label and template are built English: the Cli.EventLogReason.*
         // labels are translated in the Japanese satellite and in no other, but the
         // Application channel is sysadmin-facing and an RMM grep on a known phrase
@@ -1313,23 +1354,11 @@ internal static class Program
         // wrong. This note said "the satellites", which sends the next reader hunting
         // them through fifteen files and then deciding which half of the arrangement
         // is the mistake. The localised stdout sentence above is what the operator
-        // reads; the label switch lives inside the scope so it resolves en-GB, not the
-        // OS language.
+        // reads; the label is resolved INSIDE the scope below, which is what makes it
+        // en-GB rather than the OS language, so the call stays in the lambda.
         MachineContract.WriteEventLog(CliEventClass.TransientSkip, () =>
-        {
-            var reasonLabel = reason switch
-            {
-                PendingRebootReason.MsiExecuteMutexHeld =>
-                    Strings.Cli_EventLogReason_MsiExecuteMutex,
-                PendingRebootReason.InstallerInProgress =>
-                    Strings.Cli_EventLogReason_InstallerInProgress,
-                PendingRebootReason.PendingRenameInCache =>
-                    Strings.Cli_EventLogReason_PendingRenameInCache,
-                _ => reason.ToString(),
-            };
-            return string.Format(Strings.Cli_EventLogPendingRebootBlocked,
-                arg, reasonLabel, detail ?? string.Empty);
-        });
+            string.Format(Strings.Cli_EventLogPendingRebootBlocked,
+                arg, PendingRebootEventLogReason(reason), detail ?? string.Empty));
         // Transient: a reboot (or the in-flight transaction finishing) clears the
         // gate. Hard scan and move/delete failures stay on ExitError.
         return ExitTransient;
