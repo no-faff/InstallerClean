@@ -1351,11 +1351,9 @@ internal static class Program
         // labels are translated in the Japanese satellite and in no other, but the
         // Application channel is sysadmin-facing and an RMM grep on a known phrase
         // needs a stable English target. Those Japanese values are inert rather than
-        // wrong. This note said "the satellites", which sends the next reader hunting
-        // them through fifteen files and then deciding which half of the arrangement
-        // is the mistake. The localised stdout sentence above is what the operator
-        // reads; the label is resolved INSIDE the scope below, which is what makes it
-        // en-GB rather than the OS language, so the call stays in the lambda.
+        // wrong. The localised stdout sentence above is what the operator reads; the
+        // label is resolved INSIDE the scope below, which is what makes it en-GB
+        // rather than the OS language, so the call stays in the lambda.
         MachineContract.WriteEventLog(CliEventClass.TransientSkip, () =>
             string.Format(Strings.Cli_EventLogPendingRebootBlocked,
                 arg, PendingRebootEventLogReason(reason), detail ?? string.Empty));
