@@ -6218,6 +6218,155 @@
       "uk": "unverified",
       "vi": "unverified",
       "zh-Hans": "unverified"
+    },
+    "Cli.DeletingFiles.One": {
+      "de": "unverified",
+      "es": "unverified",
+      "fr": "unverified",
+      "it": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.MovingFiles.One": {
+      "de": "unverified",
+      "es": "unverified",
+      "fr": "unverified",
+      "it": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Status.RegisteredPackagesFound.One": {
+      "de": "unverified",
+      "es": "unverified",
+      "fr": "unverified",
+      "it": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.DeletedFiles.One": {
+      "es": "unverified",
+      "fr": "unverified",
+      "it": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.FoundOrphans.One": {
+      "es": "unverified",
+      "fr": "unverified",
+      "it": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.MovedFiles.One": {
+      "es": "unverified",
+      "fr": "unverified",
+      "it": "unverified",
+      "nl": "unverified",
+      "pl": "unverified",
+      "pt-BR": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.DeletedFiles.Few": {
+      "pl": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.DeletingFiles.Few": {
+      "pl": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.FoundOrphans.Few": {
+      "pl": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.MovedFiles.Few": {
+      "pl": "unverified",
+      "uk": "unverified"
+    },
+    "Cli.MovingFiles.Few": {
+      "pl": "unverified",
+      "uk": "unverified"
+    },
+    "Plural.Error.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Plural.File.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Plural.Package.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Plural.Patch.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Plural.Product.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Status.RegisteredPackagesFound.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Summary.MissingFromDisk.OtherPrograms.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Summary.MissingFromDisk.Unnamed.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Summary.OrphanedToCleanUp.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Summary.RegisteredStillUsed.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Summary.RegisteredWindow.Few": {
+      "pl": "unverified",
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Completion.FailedCount.Few": {
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Completion.FailedCountDelete.Few": {
+      "ru": "unverified",
+      "uk": "unverified"
+    },
+    "Summary.MissingFromDisk.Few": {
+      "uk": "unverified"
     }
   }
 }
