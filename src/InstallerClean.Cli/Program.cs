@@ -353,7 +353,24 @@ internal static class Program
         }
     }
 
-    private static async Task<int> RunWorkAsync(string arg, CliInvocation invocation, CancellationToken token)
+    /// <param name="servicesOverride">
+    /// The service provider to run against, or null to build the real one. NULL ON
+    /// EVERY PRODUCTION PATH, and the only caller that passes anything is a test.
+    ///
+    /// IT IS THE PROVIDER'S CONSTRUCTION AND NOTHING ELSE. Not a line of behaviour sits
+    /// on either side of it: what follows reads services out of whichever provider it
+    /// was handed and cannot tell them apart. A branch that did more than this would be
+    /// a path production never takes, tested in place of the one it does.
+    ///
+    /// A SUPPLIED PROVIDER BELONGS TO ITS CALLER AND IS NOT DISPOSED HERE. The one this
+    /// method builds for itself still is, which is why the two are separate locals
+    /// rather than one: disposing a caller's provider would close it under a test that
+    /// still holds it, and skipping the disposal of its own would leak every singleton
+    /// in the graph on the ordinary path.
+    /// </param>
+    internal static async Task<int> RunWorkAsync(
+        string arg, CliInvocation invocation, CancellationToken token,
+        IServiceProvider? servicesOverride = null)
     {
         // What a cancelled batch had actually committed, read by the OCE catch to
         // write its EventLog summary and to pick ExitPartial over ExitCancelled.
@@ -367,13 +384,16 @@ internal static class Program
 
         try
         {
-            using var services = new ServiceCollection()
-                .AddInstallerCleanCore()
-                .BuildServiceProvider(new ServiceProviderOptions
-                {
-                    ValidateScopes = true,
-                    ValidateOnBuild = true,
-                });
+            using var ownedServices = servicesOverride is null
+                ? new ServiceCollection()
+                    .AddInstallerCleanCore()
+                    .BuildServiceProvider(new ServiceProviderOptions
+                    {
+                        ValidateScopes = true,
+                        ValidateOnBuild = true,
+                    })
+                : null;
+            IServiceProvider services = servicesOverride ?? ownedServices!;
 
             // For /m, resolve and validate the destination before the scan so
             // a misconfigured task fails fast instead of paying a full

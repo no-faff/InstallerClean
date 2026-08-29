@@ -113,6 +113,14 @@ jobs:
       - name: Check XAML resource keys
         run: node scripts/check-xaml-resources.mjs
 
+      # A production caller may pass the action services an empty set of claims and
+      # the compiler cannot see it: the argument is required, so passing the wrong
+      # value satisfies it. The under-lease re-read then returns a pass at its first
+      # line without having asked anything. The tests below drive the call sites that
+      # exist; this is what fails on the day somebody writes a new one.
+      - name: Check the under-lease claims reach the action services
+        run: node scripts/check-under-lease-claims.mjs
+
       # Everything from here to the test run carries the same condition the
       # publishes below do, and for a stronger reason than they have. A guard
       # above is a statement about text; the build and the test run are the only
