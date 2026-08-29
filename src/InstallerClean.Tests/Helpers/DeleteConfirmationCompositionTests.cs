@@ -19,9 +19,10 @@ namespace InstallerClean.Tests.Helpers;
 /// The brackets are ordinary characters in a resx value, so a translation can add
 /// one, drop one or move it, and check-resx-parity, which reads key presence and
 /// placeholder arity, is looking at something else. check-cross-key-rules reads
-/// the resx files and compares each language's brackets against the neutral's;
-/// this reads the values through the door the app opens, with the culture set, so
-/// what it asserts is what the dialog would be handed.
+/// the resx files and compares each language's brackets against the neutral
+/// sentence each key answers for, leaving a key the neutral has not got to
+/// check-resx-parity; this reads the values through the door the app opens, with
+/// the culture set, so what it asserts is what the dialog would be handed.
 ///
 /// IntroLeadCompositionTests does this job for the main window's four leads. This
 /// is the same job for the delete confirmation, which is the only value the app

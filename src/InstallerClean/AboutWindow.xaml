@@ -95,10 +95,10 @@
              so the target is resolved in code-behind (ReadmeLinks.Home)
              against the language on screen rather than pinned here: it
              should not open on English for someone reading the window in
-             Polish. The app's other README links are all mid-sentence and
-             each opens a different section (the main window's safety claim,
-             the missing-file note, the send-report confirmation); this is the
-             only one that offers the document itself. -->
+             Polish. The app's other README links are all mid-sentence, each
+             opening the section its own line is about, and whether one
+             renders at all is the value's decision rather than this window's.
+             This is the only link that offers the document itself. -->
         <TextBlock Grid.Row="5" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
             <Hyperlink x:Name="GuideLink"
                        Click="Hyperlink_Click"

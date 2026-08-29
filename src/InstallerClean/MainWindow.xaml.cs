@@ -694,8 +694,9 @@ public partial class MainWindow : Window
     /// and Windows-Installer-hold leads have none and render verbatim as a
     /// single Run, which is what the shared split already does with them.
     ///
-    /// This is the only link in the window's content and it sits on its
-    /// strongest safety claim, which is also the first thing on the screen.
+    /// This is the window's only content link today and it sits on its
+    /// strongest safety claim: the completion line's own split will build a
+    /// second if a translation ever brackets that value.
     /// The delete confirmation states the same claim and carries no link of
     /// its own: that dialog is modal, so this line stays visible behind it
     /// and cannot be clicked, and a second copy there would put two on screen
