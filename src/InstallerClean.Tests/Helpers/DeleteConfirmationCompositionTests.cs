@@ -26,7 +26,7 @@ namespace InstallerClean.Tests.Helpers;
 ///
 /// IntroLeadCompositionTests does this job for the main window's four leads. This
 /// is the same job for the delete confirmation, which is the only value the app
-/// splits that varies by count. None of the four leads goes through
+/// splits whose form varies by count. None of the four leads goes through
 /// DisplayHelpers.Pluralise and this value does, so the set read here is every
 /// form Pluralise can choose and not only the pair the neutral declares.
 ///
@@ -64,7 +64,10 @@ public class DeleteConfirmationCompositionTests
         yield return $"{Prefix}.Plural";
 
         // tryParents: false, so this is what this language declares and not what it
-        // inherits; an override is satellite-only by definition.
+        // inherits. A category key belongs in a satellite and the neutral declares
+        // none; if one ever appeared there, Pluralise would serve it to every culture
+        // through the ordinary fallback and the neutral's own case below would be the
+        // one to fail.
         var own = Strings.ResourceManager.GetResourceSet(
             culture, createIfNotExists: true, tryParents: false);
         if (own is null) yield break;
@@ -88,6 +91,7 @@ public class DeleteConfirmationCompositionTests
     public void Both_delete_confirmation_bodies_render_as_plain_text(string cultureName)
     {
         var culture = CultureInfo.GetCultureInfo(cultureName);
+        var faults = new List<string>();
 
         foreach (var key in BodyKeys(culture))
         {
@@ -97,16 +101,27 @@ public class DeleteConfirmationCompositionTests
             // named in the message because the set read here varies by language: a
             // failure that named only the value would leave a reader working out
             // which form it came from.
-            Assert.True(CompositionParsing.SplitAtBracketedPhrase(value) is null,
-                $"{cultureName}: {key} splits at a bracketed phrase, so the dialog would "
-                + $"render a hyperlink in it: \"{value}\"");
+            if (CompositionParsing.SplitAtBracketedPhrase(value) is not null)
+            {
+                faults.Add($"{key} splits at a bracketed phrase, so the dialog would "
+                    + $"render a hyperlink in it: \"{value}\"");
+            }
 
             // And no half of a pair either: an unmatched bracket leaves the split
-            // returning null exactly as a clean sentence does, so the assertion
-            // above cannot see one. It would paint on screen.
-            Assert.True(!value.Contains('[') && !value.Contains(']'),
-                $"{cultureName}: {key} carries a square bracket: \"{value}\"");
+            // returning null exactly as a clean sentence does, so the test above it
+            // cannot see one. It would paint on screen. Reported only where the pair
+            // did not fire, because a complete pair carries brackets as well and one
+            // form is owed one line rather than two.
+            else if (value.Contains('[') || value.Contains(']'))
+            {
+                faults.Add($"{key} carries a square bracket: \"{value}\"");
+            }
         }
+
+        // Collected across every form and asserted once, so one run names all of them.
+        // The set read here is as long as the language's own declarations make it, and
+        // an assertion inside the loop answers for the first form alone.
+        Assert.True(faults.Count == 0, $"{cultureName}: {string.Join("; ", faults)}");
     }
 
     /// <summary>
