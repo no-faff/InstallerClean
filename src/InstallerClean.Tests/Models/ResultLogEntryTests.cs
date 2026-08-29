@@ -59,7 +59,12 @@ public class ResultLogEntryTests
         UnansweredProductCount: 0,
         WithheldCandidateCount: 0,
         WithheldTotalBytes: 0,
-        RegisteredWithheldCount: 0);
+        RegisteredWithheldCount: 0,
+        WithheldIdentityUnestablishedCount: 0,
+        WithheldWholesaleCount: 0,
+        WithheldDeclaredProductInstalledCount: 0,
+        WithheldDeclaredProductUnestablishedCount: 0,
+        WithheldScreenUnansweredCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -234,6 +239,17 @@ public class ResultLogEntryTests
                 // there. Three withheld figures over three different populations;
                 // adding any two of them would answer no question.
                 "withheldTotalBytes", "registeredWithheldCount",
+                // The five-way split of withheldCandidateCount, appended as one block
+                // in the order the split declares them. Each is one finding about one
+                // machine and nothing may add any two of them: two are opposite
+                // answers from the same screen, one is that screen having answered
+                // about nothing, one is a per-file identity read that gave up, and one
+                // is the whole walk-derived offer going at once on a fact about the
+                // machine. They sum to withheldCandidateCount and to nothing else.
+                "withheldIdentityUnestablishedCount", "withheldWholesaleCount",
+                "withheldDeclaredProductInstalledCount",
+                "withheldDeclaredProductUnestablishedCount",
+                "withheldScreenUnansweredCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 

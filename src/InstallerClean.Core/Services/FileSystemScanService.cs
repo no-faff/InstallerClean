@@ -161,6 +161,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // has measured. See the decision below it for what fills it.
         var withheld = new List<OrphanedFile>();
 
+        // Which decision put each of those there, kept apart because the report reads
+        // them apart. It travels beside the list rather than being derived from it
+        // afterwards: the list holds files and the files carry no verdict, so the only
+        // place the question can be answered is where the decision is taken.
+        var withheldBy = new WithholdingSplitTally();
+
         // Candidates no registration claims, in walk order. The path comparison and
         // the file-identity match below it are the whole of what decides THIS half of
         // the offer, and there is no second screening pass over it, so a survivor of
@@ -346,7 +352,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         (registrationIdentityReads, candidateIdentityReads) =
             DropCandidatesRegisteredUnderAnotherSpelling(
-                unclaimedByPath, withheld, registered, cancellationToken);
+                unclaimedByPath, withheld, withheldBy, registered, cancellationToken);
 
         // WHAT DECIDES THIS HALF OF THE OFFER: TWO COMPARISONS AND ONE SCREEN, and
         // the difference between them is which end they start at. The path
@@ -514,6 +520,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // Candidates the identity pass already withheld one at a time are on the
             // withheld list and off this one, so nothing lands on it twice.
             withheld.AddRange(unclaimedByPath);
+            withheldBy.Wholesale(unclaimedByPath.Count);
 
             // WHAT THE HOSTS ARE TOLD IS THAT THE WITHHOLDING CAUGHT SOMETHING, AND NOT
             // MERELY THAT THIS BRANCH WAS TAKEN. A walk that produced no unclaimed
@@ -533,7 +540,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         else
         {
             WithholdCandidatesTheirOwnProductStillClaims(
-                unclaimedByPath, withheld, cancellationToken,
+                unclaimedByPath, withheld, withheldBy, cancellationToken,
                 (ex, cause) => refusalLog.Record(ex, cause));
             removable.AddRange(unclaimedByPath);
         }
@@ -983,7 +990,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // side's refusals are one of the conditions behind the bool above; the
             // candidate side's are the files it kept back one at a time.
             registrationIdentityReads,
-            candidateIdentityReads);
+            candidateIdentityReads,
+            // Which decision took each file on the list two lines above. Read here
+            // rather than derived, and held to that list's own length by a test:
+            // five counts that no longer sum to it mean a sixth decision has been
+            // added and is reported by none of them.
+            withheldBy.Taken());
     }
 
     /// <summary>
@@ -1080,6 +1092,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         DropCandidatesRegisteredUnderAnotherSpelling(
             List<OrphanedFile> candidates,
             List<OrphanedFile> withheld,
+            WithholdingSplitTally withheldBy,
             IReadOnlyList<RegisteredPackage> registered,
             CancellationToken cancellationToken)
     {
@@ -1121,6 +1134,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // account for every file the walk found.
             if (!outcome.GivesUpAWithholding()) return false;
             withheld.Add(c);
+            withheldBy.IdentityUnestablished();
             return true;
         });
 
@@ -1167,6 +1181,60 @@ public sealed class FileSystemScanService : IFileSystemScanService
     }
 
     /// <summary>
+    /// The running split of why each candidate was kept back, folded into the
+    /// immutable <see cref="WithholdingSplit"/> the result carries.
+    ///
+    /// EVERY METHOD SITS BESIDE THE ADD IT COUNTS, one statement after it, so that a
+    /// file reaching the withheld list without being accounted for takes a deliberate
+    /// edit rather than an oversight. The completeness test is what notices if one
+    /// ever does.
+    /// </summary>
+    internal sealed class WithholdingSplitTally
+    {
+        private int _identityUnestablished;
+        private int _wholesale;
+        private int _declaredProductInstalled;
+        private int _declaredProductUnestablished;
+        private int _screenUnanswered;
+
+        internal void IdentityUnestablished() => _identityUnestablished++;
+
+        internal void Wholesale(int count) => _wholesale += count;
+
+        internal void ScreenUnanswered(int count) => _screenUnanswered += count;
+
+        /// <summary>
+        /// The screen's own two withholding verdicts, named one by one.
+        ///
+        /// NEITHER IS A CATCH-ALL, AND THAT IS THE POINT. <c>Withholds</c> is written
+        /// as the complement of the two verdicts that keep a file, so a member added
+        /// to the enum withholds by default and would arrive here unnamed. Counting it
+        /// under either of these would put a cause on it that nobody established;
+        /// counting it nowhere leaves the five short of the list, which the
+        /// completeness test reports as what it is.
+        /// </summary>
+        internal void Screened(DeclaredProductOutcome outcome)
+        {
+            switch (outcome)
+            {
+                case DeclaredProductOutcome.DeclaredProductInstalled:
+                    _declaredProductInstalled++;
+                    break;
+                case DeclaredProductOutcome.Unestablished:
+                    _declaredProductUnestablished++;
+                    break;
+            }
+        }
+
+        internal WithholdingSplit Taken() => new(
+            _identityUnestablished,
+            _wholesale,
+            _declaredProductInstalled,
+            _declaredProductUnestablished,
+            _screenUnanswered);
+    }
+
+    /// <summary>
     /// Moves out of <paramref name="candidates"/> and into
     /// <paramref name="withheld"/> every installation package whose own declared
     /// product Windows still holds a record of, and every one this pass could not
@@ -1197,6 +1265,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private void WithholdCandidatesTheirOwnProductStillClaims(
         List<OrphanedFile> candidates,
         List<OrphanedFile> withheld,
+        WithholdingSplitTally withheldBy,
         CancellationToken cancellationToken,
         Action<Exception, string>? recordRefusal = null)
     {
@@ -1211,6 +1280,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         if (outcomes.Count != candidates.Count)
         {
             withheld.AddRange(candidates);
+            withheldBy.ScreenUnanswered(candidates.Count);
             candidates.Clear();
             return;
         }
@@ -1226,7 +1296,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (outcomes[i].Withholds()) withheld.Add(candidates[i]);
+            if (outcomes[i].Withholds())
+            {
+                withheld.Add(candidates[i]);
+                withheldBy.Screened(outcomes[i]);
+            }
             else survivors.Add(candidates[i]);
         }
 

@@ -408,7 +408,8 @@ public record ScanResult(
     IReadOnlyList<OrphanedFile>? WithheldFiles = null,
     bool WalkOfferWithheldWholesale = false,
     FileIdentityReadTally RegistrationIdentityReads = default,
-    FileIdentityReadTally CandidateIdentityReads = default)
+    FileIdentityReadTally CandidateIdentityReads = default,
+    WithholdingSplit WithheldBy = default)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk; the sum of the two
@@ -552,4 +553,47 @@ public static class ShortNameCreationLabels
     /// read as a machine whose setting is known.
     /// </summary>
     public const string Unreadable = "unreadable";
+}
+
+/// <summary>
+/// Which decision kept each file on <see cref="ScanResult.WithheldFiles"/> back.
+///
+/// EXACTLY THREE DECISIONS PUT A FILE ON THAT LIST AND THEY ARE MUTUALLY EXCLUSIVE
+/// PER FILE, so this is a partition of it rather than five overlapping views. The
+/// identity comparison keeps one candidate at a time; the wholesale arm keeps every
+/// remaining candidate in one go and the per-file screen is skipped entirely; and the
+/// screen itself keeps a candidate on its own verdict. A file the identity pass has
+/// already taken is off the list the wholesale arm adds, so nothing lands twice.
+///
+/// THE COUNTS ARE CARRIED APART BECAUSE THE REPORT READS THEM APART. Each member is
+/// one fact about one machine, and nothing may add any two of them and call the
+/// result a cause: what is true of every file on the list is only that the scan
+/// declined to offer it.
+///
+/// <see cref="Total"/> IS WHAT HOLDS THE PARTITION HONEST, and it is asserted against
+/// the list's own length rather than trusted. A partition is a partition until
+/// somebody adds a branch, and a sixth decision arriving later would appear in none of
+/// these five while the list grew underneath them.
+/// </summary>
+public readonly record struct WithholdingSplit(
+    int IdentityUnestablishedCount = 0,
+    int WholesaleCount = 0,
+    int DeclaredProductInstalledCount = 0,
+    int DeclaredProductUnestablishedCount = 0,
+    int ScreenUnansweredCount = 0)
+{
+    /// <summary>
+    /// Every file the five account for. It equals <see cref="ScanResult.WithheldFiles"/>'s
+    /// own length on any scan that filled both, and a test holds it there.
+    ///
+    /// IT IS A COUNT AND NEVER A CAUSE. The five members are five different findings
+    /// about a machine, so this figure answers "how many were held back" and nothing
+    /// whatever about why.
+    /// </summary>
+    public int Total =>
+        IdentityUnestablishedCount
+        + WholesaleCount
+        + DeclaredProductInstalledCount
+        + DeclaredProductUnestablishedCount
+        + ScreenUnansweredCount;
 }

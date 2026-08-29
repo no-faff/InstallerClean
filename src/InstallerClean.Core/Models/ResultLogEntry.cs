@@ -777,10 +777,11 @@ public sealed record MachineInfo(
 /// ANSWERS THAT. It is the figure that says whether a machine got nothing because its
 /// folder was clean or because the scan could not settle it.
 ///
-/// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Three separate conditions put
-/// files on that list and they are different facts about a machine; a sentence naming
-/// any one of them would be false of the others. <c>machine</c>'s counts are where
-/// the conditions are counted apart.
+/// NO CAUSE TRAVELS WITH THIS FIGURE AND NONE MAY BE ATTACHED TO IT. Three separate
+/// conditions put files on that list and they are different facts about a machine; a
+/// sentence naming any one of them would be false of the others. The five counts below
+/// are where those conditions are counted apart, one finding each, and they are read
+/// apart for the same reason.
 /// </param>
 /// <param name="WithheldTotalBytes">
 /// The bytes of the files behind <paramref name="WithheldCandidateCount"/>, summed
@@ -816,6 +817,56 @@ public sealed record MachineInfo(
 /// away and they are different facts about a machine, so a sentence naming one would
 /// be false of the rows the others put in the count.
 /// </param>
+/// <param name="WithheldIdentityUnestablishedCount">
+/// Candidates the identity comparison kept back one at a time, because the filesystem
+/// would not say which file the candidate's own path names:
+/// <c>ScanResult.WithheldBy.IdentityUnestablishedCount</c>. The first member of the
+/// five-way split of <paramref name="WithheldCandidateCount"/>.
+///
+/// IT IS SENT RATHER THAN DERIVED, AND THAT IS DELIBERATE. The same population is
+/// recoverable today from <c>machine</c>'s candidate-side refusal total, which has the
+/// same membership and the same value. Two expressions answering one question is the
+/// arrangement that agrees until one side moves, after which nothing fails and the
+/// report goes on looking right; a figure that happens to match is a coincidence
+/// somebody later has to prove is still holding.
+/// </param>
+/// <param name="WithheldWholesaleCount">
+/// Candidates kept back in one go, the whole walk-derived offer having been withheld on
+/// a fact about the machine rather than about any file:
+/// <c>ScanResult.WithheldBy.WholesaleCount</c>.
+///
+/// IT SUBSUMES THE FLAG AND NO SEPARATE ONE IS SENT.
+/// <c>ScanResult.WalkOfferWithheldWholesale</c> is set as "the list this count came
+/// from was not empty", so this count above zero IS that flag rather than a second
+/// reading of it.
+///
+/// NO CAUSE TRAVELS WITH IT. Three named conditions reach that branch and any
+/// combination of them can be true at once, so nothing may say which one held a
+/// machine's offer back.
+/// </param>
+/// <param name="WithheldDeclaredProductInstalledCount">
+/// Candidates the declared-product screen kept back because Windows still holds a
+/// record of the product the file itself declares it belongs to:
+/// <c>ScanResult.WithheldBy.DeclaredProductInstalledCount</c>.
+/// </param>
+/// <param name="WithheldDeclaredProductUnestablishedCount">
+/// Candidates the same screen kept back having settled nothing about them:
+/// <c>ScanResult.WithheldBy.DeclaredProductUnestablishedCount</c>.
+///
+/// IT IS THE OPPOSITE FINDING FROM THE ONE ABOVE IT AND THE TWO MUST NOT BE ADDED. That
+/// one is a positive answer about a machine; this one is a question that went
+/// unanswered, and it covers two different inabilities under one name deliberately.
+/// A total over the pair would state a cause true of neither.
+/// </param>
+/// <param name="WithheldScreenUnansweredCount">
+/// Candidates kept back because the screen answered a different number of files than it
+/// was handed, so no verdict in it could be attached to any file:
+/// <c>ScanResult.WithheldBy.ScreenUnansweredCount</c>.
+///
+/// A THIRD FACT AND NOT A MEMBER OF EITHER SCREEN OUTCOME ABOVE. Those two are verdicts
+/// the screen reached about a file; this is the screen having reached none, and filing
+/// it under either would state a cause that was never established.
+/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -835,7 +886,12 @@ public sealed record ScanInfo(
     int UnansweredProductCount,
     int WithheldCandidateCount,
     long WithheldTotalBytes,
-    int RegisteredWithheldCount)
+    int RegisteredWithheldCount,
+    int WithheldIdentityUnestablishedCount,
+    int WithheldWholesaleCount,
+    int WithheldDeclaredProductInstalledCount,
+    int WithheldDeclaredProductUnestablishedCount,
+    int WithheldScreenUnansweredCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -883,7 +939,16 @@ public sealed record ScanInfo(
             scan.WithheldTotalBytes,
             // Counted off the kept list by the scan, so the number sent and the rows
             // the registered-files window shows cannot come apart.
-            scan.RegisteredWithheldCount);
+            scan.RegisteredWithheldCount,
+            // The five-way split of the count three lines up, taken off the one place
+            // that knows it. Appended rather than placed among the members they belong
+            // beside: every argument after an insertion point re-points at its
+            // neighbour's value, and a shift within a run of ints compiles silently.
+            scan.WithheldBy.IdentityUnestablishedCount,
+            scan.WithheldBy.WholesaleCount,
+            scan.WithheldBy.DeclaredProductInstalledCount,
+            scan.WithheldBy.DeclaredProductUnestablishedCount,
+            scan.WithheldBy.ScreenUnansweredCount);
     }
 }
 
