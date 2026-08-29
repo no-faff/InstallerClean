@@ -403,7 +403,7 @@
     <value>These files can't be cleaned up right now.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
-  <!-- The four reason-specific banners. Each names the folder with the
+  <!-- The reason-specific banners. Each names the folder with the
        {InstallerFolder} token, like every other line in the app that names it:
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
@@ -411,13 +411,13 @@
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.</value></data>
-  <!-- The fourth reason-specific banner. Names the folder with the {InstallerFolder}
-       token like its three siblings. It states what the machine holds, a queued file
-       operation, and stops there: nothing here has shown that Windows Installer is
-       running or that an install is suspended, so the two banners that say so would both
-       be untrue, and Body.PendingReboot.Other says something is in progress and would be
-       untrue as well. The restart is the instruction because these operations are carried
-       out at the next boot and not before. -->
+  <!-- The banner for an entry the gate cannot place. Names the folder with the
+       {InstallerFolder} token like the rest of the family. It states what the machine
+       holds, a queued file operation, and stops there: nothing here has shown that
+       Windows Installer is running or that an install is suspended, so the two banners
+       that say so would both be untrue, and Body.PendingReboot.Other says something is
+       in progress and would be untrue as well. The restart is the instruction because
+       these operations are carried out at the next boot and not before. -->
   <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning.</value></data>
   <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
