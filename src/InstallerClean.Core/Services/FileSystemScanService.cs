@@ -511,8 +511,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // the paragraph above arriving where it was always going. A host now names
         // which of these held rather than only that the branch was taken, so the gate
         // and that host read the same expression: a condition added to WithholdingLeg
-        // is one this line acts on and one that host prints, and a condition added
-        // anywhere else is caught by the test that holds this line to that list.
+        // is one this line acts on and one that host prints. A condition written in
+        // beside this call instead, which would withhold an offer the breakdown has
+        // nothing to say about, is what
+        // FileSystemScanServiceWithholdingLegsTests holds this line against.
         var withholdWalkOfferWholesale =
             WithholdingLegs.Any(query.Census, registrationIdentityReads);
 

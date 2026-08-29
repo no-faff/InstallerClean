@@ -94,11 +94,17 @@ public class WithholdingLegsTests
     /// the test that closes that, and it needs no maintenance: the members are read off
     /// the types, so one added later is covered the day it lands.
     ///
-    /// IT IS AN EQUIVALENCE AND NOT A TABLE, which is safe here for the reason it is
-    /// unsafe above: what it compares are two DIFFERENT expressions, the gate and the
-    /// list, where the table compares one expression against a literal. A test deriving
-    /// its expectation from its subject is the trap; this derives one subject's
-    /// expectation from another subject.
+    /// WHAT IT PINS IS THE DEFINITION OF <c>Any</c>, AND SAYING SO MATTERS. It is not
+    /// two independently derived answers agreeing: <c>Any</c> is written as
+    /// <c>Fired(...).Count > 0</c>, so today the theory holds a thing against a wrapper
+    /// round it. That is worth holding, because the wrapper is what the scan calls and
+    /// the list is what the host prints, and rewriting <c>Any</c> to read a condition of
+    /// its own is what this catches. But a reader who takes the two for independent
+    /// reads more into a green run than is in it.
+    ///
+    /// AND IT SAYS NOTHING WHATEVER ABOUT THE SCAN. The scan is free to stop calling
+    /// either of these, and no test in this class could see it.
+    /// FileSystemScanServiceWithholdingLegsTests is where that is held.
     /// </summary>
     [Theory]
     [MemberData(nameof(EveryCensusMember))]
