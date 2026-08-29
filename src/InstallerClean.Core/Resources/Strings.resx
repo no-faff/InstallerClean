@@ -419,14 +419,14 @@
        untrue as well. The restart is the instruction because these operations are carried
        out at the next boot and not before. -->
   <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning.</value></data>
-  <!-- The fourth arm, for a reason the app can detect but has no line of its
+  <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
        property throwing produces: WPF swallows it as a binding error and paints
        nothing. It says what is true of every reason in that family, that
        something is in progress and the buttons come back afterwards, and says
-       nothing it cannot know. Names the folder with the token like its three
-       siblings. -->
+       nothing it cannot know. Names the folder with the token like the rest of
+       the family. -->
   <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Select a file to view details.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
@@ -1681,7 +1681,7 @@ The crash log could not be written.</value></data>
   <!-- What a blocking reason with no line of its own gets, so a reason added
        later cannot leave the command line reporting an unexpected crash for a
        run that was merely held. The command-line twin of Body.PendingReboot.Other,
-       adapted the way its three siblings are: the flags rather than the window's
+       adapted the way the rest of the family is: the flags rather than the window's
        button names, "blocked" rather than "paused" to match them, and no Re-scan,
        there being nothing to re-scan on a command line. -->
   <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
