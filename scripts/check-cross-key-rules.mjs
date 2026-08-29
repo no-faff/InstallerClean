@@ -300,6 +300,14 @@ const RAW_READ_ALLOWED = [
       + 'drives the typed accessor. The expectation has to come from the satellite '
       + 'rather than from the door under test.',
   },
+  {
+    file: 'src/InstallerClean.Tests/Helpers/DeleteConfirmationCompositionTests.cs',
+    reason: 'Enumerates one culture\'s own resource set, with tryParents false, to '
+      + 'find the plural overrides that language declares. A door that answers one '
+      + 'named key cannot list a set, and which forms exist is the language\'s '
+      + 'decision rather than a list this file could hold. Every value it goes on to '
+      + 'assert against is read through Strings.Get.',
+  },
 ];
 
 // ---------------------------------------------------------------------------
