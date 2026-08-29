@@ -66,6 +66,7 @@
 //                                                           seed every key/language pair
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { standsInFor } from './plural-overrides.mjs';
 
 const RES = 'src/InstallerClean.Core/Resources';
 const NEUTRAL = `${RES}/Strings.resx`;
@@ -94,9 +95,36 @@ function readResx(path) {
 }
 
 const neutral = readResx(NEUTRAL);
+
 const satFiles = readdirSync(RES).filter((f) => /^Strings\.[A-Za-z-]+\.resx$/.test(f)).sort();
 const langOf = (f) => f.match(/^Strings\.([A-Za-z-]+)\.resx$/)[1];
 const ledger = existsSync(LEDGER) ? JSON.parse(readFileSync(LEDGER, 'utf8')) : { keys: {} };
+
+// THE ENGLISH A KEY ANSWERS FOR, WHICH IS NOT ALWAYS ITS OWN. A satellite-only plural
+// override translates a FORM of a base key: Russian's Plural.File.Few is one of the
+// forms Pluralise chooses between for Plural.File, and the neutral declares no
+// Plural.File.Few for it to have been made from. So its freshness is the base form's
+// freshness, because that is what moving would make it out of date. Stamped against
+// anything else it would carry a number that never moves.
+const englishFor = (key) =>
+  neutral.get(key) ?? neutral.get(standsInFor(key, neutral) ?? '\u0000');
+
+// EVERY KEY THIS LANGUAGE HAS A CLAIM TO MAKE ABOUT, and it is three sets rather than
+// the neutral's alone. The neutral's keys are what every satellite is measured against.
+// A satellite's own overrides are keys the neutral will never hold, and walking only
+// the neutral is why they have never been recorded and are never checked. And a key
+// this language is STAMPED for is walked whether it is still there or not, which is
+// what lets an override that has been deleted be reported as gone rather than
+// disappearing with the walk that would have found it.
+const keysFor = (sat, lang) => {
+  const out = new Set(neutral.keys());
+  for (const k of sat.keys())
+    if (!neutral.has(k) && standsInFor(k, neutral) !== null) out.add(k);
+  for (const [k, langs] of Object.entries(ledger.keys ?? {}))
+    if (!neutral.has(k) && langs?.[lang] !== undefined && standsInFor(k, neutral) !== null)
+      out.add(k);
+  return out;
+};
 
 const args = process.argv.slice(2);
 const recordIdx = args.indexOf('--record');
@@ -113,39 +141,71 @@ const recordAll = args.includes('--record-all-current');
 // flag is never read as the shorter one.
 if (recordIdx !== -1 || unverifiedIdx !== -1 || recordAll) {
   const asUnverified = unverifiedIdx !== -1;
+  // --record-all-current TAKES THE OVERRIDES TOO, and until it did they were the one
+  // population no seed could reach. The union is built across every satellite because
+  // which language declares which override is that language's own decision.
+  //
+  // TWO SETS AND NOT ONE, BECAUSE THEY ARE DIFFERENT QUANTITIES. The key list wants
+  // DISTINCT KEYS, one per name, and the figure printed at the end wants KEY-SLOTS,
+  // one per language that declares it. Reported as one number they would be compared
+  // against each other, and the gap between them would read as a shortfall.
+  const overrides = new Set();
+  const overrideSlots = new Set();
+  for (const f of satFiles)
+    for (const k of readResx(`${RES}/${f}`).keys())
+      if (!neutral.has(k) && standsInFor(k, neutral) !== null) {
+        overrides.add(k);
+        overrideSlots.add(`${langOf(f)}\u0000${k}`);
+      }
+
   const keys = recordAll
-    ? [...neutral.keys()]
+    ? [...neutral.keys(), ...overrides]
     : args.slice((asUnverified ? unverifiedIdx : recordIdx) + 1);
-  const unknown = keys.filter((k) => !neutral.has(k));
+
+  // A NAMED KEY IS ACCEPTED WHERE THE NEUTRAL HOLDS IT OR WHERE IT ANSWERS FOR A FORM
+  // THE NEUTRAL HOLDS. The second is what an override is, and rejecting it was why no
+  // override has ever carried an entry: satellite-only by construction, so
+  // neutral.has is false for every one of them and always will be.
+  const unknown = keys.filter((k) => englishFor(k) === undefined);
   if (!keys.length || unknown.length) {
-    console.error(unknown.length ? `Not in the neutral resx: ${unknown.join(', ')}` : 'Usage: --record <Key> [<Key> ...] | --record-unverified <Key> [<Key> ...]');
+    console.error(unknown.length ? `Neither in the neutral resx nor answering for a form that is: ${unknown.join(', ')}` : 'Usage: --record <Key> [<Key> ...] | --record-unverified <Key> [<Key> ...]');
     process.exit(2);
   }
   let stamped = 0;
+  let overridesStamped = 0;
   for (const f of satFiles) {
     const lang = langOf(f);
     const sat = readResx(`${RES}/${f}`);
     for (const k of keys) {
       if (!sat.has(k)) continue;
       ledger.keys[k] ??= {};
-      ledger.keys[k][lang] = asUnverified ? UNVERIFIED : digest(neutral.get(k));
+      // The digest is of the English this key answers for, which for an override is
+      // the base form's. See englishFor.
+      ledger.keys[k][lang] = asUnverified ? UNVERIFIED : digest(englishFor(k));
       stamped++;
+      if (!neutral.has(k)) overridesStamped++;
     }
   }
   writeFileSync(LEDGER, JSON.stringify(ledger, null, 2) + '\n', 'utf8');
+  // BOTH POPULATIONS SIDE BY SIDE. A widened walk that reached fewer overrides than
+  // the satellites hold would report a smaller number and read exactly like a clean
+  // run, so the count of overrides available is printed beside the count stamped.
   console.log(`RECORDED: ${keys.length} key(s), ${stamped} key-slot(s) stamped ${asUnverified ? 'as never established' : 'against the current neutral'}, across ${satFiles.length} satellite(s).`);
+  console.log(`  of those, ${overridesStamped} override key-slot(s) stamped, out of ${overrideSlots.size} the satellites declare (${overrides.size} distinct override key(s)).`);
   process.exit(0);
 }
 
 const stale = [];
 const deleted = [];
-let checked = 0, fresh = 0, unverified = 0, absent = 0, notInLedger = 0;
+let checked = 0, fresh = 0, unverified = 0, absent = 0, notInLedger = 0, overridesWalked = 0;
 
 for (const f of satFiles) {
   const lang = langOf(f);
   const sat = readResx(`${RES}/${f}`);
-  for (const [key, englishNow] of neutral) {
+  for (const key of keysFor(sat, lang)) {
+    const englishNow = englishFor(key);
     const recorded = ledger.keys?.[key]?.[lang];
+    if (!neutral.has(key)) overridesWalked++;
     // AN ENTRY STANDING OVER A KEY THAT IS NOT THERE IS A TRANSLATION THAT HAS
     // GONE, and the ledger is what tells the two absences apart. A slot is only
     // ever stamped while the satellite holds the key, so a stamp with no key
@@ -189,7 +249,26 @@ console.log(
   `${unverified} unverified (recorded as never established), ` +
   `${notInLedger} not in the ledger (no claim made), ${absent} absent from the satellite.`
 );
+// PRINTED BESIDE THE WALK'S OWN TOTAL AND NEVER INSTEAD OF IT. The overrides are the
+// population this walk was widened to reach, so a widening that reached fewer of them
+// than the satellites hold would report a smaller number and look exactly like a run
+// over a tree that has fewer. The second figure is counted from the files rather than
+// from the walk, which is what makes the pair worth reading.
+//
+// BOTH ARE KEY-SLOTS, LANGUAGE BY LANGUAGE, AND SAYING SO IS THE POINT. Counted as
+// distinct KEYS the two are different quantities and a reader comparing them would be
+// comparing 25 against 99 and drawing a conclusion from the gap. Walked can exceed
+// declared by exactly the slots a language is stamped for and no longer holds, which
+// is the GONE line above.
+const declared = new Set();
+for (const f of satFiles)
+  for (const k of readResx(`${RES}/${f}`).keys())
+    if (!neutral.has(k) && standsInFor(k, neutral) !== null) declared.add(`${langOf(f)}\u0000${k}`);
+console.log(`OVERRIDES: ${overridesWalked} key-slot(s) walked, ${declared.size} declared across the satellites.`);
 if (notInLedger > 0) {
   console.log(`NOTE: ${notInLedger} key-slot(s) carry no ledger entry, so this run says NOTHING about them. It reports drift from the seed forward and makes no claim about any translation predating it.`);
 }
+// UNJUDGEABLE FAILS. A stamp standing on a key that answers for nothing is a claim
+// about a translation nobody can check, and leaving it green would let the ledger
+// carry entries the check has quietly stopped reading.
 process.exit(stale.length || deleted.length ? 1 : 0);
