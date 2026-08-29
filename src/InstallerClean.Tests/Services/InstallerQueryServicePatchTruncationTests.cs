@@ -43,6 +43,9 @@ public class InstallerQueryServicePatchTruncationTests
 
     private const string Shared = @"C:\Windows\Installer\shared.msp";
 
+    /// <summary>The account a second installation of one product code sits under.</summary>
+    private const string PerUserSid = "S-1-5-21-1111111111-2222222222-3333333333-1001";
+
     private static InstallerQueryService.FallbackRead NoFallback(
         Dictionary<string, RegisteredPackage> claimed, CancellationToken ct) => new(0, 0);
 
@@ -77,7 +80,26 @@ public class InstallerQueryServicePatchTruncationTests
     /// </summary>
     private static Dictionary<string, RegisteredPackage> Confirm(
         FakeApi msi, IPackageIdentityReader? reader = null,
-        PerItemFailureLog? unreadPatchFileLog = null, params string[] recovered)
+        PerItemFailureLog? unreadPatchFileLog = null, params string[] recovered) =>
+        ConfirmWith(
+            msi,
+            recovered
+                .Select(p => (ProductCode: p, Sid: (string?)null, Context: MsiInstallContext.Machine))
+                .ToList(),
+            reader, unreadPatchFileLog);
+
+    /// <summary>
+    /// The same driver, taking the recovered products as the instances they are.
+    /// <see cref="Confirm"/> names them by code alone, which is every existing
+    /// fixture's shape and reads as one per-machine installation each; a fixture
+    /// about a code installed more than once has to say which installation it means,
+    /// and that is the only thing this adds.
+    /// </summary>
+    private static Dictionary<string, RegisteredPackage> ConfirmWith(
+        FakeApi msi,
+        List<(string ProductCode, string? Sid, MsiInstallContext Context)> recovered,
+        IPackageIdentityReader? reader = null,
+        PerItemFailureLog? unreadPatchFileLog = null)
     {
         var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
         var claims = new List<PatchClaim>();
@@ -127,7 +149,7 @@ public class InstallerQueryServicePatchTruncationTests
             claimed,
             claims,
             msi.WalkedProductInstances.ToList(),
-            recovered.Select(p => (ProductCode: p, Sid: (string?)null, Context: MsiInstallContext.Machine)).ToList(),
+            recovered,
             // NOTHING ESTABLISHED ABOUT WHAT THE RECOVERED PRODUCTS HOLD, which is
             // deliberate and is what these tests want. A default reach judges every
             // recovered product against every path, so the narrowing is out of the
@@ -379,6 +401,47 @@ public class InstallerQueryServicePatchTruncationTests
         Confirm(msi);
 
         Assert.Empty(msi.ConfirmationAsks);
+    }
+
+    /// <summary>
+    /// ONE PRODUCT CODE, TWO INSTALLATIONS, AND A PAIRING READ UNDER ONE OF THEM.
+    /// A code can be installed for the machine and for a user at once, or under two
+    /// accounts, and each installation carries its own patch registrations: a patch
+    /// can be superseded under one and still applied under the other. So a pairing
+    /// the enumeration read under one instance leaves the same pairing unread under
+    /// the other, and the second instance is put the question as itself.
+    ///
+    /// THE PER-PRODUCT CONDITION MUST NOT SETTLE THE PATH FIRST or the per-pairing
+    /// pass never runs and this would pass for a reason that has nothing to do with
+    /// its name. Nothing here holds anything uninstallable, and the verdict is
+    /// asserted below rather than assumed.
+    /// </summary>
+    [Fact]
+    public void A_second_instance_of_a_product_already_read_is_asked_as_itself()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+
+        var row = TheSharedPatch(ConfirmWith(msi, new List<(string, string?, MsiInstallContext)>
+        {
+            (Superseding, PerUserSid, MsiInstallContext.UserUnmanaged),
+        }));
+
+        Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
+
+        Assert.Contains(
+            (Patch, Superseding, (string?)PerUserSid, MsiInstallContext.UserUnmanaged),
+            msi.KeyedPatchReads);
+
+        // AND THE INSTANCE THE ENUMERATION ALREADY READ IS STILL NOT ASKED AGAIN,
+        // which is the half that keeps the skip doing its job: that reading would come
+        // back from the same rows for the same reason. It is asserted against every
+        // keyed read rather than against the confirmation record, which a pairing the
+        // enumeration named cannot enter.
+        Assert.DoesNotContain(
+            (Patch, Superseding, (string?)null, MsiInstallContext.Machine),
+            msi.KeyedPatchReads);
     }
 
     [Fact]
@@ -1137,6 +1200,21 @@ public class InstallerQueryServicePatchTruncationTests
         public List<(string Patch, string Product, string? Sid, MsiInstallContext Context)>
             ConfirmationAskIdentities { get; } = new();
 
+        /// <summary>
+        /// Every keyed patch-property read this fixture served, in order, with the
+        /// account and context it was made under.
+        ///
+        /// IT IS THE WHOLE SET AND THAT IS WHAT IT IS FOR. The two lists above hold
+        /// the pairings the enumeration never named, which is the right question for
+        /// "did the pass go and find something", and the wrong one for "was this
+        /// pairing left alone": a read of an already-enumerated pairing never reaches
+        /// them, so an assertion about one not happening would hold whether or not it
+        /// happened. The harness here calls no keyed read of its own, so everything in
+        /// this list was asked by the pass under test.
+        /// </summary>
+        public List<(string Patch, string Product, string? Sid, MsiInstallContext Context)>
+            KeyedPatchReads { get; } = new();
+
         public void AddProduct(string code) => _products.Add(code);
 
         /// <summary>
@@ -1321,10 +1399,22 @@ public class InstallerQueryServicePatchTruncationTests
         public uint GetPatchInfo(string patchCode, string productCode, string? userSid,
             MsiInstallContext context, string property, char[]? value, ref uint valueLength)
         {
-            // Recorded only where this product's own enumeration never named the
-            // patch, which is the one thing the product loop cannot have asked.
-            var enumeratedIt = !EnumerationEndsEarlyFor.Contains(productCode)
-                && _patchesOf.TryGetValue(productCode, out var held) && held.Contains(patchCode);
+            // EVERY keyed read, whatever it is about. The two lists below are the
+            // interesting subset and cannot answer for the whole: a read of a pairing
+            // the enumeration already named is absent from them by construction, so
+            // an assertion about a pairing NOT being read a second time has to be made
+            // against this one.
+            KeyedPatchReads.Add((patchCode, productCode, userSid, context));
+
+            // Recorded only where this INSTANCE's own enumeration never named the
+            // patch, which is the one thing the product loop cannot have asked. It is
+            // the instance and not the code because a code can name more than one
+            // installation, each with its own patch rows: a pairing read under one of
+            // them leaves the same pairing unread under the other, so the enumerated
+            // pairings are matched on the account and the context as well.
+            var enumeratedIt = EnumeratedPairings().Any(r =>
+                r.Patch == patchCode && r.Product == productCode
+                && r.UserSid == userSid && r.Context == context);
             if (!enumeratedIt)
             {
                 ConfirmationAsks.Add((patchCode, productCode));

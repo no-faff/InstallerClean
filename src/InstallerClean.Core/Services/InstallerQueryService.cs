@@ -1438,12 +1438,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // What is left is the machine-wide enumeration below, which reads no file and
         // which every machine that offers anything already pays for on every scan.
         //
-        // The pairings the product loop already read. Re-asking them would get the
-        // same answer for the same reason, so they are skipped: what this pass is
-        // for is the pairings no enumeration produced.
-        var alreadyAsked = new HashSet<(string, string)>();
+        // The pairings the product loop already read, keyed by the INSTANCE that
+        // answered and not by the product code alone. Re-asking gets the same answer
+        // for the same reason only where the same instance is being asked: one product
+        // code can be installed for two accounts, or per-machine and per-user at once,
+        // and each instance holds its own patch registrations and answers for itself.
+        // So the account and the context are part of what makes a pairing already
+        // asked, and an instance this loop never reached is asked below rather than
+        // taken as answered by another. What this pass is for is the pairings no
+        // enumeration produced.
+        //
+        // The context is the raw API value on both sides. A claim carries it as an int
+        // because the models keep no dependency on the interop layer, and the
+        // enumerated form is cast to match rather than the claim being widened.
+        var alreadyAsked = new HashSet<(string PatchCode, string ProductCode, string? UserSid, int Context)>();
         foreach (var claim in patchClaims)
-            alreadyAsked.Add((claim.PatchCode, claim.ProductCode));
+            alreadyAsked.Add((claim.PatchCode, claim.ProductCode, claim.UserSid, claim.Context));
 
         // ROUTE A. Every (patch, product) pairing the API will name when asked
         // about no product in particular, which is the only way to hear about a
@@ -1567,7 +1577,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             foreach (var (productCode, userSid, context) in toAsk)
             {
-                if (alreadyAsked.Contains((patchCode, productCode))) continue;
+                if (alreadyAsked.Contains((patchCode, productCode, userSid, (int)context))) continue;
 
                 ct.ThrowIfCancellationRequested();
 
