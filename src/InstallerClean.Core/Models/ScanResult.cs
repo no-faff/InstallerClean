@@ -424,6 +424,21 @@ public record ScanResult(
     /// <summary>Total bytes of the files this scan declined to offer.</summary>
     public long WithheldTotalBytes =>
         WithheldFiles?.Sum(f => f.SizeBytes) ?? 0;
+
+    /// <summary>
+    /// Which conditions kept the walk-derived offer back, for a host that explains the
+    /// withholding rather than merely reporting it.
+    ///
+    /// IT IS A SECOND CALLER OF THE GATE'S OWN EXPRESSION AND NOT A SECOND DERIVATION.
+    /// The scan computes the gate from these same two values before it builds this
+    /// result, so what a host reads here cannot disagree with what the scan acted on.
+    /// The list is empty on any scan whose offer stood, and
+    /// <see cref="WalkOfferWithheldWholesale"/> stays the thing to test for that: the
+    /// gate fires on a machine whose walk found nothing to withhold, and the flag
+    /// answers whether the withholding actually took anything.
+    /// </summary>
+    public IReadOnlyList<WithholdingLeg> WithholdingLegsFired =>
+        WithholdingLegs.Fired(Census, RegistrationIdentityReads);
 }
 
 /// <summary>
@@ -596,4 +611,75 @@ public readonly record struct WithholdingSplit(
         + DeclaredProductInstalledCount
         + DeclaredProductUnestablishedCount
         + ScreenUnansweredCount;
+}
+
+/// <summary>
+/// The named conditions that keep the walk-derived offer back, one member per leg.
+///
+/// THEY ARE CONDITIONS THE RUN MET AND NOT A PARTITION OF ANY FILE SET. Any
+/// combination of them can hold at once and none of them counts anything, so nothing
+/// sums over these and no line built on one may state a cause for the files that were
+/// withheld.
+///
+/// THE ORDER IS THE ORDER THEY ARE REPORTED IN, so a reader meeting two of them meets
+/// them the same way twice.
+/// </summary>
+public enum WithholdingLeg
+{
+    /// <summary>A path in Windows Installer's own records would not resolve.</summary>
+    RecordedPathUnestablished,
+
+    /// <summary>The identity of a file named in those records would not read.</summary>
+    FileIdentityUnestablished,
+
+    /// <summary>A product may be installed more than once on this machine.</summary>
+    SecondInstanceNotRuledOut,
+}
+
+/// <summary>
+/// The one place the walk-offer withholding is decided, and the reason it is a type
+/// rather than an expression written twice.
+///
+/// THE GATE AND THE HOST THAT EXPLAINS IT READ THE SAME CALL. The scan asks whether
+/// anything fired; the command line asks which. Written as two expressions they agree
+/// until one of them changes, after which the gate can grow a fourth condition while
+/// the breakdown under it goes on naming three, every test still green and the output
+/// still looking like an answer. Here a leg added to the enum is a leg the gate acts
+/// on and a leg the host prints, and a leg added without a line is a failing test.
+/// </summary>
+public static class WithholdingLegs
+{
+    /// <summary>
+    /// Every leg that fired, in declaration order.
+    ///
+    /// The census is asked about two of them and the registration side of the identity
+    /// comparison about the third, each through the property that owns the question
+    /// rather than by naming its members here: a rule that named them itself would be
+    /// one edit away from silently not acting on a member added later.
+    /// </summary>
+    public static IReadOnlyList<WithholdingLeg> Fired(
+        EnumerationCensus census, FileIdentityReadTally registrationIdentityReads)
+    {
+        var fired = new List<WithholdingLeg>(3);
+
+        if (census.AnyRecordedPathUnestablished)
+            fired.Add(WithholdingLeg.RecordedPathUnestablished);
+        if (registrationIdentityReads.AnyUnestablished)
+            fired.Add(WithholdingLeg.FileIdentityUnestablished);
+        if (census.SecondInstanceNotRuledOut)
+            fired.Add(WithholdingLeg.SecondInstanceNotRuledOut);
+
+        return fired;
+    }
+
+    /// <summary>
+    /// Whether the walk-derived offer is withheld wholesale: any leg at all.
+    ///
+    /// It calls <see cref="Fired"/> rather than repeating its conditions, which is the
+    /// whole point of the type. The list is at most three entries and is built once per
+    /// scan.
+    /// </summary>
+    public static bool Any(
+        EnumerationCensus census, FileIdentityReadTally registrationIdentityReads) =>
+        Fired(census, registrationIdentityReads).Count > 0;
 }

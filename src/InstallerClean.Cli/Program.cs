@@ -947,6 +947,29 @@ internal static class Program
             MachineContract.WriteEventLog(CliEventClass.ScanNothingOfferedNotice,
                 () => string.Format(Strings.Cli_EventLogNothingOfferedNotice,
                     arg, heldBack, DisplayHelpers.PluraliseFile(heldBack)));
+
+            // THE LEAD, FOR THE MACHINE THAT OTHERWISE HEARS NOTHING. Where the offer
+            // is empty the branch above this method has already said this in the line
+            // it printed instead of the clean one. Where a superseded row WAS offered
+            // beside the withheld half, that branch printed "Found N unneeded files"
+            // and said nothing at all about the half that went; this is that machine's
+            // only statement of it, and the window has had a line for exactly it.
+            if (scanResult.RemovableFiles.Count > 0)
+                Console.WriteLine(string.Format(
+                    DisplayHelpers.Pluralise(heldBack,
+                        Strings.Cli_NothingListed_Singular,
+                        Strings.Cli_NothingListed_Plural, "Cli.NothingListed"),
+                    heldBack, DisplayHelpers.PluraliseFile(heldBack),
+                    DisplayHelpers.FormatSize(scanResult.WithheldTotalBytes)));
+
+            // AND WHY, ONE LINE PER CONDITION THE RUN MET. Read off the result, which
+            // calls the same expression the scan gated on, so the breakdown cannot
+            // name a different set of conditions from the one that withheld the offer.
+            // No line carries a count and none states a cause for any file: these are
+            // conditions, any combination of them can hold, and nothing sums.
+            Console.WriteLine(Strings.Cli_WithheldReasons_Header);
+            foreach (var leg in scanResult.WithholdingLegsFired)
+                Console.WriteLine(LineFor(leg));
         }
 
         // SUPERSEDED FILES HELD BACK. Word for word the sentence the window prints,
@@ -1284,6 +1307,26 @@ internal static class Program
             () => InstallerLockUnavailableEventLogLine(arg));
         return ExitTransient;
     }
+
+    /// <summary>
+    /// The line printed for one leg of the wholesale withholding.
+    ///
+    /// Its own method rather than a switch inside the report, so
+    /// CliWithholdingReasonsTests can walk the enum against it: a leg added to
+    /// WithholdingLeg is a leg the gate acts on and the scan withholds for, and a leg
+    /// with no line here would leave a reader a heading with nothing under it.
+    ///
+    /// The fallback is the heading's own antecedent rather than a blank, because a
+    /// heading followed by nothing reads as output that failed rather than as a
+    /// condition nobody wrote up. It is unreachable while every leg is handled.
+    /// </summary>
+    internal static string LineFor(WithholdingLeg leg) => leg switch
+    {
+        WithholdingLeg.RecordedPathUnestablished => Strings.Cli_WithheldReasons_RecordedPath,
+        WithholdingLeg.FileIdentityUnestablished => Strings.Cli_WithheldReasons_FileIdentity,
+        WithholdingLeg.SecondInstanceNotRuledOut => Strings.Cli_WithheldReasons_SecondInstance,
+        _ => Strings.Cli_WithheldReasons_Header,
+    };
 
     /// <summary>
     /// The sentence a blocked run prints, one per reason.

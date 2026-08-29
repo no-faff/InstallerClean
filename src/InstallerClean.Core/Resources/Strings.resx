@@ -1448,6 +1448,40 @@ The crash log could not be written.</value></data>
        each being right in its own register. -->
   <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.</value></data>
   <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.</value></data>
+  <!-- The command line's twin of Summary.NothingListed, for the machine whose
+       walk-derived half was withheld wholesale while a superseded row was still
+       offered: that run takes the found-files branch, so Cli.NothingOffered is not
+       printed and this line is the only place the withholding is stated. Word for
+       word the window's sentence, as Cli.SupersededHeldBack is, with the size added
+       because this host already gives one in Cli.NothingOffered. The one-form names
+       the size and not the numeral, so it spends {2} and leaves {0} and {1} unused;
+       both are passed on either branch so the two forms cannot disagree about which
+       index is which. -->
+  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it.</value></data>
+  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them.</value></data>
+  <!-- Introduces the reasons the walk-derived offer was withheld wholesale, under
+       whichever of Cli.NothingOffered or Cli.NothingListed that run printed. It picks
+       up "couldn't be certain" from both of them on purpose, so the reader has the
+       antecedent in the line above. The lines under it are Cli.WithheldReasons.*, one
+       per condition met, and any combination of them can print: they say which
+       conditions the run met and are not a partition of the files, so none of them
+       carries a count and nothing sums. -->
+  <data name="Cli.WithheldReasons.Header" xml:space="preserve"><value>Why it couldn't be certain:</value></data>
+  <!-- One line per leg of the wholesale withholding, each printed only when its own
+       leg is true, each carrying two leading spaces like the Cli.Help.* block. The
+       nine path-resolution counts and the four identity-read outcomes sit underneath
+       legs one and two and are deliberately not printed: they travel in the opt-in
+       report, which reads them apart, and a reader of a console line can do nothing
+       different on one of them than on another. NO LEG CARRIES A COUNT. Leg one's two
+       groups can double-count one value, so their sum is a count of refusals and not
+       of paths; leg three's two members are opposite findings and a single number
+       states a cause over the pair; a count on leg two alone would read as a total.
+       The count and the size of what was held back are on the line above. And no line
+       says whether re-running helps, because each leg holds members that differ on
+       exactly that. -->
+  <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  A file path in Windows Installer's own records wouldn't resolve.</value></data>
+  <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  The identity of a file named in Windows Installer's records wouldn't read.</value></data>
+  <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  A program may be installed more than once on this PC.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel

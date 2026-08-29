@@ -164,7 +164,7 @@ internal static class DisplayHelpers
         // number and agrees with nothing; it is simply false of twenty-one files and
         // false of none. Three of these carry a numeral in their PLURAL and none in
         // their singular, which is why the classification reads the one-form alone.
-        "Cli.NothingOffered" or "Completion.NothingOfferedBody"
+        "Cli.NothingListed" or "Cli.NothingOffered" or "Completion.NothingOfferedBody"
             or "Confirm.DeletePermanently" or "Confirm.MoveDestination"
             or "Error.AccessDenied" or "Error.FileInUse" or "Error.IOFailure"
             or "Error.UnknownError" or "Summary.NothingListed"

@@ -219,6 +219,8 @@ public static class Strings
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
+    public static string Cli_NothingListed_Plural => Get("Cli.NothingListed.Plural");
+    public static string Cli_NothingListed_Singular => Get("Cli.NothingListed.Singular");
     public static string Cli_NothingOffered_Plural => Get("Cli.NothingOffered.Plural");
     public static string Cli_NothingOffered_Singular => Get("Cli.NothingOffered.Singular");
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
@@ -232,6 +234,10 @@ public static class Strings
     public static string Cli_TooManyArguments => Get("Cli.TooManyArguments");
     public static string Cli_TooManyArgumentsNoPath => Get("Cli.TooManyArgumentsNoPath");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
+    public static string Cli_WithheldReasons_FileIdentity => Get("Cli.WithheldReasons.FileIdentity");
+    public static string Cli_WithheldReasons_Header => Get("Cli.WithheldReasons.Header");
+    public static string Cli_WithheldReasons_RecordedPath => Get("Cli.WithheldReasons.RecordedPath");
+    public static string Cli_WithheldReasons_SecondInstance => Get("Cli.WithheldReasons.SecondInstance");
     public static string Completion_AllClean => Get("Completion.AllClean");
     public static string Completion_DonateAsk => Get("Completion.DonateAsk");
     public static string Completion_FailedCountDelete_Plural => Get("Completion.FailedCountDelete.Plural");

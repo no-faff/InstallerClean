@@ -56,7 +56,7 @@ public class CountedStringTests
     private static readonly string[] CountedPrefixes =
     {
         "Cli.DeletedFiles", "Cli.DeletingFiles", "Cli.FoundOrphans", "Cli.MissingFromDisk",
-        "Cli.MovedFiles", "Cli.MovingFiles", "Cli.NothingOffered",
+        "Cli.MovedFiles", "Cli.MovingFiles", "Cli.NothingListed", "Cli.NothingOffered",
         "Completion.FailedCount", "Completion.FailedCountDelete",
         "Completion.HeldBack",
         "Completion.MoveCancelledSummary", "Completion.MoveSummary",
@@ -82,7 +82,7 @@ public class CountedStringTests
     {
         "Cli.DeletedFiles", "Cli.DeletingFiles", "Cli.FoundOrphans", "Cli.MissingFromDisk",
         "Cli.MovedFiles", "Cli.MovingFiles",
-        "Cli.NothingOffered",
+        "Cli.NothingListed", "Cli.NothingOffered",
         "Completion.HeldBack",
         "Completion.NothingOfferedBody",
         "Completion.PermanentDeleteSummary",

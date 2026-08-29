@@ -506,10 +506,15 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // scan can work out WHICH cached file belongs to the second copy. So the screen
         // is not run and nothing walk-derived is offered. The question is asked of the
         // census, where its two members live, on the same rule as the other two.
+        //
+        // AND IT IS ONE CALL RATHER THAN THREE CONDITIONS SPELLED OUT HERE, which is
+        // the paragraph above arriving where it was always going. A host now names
+        // which of these held rather than only that the branch was taken, so the gate
+        // and that host read the same expression: a condition added to WithholdingLeg
+        // is one this line acts on and one that host prints, and a condition added
+        // anywhere else is caught by the test that holds this line to that list.
         var withholdWalkOfferWholesale =
-            query.Census.AnyRecordedPathUnestablished
-            || registrationIdentityReads.AnyUnestablished
-            || query.Census.SecondInstanceNotRuledOut;
+            WithholdingLegs.Any(query.Census, registrationIdentityReads);
 
         if (withholdWalkOfferWholesale)
         {
