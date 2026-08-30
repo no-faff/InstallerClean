@@ -368,7 +368,7 @@ const MAP = {
   'Error.CannotWriteFolder': `Не удаётся выполнить запись в {0}.`,
 
   // 0 = file name
-  'Error.NoUniqueFilename': `Не удалось подобрать уникальное имя файла для «{0}» после 10 000 попыток.`,
+  'Error.DestinationCollision': `Не удалось подобрать уникальное имя файла для «{0}» после 10 000 попыток.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Отправка...`,

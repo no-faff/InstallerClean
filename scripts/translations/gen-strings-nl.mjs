@@ -367,7 +367,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean kon je browser niet openen en kon de link ook niet naar je klembord kopiëren. De link is:&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean kon de back-upmap niet meer bevestigen en is gestopt in plaats van op de verkeerde plek te schrijven. Controleer {0}, klik daarna op Opnieuw scannen en probeer het opnieuw.`,
   'Error.CannotWriteFolder': `Kan niet schrijven naar {0}.`,
-  'Error.NoUniqueFilename': `Na 10.000 pogingen kon er geen unieke bestandsnaam voor '{0}' worden gevonden.`,
+  'Error.DestinationCollision': `Na 10.000 pogingen kon er geen unieke bestandsnaam voor '{0}' worden gevonden.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Verzenden...`,

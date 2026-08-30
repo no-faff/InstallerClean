@@ -367,7 +367,7 @@ const MAP = {
   'Error.CannotWriteFolder': `{0}에 쓸 수 없습니다.`,
 
   // 0 = file name
-  'Error.NoUniqueFilename': `10,000번 시도한 후에도 '{0}'에 대한 고유한 파일 이름을 찾을 수 없었습니다.`,
+  'Error.DestinationCollision': `10,000번 시도한 후에도 '{0}'에 대한 고유한 파일 이름을 찾을 수 없었습니다.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `보내는 중...`,

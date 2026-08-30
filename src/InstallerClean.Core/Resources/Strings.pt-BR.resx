@@ -1168,7 +1168,7 @@ Detalhes em {1}.</value></data>
        out of another user's profile, in front of the user. -->
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Não é possível gravar em {0}.</value></data>
   <!-- 0 = file name -->
-  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Não foi possível encontrar um nome de arquivo único para '{0}' após 10.000 tentativas.</value></data>
+  <data name="Error.DestinationCollision" xml:space="preserve"><value>Não foi possível encontrar um nome de arquivo único para '{0}' após 10.000 tentativas.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Enviando...</value></data>

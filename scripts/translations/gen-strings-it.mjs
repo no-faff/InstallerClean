@@ -314,7 +314,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean non è riuscito ad aprire il browser e non è riuscito nemmeno a copiare il link negli appunti. Il link è:&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean non è più riuscito a confermare la cartella di backup, quindi si è fermato anziché scrivere nel posto sbagliato. Controlla {0}, poi Ripeti scansione e riprova.`,
   'Error.CannotWriteFolder': `Impossibile scrivere in {0}.`,
-  'Error.NoUniqueFilename': `Dopo 10.000 tentativi impossibile trovare un nome file univoco per '{0}'.`,
+  'Error.DestinationCollision': `Dopo 10.000 tentativi impossibile trovare un nome file univoco per '{0}'.`,
   'ResultLog.Sending': `Invio...`,
   'ResultLog.Sent': `Grazie! Rapporto inviato.`,
   'ResultLog.Failed': `Invio non riuscito. Riprova più tardi.`,

@@ -389,7 +389,7 @@ const MAP = {
   'Error.CannotWriteFolder': `Tidak bisa menulis ke {0}.`,
 
   // 0 = file name
-  'Error.NoUniqueFilename': `Tidak bisa menemukan nama file yang unik untuk '{0}' setelah 10.000 percobaan.`,
+  'Error.DestinationCollision': `Tidak bisa menemukan nama file yang unik untuk '{0}' setelah 10.000 percobaan.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Mengirim...`,

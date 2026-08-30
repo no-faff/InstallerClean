@@ -374,7 +374,7 @@ const MAP = {
   'Error.CannotWriteFolder': `Não é possível gravar em {0}.`,
 
   // 0 = file name
-  'Error.NoUniqueFilename': `Não foi possível encontrar um nome de arquivo único para '{0}' após 10.000 tentativas.`,
+  'Error.DestinationCollision': `Não foi possível encontrar um nome de arquivo único para '{0}' após 10.000 tentativas.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Enviando...`,

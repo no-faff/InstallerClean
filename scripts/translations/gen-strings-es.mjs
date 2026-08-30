@@ -319,7 +319,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean no pudo abrir tu navegador, y tampoco pudo copiar el enlace al portapapeles. El enlace es:&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean ya no pudo confirmar la carpeta de copia de seguridad, así que se detuvo en lugar de escribir en el sitio equivocado. Comprueba {0}, luego Volver a analizar e inténtalo de nuevo.`,
   'Error.CannotWriteFolder': `No se puede escribir en {0}.`,
-  'Error.NoUniqueFilename': `No se pudo encontrar un nombre de archivo único para '{0}' tras 10.000 intentos.`,
+  'Error.DestinationCollision': `No se pudo encontrar un nombre de archivo único para '{0}' tras 10.000 intentos.`,
   'ResultLog.Sending': `Enviando...`,
   'ResultLog.Sent': `¡Gracias! Informe enviado.`,
   'ResultLog.Failed': `Envío fallido. Inténtalo de nuevo más tarde.`,

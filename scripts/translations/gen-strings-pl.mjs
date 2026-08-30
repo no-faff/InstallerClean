@@ -403,7 +403,7 @@ const MAP = {
   'Error.CannotWriteFolder': `Nie można zapisać w {0}.`,
 
   // 0 = file name
-  'Error.NoUniqueFilename': `Nie udało się znaleźć unikalnej nazwy pliku dla „{0}” po 10 000 prób.`,
+  'Error.DestinationCollision': `Nie udało się znaleźć unikalnej nazwy pliku dla „{0}” po 10 000 prób.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Wysyłanie...`,

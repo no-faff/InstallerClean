@@ -295,7 +295,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean 无法打开您的浏览器，也无法将链接复制到您的剪贴板。链接如下：&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean 已无法确认备份文件夹，因此停了下来，而不是写到错误的位置。请检查 {0}，然后重新扫描并再试一次。`,
   'Error.CannotWriteFolder': `无法写入 {0}。`,
-  'Error.NoUniqueFilename': `尝试 10,000 次后仍无法为“{0}”找到唯一的文件名。`,
+  'Error.DestinationCollision': `尝试 10,000 次后仍无法为“{0}”找到唯一的文件名。`,
   'ResultLog.Sending': `正在发送…`,
   'ResultLog.Sent': `谢谢！报告已发送。`,
   'ResultLog.Failed': `发送失败。请稍后重试。`,

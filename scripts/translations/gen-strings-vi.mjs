@@ -373,7 +373,7 @@ const MAP = {
   'Error.CannotWriteFolder': `Không thể ghi vào {0}.`,
 
   // 0 = file name
-  'Error.NoUniqueFilename': `Không tìm được tên tệp duy nhất cho '{0}' sau 10.000 lần thử.`,
+  'Error.DestinationCollision': `Không tìm được tên tệp duy nhất cho '{0}' sau 10.000 lần thử.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Đang gửi...`,

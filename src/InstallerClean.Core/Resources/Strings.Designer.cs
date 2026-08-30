@@ -293,6 +293,7 @@ public static class Strings
     public static string Error_CannotWriteFolder => Get("Error.CannotWriteFolder");
     public static string Error_DeleteFailedTitle => Get("Error.DeleteFailedTitle");
     public static string Error_DestinationChangedMidBatch => Get("Error.DestinationChangedMidBatch");
+    public static string Error_DestinationCollision => Get("Error.DestinationCollision");
     public static string Error_DestinationInsideInstaller => Get("Error.DestinationInsideInstaller");
     public static string Error_DestinationInSystemFolder => Get("Error.DestinationInSystemFolder");
     public static string Error_DestinationMissing => Get("Error.DestinationMissing");
@@ -320,7 +321,6 @@ public static class Strings
     public static string Error_MsiPatchEnumerationNeverEnded => Get("Error.MsiPatchEnumerationNeverEnded");
     public static string Error_NotEnoughSpaceBody => Get("Error.NotEnoughSpaceBody");
     public static string Error_NotEnoughSpaceTitle => Get("Error.NotEnoughSpaceTitle");
-    public static string Error_NoUniqueFilename => Get("Error.NoUniqueFilename");
     public static string Error_PathTooLong => Get("Error.PathTooLong");
     public static string Error_ScanCacheRootUnresolved => Get("Error.ScanCacheRootUnresolved");
     public static string Error_ScanCorrelationFailed => Get("Error.ScanCorrelationFailed");

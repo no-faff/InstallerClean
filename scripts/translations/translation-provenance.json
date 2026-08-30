@@ -4346,7 +4346,7 @@
       "vi": "c3a847f4b2e70972",
       "zh-Hans": "c3a847f4b2e70972"
     },
-    "Error.NoUniqueFilename": {
+    "Error.DestinationCollision": {
       "de": "0f71f3d21a003948",
       "es": "0f71f3d21a003948",
       "fr": "0f71f3d21a003948",

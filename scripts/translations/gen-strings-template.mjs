@@ -472,7 +472,7 @@ To put it back, you need the installer for the version you already have. Get it 
   'Error.CannotWriteFolder': `Cannot write to {0}.`,
 
   // 0 = file name
-  'Error.NoUniqueFilename': `Could not find a unique filename for '{0}' after 10,000 attempts.`,
+  'Error.DestinationCollision': `Could not find a unique filename for '{0}' after 10,000 attempts.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Sending...`,

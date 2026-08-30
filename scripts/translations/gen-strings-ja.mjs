@@ -302,7 +302,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean はブラウザを開けず、リンクをクリップボードにコピーすることもできませんでした。リンクはこちらです：&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean はバックアップフォルダーを確認できなくなったため、誤った場所に書き込まずに停止しました。{0} を確認してから、再スキャンしてもう一度お試しください。`,
   'Error.CannotWriteFolder': `{0} に書き込めません。`,
-  'Error.NoUniqueFilename': `10,000回の試行後も'{0}'の一意のファイル名が見つかりませんでした。`,
+  'Error.DestinationCollision': `10,000回の試行後も'{0}'の一意のファイル名が見つかりませんでした。`,
   'ResultLog.Sending': `送信中...`,
   'ResultLog.Sent': `ありがとうございます！レポートを送信しました。`,
   'ResultLog.Failed': `送信に失敗しました。後でもう一度試してください。`,

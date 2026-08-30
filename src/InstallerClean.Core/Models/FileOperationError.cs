@@ -74,15 +74,12 @@ public sealed record AccessDenied(string FilePath)
 /// restores everything, and Windows Installer finds a cached package by the exact
 /// path it recorded, so a file put back under an appended name would not be found
 /// at all. The renaming went, and the first collision is now the refusal.
-///
-/// The key name <c>Error.NoUniqueFilename</c> dates from that arrangement. The
-/// message it holds describes the refusal.
 /// </summary>
 public sealed record DestinationCollision(string FilePath, string FileName)
     : FileOperationError(FilePath)
 {
     public override string LocalisedMessage =>
-        string.Format(Strings.Error_NoUniqueFilename, FileName);
+        string.Format(Strings.Error_DestinationCollision, FileName);
 }
 
 /// <summary>

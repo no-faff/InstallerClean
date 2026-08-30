@@ -397,7 +397,7 @@ const MAP = {
   'Error.CannotWriteFolder': `Impossible d'écrire dans {0}.`,
 
   // 0 = file name
-  'Error.NoUniqueFilename': `Impossible de trouver un nom de fichier unique pour « {0} » après 10 000 tentatives.`,
+  'Error.DestinationCollision': `Impossible de trouver un nom de fichier unique pour « {0} » après 10 000 tentatives.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Envoi...`,

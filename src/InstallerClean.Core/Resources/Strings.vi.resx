@@ -1168,7 +1168,7 @@ Chi tiết trong {1}.</value></data>
        out of another user's profile, in front of the user. -->
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Không thể ghi vào {0}.</value></data>
   <!-- 0 = file name -->
-  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Không tìm được tên tệp duy nhất cho '{0}' sau 10.000 lần thử.</value></data>
+  <data name="Error.DestinationCollision" xml:space="preserve"><value>Không tìm được tên tệp duy nhất cho '{0}' sau 10.000 lần thử.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Đang gửi...</value></data>

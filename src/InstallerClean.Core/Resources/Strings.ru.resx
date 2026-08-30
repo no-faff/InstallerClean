@@ -1168,7 +1168,7 @@ InstallerClean уже был запущен от имени администра
        out of another user's profile, in front of the user. -->
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Не удаётся выполнить запись в {0}.</value></data>
   <!-- 0 = file name -->
-  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Не удалось подобрать уникальное имя файла для «{0}» после 10 000 попыток.</value></data>
+  <data name="Error.DestinationCollision" xml:space="preserve"><value>Не удалось подобрать уникальное имя файла для «{0}» после 10 000 попыток.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Отправка...</value></data>

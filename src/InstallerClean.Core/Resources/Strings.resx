@@ -1282,7 +1282,7 @@ Details in {1}.</value></data>
        out of another user's profile, in front of the user. -->
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Cannot write to {0}.</value></data>
   <!-- 0 = file name -->
-  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>A file called '{0}' is already in the backup folder.</value></data>
+  <data name="Error.DestinationCollision" xml:space="preserve"><value>A file called '{0}' is already in the backup folder.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Sending...</value></data>
