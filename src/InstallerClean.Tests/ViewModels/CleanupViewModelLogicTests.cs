@@ -21,9 +21,25 @@ namespace InstallerClean.Tests.ViewModels;
 /// <c>CleanupPreFlightTests.A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space</c>
 /// with the predicate underneath it in
 /// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c>.
+///
+/// AND "ANSWERS FROM THE SPELLING" IS PROVED HERE RATHER THAN READ. Both
+/// theories hand the classifier a resolve that throws, so an arm that consulted
+/// the volume before answering would fail rather than return the right kind by a
+/// route these tests cannot see.
 /// </remarks>
 public class CleanupViewModelLogicTests
 {
+    /// <summary>
+    /// The volume question, handed to <c>ClassifyMoveDestination</c> by the two
+    /// theories below. Both cover an arm that answers from the spelling of the
+    /// path, and reaching this is the failure those theories exist to catch:
+    /// a reordering that asked the volume first would still return the right
+    /// kind, and would have moved those answers onto the network to get it.
+    /// </summary>
+    private static bool? TheVolumeIsNeverAsked(string dest) =>
+        throw new InvalidOperationException(
+            $"the volume was asked about '{dest}' on an arm that answers from the path's spelling");
+
     [Theory]
     // A share frees space on the system drive as surely as another disk does:
     // the files have left it. This is the arm that reads as a special case and
@@ -53,11 +69,13 @@ public class CleanupViewModelLogicTests
     [InlineData("//server/backup")]
     [InlineData(@"\\?\UNC\server\backup")]
     public void ClassifyMoveDestination_calls_a_share_a_share(string dest) =>
-        Assert.Equal(MoveDestinationKinds.UncShare, CleanupViewModel.ClassifyMoveDestination(dest));
+        Assert.Equal(MoveDestinationKinds.UncShare,
+            CleanupViewModel.ClassifyMoveDestination(dest, TheVolumeIsNeverAsked));
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
     public void ClassifyMoveDestination_says_unknown_when_there_is_nothing_to_classify(string dest) =>
-        Assert.Equal(MoveDestinationKinds.Unknown, CleanupViewModel.ClassifyMoveDestination(dest));
+        Assert.Equal(MoveDestinationKinds.Unknown,
+            CleanupViewModel.ClassifyMoveDestination(dest, TheVolumeIsNeverAsked));
 }
