@@ -38,6 +38,13 @@ public class InstallerQueryServicePatchTruncationTests
     /// <summary>The patch that supersedes <see cref="Patch"/> and can still come off.</summary>
     private const string Superseder = "{DDDDDDDD-0000-0000-0000-00000000000D}";
 
+    /// <summary>
+    /// A second product holding <see cref="Patch"/> in the same state as
+    /// <see cref="Superseding"/>, superseded and no longer uninstallable, so the two
+    /// claims merge to a removable row and the per-pairing pass has a work list.
+    /// </summary>
+    private const string AlsoSuperseding = "{FFFFFFFF-0000-0000-0000-00000000000F}";
+
     /// <summary>A product code no machine here has, for the resolve's clean negative.</summary>
     private const string NotInstalled = "{EEEEEEEE-0000-0000-0000-00000000000E}";
 
@@ -278,6 +285,15 @@ public class InstallerQueryServicePatchTruncationTests
     /// does not answer for, and this is the ordinary shape of one: most second
     /// products holding a patch cannot uninstall it.
     ///
+    /// THAT ACCOUNT IS OF THE TRUNCATED FORM, AND THE UNTRUNCATED ONE IS STOPPED A
+    /// STEP EARLIER BY SOMETHING ELSE, which is worth separating because the two
+    /// share a factory name. At <c>truncateSecond: false</c> the sibling's applied
+    /// state reaches the merge, MergeClaim takes the harsher, and the merged row is
+    /// not removable, so the work list the pairing loop walks is empty before the
+    /// condition has anything to settle. Either way the pass is out of reach, and a
+    /// test of it needs both: a merged row that is removable, and a machine the
+    /// condition cannot answer for.
+    ///
     /// The shared fixture is left alone rather than changed to this, because several
     /// tests below are about the sibling still needing the patch, and re-pointing them
     /// silently would be the same class of fault this fixture exists to avoid.
@@ -392,15 +408,39 @@ public class InstallerQueryServicePatchTruncationTests
     [Fact]
     public void A_pairing_the_enumeration_already_read_is_not_asked_again()
     {
-        // Both products enumerated the patch, so both claims reached the merge
-        // and there is nothing left to establish. Re-asking would get the same
-        // answers for the same reason and would cost a read per pairing on every
-        // scan.
-        var msi = TwoProductsOneSharedPatch(truncateSecond: false);
+        // Both products enumerated the patch, so both claims reached the merge and
+        // there is nothing left to establish. Re-asking would get the same answers
+        // for the same reason and would cost a read per pairing on every scan.
+        //
+        // BOTH HOLD IT SUPERSEDED AND NO LONGER UNINSTALLABLE, WHICH IS WHAT GIVES
+        // THE PASS ANYTHING TO WALK. The work list is built from the rows that are
+        // still removable, and MergeClaim takes the harsher of two claims, so one
+        // product holding the patch applied is enough to empty it. The method then
+        // reaches the guard below the per-product pass without entering the pairing
+        // loop this test is named for.
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.AddProduct(AlsoSuperseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.HoldPatch(AlsoSuperseding, Patch, Shared, state: "2", uninstallable: "0");
 
-        Confirm(msi);
+        var row = TheSharedPatch(Confirm(msi));
 
-        Assert.Empty(msi.ConfirmationAsks);
+        // THE WORK LIST IS PINNED RATHER THAN ASSUMED, and that is the half that
+        // keeps this test about what its name says. A later change that merges these
+        // two claims to a non-removable row empties the list, the loop never runs,
+        // and the assertions below are then true of a pass that was never reached.
+        Assert.True(row.IsRemovable);
+
+        // ASSERTED AGAINST EVERY KEYED READ RATHER THAN AGAINST THE CONFIRMATION
+        // RECORD, which a pairing the enumeration named cannot enter: an assertion
+        // that one of those never happened holds whether or not it happened.
+        Assert.DoesNotContain(
+            (Patch, Superseding, (string?)null, MsiInstallContext.Machine),
+            msi.KeyedPatchReads);
+        Assert.DoesNotContain(
+            (Patch, AlsoSuperseding, (string?)null, MsiInstallContext.Machine),
+            msi.KeyedPatchReads);
     }
 
     /// <summary>
