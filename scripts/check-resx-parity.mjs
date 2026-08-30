@@ -20,6 +20,14 @@
 // language under NEUTRAL-ONLY below, and both reach check-translation-freshness the
 // moment the English moves, so the translation round has them either way.
 //
+// A PLURAL OVERRIDE IS MEASURED BOTH WAYS AS WELL, against the neutral form it
+// answers for. The failing direction is the same FormatException, an index the base
+// never provides. The reporting direction is a count that goes missing at exactly
+// the counts this form is chosen for: the sentence renders, in that language, with
+// the number it was written to say left out of it. An override has no neutral key of
+// its own name to be compared against, so the base form is what answers for it here
+// as it does everywhere else in this gate.
+//
 // CLI keys (Cli.*) follow a two-tier rule. A satellite either ships the CLI
 // surface or it does not: until it carries its first Cli. key it is skipped for
 // CLI (the CLI falls back to neutral English), and once it carries any Cli. key
@@ -42,7 +50,7 @@
 // some languages need, Russian's 2-4 "few" form among them, and a correct n==1 form
 // for a count string the neutral keeps flat; they are optional and language-specific,
 // so they are allowed as satellite-only keys rather than flagged stray. Which form
-// each answers for comes from scripts/lib/plural-overrides.mjs, so this gate and
+// each answers for comes from scripts/plural-overrides.mjs, so this gate and
 // check-cross-key-rules measure an override against the same neutral key.
 //
 // Run from the repo root: node scripts/check-resx-parity.mjs
@@ -106,10 +114,12 @@ const isHumanCliKey = (key) => isCliKey(key) && !isMachineCliKey(key);
 const unprovidedIndices = (neutralPh, satPh) =>
   [...satPh].filter((i) => !neutralPh.has(i)).sort();
 
-// The reporting direction: indices the neutral provides that this satellite's
+// The reporting direction: indices the neutral form provides that this satellite's
 // sentence does not use. Harmless at runtime and worth a name, since it is either
 // an English change the round has not reached yet or a placeholder a translation
-// dropped, and this gate cannot tell those apart.
+// dropped, and this gate cannot tell those apart. Called with the neutral's own key
+// for a translated key and with the base form's for an override, which is the same
+// question asked of the same English.
 const unusedIndices = (neutralPh, satPh) =>
   [...neutralPh].filter((i) => !satPh.has(i)).sort();
 
@@ -181,6 +191,14 @@ for (const file of satellites) {
     const extra = [...sat.get(key)].filter((i) => !basePh.has(i)).sort();
     if (extra.length)
       errors.push(`PLACEHOLDER override ${key}: {${extra}} not provided by base ${base} {${[...basePh].sort()}}`);
+    // And the other direction, which is reported rather than failed for the same
+    // reason the neutral's own keys are: an override whose base has since gained a
+    // placeholder is a translation the English has moved ahead of, and one written
+    // without a count it was given is a sentence that will render short. The gate
+    // cannot tell those apart, so it names every one.
+    const dropped = unusedIndices(basePh, sat.get(key));
+    if (dropped.length)
+      neutralOnly.push(`${file}  ${key}  base ${base} provides {${dropped}} that this value does not use`);
   }
 
   if (errors.length) {
