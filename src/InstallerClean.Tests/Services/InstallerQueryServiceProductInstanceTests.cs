@@ -112,6 +112,35 @@ public class InstallerQueryServiceProductInstanceTests
     }
 
     [Fact]
+    public void A_code_whose_rows_never_end_is_unaskable_when_the_budget_runs_out()
+    {
+        // The other end of the walk. Every index the budget allows answers with a
+        // row, so the API never says the rows have run out and the loop leaves by
+        // its own condition instead of by an answer. What comes back is the
+        // withholding answer: a list that stopped at a number cannot be told from a
+        // machine that holds exactly that many, and the answer true of both is the
+        // one that keeps the file.
+        //
+        // THE BUDGET IS WRITTEN HERE RATHER THAN READ FROM THE CODE, which is what
+        // makes it a test: a walk given a different cap would stop somewhere this
+        // fixture does not reach and the rows read would say so.
+        //
+        // THE ROW COUNT IS WHAT NAMES THIS ARM. Both unaskable arms above return an
+        // empty list too, and so does a code the machine does not hold, so the
+        // number of rows the walk got through is the only part of the answer that
+        // separates a budget it spent from a row it could not read.
+        var msi = new ScriptedMsiProducts();
+        msi.Installed(ProductA,
+            Enumerable.Repeat(((string?)null, MsiInstallContext.Machine), 10_000).ToArray());
+
+        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA);
+
+        Assert.True(resolved.Unaskable);
+        Assert.Empty(resolved.Instances);
+        Assert.Equal(10_000, msi.Rows);
+    }
+
+    [Fact]
     public void The_walk_asks_about_the_code_it_was_given_and_stops_where_the_rows_do()
     {
         // One question per row plus the one that ends them, and every one of them keyed
