@@ -30,10 +30,39 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     private readonly IRemovableReverifier _reverifier;
     private readonly PropertyChangedEventHandler _scanHandler;
 
+    /// <summary>
+    /// How this view model asks whether a folder is on the volume the installer
+    /// cache is on. <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/>
+    /// unless a caller hands over something else, which nothing in the app does.
+    /// </summary>
+    /// <remarks>
+    /// ONE FIELD BECAUSE THERE IS ONE QUESTION. The class asks it twice, from
+    /// <see cref="ResolveDestinationVolumeAsync"/> for the tooltip and from
+    /// <see cref="ClassifyMoveDestination"/> for the result-log label, and two
+    /// routes to one answer are two things to keep in step.
+    ///
+    /// It answers about a real volume, so what a folder is on cannot be arranged
+    /// from a test: that needs a second disk, and the timing needs an answer that
+    /// arrives when the test says rather than when Windows is ready. Handing the
+    /// resolve in is what settles both. It changes where the answer comes from
+    /// and nothing about what is done with it: the same debounce, the same hop
+    /// off the dispatcher and the same check that the answer is still wanted.
+    /// </remarks>
+    private readonly Func<string, bool?> _resolveIsOnCacheVolume;
+
     private CancellationTokenSource? _operationCts;
     private CancellationTokenSource? _moveDestinationSaveCts;
     private CancellationTokenSource? _destinationVolumeCts;
     private AppSettings _settings;
+
+    /// <summary>
+    /// The volume question as the app asks it, and the value both readings fall
+    /// back to. A wrapper rather than the method itself because
+    /// <see cref="MoveSpaceCheck.ResolveIsOnInstallerCacheDrive"/> carries an
+    /// optional second parameter, which no delegate of this shape can bind.
+    /// </summary>
+    private static bool? AskWhetherOnCacheVolume(string destination) =>
+        MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination);
 
     /// <summary>
     /// Debounce window for write-back of MoveDestination edits. Each
@@ -159,7 +188,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         ScanViewModel scan,
         CompletionViewModel completion,
         IResultLogService resultLogService,
-        IRemovableReverifier reverifier)
+        IRemovableReverifier reverifier,
+        Func<string, bool?>? resolveIsOnCacheVolume = null)
     {
         _moveService = moveService;
         _deleteService = deleteService;
@@ -171,6 +201,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         _completion = completion;
         _resultLogService = resultLogService;
         _reverifier = reverifier;
+        _resolveIsOnCacheVolume = resolveIsOnCacheVolume ?? AskWhetherOnCacheVolume;
 
         _settings = settingsService.Load();
         MoveDestination = _settings.MoveDestination;
@@ -368,7 +399,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // rather than acting on it, and the two refusals are not the same thing
         // to a sentence a person reads.
         var onCacheVolume = await Task
-            .Run(() => MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination))
+            .Run(() => _resolveIsOnCacheVolume(destination))
             .ConfigureAwait(true);
 
         // Publish only if this resolve is still the current one. A keystroke
@@ -630,7 +661,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // which is the case this arm exists for.
             return new DestinationPreFlight(
                 false, false,
-                ClassifyMoveDestination(dest),
+                ClassifyMoveDestination(dest, _resolveIsOnCacheVolume),
                 StorageHelpers.GetAvailableFreeSpace(dest));
         }, probeToken);
 
@@ -1827,7 +1858,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// risk. This runs once per operation, inside the pre-flight, off the
     /// dispatcher.
     /// </remarks>
-    internal static string ClassifyMoveDestination(string dest)
+    /// <param name="dest">The folder the move would write into.</param>
+    /// <param name="resolveIsOnCacheVolume">
+    /// The same-drive question, taken rather than reached for: the caller in this
+    /// class hands over <see cref="_resolveIsOnCacheVolume"/>, so the label written
+    /// to the result log and the answer behind the tooltip come from one place.
+    /// Omitted, it is <see cref="AskWhetherOnCacheVolume"/>, which is what the app
+    /// itself asks, so a call site that leaves it out gets the app's own answer.
+    /// </param>
+    internal static string ClassifyMoveDestination(
+        string dest, Func<string, bool?>? resolveIsOnCacheVolume = null)
     {
         if (string.IsNullOrWhiteSpace(dest)) return MoveDestinationKinds.Unknown;
 
@@ -1841,7 +1881,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // volume question Windows would not settle is unknown, not another
         // drive, and calling it another drive is what would let the completion
         // card head a move with a freed count it had not established.
-        var onCacheVolume = MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(dest);
+        var onCacheVolume = (resolveIsOnCacheVolume ?? AskWhetherOnCacheVolume)(dest);
         if (onCacheVolume is null) return MoveDestinationKinds.Unknown;
         if (onCacheVolume.Value) return MoveDestinationKinds.SameDrive;
 

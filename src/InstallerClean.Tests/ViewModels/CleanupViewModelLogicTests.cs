@@ -11,16 +11,16 @@ namespace InstallerClean.Tests.ViewModels;
 /// looking different until somebody moves files to a share.
 /// </summary>
 /// <remarks>
-/// ONLY THE ARMS THAT ASK NOTHING OF A VOLUME ARE HERE. From 3.0.0
-/// ClassifyMoveDestination reads the volume a folder is on rather than the
-/// letter its path starts with, so its fixed / removable / same-drive arms need
-/// real storage: the same-drive one is covered end to end by
-/// <c>CleanupPreFlightTests.A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space</c>
-/// and the predicate underneath it by
-/// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c>. What is testable
-/// here is the pair of answers it reaches on spelling alone, and those are worth
+/// THE ARMS THAT ANSWER FROM THE PATH'S SPELLING ARE HERE, and they are worth
 /// pinning because they are the ones that run BEFORE anything goes to the
-/// network.
+/// network. From 3.0.0 ClassifyMoveDestination reads the volume a folder is on
+/// rather than the letter its path starts with, so the fixed and removable arms
+/// go on to ask what is mounted where and want real storage to answer. The
+/// same-drive arm takes its answer from the resolve the method is handed, and it
+/// is covered end to end by
+/// <c>CleanupPreFlightTests.A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space</c>
+/// with the predicate underneath it in
+/// <c>Helpers.Integration.MoveSpaceCheckIntegrationTests</c>.
 /// </remarks>
 public class CleanupViewModelLogicTests
 {
