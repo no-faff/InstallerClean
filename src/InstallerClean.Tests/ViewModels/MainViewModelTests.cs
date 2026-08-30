@@ -1744,9 +1744,10 @@ public class MainViewModelTests
         // The one path in the app where those are different folders, and the
         // reason this exception exists: the destination the user typed no longer
         // resolves to where their files went. The summary line names the folder,
-        // and the restore line beneath it says "the files in that folder", so a
-        // summary naming the typed path sends somebody to an empty folder to look
-        // for files they have just been told are there.
+        // and the restore line beneath it points back at it as "that folder"
+        // without naming it again, so the two lines are read as one and a summary
+        // naming the typed path sends somebody to an empty folder to look for
+        // files they have just been told are there.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
