@@ -10,9 +10,9 @@ dotnet build src/InstallerClean.sln
 dotnet test src/InstallerClean.Tests/
 ```
 
-Build the whole solution, not a single project: the test project does not
-reference the CLI, so a CLI-breaking change can build and test clean from
-the GUI project alone.
+Build the whole solution, not a single project. The solution holds four projects
+and the test project references the other three, so building the solution is the
+same work, and it stays right if a reference ever changes.
 
 The app requires **administrator privileges** to run because it accesses
 `C:\Windows\Installer` and the Windows Installer API. You can run it from an
@@ -39,12 +39,13 @@ If you find a bug or have a feature idea, open an issue. Please include:
 
 - What you expected to happen
 - What actually happened
-- Your Windows version and .NET version (`dotnet --version`)
+- Your Windows version, the InstallerClean version from the About window, and
+  which download you are running (setup, portable or the command-line tool)
 
 ## Translations
 
-InstallerClean ships in 16 languages: the app, the installer, the command-line
-tool and the README.
+InstallerClean ships in 16 languages: the app, the installer and the command-line
+tool. The README is in 17, those 16 and Arabic.
 
 To read a translation, the string tables in
 [`docs/translations/`](docs/translations/) show every line in English beside each
