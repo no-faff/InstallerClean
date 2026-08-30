@@ -113,11 +113,6 @@ internal static class CliExitCode
     /// changes the machine belongs here, or a nightly retry is refused for ever.
     /// A malformed or absent argument is the plainest worked example: nothing about
     /// waiting and running again fixes it.
-    ///
-    /// The example this comment used to give was a product installed as a second
-    /// instance of itself, which took this code for exactly that reason and stopped
-    /// being detectable in 3.0.0 when the check behind it was removed. The test the
-    /// example illustrated is unchanged, and no exit code moved with it.
     /// </summary>
     public const int Error = 1;
 
