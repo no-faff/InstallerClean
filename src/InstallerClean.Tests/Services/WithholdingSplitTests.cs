@@ -82,6 +82,12 @@ public class WithholdingSplitTests
         // over the pair would state a cause that is false of half of it.
         var identities = new ScriptedPackageIdentities();
         identities.Declares($@"{Folder}\held.msi", ProductA);
+        // The second file has to be scripted as yielding nothing rather than left
+        // unscripted. An unscripted path throws by design, so the arm this test is
+        // named for would never be reached; YieldsNothing is the reader answering
+        // that it had nothing to read, which is the answer the Unestablished count
+        // is about.
+        identities.YieldsNothing($@"{Folder}\unreadable.msi");
 
         var msi = new ScriptedMsiProducts();
         msi.Installed(ProductA);
