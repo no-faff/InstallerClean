@@ -296,8 +296,6 @@ const MAP = {
   // 0 = file count, 1 = pluralised "file"/"files", 2 = size display
   'Confirm.MoveTitle': `Chuyển {0} {1} ({2})?`,
 
-  // 0 = destination path
-  'Confirm.MoveDestination': `Chuyển tới:`,
   'Confirm.DeleteTitle': `Xóa {0} {1} ({2})?`,
 
   // Error messages
@@ -485,10 +483,6 @@ const MAP = {
   'Automation.About.ReportProblem.HelpText': `Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn.`,
   'Automation.AutoUpdateCheck.HelpText': `Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó.`,
   'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. Delete it whenever you're satisfied nothing needs them.`,
-  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to delete], so remove it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `Tệp này sẽ bị xóa vĩnh viễn. Nó [có thể xóa an toàn], nhưng nếu bạn muốn có bản sao lưu thì hãy dùng nút Chuyển.`,
   'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean không khiến được Windows phân giải đường dẫn thật của {InstallerFolder}, nên không tệp nào có thể được chứng tỏ là nằm bên trong và không tệp nào được đề xuất để dọn. Lần quét này không tìm thấy gì vì phép kiểm tra ấy thất bại, chứ không phải vì thư mục đã sạch. Không có gì bị bỏ đi.`,

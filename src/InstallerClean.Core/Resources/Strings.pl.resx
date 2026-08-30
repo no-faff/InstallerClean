@@ -601,37 +601,6 @@ To put it back, you need the installer for the version you already have. Get it 
        had to explain a button press that did nothing, where those explained an empty
        list. It went with the cached-package identity check and did not come back with
        them: nothing refuses a confirmed batch that way now. -->
-  <!-- The line under the post-Move summary, in its four forms: the backup
-       folder is on another drive or on the same one, at one file or at more.
-       Delete has no counterpart, and deliberately: it makes no safety claim on
-       its completion screen, so there is nothing there for a link to hang on.
-
-       The bracketed phrase becomes a hyperlink to the README's "Is it safe?"
-       section (rendered in MainWindow.xaml.cs BuildCompletionRestoreLine); the
-       square brackets are the link delimiter and are NOT shown, only the
-       phrase between them becomes the link. Keep the brackets in place and
-       translate the phrase. Quoting the phrase itself here is what let an
-       earlier version of this comment go stale against the values.
-
-       "Until then" is the load-bearing part and the reason the line was
-       rewritten: a real user moved his files, watched nothing break for weeks,
-       and still wrote "at some point I could probably delete those files".
-       The backup exists for as long as the folder does, and deleting the
-       folder is what finishes the job.
-
-       The singular is a recast rather than a mechanical de-pluralising. In the
-       plural, "delete it" can only mean the folder, because "the files" cannot
-       be "it"; at one file that disambiguation is gone, so the singular names
-       the folder outright. -->
-  <data name="Completion.MoveRestoreHint.Singular" xml:space="preserve"><value>Plik w tym folderze [można bezpiecznie usunąć], więc skasuj folder, kiedy zechcesz. Do tego czasu możesz umieścić go z powrotem w {InstallerFolder}, gdyby jakiś program okazał się go potrzebować (skrajnie mało prawdopodobne).</value></data>
-  <data name="Completion.MoveRestoreHint.Plural" xml:space="preserve"><value>Pliki w tym folderze [można bezpiecznie usunąć], więc skasuj go, kiedy zechcesz. Do tego czasu możesz umieścić je z powrotem w {InstallerFolder}, gdyby jakiś program okazał się potrzebować któregoś z nich (skrajnie mało prawdopodobne).</value></data>
-  <!-- The same line where the backup folder is on the drive the files came
-       from. A same-drive move is a rename, so it reclaims nothing until the
-       folder goes or moves; that is the one fact this variant adds, and it is
-       the only completion line in the app that has to explain why the disk did
-       not get emptier. -->
-  <data name="Completion.MoveRestoreHintSameDrive.Singular" xml:space="preserve"><value>Plik w tym folderze [można bezpiecznie usunąć], więc skasuj folder albo przenieś go na inny dysk, kiedy naprawdę zechcesz odzyskać miejsce. Do tego czasu możesz umieścić go z powrotem w {InstallerFolder}, gdyby jakiś program okazał się go potrzebować (skrajnie mało prawdopodobne).</value></data>
-  <data name="Completion.MoveRestoreHintSameDrive.Plural" xml:space="preserve"><value>Pliki w tym folderze [można bezpiecznie usunąć], więc skasuj go albo przenieś na inny dysk, kiedy naprawdę zechcesz odzyskać miejsce. Do tego czasu możesz umieścić je z powrotem w {InstallerFolder}, gdyby jakiś program okazał się potrzebować któregoś z nich (skrajnie mało prawdopodobne).</value></data>
   <!-- Headline size figures. "freed" is used where space is genuinely
        reclaimed at that instant: a Delete, and a Move to another volume, which
        frees the system drive. A same-volume Move reads "moved", a rename
@@ -921,7 +890,6 @@ To put it back, you need the installer for the version you already have. Get it 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Przenieść {0} {1} ({2})?</value></data>
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Przenieś do:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Usunąć {0} {1} ({2})?</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.

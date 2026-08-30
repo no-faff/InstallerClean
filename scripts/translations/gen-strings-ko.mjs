@@ -290,8 +290,6 @@ const MAP = {
   // 0 = file count, 1 = pluralised "file"/"files", 2 = size display
   'Confirm.MoveTitle': `{1} {0}개를 이동하시겠습니까? ({2})`,
 
-  // 0 = destination path
-  'Confirm.MoveDestination': `이동할 위치:`,
   'Confirm.DeleteTitle': `{1} {0}개를 삭제하시겠습니까? ({2})`,
 
   // Error messages
@@ -482,10 +480,6 @@ const MAP = {
   'Automation.About.ReportProblem.HelpText': `브라우저에서 github.com의 이슈 트래커를 엽니다.`,
   'Automation.AutoUpdateCheck.HelpText': `선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다.`,
   'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. Delete it whenever you're satisfied nothing needs them.`,
-  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to delete], so remove it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `이 파일은 영구히 삭제됩니다. [안전하게 삭제할 수 있습니다]. 다만 백업을 원하시면 대신 이동 단추를 사용하세요.`,
   'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean이 Windows로부터 {InstallerFolder}의 실제 경로를 확인받지 못해서, 어떤 파일도 그 안에 있다고 밝힐 수 없었고 정리 대상으로 제시된 파일도 없습니다. 이번 검사가 아무것도 찾지 못한 것은 폴더가 깨끗해서가 아니라 그 확인이 실패했기 때문입니다. 아무것도 제거하지 않았습니다.`,

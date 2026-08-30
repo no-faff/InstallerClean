@@ -297,8 +297,6 @@ const MAP = {
   // 0 = file count, 1 = pluralised "file"/"files", 2 = size display
   'Confirm.MoveTitle': `Mover {0} {1} ({2})?`,
 
-  // 0 = destination path
-  'Confirm.MoveDestination': `Mover para:`,
   'Confirm.DeleteTitle': `Excluir {0} {1} ({2})?`,
 
   // Error messages
@@ -488,10 +486,6 @@ const MAP = {
   'Automation.About.ReportProblem.HelpText': `Abre o rastreador de problemas (Issues) em github.com no seu navegador.`,
   'Automation.AutoUpdateCheck.HelpText': `Se marcada, o InstallerClean consulta o github em busca de uma versão mais recente quando você o executa.`,
   'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. Delete it whenever you're satisfied nothing needs them.`,
-  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to delete], so remove the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to delete], so remove it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to delete], so remove the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
-  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to delete], so remove it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `Este arquivo será excluído permanentemente. Ele é [seguro para excluir], mas se você quiser uma cópia, use o botão Mover.`,
   'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Error.ScanCacheRootUnresolved': `O InstallerClean não conseguiu que o Windows resolvesse o caminho verdadeiro de {InstallerFolder}, então não foi possível mostrar que algum arquivo estivesse dentro dela e nenhum foi oferecido para limpeza. Esta análise não encontrou nada porque essa verificação falhou, não porque a pasta esteja limpa. Nada foi removido.`,
