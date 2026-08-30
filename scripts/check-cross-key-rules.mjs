@@ -13,6 +13,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { standsInFor } from './plural-overrides.mjs';
+import { readLedger, englishFor, recordedFreshness } from './translation-ledger.mjs';
 
 const RESX_DIR = 'src/InstallerClean.Core/Resources';
 const GUI = 'src/InstallerClean';
@@ -159,6 +160,9 @@ const NO_VISIBLE_LABEL = new Set([
 // English button while the button beside it has been translated, so listing them
 // here would fault fifteen languages for what check-still-english and
 // check-superseded-english already name, and name in the place the fix goes.
+// Rule 3a below carries them with the condition they are out under, so each one
+// rejoins this rule the day its language stops holding English for it rather than
+// the day somebody remembers to move it.
 const QUOTES_A_LABEL = [
   { sentence: 'Body.NotScanned.Why', label: 'Action.Rescan' },
   // Each confirmation dialog's spoken help names both of its own buttons, which
@@ -177,6 +181,39 @@ const QUOTES_A_LABEL = [
   // A batch that stopped because the backup folder would no longer resolve says
   // which button starts the scan again.
   { sentence: 'Error.DestinationChangedMidBatch', label: 'Action.Rescan' },
+];
+
+// ---------------------------------------------------------------------------
+// Rule 3a. The same rule, on the sentences whose satellites cannot meet it yet.
+//
+// A satellite still carrying English cannot quote a translated button, so a
+// sentence in that state fails rule 3 in every language for a reason that belongs
+// to the translation round and to the generator. Listing it above would mean
+// reading that failure fifteen times over; leaving it out of the file altogether
+// would mean somebody remembering to put it back. It is declared here instead,
+// with the condition it is out under, and it rejoins rule 3 language by language
+// as that condition lifts.
+//
+// TWO LEGS, AND NEITHER IS SPARE, BECAUSE A SATELLITE HOLDS ENGLISH IN TWO SHAPES.
+// The value equalling the English it answers for catches a satellite carrying the
+// CURRENT neutral, which is what a key flagged for re-translation holds until the
+// round reaches it. The ledger recording the slot stale catches a satellite
+// carrying a wording the neutral has SINCE REPLACED, which is equal to nothing the
+// first leg compares against. And a slot the ledger records as unverified is a
+// claim nobody has made rather than a translation, so the ledger has no answer for
+// it and the value comparison is the only thing that can hold it.
+//
+// Held out is either leg. Checked is neither. Every slot held out is printed with
+// the leg that held it, and an entry no language holds out any more is reported as
+// something to move up, so this list empties itself rather than outliving the
+// round it is waiting for.
+const QUOTES_A_LABEL_ONCE_TRANSLATED = [
+  // The plural of the sentence whose singular sits in rule 3 above.
+  { sentence: 'Confirm.DeletePermanently.Plural', label: 'Action.Move' },
+  // The registered-files row's own button, named by the sentence that sends the
+  // reader to it.
+  { sentence: 'Summary.MissingFromDisk.Singular', label: 'Action.Details' },
+  { sentence: 'Summary.MissingFromDisk.Plural', label: 'Action.Details' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -602,12 +639,37 @@ const tokenKeys = new Set(
 const linkKeys = new Set(
   [...neutral].filter(([, v]) => v.includes('[') || v.includes(']')).map(([k]) => k));
 
-// The labels each rule 3 sentence must quote, keyed by the sentence, so a plural
-// override can be measured against the same ones as the form it inflects. Two of
-// the sentences name two buttons, which is why the value is a list.
-const labelsBySentence = new Map();
-for (const { sentence, label } of QUOTES_A_LABEL)
-  labelsBySentence.set(sentence, [...(labelsBySentence.get(sentence) ?? []), label]);
+// The labels each sentence must quote, keyed by the sentence, so a plural override
+// can be measured against the same ones as the form it inflects. Two of the
+// sentences name two buttons, which is why the value is a list. Rule 3 and rule 3a
+// each get one, because a held-out sentence's overrides are held out with it.
+const labelsFor = (pairs) => {
+  const out = new Map();
+  for (const { sentence, label } of pairs)
+    out.set(sentence, [...(out.get(sentence) ?? []), label]);
+  return out;
+};
+const labelsBySentence = labelsFor(QUOTES_A_LABEL);
+const heldOutLabelsBySentence = labelsFor(QUOTES_A_LABEL_ONCE_TRANSLATED);
+
+const ledger = readLedger();
+
+// WHICH LEG, RATHER THAN WHETHER, so a run can say why a sentence went unmeasured
+// instead of leaving a reader to work it out. Empty is the answer that means the
+// sentence is rule 3's to check.
+const holdingLegs = (key, value, lang) => {
+  const legs = [];
+  if (value === englishFor(key, neutral)) legs.push('its value is the English it answers for');
+  if (recordedFreshness(ledger, key, lang, neutral) === 'stale')
+    legs.push('the ledger records this slot stale');
+  return legs;
+};
+
+// Held out, key-slot by key-slot, and what each declared entry saw, which is what
+// tells an entry still doing its job from one that has nothing left to hold.
+const heldOut = [];
+const heldOutTally = new Map(
+  QUOTES_A_LABEL_ONCE_TRANSLATED.map((entry) => [entry, { read: 0, held: 0 }]));
 
 if (stale.length) {
   console.error(`Cross-key rules FAILED (${stale.length}): the declarations in this file are stale.`);
@@ -662,14 +724,39 @@ for (const lang of LANGS) {
   // that button does not carry misdirects at exactly the counts that select it.
   // Rules 6 and 9 below fold overrides in on the same ground, and which neutral
   // form each answers for is standsInFor's decision rather than this rule's.
-  const quotingOverrides = [...map.keys()]
+  const overridesOf = (bySentence) => [...map.keys()]
     .filter((key) => !neutral.has(key))
-    .flatMap((key) => (labelsBySentence.get(standsInFor(key, neutral)) ?? [])
+    .flatMap((key) => (bySentence.get(standsInFor(key, neutral)) ?? [])
       .map((label) => ({ sentence: key, label })));
 
-  for (const { sentence, label } of [...QUOTES_A_LABEL, ...quotingOverrides]) {
+  for (const { sentence, label } of [...QUOTES_A_LABEL, ...overridesOf(labelsBySentence)]) {
     const body = read(sentence), button = read(label);
     if (body === null || button === null) continue;
+    if (!compare(body, lang).includes(compare(button, lang)))
+      failures.push(`${sentence} does not quote ${label} ("${wording(button)}")`);
+  }
+
+  // Rule 3a. The same comparison, run only where neither leg holds the sentence
+  // out. An override of a held-out sentence goes through it as well, because a
+  // few-form of an untranslated sentence is untranslated in the same way.
+  for (const entry of [...QUOTES_A_LABEL_ONCE_TRANSLATED, ...overridesOf(heldOutLabelsBySentence)]) {
+    const { sentence, label } = entry;
+    const body = read(sentence), button = read(label);
+    if (body === null || button === null) continue;
+    // Counted for the declared entries alone. An override comes and goes with the
+    // language that declares it, so it says nothing about whether the entry above
+    // it still has anything to hold.
+    const tally = heldOutTally.get(entry);
+    // THE NEUTRAL CANNOT BE IN THE STATE THE LEGS DESCRIBE: it IS the English, so
+    // the first leg would answer yes for ever and hold this sentence out of its
+    // own language's check permanently.
+    const legs = lang === 'en-GB' ? [] : holdingLegs(sentence, body, lang);
+    if (tally && lang !== 'en-GB') tally.read += 1;
+    if (legs.length) {
+      if (tally) tally.held += 1;
+      heldOut.push({ lang, sentence, legs });
+      continue;
+    }
     if (!compare(body, lang).includes(compare(button, lang)))
       failures.push(`${sentence} does not quote ${label} ("${wording(button)}")`);
   }
@@ -744,10 +831,42 @@ for (const lang of LANGS) {
   }
 }
 
+// The count of problems a LANGUAGE raised, taken before rule 3a's own findings are
+// added, because the footer below sends a reader to a generator and an entry this
+// file has outlived is fixed in this file.
+const perLanguageProblems = problems.length - sourceShapeProblems;
+
+// PRINTED ON EVERY RUN, CLEAN OR NOT, AND WITH THE LEG THAT DID IT. A sentence that
+// went unmeasured is not a sentence that passed, and a held-out list nobody sees is
+// the exclusion this rule was written to stop being invisible.
+if (heldOut.length) {
+  const byEntry = new Map();
+  for (const { sentence, legs, lang } of heldOut) {
+    const byReason = byEntry.get(sentence) ?? new Map();
+    const reason = legs.join(' and ');
+    byReason.set(reason, [...(byReason.get(reason) ?? []), lang]);
+    byEntry.set(sentence, byReason);
+  }
+  console.log(`\nHELD OUT OF RULE 3 (${heldOut.length} key-slot(s)), and by which leg:`);
+  for (const [sentence, byReason] of [...byEntry].sort())
+    for (const [reason, langs] of [...byReason].sort())
+      console.log(`  ${sentence}, ${reason}: ${langs.sort().join(', ')}`);
+}
+
+// AN ENTRY WITH NOTHING LEFT TO HOLD IS A DECLARATION THIS FILE HAS OUTLIVED, and
+// it is reported rather than left, because a rule that has quietly stopped applying
+// to anything reads exactly like a rule that is working.
+for (const [{ sentence, label }, { read, held }] of heldOutTally)
+  if (read > 0 && held === 0)
+    problems.push(`${sentence} is declared as quoting ${label} once translated, and no satellite `
+      + 'holds it out any longer: in none of them is the value the English it answers for, and in '
+      + 'none does the ledger record the slot stale. Move the pair into QUOTES_A_LABEL and drop '
+      + 'this entry.');
+
 if (problems.length) {
   console.error(`\nCross-key rules FAILED (${problems.length}):`);
   for (const p of problems) console.error(`  ${p}`);
-  if (problems.length > sourceShapeProblems)
+  if (perLanguageProblems > 0)
     console.error('\nThe translated resx files are generated from'
       + '\nscripts/translations/gen-strings-<code>.mjs and are never hand-edited, so a fix'
       + "\ngoes into that language's generator and the file is regenerated.");

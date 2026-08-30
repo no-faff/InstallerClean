@@ -64,16 +64,12 @@
 //                                                           stamp keys as never established
 //   node scripts/check-translation-freshness.mjs --record-all-current
 //                                                           seed every key/language pair
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
-import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { standsInFor } from './plural-overrides.mjs';
+import { LEDGER, UNVERIFIED, digest, readLedger, englishFor, recordedFreshness } from './translation-ledger.mjs';
 
 const RES = 'src/InstallerClean.Core/Resources';
 const NEUTRAL = `${RES}/Strings.resx`;
-const LEDGER = 'scripts/translations/translation-provenance.json';
-const UNVERIFIED = 'unverified';
-
-const digest = (s) => createHash('sha256').update(s, 'utf8').digest('hex').slice(0, 16);
 
 // Parse a resx into key -> raw <value> body. Controlled against a raw count of
 // '<data ' occurrences, because a regex requiring <value> on the same line as
@@ -98,16 +94,12 @@ const neutral = readResx(NEUTRAL);
 
 const satFiles = readdirSync(RES).filter((f) => /^Strings\.[A-Za-z-]+\.resx$/.test(f)).sort();
 const langOf = (f) => f.match(/^Strings\.([A-Za-z-]+)\.resx$/)[1];
-const ledger = existsSync(LEDGER) ? JSON.parse(readFileSync(LEDGER, 'utf8')) : { keys: {} };
+const ledger = readLedger();
 
-// THE ENGLISH A KEY ANSWERS FOR, WHICH IS NOT ALWAYS ITS OWN. A satellite-only plural
-// override translates a FORM of a base key: Russian's Plural.File.Few is one of the
-// forms Pluralise chooses between for Plural.File, and the neutral declares no
-// Plural.File.Few for it to have been made from. So its freshness is the base form's
-// freshness, because that is what moving would make it out of date. Stamped against
-// anything else it would carry a number that never moves.
-const englishFor = (key) =>
-  neutral.get(key) ?? neutral.get(standsInFor(key, neutral) ?? '\u0000');
+// The English a key answers for, and the freshness of one slot, both come from
+// translation-ledger.mjs, so this gate and check-cross-key-rules read the ledger
+// the same way. englishFor is what measures an override against the base form it
+// inflects rather than against a key the neutral was never going to hold.
 
 // EVERY KEY THIS LANGUAGE HAS A CLAIM TO MAKE ABOUT, and it is three sets rather than
 // the neutral's alone. The neutral's keys are what every satellite is measured against.
@@ -166,7 +158,7 @@ if (recordIdx !== -1 || unverifiedIdx !== -1 || recordAll) {
   // THE NEUTRAL HOLDS. The second is what an override is, and rejecting it was why no
   // override has ever carried an entry: satellite-only by construction, so
   // neutral.has is false for every one of them and always will be.
-  const unknown = keys.filter((k) => englishFor(k) === undefined);
+  const unknown = keys.filter((k) => englishFor(k, neutral) === undefined);
   if (!keys.length || unknown.length) {
     console.error(unknown.length ? `Neither in the neutral resx nor answering for a form that is: ${unknown.join(', ')}` : 'Usage: --record <Key> [<Key> ...] | --record-unverified <Key> [<Key> ...]');
     process.exit(2);
@@ -181,7 +173,7 @@ if (recordIdx !== -1 || unverifiedIdx !== -1 || recordAll) {
       ledger.keys[k] ??= {};
       // The digest is of the English this key answers for, which for an override is
       // the base form's. See englishFor.
-      ledger.keys[k][lang] = asUnverified ? UNVERIFIED : digest(englishFor(k));
+      ledger.keys[k][lang] = asUnverified ? UNVERIFIED : digest(englishFor(k, neutral));
       stamped++;
       if (!neutral.has(k)) overridesStamped++;
     }
@@ -203,7 +195,6 @@ for (const f of satFiles) {
   const lang = langOf(f);
   const sat = readResx(`${RES}/${f}`);
   for (const key of keysFor(sat, lang)) {
-    const englishNow = englishFor(key);
     const recorded = ledger.keys?.[key]?.[lang];
     if (!neutral.has(key)) overridesWalked++;
     // AN ENTRY STANDING OVER A KEY THAT IS NOT THERE IS A TRANSLATION THAT HAS
@@ -220,8 +211,9 @@ for (const f of satFiles) {
     }
     if (recorded === undefined) { notInLedger++; continue; }
     checked++;
-    if (recorded === UNVERIFIED) { unverified++; continue; }
-    if (recorded === digest(englishNow)) { fresh++; continue; }
+    const state = recordedFreshness(ledger, key, lang, neutral);
+    if (state === UNVERIFIED) { unverified++; continue; }
+    if (state === 'fresh') { fresh++; continue; }
     stale.push({ lang, key });
   }
 }
