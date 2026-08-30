@@ -412,9 +412,19 @@ public record ScanResult(
     WithholdingSplit WithheldBy = default)
 {
     /// <summary>
-    /// Every registration naming a file that is not on disk; the sum of the two
-    /// sub-counts and the figure both hosts speak, the split beneath it being
-    /// data rather than copy.
+    /// Every registration naming a file that is not on disk, the sum of the two
+    /// sub-counts.
+    ///
+    /// IT IS THE FIGURE THE ANONYMOUS REPORT CARRIES, AND NOT THE ONE EITHER HOST
+    /// SPEAKS. Both the window and the command line print
+    /// <see cref="MissingAffectedCount"/>: the window through its own property of the
+    /// same name, which is assigned that half, and the command line at every site it
+    /// reads. The report carries this total alongside the affected half, so the
+    /// series it feeds keeps one meaning across the release.
+    ///
+    /// SO FOLLOW THE ASSIGNMENT AND NOT THE NAME. A view model property spelled the
+    /// same way holds a different quantity, and reading the two as one makes the
+    /// banner look as though it speaks for a population it does not.
     /// </summary>
     public int MissingFromDiskCount => MissingAffectedCount + MissingUnaffectedCount;
 
