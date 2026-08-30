@@ -31,13 +31,15 @@
 AppId=InstallerClean
 AppName=InstallerClean
 AppVersion={#AppVersion}
-; AppVerName sets the name+version string Inno shows in the wizard title bar and
-; the Add/Remove Programs entry; set explicitly so it reads "InstallerClean
-; <version>" with no localised "version"/"versione" word. Inno Setup 6's default
-; includes that word in every language and offers no [Messages] override for it
-; (an "<lang>.NameAndVersion" entry is unrecognised and silently ignored). Inno
-; Setup 7 drops the word from the default, so on 7.x this directive is redundant
-; but harmless; keeping it means the title stays correct on either compiler.
+; AppVerName sets the name+version string Inno shows in the wizard title bar; set
+; explicitly so it reads "InstallerClean <version>" with no localised
+; "version"/"versione" word. Inno Setup 6's default includes that word in every
+; language and offers no [Messages] override for it (an "<lang>.NameAndVersion"
+; entry is unrecognised and silently ignored). Inno Setup 7 drops the word from
+; the default, so on 7.x this directive is redundant but harmless; keeping it
+; means the title stays correct on either compiler. The Add/Remove Programs entry
+; is named by UninstallDisplayName further down and does not follow this
+; directive.
 AppVerName=InstallerClean {#AppVersion}
 ; Mutex name matches App.xaml.cs and Cli/Program.cs. Setup pauses with
 ; a "close the running app" prompt when the user upgrades while
@@ -67,6 +69,12 @@ VersionInfoCopyright=(c) {#CurrentYear} {#MyCompany}
 VersionInfoDescription=InstallerClean Setup
 DefaultDirName={autopf}\InstallerClean
 DefaultGroupName=InstallerClean
+; The name Windows shows in Apps and Features. Inno's default here is AppVerName,
+; which would carry the version into a list that already prints it in a column of
+; its own, so the entry would read it twice. Setting the name explicitly leaves
+; the wizard title bar alone. It does not change what winget matches on either:
+; the published manifest correlates on the product code and carries no display
+; name at all.
 UninstallDisplayName=InstallerClean
 UninstallDisplayIcon={app}\InstallerClean.exe
 OutputDir={#PublishDir}
