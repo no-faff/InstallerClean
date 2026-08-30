@@ -1004,7 +1004,8 @@ public class MainViewModelTests
         // TWO LINES BELOW ARE WHY. They are adjacent synchronous property sets,
         // so the first resolve is still parked in its debounce when the second
         // cancels it: the Task.Delay throws, ResolveDestinationVolumeAsync
-        // returns, and IsOnInstallerCacheDrive is never called for that path.
+        // returns, and ResolveIsOnInstallerCacheDrive is never called for that
+        // path.
         // The string is built from the cache folder's path root as in
         // MoveButtonTooltip_answers_from_the_box_and_changes_as_it_is_typed_in;
         // here it names a folder nothing asks a question about.

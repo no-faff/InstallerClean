@@ -383,12 +383,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return;
         }
 
-        // OFF THE DISPATCHER, AND THAT IS THE WHOLE POINT OF THIS METHOD.
-        // MoveSpaceCheck.IsOnInstallerCacheDrive reaches GetVolumePathName,
-        // which Win32 documents as validating a remote path over the network;
-        // IsRemotePath turns away the shapes that say so in their spelling, and
-        // a mapped drive letter does not. ConfigureAwait(true) to come back and
-        // publish on the thread the binding is read from.
+        // OFF THE DISPATCHER, AND THAT IS THE WHOLE POINT OF THIS METHOD. The
+        // resolve is MoveSpaceCheck.ResolveIsOnInstallerCacheDrive, which reaches
+        // GetVolumePathName, and Win32 documents that as validating a remote path
+        // over the network; IsRemotePath turns away the shapes that say so in
+        // their spelling, and a mapped drive letter does not. ConfigureAwait(true)
+        // to come back and publish on the thread the binding is read from.
         //
         // No token on the Task.Run: the debounce is the cancellable part and it
         // is over, the body is two volume queries and a token cannot abandon a
