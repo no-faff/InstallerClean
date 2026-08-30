@@ -1016,9 +1016,11 @@ public class MainViewModelTests
         // the way back, which belongs to a resolve whose debounce had already
         // elapsed. Here the cancelled resolve dies parked in its debounce and
         // never reaches that re-check; the surviving resolve reaches it and passes
-        // through. Putting an answer in flight rather than parked needs the
-        // resolve interruptible partway, which two adjacent property sets cannot
-        // do on any host.
+        // through. Putting an answer in flight rather than parked is what
+        // CleanupDestinationVolumeTests does, by taking the volume question as a
+        // function so an answer can be held open across the keystroke that makes
+        // it stale; two adjacent property sets leave the earlier resolve parked,
+        // and that is the state this one is for.
         //
         // A KEYSTROKE ARRIVING AFTER AN ANSWER HAS LANDED IS A DIFFERENT PATH,
         // and it is the one
