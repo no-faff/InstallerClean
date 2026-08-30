@@ -602,6 +602,13 @@ const tokenKeys = new Set(
 const linkKeys = new Set(
   [...neutral].filter(([, v]) => v.includes('[') || v.includes(']')).map(([k]) => k));
 
+// The labels each rule 3 sentence must quote, keyed by the sentence, so a plural
+// override can be measured against the same ones as the form it inflects. Two of
+// the sentences name two buttons, which is why the value is a list.
+const labelsBySentence = new Map();
+for (const { sentence, label } of QUOTES_A_LABEL)
+  labelsBySentence.set(sentence, [...(labelsBySentence.get(sentence) ?? []), label]);
+
 if (stale.length) {
   console.error(`Cross-key rules FAILED (${stale.length}): the declarations in this file are stale.`);
   for (const s of stale) console.error(`  ${s}`);
@@ -649,7 +656,18 @@ for (const lang of LANGS) {
         + '(WCAG 2.5.3)');
   }
 
-  for (const { sentence, label } of QUOTES_A_LABEL) {
+  // A PLURAL OVERRIDE IS ANOTHER COUNT FORM OF THE SENTENCE IT INFLECTS, so it
+  // owes the same rule. Pluralise hands the override to the same screen the
+  // neutral form would have reached, and a few-form naming a button by a word
+  // that button does not carry misdirects at exactly the counts that select it.
+  // Rules 6 and 9 below fold overrides in on the same ground, and which neutral
+  // form each answers for is standsInFor's decision rather than this rule's.
+  const quotingOverrides = [...map.keys()]
+    .filter((key) => !neutral.has(key))
+    .flatMap((key) => (labelsBySentence.get(standsInFor(key, neutral)) ?? [])
+      .map((label) => ({ sentence: key, label })));
+
+  for (const { sentence, label } of [...QUOTES_A_LABEL, ...quotingOverrides]) {
     const body = read(sentence), button = read(label);
     if (body === null || button === null) continue;
     if (!compare(body, lang).includes(compare(button, lang)))
