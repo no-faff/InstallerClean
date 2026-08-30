@@ -56,15 +56,6 @@ public class CleanupDestinationVolumeTests
     private static readonly TimeSpan SignalTimeout = TimeSpan.FromSeconds(10);
 
     /// <summary>
-    /// How long the newer resolve is given to finish after its answer appears.
-    /// The flag is raised from inside the publish and the source that resolve was
-    /// holding is let go on the two lines after it, so the state named "after the
-    /// newer one has answered" begins a moment later than the property change
-    /// announcing it. Wildly longer than two statements, and spent once.
-    /// </summary>
-    private static readonly TimeSpan PublishFinishes = TimeSpan.FromMilliseconds(500);
-
-    /// <summary>
     /// How long an answer belonging to the path the box left is given to appear
     /// after it has had its chance. An answer that is published raises
     /// PropertyChanged as the resolve returns, so this ends early whenever there
@@ -155,12 +146,13 @@ public class CleanupDestinationVolumeTests
         Assert.True(await held.Entered(), $"the resolve for '{LeftBehind}' never started");
 
         // Held across the keystroke and past the newer resolve's whole debounce
-        // and query, so by the time it is let go the newer answer has been
-        // published and the source it was holding has been let go with it. The
-        // guard meets nothing to compare against, and that is its other arm.
+        // and query, so by the time it is let go that resolve has finished. Its
+        // answer is the last thing it publishes, on the far side of letting its
+        // own source go, so the answer arriving is what says the source has
+        // gone. The guard meets nothing to compare against, and that is its
+        // other arm.
         vm.MoveDestination = InTheBox;
         await Reached(published.TheBoxsOwnAnswer, $"'{InTheBox}' never got an answer");
-        await Task.Delay(PublishFinishes);
 
         held.Release();
         Assert.True(await held.Returned, $"the resolve for '{LeftBehind}' was never released");

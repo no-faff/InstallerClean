@@ -407,9 +407,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // will answer for the path now in the box.
         if (_destinationVolumeCts is not { } current || current.Token != token) return;
 
-        DestinationIsOnCacheVolume = onCacheVolume;
+        // PUT THE SOURCE AWAY FIRST AND PUBLISH LAST. The publish is what
+        // raises PropertyChanged, so it is the moment anything else gets to
+        // look at this view model. Doing it after the clear-up means what
+        // they find is a resolve that has finished rather than one still
+        // halfway through putting itself away, and the field is already
+        // empty for whatever reads it next.
         current.Dispose();
         _destinationVolumeCts = null;
+        DestinationIsOnCacheVolume = onCacheVolume;
     }
 
     /// <summary>
