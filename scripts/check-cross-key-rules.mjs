@@ -150,24 +150,33 @@ const NO_VISIBLE_LABEL = new Set([
 // can quote uninflected. Not every sentence that mentions one: the
 // pending-reboot family says "Move and Delete are paused", which several
 // languages have to inflect, so a rule there would fault a correct translation.
-// And five that do belong (Automation.ConfirmDelete,
-// Confirm.DeletePermanently.*, Summary.ProgramsUnreadable.*,
-// Error.DestinationChangedMidBatch and Summary.MissingFromDisk.*) are out only
-// while their satellites hold English for the coming translation round: added
-// now they would fault fifteen languages for the one thing the still-English
-// gate already reports. Summary.MissingFromDisk.* is the one to put back, its
-// sentence being "Open Details for what to do" against the registered files
-// row's own button; the other four are new or reworded English that has never
-// had a round.
+//
+// Three sentences that belong here are out for now, and what keeps them out is
+// what their satellites hold rather than anything the sentences say.
+// Confirm.DeletePermanently.Plural and both of Summary.MissingFromDisk's neutral
+// forms carry English in every satellite, either the current neutral value or a
+// wording the neutral has since replaced. A sentence still in English quotes an
+// English button while the button beside it has been translated, so listing them
+// here would fault fifteen languages for what check-still-english and
+// check-superseded-english already name, and name in the place the fix goes.
 const QUOTES_A_LABEL = [
   { sentence: 'Body.NotScanned.Why', label: 'Action.Rescan' },
-  // The two confirmation dialogs' spoken help names both of their own buttons,
-  // which is the whole of what it says: "Move puts the files in the chosen
-  // folder. Cancel leaves them where they are."
+  // Each confirmation dialog's spoken help names both of its own buttons, which
+  // is the whole of what it says: "Move puts the unneeded files in the chosen
+  // destination folder. Cancel leaves them where they are."
   { sentence: 'Automation.ConfirmMove', label: 'Action.Move' },
   { sentence: 'Automation.ConfirmMove', label: 'Action.Cancel' },
+  { sentence: 'Automation.ConfirmDelete', label: 'Action.DeletePermanently' },
+  { sentence: 'Automation.ConfirmDelete', label: 'Action.Cancel' },
   { sentence: 'Automation.ConfirmSendResultLog', label: 'Action.SendResultLogConfirm' },
   { sentence: 'Automation.ConfirmSendResultLog', label: 'Action.Cancel' },
+  // The sentence the delete dialog introduces offers the other way of doing it
+  // by name, so the offer is worth exactly what the button it points at is
+  // called. Only the singular is here; the plural is one of the three held out.
+  { sentence: 'Confirm.DeletePermanently.Singular', label: 'Action.Move' },
+  // A batch that stopped because the backup folder would no longer resolve says
+  // which button starts the scan again.
+  { sentence: 'Error.DestinationChangedMidBatch', label: 'Action.Rescan' },
 ];
 
 // ---------------------------------------------------------------------------
