@@ -342,12 +342,21 @@ public class MainViewModelTests
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        // Equality against the resx, not a fragment of it: the ladder passes
-        // ex.Message through untouched and titles it, and a fragment match kept
-        // a copy of the English in the test that went stale the moment the
-        // string was reworded.
+        // Against the resx and never a copy of the English: a fragment written out
+        // here goes stale the moment the string is reworded, which is what this
+        // assertion has always been guarding. StartsWith against the constant keeps
+        // that guard and drops a different one.
+        //
+        // WHAT IT STOPS DEPENDING ON IS THE MACHINE. The ladder appends a sentence
+        // naming the crash log where one was written and omits it where none was, so
+        // an equality here asks the host whether it can write to LocalApplicationData
+        // and reads the answer as a verdict on the view model. The composition itself
+        // is pinned by ScanViewModelStoppedScanTests, which asks that question first
+        // and asserts whichever form the host can reach.
         _dialogService.Received(1).ShowError(
-            Strings.Error_InstallerDbEmpty, Strings.Error_InstallerDbUnavailableTitle);
+            Arg.Is<string>(m => m != null
+                && m.StartsWith(Strings.Error_InstallerDbEmpty, StringComparison.Ordinal)),
+            Strings.Error_InstallerDbUnavailableTitle);
     }
 
     [Fact]
@@ -2463,7 +2472,11 @@ public class MainViewModelTests
 
         Assert.False(vm.Scan.HasScanned);
         Assert.True(vm.Scan.HasScanError);
-        Assert.Equal(Strings.Error_InstallerDbEmpty, vm.Scan.LastScanError);
+        // StartsWith for the reason the sibling above gives: the crash-log sentence
+        // is appended after the account where the host could write one, and what this
+        // test is about is the account reaching the window at all.
+        Assert.StartsWith(Strings.Error_InstallerDbEmpty, vm.Scan.LastScanError,
+            StringComparison.Ordinal);
         // The window's intro shows the diagnosis, not "nothing scanned yet", and
         // the startup path is inline: no modal fires over the splash.
         Assert.Equal(Strings.Error_ScanFailedTitle, vm.IntroLead);
