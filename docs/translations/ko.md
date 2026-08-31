@@ -21,7 +21,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | PATCHES | 패치 |
 | PRODUCT DETAILS | 제품 세부 정보 |
-| BACKUP FOLDER | 대상 폴더 |
+| BACKUP FOLDER | 백업 폴더 |
 | SAY THANKS | 감사 인사 |
 
 ## Buttons and actions
@@ -117,18 +117,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are [safe to delete]. | 아래에 있는 불필요한 파일은 모두 [안전하게 삭제할 수 있습니다]. |
 | They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | 이 파일들은 {InstallerFolder}에 있습니다. InstallerClean은 설치된 모든 프로그램에 대해 Windows에 문의합니다. 어떤 프로그램도 자기 것이라고 하지 않거나({0}), 더 새로운 패치가 그 파일을 대체했고 어떤 프로그램도 그 파일로 되돌아갈 수 없을 때({1}) 목록에 오릅니다. |
-| Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update, repair and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | 직접 고른 대상 폴더로 옮긴 다음, 프로그램들이 여전히 평소처럼 업데이트되고 복구되고 제거되는 것을 확인하면 그 폴더를 삭제하세요. {InstallerFolder}에 다시 넣으면 모든 것이 원래대로 돌아옵니다. 아니면 지금 바로 영구 삭제하세요. |
+| Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | 직접 고른 백업 폴더로 옮긴 다음, 프로그램이 여전히 정상적으로 업데이트되고 제거되는지 확인되면 그 폴더를 삭제하세요. {InstallerFolder}에 다시 넣으면 모두 원래대로 돌아갑니다. 아니면 지금 영구히 삭제하세요. |
 | Nothing scanned yet. | 아직 검사하지 않았습니다. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 다시 검사를 눌러 {InstallerFolder}에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요. |
 | These files can't be cleaned up right now. | 지금은 이 파일들을 정리할 수 없습니다. |
 | Something is using Windows Installer right now, such as a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. | 지금 무언가가 Windows Installer를 사용하고 있습니다. Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램일 수 있습니다. 그동안 이동과 삭제는 일시 중지되어, InstallerClean이 변경 중인 {InstallerFolder}를 건드리지 않습니다. 끝나면 다시 검사하면 두 기능이 돌아옵니다. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | 이 컴퓨터에 이전 Windows Installer 트랜잭션이 중단된 채 남아 있습니다. {InstallerFolder}를 정리하기 전에 그 설치를 계속하거나 되돌리세요(또는 Windows를 다시 시작하세요). |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows가 다음 재시작 때 처리할 파일 이름 변경을 대기열에 넣어 두었고, 그 대상이 {InstallerFolder}입니다. 정리하기 전에 Windows를 다시 시작하세요. |
+| A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning. | 다음 재시작을 위해 예약된 파일 작업이 있는데 InstallerClean은 그 작업이 어떤 파일을 가리키는지 알 수 없으므로, 그 파일들이 {InstallerFolder}에 있지 않다고 단정할 수 없습니다. 정리하기 전에 Windows를 다시 시작하세요. |
 | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer가 진행 중인 작업이 있어 이동과 삭제가 일시 중지되었습니다. InstallerClean은 변경 중인 {InstallerFolder}를 건드리지 않습니다. 끝나면 다시 검사하면 두 기능이 돌아옵니다. |
 | Select a file to view details. | 세부 정보를 보려면 파일을 선택하세요. |
 | Select a product to view details. | 세부 정보를 보려면 제품을 선택하세요. |
 | No metadata available. | 사용할 수 있는 메타데이터가 없습니다. |
-| This installer file is missing. It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it, and its own last resort is reinstalling the program. | 이 설치 관리자 파일이 없습니다. 지금은 아무 문제도 일으키지 않으며, 이 파일이 속한 프로그램을 복구하거나 업데이트하거나 제거하려는 날이 오기 전까지는 문제가 되지 않습니다. 그때는 Windows가 이 파일을 찾는데 파일이 없으므로 그 단계가 실패할 수 있습니다.<br><br>해결을 시도하려면 해당 프로그램의 설치 관리자를 제조사에서 내려받아 기존 설치본 위에 실행하세요(먼저 제거하지 마세요. 제거 자체가 이 파일을 필요로 하는 단계입니다). 구할 수 있다면 설치되어 있는 것과 같은 버전을 사용하세요. Windows가 다른 버전을 거부할 수 있습니다. 이렇게 하면 파일이 복구되고 설정은 그대로 유지될 것입니다. 다만 Microsoft가 보장하지는 않으며, Microsoft의 최후 수단은 프로그램을 다시 설치하는 것입니다. |
+| This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | 이 설치 파일이 없습니다. 지금은 아무 문제도 일으키지 않으며, 이 파일이 속한 프로그램을 업데이트하거나 제거하려는 날이 오기 전까지는 문제가 없습니다. 그때 Windows가 이 파일을 찾지 못해 그 단계가 실패할 수 있습니다.<br><br>되돌리려면 지금 사용 중인 버전의 설치 프로그램이 필요합니다. 프로그램 제작사에서 구해 기존 설치본 위에 실행하세요. 더 새 버전으로는 되지 않습니다. 새 버전은 먼저 지금 있는 것을 제거해야 하는데, 바로 그 단계에 이 파일이 필요하기 때문입니다. 먼저 제거하는 방법도 같은 이유로 되지 않습니다. 이렇게 하면 파일이 복원되고 설정은 그대로 남아야 하지만, Microsoft가 보장하지는 않습니다. |
 | The README [explains this folder], and how to recover a file, in Microsoft's own words. | README에는 Microsoft의 표현 그대로 [이 폴더에 대한 설명]과 파일을 복구하는 방법이 담겨 있습니다. |
 | (none) | (없음) |
 
@@ -145,16 +146,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | All clean | 모두 깨끗합니다 |
-| Nothing removed | 제거된 것 없음 |
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder}에 정리할 것이 없습니다 |
 | Scanned {0} {1} in {2} | {1} {0}개 검사, {2} 소요 |
 | Nothing offered on this PC | 이 PC에서는 아무것도 제시하지 않았습니다 |
 | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 하나({2})를 그대로 두었습니다. |
 | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 {1} {0}개({2}) 전부를 그대로 두었습니다. |
-| The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 그 폴더에 있는 파일은 [안전하게 제거할 수 있습니다]. 그러니 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
-| The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 그 폴더에 있는 파일들은 [안전하게 제거할 수 있습니다]. 그러니 원하실 때 폴더를 삭제하세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
-| The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | 그 폴더에 있는 파일은 [안전하게 제거할 수 있습니다]. 그러니 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
-| The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | 그 폴더에 있는 파일들은 [안전하게 제거할 수 있습니다]. 그러니 공간을 실제로 되찾고 싶을 때 폴더를 삭제하거나 다른 드라이브로 옮기세요. 그때까지는 어떤 프로그램이 그중 하나를 정말로 필요로 하는 경우 {InstallerFolder}에 다시 넣을 수 있습니다(가능성은 극히 낮습니다). |
+| Delete that folder when you're satisfied all is well. | 모든 것이 괜찮다고 확신하게 되면 그 폴더를 삭제하세요. |
+| Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do. | 모든 것이 괜찮다고 확신하게 되면 그 폴더를 삭제하세요. 그때까지는 공간이 실제로 확보되지 않습니다. |
 | {0} freed | {0} 확보 |
 | {0} moved | {0} 이동 |
 | Nothing was moved | 이동된 파일 없음 |
@@ -165,10 +163,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} of {1} could not be deleted. | 파일 {1}개 중 {0}개를 삭제하지 못했습니다. |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
-| {0} {1} kept in place, because the records now claim what the scan flagged. | {1} {0}개를 그대로 두었습니다. 기록이 이제 검사에서 표시한 것을 자기 것이라고 하기 때문입니다. |
-| {0} {1} kept in place, because the Windows Installer records had changed by the final check. | {1} {0}개를 그대로 두었습니다. 마지막 확인 시점에는 Windows Installer 기록이 이미 바뀌어 있었기 때문입니다. |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read in the final check. | {1} {0}개를 그대로 두었습니다. 마지막 확인에서 Windows Installer 기록을 전부 읽지 못했기 때문입니다. |
-| {0} {1} kept in place, because by the final check InstallerClean could not be certain which cached files belong to the programs installed here. | {1} {0}개를 그대로 두었습니다. 마지막 확인 시점까지 InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없었기 때문입니다. |
+| {0} file held back. The scan said it was unneeded. The final check didn't agree. | {0}개 파일을 보류했습니다. 검사는 필요 없다고 했지만, 최종 확인은 생각이 달랐습니다. |
+| {0} files held back. The scan said these were unneeded. The final check didn't agree. | {0}개 파일을 보류했습니다. 검사는 필요 없다고 했지만, 최종 확인은 생각이 달랐습니다. |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | {1} {0}개를 그대로 두었습니다. 파일 안에 이름이 적힌 프로그램의 기록을 Windows가 가지고 있기 때문입니다. |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {1} {0}개를 그대로 두었습니다. InstallerClean이 파일 안에서 프로그램 이름을 찾지 못했기 때문입니다. |
 | Moved {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다. |
@@ -185,15 +181,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} files left alone | 파일 {0}개 그대로 둠 |
 | {0} unneeded file to clean up | 정리할 불필요한 파일 {0}개 |
 | {0} unneeded files to clean up | 정리할 불필요한 파일 {0}개 |
-| Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Open Details for what to do. | {InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 무엇을 해야 하는지는 세부 정보를 열어 확인하세요. |
-| Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Open Details for what to do. | {InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 무엇을 해야 하는지는 세부 정보를 열어 확인하세요. |
+| Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do. | Windows에 {InstallerFolder}에 없는 파일 {0}개의 기록이 있습니다: {1}. 평소에는 문제가 없지만 그 프로그램의 업데이트나 제거가 실패할 수 있습니다. 어떻게 할지는 세부 정보를 여세요. |
+| Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do. | Windows에 {InstallerFolder}에 없는 파일 {0}개의 기록이 있습니다: {1}. 평소에는 문제가 없지만 그 프로그램들의 업데이트나 제거가 실패할 수 있습니다. 어떻게 할지는 세부 정보를 여세요. |
 | {0} other program | 다른 프로그램 {0}개 |
 | {0} other programs | 다른 프로그램 {0}개 |
 | {0} file with no program named in the records | 기록에 프로그램 이름이 없는 파일 {0}개 |
 | {0} files with no program named in the records | 기록에 프로그램 이름이 없는 파일 {0}개 |
 | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | 이 PC에서는 InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 그 파일 하나를 목록에 올리지 않고 그대로 두었습니다. |
 | On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | 이 PC에서는 InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, {1} {0}개를 목록에 올리지 않고 그대로 두었습니다. |
-| InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. The unneeded files above are unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Re-scan to try again. | InstallerClean이 Windows 기록에 있는 모든 것을 대조하지 못해서 전부 읽지는 못했습니다. 위의 불필요한 파일은 영향을 받지 않지만, {InstallerFolder}에서 빠진 파일에 대한 설명은 전체를 담고 있지 않을 수 있습니다. 다시 검사해서 한 번 더 시도해 보세요. |
+| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | 이 PC에서는 InstallerClean이 대체된 그 파일 하나가 더 이상 필요하지 않다고 확실히 알 수 없어서, 그 파일을 그대로 두었습니다. |
+| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | 이 PC에서는 InstallerClean이 대체된 파일 {0}개가 더 이상 필요하지 않다고 확실히 알 수 없어서, 그 파일들을 그대로 두었습니다. |
 | {0} of {1} {2} | {2} {1}개 중 {0}개 |
 | {0} unneeded {1} ({2}) | 불필요한 {1} {0}개 ({2}) |
 | {0} file left alone ({1}) | 파일 {0}개 그대로 둠 ({1}) |
@@ -204,25 +201,27 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | Move {0} {1} ({2})? | {1} {0}개를 이동하시겠습니까? ({2}) |
-| Move to: | 이동할 위치: |
+| This file will be moved to: | 이 파일을 다음 위치로 옮깁니다: |
+| These files will be moved to: | 이 파일들을 다음 위치로 옮깁니다: |
 | Delete {0} {1} ({2})? | {1} {0}개를 삭제하시겠습니까? ({2}) |
-| This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. | 이 파일은 영구히 삭제됩니다. [안전하게 삭제할 수 있습니다]. 다만 백업을 원하시면 대신 이동 단추를 사용하세요. |
-| Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. | 파일들이 영구히 삭제됩니다. [안전하게 삭제할 수 있습니다]. 다만 백업을 원하시면 대신 이동 단추를 사용하세요. |
+| This file will be deleted permanently. It's safe to do but if you'd like a backup, use Move instead. | 이 파일은 영구히 삭제됩니다. 안전한 작업이지만 백업을 원하시면 대신 이동을 사용하세요. |
+| These files will be deleted permanently. It's safe to do but if you'd like a backup, use Move instead. | 이 파일들은 영구히 삭제됩니다. 안전한 작업이지만 백업을 원하시면 대신 이동을 사용하세요. |
 | That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. | 그 폴더는 같은 드라이브에 있어서, 폴더를 삭제하기 전까지는 공간이 돌아오지 않습니다. 공간을 바로 확보하려면 다른 드라이브의 폴더를 선택하세요. |
 
 ## Error messages
 
 | English | 한국어 |
 | --- | --- |
+| This is also recorded in {0}. | 이 내용은 {0}에도 기록됩니다. |
 | Access denied | 액세스 거부됨 |
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows가 InstallerClean의 접근을 거부해서 작업을 멈췄습니다. 아무것도 제거되지 않았습니다.<br><br>InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런 식으로 다시 시작해도 도움이 되지 않습니다. Windows는 무엇이 접근을 거부했는지 더 이상 알려주지 않으므로 구체적으로 시도해 볼 것이 없습니다. |
 | Couldn't read the Windows Installer records | Windows Installer 기록을 읽을 수 없습니다 |
 | Scan failed | 검사 실패 |
 | The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer 기록이 완전히 비어서 돌아왔습니다. 설치된 프로그램도, 업데이트도 캐시된 설치 파일을 하나도 요구하지 않습니다. 정상적으로 작동하는 컴퓨터에서는 이런 일이 없으므로(갓 설치한 Windows에도 그런 파일이 있습니다) 기록이 손상되었거나 읽을 수 없었던 것이고, 이 답을 그대로 믿은 검사는 {InstallerFolder}의 모든 파일을 잘못 고립된 것으로 판단했을 것입니다. InstallerClean은 그러지 않고 멈췄습니다. 아무것도 제거되지 않았습니다. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer가 InstallerClean에게 설치된 항목의 목록 표시를 허용하지 않았습니다. InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 관리자 권한으로 다시 실행해도 달라지는 것이 없습니다. 그 목록이 없으면 캐시된 파일 중 어느 것이 아직 필요한지 안전하게 알아낼 방법이 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
-| Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer가 InstallerClean에게 읽을 수 있는 설치된 프로그램 목록을 주지 못했습니다. {0}개 항목이 연속으로 읽을 수 없는 상태로 돌아왔습니다(마지막 오류 코드 {1}). 일부만 읽은 목록으로 작업하는 대신 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
-| Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
-| Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
+| Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {2} {3}, then {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer가 InstallerClean에게 읽을 수 있는 설치된 프로그램 목록을 주지 못했습니다. {2} {3}을(를) 읽은 다음 {0}개 항목이 연속으로 읽을 수 없는 상태로 돌아왔습니다(마지막 오류 코드 {1}). 일부만 읽은 목록으로 작업하는 대신 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
+| Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {2} {3}을(를) 읽은 다음 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
+| Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {2} {3}을(를) 읽은 다음 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
 | InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean이 Windows Installer 기록을 {InstallerFolder}의 내용과 대조하지 못했습니다. 기록이 가리키는 것 중 실제로 그곳에 있는 것이 거의 없고, 그곳에 있는 것 중 어떤 기록에도 이름이 없는 것이 거의 전부여서, 어떤 파일도 불필요하다고 밝힐 수 없었습니다. 아무것도 제시하지 않았고 아무것도 제거하지 않았습니다. |
 | InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean이 Windows Installer 기록을 {InstallerFolder}의 내용과 대조하지 못했습니다. 폴더에 파일은 있지만 그 안의 어떤 것도 가리키는 기록이 하나도 없어서, 어떤 파일도 불필요하다고 밝힐 수 없었습니다. 아무것도 제시하지 않았고 아무것도 제거하지 않았습니다. |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean이 무엇이 아직 필요한지 확신할 만큼 Windows Installer 기록을 읽지 못했습니다. 설치된 프로그램 목록이 일부 빠진 채로 돌아왔고, 같은 기록을 레지스트리에서 직접 읽는 것도 오류를 만났습니다. 어떤 파일을 가리키는 기록이 읽을 수 없는 것 중 하나였다는 이유만으로 그 파일이 고립된 것처럼 보일 수 있으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
@@ -260,10 +259,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Something went wrong with this file; it was left in place. | 이 파일에서 문제가 발생했습니다. 파일은 그대로 두었습니다. |
 | Something went wrong with these files; they were left in place. | 이 파일들에서 문제가 발생했습니다. 파일은 그대로 두었습니다. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | 파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}). |
-| The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | 대상 폴더는 드라이브 문자나 네트워크 공유로 시작하는 폴더의 전체 경로여야 합니다(예: D:\Backup 또는 \\server\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean이 대상 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요. |
+| The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | 백업 폴더는 드라이브 문자나 네트워크 공유로 시작하는 폴더의 전체 경로여야 합니다(예: D:\Backup 또는 \\server\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0} |
+| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요. |
 | Cannot write to {0}. | {0}에 쓸 수 없습니다. |
-| Could not find a unique filename for '{0}' after 10,000 attempts. | 10,000번 시도한 후에도 '{0}'에 대한 고유한 파일 이름을 찾을 수 없었습니다. |
+| A file called '{0}' is already in the backup folder. | '{0}'(이)라는 이름의 파일이 이미 백업 폴더에 있습니다. |
 
 ## Update check
 
@@ -325,10 +324,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Minimise | 최소화 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
-| Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them. | 불필요한 파일을 대상 폴더로 옮깁니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요. |
-| Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them. | 불필요한 파일을 대상 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그 폴더를 삭제하세요. |
-| Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them. | 불필요한 파일을 대상 폴더로 옮깁니다. 그 폴더가 같은 드라이브에 있어서, 폴더를 삭제하거나 다른 드라이브로 옮기기 전까지는 공간을 되찾지 못합니다. 아무것도 그 파일들을 필요로 하지 않는다고 확신하게 되면 그렇게 하시면 됩니다. |
-| Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away. | 불필요한 파일을 영구히 삭제합니다. 안전하게 제거할 수 있으며 공간은 바로 돌아옵니다. |
+| Move the unneeded files to the backup folder. | 불필요한 파일을 백업 폴더로 옮깁니다. |
+| Move the unneeded files to a backup folder. You'll choose it next. | 불필요한 파일을 백업 폴더로 옮깁니다. 폴더는 곧이어 선택하게 됩니다. |
+| Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder. | 불필요한 파일을 백업 폴더로 옮깁니다. 같은 드라이브에 있으므로 그 폴더를 삭제하기 전에는 공간이 확보되지 않습니다. |
+| Delete the unneeded files permanently. Use Move instead if you'd like a chance to satisfy yourself all is well. | 불필요한 파일을 영구히 삭제합니다. 모든 것이 괜찮은지 직접 확인해 보고 싶으면 대신 이동을 사용하세요. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | 내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다. |
 | Change language. The program will restart. | 언어를 변경합니다. 프로그램이 다시 시작됩니다. |
 
@@ -357,10 +356,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | If ticked, InstallerClean checks github for a newer version when you run it. | 선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다. |
 | Open the release page to download the newer version, or cancel to keep the current version. | 새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요. |
 | Opens the licence file on github.com in your browser. | 브라우저에서 github.com의 라이선스 파일을 엽니다. |
-| Backup folder | 대상 폴더 |
+| Backup folder | 백업 폴더 |
 | Patches | 패치 |
 | Product details | 제품 세부 정보 |
-| Backup folder | 대상 폴더 |
+| Backup folder | 백업 폴더 |
 | Operation progress | 작업 진행 상황 |
 | Scan {InstallerFolder} again | {InstallerFolder} 다시 검사 |
 | Scanning progress | 검사 진행 상황 |
@@ -440,9 +439,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found no unneeded files. | 불필요한 파일을 찾지 못했습니다. |
 | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 파일 하나({2})를 그대로 두었습니다. |
 | InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 제시할 수도 있었던 {1} {0}개({2}) 전부를 그대로 두었습니다. |
-| Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but a repair, update or uninstall can fail on it. Running that program's installer again, preferably the same version, usually restores the file. | {InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 그 프로그램의 설치 관리자를, 되도록 같은 버전으로 다시 실행하면 대개 파일이 복구됩니다. |
-| Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but a repair, update or uninstall can fail on them. Running each program's installer again, preferably the same version, usually restores the files. | {InstallerFolder}에 없는 파일 {0}개에 대한 기록이 Windows에 있습니다: {1}. 평소에는 문제가 되지 않지만, 복구나 업데이트, 제거가 이 때문에 실패할 수 있습니다. 각 프로그램의 설치 관리자를, 되도록 같은 버전으로 다시 실행하면 대개 파일이 복구됩니다. |
-| InstallerClean couldn't match up everything in the Windows records, so it didn't read all of them. What it found is unaffected, but what it says about files missing from {InstallerFolder} may be short of the full picture. Running it again may pick up more. | InstallerClean이 Windows 기록에 있는 모든 것을 대조하지 못해서 전부 읽지는 못했습니다. 찾아낸 것은 영향을 받지 않지만, {InstallerFolder}에서 빠진 파일에 대한 설명은 전체를 담고 있지 않을 수 있습니다. 다시 실행하면 더 찾아낼 수도 있습니다. |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it. | 이 PC에서 InstallerClean은 캐시에 있는 어떤 파일이 여기 설치된 프로그램의 것인지 확신할 수 없어서, 그 파일 하나({2})를 목록에 올리지 않고 보류했습니다. |
+| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them. | 이 PC에서 InstallerClean은 캐시에 있는 어떤 파일이 여기 설치된 프로그램의 것인지 확신할 수 없어서, {0} {1}({2})을 목록에 올리지 않고 보류했습니다. |
+| Why it couldn't be certain: | 확신할 수 없었던 이유: |
+|   A file path in Windows Installer's own records wouldn't resolve. |   Windows Installer 자체 기록에 있는 파일 경로를 확인할 수 없었습니다. |
+|   The identity of a file named in Windows Installer's records wouldn't read. |   Windows Installer 기록에 나온 파일의 신원을 읽을 수 없었습니다. |
+|   A program may be installed more than once on this PC. |   이 PC에 같은 프로그램이 두 번 이상 설치되어 있을 수 있습니다. |
+| Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows에 {InstallerFolder}에 없는 파일 {0}개의 기록이 있습니다: {1}. 평소에는 문제가 없지만 그 프로그램의 업데이트나 제거가 실패할 수 있습니다. 파일을 되돌리려면 지금 사용 중인 버전의 설치 프로그램이 필요합니다. 프로그램 제작사에서 구해 기존 설치본 위에 실행하세요. 더 새 버전으로는 되지 않습니다. 새 버전은 먼저 지금 있는 것을 제거해야 하는데, 바로 그 단계에 이 파일이 필요하기 때문입니다. 먼저 제거하는 방법도 같은 이유로 되지 않습니다. 이렇게 하면 파일이 복원되고 설정은 그대로 남아야 하지만, Microsoft가 보장하지는 않습니다. |
+| Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows에 {InstallerFolder}에 없는 파일 {0}개의 기록이 있습니다: {1}. 평소에는 문제가 없지만 그 프로그램들의 업데이트나 제거가 실패할 수 있습니다. 파일을 되돌리려면 그 프로그램의 지금 사용 중인 버전의 설치 프로그램이 필요합니다. 프로그램 제작사에서 구해 기존 설치본 위에 실행하세요. 더 새 버전으로는 되지 않습니다. 새 버전은 먼저 지금 있는 것을 제거해야 하는데, 바로 그 단계에 그 파일이 필요하기 때문입니다. 먼저 제거하는 방법도 같은 이유로 되지 않습니다. 이렇게 하면 파일이 복원되고 설정은 그대로 남아야 하지만, Microsoft가 보장하지는 않습니다. |
+| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | 이 PC에서는 InstallerClean이 대체된 그 파일 하나가 더 이상 필요하지 않다고 확실히 알 수 없어서, 그 파일을 그대로 두었습니다. |
+| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | 이 PC에서는 InstallerClean이 대체된 파일 {0}개가 더 이상 필요하지 않다고 확실히 알 수 없어서, 그 파일들을 그대로 두었습니다. |
 | Deleting {0} unneeded {1}... | 불필요한 {1} {0}개 삭제 중... |
 | Permanently deleted {0} unneeded {1}. | 불필요한 {1} {0}개를 영구 삭제했습니다. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.) |
@@ -453,12 +459,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: something is using Windows Installer right now, such as a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | 오류: 지금 무언가가 Windows Installer를 사용하고 있습니다. Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램일 수 있습니다. 그동안 /m과 /d는 차단됩니다. 끝나면 다시 시도하세요. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | 오류: 이 컴퓨터에 이전 Windows Installer 트랜잭션이 중단된 채 남아 있습니다. {InstallerFolder}를 정리하기 전에 그 설치를 계속하거나 되돌리세요(또는 Windows를 다시 시작하세요). |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | 오류: 재시작 후에 처리하도록 대기열에 든 파일 작업이 {InstallerFolder}를 대상으로 합니다({0}). 정리하기 전에 Windows를 다시 시작해 그 작업을 끝내세요. |
+| Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning. | 오류: 다음 재시작을 위해 예약된 파일 작업이 있는데 InstallerClean은 그 작업이 어떤 파일을 가리키는지 알 수 없으므로, {InstallerFolder}를 배제할 수 없습니다. 정리하기 전에 Windows를 다시 시작하세요. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | 오류: Windows Installer가 진행 중인 작업이 있어 /m과 /d가 차단되었습니다. InstallerClean은 변경 중인 {InstallerFolder}를 건드리지 않습니다. 끝나면 다시 시도하세요. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | 오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 삭제하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | 오류: 두 프로그램이 설치된 소프트웨어를 동시에 변경하지 못하도록 하는 Windows Installer 잠금을 InstallerClean이 가져오지 못해서, 작업 도중에 어떤 파일이 필요해지지 않는다고 확신할 수 없었습니다. 아무것도 이동하지 않았습니다. 다시 시도해 보시고, 계속 이러면 Windows를 다시 시작하세요. |
 | Moving {0} unneeded {1} to {2}... | 불필요한 {1} {0}개를 {2}(으)로 이동 중... |
 | Moved {0} unneeded {1}. | 불필요한 {1} {0}개를 이동했습니다. |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean이 대상 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요. |
+| Check that your programs still update and uninstall as normal, then delete {0}. | 프로그램이 여전히 정상적으로 업데이트되고 제거되는지 확인한 다음 {0}을(를) 삭제하세요. |
+| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 다른 InstallerClean 프로세스가 단일 인스턴스 잠금을 보유하고 있습니다(GUI 또는 다른 CLI 실행). 종료 코드 75(일시적); 나중에 다시 시도해도 안전합니다. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 참고: 이벤트 로그 쓰기에 실패했습니다. 응용 프로그램 로그 권한 또는 그룹 정책을 확인하세요. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - {InstallerFolder} 정리 |
@@ -469,7 +477,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  버전 출력 (-v도 사용 가능) |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         검사만 - 불필요한 파일 나열 |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         불필요한 파일 영구 삭제 |
-|   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         저장된 대상 폴더로 이동 |
+|   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         저장된 백업 폴더로 이동 |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 경로    지정한 경로로 이동 |
 | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli는 끝날 때까지 프롬프트를 붙잡고 있으므로 스크립트나<br>예약 작업이 이를 기다릴 수 있습니다. |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | 폴더는 사용자별 저장. 예약 또는 SYSTEM 실행에는 /m 경로 필요. |

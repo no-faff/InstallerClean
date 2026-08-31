@@ -244,15 +244,15 @@ const MAP = {
   'Tooltip.Minimise': `Minimise`,
   'Tooltip.SendResultLog': `Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm.`,
   'Tooltip.SendResultLog.NothingFound': `Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.`,
-  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
-  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. Use Move instead if you'd like a chance to satisfy yourself all is well.`,
   'Tooltip.SigningCertificate': `Subject name from the embedded Authenticode certificate. Not chain-verified.`,
 
   // Body copy
   'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}).`,
-  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.`,
+  'Body.MainExplanation.Action': `Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now.`,
   'Body.NotScanned.Lead': `Nothing scanned yet.`,
   'Body.NotScanned.Why': `Press Re-scan to look through {InstallerFolder} for installer files that no program still needs.`,
   'Body.PendingReboot.Lead': `These files can't be cleaned up right now.`,
@@ -263,9 +263,7 @@ const MAP = {
   'Body.NoFileSelected': `Select a file to view details.`,
   'Body.NoProductSelected': `Select a product to view details.`,
   'Body.NoMetadata': `No metadata available.`,
-  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.
-
-To put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.\n\nTo put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `The README [explains this folder], and how to recover a file, in Microsoft's own words.`,
   'Body.NoPatches': `(none)`,
 
@@ -312,7 +310,6 @@ To put it back, you need the installer for the version you already have. Get it 
 
   // Completion screen
   'Completion.AllClean': `All clean`,
-  'Completion.NothingRemoved': `Nothing removed`,
   'Completion.NothingToCleanUp': `Nothing to clean up in {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `Scanned {0} {1} in {2}`,
 
@@ -390,9 +387,9 @@ To put it back, you need the installer for the version you already have. Get it 
   'Error.ScanFailedTitle': `Scan failed`,
   'Error.InstallerDbEmpty': `The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed.`,
   'Error.MsiAccessDenied': `Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed.`,
-  'Error.MsiNonSuccess': `Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.`,
-  'Error.MsiEnumerationNeverEnded': `Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.`,
-  'Error.MsiPatchEnumerationNeverEnded': `Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.`,
+  'Error.MsiNonSuccess': `Windows Installer couldn't give InstallerClean a readable list of the installed programs: it read {2} {3}, then {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.`,
+  'Error.MsiEnumerationNeverEnded': `Windows Installer never signalled the end of the list of installed programs: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.`,
+  'Error.MsiPatchEnumerationNeverEnded': `Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.`,
   'Error.ScanCorrelationFailed': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed.`,
   'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
@@ -472,7 +469,7 @@ To put it back, you need the installer for the version you already have. Get it 
   'Error.CannotWriteFolder': `Cannot write to {0}.`,
 
   // 0 = file name
-  'Error.DestinationCollision': `Could not find a unique filename for '{0}' after 10,000 attempts.`,
+  'Error.DestinationCollision': `A file called '{0}' is already in the backup folder.`,
 
   // Result log (post-cleanup diagnostic send)
   'ResultLog.Sending': `Sending...`,
@@ -571,12 +568,12 @@ To put it back, you need the installer for the version you already have. Get it 
   'Tooltip.ChangeLanguage': `Change language. The program will restart.`,
   'Automation.ChangeLanguage': `Change language`,
   'Automation.ChangeLanguage.HelpText': `The program will restart.`,
-  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
-  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
-  'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder.`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's safe to do but if you'd like a backup, use Move instead.`,
+  'Confirm.DeletePermanently.Plural': `These files will be deleted permanently. It's safe to do but if you'd like a backup, use Move instead.`,
   'Cli.TooManyArgumentsNoPath': `Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.`,
-  'Cli.MissingFromDisk.Singular': `Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.`,
-  'Cli.MissingFromDisk.Plural': `Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.`,
+  'Cli.MissingFromDisk.Singular': `Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.`,
+  'Cli.MissingFromDisk.Plural': `Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
   'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
@@ -596,6 +593,20 @@ To put it back, you need the installer for the version you already have. Get it 
   'Cli.NothingOffered.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.`,
   'Cli.NothingOffered.Plural': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.`,
 
+  'Body.PendingReboot.PendingRenameUnresolved': `A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning.`,
+  'Error.ScanStoppedDetails': `This is also recorded in {0}.`,
+  'Completion.MoveRestoreHint': `Delete that folder when you're satisfied all is well.`,
+  'Completion.MoveRestoreHintSameDrive': `Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do.`,
+  'Confirm.MoveDestination.Singular': `This file will be moved to:`,
+  'Confirm.MoveDestination.Plural': `These files will be moved to:`,
+  'Cli.NothingListed.Singular': `On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it.`,
+  'Cli.NothingListed.Plural': `On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them.`,
+  'Cli.WithheldReasons.Header': `Why it couldn't be certain:`,
+  'Cli.WithheldReasons.RecordedPath': `  A file path in Windows Installer's own records wouldn't resolve.`,
+  'Cli.WithheldReasons.FileIdentity': `  The identity of a file named in Windows Installer's records wouldn't read.`,
+  'Cli.WithheldReasons.SecondInstance': `  A program may be installed more than once on this PC.`,
+  'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning.`,
+  'Cli.MoveRestoreHint': `Check that your programs still update and uninstall as normal, then delete {0}.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

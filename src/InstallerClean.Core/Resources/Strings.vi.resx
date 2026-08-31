@@ -329,31 +329,53 @@
 
        "The backup folder", not "your backup folder": one "you're" in the
        sentence is enough and "the" has its referent in the field label
-       directly above. All three end on the same instruction, that deleting
-       the folder is what finishes the job, because the screen never said so
-       and a real user moved his files, watched nothing break for weeks and
-       still did not know he was done. -->
-  <data name="Tooltip.Move" xml:space="preserve"><value>Chuyển các tệp không cần thiết vào thư mục sao lưu. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.</value></data>
+       directly above. All three say when to delete the backup folder, that
+       being what finishes the job, and the screen never said so anywhere
+       else. Somebody who moves their files and sees nothing break for a
+       fortnight has done the whole check this app can offer, and the natural
+       next thought is that they will get round to the folder sometime. These
+       lines tell them that is the last step rather than an optional tidy-up.
+       The same-drive state reaches it through the space it is holding on to;
+       the other two state it plainly.
+
+       THIS ONE SAYS NOTHING ABOUT SPACE, AND IT IS THE STATE THE BUTTON IS IN
+       WHENEVER THE APP HAS NOT BEEN TOLD THE FOLDER IS ON THIS DRIVE. That
+       covers three answers: a folder Windows has placed elsewhere, a volume
+       question still in flight, and one Windows will not answer at all. The
+       value is true of every one of them, which is what lets a single wording
+       serve all three. Where the space goes is explained on the main window
+       above the buttons rather than asserted in a hover. -->
+  <data name="Tooltip.Move" xml:space="preserve"><value>Chuyển các tệp không cần thiết vào thư mục sao lưu.</value></data>
   <!-- The Move button's tooltip while the backup folder box is empty. The
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
        for one to be set first. "A" and not "the" because there is no folder
        yet, and the browser is named early because that is what a
        screen-reader user most needs to know before pressing. -->
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Chuyển các tệp không cần thiết vào một thư mục sao lưu. Bạn sẽ chọn thư mục ngay sau đây. Hãy xóa thư mục đó khi bạn đã yên tâm rằng không gì cần đến chúng.</value></data>
-  <!-- The same-drive state. It exists to give a matched pair with
-       Tooltip.Delete on the one trade the user is actually making: hover
-       Delete and the space comes back at once, hover Move with a folder on
-       the same drive and it comes back when that folder goes. Same verb,
-       same promise, different timing, both readable before either button is
-       pressed. Distinct from Confirm.MoveSameDrive, which says a related
-       thing after the choice has been made. -->
-  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Chuyển các tệp không cần thiết vào thư mục sao lưu. Thư mục đó nằm trên cùng một ổ đĩa, nên bạn chỉ lấy lại dung lượng sau khi xóa nó hoặc chuyển nó sang ổ đĩa khác. Bạn có thể làm vậy khi đã yên tâm rằng không gì cần đến chúng.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Chuyển các tệp không cần thiết vào một thư mục sao lưu. Bạn sẽ chọn thư mục ngay sau đây.</value></data>
+  <!-- The same-drive state, and the only Move state that says anything about
+       space. It is the one case where the outcome is not what a reader
+       expects of a move, so it is worth saying before the button is pressed
+       rather than only on the finished screen. Shown only once Windows has
+       said the folder is on this volume, never while the question is open.
+       Distinct from Confirm.MoveSameDrive, which says a related thing after
+       the choice has been made. -->
+  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Chuyển các tệp không cần thiết vào thư mục sao lưu. Thư mục đó nằm trên cùng ổ đĩa, nên dung lượng chỉ được giải phóng sau khi bạn xóa thư mục đó.</value></data>
   <!-- The Delete button's tooltip and its screen-reader help text, one
-       value feeding both. "Reclaim" rather than a synonym because it is
-       already the app's word for this: the reports chart says "Space
-       reclaimed from C:\Windows\Installer". -->
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Xóa vĩnh viễn các tệp không cần thiết. Chúng có thể bỏ đi an toàn, và bạn lấy lại dung lượng ngay lập tức.</value></data>
+       value feeding both.
+
+       IT POINTS AT THE OTHER BUTTON, WHICH IS THE WHOLE OF WHY IT IS WORDED
+       THIS WAY. Move is the route by which a person can satisfy themselves
+       before anything is permanent, so the tooltip on the irreversible button
+       is where saying so is worth most. "Move" names the button rather than
+       the act, as Confirm.DeletePermanently already does.
+
+       IT SAYS NOTHING ABOUT SPACE AND NOTHING ABOUT SAFETY. Both are on the
+       main window above these buttons, where they are explained rather than
+       asserted in a hover, and the safety claim there carries the link into
+       the README that lets a reader check it. The delete confirmation states it
+       too, and is the last surface before the act. -->
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Xóa vĩnh viễn các tệp không cần thiết. Hãy dùng Chuyển nếu bạn muốn có cơ hội tự mình yên tâm rằng mọi thứ đều ổn.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi.</value></data>
 
   <!-- Body copy -->
@@ -366,8 +388,8 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). TWO PLACEHOLDERS, ONE PER CAUSE THE OFFER CAN CONTAIN: {0} is Reason.Orphaned and {1} is Reason.Superseded, the only two labels the scan sets (FileSystemScanService, the walked-file branch and the superseded-patch branch). Reason.Obsoleted is still passed as {2} by MainViewModel and is deliberately unused here: an obsoleted registration is counted at scan time and never offered, so naming that cause on this screen would describe a file the list cannot hold. Carrying the labels as placeholders means a translator edits each one in a single place and this sentence follows. THE OPENING CLAUSE CARRIES THE EPISTEMICS FOR BOTH HALVES: it says what the app asked, so what follows is read as the answer it got and not as an assertion about the machine. IT PARTITIONS BECAUSE THE SET HAS TWO CAUSES, and a sentence naming one of them is false of the other half: an orphan is offered because no registration claims its file, and a superseded patch is offered BECAUSE a registration does claim it and reports the patch replaced. THE SECOND CLAUSE'S ROLLBACK HALF IS NOT A RESTATEMENT OF ITS FIRST and must not be dropped as one in any language: replaced is not finished with, since uninstalling whatever replaced the patch can roll back onto it and reach for this exact file, which is the condition that decides whether a superseded patch is offered at all. The single-cause sentence this replaces was true only while the superseded class was withheld, which is a state no released version was ever in. BOTH CLAUSES ARE ABOUT THE ANSWER THE APP RECEIVED AND NOT ABOUT THE STATE OF THE MACHINE, which is the weaker claim and the one that stays true whatever an enumeration cannot see, so it is kept rather than tightened. The wording this replaces gave two reasons for that framing and neither survives at 3.0.0: the instance-code reading lost its subject once nothing read inside a cached file any more (see InstanceProductCount, which says so in its own words), and a recorded path spelled in a form the folder walk never produces is expanded and handled from 3.0.0 rather than guarded against (see NormaliseLocalPackagePath). The framing outlives its old reasons. Translations must keep both clauses statements about what came back; a rendering that says outright that Windows has no record of the file makes a claim about the machine that this wording exists to avoid.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. If anything does go wrong, put them back into {InstallerFolder} under the names they had. Or delete them permanently now.</value>
-    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND BOTH OPERATIONS ARE NAMED ON PURPOSE: update and uninstall are what a cached package is kept for, so somebody who has done both and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. REPAIR WAS THE THIRD AND CAME OUT ON A MEASUREMENT RATHER THAN ON CAUTION. A repair does not read the cached file: on one real machine seven of eight products failed a repair with the file present and one succeeded with it absent. So the check established nothing about what this app had done, and it fails often for reasons that predate the app entirely. Somebody following the old instruction, meeting a failed repair and concluding InstallerClean had broken their machine, is the worst thing this sentence could have produced. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. THE THIRD SENTENCE IS AN INSTRUCTION AND NOT A PROMISE, WHICH IS A CORRECTION RATHER THAN A HEDGE. It read "Putting them back into {InstallerFolder} restores everything", which promises an outcome nothing on this screen can see. A cached package counts as present if and only if its recorded LocalPackage path exists, so the name is the whole of what makes a restore work, and "under the names they had" is the part a reader has to get right. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README, which the bracketed phrase in the lead links to. The button order is a separate matter and does not govern this line.</comment>
+    <value>Hãy chuyển chúng vào một thư mục sao lưu do bạn chọn, rồi xóa thư mục đó khi bạn đã yên tâm rằng các chương trình của mình vẫn cập nhật và gỡ cài đặt bình thường. Đưa chúng trở lại {InstallerFolder} sẽ khôi phục mọi thứ. Hoặc xóa vĩnh viễn ngay bây giờ.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). MOVE IS NAMED FIRST AND DELETE LAST, REVERSING WHAT THIS LINE USED TO DO, and the reason is not doubt about the offer: the lead above says these files are safe to delete and that claim stands at full strength. It is that Move is the only route by which a person can satisfy themselves, and the app had never told anybody how, leaving a real user to work it out for himself and say so in public. THE MIDDLE CLAUSE IS THE WHOLE OF THAT INSTRUCTION AND BOTH OPERATIONS ARE NAMED ON PURPOSE: update and uninstall are what a cached package is kept for, so somebody who has done both and seen nothing break has exercised the thing the file exists for. Naming fewer leaves a person guessing what else to try. REPAIR IS DELIBERATELY NOT AMONG THEM, AND THE REASON IS WHAT A REPAIR ACTUALLY DOES. It does not read the cached package, so it can fail with the file present and succeed with it absent, which makes it silent about anything this app has done, and it fails for reasons that predate the app entirely. Somebody sent to try one, meeting a failure and concluding InstallerClean had broken their machine, is the worst thing this sentence could produce. "Then delete that folder" is the finish and must survive translation: without it the advice is to move files somewhere and keep them for ever, which reclaims nothing and is not what Move is for. THE THIRD SENTENCE STATES THE RESTORE PLAINLY AND CARRIES NO CONDITION, WHICH IS THE SAME DECISION AS THE ONE BELOW RATHER THAN A SEPARATE ONE: opening it with a condition, on the order of "if anything does go wrong", sits three lines under the lead's safe-to-delete claim and argues with it. WHAT MAKES THE PLAIN FORM HONEST IS IN THE MOVE ITSELF. A cached package counts as present if and only if its recorded LocalPackage path exists, so the name is the whole of what makes a restore work, and Move never renames: the file carries its own name into the backup folder, a name already taken there is refused rather than worked around, and every file on the offer sits directly in the cache folder, whichever half of the scan found it, because CandidateGuard.CheckSafeToRemove admits nothing else. Every file that moved therefore goes back to the exact path it came from, so the reader has nothing to get right and the line does not ask them to. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before. NO QUALIFIER BELONGS ON THIS LINE, and a draft carrying one was rejected rather than never written. It would have sat three lines under the safe-to-delete claim and argued with it, and attaching it to Delete alone would imply Move protects against something the app declines to name, which is the shape a rival would have chosen. The screen's safety claim is ONE decision across the lead and this line and not two: anything that hedged here would have had to weaken the lead in the same pass. The limit is stated once, in the README, which the bracketed phrase in the lead links to. The button order is a separate matter and does not govern this line.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
     <value>Chưa quét gì cả.</value>
@@ -381,7 +403,7 @@
     <value>Hiện chưa thể dọn những tệp này.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
-  <!-- The three reason-specific banners. Each names the folder with the
+  <!-- The reason-specific banners. Each names the folder with the
        {InstallerFolder} token, like every other line in the app that names it:
        they are read at the one moment the buttons are dead, by somebody who
        may not know what an MSI is, so "the cache" was a term the app used here
@@ -389,22 +411,30 @@
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Có thứ gì đó đang dùng Windows Installer ngay lúc này, chẳng hạn một bản cập nhật Windows hoặc một chương trình đang cài trong nền. Chuyển và Xóa tạm dừng trong lúc đó, để InstallerClean không đụng vào {InstallerFolder} khi thư mục đang thay đổi. Xong rồi thì quét lại, hai nút sẽ trở lại.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Máy này có một giao dịch Windows Installer trước đó đang bị treo. Hãy tiếp tục hoặc hoàn tác lần cài đặt ấy (hoặc khởi động lại Windows) trước khi dọn {InstallerFolder}.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows đã xếp hàng một thao tác đổi tên tệp cho lần khởi động tới, có ảnh hưởng tới {InstallerFolder}. Hãy khởi động lại Windows trước khi dọn.</value></data>
-  <!-- The fourth arm, for a reason the app can detect but has no line of its
+  <!-- The banner for an entry the gate cannot place. Names the folder with the
+       {InstallerFolder} token like the rest of the family. It states what the machine
+       holds, a queued file operation, and stops there: nothing here has shown that
+       Windows Installer is running or that an install is suspended, so the two banners
+       that say so would both be untrue, and Body.PendingReboot.Other says something is
+       in progress and would be untrue as well. The restart is the instruction because
+       these operations are carried out at the next boot and not before. -->
+  <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>Có một thao tác tệp đang xếp hàng chờ lần khởi động lại tới và InstallerClean không biết được thao tác đó nêu tên những tệp nào, nên không thể loại trừ khả năng chúng nằm trong {InstallerFolder}. Hãy khởi động lại Windows trước khi dọn dẹp.</value></data>
+  <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
        property throwing produces: WPF swallows it as a binding error and paints
        nothing. It says what is true of every reason in that family, that
        something is in progress and the buttons come back afterwards, and says
-       nothing it cannot know. Names the folder with the token like its three
-       siblings. -->
+       nothing it cannot know. Names the folder with the token like the rest of
+       the family. -->
   <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer đang có việc dở dang, nên Chuyển và Xóa tạm dừng. InstallerClean sẽ không đụng vào {InstallerFolder} khi thư mục đang thay đổi. Xong rồi thì quét lại, hai nút sẽ trở lại.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Chọn một tệp để xem chi tiết.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Chọn một sản phẩm để xem chi tiết.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Không có siêu dữ liệu.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>This installer file is missing. It causes no trouble now, and won't until the day you try to update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.
+    <value>Thiếu tệp cài đặt này. Hiện tại nó không gây rắc rối gì, và sẽ không gây rắc rối cho tới ngày bạn thử cập nhật hoặc gỡ cài đặt chương trình mà nó thuộc về. Khi đó bước này có thể thất bại, vì Windows tìm tệp này mà không thấy.
 
-To put it back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it.</value>
+Để đưa nó trở lại, bạn cần bộ cài của đúng phiên bản bạn đang có. Hãy lấy từ nhà sản xuất chương trình và chạy đè lên bản đang cài. Phiên bản mới hơn không dùng được: nó phải gỡ bản bạn đang có trước, và chính bước đó mới cần tệp này. Gỡ cài đặt trước cũng không được, vì cùng lý do. Việc này sẽ khôi phục tệp và giữ nguyên các thiết lập của bạn, nhưng Microsoft không bảo đảm điều đó.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -505,7 +535,7 @@ To put it back, you need the installer for the version you already have. Get it 
        is on a card that goes when the window does, so the same text is written to
        the crash log and this line says where. Only shown where the write
        succeeded. 0 = the full path of the log file. -->
-  <data name="Error.ScanStoppedDetails" xml:space="preserve"><value>This is also recorded in {0}.</value></data>
+  <data name="Error.ScanStoppedDetails" xml:space="preserve"><value>Điều này cũng được ghi lại trong {0}.</value></data>
   <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Quét thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
 
   <!-- Completion screen -->
@@ -601,6 +631,41 @@ To put it back, you need the installer for the version you already have. Get it 
        had to explain a button press that did nothing, where those explained an empty
        list. It went with the cached-package identity check and did not come back with
        them: nothing refuses a confirmed batch that way now. -->
+  <!-- The line under the post-Move summary, in its two forms: the backup folder
+       is on another drive, or on the drive the files came from. Delete has no
+       counterpart, and deliberately: nothing is left in a folder after a delete,
+       so there is no next step to name.
+
+       IT ENDS ON THE INSTRUCTION, BECAUSE FINISHING THE JOB IS THE PART PEOPLE
+       LEAVE UNDONE. A user moved his files, watched nothing break for weeks and
+       then wrote that at some point he could probably delete them. The folder is
+       the backup for exactly as long as it exists, and deleting it is what turns
+       a move into reclaimed space, so the line says when to do that rather than
+       leaving the reader to decide what "at some point" means.
+
+       IT ECHOES THE DELETE BUTTON'S TOOLTIP ON PURPOSE. That tooltip offers Move
+       to anybody who would like a chance to satisfy themselves all is well, and
+       this is the screen they reach by taking it, so the same words close the
+       loop they opened.
+
+       FLAT AT ANY COUNT, like Confirm.MoveSameDrive and unlike the summary line
+       above it. Both forms talk about the folder and the space rather than about
+       files, so there is no count-dependent noun to agree with and no singular
+       to recast.
+
+       NO BRACKETED PHRASE, SO NO LINK. BuildCompletionRestoreLine renders a
+       plain run when CompositionParsing.SplitAtBracketedPhrase finds no
+       bracketed phrase, so these values alone decide whether there is one. The
+       app's link into the README's "Is it safe?" section is on the main window,
+       which is the screen behind this one and the screen a reader returns to. -->
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Hãy xóa thư mục đó khi bạn đã yên tâm rằng mọi thứ đều ổn.</value></data>
+  <!-- The same line where the backup folder is on the drive the files came
+       from. A same-drive move is a rename, so it reclaims nothing until the
+       folder goes; that is the one fact this variant adds, and it is the only
+       completion line in the app that has to explain why the disk did not get
+       emptier. It pairs with the heading above it, which reads "moved" rather
+       than "freed" for the same reason. -->
+  <data name="Completion.MoveRestoreHintSameDrive" xml:space="preserve"><value>Hãy xóa thư mục đó khi bạn đã yên tâm rằng mọi thứ đều ổn. Chỉ khi đó dung lượng mới thực sự được giải phóng.</value></data>
   <!-- Headline size figures. "freed" is used where space is genuinely
        reclaimed at that instant: a Delete, and a Move to another volume, which
        frees the system drive. A same-volume Move reads "moved", a rename
@@ -674,8 +739,8 @@ To put it back, you need the installer for the version you already have. Get it 
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file held back. The scan said it was unneeded. The final check didn't agree.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files held back. The scan said these were unneeded. The final check didn't agree.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>Đã giữ lại {0} tệp. Lần quét cho rằng nó không cần thiết. Lần kiểm tra cuối không đồng ý.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>Đã giữ lại {0} tệp. Lần quét cho rằng chúng không cần thiết. Lần kiểm tra cuối không đồng ý.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -783,8 +848,8 @@ To put it back, you need the installer for the version you already have. Get it 
        trouble day to day" and "can fail", never "will". Microsoft guarantees
        nothing here. Details carries the recovery step, which is why this closes
        by sending the reader there rather than trying to give it. -->
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Windows có hồ sơ về {0} tệp không nằm trong {InstallerFolder}: {1}. Trong sử dụng hằng ngày điều này không gây rắc rối, nhưng việc cập nhật hoặc gỡ cài đặt chương trình đó có thể thất bại. Hãy mở Chi tiết để biết cần làm gì.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>Windows có hồ sơ về {0} tệp không nằm trong {InstallerFolder}: {1}. Trong sử dụng hằng ngày điều này không gây rắc rối, nhưng việc cập nhật hoặc gỡ cài đặt các chương trình đó có thể thất bại. Hãy mở Chi tiết để biết cần làm gì.</value></data>
   <!-- The two tails of that program list, and they are SEPARATE because they are
        different findings. The first is a program this app can name and had no
        room for; the second is a registration nothing named at all, which is the
@@ -862,8 +927,8 @@ To put it back, you need the installer for the version you already have. Get it 
        count itself, so the line could appear on a machine holding back no
        superseded file at all and tell its owner something had been kept back. See
        ScanViewModel.HasSupersededHeldBack. -->
-  <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
-  <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
+  <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>Trên máy này, InstallerClean không thể chắc chắn rằng tệp bị thay thế duy nhất đó không còn cần đến nữa, nên đã giữ lại nó.</value></data>
+  <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>Trên máy này, InstallerClean không thể chắc chắn rằng {0} tệp bị thay thế không còn cần đến nữa, nên đã giữ lại chúng.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -890,19 +955,48 @@ To put it back, you need the installer for the version you already have. Get it 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Chuyển {0} {1} ({2})?</value></data>
+  <!-- The Move confirmation's destination label. It runs straight into the
+       path on the line below and is read as one sentence with it, so it ends on
+       a colon and carries no full stop. Split singular/plural for its subject,
+       which is the only part that agrees.
+
+       IT DOES NOT USE THE WORD "MOVE", AND THAT IS WHAT IT IS FOR. The title
+       above asks the question with the verb in it and the affirmative button
+       carries it again, so a label naming the verb a third time made every line
+       on a three-line card say the same word.
+
+       NEITHER FORM TAKES A PLACEHOLDER. ConfirmMoveWindow hands the chosen
+       string to a TextBlock raw and it never reaches string.Format, so a {0}
+       written here is painted on the dialog. CountedStringTests holds this
+       prefix in its unformatted set for that reason.
+
+       The path is appended to this label for the screen-reader announcement as
+       well, in the order the card reads, so the join has to work in every
+       language. -->
+  <data name="Confirm.MoveDestination.Singular" xml:space="preserve"><value>Tệp này sẽ được chuyển tới:</value></data>
+  <data name="Confirm.MoveDestination.Plural" xml:space="preserve"><value>Các tệp này sẽ được chuyển tới:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Xóa {0} {1} ({2})?</value></data>
   <!-- The delete confirmation's body, split singular/plural like every other
        count-bearing line in the app.
 
-       It carries the bracketed link even though no confirmation dialog did
-       before, and for a reason particular to this one: the dialog is modal, so
-       the main window's own "safe to delete" link is visible behind it and
-       cannot be clicked. Without a link here the claim is unreachable at the
-       one moment it is load-bearing.
+       THE CLAIM IS HERE AND IT IS THE LAST PLACE IT IS MADE. The button
+       tooltips behind this dialog say nothing about safety, so between the main
+       window and the files going this card is the only surface that states it,
+       and it states it at the moment somebody is relying on it. The main window
+       carries the same claim and links it into the README's "Is it safe?"
+       section for a reader who wants to weigh it first.
 
-       "But" and not "and": offering the backup concedes something to the
-       sentence before it. "The Move button", not bare "Move", so "use Move"
-       is read as a button and not as a second verb in the same sentence.
+       "IT'S SAFE TO DO" AND NOT "THEY'RE SAFE TO DELETE". The subject is the
+       act this dialog is confirming rather than the files, which is what lets
+       one clause serve the singular and the plural without agreeing with
+       anything. The button is named bare, without "the" or "button" after it,
+       which is how every screen in the app names one.
+
+       NO SQUARE-BRACKETED PHRASE BELONGS HERE IN ANY LANGUAGE. Brackets are
+       what CompositionParsing turns into a hyperlink, and this dialog is modal
+       over a window already carrying that link, so a bracketed phrase here puts
+       two copies of one link on screen together, one live and one behind glass
+       that cannot be clicked.
 
        "THESE FILES" AND NOT A BARE "FILES", WHICH IS WHAT THE PLURAL CARRIED.
        The singular was written fresh in the same commit and says "This file";
@@ -915,8 +1009,8 @@ To put it back, you need the installer for the version you already have. Get it 
        raw and it never reaches string.Format, so a {0} written here is painted
        on the dialog. CountedStringTests holds this prefix in its unformatted
        set for that reason. -->
-  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>Tệp này sẽ bị xóa vĩnh viễn. Nó [có thể xóa an toàn], nhưng nếu bạn muốn có bản sao lưu thì hãy dùng nút Chuyển.</value></data>
-  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>These files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
+  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>Tệp này sẽ bị xóa vĩnh viễn. Việc này an toàn, nhưng nếu bạn muốn có bản sao lưu thì hãy dùng Chuyển.</value></data>
+  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>Các tệp này sẽ bị xóa vĩnh viễn. Việc này an toàn, nhưng nếu bạn muốn có bản sao lưu thì hãy dùng Chuyển.</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only
@@ -951,17 +1045,37 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer không cho phép InstallerClean liệt kê những gì đã được cài. InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại với quyền quản trị viên cũng không thay đổi được gì. Không có danh sách đó thì không có cách nào an toàn để biết tệp nào trong bộ nhớ đệm vẫn còn cần, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
-       to look it up). -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer không thể đưa cho InstallerClean một danh sách chương trình đã cài đọc được: {0} mục liên tiếp trả về không đọc được (mã lỗi cuối {1}). Thay vì làm việc với một danh sách chỉ đọc được một phần, InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+       to look it up), 2 = how many programs were read cleanly before
+       the run of failures began, 3 = the noun for that count.
+
+       2 AND 3 ARE THE PAIR THAT MAKES THIS ACTIONABLE. The failure
+       count is a fixed threshold and reads the same on every machine
+       that reaches it; how far the enumeration got first does not, and
+       that is what somebody helping needs. Reading none and reading two
+       hundred are different situations with different answers, and this
+       count is what tells them apart. Zero is a real value and reads
+       correctly: "it read 0 programs". -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer không thể đưa cho InstallerClean một danh sách chương trình đã cài đọc được: nó đã đọc {2} {3}, rồi {0} mục liên tiếp trả về không đọc được (mã lỗi cuối {1}). Thay vì làm việc với một danh sách chỉ đọc được một phần, InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <!-- The index cap, which is a different condition from the consecutive
        failures above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
        count) and 1 = the last row's error code, which here is Success (0) when
-       every row read cleanly and the list simply never terminated. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+       every row read cleanly and the list simply never terminated. 2 = how many
+       programs were read cleanly, 3 = the noun for that count.
+
+       The two strings stay separate and carry the same pair for the same
+       reason: how far the enumeration got is the fact somebody helping needs,
+       and it is as worth having when the budget runs out as when a run of
+       failures stops the walk. -->
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã đọc {2} {3}, rồi bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
-       condition and the same two placeholders. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+       condition and the same four placeholders.
+
+       3 IS A DIFFERENT NOUN HERE AND THAT IS THE WHOLE DIFFERENCE. This loop
+       walks one program's patches, so 2 counts patches read cleanly and 3 is
+       the patch noun. Borrowing the sibling's noun would report a count of
+       patches as a count of programs. -->
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã đọc {2} {3}, rồi bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1168,7 +1282,7 @@ Chi tiết trong {1}.</value></data>
        out of another user's profile, in front of the user. -->
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Không thể ghi vào {0}.</value></data>
   <!-- 0 = file name -->
-  <data name="Error.DestinationCollision" xml:space="preserve"><value>Không tìm được tên tệp duy nhất cho '{0}' sau 10.000 lần thử.</value></data>
+  <data name="Error.DestinationCollision" xml:space="preserve"><value>Đã có một tệp tên '{0}' trong thư mục sao lưu.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Đang gửi...</value></data>
@@ -1334,6 +1448,40 @@ Không thể ghi nhật ký sự cố.</value></data>
        each being right in its own register. -->
   <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) mà lẽ ra nó có thể đề xuất.</value></data>
   <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} {1} ({2}) mà lẽ ra nó có thể đề xuất.</value></data>
+  <!-- The command line's twin of Summary.NothingListed, for the machine whose
+       walk-derived half was withheld wholesale while a superseded row was still
+       offered: that run takes the found-files branch, so Cli.NothingOffered is not
+       printed and this line is the only place the withholding is stated. Word for
+       word the window's sentence, as Cli.SupersededHeldBack is, with the size added
+       because this host already gives one in Cli.NothingOffered. The one-form names
+       the size and not the numeral, so it spends {2} and leaves {0} and {1} unused;
+       both are passed on either branch so the two forms cannot disagree about which
+       index is which. -->
+  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>Trên máy này InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) thay vì liệt kê nó.</value></data>
+  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>Trên máy này InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại {0} {1} ({2}) thay vì liệt kê chúng.</value></data>
+  <!-- Introduces the reasons the walk-derived offer was withheld wholesale, under
+       whichever of Cli.NothingOffered or Cli.NothingListed that run printed. It picks
+       up "couldn't be certain" from both of them on purpose, so the reader has the
+       antecedent in the line above. The lines under it are Cli.WithheldReasons.*, one
+       per condition met, and any combination of them can print: they say which
+       conditions the run met and are not a partition of the files, so none of them
+       carries a count and nothing sums. -->
+  <data name="Cli.WithheldReasons.Header" xml:space="preserve"><value>Vì sao không thể chắc chắn:</value></data>
+  <!-- One line per leg of the wholesale withholding, each printed only when its own
+       leg is true, each carrying two leading spaces like the Cli.Help.* block. The
+       nine path-resolution counts and the four identity-read outcomes sit underneath
+       legs one and two and are deliberately not printed: they travel in the opt-in
+       report, which reads them apart, and a reader of a console line can do nothing
+       different on one of them than on another. NO LEG CARRIES A COUNT. Leg one's two
+       groups can double-count one value, so their sum is a count of refusals and not
+       of paths; leg three's two members are opposite findings and a single number
+       states a cause over the pair; a count on leg two alone would read as a total.
+       The count and the size of what was held back are on the line above. And no line
+       says whether re-running helps, because each leg holds members that differ on
+       exactly that. -->
+  <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Một đường dẫn tệp trong chính hồ sơ của Windows Installer không phân giải được.</value></data>
+  <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Không đọc được danh tính của một tệp được nêu tên trong hồ sơ của Windows Installer.</value></data>
+  <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Một chương trình có thể đã được cài nhiều hơn một lần trên máy này.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel
@@ -1424,11 +1572,21 @@ Không thể ghi nhật ký sự cố.</value></data>
        detail than the other; it may not drop the instruction that prevents a
        reader making the problem worse. Two smaller omissions went with it: the
        old wording said "preferably the same version" for something Windows
-       refuses outright, and "usually restores" travelled here without the
-       companion hedge it has in the window.
+       refuses outright.
 
-       "Can fail", "usually", "may" and "doesn't guarantee" are the verified
-       positions and none may harden: Microsoft guarantees nothing here. The
+       "Can fail", "may" and "doesn't guarantee" are the verified positions and
+       none may harden: Microsoft guarantees nothing here.
+
+       THE CLOSING SENTENCE IS SETTLED AND IS NOT TO BE REWORDED, and the word to
+       leave alone is "should". It says what the step is meant to do and claims no
+       rate. "Usually" claims a frequency, and the word would be ours: none of
+       Microsoft's own wording on this says it, their position being to ask the
+       vendor and, in some cases, to rebuild the operating system. Nobody has
+       counted how often the recovery works, so the word would assert something
+       nothing behind it establishes. Both halves sit under the one hedge on
+       purpose: nothing here knows more about the settings than about the file.
+       The same sentence ends Body.RegisteredMissingFromDisk. It is one claim on
+       three surfaces and they move together or not at all. The
        version IS knowable, being the program's own and printed in Settings and
        in Programs and Features; what is hard is OBTAINING it, makers usually
        publishing only the current one, which is what "if you can get it" carries
@@ -1437,8 +1595,8 @@ Không thể ghi nhật ký sự cố.</value></data>
        THE COLON IS NEW AND FRENCH NEEDS A NARROW NO-BREAK SPACE BEFORE IT
        (U+202F), which the Edit tool silently flattens; check-french-spacing
        holds it. -->
-  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.</value></data>
-  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This usually restores the file, but Microsoft doesn't guarantee it.</value></data>
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows có hồ sơ về {0} tệp không nằm trong {InstallerFolder}: {1}. Trong sử dụng hằng ngày điều này không gây rắc rối, nhưng việc cập nhật hoặc gỡ cài đặt chương trình đó có thể thất bại. Để đưa tệp trở lại, bạn cần bộ cài của đúng phiên bản bạn đang có. Hãy lấy từ nhà sản xuất chương trình và chạy đè lên bản đang cài. Phiên bản mới hơn không dùng được: nó phải gỡ bản bạn đang có trước, và chính bước đó mới cần tệp này. Gỡ cài đặt trước cũng không được, vì cùng lý do. Việc này sẽ khôi phục tệp và giữ nguyên các thiết lập của bạn, nhưng Microsoft không bảo đảm điều đó.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows có hồ sơ về {0} tệp không nằm trong {InstallerFolder}: {1}. Trong sử dụng hằng ngày điều này không gây rắc rối, nhưng việc cập nhật hoặc gỡ cài đặt các chương trình đó có thể thất bại. Để đưa một tệp trở lại, bạn cần bộ cài của đúng phiên bản chương trình đó mà bạn đang có. Hãy lấy từ nhà sản xuất chương trình và chạy đè lên bản đang cài. Phiên bản mới hơn không dùng được: nó phải gỡ bản bạn đang có trước, và chính bước đó mới cần tệp đó. Gỡ cài đặt trước cũng không được, vì cùng lý do. Việc này sẽ khôi phục tệp và giữ nguyên các thiết lập của bạn, nhưng Microsoft không bảo đảm điều đó.</value></data>
   <!-- The command line's own copy of Summary.SupersededHeldBack, whose remarks
        carry the placeholder, why no cause is named, why "superseded" is earned and
        why neither host closes on a clause about listing.
@@ -1454,8 +1612,8 @@ Không thể ghi nhật ký sự cố.</value></data>
        condition and its own figure, on records that could not be matched up rather
        than on files held back, and the two counts are not the same quantity: see
        Cli.EventLogScanWithheld and ReportScanSignals. -->
-  <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
-  <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
+  <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>Trên máy này, InstallerClean không thể chắc chắn rằng tệp bị thay thế duy nhất đó không còn cần đến nữa, nên đã giữ lại nó.</value></data>
+  <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>Trên máy này, InstallerClean không thể chắc chắn rằng {0} tệp bị thay thế không còn cần đến nữa, nên đã giữ lại chúng.</value></data>
   <!-- 0 = mode arg, 1 = entries in the Windows Installer records the scan could
        not match up. A notice beside the run's summary, not a summary itself
        (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
@@ -1534,15 +1692,20 @@ Không thể ghi nhật ký sự cố.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Lỗi: máy này có một giao dịch Windows Installer trước đó đang bị treo. Hãy tiếp tục hoặc hoàn tác lần cài đặt ấy (hoặc khởi động lại Windows) trước khi dọn {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Lỗi: một thao tác tệp đã xếp hàng sau khi khởi động lại có nhắm vào {InstallerFolder} ({0}). Hãy khởi động lại Windows để hoàn tất thao tác đó trước khi dọn.</value></data>
+  <!-- The command-line twin of Body.PendingReboot.PendingRenameUnresolved, adapted the
+       way the rest of this family is: opens "Error: " and goes lower case after it. No
+       placeholder, because the {0} in the PendingRenameInCache line above names a
+       resolved cache path and this arm has none to name. -->
+  <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Lỗi: có một thao tác tệp đang xếp hàng chờ lần khởi động lại tới và InstallerClean không biết được thao tác đó nêu tên những tệp nào, nên không thể loại trừ {InstallerFolder}. Hãy khởi động lại Windows trước khi dọn dẹp.</value></data>
   <!-- What a blocking reason with no line of its own gets, so a reason added
        later cannot leave the command line reporting an unexpected crash for a
        run that was merely held. The command-line twin of Body.PendingReboot.Other,
-       adapted the way its three siblings are: the flags rather than the window's
+       adapted the way the rest of the family is: the flags rather than the window's
        button names, "blocked" rather than "paused" to match them, and no Re-scan,
        there being nothing to re-scan on a command line. -->
   <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Lỗi: Windows Installer đang có việc dở dang, nên /m và /d bị chặn. InstallerClean sẽ không đụng vào {InstallerFolder} khi thư mục đang thay đổi. Hãy thử lại khi xong.</value></data>
   <!-- The command line's twin of Error.InstallerLockUnavailable, and a separate
-       string rather than a shared one because this whole family is: all four
+       string rather than a shared one because this whole family is: all five
        Cli.PendingRebootBlocked.* values open "Error: " and go lower case after
        it, which is the console's shape and not the window's. Same condition,
        same refusal, /d. No placeholders. -->
@@ -1576,6 +1739,34 @@ Không thể ghi nhật ký sự cố.</value></data>
        making it would imply the word meant something about deleting. All four
        run lines carry it. -->
   <data name="Cli.MovedFiles" xml:space="preserve"><value>Đã chuyển {0} {1} không cần thiết.</value></data>
+  <!-- 0 = the backup folder the files are in. The line that finishes the job on
+       this host, printed under the move summary and only where something moved,
+       on the silent-at-zero rule the run lines around it already follow.
+
+       IT NAMES THE FOLDER RATHER THAN SAYING "that folder". A line telling
+       somebody to delete something has to say what it means on its own, because
+       this host's output is read in a scheduled task's log and in a pipe, where
+       the line above it may not be beside it.
+
+       IT SAYS WHAT BEING SATISFIED IS, WHICH IS THE PART THIS HOST HAS NEVER
+       CARRIED. The window's reader is told on the main window to check their
+       programs still update and uninstall as normal; a console reader is told
+       nowhere, so the check goes into the line that asks for it. The words are
+       the ones the command line already uses: Cli.MissingFromDisk says an update
+       or uninstall of that program can fail.
+
+       FLAT AT ANY COUNT. It talks about the folder and not about the files, so
+       nothing in it agrees with a number: no Pluralise call, no plural sibling.
+
+       THERE IS NO SAME-DRIVE VARIANT, AND THAT IS A DECISION. The window's line
+       has one because the window reports what a move reclaimed, so a same-drive
+       move has to explain why the disk did not get emptier. Nothing on this host
+       reports that. The move summary names no size and the event log's says what
+       was relocated rather than what was freed; the only lines reporting free
+       space are the refusal when the destination has too little and its
+       event-log twin, which are about whether the move can start. There is
+       nothing here for a same-drive form to correct. -->
+  <data name="Cli.MoveRestoreHint" xml:space="preserve"><value>Hãy kiểm tra xem các chương trình của bạn vẫn cập nhật và gỡ cài đặt bình thường, rồi xóa {0}.</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,

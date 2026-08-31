@@ -343,12 +343,15 @@ public class CountedStringTests
         // noun moved into a slot Plural.File fills, which left the .Few value
         // character-identical to its own .Plural and therefore a copy waiting to drift.
         //
-        // SO NO CARDINALITY KEY SHIPS A .Few OR .Many OVERRIDE ANYWHERE TODAY, and the
-        // honest consequence is that collapsing the band would currently change nothing
-        // a user sees. That is exactly why the pin has to sit on the selector: the arm
-        // is now correct-in-principle with no live consumer, which is the state in which
-        // somebody deletes it. A satellite may add such an override at any time, the
-        // key's own resx note invites it, and the collapse would silently disarm it.
+        // SO THE BAND HAS A LIVE CONSUMER, AND THE PIN STILL BELONGS ON THE SELECTOR.
+        // Summary.SupersededHeldBack and Cli.SupersededHeldBack carry a .Few in these
+        // three languages, their counted noun sitting inside the sentence where the
+        // numeral governs it, so collapsing everything that is not One into Other would
+        // put the five-and-up form on a count of three. Pinning one of those renderings
+        // instead would hold only while that language kept that value and would say
+        // nothing about the arm itself. The prefix used below has no override of its
+        // own, which is what makes the null assertion mean something: the band is
+        // checked directly, with no translated value standing in for it.
         //
         // Plural.File.Few is NOT what this guards. That prefix is Grammatical, so it
         // goes through CategoryFor and never through CardinalCategoryFor, and it would

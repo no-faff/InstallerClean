@@ -176,8 +176,13 @@ const QUOTES_A_LABEL = [
   { sentence: 'Automation.ConfirmSendResultLog', label: 'Action.Cancel' },
   // The sentence the delete dialog introduces offers the other way of doing it
   // by name, so the offer is worth exactly what the button it points at is
-  // called. Only the singular is here; the plural is one of the three held out.
+  // called, in both of its forms.
   { sentence: 'Confirm.DeletePermanently.Singular', label: 'Action.Move' },
+  { sentence: 'Confirm.DeletePermanently.Plural', label: 'Action.Move' },
+  // The registered-files row's own button, named by the sentence that sends the
+  // reader to it.
+  { sentence: 'Summary.MissingFromDisk.Singular', label: 'Action.Details' },
+  { sentence: 'Summary.MissingFromDisk.Plural', label: 'Action.Details' },
   // A batch that stopped because the backup folder would no longer resolve says
   // which button starts the scan again.
   { sentence: 'Error.DestinationChangedMidBatch', label: 'Action.Rescan' },
@@ -208,12 +213,8 @@ const QUOTES_A_LABEL = [
 // something to move up, so this list empties itself rather than outliving the
 // round it is waiting for.
 const QUOTES_A_LABEL_ONCE_TRANSLATED = [
-  // The plural of the sentence whose singular sits in rule 3 above.
-  { sentence: 'Confirm.DeletePermanently.Plural', label: 'Action.Move' },
-  // The registered-files row's own button, named by the sentence that sends the
-  // reader to it.
-  { sentence: 'Summary.MissingFromDisk.Singular', label: 'Action.Details' },
-  { sentence: 'Summary.MissingFromDisk.Plural', label: 'Action.Details' },
+  // An entry here is a pair whose containment cannot be checked until the
+  // translation lands. It moves up into rule 3 when it does.
 ];
 
 // ---------------------------------------------------------------------------

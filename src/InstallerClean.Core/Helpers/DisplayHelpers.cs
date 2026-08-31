@@ -187,16 +187,16 @@ internal static class DisplayHelpers
     /// their PLURAL and none in their singular, so their plural side is still a numeral
     /// governing a noun and still wants its paucal band.
     ///
-    /// NO CARDINALITY KEY SHIPS A .Few OR .Many OVERRIDE TODAY, WHICH IS SAID HERE
-    /// RATHER THAN LEFT TO BE DISCOVERED. Polish, Russian and Ukrainian each shipped a
-    /// live Completion.NothingOfferedBody.Few until that key's noun moved into a slot
-    /// Plural.File fills, which left the override character-identical to its own .Plural
-    /// and it was deleted. So collapsing everything that is not One into Other would
-    /// currently change nothing a user sees, and that is the danger rather than the
-    /// reassurance: this arm is correct with no live consumer, which is the state in
-    /// which somebody removes it. A satellite may add such an override at any time and
-    /// the collapse would silently disarm it, so the band is pinned directly, on the
-    /// selector, by CountedStringTests.The_cardinality_selector_keeps_its_paucal_band.
+    /// CARDINALITY KEYS SHIP PAUCAL OVERRIDES, SO THE BAND IS LOAD-BEARING RATHER
+    /// THAN THEORETICAL. Summary.SupersededHeldBack and Cli.SupersededHeldBack carry
+    /// a .Few in Polish, Russian and Ukrainian: their counted noun sits inside the
+    /// sentence, so the numeral governs it directly. Where a key's noun arrives
+    /// through a slot Plural.File fills, the noun agrees there instead and an override
+    /// on the outer key would be character-identical to its own .Plural, which is why
+    /// Completion.NothingOfferedBody carries none. Collapsing everything that is not
+    /// One into Other would put the five-and-up form on a count of three wherever the
+    /// first case applies, and the band is pinned on the selector besides, by
+    /// CountedStringTests.The_cardinality_selector_keeps_its_paucal_band.
     ///
     /// A CLDR One that is not exactly one becomes Other rather than Many. Nothing
     /// special applies to it, so it wants the plain plural, and a Many override written

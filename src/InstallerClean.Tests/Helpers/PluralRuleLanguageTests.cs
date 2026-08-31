@@ -41,14 +41,15 @@ public class PluralRuleLanguageTests
     private static readonly int[] Counts = { 0, 1, 2, 5, 11, 21, 101 };
 
     /// <summary>
-    /// The prefix every observation below is made through, chosen for one property:
-    /// no language defines a CLDR override for it, so what comes back is the category
-    /// the rule selected and nothing else.
-    /// <see cref="The_observation_prefix_carries_no_override_in_any_language"/> is what
-    /// keeps that true, because a translation round adding one would quietly turn every
-    /// assertion here into a reading of the override instead.
+    /// The prefix every observation below is made through, chosen for a property that
+    /// cannot lapse: its counted noun arrives through {1}, which Plural.File fills, so
+    /// the noun agrees there and an override on this prefix would be character-identical
+    /// to its own .Plural. Nothing can need one, so nothing can add one, and what comes
+    /// back is the category the rule selected and nothing else.
+    /// <see cref="The_observation_prefix_carries_no_override_in_any_language"/> holds
+    /// that to account.
     /// </summary>
-    private const string Observed = "Completion.HeldBack";
+    private const string Observed = "Completion.PermanentDeleteSummary";
 
     private const string One = "SINGULAR FORM";
     private const string Other = "PLURAL FORM";
