@@ -37,7 +37,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = 'src';
-const TESTS = 'src/InstallerClean.Tests';
+const TESTS = join(ROOT, 'InstallerClean.Tests');
 const METHODS = ['DeleteFilesAsync', 'MoveFilesAsync'];
 const REQUIRED = 'UnderLeaseClaims.From(';
 
