@@ -40,10 +40,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      # EVERY STEP IN THIS JOB RUNS WHETHER OR NOT THE ONE BEFORE IT WENT RED, AND
+      # THAT IS A DECISION RATHER THAN BOILERPLATE. Each guard below reads a
+      # different part of the tree and none is a premise for any other: the resx
+      # contract says nothing about XAML resource keys, and neither says anything
+      # about whether the app builds. Without the condition the first red step
+      # decides what the rest of the job is allowed to measure, so one guard going
+      # red takes every verdict behind it with it and a run carrying several
+      # faults reports one. A red step still fails the job. It just no longer
+      # speaks for the steps it happens to stand in front of.
+
       # Source-level satellite contract: key presence, stray keys and {N}
       # placeholder arity across every Strings.<code>.resx. The compiled-
       # resource side is covered by SatelliteResxParityTests in the test run.
       - name: Check resx satellite parity
+        if: success() || failure()
         run: node scripts/check-resx-parity.mjs
 
       # Strings.Designer.cs is hand-regenerated, so it can drift from the neutral
@@ -51,6 +62,7 @@ jobs:
       # Get() falls back to returning the key, so the first sign is a raw key on
       # screen.
       - name: Check Strings.Designer.cs is in step
+        if: success() || failure()
         run: node scripts/check-designer-parity.mjs
 
       # Source-level drift guards, each pinned to a concrete failure the app has
@@ -58,17 +70,18 @@ jobs:
       # set and SupportedLanguages diverging when a language is added to one and
       # not the other. These need only the checkout, not the SDK, so they run
       # before it and report a source fault in seconds rather than after a build.
-      # Reporting is now all they decide: the SDK steps below run whatever these
-      # say, so an early red no longer buys a shorter job by hiding the test run.
       - name: Check for dead resx keys
+        if: success() || failure()
         run: node scripts/check-dead-resx-keys.mjs
 
       - name: Check installer language list
+        if: success() || failure()
         run: node scripts/check-installer-languages.mjs
 
       # The two lists of counted strings, compared at the source because a
       # switch's arms are not enumerable at runtime. The script says why.
       - name: Check the counted-string inventory
+        if: success() || failure()
         run: node scripts/check-counted-string-inventory.mjs
 
       # Directory.Build.props and the two app.manifest identities, checked here
@@ -76,11 +89,13 @@ jobs:
       # after a release has built its binaries the fix costs a rebuild and every
       # hash it was scanned under.
       - name: Check version surfaces agree
+        if: success() || failure()
         run: node scripts/check-version-surfaces.mjs
 
       # A French value that lost its narrow no-break space to a plain space,
       # which plenty of editors do silently.
       - name: Lint French spacing
+        if: success() || failure()
         run: node scripts/check-french-spacing.mjs
 
       # Program.cs prints each Cli.Help.* value with Console.WriteLine and wraps
@@ -91,6 +106,7 @@ jobs:
       # gates at the end because it is not one: it passes today, and a language
       # going over is a mistake rather than a translation window.
       - name: Check CLI help fits its column budget
+        if: success() || failure()
         run: node scripts/check-cli-help-width.mjs
 
       # Its sibling above holds how wide a help line may be; this holds where the
@@ -104,6 +120,7 @@ jobs:
       # as the width check: it passes today, a row still holding the English
       # neutral being left to check-still-english rather than measured.
       - name: Check CLI help columns line up
+        if: success() || failure()
         run: node scripts/check-cli-help-alignment.mjs
 
       # The only mechanical check on XAML resource keys. A {StaticResource} whose
@@ -111,6 +128,7 @@ jobs:
       # the window is first opened, so neither the build nor the test run below
       # can catch a rename that misses a consumer.
       - name: Check XAML resource keys
+        if: success() || failure()
         run: node scripts/check-xaml-resources.mjs
 
       # A production caller may pass the action services an empty set of claims and
@@ -119,17 +137,12 @@ jobs:
       # line without having asked anything. The tests below drive the call sites that
       # exist; this is what fails on the day somebody writes a new one.
       - name: Check the under-lease claims reach the action services
+        if: success() || failure()
         run: node scripts/check-under-lease-claims.mjs
 
-      # Everything from here to the test run carries the same condition the
-      # publishes below do, and for a stronger reason than they have. A guard
-      # above is a statement about text; the build and the test run are the only
-      # statements about whether the app works, and twice now they have been
-      # skipped for weeks by a step in front of them going red for a reason
-      # entirely of its own. A red guard is precisely when somebody wants to know
-      # the code still builds and the suite still passes, and nothing above here
-      # is a premise for either. It is not a softening: a red guard still fails
-      # the job, it just no longer decides what gets measured.
+      # Every step in this job carries the same condition, for the reason set
+      # out at the first guard: no step here is a premise for any other, so a
+      # red one reports its own verdict and decides nothing about the rest.
       - name: Setup .NET SDK
         if: success() || failure()
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
