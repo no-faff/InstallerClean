@@ -126,11 +126,19 @@ jobs:
       # The timeout is an hour because the policy requires an approval and the
       # run waits for it. The action's own default is ten minutes, which is a
       # sensible wait for a machine and not for a person.
+      #
+      # The organisation id is written in rather than held as a repository
+      # variable: it is an identifier and not a credential, SignPath's own
+      # documentation shows it inline, and one fewer thing to configure is one
+      # fewer thing to configure wrongly. The API token is the secret.
+      #
+      # The job runs on a GitHub-hosted runner, which their open-source tier
+      # requires of every job leading up to a signing request.
       - name: Sign the executables
         uses: SignPath/github-action-submit-signing-request@c92b958760219087e01f8d67a1669ed57afe2627 # v2.3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
-          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          organization-id: 8a1f274f-0ee2-4d6a-9417-992f7c9c94c0
           project-slug: InstallerClean
           signing-policy-slug: ${{ inputs.signing_policy }}
           github-artifact-id: ${{ steps.upload-executables.outputs.artifact-id }}
@@ -189,7 +197,7 @@ jobs:
         uses: SignPath/github-action-submit-signing-request@c92b958760219087e01f8d67a1669ed57afe2627 # v2.3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
-          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          organization-id: 8a1f274f-0ee2-4d6a-9417-992f7c9c94c0
           project-slug: InstallerClean
           signing-policy-slug: ${{ inputs.signing_policy }}
           github-artifact-id: ${{ steps.upload-setup.outputs.artifact-id }}
