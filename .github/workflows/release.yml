@@ -147,6 +147,13 @@ jobs:
           wait-for-completion-timeout-in-seconds: '3600'
           output-artifact-directory: signing/signed-executables
 
+      # THE FILE COMING BACK IS NOT PROOF THAT IT WAS SIGNED, AND THE SETUP IS
+      # COMPILED AROUND THESE. A returned-but-unsigned executable would be
+      # bundled, published and hashed with nothing downstream noticing, so each
+      # one is opened and asked for its signer before it goes anywhere. The test
+      # is that a signature EXISTS rather than that it validates: a test
+      # certificate chains to nothing this runner trusts, so a status check would
+      # refuse the very artefacts the test policy exists to produce.
       - name: Put the signed executables back
         run: |
           $expected = @(
@@ -156,6 +163,11 @@ jobs:
           )
           $missing = $expected | Where-Object { -not (Test-Path $_) }
           if ($missing) { throw "Signing returned without: $($missing -join ', ')" }
+          foreach ($f in $expected) {
+            $sig = Get-AuthenticodeSignature $f
+            if (-not $sig.SignerCertificate) { throw "$f came back with no signature." }
+            Write-Host "  $(Split-Path $f -Leaf): $($sig.SignerCertificate.Subject)"
+          }
           Copy-Item signing/signed-executables/InstallerClean-portable.exe publish/self-contained/InstallerClean.exe      -Force
           Copy-Item signing/signed-executables/InstallerClean-slim.exe     publish/framework-dependent/InstallerClean.exe -Force
           Copy-Item signing/signed-executables/installerclean-cli.exe      publish/cli/installerclean-cli.exe             -Force
@@ -240,6 +252,18 @@ jobs:
           Copy-Item publish/self-contained/InstallerClean.exe      "publish/InstallerClean-$version-portable.exe"
           Copy-Item publish/framework-dependent/InstallerClean.exe "publish/InstallerClean-$version-slim.exe"
           Copy-Item publish/cli/installerclean-cli.exe             publish/installerclean-cli.exe
+          # The same question asked of what will actually be published, after
+          # the copies rather than before them, so a mis-copy is caught here as
+          # well as a missing signature.
+          foreach ($f in @(
+            "publish/InstallerClean-$version-setup.exe",
+            "publish/InstallerClean-$version-portable.exe",
+            "publish/InstallerClean-$version-slim.exe",
+            'publish/installerclean-cli.exe')) {
+            $sig = Get-AuthenticodeSignature $f
+            if (-not $sig.SignerCertificate) { throw "$f is not signed." }
+            Write-Host "  $(Split-Path $f -Leaf): $($sig.SignerCertificate.Subject)"
+          }
 
       # build-provenance.txt is what the release script reads before it tags: it
       # refuses to tag when the recorded commit is not in the repository, when a
