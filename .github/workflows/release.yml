@@ -135,6 +135,7 @@ jobs:
       # The job runs on a GitHub-hosted runner, which their open-source tier
       # requires of every job leading up to a signing request.
       - name: Sign the executables
+        id: sign-executables
         uses: SignPath/github-action-submit-signing-request@c92b958760219087e01f8d67a1669ed57afe2627 # v2.3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
@@ -194,6 +195,7 @@ jobs:
           retention-days: 1
 
       - name: Sign the setup
+        id: sign-setup
         uses: SignPath/github-action-submit-signing-request@c92b958760219087e01f8d67a1669ed57afe2627 # v2.3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
@@ -204,6 +206,27 @@ jobs:
           wait-for-completion: true
           wait-for-completion-timeout-in-seconds: '3600'
           output-artifact-directory: signing/signed-setup
+
+      # WHERE A FAILED SIGNING REQUEST EXPLAINS ITSELF, AND IT IS NOT IN THIS LOG.
+      # The action reports only "Failed"; the reason lives on the signing request
+      # page, which nothing linked to until this step existed. Both links are
+      # printed whatever happens, because the failing case is the one that needs
+      # them. The action sets the output when the request is submitted, so a
+      # request that is accepted and then fails still has a link here.
+      - name: Link the signing requests
+        if: always()
+        run: |
+          $rows = @(
+            @{ name = 'executables'; url = '${{ steps.sign-executables.outputs.signing-request-web-url }}' },
+            @{ name = 'setup';       url = '${{ steps.sign-setup.outputs.signing-request-web-url }}' }
+          ) | Where-Object { $_.url }
+          if (-not $rows) { return }
+          Add-Content $env:GITHUB_STEP_SUMMARY '## Signing requests'
+          Add-Content $env:GITHUB_STEP_SUMMARY ''
+          foreach ($r in $rows) {
+            Add-Content $env:GITHUB_STEP_SUMMARY "- $($r.name): $($r.url)"
+            Write-Host "  $($r.name): $($r.url)"
+          }
 
       # The four downloads, named as they will be published. The GUI downloads
       # carry the version so a saved copy says which release it is; the
