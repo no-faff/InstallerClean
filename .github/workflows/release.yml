@@ -147,13 +147,13 @@ jobs:
           wait-for-completion-timeout-in-seconds: '3600'
           output-artifact-directory: signing/signed-executables
 
-      # THE FILE COMING BACK IS NOT PROOF THAT IT WAS SIGNED, AND THE SETUP IS
-      # COMPILED AROUND THESE. A returned-but-unsigned executable would be
-      # bundled, published and hashed with nothing downstream noticing, so each
-      # one is opened and asked for its signer before it goes anywhere. The test
-      # is that a signature EXISTS rather than that it validates: a test
-      # certificate chains to nothing this runner trusts, so a status check would
-      # refuse the very artefacts the test policy exists to produce.
+      # THE SETUP IS COMPILED AROUND THESE, so each one is opened and asked for
+      # its signer before it goes anywhere: what these downloads carry has to be
+      # established here rather than assumed from a request that reported
+      # success. The test is that a signature EXISTS rather than that it
+      # validates, because a test certificate chains to nothing this runner
+      # trusts and a status check would refuse the artefacts the test policy
+      # exists to produce.
       - name: Put the signed executables back
         run: |
           $expected = @(
@@ -219,12 +219,10 @@ jobs:
           wait-for-completion-timeout-in-seconds: '3600'
           output-artifact-directory: signing/signed-setup
 
-      # WHERE A FAILED SIGNING REQUEST EXPLAINS ITSELF, AND IT IS NOT IN THIS LOG.
-      # The action reports only "Failed"; the reason lives on the signing request
-      # page, which nothing linked to until this step existed. Both links are
-      # printed whatever happens, because the failing case is the one that needs
-      # them. The action sets the output when the request is submitted, so a
-      # request that is accepted and then fails still has a link here.
+      # A SIGNING REQUEST EXPLAINS ITSELF ON ITS OWN PAGE RATHER THAN IN THIS LOG,
+      # so both links are printed whatever the outcome: the failing case is the
+      # one that needs them. The action sets the link when the request is
+      # submitted, so a request that is accepted and then fails still carries one.
       - name: Link the signing requests
         if: always()
         run: |
