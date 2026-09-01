@@ -1,0 +1,284 @@
+# Builds the four release downloads on a trusted build system and has SignPath
+# sign them.
+#
+# WHY THIS EXISTS AT ALL, because it looks like a duplicate of ci.yml and is not.
+# SignPath's release policy verifies the ORIGIN of what it signs: it will only
+# put a signature on a binary that a named CI run produced from a named commit in
+# this repository. A binary built anywhere else cannot be signed under that
+# policy however good it is. So the release build moves here, and the signature
+# is what pays for the move.
+#
+# WHAT IT DELIBERATELY DOES NOT DO. It publishes nothing: no tag, no release, no
+# upload to any channel. It leaves a `publish/` folder as a workflow artifact,
+# laid out exactly as a local Stage-1 build leaves one, including
+# build-provenance.txt. The release is still cut by hand from that folder, so
+# every gate that sits between building and publishing stays where it is and
+# still has to be passed. The one that matters most is the malware scan, which
+# has to run on the SIGNED bytes: a signature changes the file, and a scan of the
+# unsigned build says nothing about what people will download.
+#
+# THE TWO SIGNING ROUNDS ARE NOT AN ACCIDENT OF LAYOUT. The setup carries the
+# portable GUI and the command-line tool inside it, so those two are signed
+# first, the setup is compiled around the signed copies, and the setup is then
+# signed in its own right. Signing only the setup would install an unsigned
+# InstallerClean.exe and leave the app people actually run showing an unknown
+# publisher, which is the whole thing signing is for. Each round is one signing
+# request and each request is approved separately, so a release asks for two
+# approvals rather than one.
+
+name: Release build
+
+on:
+  # Manual only. A tag push must not start this: the binaries are built, scanned
+  # and only then tagged, so the tag does not exist yet when this runs.
+  workflow_dispatch:
+    inputs:
+      signing_policy:
+        description: 'Signing policy. release-signing is the real one; test-signing proves the plumbing and must never be published.'
+        type: choice
+        options:
+          - release-signing
+          - test-signing
+        default: release-signing
+      gui_compression:
+        description: 'Compress the single-file GUI builds'
+        type: boolean
+        default: true
+      cli_compression:
+        description: 'Compress the single-file command-line build'
+        type: boolean
+        default: true
+
+# actions: read is what lets SignPath's connector fetch the uploaded artifact
+# through the workflow token. contents: read is the default and is kept explicit
+# so the whole grant is readable in one place.
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build:
+    # Pinned to the same image as CI, for the same reason: the runner image is a
+    # build input, and a release must not be shaped by whatever "latest" moved to
+    # that week.
+    runs-on: windows-2025
+
+    steps:
+      - name: Check out the commit to be released
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      # Same order and same reasoning as CI: the audit runs during restore and
+      # -warnaserror is what turns an advisory into a failed run, so it has to
+      # come before anything else restores.
+      - name: Fail on a vulnerable package
+        run: dotnet restore src/InstallerClean.sln -p:RestoreLockedMode=true -p:NuGetAuditMode=all -warnaserror:NU1901,NU1902,NU1903,NU1904
+
+      - name: Test
+        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true
+
+      # The three publishes below are the shapes that ship, flags and all. They
+      # are the release script's own, and CI smoke-publishes the same shapes on
+      # every push; if any of the three lines drift apart, the README's promise
+      # that a reader can rebuild a tag and compare hashes stops being true.
+      #
+      # Compression is on by default because it roughly halves a download whose
+      # whole audience is wary of what they are running. It is an input rather
+      # than a constant for one reason: where a scan flags the compressed build
+      # and the uncompressed build of the same source comes back clean, the
+      # uncompressed shape ships that release. It does not carry forward.
+      - name: Publish the command-line tool
+        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=${{ inputs.cli_compression }} --nologo -o publish/cli
+
+      - name: Publish the portable GUI
+        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=${{ inputs.gui_compression }} --nologo -o publish/self-contained
+
+      # PublishSelfContained=false is the property that actually disables the
+      # "PublishSingleFile implies SelfContained" rule; --self-contained false
+      # sets a different one and .NET 10 no longer takes it, which packs the
+      # whole WPF runtime into a build meant to be a small launcher.
+      - name: Publish the slim GUI
+        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true --nologo -o publish/framework-dependent
+
+      # THE FIRST SIGNING ROUND. The three exes go up under distinct names
+      # because two of them are called InstallerClean.exe, and they come back
+      # into the folders the compile step reads from.
+      - name: Stage the executables for signing
+        run: |
+          New-Item -ItemType Directory -Force -Path signing/executables | Out-Null
+          Copy-Item publish/self-contained/InstallerClean.exe      signing/executables/InstallerClean-portable.exe
+          Copy-Item publish/framework-dependent/InstallerClean.exe signing/executables/InstallerClean-slim.exe
+          Copy-Item publish/cli/installerclean-cli.exe             signing/executables/installerclean-cli.exe
+
+      - name: Upload the executables for signing
+        id: upload-executables
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: unsigned-executables
+          path: signing/executables
+          if-no-files-found: error
+          retention-days: 1
+
+      # The timeout is an hour because the policy requires an approval and the
+      # run waits for it. The action's own default is ten minutes, which is a
+      # sensible wait for a machine and not for a person.
+      - name: Sign the executables
+        uses: SignPath/github-action-submit-signing-request@c92b958760219087e01f8d67a1669ed57afe2627 # v2.3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: InstallerClean
+          signing-policy-slug: ${{ inputs.signing_policy }}
+          github-artifact-id: ${{ steps.upload-executables.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: '3600'
+          output-artifact-directory: signing/signed-executables
+
+      - name: Put the signed executables back
+        run: |
+          $expected = @(
+            'signing/signed-executables/InstallerClean-portable.exe',
+            'signing/signed-executables/InstallerClean-slim.exe',
+            'signing/signed-executables/installerclean-cli.exe'
+          )
+          $missing = $expected | Where-Object { -not (Test-Path $_) }
+          if ($missing) { throw "Signing returned without: $($missing -join ', ')" }
+          Copy-Item signing/signed-executables/InstallerClean-portable.exe publish/self-contained/InstallerClean.exe      -Force
+          Copy-Item signing/signed-executables/InstallerClean-slim.exe     publish/framework-dependent/InstallerClean.exe -Force
+          Copy-Item signing/signed-executables/installerclean-cli.exe      publish/cli/installerclean-cli.exe             -Force
+
+      # ISCC is not on the runner image. The version is pinned for the same
+      # reason the runner is, and it is the compiler the bundled community
+      # language files are known to compile against.
+      - name: Install Inno Setup
+        run: choco install innosetup --version=6.7.1 --no-progress -y
+
+      - name: Compile the installer around the signed executables
+        run: |
+          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
+                  Select-Object -First 1 -ExpandProperty FullName
+          if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
+                     Where-Object { $_ } | Select-Object -First 1
+          if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
+          & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed" }
+
+      # THE SECOND SIGNING ROUND, the setup on its own.
+      - name: Stage the setup for signing
+        run: |
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
+                     Where-Object { $_ } | Select-Object -First 1
+          New-Item -ItemType Directory -Force -Path signing/setup | Out-Null
+          Copy-Item "publish/InstallerClean-$version-setup.exe" signing/setup/
+
+      - name: Upload the setup for signing
+        id: upload-setup
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: unsigned-setup
+          path: signing/setup
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Sign the setup
+        uses: SignPath/github-action-submit-signing-request@c92b958760219087e01f8d67a1669ed57afe2627 # v2.3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: InstallerClean
+          signing-policy-slug: ${{ inputs.signing_policy }}
+          github-artifact-id: ${{ steps.upload-setup.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: '3600'
+          output-artifact-directory: signing/signed-setup
+
+      # The four downloads, named as they will be published. The GUI downloads
+      # carry the version so a saved copy says which release it is; the
+      # command-line tool keeps its bare command name, because scheduled tasks
+      # hold a path to it and the docs print that name.
+      - name: Collect the four downloads
+        run: |
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
+                     Where-Object { $_ } | Select-Object -First 1
+          Copy-Item "signing/signed-setup/InstallerClean-$version-setup.exe" "publish/InstallerClean-$version-setup.exe" -Force
+          Copy-Item publish/self-contained/InstallerClean.exe      "publish/InstallerClean-$version-portable.exe"
+          Copy-Item publish/framework-dependent/InstallerClean.exe "publish/InstallerClean-$version-slim.exe"
+          Copy-Item publish/cli/installerclean-cli.exe             publish/installerclean-cli.exe
+
+      # build-provenance.txt is what the release script reads before it tags: it
+      # refuses to tag when the recorded commit is not in the repository, when a
+      # build input has moved since, or when a published file's hash disagrees
+      # with the one recorded here. Written in the same shape a local build
+      # writes it, with LF endings and no BOM, because it is parsed on Linux and
+      # a stray carriage return turns a good commit into an unknown one.
+      #
+      # A CI build has no dirty line to write. It builds a commit rather than a
+      # working tree, which is the whole reason the check exists.
+      - name: Record what was built
+        run: |
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
+                     Where-Object { $_ } | Select-Object -First 1
+          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
+                  Select-Object -First 1 -ExpandProperty FullName
+          $guiShape = 'self-contained, single-file, ' + $(if ('${{ inputs.gui_compression }}' -eq 'true') { 'compression on' } else { 'compression off' })
+          $cliShape = 'self-contained, single-file, ' + $(if ('${{ inputs.cli_compression }}' -eq 'true') { 'compression on' } else { 'compression off' })
+          $artefacts = [ordered]@{
+            setup    = "InstallerClean-$version-setup.exe"
+            portable = "InstallerClean-$version-portable.exe"
+            slim     = "InstallerClean-$version-slim.exe"
+            cli      = 'installerclean-cli.exe'
+          }
+          $lines = @(
+            "commit=${{ github.sha }}",
+            "iscc_sha256=$((Get-FileHash -Algorithm SHA256 $iscc).Hash.ToLowerInvariant())",
+            "dotnet_sdk=$((& dotnet --version).Trim())",
+            "publish_portable=$guiShape",
+            "publish_cli=$cliShape",
+            "publish_slim=framework-dependent, single-file",
+            "signing_policy=${{ inputs.signing_policy }}",
+            "build_run=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          )
+          foreach ($name in $artefacts.Keys) {
+            $path = Join-Path 'publish' $artefacts[$name]
+            if (-not (Test-Path $path)) { throw "Missing $path" }
+            $lines += "sha256_$name=$((Get-FileHash -Algorithm SHA256 $path).Hash.ToLowerInvariant())"
+          }
+          $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+          [System.IO.File]::WriteAllText((Join-Path (Get-Location) 'publish\build-provenance.txt'), (($lines -join "`n") + "`n"), $utf8NoBom)
+          $lines | ForEach-Object { Write-Host "  $_" }
+
+      # The summary is where the hashes are read from, so they are printed
+      # somewhere that outlives the artifact's retention.
+      - name: Summarise the build
+        run: |
+          $policy = '${{ inputs.signing_policy }}'
+          if ($policy -ne 'release-signing') {
+            Add-Content $env:GITHUB_STEP_SUMMARY "## Signed with **$policy**, not for publication"
+            Add-Content $env:GITHUB_STEP_SUMMARY ""
+            Add-Content $env:GITHUB_STEP_SUMMARY "These files carry a test signature. They prove the pipeline runs. Do not publish them."
+            Add-Content $env:GITHUB_STEP_SUMMARY ""
+          }
+          Add-Content $env:GITHUB_STEP_SUMMARY '## The four downloads'
+          Add-Content $env:GITHUB_STEP_SUMMARY ''
+          Add-Content $env:GITHUB_STEP_SUMMARY '```'
+          Get-Content publish/build-provenance.txt | Add-Content $env:GITHUB_STEP_SUMMARY
+          Add-Content $env:GITHUB_STEP_SUMMARY '```'
+
+      # Uploaded as `publish` so it unpacks over a local publish/ folder and the
+      # release script finds everything where it expects it.
+      - name: Upload the release folder
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: publish-${{ inputs.signing_policy }}
+          path: |
+            publish/InstallerClean-*-setup.exe
+            publish/InstallerClean-*-portable.exe
+            publish/InstallerClean-*-slim.exe
+            publish/installerclean-cli.exe
+            publish/build-provenance.txt
+          if-no-files-found: error
