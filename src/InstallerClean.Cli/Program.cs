@@ -673,18 +673,6 @@ internal static class Program
                     totalToProcess = count;
                 }
 
-                // The service returns its partial result on a mid-batch cancel
-                // rather than throwing, so re-enter the OCE catch by hand: a
-                // cancelled run gets one cancelled-run event-log entry and a
-                // Partial or Cancelled exit code whichever way the cancellation
-                // reached the host. The service's own count is what the catch
-                // attributes on, and this is the only place it can be read.
-                if (result.Cancelled)
-                {
-                    committedCount = result.DeletedCount;
-                    token.ThrowIfCancellationRequested();
-                }
-
                 Console.WriteLine(string.Format(
                     DisplayHelpers.Pluralise(result.DeletedCount, Strings.Cli_DeletedFiles, "Cli.DeletedFiles"),
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
@@ -705,6 +693,19 @@ internal static class Program
                     foreach (var err in result.Errors)
                         Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
+
+                // The service returns its partial result on a mid-batch cancel
+                // rather than throwing, so re-enter the OCE catch by hand: a
+                // cancelled run gets one cancelled-run event-log entry and a
+                // Partial or Cancelled exit code whichever way the cancellation
+                // reached the host. The service's own count is what the catch
+                // attributes on, and this is the only place it can be read.
+                if (result.Cancelled)
+                {
+                    committedCount = result.DeletedCount;
+                    token.ThrowIfCancellationRequested();
+                }
+
                 // Bytes-recovered figure excludes the per-file error
                 // list. Reporting the scan total on a partial failure
                 // would overstate the freed-space figure for every run
@@ -816,15 +817,6 @@ internal static class Program
                 totalToProcess = count;
             }
 
-            // Partial result returned on a mid-batch cancel; re-enter the OCE catch
-            // so the machine contract matches a thrown cancellation. See the /d
-            // branch above.
-            if (moveResult.Cancelled)
-            {
-                committedCount = moveResult.MovedCount;
-                token.ThrowIfCancellationRequested();
-            }
-
             Console.WriteLine(string.Format(
                 DisplayHelpers.Pluralise(moveResult.MovedCount, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
@@ -847,6 +839,16 @@ internal static class Program
             // made one worth naming.
             if (moveResult.MovedCount > 0)
                 Console.WriteLine(string.Format(Strings.Cli_MoveRestoreHint, moveDest));
+
+            // Partial result returned on a mid-batch cancel; re-enter the OCE catch
+            // so the machine contract matches a thrown cancellation. See the /d
+            // branch above.
+            if (moveResult.Cancelled)
+            {
+                committedCount = moveResult.MovedCount;
+                token.ThrowIfCancellationRequested();
+            }
+
             // Same per-file error exclusion as the /d branch.
             long actualMovedBytes = moveResult.Errors.Count == 0
                 ? totalBytes
