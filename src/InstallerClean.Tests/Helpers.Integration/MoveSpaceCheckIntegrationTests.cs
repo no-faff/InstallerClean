@@ -13,29 +13,26 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// first run; and from 3.0.0 the same-volume question is a GetVolumePathName
 /// call rather than a comparison of two path roots, so it lands here too.
 ///
-/// WHAT THIS FILE CANNOT SET UP, said plainly so nobody reads its green as
-/// wider than it is: a volume mounted into a folder, which is the shape the
-/// 3.0.0 change was written for. Making one needs a second volume and
-/// administrator rights, so no test here builds the fault it fixes. What is
-/// covered is that the real question is being asked and its answer used, and in
-/// particular that a folder which does not exist yet still resolves, which is
-/// the property the command line's first run depends on and the one that would
-/// have broken the app's own reason for existing had it not held.
+/// A VOLUME MOUNTED INTO A FOLDER NEEDS A SECOND VOLUME AND ADMINISTRATOR
+/// RIGHTS, and that is the shape the 3.0.0 change was written for. What these
+/// tests do is put the real question to a real volume and use the answer, and in
+/// particular establish that a folder which does not exist yet still resolves,
+/// which is the property the command line's first run depends on and the one that
+/// would have broken the app's own reason for existing had it not held.
 ///
-/// AND THERE ARE TWO SUCH SHAPES NOW, NOT ONE. The 3.0.0 change fixed the
-/// DESTINATION side, so the shape it could not set up was a volume mounted
-/// under the folder the user names. <c>IsOnInstallerCacheDrive</c> then went on
-/// asking about the system directory's volume rather than the cache's, so the
-/// second shape is a volume mounted at <c>C:\Windows\Installer</c> itself. This
-/// file can build neither, for the same reason.
+/// AND THERE ARE TWO SUCH SHAPES, NOT ONE. The 3.0.0 change fixed the
+/// DESTINATION side, where the mount sits under the folder the user names.
+/// <c>IsOnInstallerCacheDrive</c> then went on asking about the system
+/// directory's volume rather than the cache's, so the second shape is a volume
+/// mounted at <c>C:\Windows\Installer</c> itself. Both want the same second
+/// volume and the same rights.
 ///
-/// WHICH ASSERTIONS REST ON THE TWO COINCIDING IS NOT UNIFORM, AND EACH SAYS SO
-/// WHERE IT STANDS. Of those asking whether something is on the CACHE's volume,
-/// the ones built under the cache folder itself hold on any machine, and the
-/// ones built from a PATH ROOT hold only where nothing is mounted between that
-/// root and the cache folder and are false where something is. The root is kept
-/// in those rather than swapped for the call under test, which would let the
-/// fixture agree with the code by construction.
+/// WHICH ASSERTIONS DEPEND ON THE TWO COINCIDING IS NOT UNIFORM. Of those asking
+/// whether something is on the CACHE's volume, the ones built under the cache
+/// folder itself hold on any machine, and the ones built from a PATH ROOT are
+/// written for a machine with nothing mounted between that root and the cache
+/// folder. The root is kept in those rather than swapped for the call under test,
+/// which would let the fixture agree with the code by construction.
 ///
 /// The tests asking about the SYSTEM directory's own volume are a separate
 /// matter and none of this touches them: a volume mounted at the cache folder
@@ -267,7 +264,7 @@ public class MoveSpaceCheckIntegrationTests
         // Win32 returns the mount point with its trailing backslash, which is
         // what GetPathRoot spells for a drive letter too, so the two agree here.
         // They stop agreeing at a mount point, which is the whole reason the
-        // call replaced the arithmetic and is the case no test here can build.
+        // call replaced the arithmetic.
         Assert.Equal(systemRoot, volume, ignoreCase: true);
     }
 
