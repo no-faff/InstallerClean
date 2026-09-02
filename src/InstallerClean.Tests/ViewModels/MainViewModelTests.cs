@@ -175,8 +175,8 @@ public class MainViewModelTests
         //
         // THE FIXTURE IS WHERE TO SEE WHICH LAYER ANSWERS IT. This host does not count
         // the withheld list to reach the all-clear, because that list is written to by
-        // two separate decisions and a host counting it would mean something different
-        // the moment either one's membership moved. The scan reads it where the
+        // three separate decisions and a host counting it would mean something different
+        // the moment any one of their memberships moved. The scan reads it where the
         // withholding happens and this machine arrives with nothing withheld at all,
         // which is what the fixture below sets. The scan service's own test is what
         // pins that a walk finding nothing to keep back arrives that way; see

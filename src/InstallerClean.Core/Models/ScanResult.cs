@@ -255,16 +255,19 @@ namespace InstallerClean.Models;
 /// excludes, which nobody has measured.
 /// </param>
 /// <param name="WithheldFiles">
-/// Every candidate this scan declined to offer, in walk order. TWO CAUSES REACH IT
+/// Every candidate this scan declined to offer, in walk order. THREE CAUSES REACH IT
 /// AND THEY ARE NOT ONE THING, so they are listed rather than covered by a sentence
 /// that would be false of one of them:
 ///
 /// The scan could not establish which cached files belong to which programs, which
 /// withholds the whole walk-derived set at once (<see cref="WalkOfferWithheldWholesale"/>,
-/// and see it for the three findings that reach it); or the candidate is an installation
-/// package whose own declared product Windows still holds a record of, or whose
-/// declaration this scan could not settle, which withholds that one file. A run can
-/// hold files put here by either, and a reader of this list may assume neither.
+/// and see it for the three findings that empty the offer wholesale); or this one
+/// candidate's own identity could not be read, so nothing could compare it against the
+/// registrations and it is kept back while the rest stand
+/// (<see cref="CandidateIdentityReads"/>); or the candidate is an installation package
+/// whose own declared product Windows still holds a record of, or whose declaration this
+/// scan could not settle, which withholds that one file. A run can hold files put here by
+/// any of the three, and a reader of this list may assume none of them.
 ///
 /// NO SURFACE STATES A CAUSE OVER IT AND NONE MAY START. The main window counts these
 /// into its left-alone line. The Details window lists them among the registrations, in
@@ -325,9 +328,9 @@ namespace InstallerClean.Models;
 /// THE SECOND HALF OF THAT IS THE WHOLE OF WHAT THIS FLAG IS FOR, and it is answered
 /// where the withholding happens, that being the only place that knows what the
 /// withholding took. A host may not answer it instead by asking whether
-/// <see cref="WithheldFiles"/> is empty: two different decisions contribute to that
-/// list, so the moment either one's membership changes, a gate built on it is asking
-/// a different question.
+/// <see cref="WithheldFiles"/> is empty: three different decisions contribute to that
+/// list, so the moment any one of their memberships changes, a gate built on it is
+/// asking a different question.
 ///
 /// IT IS NOT "THE OFFER IS EMPTY" AND THE TWO MUST NOT BE CONFLATED, which is the
 /// whole reason this exists rather than the hosts asking
@@ -346,7 +349,7 @@ namespace InstallerClean.Models;
 /// construction rather than by coincidence. A machine that took the branch and had
 /// nothing to withhold reads false here, and the all-clear is right for it, nothing in
 /// its folder having gone unclaimed. The reverse does not hold, and no host may assume
-/// it: the other decision puts files in that list on runs where this is false.
+/// it: the other two decisions put files in that list on runs where this is false.
 ///
 /// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Several conditions can empty an
 /// offer wholesale and they are different facts about a machine, so a bool is the
@@ -657,7 +660,7 @@ public static class ShortNameCreationLabels
 ///
 /// <see cref="Total"/> IS WHAT HOLDS THE PARTITION HONEST, and it is asserted against
 /// the list's own length rather than trusted. A partition is a partition until
-/// somebody adds a branch, and a sixth decision arriving later would appear in none of
+/// somebody adds a branch, and a sixth arm arriving later would appear in none of
 /// these five while the list grew underneath them.
 /// </summary>
 public readonly record struct WithholdingSplit(

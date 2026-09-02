@@ -321,9 +321,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             //
             // THE READING IS THE SCAN'S AND THIS HOST DOES NOT PARTITION ANYTHING TO
             // GET IT, which is the constraint on anything that replaces these lines.
-            // Two separate decisions fill the withheld list, so a host counting that
-            // list is inferring one decision's outcome from figures the other also
-            // writes to: the moment either one's membership moves, the gate means
+            // Three separate decisions fill the withheld list, so a host counting that
+            // list is inferring one decision's outcome from figures the others also
+            // write to: the moment any one of their memberships moves, the gate means
             // something different and nothing fails. ScanResult.Withholding answers it
             // where the withholding happens, in the three states these branches want,
             // and the host spends the answer rather than deriving it.

@@ -292,10 +292,10 @@ public partial class CompletionViewModel : ObservableObject
     /// decision's share of it, so this screen and the main window's left-alone line
     /// cannot disagree about one machine.
     ///
-    /// A RUN CAN FILL THAT LIST FROM BOTH DECISIONS AND THE FIGURES STILL HOLD. What
-    /// is true of every file counted here is that it was held back and would otherwise
-    /// have been offered. What is not true of all of them at once is any sentence about
-    /// why, which is what <paramref name="account"/> is for.
+    /// A RUN CAN FILL THAT LIST FROM MORE THAN ONE DECISION AND THE FIGURES STILL HOLD.
+    /// What is true of every file counted here is that it was held back and would
+    /// otherwise have been offered. What is not true of all of them at once is any
+    /// sentence about why, which is what <paramref name="account"/> is for.
     /// </param>
     public void ShowNothingOffered(
         WithholdingAccount account, int withheldCount, long withheldBytes,

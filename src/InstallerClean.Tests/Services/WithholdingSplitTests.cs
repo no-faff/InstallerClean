@@ -11,7 +11,7 @@ namespace InstallerClean.Tests.Services;
 ///
 /// THE POINT IS THE COMPLETENESS ASSERTION AND NOT THE INDIVIDUAL COUNTS. Three
 /// decisions put a file on the withheld list, and the five counts are a partition of
-/// it. A partition stays one until somebody adds a branch, and a sixth decision
+/// it. A partition stays one until somebody adds a branch, and a sixth arm
 /// arriving later would appear in none of the five while the list grew underneath
 /// them: five counts that no longer sum to the list are the only thing that says so.
 /// Every test here asserts the sum as well as its own arm, so a fixture reaching a

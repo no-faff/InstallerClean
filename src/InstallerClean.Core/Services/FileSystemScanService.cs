@@ -536,12 +536,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // have offered", which at zero is both absurd and untrue; for that machine
             // the all-clear is right, nothing in the folder having gone unclaimed.
             //
-            // IT IS DECIDED HERE BECAUSE THE HOST CANNOT DECIDE IT SAFELY. The window
-            // used to reach the same answer by counting ScanResult.WithheldFiles, which
-            // is a list two different decisions contribute to, so the moment either
-            // one's membership changes the screen's gate changes meaning with it and
-            // nothing fails. This branch is the only thing that knows what THIS
-            // withholding took, so this is where the question is answered.
+            // IT IS DECIDED HERE BECAUSE THE HOST CANNOT DECIDE IT SAFELY. A host
+            // counting ScanResult.WithheldFiles would be reading a list three different
+            // decisions contribute to, so the moment any one of their memberships
+            // changes the screen's gate changes meaning with it and nothing fails. This
+            // branch is the only thing that knows what THIS withholding took, so this is
+            // where the question is answered.
             walkOfferWithheldWholesale = unclaimedByPath.Count > 0;
         }
         else
@@ -1000,7 +1000,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             candidateIdentityReads,
             // Which decision took each file on the list two lines above. Read here
             // rather than derived, and held to that list's own length by a test:
-            // five counts that no longer sum to it mean a sixth decision has been
+            // five counts that no longer sum to it mean a sixth arm has been
             // added and is reported by none of them.
             withheldBy.Taken());
     }
