@@ -945,17 +945,17 @@ internal static class Program
     /// </remarks>
     private static void ReportScanSignals(string arg, ScanResult scanResult)
     {
-        // THE WALK OFFER WAS EMPTIED WHOLESALE. An audit line and no stdout line,
-        // which is the one asymmetry in this method and is deliberate: where nothing
-        // at all was offered the stdout branch above has already said this in the
-        // line it printed instead of the clean one, and where a superseded
-        // registration WAS offered beside it the human surfaces say nothing yet.
+        // THE WALK OFFER WAS EMPTIED WHOLESALE. An audit line for every machine that
+        // meets it, and on stdout a lead, a header and one line per condition the run
+        // met. The lead is the one part that is gated, on whether anything was offered
+        // beside the withheld half, and the comment at that line says what decides it.
         //
-        // IT IS HERE RATHER THAN INSIDE THAT BRANCH SO IT REACHES BOTH MACHINES.
-        // Written where the offer is empty, it would miss the machine whose walk
-        // offer went while a superseded row survived, and that is a machine a
-        // monitoring tool most needs to be able to see: its "Found N unneeded files"
-        // is true and says nothing at all about the half that was withheld.
+        // THIS BLOCK IS HERE RATHER THAN INSIDE THE EMPTY-OFFER BRANCH ABOVE THIS
+        // METHOD, SO IT REACHES BOTH MACHINES. Written where the offer is empty, it
+        // would miss the machine whose walk offer went while a superseded row
+        // survived, and that is a machine a monitoring tool most needs to be able to
+        // see: its "Found N unneeded files" is true and says nothing at all about the
+        // half that was withheld.
         //
         // A NOTICE AND NOT AN OUTCOME. The run scanned, judged, withheld correctly
         // and reported, so its outcome entry stays in the 1000 band; what the band
