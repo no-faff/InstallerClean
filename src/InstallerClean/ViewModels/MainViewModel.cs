@@ -231,8 +231,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// and the copy follows. Two kinds of file reach the list, orphaned and
     /// superseded, so the neutral spends the first two slots and no satellite
     /// spends the third: read out of the neutral and all fifteen, not one contains
-    /// {2}. This note used to say the argument was passed for the translations that
-    /// still carry an older three-slot sentence, which named an empty set.
+    /// {2}.
     ///
     /// IT STAYS, AND WHAT IT GUARDS IS THE OTHER DIRECTION. string.Format ignores a
     /// surplus argument and throws on a missing one, so a translator who writes a

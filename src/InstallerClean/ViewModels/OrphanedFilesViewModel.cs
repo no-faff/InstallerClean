@@ -52,9 +52,10 @@ public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
         Files = files.OrderByDescending(f => f.SizeBytes).ToList();
 
         var totalSize = DisplayHelpers.FormatSize(files.Sum(f => f.SizeBytes));
-        // One count, because one pathway reaches this window. The footer used to
-        // mirror the Reason column's three-way split, and two of those three would
-        // now read zero on every machine.
+        // One count over both populations, stating no cause. Two kinds of file
+        // reach this window, a file the walk found that no registration claims
+        // and a registered superseded patch; Summary.OrphanedWindow names
+        // neither, and the per-row cause is the Reason column.
         Summary = string.Format(Strings.Summary_OrphanedWindow,
             files.Count, DisplayHelpers.PluraliseFile(files.Count), totalSize);
 

@@ -169,12 +169,12 @@ public partial class ScanViewModel : ObservableObject
     /// below are read off it, so a machine cannot show the sentence and no number
     /// or the reverse.
     ///
-    /// WHAT THIS REPLACED, BECAUSE THE FIELD IT REPLACED WAS THE FAULT. The line
-    /// was gated on the count of products the scan could not account for, which is
-    /// the trigger for ONE of the six routes into this count rather than a count of
-    /// files at all. A machine meeting that condition with no superseded file on it
-    /// was told something had been kept back when nothing had. The count that the
-    /// sentence prints is the only thing that can gate the sentence.
+    /// THE COUNT THE SENTENCE PRINTS IS THE ONLY THING THAT MAY GATE THE SENTENCE.
+    /// Anything else is a condition that TENDS to produce a withholding rather than
+    /// a count of files. The count of products the scan could not account for is the
+    /// trigger for one of the six routes into this, and it is non-zero on machines
+    /// carrying no superseded file at all; a line gated on it would tell such a
+    /// machine something had been kept back when nothing had.
     ///
     /// IT IS NOT THE PARTITION MEMBER and must not be pointed at it.
     /// <see cref="ScanResult.RegisteredWithheldCount"/> counts the same rows
@@ -274,15 +274,12 @@ public partial class ScanViewModel : ObservableObject
     /// and because the offer above is the only thing the reader can see.
     ///
     /// GATED ON THE COUNT IT PRINTS, exactly as <see cref="HasNothingListed"/> is,
-    /// and the two are the same sentence about two populations. What it used to be
-    /// gated on was the machine-wide refusal, which is one of six routes into this
-    /// count rather than the count itself; see <see cref="SupersededHeldBackCount"/>
-    /// for what that cost. THAT ROUTE IS STILL THE ONE THAT MATTERS MOST TO THIS
-    /// LINE, WHICH IS WHY LOSING THE GATE IS NOT LOSING THE SUBJECT: it is the only
-    /// one of the six that reaches the whole population at once, taking the removable
-    /// verdict off every superseded row, so it is what makes this sentence report a
-    /// large number rather than a handful. Its own account, and the six days in
-    /// August when the opposite was true, are on
+    /// and the two are the same sentence about two populations. THE MACHINE-WIDE
+    /// REFUSAL IS THE ROUTE THAT MATTERS MOST TO THIS LINE, and it is one of six
+    /// routes into the count rather than the count itself: it is the only one of the
+    /// six that reaches the whole population at once, taking the removable verdict
+    /// off every superseded row, so it is what makes this sentence report a large
+    /// number rather than a handful. Its own account is on
     /// <see cref="InstallerQueryResult.UnaccountedProductCount"/> and on
     /// <c>CliEventClass.ScanRecordsIncompleteNotice</c>.
     ///
@@ -329,8 +326,7 @@ public partial class ScanViewModel : ObservableObject
     /// THAN READ HERE. A predicate over two observable properties has to be notified
     /// from both, and this one is set before the flag that would notify it: it would
     /// have been computed once, while the offer still read empty, and never asked
-    /// again. The line would then never appear on the one machine it is for, with a
-    /// green build and nothing to see.
+    /// again. The line would then never appear on the one machine it is for.
     /// </summary>
     public bool HasNothingListed => NothingListedCount > 0;
 
