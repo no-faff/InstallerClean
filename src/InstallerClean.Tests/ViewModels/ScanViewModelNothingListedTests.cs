@@ -117,10 +117,15 @@ public class ScanViewModelNothingListedTests
     [Fact]
     public void The_count_is_every_file_kept_back_and_not_one_decision_s_share()
     {
-        // THE MUST-MISS THAT SETS THE FIGURES APART. Two decisions filled this list and
-        // the wholesale arm accounts for one of the three, so a count taken from that
-        // arm reads 1, a count taken from the superseded figure reads 9, and only the
-        // list's own length reads 3. No assertion here accepts either of the others.
+        // THE MUST-MISS THAT SETS THE FIGURES APART. Four figures are within reach here
+        // and only one of them is the answer: the wholesale arm reads 1, the superseded
+        // figure reads 9, the split's own total reads 2 because it does not account for
+        // every file on the list, and only the list's own length reads 3. No assertion
+        // here accepts any of the other three.
+        //
+        // THE SPLIT IS LEFT SHORT ON PURPOSE. The line is the whole withholding, so a
+        // count derived from the split would under-report against the list the Details
+        // window shows on any machine the split does not account for whole.
         var vm = Driven(new ScanResult(
             RemovableFiles: Files(2, "offered"),
             RegisteredPackages: Array.Empty<RegisteredPackage>(),
@@ -128,7 +133,7 @@ public class ScanViewModelNothingListedTests
             WithheldCount: 9,
             WithheldFiles: Files(3, "held"),
             WalkOfferWithheldWholesale: true,
-            WithheldBy: new WithholdingSplit(IdentityUnestablishedCount: 2, WholesaleCount: 1)));
+            WithheldBy: new WithholdingSplit(IdentityUnestablishedCount: 1, WholesaleCount: 1)));
 
         Assert.True(vm.HasNothingListed);
         Assert.Equal(3, vm.NothingListedCount);
