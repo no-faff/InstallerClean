@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.0-blue" alt="GitHub リリース"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-66k-brightgreen" alt="総ダウンロード数"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-67k-brightgreen" alt="総ダウンロード数"></a>
 </p>
 
 ![クリーンアップ成功後の InstallerClean の画面：1.28 GB をクリーンアップし、68 個のファイルをごみ箱へ移動したところ](docs/screenshots/ja/07-success-done.webp)
 
 - **概要：** InstallerClean がすることは 1 つだけです。Windows が一切クリーンアップしない隠しフォルダー `C:\Windows\Installer` から、不要なファイルを取り除きます。ほぼ一瞬で終わるスキャンのあと、不要なファイルがあるかどうかを知らせ、詳しく見たい人にはさらに詳細を示し、それらを削除して C: ドライブの空き容量を増やせるようにします。一度使ったら、それで終わりです。
 - **こんな覚えはありませんか：** [WinDirStat](https://github.com/windirstat/windirstat)、WizTree、TreeSize などでディスクを調べていて、`C:\Windows\Installer` が大量の容量を占めているのに気づいたものの、中に何が入っているのか分からなかった。InstallerClean は、まさにそんなあなたのためのツールです。`9f05cba.msi` のような一見ランダムな名前のファイルの中身を把握していて、どれなら安全に削除できるのかをすぐに教えてくれます。
-- **どれくらい空くか：** これまでに（任意・匿名で）送られてきたレポートでは、<!-- reports-freedpct-start -->64%<!-- reports-freedpct-end --> のマシンに掃除できる不要なファイルがありました。そのうち、解放できた容量の中央値は <!-- reports-median-start -->14.5 GB<!-- reports-median-end --><!-- reports-biggest-start --> で、1 台はなんと 462 GB を取り戻しています<!-- reports-biggest-end -->。残りの <!-- reports-nothingpct-start -->36%<!-- reports-nothingpct-end --> は削除するものが見つからず、これは単に Installer フォルダーがすでにきれいだったというだけのことです。詳しくは下の [よくある質問](#よくある質問) をご覧ください。
+- **どれくらい空くか：** これまでに（任意・匿名で）送られてきたレポートでは、<!-- reports-freedpct-start -->64%<!-- reports-freedpct-end --> のマシンに掃除できる不要なファイルがありました。そのうち、解放できた容量の中央値は <!-- reports-median-start -->14.0 GB<!-- reports-median-end --><!-- reports-biggest-start --> で、1 台はなんと 462 GB を取り戻しています<!-- reports-biggest-end -->。残りの <!-- reports-nothingpct-start -->36%<!-- reports-nothingpct-end --> は削除するものが見つからず、これは単に Installer フォルダーがすでにきれいだったというだけのことです。詳しくは下の [よくある質問](#よくある質問) をご覧ください。
 - **安全性：** はい。どのファイルがまだ必要かを Windows インストーラー API 自身に問い合わせ、Windows が「用済み」と報告したファイルだけを一覧に出します。オープンソース（Apache 2.0）で、あなたについて何も尋ねません。アカウントも、広告も、追跡も、テレメトリもなく、バックグラウンドで動くものもありません。自分からオンラインで行うのは、起動時に GitHub で新しいバージョンがないか確認することだけで、これはオフにできます。
 - **入手方法：** [最新リリースをダウンロード](../../releases/latest)してください。実行し、[「不明な発行元」の警告](#unknown-publisher)と[管理者権限の確認](#admin)をクリックして進みます。不要なファイルがあれば削除します。これで完了です。
 
@@ -164,7 +164,7 @@ InstallerClean は、不要なファイルを 3 種類に分けて見つけ出�
 
 **「削除」と「移動」について。** InstallerClean が削除するファイルは、完全に削除してしまっても問題ありません。「削除」を選ぶと、それらはごみ箱へ移動されます（ごみ箱が使えない場合は警告が表示されます）。ごみ箱を空にすると、その分の容量が C: ドライブに戻ります。
 
-とはいえ、ファイルが削除しても安全だという点を、私の言葉だけで信じる必要はありません。ファイルがごみ箱に入っている間に、このフォルダーを使うアプリ（Office、Acrobat、Visual Studio など）が、引き続き問題なく更新・アンインストールできることを確かめられます。もし何かが壊れているのを見つけたら（その可能性は極めて低く、<!-- downloads-start -->66,000+<!-- downloads-end --> 回のダウンロードを通じて報告は 1 件もありません）、ごみ箱からファイルを復元すれば直せます。より万全を期すなら、代わりに「移動」を使い、ファイルを自分で選んだフォルダーにバックアップしておくこともできます（C: ドライブの容量を空けたいのであれば、当然ながら別のパーティションやドライブにあるフォルダーを選んでください）。元どおりに戻したくなったら、ファイルを `C:\Windows\Installer` にコピーして戻すだけです（とはいえ、その必要が生じることはまずないはずです）。ファイル名に「(1)」が付いてしまっている場合（同じフォルダーへ二度移動すると、こうなります）は、コピーして戻す前にそれを外してください。
+とはいえ、ファイルが削除しても安全だという点を、私の言葉だけで信じる必要はありません。ファイルがごみ箱に入っている間に、このフォルダーを使うアプリ（Office、Acrobat、Visual Studio など）が、引き続き問題なく更新・アンインストールできることを確かめられます。もし何かが壊れているのを見つけたら（その可能性は極めて低く、<!-- downloads-start -->67,000+<!-- downloads-end --> 回のダウンロードを通じて報告は 1 件もありません）、ごみ箱からファイルを復元すれば直せます。より万全を期すなら、代わりに「移動」を使い、ファイルを自分で選んだフォルダーにバックアップしておくこともできます（C: ドライブの容量を空けたいのであれば、当然ながら別のパーティションやドライブにあるフォルダーを選んでください）。元どおりに戻したくなったら、ファイルを `C:\Windows\Installer` にコピーして戻すだけです（とはいえ、その必要が生じることはまずないはずです）。ファイル名に「(1)」が付いてしまっている場合（同じフォルダーへ二度移動すると、こうなります）は、コピーして戻す前にそれを外してください。
 
 Windows インストーラーが今まさにキャッシュへ書き込んでいる、前回のトランザクションが中断されている、またはキャッシュを対象とする再起動後のリネームが予約されている場合、「移動」と「削除」は無効になり、具体的な理由が表示されます。
 
@@ -176,7 +176,7 @@ Windows インストーラーが今まさにキャッシュへ書き込んでい
 - VirusTotal：ビルドごとにスキャンしており、エンジンごとの詳細な結果はそのリリースページにリンクされているので、各ファイルのスコアを確認したり、ご自身で再スキャンしたりできます。リリース時点で残っている誤検知は、そのリリースのページで名指しして説明し、ベンダーが取り下げた時点でページを更新しています。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあり、CI が毎回のコミットをビルド・テストしています（上の緑色の CI バッジを参照）。
 - リリースビルドは決定論的です。コンパイラの設定により、同じソースコードと同じ SDK からは必ず同じバイト列が生成されますし、公開する exe が、まさにそのタグの時点のクリーンな作業ツリーからビルドされたものでなければ、リリース手順はそのバージョンにタグを打つことを拒否します。ですからタグをチェックアウトしてご自身でビルドし、公開されているハッシュと突き合わせることができます。ダウンロードしたものが公開されているソースコードと一致することを、そうやって証明できるわけです。まず SDK のバージョンを合わせてください（各リリースのノートに、どの SDK でビルドしたかを記載しています）。SDK のパッチバージョンが違うと生成されるバイト列も変わり、一致していないように見えますが、そうではありません。
-- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->66,000+<!-- downloads-end --> 回ダウンロードされています。
+- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->67,000+<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認証済み 100% クリーン" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は各リリースをウイルス・スパイウェア・アドウェアについて検査しています。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 認証済み 100% クリーン" width="190"></a>
 
@@ -252,7 +252,7 @@ InstallerClean は、キーボードだけでも、スクリーンリーダー�
 **本当に数 GB も空きますか？** お使いのマシン次第です。追加ソフトを入れていないまっさらな Windows 11 では、削除するものは何もありません。長く使い込んだ開発用ワークステーションや、MSI ベースのソフトを多く入れたマシン（Acrobat、Office、LibreOffice、大規模な開発ツールなど）では、数十 GB になることもあります。いずれにせよ、実行した瞬間に、どれだけ空くかが正確にわかります。
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-v1.8.0 から、結果を短い匿名のレポートとして送れるオプションがあります。これまでに 252 件が届いていて（みなさんありがとうございます🙏）、片づけるものがあった 64% のマシンでは、解放できた容量の中央値は 14.5 GB でした。なんと 462 GB を取り戻したマシンも 1 台あります。結果をまとめると次のとおりです。
+v1.8.0 から、結果を短い匿名のレポートとして送れるオプションがあります。これまでに 256 件が届いていて（みなさんありがとうございます🙏）、片づけるものがあった 64% のマシンでは、解放できた容量の中央値は 14.0 GB でした。なんと 462 GB を取り戻したマシンも 1 台あります。結果をまとめると次のとおりです。
 
 <p align="center">
   <picture>
