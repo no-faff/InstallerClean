@@ -190,19 +190,20 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         // every row, and nothing has replaced it.
         //
         // AND THERE IS NO PER-FILE RECORD OF WHICH CAUSE PUT A ROW HERE, on this
-        // screen or anywhere else. One of the causes is counted in the opt-in
-        // report, as a figure about the machine's records rather than about any
-        // file; the other is counted nowhere.
+        // screen or anywhere else. The opt-in report carries each cause as its own
+        // count, so what travels is how many files each decision kept back and
+        // never which decision kept back any one of them. A figure about a scan
+        // cannot be read down onto a row.
         //
         // No patches and not missing, both being the truth rather than a gap. A
         // file no registration names has no registered patches to list, and the
         // missing flag drives a recovery note about a file WINDOWS HAS A RECORD
         // FOR, which is the one thing these rows are not.
         //
-        // THE EMPTY PRODUCT NAME PUTS EVERY ONE OF THESE ROWS AT THE TOP OF THE
-        // DISPLAYED LIST, which is accepted rather than overlooked. The window
-        // orders by product name ascending and an empty string sorts first; the
-        // note that says so in full is beside that sort, in Window_Loaded.
+        // THE EMPTY PRODUCT NAME IS WHAT PUTS THESE ROWS AT THE FOOT OF THE
+        // DISPLAYED LIST. The window ranks on ProductRow.HasNoNamedProduct ahead
+        // of the product name itself; the note that says so in full is beside
+        // that sort, in Window_Loaded.
         var withheld = withheldFiles ?? Array.Empty<OrphanedFile>();
         foreach (var file in withheld)
         {
@@ -242,10 +243,10 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         // that row's details pane carries. Selecting the top row instead leaves
         // the user hunting for a small amber triangle somewhere in an
         // alphabetical list of every installed product, which is an instruction
-        // they cannot follow. Both orders here are by product name, so the missing
-        // rows are wherever the alphabet puts them; when there is no missing row,
-        // the intent is the top of the list, which the window reads off its own
-        // sorted view rather than off this one.
+        // they cannot follow. Both orders here rank on product name, so a missing
+        // row is wherever that puts it; when there is no missing row, the intent
+        // is the top of the list, which the window reads off its own sorted view
+        // rather than off this one.
         SelectedProduct = products.FirstOrDefault(p => p.IsMissing) ?? products.FirstOrDefault();
     }
 

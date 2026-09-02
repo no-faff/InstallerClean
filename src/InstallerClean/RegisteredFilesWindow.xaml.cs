@@ -70,19 +70,18 @@ public partial class RegisteredFilesWindow : Window
         // is what decides the index the bound selection sits at, and the scroll
         // and the container focus below are both taken from that index.
         //
-        // EVERY FILE THE SCAN COULD NOT SETTLE SITS AT THE TOP OF THIS LIST, AND
-        // THAT IS THE DELIBERATE RESULT OF TWO DECISIONS RATHER THAN AN OVERSIGHT.
-        // The list opens ordered by product name ascending. A file the scan
-        // declined to offer has no product name at all, because no registration
-        // names it and no placeholder is invented for it, and an empty string
-        // sorts before every real name. So those rows cluster above the first
-        // registered product, each with a blank first cell.
+        // EVERY FILE THE SCAN COULD NOT SETTLE SITS AT THE FOOT OF THIS LIST.
+        // The list opens ordered by product name ascending, and ProductRow's
+        // HasNoNamedProduct is applied ahead of it so that a row with nothing in
+        // the product cell ranks below every row that has a name, in both sort
+        // directions. The reader meets the named products first, which is what
+        // the window is for.
         //
-        // It was looked at and accepted in that form. Anybody minting a
-        // placeholder name to fill the cell, special-casing these rows in the
-        // sort, or splitting them back out under a heading of their own is
-        // undoing a decision rather than tidying a layout: the window held two
-        // headed groups until 3.0.0 and the merge into one list is the ruling.
+        // The rows themselves are not marked and no cause travels with them: the
+        // ordering is the whole of the distinction and no placeholder name is
+        // invented to fill the cell. Splitting them back out under a heading of
+        // their own is undoing a decision rather than tidying a layout, one list
+        // being the ruling.
         //
         // How many rows land there is not something this app can know. It is
         // whatever the scan could not settle on the machine in front of it.
@@ -166,6 +165,15 @@ public partial class RegisteredFilesWindow : Window
         using (view.DeferRefresh())
         {
             view.SortDescriptions.Clear();
+            // Rows with no product name to scan for go to the foot of the list,
+            // ahead of the key the user asked for and always ascending so they
+            // stay there in both directions. Only the product column, since it
+            // is the only one where those rows have nothing in the cell; sorting
+            // by file, size or patches ranks them on their own values like any
+            // other row.
+            if (sortProperty == nameof(ProductRow.ProductName))
+                view.SortDescriptions.Add(
+                    new SortDescription(nameof(ProductRow.HasNoNamedProduct), ListSortDirection.Ascending));
             view.SortDescriptions.Add(new SortDescription(sortProperty, direction));
             view.SortDescriptions.Add(
                 new SortDescription(nameof(ProductRow.FullPath), ListSortDirection.Ascending));

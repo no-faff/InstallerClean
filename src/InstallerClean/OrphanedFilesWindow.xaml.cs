@@ -171,12 +171,12 @@ public partial class OrphanedFilesWindow : Window
     ///
     /// Every sort ends on the full path, which is unique per row, so the order
     /// is total. This list needs that more than its sibling does: the Reason
-    /// column takes exactly three values, so sorting by it puts every row into
-    /// one of three ties, and without a tiebreaker Reason, File, Reason
+    /// column takes exactly two values, so sorting by it puts every row into
+    /// one of two ties, and without a tiebreaker Reason, File, Reason
     /// reshuffles rows inside a group for no reason a user can see.
-    /// RegisteredFilesWindow.ApplySort is the same three lines and says why
-    /// SortDescriptions beat a CustomSort comparer, which is not the obvious
-    /// way round.
+    /// RegisteredFilesWindow.ApplySort builds its descriptions the same way and
+    /// says why SortDescriptions beat a CustomSort comparer, which is not the
+    /// obvious way round.
     /// </summary>
     private void ApplySort(string sortProperty, ListSortDirection direction, GridViewColumn column)
     {

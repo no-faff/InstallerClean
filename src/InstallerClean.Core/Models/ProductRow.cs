@@ -10,8 +10,9 @@ namespace InstallerClean.Models;
 /// IT ALSO CARRIES A ROW NO REGISTRATION NAMES: a file the scan declined to
 /// offer sits in the same list, and the only thing that distinguishes it is
 /// that <see cref="ProductName"/> is empty, because there is no product to
-/// name. Nothing here treats such a row differently, which is the point of
-/// merging the two lists.
+/// name. It carries no marking of its own and no cause: the one place the
+/// distinction is read is <see cref="HasNoNamedProduct"/>, which keeps these
+/// rows at the foot of the list rather than the head of it.
 /// </summary>
 /// <param name="ProductName">
 /// The product Windows names for the registration behind this row, or empty
@@ -33,6 +34,21 @@ public sealed record ProductRow(
     // from the file, so it is unavailable for a missing row.
     bool IsMissing = false)
 {
+    /// <summary>
+    /// Orders a row carrying no established product name below every row that
+    /// has one. Two values reach it: an empty name, where no registration names
+    /// the file at all, and <c>Field.UnknownProductName</c>, where a
+    /// registration exists and its display name did not come back. They are
+    /// different facts and they sit together here for one reason, that neither
+    /// gives the reader a name to scan for.
+    ///
+    /// The list sorts on this before the product name itself and always
+    /// ascending, so these rows stay at the foot whichever way the header
+    /// points. Sorting on any other column ignores it.
+    /// </summary>
+    public bool HasNoNamedProduct =>
+        ProductName.Length == 0 || ProductName == Strings.Field_UnknownProductName;
+
     /// <summary>
     /// Spoken name for the row, composed from the visible cells. The list
     /// container binds it to AutomationProperties.Name; without that, UI
