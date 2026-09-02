@@ -651,6 +651,11 @@ public class CleanupPreFlightTests
         Assert.True(vm.Completion.IsComplete);
     }
 
+    /// <summary>
+    /// Pins that a destination on the cache's own volume reaches the confirmation
+    /// as a same-drive move, on a host where the cache folder's path root and the
+    /// cache's own volume are the same string.
+    /// </summary>
     [Fact]
     public async Task A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space()
     {
@@ -667,19 +672,16 @@ public class CleanupPreFlightTests
         // being about the system directory. The name says path root because the
         // two part on the machine this whole change is for.
         //
-        // THE ASSERTION AT THE BOTTOM IS FALSE ON THAT MACHINE. With a volume
-        // mounted at C:\Windows\Installer, C:\ic-test-samedrive is on another
-        // volume, ClassifyMoveDestination returns differentFixedDrive, the
-        // dialog is told sameDrive: false and the Received check below fails.
-        // Where nothing is mounted between the root and the cache it passes,
-        // and there it cannot tell the fixed code from the code it replaced
-        // either.
+        // THE ASSERTION IS WRITTEN FOR A ROOT AND A CACHE VOLUME THAT ARE THE
+        // SAME STRING, which is the shape of a machine with nothing mounted
+        // between them. That is the condition it holds under and it is why the
+        // fixture takes the path root.
         //
-        // THE FIXTURE CANNOT BE BUILT UNDER THE CACHE FOLDER TO FIX THAT, which
-        // is the obvious repair and is closed off. Move refuses any destination
-        // resolving inside the installer cache, on the first of the pre-flight's
-        // two path gates, so it would be rejected before the classification this
-        // test is about is ever reached.
+        // AND THE FIXTURE IS NOT BUILT UNDER THE CACHE FOLDER, which is the
+        // other way to name a destination on the cache's own volume. Move
+        // refuses any destination resolving inside the installer cache, on the
+        // first of the pre-flight's two path gates, so such a fixture is
+        // rejected before the classification this test is about is reached.
         var cachePathRoot = Path.GetPathRoot(InstallerCacheHelpers.InstallerFolder)!;
         var sameDriveDestination = Path.Combine(cachePathRoot, "ic-test-samedrive");
         _confirmationService.ConfirmMove(

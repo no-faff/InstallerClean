@@ -50,21 +50,23 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// code this change replaced: leave the cache root alone and the two are the
 /// same string, so the fixture answers the same whichever version is underneath.
 /// <see cref="IsOnInstallerCacheDrive_asks_the_cache_root_it_is_given_and_not_the_system_directory"/>
-/// is written for it. What the override still does not reach is the arm where
-/// two volumes are compared and found different: a false from a cache root that
-/// will not resolve is not that. That arm needs a host with a second volume and
-/// is carried as outstanding rather than pretended to here.
+/// is written for it.
 /// </remarks>
 public class MoveSpaceCheckIntegrationTests
 {
+    /// <summary>
+    /// Pins that the cache-side query is asked and answered, on a host where the
+    /// cache folder's path root and the cache's own volume are the same string.
+    /// </summary>
     [Fact]
     public void IsOnInstallerCacheDrive_is_true_for_a_folder_under_the_cache_path_root()
     {
-        // THIS TEST WAS NAMED FOR THE SYSTEM DRIVE AND PINNED A FAULT. The
-        // method asked which volume the Windows system directory is on, which
-        // is not the installer cache's volume where a volume is mounted at
-        // C:\Windows\Installer, and the test asserted that behaviour by name.
-        // The subject moved to the cache when the method did.
+        // THE SUBJECT IS THE CACHE'S VOLUME AND THE NAME SAYS SO. The method
+        // asks which volume the installer cache is on, not which volume the
+        // Windows system directory is on. Those are the same string unless a
+        // volume is mounted at C:\Windows\Installer, which is the machine the
+        // method was rewritten for and the reason it no longer asks about the
+        // system directory.
         //
         // THE FIXTURE COMPUTES A PATH ROOT AND THE METHOD COMPARES VOLUMES, AND
         // THE NAME NOW SAYS WHICH. Path.GetPathRoot answers C:\ for the cache
@@ -74,28 +76,20 @@ public class MoveSpaceCheckIntegrationTests
         // its expectation with the call under test, and a fixture that agrees
         // with the code by construction cannot fail at what its name claims.
         //
-        // SO THIS ASSERTION IS FALSE ON THE MACHINE THE FIX IS FOR. With a
-        // volume mounted at C:\Windows\Installer the cache's volume is
-        // C:\Windows\Installer\, C:\backup is genuinely not on it, the method
-        // correctly answers false, and this test fails. It holds only where
-        // nothing is mounted between the path root and the cache folder.
+        // SO THE ASSERTION IS WRITTEN FOR A PATH ROOT AND A CACHE VOLUME THAT
+        // ARE THE SAME STRING, which is the shape of a machine with nothing
+        // mounted between them. That is the condition it holds under, and it
+        // follows from the fixture keeping the path root rather than asking the
+        // method.
         //
-        // AND WHERE IT DOES HOLD IT CANNOT TELL THE FIXED CODE FROM THE CODE IT
-        // REPLACED, which is a second statement and a weaker one, not the same
-        // one said twice. The cache's volume and the system root are the same
-        // string on every host this suite runs on, so the assertion passes
-        // against both. Building a host where it could tell them apart needs a
-        // second volume and administrator rights.
-        //
-        // What it does newly pin is that the cache-side query answers at all.
-        // Before the fix this method never touched the cache path; it does now,
-        // and a GetVolumePathName that would not answer for it returns null, so
-        // the method answers false for every destination on the machine, the
+        // What it pins is that the cache-side query answers at all. Before the
+        // fix this method never touched the cache path; it does now, and a
+        // GetVolumePathName that would not answer for it returns null, so the
+        // method answers false for every destination on the machine, the
         // free-space check runs on a move that is a rename, and the Move this
         // app exists for is refused for want of space it does not need. Whether
         // anything about that folder could make the call refuse is not asserted
-        // here and was not reasoned out. This test is what answers it, on a
-        // real Windows host.
+        // here. This test is what answers it, on a real Windows host.
         //
         // READ A RED HERE AGAINST ONE DIFFERENCE BEFORE READING IT AS A FAULT.
         // Both hosts ship requireAdministrator in their manifests, so the app
