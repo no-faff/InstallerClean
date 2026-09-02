@@ -681,10 +681,11 @@ public partial class MainWindow : Window
 
     // Stable README anchor (an explicit <a id="is-it-safe"> before the
     // "Is it safe?" section of every README, so rewording a heading never
-    // breaks the link). The post-Move / post-Delete restore hints each carry a
-    // bracket-delimited phrase that links here, the reasoning behind the claim
-    // that a cleaned file was safe to remove; the URL targets the README in the
-    // displayed language.
+    // breaks the link); the URL targets the README in the displayed language.
+    // It is the destination for every link this window composes out of a
+    // displayed value. Two lines compose that way, the intro lead and the
+    // completion restore line, each by splitting its value at a
+    // bracket-delimited phrase.
     private static string SafetyUrl => ReadmeLinks.For("is-it-safe", Localisation.UiCulture);
 
     /// <summary>
@@ -697,10 +698,9 @@ public partial class MainWindow : Window
     /// This is the window's only content link today and it sits on its
     /// strongest safety claim: the completion line's own split will build a
     /// second if a translation ever brackets that value.
-    /// The delete confirmation states the same claim and carries no link of
-    /// its own: that dialog is modal, so this line stays visible behind it
-    /// and cannot be clicked, and a second copy there would put two on screen
-    /// at once.
+    /// The delete confirmation states the same claim and composes its body the
+    /// same way, over a value no language's sentence is meant to bracket; the
+    /// resx entry for that string carries the reason.
     /// </summary>
     private void BuildIntroLeadLine()
     {
