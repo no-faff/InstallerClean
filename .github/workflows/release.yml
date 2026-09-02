@@ -64,8 +64,67 @@ jobs:
     runs-on: windows-2025
 
     steps:
+      # fetch-depth: 0 for the superseded-English guard in the step below, which
+      # compares every satellite value against every wording the neutral resx has
+      # ever held, and so answers for exactly as much history as it is given. The
+      # default fetch is one commit. That guard refuses to run in a shallow clone
+      # rather than relying on this line, so removing the depth turns the step red.
       - name: Check out the commit to be released
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # THE GUARDS RUN HERE, BEFORE ANYTHING IS BUILT OR SIGNED, AND THE WHOLE
+      # SET RUNS. A release is cut by hand from this workflow's artifact, so
+      # without this step a release can be built, signed twice and published off
+      # a commit no guard has ever read. Finding that out afterwards is not a
+      # cheap rebuild: the fix edits a file under src/, so the binaries change,
+      # both signing rounds have to be requested and approved again, and any
+      # malware scan bound to the old hashes says nothing about the new ones.
+      #
+      # THE SET IS A GLOB AND NOT A LIST, which is how the release script's own
+      # guard loop names it. The two therefore run the identical set by
+      # construction, and a seventeenth guard is gated by the release path on
+      # the day it is written with nothing here to keep in step.
+      #
+      # EVERY GUARD RUNS EVEN AFTER ONE HAS GONE RED, for the reason CI gives at
+      # its first guard: none of them is a premise for any other, so a red one
+      # reports its own verdict and decides nothing about the rest. An empty set
+      # is a failure rather than a pass, because a glob that matched nothing
+      # would otherwise report a clean run having read no file at all.
+      #
+      # THERE IS NO BYPASS AND THAT IS DELIBERATE. The translation guards are red
+      # for the stretch between the English being reworded and the translation
+      # round catching up, and in that stretch this workflow does not run. That is
+      # the gate working rather than a case to be excepted: a run allowed to skip
+      # the guards is a release path with a hole in it, whatever it was for.
+      #
+      # No setup-node step, for the same reason CI has none: node is on the
+      # runner image and both workflows are pinned to the same one.
+      - name: Run the source guards
+        shell: pwsh
+        run: |
+          $guards = @(Get-ChildItem -Path scripts/check-*.mjs | Sort-Object Name)
+          Write-Host "Guards found: $($guards.Count)"
+          $guards | ForEach-Object { Write-Host "  $($_.Name)" }
+          if ($guards.Count -eq 0) {
+            Write-Host "::error::No guard scripts matched scripts/check-*.mjs"
+            exit 1
+          }
+
+          $failed = @()
+          foreach ($guard in $guards) {
+            Write-Host "::group::$($guard.Name)"
+            node $guard.FullName
+            if ($LASTEXITCODE -ne 0) { $failed += $guard.Name }
+            Write-Host "::endgroup::"
+          }
+
+          Write-Host "Guards run: $($guards.Count). Failed: $($failed.Count)."
+          if ($failed.Count -gt 0) {
+            Write-Host "::error::Guards failed: $($failed -join ', ')"
+            exit 1
+          }
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
