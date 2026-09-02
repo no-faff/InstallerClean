@@ -4056,13 +4056,43 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// mostly products the machine does not have, so it would withhold on the
     /// ordinary case rather than on a fault.
     ///
-    /// THE SAME CODE IS A FAILURE WHERE THE CALL NAMES NO PRODUCT, AND THAT IS NOT
-    /// AN INCONSISTENCY TO TIDY AWAY. <see cref="EnumerateProducts"/> and
+    /// THE SAME CODE IS CLASSIFIED AT FIVE OTHER POINTS IN THIS FILE, THREE OF
+    /// THEM THE OTHER WAY, AND NOT ONE OF THOSE DISAGREEMENTS IS AN INCONSISTENCY
+    /// TO TIDY AWAY. What separates the sites is whether something earlier in the
+    /// same run has already established that the product exists, and not whether
+    /// the call names it: three of the five do name a product, and none of them
+    /// lets the scan act on the code as an absence.
+    ///
+    /// Nothing has established it here, which is what the paragraph above is
+    /// about: the question this call puts is whether the machine holds the code
+    /// at all, so a no is the machine answering.
+    ///
+    /// <see cref="EnumerateProducts"/> and
     /// <see cref="EnumeratePatchHoldersAcrossAllProducts"/> both pass a null
     /// product code, so there is no product for the code to be reporting absent
     /// and it cannot carry this meaning; both are right to treat it as a row or a
-    /// set short by an unknown amount. The meaning is the question's, not the
-    /// number's.
+    /// set short by an unknown amount.
+    ///
+    /// <see cref="EnumeratePatches"/> NAMES A PRODUCT AND IS STILL RIGHT TO TREAT
+    /// IT AS A FAILURE. That product came out of the product enumeration moments
+    /// earlier, so an absence contradicts what the run has already established,
+    /// and the reading that fits both is a registration whose patch list this
+    /// scan cannot see. What reading it as an absence would cost is written at
+    /// that line.
+    ///
+    /// ONE RETURN IS CLASSIFIED TWICE IN ONE EXPRESSION, ON PURPOSE, AT
+    /// <see cref="GetProductProperty"/> AND <see cref="GetPatchProperty"/>.
+    /// <see cref="IsBenignPropertyRead"/> does not carry the code, so the read
+    /// is Unreadable and the scan's own consumers withhold on it;
+    /// <see cref="IsRecordAbsent"/> does carry it, so the same return is
+    /// NotRegistered as well, which the under-lease re-read alone asks and which
+    /// is a different question: whether a registration has gone since the scan
+    /// read it. The two predicates read as a contradiction until that is known.
+    /// Putting the code on the benign list to settle them would turn a record
+    /// that has gone into a readable empty value, which is the direction that
+    /// costs a file.
+    ///
+    /// The meaning is the question's, not the number's.
     /// </summary>
     private static bool IsProductNotInstalled(uint error) =>
         error is MsiError.NoMoreItems or MsiError.UnknownProduct;
