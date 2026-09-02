@@ -78,11 +78,10 @@ const MAP = {
   'Window.About.Title': `InstallerClean について`,
   'Window.Registered.Title': `そのままにしたファイル`,
   'Window.Orphaned.Title': `削除しても安全な不要ファイル`,
-  // Section.Registered.Products and Automation.Section.Products were removed from
-  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
-  // registered-files window stopped having a products group of its own, and stayed
-  // here and in all fifteen satellites, so every round regenerated two keys the app
-  // cannot use and check-resx-parity reported them as strays in every language.
+  // Section.Registered.Products and Automation.Section.Products are deliberately
+  // not here. They left the neutral resx when the registered-files window stopped
+  // having a products group of its own, so a value for either would be
+  // regenerated into a key the app cannot use.
   'Section.Registered.Patches': `パッチ`,
   'Section.Registered.Details': `製品詳細`,
   'Section.Backup.Folder': `バックアップフォルダー`,

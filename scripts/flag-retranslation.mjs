@@ -29,9 +29,8 @@
 // IT SHOWS BEFORE IT ACTS, AND THAT IS THE DEFAULT RATHER THAN A FLAG. The real
 // hazard here is judgement and not mechanism: every flag throws away a translation
 // a human then has to redo, and the signal that suggests a key needs flagging is
-// wrong far more often than it is right. check-translation-freshness.mjs measured
-// the cheap version of that signal at ONE genuine key-slot against THIRTEEN false
-// positives. An undo lets you back out after you have seen the damage; a preview
+// wrong far more often than it is right, the cheap version of it most of all.
+// An undo lets you back out after you have seen the damage; a preview
 // lets you not do it. A flag you have to remember is a flag you forget on the run
 // that matters, so the safe mode is the one you get by typing nothing.
 //

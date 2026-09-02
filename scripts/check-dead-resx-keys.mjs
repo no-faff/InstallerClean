@@ -82,17 +82,12 @@ const ALLOWLIST = new Set([
   // that the pair left this list deliberately and is not missing from it.
 ]);
 
-// FIVE INSTANCE-REFUSAL KEYS STOOD IN THAT LIST UNTIL 2026-08-21 AND THEY ARE GONE
-// FROM THE RESX, NOT FROM THIS LIST ONLY. Completion.InstanceRefusal,
-// Cli.NothingOfferedInstance, Cli.EventLogNothingOfferedInstance, Cli.InstanceRefusal
-// and Cli.EventLogInstanceRefusal, all surfaces for the second-instance condition.
-//
-// THE REASON THIS LIST GAVE FOR KEEPING THEM WAS FALSE AND NOBODY HAD CHECKED IT.
-// It said they were kept in all fifteen satellites and that deleting the English
-// would throw away fifteen translations. Measured across all sixteen resx files:
-// every one of the five was in the neutral and in NONE of the satellites. There
-// were no translations to lose, so the sentence that justified keeping them was
-// arguing from a thing that did not exist, and it read as a checked decision.
+// FIVE INSTANCE-REFUSAL KEYS ARE GONE FROM THE RESX, NOT FROM THIS LIST ONLY.
+// Completion.InstanceRefusal, Cli.NothingOfferedInstance,
+// Cli.EventLogNothingOfferedInstance, Cli.InstanceRefusal and
+// Cli.EventLogInstanceRefusal, all surfaces for the second-instance condition.
+// They stood in the neutral and in none of the satellites, so removing the
+// English threw away no translation and there is nothing here to put back.
 //
 // AND THE OTHER REASON DOES NOT REACH THEM EITHER. All five NAME A CAUSE. A
 // cause-naming string for a mechanism that has left the tree cannot be brought

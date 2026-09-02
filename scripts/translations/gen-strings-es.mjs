@@ -91,11 +91,10 @@ const MAP = {
   'Window.About.Title': `Acerca de`,
   'Window.Registered.Title': `Archivos que se han dejado en paz`,
   'Window.Orphaned.Title': `Archivos innecesarios que puedes eliminar sin riesgo`,
-  // Section.Registered.Products and Automation.Section.Products were removed from
-  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
-  // registered-files window stopped having a products group of its own, and stayed
-  // here and in all fifteen satellites, so every round regenerated two keys the app
-  // cannot use and check-resx-parity reported them as strays in every language.
+  // Section.Registered.Products and Automation.Section.Products are deliberately
+  // not here. They left the neutral resx when the registered-files window stopped
+  // having a products group of its own, so a value for either would be
+  // regenerated into a key the app cannot use.
   'Section.Registered.Patches': `PARCHES`,
   'Section.Registered.Details': `DETALLES DEL PRODUCTO`,
   'Section.Backup.Folder': `CARPETA DE COPIA DE SEGURIDAD`,

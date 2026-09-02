@@ -25,9 +25,9 @@
 // merely stated. It rebuilds every table in memory and fails on any difference
 // from the committed file, so a resx change that skips this script is caught on
 // the commit that causes it instead of by whoever next reads the public page.
-// Without it the fourteen tables went stale in 47a00f5 and reached HEAD still
-// quoting two strings the app no longer had, on the very pages the project
-// invites native speakers to review.
+// Without it a table goes stale silently and reaches the public pages still
+// quoting a string the app no longer has, on the very pages the project invites
+// native speakers to review.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 
 const LANGS = {

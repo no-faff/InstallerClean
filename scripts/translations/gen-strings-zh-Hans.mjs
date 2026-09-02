@@ -67,11 +67,10 @@ const MAP = {
   'Window.About.Title': `关于`,
   'Window.Registered.Title': `原样保留的文件`,
   'Window.Orphaned.Title': `不需要的文件，可安全删除`,
-  // Section.Registered.Products and Automation.Section.Products were removed from
-  // this map on 2026-08-21. They left the neutral resx at f49b795b, when the
-  // registered-files window stopped having a products group of its own, and stayed
-  // here and in all fifteen satellites, so every round regenerated two keys the app
-  // cannot use and check-resx-parity reported them as strays in every language.
+  // Section.Registered.Products and Automation.Section.Products are deliberately
+  // not here. They left the neutral resx when the registered-files window stopped
+  // having a products group of its own, so a value for either would be
+  // regenerated into a key the app cannot use.
   'Section.Registered.Patches': `补丁`,
   'Section.Registered.Details': `产品详情`,
   'Section.Backup.Folder': `备份文件夹`,

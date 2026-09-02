@@ -10,13 +10,10 @@
 // neutral, so it reads as translated, while what it actually holds is the old
 // English. The value looks done and is not.
 //
-// MEASURED, 2026-08-24, at c6726f7f: seven distinct keys were in exactly that gap
-// across fourteen languages, ninety-eight key-slots, and check-still-english
-// reported every one of them as fine. Two more were plural overrides, which fall
-// through BOTH of that gate's arms at once: not equal to the current neutral, so
-// the untranslated arm misses them, and their base not equal either, so the
-// stranded arm misses them too. Those two had lost a placeholder and a folder
-// token as well, and had been shipping-adjacent in the tree for weeks.
+// A PLURAL OVERRIDE FALLS THROUGH BOTH OF THAT GATE'S ARMS AT ONCE, which is the
+// same gap arriving twice over: not equal to the current neutral, so the
+// untranslated arm misses it, and its base not equal either, so the stranded arm
+// misses it too.
 //
 // WHAT IT IS NOT. It is not a freshness ledger and needs no seed file. It reads
 // the value history out of git, which already records every wording the neutral
@@ -34,8 +31,8 @@
 // neutral, and lists the ones the English overtook. That catches a real
 // translation of superseded English, which nothing else can, and it also catches
 // every cosmetic edit a translation never needed to follow. It never fails the
-// build and its output is a reading list, not a verdict: at c6726f7f it named 137
-// key-slots of which 105 were real. Read them; do not act on the count.
+// build and its output is a reading list, not a verdict. Read them; do not act
+// on the count.
 //
 // Run from the repo root: node scripts/check-superseded-english.mjs [--drift]
 import { readdirSync, readFileSync } from 'node:fs';
@@ -126,10 +123,8 @@ const neutral = parse(readFileSync(NEUTRAL, 'utf8'), NEUTRAL);
 // THE catch BELOW IS WHAT MAKES THE CONTROL SAFE AND IT IS LOAD-BEARING. A revision
 // from before this file existed makes `git show` fail, and that revision is skipped
 // without ever reaching the control: absent at this commit and present-but-read-as-
-// empty are different things and only the second is a fault. Measured before this
-// was added, over every revision of all sixteen resx: 1,521 revisions read, raw and
-// parsed agreeing on every one, never zero. So it is provably safe rather than
-// presumed safe, and a red here is a real change of shape.
+// empty are different things and only the second is a fault. So a red here is a
+// real change of shape rather than a revision the parser could not reach.
 const revs = git('rev-list', 'HEAD', '--', NEUTRAL).split('\n').filter(Boolean);
 const history = new Map();
 for (const rev of revs) {

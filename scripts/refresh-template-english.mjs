@@ -21,20 +21,18 @@
 // translator adding the seventeenth language would have worked from wording the
 // app stopped using on 11 August.
 //
-// THE THIRTEEN KEYS THE TEMPLATE'S SELF-CHECK NAMES ARE NOT A SEPARATE BACKLOG.
-// Measured 2026-08-21 at 52c31d63: they are SEVEN of the eight stale keys this
-// script's sibling job flags, plus SIX belonging to the coordinator's app-string
-// batch, with nothing left over. Cli.EventLogUnavailable is in that eight and
-// not in the thirteen, because the template's English for it already matches the
-// neutral and its staleness is Japanese-only.
+// THE KEYS THE TEMPLATE'S SELF-CHECK NAMES ARE NOT A SEPARATE BACKLOG. They are
+// the stale keys this script's sibling job flags, plus the ones whose English is
+// still being rewritten, with nothing left over. A key can be in the sibling's
+// set and not in the template's: Cli.EventLogUnavailable is one, the template's
+// English for it already matching the neutral and its staleness being
+// Japanese-only.
 //
-// SO THE COUNT GOES FROM THIRTEEN TO SIX AND THAT IS THE TOOL WORKING, NOT A
-// HALF-FIX. The remaining six are HELD DELIBERATELY: their English is being
-// rewritten and nobody may put a wording into the template that the owner has
-// not ruled on. What releases them is the app-string batch, not this script.
-// Read six where a document said thirteen and you are reading progress, not a
-// regression, and "fixing" the six by inventing English here is the specific
-// mistake this paragraph exists to prevent.
+// SO THE SET SHRINKS AS THE ENGLISH SETTLES, AND THAT IS THE TOOL WORKING RATHER
+// THAN A HALF-FIX. What is left is HELD DELIBERATELY: nobody may put a wording
+// into the template that has not been ruled on, and what releases those keys is
+// the English being settled rather than this script. "Fixing" them by inventing
+// English here is the specific mistake this paragraph exists to prevent.
 //
 // Usage (from the repo root):
 //   node scripts/refresh-template-english.mjs <Key.Name> [<Key.Name> ...]
