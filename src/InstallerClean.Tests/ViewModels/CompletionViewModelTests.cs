@@ -100,9 +100,8 @@ public class CompletionViewModelTests
             errors: new List<FileOperationError>());
 
         // A delete reclaims the disk at the instant it happens, so the headline
-        // says so. The screen makes no safety claim and offers no recovery
-        // advice, which is why it is the one completion state with no line
-        // under the summary and no link.
+        // says so, and this is the completion state carrying no line under the
+        // summary.
         Assert.Contains("freed", vm.Heading);
         Assert.Equal(string.Empty, vm.Restore);
     }
@@ -333,8 +332,8 @@ public class CompletionViewModelTests
     [Fact]
     public void A_cancelled_delete_carries_no_restore_line_whatever_it_reached()
     {
-        // Same rule as the completed delete: the screen makes no safety claim,
-        // so there is nothing under the summary at any count.
+        // Same rule as the completed delete: nothing under the summary at any
+        // count.
         var vm = new CompletionViewModel();
         vm.ShowDeleteCancelledSummary(deletedCount: 3, totalCount: 40, deletedBytes: 1024,
             errors: Failures(2));

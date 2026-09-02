@@ -100,13 +100,11 @@ const ELABORATES_A_LABEL = [
 // that heading plus an explicit Name resolving to the heading's own key.
 //
 // IT IS EMPTY, AND EMPTY IS SAFE HERE IN A WAY AN EMPTY ALLOWLIST USUALLY IS
-// NOT. Its one member was the details window's second group, whose heading and
-// ListBox both went when the window became a single list. Emptying a list that
-// SUPPRESSES a check would quietly stop the checking; this one only ever ADMITS
-// a key to a classification, and rule 2 below fails on any automation name that
-// is in none of the five lists. So an empty list here can make the guard
-// stricter and never looser, and the classification stays written down for
-// whoever builds that shape again.
+// NOT. Emptying a list that SUPPRESSES a check would quietly stop the checking;
+// this one only ever ADMITS a key to a classification, and rule 2 below fails on
+// any automation name that is in none of the five lists. So an empty list here
+// can make the guard stricter and never looser, and the classification stays
+// written down for whoever builds that shape.
 //
 // IT IS NOT MUST_AGREE, AND PUTTING A KEY THERE WOULD BE THIS FILE'S OWN NAMED
 // MISTAKE. That list measures whether two keys' values agree in every language.

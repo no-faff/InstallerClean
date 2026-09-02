@@ -694,13 +694,6 @@ public partial class MainWindow : Window
     /// the scanned state's lead carries a pair; the not-scanned, scan-failed
     /// and Windows-Installer-hold leads have none and render verbatim as a
     /// single Run, which is what the shared split already does with them.
-    ///
-    /// This is the window's only content link today and it sits on its
-    /// strongest safety claim: the completion line's own split will build a
-    /// second if a translation ever brackets that value.
-    /// The delete confirmation states the same claim and composes its body the
-    /// same way, over a value no language's sentence is meant to bracket; the
-    /// resx entry for that string carries the reason.
     /// </summary>
     private void BuildIntroLeadLine()
     {

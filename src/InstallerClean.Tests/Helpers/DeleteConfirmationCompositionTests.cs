@@ -10,11 +10,7 @@ namespace InstallerClean.Tests.Helpers;
 ///
 /// ConfirmDeleteWindow's BuildBodyLine takes one of the two count forms from
 /// DisplayHelpers.Pluralise and renders it, hyperlinking a phrase wrapped in
-/// <c>[ ]</c>. Neither form carries a pair, in any language: the dialog is modal
-/// over the main window, which states the same claim and links it into the
-/// README's "Is it safe?" section, so a bracketed phrase here would put two
-/// copies of one link on screen together, one live and one behind glass that
-/// cannot be clicked.
+/// <c>[ ]</c>. Neither form carries a pair, in any language.
 ///
 /// The brackets are ordinary characters in a resx value, so a translation can add
 /// one, drop one or move it, and check-resx-parity, which reads key presence and

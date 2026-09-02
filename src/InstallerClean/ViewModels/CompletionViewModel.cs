@@ -469,8 +469,7 @@ public partial class CompletionViewModel : ObservableObject
     /// about this screen worth defending. The app's claim is not that a delete
     /// can be undone, it is that these files do not need undoing, so a recovery
     /// line here would be the app hedging against the thing it has just said
-    /// will not happen. That also leaves the screen with no safety claim on it,
-    /// and so nothing on it for a link to hang on.
+    /// will not happen.
     /// </summary>
     public void ShowDeleteSummary(int deletedCount, long deletedBytes,
         IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)

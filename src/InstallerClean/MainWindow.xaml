@@ -154,8 +154,7 @@
                          inline Hyperlink at once, so there is no Text binding
                          here. The other three leads (not scanned, scan failed,
                          Windows Installer hold) carry no brackets and render
-                         verbatim. This is the only link in the window's
-                         content, on its strongest safety claim. -->
+                         verbatim. -->
                     <TextBlock x:Name="IntroLeadText" TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
                                FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"/>
                     <!-- The converter prepares the line for layout. It binds the
@@ -975,12 +974,11 @@
                     </TextBlock>
 
                     <!-- Restore guidance, after a Move and on the all-clear
-                         receipt. Collapses when empty, which is every delete
-                         (that screen makes no safety claim and so carries no
-                         line here) and the all-clear before its receipt lands,
-                         so the card does not carry a phantom 30+ pixel gap from
-                         the bottom margin plus line-height of an empty
-                         TextBlock. Pattern matches the Errors Border below.
+                         receipt. Collapses when empty, which is every delete and
+                         the all-clear before its receipt lands, so the card does
+                         not carry a phantom 30+ pixel gap from the bottom margin
+                         plus line-height of an empty TextBlock. Pattern matches
+                         the Errors Border below.
                          LiveSetting + the code-behind raise on reveal: this
                          line is the second half of the outcome (where the files
                          went after a Move; the scan receipt on an all-clear).

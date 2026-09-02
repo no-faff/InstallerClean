@@ -272,12 +272,6 @@ namespace InstallerClean.Models;
 /// lookup of a program that might have used the file. Both are true of every row
 /// whichever cause put it there, and there is no per-file record of which did.
 ///
-/// THE HEADING THAT USED TO CARRY THIS RULE IS GONE AND THE RULE IS NOT. Until 3.0.0 the
-/// Details window held a second group under "InstallerClean couldn't be sure about
-/// these", chosen because it was true of every row whatever had put it there. The two
-/// groups are now one list and that heading has gone with them, which weakens nothing
-/// here: a surface that says nothing about these rows cannot state a cause over them.
-///
 /// WHY THE FIRST CAUSE TAKES THE WHOLE WALK-DERIVED SET AND NOT ONE FILE, and the
 /// answer is the same shape for all three findings behind it: the app knows a needed
 /// file may be sitting in the candidate list and cannot say WHICH. For an unspellable

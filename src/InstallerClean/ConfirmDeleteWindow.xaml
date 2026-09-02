@@ -56,10 +56,7 @@
                      renders a bracketed phrase as a hyperlink into the
                      README's "Is it safe?" section; a TextBlock cannot bind
                      Text and host an inline Hyperlink at once, so there is no
-                     Text binding here. The sentence itself is not meant to
-                     carry one: it states the safety claim in its own words,
-                     and the link to that section is on the main window's lead,
-                     which this dialog opens over. -->
+                     Text binding here. -->
                 <TextBlock x:Name="BodyText"
                            Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                            Margin="{StaticResource GapBottom.Xl}"/>
