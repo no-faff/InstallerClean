@@ -2601,16 +2601,15 @@ public class MainViewModelTests
     [Fact]
     public void MainExplanationWhyText_renders_with_no_placeholder_markers_left()
     {
-        // It carried one format slot per Reason label while three kinds of file
-        // reached the list, and this pinned all three being passed, a missing
-        // argument surfacing as a literal "{2}" on screen. One kind reaches it
-        // now, so the sentence takes no arguments at all.
+        // The sentence carries a slot per Reason label so that a translator edits the
+        // column labels in one place and the copy follows. Two kinds of file reach the
+        // list, orphaned and superseded, so it spends two slots and three are passed.
         //
-        // THE THREE ARE STILL PASSED AND THAT IS NOT AN OVERSIGHT. string.Format
-        // ignores a surplus argument, and a translation still carrying the older
-        // three-slot sentence renders that sentence rather than its own
-        // placeholder markers. What this asserts is the outcome either way: no
-        // marker survives to the screen.
+        // THE THIRD IS PASSED ON PURPOSE AND THAT IS NOT AN OVERSIGHT. string.Format
+        // ignores a surplus argument and throws on a missing one, so a translator who
+        // writes a three-slot sentence into a satellite gets it rendered rather than a
+        // FormatException on the main window. What this asserts is the outcome either
+        // way: no marker survives to the screen.
         var vm = CreateViewModel();
 
         Assert.DoesNotContain("{0}", vm.MainExplanationWhyText);

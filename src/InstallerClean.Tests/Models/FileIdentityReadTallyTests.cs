@@ -6,7 +6,8 @@ namespace InstallerClean.Tests.Models;
 
 /// <summary>
 /// The identity-read tally as a STRUCTURE rather than as a number: that every member
-/// of <see cref="FileIdentityRead"/> reaches a counter of its own, and that the set
+/// of <see cref="FileIdentityRead"/> but <c>Read</c> reaches a counter of its own,
+/// that <c>Read</c> reaches none, and that the set
 /// of members inside <see cref="FileIdentityReadTally.RefusedTotal"/> is exactly the
 /// set <see cref="FileIdentityReadOutcomes.GivesUpAWithholding"/> acts on.
 ///
@@ -29,8 +30,9 @@ namespace InstallerClean.Tests.Models;
 /// anybody remembering an exclusion list.
 ///
 /// WHERE THE BOUNDARY OF THIS FILE RUNS. What is on this side of it is that every
-/// outcome is wired to a counter of its own, and that the counters and the rule
-/// agree about which of them withhold. On the other side is the production reader's
+/// outcome the tally counts is wired to a counter of its own, that <c>Read</c> is
+/// counted nowhere, and that the counters and the rule agree about which of them
+/// withhold. On the other side is the production reader's
 /// mapping from a Win32 failure to an outcome: whether <c>CreateFile</c> answers
 /// <c>ERROR_FILE_NOT_FOUND</c> for the case this app reads as an absence is a fact
 /// about Windows, and nothing off the platform can settle it.

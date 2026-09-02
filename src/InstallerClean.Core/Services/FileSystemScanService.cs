@@ -1193,8 +1193,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
     ///
     /// EVERY METHOD SITS BESIDE THE ADD IT COUNTS, one statement after it, so that a
     /// file reaching the withheld list without being accounted for takes a deliberate
-    /// edit rather than an oversight. The completeness test is what notices if one
-    /// ever does.
+    /// edit rather than an oversight. WithholdingSplitTallyTests is what notices if one
+    /// ever does: it walks the withholding verdicts the enum declares and holds each one
+    /// to an arm of its own, so a verdict arriving without an arm is red by construction.
     /// </summary>
     internal sealed class WithholdingSplitTally
     {
