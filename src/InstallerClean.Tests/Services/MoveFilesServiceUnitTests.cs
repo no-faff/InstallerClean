@@ -32,6 +32,19 @@ public class MoveFilesServiceUnitTests
     private const string SourceDir = @"C:\Windows\Installer";
     private const string DestDir = @"D:\backup\installer";
 
+    // A destination inside the installer cache, and one inside a system folder,
+    // each built from the folder the gate itself asks Windows about, so the two
+    // tests that use them are one test on whichever host runs them. The gate ahead
+    // of the containment pair takes only a fully qualified path, and a
+    // drive-letter spelling is not one off Windows while a slash-rooted one is not
+    // one on it.
+    private static readonly string InsideInstallerCache = Path.GetFullPath(
+        Path.Combine(InstallerCacheHelpers.InstallerFolder, "installerclean-gate-test"));
+
+    private static readonly string InsideSystemFolder = Path.GetFullPath(Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        "installerclean-gate-test"));
+
     [Fact]
     public async Task MoveFilesAsync_moves_a_single_file()
     {
@@ -708,14 +721,64 @@ public class MoveFilesServiceUnitTests
         Assert.True(fs.File.Exists(destPath));
     }
 
+    // THE TWO CONTAINMENT GATES AT THE SERVICE BOUNDARY, one test each, driven
+    // through the real method with a forbidden destination. They are anchored
+    // inside MoveFilesAsync so that a caller arriving at the service directly
+    // meets them, and a test that asked the helper behind them would be answering
+    // about something else.
+    //
+    // WHAT EACH ASSERTION HOLDS, because the two hold different halves. The same
+    // destination is refused a second time once the destination folder has been
+    // created, and that refusal carries the same exception type and the same text,
+    // so the folder is what tells the pair apart: a refusal at the boundary leaves
+    // none behind, and Directory.Exists is the line holding the boundary gate. The
+    // message holds which forbidden set the refusal names, the cache folder and
+    // the system folders having a sentence each.
+
+    [Fact]
+    public async Task MoveFilesAsync_refuses_a_destination_inside_the_installer_cache()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+
+        var svc = new MoveFilesService(fs);
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            svc.MoveFilesAsync(new[] { source }, InsideInstallerCache, UnderLeaseClaims.None));
+
+        Assert.Equal(
+            string.Format(InstallerClean.Resources.Strings.Error_MoveIntoInstaller, InsideInstallerCache),
+            ex.Message);
+        Assert.False(fs.Directory.Exists(InsideInstallerCache));
+        Assert.True(fs.File.Exists(source));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_refuses_a_destination_inside_a_system_folder()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+
+        var svc = new MoveFilesService(fs);
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            svc.MoveFilesAsync(new[] { source }, InsideSystemFolder, UnderLeaseClaims.None));
+
+        Assert.Equal(
+            string.Format(InstallerClean.Resources.Strings.Error_DestinationInSystemFolder, InsideSystemFolder),
+            ex.Message);
+        Assert.False(fs.Directory.Exists(InsideSystemFolder));
+        Assert.True(fs.File.Exists(source));
+    }
+
     // The destination guard's classification, at every combination of its four
-    // inputs. It is reachable only as a function: the resolve behind those inputs
-    // asks the real kernel whatever IFileSystem is injected, and on a local disk
-    // the walk always finds an existing ancestor to open, so no test in this suite
-    // can drive the loop into the lost-destination condition. What the integration
-    // test next door covers is one condition end to end; what these cover is that
-    // the two are told apart at all. Neither covers what the kernel really returns
-    // when a share drops, and nothing here should be read as though it did.
+    // inputs. The resolve behind those inputs asks the real kernel whatever
+    // IFileSystem is injected, so the theory hands the four values to the
+    // classification directly and pins its answer to each combination: which are a
+    // destination that has changed, which are one whose resolution was lost, and
+    // which are the state an ordinary batch runs in. The integration test next
+    // door drives one of those conditions end to end; these hold that the
+    // conditions are told apart at all.
 
     [Theory]
     // Both proven, same folder: nothing happened, the batch carries on.
