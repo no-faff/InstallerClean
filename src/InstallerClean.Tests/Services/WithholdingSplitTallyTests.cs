@@ -1,3 +1,4 @@
+using System.Reflection;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
@@ -22,6 +23,28 @@ namespace InstallerClean.Tests.Services;
 /// </summary>
 public class WithholdingSplitTallyTests
 {
+    /// <summary>
+    /// The split's arms, read off its primary constructor so an arm added there is
+    /// picked up here without anybody remembering a list. Every parameter is a count,
+    /// so unlike the identity tally there is nothing to leave out.
+    /// </summary>
+    private static string[] Arms() =>
+        typeof(WithholdingSplit)
+            .GetConstructors()
+            .OrderByDescending(c => c.GetParameters().Length)
+            .First()
+            .GetParameters()
+            .Select(p => p.Name!)
+            .OrderBy(n => n, StringComparer.Ordinal)
+            .ToArray();
+
+    private static int Read(string arm, WithholdingSplit split) =>
+        (int)typeof(WithholdingSplit).GetProperty(arm, BindingFlags.Instance | BindingFlags.Public)!
+            .GetValue(split)!;
+
+    private static string[] Moved(WithholdingSplit split) =>
+        Arms().Where(a => Read(a, split) != 0).ToArray();
+
     [Fact]
     public void The_total_is_the_five_and_nothing_else()
     {
@@ -120,14 +143,29 @@ public class WithholdingSplitTallyTests
         // so splitting a verdict out does not fail this for the wrong reason.
         Assert.True(withholding.Length >= 2, "the withholding verdict list came back short");
 
+        // AN ARM OF ITS OWN AND NOT MERELY AN ARM. A verdict folded into a neighbour's
+        // case still counts into one, so a total of one cannot tell that apart from the
+        // arm this asks for. The slot each verdict lands in is recorded and no two may
+        // share one: counting a verdict under its neighbour would put that neighbour's
+        // cause on it, and the arms reach a line the user reads.
+        var seen = new Dictionary<string, DeclaredProductOutcome>(StringComparer.Ordinal);
+
         foreach (var outcome in withholding)
         {
             var tally = new FileSystemScanService.WithholdingSplitTally();
 
             tally.Screened(outcome);
 
-            Assert.True(tally.Taken().Total == 1,
-                $"{outcome} withholds and counts into no arm of the split");
+            var moved = Moved(tally.Taken());
+
+            Assert.True(moved.Length == 1,
+                $"{outcome} withholds and moved {moved.Length} arms of the split "
+                + $"({string.Join(", ", moved)}); it needs exactly one of its own.");
+            Assert.True(!seen.TryGetValue(moved[0], out var already),
+                $"{outcome} and {already} both count into {moved[0]}, so the split "
+                + "cannot tell them apart and a surface reading it would state one "
+                + "verdict's cause over the other's file.");
+            seen[moved[0]] = outcome;
         }
     }
 }
