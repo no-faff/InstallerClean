@@ -28,13 +28,12 @@ namespace InstallerClean.Tests.Models;
 /// counters this type declares, and a counter added there is picked up here without
 /// anybody remembering an exclusion list.
 ///
-/// WHAT THIS FILE DOES NOT REACH, said plainly so it is not read as end-to-end
-/// cover. Nothing here calls the production reader, so the mapping from a Win32
-/// failure to an outcome is untested: whether <c>CreateFile</c> really answers
-/// <c>ERROR_FILE_NOT_FOUND</c> for the case this app calls an absence is a fact
-/// about Windows and cannot be established off it. What is covered is that every
-/// outcome is wired to a counter, and that the counters and the rule agree about
-/// which of them withhold.
+/// WHERE THE BOUNDARY OF THIS FILE RUNS. What is on this side of it is that every
+/// outcome is wired to a counter of its own, and that the counters and the rule
+/// agree about which of them withhold. On the other side is the production reader's
+/// mapping from a Win32 failure to an outcome: whether <c>CreateFile</c> answers
+/// <c>ERROR_FILE_NOT_FOUND</c> for the case this app reads as an absence is a fact
+/// about Windows, and nothing off the platform can settle it.
 /// </summary>
 public class FileIdentityReadTallyTests
 {

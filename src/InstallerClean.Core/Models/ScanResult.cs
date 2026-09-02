@@ -287,15 +287,13 @@ namespace InstallerClean.Models;
 ///
 /// THE SUPERSEDED HALF OF THE OFFER IS NOT IN HERE, under either cause. Those rows
 /// are judged on products, through registry keys read by product code and patch code,
-/// and nothing on that path reads a cached-package path at all; measured with a
-/// planted unspellable value beside an ordinary-value control, the sibling patch's
-/// offer was identical. They cannot be reached by the second cause either, on the
-/// structure rather than on a measurement: that screen runs over the walk's unclaimed
-/// candidates, a superseded row reaches the offer from the registered set without
-/// ever having been one, and the screen refuses a patch in any case. What remains
-/// unobserved rather than ruled out is an unspellable registration naming the very
-/// same file an offered superseded row names, which would be a second claim on that
-/// path that the merge cannot see.
+/// and nothing on that path reads a cached-package path at all. They cannot be
+/// reached by the second cause either, and the structure is what says so: that
+/// screen runs over the walk's unclaimed candidates, a superseded row reaches the
+/// offer from the registered set without ever having been one, and the screen
+/// refuses a patch in any case. What remains unobserved rather than ruled out is an
+/// unspellable registration naming the very same file an offered superseded row
+/// names, which would be a second claim on that path that the merge cannot see.
 ///
 /// IT EXISTS SO THE TWO SUMMARY LINES ACCOUNT FOR EVERY FILE IN THE FOLDER. A
 /// withheld file would otherwise appear in neither: not offered, and not a registered
@@ -324,14 +322,12 @@ namespace InstallerClean.Models;
 /// each candidate and keeping it, AND that emptying actually took a file off a list it
 /// would otherwise have made.
 ///
-/// THE SECOND HALF OF THAT IS NEW AND IS THE WHOLE OF WHAT THIS FLAG IS FOR. It used to
-/// report only which branch the scan took, so it was true on a machine whose walk found
-/// no unclaimed candidates and therefore held nothing back, and the window had to check
-/// <see cref="WithheldFiles"/> itself before showing the screen that reads this. That
-/// gate was a host counting a list two different decisions contribute to: the moment
-/// either one's membership changes, the gate changes meaning and nothing fails. The
-/// question is now answered where the withholding happens, which is the only place that
-/// knows what that withholding took.
+/// THE SECOND HALF OF THAT IS THE WHOLE OF WHAT THIS FLAG IS FOR, and it is answered
+/// where the withholding happens, that being the only place that knows what the
+/// withholding took. A host may not answer it instead by asking whether
+/// <see cref="WithheldFiles"/> is empty: two different decisions contribute to that
+/// list, so the moment either one's membership changes, a gate built on it is asking
+/// a different question.
 ///
 /// IT IS NOT "THE OFFER IS EMPTY" AND THE TWO MUST NOT BE CONFLATED, which is the
 /// whole reason this exists rather than the hosts asking
@@ -346,23 +342,18 @@ namespace InstallerClean.Models;
 /// only; a superseded registration that survived every withholding is offered beside
 /// it, so a host reading this must still ask what the offer holds.
 ///
-/// IT CANNOT BE TRUE WITH <see cref="WithheldFiles"/> EMPTY, which is a change and not
-/// a coincidence: see above. A machine that took the branch and had nothing to withhold
-/// reads false here, and the all-clear is right for it, nothing in its folder having
-/// gone unclaimed. The reverse does not hold, and no host may assume it: the other
-/// decision puts files in that list on runs where this is false.
+/// IT CANNOT BE TRUE WITH <see cref="WithheldFiles"/> EMPTY, and that holds by
+/// construction rather than by coincidence. A machine that took the branch and had
+/// nothing to withhold reads false here, and the all-clear is right for it, nothing in
+/// its folder having gone unclaimed. The reverse does not hold, and no host may assume
+/// it: the other decision puts files in that list on runs where this is false.
 ///
 /// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Several conditions can empty an
 /// offer wholesale and they are different facts about a machine, so a bool is the
 /// whole of what may be carried: any sentence naming one cause would be false on the
-/// others. The census is where the causes are counted apart.
-///
-/// THE LINE ABOVE USED TO OPEN "A RULE ABOUT THE MACHINE'S RECORDS", WHICH WAS A
-/// CAUSE, and 3.0.0 added a condition it is false of. It has been taken out rather
-/// than joined by a second: two named causes is the same fault with more words, and
-/// a host reading this for something to say would find one true of half the set. The
-/// only thing true of every member is that something this scan asked about did not
-/// answer.
+/// others, and two named causes is the same fault with more words. The only thing true
+/// of every member is that something this scan asked about did not answer. The census
+/// is where the causes are counted apart.
 /// </param>
 /// <param name="RegistrationIdentityReads">
 /// What the file-identity reader answered when the scan asked which file each
