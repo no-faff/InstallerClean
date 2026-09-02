@@ -307,14 +307,32 @@ jobs:
       # skips by name, so a reworded neutral leaves it holding the old English.
       # The satellites' own verdict lines are deliberately not read: they say
       # "still English (untranslated)" for every key awaiting a translation
-      # round, which is what check-still-english below holds, and they exit 0
-      # whatever they find.
+      # round, which is what check-still-english below holds, and a generator's
+      # exit code does not follow them. What it does follow is the parse control,
+      # which stops the generator before it writes anything, so the loop below
+      # keeps every generator's status rather than only the last one's.
       - name: Check every satellite reproduces from its generator
         if: '!cancelled()'
         shell: bash
         run: |
-          log=$(for g in scripts/translations/gen-strings-*.mjs; do node "$g"; done)
+          # Each generator's status is kept as the loop goes. A command
+          # substitution around the whole loop carries only the last one's, so
+          # fifteen of the sixteen would have nowhere to report from.
+          #
+          # The check on them runs before the diff because a generator that stops
+          # early leaves its satellite untouched, so the diff has nothing to say
+          # about the one language that did not run.
+          log=
+          stopped=
+          for g in scripts/translations/gen-strings-*.mjs; do
+            out=$(node "$g") || stopped="$stopped $(basename "$g")"
+            log="$log$out"$'\n'
+          done
           echo "$log"
+          if [ -n "$stopped" ]; then
+            echo "Generators that did not finish:$stopped" >&2
+            exit 1
+          fi
           git diff --exit-code -- src/InstallerClean.Core/Resources
           # A case rather than a pipe into grep: the runner sets pipefail, and a
           # grep that exits on its first match can leave the echo feeding it

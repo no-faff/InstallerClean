@@ -241,7 +241,12 @@ if (stale) {
   console.error(`Translation-table gate: ${stale} of ${codes.length} table(s) out of step with the resx.`);
   console.error('These pages are what the project invites native speakers to review, so a stale one');
   console.error('asks for corrections to text the app no longer has. Regenerate and commit:');
-  console.error('  for c in ' + Object.keys(LANGS).join(' ') + '; do node scripts/gen-translation-table.mjs $c; done');
+  // The subshell and the `|| exit 1` are the point of the line rather than shell
+  // habit. Without them the loop runs on past a language that failed and ends
+  // looking like a clean run, which is the opposite of what somebody stopped by
+  // this gate needs, and its status is 0 whatever happened. The subshell is what
+  // lets the status be 1 without ending the session of anyone who pasted it.
+  console.error('  (for c in ' + Object.keys(LANGS).join(' ') + '; do node scripts/gen-translation-table.mjs "$c" || exit 1; done)');
   process.exit(1);
 }
 
