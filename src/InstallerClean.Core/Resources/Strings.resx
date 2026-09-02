@@ -622,6 +622,16 @@ To put it back, you need the installer for the version you already have. Get it 
   <data name="Completion.NothingOffered" xml:space="preserve"><value>Nothing offered on this PC</value></data>
   <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it.</value></data>
   <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them.</value></data>
+  <!-- THE SAME SCREEN FOR A MACHINE WHOSE OFFER WAS NOT EMPTIED WHOLESALE. The body
+       above is for a run where a finding about the records took the whole walk-derived
+       offer at once; this one is for a run that kept every candidate back on its own
+       verdict, where that finding is false of the files it kept. It states only what
+       is true of all of them.
+
+       0 = files held back, 1 = pluralised "file"/"files", 2 = their size, and the
+       one-form names the size rather than the numeral, exactly as the pair above
+       does. "All {0} {1}" and "any of the cached files" because this machine was
+       offered nothing; the main window's line under an offer says "some". -->
   <data name="Completion.NothingOfferedPerFileBody.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it.</value></data>
   <data name="Completion.NothingOfferedPerFileBody.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them.</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
@@ -893,6 +903,19 @@ To put it back, you need the installer for the version you already have. Get it 
        instead of the numeral, as the other one-forms here do. -->
   <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it.</value></data>
   <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them.</value></data>
+  <!-- THE SAME LINE FOR A MACHINE WHOSE WITHHOLDING WAS NOT WHOLESALE. The pair
+       above is for a run whose walk-derived offer was emptied in one go; this pair is
+       for a run that judged candidates one at a time and kept some of them back, so
+       no single finding about the machine's records accounts for the list. The pair
+       above names such a finding and it would be false of these files, so this pair
+       says only what is true of every file on the list whatever kept it there: the
+       scan could not establish they were unneeded.
+
+       "SOME OF THE CACHED FILES" AND NOT "any of them", because something was offered
+       beside these. The screen for a machine that was offered nothing at all
+       (Completion.NothingOfferedPerFileBody.*) says "any", and the two must not be
+       swapped. The one-form spends neither placeholder and names the file instead of
+       the numeral, as the other one-forms here do. -->
   <data name="Summary.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that one of the cached files it found is unneeded, so it has held back the one file rather than offering it.</value></data>
   <data name="Summary.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that some of the cached files it found are unneeded, so it has held back {0} {1} rather than offering them.</value></data>
   <!-- THE SECOND HELD-BACK LINE, AND IT IS THE PAIR OF THE ONE ABOVE RATHER THAN
@@ -1429,10 +1452,13 @@ The crash log could not be written.</value></data>
        window's own screen opens with (Completion.NothingOfferedBody.*): the app
        could not be certain which cached files belong to which programs.
 
-       "Might otherwise have offered" keeps its hedge for the same reason the
-       window's does: some of those files would have been kept back anyway by the
-       per-file screen this branch skips, so "would have offered" claims more than
-       the run established.
+       "RATHER THAN OFFERING THEM" CLAIMS ONLY WHAT THE RUN ESTABLISHED, and that
+       is why it says what the scan declined to do rather than what it would have
+       done instead. Some of these files would have been kept back anyway by the
+       per-file screen this branch skips, so any wording promising they would have
+       been offered claims more than the run has. "Rather than listing them" would
+       be false outright: the held-back files ARE listed, in the Details window and
+       in the report, and offering is the only half of that pair this run refused.
 
        A PAIR AND NOT A FLAT KEY, because it shipped as one for an afternoon and
        read "held back all 1 file" at a count of one. The one-form names the size
@@ -1448,6 +1474,17 @@ The crash log could not be written.</value></data>
        each being right in its own register. -->
   <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it.</value></data>
   <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them.</value></data>
+  <!-- THE PER-FILE FORM OF THE OUTCOME ABOVE, for the machine whose offer came out
+       empty because every candidate was judged and kept back on its own, rather than
+       because a finding about the records emptied the whole walk at once. The pair
+       above names that finding, which is false of a file kept back on its own, so
+       this pair states only what holds of all of them.
+
+       0 = files held back, 1 = pluralised "file"/"files", 2 = their size, exactly as
+       above, and both forms are passed all three so the two cannot disagree about
+       which index is which. "All {0} {1}" and "any of the cached files" because
+       nothing was offered on this run; Cli.NothingListedPerFile drops the "all" and
+       says "some" for the machine that was offered something. -->
   <data name="Cli.NothingOfferedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it.</value></data>
   <data name="Cli.NothingOfferedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them.</value></data>
   <!-- The command line's twin of Summary.NothingListed, for the machine whose
@@ -1461,31 +1498,67 @@ The crash log could not be written.</value></data>
        index is which. -->
   <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it.</value></data>
   <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them.</value></data>
+  <!-- The per-file form of the pair above, and the command line's twin of
+       Summary.NothingListedPerFile: a run that kept files back one at a time while
+       still offering something, so the sentence names no cause that could be false of
+       any file it counts. Word for word the window's line with the size added, as the
+       pair above is.
+
+       "SOME" AND NO "ALL", because this machine was offered something and the pair
+       above was not. There is no third variation and none may be added. The one-form
+       names the size and not the numeral, so it spends {2} and leaves {0} and {1}
+       unused; both are passed on either branch so the two forms cannot disagree about
+       which index is which. -->
   <data name="Cli.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that one of the cached files it found is unneeded, so it has held back the one file ({2}) rather than offering it.</value></data>
   <data name="Cli.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that some of the cached files it found are unneeded, so it has held back {0} {1} ({2}) rather than offering them.</value></data>
-  <!-- Introduces the reasons the walk-derived offer was withheld wholesale, under
-       whichever of Cli.NothingOffered or Cli.NothingListed that run printed. It picks
-       up "couldn't be certain" from both of them on purpose, so the reader has the
-       antecedent in the line above. The lines under it are Cli.WithheldReasons.*, one
-       per condition met, and any combination of them can print: they say which
-       conditions the run met and are not a partition of the files, so none of them
-       carries a count and nothing sums. -->
+  <!-- Introduces the conditions this run met. It prints under whichever of the
+       Cli.NothingOffered and Cli.NothingListed sentences that run chose, the
+       per-file forms included, so it has to read correctly under all four rather
+       than under one. It does not pick a phrase up from the line above, two of
+       those four saying "couldn't establish" instead; what is true of every
+       machine reaching this caption is that the scan could not be certain, which
+       is what the caption itself says.
+
+       The lines under it are Cli.WithheldReasons.*, one per condition met, and any
+       combination of them can print: they say which conditions the run met and are
+       not a partition of the files, so none of them carries a count and nothing
+       sums. -->
   <data name="Cli.WithheldReasons.Header" xml:space="preserve"><value>Why it couldn't be certain:</value></data>
-  <!-- One line per leg of the wholesale withholding, each printed only when its own
-       leg is true, each carrying two leading spaces like the Cli.Help.* block. The
-       nine path-resolution counts and the four identity-read outcomes sit underneath
-       legs one and two and are deliberately not printed: they travel in the opt-in
-       report, which reads them apart, and a reader of a console line can do nothing
-       different on one of them than on another. NO LEG CARRIES A COUNT. Leg one's two
-       groups can double-count one value, so their sum is a count of refusals and not
-       of paths; leg three's two members are opposite findings and a single number
-       states a cause over the pair; a count on leg two alone would read as a total.
-       The count and the size of what was held back are on the line above. And no line
-       says whether re-running helps, because each leg holds members that differ on
-       exactly that. -->
+  <!-- One line per condition met, each printed only when its own condition holds,
+       each carrying two leading spaces like the Cli.Help.* block. THE FIRST THREE
+       ARE THE WHOLESALE LEGS AND THE FOUR AFTER THEM ARE THE PER-FILE ARMS: the
+       legs are read off the conditions the scan gated on, the arms off the split it
+       filled as it withheld, and a run that withheld both ways prints from both
+       sets.
+
+       The nine path-resolution counts and the four identity-read outcomes sit
+       underneath legs one and two and are deliberately not printed: they travel in
+       the opt-in report, which reads them apart, and a reader of a console line can
+       do nothing different on one of them than on another.
+
+       NO LINE CARRIES A COUNT. Leg one's two groups can double-count one value, so
+       their sum is a count of refusals and not of paths; leg three's two members are
+       opposite findings and a single number states a cause over the pair; a count on
+       leg two alone would read as a total; and each arm is one fact about one
+       machine, which nothing may add to another and call a cause. The count and the
+       size of what was held back are on the line above. And no line says whether
+       re-running helps, because these conditions differ on exactly that. -->
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it.</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  A program may be installed more than once on this PC, and the records can't say which copy a file belongs to.</value></data>
+  <!-- THE FOUR PER-FILE ARMS. Each is one decision taken about one candidate, where
+       the three lines above are findings about the machine's records that withheld the
+       walk-derived offer whole. A run can print from both sets, and these read as
+       conditions rather than counts for the same reason the legs do: each is one fact
+       about one machine, and nothing may add it to another and call the result a
+       cause.
+
+       The first is the identity pass giving up on one file in the folder. The other
+       three are the declared-product screen: a file whose own declared product is
+       still installed, a file that would not say which program it belongs to OR a
+       program Windows would not answer about, and a screen whose answers did not line
+       up with the files it was handed. The middle one carries two inabilities under
+       one line deliberately, a sentence naming either being false of the other half. -->
   <data name="Cli.WithheldReasons.CandidateIdentity" xml:space="preserve"><value>  A file in the folder couldn't be identified, so it couldn't be matched against the records.</value></data>
   <data name="Cli.WithheldReasons.DeclaredProductInstalled" xml:space="preserve"><value>  A file says it belongs to a program that is still installed, so it may still be needed.</value></data>
   <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program.</value></data>
@@ -1521,6 +1594,13 @@ The crash log could not be written.</value></data>
        subject makes one shape correct at every count, which is what a matched
        surface needs. -->
   <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish which cached files belong to the programs installed here, so it held back {1} {2}. No action taken.</value></data>
+  <!-- The per-file twin of the entry above, for the machine whose candidates were
+       each judged and kept rather than emptied wholesale, so the Application channel
+       tells those two apart the way stdout does. It shares Event ID 1000 with its
+       sibling for the reason recorded above, and it takes the same three arguments in
+       the same order. Machine-read and forced English at the emit site, as that entry
+       is, so it takes no .Singular/.Plural pair and keeps the app as the subject:
+       "it held back {1} {2}" is correct at every count where the passive is not. -->
   <data name="Cli.EventLogNothingOfferedPerFile" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish that any of the cached files it found are unneeded, so it held back {1} {2}. No action taken.</value></data>
   <!-- THE NOTICE BESIDE THAT OUTCOME, Event ID 3002, and it exists because the
        outcome band cannot carry the distinction. The entry above sits at 1000 with
@@ -1554,6 +1634,12 @@ The crash log could not be written.</value></data>
        superseded registration was still offered beside it. Naming no cause matters
        more here for that reason, not less. -->
   <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish which cached files belong to the programs installed here, so it held back {1} {2} and offered nothing it found by looking in the folder.</value></data>
+  <!-- The per-file twin of the notice above, at the same Event ID 3002 and for the
+       same reason: the outcome band cannot separate a machine nothing could be judged
+       on from one that is genuinely clean. It says "some" where the notice above says
+       nothing of the kind, this being the run that still offered something. Same three
+       arguments, same order, and it names no folder, which is the rule on this channel
+       and is stated above. -->
   <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish that some of the cached files it found are unneeded, so it held back {1} {2}.</value></data>
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
