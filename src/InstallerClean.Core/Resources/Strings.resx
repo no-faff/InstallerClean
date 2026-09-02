@@ -885,9 +885,12 @@ To put it back, you need the installer for the version you already have. Get it 
        true of all of them, and it is the clause both the completion screen and the
        command line already use.
 
-       "Rather than listing them" and not "rather than offering them", because the
-       list is what the reader is looking at. The one-form spends neither placeholder
-       and names the file instead of the numeral, as the other one-forms here do. -->
+       "Rather than offering them" and not "rather than listing them", because the
+       held-back files ARE listed: the Details window shows them among the
+       registrations, in one list, and an empty product cell sorts them to the foot
+       of it. What this scan declined to do is offer them, and that is what the
+       sentence says. The one-form spends neither placeholder and names the file
+       instead of the numeral, as the other one-forms here do. -->
   <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it.</value></data>
   <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them.</value></data>
   <data name="Summary.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that one of the cached files it found is unneeded, so it has held back the one file rather than offering it.</value></data>
