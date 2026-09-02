@@ -434,6 +434,81 @@ public record ScanResult(
     /// </summary>
     public IReadOnlyList<WithholdingLeg> WithholdingLegsFired =>
         WithholdingLegs.Fired(Census, RegistrationIdentityReads);
+
+    /// <summary>
+    /// What this run's withholding amounts to, for a host deciding what to tell
+    /// somebody about it.
+    ///
+    /// THREE STATES, BECAUSE A SURFACE MAKES TWO DECISIONS AND NOT ONE. Whether to say
+    /// anything about a withholding at all, and which of the two sentences the machine
+    /// has earned. Asking whether <see cref="WithheldFiles"/> is empty answers the
+    /// first and is silent on the second, and
+    /// <see cref="WalkOfferWithheldWholesale"/> cannot answer it either: that flag is
+    /// true of a run whose wholesale branch fired after the identity pass had already
+    /// kept files back one at a time.
+    ///
+    /// THE WHOLESALE SENTENCE NEEDS POSITIVE EVIDENCE AND THE PER-FILE ONE DOES NOT.
+    /// That asymmetry is the whole of why this is written as "the wholesale arm
+    /// accounts for all of them" rather than as "no per-file arm fired". The per-file
+    /// sentence says the scan could not establish these files were unneeded, which is
+    /// true of every file on that list whatever put it there. The wholesale sentence
+    /// names a cause, and that cause is false of a file kept back because Windows still
+    /// holds a record of the product it declares: for that file the scan was certain,
+    /// which is the opposite of what the sentence would say. So the wholesale reading
+    /// is reached only where the wholesale arm accounts for the whole list, and
+    /// everything else takes the sentence that is true of all of them.
+    ///
+    /// WHICH IS ALSO WHAT MAKES THIS RIGHT OVER A SPLIT THAT HAS FALLEN SHORT. A file
+    /// on the list that no arm counted leaves the wholesale arm short of the list's own
+    /// length, so the machine takes the per-file sentence, which is still true of it.
+    /// Read the other way round, an uncounted file would have been swept into a cause
+    /// nobody established.
+    ///
+    /// IT IS DERIVED AND NOT CARRIED, so nothing can set it apart from the two values
+    /// it is read off and leave a result disagreeing with itself.
+    /// </summary>
+    public WithholdingAccount Withholding
+    {
+        get
+        {
+            var withheld = WithheldFiles?.Count ?? 0;
+            if (withheld == 0) return WithholdingAccount.Nothing;
+
+            return WithheldBy.WholesaleCount == withheld
+                ? WithholdingAccount.WholeWalkOffer
+                : WithholdingAccount.PerFile;
+        }
+    }
+}
+
+/// <summary>
+/// What a scan's withholding amounts to, in the terms a host has to speak it.
+///
+/// IT IS A READING OF A RESULT AND NOT A FOURTH DECISION. Nothing sets one of these;
+/// <see cref="ScanResult.Withholding"/> derives it from the withheld list and the
+/// split, so it cannot drift from either.
+/// </summary>
+public enum WithholdingAccount
+{
+    /// <summary>
+    /// This scan kept nothing back, so there is nothing for a surface to say and the
+    /// all-clear is the machine's to have.
+    /// </summary>
+    Nothing,
+
+    /// <summary>
+    /// Every file kept back was kept by the wholesale arm, so the sentence naming what
+    /// the scan could not establish about the machine's records is true of all of them.
+    /// </summary>
+    WholeWalkOffer,
+
+    /// <summary>
+    /// Files were kept back and the wholesale arm does not account for all of them, so
+    /// the only sentence true of every one is that the scan could not establish they
+    /// were unneeded. A run that kept files back both ways reads as this, the wholesale
+    /// sentence being false of the half it did not cover.
+    /// </summary>
+    PerFile,
 }
 
 /// <summary>
@@ -606,6 +681,75 @@ public readonly record struct WithholdingSplit(
         + DeclaredProductInstalledCount
         + DeclaredProductUnestablishedCount
         + ScreenUnansweredCount;
+
+    /// <summary>
+    /// Which of the per-file decisions kept anything back, in declaration order, for a
+    /// host that explains the withholding rather than only reporting it.
+    ///
+    /// THE WHOLESALE ARM IS NOT AMONG THEM AND THAT IS THE ONE ASYMMETRY HERE.
+    /// <see cref="WholesaleCount"/> counts files kept back on a condition about the
+    /// machine's records, and <see cref="ScanResult.WithholdingLegsFired"/> already
+    /// names which of those conditions held. A line built on the count would say less
+    /// than the legs do and would say it a second time.
+    ///
+    /// A MEMBER MEANS ONE DECISION KEPT AT LEAST ONE FILE, AND NEVER A CAUSE FOR ANY
+    /// PARTICULAR ONE. Any combination of them can hold at once, so nothing sums over
+    /// this list: <see cref="Total"/> is the sum, and it answers how many rather than
+    /// why any single file is on the list.
+    /// </summary>
+    public IReadOnlyList<WithholdingSplitArm> ArmsFired
+    {
+        get
+        {
+            var fired = new List<WithholdingSplitArm>(4);
+
+            if (IdentityUnestablishedCount > 0)
+                fired.Add(WithholdingSplitArm.IdentityUnestablished);
+            if (DeclaredProductInstalledCount > 0)
+                fired.Add(WithholdingSplitArm.DeclaredProductInstalled);
+            if (DeclaredProductUnestablishedCount > 0)
+                fired.Add(WithholdingSplitArm.DeclaredProductUnestablished);
+            if (ScreenUnansweredCount > 0)
+                fired.Add(WithholdingSplitArm.ScreenUnanswered);
+
+            return fired;
+        }
+    }
+}
+
+/// <summary>
+/// The per-file withholding decisions, one member per arm of
+/// <see cref="WithholdingSplit"/> that speaks for itself.
+///
+/// ONE MEMBER PER ARM RATHER THAN ONE PER CAUSE, which is what keeps a breakdown built
+/// on this honest. Two of these are the declared-product screen's own two verdicts and
+/// they are different findings about a machine, so nothing may add them together or
+/// write one sentence over both.
+///
+/// THE ORDER IS THE ORDER THEY ARE REPORTED IN, and it is the order of the arms they
+/// name, so a reader holding a breakdown against <see cref="WithholdingSplit"/> meets
+/// them the same way in each.
+/// </summary>
+public enum WithholdingSplitArm
+{
+    /// <summary>A file in the folder would not identify itself.</summary>
+    IdentityUnestablished,
+
+    /// <summary>A file declares a product Windows still holds a record of.</summary>
+    DeclaredProductInstalled,
+
+    /// <summary>
+    /// A file would not say which product it belongs to, or Windows would not answer
+    /// about the product it named. Two inabilities under one arm, as the verdict they
+    /// come from keeps them.
+    /// </summary>
+    DeclaredProductUnestablished,
+
+    /// <summary>
+    /// The screen answered about a different number of files than it was handed, so
+    /// none of its answers could be read against a file.
+    /// </summary>
+    ScreenUnanswered,
 }
 
 /// <summary>

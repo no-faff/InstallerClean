@@ -266,40 +266,40 @@ public partial class CompletionViewModel : ObservableObject
     /// where the second is true is a claim about somebody's disk that the scan never
     /// made.
     ///
-    /// THIS SCREEN WAS RETIRED FOR ONE RELEASE AND THE HOLE THAT LEFT IS THE REASON
-    /// IT IS BACK. It was written for the cached-package identity check; that check
-    /// left the tree, a comment here recorded that an empty offer had one meaning
-    /// again, and the unspellable-claims rule then took the retired check's place in
-    /// the same release without anybody re-reading it. So the screen was gone and the
-    /// condition was not. 3.0.0 adds a third such condition. The comment ended "if
-    /// anything ever empties an offer wholesale again it needs its own screen back,
-    /// and not ShowAllClear", which was right, and this is that.
+    /// ONE SCREEN WITH TWO BODIES, CHOSEN BY <paramref name="account"/> AND NOT HERE.
+    /// The two say what the scan could not establish, and they could not establish
+    /// different things: one that it could not tell which cached files belong to which
+    /// installed programs, the other only that it could not clear the files it judged
+    /// one at a time. Each is false of the other's machine, so the reading is made
+    /// where the withholding happened and this method spends it.
     ///
-    /// THE BODY NAMES NO CAUSE AND MAY NOT ACQUIRE ONE. Several conditions reach
-    /// <c>ScanResult.WalkOfferWithheldWholesale</c>, they are different facts about a
-    /// machine, and a sentence naming one is false on the others.
+    /// NEITHER BODY NAMES A CAUSE FOR ANY PARTICULAR FILE AND NEITHER MAY ACQUIRE ONE.
+    /// Several conditions reach each of them, they are different facts about a machine,
+    /// and a sentence naming one of them is false of the files the others contribute.
     ///
     /// THE RECEIPT LINE STAYS, and it is the same one the all-clear carries. A screen
     /// with a heading and a body and no evidence that a scan ran reads as a failure
     /// rather than as a result, which is the opposite of what it has to say.
     /// </summary>
+    /// <param name="account">
+    /// Which of the two bodies this machine has earned, read off the scan result. A run
+    /// that kept files back both wholesale and one at a time reads as the per-file one,
+    /// that being the only sentence true of every file on the list.
+    /// </param>
     /// <param name="withheldCount">
     /// How many files were held back, and <paramref name="withheldBytes"/> their
-    /// size. Both come from the WHOLE withheld list rather than from the wholesale
-    /// set alone, so this screen and the main window's left-alone line cannot
-    /// disagree about one machine.
+    /// size. Both come from the WHOLE withheld list rather than from any one
+    /// decision's share of it, so this screen and the main window's left-alone line
+    /// cannot disagree about one machine.
     ///
-    /// THE TWO READINGS COINCIDE TODAY AND WILL NOT AUTOMATICALLY GO ON DOING SO.
-    /// They are the same list right now only because the per-file declared-product
-    /// screen is SKIPPED on the branch that sets the flag, so nothing else can have
-    /// put a file in that list. The moment a wholesale branch runs alongside a
-    /// per-file one, the whole list will hold files this screen did not withhold, and
-    /// this text will still be true of them: they were held back and they would
-    /// otherwise have been offered. What would stop being true is any sentence about
-    /// WHY, which is why there is none.
+    /// A RUN CAN FILL THAT LIST FROM BOTH DECISIONS AND THE FIGURES STILL HOLD. What
+    /// is true of every file counted here is that it was held back and would otherwise
+    /// have been offered. What is not true of all of them at once is any sentence about
+    /// why, which is what <paramref name="account"/> is for.
     /// </param>
     public void ShowNothingOffered(
-        int withheldCount, long withheldBytes, int installedProductCount, long scanDurationMs)
+        WithholdingAccount account, int withheldCount, long withheldBytes,
+        int installedProductCount, long scanDurationMs)
     {
         HeadingIsWarning = false;
         Heading = Strings.Completion_NothingOffered;
@@ -315,12 +315,19 @@ public partial class CompletionViewModel : ObservableObject
         // picks the sentence and PluraliseFile picks the noun, and they answer two
         // different questions, so both are needed here. See the key's own note in
         // Strings.resx for which language puts the slot where.
+        var perFile = account == WithholdingAccount.PerFile;
         Summary = string.Format(
             DisplayHelpers.Pluralise(
                 withheldCount,
-                Strings.Completion_NothingOfferedBody_Singular,
-                Strings.Completion_NothingOfferedBody_Plural,
-                "Completion.NothingOfferedBody"),
+                perFile
+                    ? Strings.Completion_NothingOfferedPerFileBody_Singular
+                    : Strings.Completion_NothingOfferedBody_Singular,
+                perFile
+                    ? Strings.Completion_NothingOfferedPerFileBody_Plural
+                    : Strings.Completion_NothingOfferedBody_Plural,
+                perFile
+                    ? "Completion.NothingOfferedPerFileBody"
+                    : "Completion.NothingOfferedBody"),
             withheldCount,
             DisplayHelpers.PluraliseFile(withheldCount),
             DisplayHelpers.FormatSize(withheldBytes));

@@ -374,7 +374,7 @@ public class CompletionViewModelTests
         var vm = new CompletionViewModel();
 
         vm.ShowNothingOffered(
-            withheldCount: 3, withheldBytes: 3072,
+            WithholdingAccount.WholeWalkOffer, withheldCount: 3, withheldBytes: 3072,
             installedProductCount: 5, scanDurationMs: 10);
 
         Assert.True(vm.IsComplete);
@@ -414,7 +414,7 @@ public class CompletionViewModelTests
         var vm = new CompletionViewModel();
 
         vm.ShowNothingOffered(
-            withheldCount: 1, withheldBytes: 1024,
+            WithholdingAccount.WholeWalkOffer, withheldCount: 1, withheldBytes: 1024,
             installedProductCount: 5, scanDurationMs: 10);
 
         Assert.Equal(
@@ -445,13 +445,59 @@ public class CompletionViewModelTests
 
         allClear.ShowAllClear(installedProductCount: 5, scanDurationMs: 10);
         nothingOffered.ShowNothingOffered(
-            withheldCount: 3, withheldBytes: 3072,
+            WithholdingAccount.WholeWalkOffer, withheldCount: 3, withheldBytes: 3072,
             installedProductCount: 5, scanDurationMs: 10);
 
         Assert.NotEqual(allClear.Heading, nothingOffered.Heading);
         Assert.NotEqual(allClear.Summary, nothingOffered.Summary);
         // The receipt IS shared, deliberately, and is the one thing that should match.
         Assert.Equal(allClear.Restore, nothingOffered.Restore);
+    }
+
+    [Fact]
+    public void The_two_withholding_bodies_do_not_share_a_sentence()
+    {
+        // THE SAME POINT ONE LEVEL DOWN, and the level where it is easiest to lose.
+        // One heading carries two bodies: one says the scan could not tell which
+        // cached files belong to which installed programs, the other only that it
+        // could not clear the files it judged one at a time. Each is false of the
+        // other's machine, so a tidy that collapsed them would put a cause on a set
+        // that did not earn it, with the heading and the receipt still matching and
+        // nothing else to notice.
+        var wholesale = new CompletionViewModel();
+        var perFile = new CompletionViewModel();
+
+        wholesale.ShowNothingOffered(
+            WithholdingAccount.WholeWalkOffer, withheldCount: 3, withheldBytes: 3072,
+            installedProductCount: 5, scanDurationMs: 10);
+        perFile.ShowNothingOffered(
+            WithholdingAccount.PerFile, withheldCount: 3, withheldBytes: 3072,
+            installedProductCount: 5, scanDurationMs: 10);
+
+        Assert.NotEqual(wholesale.Summary, perFile.Summary);
+        // Everything else about the screen IS shared, which is what makes the body the
+        // only thing carrying the difference and the only thing worth pinning.
+        Assert.Equal(wholesale.Heading, perFile.Heading);
+        Assert.Equal(wholesale.Restore, perFile.Restore);
+    }
+
+    [Fact]
+    public void The_per_file_body_is_the_one_the_per_file_reading_renders()
+    {
+        // The key-level assertion the test above cannot make: NotEqual would be
+        // satisfied by any two different strings, including the right key formatted
+        // with the wrong arguments. This names the value.
+        var vm = new CompletionViewModel();
+
+        vm.ShowNothingOffered(
+            WithholdingAccount.PerFile, withheldCount: 3, withheldBytes: 3072,
+            installedProductCount: 5, scanDurationMs: 10);
+
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingOfferedPerFileBody_Plural,
+                3, DisplayHelpers.PluraliseFile(3), DisplayHelpers.FormatSize(3072)),
+            vm.Summary);
     }
 
     // The kept-back block. One sentence since 3.0.0, naming no cause, carrying the

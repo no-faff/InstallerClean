@@ -129,10 +129,13 @@ public class MainViewModelTests
         Assert.Equal("All clean", vm.Completion.Heading);
     }
 
-    // AN EMPTY OFFER HAS TWO MEANINGS AND THE THREE TESTS BELOW ARE THE PARTITION.
-    // Read what each one SETS UP rather than what it asserts: they differ only in the
-    // wholesale flag and the withheld list, which is exactly the pair the branch
-    // reads, and any two of them passing while the third fails names the mistake.
+    // AN EMPTY OFFER HAS THREE MEANINGS AND THE THREE TESTS BELOW ARE THE PARTITION.
+    // The folder held nothing to offer; a rule about the machine's records emptied the
+    // walk-derived offer in one go; or the files were judged one at a time and none
+    // could be cleared. Read what each one SETS UP rather than what it asserts: they
+    // differ in the withheld list and in the split that says what put those files
+    // there, which is exactly what the branch reads, and any two of them passing while
+    // the third fails names the mistake.
 
     [Fact]
     public async Task A_wholesale_withholding_gets_its_own_screen_rather_than_the_all_clear()
@@ -149,7 +152,8 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: true));
+                WithheldFiles: withheld, WalkOfferWithheldWholesale: true,
+                WithheldBy: new WithholdingSplit(WholesaleCount: 2)));
 
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -169,14 +173,13 @@ public class MainViewModelTests
         // would then say it had held back all 0 files, which is absurd and untrue.
         // Nothing in that folder went unclaimed, so the all-clear is right.
         //
-        // WHICH LAYER ANSWERS THAT MOVED IN 3.0.0 AND THE FIXTURE IS WHERE TO SEE IT.
-        // The flag used to say only which branch the scan took, so this window had to
-        // check the withheld list itself before showing the screen. That made the gate
-        // a host counting a list that TWO separate decisions write to, and the moment
-        // either one's membership changed the gate would have changed meaning with it,
-        // silently. The flag now says the withholding took something, so this machine
-        // arrives with it false and the fixture below sets it false. The scan service's
-        // own test is what pins that it does; see
+        // THE FIXTURE IS WHERE TO SEE WHICH LAYER ANSWERS IT. This host does not count
+        // the withheld list to reach the all-clear, because that list is written to by
+        // two separate decisions and a host counting it would mean something different
+        // the moment either one's membership moved. The scan reads it where the
+        // withholding happens and this machine arrives with nothing withheld at all,
+        // which is what the fixture below sets. The scan service's own test is what
+        // pins that a walk finding nothing to keep back arrives that way; see
         // FileSystemScanServiceSecondInstanceTests.
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -190,14 +193,14 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task Files_withheld_one_at_a_time_do_not_reach_the_wholesale_screen()
+    public async Task Files_withheld_one_at_a_time_get_the_per_file_screen_and_not_the_all_clear()
     {
-        // THE MUST-MISS CONTROL, and it is the one that proves the branch reads the
-        // FLAG rather than the withheld list. Files kept back by the per-file
-        // declared-product screen fill the same list, and the wholesale screen's body
-        // would be false of the half of them whose declared product Windows still
-        // holds a record of: for those the app was certain, and certainty is the
-        // opposite of what that screen says.
+        // THE MACHINE THAT IS NEITHER OF THE OTHER TWO, and the reason there are three
+        // screens rather than two. Its folder is not clean: a file is sitting in it
+        // that nobody has vouched for. But the wholesale screen's body would be false
+        // of it, naming something the scan could not establish about the machine's
+        // records when what actually happened is that this one file was judged and not
+        // cleared. So it gets the body that says only that, which is true of it.
         var vm = CreateViewModel();
         var withheld = new List<OrphanedFile>
         {
@@ -206,11 +209,21 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: false));
+                WithheldFiles: withheld, WalkOfferWithheldWholesale: false,
+                WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1)));
 
         await vm.Scan.ScanWithProgressAsync(null);
 
-        Assert.Equal(Strings.Completion_AllClean, vm.Completion.Heading);
+        Assert.Equal(Strings.Completion_NothingOffered, vm.Completion.Heading);
+        Assert.NotEqual(Strings.Completion_AllClean, vm.Completion.Heading);
+        // The body is named rather than merely differing from the all-clear's: the
+        // wholesale one also differs from it, so a heading-level assertion alone would
+        // pass on the screen this machine must not get.
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingOfferedPerFileBody_Singular,
+                1, DisplayHelpers.PluraliseFile(1), DisplayHelpers.FormatSize(1024)),
+            vm.Completion.Summary);
     }
 
     [Fact]

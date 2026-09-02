@@ -319,26 +319,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // the second machine there is nothing to clean up in its Installer folder
             // is a claim about that disk the scan never made.
             //
-            // THE SECOND SCREEN WAS RETIRED IN THE SAME RELEASE THAT REPLACED ITS
-            // CONDITION. It was written for the cached-package identity check, and a
-            // comment recorded that with the check gone an empty offer had one
-            // meaning again. The unspellable-claims rule then took the same shape in
-            // that release and nobody re-read the comment, so the screen was gone
-            // while the condition was not. 3.0.0 adds a third such condition.
+            // THE READING IS THE SCAN'S AND THIS HOST DOES NOT PARTITION ANYTHING TO
+            // GET IT, which is the constraint on anything that replaces these lines.
+            // Two separate decisions fill the withheld list, so a host counting that
+            // list is inferring one decision's outcome from figures the other also
+            // writes to: the moment either one's membership moves, the gate means
+            // something different and nothing fails. ScanResult.Withholding answers it
+            // where the withholding happens, in the three states these branches want,
+            // and the host spends the answer rather than deriving it.
             //
-            // THE COUNT CLAUSE THAT USED TO BE HERE HAS MOVED INTO THE SCAN, and it is
-            // worth knowing why rather than putting it back. The flag once said only
-            // which branch the scan took, so a walk that produced no candidates at all
-            // set it while holding nothing back, and this line guarded against that by
-            // counting WithheldFiles. But that list is filled by two separate decisions,
-            // so the guard was a host inferring one decision's outcome from a list the
-            // other also writes to: the moment either one's membership moves, this line
-            // means something different and nothing fails. The flag now answers the
-            // question the screen actually asks, decided where the withholding happens.
+            // A RUN THAT HELD NOTHING BACK IS THE ALL-CLEAR'S, and the reading says so
+            // by reading the list itself: a walk that produced no candidates arrives
+            // with nothing withheld, and a screen telling that machine the app had held
+            // back all 0 files would be absurd and untrue.
             var withheld = result.WithheldFiles ?? Array.Empty<OrphanedFile>();
-            if (result.WalkOfferWithheldWholesale)
+            if (result.Withholding != WithholdingAccount.Nothing)
             {
                 Completion.ShowNothingOffered(
+                    result.Withholding,
                     withheld.Count,
                     result.WithheldTotalBytes,
                     result.RegisteredPackages.Count,

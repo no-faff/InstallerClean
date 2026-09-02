@@ -620,8 +620,10 @@ To put it back, you need the installer for the version you already have. Get it 
        with them. And "rather than guess" describes something the app never does, which
        raises a possibility that was never on the table. -->
   <data name="Completion.NothingOffered" xml:space="preserve"><value>Nothing offered on this PC</value></data>
-  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered.</value></data>
-  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered.</value></data>
+  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it.</value></data>
+  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them.</value></data>
+  <data name="Completion.NothingOfferedPerFileBody.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it.</value></data>
+  <data name="Completion.NothingOfferedPerFileBody.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them.</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
        retired list with the four that follow, and why the retired strings are kept
        rather than deleted is written out there rather than repeated here.
@@ -886,8 +888,10 @@ To put it back, you need the installer for the version you already have. Get it 
        "Rather than listing them" and not "rather than offering them", because the
        list is what the reader is looking at. The one-form spends neither placeholder
        and names the file instead of the numeral, as the other one-forms here do. -->
-  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it.</value></data>
-  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them.</value></data>
+  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it.</value></data>
+  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them.</value></data>
+  <data name="Summary.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that one of the cached files it found is unneeded, so it has held back the one file rather than offering it.</value></data>
+  <data name="Summary.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that some of the cached files it found are unneeded, so it has held back {0} {1} rather than offering them.</value></data>
   <!-- THE SECOND HELD-BACK LINE, AND IT IS THE PAIR OF THE ONE ABOVE RATHER THAN
        A DIFFERENT KIND OF SENTENCE. Summary.NothingListed reports what the
        walk-derived half of the scan held back; this reports what the superseded
@@ -1439,8 +1443,10 @@ The crash log could not be written.</value></data>
        a conclusion the reader has not reached. The tense also differs from the
        window's ("held back" here, "has held back" there) and that is deliberate,
        each being right in its own register. -->
-  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered.</value></data>
-  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered.</value></data>
+  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it.</value></data>
+  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them.</value></data>
+  <data name="Cli.NothingOfferedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it.</value></data>
+  <data name="Cli.NothingOfferedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them.</value></data>
   <!-- The command line's twin of Summary.NothingListed, for the machine whose
        walk-derived half was withheld wholesale while a superseded row was still
        offered: that run takes the found-files branch, so Cli.NothingOffered is not
@@ -1450,8 +1456,10 @@ The crash log could not be written.</value></data>
        the size and not the numeral, so it spends {2} and leaves {0} and {1} unused;
        both are passed on either branch so the two forms cannot disagree about which
        index is which. -->
-  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it.</value></data>
-  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them.</value></data>
+  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it.</value></data>
+  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them.</value></data>
+  <data name="Cli.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that one of the cached files it found is unneeded, so it has held back the one file ({2}) rather than offering it.</value></data>
+  <data name="Cli.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that some of the cached files it found are unneeded, so it has held back {0} {1} ({2}) rather than offering them.</value></data>
   <!-- Introduces the reasons the walk-derived offer was withheld wholesale, under
        whichever of Cli.NothingOffered or Cli.NothingListed that run printed. It picks
        up "couldn't be certain" from both of them on purpose, so the reader has the
@@ -1472,9 +1480,13 @@ The crash log could not be written.</value></data>
        The count and the size of what was held back are on the line above. And no line
        says whether re-running helps, because each leg holds members that differ on
        exactly that. -->
-  <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  A file path in Windows Installer's own records wouldn't resolve.</value></data>
-  <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  The identity of a file named in Windows Installer's records wouldn't read.</value></data>
-  <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  A program may be installed more than once on this PC.</value></data>
+  <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it.</value></data>
+  <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder.</value></data>
+  <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  A program may be installed more than once on this PC, and the records can't say which copy a file belongs to.</value></data>
+  <data name="Cli.WithheldReasons.CandidateIdentity" xml:space="preserve"><value>  A file in the folder couldn't be identified, so it couldn't be matched against the records.</value></data>
+  <data name="Cli.WithheldReasons.DeclaredProductInstalled" xml:space="preserve"><value>  A file says it belongs to a program that is still installed, so it may still be needed.</value></data>
+  <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program.</value></data>
+  <data name="Cli.WithheldReasons.ScreenUnanswered" xml:space="preserve"><value>  The check on which programs these files belong to gave answers that didn't line up with the files.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel
@@ -1506,6 +1518,7 @@ The crash log could not be written.</value></data>
        subject makes one shape correct at every count, which is what a matched
        surface needs. -->
   <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish which cached files belong to the programs installed here, so it held back {1} {2}. No action taken.</value></data>
+  <data name="Cli.EventLogNothingOfferedPerFile" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish that any of the cached files it found are unneeded, so it held back {1} {2}. No action taken.</value></data>
   <!-- THE NOTICE BESIDE THAT OUTCOME, Event ID 3002, and it exists because the
        outcome band cannot carry the distinction. The entry above sits at 1000 with
        the clean-machine line, since the run did its job either way, so a filter
@@ -1538,6 +1551,7 @@ The crash log could not be written.</value></data>
        superseded registration was still offered beside it. Naming no cause matters
        more here for that reason, not less. -->
   <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish which cached files belong to the programs installed here, so it held back {1} {2} and offered nothing it found by looking in the folder.</value></data>
+  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish that some of the cached files it found are unneeded, so it held back {1} {2}.</value></data>
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does

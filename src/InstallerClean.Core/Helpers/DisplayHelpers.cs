@@ -164,10 +164,13 @@ internal static class DisplayHelpers
         // number and agrees with nothing; it is simply false of twenty-one files and
         // false of none. Three of these carry a numeral in their PLURAL and none in
         // their singular, which is why the classification reads the one-form alone.
-        "Cli.NothingListed" or "Cli.NothingOffered" or "Completion.NothingOfferedBody"
+        "Cli.NothingListed" or "Cli.NothingListedPerFile"
+            or "Cli.NothingOffered" or "Cli.NothingOfferedPerFile"
+            or "Completion.NothingOfferedBody" or "Completion.NothingOfferedPerFileBody"
             or "Confirm.DeletePermanently" or "Confirm.MoveDestination"
             or "Error.AccessDenied" or "Error.FileInUse" or "Error.IOFailure"
-            or "Error.UnknownError" or "Summary.NothingListed"
+            or "Error.UnknownError"
+            or "Summary.NothingListed" or "Summary.NothingListedPerFile"
             or "Cli.SupersededHeldBack" or "Summary.SupersededHeldBack"
             => CountQuestion.Cardinality,
 

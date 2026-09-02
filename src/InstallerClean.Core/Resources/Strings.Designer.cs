@@ -174,6 +174,8 @@ public static class Strings
     public static string Cli_EventLogNoArguments => Get("Cli.EventLogNoArguments");
     public static string Cli_EventLogNothingOffered => Get("Cli.EventLogNothingOffered");
     public static string Cli_EventLogNothingOfferedNotice => Get("Cli.EventLogNothingOfferedNotice");
+    public static string Cli_EventLogNothingOfferedPerFile => Get("Cli.EventLogNothingOfferedPerFile");
+    public static string Cli_EventLogNothingOfferedPerFileNotice => Get("Cli.EventLogNothingOfferedPerFileNotice");
     public static string Cli_EventLogPendingRebootBlocked => Get("Cli.EventLogPendingRebootBlocked");
     public static string Cli_EventLogReason_InstallerInProgress => Get("Cli.EventLogReason.InstallerInProgress");
     public static string Cli_EventLogReason_MsiExecuteMutex => Get("Cli.EventLogReason.MsiExecuteMutex");
@@ -219,8 +221,12 @@ public static class Strings
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
+    public static string Cli_NothingListedPerFile_Plural => Get("Cli.NothingListedPerFile.Plural");
+    public static string Cli_NothingListedPerFile_Singular => Get("Cli.NothingListedPerFile.Singular");
     public static string Cli_NothingListed_Plural => Get("Cli.NothingListed.Plural");
     public static string Cli_NothingListed_Singular => Get("Cli.NothingListed.Singular");
+    public static string Cli_NothingOfferedPerFile_Plural => Get("Cli.NothingOfferedPerFile.Plural");
+    public static string Cli_NothingOfferedPerFile_Singular => Get("Cli.NothingOfferedPerFile.Singular");
     public static string Cli_NothingOffered_Plural => Get("Cli.NothingOffered.Plural");
     public static string Cli_NothingOffered_Singular => Get("Cli.NothingOffered.Singular");
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
@@ -234,9 +240,13 @@ public static class Strings
     public static string Cli_TooManyArguments => Get("Cli.TooManyArguments");
     public static string Cli_TooManyArgumentsNoPath => Get("Cli.TooManyArgumentsNoPath");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
+    public static string Cli_WithheldReasons_CandidateIdentity => Get("Cli.WithheldReasons.CandidateIdentity");
+    public static string Cli_WithheldReasons_DeclaredProductInstalled => Get("Cli.WithheldReasons.DeclaredProductInstalled");
+    public static string Cli_WithheldReasons_DeclaredProductUnestablished => Get("Cli.WithheldReasons.DeclaredProductUnestablished");
     public static string Cli_WithheldReasons_FileIdentity => Get("Cli.WithheldReasons.FileIdentity");
     public static string Cli_WithheldReasons_Header => Get("Cli.WithheldReasons.Header");
     public static string Cli_WithheldReasons_RecordedPath => Get("Cli.WithheldReasons.RecordedPath");
+    public static string Cli_WithheldReasons_ScreenUnanswered => Get("Cli.WithheldReasons.ScreenUnanswered");
     public static string Cli_WithheldReasons_SecondInstance => Get("Cli.WithheldReasons.SecondInstance");
     public static string Completion_AllClean => Get("Completion.AllClean");
     public static string Completion_DonateAsk => Get("Completion.DonateAsk");
@@ -258,6 +268,8 @@ public static class Strings
     public static string Completion_NothingOffered => Get("Completion.NothingOffered");
     public static string Completion_NothingOfferedBody_Plural => Get("Completion.NothingOfferedBody.Plural");
     public static string Completion_NothingOfferedBody_Singular => Get("Completion.NothingOfferedBody.Singular");
+    public static string Completion_NothingOfferedPerFileBody_Plural => Get("Completion.NothingOfferedPerFileBody.Plural");
+    public static string Completion_NothingOfferedPerFileBody_Singular => Get("Completion.NothingOfferedPerFileBody.Singular");
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");
     public static string Completion_PermanentDeleteCancelledSummary => Get("Completion.PermanentDeleteCancelledSummary");
@@ -413,6 +425,8 @@ public static class Strings
     public static string Summary_MissingFromDisk_Singular => Get("Summary.MissingFromDisk.Singular");
     public static string Summary_MissingFromDisk_Unnamed_Plural => Get("Summary.MissingFromDisk.Unnamed.Plural");
     public static string Summary_MissingFromDisk_Unnamed_Singular => Get("Summary.MissingFromDisk.Unnamed.Singular");
+    public static string Summary_NothingListedPerFile_Plural => Get("Summary.NothingListedPerFile.Plural");
+    public static string Summary_NothingListedPerFile_Singular => Get("Summary.NothingListedPerFile.Singular");
     public static string Summary_NothingListed_Plural => Get("Summary.NothingListed.Plural");
     public static string Summary_NothingListed_Singular => Get("Summary.NothingListed.Singular");
     public static string Summary_OperationFiles => Get("Summary.OperationFiles");

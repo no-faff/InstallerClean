@@ -138,19 +138,35 @@ public partial class ScanViewModel : ObservableObject
     private int _missingFromDiskCount;
 
     /// <summary>
-    /// How many files this scan held back after emptying its walk-derived offer in
-    /// one go, or zero on any other run. Both the flag and the line below are read
-    /// off it, so a machine cannot show the sentence and no number or the reverse.
+    /// How many files this scan held back on a run that still offered something, or
+    /// zero where it offered nothing. Both the flag and the line below are read off
+    /// it, so a machine cannot show the sentence and no number or the reverse.
     ///
-    /// IT IS NOT THE WHOLE WITHHELD COUNT and must not be pointed at it. The
-    /// left-alone line above counts every file the scan declined to offer, from two
-    /// separate decisions; this counts the ones the wholesale branch took, which is
-    /// the population the sentence is about.
+    /// IT COUNTS EVERY WITHHOLDING AND NOT ONE DECISION'S SHARE. Two decisions keep
+    /// files back and a run can meet both, so a count of either alone would leave the
+    /// sentence short of the list the Details window shows.
+    /// <see cref="NothingListedIsPerFile"/> is what says which sentence the number
+    /// goes in, and this is the number.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasNothingListed))]
     [NotifyPropertyChangedFor(nameof(NothingListedText))]
     private int _nothingListedCount;
+
+    /// <summary>
+    /// Which of the two sentences the count above goes in, read off the scan rather
+    /// than worked out here.
+    ///
+    /// A SECOND INPUT TO THE LINE, AND IT NOTIFIES THE LINE ITSELF, which is the whole
+    /// of what makes a second one safe. The gate beside it stays a predicate over ONE
+    /// property for the reason its own note gives; this feeds only the text, and the
+    /// text is recomputed from whichever of the two is set last because both say so.
+    /// A second input that did not notify would leave the line rendered once, in
+    /// whichever wording happened to be current, and never asked again.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NothingListedText))]
+    private bool _nothingListedIsPerFile;
 
     /// <summary>
     /// The programs those files belong to, as the one phrase the line names them
@@ -341,9 +357,15 @@ public partial class ScanViewModel : ObservableObject
     public string NothingListedText =>
         string.Format(
             DisplayHelpers.Pluralise(NothingListedCount,
-                Strings.Summary_NothingListed_Singular,
-                Strings.Summary_NothingListed_Plural,
-                "Summary.NothingListed"),
+                NothingListedIsPerFile
+                    ? Strings.Summary_NothingListedPerFile_Singular
+                    : Strings.Summary_NothingListed_Singular,
+                NothingListedIsPerFile
+                    ? Strings.Summary_NothingListedPerFile_Plural
+                    : Strings.Summary_NothingListed_Plural,
+                NothingListedIsPerFile
+                    ? "Summary.NothingListedPerFile"
+                    : "Summary.NothingListed"),
             NothingListedCount, DisplayHelpers.PluraliseFile(NothingListedCount));
 
     partial void OnRegisteredFileCountChanged(int value) =>
@@ -430,17 +452,26 @@ public partial class ScanViewModel : ObservableObject
             // simply no longer decides what this window says, being the trigger for
             // one of six routes into the count rather than a count of files.
             SupersededHeldBackCount = result.WithheldCount;
-            // Off the flag rather than off the withheld list's own length: that list
-            // is filled by two separate decisions and only one of them is what this
-            // sentence is about. The flag is false on a run whose wholesale branch
-            // caught nothing, which is what keeps the line off a tidy machine.
+            // WHICH SENTENCE FIRST, THEN THE NUMBER THAT GOES IN IT. Both notify the
+            // line, so the order does not decide what a reader ends up seeing; it is
+            // this way round because the count is the gate as well, and a reader
+            // meeting the line the instant it appears meets it in its settled wording.
+            //
+            // Off the scan's own reading rather than off the withheld list's length:
+            // that list is filled by two separate decisions and neither the list nor
+            // the wholesale flag says which sentence is true of it. The reading is
+            // Nothing on a run whose withholding caught nothing, which is what keeps
+            // the line off a tidy machine.
             //
             // AND ZERO WHERE NOTHING IS OFFERED, because that machine gets the
             // completion screen instead and never reads this window's list. Folded in
-            // here rather than into the predicate so the property has one input; see
-            // its own note for what a second input would have cost.
+            // here rather than into the predicate so the gate has one input; see its
+            // own note for what a second input would have cost.
+            NothingListedIsPerFile = result.Withholding == WithholdingAccount.PerFile;
             NothingListedCount =
-                result.WalkOfferWithheldWholesale && orphanedCount > 0 ? withheld.Count : 0;
+                result.Withholding != WithholdingAccount.Nothing && orphanedCount > 0
+                    ? withheld.Count
+                    : 0;
             HasScanned = true;
         }
         finally
