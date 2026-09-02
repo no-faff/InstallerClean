@@ -59,7 +59,7 @@ public class CliNothingOfferedTests
     [Fact]
     public async Task A_per_file_withholding_gets_its_own_line_and_not_the_wholesale_one()
     {
-        // THE MACHINE ROW 11 WAS FILED FOR. Nothing emptied the offer wholesale; the
+        // THE MACHINE THE PER-FILE LINE EXISTS FOR. Nothing emptied the offer wholesale; the
         // declared-product screen kept two files and the folder is not clean. Before
         // there was a line for it this run printed "Found no unneeded files", which is
         // a statement about a folder that has two files nobody vouched for in it.

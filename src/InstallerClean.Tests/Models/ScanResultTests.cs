@@ -93,8 +93,8 @@ public class ScanResultTests
     [Fact]
     public void A_withholding_with_no_wholesale_share_reads_as_per_file()
     {
-        // The declared-product screen keeping two files, which is the machine row 11
-        // was filed for: the flag is false and the folder is not clean.
+        // The declared-product screen keeping two files, which is the machine the
+        // per-file reading exists for: the flag is false and the folder is not clean.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
             WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 2));
