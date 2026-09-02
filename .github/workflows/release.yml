@@ -84,8 +84,8 @@ jobs:
       #
       # THE SET IS A GLOB AND NOT A LIST, which is how the release script's own
       # guard loop names it. The two therefore run the identical set by
-      # construction, and a seventeenth guard is gated by the release path on
-      # the day it is written with nothing here to keep in step.
+      # construction, and a new guard is gated by the release path on the day it
+      # is written with nothing here to keep in step.
       #
       # EVERY GUARD RUNS EVEN AFTER ONE HAS GONE RED, for the reason CI gives at
       # its first guard: none of them is a premise for any other, so a red one
@@ -120,7 +120,16 @@ jobs:
             Write-Host "::endgroup::"
           }
 
-          Write-Host "Guards run: $($guards.Count). Failed: $($failed.Count)."
+          # gen-translation-table --check runs no generation: it rebuilds every
+          # table in memory and fails on any difference, which is what CI and the
+          # release script both make a stop. It sits beside the glob rather than
+          # in it because the glob is check-*.mjs and this is not one.
+          Write-Host "::group::gen-translation-table --check"
+          node scripts/gen-translation-table.mjs --check
+          if ($LASTEXITCODE -ne 0) { $failed += 'gen-translation-table --check' }
+          Write-Host "::endgroup::"
+
+          Write-Host "Checks run: $($guards.Count + 1) ($($guards.Count) guards plus gen-translation-table --check). Failed: $($failed.Count)."
           if ($failed.Count -gt 0) {
             Write-Host "::error::Guards failed: $($failed -join ', ')"
             exit 1
