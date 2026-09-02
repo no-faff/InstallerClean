@@ -143,9 +143,7 @@ internal static class MoveSpaceCheck
     /// The volume question still goes to Windows about a real path, so this
     /// relocates WHICH path is asked about and nothing else; it cannot let a
     /// MockFileSystem answer it, the whole file being outside
-    /// <c>System.IO.Abstractions</c> for that reason. It mirrors
-    /// <see cref="InstallerCacheHelpers.IsInstallerFolderOrChild"/>'s own
-    /// override on the neighbouring safety gate.
+    /// <c>System.IO.Abstractions</c> for that reason.
     ///
     /// WITHOUT IT NO ASSERTION ON THIS METHOD CAN TELL IT FROM THE ONE IT
     /// REPLACED. The cache's volume and the system directory's are the same

@@ -91,20 +91,12 @@ internal static class InstallerCacheHelpers
     /// the entire restore-after-mistakes story collapses if files end up
     /// back inside the Installer folder.
     /// </summary>
-    /// <param name="installerFolderRoot">
-    /// Test-only real-folder override for the cache root (null in production,
-    /// which uses the real <see cref="InstallerFolder"/>). The comparison still
-    /// runs against the REAL filesystem via <see cref="ResolveFinalPath"/>, so
-    /// this only relocates the check to a real sandbox directory for the
-    /// integration tests; it does NOT let a MockFileSystem bypass the gate. It
-    /// mirrors <c>FileSystemScanService</c>'s own installer-folder override.
-    /// </param>
-    internal static bool IsInstallerFolderOrChild(string path, string? installerFolderRoot = null)
+    internal static bool IsInstallerFolderOrChild(string path)
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
         TryResolveFinalPath(path, out var resolvedInput);
-        return ResolvesInsideInstallerFolder(resolvedInput, installerFolderRoot);
+        return ResolvesInsideInstallerFolder(resolvedInput);
     }
 
     /// <summary>
@@ -129,11 +121,11 @@ internal static class InstallerCacheHelpers
     /// compares the root the same way, where the same answer becomes the source
     /// side's refusal.
     /// </summary>
-    internal static bool ResolvesInsideInstallerFolder(string resolvedInput, string? installerFolderRoot = null)
+    internal static bool ResolvesInsideInstallerFolder(string resolvedInput)
     {
         var input = resolvedInput
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        var installer = ResolveFinalPath(installerFolderRoot ?? InstallerFolder)
+        var installer = ResolveFinalPath(InstallerFolder)
             .TrimEnd(Path.DirectorySeparatorChar);
 
         return input.Equals(installer, StringComparison.OrdinalIgnoreCase)
@@ -206,9 +198,9 @@ internal static class InstallerCacheHelpers
     ///
     /// SHAPED TO MATCH ITS SIBLING RATHER THAN TO ITS OWN CONVENIENCE. Same
     /// already-resolved parameter, same trim of the input, same equality-or-prefix
-    /// test, same treatment of a root that will not resolve. It takes no root
-    /// override, because nothing needs to relocate these roots and a parameter
-    /// nobody passes is a seam nobody is testing.
+    /// test, same treatment of a root that will not resolve, and no root override on
+    /// either: nothing needs to relocate these roots, and a parameter nobody passes is
+    /// a seam nobody is testing.
     ///
     /// A DEGRADED INPUT ANSWERS "NOT INSIDE", which is what the destination side
     /// wants and what the sibling does: a caller refusing on this answer would
