@@ -100,7 +100,7 @@ public class CompletionViewModelTests
             errors: new List<FileOperationError>());
 
         // A delete reclaims the disk at the instant it happens, so the headline
-        // says so, and this is the completion state carrying no line under the
+        // says so, and this is a completion state carrying no line under the
         // summary.
         Assert.Contains("freed", vm.Heading);
         Assert.Equal(string.Empty, vm.Restore);

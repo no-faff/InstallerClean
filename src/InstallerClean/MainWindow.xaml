@@ -974,8 +974,7 @@
                     </TextBlock>
 
                     <!-- Restore guidance, after a Move and on the all-clear
-                         receipt. Collapses when empty, which is every delete and
-                         the all-clear before its receipt lands, so the card does
+                         receipt. Collapses when empty, so the card does
                          not carry a phantom 30+ pixel gap from the bottom margin
                          plus line-height of an empty TextBlock. Pattern matches
                          the Errors Border below.
