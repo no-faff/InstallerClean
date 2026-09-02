@@ -176,11 +176,11 @@
 
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Spenden</value></data>
-  <!-- The About window's own star and cuppa buttons. The .About suffix on the
-       key survives from a footer pair that no longer exists; it is the key
-       name only, and the value says what the button says on screen, because a
-       window name in the spoken one was an internal note being read out to
-       somebody who can only be in that window to hear it. -->
+  <!-- The About window's own star and cuppa buttons. The value says what the
+       button says on screen: a window name in the spoken value would be an
+       internal note read out to somebody who can only be in that window to hear
+       it. The unsuffixed Automation.BuyMeACuppa is the main window's donate
+       button and holds a different value, so the two are not one key. -->
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Spendier mir einen Kaffee</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Vorgang abbrechen</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Scan abbrechen</value></data>
@@ -381,7 +381,7 @@
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
     <value>Alle nicht benötigten Dateien unten kannst du [bedenkenlos löschen].</value>
-    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause. The bracketed phrase becomes a hyperlink into the README's "Is it safe?" section (rendered in MainWindow.xaml.cs BuildIntroLeadLine); the brackets are the delimiter and are not shown. This is the screen's strongest safety claim and the only link on it, so keep the brackets on whatever phrase carries that claim in this language.</comment>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause. The bracketed phrase becomes a hyperlink into the README's "Is it safe?" section (rendered in MainWindow.xaml.cs BuildIntroLeadLine); the brackets are the delimiter and are not shown. This is the screen's strongest safety claim, so keep the brackets on whatever phrase carries that claim in this language.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
     <value>Sie liegen in {InstallerFolder}. InstallerClean fragt Windows nach jedem installierten Programm: Eine Datei wird aufgeführt, wenn kein Programm sie beansprucht ({0}) oder wenn ein neuerer Patch sie ersetzt hat und kein Programm auf sie zurückgehen könnte ({1}).</value>
@@ -495,15 +495,15 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
   <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} gefunden, die du bedenkenlos löschen kannst.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Zielordner wird vorbereitet...</value></data>
   <!-- The operating overlay's heading. It carries no count, and that is the
-       point: the count it used to carry was the batch the scan found, while
-       the "X of Y" line directly beneath counts what the act-time re-verify
-       actually handed to the service. When the re-verify holds anything back
-       the two disagree, and the card read "Deleting 39 files..." above
-       "1 of 34 files". The heading is assigned before the overlay is revealed
-       so it is announced exactly once, which rules out re-composing it later,
-       so it names the operation and the files and leaves the counting to the
-       line that can be right. "Unneeded" is the app's own word for them and is
-       what makes the heading say something once the count has gone.
+       point: a count here would be the batch the scan found, while the "X of Y"
+       line directly beneath counts what the act-time re-verify actually handed
+       to the service. Where the re-verify holds anything back the two disagree,
+       and the card would read "Deleting 39 files..." above "1 of 34 files". The
+       heading is assigned before the overlay is revealed so it is announced
+       exactly once, which rules out re-composing it later, so it names the
+       operation and the files and leaves the counting to the line that can be
+       right. "Unneeded" is the app's own word for them and is what makes the
+       heading say something once the count has gone.
        No placeholder: do not reintroduce one. -->
   <data name="Status.Moving" xml:space="preserve"><value>Nicht benötigte Dateien werden verschoben...</value></data>
   <data name="Status.Deleting" xml:space="preserve"><value>Nicht benötigte Dateien werden gelöscht...</value></data>
@@ -653,11 +653,8 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        files, so there is no count-dependent noun to agree with and no singular
        to recast.
 
-       NO BRACKETED PHRASE, SO NO LINK. BuildCompletionRestoreLine renders a
-       plain run when CompositionParsing.SplitAtBracketedPhrase finds no
-       bracketed phrase, so these values alone decide whether there is one. The
-       app's link into the README's "Is it safe?" section is on the main window,
-       which is the screen behind this one and the screen a reader returns to. -->
+       NO SQUARE-BRACKETED PHRASE IN ANY LANGUAGE. Brackets are what the app
+       turns into a hyperlink, and this line carries none. -->
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Lösche diesen Ordner, sobald du dich überzeugt hast, dass alles in Ordnung ist.</value></data>
   <!-- The same line where the backup folder is on the drive the files came
        from. A same-drive move is a rename, so it reclaims nothing until the
@@ -835,14 +832,14 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        to v2.3.0, so nothing here can say what removed a file and nothing may
        imply it. The line fires on machines this app has never run on.
 
-       ONE LINE OVER ONE POPULATION. It used to count only the registrations that
-       carried no superseded or obsoleted state, the rest being read as the
-       expected end state of a patch Windows had finished with. Windows opens
-       every patch registered to a product whether superseded or not, so the
-       record is one Windows will act on and cannot satisfy, and both are the same
-       condition with the same recovery step, which one sentence covers. The
-       citations, and why no single consequence may be named, are on
-       RegisteredPackage.IsMissingFromDisk.
+       ONE LINE OVER ONE POPULATION. Being superseded or obsoleted does not on
+       its own keep a registration out of this count. Windows opens every patch
+       registered to a product whether superseded or not, so the record is one
+       Windows will act on and cannot satisfy, and both are the same condition
+       with the same recovery step, which one sentence covers.
+       MissingFilesReport.Affected is the predicate that decides which
+       registrations this line counts. The citations, and why no single
+       consequence may be named, are on RegisteredPackage.IsMissingFromDisk.
 
        The hedges are load-bearing and are the verified position: "causes no
        trouble day to day" and "can fail", never "will". Microsoft guarantees
@@ -922,11 +919,10 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        without the clause each sits on one row. There is no list at all on a /d or
        an /m, so the command line could not have carried it either.
 
-       THE GATE IS THE COUNT THIS LINE PRINTS. It used to be the machine-wide
-       refusal, which is one of the six routes into that count rather than the
-       count itself, so the line could appear on a machine holding back no
-       superseded file at all and tell its owner something had been kept back. See
-       ScanViewModel.HasSupersededHeldBack. -->
+       THE GATE IS THE COUNT THIS LINE PRINTS, and not the machine-wide refusal.
+       That refusal is one of six routes into the count rather than the count
+       itself, so gating on it would put this line in front of somebody holding
+       back no superseded file at all. See ScanViewModel.HasSupersededHeldBack. -->
   <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, dass die eine ersetzte Datei nicht mehr gebraucht wird, und hat sie deshalb zurückgehalten.</value></data>
   <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, dass {0} ersetzte Dateien nicht mehr gebraucht werden, und hat sie deshalb zurückgehalten.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
@@ -993,10 +989,7 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        which is how every screen in the app names one.
 
        NO SQUARE-BRACKETED PHRASE BELONGS HERE IN ANY LANGUAGE. Brackets are
-       what CompositionParsing turns into a hyperlink, and this dialog is modal
-       over a window already carrying that link, so a bracketed phrase here puts
-       two copies of one link on screen together, one live and one behind glass
-       that cannot be clicked.
+       what the app turns into a hyperlink, and this card carries none.
 
        "THESE FILES" AND NOT A BARE "FILES", WHICH IS WHAT THE PLURAL CARRIED.
        The singular was written fresh in the same commit and says "This file";
@@ -1079,11 +1072,11 @@ InstallerClean lief bereits als Administrator, es noch einmal so zu starten hilf
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
-       tests, a survivor or two no longer disarming it, and neither is a hedge to
-       be tightened back into an absolute. Both counts it weighs are taken over
+       tests, a survivor or two not disarming it, and neither is a hedge to
+       be tightened into an absolute. Both counts it weighs are taken over
        the registrations naming a file directly in the folder the scan walked, so
        both clauses are about that folder and not about the disk at large.
-       States no cause, and the cause it used to name was false of a machine whose
+       States no cause, because naming one would be false of a machine whose
        records read perfectly and whose folder was replaced or restored under
        them; three conditions reach this gate, the app cannot tell them apart,
        and that inability is the gate. A second refusal runs BEFORE this one
@@ -1561,18 +1554,18 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
 
        The window says the same thing in Summary.MissingFromDisk.*, which closes
        on "Open Details for what to do"; there is no Details window here, so the
-       last sentences carry the recovery step itself. Both count every
-       registration naming a file that is not there, and neither names a cause:
-       see the window's remarks for why on both points.
+       last sentences carry the recovery step itself. Both count the same
+       registrations, MissingFilesReport.Affected deciding which, and neither
+       names a cause: see the window's remarks for why on both points.
 
-       IT USED TO CARRY LESS THAN THE WINDOW AND ONE OF THE MISSING PIECES WAS THE
-       ONE THAT STOPS HARM. "Don't uninstall first" was absent here entirely, on
-       the host whose reader is likeliest to be scripting the recovery, and
-       uninstalling is itself a step that needs the file. A host may carry less
-       detail than the other; it may not drop the instruction that prevents a
-       reader making the problem worse. Two smaller omissions went with it: the
-       old wording said "preferably the same version" for something Windows
-       refuses outright.
+       THE INSTRUCTION THAT STOPS HARM STAYS ON THIS HOST WHATEVER ELSE IS
+       TRIMMED. "Don't uninstall first" belongs here as much as on the window,
+       this being the host whose reader is likeliest to be scripting the
+       recovery, and uninstalling is itself a step that needs the file. A host
+       may carry less detail than the other; it may not drop the instruction
+       that prevents a reader making the problem worse. And the version is not a
+       preference: nothing here may soften "the version you already have" into
+       "preferably the same version".
 
        "Can fail", "may" and "doesn't guarantee" are the verified positions and
        none may harden: Microsoft guarantees nothing here.
@@ -1620,37 +1613,30 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        the always-plural "errors:" header the same audience scrapes: a machine
        surface holds one shape, and the grammar is the price of it.
 
-       IT LOST A FIGURE IN 3.0.0, WHICH IS A CHANGE TO A MACHINE SURFACE AND IS
-       DELIBERATE. It opened on a count of the superseded and obsoleted files the
-       run had withheld, and that count is a real number again. It is not coming
-       back here. What this sentence is about is the unmatched records and what
-       they cost the count of files missing from the cache; a withheld count
-       answers a different question, so printing it beside that clause hands an
-       operator a number with no stated relation to the words next to it. The key
-       keeps the name it was given, which now describes its history rather than
-       its value, and is not a promise of a second figure. The withheld count
-       travels in the opt-in result log instead, as scan.withheldPatchCount. The
-       Event ID and the notice both stay; what the operator can act on is the
-       remaining figure and the sentence beside it.
+       ONE FIGURE, AND THE KEY NAME IS NOT A PROMISE OF A SECOND. What this
+       sentence is about is the unmatched records and what they cost the count of
+       files missing from the cache; a withheld count answers a different
+       question, so printing it beside that clause would hand an operator a
+       number with no stated relation to the words next to it. The withheld count
+       travels in the opt-in result log instead, as scan.withheldPatchCount.
 
-       That figure is an estimate that can come out high as well as low, which
+       The count this line prints is an estimate that can come out high as well
+       as low, which
        MachineContract's remarks set out: it is sound to alert on and to trend,
        and it is not a headcount of programs. The window says nothing about it at
        all, for that reason and then for a larger one, and this line keeps it, an
        RMM having a filter to hang on a number. THE WINDOW'S LINE IS NOT THIS
-       FIGURE IN OTHER WORDS: Summary.SupersededHeldBack replaced the sentence that
-       used to sit there and counts files held back, which is a different
-       quantity reached by six routes, of which the count here is one. -->
+       FIGURE IN OTHER WORDS: Summary.SupersededHeldBack counts files held back,
+       which is a different quantity reached by six routes, of which the count
+       here is one. -->
   <!-- 0 = mode arg, 1 = registrations naming a file that is not in the cache. The
        second notice (Event ID 3001), and the actionable one. Unpluralised, as
        above.
 
-       IT SAYS NOTHING ABOUT WHAT REMOVED THEM, and the comment here used to say
-       it said outright that this tool did not cause it. The line has not said
-       that for some time and must not say it again: every tool that deletes from
-       this folder leaves the same record, this one included up to v2.3.0, and the
-       entry sitting in a log beside this tool's name is a reason for care rather
-       than a licence. -->
+       IT SAYS NOTHING ABOUT WHAT REMOVED THEM AND MUST NOT: every tool that
+       deletes from this folder leaves the same record, this one included up to
+       v2.3.0, and the entry sitting in a log beside this tool's name is a reason
+       for care rather than a licence. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files". Never printed at a
        count of zero (see Program.cs), so it does not have to read sensibly
        there. It says "unneeded" for the same reason Cli.DeletedFiles below
