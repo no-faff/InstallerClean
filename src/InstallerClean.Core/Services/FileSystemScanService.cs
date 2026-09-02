@@ -1216,9 +1216,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
         /// NEITHER IS A CATCH-ALL, AND THAT IS THE POINT. <c>Withholds</c> is written
         /// as the complement of the two verdicts that keep a file, so a member added
         /// to the enum withholds by default and would arrive here unnamed. Counting it
-        /// under either of these would put a cause on it that nobody established;
-        /// counting it nowhere leaves the five short of the list, which the
-        /// completeness test reports as what it is.
+        /// under either of these would put a cause on it that nobody established, so an
+        /// unnamed verdict counts nowhere and the split falls short of the list it
+        /// splits. Such a member wants an arm of its own, and
+        /// WithholdingSplitTallyTests walks the enum's withholding members against this
+        /// switch, so adding one has to be a deliberate edit here as well as there.
         /// </summary>
         internal void Screened(DeclaredProductOutcome outcome)
         {

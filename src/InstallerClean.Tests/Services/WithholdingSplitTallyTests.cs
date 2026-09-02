@@ -8,16 +8,17 @@ namespace InstallerClean.Tests.Services;
 ///
 /// WHAT THIS COVERS AND WHAT IT DOES NOT. <see cref="WithholdingSplitTests"/> drives
 /// real scans and pins that each decision counts the files it keeps; those need the
-/// folder walk. This needs nothing, and pins the two things the walk cannot show: that
-/// the total is the five and only the five, and that a screen verdict the split does
-/// not name is counted under neither of the two it does.
+/// folder walk. This needs nothing, and pins the three things the walk cannot show:
+/// that the total is the five and only the five, that a screen verdict the split does
+/// not name is counted under neither of the two it does, and that the enum declares no
+/// withholding verdict the split leaves unnamed.
 ///
-/// THE SECOND IS THE ONE WORTH HAVING. <c>DeclaredProductOutcome.Withholds</c> is
+/// THE LAST IS THE ONE WORTH HAVING. <c>DeclaredProductOutcome.Withholds</c> is
 /// written as the complement of the two verdicts that keep a file, so a member added
 /// to that enum withholds by default and arrives here unnamed. Counting it under
-/// either named verdict would put a cause on it that nobody established. Counting it
-/// nowhere leaves the five short of the list, which is what the completeness assertion
-/// in every scan test reports.
+/// either named verdict would put a cause on it that nobody established, so it counts
+/// nowhere and the split falls short of the list it splits. Walking the enum here is
+/// what asks for that arm as the member is added.
 /// </summary>
 public class WithholdingSplitTallyTests
 {
@@ -96,8 +97,37 @@ public class WithholdingSplitTallyTests
 
         Assert.Equal(0, split.DeclaredProductInstalledCount);
         Assert.Equal(0, split.DeclaredProductUnestablishedCount);
-        // And the total falls short of the file, which is what the completeness
-        // assertion in the scan tests turns into a failure rather than a silent gap.
+        // And the total falls short of the file rather than claiming it under a cause
+        // nobody established. This is a value cast past the enum, so no scan produces
+        // it; a real member arriving in this position is what the walk below asks an
+        // arm for.
         Assert.Equal(0, split.Total);
+    }
+
+    [Fact]
+    public void Every_withholding_verdict_the_enum_declares_counts_into_an_arm_of_its_own()
+    {
+        // Driven from the enum rather than from the two the switch names, so a member
+        // added to it arrives asking for an arm instead of being kept back and counted
+        // under nothing. Withholds is the complement of the two verdicts that keep a
+        // file, so the walk picks a new member up without anybody adding it here.
+        var withholding = Enum.GetValues<DeclaredProductOutcome>()
+            .Where(o => o.Withholds())
+            .ToArray();
+
+        // A set that came back empty would leave the loop below passing over no cases
+        // at all, which reads exactly like a clean result. A floor rather than a count,
+        // so splitting a verdict out does not fail this for the wrong reason.
+        Assert.True(withholding.Length >= 2, "the withholding verdict list came back short");
+
+        foreach (var outcome in withholding)
+        {
+            var tally = new FileSystemScanService.WithholdingSplitTally();
+
+            tally.Screened(outcome);
+
+            Assert.True(tally.Taken().Total == 1,
+                $"{outcome} withholds and counts into no arm of the split");
+        }
     }
 }
