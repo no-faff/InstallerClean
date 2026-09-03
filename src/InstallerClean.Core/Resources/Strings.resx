@@ -1456,8 +1456,9 @@ The crash log could not be written.</value></data>
        Some of these files would have been kept back anyway by the per-file screen
        this branch skips, so any wording promising they would have been offered
        claims more than the run has. "Rather than listing them" would be false
-       outright: the held-back files are listed, in the Details window and in the
-       report, and offering is the only half of that pair this run refused.
+       outright: the held-back files are listed, the Details window showing them
+       among the registrations, and offering is the only half of that pair this run
+       refused.
 
        A PAIR AND NOT A FLAT KEY, because it shipped as one for an afternoon and
        read "held back all 1 file" at a count of one. The one-form names the size
@@ -1543,12 +1544,10 @@ The crash log could not be written.</value></data>
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it.</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  A program may be installed more than once on this PC, and the records can't say which copy a file belongs to.</value></data>
-  <!-- The four per-file arms. Each is a decision taken about one candidate, where the
-       three lines above are findings about the machine's records that withheld the
-       walk-derived offer whole. They name four different causes, so the four sentences
-       have to stay four and distinct: a rendering that blurs any two of them makes the
-       app state a cause it cannot support for the other one's files. Each is taken in
-       turn below, in the order they appear.
+  <!-- The four per-file arms, where the three lines above are findings about the
+       machine's records that withheld the walk-derived offer whole. They name four
+       different causes and have to stay four and distinct: a rendering that blurs any
+       two of them makes the app state a cause it cannot support for the other's files.
 
        CandidateIdentity is the identity pass failing to read one file in the folder,
        so that file could not be compared against the records at all.
