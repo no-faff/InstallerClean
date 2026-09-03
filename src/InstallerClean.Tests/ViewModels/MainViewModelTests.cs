@@ -167,10 +167,18 @@ public class MainViewModelTests
 
         await vm.Scan.ScanWithProgressAsync(null);
 
-        // Built the way ChromeViewModel builds it, off the same result.
-        var details = new RegisteredFilesViewModel(
-            scan.RegisteredPackages, scan.RegisteredTotalBytes,
-            Substitute.For<IMsiFileInfoService>(), scan.WithheldFiles);
+        // The Details view model comes off the button, not out of this method: the
+        // window service is substituted, so opening the window hands over the object
+        // ChromeViewModel itself builds. Which lists that construction passes is
+        // therefore part of what the comparison below holds, and the two screens are
+        // compared as the app assembles them rather than as a fixture repeats them.
+        RegisteredFilesViewModel? opened = null;
+        _windowService.When(s => s.ShowRegisteredDetails(Arg.Any<RegisteredFilesViewModel>()))
+            .Do(ci => opened = ci.Arg<RegisteredFilesViewModel>());
+
+        vm.Chrome.OpenRegisteredDetailsCommand.Execute(null);
+
+        var details = Assert.IsType<RegisteredFilesViewModel>(opened);
 
         // Three files left alone: two registered and present, plus the withheld one.
         Assert.Equal(3, vm.Scan.RegisteredFileCount);
