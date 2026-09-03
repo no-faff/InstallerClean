@@ -107,10 +107,9 @@ public class FileSystemScanServiceSecondInstanceTests
     public async Task A_wholesale_withholding_that_caught_nothing_does_not_report_itself()
     {
         // THE FLAG SAYS THE WITHHOLDING TOOK SOMETHING, NOT THAT THE BRANCH WAS TAKEN,
-        // and the window depends on that: the screen it drives says the app "has held
-        // back all N files it might otherwise have offered", which at zero is both
-        // absurd and untrue. For this machine the all-clear is right, nothing in its
-        // folder having gone unclaimed.
+        // and the window depends on that: the screen it drives announces a count of
+        // files held back from the offer, which at zero is both absurd and untrue. For
+        // this machine the all-clear is right, nothing in its folder having gone unclaimed.
         //
         // A host counting WithheldFiles would be deciding this off a list that more than
         // one decision writes to, so the guard would change meaning the moment any of

@@ -532,9 +532,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // WHAT THE HOSTS ARE TOLD IS THAT THE WITHHOLDING CAUGHT SOMETHING, AND NOT
             // MERELY THAT THIS BRANCH WAS TAKEN. A walk that produced no unclaimed
             // candidates reaches here having held nothing back, and the screen that
-            // reads this flag says the app "has held back all N files it might otherwise
-            // have offered", which at zero is both absurd and untrue; for that machine
-            // the all-clear is right, nothing in the folder having gone unclaimed.
+            // reads this flag announces a count of files held back from the offer,
+            // which at zero is both absurd and untrue; for that machine the all-clear
+            // is right, nothing in the folder having gone unclaimed.
             //
             // IT IS DECIDED HERE BECAUSE THE HOST CANNOT DECIDE IT SAFELY. A host
             // counting ScanResult.WithheldFiles would be reading a list more than one
