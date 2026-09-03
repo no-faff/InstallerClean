@@ -281,10 +281,10 @@ internal static class Program
         }
         finally
         {
-            // RunWorkAsync has already written this run's one Application-log
-            // entry by the time it returns, so nothing in this cleanup may reach
-            // Main's catch-all: that writes a second, and one entry per run is
-            // what an RMM counts runs by. The stdout note carries a guard of its
+            // RunWorkAsync has already written this run's summary entry by the
+            // time it returns, so nothing in this cleanup may reach Main's
+            // catch-all: that writes a second, and one summary per run is what
+            // an RMM counts runs by. The stdout note carries a guard of its
             // own so that a dead stream cannot skip the mutex release beneath it,
             // and the unhook goes last inside that guard because nothing depends
             // on it having happened.
@@ -568,9 +568,9 @@ internal static class Program
             // THE PATHS THAT NOW PRINT NOTHING ARE THE ONES THE WINDOW IS ALSO
             // SILENT ON, which is the point rather than a loss: an installer-busy
             // refusal, an unavailable lock and a free-space refusal all return
-            // before the print, and on each of them the service touched nothing, so
-            // there is no count for the sentence to account for. The window shows a
-            // dialog and no completion screen on all three.
+            // before the print, and none of them commits anything, so there is no
+            // completed-of-intended count for the sentence to sit beside. The
+            // window reaches no completion screen on any of the three either.
             // A WHOLE-BATCH REFUSAL STOOD HERE UNTIL 3.0.0 and its shape is worth
             // keeping in mind rather than rediscovering. It fired when the machine
             // gained a product installed as a second instance of itself between the
@@ -625,10 +625,11 @@ internal static class Program
             if (arg == "/d")
             {
                 var deleteService = services.GetRequiredService<IDeleteFilesService>();
-                // Silent when the re-verify just above took every file back. The
-                // line it printed has already said so, with the reason; announcing
-                // a batch of none and then reporting that none of it happened
-                // reads as a fault twice over on a run where nothing went wrong.
+                // Silent when the re-verify just above took every file back. It
+                // prints nothing itself: the run's one held-back line below is
+                // what carries those files. Announcing a batch of none here and
+                // then reporting that none of it happened reads as a fault twice
+                // over on a run where nothing went wrong.
                 if (count > 0)
                     Console.WriteLine(string.Format(
                         DisplayHelpers.Pluralise(count, Strings.Cli_DeletingFiles, "Cli.DeletingFiles"),
@@ -638,7 +639,7 @@ internal static class Program
                 // synthesizing it keeps the /d and /m branches symmetric (Move
                 // would otherwise create and probe its destination for an empty
                 // batch). The summary path below still fires with 0, exit Ok, so the
-                // one-entry-per-run event-log contract holds.
+                // one-summary-per-run event-log contract holds.
                 var result = filePaths.Count == 0
                     ? new DeleteResult(0, Array.Empty<FileOperationError>())
                     : await deleteService.DeleteFilesAsync(
@@ -943,11 +944,16 @@ internal static class Program
     }
 
     /// <summary>
-    /// Reports the two scan-level conditions that are facts about the machine
-    /// rather than about this run: records the scan could not fully read, and
-    /// registrations naming a file that is not there. Each goes to stdout in the
-    /// operator's language and to the Application log in English, because
-    /// scheduled tasks and RMM tools discard the first and read the second.
+    /// Reports the scan-level conditions that are facts about the machine rather
+    /// than about this run: an offer withheld and the conditions behind it,
+    /// superseded files kept back, records the scan could not fully read, and
+    /// registrations naming a file that is not there.
+    ///
+    /// THE SURFACE IS PER CONDITION AND NOT ONE RULE OVER ALL OF THEM. Some reach
+    /// stdout in the operator's language and the Application log in English,
+    /// because scheduled tasks discard the first and RMM tools read the second.
+    /// Others reach one of the two alone, each for the reason the comment at that
+    /// condition gives.
     /// </summary>
     /// <remarks>
     /// Called once, immediately after the scan, so every return the work loop can
@@ -1170,16 +1176,6 @@ internal static class Program
     }
 
     /// <summary>
-    /// Bytes of the files a batch that stopped part way actually moved. The
-    /// action services take their input in order and stop where they stop, so the
-    /// files they reached are the first (<paramref name="completedCount"/> plus
-    /// the errors); of those, the ones that did not error are what moved.
-    /// <see cref="SumBytesExcludingErrors"/> can lean on "no errors means every
-    /// file completed" instead, which a batch that stopped cannot.
-    /// Matches CleanupViewModel's own CompletedBytes so a fleet of GUI and CLI
-    /// machines produces telemetry on the same axis.
-    /// </summary>
-    /// <summary>
     /// Drops the paths an action service held back from this run's own list of
     /// the files it meant to act on. They were never touched, so they leave the
     /// count, the byte total and every figure taken from the list.
@@ -1203,6 +1199,16 @@ internal static class Program
         return files.Where(f => !reclaimed.Contains(f.FullPath)).ToList();
     }
 
+    /// <summary>
+    /// Bytes of the files a batch that stopped part way actually moved. The
+    /// action services take their input in order and stop where they stop, so the
+    /// files they reached are the first (<paramref name="completedCount"/> plus
+    /// the errors); of those, the ones that did not error are what moved.
+    /// <see cref="SumBytesExcludingErrors"/> can lean on "no errors means every
+    /// file completed" instead, which a batch that stopped cannot.
+    /// Matches CleanupViewModel's own CompletedBytes so a fleet of GUI and CLI
+    /// machines produces telemetry on the same axis.
+    /// </summary>
     internal static long CompletedBytes(
         IReadOnlyList<OrphanedFile> files, int completedCount,
         IReadOnlyList<FileOperationError> errors)
