@@ -67,32 +67,24 @@ public class ShortNameCreationProbeTests
     [Fact]
     public void The_state_a_read_carries_when_nobody_set_one_is_unreadable()
     {
-        // RegistryDwordRead is a record struct, so a default one carries whichever
-        // state sits at ordinal 0, with a Value of zero beside it. Zero is a setting a
-        // real machine can be at, so an ordering that put Read first would make the
-        // default say the value was read successfully and holds zero, which is the most
-        // confident answer of the four from a read nobody made. All three read states in
-        // IRegistryReader are ordered so their zero is the one that has established
-        // nothing, and this is what holds this one there when somebody tidies the enum.
+        // What holds the ordering that makes this true is stated where the ordering
+        // is, on RegistryDwordState itself, and is not repeated here.
         Assert.Equal(RegistryDwordState.Unreadable, default(RegistryDwordRead).State);
     }
 
     [Fact]
     public void A_read_nobody_set_reaches_the_label_as_unreadable_and_not_as_a_setting()
     {
-        // The half above is about the type; this is about what the app then says. The
-        // probe's switch names Absent, WrongType and Unreadable and leaves Read on the
-        // discard arm, so a default read whose state is Read is answered by the setting
-        // table and comes out as a specific claim about where short names are still
-        // being made. Kept apart from the assertion above so that neither can be removed
-        // without the other still failing.
+        // The other half of it: not what the type carries but what the app then says.
+        // The switch above names three states and leaves Read on its discard arm, so a
+        // default whose state is Read is answered by the setting table and comes out
+        // naming a policy the machine was never asked about.
+        //
+        // ONE ASSERTION, because a substitute nobody scripts answers this call with the
+        // same default value: constructing one is the same value by another route
+        // rather than a second check. The Probe helper's own scripting is exercised by
+        // the tests above, which expect real values back from it.
         Assert.Equal(ShortNameCreationLabels.Unreadable, Probe(default).Read());
-
-        // AND THE ZERO ARRIVES WITHOUT ANYBODY CONSTRUCTING ONE, which is the route it
-        // takes into a test rather than onto a machine: a substitute nobody scripts
-        // answers the default for this call.
-        Assert.Equal(ShortNameCreationLabels.Unreadable,
-            new ShortNameCreationProbe(Substitute.For<IRegistryReader>()).Read());
     }
 
     [Fact]

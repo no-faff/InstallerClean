@@ -54,6 +54,11 @@ public class CliNothingOfferedTests
         Assert.Equal(CliExitCode.Ok, exit);
         Assert.Contains(Expected(Strings.Cli_NothingOffered_Plural, 2), stdout, StringComparison.Ordinal);
         Assert.DoesNotContain(Strings.Cli_FoundNoOrphans, stdout, StringComparison.Ordinal);
+        // AND NOT THE LISTED LEAD, which is for a machine offered something beside the
+        // withheld half and is gated on the offer having anything in it. This machine
+        // was offered nothing, so printing it here would put two sentences about one
+        // folder on screen, the second describing a run the first says did not happen.
+        Assert.DoesNotContain(Expected(Strings.Cli_NothingListed_Plural, 2), stdout, StringComparison.Ordinal);
     }
 
     [Fact]

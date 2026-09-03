@@ -12,11 +12,11 @@ namespace InstallerClean.Tests.Helpers;
 /// What the command line says about files it did not act on, on a run that DID offer
 /// something, driven through the real work method rather than through the strings.
 ///
-/// THE FIXTURES ARE WHAT THIS FILE IS, and they are the pair no other file builds.
-/// Every other fixture that drives this method either offers nothing, or offers two
-/// files and holds nothing back. Both lines below are unreachable on those, so an
-/// assertion about either would be made over a run that never took the branch. Read
-/// what each test SETS UP rather than what it asserts.
+/// WHAT EVERY FIXTURE HERE SETS UP, BECAUSE BOTH LINES ARE GATED ON IT. A scan whose
+/// offer is not empty, and something held back beside it: the scan's own withholding
+/// for the lead line, and a file dropped by the pre-act re-verify for the held-back
+/// tally. A run offered nothing takes neither branch and reports through the
+/// nothing-offered sentences instead.
 ///
 /// TWO STAGES HOLD FILES BACK AND THEY ARE NOT ONE STAGE. The scan withholds before
 /// anything is offered, and the pre-act re-verify drops files out of a batch already
@@ -48,9 +48,9 @@ public class CliHeldBackBesideAnOfferTests
         Assert.Contains(HeldBackLead(Strings.Cli_NothingListedPerFile_Plural, 2),
             stdout, StringComparison.Ordinal);
 
-        // BESIDE THE OFFER RATHER THAN INSTEAD OF IT, which is what makes this machine
-        // different from every fixture in CliNothingOfferedTests: the offer was real,
-        // was acted on, and its own line is still there.
+        // BESIDE THE OFFER RATHER THAN INSTEAD OF IT. The offer was real and was acted
+        // on, so its own line is still there and the held-back lead sits under it
+        // rather than in its place.
         Assert.Contains(
             string.Format(Strings.Cli_FoundOrphans, 2, DisplayHelpers.PluraliseFile(2),
                 DisplayHelpers.FormatSize(2048)),
@@ -69,8 +69,7 @@ public class CliHeldBackBesideAnOfferTests
         // sentence for both would be false of one of them.
         var (_, stdout) = await Run(Scan(
             offer: 2, withheld: 2,
-            split: new WithholdingSplit(WholesaleCount: 2),
-            wholesaleFlag: true));
+            split: new WithholdingSplit(WholesaleCount: 2)));
 
         Assert.Contains(HeldBackLead(Strings.Cli_NothingListed_Plural, 2),
             stdout, StringComparison.Ordinal);
@@ -81,10 +80,10 @@ public class CliHeldBackBesideAnOfferTests
     [Fact]
     public async Task A_run_whose_re_verify_drops_a_file_says_so()
     {
-        // THE PRE-ACT RE-VERIFY IS THE OTHER PRODUCER AND NO OTHER FIXTURE LETS IT DROP
-        // ANYTHING. Every one hands back both files as surviving with an empty dropped
-        // list, so the tally this line is built from is zero on all of them and the
-        // line is never printed. Here one file is dropped, which is the condition.
+        // THE PRE-ACT RE-VERIFY IS THE OTHER PRODUCER. It hands back what survives and
+        // what it dropped, and the held-back line is built from the tally beside them,
+        // so a dropped file is the condition this fixture has to create: two offered,
+        // one surviving, one dropped with a reason against it.
         var (_, stdout) = await Run(
             Scan(offer: 2, withheld: 0, split: default),
             reverify: new ReverifyResult(
@@ -102,8 +101,8 @@ public class CliHeldBackBesideAnOfferTests
     {
         // The pre-act pass and the service's own re-read hold back DIFFERENT files, and
         // the run prints one sentence for the batch. Taking the later tally instead of
-        // adding it would report the second producer's files and lose the first's, and
-        // nothing else in the suite has both non-zero at once.
+        // adding it would report the second producer's files and lose the first's, so
+        // this fixture is the one that has to put a count on both at once.
         var (_, stdout) = await Run(
             Scan(offer: 2, withheld: 0, split: default),
             reverify: new ReverifyResult(
@@ -124,11 +123,12 @@ public class CliHeldBackBesideAnOfferTests
         string.Format(value, count, DisplayHelpers.PluraliseFile(count),
             DisplayHelpers.FormatSize(count * 1024L));
 
-    private static ScanResult Scan(
-        int offer, int withheld, WithholdingSplit split, bool wholesaleFlag = false) =>
+    // WHICH LEAD A RUN GETS IS DECIDED BY THE SPLIT AND NOTHING ELSE, so the split is
+    // the only thing these fixtures vary for it: ScanResult.Withholding compares the
+    // withheld count against WithholdingSplit.WholesaleCount, and reads no flag.
+    private static ScanResult Scan(int offer, int withheld, WithholdingSplit split) =>
         new(Files(offer, OfferA, OfferB), Array.Empty<RegisteredPackage>(), 0,
             WithheldFiles: Files(withheld, HeldA, HeldB),
-            WalkOfferWithheldWholesale: wholesaleFlag,
             WithheldBy: split);
 
     private static OrphanedFile[] Files(int n, string first, string second) =>
