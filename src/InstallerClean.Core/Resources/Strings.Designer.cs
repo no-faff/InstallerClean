@@ -213,6 +213,7 @@ public static class Strings
     public static string Cli_InstallerLockUnavailable => Get("Cli.InstallerLockUnavailable");
     public static string Cli_MissingFromDisk_Plural => Get("Cli.MissingFromDisk.Plural");
     public static string Cli_MissingFromDisk_Singular => Get("Cli.MissingFromDisk.Singular");
+    public static string Cli_MoveCancelledRestoreHint => Get("Cli.MoveCancelledRestoreHint");
     public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
     public static string Cli_MoveDestinationInSystemFolder => Get("Cli.MoveDestinationInSystemFolder");
     public static string Cli_MoveDestinationRelative => Get("Cli.MoveDestinationRelative");

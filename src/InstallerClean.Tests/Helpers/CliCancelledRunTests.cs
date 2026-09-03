@@ -17,12 +17,13 @@ namespace InstallerClean.Tests.Helpers;
 /// other rather than their presence alone: a summary printed after the cancellation
 /// reads as a second run.
 ///
-/// A CANCELLED MOVE DOES NOT CARRY THE KEEP-THE-MOVE LINE. That sentence asks the
-/// reader to check their programs and then delete the backup, which is what to do
-/// after a run that went the distance. The test pins its ABSENCE against the moved
-/// line's presence, so the absence is attributable to the cancel: the only other
-/// thing that suppresses it is a run that moved nothing, and asserting what moved
-/// rules that out in the same breath.
+/// A CANCELLED MOVE CARRIES THE UNDO AND NOT THE KEEP-THE-MOVE LINE, and the two
+/// halves are asserted together. The keep-the-move sentence asks the reader to check
+/// their programs and then delete the backup, which is what to do after a run that
+/// went the distance; its absence is pinned against the moved line's presence, so it
+/// answers for the cancel rather than for the zero-count gate that also suppresses
+/// it. The undo sentence takes its place, and its POSITION is asserted too: after the
+/// cancellation, so the reader learns the run stopped before being told what to do.
 ///
 /// STDOUT IS READ BACK THROUGH <c>Console.SetOut</c>, WHICH IS PROCESS-GLOBAL. The
 /// assembly disables test parallelisation for a reason of its own, in
@@ -48,7 +49,7 @@ public class CliCancelledRunTests
         new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
 
     [Fact]
-    public async Task A_cancelled_move_says_what_it_moved_and_not_to_keep_the_move()
+    public async Task A_cancelled_move_says_what_it_moved_and_then_how_to_undo_it()
     {
         // The Ctrl+C arrives while the service is working, which is the sequence
         // the host is written for: the token is cancelled and the service hands
@@ -71,14 +72,72 @@ public class CliCancelledRunTests
             1, DisplayHelpers.PluraliseFile(1));
         var restore = string.Format(Strings.Cli_MoveRestoreHint, Destination);
 
+        var undo = string.Format(Strings.Cli_MoveCancelledRestoreHint, Destination);
+
         Assert.Equal(CliExitCode.Partial, exitCode);
         Assert.Contains(moved, stdout);
         Assert.Contains(Strings.Cli_Cancelled, stdout);
+        Assert.Contains(undo, stdout);
+        // THE ORDER IS THE CLAIM. What ran, then that it stopped, then how to put it
+        // back: a reader is told the run was cancelled before being told what to do
+        // about it, and the undo is the last thing on the screen because it is what
+        // they act on.
         Assert.True(stdout.IndexOf(moved, StringComparison.Ordinal)
             < stdout.IndexOf(Strings.Cli_Cancelled, StringComparison.Ordinal));
-        // A file did move, which is the other gate on the line below, so its
+        Assert.True(stdout.IndexOf(Strings.Cli_Cancelled, StringComparison.Ordinal)
+            < stdout.IndexOf(undo, StringComparison.Ordinal));
+        // A file did move, which is the other gate on the keep-the-move line, so its
         // absence answers for the cancel and for nothing else.
         Assert.DoesNotContain(restore, stdout);
+    }
+
+    [Fact]
+    public async Task A_cancelled_move_that_moved_nothing_offers_no_undo()
+    {
+        // Nothing reached the destination, so there is nothing to put back and the
+        // sentence would name a folder the run never wrote to. This is the control
+        // that keeps the test above answering for the cancel rather than for the
+        // mere presence of a destination on the command line: the same /m, the same
+        // folder, the same cancel, and no undo line.
+        using var cts = new CancellationTokenSource();
+        var move = Substitute.For<IMoveFilesService>();
+        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                cts.Cancel();
+                return new MoveResult(0, Array.Empty<FileOperationError>(), Cancelled: true);
+            });
+
+        var (_, stdout) = await Run("/m", Destination, Services(move: move), cts.Token);
+
+        Assert.Contains(Strings.Cli_Cancelled, stdout);
+        Assert.DoesNotContain(
+            string.Format(Strings.Cli_MoveCancelledRestoreHint, Destination), stdout);
+    }
+
+    [Fact]
+    public async Task A_cancelled_delete_offers_no_undo_line_at_all()
+    {
+        // The undo is a Move sentence and a Delete has no undo, so the line is gated
+        // on a destination this path never sets. Held here because the two commands
+        // share one cancellation handler, which is where a line meant for one of them
+        // reaches the other.
+        using var cts = new CancellationTokenSource();
+        var delete = Substitute.For<IDeleteFilesService>();
+        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                cts.Cancel();
+                return new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true);
+            });
+
+        var (_, stdout) = await Run("/d", null, Services(delete: delete), cts.Token);
+
+        Assert.Contains(Strings.Cli_Cancelled, stdout);
+        Assert.DoesNotContain("It's simple to undo", stdout, StringComparison.Ordinal);
     }
 
     [Fact]

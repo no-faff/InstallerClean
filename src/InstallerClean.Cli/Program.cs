@@ -381,6 +381,11 @@ internal static class Program
         // committed.
         int committedCount = 0;
         int totalToProcess = 0;
+        // The backup folder a cancelled Move left files in, for the undo line the
+        // catch below prints. Hoisted out of the try for the same reason
+        // committedCount is: moveDest is declared inside it and the catch cannot
+        // see it. Empty on every other path, which is what gates the line.
+        string cancelledMoveDestination = string.Empty;
 
         try
         {
@@ -868,6 +873,10 @@ internal static class Program
             if (moveResult.Cancelled)
             {
                 committedCount = moveResult.MovedCount;
+                // Only where a file actually reached the destination: a cancel that
+                // moved nothing has left nothing to put back, on the same
+                // silent-at-zero rule the run lines follow.
+                if (moveResult.MovedCount > 0) cancelledMoveDestination = moveDest;
                 token.ThrowIfCancellationRequested();
             }
 
@@ -888,6 +897,14 @@ internal static class Program
         catch (OperationCanceledException)
         {
             Console.WriteLine(Strings.Cli_Cancelled);
+            // The undo, after the cancellation and not before it: the reader is told
+            // the run stopped and then how to put back what it moved, which is the
+            // order the window's card reads in. Empty unless a cancelled Move left
+            // files in the destination, so a Delete and a Move that reached no file
+            // print nothing here.
+            if (cancelledMoveDestination.Length > 0)
+                Console.WriteLine(string.Format(
+                    Strings.Cli_MoveCancelledRestoreHint, cancelledMoveDestination));
             // EventLog the cancellation so a Task Scheduler audit can
             // see how far the run got, and pick ExitPartial when work
             // committed before the Ctrl+C arrived.

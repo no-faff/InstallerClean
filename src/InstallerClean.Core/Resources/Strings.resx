@@ -1938,6 +1938,22 @@ The crash log could not be written.</value></data>
        event-log twin, which are about whether the move can start. There is
        nothing here for a same-drive form to correct. -->
   <data name="Cli.MoveRestoreHint" xml:space="preserve"><value>Check that your programs still update and uninstall as normal, then delete {0}.</value></data>
+  <!-- The line a cancelled Move prints instead of the one above, where the window's
+       card carries Completion.MoveCancelledRestoreHint. A run that went the distance
+       leaves the reader deciding when to delete the backup; a run somebody stopped
+       part-way leaves them wanting the files put back, and a Move only ever moved
+       them, so putting them back is the whole of the undo.
+
+       IT NAMES BOTH FOLDERS WHERE THE WINDOW'S NAMES ONE, and that is forced rather
+       than a choice. The window's summary line above it says where the files went,
+       so its own sentence needs only where they came from. A cancelled run here
+       prints what it moved and then Cli.Cancelled, and neither names a path, so this
+       sentence carries both ends of the journey or the reader has neither.
+
+       0 = the backup folder the run was given; {InstallerFolder} resolves to the
+       cache folder. Flat at any count, as the line above is, and for the same
+       reason: it talks about the two folders rather than about the files. -->
+  <data name="Cli.MoveCancelledRestoreHint" xml:space="preserve"><value>It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was.</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,
