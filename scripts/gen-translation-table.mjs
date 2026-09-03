@@ -113,7 +113,6 @@ const GROUPS = [
   ['Main screen text',                 ['Body.']],
   ['Reasons a file is unneeded',       ['Reason.']],
   ['Completion screen',                ['Completion.']],
-  ['Recycle Bin unavailable',          ['RecycleUnavailable.']],
   ['Summaries and counts',             ['Summary.']],
   ['Confirmation dialogs',             ['Confirm.']],
   ['Error messages',                   ['Error.']],
