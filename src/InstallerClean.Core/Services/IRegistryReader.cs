@@ -89,6 +89,17 @@ public readonly record struct RegistryMultiStringRead(
 /// <summary>How a REG_DWORD read turned out. See <see cref="RegistryDwordRead"/>.</summary>
 public enum RegistryDwordState
 {
+    /// <summary>
+    /// The read itself failed, so nothing at all was established.
+    ///
+    /// FIRST MEMBER SO THAT IT IS WHAT THE TYPE'S OWN ZERO CARRIES, for the reason
+    /// <see cref="RegistryKeyPresence.Unreadable"/> is first. The number beside it
+    /// is zero in the default too, and zero is a setting a machine can really be
+    /// at, so any other ordering would make an unset value read as a machine
+    /// answering that number.
+    /// </summary>
+    Unreadable,
+
     /// <summary>The value was there and was a number, which is in <see cref="RegistryDwordRead.Value"/>.</summary>
     Read,
 
@@ -97,9 +108,6 @@ public enum RegistryDwordState
 
     /// <summary>The value is there and is not a number, so there is nothing to report but the fact.</summary>
     WrongType,
-
-    /// <summary>The read itself failed, so nothing at all was established.</summary>
-    Unreadable,
 }
 
 /// <summary>
