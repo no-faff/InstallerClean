@@ -324,23 +324,17 @@
                             AutomationProperties.HelpText="{loc:Translate Automation.ViewRegisteredFiles.HelpText}"/>
                 </Grid>
 
-                <!-- FIRST OF THE THREE FOOTNOTES, AND THE ORDER IS AN OPEN QUESTION
-                     RATHER THAN A SETTLED ONE. It was settled on the ground that this
-                     line is about the LIST the reader is looking at while the two below
-                     are about the Windows records and about files that are not in the
-                     folder, a different subject. HALF OF THAT PREMISE HAS GONE. The
-                     third footnote used to report that the records could not all be
-                     read; it now reports that superseded files were held back, which is
-                     this line's own subject reaching the other half of the scan. The
-                     two are a pair and the warning sits between them.
+                <!-- FIRST OF THE TWO HELD-BACK FOOTNOTES, AND THEY ARE ADJACENT
+                     BECAUSE THEY ARE ONE SENTENCE ABOUT TWO POPULATIONS. This line and
+                     the one below it open on the same five words, close on the same
+                     verb, and carry the same italic caption treatment with no icon on
+                     either: one rule reaching the walk side and the registered side of
+                     the same scan. A reader meets them as a pair or not at all.
 
-                     SO THE ARGUMENT FOR THE ORDER IS NOT RESTATED HERE, having rested
-                     on a distinction that no longer separates them; a settlement
-                     resting on withdrawn wording is worse than none. Nothing about the
-                     order has been shown to be wrong. It has not been looked at since
-                     the pair existed, and whoever looks is deciding whether the two
-                     held-back lines belong together with the warning under them or
-                     apart as they are.
+                     THE WARNING GOES UNDER BOTH, and it is the only line in the block
+                     carrying something to act on, so it ends up nearest the buttons.
+                     Its own note places it under the left-alone count, which is where
+                     it now is.
 
                      WHAT THIS ONE SAYS AND WHY IT HAS TO. The explanation at the top of
                      this window states two criteria for listing a file, and on this
@@ -364,35 +358,9 @@
                            Margin="{StaticResource GapTop.Sm}"
                            AutomationProperties.LiveSetting="Polite"/>
 
-                <!-- Registered files missing from disk. Sits as a footnote
-                     under the left-alone count: a missing file is one of the
-                     needed files, Windows still expects it, it just isn't on
-                     disk. DockPanel (not a horizontal StackPanel) so the
-                     advisory wraps; icon docks left, aligned to the first line.
-
-                     The text takes Type.Caption, as the two footnotes either
-                     side of it do, and it has to be a size token rather than
-                     nothing: the icon beside it is TextScaled, so an unsized
-                     TextBlock leaves the warning growing with the OS text-size
-                     setting while the sentence it belongs to stays put. -->
-                <DockPanel Margin="{StaticResource GapTop.Sm}"
-                           Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
-                    <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
-                          Fill="{StaticResource Status.Warning}" Stretch="Uniform"
-                          Width="{a11y:TextScaled 16}" Height="{a11y:TextScaled 16}"
-                          DockPanel.Dock="Left" VerticalAlignment="Top" Margin="{StaticResource GapRight.Icon}"/>
-                    <TextBlock x:Name="MissingFromDiskBannerText"
-                               Text="{Binding Scan.MissingFromDiskSummaryText}"
-                               TextWrapping="Wrap"
-                               Foreground="{StaticResource Text.Muted}"
-                               FontSize="{DynamicResource Type.Caption}"
-                               VerticalAlignment="Center"
-                               AutomationProperties.LiveSetting="Polite"/>
-                </DockPanel>
-
                 <!-- Superseded files this scan held back (informational), and the
-                     pair of the first footnote rather than a different kind of line:
-                     the same sentence about the other half of the scan. The app could
+                     pair of the line directly above rather than a different kind of
+                     line: the same sentence about the other half of the scan. The app could
                      not establish that nothing still needed them, so it kept them.
                      Same low-emphasis treatment as the line above and for the same
                      reason, nothing being wrong with the machine and there being
@@ -415,6 +383,40 @@
                            TextWrapping="Wrap"
                            Margin="{StaticResource GapTop.Sm}"
                            AutomationProperties.LiveSetting="Polite"/>
+
+                <!-- Registered files missing from disk. Sits as a footnote
+                     under the left-alone count: a missing file is one of the
+                     needed files, Windows still expects it, it just isn't on
+                     disk. DockPanel (not a horizontal StackPanel) so the
+                     advisory wraps; icon docks left, aligned to the first line.
+
+                     LAST OF THE THREE, BECAUSE IT IS THE ONLY ONE WITH ANYTHING TO
+                     DO IN IT. The two held-back lines above are facts about the scan
+                     and stay together; this one names programs whose update or
+                     uninstall can fail, so it sits closest to the buttons and it is
+                     the line the amber icon marks out.
+
+                     The text takes Type.Caption, as the two footnotes above it
+                     do, and it has to be a size token rather than
+                     nothing: the icon beside it is TextScaled, so an unsized
+                     TextBlock leaves the warning growing with the OS text-size
+                     setting while the sentence it belongs to stays put. -->
+                <DockPanel Margin="{StaticResource GapTop.Sm}"
+                           Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
+                    <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                          Fill="{StaticResource Status.Warning}" Stretch="Uniform"
+                          Width="{a11y:TextScaled 16}" Height="{a11y:TextScaled 16}"
+                          DockPanel.Dock="Left" VerticalAlignment="Top" Margin="{StaticResource GapRight.Icon}"/>
+                    <TextBlock x:Name="MissingFromDiskBannerText"
+                               Text="{Binding Scan.MissingFromDiskSummaryText}"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Text.Muted}"
+                               FontSize="{DynamicResource Type.Caption}"
+                               VerticalAlignment="Center"
+                               AutomationProperties.LiveSetting="Polite"/>
+                </DockPanel>
+
+
 
 
             </StackPanel>

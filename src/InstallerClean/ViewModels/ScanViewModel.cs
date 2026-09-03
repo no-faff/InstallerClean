@@ -449,6 +449,20 @@ public partial class ScanViewModel : ObservableObject
             RegisteredSizeDisplay = registeredSize;
             OrphanedFileCount = orphanedCount;
             OrphanedSizeDisplay = orphanedSize;
+            // OFF THE SCAN'S OWN COST FIGURE, not off the machine-wide trigger the
+            // line used to read. ScanResult.UnaccountedProductCount is untouched and
+            // still travels in the opt-in report and the command line's event log; it
+            // simply no longer decides what this window says, being the trigger for
+            // one of six routes into the count rather than a count of files.
+            //
+            // AHEAD OF THE MISSING-FILES COUNT BECAUSE THAT IS THE ORDER THE TWO LINES
+            // SIT IN. Each of these assignments raises the PropertyChanged the window
+            // turns into a live-region announcement, and the raises are queued in the
+            // order they arrive, so this order is the order a screen reader speaks
+            // them in. The block in MainWindow.xaml.cs that maps them to elements
+            // tests one property name per call, so it says nothing about sequence;
+            // this does.
+            SupersededHeldBackCount = result.WithheldCount;
             // THE AFFECTED HALF, NOT THE SUM, which is the line item 5 moves back. The
             // banner fires where something could still reach for a file that is gone, so
             // a registration whose absence the app positively established to be harmless
@@ -457,12 +471,6 @@ public partial class ScanViewModel : ObservableObject
             // payload, where a public chart reads it with no version gate.
             MissingFromDiskCount = result.MissingAffectedCount;
             MissingFromDiskPrograms = missingPrograms;
-            // OFF THE SCAN'S OWN COST FIGURE, not off the machine-wide trigger the
-            // line used to read. ScanResult.UnaccountedProductCount is untouched and
-            // still travels in the opt-in report and the command line's event log; it
-            // simply no longer decides what this window says, being the trigger for
-            // one of six routes into the count rather than a count of files.
-            SupersededHeldBackCount = result.WithheldCount;
             // WHICH SENTENCE FIRST, THEN THE NUMBER THAT GOES IN IT. Both notify the
             // line, so the order does not decide what a reader ends up seeing; it is
             // this way round because the count is the gate as well, and a reader

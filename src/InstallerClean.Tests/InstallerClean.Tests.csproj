@@ -63,6 +63,7 @@
     <EmbeddedResource Include="..\InstallerClean\Themes\Components.xaml" LogicalName="ThemeXaml.Components.xaml" />
     <EmbeddedResource Include="..\InstallerClean\OrphanedFilesWindow.xaml" LogicalName="ThemeXaml.OrphanedFilesWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\RegisteredFilesWindow.xaml" LogicalName="ThemeXaml.RegisteredFilesWindow.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\MainWindow.xaml" LogicalName="ThemeXaml.MainWindow.xaml" />
   </ItemGroup>
 
 </Project>
