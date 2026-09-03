@@ -78,6 +78,11 @@ public class CliNothingOfferedTests
         // Named rather than merely different from the clean line: the wholesale
         // sentence is also different from it, and is false of this machine.
         Assert.DoesNotContain(Expected(Strings.Cli_NothingOffered_Plural, 2), stdout, StringComparison.Ordinal);
+        // AND NOT THE LISTED LEAD, on its own branch. The wholesale fixture asserts the
+        // same thing about the other one, and the guard has two branches to widen: one
+        // that lets the lead onto every machine and one that lets it onto per-file
+        // machines alone. Each fixture holds the branch its own machine takes.
+        Assert.DoesNotContain(Expected(Strings.Cli_NothingListedPerFile_Plural, 2), stdout, StringComparison.Ordinal);
     }
 
     [Fact]
