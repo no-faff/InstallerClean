@@ -22,18 +22,6 @@ public interface IRegistryReader
     RegistryMultiStringRead LocalMachineMultiStringValue(string keyPath, string valueName);
 
     /// <summary>
-    /// The immediate subkey names under an HKLM path, or null where the key is
-    /// absent or the read fails.
-    ///
-    /// NULL AND EMPTY MEAN DIFFERENT THINGS AND A CALLER THAT CONFLATES THEM IS
-    /// WRONG. Empty is an answer: the key is there and holds nothing. Null is the
-    /// absence of an answer, and the caller that reads the installed accounts off
-    /// this treats it as a question it could not put, because a list it could not
-    /// read is not a list of nobody.
-    /// </summary>
-    string[]? LocalMachineSubKeyNames(string relativePath);
-
-    /// <summary>
     /// A REG_DWORD value, four-state because the three ways of having no number
     /// are three different things to have found out and a caller reporting them
     /// would otherwise have to pick one sentence for all three. Absent is an
