@@ -651,6 +651,15 @@ public class CleanupPreFlightTests
         // The batch's own account of itself still reaches the user, which is what
         // makes the folder worth keeping: it names files that are in it.
         Assert.True(vm.Completion.IsComplete);
+        // And the card says the run stopped. This arm took the finished Move's
+        // card, so the line under the summary told the reader to delete the folder
+        // the dialog beside it had just told them to check, and the dialog is the
+        // one that goes when it is dismissed. Asserted here rather than only on the
+        // view model because it is the wiring that was wrong: the card was right
+        // for a Move that reached the end.
+        Assert.Equal(
+            string.Format(InstallerClean.Resources.Strings.Error_DestinationChangedMidBatch, @"E:\resolved-elsewhere"),
+            vm.Completion.Restore);
     }
 
     /// <summary>

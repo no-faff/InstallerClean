@@ -429,7 +429,34 @@ public partial class CompletionViewModel : ObservableObject
     /// claim-less verb and the restore line that names no drive.
     /// </summary>
     public void ShowMoveSummary(int movedCount, long movedBytes, string destination,
-        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null)
+        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null) =>
+        ShowMoveCard(movedCount, movedBytes, destination, errors, space, reverify, stopped: false);
+
+    /// <summary>
+    /// Shows the card after a Move the app stopped itself, which is what the
+    /// reader is left looking at once the dialog naming the reason is dismissed.
+    ///
+    /// Everything above the last line is <see cref="ShowMoveSummary"/>'s, and it
+    /// is all still true: files did move, the space they took did come back, and
+    /// the summary names where they went. The last line is the difference. After
+    /// a Move that ran to the end that line says to delete the backup folder once
+    /// satisfied all is well, and here the app has just said it could no longer
+    /// confirm that folder, so the card would be telling the reader to delete
+    /// what the dialog told them to check. The sentence in its place is the
+    /// dialog's own, so both surfaces say one thing about one folder.
+    /// </summary>
+    public void ShowMoveStoppedSummary(int movedCount, long movedBytes, string destination,
+        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null) =>
+        ShowMoveCard(movedCount, movedBytes, destination, errors, space, reverify, stopped: true);
+
+    // One body for both, because everything except the last line is the same
+    // card and a second copy of it would drift. The flag is read once, at that
+    // line, and every property is settled before IsComplete reveals the overlay:
+    // the window turns that raise into the announcement, so a value assigned
+    // after it would be drawn but never spoken.
+    private void ShowMoveCard(int movedCount, long movedBytes, string destination,
+        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify,
+        bool stopped)
     {
         // The heading states one outcome and only one. A partial failure still
         // freed what it freed, so it keeps the size heading and lets the count
@@ -465,8 +492,13 @@ public partial class CompletionViewModel : ObservableObject
                 movedCount, movedLabel, destination);
         // No restore line when nothing moved: it tells the reader when to delete
         // the backup folder, and a move that put nothing there has not made one
-        // worth naming.
-        Restore = HeadingIsWarning ? string.Empty : MoveRestoreText(space);
+        // worth naming. A stopped Move takes its sentence on every arm instead,
+        // because that sentence is the news rather than advice about what is in
+        // the folder, and it is the only line on the card saying the run did not
+        // reach the end.
+        Restore = stopped
+            ? string.Format(Strings.Error_DestinationChangedMidBatch, destination)
+            : HeadingIsWarning ? string.Empty : MoveRestoreText(space);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;

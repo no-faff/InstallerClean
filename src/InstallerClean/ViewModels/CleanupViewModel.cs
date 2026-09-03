@@ -938,9 +938,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     // The service's destination, never `dest`. The whole of what
                     // this arm reports is a batch stopped because the two stopped
                     // naming the same folder, so the summary line must name the one
-                    // the files are in, and the restore line under it points back
-                    // at whatever that line named.
-                    _completion.ShowMoveSummary(ex.Partial.MovedCount,
+                    // the files are in, and the line under it names the same folder
+                    // again in the sentence sending the reader to check it.
+                    _completion.ShowMoveStoppedSummary(ex.Partial.MovedCount,
                         CompletedBytes(abortSurviving, ex.Partial.MovedCount, ex.Partial.Errors),
                         ex.Destination, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind),
                         FoldHeldBack(reverify, ex.Partial.HeldBack, ex.Partial.HeldBackReasons));

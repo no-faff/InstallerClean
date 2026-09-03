@@ -308,6 +308,51 @@ public class CompletionViewModelTests
     // it gives way to the same string the completed paths use.
 
     [Fact]
+    public void A_stopped_move_says_why_it_stopped_and_not_to_delete_the_folder()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveStoppedSummary(movedCount: 62, movedBytes: 1024 * 1024, destination: @"D:\backup",
+            errors: [], space: MoveSpaceOutcome.FreedSpace);
+
+        Assert.Equal(
+            string.Format(Strings.Error_DestinationChangedMidBatch, @"D:\backup"),
+            vm.Restore);
+
+        // The control that makes the absence attributable. Without it, a line that
+        // had stopped being written at all would satisfy the assertion above just
+        // as well as one that had been replaced.
+        var finished = new CompletionViewModel();
+        finished.ShowMoveSummary(movedCount: 62, movedBytes: 1024 * 1024, destination: @"D:\backup",
+            errors: [], space: MoveSpaceOutcome.FreedSpace);
+        Assert.Equal(Strings.Completion_MoveRestoreHint, finished.Restore);
+
+        // Everything above that line is the finished card's, and it is meant to
+        // be: those files really did move and that space really did come back.
+        Assert.Equal(finished.Heading, vm.Heading);
+        Assert.Equal(finished.Summary, vm.Summary);
+        Assert.Equal(finished.SummaryDestination, vm.SummaryDestination);
+        Assert.False(vm.HeadingIsWarning);
+    }
+
+    [Fact]
+    public void A_stopped_move_that_moved_nothing_still_says_why_it_stopped()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveStoppedSummary(movedCount: 0, movedBytes: 0, destination: @"D:\backup",
+            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
+
+        // The warning heading empties the summary and, on a Move that reached the
+        // end, the line under it as well. The stop sentence is not that line's
+        // advice about a folder's contents, it is why the run ended, so it is the
+        // one thing that survives the arm which clears everything else.
+        Assert.True(vm.HeadingIsWarning);
+        Assert.Equal(string.Empty, vm.Summary);
+        Assert.Equal(
+            string.Format(Strings.Error_DestinationChangedMidBatch, @"D:\backup"),
+            vm.Restore);
+    }
+
+    [Fact]
     public void A_cancelled_delete_that_deleted_nothing_and_hit_an_error_warns()
     {
         var vm = new CompletionViewModel();
