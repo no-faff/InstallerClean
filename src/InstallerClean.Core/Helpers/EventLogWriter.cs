@@ -5,9 +5,10 @@ namespace InstallerClean.Helpers;
 /// <summary>
 /// Writes Application-channel entries for a CLI run, so sysadmins running
 /// InstallerClean under Task Scheduler can audit what happened without trawling
-/// stdout redirects. A run that does work writes one summary entry, and beside it
-/// any notices the scan's own findings call for; every one of them comes through
-/// here.
+/// stdout redirects. A run writes at most one summary entry: /? and /version write
+/// none, an argless or malformed invocation writes one, and a scan, delete or move
+/// run writes one for its outcome. Beside that last kind a run may also write
+/// notices the scan's own findings call for. Every one of them comes through here.
 /// </summary>
 /// <remarks>
 /// The entries can disclose two kinds of path to the Application log, which is
