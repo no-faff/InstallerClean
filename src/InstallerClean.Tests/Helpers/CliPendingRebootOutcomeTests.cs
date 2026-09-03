@@ -23,9 +23,12 @@ namespace InstallerClean.Tests.Helpers;
 ///
 /// WHAT THE TWO COLUMNS ARE WORTH, BECAUSE THEY ARE NOT EQUAL AND A READER SHOULD NOT
 /// ASSUME THEY ARE. The exit code is read back from a real run driven through the work
-/// method. The event class is not: it is handed to a static write that takes it
-/// directly, so there is no seam to observe it through, and that column is the
-/// recorded intent rather than a reading of what reached the channel.
+/// method. THE EVENT CLASS IS NEVER READ BACK FROM ANYTHING THE APP WRITES. It is
+/// handed to a static write that takes it directly, and nothing here observes what
+/// reaches the channel. What holds that column instead is a check that it agrees with
+/// the exit code declared beside it, which is two declared values agreeing with each
+/// other rather than either of them being compared to behaviour. Observing the class
+/// would need a seam in shipping code, and that is ruled out.
 /// </summary>
 public class CliPendingRebootOutcomeTests
 {
@@ -42,7 +45,7 @@ public class CliPendingRebootOutcomeTests
     };
 
     [Fact]
-    public void Every_reason_has_an_exit_code_and_an_event_class_chosen_for_it()
+    public void Every_reason_has_a_row_in_the_table()
     {
         var undeclared = Enum.GetValues<PendingRebootReason>()
             .Where(reason => !Declared.ContainsKey(reason))
@@ -52,6 +55,52 @@ public class CliPendingRebootOutcomeTests
         // decision rather than only that one does.
         Assert.True(undeclared.Count == 0,
             "No exit code or event class has been chosen for: " + string.Join(", ", undeclared));
+    }
+
+    /// <summary>
+    /// The band an exit code's entry belongs in, taken from the pairs the host writes:
+    /// Ok and Partial go out with a 1000-band class, Transient and Cancelled with the
+    /// 2000, Error with the 4000.
+    ///
+    /// EVERY MEMBER OF CliExitCode IS HERE AND NOT ONLY THE ONE THE TABLE USES, so a
+    /// row that declares a different code is held rather than passed over by a check
+    /// shaped around the single value in front of it today.
+    /// </summary>
+    private static readonly Dictionary<int, int> BandForExit = new()
+    {
+        [CliExitCode.Ok] = 1000,
+        [CliExitCode.Partial] = 1000,
+        [CliExitCode.Transient] = 2000,
+        [CliExitCode.Cancelled] = 2000,
+        [CliExitCode.Error] = 4000,
+    };
+
+    [Fact]
+    public void Every_row_declares_an_event_class_whose_band_matches_its_exit_code()
+    {
+        // WHAT THIS IS AND IS NOT, so the column above is not read as more than it is.
+        // It does not make the emitter observable: EmitPendingRebootBlocked still hands
+        // a literal to the write. It compares two DECLARED values with each other and
+        // reads no behaviour at all. What it buys is that the class column can no
+        // longer hold a value the exit code beside it contradicts, which is what a
+        // column nothing looks at would otherwise allow.
+        var wrong = new List<string>();
+
+        foreach (var (reason, declared) in Declared)
+        {
+            if (!BandForExit.TryGetValue(declared.Exit, out var band))
+            {
+                wrong.Add($"{reason}: exit {declared.Exit} is in no band this test knows");
+                continue;
+            }
+
+            var id = CliContract.EventIdFor(declared.Class);
+            if (id / 1000 * 1000 != band)
+                wrong.Add($"{reason}: exit {declared.Exit} belongs in the {band} band "
+                    + $"and {declared.Class} is Event ID {id}");
+        }
+
+        Assert.True(wrong.Count == 0, string.Join("; ", wrong));
     }
 
     [Fact]
