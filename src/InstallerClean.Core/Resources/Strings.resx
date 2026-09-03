@@ -1455,10 +1455,10 @@ The crash log could not be written.</value></data>
        what the scan declined to do rather than what it would have done instead.
        Some of these files would have been kept back anyway by the per-file screen
        this branch skips, so any wording promising they would have been offered
-       claims more than the run has. "Rather than listing them" would be false
-       outright: the held-back files are listed, the Details window showing them
-       among the registrations, and offering is the only half of that pair this run
-       refused.
+       claims more than the run has. "Rather than listing them" would say something
+       else again: what the run refused was the offer, and on this host the
+       held-back files reach no list at all, the command line carrying their count
+       and not their names.
 
        A PAIR AND NOT A FLAT KEY, because it shipped as one for an afternoon and
        read "held back all 1 file" at a count of one. The one-form names the size
