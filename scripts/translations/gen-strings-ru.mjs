@@ -596,6 +596,12 @@ const CLI = {
   // untranslated. Translate both when the English is ruled.
   'Cli.NothingOffered.Singular': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал единственный файл ({2}), который иначе предложил бы.`,
   'Cli.NothingOffered.Plural': `InstallerClean не смог с уверенностью определить, каким из установленных здесь программ принадлежат файлы в кэше, поэтому удержал все {0} {1} ({2}), которые иначе предложил бы.`,
+  // The per-file forms hold the English on the same terms as the pair above, and
+  // for the same reason: this object is Russian's own command-line block, so a key
+  // added to the neutral reaches the other fourteen MAPs and never this one, and it
+  // would go missing from the Russian resx rather than arriving untranslated.
+  'Cli.NothingOfferedPerFile.Singular': `InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it.`,
+  'Cli.NothingOfferedPerFile.Plural': `InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean больше не смог подтвердить папку резервных копий и остановился, чтобы не записать не туда. Проверьте {0}, затем запустите команду снова.`,
   'Cli.Help.Summary': `Убирает .msi и .msp из кэша, не нужные ни одной установленной программе.`,
   'Cli.Help.Elevation': `Нужна командная строка администратора; иначе Windows её не запустит.`,
@@ -605,10 +611,23 @@ const CLI = {
   'Cli.SupersededHeldBack.Plural': `На этом ПК InstallerClean не смог с уверенностью определить, что {0} замещённых файлов больше не нужны, поэтому удержал их.`,
   'Cli.NothingListed.Singular': `На этом ПК InstallerClean не смог с уверенностью определить, какие файлы в кэше принадлежат установленным здесь программам, поэтому удержал единственный файл ({2}), а не внёс его в список.`,
   'Cli.NothingListed.Plural': `На этом ПК InstallerClean не смог с уверенностью определить, какие файлы в кэше принадлежат установленным здесь программам, поэтому удержал {0} {1} ({2}), а не внёс их в список.`,
+  // The per-file forms of the pair above, holding the English on the same terms.
+  'Cli.NothingListedPerFile.Singular': `InstallerClean couldn't establish that one of the cached files it found is unneeded, so it has held back the one file ({2}) rather than offering it.`,
+  'Cli.NothingListedPerFile.Plural': `InstallerClean couldn't establish that some of the cached files it found are unneeded, so it has held back {0} {1} ({2}) rather than offering them.`,
   'Cli.WithheldReasons.Header': `Почему уверенности не было:`,
   'Cli.WithheldReasons.RecordedPath': `  Путь к файлу из собственных записей Windows Installer не удалось разрешить.`,
   'Cli.WithheldReasons.FileIdentity': `  Идентичность файла, названного в записях Windows Installer, не удалось прочитать.`,
   'Cli.WithheldReasons.SecondInstance': `  Программа может быть установлена на этом ПК более одного раза.`,
+  // The four per-file arms, holding the English on the same terms. Each names a
+  // different cause and the four have to stay four and distinct once translated:
+  // DeclaredProductUnestablished is itself a disjunction, either the file would not
+  // say which program it belongs to or Windows would not answer about that program,
+  // and a rendering that keeps one half states a cause the app did not establish for
+  // the files the other half holds. Keep the two leading spaces on all four.
+  'Cli.WithheldReasons.CandidateIdentity': `  A file in the folder couldn't be identified, so it couldn't be matched against the records.`,
+  'Cli.WithheldReasons.DeclaredProductInstalled': `  A file says it belongs to a program that is still installed, so it may still be needed.`,
+  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program.`,
+  'Cli.WithheldReasons.ScreenUnanswered': `  The check on which programs these files belong to gave answers that didn't line up with the files.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Ошибка: файловая операция поставлена в очередь до следующей перезагрузки, и InstallerClean не может определить, какие файлы в ней названы, поэтому не может исключить {InstallerFolder}. Перезагрузите Windows перед очисткой.`,
   'Cli.MoveRestoreHint': `Убедитесь, что ваши программы по-прежнему обновляются и удаляются как обычно, а затем удалите {0}.`,
 };
