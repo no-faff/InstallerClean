@@ -937,9 +937,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 {
                     // The service's destination, never `dest`. The whole of what
                     // this arm reports is a batch stopped because the two stopped
-                    // naming the same folder, so the summary line and the restore
-                    // line under it ("the files in that folder") must name the one
-                    // the files are in.
+                    // naming the same folder, so the summary line must name the one
+                    // the files are in, and the restore line under it points back
+                    // at whatever that line named.
                     _completion.ShowMoveSummary(ex.Partial.MovedCount,
                         CompletedBytes(abortSurviving, ex.Partial.MovedCount, ex.Partial.Errors),
                         ex.Destination, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind),
