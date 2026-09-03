@@ -1276,10 +1276,9 @@ public class InstallerQueryServiceUnitTests
     [Fact]
     public async Task Withholding_the_removable_class_leaves_orphan_detection_alone()
     {
-        // The bounded-cost claim the user-facing copy makes ("Orphaned files are
-        // not affected"): a withheld scan still carries every registered path, so
-        // the walk still has everything it needs to tell an orphan from a
-        // registered file.
+        // The bound on what a withholding costs: a withheld scan still carries
+        // every registered path, so the walk still has everything it needs to tell
+        // an orphan from a registered file.
         const string productPackage = @"C:\Windows\Installer\kept.msi";
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
@@ -1451,8 +1450,8 @@ public class InstallerQueryServiceUnitTests
     // the registry fallback still contributes the lost product's paths as
     // non-removable rows, which is what keeps its cached file out of the orphan
     // list. When the fallback is failing reads of its own that recovery is no
-    // longer established, and the scan would offer a file as an orphan under a
-    // notice saying orphaned files are not affected.
+    // longer established, and the scan would offer a file as an orphan on a run
+    // whose withholding was bounded to the superseded class.
 
     [Fact]
     public async Task Both_sources_degraded_refuses_the_scan()

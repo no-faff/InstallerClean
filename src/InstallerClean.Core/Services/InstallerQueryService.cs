@@ -980,12 +980,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // longer established. A product lost from the API whose UserData key was
         // one of the unreadable ones is claimed by neither source, and its cached
         // file is walked, matched against nothing, and offered as an orphan by a
-        // scan whose own notice says orphaned files are not affected. The two
-        // failures are not independent, either: the same corrupt registration
-        // that loses an API row can equally make that product's UserData subtree
-        // unreadable, so the backup is likeliest to be missing exactly the
-        // product the primary lost. Neither counter can bound what the other
-        // lost, so nothing here can be salvaged into a narrower rule.
+        // scan whose withholding was bounded to the superseded class and left the
+        // orphan half alone. The two failures are not independent, either: the
+        // same corrupt registration that loses an API row can equally make that
+        // product's UserData subtree unreadable, so the backup is likeliest to
+        // be missing exactly the product the primary lost. Neither counter can
+        // bound what the other lost, so nothing here can be salvaged into a
+        // narrower rule.
         //
         // On any healthy machine both counters are zero and this is dead code.
         //
