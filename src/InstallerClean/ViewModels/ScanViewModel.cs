@@ -769,8 +769,8 @@ public partial class ScanViewModel : ObservableObject
     ///
     /// <paramref name="cancellationToken"/> is what makes it interruptible, and
     /// it is not optional in practice: this is a full folder walk plus a full
-    /// API enumeration, the folder has been measured at 6.4 million files, and
-    /// the caller runs it behind an overlay the user has usually just pressed
+    /// API enumeration on a folder that can hold millions of files, and the
+    /// caller runs it behind an overlay the user has usually just pressed
     /// Cancel on. Without a token every checkpoint inside the scan is unreachable
     /// and the wait reads as a hang. A cancellation is swallowed like any other
     /// failure below: the counts stay as they were, which is the same outcome a

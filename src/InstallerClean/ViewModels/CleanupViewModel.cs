@@ -1723,8 +1723,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// and on a success path a Cancel pressed as the last file finished leaves a
     /// cancelled token behind a batch that reports itself complete. Nor can the
     /// refresh run without a token: this is a full folder walk plus a full API
-    /// enumeration, the folder has been measured at 6.4 million files, and the
-    /// user is watching an overlay that has stopped saying anything. Held behind
+    /// enumeration on a folder that can hold millions of files, and the user is
+    /// watching an overlay that has stopped saying anything. Held behind
     /// a greyed Cancel button with nothing advancing, that wait is the shape
     /// people report as a hang.
     ///
