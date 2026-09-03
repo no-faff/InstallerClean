@@ -243,7 +243,7 @@ public partial class ScanViewModel : ObservableObject
     /// <summary>
     /// Tells the Scan command to re-evaluate its CanExecute. MainViewModel
     /// calls this when the externally-blocked predicate's inputs change
-    /// (Cleanup.IsOperating or Completion.IsComplete).
+    /// (Cleanup.IsOperationInFlight or Completion.IsComplete).
     /// </summary>
     public void NotifyExternallyBlockedChanged() =>
         ScanCommand.NotifyCanExecuteChanged();
