@@ -158,6 +158,7 @@ internal static class DisplayHelpers
             or "Summary.MissingFromDisk" or "Summary.MissingFromDisk.OtherPrograms"
             or "Summary.MissingFromDisk.Unnamed" or "Summary.OrphanedToCleanUp"
             or "Summary.RegisteredStillUsed" or "Summary.RegisteredWindow"
+            or "Summary.RegisteredWindow.Missing"
             => CountQuestion.Grammatical,
 
         // Oneness asserted in words. "This file will be deleted permanently" names no

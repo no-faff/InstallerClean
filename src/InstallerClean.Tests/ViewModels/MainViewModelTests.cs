@@ -117,6 +117,72 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task ScanAsync_leaves_a_registration_whose_file_is_gone_out_of_the_left_alone_count()
+    {
+        // The line says files were left alone. A registration whose cached file is not
+        // in the folder names no file to leave alone, and the size beside it counts
+        // none either, so the count and the size answer for one population.
+        var vm = CreateViewModel();
+        var registered = new List<RegisteredPackage>
+        {
+            new(@"C:\Windows\Installer\here.msi", "Product A", "{AAA}"),
+            new(@"C:\Windows\Installer\gone.msi", "Product B", "{BBB}", FileExists: false),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(Array.Empty<OrphanedFile>(), registered, 1_048_576));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(1, vm.Scan.RegisteredFileCount);
+        Assert.Equal("1.0 MB", vm.Scan.RegisteredSizeDisplay);
+    }
+
+    [Fact]
+    public async Task The_left_alone_count_and_the_details_footer_agree_on_one_scan()
+    {
+        // THE PROPERTY BOTH VIEW MODELS SAY THEY ARE PROTECTING, HELD ACROSS THE PAIR.
+        // The two are one click apart and are built from the same two lists off one
+        // ScanResult, by this view model and by ChromeViewModel.OpenRegisteredDetails,
+        // so a change to either count that misses the other is invisible until a reader
+        // compares the screens. This fixture holds every population at once: a
+        // registration present, one whose file is gone, and a withheld file.
+        var vm = CreateViewModel();
+        var registered = new List<RegisteredPackage>
+        {
+            new(@"C:\Windows\Installer\here.msi", "Product A", "{AAA}"),
+            new(@"C:\Windows\Installer\alsohere.msi", "Product B", "{BBB}"),
+            new(@"C:\Windows\Installer\gone.msi", "Product C", "{CCC}", FileExists: false),
+        };
+        var withheld = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\kept.msi", 1_048_576, false, false, false, "orphaned"),
+        };
+        var scan = new ScanResult(
+            RemovableFiles: Array.Empty<OrphanedFile>(),
+            RegisteredPackages: registered,
+            RegisteredTotalBytes: 2_097_152,
+            WithheldFiles: withheld);
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(scan);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        // Built the way ChromeViewModel builds it, off the same result.
+        var details = new RegisteredFilesViewModel(
+            scan.RegisteredPackages, scan.RegisteredTotalBytes,
+            Substitute.For<IMsiFileInfoService>(), scan.WithheldFiles);
+
+        // Three files left alone: two registered and present, plus the withheld one.
+        Assert.Equal(3, vm.Scan.RegisteredFileCount);
+        Assert.StartsWith(
+            string.Format(Strings.Summary_RegisteredWindow_Plural, 3, "3.0 MB"),
+            details.Summary, StringComparison.Ordinal);
+        Assert.EndsWith(
+            string.Format(Strings.Summary_RegisteredWindow_Missing_Singular, 1),
+            details.Summary, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ScanAsync_shows_all_clear_when_no_orphans()
     {
         var vm = CreateViewModel();

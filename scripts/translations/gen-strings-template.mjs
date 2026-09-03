@@ -372,6 +372,8 @@ const MAP = {
   // one file ("file ... is" vs "files ... are"). 0 = count, 1 = size display.
   'Summary.RegisteredWindow.Singular': `{0} file left alone ({1})`,
   'Summary.RegisteredWindow.Plural': `{0} files left alone ({1})`,
+  'Summary.RegisteredWindow.Missing.Singular': `{0} missing`,
+  'Summary.RegisteredWindow.Missing.Plural': `{0} missing`,
 
   // Confirmation dialogs
 

@@ -130,6 +130,81 @@ public class RegisteredFilesViewModelTests
     }
 
     [Fact]
+    public void Summary_leaves_a_registration_whose_file_is_gone_out_of_the_count()
+    {
+        // A file that is not in the folder was not left alone, and the size beside the
+        // count has never included one: it is summed under the same existence test the
+        // scan settles the split on. So the two describe one population, and the clause
+        // says how many of the rows below are in the other state.
+        var packages = new List<RegisteredPackage>
+        {
+            Pkg(@"C:\Windows\Installer\aaa.msi", "Product A", "{AAA}"),
+            Pkg(@"C:\Windows\Installer\bbb.msi", "Product B", "{BBB}"),
+            new(@"C:\Windows\Installer\ccc.msi", "Product C", "{CCC}", FileExists: false),
+            new(@"C:\Windows\Installer\ddd.msi", "Product D", "{DDD}", FileExists: false),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 2_097_152, NullInfoService());
+
+        Assert.Equal("2 files left alone (2.0 MB), 2 missing", vm.Summary);
+
+        // AND ALL FOUR ARE ROWS, which is the half the count must not take with it.
+        // The recovery note lives on a missing row and the flag is what puts it there,
+        // so a list trimmed to match the count would remove the one screen the main
+        // window's banner sends the reader to.
+        Assert.Equal(4, vm.Products.Count);
+        Assert.Equal(2, vm.Products.Count(p => p.IsMissing));
+    }
+
+    [Fact]
+    public void One_registration_whose_file_is_gone_is_reported_in_the_singular()
+    {
+        var packages = new List<RegisteredPackage>
+        {
+            Pkg(@"C:\Windows\Installer\aaa.msi", "Product A", "{AAA}"),
+            new(@"C:\Windows\Installer\ccc.msi", "Product C", "{CCC}", FileExists: false),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 1_048_576, NullInfoService());
+
+        Assert.Equal("1 file left alone (1.0 MB), 1 missing", vm.Summary);
+    }
+
+    [Fact]
+    public void The_clause_is_absent_when_every_registered_file_is_there()
+    {
+        // The footer a reader sees on an ordinary machine, and the reason the clause
+        // is a separate string rather than a slot: a nil count would otherwise print
+        // "0 missing" on every scan that found nothing wrong.
+        var packages = new List<RegisteredPackage>
+        {
+            Pkg(@"C:\Windows\Installer\aaa.msi", "Product A", "{AAA}"),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 1_048_576, NullInfoService());
+
+        Assert.Equal("1 file left alone (1.0 MB)", vm.Summary);
+        Assert.DoesNotContain("missing", vm.Summary, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void A_withheld_file_counts_as_left_alone_and_never_as_missing()
+    {
+        // The fixture that separates "not offered" from "not there". A withheld row
+        // carries no registration and no missing flag, so it belongs in the count and
+        // nowhere near the clause; the registration beside it is the other way about.
+        var packages = new List<RegisteredPackage>
+        {
+            new(@"C:\Windows\Installer\ccc.msi", "Product C", "{CCC}", FileExists: false),
+        };
+        var withheld = new List<OrphanedFile> { Withheld(Kept, 1_048_576) };
+
+        var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService(), withheld);
+
+        Assert.Equal("1 file left alone (1.0 MB), 1 missing", vm.Summary);
+    }
+
+    [Fact]
     public void Withheld_files_are_rows_in_the_one_list()
     {
         var packages = new List<RegisteredPackage>

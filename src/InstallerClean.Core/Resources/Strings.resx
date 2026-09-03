@@ -986,6 +986,22 @@ To put it back, you need the installer for the version you already have. Get it 
        0 = count, 1 = size display. -->
   <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file left alone ({1})</value></data>
   <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} files left alone ({1})</value></data>
+  <!-- Appended to the footer above, through Display.ListSeparator, when the window
+       is showing a registration whose cached file is not on the disk. Those rows are
+       in the list and carry the recovery note, and they are not in the count beside
+       them, because a file that is not there was not left alone. So the clause says
+       how many of the rows on screen are in that state, and the count and the size
+       before it describe one population again.
+
+       It names no noun, the count in front of it having named one already, and it
+       states no cause: what put a record on a machine whose file has gone is not
+       something this app can read, and the recovery note on the row is where a
+       reader is sent. A pair rather than one string, though English inflects
+       nothing here, because the numeral governs whatever noun a language supplies
+       and the paucal bands are declared per key.
+       0 = count. -->
+  <data name="Summary.RegisteredWindow.Missing.Singular" xml:space="preserve"><value>{0} missing</value></data>
+  <data name="Summary.RegisteredWindow.Missing.Plural" xml:space="preserve"><value>{0} missing</value></data>
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Move {0} {1} ({2})?</value></data>

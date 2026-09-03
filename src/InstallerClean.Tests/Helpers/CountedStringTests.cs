@@ -72,7 +72,7 @@ public class CountedStringTests
         "Summary.MissingFromDisk.Unnamed",
         "Summary.NothingListed", "Summary.NothingListedPerFile",
         "Summary.OrphanedToCleanUp", "Summary.RegisteredStillUsed",
-        "Summary.RegisteredWindow",
+        "Summary.RegisteredWindow", "Summary.RegisteredWindow.Missing",
         "Cli.SupersededHeldBack", "Summary.SupersededHeldBack",
     };
 
@@ -93,6 +93,7 @@ public class CountedStringTests
         "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
         "Summary.NothingListed", "Summary.NothingListedPerFile",
         "Summary.RegisteredStillUsed", "Summary.RegisteredWindow",
+        "Summary.RegisteredWindow.Missing",
         "Cli.SupersededHeldBack", "Summary.SupersededHeldBack",
     };
 

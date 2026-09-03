@@ -420,8 +420,18 @@ public partial class ScanViewModel : ObservableObject
             // The Details window's own header counts the same two populations, off
             // the same lists, because the two are one click apart and a reader
             // comparing them must not find them disagreeing.
+            //
+            // A REGISTRATION WHOSE FILE IS GONE IS NOT ONE OF THESE. The line says files
+            // were left alone; a file that is not in the folder was not left alone, and
+            // there is nothing on the disk for the size beside it to measure.
+            // RegisteredTotalBytes is summed under the same existence test the scan
+            // settles the split on, so the count reads it the same way and the two
+            // describe one population. The Details window's footer works off the same
+            // set and says how many are missing, which is where that figure belongs:
+            // this line carries no cause and the missing rows are not on this screen.
             var withheld = result.WithheldFiles ?? Array.Empty<OrphanedFile>();
-            var registeredCount = result.RegisteredPackages.Count + withheld.Count;
+            var registeredCount =
+                result.RegisteredPackages.Count(p => !p.IsMissingFromDisk) + withheld.Count;
             var registeredSize = DisplayHelpers.FormatSize(
                 result.RegisteredTotalBytes + withheld.Sum(f => f.SizeBytes));
             var orphanedCount = result.RemovableFiles.Count;

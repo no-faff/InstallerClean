@@ -438,6 +438,8 @@ public static class Strings
     public static string Summary_OrphanedWindow => Get("Summary.OrphanedWindow");
     public static string Summary_RegisteredStillUsed_Plural => Get("Summary.RegisteredStillUsed.Plural");
     public static string Summary_RegisteredStillUsed_Singular => Get("Summary.RegisteredStillUsed.Singular");
+    public static string Summary_RegisteredWindow_Missing_Plural => Get("Summary.RegisteredWindow.Missing.Plural");
+    public static string Summary_RegisteredWindow_Missing_Singular => Get("Summary.RegisteredWindow.Missing.Singular");
     public static string Summary_RegisteredWindow_Plural => Get("Summary.RegisteredWindow.Plural");
     public static string Summary_RegisteredWindow_Singular => Get("Summary.RegisteredWindow.Singular");
     public static string Summary_SupersededHeldBack_Plural => Get("Summary.SupersededHeldBack.Plural");

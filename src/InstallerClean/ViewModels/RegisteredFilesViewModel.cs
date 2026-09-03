@@ -232,11 +232,36 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         // patches is ONE row and FOUR packages, so Products.Count would report a
         // number neither window has ever shown. The count is of files, and it is
         // taken from the two inputs rather than from the list built out of them.
-        var shownCount = packages.Count + withheld.Count;
-        Summary = string.Format(
+        // AND A REGISTRATION WHOSE FILE IS GONE IS IN NEITHER FIGURE, which is the
+        // other half of the same rule: nothing was left alone that is not there, and
+        // totalBytes is summed under that same existence test, so the count and the
+        // size describe one population. The withheld files are in both, being real
+        // files in the folder that this scan did not offer.
+        //
+        // EVERY ROW IS LISTED, THE MISSING ONES INCLUDED. The recovery note lives on a
+        // missing row and the missing flag is what puts it there, so a list trimmed to
+        // match the count would take away the one screen that says what to do. The
+        // clause below says how many of the rows on view are in that state instead,
+        // which is a sentence only this window can carry: the main window's line has
+        // the same count and no list under it.
+        var missingCount = packages.Count(p => p.IsMissingFromDisk);
+        var shownCount = packages.Count - missingCount + withheld.Count;
+        var summary = string.Format(
             DisplayHelpers.Pluralise(shownCount, Strings.Summary_RegisteredWindow_Singular, Strings.Summary_RegisteredWindow_Plural, "Summary.RegisteredWindow"),
             shownCount,
             DisplayHelpers.FormatSize(totalBytes + withheld.Sum(f => f.SizeBytes)));
+
+        // Joined on the shared separator rather than a comma written here, on the same
+        // reasoning as MissingFilesReport.Inline: where a clause hangs off a phrase is
+        // a per-language question and the answer is a resx value.
+        Summary = missingCount == 0
+            ? summary
+            : summary + Strings.Display_ListSeparator + string.Format(
+                DisplayHelpers.Pluralise(missingCount,
+                    Strings.Summary_RegisteredWindow_Missing_Singular,
+                    Strings.Summary_RegisteredWindow_Missing_Plural,
+                    "Summary.RegisteredWindow.Missing"),
+                missingCount);
 
         // Open on the first product whose installer file is missing from disk,
         // when there is one. The main window's missing-from-disk banner ends
