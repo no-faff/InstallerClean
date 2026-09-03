@@ -1301,20 +1301,6 @@ internal static class Program
     }
 
     /// <summary>
-    /// Emits the pending-reboot-blocked outcome: the localised stdout reason
-    /// sentence, the English Application-log entry, and <see cref="ExitTransient"/>.
-    /// Shared by the pre-act gate check and the action services' own boundary
-    /// refusal. When a Move or Delete service acquires <c>Global\_MSIExecute</c>
-    /// and finds it held
-    /// (<see cref="Models.MoveResult.InstallerBusy"/> /
-    /// <see cref="Models.DeleteResult.InstallerBusy"/>), a Windows Installer
-    /// transaction started in the sub-millisecond race after the gate check passed;
-    /// mapping that to <see cref="PendingRebootReason.MsiExecuteMutexHeld"/> here
-    /// makes the service-boundary refusal produce the identical machine contract
-    /// (stdout line, event-log entry, exit code) a gate block does, so an RMM
-    /// consumer cannot tell the two apart.
-    /// </summary>
-    /// <summary>
     /// The stdout sentence for a run refused because <c>Global\_MSIExecute</c>
     /// could not be taken and nothing could be shown to be holding it, chosen by
     /// the flag that ran. <paramref name="arg"/> is the lower-cased flag, so the
@@ -1478,6 +1464,20 @@ internal static class Program
             _ => reason.ToString(),
         };
 
+    /// <summary>
+    /// Emits the pending-reboot-blocked outcome: the localised stdout reason
+    /// sentence, the English Application-log entry, and <see cref="ExitTransient"/>.
+    /// Shared by the pre-act gate check and the action services' own boundary
+    /// refusal. When a Move or Delete service acquires <c>Global\_MSIExecute</c>
+    /// and finds it held
+    /// (<see cref="Models.MoveResult.InstallerBusy"/> /
+    /// <see cref="Models.DeleteResult.InstallerBusy"/>), a Windows Installer
+    /// transaction started in the sub-millisecond race after the gate check passed;
+    /// mapping that to <see cref="PendingRebootReason.MsiExecuteMutexHeld"/> here
+    /// makes the service-boundary refusal produce the identical machine contract
+    /// (stdout line, event-log entry, exit code) a gate block does, so an RMM
+    /// consumer cannot tell the two apart.
+    /// </summary>
     private static int EmitPendingRebootBlocked(string arg, PendingRebootReason reason, string? detail)
     {
         Console.WriteLine(PendingRebootBlockedMessage(reason, detail));
