@@ -1100,20 +1100,22 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (LocalisedInvalidOperationException ex)
         {
-            // Everything reaching here is one of MoveFilesService's five
-            // destination gates, all of which run before the per-file loop, so
-            // no file has moved and the counts on screen are still right. The
-            // mid-batch abort landed here once and no longer does, being a
+            // Everything reaching here is one of MoveFilesService's destination
+            // gates, all of which run before the per-file loop, so no file has
+            // moved and the counts on screen are still right. The mid-batch
+            // abort landed here once and no longer does, being a
             // MoveAbortedException caught at the call site where the batch's own
             // tally is still in scope; a rescan here would now be a full folder
             // walk and API enumeration for nothing.
             //
             // No RemoveCreatedDestinationAsync either, and that is a ruling
-            // rather than an oversight: two of the five fire precisely because
+            // rather than an oversight: the folder gates fire precisely because
             // the destination has just been shown to resolve into
             // C:\Windows\Installer or a system folder, and deleting a directory
             // at a path just proven to land somewhere unexpected is the
-            // operation those guards exist to prevent.
+            // operation those guards exist to prevent. The gate that is not a
+            // folder check refuses before anything is created, so it leaves
+            // nothing to remove.
             _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
             OperationProgress = string.Empty;
         }
