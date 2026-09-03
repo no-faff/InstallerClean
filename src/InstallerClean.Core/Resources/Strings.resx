@@ -961,8 +961,8 @@ To put it back, you need the installer for the version you already have. Get it 
        That refusal is one of six routes into the count rather than the count
        itself, so gating on it would put this line in front of somebody holding
        back no superseded file at all. See ScanViewModel.HasSupersededHeldBack. -->
-  <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
-  <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
+  <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
+  <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -1604,21 +1604,21 @@ The crash log could not be written.</value></data>
        already ends that way, so a filter watching this channel meets one phrase
        and not two.
 
-       IT HELD BACK {1} {2} RATHER THAN "{1} {2} were held back", AND THE WORD ORDER
+       IT HAS HELD BACK {1} {2} RATHER THAN "{1} {2} were held back", AND THE WORD ORDER
        IS THE PLURALISATION. This line is machine-read and forced English at the
        emit site, so it takes no .Singular/.Plural pair and the passive form read
        "so 1 file were held back" at a count of one. Putting the app back in as the
        subject makes one shape correct at every count, which is what a matched
        surface needs. -->
-  <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish which cached files belong to the programs installed here, so it held back {1} {2}. No action taken.</value></data>
+  <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish which cached files belong to the programs installed here, so it has held back {1} {2}. No action taken.</value></data>
   <!-- The per-file twin of the entry above, for the machine whose candidates were
        each judged and kept rather than emptied wholesale, so the Application channel
        tells those two apart the way stdout does. It shares Event ID 1000 with its
        sibling for the reason recorded above, and it takes the same three arguments in
        the same order. Machine-read and forced English at the emit site, as that entry
        is, so it takes no .Singular/.Plural pair and keeps the app as the subject:
-       "it held back {1} {2}" is correct at every count where the passive is not. -->
-  <data name="Cli.EventLogNothingOfferedPerFile" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish that any of the cached files it found are unneeded, so it held back {1} {2}. No action taken.</value></data>
+       "it has held back {1} {2}" is correct at every count where the passive is not. -->
+  <data name="Cli.EventLogNothingOfferedPerFile" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish that any of the cached files it found are unneeded, so it has held back {1} {2}. No action taken.</value></data>
   <!-- THE NOTICE BESIDE THAT OUTCOME, Event ID 3002, and it exists because the
        outcome band cannot carry the distinction. The entry above sits at 1000 with
        the clean-machine line, since the run did its job either way, so a filter
@@ -1650,14 +1650,14 @@ The crash log could not be written.</value></data>
        notices, so it also reaches a machine whose walk offer was emptied while a
        superseded registration was still offered beside it. Naming no cause matters
        more here for that reason, not less. -->
-  <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish which cached files belong to the programs installed here, so it held back {1} {2} and offered nothing it found by looking in the folder.</value></data>
+  <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish which cached files belong to the programs installed here, so it has held back {1} {2} and offered nothing it found by looking in the folder.</value></data>
   <!-- The per-file twin of the notice above, at the same Event ID 3002 and for the
        same reason: the outcome band cannot separate a machine nothing could be judged
        on from one that is genuinely clean. It says "some" where the notice above says
        nothing of the kind, this being the run that still offered something. Same three
        arguments, same order, and it names no folder, which is the rule on this channel
        and is stated above. -->
-  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish that some of the cached files it found are unneeded, so it held back {1} {2}.</value></data>
+  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish that some of the cached files it found are unneeded, so it has held back {1} {2}.</value></data>
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does
@@ -1729,8 +1729,8 @@ The crash log could not be written.</value></data>
        condition and its own figure, on records that could not be matched up rather
        than on files held back, and the two counts are not the same quantity: see
        Cli.EventLogScanWithheld and ReportScanSignals. -->
-  <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
-  <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
+  <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
+  <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
   <!-- 0 = mode arg, 1 = entries in the Windows Installer records the scan could
        not match up. A notice beside the run's summary, not a summary itself
        (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
