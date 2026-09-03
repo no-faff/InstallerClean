@@ -589,13 +589,13 @@ public class CleanupPreFlightTests
         // The bare LocalisedInvalidOperationException is now only ever one of the
         // move service's destination gates, every one of which runs before the
         // per-file loop, so this arm is reached with nothing moved. It still
-        // does not delete the folder, and the reason is the arm's own: the
-        // folder gates fire precisely because the destination has just been
+        // does not delete the folder, and the reason is the arm's own: the gates
+        // that reach it fire precisely because the destination has just been
         // shown to resolve into the Installer folder or a system folder, and
         // deleting a directory at a path just proven to land somewhere
-        // unexpected is the operation those guards exist to prevent. The gate
-        // that is not a folder check refuses before anything is created, so it
-        // leaves nothing to remove.
+        // unexpected is the operation those guards exist to prevent. The
+        // service's fully-qualified check is not among them: the window refuses
+        // a relative destination before the batch is handed over.
         //
         // The mid-batch abort used to land here and no longer does. Its own twin
         // is the test below; the two are kept apart because they are now different

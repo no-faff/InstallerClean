@@ -1109,13 +1109,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // walk and API enumeration for nothing.
             //
             // No RemoveCreatedDestinationAsync either, and that is a ruling
-            // rather than an oversight: the folder gates fire precisely because
-            // the destination has just been shown to resolve into
-            // C:\Windows\Installer or a system folder, and deleting a directory
-            // at a path just proven to land somewhere unexpected is the
-            // operation those guards exist to prevent. The gate that is not a
-            // folder check refuses before anything is created, so it leaves
-            // nothing to remove.
+            // rather than an oversight: the gates that reach this arm fire
+            // precisely because the destination has just been shown to resolve
+            // into C:\Windows\Installer or a system folder, and deleting a
+            // directory at a path just proven to land somewhere unexpected is
+            // the operation those guards exist to prevent. The service's
+            // fully-qualified check is not among them: the window refuses a
+            // relative destination above, before the batch is handed over.
             _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
             OperationProgress = string.Empty;
         }
