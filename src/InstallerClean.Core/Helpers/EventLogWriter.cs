@@ -3,9 +3,10 @@ using System.Diagnostics;
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Writes a single summary entry to the Windows Application event log per
-/// CLI run, so sysadmins running InstallerClean under Task Scheduler can
-/// audit what happened without trawling stdout redirects.
+/// Writes Application-channel entries for a CLI run, so sysadmins running
+/// InstallerClean under Task Scheduler can audit what happened without trawling
+/// stdout redirects. A run writes one summary entry, and beside it any notices
+/// the scan's own findings call for; every one of them comes through here.
 /// </summary>
 /// <remarks>
 /// The entries can disclose two kinds of path to the Application log, which is
@@ -34,31 +35,31 @@ internal static class EventLogWriter
     internal static bool EventLogUnavailable { get; private set; }
 
     /// <summary>
-    /// Writes the summary entry, classified by <paramref name="outcome"/> so
-    /// the entry carries a stable Event ID and entry type (see
+    /// Writes one entry, summary or notice, classified by <paramref name="outcome"/>
+    /// so it carries a stable Event ID and entry type (see
     /// <see cref="CliContract.EventIdFor"/> / <see cref="CliContract.EntryTypeFor"/>).
     /// Never throws; a failed write (source creation denied, event log
     /// service stopped, non-Windows host, source mapped to a non-Application
     /// log) is swallowed because the primary output channel is stdout, not
     /// the event log.
     /// </summary>
-    /// <param name="buildSummary">
+    /// <param name="buildEntry">
     /// Builds the entry text, and it is a callback rather than a built string so
     /// the build runs inside the try below. C# evaluates an argument in the
     /// caller's frame, so taking the text would leave the one part of the write
     /// that formats a resx template outside the guard the rest of it has.
     /// </param>
-    internal static void Write(CliEventClass outcome, Func<string> buildSummary)
+    internal static void Write(CliEventClass outcome, Func<string> buildEntry)
     {
         try
         {
-            var summary = buildSummary();
+            var entry = buildEntry();
             if (!EnsureSourceMappedToApplicationLog())
             {
                 EventLogUnavailable = true;
                 return;
             }
-            EventLog.WriteEntry(SourceName, summary,
+            EventLog.WriteEntry(SourceName, entry,
                 CliContract.EntryTypeFor(outcome), CliContract.EventIdFor(outcome));
         }
         catch
