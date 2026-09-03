@@ -77,7 +77,8 @@ internal static class MachineContract
     /// run writes exactly ONE summary entry, and its Event ID is in the 1000,
     /// 2000 or 4000 band (<see cref="CliContract.EventIdFor"/>). Beside it a run
     /// may write NOTICES, in the 3000 band, which are conditions the scan found and
-    /// never the run's outcome. THERE ARE THREE. 3000: entries in the records could
+    /// never the run's outcome. THE LIST BELOW IS THE WHOLE BAND, which is the part
+    /// a consumer building a filter needs of it. 3000: entries in the records could
     /// not be matched up, so no superseded patch was offered and the count of files
     /// missing from the cache may be short. 3001: packages Windows still references
     /// have no file on disk. 3002: files were held back rather than offered, and

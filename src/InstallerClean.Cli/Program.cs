@@ -235,7 +235,7 @@ internal static class Program
                 // 1. A throw after it produces that 4000 as this run's SECOND
                 // entry, which is what an RMM counts runs by. So every statement
                 // below is guarded where it stands, and the write is guarded
-                // inside EventLogWriter.Write, which builds the summary there so
+                // inside EventLogWriter.Write, which builds the entry there so
                 // that no part of the call is evaluated in this frame.
                 try
                 {
