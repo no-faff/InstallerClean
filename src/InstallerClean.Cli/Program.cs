@@ -1147,10 +1147,14 @@ internal static class Program
                 ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
                 : string.Format(Strings.Cli_GenericError_NoLog, typeName));
         }
-        catch (IOException)
+        catch (Exception)
         {
-            // stdout itself is unwritable, which is one of the failures that can
-            // bring us here; crash.log and the audit entry below carry the record.
+            // Broad on purpose, and broader than a stdout failure alone would need.
+            // This runs inside Main's own catch clause, so anything it lets past
+            // reaches the runtime default handler and produces the undocumented exit
+            // the routing exists to prevent. Two things in the try can throw: the
+            // write itself, and formatting a resx string. The exception that brought
+            // us here is already in crash.log, and the audit entry below still fires.
         }
         MachineContract.WriteEventLog(CliEventClass.HardError, () => crash.Written
             ? string.Format(Strings.Cli_EventLogHardError, mode, typeName, crash.Path)
