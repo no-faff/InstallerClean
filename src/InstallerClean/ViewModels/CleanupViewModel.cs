@@ -13,8 +13,8 @@ namespace InstallerClean.ViewModels;
 /// Cleanup slice: the move-destination input plus the Move and Delete
 /// commands and their progress overlay. Reads orphans from
 /// <see cref="ScanViewModel.LastScanResult"/>, pushes outcomes into
-/// <see cref="CompletionViewModel"/>, and asks the scan VM to refresh
-/// after each successful operation.
+/// <see cref="CompletionViewModel"/>, and asks the scan VM to refresh once
+/// the worker has returned, however the batch ended.
 /// </summary>
 public partial class CleanupViewModel : ObservableObject, IDisposable
 {
