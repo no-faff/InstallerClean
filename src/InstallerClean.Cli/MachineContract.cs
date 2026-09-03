@@ -80,11 +80,15 @@ internal static class MachineContract
     /// never the run's outcome. THERE ARE THREE. 3000: entries in the records could
     /// not be matched up, so no superseded patch was offered and the count of files
     /// missing from the cache may be short. 3001: packages Windows still references
-    /// have no file on disk. 3002: the scan could not establish which cached files
-    /// belong to the programs installed here, so it offered nothing it walked. A
-    /// notice never replaces the summary and never stands in for one, so counting
-    /// runs means counting the summary bands, and each repeats for as long as its
-    /// own condition holds, so a machine can emit one on every run for weeks.
+    /// have no file on disk. 3002: files were held back rather than offered, and
+    /// the entry's own text says which condition produced it, so a filter built
+    /// for one phrase sees only some of the machines: either the scan could not
+    /// establish which cached files belong to the programs installed here and
+    /// offered nothing it walked, or it could not establish that particular files
+    /// it found are unneeded. A notice never replaces the summary and never stands
+    /// in for one, so counting runs means counting the summary bands, and each
+    /// repeats for as long as its own condition holds, so a machine can emit one on
+    /// every run for weeks.
     ///
     /// "NEVER THE RUN'S OUTCOME" IS ABOUT COUNTING RUNS AND IS NOT THE OTHER SENSE
     /// OF THE SAME WORDS. <see cref="CliContract.EntryTypeFor"/> separates a
