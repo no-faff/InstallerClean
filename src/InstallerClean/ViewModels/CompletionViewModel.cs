@@ -373,7 +373,11 @@ public partial class CompletionViewModel : ObservableObject
 
     /// <summary>
     /// The failure count line for a completion overlay, or empty when nothing
-    /// failed. The denominator is what the operation TRIED
+    /// failed. The English names the count on its own, one sentence for one
+    /// thing on the cancelled card and on the finished one alike.
+    ///
+    /// A translation may still put that count over a denominator, and the one
+    /// it is given is what the operation TRIED
     /// (<paramref name="actedCount"/> + <paramref name="failedCount"/>), not
     /// the batch it was handed: on a run the user cancelled, the files it never
     /// reached are not files that could not be processed, and on a run that went
@@ -393,6 +397,10 @@ public partial class CompletionViewModel : ObservableObject
                Strings.Completion_FailedCount_Plural,
                "Completion.FailedCount");
 
+        // BOTH ARGUMENTS GO IN, ALTHOUGH THE ENGLISH NOW SPELLS ONLY THE FIRST.
+        // The translated values spell the second, and string.Format throws on an
+        // index it was not handed while an argument nothing reads costs nothing.
+        // So the total stays here until every value has been written without it.
         return string.Format(
             DisplayHelpers.Pluralise(failedCount, singular, plural, key),
             failedCount, actedCount + failedCount);

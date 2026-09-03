@@ -1,3 +1,4 @@
+using System.Globalization;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Resources;
@@ -18,6 +19,13 @@ public class CompletionViewModelTests
         : FileOperationError(FilePath)
     {
         public override string LocalisedMessage => Message;
+    }
+
+    private sealed class LocalisationScope : IDisposable
+    {
+        public LocalisationScope(CultureInfo culture) => Localisation.Set(culture, culture);
+
+        public void Dispose() => Localisation.Reset();
     }
 
     [Fact]
@@ -196,7 +204,7 @@ public class CompletionViewModelTests
         // long for the card, and it clips.
         Assert.False(vm.HeadingIsWarning);
         Assert.Contains("freed", vm.Heading);
-        Assert.Equal("2 of 71 could not be moved.", vm.FailedCount);
+        Assert.Equal("2 files could not be moved.", vm.FailedCount);
         // The destination line is the plain variant whatever happened. An error
         // count appended here lands immediately after the path, where it reads
         // as part of the folder name.
@@ -215,7 +223,7 @@ public class CompletionViewModelTests
         // total failure as a result and then clipping mid-word.
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingMoved, vm.Heading);
-        Assert.Equal("2 of 2 could not be moved.", vm.FailedCount);
+        Assert.Equal("2 files could not be moved.", vm.FailedCount);
         // Nothing reached the destination, so nothing on screen may say files
         // are there or invite copying them back.
         Assert.Equal(string.Empty, vm.Summary);
@@ -232,7 +240,7 @@ public class CompletionViewModelTests
 
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
-        Assert.Equal("3 of 3 could not be deleted.", vm.FailedCount);
+        Assert.Equal("3 files could not be deleted.", vm.FailedCount);
         // Nothing was deleted, so nothing on screen may report a deletion.
         Assert.Equal(string.Empty, vm.Summary);
         Assert.Equal(string.Empty, vm.Restore);
@@ -248,12 +256,28 @@ public class CompletionViewModelTests
         // the heading says so and the count line carries the rest.
         Assert.False(vm.HeadingIsWarning);
         Assert.Contains("freed", vm.Heading);
-        Assert.Equal("1 of 6 could not be deleted.", vm.FailedCount);
+        Assert.Equal("1 file could not be deleted.", vm.FailedCount);
     }
 
-    [Fact]
-    public void A_cancelled_move_counts_what_it_tried_not_the_batch_it_was_given()
+    /// <summary>
+    /// Every language the app ships, because the English line names the failure
+    /// count on its own and the rule under test is about the number beside it.
+    /// </summary>
+    public static TheoryData<string> ShippedCultures()
     {
+        var data = new TheoryData<string>();
+        foreach (var name in SupportedLanguages.CultureNames)
+            data.Add(name);
+
+        return data;
+    }
+
+    [Theory]
+    [MemberData(nameof(ShippedCultures))]
+    public void A_cancelled_move_counts_what_it_tried_not_the_batch_it_was_given(string cultureName)
+    {
+        using var scope = new LocalisationScope(CultureInfo.GetCultureInfo(cultureName));
+
         var vm = new CompletionViewModel();
         vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 71, movedBytes: 1024,
             destination: @"D:\backup", errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
@@ -261,7 +285,15 @@ public class CompletionViewModelTests
         // 5 tried, not 71 queued: the 66 the cancel never reached are not files
         // that could not be moved. The summary line below still names the whole
         // batch, which is its own job.
-        Assert.Equal("2 of 5 could not be moved.", vm.FailedCount);
+        //
+        // WALKED ACROSS THE LANGUAGES RATHER THAN ASSERTED ON ONE STRING, because
+        // the count is all the English says and a language that puts it over a
+        // total is where the difference between 5 and 71 can be seen at all. The
+        // render is the other half: a value naming the total is handed one, so a
+        // call site that stopped supplying it fails here rather than on a user's
+        // screen.
+        Assert.Contains("2", vm.FailedCount);
+        Assert.DoesNotContain("71", vm.FailedCount);
         Assert.Contains("71", vm.Summary);
         // A cancel is not a failure, so the heading stays as it was. This is the
         // control on the pair below: three files really did move and the size
@@ -284,7 +316,7 @@ public class CompletionViewModelTests
 
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
-        Assert.Equal("1 of 1 could not be deleted.", vm.FailedCount);
+        Assert.Equal("1 file could not be deleted.", vm.FailedCount);
         // And the cancelled sentence survives the warning, which is where these two
         // part company with ShowMoveSummary and ShowDeleteSummary. It is the only
         // line on the screen saying the run was stopped rather than that it failed.
