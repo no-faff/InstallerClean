@@ -1036,7 +1036,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     _completion.ShowMoveCancelledSummary(
                         result.MovedCount, survivingFiles.Count,
                         CompletedBytes(survivingFiles, result.MovedCount, result.Errors),
-                        result.Errors, ClassifySpaceOutcome(destinationKind), reverify);
+                        dest, result.Errors, ClassifySpaceOutcome(destinationKind), reverify);
                 }
                 OperationProgress = string.Empty;
                 return;

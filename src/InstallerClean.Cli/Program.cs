@@ -851,7 +851,15 @@ internal static class Program
             // Only where something moved, on the silent-at-zero rule the run lines
             // above already follow. A move that put no file in the folder has not
             // made one worth naming.
-            if (moveResult.MovedCount > 0)
+            //
+            // AND NOT ON A CANCEL, which is the second conjunct. The sentence asks
+            // the reader to check their programs and then delete the backup, so it
+            // is advice for a run that went the distance: it tells somebody who
+            // stopped the move part-way to go through with the thing they stopped.
+            // The cancel re-entry below is what that run reports instead. The
+            // aborted-move path keeps the line, because a destination that changed
+            // mid-batch leaves files somewhere the reader has to go and deal with.
+            if (moveResult.MovedCount > 0 && !moveResult.Cancelled)
                 Console.WriteLine(string.Format(Strings.Cli_MoveRestoreHint, moveDest));
 
             // Partial result returned on a mid-batch cancel; re-enter the OCE catch

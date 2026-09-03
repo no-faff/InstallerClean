@@ -260,6 +260,7 @@ public static class Strings
     public static string Completion_Freed => Get("Completion.Freed");
     public static string Completion_HeldBack_Plural => Get("Completion.HeldBack.Plural");
     public static string Completion_HeldBack_Singular => Get("Completion.HeldBack.Singular");
+    public static string Completion_MoveCancelledRestoreHint => Get("Completion.MoveCancelledRestoreHint");
     public static string Completion_MoveCancelledSummary => Get("Completion.MoveCancelledSummary");
     public static string Completion_Moved => Get("Completion.Moved");
     public static string Completion_MoveRestoreHint => Get("Completion.MoveRestoreHint");

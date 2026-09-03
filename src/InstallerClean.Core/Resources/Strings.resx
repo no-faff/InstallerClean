@@ -812,9 +812,29 @@ To put it back, you need the installer for the version you already have. Get it 
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
        total. These are the overlay's own summary sentence, not a body-row
-       status line. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} before you cancelled.</value></data>
+       status line.
+
+       The Move sentence carries 3 = the backup folder, in the flow of the
+       sentence rather than on a line of its own. Naming it here is what lets
+       the line below say "move them back": between them the two sentences name
+       the folder the files went to and the folder they came from, which is the
+       whole of what somebody who has just stopped a move needs. The completed
+       screen puts its destination on its own line because the path ends the
+       sentence there; here it does not. -->
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} to {3} before you cancelled.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Permanently deleted {0} of {1} {2} before you cancelled.</value></data>
+  <!-- The line under a cancelled Move, where the completed screen carries
+       Completion.MoveRestoreHint instead. The two answer different questions: a
+       run that finished leaves the reader deciding when to delete the backup, and
+       a run somebody stopped part-way leaves them wanting the files put back. A
+       Move only ever moves, so putting them back is the whole of the undo, and
+       the sentence says so plainly.
+
+       One sentence for both drives, where the completed screen picks between two.
+       The same-drive variant exists to say the space has not come back until the
+       backup is deleted, and that has nothing to attach to on a screen asking for
+       the opposite. {InstallerFolder} resolves to the cache folder. -->
+  <data name="Completion.MoveCancelledRestoreHint" xml:space="preserve"><value>It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was.</value></data>
   <!-- The post-Delete summary. 0 = deleted count, 1 = pluralised noun. It
        states the act and stops there: the screen carries no safety claim and
        no recovery advice, because the app's position is not that a delete can

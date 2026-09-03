@@ -518,6 +518,13 @@ public partial class CompletionViewModel : ObservableObject
     /// get the restore reassurance because they are the ones that reached the
     /// destination.
     ///
+    /// <paramref name="destination"/> IS NAMED IN THE SENTENCE AND NOT ON A LINE OF
+    /// ITS OWN, which is the one thing this screen composes differently from
+    /// <see cref="ShowMoveSummary"/>. The two sentences below the heading are a
+    /// pair: the first says where the files that moved have gone and the second
+    /// says where to put them back, so the reader is told how to undo a run they
+    /// stopped rather than when to delete a backup they meant to keep.
+    ///
     /// THE ONE EXCEPTION IS A CANCEL THAT ACCOMPLISHED NOTHING AND HIT AN ERROR,
     /// and it is the same exception <see cref="ShowMoveSummary"/> makes. There is
     /// no accomplishment to state, so the size heading would be reporting "0 B
@@ -526,7 +533,8 @@ public partial class CompletionViewModel : ObservableObject
     /// never does, however little it moved.
     /// </summary>
     public void ShowMoveCancelledSummary(int movedCount, int totalCount, long movedBytes,
-        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null)
+        string destination, IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space,
+        ReverifyResult? reverify = null)
     {
         // The same test ShowMoveSummary applies, and for the same reason: a cancel
         // that reached no file and hit an error has nothing to put in a size
@@ -541,6 +549,10 @@ public partial class CompletionViewModel : ObservableObject
                 space == MoveSpaceOutcome.FreedSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
                 DisplayHelpers.FormatSize(movedBytes));
         FailedCount = FailedCountText(movedCount, errors.Count, deleting: false);
+        // Left empty on purpose, which is what keeps the destination in the flow of
+        // the sentence: the WPF host forces SummaryDestination onto a line of its
+        // own, and here the path sits mid-sentence with the cancel after it. The
+        // completed screen sets it because there the path ends the sentence.
         SummaryDestination = string.Empty;
         // AND THE SUMMARY STAYS, WHICH IS WHERE THIS PARTS COMPANY WITH
         // ShowMoveSummary. That method blanks its summary under the warning heading
@@ -550,12 +562,18 @@ public partial class CompletionViewModel : ObservableObject
         // blanking it here would trade one wrong screen for another.
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_MoveCancelledSummary, "Completion.MoveCancelledSummary"),
-            movedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
-        // Same rule as ShowMoveSummary: the restore line tells the reader when to
-        // delete the backup folder, and a cancel that came before the first file
-        // moved has not made one worth naming. Reachable because a cancel with
-        // zero moved and a non-zero error count still raises a summary.
-        Restore = movedCount == 0 ? string.Empty : MoveRestoreText(space);
+            movedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount), destination);
+        // The undo, and it is this screen's own line rather than the completed
+        // screen's. Somebody who stopped a Move part-way wants the files back where
+        // they were, and a Move only ever moved them, so naming the folder they
+        // came from is the whole of it. One string for both drives: the same-drive
+        // variant says the space has not come back until the backup is deleted,
+        // which is the opposite of what this screen asks for.
+        //
+        // Still silent where nothing moved, on ShowMoveSummary's rule and for the
+        // same reason: there is nothing to put back. Reachable because a cancel
+        // with zero moved and a non-zero error count still raises a summary.
+        Restore = movedCount == 0 ? string.Empty : Strings.Completion_MoveCancelledRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;

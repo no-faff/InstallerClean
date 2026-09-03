@@ -17,9 +17,12 @@ namespace InstallerClean.Tests.Helpers;
 /// other rather than their presence alone: a summary printed after the cancellation
 /// reads as a second run.
 ///
-/// A CANCELLED MOVE NAMES THE FOLDER. The files it moved are in the destination
-/// and the operator needs the path to go and look, so the line that names it is
-/// asserted with the destination in it rather than by its sentence alone.
+/// A CANCELLED MOVE DOES NOT CARRY THE KEEP-THE-MOVE LINE. That sentence asks the
+/// reader to check their programs and then delete the backup, which is what to do
+/// after a run that went the distance. The test pins its ABSENCE against the moved
+/// line's presence, so the absence is attributable to the cancel: the only other
+/// thing that suppresses it is a run that moved nothing, and asserting what moved
+/// rules that out in the same breath.
 ///
 /// STDOUT IS READ BACK THROUGH <c>Console.SetOut</c>, WHICH IS PROCESS-GLOBAL. The
 /// assembly disables test parallelisation for a reason of its own, in
@@ -45,7 +48,7 @@ public class CliCancelledRunTests
         new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
 
     [Fact]
-    public async Task A_cancelled_move_says_what_it_moved_and_names_the_backup_folder()
+    public async Task A_cancelled_move_says_what_it_moved_and_not_to_keep_the_move()
     {
         // The Ctrl+C arrives while the service is working, which is the sequence
         // the host is written for: the token is cancelled and the service hands
@@ -70,12 +73,29 @@ public class CliCancelledRunTests
 
         Assert.Equal(CliExitCode.Partial, exitCode);
         Assert.Contains(moved, stdout);
-        Assert.Contains(restore, stdout);
         Assert.Contains(Strings.Cli_Cancelled, stdout);
         Assert.True(stdout.IndexOf(moved, StringComparison.Ordinal)
             < stdout.IndexOf(Strings.Cli_Cancelled, StringComparison.Ordinal));
-        Assert.True(stdout.IndexOf(restore, StringComparison.Ordinal)
-            < stdout.IndexOf(Strings.Cli_Cancelled, StringComparison.Ordinal));
+        // A file did move, which is the other gate on the line below, so its
+        // absence answers for the cancel and for nothing else.
+        Assert.DoesNotContain(restore, stdout);
+    }
+
+    [Fact]
+    public async Task A_move_that_was_not_cancelled_does_carry_the_keep_the_move_line()
+    {
+        // The control on the test above: the same run without the cancel prints the
+        // line, so its absence there is the cancel and not the sentence having gone.
+        var move = Substitute.For<IMoveFilesService>();
+        move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<UnderLeaseClaims>(), Arg.Any<IProgress<OperationProgress>?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(_ => new MoveResult(1, Array.Empty<FileOperationError>(), Cancelled: false));
+
+        var (_, stdout) = await Run("/m", Destination, Services(move: move), CancellationToken.None);
+
+        Assert.Contains(string.Format(Strings.Cli_MoveRestoreHint, Destination), stdout);
+        Assert.DoesNotContain(Strings.Cli_Cancelled, stdout);
     }
 
     [Fact]

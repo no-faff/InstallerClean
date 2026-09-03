@@ -256,7 +256,7 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 71, movedBytes: 1024,
-            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
+            destination: @"D:\backup", errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
         // 5 tried, not 71 queued: the 66 the cancel never reached are not files
         // that could not be moved. The summary line below still names the whole
@@ -296,7 +296,7 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveCancelledSummary(movedCount: 0, totalCount: 40, movedBytes: 0,
-            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
+            destination: @"D:\backup", errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingMoved, vm.Heading);
@@ -309,11 +309,33 @@ public class CompletionViewModelTests
     // somewhere, so it is as false here as it is there.
 
     [Fact]
+    public void A_cancelled_move_names_the_folder_its_files_went_to()
+    {
+        // The two sentences on this card are a pair: the first names where the
+        // files that moved have gone, the second names where they came from, and
+        // between them they say how to put things back. Neither is any use to a
+        // reader on its own, so the destination reaching the summary is held here
+        // rather than left to the call site.
+        var vm = new CompletionViewModel();
+        vm.ShowMoveCancelledSummary(movedCount: 4, totalCount: 20, movedBytes: 1024,
+            destination: @"D:\InstallerBackup", errors: Array.Empty<FileOperationError>(),
+            space: MoveSpaceOutcome.FreedSpace);
+
+        Assert.Contains(@"D:\InstallerBackup", vm.Summary);
+        Assert.Contains("4", vm.Summary);
+        Assert.Contains("20", vm.Summary);
+        // And it stays in the sentence rather than going onto a line of its own,
+        // which is what leaving SummaryDestination empty buys: the host splits the
+        // summary at this value, and here the cancel follows the path.
+        Assert.Equal(string.Empty, vm.SummaryDestination);
+    }
+
+    [Fact]
     public void A_cancelled_move_that_moved_nothing_drops_its_restore_hint()
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveCancelledSummary(movedCount: 0, totalCount: 40, movedBytes: 0,
-            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
+            destination: @"D:\backup", errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
         // Nothing reached the destination, so nothing may invite copying it back.
         Assert.Equal(string.Empty, vm.Restore);
@@ -324,9 +346,12 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 40, movedBytes: 1024,
-            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
+            destination: @"D:\backup", errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
-        Assert.Equal(Strings.Completion_MoveRestoreHint, vm.Restore);
+        // The cancelled screen's own line, not the completed screen's. They share
+        // no key, so a change to one cannot silently move the other.
+        Assert.Equal(Strings.Completion_MoveCancelledRestoreHint, vm.Restore);
+        Assert.NotEqual(Strings.Completion_MoveRestoreHint, vm.Restore);
     }
 
     [Fact]

@@ -336,7 +336,7 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
   'Completion.ReverifyIdentityClaimed': `{0} {1} kept in place, because Windows has a record of the program named inside.`,
   'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
-  'Completion.MoveCancelledSummary': `Moved {0} of {1} {2} before you cancelled.`,
+  'Completion.MoveCancelledSummary': `Moved {0} of {1} {2} to {3} before you cancelled.`,
   'Completion.PermanentDeleteCancelledSummary': `Permanently deleted {0} of {1} {2} before you cancelled.`,
 
   // 0 = deleted count, 1 = pluralised noun
@@ -602,6 +602,7 @@ const MAP = {
 
   'Body.PendingReboot.PendingRenameUnresolved': `A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning.`,
   'Error.ScanStoppedDetails': `This is also recorded in {0}.`,
+  'Completion.MoveCancelledRestoreHint': `It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was.`,
   'Completion.MoveRestoreHint': `Delete that folder when you're satisfied all is well.`,
   'Completion.MoveRestoreHintSameDrive': `Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do.`,
   'Confirm.MoveDestination.Singular': `This file will be moved to:`,
