@@ -595,12 +595,28 @@ public partial class MainWindow : Window
         // scan-mode reading once the overlay dismisses.
         if (_vm.Cleanup.IsOperating || _vm.Completion.IsComplete)
             return;
+        // THE PENDING-REBOOT WARNING, THE TWO HELD-BACK LINES AND THE WARNING FOR FILES
+        // MISSING FROM DISK ARE RAISED HERE. Each arrives by a Collapsed-to-Visible
+        // transition, which is the transition the bridge does not announce on its own,
+        // so a line with a live setting and no raise is marked for speech and never
+        // spoken. The window's other live regions are raised where their own values
+        // change, and a value changing inside an already-rendered subtree needs no
+        // raise at all.
+        //
+        // These branches are listed top to bottom as the lines are drawn, and that is
+        // for whoever reads them next rather than for the reader of the screen: one
+        // PropertyChanged carries one name, so at most one arm runs per call and their
+        // order decides nothing. What a screen reader hears them in is the order
+        // ScanViewModel assigns the counts, each assignment queueing its raise behind
+        // the last.
         if (e.PropertyName == nameof(ScanViewModel.HasPendingReboot) && _vm.Scan.HasPendingReboot)
             AnnounceLiveRegions(PendingRebootBannerText);
-        if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
-            AnnounceLiveRegions(MissingFromDiskBannerText);
+        if (e.PropertyName == nameof(ScanViewModel.HasNothingListed) && _vm.Scan.HasNothingListed)
+            AnnounceLiveRegions(NothingListedText);
         if (e.PropertyName == nameof(ScanViewModel.HasSupersededHeldBack) && _vm.Scan.HasSupersededHeldBack)
             AnnounceLiveRegions(SupersededHeldBackText);
+        if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
+            AnnounceLiveRegions(MissingFromDiskBannerText);
     }
 
     // Routes focus to the move-destination field, the entry point of the Move

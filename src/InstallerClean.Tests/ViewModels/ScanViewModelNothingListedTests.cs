@@ -47,6 +47,63 @@ public class ScanViewModelNothingListedTests
                 $@"C:\Windows\Installer\{prefix}{i}.msi", 1024, false, false, false, Orphaned))
             .ToArray();
 
+    /// <summary>
+    /// The three footnote gates, in the order the scan raises them.
+    ///
+    /// WHY A TEST RATHER THAN A READING. The window turns each of these property
+    /// changes into a live-region announcement and queues them as they arrive, so
+    /// this sequence is what a screen reader says and in what order. Nothing else
+    /// decides it: the code-behind matches one property name per notification, so
+    /// its own layout says nothing about sequence. Reordering the assignments in
+    /// OnScanCompleted is therefore a change to the window, and this is the only
+    /// place that can catch one.
+    ///
+    /// The fixture turns all three on at once, which is what makes an order
+    /// observable at all: any run that trips fewer than three leaves a sequence
+    /// that a wrong order still satisfies.
+    /// </summary>
+    [Fact]
+    public async Task The_three_footnote_gates_are_raised_in_the_order_their_lines_are_drawn()
+    {
+        var scan = Substitute.For<IFileSystemScanService>();
+        scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                RemovableFiles: Files(4, "offered"),
+                RegisteredPackages: Array.Empty<RegisteredPackage>(),
+                RegisteredTotalBytes: 0,
+                MissingAffectedCount: 2,
+                WithheldCount: 5,
+                WithheldFiles: Files(3, "held"),
+                WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 3)));
+
+        var vm = new ScanViewModel(
+            scan,
+            Substitute.For<IPendingRebootService>(),
+            Substitute.For<IDialogService>());
+
+        var drawn = new[]
+        {
+            nameof(ScanViewModel.HasNothingListed),
+            nameof(ScanViewModel.HasSupersededHeldBack),
+            nameof(ScanViewModel.HasMissingFromDisk),
+        };
+        var raised = new List<string>();
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is { } name && drawn.Contains(name))
+                raised.Add(name);
+        };
+
+        await vm.ScanWithProgressAsync(null);
+
+        // All three are on, so the sequence below is over a full set rather than a
+        // subset a wrong order would also produce.
+        Assert.True(vm.HasNothingListed);
+        Assert.True(vm.HasSupersededHeldBack);
+        Assert.True(vm.HasMissingFromDisk);
+        Assert.Equal(drawn, raised);
+    }
+
     [Fact]
     public void A_run_that_offered_something_and_kept_files_back_says_so_and_says_how_many()
     {
