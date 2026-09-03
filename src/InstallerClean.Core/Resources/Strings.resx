@@ -423,7 +423,7 @@
        {InstallerFolder} token like the rest of the family. It names neither of the two
        reads, because one sentence has to be true whichever of them it was, and it claims
        nothing about the machine: no operation has been shown to be running, suspended or
-       queued, so the other four banners would all be untrue here. The restart is offered
+       queued, so a banner stating any of those would be untrue here. The restart is offered
        because it clears a transient fault, and the last sentence says plainly what it
        means if it does not, rather than leaving somebody re-scanning at a machine whose
        permissions will refuse the read again tomorrow. -->
