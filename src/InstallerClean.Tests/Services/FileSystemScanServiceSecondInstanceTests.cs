@@ -112,10 +112,10 @@ public class FileSystemScanServiceSecondInstanceTests
         // absurd and untrue. For this machine the all-clear is right, nothing in its
         // folder having gone unclaimed.
         //
-        // A HOST COUNTING WithheldFiles WOULD BE DECIDING THIS OFF A LIST that three
-        // separate decisions write to, so the guard would change meaning the moment any
-        // one of their memberships moved and nothing would fail. This branch is the only
-        // thing that knows what THIS withholding took.
+        // A host counting WithheldFiles would be deciding this off a list that more than
+        // one decision writes to, so the guard would change meaning the moment any of
+        // their memberships moved and nothing would fail. This branch is the only thing
+        // that knows what THIS withholding took.
         var result = await Scan(new EnumerationCensus(InstanceProductCount: 1), walkOrphan: false);
 
         Assert.Empty(result.RemovableFiles);

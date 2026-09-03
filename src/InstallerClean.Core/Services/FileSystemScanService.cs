@@ -537,9 +537,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // the all-clear is right, nothing in the folder having gone unclaimed.
             //
             // IT IS DECIDED HERE BECAUSE THE HOST CANNOT DECIDE IT SAFELY. A host
-            // counting ScanResult.WithheldFiles would be reading a list three different
-            // decisions contribute to, so the moment any one of their memberships
-            // changes the screen's gate changes meaning with it and nothing fails. This
+            // counting ScanResult.WithheldFiles would be reading a list more than one
+            // decision contributes to, so the moment any of their memberships changes
+            // the screen's gate changes meaning with it and nothing fails. This
             // branch is the only thing that knows what THIS withholding took, so this is
             // where the question is answered.
             walkOfferWithheldWholesale = unclaimedByPath.Count > 0;

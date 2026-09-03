@@ -175,8 +175,8 @@ public class MainViewModelTests
         //
         // THE FIXTURE IS WHERE TO SEE WHICH LAYER ANSWERS IT. This host does not count
         // the withheld list to reach the all-clear, because that list is written to by
-        // three separate decisions and a host counting it would mean something different
-        // the moment any one of their memberships moved. The scan reads it where the
+        // more than one decision and a host counting it would mean something different
+        // the moment any of their memberships moved. The scan reads it where the
         // withholding happens and this machine arrives with nothing withheld at all,
         // which is what the fixture below sets. The scan service's own test is what
         // pins that a walk finding nothing to keep back arrives that way; see
@@ -2601,14 +2601,8 @@ public class MainViewModelTests
     [Fact]
     public void MainExplanationWhyText_renders_with_no_placeholder_markers_left()
     {
-        // The sentence carries a slot per Reason label so that a translator edits the
-        // column labels in one place and the copy follows. Two kinds of file reach the
-        // list, orphaned and superseded, so it spends two slots and three are passed.
-        //
-        // THE THIRD IS PASSED ON PURPOSE AND THAT IS NOT AN OVERSIGHT. string.Format
-        // ignores a surplus argument and throws on a missing one, so a translator who
-        // writes a three-slot sentence into a satellite gets it rendered rather than a
-        // FormatException on the main window. What this asserts is the outcome either
+        // Three arguments go into a two-slot sentence, and MainExplanationWhyText's own
+        // doc carries why the third is passed. What this asserts is the outcome either
         // way: no marker survives to the screen.
         var vm = CreateViewModel();
 

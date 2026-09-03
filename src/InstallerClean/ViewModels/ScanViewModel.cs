@@ -142,8 +142,8 @@ public partial class ScanViewModel : ObservableObject
     /// zero where it offered nothing. Both the flag and the line below are read off
     /// it, so a machine cannot show the sentence and no number or the reverse.
     ///
-    /// IT COUNTS EVERY WITHHOLDING AND NOT ONE DECISION'S SHARE. Three decisions keep
-    /// files back and a run can meet more than one, so a count of any one of them alone
+    /// IT COUNTS EVERY WITHHOLDING AND NOT ONE DECISION'S SHARE. Several decisions keep
+    /// files back and a run can meet more than one of them, so a count of any one alone
     /// would leave the sentence short of the list the Details window shows.
     /// <see cref="NothingListedIsPerFile"/> is what says which sentence the number
     /// goes in, and this is the number.
@@ -458,7 +458,7 @@ public partial class ScanViewModel : ObservableObject
             // meeting the line the instant it appears meets it in its settled wording.
             //
             // Off the scan's own reading rather than off the withheld list's length:
-            // that list is filled by three separate decisions and neither the list nor
+            // that list is filled by more than one decision and neither the list nor
             // the wholesale flag says which sentence is true of it. The reading is
             // Nothing on a run whose withholding caught nothing, which is what keeps
             // the line off a tidy machine.

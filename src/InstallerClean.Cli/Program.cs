@@ -430,8 +430,8 @@ internal static class Program
             //
             // THE HOST DOES NOT PARTITION ANYTHING TO GET HERE. Deciding it here would
             // mean reading a split the scan owns, and a host that infers one decision's
-            // outcome from figures another also writes to means something different the
-            // moment either one moves. The scan answers it where the withholding
+            // outcome from figures the others also write to means something different
+            // the moment any of them moves. The scan answers it where the withholding
             // happens; this switch spends the answer.
             //
             // The count and the size are the whole withheld set rather than any one

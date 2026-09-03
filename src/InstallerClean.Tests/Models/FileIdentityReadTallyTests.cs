@@ -30,8 +30,8 @@ namespace InstallerClean.Tests.Models;
 /// anybody remembering an exclusion list.
 ///
 /// WHERE THE BOUNDARY OF THIS FILE RUNS. What is on this side of it is that every
-/// outcome the tally counts is wired to a counter of its own, that <c>Read</c> is
-/// counted nowhere, and that the counters and the rule agree about which of them
+/// outcome the tally counts is wired to a counter of its own, that <c>Read</c> reaches
+/// none, and that the counters and the rule agree about which of them
 /// withhold. On the other side is the production reader's
 /// mapping from a Win32 failure to an outcome: whether <c>CreateFile</c> answers
 /// <c>ERROR_FILE_NOT_FOUND</c> for the case this app reads as an absence is a fact

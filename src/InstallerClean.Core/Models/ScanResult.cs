@@ -328,8 +328,8 @@ namespace InstallerClean.Models;
 /// THE SECOND HALF OF THAT IS THE WHOLE OF WHAT THIS FLAG IS FOR, and it is answered
 /// where the withholding happens, that being the only place that knows what the
 /// withholding took. A host may not answer it instead by asking whether
-/// <see cref="WithheldFiles"/> is empty: three different decisions contribute to that
-/// list, so the moment any one of their memberships changes, a gate built on it is
+/// <see cref="WithheldFiles"/> is empty: more than one decision contributes to that
+/// list, so the moment any of their memberships changes, a gate built on it is
 /// asking a different question.
 ///
 /// IT IS NOT "THE OFFER IS EMPTY" AND THE TWO MUST NOT BE CONFLATED, which is the
@@ -349,7 +349,7 @@ namespace InstallerClean.Models;
 /// construction rather than by coincidence. A machine that took the branch and had
 /// nothing to withhold reads false here, and the all-clear is right for it, nothing in
 /// its folder having gone unclaimed. The reverse does not hold, and no host may assume
-/// it: the other two decisions put files in that list on runs where this is false.
+/// it: the other decisions put files in that list on runs where this is false.
 ///
 /// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Several conditions can empty an
 /// offer wholesale and they are different facts about a machine, so a bool is the
