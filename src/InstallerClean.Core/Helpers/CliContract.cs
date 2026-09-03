@@ -181,8 +181,8 @@ internal enum CliEventClass
 
     /// <summary>
     /// Notice: registrations Windows holds name a file that is not in the cache.
-    /// Nothing that bites today, but a repair, update or uninstall of those
-    /// programs can fail on it.
+    /// Nothing that bites today, but an update or uninstall of those programs
+    /// can fail on it.
     ///
     /// IT SAYS NOTHING ABOUT WHAT REMOVED THEM AND NEITHER MAY THIS COMMENT. Every
     /// tool that deletes from that folder leaves the same record, this one
