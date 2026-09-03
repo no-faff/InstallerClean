@@ -1504,6 +1504,36 @@ internal static class Program
         };
 
     /// <summary>
+    /// The whole line the Application channel carries for a blocked run: the mode,
+    /// the reason's own label, and the resolved path for the one reason that has
+    /// one.
+    ///
+    /// A method of its own for the reason the two above have one: the emitter writes
+    /// to the console and to the channel in the same breath, so nothing could read
+    /// this line back without doing both.
+    ///
+    /// WHAT THE FIXED HALF SAYS, AND WHY IT SAYS SO LITTLE. The label is the whole of
+    /// what the line claims about the condition. Of the five, one is an installer
+    /// running right now, one a transaction suspended and waiting on a person, two
+    /// are operations queued for the next restart, and one is a registry value the
+    /// check could not read, so nothing shorter than the label is true of all five.
+    ///
+    /// The detail arrives carrying its own separator, which is why the template ends
+    /// in a placeholder with no space in front of it: the four reasons that never
+    /// carry a detail would otherwise each log a line with a space hanging off it.
+    ///
+    /// CALL IT FROM INSIDE THE EVENT-LOG SCOPE, for the reason
+    /// <see cref="PendingRebootEventLogReason"/> gives: it reads through the ordinary
+    /// door, so it answers in whatever culture is current when it runs.
+    /// </summary>
+    internal static string PendingRebootEventLogLine(string arg, PendingRebootReason reason, string? detail) =>
+        string.Format(
+            Strings.Cli_EventLogPendingRebootBlocked,
+            arg,
+            PendingRebootEventLogReason(reason),
+            string.IsNullOrEmpty(detail) ? string.Empty : " " + detail);
+
+    /// <summary>
     /// Emits the pending-reboot-blocked outcome: the localised stdout reason
     /// sentence, the English Application-log entry, and <see cref="ExitTransient"/>.
     /// Shared by the pre-act gate check and the action services' own boundary
@@ -1528,8 +1558,7 @@ internal static class Program
         // label is resolved INSIDE the scope below, which is what makes it en-GB
         // rather than the OS language, so the call stays in the lambda.
         MachineContract.WriteEventLog(CliEventClass.TransientSkip, () =>
-            string.Format(Strings.Cli_EventLogPendingRebootBlocked,
-                arg, PendingRebootEventLogReason(reason), detail ?? string.Empty));
+            PendingRebootEventLogLine(arg, reason, detail));
         // Transient: a reboot (or the in-flight transaction finishing) clears the
         // gate. Hard scan and move/delete failures stay on ExitError.
         return ExitTransient;

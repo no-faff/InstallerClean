@@ -78,6 +78,44 @@ public class CliPendingRebootStringsTests
     }
 
     /// <summary>
+    /// The line the Application channel carries, which nothing read back until it had
+    /// a method of its own.
+    /// </summary>
+    [Fact]
+    public void No_blocked_line_asserts_a_pending_reboot_over_its_reason()
+    {
+        foreach (var reason in Enum.GetValues<PendingRebootReason>())
+        {
+            var line = Program.PendingRebootEventLogLine("/m", reason, detail: null);
+
+            // Only two of the five are a restart waiting to happen. One is an
+            // installer running right now, one a transaction suspended and waiting on
+            // a person, and one a registry value the check could not read, which is
+            // the check saying it cannot answer rather than an answer.
+            Assert.DoesNotContain(
+                "pending reboot detected", line, StringComparison.OrdinalIgnoreCase);
+            // Beside the absence, so the absence is attributable: a line that had
+            // stopped naming anything at all would satisfy the assertion above.
+            Assert.Contains(Program.PendingRebootEventLogReason(reason), line);
+        }
+    }
+
+    [Fact]
+    public void The_blocked_line_carries_its_detail_and_no_dangling_space()
+    {
+        var withPath = Program.PendingRebootEventLogLine(
+            "/m", PendingRebootReason.PendingRenameInCache, @"C:\Windows\Installer\1234.msi");
+        var withNothing = Program.PendingRebootEventLogLine(
+            "/m", PendingRebootReason.PendingRenameUnresolved, detail: null);
+
+        // The separator comes with the detail, so the reason that has one reads as a
+        // sentence and the four that do not end where their sentence ends.
+        Assert.EndsWith(@". C:\Windows\Installer\1234.msi", withPath);
+        Assert.EndsWith(".", withNothing);
+        Assert.Equal(withNothing, withNothing.TrimEnd());
+    }
+
+    /// <summary>
     /// The one line that takes the resolved path. A null detail is what every other arm
     /// passes, so the format has to survive it rather than printing the placeholder.
     /// </summary>

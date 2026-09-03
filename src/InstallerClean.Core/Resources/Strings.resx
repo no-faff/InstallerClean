@@ -1889,8 +1889,19 @@ The crash log could not be written.</value></data>
   <data name="Cli.EventLogReason.PendingRenameUnresolved" xml:space="preserve"><value>queued post-reboot file rename could not be resolved</value></data>
   <data name="Cli.EventLogReason.RegistryCheckUnreadable" xml:space="preserve"><value>registry value the pending-reboot check needs could not be read</value></data>
   <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
-       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
-  <data name="Cli.EventLogPendingRebootBlocked" xml:space="preserve"><value>{0} mode aborted: pending reboot detected, reason: {1}. {2}</value></data>
+       2 = detail (matched path for PendingRenameInCache, otherwise empty).
+
+       The reason label is the whole of what this line says about the condition,
+       and it is why the line names none of its own: the five labels cover an
+       installer running now, a suspended transaction, two queued post-restart
+       renames and a registry read that could not answer, and no one phrase is
+       true of all five. The label carries the difference, so the fixed half
+       carries nothing but the mode and the fact that the run stopped.
+
+       The detail arrives with its own leading separator rather than the template
+       spacing it, so the four reasons that never carry one do not each log a
+       line ending in a space. -->
+  <data name="Cli.EventLogPendingRebootBlocked" xml:space="preserve"><value>{0} mode aborted: {1}.{2}</value></data>
   <!-- 0 = arg ("/d" or "/m"). The audit twin of the two stdout lines above, and
        ONE line for both modes where they are a pair, because a machine-read line
        is matched on its shape and {0} already carries which mode ran. It cannot
