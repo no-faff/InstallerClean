@@ -524,17 +524,16 @@ public partial class MainWindow : Window
         {
             // The overlay's focused Cancel button collapses with the
             // overlay, and when no completion overlay follows (a
-            // cancelled operation, a failure dialog, the bin-unavailable
-            // refusal) keyboard focus would drop to the window root:
-            // no ring, Tab restarting from the first stop, a screen
-            // reader gone quiet. Normal priority, not Input:
-            // PropertyChanged fires inside the operation's finally,
+            // cancelled operation, a failure dialog, the Move pre-flight
+            // handing over to its confirmation) keyboard focus would drop
+            // to the window root: no ring, Tab restarting from the first
+            // stop, a screen reader gone quiet. Normal priority, not
+            // Input: PropertyChanged fires inside the operation's finally,
             // before the awaiting caller's continuation is posted
             // (DispatcherSynchronizationContext posts at Normal), so
-            // same-priority FIFO runs this callback first and a
-            // follow-up modal (the bin-unavailable choice) opens with a
-            // live focus target in the owner window to restore to on
-            // close.
+            // same-priority FIFO runs this callback first and a follow-up
+            // modal opens with a live focus target in the owner window to
+            // restore to on close.
             Dispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
             {
                 if (!_vm.Completion.IsComplete && !_vm.Scan.IsScanning && !_vm.Cleanup.IsOperating)

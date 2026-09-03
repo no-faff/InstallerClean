@@ -41,8 +41,8 @@
                  TextBlock unbounded width, so TextWrapping never engages and a
                  long heading clips off the card edge. The icon is collapsed for
                  an informational message and shown for a warning or a failure;
-                 it is the same amber triangle the pending-reboot, missing-file
-                 and bin-unavailable notices use, because the tokens carry one
+                 it is the same amber triangle the pending-reboot and
+                 missing-file notices use, because the tokens carry one
                  attention colour and inventing a second (a red icon brush) for
                  an error would put a colour on screen that means nothing
                  anywhere else in the app. -->
