@@ -70,25 +70,35 @@ public sealed class PendingRebootService : IPendingRebootService
             return PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld);
 
         // IRegistryReader documents "never throws", but the unit tests deliberately
-        // substitute throwing fakes to exercise the fail-open path; this wrap keeps
-        // Check's contract intact whether the bound implementation honours the
-        // interface contract or not.
-        bool installerInProgress;
+        // substitute throwing fakes to exercise what a non-conforming implementation
+        // would do; this wrap keeps Check's contract intact whether the bound
+        // implementation honours the interface contract or not. A throw is a read
+        // that did not happen, so it answers the same state the reader's own failure
+        // return does and the two arrive at the gate below as one case.
+        RegistryKeyPresence installerInProgress;
         try
         {
-            installerInProgress = _registry.LocalMachineKeyExists(InstallerInProgressKey);
+            installerInProgress = _registry.LocalMachineKeyPresence(InstallerInProgressKey);
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {
-            installerInProgress = false;
+            installerInProgress = RegistryKeyPresence.Unreadable;
         }
-        if (installerInProgress)
+        if (installerInProgress is RegistryKeyPresence.Present)
             return PendingRebootResult.Block(PendingRebootReason.InstallerInProgress);
+
+        // ABSENT IS THE ONLY STATE THAT CARRIES ON, AND THE TEST IS WRITTEN THAT WAY
+        // ROUND ON PURPOSE. A key that is not there says no transaction is suspended,
+        // which is the answer nearly every machine gives. Anything else is a read
+        // that did not answer, so whether one is suspended is not established, and a
+        // state added to the enum later falls here rather than through.
+        if (installerInProgress is not RegistryKeyPresence.Absent)
+            return PendingRebootResult.Block(PendingRebootReason.RegistryCheckUnreadable);
 
         // Bare PendingFileRenameOperations is too broad (any third-party uninstaller
         // writes to it); refine to "an entry, source or destination, that names a path
         // inside %SystemRoot%\Installer, or that names somewhere this cannot place".
-        string[]? renames;
+        RegistryMultiStringRead renames;
         try
         {
             renames = _registry.LocalMachineMultiStringValue(
@@ -96,10 +106,22 @@ public sealed class PendingRebootService : IPendingRebootService
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {
-            renames = null;
+            renames = new RegistryMultiStringRead(RegistryMultiStringState.Unreadable);
         }
-        if (renames is null)
+
+        // A value that is not there is a machine with nothing queued, and that is the
+        // ordinary reading on a machine at rest.
+        if (renames.State is RegistryMultiStringState.Absent)
             return PendingRebootResult.Clean;
+
+        // Everything that is not a read array is a value whose contents this does not
+        // have: refused, faulted, or written in a form it does not read. A value
+        // recorded at the name Windows queues renames under, whose contents cannot be
+        // seen, leaves it unestablished whether one of them names the cache, and the
+        // pass below is what would have established it. The same arm takes a state
+        // added to the enum later, so a new one refuses until somebody rules on it.
+        if (renames is not { State: RegistryMultiStringState.Read, Entries: { } entries })
+            return PendingRebootResult.Block(PendingRebootReason.RegistryCheckUnreadable);
 
         var windowsRoot = _windowsRootOverride
             ?? Environment.GetFolderPath(Environment.SpecialFolder.Windows);
@@ -113,7 +135,7 @@ public sealed class PendingRebootService : IPendingRebootService
         // than acted on until every entry has been read.
         var anyUnplaceable = false;
 
-        foreach (var raw in renames)
+        foreach (var raw in entries)
         {
             if (string.IsNullOrEmpty(raw)) continue;
 

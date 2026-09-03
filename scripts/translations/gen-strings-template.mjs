@@ -618,6 +618,8 @@ const MAP = {
   'Cli.WithheldReasons.ScreenUnanswered': `  A check on which programs the files belong to gave answers that didn't line up with the files it was handed.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning.`,
   'Cli.MoveRestoreHint': `Check that your programs still update and uninstall as normal, then delete {0}.`,
+  'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean.`,
+  'Cli.PendingRebootBlocked.RegistryCheckUnreadable': `Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

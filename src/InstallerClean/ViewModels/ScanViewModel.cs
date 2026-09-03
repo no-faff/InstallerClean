@@ -108,6 +108,7 @@ public partial class ScanViewModel : ObservableObject
         PendingRebootReason.InstallerInProgress => Strings.Body_PendingReboot_InstallerInProgress,
         PendingRebootReason.PendingRenameInCache => Strings.Body_PendingReboot_PendingRenameInCache,
         PendingRebootReason.PendingRenameUnresolved => Strings.Body_PendingReboot_PendingRenameUnresolved,
+        PendingRebootReason.RegistryCheckUnreadable => Strings.Body_PendingReboot_RegistryCheckUnreadable,
         null => string.Empty,
         _ => Strings.Body_PendingReboot_Other,
     };

@@ -53,10 +53,26 @@ public enum PendingRebootReason
     /// queued. A single verdict covering the two would put a cause in front of a user
     /// that is false of one of them.
     ///
-    /// AND IT IS A SEPARATE THING AGAIN FROM THE GATE'S FAIL-OPEN ON A READ IT COULD NOT
-    /// MAKE, which is deliberate and stays. A failed read leaves the app knowing nothing
-    /// about whether anything is queued at all. This is the opposite: something IS
-    /// queued, and its target is what could not be established.
+    /// AND IT IS A SEPARATE THING AGAIN FROM <see cref="RegistryCheckUnreadable"/>, which
+    /// is a read the gate could not make and leaves the app knowing nothing about whether
+    /// anything is queued at all. This is the opposite: something IS queued, and its
+    /// target is what could not be established.
     /// </summary>
     PendingRenameUnresolved,
+
+    /// <summary>
+    /// One of the registry reads the gate makes did not answer, so whether a Windows
+    /// Installer transaction is suspended, or a file operation is queued against
+    /// %SystemRoot%\Installer, is not established either way.
+    ///
+    /// IT COVERS BOTH READS AND NAMES NEITHER, because one sentence has to be true
+    /// whichever of them it was. A message naming the InProgress key would be false of
+    /// every run the PendingFileRenameOperations read produced, and the other way about.
+    ///
+    /// A value written in a type this does not read reaches it too. That is not an empty
+    /// machine: something is recorded at the name Windows queues renames under and its
+    /// contents cannot be seen, which is the same standing as an entry the placing pass
+    /// cannot resolve and is refused for the same reason.
+    /// </summary>
+    RegistryCheckUnreadable,
 }

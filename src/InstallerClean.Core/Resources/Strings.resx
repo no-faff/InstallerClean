@@ -419,6 +419,15 @@
        in progress and would be untrue as well. The restart is the instruction because
        these operations are carried out at the next boot and not before. -->
   <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <!-- The banner for a registry read that did not answer. Names the folder with the
+       {InstallerFolder} token like the rest of the family. It names neither of the two
+       reads, because one sentence has to be true whichever of them it was, and it claims
+       nothing about the machine: no operation has been shown to be running, suspended or
+       queued, so the other four banners would all be untrue here. The restart is offered
+       because it clears a transient fault, and the last sentence says plainly what it
+       means if it does not, rather than leaving somebody re-scanning at a machine whose
+       permissions will refuse the read again tomorrow. -->
+  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean.</value></data>
   <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -1809,6 +1818,13 @@ The crash log could not be written.</value></data>
        placeholder, because the {0} in the PendingRenameInCache line above names a
        resolved cache path and this arm has none to name. -->
   <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <!-- The command-line twin of Body.PendingReboot.RegistryCheckUnreadable, adapted the
+       way the rest of this family is: opens "Error: ", names the flags rather than the
+       window's buttons, and drops Re-scan, there being nothing to re-scan on a command
+       line. It says "registry values" where the banner says "Windows settings", the
+       reader here being the person who typed the switch. Names neither read, for the
+       reason the banner does not. No placeholder. -->
+  <data name="Cli.PendingRebootBlocked.RegistryCheckUnreadable" xml:space="preserve"><value>Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean.</value></data>
   <!-- What a blocking reason with no line of its own gets, so a reason added
        later cannot leave the command line reporting an unexpected crash for a
        run that was merely held. The command-line twin of Body.PendingReboot.Other,
@@ -1835,6 +1851,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.EventLogReason.InstallerInProgress" xml:space="preserve"><value>installer transaction in progress</value></data>
   <data name="Cli.EventLogReason.PendingRenameInCache" xml:space="preserve"><value>queued post-reboot file rename targets the Installer cache</value></data>
   <data name="Cli.EventLogReason.PendingRenameUnresolved" xml:space="preserve"><value>queued post-reboot file rename could not be resolved</value></data>
+  <data name="Cli.EventLogReason.RegistryCheckUnreadable" xml:space="preserve"><value>registry value the pending-reboot check needs could not be read</value></data>
   <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
        2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
   <data name="Cli.EventLogPendingRebootBlocked" xml:space="preserve"><value>{0} mode aborted: pending reboot detected, reason: {1}. {2}</value></data>

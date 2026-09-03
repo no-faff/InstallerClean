@@ -10,6 +10,19 @@ public class PendingRebootServiceUnitTests
     private readonly IMutexProbe _mutex = Substitute.For<IMutexProbe>();
     private readonly IVolumeMountProbe _volumes = Substitute.For<IVolumeMountProbe>();
 
+    /// <summary>
+    /// The quiet machine every test starts from, stated rather than left to the
+    /// fakes: nothing suspended and nothing queued. Both registry reads answer
+    /// their type's own zero when nobody sets one, and that zero says the read
+    /// did not answer, which is a refusal rather than a clean machine. A test
+    /// about either read names it and overwrites what is set here.
+    /// </summary>
+    public PendingRebootServiceUnitTests()
+    {
+        InProgress(RegistryKeyPresence.Absent);
+        Renames(new RegistryMultiStringRead(RegistryMultiStringState.Absent));
+    }
+
     /// <summary>Builds a service with a fixed Windows root so path comparisons don't depend on the host.</summary>
     private PendingRebootService Build(string windowsRoot = @"C:\Windows") =>
         new(_registry, _mutex, _volumes, windowsRoot);
@@ -30,10 +43,28 @@ public class PendingRebootServiceUnitTests
 
     /// <summary>The value Session Manager holds, as the registry hands it over.</summary>
     private void Queued(params string[] entries) =>
+        Renames(new RegistryMultiStringRead(RegistryMultiStringState.Read, entries));
+
+    /// <summary>
+    /// How the PendingFileRenameOperations read turns out, for the cases that are
+    /// about the read rather than about the entries. Every test names one: an
+    /// unscripted fake answers the type's own zero, which is Unreadable, so a test
+    /// that says nothing about this read is a test about a machine that refused it.
+    /// </summary>
+    private void Renames(RegistryMultiStringRead read) =>
         _registry.LocalMachineMultiStringValue(
                 PendingRebootService.SessionManagerKey,
                 PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(entries);
+            .Returns(read);
+
+    /// <summary>
+    /// What the InProgress key read answers. Absent is the quiet machine and is what
+    /// most of these tests want; it is stated rather than left to the fake, for the
+    /// reason above.
+    /// </summary>
+    private void InProgress(RegistryKeyPresence presence) =>
+        _registry.LocalMachineKeyPresence(PendingRebootService.InstallerInProgressKey)
+            .Returns(presence);
 
     // Positive: must Block.
 
@@ -51,9 +82,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void InProgress_key_exists_blocks()
     {
-        _registry.LocalMachineKeyExists(
-                PendingRebootService.InstallerInProgressKey)
-            .Returns(true);
+        InProgress(RegistryKeyPresence.Present);
 
         var result = Build().Check();
 
@@ -64,10 +93,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Rename_targets_cache_blocks()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[] { @"\??\C:\Windows\Installer\1234.msi", "" });
+        Queued(new[] { @"\??\C:\Windows\Installer\1234.msi", "" });
 
         var result = Build().Check();
 
@@ -79,14 +105,11 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Multiple_renames_blocks_on_first_cache_match()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[]
-            {
-                @"\??\C:\Users\foo.tmp", "",
-                @"\??\C:\Windows\Installer\1234.msp", "",
-            });
+        Queued(new[]
+        {
+            @"\??\C:\Users\foo.tmp", "",
+            @"\??\C:\Windows\Installer\1234.msp", "",
+        });
 
         var result = Build().Check();
 
@@ -98,10 +121,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Long_path_prefix_still_matches()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[] { @"\\?\C:\Windows\Installer\1234.msi", "" });
+        Queued(new[] { @"\\?\C:\Windows\Installer\1234.msi", "" });
 
         var result = Build().Check();
 
@@ -116,10 +136,7 @@ public class PendingRebootServiceUnitTests
         // A destination queued with MOVEFILE_REPLACE_EXISTING carries a
         // leading '!' before the NT prefix; the entry still targets the
         // cache and must block.
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[] { @"\??\C:\Users\elsewhere.tmp", @"!\??\C:\Windows\Installer\1234.msi" });
+        Queued(new[] { @"\??\C:\Users\elsewhere.tmp", @"!\??\C:\Windows\Installer\1234.msi" });
 
         var result = Build().Check();
 
@@ -131,13 +148,10 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Rename_targets_per_product_folder_blocks()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[]
-            {
-                @"\??\C:\Windows\Installer\{12345678-1234-1234-1234-123456789abc}\foo.dll", "",
-            });
+        Queued(new[]
+        {
+            @"\??\C:\Windows\Installer\{12345678-1234-1234-1234-123456789abc}\foo.dll", "",
+        });
 
         var result = Build().Check();
 
@@ -163,25 +177,22 @@ public class PendingRebootServiceUnitTests
     [InlineData(@"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\PostRebootReporting")]
     public void Legacy_broad_signals_are_never_queried(string oldKey)
     {
-        _registry.LocalMachineKeyExists(oldKey).Returns(true);
+        _registry.LocalMachineKeyPresence(oldKey).Returns(RegistryKeyPresence.Present);
 
         var result = Build().Check();
 
         Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
-        _registry.DidNotReceive().LocalMachineKeyExists(oldKey);
+        _registry.DidNotReceive().LocalMachineKeyPresence(oldKey);
     }
 
     [Fact]
     public void Pending_renames_not_in_cache_returns_clean()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[]
-            {
-                @"\??\C:\Users\foo.tmp", "",
-                @"\??\C:\ProgramData\Vendor\update.dat", @"\??\C:\ProgramData\Vendor\update.dat.bak",
-            });
+        Queued(new[]
+        {
+            @"\??\C:\Users\foo.tmp", "",
+            @"\??\C:\ProgramData\Vendor\update.dat", @"\??\C:\ProgramData\Vendor\update.dat.bak",
+        });
 
         var result = Build().Check();
 
@@ -198,13 +209,10 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Pending_rename_with_traversal_outside_cache_returns_clean()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[]
-            {
-                @"\??\C:\Windows\Installer\..\..\Users\Other\secret.txt", "",
-            });
+        Queued(new[]
+        {
+            @"\??\C:\Windows\Installer\..\..\Users\Other\secret.txt", "",
+        });
 
         var result = Build().Check();
 
@@ -220,13 +228,10 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Pending_rename_in_sibling_folder_returns_clean()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[]
-            {
-                @"\??\C:\Windows\InstallerExtra\foo.dll", "",
-            });
+        Queued(new[]
+        {
+            @"\??\C:\Windows\InstallerExtra\foo.dll", "",
+        });
 
         var result = Build().Check();
 
@@ -263,10 +268,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Empty_pending_file_renames_returns_clean()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(Array.Empty<string>());
+        Queued(Array.Empty<string>());
 
         var result = Build().Check();
 
@@ -276,10 +278,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Missing_pending_file_renames_value_returns_clean()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns((string[]?)null);
+        Renames(new RegistryMultiStringRead(RegistryMultiStringState.Absent));
 
         var result = Build().Check();
 
@@ -289,28 +288,64 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Missing_in_progress_key_returns_clean()
     {
-        _registry.LocalMachineKeyExists(
-                PendingRebootService.InstallerInProgressKey)
-            .Returns(false);
+        InProgress(RegistryKeyPresence.Absent);
 
         var result = Build().Check();
 
         Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
     }
 
-    // Edge: must not throw, must fail open.
+    // Edge: must not throw, and a read that did not answer must not pass as quiet.
 
+    /// <summary>
+    /// A reader that throws rather than reporting, which the interface says will not
+    /// happen and which Check wraps anyway. The wrap answers the same state the
+    /// reader's own failure return does, so the gate refuses and names the read.
+    /// </summary>
     [Fact]
-    public void Registry_read_throws_fails_open_returns_clean()
+    public void Registry_read_that_throws_blocks_on_the_unreadable_check()
     {
-        _registry.LocalMachineKeyExists(Arg.Any<string>())
+        _registry.LocalMachineKeyPresence(Arg.Any<string>())
             .Returns(_ => throw new UnauthorizedAccessException("denied"));
         _registry.LocalMachineMultiStringValue(Arg.Any<string>(), Arg.Any<string>())
             .Returns(_ => throw new UnauthorizedAccessException("denied"));
 
         var result = Build().Check();
 
-        Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
+        Assert.Equal(PendingRebootVerdict.Block, result.Verdict);
+        Assert.Equal(PendingRebootReason.RegistryCheckUnreadable, result.Reason);
+    }
+
+    /// <summary>
+    /// The InProgress key on its own: refused, so whether a transaction is suspended
+    /// is not established and the pass never reaches the queued renames.
+    /// </summary>
+    [Fact]
+    public void In_progress_key_that_would_not_read_blocks()
+    {
+        InProgress(RegistryKeyPresence.Unreadable);
+        Queued(@"\??\C:\Users\elsewhere.tmp", "");
+
+        var result = Build().Check();
+
+        Assert.Equal(PendingRebootVerdict.Block, result.Verdict);
+        Assert.Equal(PendingRebootReason.RegistryCheckUnreadable, result.Reason);
+    }
+
+    /// <summary>
+    /// The queued-renames value on its own: refused, so whether anything is queued
+    /// against the cache is not established. The InProgress key answers absent here,
+    /// which is what separates this from the test above it.
+    /// </summary>
+    [Fact]
+    public void Pending_file_renames_value_that_would_not_read_blocks()
+    {
+        Renames(new RegistryMultiStringRead(RegistryMultiStringState.Unreadable));
+
+        var result = Build().Check();
+
+        Assert.Equal(PendingRebootVerdict.Block, result.Verdict);
+        Assert.Equal(PendingRebootReason.RegistryCheckUnreadable, result.Reason);
     }
 
     [Fact]
@@ -318,9 +353,7 @@ public class PendingRebootServiceUnitTests
     {
         _mutex.IsHeld(Arg.Any<string>())
             .Returns(_ => throw new InvalidOperationException("transient"));
-        _registry.LocalMachineKeyExists(
-                PendingRebootService.InstallerInProgressKey)
-            .Returns(true);
+        InProgress(RegistryKeyPresence.Present);
 
         var result = Build().Check();
 
@@ -333,10 +366,7 @@ public class PendingRebootServiceUnitTests
     {
         _mutex.IsHeld(Arg.Any<string>())
             .Returns(_ => throw new UnauthorizedAccessException("denied"));
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
+        Queued(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
 
         var result = Build().Check();
 
@@ -385,28 +415,34 @@ public class PendingRebootServiceUnitTests
         Assert.Equal(PendingRebootReason.PendingRenameUnresolved, result.Reason);
     }
 
+    /// <summary>
+    /// A value recorded at the name Windows queues renames under, in a type this does
+    /// not read. Something is there and its contents cannot be seen, so whether one of
+    /// them names the cache is not established and the run is held.
+    ///
+    /// It is the same standing as an entry the placing pass cannot resolve, one level
+    /// up: Malformed_pending_rename_blocks_rather_than_being_dismissed refuses on an
+    /// entry that is not a path, and dismissing the value holding it would contradict
+    /// that inside one service.
+    ///
+    /// The fixture states the wrong type rather than the absence the production reader
+    /// once reported for it, which is what lets this test fail at what it is named for.
+    /// </summary>
     [Fact]
-    public void Wrong_value_type_on_pending_file_renames_returns_clean()
+    public void Wrong_value_type_on_pending_file_renames_blocks()
     {
-        // Production RegistryReader returns null when GetValue surfaces a non-string[]
-        // via `as string[]`. Simulate the contract here.
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns((string[]?)null);
+        Renames(new RegistryMultiStringRead(RegistryMultiStringState.WrongType));
 
         var result = Build().Check();
 
-        Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
+        Assert.Equal(PendingRebootVerdict.Block, result.Verdict);
+        Assert.Equal(PendingRebootReason.RegistryCheckUnreadable, result.Reason);
     }
 
     [Fact]
     public void Windows_on_different_drive_still_detects_cache_rename()
     {
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[] { @"\??\D:\Windows\Installer\foo.msi", "" });
+        Queued(new[] { @"\??\D:\Windows\Installer\foo.msi", "" });
 
         var result = Build(windowsRoot: @"D:\Windows").Check();
 
@@ -597,18 +633,13 @@ public class PendingRebootServiceUnitTests
     public void Mutex_wins_over_in_progress_and_pending_rename()
     {
         _mutex.IsHeld(PendingRebootService.MsiExecuteMutexName).Returns(true);
-        _registry.LocalMachineKeyExists(
-                PendingRebootService.InstallerInProgressKey)
-            .Returns(true);
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
+        InProgress(RegistryKeyPresence.Present);
+        Queued(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
 
         var result = Build().Check();
 
         Assert.Equal(PendingRebootReason.MsiExecuteMutexHeld, result.Reason);
-        _registry.DidNotReceive().LocalMachineKeyExists(Arg.Any<string>());
+        _registry.DidNotReceive().LocalMachineKeyPresence(Arg.Any<string>());
         _registry.DidNotReceive().LocalMachineMultiStringValue(
             Arg.Any<string>(), Arg.Any<string>());
     }
@@ -616,13 +647,8 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void In_progress_wins_over_pending_rename()
     {
-        _registry.LocalMachineKeyExists(
-                PendingRebootService.InstallerInProgressKey)
-            .Returns(true);
-        _registry.LocalMachineMultiStringValue(
-                PendingRebootService.SessionManagerKey,
-                PendingRebootService.PendingFileRenameOperationsValue)
-            .Returns(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
+        InProgress(RegistryKeyPresence.Present);
+        Queued(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
 
         var result = Build().Check();
 

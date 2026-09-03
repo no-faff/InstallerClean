@@ -1428,6 +1428,8 @@ internal static class Program
                     detail ?? string.Empty),
             PendingRebootReason.PendingRenameUnresolved =>
                 Strings.Cli_PendingRebootBlocked_PendingRenameUnresolved,
+            PendingRebootReason.RegistryCheckUnreadable =>
+                Strings.Cli_PendingRebootBlocked_RegistryCheckUnreadable,
             // What a reason with no line of its own gets. It threw before, which
             // landed in the generic catch and reported an unexpected crash with
             // exit 1, where a blocked run wants the 75 a scheduler retries on.
@@ -1461,6 +1463,8 @@ internal static class Program
                 Strings.Cli_EventLogReason_PendingRenameInCache,
             PendingRebootReason.PendingRenameUnresolved =>
                 Strings.Cli_EventLogReason_PendingRenameUnresolved,
+            PendingRebootReason.RegistryCheckUnreadable =>
+                Strings.Cli_EventLogReason_RegistryCheckUnreadable,
             _ => reason.ToString(),
         };
 

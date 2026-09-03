@@ -145,6 +145,7 @@ public static class Strings
     public static string Body_PendingReboot_Other => Get("Body.PendingReboot.Other");
     public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");
     public static string Body_PendingReboot_PendingRenameUnresolved => Get("Body.PendingReboot.PendingRenameUnresolved");
+    public static string Body_PendingReboot_RegistryCheckUnreadable => Get("Body.PendingReboot.RegistryCheckUnreadable");
     public static string Body_RegisteredMissingFromDisk => Get("Body.RegisteredMissingFromDisk");
     public static string Body_RegisteredMissingFromDisk_SeeAlso => Get("Body.RegisteredMissingFromDisk.SeeAlso");
     public static string BrowserLaunch_ClipboardFailed => Get("BrowserLaunch.ClipboardFailed");
@@ -181,6 +182,7 @@ public static class Strings
     public static string Cli_EventLogReason_MsiExecuteMutex => Get("Cli.EventLogReason.MsiExecuteMutex");
     public static string Cli_EventLogReason_PendingRenameInCache => Get("Cli.EventLogReason.PendingRenameInCache");
     public static string Cli_EventLogReason_PendingRenameUnresolved => Get("Cli.EventLogReason.PendingRenameUnresolved");
+    public static string Cli_EventLogReason_RegistryCheckUnreadable => Get("Cli.EventLogReason.RegistryCheckUnreadable");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
     public static string Cli_EventLogScanWithheld => Get("Cli.EventLogScanWithheld");
@@ -234,6 +236,7 @@ public static class Strings
     public static string Cli_PendingRebootBlocked_Other => Get("Cli.PendingRebootBlocked.Other");
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
     public static string Cli_PendingRebootBlocked_PendingRenameUnresolved => Get("Cli.PendingRebootBlocked.PendingRenameUnresolved");
+    public static string Cli_PendingRebootBlocked_RegistryCheckUnreadable => Get("Cli.PendingRebootBlocked.RegistryCheckUnreadable");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_SupersededHeldBack_Plural => Get("Cli.SupersededHeldBack.Plural");
     public static string Cli_SupersededHeldBack_Singular => Get("Cli.SupersededHeldBack.Singular");
