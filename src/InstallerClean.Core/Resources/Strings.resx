@@ -757,8 +757,8 @@ To put it back, you need the installer for the version you already have. Get it 
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file held back. The scan said it was unneeded. The final check didn't agree.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files held back. The scan said these were unneeded. The final check didn't agree.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} file held back. The scan said it was unneeded. The final check couldn't confirm that.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} files held back. The scan said these were unneeded. The final check couldn't confirm that.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -1626,7 +1626,7 @@ The crash log could not be written.</value></data>
        "so 1 file were held back" at a count of one. Putting the app back in as the
        subject makes one shape correct at every count, which is what a matched
        surface needs. -->
-  <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish which cached files belong to the programs installed here, so it has held back {1} {2}. No action taken.</value></data>
+  <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not be certain which cached files belong to the programs installed here, so it has held back {1} {2}. No action taken.</value></data>
   <!-- The per-file twin of the entry above, for the machine whose candidates were
        each judged and kept rather than emptied wholesale, so the Application channel
        tells those two apart the way stdout does. It shares Event ID 1000 with its
@@ -1666,7 +1666,7 @@ The crash log could not be written.</value></data>
        notices, so it also reaches a machine whose walk offer was emptied while a
        superseded registration was still offered beside it. Naming no cause matters
        more here for that reason, not less. -->
-  <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish which cached files belong to the programs installed here, so it has held back {1} {2} and offered nothing it found by looking in the folder.</value></data>
+  <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain which cached files belong to the programs installed here, so it has held back {1} {2} and offered nothing it found by looking in the folder.</value></data>
   <!-- The per-file twin of the notice above, at the same Event ID 3002 and for the
        same reason: the outcome band cannot separate a machine nothing could be judged
        on from one that is genuinely clean. It says "some" where the notice above says
