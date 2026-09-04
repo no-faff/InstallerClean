@@ -520,13 +520,21 @@ To put it back, you need the installer for the version you already have. Get it 
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Move cancelled. {0} of {1} {2} processed.</value></data>
   <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Delete cancelled. {0} of {1} {2} processed.</value></data>
-  <!-- 0 = exception type name, 1 = crash log path. Both surface in
-       the status pill so the user can find the log; full message +
-       stack trace go to the log itself. -->
-  <data name="Status.MoveFailed" xml:space="preserve"><value>Move failed ({0}). Details in {1}.</value></data>
-  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Move failed ({0}). The crash log could not be written.</value></data>
-  <data name="Status.DeleteFailed" xml:space="preserve"><value>Delete failed ({0}). Details in {1}.</value></data>
-  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Delete failed ({0}). The crash log could not be written.</value></data>
+  <!-- 0 = exception type name, 1 = crash log path. Full message and stack trace
+       go to the log itself.
+
+       THESE FOUR NAME NO SUBJECT OF THEIR OWN, and the pair below them says why
+       that is a rule rather than an omission: each has exactly one consumer, the
+       body of a dialog whose heading already says which command failed, so
+       repeating it there is the only thing the reader gains nothing from. The two
+       commands' bodies are word for word the same because neither says which
+       command it is, which is the point. Any new consumer that shows one of these
+       WITHOUT a heading over it needs a string of its own; do not reach for these.
+       Status.ScanFailedDetails is the worked example. -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>{0}. Details are in {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>{0}. The crash log could not be written.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>{0}. Details are in {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>{0}. The crash log could not be written.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Windows refused the scan.</value></data>
   <!-- The overlay line for the same ladder branch as
        Error.InstallerDbUnavailableTitle, passed together in one record, so the
@@ -1251,8 +1259,10 @@ InstallerClean was already running as administrator, so starting it again that w
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Not enough space</value></data>
-  <!-- 0 = destination, 1 = required size, 2 = available size -->
-  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Not enough space at {0}
+  <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
+       body under Error.NotEnoughSpaceTitle, so the opening carries the folder
+       rather than the heading's own words again. -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>There isn't room at {0}
 
 Required: {1}
 Available: {2}</value></data>

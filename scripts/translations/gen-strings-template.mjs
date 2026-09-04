@@ -296,10 +296,10 @@ const MAP = {
   'Status.Deleting': `Deleting unneeded files...`,
   'Status.MoveCancelled.Partial': `Move cancelled. {0} of {1} {2} processed.`,
   'Status.DeleteCancelled.Partial': `Delete cancelled. {0} of {1} {2} processed.`,
-  'Status.MoveFailed': `Move failed ({0}). Details in {1}.`,
-  'Status.MoveFailed.NoLog': `Move failed ({0}). The crash log could not be written.`,
-  'Status.DeleteFailed': `Delete failed ({0}). Details in {1}.`,
-  'Status.DeleteFailed.NoLog': `Delete failed ({0}). The crash log could not be written.`,
+  'Status.MoveFailed': `{0}. Details are in {1}.`,
+  'Status.MoveFailed.NoLog': `{0}. The crash log could not be written.`,
+  'Status.DeleteFailed': `{0}. Details are in {1}.`,
+  'Status.DeleteFailed.NoLog': `{0}. The crash log could not be written.`,
   'Status.ScanAccessDenied': `Access denied. Windows refused the scan.`,
   'Status.ScanFailedDb': `Scan failed: couldn't read the Windows Installer records.`,
   'Status.ScanCancelled': `Scan cancelled.`,
@@ -415,7 +415,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `Not enough space`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `Not enough space at {0}\n\nRequired: {1}\nAvailable: {2}`,
+  'Error.NotEnoughSpaceBody': `There isn't room at {0}\n\nRequired: {1}\nAvailable: {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `You don't have permission to write to {0}.\nTry a folder in your user profile or on a drive you own.`,
