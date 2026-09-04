@@ -229,6 +229,72 @@ public class CliHeldBackTests
     }
 
     /// <summary>
+    /// The two Event ID 3002 notices, composed with the three arguments the write
+    /// site passes and inside the en-GB scope it builds them in.
+    ///
+    /// WHAT THIS REACHES AND WHAT IT DOES NOT. It holds the wording and the argument
+    /// slots. It does not show that either line is written to the Application
+    /// channel: the call sits in a private method and reaching it means a test run
+    /// writing a real entry to the Application log, so the emitter stays out of the
+    /// suite here as it does for the lock-refusal line.
+    ///
+    /// THE en-GB SCOPE IS THE WRITE SITE'S OWN DOOR RATHER THAN A CHECK ON IT.
+    /// Reading a value through the scope that builds it makes the assertion hold
+    /// whatever language the host is in. It proves nothing about the forcing itself,
+    /// no satellite declaring either of these keys, so nothing the scope does is
+    /// observable here.
+    /// </summary>
+    /// <remarks>
+    /// A SHARE-NAMING WORD IS THE MECHANICAL HALF OF A CLAIM ABOUT TWO RUNS. Both
+    /// notices are written where the offer survived beside the withheld half AND
+    /// where nothing was offered at all, and on the second of those the outcome
+    /// entry one band away says the app could not establish that any of the files
+    /// are unneeded. A word here naming a share of them describes one machine two
+    /// ways, a band apart in the same log. The list below is the wording that does
+    /// it rather than the whole of the property, which is why the note above each
+    /// value carries the reasoning.
+    /// </remarks>
+    [Theory]
+    [InlineData(false, 3)]
+    [InlineData(true, 3)]
+    [InlineData(false, 1)]
+    [InlineData(true, 1)]
+    public void Neither_scan_notice_names_a_share_of_the_files_it_held_back(
+        bool perFile, int heldBack)
+    {
+        var line = MachineContract.English(() => string.Format(
+            perFile
+                ? Strings.Cli_EventLogNothingOfferedPerFileNotice
+                : Strings.Cli_EventLogNothingOfferedNotice,
+            "/s", heldBack, DisplayHelpers.PluraliseFile(heldBack)));
+
+        foreach (var share in new[] { "some", "any", "all", "every", "most", "several" })
+            Assert.DoesNotMatch($@"\b{share}\b", line);
+
+        // And the three slots the write site fills, so a line that had stopped
+        // naming a share by dropping the sentence would not pass on the absence.
+        Assert.StartsWith("/s mode:", line, StringComparison.Ordinal);
+        Assert.Contains(
+            $"{heldBack} {DisplayHelpers.PluraliseFile(heldBack)}", line, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void The_wholesale_scan_notice_is_the_only_one_of_the_two_that_names_the_walk()
+    {
+        // The one thing the two do not share. The wholesale arm emptied the offer it
+        // built by walking the folder and says so; the per-file arm holds files back
+        // out of an offer that may still have something in it, so the same clause
+        // would be false of every run of that kind.
+        var wholesale = MachineContract.English(() => string.Format(
+            Strings.Cli_EventLogNothingOfferedNotice, "/s", 3, DisplayHelpers.PluraliseFile(3)));
+        var perFile = MachineContract.English(() => string.Format(
+            Strings.Cli_EventLogNothingOfferedPerFileNotice, "/s", 3, DisplayHelpers.PluraliseFile(3)));
+
+        Assert.Contains("offered nothing it found", wholesale, StringComparison.Ordinal);
+        Assert.DoesNotContain("offered nothing it found", perFile, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Runs <paramref name="action"/> with stdout redirected and returns what it
     /// wrote, putting the console back afterwards whatever happens.
     ///
