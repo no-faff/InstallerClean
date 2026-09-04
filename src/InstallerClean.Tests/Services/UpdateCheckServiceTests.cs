@@ -67,6 +67,9 @@ public class UpdateCheckServiceTests
         return response;
     }
 
+    /// <summary>What the substituted writer says it wrote, where a test does not say otherwise.</summary>
+    private const string StubCrashLogPath = @"C:\ProgramData\InstallerClean\crash.log";
+
     /// <summary>
     /// The service with the network and the crash-log writer both substituted.
     /// <paramref name="crashLogPath"/> and <paramref name="crashLogWritten"/> are
@@ -74,9 +77,6 @@ public class UpdateCheckServiceTests
     /// production and the test's here: they say nothing about a file, and no file
     /// is written. The defaults are the ordinary case, a write that succeeded.
     /// </summary>
-    /// <summary>What the substituted writer says it wrote, where a test does not say otherwise.</summary>
-    private const string StubCrashLogPath = @"C:\ProgramData\InstallerClean\crash.log";
-
     private static (UpdateCheckService Service, List<Exception> Logged) Build(
         Func<HttpResponseMessage> respond,
         string crashLogPath = StubCrashLogPath,

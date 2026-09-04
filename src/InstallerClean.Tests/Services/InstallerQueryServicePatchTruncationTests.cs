@@ -264,11 +264,6 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     /// <summary>
-    /// Two products hold one cached patch. The first says superseded and no
-    /// longer uninstallable; the second still has it applied and its patch
-    /// enumeration comes back empty, which is the whole fault.
-    /// </summary>
-    /// <summary>
     /// Two products sharing one patch, where the REGISTRY CANNOT SETTLE THE PATH and
     /// the confirmation pass has to go and ask. The second product holds the patch
     /// applied and declares it not uninstallable, so its registered patch set reads
@@ -311,6 +306,11 @@ public class InstallerQueryServicePatchTruncationTests
         return msi;
     }
 
+    /// <summary>
+    /// Two products hold one cached patch. The first says superseded and no
+    /// longer uninstallable; the second still has it applied and its patch
+    /// enumeration comes back empty, which is the whole fault.
+    /// </summary>
     private static FakeApi TwoProductsOneSharedPatch(bool truncateSecond = true)
     {
         var msi = new FakeApi();

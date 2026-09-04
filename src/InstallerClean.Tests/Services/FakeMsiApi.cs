@@ -94,15 +94,6 @@ internal sealed class FakeMsiApi : IMsiApi
     public Dictionary<(string ProductCode, uint Index), uint> PatchRowResult { get; } = new();
 
     /// <summary>
-    /// Forces a return code out of a property read, keyed by (product,
-    /// property) and (patch, product, property). Needed because
-    /// <see cref="DoubleCall"/> models an unset property as a readable empty
-    /// value, which cannot express the distinction the LocalPackage reads
-    /// turn on: a record that has no cached package and a record that could
-    /// not be read both arrive as "" without it, and no test could reach the
-    /// branch that tells them apart.
-    /// </summary>
-    /// <summary>
     /// Scripts the SID-buffer retry for one product row, keyed by index: the
     /// first EnumProducts call at that index reports MoreData, and the retry
     /// returns the value given here (Success meaning the row then comes back
@@ -124,6 +115,15 @@ internal sealed class FakeMsiApi : IMsiApi
     private static readonly List<(string? Sid, MsiInstallContext Context)> OneMachineInstance =
         new() { (null, MsiInstallContext.Machine) };
 
+    /// <summary>
+    /// Forces a return code out of a property read, keyed by (product,
+    /// property) and (patch, product, property). Needed because
+    /// <see cref="DoubleCall"/> models an unset property as a readable empty
+    /// value, which cannot express the distinction the LocalPackage reads
+    /// turn on: a record that has no cached package and a record that could
+    /// not be read both arrive as "" without it, and no test could reach the
+    /// branch that tells them apart.
+    /// </summary>
     public Dictionary<(string ProductCode, string Property), uint> ProductPropertyResult { get; } = new();
     public Dictionary<(string PatchCode, string ProductCode, string Property), uint> PatchPropertyResult { get; } = new();
 
