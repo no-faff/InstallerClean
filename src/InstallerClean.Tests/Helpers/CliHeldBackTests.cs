@@ -239,10 +239,12 @@ public class CliHeldBackTests
     /// suite here as it does for the lock-refusal line.
     ///
     /// THE en-GB SCOPE IS THE WRITE SITE'S OWN DOOR RATHER THAN A CHECK ON IT.
-    /// Reading a value through the scope that builds it makes the assertion hold
-    /// whatever language the host is in. It proves nothing about the forcing itself,
-    /// no satellite declaring either of these keys, so nothing the scope does is
-    /// observable here.
+    /// The template is the neutral's alone, no satellite declaring either of these
+    /// keys. The noun beside the count is a different matter: its Plural.File pair
+    /// is declared in every satellite the app ships, and the Slavic languages carry
+    /// a Few form that a count of three reaches. So the scope does govern part of
+    /// the composed line, and whatever the assertion compares against it is built
+    /// inside the same scope.
     /// </summary>
     /// <remarks>
     /// A SHARE-NAMING WORD IS THE MECHANICAL HALF OF A CLAIM ABOUT TWO RUNS. Both
@@ -274,8 +276,11 @@ public class CliHeldBackTests
         // And the three slots the write site fills, so a line that had stopped
         // naming a share by dropping the sentence would not pass on the absence.
         Assert.StartsWith("/s mode:", line, StringComparison.Ordinal);
-        Assert.Contains(
-            $"{heldBack} {DisplayHelpers.PluraliseFile(heldBack)}", line, StringComparison.Ordinal);
+        // The count and its noun are built through the same door the line is, so
+        // the pair compared here is the pair the write site would have produced.
+        var countAndNoun = MachineContract.English(
+            () => $"{heldBack} {DisplayHelpers.PluraliseFile(heldBack)}");
+        Assert.Contains(countAndNoun, line, StringComparison.Ordinal);
     }
 
     [Fact]
