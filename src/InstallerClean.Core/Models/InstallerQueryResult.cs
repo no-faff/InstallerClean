@@ -44,12 +44,19 @@ namespace InstallerClean.Models;
 /// enumeration could not account for them. The terms themselves are in
 /// <see cref="Census"/>, separately, for anything that needs to say which.
 ///
-/// It is not an exact headcount either, and cannot be made one. The unclaimed-file
-/// term is an estimate the assembly site deliberately biases low, so the number
-/// can run under the truth. It can no longer run OVER it: the term that could,
-/// a difference between two product totals that a stale registry key inflates, is
-/// gone, and the products behind such a difference are now asked about by name
-/// instead. So no surface may present this as a count of programs.
+/// It is not an exact headcount either, and cannot be made one. It can run under the
+/// truth, the unclaimed-file term being an estimate the assembly site deliberately
+/// biases low. It can run over it as well: a product subkey whose name is not a
+/// packed GUID counts once where nothing could be asked about it, and the file that
+/// key records counts again where the enumeration never claimed it and it is on the
+/// disk, two terms that are added rather than netted against each other. What has
+/// gone is the older route to running over, a difference between two product totals
+/// that a stale registry key inflates: the products behind such a difference are now
+/// asked about by name instead.
+///
+/// READING HIGH IS THE SAFE DIRECTION, a higher count withholding the removable class
+/// on more machines and never on fewer. So no surface may present this as a count of
+/// programs, nor say the true figure is at least this one.
 /// </param>
 /// <param name="PatchClaims">
 /// Every product-to-patch claim this enumeration read, one entry per claim
