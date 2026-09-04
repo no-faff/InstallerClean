@@ -927,6 +927,63 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(1, result.UnaccountedProductCount);
     }
 
+    /// <summary>
+    /// AND THE OVERLAP THE SUBTRACTION DOES NOT REACH, WHICH IS WHY THE FIGURE IS
+    /// AN ESTIMATE RATHER THAN A LOWER BOUND. The test above is the pair it does
+    /// reconcile: a product the enumeration admitted losing, whose registry value
+    /// the fallback then claimed alone, nets back to one.
+    ///
+    /// A subkey whose name is not a packed GUID is in neither of those two terms.
+    /// It is counted where nothing could be asked about it, and the
+    /// InstallProperties read that follows does not turn on the name, so the same
+    /// key's recorded file is read as well and counted a second time wherever the
+    /// enumeration never claimed it and it is really on the disk. One product,
+    /// two terms. They are not netted against each other. Netting them would
+    /// move the figure down, and a lower figure takes the removable class back
+    /// on fewer machines.
+    ///
+    /// THE DIRECTION IS THE SAFE ONE AND THAT IS THE POINT rather than a
+    /// consolation: a count that reads high withholds the removable class on more
+    /// machines and never on fewer. What it rules out is a sentence promising the
+    /// figure is a floor, which is why the surface that prints it calls it an
+    /// estimate.
+    /// </summary>
+    [Fact]
+    public async Task A_key_that_names_no_product_and_claims_a_file_of_its_own_reaches_two_terms()
+    {
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = OneProductWithASupersededPatch(patch);
+
+        // One product subkey, in the two states such a key leaves behind at once:
+        // its name yields no code to put to Windows, and the cached file it
+        // records is on the disk and was never claimed by the enumeration.
+        // Healthy patch sets, so the per-product condition settles clean and the
+        // count under test is the only thing left able to take the removable
+        // verdict away.
+        var result = await new InstallerQueryService(msi, (_, _) =>
+                new InstallerQueryService.FallbackRead(
+                    Failures: 0, ProductKeys: 1,
+                    UnclaimedProductFiles: 1, UnparseableProductKeyNames: 1,
+                    ProductPatchSets: HealthyPatchSets(msi)))
+            .GetRegisteredPackagesAsync();
+
+        // The terms rather than the sum they feed, so a total that came out right
+        // for the wrong reasons cannot pass: one key walked, one unclaimed file,
+        // one name that yielded nothing, and nothing the enumeration itself lost
+        // or asked about in vain.
+        Assert.Equal(1, result.Census.RegistryProductKeys);
+        Assert.Equal(1, result.Census.UnclaimedProductFiles);
+        Assert.Equal(1, result.Census.UnparseableProductKeyNames);
+        Assert.Equal(0, result.Census.UnreadableProducts);
+        Assert.Equal(0, result.Census.UnansweredProductCount);
+
+        Assert.Equal(2, result.UnaccountedProductCount);
+        // The fixture's one row, and the count is not decoration: a scan that
+        // cannot account for a product takes the whole removable class back, so
+        // the superseded patch is kept and marked as having been kept.
+        AssertWithheldByADegradedEnumeration(Assert.Single(result.Packages), expectedState: 2);
+    }
+
     [Fact]
     public async Task A_registry_that_claimed_nothing_of_its_own_counts_nothing_unaccounted()
     {
