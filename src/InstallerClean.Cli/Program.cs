@@ -1514,9 +1514,9 @@ internal static class Program
     ///
     /// WHAT THE FIXED HALF SAYS, AND WHY IT SAYS SO LITTLE. The label is the whole of
     /// what the line claims about the condition. Of the five, one is an installer
-    /// running right now, one a transaction suspended and waiting on a person, two
-    /// are operations queued for the next restart, and one is a registry value the
-    /// check could not read, so nothing shorter than the label is true of all five.
+    /// running right now, one a suspended transaction, two are operations queued for
+    /// the next restart, and one is a registry value the check could not read, so
+    /// nothing shorter than the label is true of all five.
     ///
     /// The detail arrives carrying its own separator, which is why the template ends
     /// in a placeholder with no space in front of it: the four reasons that never

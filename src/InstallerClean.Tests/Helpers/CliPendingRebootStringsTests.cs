@@ -89,9 +89,9 @@ public class CliPendingRebootStringsTests
             var line = Program.PendingRebootEventLogLine("/m", reason, detail: null);
 
             // Only two of the five are a restart waiting to happen. One is an
-            // installer running right now, one a transaction suspended and waiting on
-            // a person, and one a registry value the check could not read, which is
-            // the check saying it cannot answer rather than an answer.
+            // installer running right now, one a suspended transaction, and one a
+            // registry value the check could not read, which is the check saying it
+            // cannot answer rather than an answer.
             Assert.DoesNotContain(
                 "pending reboot detected", line, StringComparison.OrdinalIgnoreCase);
             // Beside the absence, so the absence is attributable: a line that had
