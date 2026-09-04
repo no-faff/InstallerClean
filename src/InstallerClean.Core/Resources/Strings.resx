@@ -952,8 +952,8 @@ To put it back, you need the installer for the version you already have. Get it 
        (Completion.NothingOfferedPerFileBody.*) says "any", and the two must not be
        swapped. The one-form spends neither placeholder and names the file instead of
        the numeral, as the other one-forms here do. -->
-  <data name="Summary.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that one of the cached files it found is unneeded, so it has held back the one file rather than offering it.</value></data>
-  <data name="Summary.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that some of the cached files it found are unneeded, so it has held back {0} {1} rather than offering them.</value></data>
+  <data name="Summary.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it.</value></data>
+  <data name="Summary.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them.</value></data>
   <!-- THE SECOND HELD-BACK LINE, AND IT IS THE PAIR OF THE ONE ABOVE RATHER THAN
        A DIFFERENT KIND OF SENTENCE. Summary.NothingListed reports what the
        walk-derived half of the scan held back; this reports what the superseded
@@ -1598,8 +1598,8 @@ The crash log could not be written.</value></data>
        names the size and not the numeral, so it spends {2} and leaves {0} and {1}
        unused; both are passed on either branch so the two forms cannot disagree about
        which index is which. -->
-  <data name="Cli.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't establish that one of the cached files it found is unneeded, so it has held back the one file ({2}) rather than offering it.</value></data>
-  <data name="Cli.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't establish that some of the cached files it found are unneeded, so it has held back {0} {1} ({2}) rather than offering them.</value></data>
+  <data name="Cli.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back ({2}) rather than offering it.</value></data>
+  <data name="Cli.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} ({2}) rather than offering them.</value></data>
   <!-- Introduces the conditions this run met. It prints under whichever of the
        Cli.NothingOffered and Cli.NothingListed sentences that run chose, the
        per-file forms included, so it has to read correctly under all four rather
@@ -1737,7 +1737,7 @@ The crash log could not be written.</value></data>
        nothing of the kind, this being the run that still offered something. Same three
        arguments, same order, and it names no folder, which is the rule on this channel
        and is stated above. -->
-  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not establish that some of the cached files it found are unneeded, so it has held back {1} {2}.</value></data>
+  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain about some of the cached files it found, so it has held back {1} {2}.</value></data>
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does
