@@ -1356,12 +1356,18 @@ Details in {1}.</value></data>
        cause is wrong for one condition or the other, and what to do next is the
        same either way.
 
+       THE SAME HOLDS FOR WHAT THE STOP AVOIDED, WHICH IS A SEPARATE CLAIM FROM THE
+       CAUSE. On the folder being replaced there is somewhere wrong the files could
+       have gone; on the folder no longer resolving there is nowhere at all, so a
+       sentence about where they would otherwise have ended up is wrong for one
+       condition in the same way. It says what the run did and stops there.
+
        It names the folder the run was GIVEN, because it asks the reader to go and
        check that folder. Where the files that already moved ended up is a
        different question and a different string: they went wherever the folder
        pointed then, which is what the completion summary names, so this copy must
        not claim it. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -1992,7 +1998,7 @@ The crash log could not be written.</value></data>
        and there is no Re-scan here. It names the folder immediately before, so
        this one cannot close on "run it again" the way a line naming no folder can;
        "it" would reach back past the folder and take that instead of the tool. -->
-  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.</value></data>
+  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>{0} mode: {1} of {2} {3} moved to {4}, {5} relocated, {6} {7}.</value></data>

@@ -467,7 +467,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Cannot write to {0}.`,
@@ -547,7 +547,7 @@ const MAP = {
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
   'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
   'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again.`,
   'Cli.MutexBlocked': `Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later.`,
   'Cli.EventLogUnavailable': `Note: Event Log writing failed. Check Application log permissions or Group Policy.`,
   'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
