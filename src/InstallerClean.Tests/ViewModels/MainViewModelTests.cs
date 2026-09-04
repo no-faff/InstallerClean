@@ -1831,7 +1831,7 @@ public class MainViewModelTests
         // shows here as 4 MB.
         Assert.Contains(DisplayHelpers.FormatSize(1_048_576), vm.Completion.Heading);
         _dialogService.Received(1).ShowWarning(
-            Arg.Any<string>(), Strings.Error_InvalidDestinationTitle);
+            Arg.Any<string>(), Strings.Error_MoveStoppedTitle);
     }
 
     [Fact]
@@ -1871,6 +1871,47 @@ public class MainViewModelTests
         Assert.Equal(@"E:\where-they-really-went", vm.Completion.SummaryDestination);
         Assert.Contains(@"E:\where-they-really-went", vm.Completion.Summary);
         Assert.DoesNotContain(typed, vm.Completion.Summary);
+    }
+
+    [Theory]
+    [InlineData(MoveAbortReason.ResolvesElsewhere)]
+    [InlineData(MoveAbortReason.StoppedResolving)]
+    public async Task MoveAllAsync_a_stopped_batch_gets_its_own_heading(MoveAbortReason reason)
+    {
+        // The heading is what a person reads first and what a screen reader
+        // announces, and the guard behind this exception has two conditions: one
+        // is a destination that resolves somewhere else, the other a share that
+        // dropped or an access rule that closed, which leaves the folder exactly
+        // where the user put it. Nothing selects on which fired, so the four other
+        // destination messages' heading is the wrong one here whichever it was.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns<MoveResult>(_ => throw new MoveAbortedException(
+                "stopped", new MoveResult(1, Array.Empty<FileOperationError>()),
+                @"E:\where-they-really-went", reason));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-stopped-heading");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            Arg.Any<string>(), Strings.Error_MoveStoppedTitle);
+        // Beside the positive, so the heading is pinned rather than merely
+        // present: the four pre-flight refusals keep the invalid-destination one
+        // and this arm must not be swept back in with them.
+        _dialogService.DidNotReceive().ShowWarning(
+            Arg.Any<string>(), Strings.Error_InvalidDestinationTitle);
     }
 
     [Fact]

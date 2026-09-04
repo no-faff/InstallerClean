@@ -402,6 +402,7 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.`,
   'Error.ScanRecordsUnreadable': `InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed.`,
   'Error.InvalidDestinationTitle': `Invalid destination`,
+  'Error.MoveStoppedTitle': `Move stopped`,
   'Error.DestinationWriteFailedTitle': `Could not write to destination`,
   'Error.MoveFailedTitle': `Move failed`,
   'Error.DeleteFailedTitle': `Delete failed`,

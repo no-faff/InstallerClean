@@ -332,6 +332,7 @@ public static class Strings
     public static string Error_MoveInstallerLockUnavailable => Get("Error.MoveInstallerLockUnavailable");
     public static string Error_MoveInstallerLockUnavailableTitle => Get("Error.MoveInstallerLockUnavailableTitle");
     public static string Error_MoveIntoInstaller => Get("Error.MoveIntoInstaller");
+    public static string Error_MoveStoppedTitle => Get("Error.MoveStoppedTitle");
     public static string Error_MsiAccessDenied => Get("Error.MsiAccessDenied");
     public static string Error_MsiEnumerationNeverEnded => Get("Error.MsiEnumerationNeverEnded");
     public static string Error_MsiNonSuccess => Get("Error.MsiNonSuccess");

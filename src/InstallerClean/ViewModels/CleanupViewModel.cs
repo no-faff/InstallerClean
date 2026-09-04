@@ -919,33 +919,39 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             }
             catch (MoveAbortedException ex)
             {
-                // The destination was swapped part-way through, so the service
-                // stopped and handed back what it had done. Caught here rather
+                // The destination could no longer be confirmed part-way through,
+                // so the service stopped and handed back what it had done. Caught
+                // here rather
                 // than at the method's own arms so the surviving list and the
                 // destination kind are still in scope to report with; the warning
                 // over the summary carries the reason. No result-log entry, for
                 // the reason recorded on the cancel arm below.
                 await RefreshAfterBatchAsync();
-                // Same fold as the main path: a batch the destination swap stopped
-                // still owes an account of anything the under-lease re-read took
-                // back before it started.
+                // Same fold as the main path: a batch the destination guard
+                // stopped still owes an account of anything the under-lease re-read
+                // took back before it started.
                 var abortReclaimed = new HashSet<string>(ex.Partial.HeldBack, StringComparer.OrdinalIgnoreCase);
                 var abortSurviving = ex.Partial.HeldBack.Count == 0
                     ? survivingFiles
                     : survivingFiles.Where(f => !abortReclaimed.Contains(f.FullPath)).ToList();
                 if (ex.Partial.MovedCount > 0 || ex.Partial.Errors.Count > 0)
                 {
-                    // The service's destination, never `dest`. The whole of what
-                    // this arm reports is a batch stopped because the two stopped
-                    // naming the same folder, so the summary line must name the one
-                    // the files are in, and the line under it names the same folder
+                    // The service's destination, never `dest`. On the condition
+                    // where the destination resolves somewhere else the two are
+                    // different folders, so the summary line must name the one the
+                    // files are in, and the line under it names the same folder
                     // again in the sentence sending the reader to check it.
                     _completion.ShowMoveStoppedSummary(ex.Partial.MovedCount,
                         CompletedBytes(abortSurviving, ex.Partial.MovedCount, ex.Partial.Errors),
                         ex.Destination, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind),
                         FoldHeldBack(reverify, ex.Partial.HeldBack, ex.Partial.HeldBackReasons));
                 }
-                _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
+                // Its own heading, and not the one the other four destination
+                // messages carry: the guard behind this exception has two
+                // conditions and a share that dropped or an access rule that closed
+                // leaves the folder where the user put it. Nothing selects on which
+                // fired, so the heading says what the batch did.
+                _dialogService.ShowWarning(ex.Message, Strings.Error_MoveStoppedTitle);
                 OperationProgress = string.Empty;
                 return;
             }

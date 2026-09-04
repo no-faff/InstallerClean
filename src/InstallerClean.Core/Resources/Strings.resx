@@ -1228,6 +1228,15 @@ InstallerClean was already running as administrator, so starting it again that w
        user does not make the batch safer to run. No placeholders. -->
   <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Invalid destination</value></data>
+  <!-- The heading over Error.DestinationChangedMidBatch, which is the one
+       destination message that is not about a path being wrong. The guard behind
+       it has two conditions, and one of them, a share that dropped or an access
+       rule that closed, leaves the folder exactly where the user put it. Nothing
+       selects on which of the two fired, so the heading names what the batch did
+       rather than what the folder is. The four other uses of
+       Error.InvalidDestinationTitle are destinations that really are invalid. No
+       placeholders. -->
+  <data name="Error.MoveStoppedTitle" xml:space="preserve"><value>Move stopped</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Could not write to destination</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Move failed</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Delete failed</value></data>
