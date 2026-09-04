@@ -1408,7 +1408,11 @@ Details in {1}.</value></data>
 
   <!-- Single instance / startup / crash -->
   <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
-  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean is already running.</value></data>
+  <!-- One consumer, the body under Startup.AlreadyRunningTitle, which is the app
+       name, so the sentence opens on the pronoun rather than naming the app again
+       a line below it. Anything that shows this WITHOUT that heading over it needs
+       a string of its own: the command line has one, Cli.MutexBlocked. -->
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>It's already running.</value></data>
   <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
   <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
        The full exception message is intentionally NOT formatted in here:

@@ -8,14 +8,14 @@ namespace InstallerClean.Tests.Resources;
 /// words twice on the screen and twice to a screen reader.
 /// </summary>
 /// <remarks>
-/// THE PAIRS BELOW ARE EVERY DIALOG WHOSE HEADING AND BODY ARE BOTH FIXED
-/// STRINGS, not a sample of them. The rest of the app's dialogs compose one side
-/// or both at the call site (a ScanFailure's own two fields, an exception's
-/// message, a description built from a crash-log result), so there is no pair to
-/// read here; those are covered where they are built.
+/// EACH ROW IS ONE DIALOG'S HEADING AND ONE OF THE BODIES DRAWN UNDER IT. A
+/// heading that carries more than one body takes a row per body, and the body is
+/// the value as written rather than a rendered one, because what is compared is
+/// how it opens.
 ///
-/// A body may of course say the same THING as its heading in other words, which
-/// is what a body is for. What this pins is the literal repetition.
+/// The comparison is literal repetition at the start of the body. A body may of
+/// course say the same THING as its heading in other words, which is what a body
+/// is for.
 /// </remarks>
 public class DialogHeadingBodyTests
 {
@@ -33,6 +33,8 @@ public class DialogHeadingBodyTests
         { Strings.Error_DeleteFailedTitle, Strings.Status_DeleteFailed_NoLog },
         { Strings.Error_MoveStoppedTitle, Strings.Error_DestinationChangedMidBatch },
         { Strings.Error_SettingNotSavedTitle, Strings.Error_SettingNotSavedBody },
+        { Strings.Startup_AlreadyRunningTitle, Strings.Startup_AlreadyRunningBody },
+        { Strings.Error_AdminRequiredTitle, Strings.Error_AdminRequiredBody },
     };
 
     [Theory]
