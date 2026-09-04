@@ -24,6 +24,19 @@ public class CliHeldBackTests
     private static OrphanedFile File(string name, long bytes) =>
         new($@"C:\Windows\Installer\{name}", bytes, false, false, false, Strings.Reason_Orphaned);
 
+    /// <summary>
+    /// The held-back sentence for a count, composed the way the line under test
+    /// is: the form the count reaches in the displayed language, and the count
+    /// formatted for that language. Reading the plural key straight answers for
+    /// English and for every language whose rule has two arms, and parts company
+    /// with the line wherever a Few form covers the count or the count is grouped.
+    /// </summary>
+    private static string HeldBackSentence(int count) =>
+        string.Format(
+            DisplayHelpers.Pluralise(count, Strings.Completion_HeldBack_Singular,
+                Strings.Completion_HeldBack_Plural, "Completion.HeldBack"),
+            DisplayHelpers.FormatCount(count));
+
     [Fact]
     public void FoldHeldBack_drops_the_held_back_rows_and_keeps_the_rest_in_order()
     {
@@ -109,7 +122,7 @@ public class CliHeldBackTests
         var written = CaptureStdout(() =>
             Program.ReportHeldBack(new HeldBackReasons(Reclaimed: 1)));
 
-        Assert.Equal(string.Format(Strings.Completion_HeldBack_Singular, 1), written.TrimEnd());
+        Assert.Equal(HeldBackSentence(1), written.TrimEnd());
     }
 
     [Fact]
@@ -123,7 +136,7 @@ public class CliHeldBackTests
                 new HeldBackReasons(Reclaimed: 2, RecordsChanged: 1, RecordsUnreadable: 1)));
 
         Assert.Equal(
-            new[] { string.Format(Strings.Completion_HeldBack_Plural, 4) },
+            new[] { HeldBackSentence(4) },
             written.TrimEnd().Split(Environment.NewLine));
     }
 
@@ -140,7 +153,7 @@ public class CliHeldBackTests
             Program.ReportHeldBack(new HeldBackReasons(OwnershipUnestablished: 4)));
 
         Assert.Equal(perFile, machineWide);
-        Assert.Equal(string.Format(Strings.Completion_HeldBack_Plural, 4), perFile.TrimEnd());
+        Assert.Equal(HeldBackSentence(4), perFile.TrimEnd());
     }
 
     [Fact]
