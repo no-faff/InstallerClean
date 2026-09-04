@@ -945,13 +945,14 @@ To put it back, you need the installer for the version you already have. Get it 
        no single finding about the machine's records accounts for the list. The pair
        above names such a finding and it would be false of these files, so this pair
        says only what is true of every file on the list whatever kept it there: the
-       scan could not establish they were unneeded.
+       app could not be certain about them.
 
        "Some of the cached files" and not "any of them", because something was offered
        beside these. The screen for a machine that was offered nothing at all
        (Completion.NothingOfferedPerFileBody.*) says "any", and the two must not be
-       swapped. The one-form spends neither placeholder and names the file instead of
-       the numeral, as the other one-forms here do. -->
+       swapped. The one-form spends neither placeholder, and where the pair above has
+       to name the file in its second clause, this one has already named it in the
+       first and points back at it, so no noun in it has to agree with a numeral. -->
   <data name="Summary.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it.</value></data>
   <data name="Summary.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them.</value></data>
   <!-- THE SECOND HELD-BACK LINE, AND IT IS THE PAIR OF THE ONE ABOVE RATHER THAN
