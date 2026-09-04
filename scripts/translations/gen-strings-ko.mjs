@@ -357,8 +357,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 crash.log에 있습니다.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `InstallerClean이 브라우저를 열지 못했습니다. 링크를 클립보드에 복사해 두었으니 직접 붙여넣으시면 됩니다:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean이 브라우저를 열지 못했고, 링크를 클립보드에 복사하지도 못했습니다. 링크는 다음과 같습니다:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요.`,

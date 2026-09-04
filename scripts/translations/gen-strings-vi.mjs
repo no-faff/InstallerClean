@@ -363,8 +363,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong crash.log nếu bạn cần báo cáo.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `InstallerClean không thể mở trình duyệt của bạn. Liên kết đã được sao chép vào bảng tạm, nên bạn có thể tự dán nó vào:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng tạm. Liên kết là:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lần nữa.`,

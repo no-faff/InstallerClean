@@ -385,8 +385,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `Перевірка не вдалася з невідомої причини. Деталі у crash.log, якщо вам потрібно про це повідомити.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `InstallerClean не зміг відкрити ваш браузер. Посилання скопійовано до буфера обміну, тож ви можете вставити його самі:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean не зміг відкрити ваш браузер і не зміг скопіювати посилання до буфера обміну. Ось воно:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку резервних копій і зупинився, щоб не записати не туди. Перевірте {0}, потім «Повторити сканування» і спробуйте ще раз.`,
