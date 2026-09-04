@@ -103,18 +103,15 @@ internal static class MachineContract
     /// them is the one that would put two Event IDs on the wrong side of an
     /// entry-type decision.
     ///
-    /// THE LIST HELD TWO AND ONE OF THEM NAMED THE WRONG CLASS. It gave 3000 as the
-    /// scan withholding "its superseded and obsoleted verdicts" and left 3002 out
-    /// altogether. Nothing withholds an obsoleted registration, because none is ever
-    /// offered on any run and so there is no verdict to hold back: the wire text names
-    /// the superseded class alone (<c>Cli.EventLogScanWithheld</c>) and
-    /// <c>ScanResult.WithheldCount</c> says the same in its own words. A tool built
-    /// from this paragraph as the band's contents was watching two IDs of three.
+    /// NOTHING WITHHOLDS AN OBSOLETED REGISTRATION, because none is ever offered on
+    /// any run and so there is no verdict to hold back. The wire text names the
+    /// superseded class alone (<c>Cli.EventLogScanWithheld</c>) and
+    /// <c>ScanResult.WithheldCount</c> says the same in its own words.
     ///
-    /// ONE FIGURE IN THE 3000 NOTICE IS AN ESTIMATE AND NOTHING HAS EVER SAID SO.
-    /// Its count of installed products is assembled from four contributors, two
-    /// of which are inferred from a headcount and from unclaimed registry values
-    /// rather than observed, and the inference can run high as well as low (see
+    /// THE 3000 NOTICE'S COUNT OF INSTALLED PRODUCTS IS AN ESTIMATE. It is assembled
+    /// from four contributors, two of which are inferred from a headcount and from
+    /// unclaimed registry values rather than observed, and the inference can run
+    /// high as well as low (see
     /// <see cref="Models.InstallerQueryResult.UnaccountedProductCount"/> for what
     /// each contributes). It is sound to alert on and to trend; it is not a figure
     /// to reconcile against an inventory, and a fleet report presenting it as a
