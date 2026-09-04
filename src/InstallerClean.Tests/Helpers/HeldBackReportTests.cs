@@ -17,10 +17,15 @@ namespace InstallerClean.Tests.Helpers;
 /// </summary>
 public class HeldBackReportTests
 {
+    // Composed the way HeldBackReport.Line composes it: the form the count reaches
+    // in the displayed language, and the count formatted for that language. Picking
+    // the plural key on count == 1 answers for English and for any language whose
+    // rule has two arms, and differently wherever a Few form covers the count.
     private static string Expected(int count) =>
         string.Format(
-            count == 1 ? Strings.Completion_HeldBack_Singular : Strings.Completion_HeldBack_Plural,
-            count);
+            DisplayHelpers.Pluralise(count, Strings.Completion_HeldBack_Singular,
+                Strings.Completion_HeldBack_Plural, "Completion.HeldBack"),
+            DisplayHelpers.FormatCount(count));
 
     [Fact]
     public void Nothing_kept_back_produces_no_sentence()

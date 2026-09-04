@@ -51,8 +51,14 @@ public class CliHeldBackBesideAnOfferTests
         // BESIDE THE OFFER RATHER THAN INSTEAD OF IT. The offer was real and was acted
         // on, so its own line is still there and the held-back lead sits under it
         // rather than in its place.
+        // Composed the way the run composes it. Cli.FoundOrphans is one flat
+        // sentence for every count, inflecting only through the satellite-only
+        // overrides, so the form has to be picked by the same rule rather than by
+        // reading the neutral value straight.
         Assert.Contains(
-            string.Format(Strings.Cli_FoundOrphans, 2, DisplayHelpers.PluraliseFile(2),
+            string.Format(
+                DisplayHelpers.Pluralise(2, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
+                DisplayHelpers.FormatCount(2), DisplayHelpers.PluraliseFile(2),
                 DisplayHelpers.FormatSize(2048)),
             stdout, StringComparison.Ordinal);
 
@@ -92,8 +98,7 @@ public class CliHeldBackBesideAnOfferTests
                 Reasons: new HeldBackReasons(Reclaimed: 1)),
             delete: new DeleteResult(1, Array.Empty<FileOperationError>()));
 
-        Assert.Contains(string.Format(Strings.Completion_HeldBack_Singular, 1),
-            stdout, StringComparison.Ordinal);
+        Assert.Contains(HeldBackSentence(1), stdout, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -113,11 +118,19 @@ public class CliHeldBackBesideAnOfferTests
                 HeldBack: new[] { OfferA },
                 HeldBackReasons: new HeldBackReasons(RecordsChanged: 1)));
 
-        Assert.Contains(string.Format(Strings.Completion_HeldBack_Plural, 2),
-            stdout, StringComparison.Ordinal);
-        Assert.DoesNotContain(string.Format(Strings.Completion_HeldBack_Singular, 1),
-            stdout, StringComparison.Ordinal);
+        Assert.Contains(HeldBackSentence(2), stdout, StringComparison.Ordinal);
+        Assert.DoesNotContain(HeldBackSentence(1), stdout, StringComparison.Ordinal);
     }
+
+    // Composed the way the line under test is: the form the count reaches in the
+    // displayed language, and the count formatted for that language. Reading the
+    // plural key straight answers for English and for any language whose rule has
+    // two arms, and differently wherever a Few form covers the count.
+    private static string HeldBackSentence(int count) =>
+        string.Format(
+            DisplayHelpers.Pluralise(count, Strings.Completion_HeldBack_Singular,
+                Strings.Completion_HeldBack_Plural, "Completion.HeldBack"),
+            DisplayHelpers.FormatCount(count));
 
     private static string HeldBackLead(string value, int count) =>
         string.Format(value, count, DisplayHelpers.PluraliseFile(count),
