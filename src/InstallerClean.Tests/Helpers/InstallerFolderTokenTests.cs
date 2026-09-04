@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Globalization;
+using InstallerClean.Cli;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 using InstallerClean.Services;
@@ -111,7 +112,11 @@ public class InstallerFolderTokenTests
         // without resolving anything. The words are asserted beside the two
         // absences, which a line that had stopped naming the folder at all would
         // otherwise satisfy.
-        var value = Strings.Cli_EventLogMoveDestinationInsideInstaller;
+        //
+        // Read through the en-GB scope the emit site wraps this line in, so
+        // the value asserted is the one a machine reads.
+        var value = MachineContract.English(
+            () => Strings.Cli_EventLogMoveDestinationInsideInstaller);
 
         Assert.DoesNotContain(Literal, value, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(InstallerFolderToken.Token, value, StringComparison.Ordinal);
