@@ -1427,11 +1427,11 @@ Le crash.log n'a pas pu être écrit.</value></data>
        per-file screen this branch skips, so "would have offered" claims more than
        the run established.
 
-       A PAIR AND NOT A FLAT KEY, because it shipped as one for an afternoon and
-       read "held back all 1 file" at a count of one. The one-form names the size
-       and not the numeral, exactly as the window's body does, so it spends {2} and
-       leaves {0} and {1} unused; both are passed on either branch so the two forms
-       cannot disagree about which index is which.
+       A PAIR AND NOT A FLAT KEY. A flat key here reads "held back all 1 file" at a
+       count of one, which is what the two forms exist to avoid. The one-form names
+       the size and not the numeral, exactly as the window's body does, so it spends
+       {2} and leaves {0} and {1} unused; both are passed on either branch so the two
+       forms cannot disagree about which index is which.
 
        IT CLOSED ON "That is not the same as finding nothing to clean up" AND THAT
        SENTENCE WAS TAKEN OUT. The first sentence already says what happened in
@@ -1514,11 +1514,10 @@ Le crash.log n'a pas pu être écrit.</value></data>
        0 = mode arg, 1 = files held back, 2 = pluralised "file"/"files".
 
        IT NAMES NO FOLDER, WHICH IS THE RULE ON THIS CHANNEL AND NOT A PREFERENCE.
-       It carried {InstallerFolder} for an afternoon and was the only Cli.EventLog*
-       string that did. The one entry here that names the folder,
-       Cli.EventLogMoveDestinationInsideInstaller, names it in words and spells no
-       path, so it reads the same on every machine without the token. This notice
-       does not need to name it at all.
+       No Cli.EventLog* string carries {InstallerFolder}. The one entry here that
+       names the folder, Cli.EventLogMoveDestinationInsideInstaller, names it in
+       words and spells no path, so it reads the same on every machine without the
+       token. This notice does not need to name it at all.
 
        AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", so it reads
        "1 file" at a count of one and is correct at every other. THE SIBLING ABOVE
