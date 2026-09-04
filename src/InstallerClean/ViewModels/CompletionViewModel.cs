@@ -442,9 +442,13 @@ public partial class CompletionViewModel : ObservableObject
     /// the summary names where they went. The last line is the difference. After
     /// a Move that ran to the end that line says to delete the backup folder once
     /// satisfied all is well, and here the app has just said it could no longer
-    /// confirm that folder, so the card would be telling the reader to delete
-    /// what the dialog told them to check. The sentence in its place is the
-    /// dialog's own, so both surfaces say one thing about one folder.
+    /// confirm that folder, so a reader who had just been told to check a folder
+    /// would be told to delete one. The sentence in its place is the guard's own,
+    /// formatted with <see cref="MoveAbortedException.Destination"/>: the folder
+    /// the files are in, and the one the rest of the card already names. The
+    /// dialog builds the same sentence from the folder the caller asked for,
+    /// because that is the one they configured and can go and look at, and the
+    /// two are not always the same place.
     /// </summary>
     public void ShowMoveStoppedSummary(int movedCount, long movedBytes, string destination,
         IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null) =>
