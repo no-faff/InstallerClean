@@ -907,7 +907,7 @@ internal static class Program
                     Strings.Cli_MoveCancelledRestoreHint, cancelledMoveDestination));
             // EventLog the cancellation so a Task Scheduler audit can
             // see how far the run got, and pick ExitPartial when work
-            // committed before the Ctrl+C arrived.
+            // committed before the cancellation arrived.
             if (committedCount > 0)
             {
                 MachineContract.WriteEventLog(CliEventClass.Partial,
@@ -916,7 +916,7 @@ internal static class Program
                         DisplayHelpers.PluraliseFile(totalToProcess)));
                 return ExitPartial;
             }
-            // Cancelled before any file was processed (a Ctrl+C during the
+            // Cancelled before any file was processed (a cancel during the
             // scan, or before the first delete/move). Still write one entry
             // so "each /s, /d or /m run writes one summary" holds for every
             // run. TransientSkip, not Partial: nothing committed and a re-run
@@ -1089,9 +1089,9 @@ internal static class Program
         // would have changed which machines log it with every test still green. A
         // measurement that goes quiet reads exactly like nothing being wrong.
         //
-        // THEY ARE NOT TWO VIEWS OF ONE QUANTITY. This counts entries in the records
-        // that could not be matched up, which is the trigger for ONE of the six routes
-        // into the count above. A machine can meet either condition without the other,
+        // THEY ARE NOT TWO VIEWS OF ONE QUANTITY. This counts installed products the
+        // enumeration could not account for, which is the trigger for ONE of the six
+        // routes into the count above. A machine can meet either condition without the other,
         // and the commonest is meeting this one with no superseded file to hold back.
         //
         // The count does not appear in the human line and does appear here. Four

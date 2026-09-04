@@ -1762,20 +1762,22 @@ The crash log could not be written.</value></data>
 
        WHAT DOES NOT FOLLOW IS THAT THE TWO HOSTS REPORT THE SAME THINGS. This
        sentence is for a person. The notice in the 3000 band keeps its own
-       condition and its own figure, on records that could not be matched up rather
-       than on files held back, and the two counts are not the same quantity: see
+       condition and its own figure, on products the enumeration could not account
+       for rather than on files held back, and the two counts are not the same
+       quantity: see
        Cli.EventLogScanWithheld and ReportScanSignals. -->
   <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back.</value></data>
   <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back.</value></data>
-  <!-- 0 = mode arg, 1 = entries in the Windows Installer records the scan could
-       not match up. A notice beside the run's summary, not a summary itself
+  <!-- 0 = mode arg, 1 = installed products the enumeration could not account
+       for. A notice beside the run's summary, not a summary itself
        (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
        the always-plural "errors:" header the same audience scrapes: a machine
        surface holds one shape, and the grammar is the price of it.
 
        ONE FIGURE, AND THE KEY NAME IS NOT A PROMISE OF A SECOND. What this
-       sentence is about is the unmatched records and what they cost the count of
-       files missing from the cache; a withheld count answers a different
+       sentence is about is the products it could not account for and what they
+       cost the count of files missing from the cache; a withheld count answers a
+       different
        question, so printing it beside that clause would hand an operator a
        number with no stated relation to the words next to it. The withheld count
        travels in the opt-in result log instead, as scan.withheldPatchCount.
@@ -1789,7 +1791,7 @@ The crash log could not be written.</value></data>
        FIGURE IN OTHER WORDS: Summary.SupersededHeldBack counts files held back,
        which is a different quantity reached by six routes, of which the count
        here is one. -->
-  <data name="Cli.EventLogScanWithheld" xml:space="preserve"><value>{0} mode: {1} entries in the Windows records could not be matched up, so no superseded patch was offered and the count of files missing from the Installer cache may be short.</value></data>
+  <data name="Cli.EventLogScanWithheld" xml:space="preserve"><value>{0} mode: the enumeration could not account for an estimated {1} of the installed products, so no superseded patch was offered and the count of files missing from the Installer cache may be short.</value></data>
   <!-- 0 = mode arg, 1 = registrations naming a file that is not in the cache. The
        second notice (Event ID 3001), and the actionable one. Unpluralised, as
        above.
@@ -1980,14 +1982,20 @@ The crash log could not be written.</value></data>
        rather than the summary above because the counts mean something different:
        the files not in {1} were never attempted, where in the summary they
        failed. The files in {1} have left C:\Windows\Installer and are in {4},
-       which is the fact this entry exists to record. -->
-  <data name="Cli.EventLogMoveAborted" xml:space="preserve"><value>{0} mode stopped: the destination changed while the move was running. {1} of {2} {3} had already moved to {4}, {5} relocated, {6} {7}.</value></data>
-  <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0} mode interrupted by Ctrl+C: {1} of {2} {3} processed before cancellation. See progress output for the per-file detail.</value></data>
-  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       which is the fact this entry exists to record. The opening has to hold for
+       both of the guard's conditions, because no host selects on which one fired
+       and one of them leaves the destination exactly where the user put it. -->
+  <data name="Cli.EventLogMoveAborted" xml:space="preserve"><value>{0} mode stopped: could no longer confirm the destination. {1} of {2} {3} had already moved to {4}, {5} relocated, {6} {7}.</value></data>
+  <!-- 0 = mode arg, 1 = processed count, 2 = total count, 3 = pluralised noun.
+       The console cancel handler is raised for either control key and never reads
+       which one it was, so the line says where the cancellation came from rather
+       than which key sent it. -->
+  <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0} mode cancelled at the console: {1} of {2} {3} processed before cancellation. See progress output for the per-file detail.</value></data>
+  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
        processed (a cancel during the scan, or before the first delete or
        move), so "each /s, /d or /m run writes one summary entry" holds for
        every run, not only the ones that committed work. -->
-  <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>{0} mode interrupted by Ctrl+C before any work was done. No action taken.</value></data>
+  <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>{0} mode cancelled at the console before any work was done. No action taken.</value></data>
   <!-- Stdout when the CLI cannot acquire the single-instance mutex.
        The GUI variant (Strings.Startup_AlreadyRunningBody) is written
        for a user who tried to launch a second window; the CLI variant

@@ -78,9 +78,10 @@ internal static class MachineContract
     /// 2000 or 4000 band (<see cref="CliContract.EventIdFor"/>). Beside it a run
     /// may write NOTICES, in the 3000 band, which are conditions the scan found and
     /// never the run's outcome. THE LIST BELOW IS THE WHOLE BAND, which is the part
-    /// a consumer building a filter needs of it. 3000: entries in the records could
-    /// not be matched up, so no superseded patch was offered and the count of files
-    /// missing from the cache may be short. 3001: packages Windows still references
+    /// a consumer building a filter needs of it. 3000: the enumeration could not
+    /// account for an estimated share of the installed products, so no superseded
+    /// patch was offered and the count of files missing from the cache may be
+    /// short. 3001: packages Windows still references
     /// have no file on disk. 3002: files were held back rather than offered, and
     /// the entry's own text says which condition produced it, so a filter built
     /// for one phrase sees only some of the machines: either the scan could not

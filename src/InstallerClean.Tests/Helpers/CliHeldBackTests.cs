@@ -185,6 +185,48 @@ public class CliHeldBackTests
         Assert.Contains($"1 of 2 {DisplayHelpers.PluraliseFile(2)}", line);
     }
 
+    [Theory]
+    [InlineData(MoveAbortReason.ResolvesElsewhere)]
+    [InlineData(MoveAbortReason.StoppedResolving)]
+    public void AbortedMoveEventLogLine_opens_with_what_holds_for_either_condition(
+        MoveAbortReason reason)
+    {
+        // One line covers both of the guard's conditions and nothing selects on
+        // Reason, so its opening has to hold for a batch that met either. A share
+        // that dropped or an ACL that closed leaves the destination exactly where
+        // the user put it, so a sentence about the destination having changed is a
+        // sentence about the other condition.
+        var files = new[] { File("a.msi", 1024), File("b.msi", 2048) };
+        var ex = new MoveAbortedException(
+            "stopped", new MoveResult(1, Array.Empty<FileOperationError>()),
+            @"E:\where-they-really-went", reason);
+
+        var line = Program.AbortedMoveEventLogLine("/m", ex, files.Length, files);
+
+        Assert.DoesNotContain("the destination changed", line, StringComparison.OrdinalIgnoreCase);
+        // Beside the absence, so the absence is attributable: a line that had
+        // stopped saying anything about the destination at all would satisfy the
+        // assertion above on its own.
+        Assert.Contains("could no longer confirm the destination", line, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void The_withheld_notice_states_a_cause_every_contributor_meets()
+    {
+        // Four things reach this figure and only two of them are a read that
+        // failed: a product row the API skipped, a product whose records would not
+        // read, a cached file the registry claims and the API never mentioned, and
+        // a product Windows declined to answer about at all. Composed here exactly
+        // as the write site composes it.
+        var line = string.Format(Strings.Cli_EventLogScanWithheld, "/s", 3);
+
+        Assert.DoesNotContain("matched up", line, StringComparison.OrdinalIgnoreCase);
+        // The figure is an estimate rather than a headcount, so the sentence has to
+        // carry that as well as the cause. Beside the absence, so the absence is
+        // attributable.
+        Assert.Contains("could not account for an estimated", line, StringComparison.Ordinal);
+    }
+
     /// <summary>
     /// Runs <paramref name="action"/> with stdout redirected and returns what it
     /// wrote, putting the console back afterwards whatever happens.

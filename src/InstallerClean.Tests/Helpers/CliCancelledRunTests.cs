@@ -9,8 +9,9 @@ using NSubstitute;
 namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
-/// What a Ctrl+C leaves on stdout, for both commands, driven through the real
-/// work method with a service that reports a partial batch.
+/// What a cancelled run leaves on stdout, for both commands, driven through the
+/// real work method with a service that reports a partial batch, and the two lines
+/// such a run writes to the Application channel.
 ///
 /// THE ORDER IS PART OF WHAT IS ASSERTED. A run says what it did and then says it
 /// was cancelled, so each test pins the position of the two sentences against each
@@ -181,6 +182,28 @@ public class CliCancelledRunTests
         Assert.Contains(Strings.Cli_Cancelled, stdout);
         Assert.True(stdout.IndexOf(deleted, StringComparison.Ordinal)
             < stdout.IndexOf(Strings.Cli_Cancelled, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void The_cancelled_audit_lines_say_where_the_cancellation_came_from()
+    {
+        // Console.CancelKeyPress is raised for either control key and the handler
+        // never reads which one it was, so neither line is in a position to name
+        // one. Composed here exactly as the two write sites compose them, so a
+        // slot the value stopped spelling would throw here rather than in the
+        // Application channel.
+        var partial = string.Format(Strings.Cli_EventLogCancelledPartial,
+            "/m", 1, 2, DisplayHelpers.PluraliseFile(2));
+        var noWork = string.Format(Strings.Cli_EventLogCancelledNoWork, "/d");
+
+        foreach (var line in new[] { partial, noWork })
+        {
+            Assert.DoesNotContain("Ctrl+", line, StringComparison.OrdinalIgnoreCase);
+            // Beside the absence, so the absence is attributable: a line that had
+            // stopped saying how the run ended would satisfy the assertion above
+            // on its own.
+            Assert.Contains("cancelled at the console", line, StringComparison.Ordinal);
+        }
     }
 
     // ---- fixtures ----
