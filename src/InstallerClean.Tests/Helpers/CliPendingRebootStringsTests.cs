@@ -49,7 +49,8 @@ public class CliPendingRebootStringsTests
 
         foreach (var reason in Enum.GetValues<PendingRebootReason>())
         {
-            var label = Program.PendingRebootEventLogReason(reason);
+            var label = MachineContract.English(
+                () => Program.PendingRebootEventLogReason(reason));
 
             Assert.False(string.IsNullOrWhiteSpace(label), $"{reason} logs nothing");
             // The member name is the fallback, so a label equal to it is a reason whose
@@ -74,7 +75,9 @@ public class CliPendingRebootStringsTests
         Assert.Equal(
             Strings.Cli_PendingRebootBlocked_Other,
             Program.PendingRebootBlockedMessage(unwritten, detail: null));
-        Assert.Equal(unwritten.ToString(), Program.PendingRebootEventLogReason(unwritten));
+        Assert.Equal(
+            unwritten.ToString(),
+            MachineContract.English(() => Program.PendingRebootEventLogReason(unwritten)));
     }
 
     /// <summary>
@@ -86,7 +89,8 @@ public class CliPendingRebootStringsTests
     {
         foreach (var reason in Enum.GetValues<PendingRebootReason>())
         {
-            var line = Program.PendingRebootEventLogLine("/m", reason, detail: null);
+            var line = MachineContract.English(
+                () => Program.PendingRebootEventLogLine("/m", reason, detail: null));
 
             // Only two of the five are a restart waiting to happen. One is an
             // installer running right now, one a suspended transaction, and one a
@@ -96,17 +100,18 @@ public class CliPendingRebootStringsTests
                 "pending reboot detected", line, StringComparison.OrdinalIgnoreCase);
             // Beside the absence, so the absence is attributable: a line that had
             // stopped naming anything at all would satisfy the assertion above.
-            Assert.Contains(Program.PendingRebootEventLogReason(reason), line);
+            Assert.Contains(
+                MachineContract.English(() => Program.PendingRebootEventLogReason(reason)), line);
         }
     }
 
     [Fact]
     public void The_blocked_line_carries_its_detail_and_no_dangling_space()
     {
-        var withPath = Program.PendingRebootEventLogLine(
-            "/m", PendingRebootReason.PendingRenameInCache, @"C:\Windows\Installer\1234.msi");
-        var withNothing = Program.PendingRebootEventLogLine(
-            "/m", PendingRebootReason.PendingRenameUnresolved, detail: null);
+        var withPath = MachineContract.English(() => Program.PendingRebootEventLogLine(
+            "/m", PendingRebootReason.PendingRenameInCache, @"C:\Windows\Installer\1234.msi"));
+        var withNothing = MachineContract.English(() => Program.PendingRebootEventLogLine(
+            "/m", PendingRebootReason.PendingRenameUnresolved, detail: null));
 
         // The separator comes with the detail, so the reason that has one reads as a
         // sentence and the four that do not end where their sentence ends.

@@ -43,7 +43,10 @@ public class CliLockRefusalTests
         // Every entry this tool writes opens with the flag, so that a fleet's
         // history can be filtered by what was actually run. One of them did not,
         // and a search for delete runs on those machines returned nothing.
-        Assert.StartsWith(arg, Program.InstallerLockUnavailableEventLogLine(arg), StringComparison.Ordinal);
+        var line = MachineContract.English(
+            () => Program.InstallerLockUnavailableEventLogLine(arg));
+
+        Assert.StartsWith(arg, line, StringComparison.Ordinal);
     }
 
     [Fact]

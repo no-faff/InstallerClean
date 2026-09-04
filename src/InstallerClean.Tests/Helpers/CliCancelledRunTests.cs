@@ -192,9 +192,11 @@ public class CliCancelledRunTests
         // one. Composed here exactly as the two write sites compose them, so a
         // slot the value stopped spelling would throw here rather than in the
         // Application channel.
-        var partial = string.Format(Strings.Cli_EventLogCancelledPartial,
-            "/m", 1, 2, DisplayHelpers.PluraliseFile(2));
-        var noWork = string.Format(Strings.Cli_EventLogCancelledNoWork, "/d");
+        var partial = MachineContract.English(() => string.Format(
+            Strings.Cli_EventLogCancelledPartial,
+            "/m", 1, 2, DisplayHelpers.PluraliseFile(2)));
+        var noWork = MachineContract.English(
+            () => string.Format(Strings.Cli_EventLogCancelledNoWork, "/d"));
 
         foreach (var line in new[] { partial, noWork })
         {

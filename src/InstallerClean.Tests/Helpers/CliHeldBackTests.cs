@@ -187,15 +187,17 @@ public class CliHeldBackTests
         // method, which is the guarantee itself and a stronger one than a string
         // comparison. A negative over a value the call could never have seen
         // passes whatever the code does.
-        var line = Program.AbortedMoveEventLogLine("/m", ex, files.Length, files);
+        var line = MachineContract.English(
+            () => Program.AbortedMoveEventLogLine("/m", ex, files.Length, files));
 
         Assert.Contains(@"E:\where-they-really-went", line);
         // The counts either side of it, so a line that happened to carry the path
-        // in some other slot would not pass. Composed rather than written out,
-        // because this method is called inside the en-GB scope in production and
-        // outside it here: a literal would pin the noun to whatever language the
-        // machine running the suite is in.
-        Assert.Contains($"1 of 2 {DisplayHelpers.PluraliseFile(2)}", line);
+        // in some other slot would not pass. Composed rather than written out, and
+        // composed through the same scope the line is: the write site builds this
+        // in en-GB, so the noun compared against it is the machine contract's and
+        // not the host language's.
+        Assert.Contains(
+            MachineContract.English(() => $"1 of 2 {DisplayHelpers.PluraliseFile(2)}"), line);
     }
 
     [Theory]
@@ -214,7 +216,8 @@ public class CliHeldBackTests
             "stopped", new MoveResult(1, Array.Empty<FileOperationError>()),
             @"E:\where-they-really-went", reason);
 
-        var line = Program.AbortedMoveEventLogLine("/m", ex, files.Length, files);
+        var line = MachineContract.English(
+            () => Program.AbortedMoveEventLogLine("/m", ex, files.Length, files));
 
         Assert.DoesNotContain("the destination changed", line, StringComparison.OrdinalIgnoreCase);
         // Beside the absence, so the absence is attributable: a line that had
@@ -232,7 +235,8 @@ public class CliHeldBackTests
         // a product the registry named that this scan could not settle either way,
         // Windows declining to answer or the key name yielding no code to ask with.
         // Composed here exactly as the write site composes it.
-        var line = string.Format(Strings.Cli_EventLogScanWithheld, "/s", 3);
+        var line = MachineContract.English(
+            () => string.Format(Strings.Cli_EventLogScanWithheld, "/s", 3));
 
         Assert.DoesNotContain("matched up", line, StringComparison.OrdinalIgnoreCase);
         // The figure is an estimate rather than a headcount, so the sentence has to
