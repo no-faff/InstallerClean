@@ -22,7 +22,11 @@ public class DialogHeadingBodyTests
     public static TheoryData<string, string> HeadingAndBody() => new()
     {
         { Strings.Error_InvalidDestinationTitle, Strings.Error_DestinationNotFullyQualified },
+        // Both installer-folder bodies belong here: the window refuses the
+        // path before the batch is handed over, and the move service refuses
+        // it again at its own boundary, arriving as the exception's message.
         { Strings.Error_InvalidDestinationTitle, Strings.Error_DestinationInsideInstaller },
+        { Strings.Error_InvalidDestinationTitle, Strings.Error_MoveIntoInstaller },
         { Strings.Error_InvalidDestinationTitle, Strings.Error_DestinationInSystemFolder },
         { Strings.Error_NotEnoughSpaceTitle, Strings.Error_NotEnoughSpaceBody },
         { Strings.Error_DestinationWriteFailedTitle, Strings.Error_AccessDeniedDestination },
