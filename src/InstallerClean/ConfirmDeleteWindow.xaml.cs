@@ -12,7 +12,8 @@ public partial class ConfirmDeleteWindow : Window
     {
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
-        MessageText.Text = string.Format(Strings.Confirm_DeleteTitle, fileCount, label, sizeDisplay);
+        MessageText.Text = string.Format(
+            Strings.Confirm_DeleteTitle, DisplayHelpers.FormatCount(fileCount), label, sizeDisplay);
         var body = BuildBodyLine(fileCount);
         // The window title is what a screen reader announces when a dialog
         // opens, and ShowInTaskbar is false under custom chrome, so it serves

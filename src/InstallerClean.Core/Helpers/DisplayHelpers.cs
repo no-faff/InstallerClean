@@ -23,6 +23,22 @@ internal static class DisplayHelpers
         _ => string.Format(Localisation.FormatCulture, Strings.Display_Size_B, bytes)
     };
 
+    /// <summary>
+    /// A count as the reader's region writes it, so that four figures carry the
+    /// group separator that region uses: a comma in English, a full stop in German,
+    /// a space in French. It reads <see cref="Localisation.FormatCulture"/>, which
+    /// is where the sizes above take their decimal separator from, so a count and a
+    /// size in one sentence are punctuated alike.
+    ///
+    /// THE MACHINE-READ LINES DO NOT COME THROUGH HERE. Tooling matches the
+    /// Application-channel entries and the "\d+ errors:" stdout header on their
+    /// exact text, so those call sites pass the number itself and it renders as
+    /// bare digits. A count inside an exception message stays bare for the same
+    /// reason, one of those messages reaching a dialog and the event log both.
+    /// </summary>
+    internal static string FormatCount(int count) =>
+        count.ToString("N0", Localisation.FormatCulture);
+
     internal static string FormatElapsed(TimeSpan elapsed) =>
         elapsed.TotalSeconds < 1
             ? string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_Ms, elapsed.TotalMilliseconds)

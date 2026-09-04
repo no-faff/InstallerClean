@@ -254,7 +254,7 @@ public partial class ScanViewModel : ObservableObject
                 Strings.Summary_RegisteredStillUsed_Singular,
                 Strings.Summary_RegisteredStillUsed_Plural,
                 "Summary.RegisteredStillUsed"),
-            RegisteredFileCount);
+            DisplayHelpers.FormatCount(RegisteredFileCount));
 
     public string OrphanedSummaryText =>
         string.Format(
@@ -262,7 +262,7 @@ public partial class ScanViewModel : ObservableObject
                 Strings.Summary_OrphanedToCleanUp_Singular,
                 Strings.Summary_OrphanedToCleanUp_Plural,
                 "Summary.OrphanedToCleanUp"),
-            OrphanedFileCount);
+            DisplayHelpers.FormatCount(OrphanedFileCount));
 
     /// <summary>
     /// True when the last scan found files to clean up. The main window's
@@ -281,7 +281,7 @@ public partial class ScanViewModel : ObservableObject
                 Strings.Summary_MissingFromDisk_Singular,
                 Strings.Summary_MissingFromDisk_Plural,
                 "Summary.MissingFromDisk"),
-            MissingFromDiskCount, MissingFromDiskPrograms);
+            DisplayHelpers.FormatCount(MissingFromDiskCount), MissingFromDiskPrograms);
 
     /// <summary>
     /// True where this scan held back a superseded file it might otherwise have
@@ -323,7 +323,7 @@ public partial class ScanViewModel : ObservableObject
                 Strings.Summary_SupersededHeldBack_Singular,
                 Strings.Summary_SupersededHeldBack_Plural,
                 "Summary.SupersededHeldBack"),
-            SupersededHeldBackCount);
+            DisplayHelpers.FormatCount(SupersededHeldBackCount));
 
     /// <summary>
     /// True where this scan emptied its walk-derived offer in one go and something
@@ -367,7 +367,8 @@ public partial class ScanViewModel : ObservableObject
                 NothingListedIsPerFile
                     ? "Summary.NothingListedPerFile"
                     : "Summary.NothingListed"),
-            NothingListedCount, DisplayHelpers.PluraliseFile(NothingListedCount));
+            DisplayHelpers.FormatCount(NothingListedCount),
+            DisplayHelpers.PluraliseFile(NothingListedCount));
 
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));

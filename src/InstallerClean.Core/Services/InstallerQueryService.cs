@@ -1079,7 +1079,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         progress?.Report(new ScanProgressUpdate(string.Format(
             Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
-            claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count))));
+            Helpers.DisplayHelpers.FormatCount(claimed.Count),
+            Helpers.DisplayHelpers.PluralisePackage(claimed.Count))));
 
         var packages = claimed.Values.ToList();
 

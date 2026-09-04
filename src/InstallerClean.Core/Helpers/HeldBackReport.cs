@@ -63,6 +63,6 @@ internal static class HeldBackReport
                 Strings.Completion_HeldBack_Singular,
                 Strings.Completion_HeldBack_Plural,
                 "Completion.HeldBack"),
-            total);
+            DisplayHelpers.FormatCount(total));
     }
 }

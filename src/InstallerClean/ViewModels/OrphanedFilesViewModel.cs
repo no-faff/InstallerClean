@@ -57,7 +57,8 @@ public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
         // and a registered superseded patch; Summary.OrphanedWindow names
         // neither, and the per-row cause is the Reason column.
         Summary = string.Format(Strings.Summary_OrphanedWindow,
-            files.Count, DisplayHelpers.PluraliseFile(files.Count), totalSize);
+            DisplayHelpers.FormatCount(files.Count),
+            DisplayHelpers.PluraliseFile(files.Count), totalSize);
 
         if (Files.Count > 0)
             SelectedFile = Files[0];

@@ -207,7 +207,7 @@ internal static class MissingFilesReport
                     Strings.Summary_MissingFromDisk_OtherPrograms_Singular,
                     Strings.Summary_MissingFromDisk_OtherPrograms_Plural,
                     "Summary.MissingFromDisk.OtherPrograms"),
-                otherPrograms));
+                DisplayHelpers.FormatCount(otherPrograms)));
 
         if (unnamedFiles > 0)
             parts.Add(string.Format(
@@ -215,7 +215,7 @@ internal static class MissingFilesReport
                     Strings.Summary_MissingFromDisk_Unnamed_Singular,
                     Strings.Summary_MissingFromDisk_Unnamed_Plural,
                     "Summary.MissingFromDisk.Unnamed"),
-                unnamedFiles));
+                DisplayHelpers.FormatCount(unnamedFiles)));
 
         return string.Join(Strings.Display_ListSeparator, parts);
     }

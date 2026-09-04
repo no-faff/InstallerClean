@@ -16,7 +16,8 @@ public partial class ConfirmMoveWindow : Window
     {
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
-        MessageText.Text = string.Format(Strings.Confirm_MoveTitle, fileCount, label, sizeDisplay);
+        MessageText.Text = string.Format(
+            Strings.Confirm_MoveTitle, DisplayHelpers.FormatCount(fileCount), label, sizeDisplay);
         DestinationLabel.Text = DisplayHelpers.Pluralise(fileCount,
             Strings.Confirm_MoveDestination_Singular,
             Strings.Confirm_MoveDestination_Plural,

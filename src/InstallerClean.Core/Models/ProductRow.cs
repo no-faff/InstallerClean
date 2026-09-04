@@ -68,6 +68,6 @@ public sealed record ProductRow(
             ProductName,
             FileName,
             IsMissing ? Strings.Field_Missing : SizeDisplay,
-            $"{PatchCount} {DisplayHelpers.PluralisePatch(PatchCount)}",
+            $"{DisplayHelpers.FormatCount(PatchCount)} {DisplayHelpers.PluralisePatch(PatchCount)}",
         }.Where(part => !string.IsNullOrEmpty(part)));
 }

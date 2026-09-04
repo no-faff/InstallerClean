@@ -352,7 +352,10 @@ public class MainViewModelTests
         await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.Equal(10_000, vm.Scan.OrphanedFileCount);
-        Assert.Equal("10000 unneeded files to clean up", vm.Scan.OrphanedSummaryText);
+        // Grouped, because a count on a screen is written the way the reader's
+        // region writes one. The comma is English's; the same line reads
+        // "10.000" in German and "10 000" in French.
+        Assert.Equal("10,000 unneeded files to clean up", vm.Scan.OrphanedSummaryText);
         Assert.False(vm.Completion.IsComplete);
     }
 

@@ -946,7 +946,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
-            removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
+            DisplayHelpers.FormatCount(removable.Count),
+            DisplayHelpers.PluraliseFile(removable.Count))));
         // THE PROGRESS LINE COUNTS WHAT IS OFFERED AND NAMES NOTHING KEPT BACK, and
         // the three identity counts that used to travel here went with the pass that
         // produced them. Files ARE kept back per file, by the declared-product screen

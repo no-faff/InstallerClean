@@ -248,7 +248,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         var shownCount = packages.Count - missingCount + withheld.Count;
         var summary = string.Format(
             DisplayHelpers.Pluralise(shownCount, Strings.Summary_RegisteredWindow_Singular, Strings.Summary_RegisteredWindow_Plural, "Summary.RegisteredWindow"),
-            shownCount,
+            DisplayHelpers.FormatCount(shownCount),
             DisplayHelpers.FormatSize(totalBytes + withheld.Sum(f => f.SizeBytes)));
 
         // Joined on the shared separator rather than a comma written here, on the same
@@ -261,7 +261,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     Strings.Summary_RegisteredWindow_Missing_Singular,
                     Strings.Summary_RegisteredWindow_Missing_Plural,
                     "Summary.RegisteredWindow.Missing"),
-                missingCount);
+                DisplayHelpers.FormatCount(missingCount));
 
         // Open on the first product whose installer file is missing from disk,
         // when there is one. The main window's missing-from-disk banner ends

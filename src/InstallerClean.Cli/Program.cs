@@ -451,13 +451,14 @@ internal static class Program
             string HeldBackLine(string singular, string plural, string keyPrefix) =>
                 string.Format(
                     DisplayHelpers.Pluralise(withheldCount, singular, plural, keyPrefix),
-                    withheldCount, DisplayHelpers.PluraliseFile(withheldCount),
+                    DisplayHelpers.FormatCount(withheldCount),
+                    DisplayHelpers.PluraliseFile(withheldCount),
                     DisplayHelpers.FormatSize(scanResult.WithheldTotalBytes));
 
             Console.WriteLine(count > 0
                 ? string.Format(
                     DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
-                    count, DisplayHelpers.PluraliseFile(count), size)
+                    DisplayHelpers.FormatCount(count), DisplayHelpers.PluraliseFile(count), size)
                 : scanResult.Withholding switch
                 {
                     WithholdingAccount.WholeWalkOffer => HeldBackLine(
@@ -638,7 +639,7 @@ internal static class Program
                 if (count > 0)
                     Console.WriteLine(string.Format(
                         DisplayHelpers.Pluralise(count, Strings.Cli_DeletingFiles, "Cli.DeletingFiles"),
-                        count, DisplayHelpers.PluraliseFile(count)));
+                        DisplayHelpers.FormatCount(count), DisplayHelpers.PluraliseFile(count)));
                 // Skip the service when the re-verify left nothing to act on:
                 // DeleteFilesService returns 0/0 for an empty list anyway, but
                 // synthesizing it keeps the /d and /m branches symmetric (Move
@@ -694,7 +695,8 @@ internal static class Program
 
                 Console.WriteLine(string.Format(
                     DisplayHelpers.Pluralise(result.DeletedCount, Strings.Cli_DeletedFiles, "Cli.DeletedFiles"),
-                    result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
+                    DisplayHelpers.FormatCount(result.DeletedCount),
+                    DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)
                 {
                     // Plural "errors:" whatever the count, so that
@@ -773,7 +775,7 @@ internal static class Program
             if (count > 0)
                 Console.WriteLine(string.Format(
                     DisplayHelpers.Pluralise(count, Strings.Cli_MovingFiles, "Cli.MovingFiles"),
-                    count, DisplayHelpers.PluraliseFile(count), moveDest));
+                    DisplayHelpers.FormatCount(count), DisplayHelpers.PluraliseFile(count), moveDest));
             // See the /d branch: skip the service (and MoveFilesService's
             // destination-folder create + probe) when nothing survived the
             // re-verify; synthesize the empty result so the summary path still fires
@@ -838,7 +840,8 @@ internal static class Program
 
             Console.WriteLine(string.Format(
                 DisplayHelpers.Pluralise(moveResult.MovedCount, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
-                moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
+                DisplayHelpers.FormatCount(moveResult.MovedCount),
+                DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
             if (moveResult.Errors.Count > 0)
             {
                 // See the matching block in the /d branch for the always-plural
@@ -1038,7 +1041,7 @@ internal static class Program
                             ? Strings.Cli_NothingListedPerFile_Plural
                             : Strings.Cli_NothingListed_Plural,
                         perFile ? "Cli.NothingListedPerFile" : "Cli.NothingListed"),
-                    heldBack, DisplayHelpers.PluraliseFile(heldBack),
+                    DisplayHelpers.FormatCount(heldBack), DisplayHelpers.PluraliseFile(heldBack),
                     DisplayHelpers.FormatSize(scanResult.WithheldTotalBytes)));
 
             // AND WHY, ONE LINE PER CONDITION THE RUN MET, FROM BOTH HALVES OF THE
@@ -1079,7 +1082,7 @@ internal static class Program
                     Strings.Cli_SupersededHeldBack_Singular,
                     Strings.Cli_SupersededHeldBack_Plural,
                     "Cli.SupersededHeldBack"),
-                scanResult.WithheldCount));
+                DisplayHelpers.FormatCount(scanResult.WithheldCount)));
 
         // AND THE NOTICE IS ITS OWN CONDITION NOW, WHICH IS THE WHOLE POINT OF THE
         // SPLIT. The two sat in one branch for as long as the human line was gated on
@@ -1119,7 +1122,7 @@ internal static class Program
                     Strings.Cli_MissingFromDisk_Singular,
                     Strings.Cli_MissingFromDisk_Plural,
                     "Cli.MissingFromDisk"),
-                scanResult.MissingAffectedCount, programs));
+                DisplayHelpers.FormatCount(scanResult.MissingAffectedCount), programs));
             MachineContract.WriteEventLog(CliEventClass.ScanMissingFilesNotice,
                 () => string.Format(Strings.Cli_EventLogMissingFromDisk,
                     arg, scanResult.MissingAffectedCount));
@@ -1271,7 +1274,8 @@ internal static class Program
         var partial = ex.Partial;
         Console.WriteLine(string.Format(
             DisplayHelpers.Pluralise(partial.MovedCount, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
-            partial.MovedCount, DisplayHelpers.PluraliseFile(partial.MovedCount)));
+            DisplayHelpers.FormatCount(partial.MovedCount),
+            DisplayHelpers.PluraliseFile(partial.MovedCount)));
         if (partial.Errors.Count > 0)
         {
             // See the /d branch for the always-plural rationale and the

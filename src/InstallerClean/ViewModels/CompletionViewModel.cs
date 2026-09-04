@@ -243,7 +243,7 @@ public partial class CompletionViewModel : ObservableObject
         Summary = Strings.Completion_NothingToCleanUp;
         Restore = string.Format(
             Strings.Completion_NothingToCleanUpReceipt,
-            installedProductCount,
+            DisplayHelpers.FormatCount(installedProductCount),
             DisplayHelpers.PluraliseProduct(installedProductCount),
             DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
         Errors = string.Empty;
@@ -328,12 +328,12 @@ public partial class CompletionViewModel : ObservableObject
                 perFile
                     ? "Completion.NothingOfferedPerFileBody"
                     : "Completion.NothingOfferedBody"),
-            withheldCount,
+            DisplayHelpers.FormatCount(withheldCount),
             DisplayHelpers.PluraliseFile(withheldCount),
             DisplayHelpers.FormatSize(withheldBytes));
         Restore = string.Format(
             Strings.Completion_NothingToCleanUpReceipt,
-            installedProductCount,
+            DisplayHelpers.FormatCount(installedProductCount),
             DisplayHelpers.PluraliseProduct(installedProductCount),
             DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
         Errors = string.Empty;
@@ -403,7 +403,8 @@ public partial class CompletionViewModel : ObservableObject
         // So the total stays here until every value has been written without it.
         return string.Format(
             DisplayHelpers.Pluralise(failedCount, singular, plural, key),
-            failedCount, actedCount + failedCount);
+            DisplayHelpers.FormatCount(failedCount),
+            DisplayHelpers.FormatCount(actedCount + failedCount));
     }
 
     /// <summary>
@@ -489,7 +490,7 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_MoveSummary_Singular,
                     Strings.Completion_MoveSummary_Plural,
                     "Completion.MoveSummary"),
-                movedCount, movedLabel, destination);
+                DisplayHelpers.FormatCount(movedCount), movedLabel, destination);
         // No restore line when nothing moved: it tells the reader when to delete
         // the backup folder, and a move that put nothing there has not made one
         // worth naming. A stopped Move takes its sentence on every arm instead,
@@ -538,7 +539,7 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_PermanentDeleteSummary_Singular,
                     Strings.Completion_PermanentDeleteSummary_Plural,
                     "Completion.PermanentDeleteSummary"),
-                deletedCount, deletedLabel);
+                DisplayHelpers.FormatCount(deletedCount), deletedLabel);
         Restore = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
@@ -602,7 +603,8 @@ public partial class CompletionViewModel : ObservableObject
         // blanking it here would trade one wrong screen for another.
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_MoveCancelledSummary, "Completion.MoveCancelledSummary"),
-            movedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount), destination);
+            DisplayHelpers.FormatCount(movedCount), DisplayHelpers.FormatCount(totalCount),
+            DisplayHelpers.PluraliseFile(totalCount), destination);
         // The undo, and it is this screen's own line rather than the completed
         // screen's. Somebody who stopped a Move part-way wants the files back where
         // they were, and a Move only ever moved them, so naming the folder they
@@ -650,7 +652,8 @@ public partial class CompletionViewModel : ObservableObject
         SummaryDestination = string.Empty;
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_PermanentDeleteCancelledSummary, "Completion.PermanentDeleteCancelledSummary"),
-            deletedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
+            DisplayHelpers.FormatCount(deletedCount), DisplayHelpers.FormatCount(totalCount),
+            DisplayHelpers.PluraliseFile(totalCount));
         Restore = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);

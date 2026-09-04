@@ -1648,8 +1648,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </summary>
     public string OperationProgressDetail =>
         string.Format(Strings.Summary_OperationFiles,
-            OperationCurrentFile,
-            OperationTotalFiles,
+            DisplayHelpers.FormatCount(OperationCurrentFile),
+            DisplayHelpers.FormatCount(OperationTotalFiles),
             DisplayHelpers.PluraliseFile(OperationTotalFiles));
 
     partial void OnOperationCurrentFileChanged(int value) =>
