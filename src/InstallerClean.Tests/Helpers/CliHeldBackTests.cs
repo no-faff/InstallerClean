@@ -216,8 +216,9 @@ public class CliHeldBackTests
         // Four things reach this figure and only two of them are a read that
         // failed: a product row the API skipped, a product whose records would not
         // read, a cached file the registry claims and the API never mentioned, and
-        // a product Windows declined to answer about at all. Composed here exactly
-        // as the write site composes it.
+        // a product the registry named that this scan could not settle either way,
+        // Windows declining to answer or the key name yielding no code to ask with.
+        // Composed here exactly as the write site composes it.
         var line = string.Format(Strings.Cli_EventLogScanWithheld, "/s", 3);
 
         Assert.DoesNotContain("matched up", line, StringComparison.OrdinalIgnoreCase);
