@@ -294,6 +294,13 @@ public class CompletionViewModelTests
         // screen.
         Assert.Contains("2", vm.FailedCount);
         Assert.DoesNotContain("71", vm.FailedCount);
+        // AND THE DENOMINATOR BY NAME, wherever one is spelled. The tried count
+        // is not the only number this call holds: the files that moved and the
+        // files that failed are both here, and a line putting either of them
+        // under the failure count names no batch either. Naming 5 is what ties
+        // the sentence to what the operation actually tried.
+        if (cultureName != SupportedLanguages.Neutral)
+            Assert.Contains("5", vm.FailedCount);
         Assert.Contains("71", vm.Summary);
         // A cancel is not a failure, so the heading stays as it was. This is the
         // control on the pair below: three files really did move and the size
