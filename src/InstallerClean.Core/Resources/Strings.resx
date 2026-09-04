@@ -1733,11 +1733,15 @@ The crash log could not be written.</value></data>
   <data name="Cli.EventLogNothingOfferedNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain which cached files belong to the programs installed here, so it has held back {1} {2} and offered nothing it found by looking in the folder.</value></data>
   <!-- The per-file twin of the notice above, at the same Event ID 3002 and for the
        same reason: the outcome band cannot separate a machine nothing could be judged
-       on from one that is genuinely clean. It says "some" where the notice above says
-       nothing of the kind, this being the run that still offered something. Same three
-       arguments, same order, and it names no folder, which is the rule on this channel
-       and is stated above. -->
-  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain about some of the cached files it found, so it has held back {1} {2}.</value></data>
+       on from one that is genuinely clean. IT NAMES NO SHARE OF THE FILES IT WAS
+       UNCERTAIN ABOUT, because it is written on both the runs the note above describes:
+       the one that offered something beside the withheld half, and the one that offered
+       nothing at all. On that second run the outcome line one band away says the app
+       could not establish that any of the cached files are unneeded, and the two sit in
+       the same log a band apart, so a word here naming a share of them would describe
+       one machine two ways. Same three arguments, same order, and it names no folder,
+       which is the rule on this channel and is stated above. -->
+  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that particular cached files it found are unneeded, so it has held back {1} {2}.</value></data>
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does
