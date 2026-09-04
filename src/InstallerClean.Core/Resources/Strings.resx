@@ -1245,7 +1245,15 @@ InstallerClean was already running as administrator, so starting it again that w
        Error.InvalidDestinationTitle are destinations that really are invalid. No
        placeholders. -->
   <data name="Error.MoveStoppedTitle" xml:space="preserve"><value>Move stopped</value></data>
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Could not write to destination</value></data>
+  <!-- Raised only from the Move flow, so the folder it names is the backup folder
+       the user nominated. EIGHT BODIES CAN FOLLOW IT and the heading has to hold
+       over every one: five open on a form of "cannot write to", and three name a
+       reason of their own, a permission that is missing, a path too long for Windows
+       and a folder that could not be created. Naming what the app could not do with
+       the folder is true over all eight and leaves the bodies where they are. One of
+       them, Error.CannotWriteFolder, also prints on the command line with no heading
+       above it, so it is not one a subject can be taken out of. -->
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Couldn't use that backup folder</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Move failed</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Delete failed</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its
