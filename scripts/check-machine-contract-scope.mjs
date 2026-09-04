@@ -54,8 +54,27 @@ const SCOPES = ['MachineContract.English', 'MachineContract.WriteEventLog'];
 
 // Comments come off first, so a file discussing a call is not a finding and a call
 // commented out is not one either.
-const codeOnly = (s) =>
-  s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^[ \t]*\/\/.*$/gm, ' ').replace(/\/\/.*$/gm, ' ');
+//
+// A // IS ONLY A COMMENT WHERE IT IS NOT INSIDE A STRING, and cutting at the first one
+// regardless takes the rest of the line with it. A call sharing a line with a URL
+// literal would then be invisible, which is a bare call this reports as clean. The cut
+// is taken at the first // with an even number of unescaped quotes before it, which is
+// what check-counted-string-inventory does for the same reason.
+function codeOnly(source) {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .split('\n')
+    .map((line) => {
+      let quotes = 0;
+      for (let i = 0; i < line.length; i++) {
+        if (line[i] === '\\') { i++; continue; }
+        if (line[i] === '"') quotes++;
+        else if (line[i] === '/' && line[i + 1] === '/' && quotes % 2 === 0) return line.slice(0, i);
+      }
+      return line;
+    })
+    .join('\n');
+}
 
 function* csFiles(dir) {
   for (const name of readdirSync(dir)) {
