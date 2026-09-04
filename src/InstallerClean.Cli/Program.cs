@@ -1259,10 +1259,10 @@ internal static class Program
     /// destination problem and not where those files went.
     /// </summary>
     /// <remarks>
-    /// The summary, the error block and the line naming the backup folder come
-    /// first, in the shape and the order an ordinary <c>/m</c> prints them, so a
-    /// script's <c>\d+ errors:</c> scrape lands where it always does; the guard's
-    /// reason follows.
+    /// The summary and the error block come first, in the shape and the order an
+    /// ordinary <c>/m</c> prints them, so a script's <c>\d+ errors:</c> scrape lands
+    /// where it always does. The guard's reason follows, and the line naming the
+    /// backup folder comes last, under the news rather than above it.
     /// </remarks>
     private static int ReportAbortedMove(
         string arg, MoveAbortedException ex, string moveDest, int count,
@@ -1281,17 +1281,6 @@ internal static class Program
             foreach (var err in partial.Errors)
                 Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
         }
-        // IT NAMES ex.Destination AND NOT THE PATH THIS METHOD WAS HANDED, which is
-        // the folder the files are actually in and the one thing this call does
-        // differently from the ordinary /m one; the property's own summary says why
-        // the two can differ. The line's whole job is to name the folder somebody
-        // has to go and delete. The sentence below names the configured path on
-        // purpose and for the opposite reason, asking the reader to go and look at
-        // what they set.
-        //
-        // After the error block and only where something moved, as in the /m branch.
-        if (partial.MovedCount > 0)
-            Console.WriteLine(string.Format(Strings.Cli_MoveRestoreHint, ex.Destination));
         // The command line's wording of the guard's sentence rather than
         // ex.Message, which is the window's: that one closes on Re-scan, a button
         // this surface has not got. Substituting it is sound because
@@ -1302,7 +1291,27 @@ internal static class Program
         // hosts are held to that together: the guard's two conditions differ in
         // nothing the reader of this line does next, and a sentence that named
         // one of them would be naming it for a batch that met the other.
+        //
+        // It names the configured path on purpose, asking the reader to go and look
+        // at what they set. The line below names where the files went, and the two
+        // are different folders in exactly the case this method reports.
         Console.WriteLine(string.Format(Strings.Cli_DestinationChangedMidBatch, moveDest));
+        // UNDER THE SENTENCE SAYING THE RUN WENT NO FURTHER, which is the order the
+        // cancel re-entry above takes with its own pair: the reader learns the run
+        // stopped and is then told what to do about the files it had already moved,
+        // so the line they act on is the last one. Above the news, an instruction to
+        // check their programs and then delete the backup folder reads as the close
+        // of a run that went the distance.
+        //
+        // IT NAMES ex.Destination AND NOT THE PATH THIS METHOD WAS HANDED, which is
+        // the folder the files are actually in and the one thing this call does
+        // differently from the ordinary /m one; the property's own summary says why
+        // the two can differ. The line's whole job is to name the folder somebody
+        // has to go and delete.
+        //
+        // Only where something moved, as in the /m branch.
+        if (partial.MovedCount > 0)
+            Console.WriteLine(string.Format(Strings.Cli_MoveRestoreHint, ex.Destination));
 
         var outcome = CliContract.ClassifyAbortedMove(partial.MovedCount);
         // Built inside the en-GB scope, never before it; see the /d summary for
