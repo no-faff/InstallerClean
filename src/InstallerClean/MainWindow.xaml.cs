@@ -599,9 +599,10 @@ public partial class MainWindow : Window
         // MISSING FROM DISK ARE RAISED HERE. Each arrives by a Collapsed-to-Visible
         // transition, which is the transition the bridge does not announce on its own,
         // so a line with a live setting and no raise is marked for speech and never
-        // spoken. The window's other live regions are raised where their own values
-        // change, and a value changing inside an already-rendered subtree needs no
-        // raise at all.
+        // spoken. The window's other live regions are raised on that same reveal,
+        // each at the point the window makes it. The rest carry no raise because the
+        // bridge announces a text change on its own once the element is in the
+        // rendered tree.
         //
         // These branches are listed top to bottom as the lines are drawn, and that is
         // for whoever reads them next rather than for the reader of the screen: one
