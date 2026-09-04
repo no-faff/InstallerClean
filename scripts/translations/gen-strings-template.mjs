@@ -460,7 +460,8 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `GitHub returned an error response. Try again in a few minutes.`,
   'UpdateCheck.Failed.ResponseParseError': `GitHub's response did not contain a recognised release. Try again later, or open the releases page directly.`,
   'UpdateCheck.Failed.Timeout': `The check timed out. Your connection to GitHub may be slow; try again.`,
-  'UpdateCheck.Failed.Unknown': `The check failed for an unknown reason. Details are in crash.log if you need to report it.`,
+  'UpdateCheck.Failed.Unknown': `The check failed for an unknown reason. Details are in {0} if you need to report it.`,
+  'UpdateCheck.Failed.Unknown.NoLog': `The check failed for an unknown reason. The crash log could not be written.`,
 
   // 0 = the URL the user was trying to reach
   'BrowserLaunch.ClipboardOk': `InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,

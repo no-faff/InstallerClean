@@ -110,7 +110,14 @@ public sealed class UpdateCheckService : IUpdateCheckService
     }
 
     private readonly HttpClient _http;
-    private readonly Action<Exception> _logDiagnostic;
+
+    /// <summary>
+    /// Writes the diagnostic and answers with what the writer answered: where it
+    /// went, and whether it got there. The answer is what lets the unknown-reason
+    /// message name the file only when there is a file, which is why this is not
+    /// an <c>Action</c>.
+    /// </summary>
+    private readonly Func<Exception, (string Path, bool Written)> _logDiagnostic;
 
     public UpdateCheckService() : this(SharedClient, ex => CrashLog.TryWrite(ex)) { }
 
@@ -123,10 +130,12 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// through the same <see cref="CreateClient"/> the shipping path uses,
     /// so the timeout and body cap under test are the shipping values.
     /// </summary>
-    internal UpdateCheckService(HttpMessageHandler handler, Action<Exception> logDiagnostic)
+    internal UpdateCheckService(
+        HttpMessageHandler handler, Func<Exception, (string Path, bool Written)> logDiagnostic)
         : this(CreateClient(handler), logDiagnostic) { }
 
-    private UpdateCheckService(HttpClient http, Action<Exception> logDiagnostic)
+    private UpdateCheckService(
+        HttpClient http, Func<Exception, (string Path, bool Written)> logDiagnostic)
     {
         _http = http;
         _logDiagnostic = logDiagnostic;
@@ -240,8 +249,9 @@ public sealed class UpdateCheckService : IUpdateCheckService
             // Ungated on purpose. Everything above is a network the app was
             // built to meet; what reaches here is not, and an unanticipated
             // exception inside an elevated process is what crash.log is for.
-            _logDiagnostic(ex);
-            return new CheckFailed(UpdateCheckFailureReason.Unknown);
+            var crash = _logDiagnostic(ex);
+            return new CheckFailed(UpdateCheckFailureReason.Unknown,
+                crash.Written ? crash.Path : null);
         }
     }
 
@@ -262,6 +272,10 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// </summary>
     private void LogIfUserIsWaiting(UpdateCheckOrigin origin, Exception ex)
     {
+        // The answer goes nowhere here, and that is the right reading rather than
+        // an omission: the message for a network failure tells the reader about
+        // their connection and never about the log, so there is nothing for a path
+        // to appear in. Only the unknown-reason arm names the file.
         if (origin == UpdateCheckOrigin.Manual)
             _logDiagnostic(ex);
     }

@@ -223,7 +223,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
             case CheckFailed failed:
                 UpdateStatusText = string.Empty;
-                _dialogs.ShowWarning(FailureReasonText(failed.ReasonCode), Strings.UpdateCheck_Title);
+                _dialogs.ShowWarning(FailureReasonText(failed), Strings.UpdateCheck_Title);
                 break;
         }
 
@@ -296,13 +296,22 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
         return _updateCts.Token;
     }
 
-    private static string FailureReasonText(UpdateCheckFailureReason reason) => reason switch
+    /// <summary>
+    /// The sentence for a failed check. Four of the five reasons are the reason
+    /// alone; the fifth offers the crash log, so it takes the whole result and
+    /// reads the path off it. A path is there only where this check wrote an entry
+    /// and the write succeeded, so the sibling naming the file is chosen by whether
+    /// the file exists to be named rather than by which branch ran.
+    /// </summary>
+    private static string FailureReasonText(CheckFailed failed) => failed.ReasonCode switch
     {
         UpdateCheckFailureReason.NetworkUnavailable => Strings.UpdateCheck_Failed_NetworkUnavailable,
         UpdateCheckFailureReason.ServerError => Strings.UpdateCheck_Failed_ServerError,
         UpdateCheckFailureReason.ResponseParseError => Strings.UpdateCheck_Failed_ResponseParseError,
         UpdateCheckFailureReason.Timeout => Strings.UpdateCheck_Failed_Timeout,
-        _ => Strings.UpdateCheck_Failed_Unknown,
+        _ => failed.CrashLogPath is { } path
+            ? string.Format(Strings.UpdateCheck_Failed_Unknown, path)
+            : Strings.UpdateCheck_Failed_Unknown_NoLog,
     };
 
     private bool HasScanResult => _scan.LastScanResult is not null;

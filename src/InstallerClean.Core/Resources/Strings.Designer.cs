@@ -465,6 +465,7 @@ public static class Strings
     public static string UpdateCheck_Failed_ServerError => Get("UpdateCheck.Failed.ServerError");
     public static string UpdateCheck_Failed_Timeout => Get("UpdateCheck.Failed.Timeout");
     public static string UpdateCheck_Failed_Unknown => Get("UpdateCheck.Failed.Unknown");
+    public static string UpdateCheck_Failed_Unknown_NoLog => Get("UpdateCheck.Failed.Unknown.NoLog");
     public static string UpdateCheck_Status_Checking => Get("UpdateCheck.Status.Checking");
     public static string UpdateCheck_Status_UpdateAvailable => Get("UpdateCheck.Status.UpdateAvailable");
     public static string UpdateCheck_Status_UpToDate => Get("UpdateCheck.Status.UpToDate");

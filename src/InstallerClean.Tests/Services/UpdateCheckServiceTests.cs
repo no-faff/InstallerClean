@@ -67,11 +67,28 @@ public class UpdateCheckServiceTests
         return response;
     }
 
+    /// <summary>
+    /// The service with the network and the crash-log writer both substituted.
+    /// <paramref name="crashLogPath"/> and <paramref name="crashLogWritten"/> are
+    /// what the substituted writer ANSWERS, which is the writer's own decision in
+    /// production and the test's here: they say nothing about a file, and no file
+    /// is written. The defaults are the ordinary case, a write that succeeded.
+    /// </summary>
+    /// <summary>What the substituted writer says it wrote, where a test does not say otherwise.</summary>
+    private const string StubCrashLogPath = @"C:\ProgramData\InstallerClean\crash.log";
+
     private static (UpdateCheckService Service, List<Exception> Logged) Build(
-        Func<HttpResponseMessage> respond)
+        Func<HttpResponseMessage> respond,
+        string crashLogPath = StubCrashLogPath,
+        bool crashLogWritten = true)
     {
         var logged = new List<Exception>();
-        return (new UpdateCheckService(new StubHandler(respond), logged.Add), logged);
+        var service = new UpdateCheckService(new StubHandler(respond), ex =>
+        {
+            logged.Add(ex);
+            return (crashLogPath, crashLogWritten);
+        });
+        return (service, logged);
     }
 
     [Fact]
@@ -306,7 +323,40 @@ public class UpdateCheckServiceTests
 
         var result = await service.CheckAsync(origin);
 
-        Assert.Equal(new CheckFailed(UpdateCheckFailureReason.Unknown), result);
+        Assert.Equal(
+            new CheckFailed(UpdateCheckFailureReason.Unknown, StubCrashLogPath), result);
         Assert.Single(logged);
+    }
+
+    /// <summary>
+    /// The pair behind the two sentences the unknown-reason box can show. Only
+    /// this arm offers the log, so only this arm needs to know whether there is
+    /// one, and the answer comes from the writer rather than from the fact that it
+    /// was called.
+    /// </summary>
+    [Fact]
+    public async Task An_unknown_failure_carries_where_the_entry_went()
+    {
+        var (service, _) = Build(
+            () => throw new InvalidOperationException("not a network failure"),
+            crashLogPath: @"D:\logs\ic.log");
+
+        var result = await service.CheckAsync(UpdateCheckOrigin.Manual);
+
+        Assert.Equal(@"D:\logs\ic.log", Assert.IsType<CheckFailed>(result).CrashLogPath);
+    }
+
+    [Fact]
+    public async Task An_unknown_failure_whose_write_did_not_land_carries_no_path()
+    {
+        // The path the writer names is still handed back when the write failed, so
+        // a result built from the call alone would carry a file that is not there.
+        var (service, _) = Build(
+            () => throw new InvalidOperationException("not a network failure"),
+            crashLogPath: @"D:\logs\ic.log", crashLogWritten: false);
+
+        var result = await service.CheckAsync(UpdateCheckOrigin.Manual);
+
+        Assert.Null(Assert.IsType<CheckFailed>(result).CrashLogPath);
     }
 }

@@ -27,7 +27,17 @@ public sealed record UpdateAvailable(string CurrentVersion, string LatestVersion
 /// localise; the underlying exception (if any) goes to crash.log
 /// rather than into the displayed message.
 /// </summary>
-public sealed record CheckFailed(UpdateCheckFailureReason ReasonCode) : UpdateCheckResult;
+/// <param name="ReasonCode">Which of the five shapes the failure took.</param>
+/// <param name="CrashLogPath">
+/// Where this check's own crash-log entry went, and null wherever there is no
+/// entry to point at: a reason that writes none, or a write that did not
+/// succeed. It is here so a message may name the file only where the file is
+/// there to name, which is the whole of what a caller may read into it. Nothing
+/// downstream may take a null for a particular one of those two, and nothing may
+/// take a non-null for anything beyond "this run wrote there".
+/// </param>
+public sealed record CheckFailed(
+    UpdateCheckFailureReason ReasonCode, string? CrashLogPath = null) : UpdateCheckResult;
 
 /// <summary>
 /// Reason a check could not complete. The discriminated set lets the

@@ -1338,7 +1338,14 @@ Details in {1}.</value></data>
   <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub returned an error response. Try again in a few minutes.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub's response did not contain a recognised release. Try again later, or open the releases page directly.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>The check timed out. Your connection to GitHub may be slow; try again.</value></data>
-  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>The check failed for an unknown reason. Details are in crash.log if you need to report it.</value></data>
+  <!-- 0 = the crash log's full path. The pair below is the app's standard shape
+       for a message that offers the log: the first is shown only where the write
+       succeeded and the path is known, the second where it did not, so neither
+       sends anybody to a file that is not there. It names the full path like every
+       other message that offers the log, a bare file name being no use to somebody
+       who has to go and find it. -->
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>The check failed for an unknown reason. Details are in {0} if you need to report it.</value></data>
+  <data name="UpdateCheck.Failed.Unknown.NoLog" xml:space="preserve"><value>The check failed for an unknown reason. The crash log could not be written.</value></data>
   <!-- 0 = the URL the user was trying to reach. The reason the launch failed
        (this process is elevated, so the browser has to be started from the
        user's own medium-integrity shell, and that chain was unavailable) is
