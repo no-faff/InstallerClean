@@ -23,8 +23,10 @@ namespace InstallerClean.Helpers;
 /// binds the path's seams against a line break and can only do that to a real
 /// path, so substituting here, ahead of it, is what keeps that working.
 ///
-/// <c>Cli.EventLogMoveDestinationInsideInstaller</c> keeps the literal: it is
-/// machine-read, and its resx comment says why.
+/// <c>Cli.EventLogMoveDestinationInsideInstaller</c> takes no token. It is
+/// machine-read and held English at the emit site, and it names the folder in
+/// words rather than spelling a path, so it reads the same on every machine
+/// without resolving one; its resx comment carries the rest.
 /// </remarks>
 internal static class InstallerFolderToken
 {

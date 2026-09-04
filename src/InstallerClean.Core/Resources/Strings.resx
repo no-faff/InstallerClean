@@ -1711,9 +1711,9 @@ The crash log could not be written.</value></data>
        IT NAMES NO FOLDER, WHICH IS THE RULE ON THIS CHANNEL AND NOT A PREFERENCE.
        It carried {InstallerFolder} for an afternoon and was the only Cli.EventLog*
        string that did. The one entry here that names the folder,
-       Cli.EventLogMoveDestinationInsideInstaller, spells it as a LITERAL, because a
-       token resolves per machine and a line that varies by machine is the opposite
-       of what a matched shape is for. This notice does not need to name it at all.
+       Cli.EventLogMoveDestinationInsideInstaller, names it in words and spells no
+       path, so it reads the same on every machine without the token. This notice
+       does not need to name it at all.
 
        AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", so it reads
        "1 file" at a count of one and is correct at every other. THE SIBLING ABOVE
@@ -1881,8 +1881,8 @@ The crash log could not be written.</value></data>
   <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.</value></data>
   <!-- 0 = mode, 1 = destination -->
   <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve">
-    <value>{0} mode aborted: destination {1} is inside C:\Windows\Installer.</value>
-    <comment>Application event log, machine-read: RMM tooling greps these lines for a known English phrase, so MachineContract forces en-GB at the emit site and the wording is held still. It is the one string naming the installer folder that keeps the literal rather than the {InstallerFolder} token: a resolved path would vary the line by machine, which is the opposite of what a matched shape needs. The operator-facing lines that name the folder all carry the token.</comment>
+    <value>{0} mode aborted: destination {1} is inside the Windows Installer folder.</value>
+    <comment>Application event log, machine-read: MachineContract forces en-GB at the emit site, so the line reads the same whatever language the machine is in. It names the installer folder in words and spells no path, so it needs neither a literal nor the {InstallerFolder} token; the operator-facing lines that name the folder carry the token. 1 is the destination as the run was given it, and this line is the only record of that path: the sentence printed to stdout beside it names none.</comment>
   </data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0} mode aborted: destination {1} is not a fully qualified path.</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0} mode aborted: destination {1} resolves inside a Windows system folder.</value></data>

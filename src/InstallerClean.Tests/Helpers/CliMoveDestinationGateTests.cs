@@ -18,11 +18,18 @@ namespace InstallerClean.Tests.Helpers;
 /// path and answers with the same exit code; the two carry a sentence each, and
 /// the sentence is what says which gate the run met.
 ///
-/// THE THIRD TEST IS THE CONTROL AND IT IS NOT DECORATION. Both refusals assert
-/// that the scan was never reached, and a service that is never called at all
-/// satisfies that on its own. The accepted destination takes the same fixture
-/// through to a completed move, so what the two refusals show is the gates
-/// answering rather than a fixture that goes nowhere.
+/// THE CONTROL IS NOT DECORATION. Every refusal here asserts that the scan was
+/// never reached, and a service that is never called at all satisfies that on
+/// its own. The accepted destination takes the same fixture through to a
+/// completed move, so what the refusals show is the gates answering rather than
+/// a fixture that goes nowhere.
+///
+/// THE CACHE FOLDER TAKES A CASE OF ITS OWN because the gate's predicate admits
+/// the folder as well as anything under it, and a fixture built by joining a
+/// child name onto it exercises one of those two. The event-log line for that
+/// gate is held here as well: it carries the path the run was given, which the
+/// sentence on stdout does not, so it is the only record of where a refused run
+/// was pointed.
 ///
 /// STDOUT IS READ BACK THROUGH <c>Console.SetOut</c>, WHICH IS PROCESS-GLOBAL.
 /// The assembly disables test parallelisation for a reason of its own, in
@@ -43,6 +50,23 @@ public class CliMoveDestinationGateTests
     private static readonly string InsideSystemFolder = Path.GetFullPath(Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
         "installerclean-cli-gate-test"));
+
+    /// <summary>
+    /// The cache folder itself, the predicate's other arm. Through
+    /// <c>GetFullPath</c> for the same reason the two above go through it: the
+    /// gate ahead of this one takes only a fully qualified path, and the folder's
+    /// own spelling is not one on every host.
+    /// </summary>
+    private static readonly string TheCacheFolderItself =
+        Path.GetFullPath(InstallerCacheHelpers.InstallerFolder);
+
+    /// <summary>
+    /// A destination that reaches the gate without looking as though it should:
+    /// an ordinary folder that Windows has been told to stand for the cache folder,
+    /// so following it lands inside the cache while the text of the path says
+    /// nothing about it. The line prints what the caller typed, which is this.
+    /// </summary>
+    private const string LinkedIntoTheCache = @"D:\backup";
 
     /// <summary>
     /// The destination the gates accept, temp being fully qualified on either host
@@ -74,6 +98,65 @@ public class CliMoveDestinationGateTests
         await move.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task The_cache_folder_itself_is_refused_before_the_scan()
+    {
+        // The case above is a path UNDER the folder. This one is the folder, which
+        // the predicate takes through its other arm. It is neither empty nor
+        // relative, so the two gates ahead of this one pass it and the installer
+        // gate is the first that can answer.
+        var (services, scan, move) = Fixture();
+
+        var (exitCode, stdout) = await RunMove(TheCacheFolderItself, services);
+
+        Assert.Equal(CliExitCode.Error, exitCode);
+        Assert.Contains(Strings.Cli_MoveDestinationInsideInstaller, stdout);
+        await scan.DidNotReceive().ScanAsync(
+            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
+        await move.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// The three destinations that reach the installer gate, which is more than the
+    /// one shape the name suggests.
+    /// </summary>
+    /// <remarks>
+    /// A path under the folder is the ordinary one. The folder ITSELF is admitted
+    /// too, by the predicate's other arm. And a path that shares nothing with the
+    /// folder's name reaches it when the folder it points at is reached through a
+    /// junction: Windows lets a folder anywhere on the machine stand for another
+    /// one, the gate follows that link before it decides, and the line prints the
+    /// path the caller typed rather than the one it led to.
+    /// </remarks>
+    public static TheoryData<string> DestinationsTheGateRefuses() => new()
+    {
+        InsideInstallerCache,
+        TheCacheFolderItself,
+        LinkedIntoTheCache,
+    };
+
+    [Theory]
+    [MemberData(nameof(DestinationsTheGateRefuses))]
+    public void The_installer_gate_event_log_line_names_the_mode_the_path_and_the_folder(
+        string destination)
+    {
+        // Read through the en-GB scope the emit site wraps it in, so what is
+        // asserted is what a machine reads.
+        var line = MachineContract.English(
+            () => Program.MoveDestinationInsideInstallerEventLogLine("/m", destination));
+
+        // Which run and which path, neither of which the sentence on stdout carries.
+        Assert.StartsWith("/m mode aborted:", line, StringComparison.Ordinal);
+        Assert.Contains(destination, line, StringComparison.Ordinal);
+        // And the folder in words. A machine whose Windows sits on another drive has
+        // its cache somewhere other than C:, and the third destination above shares
+        // no text with the folder at all, so a spelled path answers for one machine
+        // and one destination shape rather than for the ones this line is written on.
+        Assert.Contains("the Windows Installer folder", line, StringComparison.Ordinal);
     }
 
     [Fact]

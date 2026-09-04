@@ -21,9 +21,10 @@ namespace InstallerClean.Tests.Helpers;
 /// </summary>
 public class InstallerFolderTokenTests
 {
-    // Written to the Application event log, which monitoring tools match on, so
-    // its shape is held stable and English at the emit site (MachineContract).
-    // It is the one string naming the folder that keeps the C: literal.
+    // Written to the Application event log and held English at the emit site
+    // (MachineContract), so a run writes the neutral value whatever language the
+    // machine is in. The neutral names the folder in words; the Japanese copy
+    // spells the path, and it is held out of the sweep below for that reason.
     private const string MachineContractKey = "Cli.EventLogMoveDestinationInsideInstaller";
 
     private const string Literal = "C:\\Windows\\Installer";
@@ -103,12 +104,18 @@ public class InstallerFolderTokenTests
     }
 
     [Fact]
-    public void The_machine_read_event_log_line_keeps_its_literal()
+    public void The_machine_read_event_log_line_names_the_folder_in_words()
     {
+        // Neither a spelled path nor the token: the folder in words, so the one
+        // entry on this channel that names it reads the same on every machine
+        // without resolving anything. The words are asserted beside the two
+        // absences, which a line that had stopped naming the folder at all would
+        // otherwise satisfy.
         var value = Strings.Cli_EventLogMoveDestinationInsideInstaller;
 
-        Assert.Contains(Literal, value, StringComparison.Ordinal);
+        Assert.DoesNotContain(Literal, value, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(InstallerFolderToken.Token, value, StringComparison.Ordinal);
+        Assert.Contains("the Windows Installer folder", value, StringComparison.Ordinal);
     }
 
     [Theory]

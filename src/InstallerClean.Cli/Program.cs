@@ -1619,7 +1619,7 @@ internal static class Program
         {
             Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
             MachineContract.WriteEventLog(CliEventClass.HardError,
-                () => string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, resolved));
+                () => MoveDestinationInsideInstallerEventLogLine(arg, resolved));
             return ExitError;
         }
 
@@ -1633,6 +1633,28 @@ internal static class Program
 
         return null;
     }
+
+    /// <summary>
+    /// The Application-channel line for a <c>/m</c> whose destination resolves
+    /// into the installer cache. <c>{1}</c> is the destination as the run was
+    /// given it, and it is the whole of what this entry adds: the sentence
+    /// printed to stdout beside it names no path, so this line is the only
+    /// record of where the run was pointed.
+    /// </summary>
+    /// <remarks>
+    /// Its own method so the wording can be held by a test without the suite
+    /// writing to the Application channel, which is what the lock-refusal and
+    /// stopped-move lines are separated for: an entry a test run forged is
+    /// indistinguishable from one a real run wrote, on a channel whose contract
+    /// is that a run leaves exactly one summary.
+    ///
+    /// Built outside the en-GB scope, like <see cref="AbortedMoveEventLogLine"/>:
+    /// the caller wraps it, so the line renders English in production and in the
+    /// ambient culture anywhere else.
+    /// </remarks>
+    internal static string MoveDestinationInsideInstallerEventLogLine(
+        string arg, string destination) =>
+        string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, destination);
 
     private static void PrintVersion()
     {

@@ -1516,9 +1516,9 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        IT NAMES NO FOLDER, WHICH IS THE RULE ON THIS CHANNEL AND NOT A PREFERENCE.
        It carried {InstallerFolder} for an afternoon and was the only Cli.EventLog*
        string that did. The one entry here that names the folder,
-       Cli.EventLogMoveDestinationInsideInstaller, spells it as a LITERAL, because a
-       token resolves per machine and a line that varies by machine is the opposite
-       of what a matched shape is for. This notice does not need to name it at all.
+       Cli.EventLogMoveDestinationInsideInstaller, names it in words and spells no
+       path, so it reads the same on every machine without the token. This notice
+       does not need to name it at all.
 
        AND IT TAKES THE PLURALISED NOUN RATHER THAN A HARDCODED "files", so it reads
        "1 file" at a count of one and is correct at every other. THE SIBLING ABOVE
