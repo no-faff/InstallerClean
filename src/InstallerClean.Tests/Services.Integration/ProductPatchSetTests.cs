@@ -335,6 +335,22 @@ public class ProductPatchSetTests
         Assert.Equal(removable, InstallerQueryService.Worse(removable, removable));
     }
 
+    [Fact]
+    public void Exactly_one_pair_of_readings_merges_to_the_value_that_permits()
+    {
+        // Taken over every pair the enum can produce rather than over the three named
+        // above, so a value added to it is in this sweep without anybody having to put
+        // it here, and a merge that let one through would have to be agreed here too.
+        var permitting = (from a in Enum.GetValues<ProductPatchSet>()
+                          from b in Enum.GetValues<ProductPatchSet>()
+                          where InstallerQueryService.Worse(a, b) == ProductPatchSet.AllNonRemovable
+                          select (a, b)).ToArray();
+
+        Assert.Equal(
+            new[] { (ProductPatchSet.AllNonRemovable, ProductPatchSet.AllNonRemovable) },
+            permitting);
+    }
+
     private static void Patch(RegistryKey products, string name, int uninstallable)
     {
         using var patch = products.CreateSubKey($@"{Product}\Patches\{name}", writable: true)!;

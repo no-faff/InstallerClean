@@ -3279,9 +3279,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         if (a == ProductPatchSet.RemovablePatchPresent || b == ProductPatchSet.RemovablePatchPresent)
             return ProductPatchSet.RemovablePatchPresent;
-        if (a == ProductPatchSet.Unestablished || b == ProductPatchSet.Unestablished)
-            return ProductPatchSet.Unestablished;
-        return ProductPatchSet.AllNonRemovable;
+
+        // THE VALUE THAT PERMITS IS THE ONE NAMED, and the inability is what everything
+        // else reduces to. Written that way round, the merge answers a value added to
+        // the enum by withholding, and letting one through has to be a deliberate edit
+        // here as well as there.
+        return a == ProductPatchSet.AllNonRemovable && b == ProductPatchSet.AllNonRemovable
+            ? ProductPatchSet.AllNonRemovable
+            : ProductPatchSet.Unestablished;
     }
 
     /// <summary>
