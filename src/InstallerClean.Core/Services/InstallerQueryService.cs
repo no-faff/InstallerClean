@@ -2126,13 +2126,26 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// characters was.
     ///
     /// THE INVARIANT THAT BUYS IS THE REASON FOR THE CHANGE, and it is worth more
-    /// than the spellings it settles. Every claim leaving this method is now EITHER
-    /// a location the kernel proved OR one whose failure to resolve has been counted,
-    /// and a counted failure withholds the whole walk-derived offer
-    /// (<c>EnumerationCensus.AnyRecordedPathUnestablished</c>). There is no third
-    /// case. So anything downstream comparing a claim is comparing a proven path,
-    /// and a reader asking "could this claim be wrong about where its file is" has
-    /// one answer rather than a case analysis.
+    /// than the spellings it settles. Every claim leaving this method is EITHER a
+    /// location the kernel proved OR one whose failure to resolve has been counted.
+    /// There is no third case, so a reader asking whether a claim's location was
+    /// proved has an answer rather than a case analysis.
+    ///
+    /// WHAT THE COUNTED HALF THEN BUYS IS THE WALK-DERIVED OFFER, AND THAT HALF
+    /// ALONE. A counted failure arms
+    /// <c>EnumerationCensus.AnyRecordedPathUnestablished</c>, which keeps back every
+    /// candidate the walk found and no registration claims; the registered side of
+    /// the scan is decided elsewhere and is not keyed on it. So the surfaces that
+    /// read a registration's own recorded path go on reading the string this method
+    /// returned, proved or counted: the correlation gate, the missing-from-disk
+    /// counts and the registered-files window.
+    ///
+    /// EACH OF THOSE TAKES AN UNPROVEN SPELLING IN THE DIRECTION THAT KEEPS MORE
+    /// BACK, which is why the ask is worth making even though it settles the offer
+    /// on one side only. A claim whose spelling names no walked file lowers the
+    /// correlation count, which moves the scan towards refusing outright; one whose
+    /// file is not found where the claim says raises the missing count, which is a
+    /// warning rather than an offer.
     ///
     /// THE COST ARGUMENT THAT KEPT THE ASK NARROW IS SPENT, and this is what
     /// replaced it. It said a handle per registration was too much to pay. But
@@ -2427,8 +2440,19 @@ public sealed class InstallerQueryService : IInstallerQueryService
             return true;
         }
 
-        // Downgrade only: a removable row loses to a later non-removable claim,
-        // and nothing else moves.
+        // Downgrade only: a removable row loses to a later non-removable claim, and the
+        // whole row goes with the verdict rather than the flag alone. A registration is
+        // one product's account of the file, so what a machine ends up with is the
+        // account of whichever product last displaced the row, its patch state and its
+        // product name included, and a state read under an earlier product does not
+        // survive that.
+        //
+        // THE WHOLE-ROW ASSIGNMENT IS THE POINT RATHER THAN A SHORTCUT. One cached patch
+        // can be superseded under one product and still applied under another, and it is
+        // the applied reading that has to reach the row: moving the flag alone would
+        // leave the row saying superseded on a machine where a product still holds the
+        // patch, and the missing-files report reads that state to decide whether a
+        // registration whose file has gone is worth putting in front of anybody.
         if (existing.IsRemovable && !candidate.IsRemovable)
         {
             claimed[candidate.LocalPackagePath] = candidate;
