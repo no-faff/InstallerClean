@@ -22,9 +22,9 @@ const OUT = 'src/InstallerClean.Core/Resources/Strings.ru.resx';
 // someone adds it here", never silently passes. Do NOT translate these values. Do
 // NOT edit this list per language.
 //
-// The four size suffixes and the two elapsed suffixes were in this list until
-// 2026-08-26 and do not belong in it, because they are not universal: French writes
-// Go/Mo/Ko/o, Russian and Ukrainian write ГБ/МБ/КБ/Б and мс/с. Those three carry real
+// The four size suffixes and the two elapsed suffixes do not belong in this list,
+// because they are not universal: French writes Go/Mo/Ko/o, Russian and Ukrainian
+// write ГБ/МБ/КБ/Б and мс/с. Those three carry real
 // values in their MAP; the languages that do abbreviate as English does keep them in
 // ALSO_KEEP, which is the per-language list. Display.ListSeparator is the same shape,
 // for the same reason.
@@ -589,8 +589,8 @@ const CLI = {
   'Cli.MoveNotEnoughSpace': `Ошибка: недостаточно места в {0}. Для перемещения этих файлов нужно {1}, а свободно {2}. Ничего не перемещено.`,
   'Cli.PendingRebootBlocked.Other': `Ошибка: у Windows Installer что-то выполняется, поэтому /m и /d заблокированы. InstallerClean не будет трогать {InstallerFolder}, пока она меняется. Попробуйте снова, когда всё закончится.`,
   'Cli.FoundNoOrphans': `Ненужных файлов не найдено.`,
-  // Added 2026-08-24 by the translation round, holding the English while the
-  // wording settles. Russian's command-line block is a separate object, so a
+  // These hold the English while the wording settles. Russian's command-line
+  // block is a separate object, so a
   // key added to the neutral reaches the other fourteen MAPs and never this
   // one, and the key goes missing from the Russian resx rather than merely
   // untranslated. Translate both when the English is ruled.

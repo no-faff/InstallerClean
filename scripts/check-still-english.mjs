@@ -89,12 +89,11 @@ const isMachineCliKey = (key) =>
 // every gen-strings-<code>.mjs (they are identical across all fifteen; the template
 // carries six more and says why in its own comment).
 //
-// The four size suffixes and the two elapsed suffixes were in this list until
-// 2026-08-26 and were never universal: French writes Go/Mo/Ko/o and Russian and
-// Ukrainian write ГБ/МБ/КБ/Б and мс/с. They are a per-language keep below now, so a
-// language that abbreviates as English does still passes while a language that has
-// its own forms and has not taken them FAILS, which is what this check is for and
-// what the universal list was suppressing.
+// The four size suffixes and the two elapsed suffixes are not here and are not
+// universal: French writes Go/Mo/Ko/o and Russian and Ukrainian write
+// ГБ/МБ/КБ/Б and мс/с. They are a per-language keep below, so a language that
+// abbreviates as English does still passes while a language that has its own forms
+// and has not taken them FAILS, which is what this check is for.
 const KEEP_ENGLISH = new Set([
   'Window.Main.Title', 'Startup.AlreadyRunningTitle', 'Startup.UnhandledTitle',
   'Automation.ScanResultAnnouncement',
@@ -109,7 +108,7 @@ const KEEP_ENGLISH = new Set([
 // it is a keep everywhere except ja and zh-Hans, which take the ideographic
 // comma and have a real value.
 //
-// The unit suffixes joined it on 2026-08-26 in the same shape. Twelve languages
+// The unit suffixes are here in the same shape. Twelve languages
 // abbreviate a size exactly as English does and keep all six; French keeps only
 // the two elapsed ones, "ms" and "s" being the SI symbols it writes unchanged
 // while Go/Mo/Ko/o are abbreviated French words; Russian and Ukrainian keep none,

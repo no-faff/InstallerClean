@@ -26,9 +26,9 @@ const OUT = `${dir}/Strings.vi.resx`;
 // someone adds it here", never silently passes. Do NOT translate these values. Do
 // NOT edit this list per language.
 //
-// The four size suffixes and the two elapsed suffixes were in this list until
-// 2026-08-26 and do not belong in it, because they are not universal: French writes
-// Go/Mo/Ko/o, Russian and Ukrainian write ГБ/МБ/КБ/Б and мс/с. Those three carry real
+// The four size suffixes and the two elapsed suffixes do not belong in this list,
+// because they are not universal: French writes Go/Mo/Ko/o, Russian and Ukrainian
+// write ГБ/МБ/КБ/Б and мс/с. Those three carry real
 // values in their MAP; the languages that do abbreviate as English does keep them in
 // ALSO_KEEP, which is the per-language list. Display.ListSeparator is the same shape,
 // for the same reason.
