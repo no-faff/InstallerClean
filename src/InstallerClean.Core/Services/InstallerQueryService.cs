@@ -2445,28 +2445,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // one product's account of the file, so what a machine ends up with is the
         // account of whichever product last displaced the row, its product name
         // included.
-        //
-        // THE PATCH STATE IS THE ONE FIELD A CLAIM CANNOT TAKE AWAY WITHOUT BRINGING
-        // ONE, and the two halves of that are separate. A claim carrying a state
-        // replaces what was there: one cached patch can be superseded under one product
-        // and still applied under another, and it is the applied reading that has to
-        // reach the row, or the row would say superseded on a machine where a product
-        // still holds the patch. A claim carrying no state leaves the state alone. Zero
-        // is what a State this loop could not read, or could not parse, arrives as, and
-        // it means not-a-patch to everything downstream that asks, so writing it over a
-        // state Windows gave would put a reading nobody made in front of one somebody
-        // did.
-        //
-        // ZERO IS THE TEST RATHER THAN THE ROW'S UNREADABLE FLAG, WHICH ANSWERS A WIDER
-        // QUESTION. That flag is the OR of this pairing's State read and its
-        // Uninstallable read, so it is set for a claim whose state Windows gave
-        // positively and whose Uninstallable alone would not read; keying on it would
-        // discard a reading the machine had made.
         if (existing.IsRemovable && !candidate.IsRemovable)
         {
-            claimed[candidate.LocalPackagePath] = candidate.PatchState == 0
-                ? candidate with { PatchState = existing.PatchState }
-                : candidate;
+            claimed[candidate.LocalPackagePath] = Displace(existing, candidate);
             return false;
         }
 
@@ -2476,10 +2457,50 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // "nothing was established" to "this product claims it", which is the
         // direction that costs no file and gains a true sentence.
         if (existing.VerdictUnreadable && !candidate.VerdictUnreadable && !candidate.IsRemovable)
-            claimed[candidate.LocalPackagePath] = candidate;
+            claimed[candidate.LocalPackagePath] = Displace(existing, candidate);
 
         return false;
     }
+
+    /// <summary>
+    /// The row a displacement leaves behind, and the one exception to displacing whole.
+    /// Both of <see cref="MergeClaim"/>'s displacements come through here, so the rule
+    /// is written once and a third displacement inherits it rather than having to
+    /// remember it.
+    ///
+    /// THE PATCH STATE IS THE ONE FIELD A CLAIM CANNOT TAKE AWAY WITHOUT BRINGING ONE,
+    /// and the two halves of that are separate. A claim carrying a state replaces what
+    /// was there: one cached patch can be superseded under one product and still applied
+    /// under another, and it is the applied reading that has to reach the row, or the row
+    /// would say superseded on a machine where a product still holds the patch. A claim
+    /// carrying no state leaves the state alone. Zero is what a State the enumeration
+    /// could not read, or could not parse, arrives as, and it means not-a-patch to
+    /// everything downstream that asks, so writing it over a state Windows gave would put
+    /// a reading nobody made in front of one somebody did.
+    ///
+    /// ZERO IS THE TEST RATHER THAN THE ROW'S UNREADABLE FLAG, WHICH ANSWERS A WIDER
+    /// QUESTION. That flag is the OR of a pairing's State read and its Uninstallable
+    /// read, so it is set for a claim whose state Windows gave positively and whose
+    /// Uninstallable alone would not read; keying on it would discard a reading the
+    /// machine had made.
+    ///
+    /// A PRODUCT'S CLAIM IS THE OTHER SHAPE THAT ARRIVES CARRYING NO STATE, and it is
+    /// why this belongs to displacement rather than to the downgrade. A product row is
+    /// built from its LocalPackage alone, so its state is zero because nothing read one
+    /// rather than because something read nothing, and a corrupt value can aim it at a
+    /// patch's cached file. It establishes which product claims the path and nothing
+    /// whatever about the patch.
+    ///
+    /// IT CANNOT PUT A FILE ON THE OFFER. Removability is granted where a row is built
+    /// and never afterwards, and both rows reaching either displacement are already
+    /// non-removable. Carrying the state forward widens what the later per-product pass
+    /// looks at, and that pass only ever withholds.
+    /// </summary>
+    private static RegisteredPackage Displace(
+        RegisteredPackage existing, RegisteredPackage candidate) =>
+        candidate.PatchState == 0
+            ? candidate with { PatchState = existing.PatchState }
+            : candidate;
 
     /// <summary>
     /// The real registry fallback: every SID subtree under UserData, read into

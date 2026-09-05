@@ -297,10 +297,11 @@ public class InstallerQueryServiceUnitTests
     }
 
     // ONE CACHED PATCH REGISTERED TO TWO PRODUCTS, and which product's reading of it
-    // the merged row ends up carrying. The three below are the whole of that rule and
-    // they are written as three because they pull in different directions: a reading
-    // Windows gave has to displace an earlier one, and a claim that established no
-    // reading has to leave the earlier one where it is.
+    // the merged row ends up carrying. The four below are the whole of that rule and
+    // they are written as four because they pull in different directions: a reading
+    // Windows gave has to displace an earlier one, a claim that established no reading
+    // has to leave the earlier one where it is, and the merge has two displacements
+    // rather than one, so the last of them drives the other.
     //
     // THE PATH IS ASSERTED THROUGH GetFullPath FOR THE REASON THE COMMAND LINE'S OWN
     // GATE TESTS DO IT. The scan normalises every recorded path, and a drive-letter
@@ -385,6 +386,47 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
+    public async Task A_products_claim_on_a_patchs_cached_file_leaves_the_state_windows_gave()
+    {
+        // THE MERGE'S OTHER DISPLACEMENT, and the shape that reaches it is the one the
+        // merge's own summary is written about: a corrupt LocalPackage aiming a product
+        // row at a patch's cached file. The three above all run through the downgrade,
+        // because their first claim is removable; this one's is not, so it falls to the
+        // displacement below it and the same rule has to hold there.
+        //
+        // Product A's patch reads Superseded and its Uninstallable does not read, so A's
+        // row carries a real state, no removable verdict and the unreadable flag.
+        // Product B then names the same cached file as its own package, and a product
+        // row is built from its LocalPackage alone: no state, and nothing that failed to
+        // read. B's claim displaces A's on the cause, which is what the branch is for,
+        // and it must not take the state with it.
+        //
+        // THE PATCH SETS ARE SUPPLIED because the row under test has to be non-removable
+        // for the merge's reason rather than the fixture's. A run that leaves every
+        // product unestablished withholds the whole removable class, so the assertion
+        // below would hold on a machine this test is not about.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddPatch("{A}", "{P}", localPackage: SharedPatchPath, state: "2", uninstallable: "0");
+        msi.PatchPropertyResult[("{P}", "{A}", MsiInstallProperty.Uninstallable)] = 5; // access denied
+        msi.AddProduct("{B}");
+        msi.SetProductProperty("{B}", "LocalPackage", SharedPatchPath);
+
+        var result = await RunHealthy(msi);
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == SharedPatchRow);
+        Assert.Equal(2, row.PatchState);
+        Assert.True(row.IsSupersededOrObsoleted);
+
+        // The displacement still happened, which is what stops this passing for the
+        // wrong reason: the row carries B, and no longer says a read failed.
+        Assert.Equal("{B}", row.ProductCode);
+        Assert.False(row.VerdictUnreadable);
+        Assert.False(row.IsRemovable);
+    }
+
+    [Fact]
     public void A_registry_fallback_claim_never_downgrades_an_api_verdict()
     {
         // The scoping rule the whole merge rests on, pinned here because the real
@@ -442,6 +484,29 @@ public class InstallerQueryServiceUnitTests
             InstallerQueryService.ClaimSource.InstallerApi);
 
         Assert.False(claimed[shared].VerdictUnreadable);
+        Assert.Equal("Applied", claimed[shared].ProductName);
+    }
+
+    [Fact]
+    public void A_claim_displacing_on_the_cause_still_brings_its_own_state()
+    {
+        // The half that stops the rule above becoming "the first state wins". A cached
+        // patch can be superseded under one product and still applied under another, and
+        // it is the applied reading that has to reach the row: a row left saying
+        // superseded on a machine where a product still holds the patch would describe a
+        // state nothing reported. The row above it in this file has the same pair with
+        // the state left at its default, so it cannot tell these two apart.
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Superseded", "{A}", PatchState: 2, VerdictUnreadable: true),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Applied", "{B}", PatchState: 1),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        Assert.Equal(1, claimed[shared].PatchState);
         Assert.Equal("Applied", claimed[shared].ProductName);
     }
 
