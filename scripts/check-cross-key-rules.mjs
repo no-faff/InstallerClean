@@ -83,10 +83,9 @@ const LABELS_A_VALUE = new Set([
 // equality is the wrong rule and no rule is the wrong answer. The rule they owe
 // is containment: WCAG 2.5.3 Label in Name asks that the accessible name
 // contain the visible label, so speech input reaches the control by the word
-// the user can see. Both sets used to be one list called DIFFERS_ON_PURPOSE,
-// read once to satisfy rule 2 and never measured, and the merge is what hid the
-// missing rule: rule 2 stops a control being unclassified, not a control being
-// classified into the list that measures nothing.
+// the user can see. KEEP THE TWO SETS APART. Rule 2 stops a control being
+// unclassified and nothing more, so a control filed under the set that measures
+// nothing satisfies it and is then never measured against anything.
 const ELABORATES_A_LABEL = [
   { label: 'Action.Cancel', name: 'Automation.CancelScan' },
   { label: 'Action.Cancel', name: 'Automation.CancelOperation' },
@@ -673,11 +672,10 @@ const heldOutTally = new Map(
 if (stale.length) {
   console.error(`Cross-key rules FAILED (${stale.length}): the declarations in this file are stale.`);
   for (const s of stale) console.error(`  ${s}`);
-  // AND SAY WHAT THIS EXIT DID NOT CHECK, because it silently skipped the whole
-  // per-language pass and that is not visible from the message above. One stale
-  // declaration once hid sixty per-language failures: the run reported a single
-  // problem, was read as "one thing to fix", and the four keys that had lost
-  // their folder token in every satellite were invisible until it was fixed.
+  // AND SAY WHAT THIS EXIT DID NOT CHECK. A stale declaration stops the run before
+  // the per-language pass, so the list above is what this run reached and never a
+  // count of what is wrong: any number of per-language failures can be standing
+  // behind it, unseen, until the declarations are fixed and it runs again.
   console.error(`\n  Rules 1 and 3 to 6 did NOT run: ${LANGS.length} languages unchecked. `
     + 'Fix the declarations and run again before believing anything about the translations.');
   process.exit(1);

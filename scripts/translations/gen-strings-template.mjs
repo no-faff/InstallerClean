@@ -15,7 +15,7 @@
 //     many that is, this file does not say: the set grows whenever the command
 //     line gains an event-log line, and the self-check below derives the figure
 //     from the neutral for exactly that reason. A number written here goes stale
-//     silently while the checked one beside it stays right, and had.
+//     silently while the checked one beside it stays right.
 //   - The `MAP` is seeded with the ENGLISH values, every translatable key (the
 //     non-`Cli.` set plus the human `Cli.` set). You replace each English value with its
 //     translation. A value you leave
@@ -583,10 +583,7 @@ const MAP = {
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
   'Cli.InstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening.`,
   'Cli.MoveInstallerLockUnavailable': `Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening.`,
-  // Added 2026-08-24 by the translation round. Eleven neutral keys had never
-  // reached this MAP, so the template was that many short of the app and a
-  // seventeenth language copied from it would have started with holes. The
-  // values are the neutral's own, as every value here must be.
+  // The values are the neutral's own, as every value here must be.
   'Display.ListSeparator': `, `,
   'Completion.NothingOffered': `Nothing offered on this PC`,
   'Completion.NothingOfferedBody.Singular': `InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it.`,

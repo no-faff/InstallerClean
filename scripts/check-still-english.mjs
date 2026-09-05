@@ -49,11 +49,11 @@ const dir = 'src/InstallerClean.Core/Resources';
 // not read as an empty file. Neither figure is written down here, so adding a
 // string to the resx cannot make this go stale.
 //
-// This gate is blind to an unreadable file by construction and not by accident:
-// its outer loop walks the NEUTRAL's keys, and a key absent from a satellite is
-// skipped as check-resx-parity's finding rather than its own. So an unreadable
-// satellite is an unreadable file in which every key is absent, and it reported
-// "OK (no untranslated keys)" for all fifteen, byte-identical to a clean run.
+// AN UNREADABLE FILE IS WHAT THE CONTROL IS FOR. The outer loop walks the
+// NEUTRAL's keys, and a key absent from a satellite is check-resx-parity's finding
+// rather than this one's, so a satellite that cannot be read is one in which every
+// key is absent. Without the control in front of it that arrives as
+// "OK (no untranslated keys)", byte for byte what a clean run prints.
 const parseControl = (file, xml, parsed) => {
   const raw = (xml.match(/<data\b/g) || []).length;
   if (raw !== 0 && parsed === raw) return;

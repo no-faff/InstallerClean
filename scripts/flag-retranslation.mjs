@@ -18,13 +18,10 @@
 //
 // A key's satellite-only CLDR plural overrides (Key.One/.Few/.Many, which exist
 // in no neutral file) are reset with it, because they are the same sentence in
-// another count form and go stale by the same edit. Nine languages carry 70 of
-// them and one release rewrote the base of five, in five languages, leaving copy
-// on screen that the neutral had just had cut. Every guard was blind to it by
-// construction, an override having no neutral counterpart to be compared with;
-// check-still-english.mjs now compares one against the neutral value it
-// overrides, which is what makes this half of the pair enforceable rather than
-// merely intended.
+// another count form and go stale by the same edit. An override has no neutral
+// counterpart of its own to be measured against, so check-still-english.mjs
+// measures one against the neutral value it overrides, which is what makes this
+// half of the pair enforceable rather than merely intended.
 //
 // IT SHOWS BEFORE IT ACTS, AND THAT IS THE DEFAULT RATHER THAN A FLAG. The real
 // hazard here is judgement and not mechanism: every flag throws away a translation

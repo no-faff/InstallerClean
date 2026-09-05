@@ -10,8 +10,7 @@
 // The sets below are the load-bearing part, and the part that goes stale: they
 // are this file's model of which controls share a window. Moving a button
 // between windows without moving its key here leaves the check reporting clean
-// about a window it is no longer describing, which is exactly what happened when
-// the update button moved from About to the main window's bottom bar.
+// about a window it is no longer describing. A control that moves moves here too.
 //
 // LIVE MEANS ENABLED, NOT MERELY ON SCREEN. AccessKeyManager only targets an
 // element that is both visible and enabled, and the main window's bottom bar is

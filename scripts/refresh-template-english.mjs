@@ -15,11 +15,10 @@
 // WHY IT HAD TO EXIST AT ALL. flag-retranslation.mjs discovers its targets with
 //   .filter((f) => /^gen-strings-.+\.mjs$/.test(f) && f !== 'gen-strings-template.mjs')
 // so it reaches fifteen generators and never the sixteenth, by an explicit name
-// test somebody wrote deliberately. Its own header then says it rewrites "each
-// gen-strings-<code>.mjs", which is true only if you already know the template
-// is not one. So a flag run left the template on the old English, and a
-// translator adding the seventeenth language would have worked from wording the
-// app stopped using on 11 August.
+// test somebody wrote deliberately. So a flag run resets the fifteen and leaves
+// the template holding whatever English it held before, and the template is what
+// a seventeenth language would be copied from. This is what puts the current
+// English into it.
 //
 // THE KEYS THE TEMPLATE'S SELF-CHECK NAMES ARE NOT A SEPARATE BACKLOG. They are
 // the stale keys this script's sibling job flags, plus the ones whose English is

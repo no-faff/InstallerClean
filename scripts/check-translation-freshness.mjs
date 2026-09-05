@@ -12,11 +12,10 @@
 // present, the arity usually matches, and the value is not the current English.
 // It passes all three silently, in every language, for as long as nobody looks.
 //
-// flag-retranslation.mjs's own header has said so since it was written: "a
-// STALE translation (the old wording of a key whose English changed) passes it
-// silently". The mechanism was understood. What was missing was enforcement:
-// the tool has to be RUN when a neutral value moves, and when nobody ran it
-// there was nothing to notice. This is that enforcement.
+// flag-retranslation.mjs is what resets a key when its English moves, and it says
+// so in its own header: "a STALE translation (the old wording of a key whose
+// English changed) passes it silently". A tool has to be reached for. This is the
+// enforcement, asking on every push rather than when somebody remembers.
 //
 // WHAT IT CANNOT DO, STATED HERE SO NOBODY READS A PASS AS MORE THAN IT IS.
 // Which neutral value a given translation was actually made from is not
@@ -234,8 +233,7 @@ for (const [lang, keys] of [...goneByLang].sort()) {
 }
 
 // The totals line is printed ALWAYS, beside the filtered list and never instead
-// of it. A silent zero over an empty set reads exactly like a clean result, and
-// this project has been caught by that shape twice.
+// of it. A silent zero over an empty set reads exactly like a clean result.
 console.log(
   `TOTALS: ${satFiles.length} satellite(s), ${neutral.size} neutral key(s); ` +
   `${checked} key-slot(s) checked, ${fresh} fresh, ${stale.length} STALE, ${deleted.length} GONE, ` +
