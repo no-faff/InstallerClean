@@ -145,7 +145,7 @@ jobs:
       # outside that scope reads it in the language the host is running, so the
       # value under assertion is not the value the channel carries. The bare form
       # is always available and always compiles; this fails on the day one is
-      # written. Its own output names the two things it does not cover.
+      # written. Its own output names two things it does not cover.
       - name: Check the machine-contract values are read in their own scope
         if: success() || failure()
         run: node scripts/check-machine-contract-scope.mjs
