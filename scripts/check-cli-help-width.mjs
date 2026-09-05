@@ -97,9 +97,9 @@ const printed = (value) => value
 // string to the resx cannot make this go stale.
 //
 // Cli.Help lines are a SUBSET of what is parsed, so the control counts every entry
-// read and the return stays filtered. Without it this script printed "CLI help
-// width OK" over fifteen satellites it had not read a byte of, its own line count
-// falling from 320 to 20 with nothing gating on the figure.
+// read while the return stays filtered: a reader that had stopped matching would
+// leave the filtered list empty, and an empty list is also what a file with no
+// long lines produces.
 const parseControl = (file, xml, parsed) => {
   const raw = (xml.match(/<data\b/g) || []).length;
   if (raw !== 0 && parsed === raw) return;
