@@ -146,7 +146,7 @@ jobs:
       # value under assertion is not the value the channel carries. The bare form
       # is always available and always compiles; this fails on the day one is
       # written. Its own output names two things it does not cover.
-      - name: Check the machine-contract values are read in their own scope
+      - name: Check the tests compose machine-contract values in scope
         if: success() || failure()
         run: node scripts/check-machine-contract-scope.mjs
 
@@ -356,7 +356,7 @@ jobs:
               ;;
           esac
 
-      - name: Check access keys do not clash
+      - name: Check the access-key sets for a clash
         if: '!cancelled()'
         # Two controls live on one window at one moment must not share an Alt
         # access key: WPF answers a duplicate by cycling focus between the
@@ -387,7 +387,7 @@ jobs:
       # required key fails the build. Expected to fail on the commits between a
       # string's English landing and its translation round running, rather than
       # only on a mistake.
-      - name: Check every satellite is translated
+      - name: Check no satellite value is still the English
         if: '!cancelled()'
         run: node scripts/check-still-english.mjs
 
@@ -421,7 +421,7 @@ jobs:
       # fails the same way. The ledger is seeded now, so it reports and it fails;
       # a key-slot still outside the ledger is named in a NOTE line and remains
       # one this makes no claim about.
-      - name: Check no translation has fallen behind its English
+      - name: Check translations against the freshness ledger
         if: '!cancelled()'
         run: node scripts/check-translation-freshness.mjs
 
