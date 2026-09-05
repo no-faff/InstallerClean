@@ -18,8 +18,8 @@
 // WHAT IT IS NOT. It is not a freshness ledger and needs no seed file. It reads
 // the value history out of git, which already records every wording the neutral
 // has ever had, so it cannot drift out of step with the thing it measures and
-// there is no state to keep current. check-translation-freshness.mjs holds the
-// ledger idea and reports on an empty one; this holds the answer.
+// there is no state to keep current. check-translation-freshness.mjs answers from
+// a ledger that has to be stamped and kept current; this answers from the history.
 //
 // NO FALSE POSITIVES BY CONSTRUCTION, which is why it can be a hard gate. A
 // satellite value that is byte-identical to a former English value is either the
