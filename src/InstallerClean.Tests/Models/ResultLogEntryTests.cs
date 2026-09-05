@@ -757,7 +757,8 @@ public class ResultLogEntryTests
                 RecoveredProductCount: 17,
                 UnansweredProductCount: 18),
             RegisteredWithheldCount: 19,
-            WithheldFiles: withheld);
+            WithheldFiles: withheld,
+            WithheldBy: new WithholdingSplit(20, 21, 22, 23, 24));
 
         var info = ScanInfo.From(scan, 7001);
 
@@ -780,5 +781,101 @@ public class ResultLogEntryTests
         Assert.Equal(6, info.WithheldCandidateCount);
         Assert.Equal(66, info.WithheldTotalBytes);
         Assert.Equal(19, info.RegisteredWithheldCount);
+        Assert.Equal(20, info.WithheldIdentityUnestablishedCount);
+        Assert.Equal(21, info.WithheldWholesaleCount);
+        Assert.Equal(22, info.WithheldDeclaredProductInstalledCount);
+        Assert.Equal(23, info.WithheldDeclaredProductUnestablishedCount);
+        Assert.Equal(24, info.WithheldScreenUnansweredCount);
+    }
+
+    [Fact]
+    public void MachineInfo_From_maps_every_member_to_the_scan_figure_it_names()
+    {
+        // THE SAME MECHANISM AS THE SCANINFO TEST ABOVE AND FOR THE SAME REASON.
+        // MachineInfo is a positional record and From fills it positionally; thirty-
+        // nine of its forty members are ints, so a value placed among them re-points
+        // every one after it at its neighbour's and still compiles. Every figure
+        // below is distinct and every member is read, so a shift anywhere in the run
+        // fails at least one assertion here.
+        //
+        // Serialisation is by property NAME, so a shift produces a payload whose keys
+        // are all spelled correctly and whose values are one member out. Nothing
+        // downstream can see that, which is why it is pinned here.
+        var scan = new ScanResult(
+            Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+            Census: new EnumerationCensus(
+                LongLeafStemCount: 102,
+                NonStringLocalPackageValues: 103,
+                UnreadablePatchStates: 104,
+                UnreadableVerdictPaths: 105,
+                UnparseableProductKeyNames: 106,
+                ProductCount: 107,
+                RegistryProductKeys: 108,
+                PatchClaimCount: 109,
+                InstanceProductCount: 110,
+                InstanceTypeUnreadableCount: 111,
+                ProductPatchKeyCount: 114,
+                ProductPatchRegistrationCount: 115,
+                ProductsWithRemovablePatchCount: 116,
+                ProductsWithPatchSetUnestablishedCount: 117,
+                PathResolverAttemptCount: 118,
+                PathResolverNotAPathCount: 119,
+                PathResolverNoAncestorCount: 120,
+                PathResolverOpenRefusedCount: 121,
+                PathResolverNoFinalNameCount: 122,
+                PathResolverFaultedCount: 123,
+                PathNormalisationRefusedAtExpansionCount: 124,
+                PathNormalisationRefusedAtPrefixStripCount: 125,
+                PathNormalisationRefusedAtFullPathCount: 126,
+                PathNormalisationRefusedAtEmbeddedNullCount: 127,
+                PathFlaggedSpellingCount: 128),
+            ShortNameCreation: ShortNameCreationLabels.PerVolume,
+            SupersededRegistrationCount: 112,
+            ObsoletedRegistrationCount: 113,
+            RegistrationIdentityReads: new FileIdentityReadTally(129, 130, 131, 132, 133, 134),
+            CandidateIdentityReads: new FileIdentityReadTally(135, 136, 137, 138, 139, 140));
+
+        var machine = MachineInfo.From(scan);
+
+        Assert.Equal(ShortNameCreationLabels.PerVolume, machine.ShortNameCreation);
+        Assert.Equal(102, machine.LongFileNameCount);
+        Assert.Equal(103, machine.NonStringLocalPackageCount);
+        Assert.Equal(104, machine.UnreadablePatchStateCount);
+        Assert.Equal(105, machine.UnreadableVerdictPathCount);
+        Assert.Equal(106, machine.UnparseableProductKeyCount);
+        Assert.Equal(107, machine.ProductCount);
+        Assert.Equal(108, machine.RegistryProductKeyCount);
+        Assert.Equal(109, machine.PatchClaimCount);
+        Assert.Equal(110, machine.InstanceProductCount);
+        Assert.Equal(111, machine.InstanceTypeUnreadableCount);
+        Assert.Equal(112, machine.SupersededRegistrationCount);
+        Assert.Equal(113, machine.ObsoletedRegistrationCount);
+        Assert.Equal(114, machine.ProductPatchKeyCount);
+        Assert.Equal(115, machine.ProductPatchRegistrationCount);
+        Assert.Equal(116, machine.ProductsWithRemovablePatchCount);
+        Assert.Equal(117, machine.ProductsWithPatchSetUnestablishedCount);
+        Assert.Equal(118, machine.PathResolverAttemptCount);
+        Assert.Equal(119, machine.PathResolverNotAPathCount);
+        Assert.Equal(120, machine.PathResolverNoAncestorCount);
+        Assert.Equal(121, machine.PathResolverOpenRefusedCount);
+        Assert.Equal(122, machine.PathResolverNoFinalNameCount);
+        Assert.Equal(123, machine.PathResolverFaultedCount);
+        Assert.Equal(124, machine.PathNormalisationRefusedAtExpansionCount);
+        Assert.Equal(125, machine.PathNormalisationRefusedAtPrefixStripCount);
+        Assert.Equal(126, machine.PathNormalisationRefusedAtFullPathCount);
+        Assert.Equal(127, machine.PathNormalisationRefusedAtEmbeddedNullCount);
+        Assert.Equal(128, machine.PathFlaggedSpellingCount);
+        Assert.Equal(129, machine.RegistrationIdentityAttemptCount);
+        Assert.Equal(130, machine.RegistrationIdentityNamesNothingCount);
+        Assert.Equal(131, machine.RegistrationIdentityNotAPathCount);
+        Assert.Equal(132, machine.RegistrationIdentityOpenRefusedCount);
+        Assert.Equal(133, machine.RegistrationIdentityUnavailableCount);
+        Assert.Equal(134, machine.RegistrationIdentityFaultedCount);
+        Assert.Equal(135, machine.CandidateIdentityAttemptCount);
+        Assert.Equal(136, machine.CandidateIdentityNamesNothingCount);
+        Assert.Equal(137, machine.CandidateIdentityNotAPathCount);
+        Assert.Equal(138, machine.CandidateIdentityOpenRefusedCount);
+        Assert.Equal(139, machine.CandidateIdentityUnavailableCount);
+        Assert.Equal(140, machine.CandidateIdentityFaultedCount);
     }
 }
