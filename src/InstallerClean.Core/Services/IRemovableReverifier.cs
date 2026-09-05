@@ -351,11 +351,12 @@ public readonly record struct HeldBackReasons(
 /// </param>
 /// <param name="Reasons">
 /// How many of <paramref name="HeldBack"/> fell to each cause, for exactly the
-/// reason <see cref="ReverifyResult.Reasons"/> carries it: the report the user
-/// reads names a cause, one re-read can meet more than one of them, and a file's own cause is
-/// the only thing that is true of it. A read that could not be made has not shown
-/// the file to be removable, so it is held back whichever cause it fell to; what
-/// it has not shown is that a program wants it back.
+/// reason <see cref="ReverifyResult.Reasons"/> carries it: the opt-in result log
+/// carries the split, and a count per cause is the only way to size what each
+/// condition costs in the field. One re-read can meet more than one of them, and
+/// a file's own cause is the only thing that is true of it. A read that could not
+/// be made has not shown the file to be removable, so it is held back whichever
+/// cause it fell to; what it has not shown is that a program wants it back.
 /// </param>
 public record UnderLeaseRecheck(
     IReadOnlyList<string> HeldBack,
