@@ -51,20 +51,10 @@ const ALLOWLIST = new Set([
   'Status.DeleteCancelled.Partial',
 
   // ---- Retired in 3.0.0 with the identity check, and RETIRED IS NOT DEAD ----
-  // The scan used to open each removal candidate, read the product or patch code
-  // the file declares about itself, and ask Windows about that code before the
-  // file could be offered. That check was removed in 3.0.0: the class it guarded
-  // is covered by the file-identity match, the registry fallback, the
-  // records-unreadable refusal and the environment-variable expansion, and what it
-  // uniquely reached is one case nobody has ever observed. Every key below was a
-  // surface for that check or for the machine condition inside it.
-  //
-  // THE TWO BELOW ARE KEPT AND THEY ARE IN ALL FIFTEEN SATELLITES, which is what
-  // makes keeping them worth something: deleting the English would throw away
-  // fifteen translations of the only wording this project has ever had for the
-  // condition. Whether the app should say anything at all about a file it declines
-  // to touch is an open question, and if the answer is ever yes, these are a
-  // starting point somebody was paid for.
+  // THE TWO BELOW ARE IN ALL FIFTEEN SATELLITES, which is what makes keeping them
+  // worth something and is the same reason as the pair above: deleting the English
+  // would throw away fifteen translations of the only wording this project has for
+  // the condition they describe.
 
   // Two of the five held-back causes on the completion overlay, both produced only
   // by the identity re-check at action time: a record existing under the code the

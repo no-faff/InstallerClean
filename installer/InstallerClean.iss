@@ -85,12 +85,11 @@ OutputDir={#PublishDir}
 ; release pipeline builds the same name from the same version to find this
 ; file afterwards, so the two have to agree.
 OutputBaseFilename=InstallerClean-{#AppVersion}-setup
-; Compression=bzip; SolidCompression=no. Every other Inno
-; compression combination tested on this project has tripped a
-; static-ML false positive on the setup hash: lzma2 trips one
-; engine, and zip (with or without SolidCompression=yes) trips one
-; of two, which of them depending on the embedded portable's
-; runtime compression. bzip cleared every VirusTotal engine.
+; Compression=bzip; SolidCompression=no. Of the Inno compression combinations
+; tested for this setup, this is the one that did not trip a static false
+; positive on the setup hash: lzma2 and zip both did, zip with or without
+; SolidCompression=yes, and it varied with the embedded portable's own runtime
+; compression. Changing either line means scanning the setup again.
 Compression=bzip
 SolidCompression=no
 ; The .NET 10 Desktop Runtime's oldest supported Windows release is
