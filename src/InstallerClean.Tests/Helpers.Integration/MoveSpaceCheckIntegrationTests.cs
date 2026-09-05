@@ -112,14 +112,15 @@ public class MoveSpaceCheckIntegrationTests
         // built from a path root holds only where nothing is mounted between the
         // root and the folder. The cache folder is on its own volume, so this is
         // true with a volume mounted at C:\Windows\Installer and true without
-        // one, including on the machine nothing here can build. Under the code this
-        // replaced it was true only where the cache and the system directory
-        // shared a volume, and false on the machine the fix is for.
+        // one, that mounted machine included. Under the code this replaced it was
+        // true only where the cache and the system directory shared a volume, and
+        // false on the machine the fix is for.
         //
-        // It is close to asking one query whether it agrees with itself, and it
-        // is kept for the part that is not: the query has to ANSWER for the
-        // cache path, or this is false rather than trivially true. The test
-        // above says what to make of that and what elevation does to it.
+        // WHAT IT TURNS ON IS THE QUERY ANSWERING FOR THE CACHE PATH. A
+        // GetVolumePathName that would not answer for the cache folder returns
+        // null and the method answers false, so a green here is the call
+        // reaching an answer and not an identity. The test above says what
+        // elevation does to that.
         Assert.True(MoveSpaceCheck.IsOnInstallerCacheDrive(InstallerCacheHelpers.InstallerFolder));
     }
 
@@ -142,11 +143,12 @@ public class MoveSpaceCheckIntegrationTests
         // The first does that on any machine; the second does it on one where
         // nothing is mounted at the cache.
         //
-        // WHAT IT DOES NOT PIN, said here rather than left to be discovered. The
-        // false comes from the cache side failing to resolve, not from two
-        // volumes being compared and found different. That arm needs a cache root
-        // on a real second volume and a host that has one, and no assertion here
-        // reaches it.
+        // WHICH OF THE METHOD'S TWO ROUTES TO FALSE THIS ONE TAKES. An unmounted
+        // letter is a path GetVolumePathName cannot answer for, so the cache side
+        // returns null and the method answers false on that alone. The other
+        // route is two volumes that both resolve and are found to differ, which
+        // is a separate way through the same method and a separate reason for the
+        // same answer.
         var unmounted = TestHost.FirstUnmountedDriveLetter();
         if (unmounted is null)
             return; // every letter is in use on this host
