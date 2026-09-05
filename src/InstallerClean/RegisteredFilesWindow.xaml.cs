@@ -72,16 +72,17 @@ public partial class RegisteredFilesWindow : Window
         //
         // EVERY FILE THE SCAN COULD NOT SETTLE SITS AT THE FOOT OF THIS LIST.
         // The list opens ordered by product name ascending, and ProductRow's
-        // HasNoNamedProduct is applied ahead of it so that a row with nothing in
-        // the product cell ranks below every row that has a name, in both sort
+        // HasNoNamedProduct is applied ahead of it so that a row with no product
+        // name behind it ranks below every row that has one, in both sort
         // directions. The reader meets the named products first, which is what
         // the window is for.
         //
-        // The rows themselves are not marked and no cause travels with them: the
-        // ordering is the whole of the distinction and no placeholder name is
-        // invented to fill the cell. Splitting them back out under a heading of
-        // their own is undoing a decision rather than tidying a layout, one list
-        // being the ruling.
+        // The rows themselves are not marked and no cause travels with them. What
+        // their product cell says is that there is no program to name, which is
+        // the fact about the file rather than a label put on the row, and the
+        // ordering is the whole of the rest of the distinction. Splitting them
+        // back out under a heading of their own is undoing a decision rather than
+        // tidying a layout, one list being the ruling.
         //
         // How many rows land there is not something this app can know. It is
         // whatever the scan could not settle on the machine in front of it.
@@ -167,9 +168,9 @@ public partial class RegisteredFilesWindow : Window
             view.SortDescriptions.Clear();
             // Rows with no product name to scan for go to the foot of the list,
             // ahead of the key the user asked for and always ascending so they
-            // stay there in both directions. Only the product column, since it
-            // is the only one where those rows have nothing in the cell; sorting
-            // by file, size or patches ranks them on their own values like any
+            // stay there in both directions. Only the product column, since the
+            // product name is the one key those rows do not have; sorting by
+            // file, size or patches ranks them on their own values like any
             // other row.
             if (sortProperty == nameof(ProductRow.ProductName))
                 view.SortDescriptions.Add(

@@ -111,6 +111,11 @@
   <data name="Field.Patches" xml:space="preserve"><value>Patches</value></data>
   <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
   <data name="Field.UnknownProductName" xml:space="preserve"><value>(unknown)</value></data>
+  <!-- Shown in the same column for a file Windows holds no record of at all, where
+       there is no program to name. Field.UnknownProductName above is the other
+       case, a registered product whose display name did not come back, and the two
+       never stand in for one another. -->
+  <data name="Field.NoNamedProduct" xml:space="preserve"><value>(no program)</value></data>
   <!-- What goes between items when the app joins a short list into one line, as
        the missing-files line does with the programs it names. A resx value and
        not a hard-coded ", " because the mark is not the same everywhere: a

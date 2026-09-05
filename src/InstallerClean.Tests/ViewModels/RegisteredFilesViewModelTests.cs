@@ -231,14 +231,13 @@ public class RegisteredFilesViewModelTests
     }
 
     [Fact]
-    public void A_withheld_row_has_no_product_name_and_no_placeholder()
+    public void A_withheld_row_says_there_is_no_program_and_a_registration_says_unknown()
     {
-        // The two halves of this are one test on purpose. A withheld row's product
-        // cell is EMPTY, and the "(unknown)" string stays reserved for a REGISTERED
-        // product whose display name did not come back. Assert only the first half
-        // and a change reusing "(unknown)" here still passes, because a placeholder
-        // is not empty either way round; assert only the second and nothing pins
-        // which row got it.
+        // The two halves of this are one test on purpose. Windows holds no record of
+        // the withheld file, so there is no program to name; "(unknown)" stays
+        // reserved for a REGISTERED product whose display name did not come back.
+        // Assert only the first half and a change reusing "(unknown)" here still
+        // passes; assert only the second and nothing pins which row got it.
         var packages = new List<RegisteredPackage>
         {
             Pkg(@"C:\Windows\Installer\aaa.msi", "", "{AAA}"),
@@ -251,11 +250,22 @@ public class RegisteredFilesViewModelTests
         var kept = Assert.Single(vm.Products, p => p.FullPath == Kept);
 
         Assert.Equal(InstallerClean.Resources.Strings.Field_UnknownProductName, registered.ProductName);
+        Assert.Equal(InstallerClean.Resources.Strings.Field_UnknownProductName, registered.ProductNameDisplay);
+
+        Assert.Equal(InstallerClean.Resources.Strings.Field_NoNamedProduct, kept.ProductNameDisplay);
+        Assert.NotEqual(InstallerClean.Resources.Strings.Field_UnknownProductName, kept.ProductNameDisplay);
+
+        // AND THE ROW STILL RANKS AS HAVING NO NAMED PRODUCT, which is what keeps it
+        // at the foot of the list. The window sorts on that flag ahead of the product
+        // name, and the flag reads the STORED name, so this pair is the one that
+        // would catch words written into the record instead of composed for the cell:
+        // the display would look right and the row would rise up among the named ones.
         Assert.Equal(string.Empty, kept.ProductName);
+        Assert.True(kept.HasNoNamedProduct);
     }
 
     [Fact]
-    public void A_withheld_rows_spoken_name_does_not_open_with_a_comma()
+    public void A_withheld_rows_spoken_name_opens_with_what_its_product_cell_shows()
     {
         var withheld = new List<OrphanedFile> { Withheld(Kept, 1_048_576) };
 
@@ -264,25 +274,25 @@ public class RegisteredFilesViewModelTests
 
         var row = Assert.Single(vm.Products);
 
-        // Composed from the cells that have something in them. The product cell is
-        // blank on this row, and a plain join would put a stray comma in front of
-        // the file name for a screen reader to pause on.
+        // Composed from the four cells the row paints, in the order the reader meets
+        // them. A screen reader has only this line, so the product cell's words have
+        // to be in it: a listener who is told the file name first has been given less
+        // than the screen shows.
         //
         // The expectation opens with the row's OWN file-name cell rather than a
         // literal "1285c2.msi", and that is not the assertion going soft. What is
-        // under test is the JOIN: three parts, comma-separated, nothing standing in
-        // for the absent product. Spelling the base name out here would also pin
+        // under test is the composition: four parts, comma-separated, opening with
+        // the product cell. Spelling the base name out here would also pin
         // Path.GetFileName's answer, which is a different subject and one that
         // depends on the platform's path separator.
         //
-        // THE OBVIOUS OBJECTION IS THAT THE SUBJECT APPEARS ON BOTH SIDES, SO THIS
-        // COULD NOT FAIL. IT WAS CHECKED RATHER THAN ARGUED. Restoring the plain
-        // string.Join to ProductRow.AccessibleName, which is the fault this test
-        // exists for, fails THIS test and no other: the join then emits a leading
-        // comma for the empty product name and the composition no longer matches.
-        // The interpolated FileName pins the join's SHAPE while leaving the base
-        // name to whichever platform is running it.
-        Assert.Equal($"{row.FileName}, 1.0 MB, 0 patches", row.AccessibleName);
+        // THE OBVIOUS OBJECTION IS THAT PART OF THE SUBJECT APPEARS ON BOTH SIDES, SO
+        // THIS COULD NOT FAIL. IT WAS CHECKED RATHER THAN ARGUED. Composing the line
+        // from the STORED product name, which is empty on this row, fails THIS test:
+        // the opening words go and the composition no longer matches.
+        Assert.Equal(
+            $"{InstallerClean.Resources.Strings.Field_NoNamedProduct}, {row.FileName}, 1.0 MB, 0 patches",
+            row.AccessibleName);
         Assert.DoesNotContain(", ,", row.AccessibleName);
         Assert.False(row.AccessibleName.StartsWith(","));
     }

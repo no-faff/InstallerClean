@@ -146,9 +146,9 @@
                                               Width="{a11y:TextScaled 14}" Height="{a11y:TextScaled 14}"
                                               VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"
                                               Visibility="{Binding IsMissing, Converter={StaticResource BoolToVis}}"/>
-                                        <TextBlock Text="{Binding ProductName}" Foreground="{StaticResource Text.Heading}"
+                                        <TextBlock Text="{Binding ProductNameDisplay}" Foreground="{StaticResource Text.Heading}"
                                                    FontSize="{DynamicResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
-                                                   VerticalAlignment="Center" ToolTip="{Binding ProductName}"/>
+                                                   VerticalAlignment="Center" ToolTip="{Binding ProductNameDisplay}"/>
                                     </DockPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>

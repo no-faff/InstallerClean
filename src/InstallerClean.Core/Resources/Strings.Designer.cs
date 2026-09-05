@@ -360,6 +360,7 @@ public static class Strings
     public static string Field_FileSize => Get("Field.FileSize");
     public static string Field_Keywords => Get("Field.Keywords");
     public static string Field_Missing => Get("Field.Missing");
+    public static string Field_NoNamedProduct => Get("Field.NoNamedProduct");
     public static string Field_Patches => Get("Field.Patches");
     public static string Field_PatchesOnly => Get("Field.PatchesOnly");
     public static string Field_ProductName => Get("Field.ProductName");

@@ -16,11 +16,11 @@ namespace InstallerClean.ViewModels;
 /// ONE LIST, HOLDING TWO POPULATIONS. The registrations Windows still has a
 /// record of, and the files this scan declined to offer. They sat under
 /// separate headings until 3.0.0 and now share <see cref="Products"/>, a
-/// withheld file arriving as an ordinary row whose product name is empty. The
-/// detail pane needs no special case for one, because it reads the FILE rather
-/// than the registration: author, title, signing certificate and the rest all
-/// come out of the package's own summary stream, which is why the orphaned
-/// window can show a certificate for a file no registration claims.
+/// withheld file arriving as an ordinary row with no product name of its own.
+/// The detail pane needs no special case for one, because it reads the FILE
+/// rather than the registration: author, title, signing certificate and the
+/// rest all come out of the package's own summary stream, which is why the
+/// orphaned window can show a certificate for a file no registration claims.
 ///
 /// Rows flag as missing on <c>IsMissingFromDisk</c>, which is now the plain
 /// question of whether the file is there. It drives <see cref="ShowMissing"/>,
@@ -176,12 +176,19 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         // The files this scan declined to offer, in the same list as the
         // registrations rather than under a heading of their own. Nothing marks
         // them out: no column, no indicator and no lookup of a program that might
-        // have used the file. The product cell is simply empty, because no
-        // registration names the file and there is therefore no product to name,
-        // and NO PLACEHOLDER STANDS IN FOR IT. Not "(unknown)" above all, which
-        // this window already uses for a REGISTERED product whose display name did
-        // not come back: reusing it here would tell the reader a product had been
-        // established when none has.
+        // have used the file. The product name is empty, because no registration
+        // names the file and there is therefore no product to name, and the cell
+        // says exactly that: ProductRow.ProductNameDisplay puts
+        // Field.NoNamedProduct in front of the reader, which states the fact
+        // rather than leaving a space for them to account for themselves.
+        //
+        // NOT "(unknown)", which this window uses for a REGISTERED product whose
+        // display name did not come back: reusing it here would tell the reader a
+        // product had been established when none has.
+        //
+        // AND THE NAME ITSELF STAYS EMPTY IN THE RECORD. What the cell says is
+        // composed for display, so the ordering below goes on reading an empty
+        // name and these rows keep their place at the foot of the list.
         //
         // NO CAUSE TRAVELS WITH THESE ROWS AND NONE MAY BE ADDED. More than one
         // condition puts a file here and they are not one thing, so any sentence
