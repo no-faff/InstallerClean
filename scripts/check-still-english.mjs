@@ -211,7 +211,8 @@ if (totalStranded > 0) {
 if (totalStillEnglish > 0) {
   const distinct = new Set(perLang.flatMap(([, keys]) => keys)).size;
   console.error(`\nStill-English gate: ${totalStillEnglish} untranslated key-slot(s) across ${satellites.length} satellites (${distinct} distinct keys).`);
-  console.error('These clear when the per-language translation batch runs (CHANGING-A-TRANSLATED-STRING.md).');
+  console.error('These clear when each is translated in its gen-strings-<code>.mjs MAP and');
+  console.error('the satellites are regenerated.');
   console.error('This is a required CI step, so translate these before the branch can go green.');
 }
 if (totalStillEnglish > 0 || totalStranded > 0) process.exit(1);

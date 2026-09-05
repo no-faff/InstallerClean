@@ -52,10 +52,11 @@
 //       make the change anyway, copying every generator aside first
 //
 // After running: translate each flagged key in each gen-strings-<code>.mjs MAP,
-// regenerate (the self-check returns to GENERATION OK), run
-// check-resx-parity.mjs, and clear the key from PENDING-RETRANSLATION.md. A
-// plural override is not a neutral key and no self-check compares one, so
-// check-still-english.mjs is what says whether the overrides are done.
+// regenerate (the self-check returns to GENERATION OK) and run
+// check-resx-parity.mjs. Nothing here keeps a list of what a run flagged, so that
+// is a note to keep yourself. A plural override is not a neutral key and no
+// self-check compares one, so check-still-english.mjs is what says whether the
+// overrides are done.
 import { readFileSync, writeFileSync, readdirSync, copyFileSync, mkdtempSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -413,11 +414,11 @@ if (backup !== null) {
   console.log(`  git checkout -- ${GENDIR}/`);
 }
 
-// This script writes to the generators and nothing else, so the sign-off says
-// so outright. PENDING-RETRANSLATION.md is a manual step; a closing line that
-// merely implies the log was written gets taken at its word, and the debt goes
-// unrecorded.
-console.log('\nNext: log the key(s) in PENDING-RETRANSLATION.md by hand (this script does not),');
-console.log('then translate each in the gen MAPs and regenerate.');
+// This script writes to the generators and nothing else, so the sign-off says so
+// outright. Keeping track of what is waiting to be translated is a manual step, and
+// a closing line that merely implied this run had recorded it would get taken at its
+// word, leaving the debt unrecorded.
+console.log('\nNext: this run keeps no list of what it flagged, so note the key(s) above');
+console.log('yourself, then translate each in the gen MAPs and regenerate.');
 console.log('Any plural override listed above needs translating too, and has no neutral key of');
 console.log('its own to appear under: log it by language as well as by key.');

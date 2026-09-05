@@ -36,7 +36,8 @@
 // translations for a human to redo. It flags the two Cli.Help lines in seven
 // languages, where the only thing that moved was column padding that
 // check-cli-help-alignment.mjs already owns. A date is a screen for a human to
-// read, never a gate. flag-retranslation.mjs is destructive with no undo.
+// read, never a gate. flag-retranslation.mjs replaces a translation with the
+// English, and the way back is git.
 //
 // THE PARSE CONTROL ABOVE readResx IS NOT DEFENSIVE PROGRAMMING AND MUST NOT BE
 // SIMPLIFIED INTO A WARNING. This file's regex wants <value> on the same
