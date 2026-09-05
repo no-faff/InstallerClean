@@ -1852,7 +1852,7 @@ public class InstallerQueryServiceUnitTests
     [Fact]
     public async Task A_sibling_patch_that_can_be_uninstalled_withholds_the_superseded_one()
     {
-        // THE FIX, AND THE ROUTE TEST 4 MEASURED. Uninstalling the patch that
+        // THE ROUTE THIS CLOSES. Uninstalling the patch that
         // superseded this one rolls the product back onto this one's cached file; with
         // the file gone that rollback went all the way to the unpatched base and
         // reported success. The old rule read THIS patch's own removability, which says

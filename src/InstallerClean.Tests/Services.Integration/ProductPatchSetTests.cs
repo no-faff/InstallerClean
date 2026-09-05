@@ -288,10 +288,9 @@ public class ProductPatchSetTests
         // ready-made list of exactly this, and on a machine holding superseded patches
         // it lists the applied patch alone and omits the superseded ones, so anything
         // built on it silently excludes the class the condition exists for. That was
-        // measured on one machine while it still held superseded patches; re-run on
-        // 2026-08-17 after they had gone, all 147 products agreed, because the
-        // disagreement is ABOUT superseded patches. So the field evidence has
-        // evaporated and cannot be re-taken there. This test plants the disagreement
+        // measured on one machine while it still held superseded patches, and the
+        // disagreement is ABOUT superseded patches: a machine that no longer holds any
+        // has nothing to disagree about. This test plants the disagreement
         // instead of waiting for one: AllPatches names one patch, the subkeys hold a
         // second that is removable, and reading AllPatches would answer clean.
         WithProductsKey(products =>
