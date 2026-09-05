@@ -584,8 +584,8 @@ public sealed class MoveFilesService : IMoveFilesService
     /// account of a stopped batch is that its destination changed, which is false
     /// of a share that dropped or an ACL that closed: nothing replaced or
     /// redirected anything, and the folder is exactly where the user put it. One
-    /// bool cannot answer WHY without answering it wrongly for half the batches
-    /// that reach it.
+    /// bool cannot answer WHY without answering it wrongly for the batches that
+    /// met the other condition.
     ///
     /// Separated out because the loop cannot be driven into the second condition
     /// by any test the suite can write: the resolve deliberately bypasses the
