@@ -44,16 +44,18 @@
 // trusted when it came from a different run.
 //
 // Usage (from the repo root):
-//   node scripts/flag-retranslation.mjs Completion.CleanedUp Completion.DeleteRestoreHint ...
+//   node scripts/flag-retranslation.mjs Action.Cancel Action.Close ...
 //       show what would change and write nothing
-//   node scripts/flag-retranslation.mjs --apply Completion.CleanedUp ...
+//   node scripts/flag-retranslation.mjs --apply Action.Cancel ...
 //       make the change, refusing if any generator has uncommitted changes
-//   node scripts/flag-retranslation.mjs --apply --force Completion.CleanedUp ...
+//   node scripts/flag-retranslation.mjs --apply --force Action.Cancel ...
 //       make the change anyway, copying every generator aside first
 //
 // After running: translate each flagged key in each gen-strings-<code>.mjs MAP,
 // regenerate (the self-check returns to GENERATION OK), run
-// check-resx-parity.mjs, and clear the key from PENDING-RETRANSLATION.md.
+// check-resx-parity.mjs, and clear the key from PENDING-RETRANSLATION.md. A
+// plural override is not a neutral key and no self-check compares one, so
+// check-still-english.mjs is what says whether the overrides are done.
 import { readFileSync, writeFileSync, readdirSync, copyFileSync, mkdtempSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -373,8 +375,20 @@ console.log(`Flagged ${keys.length} key(s) across ${files.length} generator(s). 
 report();
 console.log(`\nTOTALS: ${totalReset} reset in place, ${totalAdded} appended, `
   + `${totalOverrides} plural override(s) reset.`);
-console.log('Each is now the English neutral value, so every generator will report it as ' +
-  '"still English (untranslated)" until translated.');
+// PARTITIONED, one line per kind present, on the rule the preview follows: no
+// sentence is true of both. An entry is a neutral key, so a generator's own
+// self-check compares it against the neutral and names it; an override answers for
+// a count form the neutral has no key for, so nothing inside a generator can
+// compare it and check-still-english.mjs is what reads it.
+const reported = [];
+if (totalReset + totalAdded > 0)
+  reported.push(`The ${totalReset + totalAdded} entr(ies) now hold the English neutral value, so every generator`
+    + '\nreports each of them as "still English (untranslated)" until translated.');
+if (totalOverrides > 0)
+  reported.push(`The ${totalOverrides} plural override(s) now hold the English their base key holds. No`
+    + '\nneutral key exists for an override to be compared with, so no generator reports'
+    + '\none as still English: check-still-english.mjs names them until translated.');
+for (const c of reported) console.log(`\n${c}`);
 
 // The way back, printed by every run that writes, before the way forward. Nobody
 // should have to remember a restore command or go and look one up at the moment
