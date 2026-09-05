@@ -1549,7 +1549,8 @@ internal static class Program
 
     /// <summary>
     /// Emits the pending-reboot-blocked outcome: the localised stdout reason
-    /// sentence, the English Application-log entry, and <see cref="ExitTransient"/>.
+    /// sentence, the English Application-log entry, and the exit code its reason
+    /// takes.
     /// Shared by the pre-act gate check and the action services' own boundary
     /// refusal. When a Move or Delete service acquires <c>Global\_MSIExecute</c>
     /// and finds it held
@@ -1564,6 +1565,37 @@ internal static class Program
     private static int EmitPendingRebootBlocked(string arg, PendingRebootReason reason, string? detail)
     {
         Console.WriteLine(PendingRebootBlockedMessage(reason, detail));
+
+        // WHAT A SCHEDULER IS TOLD, DECIDED FROM THE REASON AND TAKEN AS A PAIR.
+        // The exit code and the entry class are one statement about this run said to
+        // two audiences, so they are read out of one expression: a code meaning
+        // "come back later" beside an entry classed as a run that failed outright
+        // would leave the machine contract disagreeing with itself.
+        //
+        // THE FOUR THAT ASSERT SOMETHING IS IN FLIGHT TAKE THE TRANSIENT CODE. An
+        // install holding the mutex, a suspended transaction, a queued rename: each
+        // of those ends by itself, so a scheduler that comes back finds the machine
+        // in a different state.
+        //
+        // A READ THE APP COULD NOT MAKE IS NOT ONE OF THEM, and this is the arm the
+        // default falls to. Nothing about waiting says the value will read next
+        // time, and the sentence this run prints tells the operator that if it still
+        // will not read, this is not a machine InstallerClean can clean. A code
+        // meaning "temporary, retry" under those words has a nightly task coming
+        // back for ever. The code it takes instead claims only what is true of the
+        // run: nothing was processed. A reason added to the enum later lands here
+        // too, on the same reasoning, until somebody decides otherwise in
+        // CliPendingRebootOutcomeTests' own table.
+        var (exitCode, entryClass) = reason switch
+        {
+            PendingRebootReason.MsiExecuteMutexHeld or
+            PendingRebootReason.InstallerInProgress or
+            PendingRebootReason.PendingRenameInCache or
+            PendingRebootReason.PendingRenameUnresolved =>
+                (ExitTransient, CliEventClass.TransientSkip),
+            _ => (ExitError, CliEventClass.HardError),
+        };
+
         // The reason label and template are built English: the Cli.EventLogReason.*
         // labels are translated in the Japanese satellite and in no other, but the
         // Application channel is sysadmin-facing and an RMM grep on a known phrase
@@ -1571,11 +1603,9 @@ internal static class Program
         // wrong. The localised stdout sentence above is what the operator reads; the
         // label is resolved INSIDE the scope below, which is what makes it en-GB
         // rather than the OS language, so the call stays in the lambda.
-        MachineContract.WriteEventLog(CliEventClass.TransientSkip, () =>
+        MachineContract.WriteEventLog(entryClass, () =>
             PendingRebootEventLogLine(arg, reason, detail));
-        // Transient: a reboot (or the in-flight transaction finishing) clears the
-        // gate. Hard scan and move/delete failures stay on ExitError.
-        return ExitTransient;
+        return exitCode;
     }
 
     /// <summary>

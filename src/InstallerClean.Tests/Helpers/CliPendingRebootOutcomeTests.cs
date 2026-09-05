@@ -12,11 +12,11 @@ namespace InstallerClean.Tests.Helpers;
 ///
 /// CliPendingRebootStringsTests walks the same enum twice, once per string surface, so
 /// a reason added without its sentence or without its label is a red test. The emitter
-/// spends the reason on those two and on nothing else: it returns its exit code and
-/// writes its event class without consulting it at all. A reason added later therefore
-/// takes both by inheritance, and the two surfaces that ARE gated give no cover here,
-/// because a member can carry a sentence and a label and still have had no thought
-/// given to what a scheduler should do about it.
+/// reads the exit code and the entry class off the reason as well, in one expression,
+/// and a member it does not name falls to the arm that promises a caller nothing about
+/// coming back. So a reason added later still takes both without anybody choosing them,
+/// and the two string surfaces give no cover here: a member can carry a sentence and a
+/// label and still have had no thought given to what a scheduler should do about it.
 ///
 /// THE TABLE IS THE DECISION AND THE WALK IS THE GATE. One row per reason; a member
 /// with no row fails below, and writing its row is the choice being made.
@@ -41,7 +41,7 @@ public class CliPendingRebootOutcomeTests
         [PendingRebootReason.InstallerInProgress]     = (CliExitCode.Transient, CliEventClass.TransientSkip),
         [PendingRebootReason.PendingRenameInCache]    = (CliExitCode.Transient, CliEventClass.TransientSkip),
         [PendingRebootReason.PendingRenameUnresolved] = (CliExitCode.Transient, CliEventClass.TransientSkip),
-        [PendingRebootReason.RegistryCheckUnreadable] = (CliExitCode.Transient, CliEventClass.TransientSkip),
+        [PendingRebootReason.RegistryCheckUnreadable] = (CliExitCode.Error, CliEventClass.HardError),
     };
 
     [Fact]
@@ -79,9 +79,9 @@ public class CliPendingRebootOutcomeTests
     public void Every_row_declares_an_event_class_whose_band_matches_its_exit_code()
     {
         // WHAT THIS IS AND IS NOT, so the column above is not read as more than it is.
-        // It does not make the emitter observable: EmitPendingRebootBlocked still hands
-        // a literal to the write. It compares two DECLARED values with each other and
-        // reads no behaviour at all. What it buys is that the class column can no
+        // It does not make the emitter observable: what reaches the channel is written
+        // by a static this cannot see. It compares two DECLARED values with each other
+        // and reads no behaviour at all. What it buys is that the class column can no
         // longer hold a value the exit code beside it contradicts, which is what a
         // column nothing looks at would otherwise allow.
         var wrong = new List<string>();
