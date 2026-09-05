@@ -1034,10 +1034,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // It does not: ProductKeys is counted from the subkeys the fallback
         // actually walked, so a fallback that failed reports FEWER keys, which
         // shrinks the difference against the enumeration rather than widening it.
-        // A total is blinded by exactly the failure that empties the comparison,
-        // and blinded quietly, reading as a machine whose two sources agree. What
-        // is keyed on that state is the both-sources gate above, which weighs the
-        // fallback's own failure count and refuses.
+        // Two totals taken off a short registry side sit as close together as two
+        // taken off a whole one, and asking by name is no worse placed there, both
+        // working from the codes that side handed over.
+        //
+        // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,
+        // which is worth spelling out beside this because they count different
+        // things. fallback.Failures is the registry side's own tally of key reads
+        // that failed. unreadableProducts is what the API said about ITSELF: rows
+        // it returned that this code could not read, and products whose records
+        // came back short inside the loop. An enumeration ending on NoMoreItems
+        // has said nothing about itself and raises neither term, which is why the
+        // products behind a disagreement are named above rather than counted here.
         //
         // What remains here is an OBSERVATION and not an estimate, which is why it
         // stays. The fallback reads the same UserData keys the API read and runs
