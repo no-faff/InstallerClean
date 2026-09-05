@@ -237,12 +237,12 @@ public class CompletionScreenResetTests
         // every screen without comparing anything at all. The method walk keys on a
         // prefix, and a rename away from Show* would empty it the same way.
         //
-        // A LEGITIMATE ADDITION IS MEANT TO FAIL HERE. Adding an eighth screen or a
+        // A LEGITIMATE ADDITION IS MEANT TO FAIL HERE. Adding a ninth screen or a
         // fifteenth observable property should be a decision somebody takes with this
         // rule in front of them, which is what a figure that has to be moved by hand
         // buys. A new field joins the set every screen must paint; a new field that is
         // NOT part of the card goes in NotPaintedByAScreen with its reason.
-        Assert.Equal(7, Screens().Length);
+        Assert.Equal(8, Screens().Length);
         Assert.Equal(12, ScreenFields().Length);
     }
 }
