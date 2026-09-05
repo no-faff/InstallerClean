@@ -12,10 +12,9 @@ jobs:
   # moves a package that lives in InstallerClean.Core. Core is referenced by the
   # GUI, the CLI and the tests, and each of those projects' locks carries its own
   # copy of Core's dependency ranges, so a version inside Core forces all four
-  # locks to move together. On the System.IO.Abstractions 22.1.1 -> 22.2.0 bump
-  # (July 2026) it left the CLI's lock asserting Core still wanted [22.1.1, ) and
-  # dropped a live System.Diagnostics.EventLog transitive entry from the GUI's;
-  # CI restores with RestoreLockedMode, so the CLI build failed with NU1004.
+  # locks to move together. Left to the updater, one lock can go on asserting the
+  # range Core has moved off while another loses a live transitive entry
+  # altogether, and CI restores with RestoreLockedMode, so a build fails NU1004.
   # Regenerating all four from the csproj files Dependabot edited is the fix, and
   # is a no-op on the bumps it already gets right (a package used by one project
   # only).
@@ -32,10 +31,7 @@ jobs:
   # "Approve and run" click is a different mechanism (a first-time contributor's
   # fork PR held for a maintainer) and does not apply to a branch in this repo, so
   # it is not what unblocks this push. This is a reading of GitHub's documented
-  # behaviour, and the one live firing tested only half of it: on PR #49
-  # (750c680e, merged 2026-07-20) the relock step ran, committed and pushed, and
-  # nothing in the repository records whether the dispatch step then fired. So the
-  # push is proven and the path this paragraph describes is not.
+  # behaviour.
   #
   # And Dependabot stops rebasing a PR once a commit it did not write lands on the
   # branch, so if such a PR later goes stale against main, close it and let
@@ -50,11 +46,9 @@ jobs:
     # windows-2025, which this was, System.Diagnostics.EventLog resolves out of
     # the Desktop shared framework, so a regenerated lock can lose it and a
     # locked restore on Windows still passes over the gap that the same restore
-    # on Linux fails as NU1004. Not hypothetical: the job's one live firing
-    # dropped exactly that entry from the GUI's lock, and the whole
-    # net10.0-windows7.0/win-x64 section with it (750c680e, PR #49; 1a049a76
-    # restored it by hand). The runner that cannot see the damage was the one
-    # writing the file.
+    # on Linux fails as NU1004. A lock can lose the whole
+    # net10.0-windows7.0/win-x64 section that way. The runner that cannot see that
+    # gap must not be the one writing the file.
     runs-on: ubuntu-latest
     concurrency:
       group: relock-${{ github.event.pull_request.number }}
