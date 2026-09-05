@@ -2443,19 +2443,30 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Downgrade only: a removable row loses to a later non-removable claim, and the
         // whole row goes with the verdict rather than the flag alone. A registration is
         // one product's account of the file, so what a machine ends up with is the
-        // account of whichever product last displaced the row, its patch state and its
-        // product name included, and a state read under an earlier product does not
-        // survive that.
+        // account of whichever product last displaced the row, its product name
+        // included.
         //
-        // THE WHOLE-ROW ASSIGNMENT IS THE POINT RATHER THAN A SHORTCUT. One cached patch
-        // can be superseded under one product and still applied under another, and it is
-        // the applied reading that has to reach the row: moving the flag alone would
-        // leave the row saying superseded on a machine where a product still holds the
-        // patch, and the missing-files report reads that state to decide whether a
-        // registration whose file has gone is worth putting in front of anybody.
+        // THE PATCH STATE IS THE ONE FIELD A CLAIM CANNOT TAKE AWAY WITHOUT BRINGING
+        // ONE, and the two halves of that are separate. A claim carrying a state
+        // replaces what was there: one cached patch can be superseded under one product
+        // and still applied under another, and it is the applied reading that has to
+        // reach the row, or the row would say superseded on a machine where a product
+        // still holds the patch. A claim carrying no state leaves the state alone. Zero
+        // is what a State this loop could not read, or could not parse, arrives as, and
+        // it means not-a-patch to everything downstream that asks, so writing it over a
+        // state Windows gave would put a reading nobody made in front of one somebody
+        // did.
+        //
+        // ZERO IS THE TEST RATHER THAN THE ROW'S UNREADABLE FLAG, WHICH ANSWERS A WIDER
+        // QUESTION. That flag is the OR of this pairing's State read and its
+        // Uninstallable read, so it is set for a claim whose state Windows gave
+        // positively and whose Uninstallable alone would not read; keying on it would
+        // discard a reading the machine had made.
         if (existing.IsRemovable && !candidate.IsRemovable)
         {
-            claimed[candidate.LocalPackagePath] = candidate;
+            claimed[candidate.LocalPackagePath] = candidate.PatchState == 0
+                ? candidate with { PatchState = existing.PatchState }
+                : candidate;
             return false;
         }
 

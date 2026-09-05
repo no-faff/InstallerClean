@@ -296,6 +296,94 @@ public class InstallerQueryServiceUnitTests
         Assert.False(Assert.Single(result.Packages, r => r.LocalPackagePath == productPackage).IsRemovable);
     }
 
+    // ONE CACHED PATCH REGISTERED TO TWO PRODUCTS, and which product's reading of it
+    // the merged row ends up carrying. The three below are the whole of that rule and
+    // they are written as three because they pull in different directions: a reading
+    // Windows gave has to displace an earlier one, and a claim that established no
+    // reading has to leave the earlier one where it is.
+    //
+    // THE PATH IS ASSERTED THROUGH GetFullPath FOR THE REASON THE COMMAND LINE'S OWN
+    // GATE TESTS DO IT. The scan normalises every recorded path, and a drive-letter
+    // spelling completes differently off Windows, so comparing against the literal
+    // finds nothing on one of the two hosts while the run has produced exactly the row
+    // under test.
+    private const string SharedPatchPath = @"C:\Windows\Installer\shared-two-products.msp";
+    private static string SharedPatchRow => Path.GetFullPath(SharedPatchPath);
+
+    /// <summary>
+    /// Builds the machine both directions start from: product A holds the patch and
+    /// reads cleanly as superseded, product B holds the same cached file, and A
+    /// enumerates first so its reading is the one already on the row when B's claim
+    /// arrives.
+    /// </summary>
+    private static FakeMsiApi TwoProductsSharingOnePatch()
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: SharedPatchPath, state: "2", uninstallable: "0");
+        msi.AddProduct("{B}");
+        msi.AddPatch("{B}", "{P}", localPackage: SharedPatchPath, state: "2", uninstallable: "0");
+        return msi;
+    }
+
+    [Fact]
+    public async Task A_claim_whose_state_read_failed_leaves_the_state_windows_gave()
+    {
+        // B's cached path reads, so its claim reaches the merge, and its State does
+        // not. A claim that established no state must not write not-a-patch over one
+        // the machine answered: every consumer of that field, the superseded and
+        // obsoleted counts and the per-product patch-set judging among them, reads a
+        // zero as a row that is not a patch at all.
+        var msi = TwoProductsSharingOnePatch();
+        msi.PatchPropertyResult[("{P}", "{B}", MsiInstallProperty.State)] = 5; // access denied
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == SharedPatchRow);
+        Assert.Equal(2, row.PatchState);
+        Assert.True(row.IsSupersededOrObsoleted);
+        // The claim still displaces the rest of the row and still takes the verdict
+        // down, which is what the branch is for.
+        Assert.False(row.IsRemovable);
+        Assert.True(row.VerdictUnreadable);
+    }
+
+    [Fact]
+    public async Task A_state_windows_gave_still_replaces_an_earlier_one()
+    {
+        // The direction that must survive the rule above. A patch superseded under one
+        // product can still be applied under another, and it is the applied reading
+        // that has to reach the row: a row left saying superseded on a machine where a
+        // product still holds the patch would be describing a state nothing reported.
+        var msi = TwoProductsSharingOnePatch();
+        msi.SetPatchProperty("{P}", "{B}", MsiInstallProperty.State, "1");
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == SharedPatchRow);
+        Assert.Equal(1, row.PatchState);
+        Assert.False(row.IsSupersededOrObsoleted);
+    }
+
+    [Fact]
+    public async Task A_claim_whose_uninstallable_alone_would_not_read_still_brings_its_state()
+    {
+        // THE CASE THAT DECIDES WHICH FIELD THE RULE IS KEYED ON. This row's unreadable
+        // flag is set, because it is the OR of the two reads, while its State was
+        // answered positively. A rule keyed on that flag would keep the earlier
+        // superseded reading and discard the applied one Windows had just given.
+        var msi = TwoProductsSharingOnePatch();
+        msi.SetPatchProperty("{P}", "{B}", MsiInstallProperty.State, "1");
+        msi.PatchPropertyResult[("{P}", "{B}", MsiInstallProperty.Uninstallable)] = 5;
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == SharedPatchRow);
+        Assert.True(row.VerdictUnreadable);
+        Assert.Equal(1, row.PatchState);
+        Assert.False(row.IsSupersededOrObsoleted);
+    }
+
     [Fact]
     public void A_registry_fallback_claim_never_downgrades_an_api_verdict()
     {
