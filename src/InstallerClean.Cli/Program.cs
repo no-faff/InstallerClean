@@ -865,8 +865,9 @@ internal static class Program
             // is advice for a run that went the distance: it tells somebody who
             // stopped the move part-way to go through with the thing they stopped.
             // The cancel re-entry below is what that run reports instead. The
-            // aborted-move path keeps the line, because a destination that changed
-            // mid-batch leaves files somewhere the reader has to go and deal with.
+            // aborted-move path keeps the line: whatever stopped the batch, the
+            // files already moved are in a folder the reader has to go and
+            // deal with.
             if (moveResult.MovedCount > 0 && !moveResult.Cancelled)
                 Console.WriteLine(string.Format(Strings.Cli_MoveRestoreHint, moveDest));
 
