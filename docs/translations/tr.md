@@ -77,6 +77,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Size | Boyut |
 | Patches | Yamalar |
 | (unknown) | (bilinmiyor) |
+| (no program) | (program yok) |
 | (patches only) | (yalnızca yama) |
 | missing | eksik |
 
@@ -100,10 +101,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting unneeded files... | Gereksiz dosyalar siliniyor... |
 | Move cancelled. {0} of {1} {2} processed. | Taşıma iptal edildi. {1} {2} içinden {0} tanesi işlendi. |
 | Delete cancelled. {0} of {1} {2} processed. | Silme iptal edildi. {1} {2} içinden {0} tanesi işlendi. |
-| Move failed ({0}). Details in {1}. | Taşıma başarısız oldu ({0}). Ayrıntılar {1} içinde. |
-| Move failed ({0}). The crash log could not be written. | Taşıma başarısız oldu ({0}). Çökme günlüğü yazılamadı. |
-| Delete failed ({0}). Details in {1}. | Silme başarısız oldu ({0}). Ayrıntılar {1} içinde. |
-| Delete failed ({0}). The crash log could not be written. | Silme başarısız oldu ({0}). Çökme günlüğü yazılamadı. |
+| {0}. Details are in {1}. | {0}. Ayrıntılar {1} içinde. |
+| {0}. The crash log could not be written. | {0}. Çökme günlüğü yazılamadı. |
+| {0}. Details are in {1}. | {0}. Ayrıntılar {1} içinde. |
+| {0}. The crash log could not be written. | {0}. Çökme günlüğü yazılamadı. |
 | Access denied. Windows refused the scan. | Erişim reddedildi. Windows taramayı reddetti. |
 | Scan failed: couldn't read the Windows Installer records. | Tarama başarısız: Windows Installer kayıtları okunamadı. |
 | Scan cancelled. | Tarama iptal edildi. |
@@ -125,6 +126,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Bu makinede askıya alınmış önceki bir Windows Installer işlemi var. {InstallerFolder} klasörünü temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın). |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows, bir sonraki yeniden başlatma için {InstallerFolder} klasörünü etkileyen bir dosya adı değişikliği sıraya aldı. Temizlemeden önce Windows'u yeniden başlatın. |
 | A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning. | Bir sonraki yeniden başlatma için sıraya alınmış bir dosya işlemi var ve InstallerClean bu işlemin hangi dosyaları adlandırdığını bilemiyor, bu yüzden bunların {InstallerFolder} içinde olmadığını dışlayamıyor. Temizlemeden önce Windows'u yeniden başlatın. |
+| InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean. | InstallerClean, {InstallerFolder} klasörüne dokunmadan önce denetlediği Windows ayarlarından birini okuyamadı, bu yüzden bir yükleyici işleminin sürüp sürmediğini ya da yeniden başlatma beklediğini bilemiyor. Windows'u yeniden başlatın ve yeniden tarayın. Ayar yine okunamıyorsa, burası InstallerClean'in temizleyebileceği bir makine değil. |
 | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer'ın sürmekte olan bir işi var, bu yüzden Taşı ve Sil duraklatıldı. InstallerClean değişmekte olan {InstallerFolder} klasörüne dokunmayacak. Bittiğinde yeniden tarayın, ikisi de geri gelir. |
 | Select a file to view details. | Ayrıntıları görmek için bir dosya seçin. |
 | Select a product to view details. | Ayrıntıları görmek için bir ürün seçin. |
@@ -149,26 +151,29 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder} içinde temizlenecek bir şey yok |
 | Scanned {0} {1} in {2} | {2} içinde {0} {1} tarandı |
 | Nothing offered on this PC | Bu bilgisayarda hiçbir şey sunulmadı |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği tek dosyayı ({2}) tuttu. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği {0} {1} ({2}) geri tutuldu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tek dosyayı ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tüm {0} {1} ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean, bulduğu önbellek dosyasının gereksiz olduğunu saptayamadı, bu yüzden o tek dosyayı ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean, bulduğu önbellek dosyalarının hiçbirinin gereksiz olduğunu saptayamadı, bu yüzden tüm {0} {1} ({2}) sunmak yerine geri tuttu. |
 | Delete that folder when you're satisfied all is well. | Her şeyin yolunda olduğuna kanaat getirdiğinizde o klasörü silin. |
 | Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do. | Her şeyin yolunda olduğuna kanaat getirdiğinizde o klasörü silin. Yeri ancak o zaman gerçekten geri kazanırsınız. |
 | {0} freed | {0} yer açıldı |
 | {0} moved | {0} taşındı |
 | Nothing was moved | Hiçbir dosya taşınmadı |
 | Nothing was deleted | Hiçbir dosya silinmedi |
-| {0} of {1} could not be moved. | {1} dosya içinden {0} tanesi taşınamadı. |
-| {0} of {1} could not be moved. | {1} dosya içinden {0} tanesi taşınamadı. |
-| {0} of {1} could not be deleted. | {1} dosya içinden {0} tanesi silinemedi. |
-| {0} of {1} could not be deleted. | {1} dosya içinden {0} tanesi silinemedi. |
+| {0} file could not be moved. | {0} dosya taşınamadı. |
+| {0} files could not be moved. | {0} dosya taşınamadı. |
+| {0} file could not be deleted. | {0} dosya silinemedi. |
+| {0} files could not be deleted. | {0} dosya silinemedi. |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
-| {0} file held back. The scan said it was unneeded. The final check didn't agree. | {0} dosya geri tutuldu. Tarama bunun gereksiz olduğunu söyledi. Son denetim aynı fikirde değildi. |
-| {0} files held back. The scan said these were unneeded. The final check didn't agree. | {0} dosya geri tutuldu. Tarama bunların gereksiz olduğunu söyledi. Son denetim aynı fikirde değildi. |
+| {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | {0} dosya geri tutuldu. Tarama bunun gereksiz olduğunu söyledi. Son denetim bunu doğrulayamadı. |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | {0} dosya geri tutuldu. Tarama bunların gereksiz olduğunu söyledi. Son denetim bunu doğrulayamadı. |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} yerinde bırakıldı, çünkü Windows'ta içeride adı geçen programın kaydı var. |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} yerinde bırakıldı, çünkü InstallerClean içeride adı geçen bir program bulamadı. |
-| Moved {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi taşındı. |
+| Moved {0} of {1} {2} to {3} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi {3} konumuna taşındı. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi. |
+| It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Geri almak kolay. Onları {InstallerFolder} klasörüne geri taşıyın, her şey eskisi gibi olur. |
 | {0} {1} permanently deleted | {0} {1} kalıcı olarak silindi |
 | {0} {1} permanently deleted | {0} {1} kalıcı olarak silindi |
 | Glad to help. There's a tip jar if you're feeling kind. | Yardımcı olabildiğime sevindim. Gönlünüzden koparsa, bir bahşiş kutusu var. |
@@ -187,14 +192,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} program daha |
 | {0} file with no program named in the records | kayıtlarda hiçbir program adı geçmeyen {0} dosya |
 | {0} files with no program named in the records | kayıtlarda hiçbir program adı geçmeyen {0} dosya |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | Bu bilgisayarda InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tek dosyayı listelemek yerine tuttu. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | Bu bilgisayarda InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden {0} {1} listelemek yerine tuttu. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | Bu bilgisayarda InstallerClean, yerine geçilmiş tek dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onu tuttu. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | Bu bilgisayarda InstallerClean, yerine geçilmiş {0} dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onları tuttu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tek dosyayı sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden {0} {1} sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean, bulduğu önbellek dosyalarından biri hakkında emin olamadı, bu yüzden o dosyayı sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean, bulduğu önbellek dosyalarından bazıları hakkında emin olamadı, bu yüzden {0} {1} sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean, yerine geçilmiş tek dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onu geri tuttu. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean, yerine geçilmiş {0} dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onları geri tuttu. |
 | {0} of {1} {2} | {1} {2} içinden {0} |
 | {0} unneeded {1} ({2}) | {0} gereksiz {1} ({2}) |
 | {0} file left alone ({1}) | {0} dosya olduğu gibi bırakıldı ({1}) |
 | {0} files left alone ({1}) | {0} dosya olduğu gibi bırakıldı ({1}) |
+| {0} missing | {0} eksik |
+| {0} missing | {0} eksik |
 
 ## Confirmation dialogs
 
@@ -227,11 +236,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean, neyin hâlâ gerekli olduğundan emin olmaya yetecek kadar Windows Installer kaydını okuyamadı: yüklü programların listesi eksik döndü, aynı kayıtları doğrudan kayıt defterinden okumak da hatalarla karşılaştı. Bir dosya, yalnızca onu adlandıran kayıt okunamayanlardan biri olduğu için sahipsiz görünebilirdi, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı. |
 | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean, {InstallerFolder} klasörünün gerçek yolunu Windows'a çözdüremedi, bu yüzden hiçbir dosyanın onun içinde olduğu gösterilemedi ve hiçbiri temizlik için sunulmadı. Bu tarama, klasör temiz olduğu için değil, o denetim başarısız olduğu için hiçbir şey bulamadı. Hiçbir şey kaldırılmadı. |
 | Nothing was deleted | Hiçbir dosya silinmedi |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. | Windows, InstallerClean'e Windows Installer'ın meşgul olup olmadığını denetleme izni vermedi, bu yüzden işlem sürerken bir dosyanın gerekli hale gelmesini dışlayamadı ve hiçbir şey silinmedi. |
 | Nothing was moved | Hiçbir dosya taşınmadı |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows, InstallerClean'e Windows Installer'ın meşgul olup olmadığını denetleme izni vermedi, bu yüzden işlem sürerken bir dosyanın gerekli hale gelmesini dışlayamadı ve hiçbir şey taşınmadı. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean, Windows Installer'ın iki programın yüklü yazılımı aynı anda değiştirmesini engellemek için kullandığı kilidi alamadı, bu yüzden bir dosyanın işin ortasında gerekli hale gelmeyeceğini kesinleştiremedi ve hiçbir şey silinmedi. Yeniden deneyin, sürerse Windows'u yeniden başlatın. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean, Windows Installer'ın iki programın yüklü yazılımı aynı anda değiştirmesini engellemek için kullandığı kilidi alamadı, bu yüzden bir dosyanın işin ortasında gerekli hale gelmeyeceğini kesinleştiremedi ve hiçbir şey taşınmadı. Yeniden deneyin, sürerse Windows'u yeniden başlatın. |
 | Invalid destination | Geçersiz hedef |
-| Could not write to destination | Hedefe yazılamadı |
+| Move stopped | Taşıma durduruldu |
+| Couldn't use that backup folder | Bu yedek klasörü kullanılamadı |
 | Move failed | Taşıma başarısız |
 | Delete failed | Silme başarısız |
 | Setting not saved | Ayar kaydedilmedi |
@@ -239,7 +251,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination cannot be inside the Windows Installer folder. | Hedef, Windows Installer klasörünün içinde olamaz. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | {0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% ve %ProgramData% dışında bir yol seçin. |
 | Not enough space | Yetersiz alan |
-| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | {0} konumunda yeterli alan yok<br><br>Gerekli: {1}<br>Kullanılabilir: {2} |
+| There isn't room at {0}<br><br>Required: {1}<br>Available: {2} | {0} konumunda yeterince yer yok<br><br>Gerekli: {1}<br>Kullanılabilir: {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | {0} konumuna yazma izniniz yok.<br>Kullanıcı profilinizdeki ya da sahibi olduğunuz bir sürücüdeki bir klasörü deneyin. |
 | The path {0} is too long for Windows. Pick a shorter path. | {0} yolu Windows için çok uzun. Daha kısa bir yol seçin. |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | {0} klasörü yok ve oluşturulamadı. Sürücü harfini ya da ağ yolunu kontrol edin. |
@@ -260,7 +272,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Something went wrong with these files; they were left in place. | Bu dosyalarda bir şeyler ters gitti; dosyalar yerinde bırakıldı. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Dosyaların Windows Installer klasörüne taşınması reddediliyor (hedef: {0}). |
 | The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | Yedek klasörü, bir sürücü harfi ya da ağ paylaşımıyla başlayan, bir klasöre giden tam bir yol olmalıdır (örneğin D:\Backup ya da \\sunucu\backup). InstallerClean bunu kullanamaz: {0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean yedek klasörünü artık doğrulayamadı, bu yüzden yanlış yere yazmak yerine durdu. {0} konumunu denetleyin, sonra Yeniden tara deyip tekrar deneyin. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again. | InstallerClean yedek klasörünü artık doğrulayamadı, bu yüzden durdu. {0} konumunu denetleyin, sonra Yeniden tara deyip tekrar deneyin. |
 | Cannot write to {0}. | {0} konumuna yazılamıyor. |
 | A file called '{0}' is already in the backup folder. | '{0}' adlı bir dosya yedek klasöründe zaten var. |
 
@@ -278,15 +290,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | GitHub returned an error response. Try again in a few minutes. | GitHub bir hata yanıtı döndürdü. Birkaç dakika sonra yeniden deneyin. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub'ın yanıtı tanınan bir sürüm içermiyordu. Daha sonra yeniden deneyin ya da sürümler sayfasını doğrudan açın. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Denetim zaman aşımına uğradı. GitHub bağlantınız yavaş olabilir; yeniden deneyin. |
-| The check failed for an unknown reason. Details are in crash.log if you need to report it. | Denetim bilinmeyen bir nedenle başarısız oldu. Bildirmeniz gerekirse ayrıntılar crash.log içindedir. |
+| The check failed for an unknown reason. Details are in {0} if you need to report it. | Denetim bilinmeyen bir nedenle başarısız oldu. Bildirmeniz gerekirse ayrıntılar {0} içindedir. |
+| The check failed for an unknown reason. The crash log could not be written. | Denetim bilinmeyen bir nedenle başarısız oldu. Çökme günlüğü yazılamadı. |
 
 ## Opening links in your browser
 
 | English | Türkçe |
 | --- | --- |
 | Couldn't open your browser | Tarayıcınız açılamadı |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean tarayıcınızı açamadı. Bağlantı panonuzda, böylece onu kendiniz yapıştırabilirsiniz:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean tarayıcınızı açamadı ve bağlantıyı panonuza da kopyalayamadı. Bağlantı şu:<br><br>{0} |
+| The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | Bağlantı panoda, yani kendiniz yapıştırabilirsiniz:<br><br>{0} |
+| InstallerClean couldn't copy the link to your clipboard either, so here it is:<br><br>{0} | InstallerClean bağlantıyı panoya da kopyalayamadı, işte burada:<br><br>{0} |
 
 ## Sending the summary
 
@@ -304,7 +317,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| InstallerClean is already running. | InstallerClean zaten çalışıyor. |
+| It's already running. | Zaten çalışıyor. |
 | InstallerClean | InstallerClean |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Beklenmeyen bir hata oluştu ve InstallerClean kapanmak zorunda.<br><br>{0}<br><br>Ayrıntılar şuraya yazıldı:<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Beklenmeyen bir hata oluştu ve InstallerClean kapanmak zorunda.<br><br>{0}<br><br>Çökme günlüğü yazılamadı. |
@@ -437,18 +450,26 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | {InstallerFolder} taranıyor... |
 | Found {0} unneeded {1} to clean up ({2}). | Temizlenecek {0} gereksiz {1} bulundu ({2}). |
 | Found no unneeded files. | Gereksiz dosya bulunamadı. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği tek dosyayı ({2}) tuttu. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden sunabileceği {0} {1} ({2}) geri tutuldu. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it. | Bu bilgisayarda InstallerClean, önbellekteki hangi dosyaların burada yüklü programlara ait olduğundan emin olamadı, bu yüzden tek dosyayı ({2}) listelemek yerine geri tuttu. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them. | Bu bilgisayarda InstallerClean, önbellekteki hangi dosyaların burada yüklü programlara ait olduğundan emin olamadı, bu yüzden {0} {1} ({2}) listelemek yerine geri tuttu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tek dosyayı ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tüm {0} {1} ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean, bulduğu önbellek dosyasının gereksiz olduğunu saptayamadı, bu yüzden o tek dosyayı ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean, bulduğu önbellek dosyalarının hiçbirinin gereksiz olduğunu saptayamadı, bu yüzden tüm {0} {1} ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tek dosyayı ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden {0} {1} ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back ({2}) rather than offering it. | InstallerClean, bulduğu önbellek dosyalarından biri hakkında emin olamadı, bu yüzden o dosyayı ({2}) sunmak yerine geri tuttu. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean, bulduğu önbellek dosyalarından bazıları hakkında emin olamadı, bu yüzden {0} {1} ({2}) sunmak yerine geri tuttu. |
 | Why it couldn't be certain: | Neden emin olunamadı: |
-|   A file path in Windows Installer's own records wouldn't resolve. |   Windows Installer'ın kendi kayıtlarındaki bir dosya yolu çözümlenemedi. |
-|   The identity of a file named in Windows Installer's records wouldn't read. |   Windows Installer kayıtlarında adı geçen bir dosyanın kimliği okunamadı. |
-|   A program may be installed more than once on this PC. |   Bir program bu bilgisayara birden fazla kez yüklenmiş olabilir. |
+|   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Windows Installer'ın kendi kayıtlarındaki bir dosya yolu çözümlenemedi, bu yüzden onunla hiçbir şey eşleştirilemedi. |
+|   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Windows'un kaydı bulunan bir dosyanın kimliği belirlenemedi, bu yüzden klasörde bulunanlarla eşleştirilemedi. |
+|   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   Bir program bu bilgisayara birden fazla kez yüklenmiş olabilir ve kayıtlar bir dosyanın hangi kopyaya ait olduğunu söyleyemiyor. |
+|   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   Klasördeki bir dosyanın kimliği belirlenemedi, bu yüzden kayıtlarla eşleştirilemedi. |
+|   A file says it belongs to a program that is still installed, so it may still be needed. |   Bir dosya, hâlâ yüklü olan bir programa ait olduğunu söylüyor, bu yüzden hâlâ gerekli olabilir. |
+|   Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program. |   Ya bir dosya hangi programa ait olduğunu söylemedi ya da Windows o program hakkında yanıt vermedi. |
+|   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   Dosyaların hangi programlara ait olduğuna dair bir denetim, kendisine verilen dosyalarla örtüşmeyen yanıtlar verdi. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows'ta {InstallerFolder} içinde bulunmayan {0} dosyaya ait bir kayıt var: {1}. Günlük kullanımda sorun çıkarmaz, ama o programın güncellenmesi ya da kaldırılması başarısız olabilir. Dosyayı geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına ihtiyacınız var. Onu programın üreticisinden edinin ve mevcut kopyanızın üzerine çalıştırın. Daha yeni bir sürüm işe yaramaz: önce sizdekini kaldırması gerekir ve bu dosyaya ihtiyaç duyan tam da o adımdır. Önce kaldırmak da aynı nedenle işe yaramaz. Bunun dosyayı geri getirmesi ve ayarlarınıza dokunmaması beklenir, ancak Microsoft bunu garanti etmez. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows'ta {InstallerFolder} içinde bulunmayan {0} dosyaya ait kayıtlar var: {1}. Günlük kullanımda sorun çıkarmaz, ama o programların güncellenmesi ya da kaldırılması başarısız olabilir. Bir dosyayı geri koymak için, o programın halihazırda sahip olduğunuz sürümünün kurulum programına ihtiyacınız var. Onu programın üreticisinden edinin ve mevcut kopyanızın üzerine çalıştırın. Daha yeni bir sürüm işe yaramaz: önce sizdekini kaldırması gerekir ve o dosyaya ihtiyaç duyan tam da o adımdır. Önce kaldırmak da aynı nedenle işe yaramaz. Bunun dosyayı geri getirmesi ve ayarlarınıza dokunmaması beklenir, ancak Microsoft bunu garanti etmez. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | Bu bilgisayarda InstallerClean, yerine geçilmiş tek dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onu tuttu. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | Bu bilgisayarda InstallerClean, yerine geçilmiş {0} dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onları tuttu. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean, yerine geçilmiş tek dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onu geri tuttu. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean, yerine geçilmiş {0} dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onları geri tuttu. |
 | Deleting {0} unneeded {1}... | {0} gereksiz {1} siliniyor... |
 | Permanently deleted {0} unneeded {1}. | {0} gereksiz {1} kalıcı olarak silindi. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Hata: taşıma hedefi belirtilmedi. /m YOL kullanın. (GUI'de ayarlanan bir varsayılan, kullanıcıya özeldir ve zamanlanmış ya da hizmet hesabı çalıştırmaları için geçerli değildir.) |
@@ -460,13 +481,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Hata: bu makinede askıya alınmış önceki bir Windows Installer işlemi var. {InstallerFolder} klasörünü temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın). |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Hata: yeniden başlatma sonrasına sıraya alınmış bir dosya işlemi {InstallerFolder} klasörünü hedefliyor ({0}). Temizlemeden önce o işlemi tamamlamak için Windows'u yeniden başlatın. |
 | Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning. | Hata: bir sonraki yeniden başlatma için sıraya alınmış bir dosya işlemi var ve InstallerClean bu işlemin hangi dosyaları adlandırdığını bilemiyor, bu yüzden {InstallerFolder} klasörünü dışlayamıyor. Temizlemeden önce Windows'u yeniden başlatın. |
+| Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean. | Hata: InstallerClean, {InstallerFolder} klasörüne dokunmadan önce denetlediği kayıt defteri değerlerinden birini okuyamadı, bu yüzden sürmekte olan ya da bir sonraki yeniden başlatma için sıraya alınmış bir Windows Installer işlemini dışlayamıyor. /m ve /d engellendi. Windows'u yeniden başlatın ve tekrar deneyin. Okuma yine başarısız olursa, burası InstallerClean'in temizleyebileceği bir makine değil. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Hata: Windows Installer'ın sürmekte olan bir işi var, bu yüzden /m ve /d engellendi. InstallerClean değişmekte olan {InstallerFolder} klasörüne dokunmayacak. Bittiğinde yeniden deneyin. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | Hata: InstallerClean, iki programın yüklü yazılımı aynı anda değiştirmesini engelleyen Windows Installer kilidini alamadı, bu yüzden bir dosyanın işin ortasında gerekli hale gelmeyeceğini kesinleştiremedi. Hiçbir şey silinmedi. Yeniden deneyin, sürerse Windows'u yeniden başlatın. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | Hata: InstallerClean, iki programın yüklü yazılımı aynı anda değiştirmesini engelleyen Windows Installer kilidini alamadı, bu yüzden bir dosyanın işin ortasında gerekli hale gelmeyeceğini kesinleştiremedi. Hiçbir şey taşınmadı. Yeniden deneyin, sürerse Windows'u yeniden başlatın. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Hata: Windows, InstallerClean'e Windows Installer'ın meşgul olup olmadığını denetleme izni vermedi, bu yüzden işlem sürerken bir dosyanın gerekli hale gelmesini dışlayamadı. Hiçbir şey silinmedi. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Hata: Windows, InstallerClean'e Windows Installer'ın meşgul olup olmadığını denetleme izni vermedi, bu yüzden işlem sürerken bir dosyanın gerekli hale gelmesini dışlayamadı. Hiçbir şey taşınmadı. |
 | Moving {0} unneeded {1} to {2}... | {0} gereksiz {1} şuraya taşınıyor: {2}... |
 | Moved {0} unneeded {1}. | {0} gereksiz {1} taşındı. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Programlarınızın hâlâ normal şekilde güncellendiğini ve kaldırıldığını doğrulayın, sonra {0} klasörünü silin. |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean yedek klasörünü artık doğrulayamadı, bu yüzden yanlış yere yazmak yerine durdu. {0} konumunu denetleyin, sonra komutu yeniden çalıştırın. |
+| It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was. | Geri almak kolay. Onları {0} konumundan {InstallerFolder} klasörüne geri taşıyın, her şey eskisi gibi olur. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again. | InstallerClean yedek klasörünü artık doğrulayamadı, bu yüzden durdu. {0} konumunu denetleyin, sonra komutu yeniden çalıştırın. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Başka bir InstallerClean işlemi tek örnek kilidini tutuyor (GUI ya da başka bir CLI çalıştırması). Çıkış 75 (geçici); daha sonra yeniden denemek güvenli. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Not: Olay Günlüğü'ne yazma başarısız oldu. Uygulama günlüğü izinlerini ya da Grup İlkesi'ni kontrol edin. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - {InstallerFolder} temizliği |

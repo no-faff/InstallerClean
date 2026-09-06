@@ -77,6 +77,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Size | Dimensione |
 | Patches | Patch |
 | (unknown) | (sconosciuto) |
+| (no program) | (nessun programma) |
 | (patches only) | (solo patch) |
 | missing | mancante |
 
@@ -100,10 +101,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting unneeded files... | Eliminazione dei file non necessari... |
 | Move cancelled. {0} of {1} {2} processed. | Spostamento annullato dopo {0} di {1} {2}. |
 | Delete cancelled. {0} of {1} {2} processed. | Eliminazione annullata dopo {0} di {1} {2}. |
-| Move failed ({0}). Details in {1}. | Spostamento non riuscito ({0}). Dettagli in {1}. |
-| Move failed ({0}). The crash log could not be written. | Spostamento non riuscito ({0}). Non è stato possibile scrivere il file crash.log. |
-| Delete failed ({0}). Details in {1}. | Eliminazione non riuscita ({0}). Dettagli in {1}. |
-| Delete failed ({0}). The crash log could not be written. | Eliminazione non riuscita ({0}). Non è stato possibile scrivere il file crash.log. |
+| {0}. Details are in {1}. | {0}. Dettagli in {1}. |
+| {0}. The crash log could not be written. | {0}. Non è stato possibile scrivere il file crash.log. |
+| {0}. Details are in {1}. | {0}. Dettagli in {1}. |
+| {0}. The crash log could not be written. | {0}. Non è stato possibile scrivere il file crash.log. |
 | Access denied. Windows refused the scan. | Accesso negato. Windows ha rifiutato la scansione. |
 | Scan failed: couldn't read the Windows Installer records. | Scansione non riuscita: impossibile leggere i record di Windows Installer. |
 | Scan cancelled. | Scansione annullata. |
@@ -125,6 +126,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Su questo computer c'è una transazione di Windows Installer sospesa. Riprendi o annulla quell'installazione (o riavvia Windows) prima di ripulire {InstallerFolder}. |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows ha in coda per il prossimo riavvio una ridenominazione di file che riguarda {InstallerFolder}. Riavvia Windows prima di ripulire. |
 | A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning. | Un'operazione sui file è in coda per il prossimo riavvio e InstallerClean non riesce a sapere quali file nomina, quindi non può escludere che siano in {InstallerFolder}. Riavvia Windows prima di pulire. |
+| InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean. | InstallerClean non è riuscito a leggere una delle impostazioni di Windows che controlla prima di toccare {InstallerFolder}, quindi non può sapere se un'operazione di installazione è in corso o in attesa di un riavvio. Riavvia Windows e usa Ripeti scansione. Se l'impostazione continua a non essere leggibile, questo non è un computer che InstallerClean possa pulire. |
 | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer ha qualcosa in corso, quindi Sposta ed Elimina sono in pausa. InstallerClean non tocca {InstallerFolder} mentre cambia. Quando ha finito, ripeti la scansione e tornano disponibili. |
 | Select a file to view details. | Seleziona un file per vederne i dettagli. |
 | Select a product to view details. | Seleziona un prodotto per vederne i dettagli. |
@@ -149,26 +151,29 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to clean up in {InstallerFolder} | Niente da eliminare in {InstallerFolder} |
 | Scanned {0} {1} in {2} | Analizzati {0} {1} in {2} |
 | Nothing offered on this PC | Nulla proposto su questo PC |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file ({2}) che altrimenti avrebbe proposto. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto tutti i {0} {1} ({2}) che altrimenti avrebbe proposto. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file ({2}) invece di proporlo. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto tutti i {0} {1} ({2}) invece di proporli. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean non è riuscito ad accertare che il file nella cache che ha trovato non sia necessario, perciò ha trattenuto quell'unico file ({2}) invece di proporlo. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean non è riuscito ad accertare di nessuno dei file nella cache che ha trovato che non sia necessario, perciò ha trattenuto tutti i {0} {1} ({2}) invece di proporli. |
 | Delete that folder when you're satisfied all is well. | Elimina quella cartella quando sei convinto che vada tutto bene. |
 | Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do. | Elimina quella cartella quando sei convinto che vada tutto bene. Solo allora recuperi davvero lo spazio. |
 | {0} freed | Liberati {0} |
 | {0} moved | Spostati {0} |
 | Nothing was moved | Nessun file spostato |
 | Nothing was deleted | Nessun file eliminato |
-| {0} of {1} could not be moved. | {0} di {1} file non è stato spostato. |
-| {0} of {1} could not be moved. | {0} di {1} file non sono stati spostati. |
-| {0} of {1} could not be deleted. | {0} di {1} file non è stato eliminato. |
-| {0} of {1} could not be deleted. | {0} di {1} file non sono stati eliminati. |
+| {0} file could not be moved. | {0} file non è stato spostato. |
+| {0} files could not be moved. | {0} file non sono stati spostati. |
+| {0} file could not be deleted. | {0} file non è stato eliminato. |
+| {0} files could not be deleted. | {0} file non sono stati eliminati. |
 | {0} {1} moved to: {2} | Spostato {0} {1} in: {2} |
 | {0} {1} moved to: {2} | Spostati {0} {1} in: {2} |
-| {0} file held back. The scan said it was unneeded. The final check didn't agree. | {0} file trattenuto. La scansione lo dava per non necessario. Il controllo finale non è stato d'accordo. |
-| {0} files held back. The scan said these were unneeded. The final check didn't agree. | {0} file trattenuti. La scansione li dava per non necessari. Il controllo finale non è stato d'accordo. |
+| {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | {0} file trattenuto. La scansione lo dava per non necessario. Il controllo finale non ha potuto confermarlo. |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | {0} file trattenuti. La scansione li dava per non necessari. Il controllo finale non ha potuto confermarlo. |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} lasciati al loro posto, perché Windows ha un record del programma nominato all'interno. |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} lasciati al loro posto, perché InstallerClean non ha trovato alcun programma nominato all'interno. |
-| Moved {0} of {1} {2} before you cancelled. | Spostati {0} di {1} {2} prima dell'annullamento. |
+| Moved {0} of {1} {2} to {3} before you cancelled. | Spostati {0} di {1} {2} in {3} prima dell'annullamento. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Eliminati definitivamente {0} di {1} {2} prima dell'annullamento. |
+| It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Annullarlo è semplice. Rispostali in {InstallerFolder} e tornerà tutto com'era. |
 | {0} {1} permanently deleted | {0} {1} eliminato definitivamente |
 | {0} {1} permanently deleted | {0} {1} eliminati definitivamente |
 | Glad to help. There's a tip jar if you're feeling kind. | Felice di esserti stato utile. Un caffè è sempre bene accetto, se ti viene dal cuore. |
@@ -187,14 +192,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} altri programmi |
 | {0} file with no program named in the records | {0} file senza alcun programma nominato nei record |
 | {0} files with no program named in the records | {0} file senza alcun programma nominato nei record |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | Su questo PC InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file invece di elencarlo. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | Su questo PC InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto {0} {1} invece di elencarli. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | Su questo PC InstallerClean non è riuscito a stabilire con certezza che l'unico file sostituito non serva più, perciò l'ha trattenuto. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | Su questo PC InstallerClean non è riuscito a stabilire con certezza che {0} file sostituiti non servano più, perciò li ha trattenuti. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file invece di proporlo. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto {0} {1} invece di proporli. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean non ha avuto la certezza su uno dei file nella cache che ha trovato, perciò l'ha trattenuto invece di proporlo. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean non ha avuto la certezza su alcuni dei file nella cache che ha trovato, perciò ha trattenuto {0} {1} invece di proporli. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean non è riuscito a stabilire con certezza che l'unico file sostituito non serva più, perciò l'ha trattenuto. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean non è riuscito a stabilire con certezza che {0} file sostituiti non servano più, perciò li ha trattenuti. |
 | {0} of {1} {2} | {0} di {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} da eliminare ({2}) |
 | {0} file left alone ({1}) | {0} file lasciato stare ({1}) |
 | {0} files left alone ({1}) | {0} file lasciati stare ({1}) |
+| {0} missing | {0} mancante |
+| {0} missing | {0} mancanti |
 
 ## Confirmation dialogs
 
@@ -227,11 +236,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean non è riuscito a leggere abbastanza dei record di Windows Installer per essere sicuro di che cosa serva ancora: l'elenco dei programmi installati è tornato incompleto, e leggere gli stessi record direttamente dal registro di sistema ha dato errori a sua volta. Un file potrebbe sembrare orfano solo perché il record che lo nomina era fra quelli illeggibili, quindi InstallerClean si è fermato. Non è stato rimosso nulla. |
 | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean non è riuscito a far risolvere a Windows il vero percorso di {InstallerFolder}, quindi non si è potuto dimostrare che qualche file fosse al suo interno e nessuno è stato proposto per la pulizia. Questa scansione non ha trovato nulla perché quel controllo non è riuscito, non perché la cartella sia pulita. Non è stato rimosso nulla. |
 | Nothing was deleted | Nessun file eliminato |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. | Windows ha negato a InstallerClean il permesso di controllare se Windows Installer fosse occupato, quindi non ha potuto escludere che un file servisse a metà strada, e non è stato eliminato nulla. |
 | Nothing was moved | Nessun file spostato |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows ha negato a InstallerClean il permesso di controllare se Windows Installer fosse occupato, quindi non ha potuto escludere che un file servisse a metà strada, e non è stato spostato nulla. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean non è riuscito a prendere il blocco che Windows Installer usa per impedire a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada, e non è stato eliminato nulla. Riprova, e riavvia Windows se continua a succedere. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean non è riuscito a prendere il blocco che Windows Installer usa per impedire a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada, e non è stato spostato nulla. Riprova, e riavvia Windows se continua a succedere. |
 | Invalid destination | Destinazione non valida |
-| Could not write to destination | Impossibile scrivere nella destinazione |
+| Move stopped | Spostamento interrotto |
+| Couldn't use that backup folder | Impossibile usare quella cartella di backup |
 | Move failed | Spostamento non riuscito |
 | Delete failed | Eliminazione non riuscita |
 | Setting not saved | Impostazione non salvata |
@@ -239,7 +251,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination cannot be inside the Windows Installer folder. | La destinazione non può trovarsi all'interno della cartella di Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | La destinazione {0} si risolve dentro una cartella di sistema di Windows. Scegli un percorso fuori da %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% e %ProgramData%. |
 | Not enough space | Spazio insufficiente |
-| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Spazio insufficiente in {0}<br><br>Necessario: {1}<br>Disponibile: {2} |
+| There isn't room at {0}<br><br>Required: {1}<br>Available: {2} | Non c'è abbastanza posto in {0}<br><br>Necessario: {1}<br>Disponibile: {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Non hai i permessi per scrivere in {0}.<br>Prova una cartella nel profilo utente o in un'unità di tua proprietà. |
 | The path {0} is too long for Windows. Pick a shorter path. | Il percorso {0} è troppo lungo per Windows. Scegli un percorso più corto. |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | La cartella {0} non esiste e non è stato possibile crearla. Controlla la lettera dell'unità o il percorso di rete. |
@@ -260,7 +272,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Something went wrong with these files; they were left in place. | Qualcosa è andato storto con questi file; sono stati lasciati al loro posto. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Spostamento dei file nella cartella di Windows Installer rifiutato (destinazione: {0}). |
 | The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | La cartella di backup deve essere un percorso completo a una cartella, che inizia con una lettera di unità o una condivisione di rete (ad esempio D:\Backup, oppure \\server\backup). InstallerClean non può usare questo: {0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean non è più riuscito a confermare la cartella di backup, quindi si è fermato anziché scrivere nel posto sbagliato. Controlla {0}, poi Ripeti scansione e riprova. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again. | InstallerClean non è più riuscito a confermare la cartella di backup, quindi si è fermato. Controlla {0}, poi Ripeti scansione e riprova. |
 | Cannot write to {0}. | Impossibile scrivere in {0}. |
 | A file called '{0}' is already in the backup folder. | Un file di nome '{0}' è già nella cartella di backup. |
 
@@ -278,15 +290,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | GitHub returned an error response. Try again in a few minutes. | GitHub ha restituito una risposta di errore. Riprova tra qualche minuto. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | La risposta di GitHub non conteneva una release riconoscibile. Riprova più tardi, o apri direttamente la pagina delle release. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Il controllo è scaduto. La connessione a GitHub potrebbe essere lenta; riprova. |
-| The check failed for an unknown reason. Details are in crash.log if you need to report it. | Il controllo non è riuscito per un motivo sconosciuto. I dettagli sono nel file crash.log, se devi segnalarlo. |
+| The check failed for an unknown reason. Details are in {0} if you need to report it. | Il controllo non è riuscito per un motivo sconosciuto. I dettagli sono in {0}, se devi segnalarlo. |
+| The check failed for an unknown reason. The crash log could not be written. | Il controllo non è riuscito per un motivo sconosciuto. Non è stato possibile scrivere il file crash.log. |
 
 ## Opening links in your browser
 
 | English | Italiano |
 | --- | --- |
 | Couldn't open your browser | Impossibile aprire il browser |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean non è riuscito ad aprire il browser. Il link è negli appunti, così puoi incollarlo da te:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean non è riuscito ad aprire il browser e non è riuscito nemmeno a copiare il link negli appunti. Il link è:<br><br>{0} |
+| The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | Il link è negli appunti, così puoi incollarlo tu:<br><br>{0} |
+| InstallerClean couldn't copy the link to your clipboard either, so here it is:<br><br>{0} | InstallerClean non è riuscito nemmeno a copiare il link negli appunti, eccolo:<br><br>{0} |
 
 ## Sending the summary
 
@@ -304,7 +317,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Italiano |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| InstallerClean is already running. | InstallerClean è già in esecuzione. |
+| It's already running. | È già in esecuzione. |
 | InstallerClean | InstallerClean |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Si è verificato un errore imprevisto e InstallerClean verrà chiuso.<br><br>{0}<br><br>Dettagli salvati in:<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Si è verificato un errore imprevisto e InstallerClean verrà chiuso.<br><br>{0}<br><br>Non è stato possibile scrivere il file crash.log. |
@@ -437,18 +450,26 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | Scansione di {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Trovati {0} {1} non necessari da eliminare ({2}). |
 | Found no unneeded files. | Nessun file non necessario trovato. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file ({2}) che altrimenti avrebbe proposto. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto tutti i {0} {1} ({2}) che altrimenti avrebbe proposto. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it. | Su questo PC InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, quindi ha trattenuto l'unico file ({2}) invece di elencarlo. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them. | Su questo PC InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, quindi ha trattenuto {0} {1} ({2}) invece di elencarli. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file ({2}) invece di proporlo. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto tutti i {0} {1} ({2}) invece di proporli. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean non è riuscito ad accertare che il file nella cache che ha trovato non sia necessario, perciò ha trattenuto quell'unico file ({2}) invece di proporlo. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean non è riuscito ad accertare di nessuno dei file nella cache che ha trovato che non sia necessario, perciò ha trattenuto tutti i {0} {1} ({2}) invece di proporli. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file ({2}) invece di proporlo. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto {0} {1} ({2}) invece di proporli. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back ({2}) rather than offering it. | InstallerClean non ha avuto la certezza su uno dei file nella cache che ha trovato, perciò ha trattenuto quello ({2}) invece di proporlo. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean non ha avuto la certezza su alcuni dei file nella cache che ha trovato, perciò ha trattenuto {0} {1} ({2}) invece di proporli. |
 | Why it couldn't be certain: | Perché non è stato possibile averne certezza: |
-|   A file path in Windows Installer's own records wouldn't resolve. |   Un percorso di file negli archivi di Windows Installer non si è risolto. |
-|   The identity of a file named in Windows Installer's records wouldn't read. |   L'identità di un file citato negli archivi di Windows Installer non si è letta. |
-|   A program may be installed more than once on this PC. |   Un programma potrebbe essere installato più di una volta su questo PC. |
+|   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Un percorso di file negli archivi di Windows Installer non si è risolto, perciò non è stato possibile associarvi nulla. |
+|   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Non è stato possibile identificare un file di cui Windows ha un archivio, perciò non è stato possibile confrontarlo con il contenuto della cartella. |
+|   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   Un programma potrebbe essere installato più di una volta su questo PC, e gli archivi non possono dire a quale copia appartenga un file. |
+|   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   Non è stato possibile identificare un file nella cartella, perciò non è stato possibile confrontarlo con gli archivi. |
+|   A file says it belongs to a program that is still installed, so it may still be needed. |   Un file dichiara di appartenere a un programma ancora installato, perciò potrebbe servire ancora. |
+|   Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program. |   O un file non ha indicato a quale programma appartiene, oppure Windows non ha risposto riguardo a quel programma. |
+|   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   Un controllo su a quali programmi appartengono i file ha dato risposte che non corrispondevano ai file ricevuti. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows ha un record per {0} file che non è in {InstallerFolder}: {1}. Nell'uso quotidiano non crea problemi, ma un aggiornamento o una disinstallazione di quel programma può fallire. Per rimettere il file, ti serve il programma di installazione della versione che hai già. Procuratelo dal produttore del programma ed eseguilo sopra la copia esistente. Una versione più recente non va bene: dovrebbe prima rimuovere quella che hai, ed è proprio il passaggio che ha bisogno di questo file. Nemmeno disinstallare prima funziona, per lo stesso motivo. Questo dovrebbe ripristinare il file e lasciare intatte le tue impostazioni, ma Microsoft non lo garantisce. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows ha record per {0} file che non sono in {InstallerFolder}: {1}. Nell'uso quotidiano non creano problemi, ma un aggiornamento o una disinstallazione di quei programmi può fallire. Per rimettere un file, ti serve il programma di installazione della versione di quel programma che hai già. Procuratelo dal produttore del programma ed eseguilo sopra la copia esistente. Una versione più recente non va bene: dovrebbe prima rimuovere quella che hai, ed è proprio il passaggio che ha bisogno del file. Nemmeno disinstallare prima funziona, per lo stesso motivo. Questo dovrebbe ripristinare il file e lasciare intatte le tue impostazioni, ma Microsoft non lo garantisce. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | Su questo PC InstallerClean non è riuscito a stabilire con certezza che l'unico file sostituito non serva più, perciò l'ha trattenuto. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | Su questo PC InstallerClean non è riuscito a stabilire con certezza che {0} file sostituiti non servano più, perciò li ha trattenuti. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean non è riuscito a stabilire con certezza che l'unico file sostituito non serva più, perciò l'ha trattenuto. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean non è riuscito a stabilire con certezza che {0} file sostituiti non servano più, perciò li ha trattenuti. |
 | Deleting {0} unneeded {1}... | Eliminazione di {0} {1} non necessari... |
 | Permanently deleted {0} unneeded {1}. | Eliminati definitivamente {0} {1} non necessari. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Errore: nessuna destinazione di spostamento specificata. Usa /m PERCORSO. (Una destinazione predefinita impostata nella GUI è specifica per utente e non si applica alle esecuzioni pianificate o con account di servizio.) |
@@ -460,13 +481,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Errore: su questo computer c'è una transazione di Windows Installer sospesa. Riprendi o annulla quell'installazione (o riavvia Windows) prima di ripulire {InstallerFolder}. |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Errore: un'operazione su file in coda dopo il riavvio riguarda {InstallerFolder} ({0}). Riavvia Windows per completare quell'operazione prima di ripulire. |
 | Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning. | Errore: un'operazione sui file è in coda per il prossimo riavvio e InstallerClean non riesce a sapere quali file nomina, quindi non può escludere {InstallerFolder}. Riavvia Windows prima di pulire. |
+| Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean. | Errore: InstallerClean non è riuscito a leggere uno dei valori di registro che controlla prima di toccare {InstallerFolder}, quindi non può escludere un'operazione di Windows Installer in corso o in coda per il prossimo riavvio. /m e /d sono bloccati. Riavvia Windows e riprova. Se la lettura continua a non riuscire, questo non è un computer che InstallerClean possa pulire. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Errore: Windows Installer ha qualcosa in corso, quindi /m e /d sono bloccati. InstallerClean non tocca {InstallerFolder} mentre cambia. Riprova quando ha finito. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | Errore: InstallerClean non è riuscito a prendere il blocco di Windows Installer che impedisce a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada. Non è stato eliminato nulla. Riprova, e riavvia Windows se continua a succedere. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | Errore: InstallerClean non è riuscito a prendere il blocco di Windows Installer che impedisce a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada. Non è stato spostato nulla. Riprova, e riavvia Windows se continua a succedere. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Errore: Windows ha negato a InstallerClean il permesso di controllare se Windows Installer fosse occupato, quindi non ha potuto escludere che un file servisse a metà strada. Non è stato eliminato nulla. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Errore: Windows ha negato a InstallerClean il permesso di controllare se Windows Installer fosse occupato, quindi non ha potuto escludere che un file servisse a metà strada. Non è stato spostato nulla. |
 | Moving {0} unneeded {1} to {2}... | Spostamento di {0} {1} non necessari in {2}... |
 | Moved {0} unneeded {1}. | Spostati {0} {1} non necessari. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Verifica che i tuoi programmi si aggiornino e si disinstallino ancora normalmente, poi elimina {0}. |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean non è più riuscito a confermare la cartella di backup, quindi si è fermato anziché scrivere nel posto sbagliato. Controlla {0}, poi esegui di nuovo il comando. |
+| It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was. | Annullarlo è semplice. Rispostali da {0} in {InstallerFolder} e tornerà tutto com'era. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again. | InstallerClean non è più riuscito a confermare la cartella di backup, quindi si è fermato. Controlla {0}, poi esegui di nuovo il comando. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Un altro processo InstallerClean mantiene il blocco a istanza singola (la GUI o un'altra esecuzione della CLI). Codice di uscita 75 (transitorio); è sicuro riprovare più tardi. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Nota: scrittura nel registro eventi non riuscita. Controlla i permessi del registro Applicazione o i Criteri di gruppo. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - pulizia di {InstallerFolder} |

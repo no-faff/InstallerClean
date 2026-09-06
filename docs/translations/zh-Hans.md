@@ -77,6 +77,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Size | 大小 |
 | Patches | 补丁 |
 | (unknown) | （未知） |
+| (no program) | （无程序） |
 | (patches only) | （仅补丁） |
 | missing | 缺失 |
 
@@ -100,10 +101,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting unneeded files... | 正在删除不需要的文件… |
 | Move cancelled. {0} of {1} {2} processed. | 移动已取消。{1} 个{2}中已处理 {0} 个。 |
 | Delete cancelled. {0} of {1} {2} processed. | 删除已取消。{1} 个{2}中已处理 {0} 个。 |
-| Move failed ({0}). Details in {1}. | 移动失败（{0}）。详情见 {1}。 |
-| Move failed ({0}). The crash log could not be written. | 移动失败（{0}）。无法写入崩溃日志。 |
-| Delete failed ({0}). Details in {1}. | 删除失败（{0}）。详情见 {1}。 |
-| Delete failed ({0}). The crash log could not be written. | 删除失败（{0}）。无法写入崩溃日志。 |
+| {0}. Details are in {1}. | {0}。详情见 {1}。 |
+| {0}. The crash log could not be written. | {0}。无法写入崩溃日志。 |
+| {0}. Details are in {1}. | {0}。详情见 {1}。 |
+| {0}. The crash log could not be written. | {0}。无法写入崩溃日志。 |
 | Access denied. Windows refused the scan. | 访问被拒绝。Windows 拒绝了扫描。 |
 | Scan failed: couldn't read the Windows Installer records. | 扫描失败：无法读取 Windows Installer 记录。 |
 | Scan cancelled. | 扫描已取消。 |
@@ -125,6 +126,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | 这台计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚那次安装（或重启 Windows），再清理 {InstallerFolder}。 |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows 已把一次文件重命名排入下次重启的队列，且会影响 {InstallerFolder}。请先重启 Windows 再清理。 |
 | A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning. | 有一项文件操作已排入下次重启的队列，InstallerClean 无法得知它指名了哪些文件，因此无法排除这些文件位于 {InstallerFolder} 的可能。请在清理前重启 Windows。 |
+| InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean. | InstallerClean 无法读取它在碰 {InstallerFolder} 之前会检查的一项 Windows 设置，因此无法判断是否有安装程序操作正在进行或正在等待重启。请重启 Windows 并重新扫描。如果该设置仍然无法读取，这台机器就不是 InstallerClean 能清理的。 |
 | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer 有操作正在进行，因此移动和删除已暂停。InstallerClean 不会在 {InstallerFolder} 变动时去碰它。等结束后重新扫描，两者就会恢复。 |
 | Select a file to view details. | 选择一个文件以查看详情。 |
 | Select a product to view details. | 选择一个产品以查看详情。 |
@@ -149,26 +151,29 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder} 中没有需要清理的内容 |
 | Scanned {0} {1} in {2} | 扫描了 {0} 个{1}，用时 {2} |
 | Nothing offered on this PC | 在这台电脑上没有提供任何内容 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的那 1 个文件（{2}）。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的全部 {0} 个{1}（{2}）。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此没有提供那 1 个文件（{2}），而是把它保留了下来。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此没有提供全部 {0} 个{1}（{2}），而是把它们保留了下来。 |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean 无法证实它找到的那个缓存文件是不需要的，因此没有提供那 1 个文件（{2}），而是把它保留了下来。 |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean 无法证实它找到的缓存文件中有任何一个是不需要的，因此没有提供全部 {0} 个{1}（{2}），而是把它们保留了下来。 |
 | Delete that folder when you're satisfied all is well. | 等您确信一切正常时，再删除那个文件夹。 |
 | Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do. | 等您确信一切正常时，再删除那个文件夹。在那之前空间不会真正释放。 |
 | {0} freed | 已释放 {0} |
 | {0} moved | 已移动 {0} |
 | Nothing was moved | 没有移动任何文件 |
 | Nothing was deleted | 没有删除任何文件 |
-| {0} of {1} could not be moved. | {1} 个文件中有 {0} 个无法移动。 |
-| {0} of {1} could not be moved. | {1} 个文件中有 {0} 个无法移动。 |
-| {0} of {1} could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
-| {0} of {1} could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
+| {0} file could not be moved. | {0} 个文件无法移动。 |
+| {0} files could not be moved. | {0} 个文件无法移动。 |
+| {0} file could not be deleted. | {0} 个文件无法删除。 |
+| {0} files could not be deleted. | {0} 个文件无法删除。 |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
-| {0} file held back. The scan said it was unneeded. The final check didn't agree. | 已保留 {0} 个文件。扫描认为它不需要，最终检查却不这么认为。 |
-| {0} files held back. The scan said these were unneeded. The final check didn't agree. | 已保留 {0} 个文件。扫描认为它们不需要，最终检查却不这么认为。 |
+| {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | 已保留 {0} 个文件。扫描认为它不需要，但最终检查无法确认这一点。 |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | 已保留 {0} 个文件。扫描认为它们不需要，但最终检查无法确认这一点。 |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | 有 {0} 个{1}保持原位，因为 Windows 有文件内所标示程序的记录。 |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | 有 {0} 个{1}保持原位，因为 InstallerClean 没能在文件内找到程序名。 |
-| Moved {0} of {1} {2} before you cancelled. | 在您取消前，已移动 {1} 个{2}中的 {0} 个。 |
+| Moved {0} of {1} {2} to {3} before you cancelled. | 在您取消前，已将 {1} 个{2}中的 {0} 个移动到 {3}。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
+| It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 撤销很简单。把它们移回 {InstallerFolder}，一切就会恢复原样。 |
 | {0} {1} permanently deleted | 已永久删除 {0} 个{1} |
 | {0} {1} permanently deleted | 已永久删除 {0} 个{1} |
 | Glad to help. There's a tip jar if you're feeling kind. | 很高兴帮上忙。您若有心，这里可以打赏。 |
@@ -187,14 +192,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 另外 {0} 个程序 |
 | {0} file with no program named in the records | {0} 个在记录中没有标明程序的文件 |
 | {0} files with no program named in the records | {0} 个在记录中没有标明程序的文件 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | 在这台电脑上，InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了唯一的那个文件，没有把它列出来。 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | 在这台电脑上，InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了 {0} 个{1}，没有把它们列出来。 |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | 在这台电脑上，InstallerClean 无法确定唯一那个被取代的文件已不再需要，因此保留了它。 |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | 在这台电脑上，InstallerClean 无法确定 {0} 个被取代的文件已不再需要，因此保留了它们。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此没有提供那 1 个文件，而是把它保留了下来。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此没有提供 {0} 个{1}，而是把它们保留了下来。 |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean 对它找到的缓存文件中的一个没有把握，因此没有提供它，而是把它保留了下来。 |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean 对它找到的部分缓存文件没有把握，因此没有提供 {0} 个{1}，而是把它们保留了下来。 |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean 无法确定唯一那个被取代的文件已不再需要，因此保留了它。 |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean 无法确定 {0} 个被取代的文件已不再需要，因此保留了它们。 |
 | {0} of {1} {2} | {1} 个{2}中的 {0} 个 |
 | {0} unneeded {1} ({2}) | {0} 个不需要的{1}（{2}） |
 | {0} file left alone ({1}) | {0} 个文件原样保留（{1}） |
 | {0} files left alone ({1}) | {0} 个文件原样保留（{1}） |
+| {0} missing | 缺失 {0} 个 |
+| {0} missing | 缺失 {0} 个 |
 
 ## Confirmation dialogs
 
@@ -227,11 +236,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean 未能读取到足够的 Windows Installer 记录，无法确定哪些内容仍然需要：已安装程序的清单返回时并不完整，而直接从注册表读取同样的记录也遇到了错误。一个文件可能仅仅因为指明它的那条记录属于读不到的记录之一，就显得像是孤立的，因此 InstallerClean 停了下来。没有删除任何内容。 |
 | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean 未能让 Windows 解析出 {InstallerFolder} 的真实路径，因此无法证明任何文件位于其中，也没有提供任何文件供清理。这次扫描一无所获是因为那项检查失败，而不是因为文件夹是干净的。没有移除任何内容。 |
 | Nothing was deleted | 没有删除任何文件 |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. | Windows 拒绝了 InstallerClean 检查 Windows Installer 是否正忙的权限，因此它无法排除某个文件在中途变得需要，没有删除任何文件。 |
 | Nothing was moved | 没有移动任何文件 |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows 拒绝了 InstallerClean 检查 Windows Installer 是否正忙的权限，因此它无法排除某个文件在中途变得需要，没有移动任何文件。 |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有删除任何内容。请重试，若一直如此请重启 Windows。 |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean 未能取得 Windows Installer 用来防止两个程序同时更改已安装软件的锁，因此无法排除某个文件在中途变成必需的可能，也没有移动任何内容。请重试，若一直如此请重启 Windows。 |
 | Invalid destination | 目标无效 |
-| Could not write to destination | 无法写入目标 |
+| Move stopped | 移动已停止 |
+| Couldn't use that backup folder | 无法使用该备份文件夹 |
 | Move failed | 移动失败 |
 | Delete failed | 删除失败 |
 | Setting not saved | 设置未保存 |
@@ -239,7 +251,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination cannot be inside the Windows Installer folder. | 目标不能位于 Windows Installer 文件夹内。 |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | 目标 {0} 解析到了 Windows 系统文件夹之下。请选择 %SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)% 和 %ProgramData% 之外的路径。 |
 | Not enough space | 空间不足 |
-| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | {0} 上的空间不足<br><br>所需：{1}<br>可用：{2} |
+| There isn't room at {0}<br><br>Required: {1}<br>Available: {2} | {0} 上放不下<br><br>所需：{1}<br>可用：{2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | 您没有写入 {0} 的权限。<br>请尝试您的用户配置文件中的文件夹，或您拥有的驱动器。 |
 | The path {0} is too long for Windows. Pick a shorter path. | 路径 {0} 对 Windows 来说太长了。请选择更短的路径。 |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | 文件夹 {0} 不存在，且无法创建。请检查驱动器盘符或网络路径。 |
@@ -260,7 +272,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Something went wrong with these files; they were left in place. | 这些文件出了点问题；它们已留在原处。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | 拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。 |
 | The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | 备份文件夹必须是指向某个文件夹的完整路径，以驱动器盘符或网络共享开头（例如 D:\Backup，或 \\server\backup）。InstallerClean 无法使用这个：{0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean 已无法确认备份文件夹，因此停了下来，而不是写到错误的位置。请检查 {0}，然后重新扫描并再试一次。 |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again. | InstallerClean 已无法确认备份文件夹，因此停了下来。请检查 {0}，然后重新扫描并再试一次。 |
 | Cannot write to {0}. | 无法写入 {0}。 |
 | A file called '{0}' is already in the backup folder. | 备份文件夹中已经有一个名为“{0}”的文件。 |
 
@@ -278,15 +290,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | GitHub returned an error response. Try again in a few minutes. | GitHub 返回了错误响应。请过几分钟后重试。 |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub 的响应中没有可识别的发布版本。请稍后重试，或直接打开发布页面。 |
 | The check timed out. Your connection to GitHub may be slow; try again. | 检查超时。您与 GitHub 的连接可能较慢；请重试。 |
-| The check failed for an unknown reason. Details are in crash.log if you need to report it. | 检查因未知原因失败。如果您需要报告此问题，详情在 crash.log 中。 |
+| The check failed for an unknown reason. Details are in {0} if you need to report it. | 检查因未知原因失败。如果您需要报告此问题，详情在 {0} 中。 |
+| The check failed for an unknown reason. The crash log could not be written. | 检查因未知原因失败。无法写入崩溃日志。 |
 
 ## Opening links in your browser
 
 | English | 简体中文 |
 | --- | --- |
 | Couldn't open your browser | 无法打开您的浏览器 |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean 无法打开您的浏览器。链接已复制到您的剪贴板，您可以自行粘贴：<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean 无法打开您的浏览器，也无法将链接复制到您的剪贴板。链接如下：<br><br>{0} |
+| The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | 链接已复制到剪贴板，您可以自己粘贴：<br><br>{0} |
+| InstallerClean couldn't copy the link to your clipboard either, so here it is:<br><br>{0} | InstallerClean 也无法把链接复制到剪贴板，链接在这里：<br><br>{0} |
 
 ## Sending the summary
 
@@ -304,7 +317,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| InstallerClean is already running. | InstallerClean 已在运行。 |
+| It's already running. | 已在运行。 |
 | InstallerClean | InstallerClean |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | 发生了意外错误，InstallerClean 需要关闭。<br><br>{0}<br><br>详情已写入：<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | 发生了意外错误，InstallerClean 需要关闭。<br><br>{0}<br><br>无法写入崩溃日志。 |
@@ -437,18 +450,26 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | 正在扫描 {InstallerFolder}… |
 | Found {0} unneeded {1} to clean up ({2}). | 找到 {0} 个可清理的、不需要的{1}（{2}）。 |
 | Found no unneeded files. | 未找到不需要的文件。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的那 1 个文件（{2}）。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此保留了本可提供的全部 {0} 个{1}（{2}）。 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it. | 在这台电脑上，InstallerClean 无法确定缓存中哪些文件属于这里安装的程序，因此保留了这个文件（{2}），没有把它列出。 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them. | 在这台电脑上，InstallerClean 无法确定缓存中哪些文件属于这里安装的程序，因此保留了 {0} {1}（{2}），没有把它们列出。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此没有提供那 1 个文件（{2}），而是把它保留了下来。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此没有提供全部 {0} 个{1}（{2}），而是把它们保留了下来。 |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean 无法证实它找到的那个缓存文件是不需要的，因此没有提供那 1 个文件（{2}），而是把它保留了下来。 |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean 无法证实它找到的缓存文件中有任何一个是不需要的，因此没有提供全部 {0} 个{1}（{2}），而是把它们保留了下来。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此没有提供那 1 个文件（{2}），而是把它保留了下来。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean 无法确定缓存中的哪些文件属于这里安装的程序，因此没有提供 {0} 个{1}（{2}），而是把它们保留了下来。 |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back ({2}) rather than offering it. | InstallerClean 对它找到的缓存文件中的一个没有把握，因此没有提供那一个（{2}），而是把它保留了下来。 |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean 对它找到的部分缓存文件没有把握，因此没有提供 {0} 个{1}（{2}），而是把它们保留了下来。 |
 | Why it couldn't be certain: | 无法确定的原因： |
-|   A file path in Windows Installer's own records wouldn't resolve. |   Windows Installer 自身记录中的一个文件路径无法解析。 |
-|   The identity of a file named in Windows Installer's records wouldn't read. |   无法读取 Windows Installer 记录中所列某个文件的标识。 |
-|   A program may be installed more than once on this PC. |   某个程序可能在这台电脑上安装了不止一次。 |
+|   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Windows Installer 自身记录中的一个文件路径无法解析，因此没有任何内容能与它对应起来。 |
+|   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   无法识别 Windows 有记录的某个文件，因此无法把它与文件夹中的内容对应起来。 |
+|   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   某个程序可能在这台电脑上安装了不止一次，而记录无法说明某个文件属于哪一份。 |
+|   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   无法识别文件夹中的某个文件，因此无法把它与记录对应起来。 |
+|   A file says it belongs to a program that is still installed, so it may still be needed. |   某个文件声称属于一个仍然安装着的程序，因此可能仍然需要。 |
+|   Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program. |   要么某个文件没有说明它属于哪个程序，要么 Windows 没有就该程序作出回答。 |
+|   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   一项关于这些文件属于哪些程序的检查，给出的答案与交给它的文件对不上。 |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有问题，但该程序的更新或卸载可能会失败。要把该文件放回去，您需要您当前所用版本的安装程序。请从程序的制作方获取，并在现有副本上运行它。更新的版本不行：新版本必须先移除您现有的版本，而正是这一步需要这个文件。先卸载同样行不通，原因相同。这应当会恢复该文件并保持您的设置不变，但 Microsoft 并不保证。 |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows 有 {0} 个不在 {InstallerFolder} 中的文件的记录：{1}。日常使用不会有问题，但这些程序的更新或卸载可能会失败。要把某个文件放回去，您需要该程序当前所用版本的安装程序。请从程序的制作方获取，并在现有副本上运行它。更新的版本不行：新版本必须先移除您现有的版本，而正是这一步需要该文件。先卸载同样行不通，原因相同。这应当会恢复该文件并保持您的设置不变，但 Microsoft 并不保证。 |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | 在这台电脑上，InstallerClean 无法确定唯一那个被取代的文件已不再需要，因此保留了它。 |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | 在这台电脑上，InstallerClean 无法确定 {0} 个被取代的文件已不再需要，因此保留了它们。 |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean 无法确定唯一那个被取代的文件已不再需要，因此保留了它。 |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean 无法确定 {0} 个被取代的文件已不再需要，因此保留了它们。 |
 | Deleting {0} unneeded {1}... | 正在删除 {0} 个不需要的{1}… |
 | Permanently deleted {0} unneeded {1}. | 已永久删除 {0} 个不需要的{1}。 |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 错误：未指定移动目标位置。请使用 /m 路径。（在 GUI 中设置的默认位置是按用户保存的，不适用于计划任务或服务账户下的运行。） |
@@ -460,13 +481,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | 错误：这台计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚那次安装（或重启 Windows），再清理 {InstallerFolder}。 |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | 错误：一项排在重启之后的文件操作指向 {InstallerFolder}（{0}）。请先重启 Windows 让该操作完成，再进行清理。 |
 | Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning. | 错误：有一项文件操作已排入下次重启的队列，InstallerClean 无法得知它指名了哪些文件，因此无法排除 {InstallerFolder}。请在清理前重启 Windows。 |
+| Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean. | 错误：InstallerClean 无法读取它在碰 {InstallerFolder} 之前会检查的一项注册表值，因此无法排除有 Windows Installer 操作正在进行或已排入下次重启的队列。/m 和 /d 会被阻止。请重启 Windows 后再试。如果仍然读不到，这台机器就不是 InstallerClean 能清理的。 |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | 错误：Windows Installer 有操作正在进行，因此 /m 和 /d 会被阻止。InstallerClean 不会在 {InstallerFolder} 变动时去碰它。等结束后再试。 |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | 错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有删除任何内容。请重试，若一直如此请重启 Windows。 |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | 错误：InstallerClean 未能取得防止两个程序同时更改已安装软件的 Windows Installer 锁，因此无法排除某个文件在中途变成必需的可能。没有移动任何内容。请重试，若一直如此请重启 Windows。 |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | 错误：Windows 拒绝了 InstallerClean 检查 Windows Installer 是否正忙的权限，因此它无法排除某个文件在中途变得需要。没有删除任何文件。 |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | 错误：Windows 拒绝了 InstallerClean 检查 Windows Installer 是否正忙的权限，因此它无法排除某个文件在中途变得需要。没有移动任何文件。 |
 | Moving {0} unneeded {1} to {2}... | 正在把 {0} 个不需要的{1}移动到 {2}… |
 | Moved {0} unneeded {1}. | 已移动 {0} 个不需要的{1}。 |
 | Check that your programs still update and uninstall as normal, then delete {0}. | 请确认您的程序仍能照常更新和卸载，然后删除 {0}。 |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean 已无法确认备份文件夹，因此停了下来，而不是写到错误的位置。请检查 {0}，然后重新运行该命令。 |
+| It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was. | 撤销很简单。把它们从 {0} 移回 {InstallerFolder}，一切就会恢复原样。 |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again. | InstallerClean 已无法确认备份文件夹，因此停了下来。请检查 {0}，然后重新运行该命令。 |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 另一个 InstallerClean 进程正持有单实例锁（GUI 或另一次 CLI 运行）。退出代码 75（暂时性）；稍后可安全重试。 |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：事件日志写入失败。请检查应用程序日志的权限或组策略。 |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - 清理 {InstallerFolder} |

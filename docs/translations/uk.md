@@ -77,6 +77,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Size | Розмір |
 | Patches | Виправлення |
 | (unknown) | (невідомо) |
+| (no program) | (немає програми) |
 | (patches only) | (лише виправлення) |
 | missing | відсутній |
 
@@ -100,10 +101,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting unneeded files... | Видалення непотрібних файлів... |
 | Move cancelled. {0} of {1} {2} processed. | Переміщення скасовано. Опрацьовано {0} з {1} {2}. |
 | Delete cancelled. {0} of {1} {2} processed. | Видалення скасовано. Опрацьовано {0} з {1} {2}. |
-| Move failed ({0}). Details in {1}. | Не вдалося перемістити ({0}). Деталі у {1}. |
-| Move failed ({0}). The crash log could not be written. | Не вдалося перемістити ({0}). Не вдалося записати журнал збоїв. |
-| Delete failed ({0}). Details in {1}. | Не вдалося видалити ({0}). Деталі у {1}. |
-| Delete failed ({0}). The crash log could not be written. | Не вдалося видалити ({0}). Не вдалося записати журнал збоїв. |
+| {0}. Details are in {1}. | {0}. Деталі у {1}. |
+| {0}. The crash log could not be written. | {0}. Не вдалося записати журнал збоїв. |
+| {0}. Details are in {1}. | {0}. Деталі у {1}. |
+| {0}. The crash log could not be written. | {0}. Не вдалося записати журнал збоїв. |
 | Access denied. Windows refused the scan. | Відмовлено в доступі. Windows відхилив сканування. |
 | Scan failed: couldn't read the Windows Installer records. | Сканування не вдалося: не вдалося прочитати записи Windows Installer. |
 | Scan cancelled. | Сканування скасовано. |
@@ -125,6 +126,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | На цьому комп'ютері призупинено попередню транзакцію Windows Installer. Відновіть або скасуйте те встановлення (чи перезавантажте Windows), перш ніж очищати {InstallerFolder}. |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows поставив в чергу на наступне перезавантаження перейменування файлу, що стосується {InstallerFolder}. Перезавантажте Windows, перш ніж очищати. |
 | A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning. | Файлову операцію поставлено в чергу до наступного перезавантаження, і InstallerClean не може визначити, які файли в ній названо, тож не може виключити, що вони в {InstallerFolder}. Перезавантажте Windows перед очищенням. |
+| InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean. | InstallerClean не зміг прочитати один із параметрів Windows, які перевіряє перед тим, як торкатися {InstallerFolder}, тож не може визначити, чи операція встановлювача виконується, чи чекає на перезавантаження. Перезавантажте Windows і повторіть сканування. Якщо параметр і далі не читається, це не та машина, яку InstallerClean може очистити. |
 | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | У Windows Installer щось виконується, тому «Перемістити» і «Видалити» призупинено. InstallerClean не чіпатиме {InstallerFolder}, доки вона змінюється. Коли все завершиться, повторіть сканування, і вони повернуться. |
 | Select a file to view details. | Виберіть файл, щоб переглянути деталі. |
 | Select a product to view details. | Виберіть продукт, щоб переглянути деталі. |
@@ -149,26 +151,29 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to clean up in {InstallerFolder} | У {InstallerFolder} немає чого прибирати |
 | Scanned {0} {1} in {2} | Проскановано {0} {1} за {2} |
 | Nothing offered on this PC | На цьому ПК нічого не запропоновано |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав єдиний файл ({2}), який інакше запропонував би. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав усі {0} {1} ({2}), які інакше запропонував би. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав єдиний файл ({2}), замість того щоб запропонувати його. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав усі {0} {1} ({2}), замість того щоб запропонувати їх. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean не зміг встановити, що знайдений ним файл у кеші не потрібен, тож затримав цей єдиний файл ({2}), замість того щоб запропонувати його. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean про жоден зі знайдених ним файлів у кеші не зміг встановити, що він не потрібен, тож затримав усі {0} {1} ({2}), замість того щоб запропонувати їх. |
 | Delete that folder when you're satisfied all is well. | Видаліть цю папку, коли переконаєтеся, що все гаразд. |
 | Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do. | Видаліть цю папку, коли переконаєтеся, що все гаразд. Лише після цього місце справді звільниться. |
 | {0} freed | Звільнено {0} |
 | {0} moved | Переміщено {0} |
 | Nothing was moved | Нічого не переміщено |
 | Nothing was deleted | Нічого не видалено |
-| {0} of {1} could not be moved. | Не вдалося перемістити {0} файл з {1}. |
-| {0} of {1} could not be moved. | Не вдалося перемістити {0} файлів з {1}. |
-| {0} of {1} could not be deleted. | Не вдалося видалити {0} файл з {1}. |
-| {0} of {1} could not be deleted. | Не вдалося видалити {0} файлів з {1}. |
+| {0} file could not be moved. | Не вдалося перемістити {0} файл. |
+| {0} files could not be moved. | Не вдалося перемістити {0} файлів. |
+| {0} file could not be deleted. | Не вдалося видалити {0} файл. |
+| {0} files could not be deleted. | Не вдалося видалити {0} файлів. |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
-| {0} file held back. The scan said it was unneeded. The final check didn't agree. | Затримано {0} файл. Сканування вважало його непотрібним. Підсумкова перевірка не погодилася. |
-| {0} files held back. The scan said these were unneeded. The final check didn't agree. | Затримано {0} файлів. Сканування вважало їх непотрібними. Підсумкова перевірка не погодилася. |
+| {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | Затримано {0} файл. Сканування вважало його непотрібним. Підсумкова перевірка не змогла це підтвердити. |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | Затримано {0} файлів. Сканування вважало їх непотрібними. Підсумкова перевірка не змогла це підтвердити. |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | Залишено на місці {0} {1}, бо Windows має запис про програму, названу всередині. |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | Залишено на місці {0} {1}, бо InstallerClean не знайшов усередині назви програми. |
-| Moved {0} of {1} {2} before you cancelled. | Переміщено {0} з {1} {2}, перш ніж ви скасували. |
+| Moved {0} of {1} {2} to {3} before you cancelled. | Переміщено {0} з {1} {2} до {3}, перш ніж ви скасували. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували. |
+| It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Це легко скасувати. Перемістіть їх назад до {InstallerFolder}, і все повернеться як було. |
 | {0} {1} permanently deleted | Остаточно видалено {0} {1} |
 | {0} {1} permanently deleted | Остаточно видалено {0} {1} |
 | Glad to help. There's a tip jar if you're feeling kind. | Радий, що знадобилося. Якщо ваша ласка, є куди докинути на каву. |
@@ -187,14 +192,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | ще {0} програм |
 | {0} file with no program named in the records | {0} файл, для якого в записах не названо програми |
 | {0} files with no program named in the records | {0} файлів, для яких у записах не названо програми |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | На цьому ПК InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав єдиний файл, а не показав його в списку. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | На цьому ПК InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав {0} {1}, а не показав їх у списку. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | На цьому ПК InstallerClean не зміг упевнено визначити, що єдиний заміщений файл більше не потрібен, тож затримав його. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | На цьому ПК InstallerClean не зміг упевнено визначити, що {0} заміщених файлів більше не потрібні, тож затримав їх. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав єдиний файл, замість того щоб запропонувати його. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав {0} {1}, замість того щоб запропонувати їх. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean не був певен щодо одного зі знайдених ним файлів у кеші, тож затримав його, замість того щоб запропонувати. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean не був певен щодо деяких зі знайдених ним файлів у кеші, тож затримав {0} {1}, замість того щоб запропонувати їх. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean не зміг упевнено визначити, що єдиний заміщений файл більше не потрібен, тож затримав його. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean не зміг упевнено визначити, що {0} заміщених файлів більше не потрібні, тож затримав їх. |
 | {0} of {1} {2} | {0} з {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} для очищення ({2}) |
 | {0} file left alone ({1}) | {0} файл залишено без змін ({1}) |
 | {0} files left alone ({1}) | {0} файлів залишено без змін ({1}) |
+| {0} missing | {0} відсутній |
+| {0} missing | {0} відсутніх |
 
 ## Confirmation dialogs
 
@@ -227,11 +236,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean не зміг прочитати достатньо записів Windows Installer, щоб напевно знати, що ще потрібно: список встановлених програм повернувся неповним, а читання тих самих записів прямо з реєстру теж призвело до помилок. Файл міг видаватися осиротілим лише тому, що запис, який його називає, виявився одним із нечитабельних, тож InstallerClean зупинився. Нічого не було видалено. |
 | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean не зміг отримати від Windows справжній шлях до {InstallerFolder}, тож про жоден файл не вдалося показати, що він усередині, і жоден не було запропоновано для очищення. Це сканування нічого не знайшло через невдачу тієї перевірки, а не тому, що папка чиста. Нічого не прибрано. |
 | Nothing was deleted | Нічого не видалено |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. | Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі, і нічого не було видалено. |
 | Nothing was moved | Нічого не переміщено |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі, і нічого не було переміщено. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean не зміг узяти блокування, яким Windows Installer не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі, і нічого не видалено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean не зміг узяти блокування, яким Windows Installer не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі, і нічого не переміщено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows. |
 | Invalid destination | Недійсне призначення |
-| Could not write to destination | Не вдалося записати в призначення |
+| Move stopped | Переміщення зупинено |
+| Couldn't use that backup folder | Не вдалося використати цю папку резервних копій |
 | Move failed | Не вдалося перемістити |
 | Delete failed | Не вдалося видалити |
 | Setting not saved | Налаштування не збережено |
@@ -239,7 +251,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination cannot be inside the Windows Installer folder. | Призначення не може бути всередині папки Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | Призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% і %ProgramData%. |
 | Not enough space | Недостатньо місця |
-| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Недостатньо місця в {0}<br><br>Потрібно: {1}<br>Доступно: {2} |
+| There isn't room at {0}<br><br>Required: {1}<br>Available: {2} | У {0} не вистачає місця<br><br>Потрібно: {1}<br>Доступно: {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | У вас немає дозволу на запис у {0}.<br>Спробуйте папку у вашому профілі користувача або на диску, який вам належить. |
 | The path {0} is too long for Windows. Pick a shorter path. | Шлях {0} задовгий для Windows. Виберіть коротший шлях. |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | Папки {0} не існує, і її не вдалося створити. Перевірте літеру диска або мережевий шлях. |
@@ -260,7 +272,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Something went wrong with these files; they were left in place. | З цими файлами щось пішло не так; їх залишено на місці. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Відмова перемістити файли до папки Windows Installer (призначення: {0}). |
 | The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | Папка резервних копій має бути повним шляхом до папки, що починається з літери диска або мережевого ресурсу (наприклад, D:\Backup або \\server\backup). InstallerClean не може використати цей: {0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean більше не зміг підтвердити папку резервних копій і зупинився, щоб не записати не туди. Перевірте {0}, потім «Повторити сканування» і спробуйте ще раз. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again. | InstallerClean більше не зміг підтвердити папку резервних копій і зупинився. Перевірте {0}, потім «Повторити сканування» і спробуйте ще раз. |
 | Cannot write to {0}. | Не вдається записати в {0}. |
 | A file called '{0}' is already in the backup folder. | Файл з іменем «{0}» уже є в папці резервних копій. |
 
@@ -278,15 +290,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | GitHub returned an error response. Try again in a few minutes. | GitHub повернув повідомлення про помилку. Спробуйте ще раз за кілька хвилин. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | Відповідь GitHub не містила розпізнаного випуску. Спробуйте пізніше або відкрийте сторінку випусків напряму. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Час перевірки вичерпано. Можливо, ваше з'єднання з GitHub повільне; спробуйте ще раз. |
-| The check failed for an unknown reason. Details are in crash.log if you need to report it. | Перевірка не вдалася з невідомої причини. Деталі у crash.log, якщо вам потрібно про це повідомити. |
+| The check failed for an unknown reason. Details are in {0} if you need to report it. | Перевірка не вдалася з невідомої причини. Деталі у {0}, якщо вам потрібно про це повідомити. |
+| The check failed for an unknown reason. The crash log could not be written. | Перевірка не вдалася з невідомої причини. Не вдалося записати журнал збоїв. |
 
 ## Opening links in your browser
 
 | English | Українська |
 | --- | --- |
 | Couldn't open your browser | Не вдалося відкрити ваш браузер |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean не зміг відкрити ваш браузер. Посилання скопійовано до буфера обміну, тож ви можете вставити його самі:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean не зміг відкрити ваш браузер і не зміг скопіювати посилання до буфера обміну. Ось воно:<br><br>{0} |
+| The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | Посилання в буфері обміну, тож ви можете вставити його самі:<br><br>{0} |
+| InstallerClean couldn't copy the link to your clipboard either, so here it is:<br><br>{0} | InstallerClean також не зміг скопіювати посилання в буфер обміну, ось воно:<br><br>{0} |
 
 ## Sending the summary
 
@@ -304,7 +317,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Українська |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| InstallerClean is already running. | InstallerClean уже працює. |
+| It's already running. | Уже працює. |
 | InstallerClean | InstallerClean |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Сталася неочікувана помилка, і InstallerClean потрібно закрити.<br><br>{0}<br><br>Деталі записано до:<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Сталася неочікувана помилка, і InstallerClean потрібно закрити.<br><br>{0}<br><br>Не вдалося записати журнал збоїв. |
@@ -437,18 +450,26 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | Сканування {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Знайдено {0} непотрібних {1} для очищення ({2}). |
 | Found no unneeded files. | Непотрібних файлів не знайдено. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав єдиний файл ({2}), який інакше запропонував би. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean не зміг упевнено визначити, яким зі встановлених тут програм належать файли в кеші, тож затримав усі {0} {1} ({2}), які інакше запропонував би. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it. | На цьому ПК InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав єдиний файл ({2}), а не вніс його до списку. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them. | На цьому ПК InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав {0} {1} ({2}), а не вніс їх до списку. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав єдиний файл ({2}), замість того щоб запропонувати його. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав усі {0} {1} ({2}), замість того щоб запропонувати їх. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean не зміг встановити, що знайдений ним файл у кеші не потрібен, тож затримав цей єдиний файл ({2}), замість того щоб запропонувати його. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean про жоден зі знайдених ним файлів у кеші не зміг встановити, що він не потрібен, тож затримав усі {0} {1} ({2}), замість того щоб запропонувати їх. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав єдиний файл ({2}), замість того щоб запропонувати його. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав {0} {1} ({2}), замість того щоб запропонувати їх. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back ({2}) rather than offering it. | InstallerClean не був певен щодо одного зі знайдених ним файлів у кеші, тож затримав саме його ({2}), замість того щоб запропонувати. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean не був певен щодо деяких зі знайдених ним файлів у кеші, тож затримав {0} {1} ({2}), замість того щоб запропонувати їх. |
 | Why it couldn't be certain: | Чому впевненості не було: |
-|   A file path in Windows Installer's own records wouldn't resolve. |   Шлях до файлу з власних записів Windows Installer не вдалося розв'язати. |
-|   The identity of a file named in Windows Installer's records wouldn't read. |   Ідентичність файлу, названого в записах Windows Installer, не вдалося прочитати. |
-|   A program may be installed more than once on this PC. |   Програму може бути встановлено на цьому ПК більше одного разу. |
+|   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Шлях до файлу з власних записів Windows Installer не вдалося розв'язати, тож із ним нічого не вдалося зіставити. |
+|   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Файл, про який Windows має запис, не вдалося розпізнати, тож його не вдалося зіставити з тим, що є в теці. |
+|   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   Програму може бути встановлено на цьому ПК більше одного разу, а записи не можуть сказати, якій копії належить файл. |
+|   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   Файл у теці не вдалося розпізнати, тож його не вдалося зіставити із записами. |
+|   A file says it belongs to a program that is still installed, so it may still be needed. |   Файл заявляє, що належить програмі, яка досі встановлена, тож він може бути ще потрібен. |
+|   Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program. |   Або файл не вказав, якій програмі він належить, або Windows не відповів про цю програму. |
+|   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   Перевірка того, яким програмам належать файли, дала відповіді, які не збіглися з переданими їй файлами. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows має запис про {0} файл, якого немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цієї програми може не виконатися. Щоб повернути файл, вам потрібен інсталятор тієї версії, яку ви вже маєте. Візьміть його у виробника програми і запустіть поверх наявної копії. Новіша версія не підійде: їй довелося б спершу видалити ту, що у вас є, а саме цьому крокові й потрібен цей файл. Видалити спершу теж не вийде, з тієї самої причини. Це має відновити файл і залишити ваші налаштування недоторканими, але Microsoft цього не гарантує. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows має записи про {0} файлів, яких немає в {InstallerFolder}: {1}. У щоденній роботі це не заважає, але оновлення чи видалення цих програм може не виконатися. Щоб повернути файл, вам потрібен інсталятор тієї версії цієї програми, яку ви вже маєте. Візьміть його у виробника програми і запустіть поверх наявної копії. Новіша версія не підійде: їй довелося б спершу видалити ту, що у вас є, а саме цьому крокові й потрібен цей файл. Видалити спершу теж не вийде, з тієї самої причини. Це має відновити файл і залишити ваші налаштування недоторканими, але Microsoft цього не гарантує. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | На цьому ПК InstallerClean не зміг упевнено визначити, що єдиний заміщений файл більше не потрібен, тож затримав його. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | На цьому ПК InstallerClean не зміг упевнено визначити, що {0} заміщених файлів більше не потрібні, тож затримав їх. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean не зміг упевнено визначити, що єдиний заміщений файл більше не потрібен, тож затримав його. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean не зміг упевнено визначити, що {0} заміщених файлів більше не потрібні, тож затримав їх. |
 | Deleting {0} unneeded {1}... | Триває видалення: {0} непотрібних {1}... |
 | Permanently deleted {0} unneeded {1}. | Остаточно видалено {0} непотрібних {1}. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Помилка: не вказано розташування для переміщення. Скористайтеся /m ШЛЯХ. (Типове значення, задане в графічному інтерфейсі, діє лише для поточного користувача і не застосовується до запусків за розкладом чи від імені службового облікового запису.) |
@@ -460,13 +481,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Помилка: на цьому комп'ютері призупинено попередню транзакцію Windows Installer. Відновіть або скасуйте те встановлення (чи перезавантажте Windows), перш ніж очищати {InstallerFolder}. |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Помилка: поставлена в чергу після перезавантаження операція з файлом стосується {InstallerFolder} ({0}). Перезавантажте Windows, щоб завершити цю операцію, перш ніж очищати. |
 | Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning. | Помилка: файлову операцію поставлено в чергу до наступного перезавантаження, і InstallerClean не може визначити, які файли в ній названо, тож не може виключити {InstallerFolder}. Перезавантажте Windows перед очищенням. |
+| Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean. | Помилка: InstallerClean не зміг прочитати одне зі значень реєстру, які перевіряє перед тим, як торкатися {InstallerFolder}, тож не може виключити операцію Windows Installer, що виконується зараз або поставлена в чергу до наступного перезавантаження. /m і /d заблоковано. Перезавантажте Windows і спробуйте ще раз. Якщо читання й далі не вдається, це не та машина, яку InstallerClean може очистити. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Помилка: у Windows Installer щось виконується, тому /m і /d заблоковано. InstallerClean не чіпатиме {InstallerFolder}, доки вона змінюється. Спробуйте ще раз, коли все завершиться. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | Помилка: InstallerClean не зміг узяти блокування Windows Installer, яке не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі. Нічого не видалено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | Помилка: InstallerClean не зміг узяти блокування Windows Installer, яке не дає двом програмам одночасно змінювати встановлене ПЗ, тож не зміг виключити, що файл знадобиться на півдорозі. Нічого не переміщено. Спробуйте ще раз, а якщо повторюється — перезавантажте Windows. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Помилка: Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі. Нічого не було видалено. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Помилка: Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі. Нічого не було переміщено. |
 | Moving {0} unneeded {1} to {2}... | Триває переміщення до {2}: {0} непотрібних {1}... |
 | Moved {0} unneeded {1}. | Переміщено {0} непотрібних {1}. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Переконайтеся, що ваші програми досі оновлюються та видаляються як звичайно, а потім видаліть {0}. |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean більше не зміг підтвердити папку резервних копій і зупинився, щоб не записати не туди. Перевірте {0}, потім запустіть команду ще раз. |
+| It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was. | Це легко скасувати. Перемістіть їх з {0} назад до {InstallerFolder}, і все повернеться як було. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again. | InstallerClean більше не зміг підтвердити папку резервних копій і зупинився. Перевірте {0}, потім запустіть команду ще раз. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Інший процес InstallerClean утримує блокування єдиного екземпляра (графічний інтерфейс чи інший запуск CLI). Вихід 75 (тимчасовий); можна безпечно повторити пізніше. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Примітка: не вдалося записати до журналу подій. Перевірте дозволи журналу «Програма» чи групову політику. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - очищення {InstallerFolder} |

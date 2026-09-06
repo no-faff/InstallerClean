@@ -77,6 +77,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Size | Kích thước |
 | Patches | Bản vá |
 | (unknown) | (không rõ) |
+| (no program) | (không có chương trình) |
 | (patches only) | (chỉ bản vá) |
 | missing | thiếu |
 
@@ -100,10 +101,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting unneeded files... | Đang xóa các tệp không cần thiết... |
 | Move cancelled. {0} of {1} {2} processed. | Đã hủy chuyển. Đã xử lý {0}/{1} {2}. |
 | Delete cancelled. {0} of {1} {2} processed. | Đã hủy xóa. Đã xử lý {0}/{1} {2}. |
-| Move failed ({0}). Details in {1}. | Chuyển thất bại ({0}). Chi tiết trong {1}. |
-| Move failed ({0}). The crash log could not be written. | Chuyển thất bại ({0}). Không thể ghi nhật ký sự cố. |
-| Delete failed ({0}). Details in {1}. | Xóa thất bại ({0}). Chi tiết trong {1}. |
-| Delete failed ({0}). The crash log could not be written. | Xóa thất bại ({0}). Không thể ghi nhật ký sự cố. |
+| {0}. Details are in {1}. | {0}. Chi tiết trong {1}. |
+| {0}. The crash log could not be written. | {0}. Không thể ghi nhật ký sự cố. |
+| {0}. Details are in {1}. | {0}. Chi tiết trong {1}. |
+| {0}. The crash log could not be written. | {0}. Không thể ghi nhật ký sự cố. |
 | Access denied. Windows refused the scan. | Truy cập bị từ chối. Windows đã từ chối lần quét. |
 | Scan failed: couldn't read the Windows Installer records. | Quét thất bại: không thể đọc các bản ghi Windows Installer. |
 | Scan cancelled. | Đã hủy quét. |
@@ -125,6 +126,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Máy này có một giao dịch Windows Installer trước đó đang bị treo. Hãy tiếp tục hoặc hoàn tác lần cài đặt ấy (hoặc khởi động lại Windows) trước khi dọn {InstallerFolder}. |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows đã xếp hàng một thao tác đổi tên tệp cho lần khởi động tới, có ảnh hưởng tới {InstallerFolder}. Hãy khởi động lại Windows trước khi dọn. |
 | A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning. | Có một thao tác tệp đang xếp hàng chờ lần khởi động lại tới và InstallerClean không biết được thao tác đó nêu tên những tệp nào, nên không thể loại trừ khả năng chúng nằm trong {InstallerFolder}. Hãy khởi động lại Windows trước khi dọn dẹp. |
+| InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean. | InstallerClean không đọc được một trong các thiết lập Windows mà nó kiểm tra trước khi đụng vào {InstallerFolder}, nên không biết được có thao tác cài đặt nào đang chạy hay đang chờ khởi động lại không. Hãy khởi động lại Windows rồi quét lại. Nếu thiết lập đó vẫn không đọc được thì đây không phải máy mà InstallerClean có thể dọn. |
 | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer đang có việc dở dang, nên Chuyển và Xóa tạm dừng. InstallerClean sẽ không đụng vào {InstallerFolder} khi thư mục đang thay đổi. Xong rồi thì quét lại, hai nút sẽ trở lại. |
 | Select a file to view details. | Chọn một tệp để xem chi tiết. |
 | Select a product to view details. | Chọn một sản phẩm để xem chi tiết. |
@@ -149,26 +151,29 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to clean up in {InstallerFolder} | Không còn gì để dọn trong {InstallerFolder} |
 | Scanned {0} {1} in {2} | Đã quét {0} {1} trong {2} |
 | Nothing offered on this PC | Không có gì được đề xuất trên máy này |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) mà lẽ ra nó có thể đề xuất. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} {1} ({2}) mà lẽ ra nó có thể đề xuất. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) thay vì đề xuất nó. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} {1} ({2}) thay vì đề xuất chúng. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean không thể xác định rằng tệp trong bộ nhớ đệm mà nó tìm thấy là không cần thiết, nên đã giữ lại đúng tệp đó ({2}) thay vì đề xuất nó. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean không thể xác định rằng bất kỳ tệp nào trong bộ nhớ đệm mà nó tìm thấy là không cần thiết, nên đã giữ lại toàn bộ {0} {1} ({2}) thay vì đề xuất chúng. |
 | Delete that folder when you're satisfied all is well. | Hãy xóa thư mục đó khi bạn đã yên tâm rằng mọi thứ đều ổn. |
 | Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do. | Hãy xóa thư mục đó khi bạn đã yên tâm rằng mọi thứ đều ổn. Chỉ khi đó dung lượng mới thực sự được giải phóng. |
 | {0} freed | Đã giải phóng {0} |
 | {0} moved | Đã chuyển {0} |
 | Nothing was moved | Không có tệp nào được chuyển |
 | Nothing was deleted | Không có tệp nào bị xóa |
-| {0} of {1} could not be moved. | Không thể chuyển {0} trong số {1} tệp. |
-| {0} of {1} could not be moved. | Không thể chuyển {0} trong số {1} tệp. |
-| {0} of {1} could not be deleted. | Không thể xóa {0} trong số {1} tệp. |
-| {0} of {1} could not be deleted. | Không thể xóa {0} trong số {1} tệp. |
+| {0} file could not be moved. | Không thể chuyển {0} tệp. |
+| {0} files could not be moved. | Không thể chuyển {0} tệp. |
+| {0} file could not be deleted. | Không thể xóa {0} tệp. |
+| {0} files could not be deleted. | Không thể xóa {0} tệp. |
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
-| {0} file held back. The scan said it was unneeded. The final check didn't agree. | Đã giữ lại {0} tệp. Lần quét cho rằng nó không cần thiết. Lần kiểm tra cuối không đồng ý. |
-| {0} files held back. The scan said these were unneeded. The final check didn't agree. | Đã giữ lại {0} tệp. Lần quét cho rằng chúng không cần thiết. Lần kiểm tra cuối không đồng ý. |
+| {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | Đã giữ lại {0} tệp. Lần quét cho rằng nó không cần thiết. Lần kiểm tra cuối không xác nhận được điều đó. |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | Đã giữ lại {0} tệp. Lần quét cho rằng chúng không cần thiết. Lần kiểm tra cuối không xác nhận được điều đó. |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | Đã giữ nguyên {0} {1}, vì Windows có bản ghi về chương trình được nêu tên bên trong. |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | Đã giữ nguyên {0} {1}, vì InstallerClean không tìm thấy tên chương trình nào bên trong. |
-| Moved {0} of {1} {2} before you cancelled. | Đã chuyển {0}/{1} {2} trước khi bạn hủy. |
+| Moved {0} of {1} {2} to {3} before you cancelled. | Đã chuyển {0}/{1} {2} tới {3} trước khi bạn hủy. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Đã xóa vĩnh viễn {0}/{1} {2} trước khi bạn hủy. |
+| It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Hoàn tác rất đơn giản. Hãy chuyển chúng trở lại {InstallerFolder} và mọi thứ sẽ như cũ. |
 | {0} {1} permanently deleted | Đã xóa vĩnh viễn {0} {1} |
 | {0} {1} permanently deleted | Đã xóa vĩnh viễn {0} {1} |
 | Glad to help. There's a tip jar if you're feeling kind. | Rất vui vì đã giúp được. Nếu bạn có lòng, một ly cà phê cũng quý. |
@@ -187,14 +192,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} chương trình khác |
 | {0} file with no program named in the records | {0} tệp không có chương trình nào được nêu tên trong bản ghi |
 | {0} files with no program named in the records | {0} tệp không có chương trình nào được nêu tên trong bản ghi |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | Trên máy này, InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất thay vì liệt kê nó. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | Trên máy này, InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại {0} {1} thay vì liệt kê chúng. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | Trên máy này, InstallerClean không thể chắc chắn rằng tệp bị thay thế duy nhất đó không còn cần đến nữa, nên đã giữ lại nó. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | Trên máy này, InstallerClean không thể chắc chắn rằng {0} tệp bị thay thế không còn cần đến nữa, nên đã giữ lại chúng. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất đó thay vì đề xuất nó. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại {0} {1} thay vì đề xuất chúng. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean không chắc chắn về một trong những tệp trong bộ nhớ đệm mà nó tìm thấy, nên đã giữ lại nó thay vì đề xuất. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean không chắc chắn về một số tệp trong bộ nhớ đệm mà nó tìm thấy, nên đã giữ lại {0} {1} thay vì đề xuất chúng. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean không thể chắc chắn rằng tệp bị thay thế duy nhất đó không còn cần đến nữa, nên đã giữ lại nó. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean không thể chắc chắn rằng {0} tệp bị thay thế không còn cần đến nữa, nên đã giữ lại chúng. |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} không cần thiết ({2}) |
 | {0} file left alone ({1}) | {0} tệp được để nguyên ({1}) |
 | {0} files left alone ({1}) | {0} tệp được để nguyên ({1}) |
+| {0} missing | {0} thiếu |
+| {0} missing | {0} thiếu |
 
 ## Confirmation dialogs
 
@@ -227,11 +236,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa. |
 | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean không khiến được Windows phân giải đường dẫn thật của {InstallerFolder}, nên không tệp nào có thể được chứng tỏ là nằm bên trong và không tệp nào được đề xuất để dọn. Lần quét này không tìm thấy gì vì phép kiểm tra ấy thất bại, chứ không phải vì thư mục đã sạch. Không có gì bị bỏ đi. |
 | Nothing was deleted | Không có tệp nào bị xóa |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. | Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không, nên nó không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng, và không có gì bị xóa. |
 | Nothing was moved | Không có tệp nào được chuyển |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không, nên nó không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng, và không có gì được chuyển. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean không lấy được khóa mà Windows Installer dùng để ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng, và không có gì bị xóa. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean không lấy được khóa mà Windows Installer dùng để ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng, và không có gì được chuyển. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn. |
 | Invalid destination | Đích không hợp lệ |
-| Could not write to destination | Không thể ghi vào đích |
+| Move stopped | Đã dừng chuyển |
+| Couldn't use that backup folder | Không thể dùng thư mục sao lưu đó |
 | Move failed | Chuyển thất bại |
 | Delete failed | Xóa thất bại |
 | Setting not saved | Không lưu được cài đặt |
@@ -239,7 +251,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination cannot be inside the Windows Installer folder. | Đích không thể nằm bên trong thư mục Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | Đích {0} phân giải vào bên trong một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% và %ProgramData%. |
 | Not enough space | Không đủ dung lượng |
-| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Không đủ dung lượng tại {0}<br><br>Cần: {1}<br>Còn trống: {2} |
+| There isn't room at {0}<br><br>Required: {1}<br>Available: {2} | Không còn đủ chỗ tại {0}<br><br>Cần: {1}<br>Còn trống: {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Bạn không có quyền ghi vào {0}.<br>Hãy thử một thư mục trong hồ sơ người dùng của bạn hoặc trên một ổ đĩa bạn sở hữu. |
 | The path {0} is too long for Windows. Pick a shorter path. | Đường dẫn {0} quá dài đối với Windows. Hãy chọn một đường dẫn ngắn hơn. |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | Thư mục {0} không tồn tại và không thể tạo được. Hãy kiểm tra ký tự ổ đĩa hoặc đường dẫn mạng. |
@@ -260,7 +272,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Something went wrong with these files; they were left in place. | Đã có trục trặc với các tệp này; các tệp được giữ nguyên tại chỗ. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}). |
 | The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | Thư mục sao lưu phải là một đường dẫn đầy đủ tới một thư mục, bắt đầu bằng ký tự ổ đĩa hoặc một chia sẻ mạng (ví dụ D:\Backup, hoặc \\server\backup). InstallerClean không dùng được cái này: {0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lần nữa. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again. | InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại. Hãy kiểm tra {0}, rồi Quét lại và thử lần nữa. |
 | Cannot write to {0}. | Không thể ghi vào {0}. |
 | A file called '{0}' is already in the backup folder. | Đã có một tệp tên '{0}' trong thư mục sao lưu. |
 
@@ -278,15 +290,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | GitHub returned an error response. Try again in a few minutes. | GitHub trả về phản hồi lỗi. Hãy thử lại sau vài phút. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | Phản hồi của GitHub không chứa bản phát hành nào nhận ra được. Hãy thử lại sau, hoặc mở thẳng trang phát hành. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Quá thời gian kiểm tra. Kết nối của bạn tới GitHub có thể chậm; hãy thử lại. |
-| The check failed for an unknown reason. Details are in crash.log if you need to report it. | Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong crash.log nếu bạn cần báo cáo. |
+| The check failed for an unknown reason. Details are in {0} if you need to report it. | Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong {0} nếu bạn cần báo cáo. |
+| The check failed for an unknown reason. The crash log could not be written. | Việc kiểm tra thất bại vì một lý do không xác định. Không thể ghi nhật ký sự cố. |
 
 ## Opening links in your browser
 
 | English | Tiếng Việt |
 | --- | --- |
 | Couldn't open your browser | Không thể mở trình duyệt của bạn |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean không thể mở trình duyệt của bạn. Liên kết đã được sao chép vào bảng tạm, nên bạn có thể tự dán nó vào:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng tạm. Liên kết là:<br><br>{0} |
+| The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | Liên kết đã nằm trong bảng nhớ tạm, nên bạn có thể tự dán:<br><br>{0} |
+| InstallerClean couldn't copy the link to your clipboard either, so here it is:<br><br>{0} | InstallerClean cũng không sao chép được liên kết vào bảng nhớ tạm, đây là liên kết:<br><br>{0} |
 
 ## Sending the summary
 
@@ -304,7 +317,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| InstallerClean is already running. | InstallerClean đang chạy rồi. |
+| It's already running. | Đang chạy rồi. |
 | InstallerClean | InstallerClean |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Đã xảy ra lỗi không mong muốn và InstallerClean cần đóng lại.<br><br>{0}<br><br>Chi tiết đã được ghi vào:<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Đã xảy ra lỗi không mong muốn và InstallerClean cần đóng lại.<br><br>{0}<br><br>Không thể ghi nhật ký sự cố. |
@@ -437,18 +450,26 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | Đang quét {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Đã tìm thấy {0} {1} không cần thiết để dọn ({2}). |
 | Found no unneeded files. | Không tìm thấy tệp không cần thiết nào. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) mà lẽ ra nó có thể đề xuất. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} {1} ({2}) mà lẽ ra nó có thể đề xuất. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it. | Trên máy này InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) thay vì liệt kê nó. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them. | Trên máy này InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại {0} {1} ({2}) thay vì liệt kê chúng. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) thay vì đề xuất nó. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} {1} ({2}) thay vì đề xuất chúng. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean không thể xác định rằng tệp trong bộ nhớ đệm mà nó tìm thấy là không cần thiết, nên đã giữ lại đúng tệp đó ({2}) thay vì đề xuất nó. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean không thể xác định rằng bất kỳ tệp nào trong bộ nhớ đệm mà nó tìm thấy là không cần thiết, nên đã giữ lại toàn bộ {0} {1} ({2}) thay vì đề xuất chúng. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) thay vì đề xuất nó. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại {0} {1} ({2}) thay vì đề xuất chúng. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back ({2}) rather than offering it. | InstallerClean không chắc chắn về một trong những tệp trong bộ nhớ đệm mà nó tìm thấy, nên đã giữ lại chính tệp đó ({2}) thay vì đề xuất nó. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean không chắc chắn về một số tệp trong bộ nhớ đệm mà nó tìm thấy, nên đã giữ lại {0} {1} ({2}) thay vì đề xuất chúng. |
 | Why it couldn't be certain: | Vì sao không thể chắc chắn: |
-|   A file path in Windows Installer's own records wouldn't resolve. |   Một đường dẫn tệp trong chính hồ sơ của Windows Installer không phân giải được. |
-|   The identity of a file named in Windows Installer's records wouldn't read. |   Không đọc được danh tính của một tệp được nêu tên trong hồ sơ của Windows Installer. |
-|   A program may be installed more than once on this PC. |   Một chương trình có thể đã được cài nhiều hơn một lần trên máy này. |
+|   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Một đường dẫn tệp trong chính hồ sơ của Windows Installer không phân giải được, nên không thể đối chiếu gì với nó. |
+|   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Không nhận dạng được một tệp mà Windows có hồ sơ, nên không thể đối chiếu nó với những gì có trong thư mục. |
+|   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   Một chương trình có thể đã được cài nhiều hơn một lần trên máy này, và hồ sơ không cho biết một tệp thuộc về bản sao nào. |
+|   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   Không nhận dạng được một tệp trong thư mục, nên không thể đối chiếu nó với hồ sơ. |
+|   A file says it belongs to a program that is still installed, so it may still be needed. |   Một tệp khai rằng nó thuộc về một chương trình vẫn còn được cài, nên có thể vẫn còn cần đến. |
+|   Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program. |   Hoặc một tệp không cho biết nó thuộc về chương trình nào, hoặc Windows không trả lời về chương trình đó. |
+|   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   Một lần kiểm tra xem các tệp thuộc về những chương trình nào đã trả về các câu trả lời không khớp với những tệp được giao cho nó. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows có hồ sơ về {0} tệp không nằm trong {InstallerFolder}: {1}. Trong sử dụng hằng ngày điều này không gây rắc rối, nhưng việc cập nhật hoặc gỡ cài đặt chương trình đó có thể thất bại. Để đưa tệp trở lại, bạn cần bộ cài của đúng phiên bản bạn đang có. Hãy lấy từ nhà sản xuất chương trình và chạy đè lên bản đang cài. Phiên bản mới hơn không dùng được: nó phải gỡ bản bạn đang có trước, và chính bước đó mới cần tệp này. Gỡ cài đặt trước cũng không được, vì cùng lý do. Việc này sẽ khôi phục tệp và giữ nguyên các thiết lập của bạn, nhưng Microsoft không bảo đảm điều đó. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows có hồ sơ về {0} tệp không nằm trong {InstallerFolder}: {1}. Trong sử dụng hằng ngày điều này không gây rắc rối, nhưng việc cập nhật hoặc gỡ cài đặt các chương trình đó có thể thất bại. Để đưa một tệp trở lại, bạn cần bộ cài của đúng phiên bản chương trình đó mà bạn đang có. Hãy lấy từ nhà sản xuất chương trình và chạy đè lên bản đang cài. Phiên bản mới hơn không dùng được: nó phải gỡ bản bạn đang có trước, và chính bước đó mới cần tệp đó. Gỡ cài đặt trước cũng không được, vì cùng lý do. Việc này sẽ khôi phục tệp và giữ nguyên các thiết lập của bạn, nhưng Microsoft không bảo đảm điều đó. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | Trên máy này, InstallerClean không thể chắc chắn rằng tệp bị thay thế duy nhất đó không còn cần đến nữa, nên đã giữ lại nó. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | Trên máy này, InstallerClean không thể chắc chắn rằng {0} tệp bị thay thế không còn cần đến nữa, nên đã giữ lại chúng. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean không thể chắc chắn rằng tệp bị thay thế duy nhất đó không còn cần đến nữa, nên đã giữ lại nó. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean không thể chắc chắn rằng {0} tệp bị thay thế không còn cần đến nữa, nên đã giữ lại chúng. |
 | Deleting {0} unneeded {1}... | Đang xóa {0} {1} không cần thiết... |
 | Permanently deleted {0} unneeded {1}. | Đã xóa vĩnh viễn {0} {1} không cần thiết. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Lỗi: chưa chỉ định đích để chuyển. Dùng /m ĐƯỜNG_DẪN. (Mặc định đặt trong GUI là theo từng người dùng và không áp dụng cho các lần chạy theo lịch hoặc bằng tài khoản dịch vụ.) |
@@ -460,13 +481,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Lỗi: máy này có một giao dịch Windows Installer trước đó đang bị treo. Hãy tiếp tục hoặc hoàn tác lần cài đặt ấy (hoặc khởi động lại Windows) trước khi dọn {InstallerFolder}. |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Lỗi: một thao tác tệp đã xếp hàng sau khi khởi động lại có nhắm vào {InstallerFolder} ({0}). Hãy khởi động lại Windows để hoàn tất thao tác đó trước khi dọn. |
 | Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning. | Lỗi: có một thao tác tệp đang xếp hàng chờ lần khởi động lại tới và InstallerClean không biết được thao tác đó nêu tên những tệp nào, nên không thể loại trừ {InstallerFolder}. Hãy khởi động lại Windows trước khi dọn dẹp. |
+| Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean. | Lỗi: InstallerClean không đọc được một trong các giá trị registry mà nó kiểm tra trước khi đụng vào {InstallerFolder}, nên không thể loại trừ một thao tác Windows Installer đang chạy hoặc đang xếp hàng chờ lần khởi động lại tới. /m và /d bị chặn. Hãy khởi động lại Windows rồi thử lại. Nếu vẫn không đọc được thì đây không phải máy mà InstallerClean có thể dọn. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Lỗi: Windows Installer đang có việc dở dang, nên /m và /d bị chặn. InstallerClean sẽ không đụng vào {InstallerFolder} khi thư mục đang thay đổi. Hãy thử lại khi xong. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | Lỗi: InstallerClean không lấy được khóa Windows Installer vốn ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng. Không có gì bị xóa. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | Lỗi: InstallerClean không lấy được khóa Windows Installer vốn ngăn hai chương trình cùng lúc thay đổi phần mềm đã cài, nên không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng. Không có gì được chuyển. Hãy thử lại, và khởi động lại Windows nếu việc này cứ tiếp diễn. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Lỗi: Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không, nên nó không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng. Không có gì bị xóa. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Lỗi: Windows đã từ chối cho InstallerClean quyền kiểm tra xem Windows Installer có đang bận không, nên nó không thể loại trừ khả năng một tệp trở nên cần thiết giữa chừng. Không có gì được chuyển. |
 | Moving {0} unneeded {1} to {2}... | Đang chuyển {0} {1} không cần thiết tới {2}... |
 | Moved {0} unneeded {1}. | Đã chuyển {0} {1} không cần thiết. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Hãy kiểm tra xem các chương trình của bạn vẫn cập nhật và gỡ cài đặt bình thường, rồi xóa {0}. |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi chạy lại lệnh. |
+| It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was. | Hoàn tác rất đơn giản. Hãy chuyển chúng từ {0} trở lại {InstallerFolder} và mọi thứ sẽ như cũ. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again. | InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại. Hãy kiểm tra {0}, rồi chạy lại lệnh. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Một tiến trình InstallerClean khác đang giữ khóa một-thực-thể (GUI hoặc một lần chạy CLI khác). Mã thoát 75 (tạm thời); có thể thử lại sau. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Lưu ý: ghi vào Nhật ký sự kiện thất bại. Hãy kiểm tra quyền của nhật ký Ứng dụng hoặc Chính sách nhóm. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - dọn dẹp {InstallerFolder} |

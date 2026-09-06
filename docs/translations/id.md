@@ -77,6 +77,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Size | Ukuran |
 | Patches | Patch |
 | (unknown) | (tidak diketahui) |
+| (no program) | (tanpa program) |
 | (patches only) | (patch saja) |
 | missing | hilang |
 
@@ -100,10 +101,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting unneeded files... | Menghapus file yang tidak diperlukan... |
 | Move cancelled. {0} of {1} {2} processed. | Pemindahan dibatalkan. {0} dari {1} {2} diproses. |
 | Delete cancelled. {0} of {1} {2} processed. | Penghapusan dibatalkan. {0} dari {1} {2} diproses. |
-| Move failed ({0}). Details in {1}. | Pemindahan gagal ({0}). Detail di {1}. |
-| Move failed ({0}). The crash log could not be written. | Pemindahan gagal ({0}). Log kerusakan tidak bisa ditulis. |
-| Delete failed ({0}). Details in {1}. | Penghapusan gagal ({0}). Detail di {1}. |
-| Delete failed ({0}). The crash log could not be written. | Penghapusan gagal ({0}). Log kerusakan tidak bisa ditulis. |
+| {0}. Details are in {1}. | {0}. Detail di {1}. |
+| {0}. The crash log could not be written. | {0}. Log kerusakan tidak bisa ditulis. |
+| {0}. Details are in {1}. | {0}. Detail di {1}. |
+| {0}. The crash log could not be written. | {0}. Log kerusakan tidak bisa ditulis. |
 | Access denied. Windows refused the scan. | Akses ditolak. Windows menolak pemindaian. |
 | Scan failed: couldn't read the Windows Installer records. | Pemindaian gagal: catatan Windows Installer tidak bisa dibaca. |
 | Scan cancelled. | Pemindaian dibatalkan. |
@@ -125,6 +126,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan pemasangan itu (atau mulai ulang Windows) sebelum membersihkan {InstallerFolder}. |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows mengantrekan penggantian nama file untuk mulai ulang berikutnya yang memengaruhi {InstallerFolder}. Mulai ulang Windows sebelum membersihkan. |
 | A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning. | Ada operasi file yang mengantre untuk restart berikutnya dan InstallerClean tidak bisa mengetahui file mana saja yang disebutkannya, jadi tidak bisa memastikan file-file itu tidak ada di {InstallerFolder}. Restart Windows sebelum membersihkan. |
+| InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean. | InstallerClean tidak bisa membaca salah satu pengaturan Windows yang diperiksanya sebelum menyentuh {InstallerFolder}, jadi tidak bisa tahu apakah ada operasi pemasangan yang sedang berjalan atau menunggu restart. Restart Windows lalu Pindai ulang. Kalau pengaturan itu tetap tidak terbaca, ini bukan komputer yang bisa dibersihkan InstallerClean. |
 | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer sedang mengerjakan sesuatu, jadi Pindahkan dan Hapus dijeda. InstallerClean tidak akan menyentuh {InstallerFolder} selagi berubah. Setelah selesai, pindai ulang dan keduanya kembali aktif. |
 | Select a file to view details. | Pilih file untuk melihat detail. |
 | Select a product to view details. | Pilih produk untuk melihat detail. |
@@ -149,26 +151,29 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to clean up in {InstallerFolder} | Tidak ada yang perlu dibersihkan di {InstallerFolder} |
 | Scanned {0} {1} in {2} | {0} {1} dipindai dalam {2} |
 | Nothing offered on this PC | Tidak ada yang ditawarkan di PC ini |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) yang mungkin ditawarkannya ditahan. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) yang mungkin ditawarkannya ditahan. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) itu ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean tidak bisa membuktikan bahwa file dalam cache yang ditemukannya tidak diperlukan, jadi satu-satunya file ({2}) itu ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean tidak bisa membuktikan bahwa ada file dalam cache yang ditemukannya yang tidak diperlukan, jadi seluruh {0} {1} ({2}) ditahan alih-alih ditawarkan. |
 | Delete that folder when you're satisfied all is well. | Hapus folder itu setelah Anda yakin semuanya baik-baik saja. |
 | Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do. | Hapus folder itu setelah Anda yakin semuanya baik-baik saja. Ruang kosongnya baru benar-benar kembali setelah itu. |
 | {0} freed | {0} dikosongkan |
 | {0} moved | {0} dipindahkan |
 | Nothing was moved | Tidak ada yang dipindahkan |
 | Nothing was deleted | Tidak ada yang dihapus |
-| {0} of {1} could not be moved. | {0} dari {1} file tidak bisa dipindahkan. |
-| {0} of {1} could not be moved. | {0} dari {1} file tidak bisa dipindahkan. |
-| {0} of {1} could not be deleted. | {0} dari {1} file tidak bisa dihapus. |
-| {0} of {1} could not be deleted. | {0} dari {1} file tidak bisa dihapus. |
+| {0} file could not be moved. | {0} file tidak bisa dipindahkan. |
+| {0} files could not be moved. | {0} file tidak bisa dipindahkan. |
+| {0} file could not be deleted. | {0} file tidak bisa dihapus. |
+| {0} files could not be deleted. | {0} file tidak bisa dihapus. |
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
-| {0} file held back. The scan said it was unneeded. The final check didn't agree. | {0} file ditahan. Pemindaian menyebutnya tidak diperlukan. Pemeriksaan akhir tidak sependapat. |
-| {0} files held back. The scan said these were unneeded. The final check didn't agree. | {0} file ditahan. Pemindaian menyebutnya tidak diperlukan. Pemeriksaan akhir tidak sependapat. |
+| {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | {0} file ditahan. Pemindaian menyebutnya tidak diperlukan. Pemeriksaan akhir tidak bisa memastikannya. |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | {0} file ditahan. Pemindaian menyebutnya tidak diperlukan. Pemeriksaan akhir tidak bisa memastikannya. |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | {0} {1} dibiarkan di tempatnya, karena Windows punya catatan tentang program yang disebutkan di dalamnya. |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} {1} dibiarkan di tempatnya, karena InstallerClean tidak menemukan nama program di dalamnya. |
-| Moved {0} of {1} {2} before you cancelled. | {0} dari {1} {2} dipindahkan sebelum Anda membatalkan. |
+| Moved {0} of {1} {2} to {3} before you cancelled. | {0} dari {1} {2} dipindahkan ke {3} sebelum Anda membatalkan. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | {0} dari {1} {2} dihapus permanen sebelum Anda membatalkan. |
+| It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Mudah untuk dibatalkan. Pindahkan kembali ke {InstallerFolder} dan semuanya akan kembali seperti semula. |
 | {0} {1} permanently deleted | {0} {1} dihapus permanen |
 | {0} {1} permanently deleted | {0} {1} dihapus permanen |
 | Glad to help. There's a tip jar if you're feeling kind. | Senang bisa membantu. Kalau Anda berbaik hati, secangkir kopi sangat saya hargai. |
@@ -187,14 +192,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} program lain |
 | {0} file with no program named in the records | {0} file tanpa nama program dalam catatan |
 | {0} files with no program named in the records | {0} file tanpa nama program dalam catatan |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | Di PC ini InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file itu ditahan dan tidak dicantumkan. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | Di PC ini InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi {0} {1} ditahan dan tidak dicantumkan. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | Di PC ini InstallerClean tidak bisa memastikan bahwa satu-satunya file yang digantikan itu sudah tidak diperlukan, jadi file itu ditahan. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | Di PC ini InstallerClean tidak bisa memastikan bahwa {0} file yang digantikan sudah tidak diperlukan, jadi file-file itu ditahan. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file itu ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi {0} {1} ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean tidak yakin tentang salah satu file dalam cache yang ditemukannya, jadi file itu ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean tidak yakin tentang beberapa file dalam cache yang ditemukannya, jadi {0} {1} ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean tidak bisa memastikan bahwa satu-satunya file yang digantikan itu sudah tidak diperlukan, jadi file itu ditahan. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean tidak bisa memastikan bahwa {0} file yang digantikan sudah tidak diperlukan, jadi file-file itu ditahan. |
 | {0} of {1} {2} | {0} dari {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} tidak diperlukan ({2}) |
 | {0} file left alone ({1}) | {0} file dibiarkan apa adanya ({1}) |
 | {0} files left alone ({1}) | {0} file dibiarkan apa adanya ({1}) |
+| {0} missing | {0} hilang |
+| {0} missing | {0} hilang |
 
 ## Confirmation dialogs
 
@@ -227,11 +236,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean tidak bisa membaca cukup banyak catatan Windows Installer untuk memastikan apa yang masih diperlukan: daftar program terpasang kembali tidak lengkap, dan membaca catatan yang sama langsung dari registri juga menemui kesalahan. Sebuah file bisa tampak terisolasi hanya karena catatan yang menyebutkannya termasuk yang tidak terbaca, jadi InstallerClean berhenti. Tidak ada yang dihapus. |
 | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean tidak berhasil membuat Windows menguraikan jalur sebenarnya dari {InstallerFolder}, jadi tidak ada file yang bisa ditunjukkan berada di dalamnya dan tidak ada yang ditawarkan untuk dibersihkan. Pemindaian ini tidak menemukan apa pun karena pemeriksaan itu gagal, bukan karena foldernya bersih. Tidak ada yang disingkirkan. |
 | Nothing was deleted | Tidak ada yang dihapus |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. | Windows menolak izin InstallerClean untuk memeriksa apakah Windows Installer sedang sibuk, jadi tidak bisa mengesampingkan bahwa sebuah file menjadi diperlukan di tengah jalan, dan tidak ada yang dihapus. |
 | Nothing was moved | Tidak ada yang dipindahkan |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows menolak izin InstallerClean untuk memeriksa apakah Windows Installer sedang sibuk, jadi tidak bisa mengesampingkan bahwa sebuah file menjadi diperlukan di tengah jalan, dan tidak ada yang dipindahkan. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | InstallerClean tidak bisa mengambil kunci yang dipakai Windows Installer untuk mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan, dan tidak ada yang dihapus. Coba lagi, dan mulai ulang Windows kalau terus terjadi. |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | InstallerClean tidak bisa mengambil kunci yang dipakai Windows Installer untuk mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan, dan tidak ada yang dipindahkan. Coba lagi, dan mulai ulang Windows kalau terus terjadi. |
 | Invalid destination | Tujuan tidak valid |
-| Could not write to destination | Tidak bisa menulis ke tujuan |
+| Move stopped | Pemindahan dihentikan |
+| Couldn't use that backup folder | Tidak bisa memakai folder cadangan itu |
 | Move failed | Pemindahan gagal |
 | Delete failed | Penghapusan gagal |
 | Setting not saved | Pengaturan tidak tersimpan |
@@ -239,7 +251,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination cannot be inside the Windows Installer folder. | Tujuan tidak boleh berada di dalam folder Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | Tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% dan %ProgramData%. |
 | Not enough space | Ruang tidak cukup |
-| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Ruang tidak cukup di {0}<br><br>Diperlukan: {1}<br>Tersedia: {2} |
+| There isn't room at {0}<br><br>Required: {1}<br>Available: {2} | Tidak cukup tempat di {0}<br><br>Diperlukan: {1}<br>Tersedia: {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Anda tidak punya izin untuk menulis ke {0}.<br>Coba folder di profil pengguna Anda atau di drive milik Anda sendiri. |
 | The path {0} is too long for Windows. Pick a shorter path. | Jalur {0} terlalu panjang untuk Windows. Pilih jalur yang lebih pendek. |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | Folder {0} tidak ada dan tidak bisa dibuat. Periksa huruf drive atau jalur jaringan. |
@@ -260,7 +272,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Something went wrong with these files; they were left in place. | Ada yang tidak beres dengan file-file ini; semuanya dibiarkan di tempatnya. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Menolak memindahkan file ke dalam folder Windows Installer (tujuan: {0}). |
 | The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | Folder cadangan harus berupa jalur lengkap ke sebuah folder, diawali huruf drive atau berbagi jaringan (misalnya D:\Backup, atau \\server\backup). InstallerClean tidak bisa memakai yang ini: {0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again. | InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti. Periksa {0}, lalu Pindai ulang dan coba lagi. |
 | Cannot write to {0}. | Tidak bisa menulis ke {0}. |
 | A file called '{0}' is already in the backup folder. | File bernama '{0}' sudah ada di folder cadangan. |
 
@@ -278,15 +290,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | GitHub returned an error response. Try again in a few minutes. | GitHub mengembalikan respons kesalahan. Coba lagi dalam beberapa menit. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | Respons GitHub tidak memuat rilis yang dikenali. Coba lagi nanti, atau buka halaman rilis langsung. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Pemeriksaan kehabisan waktu. Koneksi Anda ke GitHub mungkin lambat; coba lagi. |
-| The check failed for an unknown reason. Details are in crash.log if you need to report it. | Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di crash.log jika Anda perlu melaporkannya. |
+| The check failed for an unknown reason. Details are in {0} if you need to report it. | Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di {0} jika Anda perlu melaporkannya. |
+| The check failed for an unknown reason. The crash log could not be written. | Pemeriksaan gagal karena alasan yang tidak diketahui. Log kerusakan tidak bisa ditulis. |
 
 ## Opening links in your browser
 
 | English | Bahasa Indonesia |
 | --- | --- |
 | Couldn't open your browser | Tidak bisa membuka browser Anda |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean tidak bisa membuka browser Anda. Tautannya sudah ada di clipboard, jadi Anda bisa menempelkannya sendiri:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean tidak bisa membuka browser Anda, dan juga tidak bisa menyalin tautan ke clipboard. Tautannya:<br><br>{0} |
+| The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | Tautannya ada di papan klip, jadi Anda bisa menempelkannya sendiri:<br><br>{0} |
+| InstallerClean couldn't copy the link to your clipboard either, so here it is:<br><br>{0} | InstallerClean juga tidak bisa menyalin tautannya ke papan klip, jadi ini dia:<br><br>{0} |
 
 ## Sending the summary
 
@@ -304,7 +317,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| InstallerClean is already running. | InstallerClean sudah berjalan. |
+| It's already running. | Sudah berjalan. |
 | InstallerClean | InstallerClean |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Terjadi kesalahan tak terduga dan InstallerClean perlu ditutup.<br><br>{0}<br><br>Detail ditulis ke:<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Terjadi kesalahan tak terduga dan InstallerClean perlu ditutup.<br><br>{0}<br><br>Log kerusakan tidak bisa ditulis. |
@@ -437,18 +450,26 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | Memindai {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | Ditemukan {0} {1} tidak diperlukan untuk dibersihkan ({2}). |
 | Found no unneeded files. | Tidak ditemukan file yang tidak diperlukan. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) yang mungkin ditawarkannya ditahan. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) yang mungkin ditawarkannya ditahan. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it. | Di PC ini InstallerClean tidak bisa memastikan file mana saja dalam cache yang menjadi milik program yang terpasang di sini, jadi satu file itu ({2}) ditahan dan tidak didaftarkan. |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them. | Di PC ini InstallerClean tidak bisa memastikan file mana saja dalam cache yang menjadi milik program yang terpasang di sini, jadi {0} {1} ({2}) ditahan dan tidak didaftarkan. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) itu ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean tidak bisa membuktikan bahwa file dalam cache yang ditemukannya tidak diperlukan, jadi satu-satunya file ({2}) itu ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean tidak bisa membuktikan bahwa ada file dalam cache yang ditemukannya yang tidak diperlukan, jadi seluruh {0} {1} ({2}) ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) itu ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi {0} {1} ({2}) ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back ({2}) rather than offering it. | InstallerClean tidak yakin tentang salah satu file dalam cache yang ditemukannya, jadi file itu ({2}) ditahan alih-alih ditawarkan. |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean tidak yakin tentang beberapa file dalam cache yang ditemukannya, jadi {0} {1} ({2}) ditahan alih-alih ditawarkan. |
 | Why it couldn't be certain: | Kenapa tidak bisa dipastikan: |
-|   A file path in Windows Installer's own records wouldn't resolve. |   Sebuah jalur file dalam catatan Windows Installer sendiri tidak bisa diuraikan. |
-|   The identity of a file named in Windows Installer's records wouldn't read. |   Identitas sebuah file yang disebut dalam catatan Windows Installer tidak bisa dibaca. |
-|   A program may be installed more than once on this PC. |   Sebuah program mungkin terpasang lebih dari sekali di PC ini. |
+|   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Sebuah jalur file dalam catatan Windows Installer sendiri tidak bisa diuraikan, jadi tidak ada yang bisa dicocokkan dengannya. |
+|   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Sebuah file yang dicatat Windows tidak bisa dikenali, jadi file itu tidak bisa dicocokkan dengan isi folder. |
+|   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   Sebuah program mungkin terpasang lebih dari sekali di PC ini, dan catatan tidak bisa menyebutkan sebuah file milik salinan yang mana. |
+|   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   Sebuah file dalam folder tidak bisa dikenali, jadi file itu tidak bisa dicocokkan dengan catatan. |
+|   A file says it belongs to a program that is still installed, so it may still be needed. |   Sebuah file menyatakan bahwa ia milik program yang masih terpasang, jadi file itu mungkin masih diperlukan. |
+|   Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program. |   Entah sebuah file tidak menyebutkan ia milik program mana, atau Windows tidak menjawab tentang program itu. |
+|   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   Pemeriksaan tentang file-file itu milik program mana memberi jawaban yang tidak cocok dengan file-file yang diserahkan kepadanya. |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak menimbulkan masalah, tetapi pembaruan atau pencopotan program itu bisa gagal. Untuk mengembalikan file itu, Anda butuh pemasang versi yang sudah Anda miliki. Dapatkan dari pembuat programnya dan jalankan di atas salinan yang ada. Versi yang lebih baru tidak bisa: versi baru harus lebih dulu menghapus versi yang Anda miliki, dan justru langkah itulah yang membutuhkan file ini. Mencopot lebih dulu juga tidak berhasil, karena alasan yang sama. Ini semestinya memulihkan file itu dan membiarkan pengaturan Anda apa adanya, tetapi Microsoft tidak menjaminnya. |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows punya catatan untuk {0} file yang tidak ada di {InstallerFolder}: {1}. Sehari-hari ini tidak menimbulkan masalah, tetapi pembaruan atau pencopotan program-program itu bisa gagal. Untuk mengembalikan sebuah file, Anda butuh pemasang versi program itu yang sudah Anda miliki. Dapatkan dari pembuat programnya dan jalankan di atas salinan yang ada. Versi yang lebih baru tidak bisa: versi baru harus lebih dulu menghapus versi yang Anda miliki, dan justru langkah itulah yang membutuhkan file itu. Mencopot lebih dulu juga tidak berhasil, karena alasan yang sama. Ini semestinya memulihkan file itu dan membiarkan pengaturan Anda apa adanya, tetapi Microsoft tidak menjaminnya. |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | Di PC ini InstallerClean tidak bisa memastikan bahwa satu-satunya file yang digantikan itu sudah tidak diperlukan, jadi file itu ditahan. |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | Di PC ini InstallerClean tidak bisa memastikan bahwa {0} file yang digantikan sudah tidak diperlukan, jadi file-file itu ditahan. |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean tidak bisa memastikan bahwa satu-satunya file yang digantikan itu sudah tidak diperlukan, jadi file itu ditahan. |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean tidak bisa memastikan bahwa {0} file yang digantikan sudah tidak diperlukan, jadi file-file itu ditahan. |
 | Deleting {0} unneeded {1}... | Menghapus {0} {1} yang tidak diperlukan... |
 | Permanently deleted {0} unneeded {1}. | {0} {1} yang tidak diperlukan telah dihapus permanen. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR. (Default yang diatur di GUI bersifat per-pengguna dan tidak berlaku untuk tugas terjadwal atau proses akun layanan.) |
@@ -460,13 +481,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Kesalahan: ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan pemasangan itu (atau mulai ulang Windows) sebelum membersihkan {InstallerFolder}. |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Kesalahan: operasi file yang diantrekan setelah mulai ulang menyasar {InstallerFolder} ({0}). Mulai ulang Windows untuk menyelesaikan operasi itu sebelum membersihkan. |
 | Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning. | Kesalahan: ada operasi file yang mengantre untuk restart berikutnya dan InstallerClean tidak bisa mengetahui file mana saja yang disebutkannya, jadi tidak bisa mengesampingkan {InstallerFolder}. Restart Windows sebelum membersihkan. |
+| Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean. | Kesalahan: InstallerClean tidak bisa membaca salah satu nilai registri yang diperiksanya sebelum menyentuh {InstallerFolder}, jadi tidak bisa mengesampingkan operasi Windows Installer yang sedang berjalan atau mengantre untuk restart berikutnya. /m dan /d diblokir. Restart Windows lalu coba lagi. Kalau pembacaannya tetap gagal, ini bukan komputer yang bisa dibersihkan InstallerClean. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Kesalahan: Windows Installer sedang mengerjakan sesuatu, jadi /m dan /d diblokir. InstallerClean tidak akan menyentuh {InstallerFolder} selagi berubah. Coba lagi setelah selesai. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | Kesalahan: InstallerClean tidak bisa mengambil kunci Windows Installer yang mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan. Tidak ada yang dihapus. Coba lagi, dan mulai ulang Windows kalau terus terjadi. |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | Kesalahan: InstallerClean tidak bisa mengambil kunci Windows Installer yang mencegah dua program mengubah perangkat lunak terpasang sekaligus, jadi tidak bisa memastikan sebuah file tidak menjadi diperlukan di tengah jalan. Tidak ada yang dipindahkan. Coba lagi, dan mulai ulang Windows kalau terus terjadi. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | Kesalahan: Windows menolak izin InstallerClean untuk memeriksa apakah Windows Installer sedang sibuk, jadi tidak bisa mengesampingkan bahwa sebuah file menjadi diperlukan di tengah jalan. Tidak ada yang dihapus. |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | Kesalahan: Windows menolak izin InstallerClean untuk memeriksa apakah Windows Installer sedang sibuk, jadi tidak bisa mengesampingkan bahwa sebuah file menjadi diperlukan di tengah jalan. Tidak ada yang dipindahkan. |
 | Moving {0} unneeded {1} to {2}... | Memindahkan {0} {1} yang tidak diperlukan ke {2}... |
 | Moved {0} unneeded {1}. | {0} {1} yang tidak diperlukan telah dipindahkan. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Pastikan program Anda masih bisa diperbarui dan dicopot seperti biasa, lalu hapus {0}. |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu jalankan perintahnya lagi. |
+| It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was. | Mudah untuk dibatalkan. Pindahkan kembali dari {0} ke {InstallerFolder} dan semuanya akan kembali seperti semula. |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again. | InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti. Periksa {0}, lalu jalankan perintahnya lagi. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Kode keluar 75 (sementara); aman untuk dicoba lagi nanti. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Catatan: penulisan ke Log Peristiwa gagal. Periksa izin log Aplikasi atau Kebijakan Grup. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - pembersihan {InstallerFolder} |

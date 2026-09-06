@@ -77,6 +77,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Size | サイズ |
 | Patches | パッチ |
 | (unknown) | (不明) |
+| (no program) | (プログラムなし) |
 | (patches only) | (パッチのみ) |
 | missing | 見つかりません |
 
@@ -100,10 +101,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting unneeded files... | 不要ファイルを削除しています... |
 | Move cancelled. {0} of {1} {2} processed. | 移動がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。 |
 | Delete cancelled. {0} of {1} {2} processed. | 削除がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。 |
-| Move failed ({0}). Details in {1}. | 移動に失敗しました ({0})。詳細は{1}をご覧ください。 |
-| Move failed ({0}). The crash log could not be written. | 移動に失敗しました ({0})。クラッシュログを書き込めませんでした。 |
-| Delete failed ({0}). Details in {1}. | 削除に失敗しました ({0})。詳細は{1}をご覧ください。 |
-| Delete failed ({0}). The crash log could not be written. | 削除に失敗しました ({0})。クラッシュログを書き込めませんでした。 |
+| {0}. Details are in {1}. | {0}。詳細は{1}をご覧ください。 |
+| {0}. The crash log could not be written. | {0}。クラッシュログを書き込めませんでした。 |
+| {0}. Details are in {1}. | {0}。詳細は{1}をご覧ください。 |
+| {0}. The crash log could not be written. | {0}。クラッシュログを書き込めませんでした。 |
 | Access denied. Windows refused the scan. | アクセスが拒否されました。Windows がスキャンを拒否しました。 |
 | Scan failed: couldn't read the Windows Installer records. | スキャン失敗：Windows Installer の登録情報を読み取れませんでした。 |
 | Scan cancelled. | スキャンがキャンセルされました。 |
@@ -125,6 +126,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | このコンピューターには、中断されたままの以前の Windows Installer トランザクションがあります。{InstallerFolder} をクリーンアップする前に、そのインストールを再開するかロールバックしてください(または Windows を再起動してください)。 |
 | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows は次回の再起動時に実行するファイル名の変更をキューに入れており、それが {InstallerFolder} に影響します。クリーンアップする前に Windows を再起動してください。 |
 | A file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out that they're in {InstallerFolder}. Restart Windows before cleaning. | 次回の再起動に向けてファイル操作が予約されていますが、InstallerClean にはそれがどのファイルを指しているか分からないため、{InstallerFolder} 内のファイルでないとは言い切れません。クリーンアップの前に Windows を再起動してください。 |
+| InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean. | InstallerClean は {InstallerFolder} に触れる前に確認する Windows 設定の一つを読み取れなかったため、インストール操作が実行中か再起動待ちかを判断できません。Windows を再起動してから再スキャンしてください。それでも設定を読み取れない場合、この PC は InstallerClean がクリーンアップできる PC ではありません。 |
 | Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back. | Windows Installer で処理が進行中のため、移動と削除は一時停止しています。InstallerClean は変更中の {InstallerFolder} には触れません。終わったら再スキャンすれば、どちらも使えるようになります。 |
 | Select a file to view details. | ファイルを選択して詳細を表示します。 |
 | Select a product to view details. | 製品を選択して詳細を表示します。 |
@@ -149,26 +151,29 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder} にクリーンアップするものはありません |
 | Scanned {0} {1} in {2} | {0} 個の {1} を {2} でスキャンしました |
 | Nothing offered on this PC | この PC では何も提示されませんでした |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) it might otherwise have offered. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの 1 個のファイル({2})をそのままにしました。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの {0} 個の{1}({2})をすべてそのままにしました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、1 個のファイル({2})を提示せずに保留しました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、{0} 個の{1}({2})をすべて提示せずに保留しました。 |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean は、見つけたキャッシュ内のファイルが不要であることを確認できなかったため、その 1 個のファイル({2})を提示せずに保留しました。 |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean は、見つけたキャッシュ内のファイルのいずれについても不要であることを確認できなかったため、{0} 個の{1}({2})をすべて提示せずに保留しました。 |
 | Delete that folder when you're satisfied all is well. | 問題ないと納得できたら、そのフォルダーを削除してください。 |
 | Delete that folder when you're satisfied all is well. You won't actually reclaim the space until you do. | 問題ないと納得できたら、そのフォルダーを削除してください。削除するまで空き容量は実際には戻りません。 |
 | {0} freed | {0} 解放 |
 | {0} moved | {0} 移動 |
 | Nothing was moved | 何も移動されませんでした |
 | Nothing was deleted | 何も削除されませんでした |
-| {0} of {1} could not be moved. | {1} 個中 {0} 個のファイルを移動できませんでした。 |
-| {0} of {1} could not be moved. | {1} 個中 {0} 個のファイルを移動できませんでした。 |
-| {0} of {1} could not be deleted. | {1} 個中 {0} 個のファイルを削除できませんでした。 |
-| {0} of {1} could not be deleted. | {1} 個中 {0} 個のファイルを削除できませんでした。 |
+| {0} file could not be moved. | {0} 個のファイルを移動できませんでした。 |
+| {0} files could not be moved. | {0} 個のファイルを移動できませんでした。 |
+| {0} file could not be deleted. | {0} 個のファイルを削除できませんでした。 |
+| {0} files could not be deleted. | {0} 個のファイルを削除できませんでした。 |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
-| {0} file held back. The scan said it was unneeded. The final check didn't agree. | {0} 件のファイルを保留しました。スキャンでは不要と判断されましたが、最終チェックの判断は違いました。 |
-| {0} files held back. The scan said these were unneeded. The final check didn't agree. | {0} 件のファイルを保留しました。スキャンでは不要と判断されましたが、最終チェックの判断は違いました。 |
+| {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | {0} 件のファイルを保留しました。スキャンでは不要と判断されましたが、最終チェックではそれを確認できませんでした。 |
+| {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | {0} 件のファイルを保留しました。スキャンでは不要と判断されましたが、最終チェックではそれを確認できませんでした。 |
 | {0} {1} kept in place, because Windows has a record of the program named inside. | {0} 個の {1} をそのままにしました。ファイル内に記されたプログラムの登録情報が Windows にあるためです。 |
 | {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | {0} 個の {1} をそのままにしました。InstallerClean がファイル内にプログラム名を見つけられなかったためです。 |
-| Moved {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を移動しました。 |
+| Moved {0} of {1} {2} to {3} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を {3} へ移動しました。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。 |
+| It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 元に戻すのは簡単です。{InstallerFolder} に戻せば、すべて元どおりになります。 |
 | {0} {1} permanently deleted | {0} 個の {1} を完全に削除しました |
 | {0} {1} permanently deleted | {0} 個の {1} を完全に削除しました |
 | Glad to help. There's a tip jar if you're feeling kind. | お役に立てて何よりです。お心づけをいただけたら幸いです。 |
@@ -187,14 +192,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 他に {0} 個のプログラム |
 | {0} file with no program named in the records | 登録情報にプログラム名がない {0} 個のファイル |
 | {0} files with no program named in the records | 登録情報にプログラム名がない {0} 個のファイル |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than listing it. | この PC では、InstallerClean はキャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、唯一のファイルを一覧に載せずそのままにしました。 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than listing them. | この PC では、InstallerClean はキャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、{0} 個の {1} を一覧に載せずそのままにしました。 |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | この PC では、InstallerClean は唯一の置換済みファイルがもう不要だと確実には判断できなかったため、そのファイルをそのまま残しました。 |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | この PC では、InstallerClean は {0} 個の置換済みファイルがもう不要だと確実には判断できなかったため、それらのファイルをそのまま残しました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、1 個のファイルを提示せずに保留しました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、{0} 個の{1}を提示せずに保留しました。 |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean は、見つけたキャッシュ内のファイルの 1 つについて確信が持てなかったため、そのファイルを提示せずに保留しました。 |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean は、見つけたキャッシュ内のファイルの一部について確信が持てなかったため、{0} 個の{1}を提示せずに保留しました。 |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean は唯一の置換済みファイルがもう不要だと確実には判断できなかったため、そのファイルを保留しました。 |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean は {0} 個の置換済みファイルがもう不要だと確実には判断できなかったため、それらのファイルを保留しました。 |
 | {0} of {1} {2} | {2} {1} 個中 {0} 個 |
 | {0} unneeded {1} ({2}) | {0} 個の不要な {1} ({2}) |
 | {0} file left alone ({1}) | {0} 個のファイルをそのままにしました ({1}) |
 | {0} files left alone ({1}) | {0} 個のファイルをそのままにしました ({1}) |
+| {0} missing | {0} 件が見つかりません |
+| {0} missing | {0} 件が見つかりません |
 
 ## Confirmation dialogs
 
@@ -227,11 +236,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean は、何がまだ必要かを確かめられるだけの Windows Installer の登録情報を読み取れませんでした。インストール済みプログラムの一覧が不足した状態で返され、同じ登録情報をレジストリから直接読み取る方法でもエラーが発生しました。あるファイルを指し示す登録情報が読み取れなかったものの一つだったというだけで、そのファイルが孤立しているように見えてしまうことがあるため、InstallerClean は中止しました。何も削除していません。 |
 | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean は {InstallerFolder} の実際のパスを Windows に解決させられなかったため、どのファイルについてもその中にあることを示せず、クリーンアップの対象として提示されたものはありません。今回のスキャンで何も見つからなかったのは、フォルダーがきれいだからではなく、その確認が失敗したためです。何も取り除かれていません。 |
 | Nothing was deleted | 何も削除されませんでした |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. | Windows は InstallerClean に Windows Installer が処理中かどうかを確認する権限を与えなかったため、途中でファイルが必要になる可能性を排除できず、何も削除されませんでした。 |
 | Nothing was moved | 何も移動されませんでした |
+| Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. | Windows は InstallerClean に Windows Installer が処理中かどうかを確認する権限を与えなかったため、途中でファイルが必要になる可能性を排除できず、何も移動されませんでした。 |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted. Try again, and restart Windows if it keeps happening. | 二つのプログラムが同時にインストール済みソフトウェアを変更しないよう Windows Installer が使うロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できず、何も削除していません。もう一度お試しください。繰り返す場合は Windows を再起動してください。 |
 | InstallerClean couldn't take the lock Windows Installer uses to stop two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved. Try again, and restart Windows if it keeps happening. | 二つのプログラムが同時にインストール済みソフトウェアを変更しないよう Windows Installer が使うロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できず、何も移動していません。もう一度お試しください。繰り返す場合は Windows を再起動してください。 |
 | Invalid destination | 無効な移動先 |
-| Could not write to destination | 移動先に書き込めませんでした |
+| Move stopped | 移動を停止しました |
+| Couldn't use that backup folder | そのバックアップフォルダーは使えませんでした |
 | Move failed | 移動に失敗しました |
 | Delete failed | 削除に失敗しました |
 | Setting not saved | 設定の保存に失敗しました |
@@ -239,7 +251,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination cannot be inside the Windows Installer folder. | 移動先を Windows Installer フォルダー内にすることはできません。 |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | 移動先 {0} は Windows のシステムフォルダー配下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)%、%ProgramData% の外にあるパスを選んでください。 |
 | Not enough space | 空き容量が不足しています |
-| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | {0} の空き容量が不足しています<br><br>必要：{1}<br>利用可能：{2} |
+| There isn't room at {0}<br><br>Required: {1}<br>Available: {2} | {0} に十分な空きがありません<br><br>必要：{1}<br>利用可能：{2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | {0} に書き込む権限がありません。<br>ユーザープロファイル内または自分が所有するドライブ上のフォルダーを試してください。 |
 | The path {0} is too long for Windows. Pick a shorter path. | パス{0} は Windows にとって長すぎます。より短いパスを選択してください。 |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | フォルダー {0} が存在せず、作成できませんでした。ドライブ文字またはネットワークパスを確認してください。 |
@@ -260,7 +272,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Something went wrong with these files; they were left in place. | これらのファイルで何らかの問題が発生しました。ファイルはそのままにしてあります。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Windows Installerフォルダー内へのファイル移動を拒否します (移動先：{0})。 |
 | The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | バックアップフォルダーは、ドライブ文字またはネットワーク共有で始まる、フォルダーへの完全なパスである必要があります(例：D:\Backup、または \\server\backup)。InstallerClean はこれを使えません：{0} |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | InstallerClean はバックアップフォルダーを確認できなくなったため、誤った場所に書き込まずに停止しました。{0} を確認してから、再スキャンしてもう一度お試しください。 |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then Re-scan and try again. | InstallerClean はバックアップフォルダーを確認できなくなったため、停止しました。{0} を確認してから、再スキャンしてもう一度お試しください。 |
 | Cannot write to {0}. | {0} に書き込めません。 |
 | A file called '{0}' is already in the backup folder. | '{0}' という名前のファイルはすでにバックアップフォルダーにあります。 |
 
@@ -278,15 +290,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | GitHub returned an error response. Try again in a few minutes. | GitHub がエラーレスポンスを返しました。数分待ってから再試行してください。 |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。 |
 | The check timed out. Your connection to GitHub may be slow; try again. | 確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。 |
-| The check failed for an unknown reason. Details are in crash.log if you need to report it. | 不明な理由で確認に失敗しました。報告が必要な場合は詳細が crash.log にあります。 |
+| The check failed for an unknown reason. Details are in {0} if you need to report it. | 不明な理由で確認に失敗しました。報告が必要な場合は詳細が {0} にあります。 |
+| The check failed for an unknown reason. The crash log could not be written. | 確認が不明な理由で失敗しました。クラッシュログを書き込めませんでした。 |
 
 ## Opening links in your browser
 
 | English | 日本語 |
 | --- | --- |
 | Couldn't open your browser | ブラウザを開けませんでした |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean はブラウザを開けませんでした。リンクはクリップボードにコピーしてあるので、ご自分で貼り付けられます：<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean はブラウザを開けず、リンクをクリップボードにコピーすることもできませんでした。リンクはこちらです：<br><br>{0} |
+| The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | リンクはクリップボードにあります。ご自身で貼り付けてください：<br><br>{0} |
+| InstallerClean couldn't copy the link to your clipboard either, so here it is:<br><br>{0} | InstallerClean はリンクをクリップボードにコピーすることもできませんでした。こちらです：<br><br>{0} |
 
 ## Sending the summary
 
@@ -304,7 +317,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| InstallerClean is already running. | InstallerClean は既に実行中です。 |
+| It's already running. | 既に実行中です。 |
 | InstallerClean | InstallerClean |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | 予期しないエラーが発生し、InstallerClean を終了する必要があります。<br><br>{0}<br><br>詳細は以下に書き込まれました：<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | 予期しないエラーが発生し、InstallerClean を終了する必要があります。<br><br>{0}<br><br>クラッシュログを書き込めませんでした。 |
@@ -437,18 +450,26 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning {InstallerFolder}... | {InstallerFolder} をスキャン中... |
 | Found {0} unneeded {1} to clean up ({2}). | クリーンアップ対象の不要な {1} が {0} 個見つかりました ({2})。 |
 | Found no unneeded files. | 不要なファイルは見つかりませんでした。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back the one file ({2}) it might otherwise have offered. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの 1 個のファイル({2})をそのままにしました。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it held back all {0} {1} ({2}) it might otherwise have offered. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、提示できたはずの {0} 個の {1}({2})をすべてそのままにしました。 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than listing it. | この PC では、キャッシュ内のどのファイルがここにインストールされたプログラムのものか InstallerClean が確信を持てなかったため、その 1 件のファイル ({2}) を一覧に載せず保留しました。 |
-| On this PC InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than listing them. | この PC では、キャッシュ内のどのファイルがここにインストールされたプログラムのものか InstallerClean が確信を持てなかったため、{0} {1} ({2}) を一覧に載せず保留しました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、1 個のファイル({2})を提示せずに保留しました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、{0} 個の{1}({2})をすべて提示せずに保留しました。 |
+| InstallerClean couldn't establish that the cached file it found is unneeded, so it has held back the one file ({2}) rather than offering it. | InstallerClean は、見つけたキャッシュ内のファイルが不要であることを確認できなかったため、その 1 個のファイル({2})を提示せずに保留しました。 |
+| InstallerClean couldn't establish that any of the cached files it found are unneeded, so it has held back all {0} {1} ({2}) rather than offering them. | InstallerClean は、見つけたキャッシュ内のファイルのいずれについても不要であることを確認できなかったため、{0} 個の{1}({2})をすべて提示せずに保留しました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、1 個のファイル({2})を提示せずに保留しました。 |
+| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、{0} 個の{1}({2})を提示せずに保留しました。 |
+| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back ({2}) rather than offering it. | InstallerClean は、見つけたキャッシュ内のファイルの 1 つについて確信が持てなかったため、そのファイル({2})を提示せずに保留しました。 |
+| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean は、見つけたキャッシュ内のファイルの一部について確信が持てなかったため、{0} 個の{1}({2})を提示せずに保留しました。 |
 | Why it couldn't be certain: | 確信を持てなかった理由: |
-|   A file path in Windows Installer's own records wouldn't resolve. |   Windows Installer 自身の記録にあるファイルパスを解決できませんでした。 |
-|   The identity of a file named in Windows Installer's records wouldn't read. |   Windows Installer の記録に挙げられたファイルの識別情報を読み取れませんでした。 |
-|   A program may be installed more than once on this PC. |   この PC には同じプログラムが複数回インストールされている可能性があります。 |
+|   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Windows Installer 自身の記録にあるファイルパスを解決できなかったため、それに何も照合できませんでした。 |
+|   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Windows に記録のあるファイルを識別できなかったため、フォルダー内のものと照合できませんでした。 |
+|   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   この PC には同じプログラムが複数回インストールされている可能性があり、記録ではファイルがどのコピーのものか分かりません。 |
+|   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   フォルダー内のファイルを識別できなかったため、記録と照合できませんでした。 |
+|   A file says it belongs to a program that is still installed, so it may still be needed. |   あるファイルがまだインストールされているプログラムのものだと示しているため、まだ必要な可能性があります。 |
+|   Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program. |   ファイルがどのプログラムのものか示さなかったか、Windows がそのプログラムについて応答しませんでした。 |
+|   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   ファイルがどのプログラムのものかを調べたところ、渡されたファイルと合わない答えが返りました。 |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows には、{InstallerFolder} にない {0} 件のファイルの記録があります: {1}。普段の使用では問題ありませんが、そのプログラムの更新やアンインストールが失敗することがあります。ファイルを元に戻すには、今お使いのバージョンのインストーラーが必要です。プログラムの提供元から入手し、既存のインストールに上書きして実行してください。新しいバージョンでは代用できません。新しいバージョンはまず今のものを削除する必要があり、その手順こそがこのファイルを必要とするからです。先にアンインストールする方法も、同じ理由でうまくいきません。これでファイルが復元され、設定はそのまま残るはずですが、Microsoft が保証しているわけではありません。 |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows には、{InstallerFolder} にない {0} 件のファイルの記録があります: {1}。普段の使用では問題ありませんが、それらのプログラムの更新やアンインストールが失敗することがあります。ファイルを元に戻すには、そのプログラムの今お使いのバージョンのインストーラーが必要です。プログラムの提供元から入手し、既存のインストールに上書きして実行してください。新しいバージョンでは代用できません。新しいバージョンはまず今のものを削除する必要があり、その手順こそがこのファイルを必要とするからです。先にアンインストールする方法も、同じ理由でうまくいきません。これでファイルが復元され、設定はそのまま残るはずですが、Microsoft が保証しているわけではありません。 |
-| On this PC InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | この PC では、InstallerClean は唯一の置換済みファイルがもう不要だと確実には判断できなかったため、そのファイルをそのまま残しました。 |
-| On this PC InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | この PC では、InstallerClean は {0} 個の置換済みファイルがもう不要だと確実には判断できなかったため、それらのファイルをそのまま残しました。 |
+| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean は唯一の置換済みファイルがもう不要だと確実には判断できなかったため、そのファイルを保留しました。 |
+| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean は {0} 個の置換済みファイルがもう不要だと確実には判断できなかったため、それらのファイルを保留しました。 |
 | Deleting {0} unneeded {1}... | {0} 個の不要な {1} を削除しています... |
 | Permanently deleted {0} unneeded {1}. | {0} 個の不要な {1} を完全に削除しました。 |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | エラー：移動先が指定されていません。/m PATH を使用してください (GUI で設定したデフォルトはユーザーごとのもので、スケジュール実行やサービスアカウントでの実行には適用されません)。 |
@@ -460,13 +481,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | エラー：このコンピューターには、中断されたままの以前の Windows Installer トランザクションがあります。{InstallerFolder} をクリーンアップする前に、そのインストールを再開するかロールバックしてください(または Windows を再起動してください)。 |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | エラー：再起動後に実行するためキューに入れられたファイル操作が {InstallerFolder} を対象にしています ({0})。クリーンアップする前に Windows を再起動して、その操作を完了させてください。 |
 | Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning. | エラー: 次回の再起動に向けてファイル操作が予約されていますが、InstallerClean にはそれがどのファイルを指しているか分からないため、{InstallerFolder} を除外できません。クリーンアップの前に Windows を再起動してください。 |
+| Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean. | エラー: InstallerClean は {InstallerFolder} に触れる前に確認するレジストリ値の一つを読み取れなかったため、実行中または次回の再起動に予約された Windows Installer の操作を除外できません。/m と /d はブロックされています。Windows を再起動してから再試行してください。それでも読み取りに失敗する場合、この PC は InstallerClean がクリーンアップできる PC ではありません。 |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | エラー：Windows Installer で処理が進行中のため、/m と /d はブロックされます。InstallerClean は変更中の {InstallerFolder} には触れません。終わってからもう一度お試しください。 |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. Try again, and restart Windows if it keeps happening. | エラー：二つのプログラムが同時にインストール済みソフトウェアを変更しないようにする Windows Installer のロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も削除されていません。もう一度お試しください。繰り返す場合は Windows を再起動してください。 |
 | Error: InstallerClean couldn't take the Windows Installer lock that stops two programs changing installed software at once, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. Try again, and restart Windows if it keeps happening. | エラー：二つのプログラムが同時にインストール済みソフトウェアを変更しないようにする Windows Installer のロックを InstallerClean が取得できなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も移動されていません。もう一度お試しください。繰り返す場合は Windows を再起動してください。 |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted. | エラー: Windows は InstallerClean に Windows Installer が処理中かどうかを確認する権限を与えなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も削除されていません。 |
+| Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved. | エラー: Windows は InstallerClean に Windows Installer が処理中かどうかを確認する権限を与えなかったため、途中でファイルが必要になる可能性を排除できませんでした。何も移動されていません。 |
 | Moving {0} unneeded {1} to {2}... | {0} 個の不要な {1} を {2} へ移動しています... |
 | Moved {0} unneeded {1}. | {0} 個の不要な {1} を移動しました。 |
 | Check that your programs still update and uninstall as normal, then delete {0}. | プログラムがこれまでどおり更新およびアンインストールできることを確認してから、{0} を削除してください。 |
-| InstallerClean could no longer confirm the backup folder, so it stopped rather than write into the wrong place. Check {0}, then run the command again. | InstallerClean はバックアップフォルダーを確認できなくなったため、誤った場所に書き込まずに停止しました。{0} を確認してから、コマンドをもう一度実行してください。 |
+| It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was. | 元に戻すのは簡単です。{0} から {InstallerFolder} に戻せば、すべて元どおりになります。 |
+| InstallerClean could no longer confirm the backup folder, so it went no further. Check {0}, then run the command again. | InstallerClean はバックアップフォルダーを確認できなくなったため、停止しました。{0} を確認してから、コマンドをもう一度実行してください。 |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 別の InstallerClean プロセスが単一インスタンスロックを保持しています (GUIまたは別のCLI実行)。終了コード75 (一時的)。後で再試行しても安全です。 |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：イベントログの書き込みに失敗しました。Application ログのアクセス許可またはグループポリシーを確認してください。 |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - {InstallerFolder} をクリーンアップ |
