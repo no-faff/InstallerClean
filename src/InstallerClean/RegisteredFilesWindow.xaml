@@ -217,7 +217,7 @@
                                         HeaderContainerStyle="{StaticResource NumericColumnHeader}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding PatchCount}" Foreground="{StaticResource Text.Body}"
+                                    <TextBlock Text="{Binding PatchCountDisplay}" Foreground="{StaticResource Text.Body}"
                                                FontSize="{DynamicResource Type.Body}" TextAlignment="Right"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>

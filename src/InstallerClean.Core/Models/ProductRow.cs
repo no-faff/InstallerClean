@@ -74,6 +74,20 @@ public sealed record ProductRow(
         ProductName.Length == 0 ? Strings.Field_NoNamedProduct : ProductName;
 
     /// <summary>
+    /// What the patches cell paints, and the same value the spoken line uses.
+    /// The count goes through <see cref="DisplayHelpers.FormatCount"/> so that a
+    /// four-figure total carries the group separator the reader's region writes,
+    /// as every other number the app shows already does.
+    ///
+    /// It is a composed string rather than the bare <see cref="PatchCount"/>
+    /// because a bound integer renders through the default converter, under the
+    /// binding's own culture rather than the one the rest of the window reads,
+    /// and the cell and the spoken line would then punctuate the same figure
+    /// differently. One property is what keeps them saying the same thing.
+    /// </summary>
+    public string PatchCountDisplay => DisplayHelpers.FormatCount(PatchCount);
+
+    /// <summary>
     /// Spoken name for the row, composed from the visible cells. The list
     /// container binds it to AutomationProperties.Name; without that, UI
     /// Automation's item peer falls back to the record's generated
@@ -89,5 +103,5 @@ public sealed record ProductRow(
         ProductNameDisplay,
         FileName,
         IsMissing ? Strings.Field_Missing : SizeDisplay,
-        $"{DisplayHelpers.FormatCount(PatchCount)} {DisplayHelpers.PluralisePatch(PatchCount)}");
+        $"{PatchCountDisplay} {DisplayHelpers.PluralisePatch(PatchCount)}");
 }
