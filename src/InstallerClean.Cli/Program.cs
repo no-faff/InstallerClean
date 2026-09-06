@@ -1442,12 +1442,12 @@ internal static class Program
     /// <remarks>
     /// The SAME exit code and event class as
     /// <see cref="EmitInstallerLockUnavailable"/>, and only the wording differs.
-    /// What the machine is told is that the run was skipped and a later one may
-    /// succeed, which is what both refusals have in common; what the operator is
-    /// told is which of the two happened, which is what they differ in. Neither
-    /// line tells the operator whether to retry: the app was refused the one
-    /// question that would have said, so it reports what happened and leaves that
-    /// judgement to whoever reads it.
+    /// What the two refusals have in common is a run that stopped before it
+    /// touched anything, which is what the shared code carries to a scheduler;
+    /// what the operator is told is which of the two happened, which is what they
+    /// differ in. Neither line tells the operator whether to retry: the app was
+    /// refused the one question that would have said, so it reports what happened
+    /// and leaves that judgement to whoever reads it.
     ///
     /// Its two lines are separately reachable and this method is not, on the same
     /// terms as its sibling: the wording can be held by tests without one of them
