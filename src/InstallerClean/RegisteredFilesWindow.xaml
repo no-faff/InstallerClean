@@ -153,7 +153,15 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="{loc:Translate Field.File}" Width="{a11y:TextScaled 170}"
+                        <!-- 120, and the 50 it gives up goes to the Patches column at
+                             the end of the row, so the total across the four is
+                             unchanged and nothing else in the layout moves. This
+                             column holds a Windows-generated cache name, which is
+                             eight hex digits and an extension: twelve characters at
+                             its longest, and comfortably inside 120 with the
+                             sorted header's arrow. The heading is short in all
+                             sixteen languages, "Bestand" the longest of them. -->
+                        <GridViewColumn Header="{loc:Translate Field.File}" Width="{a11y:TextScaled 120}"
                                         x:Name="ColFileName">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -196,7 +204,15 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="{loc:Translate Field.Patches}" Width="{a11y:TextScaled 100}"
+                        <!-- 150, taking the 50 the File column gives up. This heading
+                             is the longest of the four in the languages that matter
+                             most to it: the Russian and Ukrainian words for patches
+                             each run to eleven characters, and Poppins carries no
+                             Cyrillic, so both are served by the system fallback face
+                             at its own widths. At 100 they filled the column and left
+                             the sorted header no room for its arrow. The cells hold a
+                             small integer, so the width is decided by the heading. -->
+                        <GridViewColumn Header="{loc:Translate Field.Patches}" Width="{a11y:TextScaled 150}"
                                         x:Name="ColPatchCount"
                                         HeaderContainerStyle="{StaticResource NumericColumnHeader}">
                             <GridViewColumn.CellTemplate>
