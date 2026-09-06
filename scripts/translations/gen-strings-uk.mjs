@@ -61,6 +61,10 @@ const OVERRIDES = {
   // 2-4 takes "встановлені програми"; the base Plural key carries the 5+
   // genitive "встановлених програм".
   'Summary.RegisteredWindow.Few': `{0} файли залишено без змін ({1})`,
+  // The counted noun is not in this fragment: it sits in the clause this one is
+  // joined to, so the adjective is the only word the numeral governs and it takes
+  // its own form at 2-4.
+  'Summary.RegisteredWindow.Missing.Few': `{0} відсутні`,
 
   // Flat key with an inflecting adjective: one / few / (base = many).
   'Status.RegisteredPackagesFound.One': `Знайдено {0} зареєстрований {1}.`,
@@ -564,19 +568,19 @@ const MAP = {
   'Cli.WithheldReasons.DeclaredProductInstalled': `  Файл заявляє, що належить програмі, яка досі встановлена, тож він може бути ще потрібен.`,
   'Cli.WithheldReasons.DeclaredProductUnestablished': `  Або файл не вказав, якій програмі він належить, або Windows не відповів про цю програму.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  Перевірка того, яким програмам належать файли, дала відповіді, які не збіглися з переданими їй файлами.`,
-  'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean.`,
-  'Cli.InstallerLockAccessRefused': `Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted.`,
-  'Cli.MoveCancelledRestoreHint': `It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was.`,
-  'Cli.MoveInstallerLockAccessRefused': `Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved.`,
-  'Cli.PendingRebootBlocked.RegistryCheckUnreadable': `Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean.`,
-  'Completion.MoveCancelledRestoreHint': `It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was.`,
-  'Error.InstallerLockAccessRefused': `Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted.`,
-  'Error.MoveInstallerLockAccessRefused': `Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved.`,
-  'Error.MoveStoppedTitle': `Move stopped`,
-  'Field.NoNamedProduct': `(no program)`,
-  'Summary.RegisteredWindow.Missing.Plural': `{0} missing`,
-  'Summary.RegisteredWindow.Missing.Singular': `{0} missing`,
-  'UpdateCheck.Failed.Unknown.NoLog': `The check failed for an unknown reason. The crash log could not be written.`,
+  'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean не зміг прочитати один із параметрів Windows, які перевіряє перед тим, як торкатися {InstallerFolder}, тож не може визначити, чи операція встановлювача виконується, чи чекає на перезавантаження. Перезавантажте Windows і повторіть сканування. Якщо параметр і далі не читається, це не та машина, яку InstallerClean може очистити.`,
+  'Cli.InstallerLockAccessRefused': `Помилка: Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі. Нічого не було видалено.`,
+  'Cli.MoveCancelledRestoreHint': `Це легко скасувати. Перемістіть їх з {0} назад до {InstallerFolder}, і все повернеться як було.`,
+  'Cli.MoveInstallerLockAccessRefused': `Помилка: Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі. Нічого не було переміщено.`,
+  'Cli.PendingRebootBlocked.RegistryCheckUnreadable': `Помилка: InstallerClean не зміг прочитати одне зі значень реєстру, які перевіряє перед тим, як торкатися {InstallerFolder}, тож не може виключити операцію Windows Installer, що виконується зараз або поставлена в чергу до наступного перезавантаження. /m і /d заблоковано. Перезавантажте Windows і спробуйте ще раз. Якщо читання й далі не вдається, це не та машина, яку InstallerClean може очистити.`,
+  'Completion.MoveCancelledRestoreHint': `Це легко скасувати. Перемістіть їх назад до {InstallerFolder}, і все повернеться як було.`,
+  'Error.InstallerLockAccessRefused': `Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі, і нічого не було видалено.`,
+  'Error.MoveInstallerLockAccessRefused': `Windows відмовив InstallerClean у праві перевірити, чи зайнятий Windows Installer, тож він не зміг виключити, що файл знадобиться в процесі, і нічого не було переміщено.`,
+  'Error.MoveStoppedTitle': `Переміщення зупинено`,
+  'Field.NoNamedProduct': `(немає програми)`,
+  'Summary.RegisteredWindow.Missing.Plural': `{0} відсутніх`,
+  'Summary.RegisteredWindow.Missing.Singular': `{0} відсутній`,
+  'UpdateCheck.Failed.Unknown.NoLog': `Перевірка не вдалася з невідомої причини. Не вдалося записати журнал збоїв.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

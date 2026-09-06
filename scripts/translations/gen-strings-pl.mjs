@@ -77,6 +77,10 @@ const OVERRIDES = {
   'Summary.RegisteredStillUsed.Few': `{0} pliki pozostawione bez zmian`,
   'Summary.OrphanedToCleanUp.Few': `{0} niepotrzebne pliki do wyczyszczenia`,
   'Summary.RegisteredWindow.Few': `{0} pliki pozostawione bez zmian ({1})`,
+  // The counted noun is not in this fragment: it sits in the clause this one is
+  // joined to, so the adjective is the only word the numeral governs and it takes
+  // its own form at 2-4.
+  'Summary.RegisteredWindow.Missing.Few': `{0} brakujące`,
   // Completion.PermanentDeleteSummary.Few was removed in the 3.0.0 round, for the
   // reason above: "Trwale usunięto" is impersonal and the counted noun comes from
   // Plural.File, so the paucal band needs no sentence of its own.
@@ -581,19 +585,19 @@ const MAP = {
   'Cli.WithheldReasons.DeclaredProductInstalled': `  Plik podaje, że należy do programu, który jest nadal zainstalowany, więc może być jeszcze potrzebny.`,
   'Cli.WithheldReasons.DeclaredProductUnestablished': `  Albo plik nie podał, do którego programu należy, albo Windows nie udzielił odpowiedzi na temat tego programu.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  Sprawdzenie, do których programów należą pliki, dało odpowiedzi, które nie zgadzały się z przekazanymi mu plikami.`,
-  'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean.`,
-  'Cli.InstallerLockAccessRefused': `Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted.`,
-  'Cli.MoveCancelledRestoreHint': `It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was.`,
-  'Cli.MoveInstallerLockAccessRefused': `Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved.`,
-  'Cli.PendingRebootBlocked.RegistryCheckUnreadable': `Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean.`,
-  'Completion.MoveCancelledRestoreHint': `It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was.`,
-  'Error.InstallerLockAccessRefused': `Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted.`,
-  'Error.MoveInstallerLockAccessRefused': `Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved.`,
-  'Error.MoveStoppedTitle': `Move stopped`,
-  'Field.NoNamedProduct': `(no program)`,
-  'Summary.RegisteredWindow.Missing.Plural': `{0} missing`,
-  'Summary.RegisteredWindow.Missing.Singular': `{0} missing`,
-  'UpdateCheck.Failed.Unknown.NoLog': `The check failed for an unknown reason. The crash log could not be written.`,
+  'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean nie zdołał odczytać jednego z ustawień Windows, które sprawdza przed dotknięciem {InstallerFolder}, więc nie potrafi ustalić, czy operacja instalatora jest w toku, czy czeka na ponowne uruchomienie. Uruchom Windows ponownie i skanuj ponownie. Jeśli ustawienie nadal się nie odczytuje, to nie jest maszyna, którą InstallerClean może wyczyścić.`,
+  'Cli.InstallerLockAccessRefused': `Błąd: Windows odmówił InstallerClean uprawnień do sprawdzenia, czy Instalator Windows jest zajęty, więc nie mógł wykluczyć, że plik stanie się potrzebny w trakcie. Nic nie zostało usunięte.`,
+  'Cli.MoveCancelledRestoreHint': `Łatwo to cofnąć. Przenieś je z {0} z powrotem do {InstallerFolder}, a wszystko wróci do stanu sprzed.`,
+  'Cli.MoveInstallerLockAccessRefused': `Błąd: Windows odmówił InstallerClean uprawnień do sprawdzenia, czy Instalator Windows jest zajęty, więc nie mógł wykluczyć, że plik stanie się potrzebny w trakcie. Nic nie zostało przeniesione.`,
+  'Cli.PendingRebootBlocked.RegistryCheckUnreadable': `Błąd: InstallerClean nie zdołał odczytać jednej z wartości rejestru, które sprawdza przed dotknięciem {InstallerFolder}, więc nie może wykluczyć operacji Instalatora Windows w toku ani zakolejkowanej do następnego uruchomienia. /m i /d są zablokowane. Uruchom Windows ponownie i spróbuj jeszcze raz. Jeśli odczyt nadal się nie udaje, to nie jest maszyna, którą InstallerClean może wyczyścić.`,
+  'Completion.MoveCancelledRestoreHint': `Łatwo to cofnąć. Przenieś je z powrotem do {InstallerFolder}, a wszystko wróci do stanu sprzed.`,
+  'Error.InstallerLockAccessRefused': `Windows odmówił InstallerClean uprawnień do sprawdzenia, czy Instalator Windows jest zajęty, więc nie mógł wykluczyć, że plik stanie się potrzebny w trakcie, i nic nie zostało usunięte.`,
+  'Error.MoveInstallerLockAccessRefused': `Windows odmówił InstallerClean uprawnień do sprawdzenia, czy Instalator Windows jest zajęty, więc nie mógł wykluczyć, że plik stanie się potrzebny w trakcie, i nic nie zostało przeniesione.`,
+  'Error.MoveStoppedTitle': `Przenoszenie zatrzymane`,
+  'Field.NoNamedProduct': `(brak programu)`,
+  'Summary.RegisteredWindow.Missing.Plural': `{0} brakujących`,
+  'Summary.RegisteredWindow.Missing.Singular': `{0} brakujący`,
+  'UpdateCheck.Failed.Unknown.NoLog': `Sprawdzanie nie powiodło się z nieznanej przyczyny. Nie udało się zapisać dziennika awarii.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

@@ -6676,6 +6676,114 @@
       "uk": "eeb56a550ba6fad1",
       "vi": "eeb56a550ba6fad1",
       "zh-Hans": "eeb56a550ba6fad1"
+    },
+    "Field.NoNamedProduct": {
+      "pl": "f6609b048c2dd142",
+      "ru": "f6609b048c2dd142",
+      "tr": "f6609b048c2dd142",
+      "uk": "f6609b048c2dd142",
+      "vi": "f6609b048c2dd142",
+      "zh-Hans": "f6609b048c2dd142"
+    },
+    "Body.PendingReboot.RegistryCheckUnreadable": {
+      "pl": "7d9a3a0b00af3184",
+      "ru": "7d9a3a0b00af3184",
+      "tr": "7d9a3a0b00af3184",
+      "uk": "7d9a3a0b00af3184",
+      "vi": "7d9a3a0b00af3184",
+      "zh-Hans": "7d9a3a0b00af3184"
+    },
+    "Cli.PendingRebootBlocked.RegistryCheckUnreadable": {
+      "pl": "7e68cb2ebc881ffe",
+      "ru": "7e68cb2ebc881ffe",
+      "tr": "7e68cb2ebc881ffe",
+      "uk": "7e68cb2ebc881ffe",
+      "vi": "7e68cb2ebc881ffe",
+      "zh-Hans": "7e68cb2ebc881ffe"
+    },
+    "Error.MoveStoppedTitle": {
+      "pl": "10cfdc61ab6d46ca",
+      "ru": "10cfdc61ab6d46ca",
+      "tr": "10cfdc61ab6d46ca",
+      "uk": "10cfdc61ab6d46ca",
+      "vi": "10cfdc61ab6d46ca",
+      "zh-Hans": "10cfdc61ab6d46ca"
+    },
+    "Completion.MoveCancelledRestoreHint": {
+      "pl": "9ccdd05a48d00b64",
+      "ru": "9ccdd05a48d00b64",
+      "tr": "9ccdd05a48d00b64",
+      "uk": "9ccdd05a48d00b64",
+      "vi": "9ccdd05a48d00b64",
+      "zh-Hans": "9ccdd05a48d00b64"
+    },
+    "Cli.MoveCancelledRestoreHint": {
+      "pl": "13b883305bd9696c",
+      "ru": "13b883305bd9696c",
+      "tr": "13b883305bd9696c",
+      "uk": "13b883305bd9696c",
+      "vi": "13b883305bd9696c",
+      "zh-Hans": "13b883305bd9696c"
+    },
+    "Error.InstallerLockAccessRefused": {
+      "pl": "ccff057a178fecd6",
+      "ru": "ccff057a178fecd6",
+      "tr": "ccff057a178fecd6",
+      "uk": "ccff057a178fecd6",
+      "vi": "ccff057a178fecd6",
+      "zh-Hans": "ccff057a178fecd6"
+    },
+    "Error.MoveInstallerLockAccessRefused": {
+      "pl": "851d25a0e398c384",
+      "ru": "851d25a0e398c384",
+      "tr": "851d25a0e398c384",
+      "uk": "851d25a0e398c384",
+      "vi": "851d25a0e398c384",
+      "zh-Hans": "851d25a0e398c384"
+    },
+    "Cli.InstallerLockAccessRefused": {
+      "pl": "17afa34662220ace",
+      "ru": "17afa34662220ace",
+      "tr": "17afa34662220ace",
+      "uk": "17afa34662220ace",
+      "vi": "17afa34662220ace",
+      "zh-Hans": "17afa34662220ace"
+    },
+    "Cli.MoveInstallerLockAccessRefused": {
+      "pl": "5a9a0bd63b0f1744",
+      "ru": "5a9a0bd63b0f1744",
+      "tr": "5a9a0bd63b0f1744",
+      "uk": "5a9a0bd63b0f1744",
+      "vi": "5a9a0bd63b0f1744",
+      "zh-Hans": "5a9a0bd63b0f1744"
+    },
+    "Summary.RegisteredWindow.Missing.Singular": {
+      "pl": "19f9fbfd4d5fd205",
+      "ru": "19f9fbfd4d5fd205",
+      "tr": "19f9fbfd4d5fd205",
+      "uk": "19f9fbfd4d5fd205",
+      "vi": "19f9fbfd4d5fd205",
+      "zh-Hans": "19f9fbfd4d5fd205"
+    },
+    "Summary.RegisteredWindow.Missing.Plural": {
+      "pl": "19f9fbfd4d5fd205",
+      "ru": "19f9fbfd4d5fd205",
+      "tr": "19f9fbfd4d5fd205",
+      "uk": "19f9fbfd4d5fd205",
+      "vi": "19f9fbfd4d5fd205",
+      "zh-Hans": "19f9fbfd4d5fd205"
+    },
+    "UpdateCheck.Failed.Unknown.NoLog": {
+      "pl": "bba737db610a8c3c",
+      "ru": "bba737db610a8c3c",
+      "tr": "bba737db610a8c3c",
+      "uk": "bba737db610a8c3c",
+      "vi": "bba737db610a8c3c",
+      "zh-Hans": "bba737db610a8c3c"
+    },
+    "Summary.RegisteredWindow.Missing.Few": {
+      "pl": "19f9fbfd4d5fd205",
+      "uk": "19f9fbfd4d5fd205"
     }
   }
 }
