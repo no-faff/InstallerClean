@@ -266,10 +266,10 @@ const MAP = {
   // to {1}, so treat the two independently.
   'Completion.NothingMoved': `Tidak ada yang dipindahkan`,
   'Completion.NothingDeleted': `Tidak ada yang dihapus`,
-  'Completion.FailedCount.Singular': `{0} dari {1} file tidak bisa dipindahkan.`,
-  'Completion.FailedCount.Plural': `{0} dari {1} file tidak bisa dipindahkan.`,
-  'Completion.FailedCountDelete.Singular': `{0} dari {1} file tidak bisa dihapus.`,
-  'Completion.FailedCountDelete.Plural': `{0} dari {1} file tidak bisa dihapus.`,
+  'Completion.FailedCount.Singular': `{0} file tidak bisa dipindahkan.`,
+  'Completion.FailedCount.Plural': `{0} file tidak bisa dipindahkan.`,
+  'Completion.FailedCountDelete.Singular': `{0} file tidak bisa dihapus.`,
+  'Completion.FailedCountDelete.Plural': `{0} file tidak bisa dihapus.`,
 
   // 0 = moved count, 1 = pluralised noun, 2 = destination path
   'Completion.MoveSummary.Singular': `{0} {1} dipindahkan ke: {2}`,

@@ -267,10 +267,10 @@ const MAP = {
   // to {1}, so treat the two independently.
   'Completion.NothingMoved': `Nichts verschoben`,
   'Completion.NothingDeleted': `Nichts gelöscht`,
-  'Completion.FailedCount.Singular': `{0} Datei von {1} konnte nicht verschoben werden.`,
-  'Completion.FailedCount.Plural': `{0} Dateien von {1} konnten nicht verschoben werden.`,
-  'Completion.FailedCountDelete.Singular': `{0} Datei von {1} konnte nicht gelöscht werden.`,
-  'Completion.FailedCountDelete.Plural': `{0} Dateien von {1} konnten nicht gelöscht werden.`,
+  'Completion.FailedCount.Singular': `{0} Datei konnte nicht verschoben werden.`,
+  'Completion.FailedCount.Plural': `{0} Dateien konnten nicht verschoben werden.`,
+  'Completion.FailedCountDelete.Singular': `{0} Datei konnte nicht gelöscht werden.`,
+  'Completion.FailedCountDelete.Plural': `{0} Dateien konnten nicht gelöscht werden.`,
 
   // 0 = moved count, 1 = pluralised noun, 2 = destination path
   'Completion.MoveSummary.Singular': `{0} {1} verschoben nach: {2}`,

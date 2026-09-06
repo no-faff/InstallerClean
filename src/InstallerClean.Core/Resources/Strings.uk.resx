@@ -726,10 +726,10 @@
        failed, and English cannot move it beside {0} without "1 file of 1",
        which reads worse. A language whose noun sits beside {0} inflects
        correctly at every count and needs no such surgery. -->
-  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>Не вдалося перемістити {0} файл з {1}.</value></data>
-  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>Не вдалося перемістити {0} файлів з {1}.</value></data>
-  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>Не вдалося видалити {0} файл з {1}.</value></data>
-  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>Не вдалося видалити {0} файлів з {1}.</value></data>
+  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>Не вдалося перемістити {0} файл.</value></data>
+  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>Не вдалося перемістити {0} файлів.</value></data>
+  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>Не вдалося видалити {0} файл.</value></data>
+  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>Не вдалося видалити {0} файлів.</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path. The colon
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the
@@ -2159,8 +2159,8 @@ InstallerClean уже працював від імені адміністрат�
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Змінити мову</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Програму буде перезапущено.</value></data>
 
-  <data name="Completion.FailedCount.Few" xml:space="preserve"><value>Не вдалося перемістити {0} файли з {1}.</value></data>
-  <data name="Completion.FailedCountDelete.Few" xml:space="preserve"><value>Не вдалося видалити {0} файли з {1}.</value></data>
+  <data name="Completion.FailedCount.Few" xml:space="preserve"><value>Не вдалося перемістити {0} файли.</value></data>
+  <data name="Completion.FailedCountDelete.Few" xml:space="preserve"><value>Не вдалося видалити {0} файли.</value></data>
   <data name="Plural.File.Few" xml:space="preserve"><value>файли</value></data>
   <data name="Plural.Error.Few" xml:space="preserve"><value>помилки</value></data>
   <data name="Plural.Package.Few" xml:space="preserve"><value>пакети</value></data>

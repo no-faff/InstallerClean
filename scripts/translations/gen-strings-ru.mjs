@@ -243,10 +243,10 @@ const MAP = {
   // to {1}, so treat the two independently.
   'Completion.NothingMoved': `Ничего не перемещено`,
   'Completion.NothingDeleted': `Ничего не удалено`,
-  'Completion.FailedCount.Singular': `Не удалось переместить {0} файл из {1}.`,
-  'Completion.FailedCount.Plural': `Не удалось переместить {0} файлов из {1}.`,
-  'Completion.FailedCountDelete.Singular': `Не удалось удалить {0} файл из {1}.`,
-  'Completion.FailedCountDelete.Plural': `Не удалось удалить {0} файлов из {1}.`,
+  'Completion.FailedCount.Singular': `Не удалось переместить {0} файл.`,
+  'Completion.FailedCount.Plural': `Не удалось переместить {0} файлов.`,
+  'Completion.FailedCountDelete.Singular': `Не удалось удалить {0} файл.`,
+  'Completion.FailedCountDelete.Plural': `Не удалось удалить {0} файлов.`,
 
   // 0 = moved count, 1 = pluralised noun, 2 = destination path
   'Completion.MoveSummary.Singular': `Перемещено {0} {1} в: {2}`,
@@ -492,8 +492,8 @@ const MAP = {
 const OVERRIDES = {
   // The counted noun sits with {0}, which is what selects the form, so the
   // pair reaches 1 (файл) and 5+ (файлов) but not the paucal 2-4 (файла).
-  'Completion.FailedCount.Few': `Не удалось переместить {0} файла из {1}.`,
-  'Completion.FailedCountDelete.Few': `Не удалось удалить {0} файла из {1}.`,
+  'Completion.FailedCount.Few': `Не удалось переместить {0} файла.`,
+  'Completion.FailedCountDelete.Few': `Не удалось удалить {0} файла.`,
   'Plural.File.Few': `файла`,
   'Plural.Package.Few': `пакета`,
   'Plural.Product.Few': `продукта`,

@@ -726,10 +726,10 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
        failed, and English cannot move it beside {0} without "1 file of 1",
        which reads worse. A language whose noun sits beside {0} inflects
        correctly at every count and needs no such surgery. -->
-  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>{0} di {1} file non è stato spostato.</value></data>
-  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>{0} di {1} file non sono stati spostati.</value></data>
-  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>{0} di {1} file non è stato eliminato.</value></data>
-  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>{0} di {1} file non sono stati eliminati.</value></data>
+  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>{0} file non è stato spostato.</value></data>
+  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>{0} file non sono stati spostati.</value></data>
+  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>{0} file non è stato eliminato.</value></data>
+  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>{0} file non sono stati eliminati.</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path. The colon
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the

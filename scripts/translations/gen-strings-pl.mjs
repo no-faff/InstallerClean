@@ -283,10 +283,10 @@ const MAP = {
   // to {1}, so treat the two independently.
   'Completion.NothingMoved': `Niczego nie przeniesiono`,
   'Completion.NothingDeleted': `Niczego nie usunięto`,
-  'Completion.FailedCount.Singular': `Nie udało się przenieść {0} pliku z {1}.`,
-  'Completion.FailedCount.Plural': `Nie udało się przenieść {0} plików z {1}.`,
-  'Completion.FailedCountDelete.Singular': `Nie udało się usunąć {0} pliku z {1}.`,
-  'Completion.FailedCountDelete.Plural': `Nie udało się usunąć {0} plików z {1}.`,
+  'Completion.FailedCount.Singular': `Nie udało się przenieść {0} pliku.`,
+  'Completion.FailedCount.Plural': `Nie udało się przenieść {0} plików.`,
+  'Completion.FailedCountDelete.Singular': `Nie udało się usunąć {0} pliku.`,
+  'Completion.FailedCountDelete.Plural': `Nie udało się usunąć {0} plików.`,
 
   // 0 = moved count, 1 = pluralised noun, 2 = destination path
   'Completion.MoveSummary.Singular': `Przeniesiono {0} {1} do: {2}`,

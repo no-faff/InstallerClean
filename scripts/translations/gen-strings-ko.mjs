@@ -244,10 +244,10 @@ const MAP = {
   // to {1}, so treat the two independently.
   'Completion.NothingMoved': `이동된 파일 없음`,
   'Completion.NothingDeleted': `삭제된 파일 없음`,
-  'Completion.FailedCount.Singular': `파일 {1}개 중 {0}개를 이동하지 못했습니다.`,
-  'Completion.FailedCount.Plural': `파일 {1}개 중 {0}개를 이동하지 못했습니다.`,
-  'Completion.FailedCountDelete.Singular': `파일 {1}개 중 {0}개를 삭제하지 못했습니다.`,
-  'Completion.FailedCountDelete.Plural': `파일 {1}개 중 {0}개를 삭제하지 못했습니다.`,
+  'Completion.FailedCount.Singular': `파일 {0}개를 이동하지 못했습니다.`,
+  'Completion.FailedCount.Plural': `파일 {0}개를 이동하지 못했습니다.`,
+  'Completion.FailedCountDelete.Singular': `파일 {0}개를 삭제하지 못했습니다.`,
+  'Completion.FailedCountDelete.Plural': `파일 {0}개를 삭제하지 못했습니다.`,
 
   // 0 = moved count, 1 = pluralised noun, 2 = destination path
   'Completion.MoveSummary.Singular': `{1} {0}개를 다음 위치로 이동함: {2}`,

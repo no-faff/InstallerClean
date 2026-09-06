@@ -247,10 +247,10 @@ const MAP = {
   // to {1}, so treat the two independently.
   'Completion.NothingMoved': `Không có tệp nào được chuyển`,
   'Completion.NothingDeleted': `Không có tệp nào bị xóa`,
-  'Completion.FailedCount.Singular': `Không thể chuyển {0} trong số {1} tệp.`,
-  'Completion.FailedCount.Plural': `Không thể chuyển {0} trong số {1} tệp.`,
-  'Completion.FailedCountDelete.Singular': `Không thể xóa {0} trong số {1} tệp.`,
-  'Completion.FailedCountDelete.Plural': `Không thể xóa {0} trong số {1} tệp.`,
+  'Completion.FailedCount.Singular': `Không thể chuyển {0} tệp.`,
+  'Completion.FailedCount.Plural': `Không thể chuyển {0} tệp.`,
+  'Completion.FailedCountDelete.Singular': `Không thể xóa {0} tệp.`,
+  'Completion.FailedCountDelete.Plural': `Không thể xóa {0} tệp.`,
 
   // 0 = moved count, 1 = pluralised noun, 2 = destination path
   'Completion.MoveSummary.Singular': `Đã chuyển {0} {1} tới: {2}`,

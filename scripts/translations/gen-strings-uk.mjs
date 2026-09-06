@@ -45,8 +45,8 @@ const ALSO_KEEP = [
 const OVERRIDES = {
   // As ru: the counted noun sits with {0}, so the pair reaches 1 (файл) and
   // 5+ (файлів) but not the paucal 2-4 (файли).
-  'Completion.FailedCount.Few': `Не вдалося перемістити {0} файли з {1}.`,
-  'Completion.FailedCountDelete.Few': `Не вдалося видалити {0} файли з {1}.`,
+  'Completion.FailedCount.Few': `Не вдалося перемістити {0} файли.`,
+  'Completion.FailedCountDelete.Few': `Не вдалося видалити {0} файли.`,
   // Noun-only pairs: few = nominative plural.
   'Plural.File.Few': `файли`,
   'Plural.Error.Few': `помилки`,
@@ -272,10 +272,10 @@ const MAP = {
   // to {1}, so treat the two independently.
   'Completion.NothingMoved': `Нічого не переміщено`,
   'Completion.NothingDeleted': `Нічого не видалено`,
-  'Completion.FailedCount.Singular': `Не вдалося перемістити {0} файл з {1}.`,
-  'Completion.FailedCount.Plural': `Не вдалося перемістити {0} файлів з {1}.`,
-  'Completion.FailedCountDelete.Singular': `Не вдалося видалити {0} файл з {1}.`,
-  'Completion.FailedCountDelete.Plural': `Не вдалося видалити {0} файлів з {1}.`,
+  'Completion.FailedCount.Singular': `Не вдалося перемістити {0} файл.`,
+  'Completion.FailedCount.Plural': `Не вдалося перемістити {0} файлів.`,
+  'Completion.FailedCountDelete.Singular': `Не вдалося видалити {0} файл.`,
+  'Completion.FailedCountDelete.Plural': `Не вдалося видалити {0} файлів.`,
 
   // 0 = moved count, 1 = pluralised noun, 2 = destination path
   'Completion.MoveSummary.Singular': `{0} {1} переміщено до: {2}`,
