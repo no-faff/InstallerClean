@@ -158,7 +158,23 @@
          the token). Each role is named for the job it does, not the size,
          so a size change edits the token instead of renaming
          consumers. -->
-    <FontFamily x:Key="Type.FontFamily">pack://application:,,,/Fonts/#Poppins</FontFamily>
+    <!-- The name after Poppins is a fallback, and it is here for one character.
+         French sets a narrow no-break space (U+202F) before its high punctuation
+         and inside guillemets, and Poppins carries no glyph for it. Without a
+         name to fall back to, that character is left to the font mapping
+         Windows keeps for the purpose, which sends it to a Mongolian face: the
+         same code point is that script's vowel separator. Segoe UI has the
+         glyph and is the Windows interface face, so naming it keeps the
+         character on a font chosen here rather than on one chosen for another
+         script.
+
+         A family that cannot render a character maps none of it and the next
+         name in the list is tried, so this adds a step and takes nothing away.
+         The scripts Poppins does not cover and Segoe UI does not either,
+         Japanese, Korean and Chinese, fall through to the system's own fonts as
+         before. The Cyrillic and Vietnamese letters Poppins has no glyph for
+         are in Segoe UI, so those have a named font here as well. -->
+    <FontFamily x:Key="Type.FontFamily">pack://application:,,,/Fonts/#Poppins, Segoe UI</FontFamily>
 
     <sys:Double x:Key="Type.Display">29</sys:Double>     <!-- splash hero -->
     <sys:Double x:Key="Type.Heading.Lg">23</sys:Double>  <!-- completion heading -->
