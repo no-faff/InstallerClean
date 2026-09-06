@@ -934,6 +934,24 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 var abortSurviving = ex.Partial.HeldBack.Count == 0
                     ? survivingFiles
                     : survivingFiles.Where(f => !abortReclaimed.Contains(f.FullPath)).ToList();
+                // Its own heading, and not the one the other four destination
+                // messages carry: the guard behind this exception has two
+                // conditions and a share that dropped or an access rule that closed
+                // leaves the folder where the user put it. Nothing selects on which
+                // fired, so the heading says what the batch did.
+                //
+                // IT GOES UP BEFORE THE SUMMARY CARD AND THE ORDER IS LOAD-BEARING.
+                // Revealing the card raises IsComplete, and the window answers that
+                // by queueing a focus move and the card's outcome announcement onto
+                // the dispatcher rather than running them where they are raised. A
+                // modal opened in the same stretch is what drains that queue, so the
+                // focus would land on a control sitting behind the dialog and the
+                // outcome would be spoken while the dialog held focus. Showing the
+                // dialog first leaves the reveal a clear queue: the reader dismisses
+                // the warning, the card appears, and its focus move and its
+                // announcement run with nothing over them. The card's own priorities
+                // are what order those two against each other, in the window.
+                _dialogService.ShowWarning(ex.Message, Strings.Error_MoveStoppedTitle);
                 if (ex.Partial.MovedCount > 0 || ex.Partial.Errors.Count > 0)
                 {
                     // The service's destination, never `dest`. On the condition
@@ -946,12 +964,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                         ex.Destination, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind),
                         FoldHeldBack(reverify, ex.Partial.HeldBack, ex.Partial.HeldBackReasons));
                 }
-                // Its own heading, and not the one the other four destination
-                // messages carry: the guard behind this exception has two
-                // conditions and a share that dropped or an access rule that closed
-                // leaves the folder where the user put it. Nothing selects on which
-                // fired, so the heading says what the batch did.
-                _dialogService.ShowWarning(ex.Message, Strings.Error_MoveStoppedTitle);
                 OperationProgress = string.Empty;
                 return;
             }
