@@ -361,7 +361,7 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `GitHub heeft een foutmelding teruggestuurd. Probeer het over een paar minuten opnieuw.`,
   'UpdateCheck.Failed.ResponseParseError': `In het antwoord van GitHub was geen release te herkennen. Probeer het later opnieuw, of open de releasepagina rechtstreeks.`,
   'UpdateCheck.Failed.Timeout': `De controle duurde te lang. Je verbinding met GitHub is mogelijk traag; probeer het opnieuw.`,
-  'UpdateCheck.Failed.Unknown': `De controle is om een onbekende reden mislukt. De details staan in crash.log, mocht je het willen melden.`,
+  'UpdateCheck.Failed.Unknown': `De controle is om een onbekende reden mislukt. De details staan in {0}, mocht je het willen melden.`,
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean kon de back-upmap niet meer bevestigen en is gestopt. Controleer {0}, klik daarna op Opnieuw scannen en probeer het opnieuw.`,

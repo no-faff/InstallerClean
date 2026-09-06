@@ -360,7 +360,7 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `GitHub trả về phản hồi lỗi. Hãy thử lại sau vài phút.`,
   'UpdateCheck.Failed.ResponseParseError': `Phản hồi của GitHub không chứa bản phát hành nào nhận ra được. Hãy thử lại sau, hoặc mở thẳng trang phát hành.`,
   'UpdateCheck.Failed.Timeout': `Quá thời gian kiểm tra. Kết nối của bạn tới GitHub có thể chậm; hãy thử lại.`,
-  'UpdateCheck.Failed.Unknown': `Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong crash.log nếu bạn cần báo cáo.`,
+  'UpdateCheck.Failed.Unknown': `Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong {0} nếu bạn cần báo cáo.`,
 
   // 0 = the URL the user was trying to reach
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,

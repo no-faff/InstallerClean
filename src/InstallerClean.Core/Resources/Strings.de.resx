@@ -1369,7 +1369,7 @@ Details in {1}.</value></data>
        sends anybody to a file that is not there. It names the full path like every
        other message that offers the log, a bare file name being no use to somebody
        who has to go and find it. -->
-  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Die Prüfung ist aus unbekanntem Grund fehlgeschlagen. Details stehen in crash.log, falls du es melden möchtest.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Die Prüfung ist aus unbekanntem Grund fehlgeschlagen. Details stehen in {0}, falls du es melden möchtest.</value></data>
   <data name="UpdateCheck.Failed.Unknown.NoLog" xml:space="preserve"><value>Die Prüfung ist aus unbekanntem Grund fehlgeschlagen. Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <!-- 0 = the URL the user was trying to reach. The reason the launch failed
        (this process is elevated, so the browser has to be started from the

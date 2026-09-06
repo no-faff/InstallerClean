@@ -289,7 +289,7 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `GitHub 返回了错误响应。请过几分钟后重试。`,
   'UpdateCheck.Failed.ResponseParseError': `GitHub 的响应中没有可识别的发布版本。请稍后重试，或直接打开发布页面。`,
   'UpdateCheck.Failed.Timeout': `检查超时。您与 GitHub 的连接可能较慢；请重试。`,
-  'UpdateCheck.Failed.Unknown': `检查因未知原因失败。如果您需要报告此问题，详情在 crash.log 中。`,
+  'UpdateCheck.Failed.Unknown': `检查因未知原因失败。如果您需要报告此问题，详情在 {0} 中。`,
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean 已无法确认备份文件夹，因此停了下来。请检查 {0}，然后重新扫描并再试一次。`,

@@ -355,7 +355,7 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `GitHub вернул ответ с ошибкой. Повторите попытку через несколько минут.`,
   'UpdateCheck.Failed.ResponseParseError': `В ответе GitHub не оказалось распознаваемого выпуска. Повторите попытку позже или откройте страницу выпусков напрямую.`,
   'UpdateCheck.Failed.Timeout': `Время ожидания проверки истекло. Возможно, соединение с GitHub медленное; повторите попытку.`,
-  'UpdateCheck.Failed.Unknown': `Проверка не удалась по неизвестной причине. Подробности в crash.log, если нужно сообщить об этом.`,
+  'UpdateCheck.Failed.Unknown': `Проверка не удалась по неизвестной причине. Подробности в {0}, если нужно сообщить об этом.`,
 
   // 0 = the URL the user was trying to reach
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,

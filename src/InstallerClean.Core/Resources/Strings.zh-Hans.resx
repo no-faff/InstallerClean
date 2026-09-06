@@ -1369,7 +1369,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        sends anybody to a file that is not there. It names the full path like every
        other message that offers the log, a bare file name being no use to somebody
        who has to go and find it. -->
-  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>检查因未知原因失败。如果您需要报告此问题，详情在 crash.log 中。</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>检查因未知原因失败。如果您需要报告此问题，详情在 {0} 中。</value></data>
   <data name="UpdateCheck.Failed.Unknown.NoLog" xml:space="preserve"><value>The check failed for an unknown reason. The crash log could not be written.</value></data>
   <!-- 0 = the URL the user was trying to reach. The reason the launch failed
        (this process is elevated, so the browser has to be started from the

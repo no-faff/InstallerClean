@@ -1369,7 +1369,7 @@ Szczegóły w {1}.</value></data>
        sends anybody to a file that is not there. It names the full path like every
        other message that offers the log, a bare file name being no use to somebody
        who has to go and find it. -->
-  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Sprawdzanie nie powiodło się z nieznanej przyczyny. Szczegóły są w crash.log, jeśli chcesz to zgłosić.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Sprawdzanie nie powiodło się z nieznanej przyczyny. Szczegóły są w {0}, jeśli chcesz to zgłosić.</value></data>
   <data name="UpdateCheck.Failed.Unknown.NoLog" xml:space="preserve"><value>The check failed for an unknown reason. The crash log could not be written.</value></data>
   <!-- 0 = the URL the user was trying to reach. The reason the launch failed
        (this process is elevated, so the browser has to be started from the

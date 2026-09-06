@@ -354,7 +354,7 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `GitHub가 오류 응답을 반환했습니다. 몇 분 후에 다시 시도하세요.`,
   'UpdateCheck.Failed.ResponseParseError': `GitHub의 응답에 인식할 수 있는 릴리스가 없습니다. 나중에 다시 시도하거나, 릴리스 페이지를 직접 여세요.`,
   'UpdateCheck.Failed.Timeout': `확인 시간이 초과되었습니다. GitHub와의 연결이 느릴 수 있으니 다시 시도하세요.`,
-  'UpdateCheck.Failed.Unknown': `알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 crash.log에 있습니다.`,
+  'UpdateCheck.Failed.Unknown': `알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 {0}에 있습니다.`,
 
   // 0 = the URL the user was trying to reach
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,

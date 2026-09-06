@@ -1369,7 +1369,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        sends anybody to a file that is not there. It names the full path like every
        other message that offers the log, a bare file name being no use to somebody
        who has to go and find it. -->
-  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>不明な理由で確認に失敗しました。報告が必要な場合は詳細が crash.log にあります。</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>不明な理由で確認に失敗しました。報告が必要な場合は詳細が {0} にあります。</value></data>
   <data name="UpdateCheck.Failed.Unknown.NoLog" xml:space="preserve"><value>確認が不明な理由で失敗しました。クラッシュログを書き込めませんでした。</value></data>
   <!-- 0 = the URL the user was trying to reach. The reason the launch failed
        (this process is elevated, so the browser has to be started from the

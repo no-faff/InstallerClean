@@ -300,7 +300,7 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `GitHub がエラーレスポンスを返しました。数分待ってから再試行してください。`,
   'UpdateCheck.Failed.ResponseParseError': `GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。`,
   'UpdateCheck.Failed.Timeout': `確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。`,
-  'UpdateCheck.Failed.Unknown': `不明な理由で確認に失敗しました。報告が必要な場合は詳細が crash.log にあります。`,
+  'UpdateCheck.Failed.Unknown': `不明な理由で確認に失敗しました。報告が必要な場合は詳細が {0} にあります。`,
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean はバックアップフォルダーを確認できなくなったため、停止しました。{0} を確認してから、再スキャンしてもう一度お試しください。`,

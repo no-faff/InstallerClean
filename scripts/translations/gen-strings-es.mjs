@@ -313,7 +313,7 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `GitHub devolvió una respuesta de error. Vuelve a intentarlo en unos minutos.`,
   'UpdateCheck.Failed.ResponseParseError': `La respuesta de GitHub no contenía una versión reconocible. Vuelve a intentarlo más tarde, o abre directamente la página de versiones.`,
   'UpdateCheck.Failed.Timeout': `Se agotó el tiempo de espera de la comprobación. Tu conexión con GitHub puede ser lenta; vuelve a intentarlo.`,
-  'UpdateCheck.Failed.Unknown': `La comprobación falló por un motivo desconocido. Los detalles están en crash.log por si necesitas informar del problema.`,
+  'UpdateCheck.Failed.Unknown': `La comprobación falló por un motivo desconocido. Los detalles están en {0} por si necesitas informar del problema.`,
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
   'Error.DestinationChangedMidBatch': `InstallerClean ya no pudo confirmar la carpeta de copia de seguridad, así que se detuvo. Comprueba {0}, luego Volver a analizar e inténtalo de nuevo.`,

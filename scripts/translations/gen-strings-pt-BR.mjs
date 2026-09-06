@@ -361,7 +361,7 @@ const MAP = {
   'UpdateCheck.Failed.ServerError': `O GitHub retornou uma resposta de erro. Tente de novo em alguns minutos.`,
   'UpdateCheck.Failed.ResponseParseError': `A resposta do GitHub não continha uma versão reconhecível. Tente de novo mais tarde, ou abra diretamente a página de versões.`,
   'UpdateCheck.Failed.Timeout': `A verificação expirou. A sua conexão com o GitHub pode estar lenta; tente de novo.`,
-  'UpdateCheck.Failed.Unknown': `A verificação falhou por um motivo desconhecido. Os detalhes estão no crash.log, se você precisar relatar o problema.`,
+  'UpdateCheck.Failed.Unknown': `A verificação falhou por um motivo desconhecido. Os detalhes estão em {0}, se você precisar relatar o problema.`,
 
   // 0 = the URL the user was trying to reach
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
