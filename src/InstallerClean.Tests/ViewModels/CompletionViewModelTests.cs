@@ -274,7 +274,7 @@ public class CompletionViewModelTests
 
     [Theory]
     [MemberData(nameof(ShippedCultures))]
-    public void A_cancelled_move_counts_what_it_tried_not_the_batch_it_was_given(string cultureName)
+    public void A_cancelled_move_names_what_failed_and_leaves_the_batch_to_the_summary(string cultureName)
     {
         using var scope = new LocalisationScope(CultureInfo.GetCultureInfo(cultureName));
 
@@ -282,25 +282,18 @@ public class CompletionViewModelTests
         vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 71, movedBytes: 1024,
             destination: @"D:\backup", errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
-        // 5 tried, not 71 queued: the 66 the cancel never reached are not files
-        // that could not be moved. The summary line below still names the whole
+        // The line names what failed and nothing else. 71 were queued and 5 were
+        // reached, and neither number belongs beside a failure count: the 66 the
+        // cancel never got to are not files that could not be moved, and the 3
+        // that moved are not either. The summary line below names the whole
         // batch, which is its own job.
         //
         // WALKED ACROSS THE LANGUAGES RATHER THAN ASSERTED ON ONE STRING, because
-        // the count is all the English says and a language that puts it over a
-        // total is where the difference between 5 and 71 can be seen at all. The
-        // render is the other half: a value naming the total is handed one, so a
-        // call site that stopped supplying it fails here rather than on a user's
-        // screen.
+        // each language builds this sentence its own way and a number put back
+        // into any one of them would show up in that language and nowhere else.
         Assert.Contains("2", vm.FailedCount);
         Assert.DoesNotContain("71", vm.FailedCount);
-        // AND THE DENOMINATOR BY NAME, wherever one is spelled. The tried count
-        // is not the only number this call holds: the files that moved and the
-        // files that failed are both here, and a line putting either of them
-        // under the failure count names no batch either. Naming 5 is what ties
-        // the sentence to what the operation actually tried.
-        if (cultureName != SupportedLanguages.Neutral)
-            Assert.Contains("5", vm.FailedCount);
+        Assert.DoesNotContain("5", vm.FailedCount);
         Assert.Contains("71", vm.Summary);
         // A cancel is not a failure, so the heading stays as it was. This is the
         // control on the pair below: three files really did move and the size
