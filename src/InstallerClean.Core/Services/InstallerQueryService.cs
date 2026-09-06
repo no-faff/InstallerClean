@@ -1674,7 +1674,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
             StringComparer.OrdinalIgnoreCase);
         var patchCode = new char[Msi.GuidBufferLength];
         var targetProductCode = new char[Msi.GuidBufferLength];
-        var sidBuffer = new char[SidBufferLength];
 
         for (uint index = 0; index < MaxPatchIndex; index++)
         {
@@ -1682,6 +1681,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             Array.Clear(patchCode);
             Array.Clear(targetProductCode);
+
+            // Buffer and length are both per row, because the retry below hands
+            // back a buffer sized to the row that needed it. Sizing every row
+            // from the constant keeps the length this call declares true of the
+            // buffer it passes.
+            var sidBuffer = new char[SidBufferLength];
             uint sidLength = SidBufferLength;
 
             var error = _msi.EnumPatches(
@@ -3604,7 +3609,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         var results = new List<(string, string?, MsiInstallContext)>();
         var productCode = new char[Msi.GuidBufferLength];
-        var sidBuffer = new char[SidBufferLength];
         int consecutiveNonSuccess = 0;
         int unreadableRows = 0;
         uint lastError = MsiError.Success;
@@ -3635,6 +3639,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // API zero-terminates so this is belt-and-braces, but the
             // belt is cheap.
             Array.Clear(productCode);
+
+            // Buffer and length are both per row, because the retry
+            // below hands back a buffer sized to the row that needed
+            // it. Sizing every row from the constant keeps the length
+            // this call declares true of the buffer it passes.
+            var sidBuffer = new char[SidBufferLength];
 
             // pcchSid is the buffer size in characters including the
             // null terminator on the Win32 input. On Success the API
