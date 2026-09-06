@@ -99,6 +99,13 @@ jobs:
         if: success() || failure()
         run: node scripts/check-elevation-manifest.mjs
 
+      # One guard reads built files, so it cannot be picked up with the
+      # check-*.mjs glob that runs before the build, and is invoked by name in
+      # both workflows instead. This is what holds those two lines in place.
+      - name: Check the artefact guard is still wired into both workflows
+        if: success() || failure()
+        run: node scripts/check-guard-wiring.mjs
+
       # A French value that lost its narrow no-break space to a plain space,
       # which plenty of editors do silently.
       - name: Lint French spacing
