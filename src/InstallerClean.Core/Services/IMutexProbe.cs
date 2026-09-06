@@ -23,21 +23,58 @@ public interface IMutexProbe
     ///   <item>a non-null lease when acquired: the caller now OWNS the mutex and
     ///   MUST dispose the lease on the SAME thread that called this (Win32
     ///   requires the acquiring thread to release);</item>
-    ///   <item><c>null</c> with <paramref name="shownHeldByAnother"/> = <c>true</c>
+    ///   <item><c>null</c> with <see cref="MutexAcquireOutcome.HeldByAnother"/>
     ///   when the mutex is held by someone else: the caller should refuse the
     ///   operation;</item>
-    ///   <item><c>null</c> with <paramref name="shownHeldByAnother"/> = <c>false</c>
-    ///   when the mutex could not be acquired for any other reason (a DACL that
-    ///   refuses creation/open, a transient failure). The false is "not shown to
-    ///   be held", never "not held": this process could not find out. Both
-    ///   callers refuse on it, and a new caller that means to act on the cache
-    ///   should too.</item>
+    ///   <item><c>null</c> with <see cref="MutexAcquireOutcome.AccessRefused"/>
+    ///   when the object exists and its security refused this process the rights
+    ///   to open it, so nothing was learned about whether anyone holds it;</item>
+    ///   <item><c>null</c> with <see cref="MutexAcquireOutcome.NotAcquired"/>
+    ///   when the acquire failed for any other non-fatal reason.</item>
     /// </list>
-    /// The flag is a positive signal only. True is a measurement, an opened
-    /// mutex a zero wait failed to take; false is the absence of one, and the
-    /// two are not opposites.
+    /// Only <see cref="MutexAcquireOutcome.HeldByAnother"/> is a measurement, an
+    /// opened mutex a zero wait failed to take. The other two say this process
+    /// could not find out, which is never the same as finding out that nothing
+    /// holds it. Every caller that means to act on the cache refuses on all
+    /// three.
     /// </summary>
-    IMutexLease? TryAcquire(string name, out bool shownHeldByAnother);
+    IMutexLease? TryAcquire(string name, out MutexAcquireOutcome outcome);
+}
+
+/// <summary>
+/// How an attempt to take a named mutex ended. The three refusals are kept apart
+/// because they are different facts about the machine and a caller reports them
+/// to the user in different words: one says something is installing, one says the
+/// app was not allowed to look, and one says the attempt failed.
+///
+/// A member added here reaches the callers' final arm, which refuses with the
+/// general wording. A member that needs to tell the user something else takes an
+/// arm of its own, which is the failure worth having.
+/// </summary>
+public enum MutexAcquireOutcome
+{
+    /// <summary>The mutex was taken and the caller now owns it.</summary>
+    Acquired,
+
+    /// <summary>
+    /// The mutex was opened and a zero wait failed to take it, so another thread
+    /// holds it. The one outcome here that is a positive observation.
+    /// </summary>
+    HeldByAnother,
+
+    /// <summary>
+    /// The object exists and its security descriptor refused this process the
+    /// rights to open it, so ownership was never sampled. Distinct from
+    /// <see cref="NotAcquired"/> because the cause is a setting on the object
+    /// rather than a condition that arose while asking.
+    /// </summary>
+    AccessRefused,
+
+    /// <summary>
+    /// The acquire failed for some other non-fatal reason and nothing was shown
+    /// to be holding the mutex.
+    /// </summary>
+    NotAcquired,
 }
 
 /// <summary>

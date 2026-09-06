@@ -8,19 +8,20 @@ namespace InstallerClean.Tests.Services.Integration;
 /// test: the fake defines the contract it imitates, so the real probe has to be
 /// held to that contract independently. The mutex hold that stops a msiexec
 /// racing a delete batch rests entirely on
-/// <c>TryAcquire</c> setting <c>shownHeldByAnother</c> correctly, since
-/// DeleteFilesService and MoveFilesService refuse the whole batch and report
-/// InstallerBusy on exactly that flag.
+/// <c>TryAcquire</c> reporting the right <see cref="MutexAcquireOutcome"/>, since
+/// DeleteFilesService and MoveFilesService refuse the whole batch and choose which
+/// refusal the user is told about on exactly that value.
 ///
 /// A <c>Local\</c> name with a fresh GUID per test, never
 /// <c>Global\_MSIExecute</c>: the real object is machine-wide and taking it
 /// would serialise every installer on whichever machine ran the suite, which
 /// is the very cost the production comment warns about.
 ///
-/// The DACL-refused arm (returns null with shownHeldByAnother false, which both
-/// callers now refuse on) is not covered: reproducing it means creating a named
-/// object with a deny ACE, and a test that got that setup subtly wrong would
-/// pass for the wrong reason.
+/// The access-refused arm (returns null with
+/// <see cref="MutexAcquireOutcome.AccessRefused"/>, which both callers refuse on
+/// under a sentence of its own) is not covered: reproducing it means creating a
+/// named object with a deny ACE, and a test that got that setup subtly wrong
+/// would pass for the wrong reason.
 /// </summary>
 public class MutexProbeTests
 {
@@ -79,10 +80,10 @@ public class MutexProbeTests
     {
         var probe = new MutexProbe();
 
-        using var lease = probe.TryAcquire(_name, out var shownHeldByAnother);
+        using var lease = probe.TryAcquire(_name, out var outcome);
 
         Assert.NotNull(lease);
-        Assert.False(shownHeldByAnother);
+        Assert.Equal(MutexAcquireOutcome.Acquired, outcome);
     }
 
     [Fact]
@@ -92,17 +93,16 @@ public class MutexProbeTests
         {
             var probe = new MutexProbe();
 
-            var lease = probe.TryAcquire(_name, out var shownHeldByAnother);
+            var lease = probe.TryAcquire(_name, out var outcome);
 
-            // The pair that decides WHICH refusal the caller reports. Both
-            // answers stop the batch, so a null lease with the flag left false
+            // The value that decides WHICH refusal the caller reports. Every
+            // outcome here stops the batch, so a null lease under the wrong one
             // would not let anything through; what it would do is send a live
-            // installer transaction down the lock-unavailable path, where the
-            // user is told nothing was shown to be holding the lock and the
-            // pending-reboot banner that would have named the real cause is
-            // never painted.
+            // installer transaction down a path whose sentence names a different
+            // condition, and the pending-reboot banner that would have named the
+            // real cause is never painted.
             Assert.Null(lease);
-            Assert.True(shownHeldByAnother);
+            Assert.Equal(MutexAcquireOutcome.HeldByAnother, outcome);
         });
     }
 
@@ -117,10 +117,10 @@ public class MutexProbeTests
         Assert.NotNull(first);
         first.Dispose();
 
-        using var second = probe.TryAcquire(_name, out var shownHeldByAnother);
+        using var second = probe.TryAcquire(_name, out var outcome);
 
         Assert.NotNull(second);
-        Assert.False(shownHeldByAnother);
+        Assert.Equal(MutexAcquireOutcome.Acquired, outcome);
     }
 
     [Fact]
@@ -142,10 +142,10 @@ public class MutexProbeTests
         Assert.True(holder.Join(TimeSpan.FromSeconds(30)));
 
         var probe = new MutexProbe();
-        using var lease = probe.TryAcquire(_name, out var shownHeldByAnother);
+        using var lease = probe.TryAcquire(_name, out var outcome);
 
         Assert.NotNull(lease);
-        Assert.False(shownHeldByAnother);
+        Assert.Equal(MutexAcquireOutcome.Acquired, outcome);
     }
 
     [Fact]

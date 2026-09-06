@@ -16,9 +16,9 @@ namespace InstallerClean.Services;
 /// unrelated to its subject.
 ///
 /// So the fall-back is deliberately NOT what this stands for. A test that means
-/// to drive an acquire failure says so with <c>FakeMutexProbe</c>, whose three
-/// modes name the three outcomes; this one stands for "the mutex is not what
-/// this test is about".
+/// to drive an acquire failure says so with <c>FakeMutexProbe</c>, whose modes
+/// name the members of <see cref="MutexAcquireOutcome"/>; this one stands for
+/// "the mutex is not what this test is about".
 /// </remarks>
 internal sealed class NullMutexProbe : IMutexProbe
 {
@@ -26,9 +26,9 @@ internal sealed class NullMutexProbe : IMutexProbe
 
     public bool IsHeld(string name) => false;
 
-    public IMutexLease? TryAcquire(string name, out bool shownHeldByAnother)
+    public IMutexLease? TryAcquire(string name, out MutexAcquireOutcome outcome)
     {
-        shownHeldByAnother = false;
+        outcome = MutexAcquireOutcome.Acquired;
         return NullLease.Instance;
     }
 

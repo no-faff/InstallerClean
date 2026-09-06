@@ -68,13 +68,16 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // (Win32 owner-thread rule); the body is synchronous, so no await hops
             // threads between acquire and release.
             //
-            // Neither way of missing the hold proceeds, and the two are reported
-            // separately because the caller can account for only one of them. Held
+            // No way of missing the hold proceeds, and they are reported separately
+            // because the caller can account for only one of them and owes the user
+            // a different sentence for each. Held
             // by a live transaction => the pending-reboot gate the caller re-runs
             // meets the same mutex and paints its banner, which says an install is
-            // in progress, which it is. Refused with nothing shown to be holding it
-            // (a DACL on the object, or any other non-fatal failure) => that gate
-            // is no account of the condition at all, whichever way it answers.
+            // in progress, which it is. Refused because the object's security would
+            // not let us open it => the app was not allowed to look, and it says so
+            // in those words. Refused any other way with nothing shown to be holding
+            // it => that gate is no account of the condition at all, whichever way
+            // it answers.
             // IsHeld asks through a different call requesting different rights, so
             // it can come back clean, leaving a refusal with nothing on screen
             // explaining it; and on a DACL it returns held (its own catch says so),
@@ -108,16 +111,34 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // it. It predates the range that wrote this block. Whether it belongs
             // inside the hold is an open behaviour question and is not settled by
             // anything here.
-            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var shownHeldByAnother);
-            if (lease is null && shownHeldByAnother)
+            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var outcome);
+            if (lease is null && outcome == MutexAcquireOutcome.HeldByAnother)
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
+            if (lease is null && outcome == MutexAcquireOutcome.AccessRefused)
+            {
+                // The object is there and its security refused us the rights to
+                // open it, so ownership was never sampled. Reported apart from the
+                // arm below because the user is owed a different sentence: this one
+                // is a setting somebody can go and look at, and saying the lock was
+                // busy would name a cause nothing here established.
+                //
+                // Recorded as well as refused, on the same terms as the arm below.
+                Helpers.CrashLog.TryWrite(new InvalidOperationException(
+                    "Delete refused: access to the Windows Installer mutex was denied, so whether an installation was in progress could not be established."));
+                return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerLockAccessRefused: true);
+            }
             if (lease is null)
             {
-                // Recorded as well as refused. The refusal is what the user is
-                // told; the crash log is the only place the machine's own
-                // condition is written down, and an operator seeing this on every
-                // run is looking at a DACL on the object rather than at a passing
-                // race. Once per batch, so it costs nothing at any file count.
+                // Every other non-fatal way the acquire can fail, with nothing
+                // shown to be holding the object. Recorded as well as refused: the
+                // refusal is what the user is told, and the crash log is the only
+                // place the machine's own condition is written down. Once per
+                // batch, so it costs nothing at any file count.
+                //
+                // An outcome added to MutexAcquireOutcome later arrives here and
+                // is refused with this general wording, which is the safe
+                // direction. One that owes the user something else takes an arm of
+                // its own above, which is the failure worth having.
                 Helpers.CrashLog.TryWrite(new InvalidOperationException(
                     "Delete refused: the Windows Installer mutex could not be acquired and nothing could be shown to be holding it."));
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerLockUnavailable: true);

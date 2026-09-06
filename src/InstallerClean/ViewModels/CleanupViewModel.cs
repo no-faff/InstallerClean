@@ -998,6 +998,22 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return;
             }
 
+            if (result.InstallerLockAccessRefused)
+            {
+                // The object's security refused the service the rights to open it,
+                // so it never learned whether a transaction held it and refused
+                // without touching anything. Same handling as the arm above and a
+                // different sentence: the app was not allowed to look, which is not
+                // the same as finding the lock busy, and only one of those two is
+                // something an administrator can go and change.
+                _dialogService.ShowWarning(
+                    Strings.Error_MoveInstallerLockAccessRefused,
+                    Strings.Error_MoveInstallerLockUnavailableTitle);
+                OperationProgress = string.Empty;
+                if (createdDestination) await RemoveCreatedDestinationAsync(dest);
+                return;
+            }
+
             if (result.HeldBack.Count > 0)
             {
                 // The service's own re-read, taken under the installer mutex, took
@@ -1307,6 +1323,20 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // service's own acquire has the detail.
                 _dialogService.ShowWarning(
                     Strings.Error_InstallerLockUnavailable, Strings.Error_InstallerLockUnavailableTitle);
+                OperationProgress = string.Empty;
+                return;
+            }
+
+            if (result.InstallerLockAccessRefused)
+            {
+                // The object's security refused the service the rights to open it,
+                // so it never learned whether a transaction held it and refused
+                // without touching anything. Same handling as the arm above and a
+                // different sentence: the app was not allowed to look, which is not
+                // the same as finding the lock busy, and only one of those two is
+                // something an administrator can go and change.
+                _dialogService.ShowWarning(
+                    Strings.Error_InstallerLockAccessRefused, Strings.Error_InstallerLockUnavailableTitle);
                 OperationProgress = string.Empty;
                 return;
             }

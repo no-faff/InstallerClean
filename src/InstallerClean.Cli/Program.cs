@@ -662,6 +662,8 @@ internal static class Program
                 // shown to be holding it, so it refused and touched nothing.
                 if (result.InstallerLockUnavailable)
                     return EmitInstallerLockUnavailable(arg);
+                if (result.InstallerLockAccessRefused)
+                    return EmitInstallerLockAccessRefused(arg);
 
                 // THE RUN'S ONE HELD-BACK LINE, printed here because this is the
                 // last of the two producers to answer: the service takes the
@@ -824,6 +826,8 @@ internal static class Program
             // destination folder included.
             if (moveResult.InstallerLockUnavailable)
                 return EmitInstallerLockUnavailable(arg);
+            if (moveResult.InstallerLockAccessRefused)
+                return EmitInstallerLockAccessRefused(arg);
 
             // The run's one held-back line. See the /d branch for why the two
             // producers' tallies are added and printed here rather than one each,
@@ -1380,6 +1384,30 @@ internal static class Program
         string.Format(Strings.Cli_EventLogInstallerLockUnavailable, arg);
 
     /// <summary>
+    /// The stdout sentence for a run refused because the security on
+    /// <c>Global\_MSIExecute</c> would not let the app open it. Keyed off the flag
+    /// exactly as <see cref="InstallerLockUnavailableLine"/> is, and separate from
+    /// it because the two refusals are different facts about the machine: one says
+    /// nothing could be shown to hold the lock, this one says the app was not
+    /// allowed to look.
+    /// </summary>
+    internal static string InstallerLockAccessRefusedLine(string arg) =>
+        arg == "/m" ? Strings.Cli_MoveInstallerLockAccessRefused : Strings.Cli_InstallerLockAccessRefused;
+
+    /// <summary>
+    /// The Application-channel line for that refusal. ONE line covers both flags
+    /// and <c>{0}</c> names which one ran, on the same terms as
+    /// <see cref="InstallerLockUnavailableEventLogLine"/>: an ending naming a
+    /// single action is false of half the runs that can produce it.
+    /// </summary>
+    /// <remarks>
+    /// Built outside the en-GB scope, like its sibling: the caller wraps it, so the
+    /// line renders English in production and in the ambient culture anywhere else.
+    /// </remarks>
+    internal static string InstallerLockAccessRefusedEventLogLine(string arg) =>
+        string.Format(Strings.Cli_EventLogInstallerLockAccessRefused, arg);
+
+    /// <summary>
     /// Reports a <c>/d</c> or <c>/m</c> the action service refused for want of
     /// <c>Global\_MSIExecute</c>, and returns the exit code for it.
     /// </summary>
@@ -1403,6 +1431,33 @@ internal static class Program
         Console.WriteLine(InstallerLockUnavailableLine(arg));
         MachineContract.WriteEventLog(CliEventClass.TransientSkip,
             () => InstallerLockUnavailableEventLogLine(arg));
+        return ExitTransient;
+    }
+
+    /// <summary>
+    /// Reports a <c>/d</c> or <c>/m</c> the action service refused because the
+    /// security on <c>Global\_MSIExecute</c> would not let it open the object, and
+    /// returns the exit code for it.
+    /// </summary>
+    /// <remarks>
+    /// The SAME exit code and event class as
+    /// <see cref="EmitInstallerLockUnavailable"/>, and only the wording differs.
+    /// What the machine is told is that the run was skipped and a later one may
+    /// succeed, which is what both refusals have in common; what the operator is
+    /// told is which of the two happened, which is what they differ in. Neither
+    /// line tells the operator whether to retry: the app was refused the one
+    /// question that would have said, so it reports what happened and leaves that
+    /// judgement to whoever reads it.
+    ///
+    /// Its two lines are separately reachable and this method is not, on the same
+    /// terms as its sibling: the wording can be held by tests without one of them
+    /// writing to the Application channel.
+    /// </remarks>
+    private static int EmitInstallerLockAccessRefused(string arg)
+    {
+        Console.WriteLine(InstallerLockAccessRefusedLine(arg));
+        MachineContract.WriteEventLog(CliEventClass.TransientSkip,
+            () => InstallerLockAccessRefusedEventLogLine(arg));
         return ExitTransient;
     }
 

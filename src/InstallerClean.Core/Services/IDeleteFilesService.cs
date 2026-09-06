@@ -60,7 +60,7 @@ public interface IDeleteFilesService
 
 /// <summary>
 /// Outcome of a Delete. When <see cref="Cancelled"/>, <see cref="InstallerBusy"/>
-/// and <see cref="InstallerLockUnavailable"/> are all <c>false</c>,
+/// and the two installer-lock flags are all <c>false</c>,
 /// <see cref="DeletedCount"/> + <see cref="Errors"/>.Count + <see cref="HeldBack"/>.Count
 /// sum to the input count: every file was deleted, recorded as an error, or kept
 /// back by the under-lease re-read. <see cref="HeldBack"/> is in that sum rather
@@ -87,6 +87,16 @@ public interface IDeleteFilesService
 /// an object whose DACL refuses that call too it reports held, which would
 /// assert an install nothing has shown. This flag carries its own sentence
 /// instead.
+/// </param>
+/// <param name="InstallerLockAccessRefused">
+/// The batch was refused before it started because the security on
+/// <c>Global\_MSIExecute</c> refused this process the rights to open it, so
+/// whether a transaction held it was never sampled: nothing was touched, and the
+/// service returns at the same point as <see cref="InstallerLockUnavailable"/>.
+/// Kept apart from that flag because the two are different facts about the
+/// machine and the user is told them in different words. This one is a setting on
+/// the object rather than a condition that arose while asking, so a sentence
+/// telling the user something was holding the lock would be false of it.
 /// </param>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,
@@ -116,6 +126,7 @@ public record DeleteResult(
     bool Cancelled = false,
     bool InstallerBusy = false,
     bool InstallerLockUnavailable = false,
+    bool InstallerLockAccessRefused = false,
     IReadOnlyList<string>? HeldBack = null,
     HeldBackReasons HeldBackReasons = default)
 {

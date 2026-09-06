@@ -162,6 +162,7 @@ public static class Strings
     public static string Cli_EventLogDeleteSummary => Get("Cli.EventLogDeleteSummary");
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
     public static string Cli_EventLogHardError_NoLog => Get("Cli.EventLogHardError.NoLog");
+    public static string Cli_EventLogInstallerLockAccessRefused => Get("Cli.EventLogInstallerLockAccessRefused");
     public static string Cli_EventLogInstallerLockUnavailable => Get("Cli.EventLogInstallerLockUnavailable");
     public static string Cli_EventLogMissingFromDisk => Get("Cli.EventLogMissingFromDisk");
     public static string Cli_EventLogMoveAborted => Get("Cli.EventLogMoveAborted");
@@ -210,6 +211,7 @@ public static class Strings
     public static string Cli_Help_Summary => Get("Cli.Help.Summary");
     public static string Cli_Help_Usage => Get("Cli.Help.Usage");
     public static string Cli_Help_Version => Get("Cli.Help.Version");
+    public static string Cli_InstallerLockAccessRefused => Get("Cli.InstallerLockAccessRefused");
     public static string Cli_InstallerLockUnavailable => Get("Cli.InstallerLockUnavailable");
     public static string Cli_MissingFromDisk_Plural => Get("Cli.MissingFromDisk.Plural");
     public static string Cli_MissingFromDisk_Singular => Get("Cli.MissingFromDisk.Singular");
@@ -218,6 +220,7 @@ public static class Strings
     public static string Cli_MoveDestinationInSystemFolder => Get("Cli.MoveDestinationInSystemFolder");
     public static string Cli_MoveDestinationRelative => Get("Cli.MoveDestinationRelative");
     public static string Cli_MovedFiles => Get("Cli.MovedFiles");
+    public static string Cli_MoveInstallerLockAccessRefused => Get("Cli.MoveInstallerLockAccessRefused");
     public static string Cli_MoveInstallerLockUnavailable => Get("Cli.MoveInstallerLockUnavailable");
     public static string Cli_MoveNotEnoughSpace => Get("Cli.MoveNotEnoughSpace");
     public static string Cli_MoveRestoreHint => Get("Cli.MoveRestoreHint");
@@ -320,6 +323,7 @@ public static class Strings
     public static string Error_FileInUse_Singular => Get("Error.FileInUse.Singular");
     public static string Error_InstallerDbEmpty => Get("Error.InstallerDbEmpty");
     public static string Error_InstallerDbUnavailableTitle => Get("Error.InstallerDbUnavailableTitle");
+    public static string Error_InstallerLockAccessRefused => Get("Error.InstallerLockAccessRefused");
     public static string Error_InstallerLockUnavailable => Get("Error.InstallerLockUnavailable");
     public static string Error_InstallerLockUnavailableTitle => Get("Error.InstallerLockUnavailableTitle");
     public static string Error_InvalidDestinationTitle => Get("Error.InvalidDestinationTitle");
@@ -329,6 +333,7 @@ public static class Strings
     public static string Error_IOWriteDestination_NoLog => Get("Error.IOWriteDestination.NoLog");
     public static string Error_MissingSourceFile => Get("Error.MissingSourceFile");
     public static string Error_MoveFailedTitle => Get("Error.MoveFailedTitle");
+    public static string Error_MoveInstallerLockAccessRefused => Get("Error.MoveInstallerLockAccessRefused");
     public static string Error_MoveInstallerLockUnavailable => Get("Error.MoveInstallerLockUnavailable");
     public static string Error_MoveInstallerLockUnavailableTitle => Get("Error.MoveInstallerLockUnavailableTitle");
     public static string Error_MoveIntoInstaller => Get("Error.MoveIntoInstaller");

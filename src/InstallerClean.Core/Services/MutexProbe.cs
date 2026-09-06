@@ -61,9 +61,9 @@ internal sealed class MutexProbe : IMutexProbe
         }
     }
 
-    public IMutexLease? TryAcquire(string name, out bool shownHeldByAnother)
+    public IMutexLease? TryAcquire(string name, out MutexAcquireOutcome outcome)
     {
-        shownHeldByAnother = false;
+        outcome = MutexAcquireOutcome.NotAcquired;
 
         // Create-or-open: if _MSIExecute does not exist (no install running,
         // or the Installer service lingering with the object gone), we create
@@ -98,11 +98,18 @@ internal sealed class MutexProbe : IMutexProbe
         }
         catch (UnauthorizedAccessException)
         {
-            // The object exists but its DACL refuses us create/open rights. The
-            // probe reports and the callers decide, which is why this returns a
-            // null lease with shownHeldByAnother left false rather than choosing for
-            // them: nothing has been shown to hold the object, and that fact
-            // alone does not settle whether an act should run without the hold.
+            // The object exists but its DACL refuses us create/open rights, so
+            // ownership was never sampled. The probe reports and the callers
+            // decide, which is why this returns a null lease under its own
+            // outcome rather than choosing for them: nothing has been shown to
+            // hold the object, and that fact alone does not settle whether an act
+            // should run without the hold.
+            //
+            // It travels apart from NotAcquired because the two are different
+            // facts about the machine: this one is a setting on the object, which
+            // is a thing an administrator can go and look at, and the callers say
+            // so in their own words rather than telling the user the lock was
+            // busy.
             //
             // Both callers refuse on it. A file this app has moved out of the cache
             // is as absent from it as one this app has deleted, so an installer
@@ -111,6 +118,7 @@ internal sealed class MutexProbe : IMutexProbe
             // Each states its own reasoning at its own acquire; neither belongs
             // here, and this method still reports rather than decides, because the
             // answer it hands back is the same one either way.
+            outcome = MutexAcquireOutcome.AccessRefused;
             return null;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
@@ -137,11 +145,12 @@ internal sealed class MutexProbe : IMutexProbe
 
         if (!acquired)
         {
-            shownHeldByAnother = true;
+            outcome = MutexAcquireOutcome.HeldByAnother;
             mutex.Dispose();
             return null;
         }
 
+        outcome = MutexAcquireOutcome.Acquired;
         return new MutexLease(mutex);
     }
 

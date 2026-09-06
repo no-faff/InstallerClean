@@ -5,17 +5,17 @@ namespace InstallerClean.Tests.Helpers;
 /// <summary>
 /// Hand fake for <see cref="IMutexProbe"/> so the action services'
 /// <c>Global\_MSIExecute</c> hold can be driven without a real Windows named
-/// mutex. Simulates the three outcomes of
+/// mutex. Simulates the outcomes of
 /// <see cref="IMutexProbe.TryAcquire"/>, named for what the probe returns rather
 /// than for what a caller does with it: the mutex was acquired, it is held by
-/// another process, or the acquire was refused with nothing shown to be holding
-/// it (a DACL on the object, or any other non-fatal failure). Records how many
-/// times a lease was taken and released so a test can assert the lease is
-/// released exactly once.
+/// another process, the object's security refused the open, or the acquire failed
+/// some other way with nothing shown to be holding it. Records how many times a
+/// lease was taken and released so a test can assert the lease is released
+/// exactly once.
 /// </summary>
 internal sealed class FakeMutexProbe : IMutexProbe
 {
-    internal enum Mode { HeldByAnother, Acquire, RefusedNotHeld }
+    internal enum Mode { HeldByAnother, Acquire, AccessRefused, RefusedNotHeld }
 
     private readonly Mode _mode;
     public int Acquired { get; private set; }
@@ -49,18 +49,22 @@ internal sealed class FakeMutexProbe : IMutexProbe
 
     public bool IsHeld(string name) => _mode == Mode.HeldByAnother;
 
-    public IMutexLease? TryAcquire(string name, out bool shownHeldByAnother)
+    public IMutexLease? TryAcquire(string name, out MutexAcquireOutcome outcome)
     {
         AcquireAttempts++;
-        shownHeldByAnother = false;
         switch (_mode)
         {
             case Mode.HeldByAnother:
-                shownHeldByAnother = true;
+                outcome = MutexAcquireOutcome.HeldByAnother;
+                return null;
+            case Mode.AccessRefused:
+                outcome = MutexAcquireOutcome.AccessRefused;
                 return null;
             case Mode.RefusedNotHeld:
+                outcome = MutexAcquireOutcome.NotAcquired;
                 return null;
             default:
+                outcome = MutexAcquireOutcome.Acquired;
                 Acquired++;
                 AcquiredOnThread = Environment.CurrentManagedThreadId;
                 return new Lease(this);

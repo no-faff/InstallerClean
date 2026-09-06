@@ -68,7 +68,7 @@ public interface IMoveFilesService
 
 /// <summary>
 /// Outcome of a Move. When <see cref="Cancelled"/>, <see cref="InstallerBusy"/>
-/// and <see cref="InstallerLockUnavailable"/> are all <c>false</c>,
+/// and the two installer-lock flags are all <c>false</c>,
 /// <see cref="MovedCount"/> + <see cref="Errors"/>.Count + <see cref="HeldBack"/>.Count
 /// sum to the input count: every file is either moved, recorded as a failure, or
 /// kept back by the under-lease re-read (never silently dropped).
@@ -105,6 +105,16 @@ public interface IMoveFilesService
 /// assert an install nothing has shown. This flag carries its own sentence
 /// instead.
 /// </param>
+/// <param name="InstallerLockAccessRefused">
+/// The batch was refused before it started because the security on
+/// <c>Global\_MSIExecute</c> refused this process the rights to open it, so
+/// whether a transaction held it was never sampled: nothing was touched, and the
+/// service returns at the same point as <see cref="InstallerLockUnavailable"/>.
+/// Kept apart from that flag because the two are different facts about the
+/// machine and the user is told them in different words. This one is a setting on
+/// the object rather than a condition that arose while asking, so a sentence
+/// telling the user something was holding the lock would be false of it.
+/// </param>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,
 /// and therefore never touched. They are the same conditions the caller's pre-act
@@ -133,6 +143,7 @@ public record MoveResult(
     bool Cancelled = false,
     bool InstallerBusy = false,
     bool InstallerLockUnavailable = false,
+    bool InstallerLockAccessRefused = false,
     IReadOnlyList<string>? HeldBack = null,
     HeldBackReasons HeldBackReasons = default)
 {
