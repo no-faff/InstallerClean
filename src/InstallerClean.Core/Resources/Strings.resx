@@ -2180,11 +2180,12 @@ The crash log could not be written.</value></data>
        which is that the run did what it was asked and nothing in it failed.
        Anyone tightening it has to check it against the five again. -->
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: the run did what it was asked and nothing failed</value></data>
-  <!-- Two printed lines from one value; see Cli.Help.NoteLine1 for why the break
-       is inside the value. The destination causes are named because they are
-       what a scheduled /m actually hits (none given, relative, inside a system
-       folder, not enough room) and all four exit 1. -->
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)</value></data>
+  <!-- Ten returns carry this code and they are not one kind of thing: a refusal
+       is among them, and CliExitCode.Error says in its own capitals that a
+       refusal is not a failure and shares the code anyway. The line has to be
+       true of all ten, so it says what they share and names no cause. Anyone
+       tightening it has to check it against the ten again. -->
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   nothing processed: the run failed or was refused</value></data>
   <!-- A Ctrl+C part way through exits 2 with nothing failed at all, so this
        cannot say that some files failed. -->
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some processed, some not (a failure or a Ctrl+C part way)</value></data>
