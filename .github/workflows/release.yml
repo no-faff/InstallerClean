@@ -172,6 +172,15 @@ jobs:
       - name: Publish the slim GUI
         run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true --nologo -o publish/framework-dependent
 
+      # THE GUARDS ABOVE READ SOURCES AND THIS ONE READS WHAT WAS JUST BUILT, so
+      # it runs here rather than in the glob, which is why it is invoked by name.
+      # scripts/check-guard-wiring.mjs, which IS in the glob, fails when this
+      # line is gone. Before the signing rounds deliberately: a satellite missing
+      # from a bundle is a rebuild, and a rebuild after signing is two more
+      # approvals and a scan of hashes nothing has cleared.
+      - name: Check the built artefacts carry every language and ask for administrator
+        run: node scripts/verify-shipped-artefacts.mjs
+
       # THE FIRST SIGNING ROUND. The three exes go up under distinct names
       # because two of them are called InstallerClean.exe, and they come back
       # into the folders the compile step reads from.

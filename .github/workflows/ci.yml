@@ -242,6 +242,15 @@ jobs:
         if: success() || failure()
         run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/cli
 
+      # Here rather than with the other guards because it reads the three
+      # published files, which do not exist until the steps above have run. A
+      # satellite that never reaches an artefact leaves the source resx present
+      # and correct, so every guard that reads the tree passes and the window
+      # opens in English on a machine set to that language.
+      - name: Check the built artefacts carry every language and ask for administrator
+        if: success() || failure()
+        run: node scripts/verify-shipped-artefacts.mjs
+
       # The setup is the artefact CI could not build: ISCC is the only thing
       # that reads installer/*.iss, so a typo there, a message missing from one
       # of the four bundled community .isl files, or an #include that lost its
