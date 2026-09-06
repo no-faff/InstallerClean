@@ -20,6 +20,16 @@
 // a seventeenth language would be copied from. This is what puts the current
 // English into it.
 //
+// TWO STATES, AND THEY ARE NOT THE SAME JOB. A key whose English was reworded has a
+// MAP entry holding the superseded wording, and bringing it forward is a rewrite in
+// place. A key the neutral has GAINED has no entry at all, and nothing else puts one
+// there: flag-retranslation.mjs appends a new key to the satellite generators and
+// skips this file by the name test above, so the entry arrives here or it is typed
+// by hand.
+// Both are handled, and --list names them separately because a superseded entry is a
+// wording somebody may want to look at while an absent one takes the neutral's value
+// verbatim.
+//
 // THE KEYS THE TEMPLATE'S SELF-CHECK NAMES ARE NOT A SEPARATE BACKLOG. They are
 // the stale keys this script's sibling job flags, plus the ones whose English is
 // still being rewritten, with nothing left over. A key can be in the sibling's
@@ -35,7 +45,10 @@
 //
 // Usage (from the repo root):
 //   node scripts/refresh-template-english.mjs <Key.Name> [<Key.Name> ...]
-//   node scripts/refresh-template-english.mjs --list     what differs, change nothing
+//       each named key's MAP value set to the current English, and an entry
+//       appended for a key the MAP does not hold yet
+//   node scripts/refresh-template-english.mjs --list
+//       what is not at the current English, changing nothing
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const NEUTRAL = 'src/InstallerClean.Core/Resources/Strings.resx';
@@ -75,40 +88,103 @@ if (rawCount === 0 || neutral.size !== rawCount) {
 let text = readFileSync(TEMPLATE, 'utf8');
 const entryRe = (k) => new RegExp("('" + reEsc(k) + "':\\s*`)((?:\\\\.|[^`\\\\])*)(`)");
 
-const differing = [];
-for (const [k, english] of neutral) {
+// The machine-contract keys, which must never gain a MAP entry. The template strips
+// the Cli.EventLog* set bar Cli.EventLogUnavailable out of its output, those being
+// Application-channel lines an RMM tool greps for fixed English phrases, so an entry
+// for one has nothing left to apply to: the template reports a value not applied and
+// stops at TEMPLATE HAS ISSUES. The same test is spelled again here so that answer
+// comes before anything is written rather than after.
+const isMachineCliKey = (k) =>
+  k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
+
+// Every neutral key the template is required to carry, and the two ways it can be
+// behind on one. A key lands in at most one list, so the figures the listing prints
+// partition the population it read.
+const required = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
+const superseded = [];
+const absent = [];
+for (const k of required) {
   const m = text.match(entryRe(k));
-  if (m && m[2] !== esc(english)) differing.push(k);
+  if (m === null) absent.push(k);
+  else if (m[2] !== esc(neutral.get(k))) superseded.push(k);
 }
+
+// The MAP's close, found as flag-retranslation.mjs finds a generator's: the first
+// line-leading "};" after the object opens, values being single-line so no earlier
+// one occurs inside it.
+const MARKER = 'const MAP = {';
+const mapClose = (s) => {
+  const open = s.indexOf(MARKER);
+  if (open < 0) return -1;
+  const rel = s.slice(open).search(/\n};/);
+  return rel < 0 ? -1 : open + rel;
+};
 
 const args = process.argv.slice(2);
 if (args.includes('--list') || args.length === 0) {
-  for (const k of differing) console.log(`  ${k}`);
-  console.log(`TOTALS: ${neutral.size} neutral key(s); ${differing.length} template entr(ies) differ from the current English; ${neutral.size - differing.length} match.`);
+  // Labelled, because the two want different things done about them and an
+  // unlabelled list of names would read as one backlog.
+  for (const k of superseded) console.log(`  superseded  ${k}`);
+  for (const k of absent) console.log(`  no entry    ${k}`);
+  console.log(`TOTALS: ${required.length} translatable neutral key(s); `
+    + `${superseded.length} template entr(ies) hold English the neutral has replaced; `
+    + `${absent.length} key(s) have no MAP entry; `
+    + `${required.length - superseded.length - absent.length} are at the current English.`);
   if (args.length === 0) console.error('\nUsage: node scripts/refresh-template-english.mjs <Key.Name> [...] , or --list');
   process.exit(args.length === 0 ? 2 : 0);
 }
 
 const unknown = args.filter((k) => !neutral.has(k));
-const absent = args.filter((k) => neutral.has(k) && !entryRe(k).test(text));
-if (unknown.length || absent.length) {
+const machine = args.filter((k) => neutral.has(k) && isMachineCliKey(k));
+if (unknown.length || machine.length) {
   if (unknown.length) console.error(`Not in the neutral resx (typo?): ${unknown.join(', ')}`);
-  if (absent.length) console.error(`No MAP entry in the template: ${absent.join(', ')}`);
+  if (machine.length) {
+    console.error(`Machine-contract key(s): ${machine.join(', ')}`);
+    console.error('The template strips those out of its output, so an entry for one would have');
+    console.error('nothing to apply to and the template would stop at TEMPLATE HAS ISSUES.');
+  }
   process.exit(2);
 }
 
-const changed = [], already = [];
+// A key with no entry needs one appended, so the place to put it is resolved before
+// anything is written: a file whose MAP cannot be found the end of is refused whole
+// rather than half-rewritten.
+if (args.some((k) => !entryRe(k).test(text)) && mapClose(text) < 0) {
+  console.error(`No "${MARKER}" with a line-leading "};" after it in ${TEMPLATE}.`);
+  console.error('At least one key needs a new entry and there is nowhere to put one, so nothing');
+  console.error('has been written.');
+  process.exit(2);
+}
+
+const rewritten = [], added = [], already = [];
 for (const k of args) {
   const english = esc(neutral.get(k));
+  if (!entryRe(k).test(text)) {
+    // The close is resolved again for each one, the previous append having moved it.
+    const at = mapClose(text);
+    text = text.slice(0, at) + `\n  '${k}': \`${english}\`,` + text.slice(at);
+    added.push(k);
+    continue;
+  }
   const before = text;
   text = text.replace(entryRe(k), (_m, p1, _body, p3) => p1 + english + p3);
-  (text === before ? already : changed).push(k);
+  (text === before ? already : rewritten).push(k);
 }
 writeFileSync(TEMPLATE, text, 'utf8');
 
-if (changed.length) console.log('Brought back to the current English:');
-for (const k of changed) console.log(`  ${k}`);
+// PARTITIONED, one heading per kind present, because no sentence is true of both: a
+// rewrite replaces a wording that was there, and an append puts a key into a file
+// that did not carry it.
+if (rewritten.length) console.log('Brought back to the current English:');
+for (const k of rewritten) console.log(`  ${k}`);
+if (added.length) console.log('Appended to the MAP, holding the current English:');
+for (const k of added) console.log(`  ${k}`);
 for (const k of already) console.log(`  (already current) ${k}`);
 // The totals line prints always, beside the list and never instead of it: a
-// silent zero over an empty set reads exactly like a clean result.
-console.log(`TOTALS: ${args.length} key(s) asked for, ${changed.length} rewritten, ${already.length} already current; ${differing.length - changed.length} template entr(ies) still differ from the neutral and are held for the app-string batch.`);
+// silent zero over an empty set reads exactly like a clean result. The last two
+// figures are what the template still holds against the neutral, so they answer for
+// the whole file rather than for the keys this run was given.
+console.log(`TOTALS: ${args.length} key(s) asked for, ${rewritten.length} rewritten, `
+  + `${added.length} appended, ${already.length} already current; `
+  + `${superseded.length - rewritten.length} entr(ies) elsewhere hold English the neutral `
+  + `has replaced and ${absent.length - added.length} key(s) elsewhere have no MAP entry.`);

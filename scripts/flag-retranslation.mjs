@@ -53,7 +53,9 @@
 // check-resx-parity.mjs. Nothing here keeps a list of what a run flagged, so that
 // is a note to keep yourself. A plural override is not a neutral key and no
 // self-check compares one, so check-still-english.mjs is what says whether the
-// overrides are done.
+// overrides are done. The template is not one of the files this rewrites, and every
+// run prints where it stands on the keys it was given: refresh-template-english.mjs
+// is what brings that one forward.
 import { readFileSync, writeFileSync, readdirSync, copyFileSync, mkdtempSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -156,6 +158,12 @@ const esc = (v) => v
   .replace(/\r/g, '\\r')
   .replace(/\n/g, '\\n');
 
+// EVERY SATELLITE GENERATOR, AND THE TEMPLATE IS NOT ONE OF THEM.
+// gen-strings-template.mjs holds the English a new language is copied from rather
+// than a translation of it, so setting a value there back to the neutral is not a
+// flag: it is that file being current. It still moves when the neutral moves, and
+// refresh-template-english.mjs is what moves it, which every run of this prints at
+// the end.
 const files = readdirSync(GENDIR)
   .filter((f) => /^gen-strings-.+\.mjs$/.test(f) && f !== 'gen-strings-template.mjs')
   .sort();
@@ -259,6 +267,45 @@ const report = () => {
   }
 };
 
+// --- WHERE THE TEMPLATE STANDS, WHICH THIS RUN LEAVES EXACTLY AS IT FOUND IT. Read
+// and never written: the English source is brought forward by
+// refresh-template-english.mjs, for the reason given at the file list above. It has
+// to be brought forward, because the template is what a new language is copied from,
+// so a run that said nothing about it would leave the previous wording in the file
+// that language starts from.
+//
+// IT ANSWERS FOR THE KEYS OF THIS RUN AND FOR NOTHING ELSE. Where the template
+// stands across the rest of the neutral is its own self-check's answer, and this
+// prints nothing about it.
+const TEMPLATE = `${GENDIR}/gen-strings-template.mjs`;
+const templateReport = () => {
+  let tmpl;
+  try {
+    tmpl = readFileSync(TEMPLATE, 'utf8');
+  } catch {
+    console.log(`\nTHE TEMPLATE: ${TEMPLATE} could not be read, so where it stands is unreported.`);
+    return;
+  }
+  const rows = keys.map((key) => {
+    const m = new RegExp("('" + reEsc(key) + "':\\s*`)((?:\\\\.|[^`\\\\])*)(`)").exec(tmpl);
+    if (m === null) return { key, state: 'no entry', held: null };
+    return { key, state: m[2] === esc(neutralValue(key)) ? 'current' : 'superseded', held: m[2] };
+  });
+  console.log('\nTHE TEMPLATE, which this run does not touch. A new language is copied from it:');
+  for (const r of rows)
+    console.log(`  ${r.state.padEnd(12)}${r.key}${r.state === 'superseded' ? `  ${r.held}` : ''}`);
+  // A key with no entry there is one the template never gained rather than one that
+  // has gone stale, and the same command answers for both.
+  const behind = rows.filter((r) => r.state !== 'current');
+  if (behind.length === 0) {
+    console.log('  Every key above already holds the current English there.');
+    return;
+  }
+  console.log(`  ${behind.length} of ${keys.length} key(s) above are not at the current English there.`);
+  console.log('  Bring them forward with:');
+  console.log(`    node scripts/refresh-template-english.mjs ${behind.map((r) => r.key).join(' ')}`);
+};
+
 const totalReset = plans.reduce((n, p) => n + p.changes.filter((c) => c.kind === 'reset').length, 0);
 const totalAdded = plans.reduce((n, p) => n + p.changes.filter((c) => c.kind === 'add').length, 0);
 const totalOverrides = plans.reduce((n, p) => n + p.changes.filter((c) => c.kind === 'override').length, 0);
@@ -290,6 +337,7 @@ if (!APPLY) {
     closing.push(`The ${totalAdded} line(s) reading "no entry yet" are generators that have no entry`
       + '\nfor that key, so those need a FIRST translation rather than a second.');
   for (const c of closing) console.log(`\n${c}`);
+  templateReport();
   console.log('\nIf that is what you want: run it again with --apply.');
   process.exit(0);
 }
@@ -419,3 +467,4 @@ console.log('\nNext: this run keeps no list of what it flagged, so note the key(
 console.log('yourself, then translate each in the gen MAPs and regenerate.');
 console.log('Any plural override listed above needs translating too, and has no neutral key of');
 console.log('its own to appear under: log it by language as well as by key.');
+templateReport();
