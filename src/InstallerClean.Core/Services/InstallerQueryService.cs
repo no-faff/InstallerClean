@@ -1223,7 +1223,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 paths.NormalisationRefusedAtPrefixStrip,
                 paths.NormalisationRefusedAtFullPath,
                 paths.NormalisationRefusedAtEmbeddedNull,
-                paths.FlaggedSpellings));
+                paths.FlaggedSpellings,
+                fallback.Failures));
         }
         finally
         {

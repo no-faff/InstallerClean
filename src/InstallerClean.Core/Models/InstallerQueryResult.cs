@@ -483,7 +483,21 @@ public readonly record struct EnumerationCensus(
     int PathNormalisationRefusedAtPrefixStripCount = 0,
     int PathNormalisationRefusedAtFullPathCount = 0,
     int PathNormalisationRefusedAtEmbeddedNullCount = 0,
-    int PathFlaggedSpellingCount = 0)
+    int PathFlaggedSpellingCount = 0,
+    // The registry side's own tally of key reads that threw, appended rather
+    // than filed beside the products it is about: every member here is a
+    // positional int, so one inserted among them re-points every argument after
+    // it with nothing in the build to say so, and appending is the arrangement
+    // that cannot do that.
+    //
+    // It counts a different thing from UnreadableProducts, which is what the
+    // enumeration said about ITSELF: rows it returned that could not be read,
+    // and products whose records came back short inside the loop. This one is
+    // the fallback failing to read a key at all. The refusal that weighs both
+    // needs each to be above zero, so a machine whose enumeration answers
+    // cleanly while the registry side fails reads leaves that refusal unarmed,
+    // and the count is the only record that the reads failed.
+    int RegistryKeyReadFailures = 0)
 {
     /// <summary>
     /// Every recorded value this scan could not turn into a path, whatever refused
