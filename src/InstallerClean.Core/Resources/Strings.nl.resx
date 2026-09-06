@@ -1270,7 +1270,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Kon niet naar de bestemming schrijven</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Kon die back-upmap niet gebruiken</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Verplaatsen mislukt</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Verwijderen mislukt</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its

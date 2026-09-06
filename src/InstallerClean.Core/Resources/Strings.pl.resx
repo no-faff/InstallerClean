@@ -1270,7 +1270,7 @@ InstallerClean działał już jako administrator, więc ponowne uruchomienie go 
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Nie udało się zapisać w folderze docelowym</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Nie udało się użyć tego folderu kopii zapasowej</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Przenoszenie nie powiodło się</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Usuwanie nie powiodło się</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its

@@ -268,7 +268,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer ha impedito a InstallerClean di elencare ciò che è installato. InstallerClean era già in esecuzione come amministratore, quindi eseguirlo di nuovo come amministratore non cambia nulla. Senza quell'elenco non c'è modo sicuro di sapere quali file nella cache servono ancora, quindi InstallerClean si è fermato. Non è stato rimosso nulla.`,
   'Error.MsiNonSuccess': `Windows Installer non è riuscito a fornire a InstallerClean un elenco leggibile dei programmi installati: ha letto {2} {3}, poi {0} voci di seguito sono tornate illeggibili (ultimo codice di errore {1}). Invece di lavorare su un elenco letto solo in parte, InstallerClean si è fermato. Non è stato rimosso nulla.`,
   'Error.InvalidDestinationTitle': `Destinazione non valida`,
-  'Error.DestinationWriteFailedTitle': `Impossibile scrivere nella destinazione`,
+  'Error.DestinationWriteFailedTitle': `Impossibile usare quella cartella di backup`,
   'Error.MoveFailedTitle': `Spostamento non riuscito`,
   'Error.DeleteFailedTitle': `Eliminazione non riuscita`,
   'Error.SettingNotSavedTitle': `Impostazione non salvata`,

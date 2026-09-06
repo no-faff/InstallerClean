@@ -328,7 +328,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer не дозволив InstallerClean перелічити встановлене. InstallerClean уже працював від імені адміністратора, тож запуск від імені адміністратора ще раз нічого не змінить. Без цього списку немає безпечного способу визначити, які кешовані файли ще потрібні, тож InstallerClean зупинився. Нічого не було видалено.`,
   'Error.MsiNonSuccess': `Windows Installer не зміг надати InstallerClean читабельний список встановлених програм: він прочитав {2} {3}, а потім {0} записів поспіль повернулися нечитабельними (останній код помилки {1}). Замість того щоб працювати зі списком, прочитаним лише частково, InstallerClean зупинився. Нічого не було видалено.`,
   'Error.InvalidDestinationTitle': `Недійсне призначення`,
-  'Error.DestinationWriteFailedTitle': `Не вдалося записати в призначення`,
+  'Error.DestinationWriteFailedTitle': `Не вдалося використати цю папку резервних копій`,
   'Error.MoveFailedTitle': `Не вдалося перемістити`,
   'Error.DeleteFailedTitle': `Не вдалося видалити`,
   'Error.SettingNotSavedTitle': `Налаштування не збережено`,

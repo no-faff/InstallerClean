@@ -330,7 +330,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer a refusé de laisser InstallerClean lister ce qui est installé. InstallerClean s'exécutait déjà en tant qu'administrateur, le relancer en tant qu'administrateur n'y changera rien. Sans cette liste, il n'y a aucun moyen sûr de savoir quels fichiers en cache servent encore, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
   'Error.MsiNonSuccess': `Windows Installer n'a pas pu fournir à InstallerClean une liste lisible des programmes installés : il a lu {2} {3}, puis {0} entrées d'affilée sont revenues illisibles (dernier code d'erreur {1}). Plutôt que de travailler sur une liste lue en partie, InstallerClean s'est arrêté. Rien n'a été supprimé.`,
   'Error.InvalidDestinationTitle': `Destination invalide`,
-  'Error.DestinationWriteFailedTitle': `Impossible d'écrire dans la destination`,
+  'Error.DestinationWriteFailedTitle': `Impossible d'utiliser ce dossier de sauvegarde`,
   'Error.MoveFailedTitle': `Échec du déplacement`,
   'Error.DeleteFailedTitle': `Échec de la suppression`,
   'Error.SettingNotSavedTitle': `Paramètre non enregistré`,

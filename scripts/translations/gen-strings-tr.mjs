@@ -250,7 +250,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer, InstallerClean'in yüklü olanları listelemesine izin vermedi. InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden yönetici olarak çalıştırmak bir şey değiştirmez. Bu liste olmadan önbellekteki hangi dosyaların hâlâ gerekli olduğunu güvenle söylemenin yolu yok, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.`,
   'Error.MsiNonSuccess': `Windows Installer, InstallerClean'e yüklü programların okunabilir bir listesini veremedi: {2} {3} okudu, sonra arka arkaya {0} kayıt okunamaz döndü (son hata kodu {1}). InstallerClean, yalnızca kısmen okunmuş bir listeyle çalışmak yerine durdu. Hiçbir şey kaldırılmadı.`,
   'Error.InvalidDestinationTitle': `Geçersiz hedef`,
-  'Error.DestinationWriteFailedTitle': `Hedefe yazılamadı`,
+  'Error.DestinationWriteFailedTitle': `Bu yedek klasörü kullanılamadı`,
   'Error.MoveFailedTitle': `Taşıma başarısız`,
   'Error.DeleteFailedTitle': `Silme başarısız`,
   'Error.SettingNotSavedTitle': `Ayar kaydedilmedi`,

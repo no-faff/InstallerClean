@@ -249,7 +249,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer 不允许 InstallerClean 列出已安装的内容。InstallerClean 本来就以管理员身份运行，所以再以管理员身份运行一次也不会有任何改变。没有这份清单，就无法安全地判断哪些缓存文件仍然需要，因此 InstallerClean 停了下来。没有删除任何内容。`,
   'Error.MsiNonSuccess': `Windows Installer 无法向 InstallerClean 提供一份可读的已安装程序清单：它读取了 {2} {3}，随后连续 {0} 个条目返回时无法读取（最后的错误代码为 {1}）。InstallerClean 没有基于只读到一半的清单继续，而是停了下来。没有删除任何内容。`,
   'Error.InvalidDestinationTitle': `目标无效`,
-  'Error.DestinationWriteFailedTitle': `无法写入目标`,
+  'Error.DestinationWriteFailedTitle': `无法使用该备份文件夹`,
   'Error.MoveFailedTitle': `移动失败`,
   'Error.DeleteFailedTitle': `删除失败`,
   'Error.SettingNotSavedTitle': `设置未保存`,

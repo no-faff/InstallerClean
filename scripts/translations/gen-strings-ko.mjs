@@ -300,7 +300,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer가 InstallerClean에게 설치된 항목의 목록 표시를 허용하지 않았습니다. InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 관리자 권한으로 다시 실행해도 달라지는 것이 없습니다. 그 목록이 없으면 캐시된 파일 중 어느 것이 아직 필요한지 안전하게 알아낼 방법이 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiNonSuccess': `Windows Installer가 InstallerClean에게 읽을 수 있는 설치된 프로그램 목록을 주지 못했습니다. {2} {3}을(를) 읽은 다음 {0}개 항목이 연속으로 읽을 수 없는 상태로 돌아왔습니다(마지막 오류 코드 {1}). 일부만 읽은 목록으로 작업하는 대신 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.InvalidDestinationTitle': `잘못된 대상`,
-  'Error.DestinationWriteFailedTitle': `대상에 쓸 수 없음`,
+  'Error.DestinationWriteFailedTitle': `해당 백업 폴더를 사용할 수 없음`,
   'Error.MoveFailedTitle': `이동 실패`,
   'Error.DeleteFailedTitle': `삭제 실패`,
   'Error.SettingNotSavedTitle': `설정 저장 실패`,

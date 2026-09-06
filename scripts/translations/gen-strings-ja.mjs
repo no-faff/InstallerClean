@@ -260,7 +260,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer が InstallerClean にインストール済みの一覧表示を許可しませんでした。InstallerClean はすでに管理者として実行されていたため、管理者として実行し直しても何も変わりません。この一覧がなければ、キャッシュされたどのファイルがまだ必要なのかを安全に判断する方法はないため、InstallerClean は中止しました。何も削除していません。`,
   'Error.MsiNonSuccess': `Windows Installer は InstallerClean に、読み取り可能なインストール済みプログラムの一覧を渡せませんでした。{2} {3} を読み取ったのち、{0} 件の項目が連続して読み取り不能で返されました (最後のエラーコード{1})。一部しか読めていない一覧を使うのではなく、InstallerClean は中止しました。何も削除していません。`,
   'Error.InvalidDestinationTitle': `無効な移動先`,
-  'Error.DestinationWriteFailedTitle': `移動先に書き込めませんでした`,
+  'Error.DestinationWriteFailedTitle': `そのバックアップフォルダーは使えませんでした`,
   'Error.MoveFailedTitle': `移動に失敗しました`,
   'Error.DeleteFailedTitle': `削除に失敗しました`,
   'Error.SettingNotSavedTitle': `設定の保存に失敗しました`,

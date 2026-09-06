@@ -1270,7 +1270,7 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Tidak bisa menulis ke tujuan</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Tidak bisa memakai folder cadangan itu</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Pemindahan gagal</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Penghapusan gagal</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its

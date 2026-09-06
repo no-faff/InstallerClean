@@ -339,7 +339,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer nie pozwolił InstallerClean wypisać tego, co jest zainstalowane. InstallerClean działał już jako administrator, więc uruchomienie go ponownie jako administrator niczego nie zmieni. Bez tej listy nie da się bezpiecznie stwierdzić, które pliki w pamięci podręcznej są nadal potrzebne, więc InstallerClean się zatrzymał. Nic nie zostało usunięte.`,
   'Error.MsiNonSuccess': `Windows Installer nie zdołał przekazać InstallerClean czytelnej listy zainstalowanych programów: odczytał {2} {3}, a potem {0} wpisów z rzędu wróciło nieczytelnych (ostatni kod błędu {1}). Zamiast pracować na liście odczytanej tylko częściowo, InstallerClean się zatrzymał. Nic nie zostało usunięte.`,
   'Error.InvalidDestinationTitle': `Nieprawidłowy folder docelowy`,
-  'Error.DestinationWriteFailedTitle': `Nie udało się zapisać w folderze docelowym`,
+  'Error.DestinationWriteFailedTitle': `Nie udało się użyć tego folderu kopii zapasowej`,
   'Error.MoveFailedTitle': `Przenoszenie nie powiodło się`,
   'Error.DeleteFailedTitle': `Usuwanie nie powiodło się`,
   'Error.SettingNotSavedTitle': `Ustawienie nie zostało zapisane`,

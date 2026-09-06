@@ -322,7 +322,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer tidak mengizinkan InstallerClean menampilkan daftar apa saja yang terpasang. InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi sebagai administrator tidak akan mengubah apa pun. Tanpa daftar itu tidak ada cara yang aman untuk mengetahui file cache mana yang masih diperlukan, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiNonSuccess': `Windows Installer tidak bisa memberi InstallerClean daftar program terpasang yang terbaca: InstallerClean membaca {2} {3}, lalu {0} entri berturut-turut kembali tidak terbaca (kode kesalahan terakhir {1}). Alih-alih bekerja dengan daftar yang hanya terbaca sebagian, InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.InvalidDestinationTitle': `Tujuan tidak valid`,
-  'Error.DestinationWriteFailedTitle': `Tidak bisa menulis ke tujuan`,
+  'Error.DestinationWriteFailedTitle': `Tidak bisa memakai folder cadangan itu`,
   'Error.MoveFailedTitle': `Pemindahan gagal`,
   'Error.DeleteFailedTitle': `Penghapusan gagal`,
   'Error.SettingNotSavedTitle': `Pengaturan tidak tersimpan`,

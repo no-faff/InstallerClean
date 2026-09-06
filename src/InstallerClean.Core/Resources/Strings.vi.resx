@@ -1270,7 +1270,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Không thể ghi vào đích</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Không thể dùng thư mục sao lưu đó</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Chuyển thất bại</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Xóa thất bại</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its

@@ -306,7 +306,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer không cho phép InstallerClean liệt kê những gì đã được cài. InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại với quyền quản trị viên cũng không thay đổi được gì. Không có danh sách đó thì không có cách nào an toàn để biết tệp nào trong bộ nhớ đệm vẫn còn cần, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiNonSuccess': `Windows Installer không thể đưa cho InstallerClean một danh sách chương trình đã cài đọc được: nó đã đọc {2} {3}, rồi {0} mục liên tiếp trả về không đọc được (mã lỗi cuối {1}). Thay vì làm việc với một danh sách chỉ đọc được một phần, InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.InvalidDestinationTitle': `Đích không hợp lệ`,
-  'Error.DestinationWriteFailedTitle': `Không thể ghi vào đích`,
+  'Error.DestinationWriteFailedTitle': `Không thể dùng thư mục sao lưu đó`,
   'Error.MoveFailedTitle': `Chuyển thất bại`,
   'Error.DeleteFailedTitle': `Xóa thất bại`,
   'Error.SettingNotSavedTitle': `Không lưu được cài đặt`,

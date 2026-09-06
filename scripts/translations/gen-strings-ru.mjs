@@ -301,7 +301,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer не позволил InstallerClean перечислить установленное. InstallerClean уже был запущен от имени администратора, поэтому повторный запуск от имени администратора ничего не изменит. Без этого списка невозможно безопасно определить, какие кэшированные файлы ещё нужны, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiNonSuccess': `Windows Installer не смог предоставить InstallerClean читаемый список установленных программ: он прочитал {2} {3}, а затем {0} записей подряд вернулись нечитаемыми (последний код ошибки {1}). Вместо того чтобы работать с прочитанным лишь частично списком, InstallerClean остановился. Ничего не было удалено.`,
   'Error.InvalidDestinationTitle': `Недопустимая папка назначения`,
-  'Error.DestinationWriteFailedTitle': `Не удалось записать в папку назначения`,
+  'Error.DestinationWriteFailedTitle': `Не удалось использовать эту папку резервных копий`,
   'Error.MoveFailedTitle': `Сбой перемещения`,
   'Error.DeleteFailedTitle': `Сбой удаления`,
   'Error.SettingNotSavedTitle': `Настройка не сохранена`,

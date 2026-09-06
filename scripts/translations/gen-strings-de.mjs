@@ -323,7 +323,7 @@ const MAP = {
   'Error.MsiAccessDenied': `Windows Installer hat es InstallerClean verweigert, die installierte Software aufzulisten. InstallerClean lief bereits als Administrator, es erneut als Administrator auszuführen ändert also nichts. Ohne diese Liste lässt sich nicht sicher sagen, welche zwischengespeicherten Dateien noch gebraucht werden, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiNonSuccess': `Windows Installer konnte InstallerClean keine lesbare Liste der installierten Programme geben: Es hat {2} {3} gelesen, dann kamen {0} Einträge in Folge unlesbar zurück (letzter Fehlercode {1}). Statt mit einer nur teilweise gelesenen Liste zu arbeiten, hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.InvalidDestinationTitle': `Ungültiges Ziel`,
-  'Error.DestinationWriteFailedTitle': `Schreiben am Ziel nicht möglich`,
+  'Error.DestinationWriteFailedTitle': `Sicherungsordner nicht verwendbar`,
   'Error.MoveFailedTitle': `Verschieben fehlgeschlagen`,
   'Error.DeleteFailedTitle': `Löschen fehlgeschlagen`,
   'Error.SettingNotSavedTitle': `Einstellung nicht gespeichert`,

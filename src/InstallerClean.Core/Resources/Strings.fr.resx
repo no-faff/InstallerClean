@@ -1270,7 +1270,7 @@ InstallerClean s'exécutait déjà en tant qu'administrateur, le relancer ainsi 
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Impossible d'écrire dans la destination</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Impossible d'utiliser ce dossier de sauvegarde</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Échec du déplacement</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Échec de la suppression</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its

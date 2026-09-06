@@ -307,7 +307,7 @@ const MAP = {
   'Error.MsiAccessDenied': `O Windows Installer não deixou o InstallerClean listar o que está instalado. O InstallerClean já estava em execução como administrador, então executá-lo de novo como administrador não muda nada. Sem essa lista não há como saber com segurança quais arquivos em cache ainda são necessários, então o InstallerClean parou. Nada foi removido.`,
   'Error.MsiNonSuccess': `O Windows Installer não conseguiu dar ao InstallerClean uma lista legível dos programas instalados: ele leu {2} {3} e depois {0} entradas seguidas voltaram ilegíveis (último código de erro {1}). Em vez de trabalhar com uma lista lida pela metade, o InstallerClean parou. Nada foi removido.`,
   'Error.InvalidDestinationTitle': `Destino inválido`,
-  'Error.DestinationWriteFailedTitle': `Não foi possível gravar no destino`,
+  'Error.DestinationWriteFailedTitle': `Não foi possível usar essa pasta de backup`,
   'Error.MoveFailedTitle': `Falha na movimentação`,
   'Error.DeleteFailedTitle': `Falha na exclusão`,
   'Error.SettingNotSavedTitle': `Configuração não salva`,

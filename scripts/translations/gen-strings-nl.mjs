@@ -321,7 +321,7 @@ const MAP = {
   'Error.ScanCorrelationFailed': `InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. Bijna niets waarnaar de records verwijzen staat daar werkelijk, en bijna niets van wat daar staat wordt door een record genoemd, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.`,
   'Error.ScanRecordsUnreadable': `InstallerClean kon niet genoeg van de Windows Installer-records lezen om zeker te weten wat er nog nodig is: de lijst met geïnstalleerde programma's kwam onvolledig terug, en dezelfde records rechtstreeks uit het register lezen leverde ook fouten op. Een bestand kon er verweesd uitzien enkel doordat het record dat het benoemt een van de onleesbare was, dus InstallerClean is gestopt. Er is niets verwijderd.`,
   'Error.InvalidDestinationTitle': `Ongeldige bestemming`,
-  'Error.DestinationWriteFailedTitle': `Kon niet naar de bestemming schrijven`,
+  'Error.DestinationWriteFailedTitle': `Kon die back-upmap niet gebruiken`,
   'Error.MoveFailedTitle': `Verplaatsen mislukt`,
   'Error.DeleteFailedTitle': `Verwijderen mislukt`,
   'Error.SettingNotSavedTitle': `Instelling niet opgeslagen`,

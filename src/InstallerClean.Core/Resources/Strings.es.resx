@@ -1270,7 +1270,7 @@ InstallerClean ya se estaba ejecutando como administrador, así que volver a ini
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>No se pudo escribir en el destino</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>No se pudo usar esa carpeta de copia de seguridad</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Movimiento fallido</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Eliminación fallida</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its

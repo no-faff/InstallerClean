@@ -1270,7 +1270,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>대상에 쓸 수 없음</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>해당 백업 폴더를 사용할 수 없음</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>이동 실패</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>삭제 실패</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its

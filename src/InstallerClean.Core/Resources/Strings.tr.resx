@@ -1270,7 +1270,7 @@ InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Hedefe yazılamadı</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Bu yedek klasörü kullanılamadı</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Taşıma başarısız</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Silme başarısız</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its

@@ -1270,7 +1270,7 @@ InstallerClean уже был запущен от имени администра
        the folder is true over all eight and leaves the bodies where they are. One of
        them, Error.CannotWriteFolder, also prints on the command line with no heading
        above it, so it is not one a subject can be taken out of. -->
-  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не удалось записать в папку назначения</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не удалось использовать эту папку резервных копий</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Сбой перемещения</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Сбой удаления</value></data>
   <!-- Shown when the automatic-update-check tick box in About cannot write its
