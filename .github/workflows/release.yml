@@ -178,7 +178,7 @@ jobs:
       # line is gone. Before the signing rounds deliberately: a satellite missing
       # from a bundle is a rebuild, and a rebuild after signing is two more
       # approvals and a scan of hashes nothing has cleared.
-      - name: Check the built artefacts carry every language and ask for administrator
+      - name: Check the built artefacts carry every satellite assembly and ask for administrator
         run: node scripts/verify-shipped-artefacts.mjs
 
       # THE FIRST SIGNING ROUND. The three exes go up under distinct names

@@ -254,7 +254,7 @@ jobs:
       # satellite that never reaches an artefact leaves the source resx present
       # and correct, so every guard that reads the tree passes and the window
       # opens in English on a machine set to that language.
-      - name: Check the built artefacts carry every language and ask for administrator
+      - name: Check the built artefacts carry every satellite assembly and ask for administrator
         if: success() || failure()
         run: node scripts/verify-shipped-artefacts.mjs
 

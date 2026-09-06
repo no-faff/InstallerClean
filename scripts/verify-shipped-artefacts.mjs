@@ -1,8 +1,16 @@
 #!/usr/bin/env node
-// Fails (exit 1) when a built artefact does not carry every language the app
-// ships, when it does not ask for administrator, or when it is older than the
-// sources it was built from. Reads the built files themselves rather than the
-// tree they came from, which is the only place these three can be answered.
+// Fails (exit 1) when a built artefact is missing a satellite assembly for a
+// language the source tree provides, when it does not ask for administrator, or
+// when it is older than the sources it was built from. Reads the built files
+// themselves rather than the tree they came from, which is the only place these
+// three can be answered.
+//
+// WHAT A GREEN LINE HERE SAYS ABOUT A LANGUAGE, AND WHAT IT DOES NOT. It says
+// the satellite reached the artefact. Whether that satellite holds every key the
+// neutral holds is a question about the source, and check-resx-parity.mjs
+// answers it there, in the guard glob, on every push. A satellite short of a key
+// still compiles and still ships, so the culture named below is a statement
+// about a file arriving rather than about a screen being translated.
 //
 // WHY A BUILT FILE AND NOT THE SOURCE. A satellite that never reaches the
 // artefact costs nothing at build time and nothing at startup: resource lookup
@@ -291,10 +299,13 @@ for (const dir of artefacts) {
     }
   }
 
-  report.push(`${exe.path}: ${cultures.length} languages, level="${level}"`);
+  report.push(`${exe.path}: level="${level}", satellites for ${cultures.join(' ')}`);
 }
 
 if (problems.length) fail(problems);
 
-console.log(`verify-shipped-artefacts: OK (${artefacts.length} artefacts, ${expected.length} languages each)`);
+// The cultures found are printed rather than counted. A total agrees with the
+// total it is checked against by the time this line is reached, so it can only
+// ever repeat itself; the names are the part a reader can act on.
+console.log(`verify-shipped-artefacts: OK (${artefacts.length} artefacts)`);
 for (const line of report) console.log(`  ${line}`);
