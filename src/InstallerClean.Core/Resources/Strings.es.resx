@@ -536,10 +536,10 @@ Para reponerlo, necesitas el instalador de la versión que ya tienes. Consíguel
        command it is, which is the point. Any new consumer that shows one of these
        WITHOUT a heading over it needs a string of its own; do not reach for these.
        Status.ScanFailedDetails is the worked example. -->
-  <data name="Status.MoveFailed" xml:space="preserve"><value>Movimiento fallido ({0}). Detalles en {1}.</value></data>
-  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Movimiento fallido ({0}). No se pudo escribir el archivo crash.log.</value></data>
-  <data name="Status.DeleteFailed" xml:space="preserve"><value>Eliminación fallida ({0}). Detalles en {1}.</value></data>
-  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Eliminación fallida ({0}). No se pudo escribir el archivo crash.log.</value></data>
+  <data name="Status.MoveFailed" xml:space="preserve"><value>{0}. Detalles en {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>{0}. No se pudo escribir el archivo crash.log.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>{0}. Detalles en {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>{0}. No se pudo escribir el archivo crash.log.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Acceso denegado. Windows rechazó el análisis.</value></data>
   <!-- The overlay line for the same ladder branch as
        Error.InstallerDbUnavailableTitle, passed together in one record, so the

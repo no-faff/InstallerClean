@@ -536,10 +536,10 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
        command it is, which is the point. Any new consumer that shows one of these
        WITHOUT a heading over it needs a string of its own; do not reach for these.
        Status.ScanFailedDetails is the worked example. -->
-  <data name="Status.MoveFailed" xml:space="preserve"><value>Spostamento non riuscito ({0}). Dettagli in {1}.</value></data>
-  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Spostamento non riuscito ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
-  <data name="Status.DeleteFailed" xml:space="preserve"><value>Eliminazione non riuscita ({0}). Dettagli in {1}.</value></data>
-  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Eliminazione non riuscita ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Status.MoveFailed" xml:space="preserve"><value>{0}. Dettagli in {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>{0}. Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>{0}. Dettagli in {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>{0}. Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Accesso negato. Windows ha rifiutato la scansione.</value></data>
   <!-- The overlay line for the same ladder branch as
        Error.InstallerDbUnavailableTitle, passed together in one record, so the

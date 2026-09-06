@@ -536,10 +536,10 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
        command it is, which is the point. Any new consumer that shows one of these
        WITHOUT a heading over it needs a string of its own; do not reach for these.
        Status.ScanFailedDetails is the worked example. -->
-  <data name="Status.MoveFailed" xml:space="preserve"><value>Taşıma başarısız oldu ({0}). Ayrıntılar {1} içinde.</value></data>
-  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Taşıma başarısız oldu ({0}). Çökme günlüğü yazılamadı.</value></data>
-  <data name="Status.DeleteFailed" xml:space="preserve"><value>Silme başarısız oldu ({0}). Ayrıntılar {1} içinde.</value></data>
-  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Silme başarısız oldu ({0}). Çökme günlüğü yazılamadı.</value></data>
+  <data name="Status.MoveFailed" xml:space="preserve"><value>{0}. Ayrıntılar {1} içinde.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>{0}. Çökme günlüğü yazılamadı.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>{0}. Ayrıntılar {1} içinde.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>{0}. Çökme günlüğü yazılamadı.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Erişim reddedildi. Windows taramayı reddetti.</value></data>
   <!-- The overlay line for the same ladder branch as
        Error.InstallerDbUnavailableTitle, passed together in one record, so the

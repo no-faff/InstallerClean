@@ -536,10 +536,10 @@
        command it is, which is the point. Any new consumer that shows one of these
        WITHOUT a heading over it needs a string of its own; do not reach for these.
        Status.ScanFailedDetails is the worked example. -->
-  <data name="Status.MoveFailed" xml:space="preserve"><value>Chuyển thất bại ({0}). Chi tiết trong {1}.</value></data>
-  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Chuyển thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
-  <data name="Status.DeleteFailed" xml:space="preserve"><value>Xóa thất bại ({0}). Chi tiết trong {1}.</value></data>
-  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Xóa thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
+  <data name="Status.MoveFailed" xml:space="preserve"><value>{0}. Chi tiết trong {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>{0}. Không thể ghi nhật ký sự cố.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>{0}. Chi tiết trong {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>{0}. Không thể ghi nhật ký sự cố.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Truy cập bị từ chối. Windows đã từ chối lần quét.</value></data>
   <!-- The overlay line for the same ladder branch as
        Error.InstallerDbUnavailableTitle, passed together in one record, so the
