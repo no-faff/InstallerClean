@@ -248,14 +248,17 @@ public sealed record AppInfo(string Version, string Language)
 /// Products installed as a second instance of themselves under an instance
 /// transform. PRODUCTS, not files, and not a count of anything held back.
 ///
-/// IT IS HERE BECAUSE THE APP HAS JUST STOPPED BEING ABLE TO TELL US. Until 3.0.0
-/// this condition emptied the entire offer on any machine carrying one; that
-/// withholding is gone, along with the check it protected, because nothing reads a
-/// product code out of a cached file any more and the condition therefore picks out
-/// no risk such a machine does not share with every other. What is left is a
-/// question nobody anywhere has an answer to: whether a machine carrying such a
-/// product exists in the field at all. Every measurement this project has of it is
-/// from one machine, where it reads zero.
+/// IT TRAVELS BECAUSE NOBODY ANYWHERE KNOWS WHETHER SUCH A MACHINE EXISTS IN THE
+/// FIELD. Every reading this project has is from one machine, where it is zero, and
+/// one machine settles nothing about all of them.
+///
+/// THE COUNT DECIDES NOTHING AND THE CONDITION IT FEEDS IS LIVE. What acts is
+/// <see cref="EnumerationCensus.SecondInstanceNotRuledOut"/>, which fires on this
+/// count or on an InstanceType read that failed. It is a withholding leg, so a
+/// machine carrying one of these products has its walk-derived offer withheld
+/// whole; the re-verification pass puts the same question again between the scan
+/// and the click; and the command line prints a line naming it among the reasons a
+/// run could not be certain.
 ///
 /// A machine fact rather than a run observation, which is what puts it in this
 /// object: two scans of one machine agree about it.
