@@ -834,7 +834,7 @@ Aby go przywrócić, potrzebujesz instalatora tej wersji, którą już masz. Zdo
        whole of what somebody who has just stopped a move needs. The completed
        screen puts its destination on its own line because the path ends the
        sentence there; here it does not. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Przed anulowaniem przeniesiono {0}/{1} {2}.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Przed anulowaniem przeniesiono {0}/{1} {2} do {3}.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Przed anulowaniem usunięto trwale {0}/{1} {2}.</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a

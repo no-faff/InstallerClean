@@ -279,7 +279,7 @@ const MAP = {
   'Completion.FailedCountDelete.Plural': `{0} bestanden konden niet worden verwijderd.`,
   'Completion.MoveSummary.Singular': `{0} {1} verplaatst naar: {2}`,
   'Completion.MoveSummary.Plural': `{0} {1} verplaatst naar: {2}`,
-  'Completion.MoveCancelledSummary': `{0} van {1} {2} verplaatst voordat je annuleerde.`,
+  'Completion.MoveCancelledSummary': `{0} van {1} {2} naar {3} verplaatst voordat je annuleerde.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} van {1} {2} definitief verwijderd voordat je annuleerde.`,
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} definitief verwijderd`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} definitief verwijderd`,

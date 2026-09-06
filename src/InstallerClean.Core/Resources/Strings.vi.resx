@@ -834,7 +834,7 @@
        whole of what somebody who has just stopped a move needs. The completed
        screen puts its destination on its own line because the path ends the
        sentence there; here it does not. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Đã chuyển {0}/{1} {2} trước khi bạn hủy.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Đã chuyển {0}/{1} {2} tới {3} trước khi bạn hủy.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Đã xóa vĩnh viễn {0}/{1} {2} trước khi bạn hủy.</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a

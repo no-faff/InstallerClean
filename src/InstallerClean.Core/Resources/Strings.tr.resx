@@ -834,7 +834,7 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
        whole of what somebody who has just stopped a move needs. The completed
        screen puts its destination on its own line because the path ends the
        sentence there; here it does not. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>İptal etmeden önce {1} {2} içinden {0} tanesi taşındı.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>İptal etmeden önce {1} {2} içinden {0} tanesi {3} konumuna taşındı.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi.</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a

@@ -399,7 +399,7 @@ const MAP = {
   'Confirm.MoveSameDrive': `Esa carpeta está en la misma unidad, así que el espacio no volverá hasta que la elimines. Elige una carpeta en otra unidad si quieres el espacio de inmediato.`,
   'Error.ScanCorrelationFailed': `InstallerClean no pudo hacer coincidir los registros de Windows Installer con el contenido de {InstallerFolder}. Casi nada de lo que señalan los registros está realmente ahí, y casi nada de lo que hay ahí lo nombra ningún registro, así que no se pudo demostrar que ningún archivo fuera innecesario. No se ha ofrecido nada y no se ha quitado nada.`,
   'Error.CandidateOutsideCache': `Este archivo no está directamente dentro de la carpeta de Windows Installer; rechazado por seguridad.`,
-  'Completion.MoveCancelledSummary': `Cancelaste tras mover {0} de {1} {2}.`,
+  'Completion.MoveCancelledSummary': `Cancelaste tras mover {0} de {1} {2} a {3}.`,
   'Completion.PermanentDeleteCancelledSummary': `Cancelaste tras eliminar definitivamente {0} de {1} {2}.`,
   'Body.PendingReboot.Lead': `Estos archivos no se pueden limpiar ahora mismo.`,
   'Cli.TooManyArguments': `Error: argumento extra inesperado '{0}'. Si la carpeta de destino tiene un espacio, escribe toda la ruta entre comillas: /m "D:\\My Backup"`,

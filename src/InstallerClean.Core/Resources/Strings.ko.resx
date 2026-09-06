@@ -834,7 +834,7 @@
        whole of what somebody who has just stopped a move needs. The completed
        screen puts its destination on its own line because the path ends the
        sentence there; here it does not. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>취소하기 전까지 {2} {1}개 중 {0}개를 {3}(으)로 이동했습니다.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다.</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a

@@ -834,7 +834,7 @@ Untuk mengembalikannya, Anda butuh pemasang versi yang sudah Anda miliki. Dapatk
        whole of what somebody who has just stopped a move needs. The completed
        screen puts its destination on its own line because the path ends the
        sentence there; here it does not. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>{0} dari {1} {2} dipindahkan sebelum Anda membatalkan.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>{0} dari {1} {2} dipindahkan ke {3} sebelum Anda membatalkan.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>{0} dari {1} {2} dihapus permanen sebelum Anda membatalkan.</value></data>
   <!-- The line under a cancelled Move, where the completed screen carries
        Completion.MoveRestoreHint instead. The two answer different questions: a

@@ -375,7 +375,7 @@ const MAP = {
   'Confirm.MoveSameDrive': `那个文件夹在同一个驱动器上，所以在您删除它之前空间不会回来。如果想立刻拿回空间，请改选另一个驱动器上的文件夹。`,
   'Error.ScanCorrelationFailed': `InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。记录所指向的内容几乎都不在那里，而那里的内容几乎都没有被任何记录标明，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。`,
   'Error.CandidateOutsideCache': `此文件不直接位于 Windows Installer 文件夹内；为安全起见已拒绝。`,
-  'Completion.MoveCancelledSummary': `在您取消前，已移动 {1} 个{2}中的 {0} 个。`,
+  'Completion.MoveCancelledSummary': `在您取消前，已将 {1} 个{2}中的 {0} 个移动到 {3}。`,
   'Completion.PermanentDeleteCancelledSummary': `在您取消前，已永久删除 {1} 个{2}中的 {0} 个。`,
   'Body.PendingReboot.Lead': `这些文件现在无法清理。`,
   'Cli.TooManyArguments': `错误：出现意外的多余参数“{0}”。如果目标文件夹的路径中含有空格，请给整个路径加上引号：/m "D:\\My Backup"`,

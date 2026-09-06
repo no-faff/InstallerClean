@@ -394,7 +394,7 @@ const MAP = {
   'Confirm.MoveSameDrive': `Quella cartella è sulla stessa unità, quindi lo spazio non torna finché non la elimini. Scegli invece una cartella su un'altra unità se vuoi lo spazio subito.`,
   'Error.ScanCorrelationFailed': `InstallerClean non è riuscito a far corrispondere i record di Windows Installer con il contenuto di {InstallerFolder}. Quasi nulla di ciò che i record indicano si trova davvero lì, e quasi nulla di ciò che è lì è nominato da un record, quindi non si è potuto dimostrare che qualche file fosse non necessario. Non è stato proposto nulla e non è stato rimosso nulla.`,
   'Error.CandidateOutsideCache': `Questo file non si trova direttamente all'interno della cartella di Windows Installer; rifiutato per sicurezza.`,
-  'Completion.MoveCancelledSummary': `Spostati {0} di {1} {2} prima dell'annullamento.`,
+  'Completion.MoveCancelledSummary': `Spostati {0} di {1} {2} in {3} prima dell'annullamento.`,
   'Completion.PermanentDeleteCancelledSummary': `Eliminati definitivamente {0} di {1} {2} prima dell'annullamento.`,
   'Body.PendingReboot.Lead': `Al momento questi file non si possono ripulire.`,
   'Cli.TooManyArguments': `Errore: argomento aggiuntivo imprevisto '{0}'. Se la cartella di destinazione contiene uno spazio, racchiudi l'intero percorso tra virgolette: /m "D:\\My Backup"`,

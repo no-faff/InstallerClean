@@ -389,7 +389,7 @@ Ayrıntılar şuraya yazıldı:
   'Confirm.MoveSameDrive': `O klasör aynı sürücüde, bu yüzden siz onu silene kadar yer geri gelmez. Yeri hemen istiyorsanız başka bir sürücüde bir klasör seçin.`,
   'Error.ScanCorrelationFailed': `InstallerClean, Windows Installer kayıtlarını {InstallerFolder} içeriğiyle eşleştiremedi. Kayıtların işaret ettiklerinin neredeyse hiçbiri orada değil ve orada olanların neredeyse hiçbirinin adı hiçbir kayıtta geçmiyor, bu yüzden hiçbir dosyanın gereksiz olduğu gösterilemedi. Hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı.`,
   'Error.CandidateOutsideCache': `Bu dosya doğrudan Windows Installer klasörünün içinde değil; güvenlik için reddedildi.`,
-  'Completion.MoveCancelledSummary': `İptal etmeden önce {1} {2} içinden {0} tanesi taşındı.`,
+  'Completion.MoveCancelledSummary': `İptal etmeden önce {1} {2} içinden {0} tanesi {3} konumuna taşındı.`,
   'Completion.PermanentDeleteCancelledSummary': `İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi.`,
   'Body.PendingReboot.Lead': `Bu dosyalar şu anda temizlenemez.`,
   'Cli.TooManyArguments': `Hata: beklenmeyen fazladan argüman '{0}'. Hedef klasörünüzün adında boşluk varsa tüm yolu tırnak içine alın: /m "D:\\My Backup"`,

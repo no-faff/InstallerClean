@@ -404,7 +404,7 @@ const MAP = {
   'Confirm.MoveSameDrive': `そのフォルダーは同じドライブにあるため、削除するまで容量は戻りません。すぐに容量が必要な場合は、別のドライブのフォルダーを選んでください。`,
   'Error.ScanCorrelationFailed': `InstallerClean は Windows Installer の登録情報を {InstallerFolder} の内容と突き合わせられませんでした。登録情報が指しているもののほとんどがそこになく、そこにあるもののほとんどがどの登録情報にも名指しされていないため、どのファイルについても不要であることを示せませんでした。何も提示されず、何も取り除かれていません。`,
   'Error.CandidateOutsideCache': `このファイルは Windows Installer フォルダーの直下にありません。安全のために拒否されました。`,
-  'Completion.MoveCancelledSummary': `キャンセルするまでに、{1} 個中 {0} 個の {2} を移動しました。`,
+  'Completion.MoveCancelledSummary': `キャンセルするまでに、{1} 個中 {0} 個の {2} を {3} へ移動しました。`,
   'Completion.PermanentDeleteCancelledSummary': `キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。`,
   'Body.PendingReboot.Lead': `これらのファイルは今はクリーンアップできません。`,
   'Cli.TooManyArguments': `エラー：予期しない余分な引数 '{0}' があります。移動先フォルダーにスペースが含まれる場合は、パス全体を引用符で囲んでください：/m "D:\\My Backup"`,
