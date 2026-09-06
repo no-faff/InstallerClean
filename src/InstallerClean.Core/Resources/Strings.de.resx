@@ -111,6 +111,11 @@
   <data name="Field.Patches" xml:space="preserve"><value>Patches</value></data>
   <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
   <data name="Field.UnknownProductName" xml:space="preserve"><value>(unbekannt)</value></data>
+  <!-- Shown in the same column for a file Windows holds no record of at all, where
+       there is no program to name. Field.UnknownProductName above is the other
+       case, a registered product whose display name did not come back, and the two
+       never stand in for one another. -->
+  <data name="Field.NoNamedProduct" xml:space="preserve"><value>(no program)</value></data>
   <!-- What goes between items when the app joins a short list into one line, as
        the missing-files line does with the programs it names. A resx value and
        not a hard-coded ", " because the mark is not the same everywhere: a
@@ -419,6 +424,15 @@
        in progress and would be untrue as well. The restart is the instruction because
        these operations are carried out at the next boot and not before. -->
   <data name="Body.PendingReboot.PendingRenameUnresolved" xml:space="preserve"><value>Für den nächsten Neustart ist ein Dateivorgang vorgemerkt, und InstallerClean kann nicht erkennen, welche Dateien darin genannt werden. Damit lässt sich nicht ausschließen, dass sie in {InstallerFolder} liegen. Starte Windows neu, bevor du aufräumst.</value></data>
+  <!-- The banner for a registry read that did not answer. Names the folder with the
+       {InstallerFolder} token like the rest of the family. It names neither of the two
+       reads, because one sentence has to be true whichever of them it was, and it claims
+       nothing about the machine: no operation has been shown to be running, suspended or
+       queued, so a banner stating any of those would be untrue here. The restart is offered
+       because it clears a transient fault, and the last sentence says plainly what it
+       means if it does not, rather than leaving somebody re-scanning at a machine whose
+       permissions will refuse the read again tomorrow. -->
+  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean.</value></data>
   <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -511,9 +525,17 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Verschieben abgebrochen. {0} von {1} {2} verarbeitet.</value></data>
   <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Löschen abgebrochen. {0} von {1} {2} verarbeitet.</value></data>
-  <!-- 0 = exception type name, 1 = crash log path. Both surface in
-       the status pill so the user can find the log; full message +
-       stack trace go to the log itself. -->
+  <!-- 0 = exception type name, 1 = crash log path. Full message and stack trace
+       go to the log itself.
+
+       THESE FOUR NAME NO SUBJECT OF THEIR OWN, and the pair below them says why
+       that is a rule rather than an omission: each has exactly one consumer, the
+       body of a dialog whose heading already says which command failed, so
+       repeating it there is the only thing the reader gains nothing from. The two
+       commands' bodies are word for word the same because neither says which
+       command it is, which is the point. Any new consumer that shows one of these
+       WITHOUT a heading over it needs a string of its own; do not reach for these.
+       Status.ScanFailedDetails is the worked example. -->
   <data name="Status.MoveFailed" xml:space="preserve"><value>Verschieben fehlgeschlagen ({0}). Details in {1}.</value></data>
   <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Verschieben fehlgeschlagen ({0}). Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Löschen fehlgeschlagen ({0}). Details in {1}.</value></data>
@@ -620,8 +642,20 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        with them. And "rather than guess" describes something the app never does, which
        raises a possibility that was never on the table. -->
   <data name="Completion.NothingOffered" xml:space="preserve"><value>Auf diesem PC nichts angeboten</value></data>
-  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei ({2}) zurückgehalten, die es sonst angeboten hätte.</value></data>
-  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb alle {0} {1} ({2}) zurückgehalten, die es sonst angeboten hätte.</value></data>
+  <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb alle {0} {1} ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <!-- The same screen for a machine whose offer was not emptied wholesale. The body
+       above is for a run where a finding about the records took the whole walk-derived
+       offer at once; this one is for a run that kept every candidate back on its own
+       verdict, where that finding is false of the files it kept. It states only what
+       is true of all of them.
+
+       0 = files held back, 1 = pluralised "file"/"files", 2 = their size, and the
+       one-form names the size rather than the numeral, exactly as the pair above
+       does. "All {0} {1}" and "any of the cached files" because this machine was
+       offered nothing; the main window's line under an offer says "some". -->
+  <data name="Completion.NothingOfferedPerFileBody.Singular" xml:space="preserve"><value>InstallerClean konnte nicht feststellen, dass die gefundene zwischengespeicherte Datei nicht benötigt wird, und hat deshalb die eine Datei ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <data name="Completion.NothingOfferedPerFileBody.Plural" xml:space="preserve"><value>InstallerClean konnte bei keiner der gefundenen zwischengespeicherten Dateien feststellen, dass sie nicht benötigt wird, und hat deshalb alle {0} {1} ({2}) zurückgehalten, statt sie anzubieten.</value></data>
   <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
        retired list with the four that follow, and why the retired strings are kept
        rather than deleted is written out there rather than repeated here.
@@ -736,8 +770,8 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        and there is nothing for the reader to do. Press Done and the kept-back
        files are on the rebuilt main list, judged fresh by the rescan the app
        runs before the overlay appears. -->
-  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} Datei zurückgehalten. Der Scan hielt sie für nicht benötigt. Die abschließende Prüfung sah das anders.</value></data>
-  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} Dateien zurückgehalten. Der Scan hielt sie für nicht benötigt. Die abschließende Prüfung sah das anders.</value></data>
+  <data name="Completion.HeldBack.Singular" xml:space="preserve"><value>{0} Datei zurückgehalten. Der Scan hielt sie für nicht benötigt. Die abschließende Prüfung konnte das nicht bestätigen.</value></data>
+  <data name="Completion.HeldBack.Plural" xml:space="preserve"><value>{0} Dateien zurückgehalten. Der Scan hielt sie für nicht benötigt. Die abschließende Prüfung konnte das nicht bestätigen.</value></data>
   <!-- The fourth state, and the first that comes from asking what a file says it
        IS rather than what the records say about its location. The candidate
        declares a product or patch code inside itself, and Windows holds a record
@@ -791,9 +825,29 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
        total. These are the overlay's own summary sentence, not a body-row
-       status line. -->
+       status line.
+
+       The Move sentence carries 3 = the backup folder, in the flow of the
+       sentence rather than on a line of its own. Naming it here is what lets
+       the line below say "move them back": between them the two sentences name
+       the folder the files went to and the folder they came from, which is the
+       whole of what somebody who has just stopped a move needs. The completed
+       screen puts its destination on its own line because the path ends the
+       sentence there; here it does not. -->
   <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>{0} von {1} {2} verschoben, bevor du abgebrochen hast.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>{0} von {1} {2} endgültig gelöscht, bevor du abgebrochen hast.</value></data>
+  <!-- The line under a cancelled Move, where the completed screen carries
+       Completion.MoveRestoreHint instead. The two answer different questions: a
+       run that finished leaves the reader deciding when to delete the backup, and
+       a run somebody stopped part-way leaves them wanting the files put back. A
+       Move only ever moves, so putting them back is the whole of the undo, and
+       the sentence says so plainly.
+
+       One sentence for both drives, where the completed screen picks between two.
+       The same-drive variant exists to say the space has not come back until the
+       backup is deleted, and that has nothing to attach to on a screen asking for
+       the opposite. {InstallerFolder} resolves to the cache folder. -->
+  <data name="Completion.MoveCancelledRestoreHint" xml:space="preserve"><value>It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was.</value></data>
   <!-- The post-Delete summary. 0 = deleted count, 1 = pluralised noun. It
        states the act and stops there: the screen carries no safety claim and
        no recovery advice, because the app's position is not that a delete can
@@ -883,11 +937,29 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        true of all of them, and it is the clause both the completion screen and the
        command line already use.
 
-       "Rather than listing them" and not "rather than offering them", because the
-       list is what the reader is looking at. The one-form spends neither placeholder
-       and names the file instead of the numeral, as the other one-forms here do. -->
-  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei zurückgehalten, statt sie aufzuführen.</value></data>
-  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb {0} {1} zurückgehalten, statt sie aufzuführen.</value></data>
+       "Rather than offering them" and not "rather than listing them", because the
+       held-back files are listed: the Details window shows them among the
+       registrations, in one list. What this scan declined to do is offer them, and
+       that is what the sentence says. The one-form spends neither placeholder and names the file
+       instead of the numeral, as the other one-forms here do. -->
+  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei zurückgehalten, statt sie anzubieten.</value></data>
+  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb {0} {1} zurückgehalten, statt sie anzubieten.</value></data>
+  <!-- The same line for a machine whose withholding was not wholesale. The pair
+       above is for a run whose walk-derived offer was emptied in one go; this pair is
+       for a run that judged candidates one at a time and kept some of them back, so
+       no single finding about the machine's records accounts for the list. The pair
+       above names such a finding and it would be false of these files, so this pair
+       says only what is true of every file on the list whatever kept it there: the
+       app could not be certain about them.
+
+       "Some of the cached files" and not "any of them", because something was offered
+       beside these. The screen for a machine that was offered nothing at all
+       (Completion.NothingOfferedPerFileBody.*) says "any", and the two must not be
+       swapped. The one-form spends neither placeholder, and where the pair above has
+       to name the file in its second clause, this one has already named it in the
+       first and points back at it, so no noun in it has to agree with a numeral. -->
+  <data name="Summary.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean war sich bei einer der gefundenen zwischengespeicherten Dateien nicht sicher und hat diese eine deshalb zurückgehalten, statt sie anzubieten.</value></data>
+  <data name="Summary.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean war sich bei einigen der gefundenen zwischengespeicherten Dateien nicht sicher und hat deshalb {0} {1} zurückgehalten, statt sie anzubieten.</value></data>
   <!-- THE SECOND HELD-BACK LINE, AND IT IS THE PAIR OF THE ONE ABOVE RATHER THAN
        A DIFFERENT KIND OF SENTENCE. Summary.NothingListed reports what the
        walk-derived half of the scan held back; this reports what the superseded
@@ -923,8 +995,8 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        That refusal is one of six routes into the count rather than the count
        itself, so gating on it would put this line in front of somebody holding
        back no superseded file at all. See ScanViewModel.HasSupersededHeldBack. -->
-  <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, dass die eine ersetzte Datei nicht mehr gebraucht wird, und hat sie deshalb zurückgehalten.</value></data>
-  <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, dass {0} ersetzte Dateien nicht mehr gebraucht werden, und hat sie deshalb zurückgehalten.</value></data>
+  <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, dass die eine ersetzte Datei nicht mehr gebraucht wird, und hat sie deshalb zurückgehalten.</value></data>
+  <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, dass {0} ersetzte Dateien nicht mehr gebraucht werden, und hat sie deshalb zurückgehalten.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} von {1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -948,6 +1020,22 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        0 = count, 1 = size display. -->
   <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} Datei unangetastet ({1})</value></data>
   <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} Dateien unangetastet ({1})</value></data>
+  <!-- Appended to the footer above, through Display.ListSeparator, when the window
+       is showing a registration whose cached file is not on the disk. Those rows are
+       in the list and carry the recovery note, and they are not in the count beside
+       them, because a file that is not there was not left alone. So the clause says
+       how many of the rows on screen are in that state, and the count and the size
+       before it describe one population again.
+
+       It names no noun, the count in front of it having named one already, and it
+       states no cause: what put a record on a machine whose file has gone is not
+       something this app can read, and the recovery note on the row is where a
+       reader is sent. A pair rather than one string, though English inflects
+       nothing here, because the numeral governs whatever noun a language supplies
+       and the paucal bands are declared per key.
+       0 = count. -->
+  <data name="Summary.RegisteredWindow.Missing.Singular" xml:space="preserve"><value>{0} missing</value></data>
+  <data name="Summary.RegisteredWindow.Missing.Plural" xml:space="preserve"><value>{0} missing</value></data>
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} {1} verschieben ({2})?</value></data>
@@ -1133,10 +1221,21 @@ InstallerClean lief bereits als Administrator, es noch einmal so zu starten hilf
        over a delete that reached no file, so a language carries one wording for
        the two rather than two wordings for one thing. No placeholders. -->
   <data name="Error.InstallerLockUnavailableTitle" xml:space="preserve"><value>Nichts gelöscht</value></data>
+  <!-- Shown when a Delete could not open Global\_MSIExecute because the object's
+       security refused this process the rights, so ownership was never sampled.
+       The pair of Error.InstallerLockUnavailable above: same outcome, different
+       cause, and the cause is the whole reason it is a separate sentence. It does
+       not tell the reader whether to try again: the app was refused the one
+       question that would have said. Takes the "Nothing was deleted" heading. No
+       placeholders. -->
+  <data name="Error.InstallerLockAccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted.</value></data>
   <!-- The move half of the heading above, and it takes the same wording as
        Completion.NothingMoved for the same reason its sibling takes
        Completion.NothingDeleted's. No placeholders. -->
   <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Nichts verschoben</value></data>
+  <!-- The move half of Error.InstallerLockAccessRefused. Takes the "Nothing was
+       moved" heading. No placeholders. -->
+  <data name="Error.MoveInstallerLockAccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved.</value></data>
   <!-- Shown when a Delete could not take Global\_MSIExecute and nothing else
        was shown to be holding it (a DACL that refuses the object, or any other
        non-fatal failure to acquire). Without that hold nothing stops a program
@@ -1154,6 +1253,23 @@ InstallerClean lief bereits als Administrator, es noch einmal so zu starten hilf
        user does not make the batch safer to run. No placeholders. -->
   <data name="Error.MoveInstallerLockUnavailable" xml:space="preserve"><value>InstallerClean konnte die Sperre nicht übernehmen, mit der Windows Installer verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts verschoben. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Ungültiges Ziel</value></data>
+  <!-- The heading over Error.DestinationChangedMidBatch, which is the one
+       destination message that is not about a path being wrong. The guard behind
+       it has two conditions, and one of them, a share that dropped or an access
+       rule that closed, leaves the folder exactly where the user put it. Nothing
+       selects on which of the two fired, so the heading names what the batch did
+       rather than what the folder is. The four other uses of
+       Error.InvalidDestinationTitle are destinations that really are invalid. No
+       placeholders. -->
+  <data name="Error.MoveStoppedTitle" xml:space="preserve"><value>Move stopped</value></data>
+  <!-- Raised only from the Move flow, so the folder it names is the backup folder
+       the user nominated. EIGHT BODIES CAN FOLLOW IT and the heading has to hold
+       over every one: five open on a form of "cannot write to", and three name a
+       reason of their own, a permission that is missing, a path too long for Windows
+       and a folder that could not be created. Naming what the app could not do with
+       the folder is true over all eight and leaves the bodies where they are. One of
+       them, Error.CannotWriteFolder, also prints on the command line with no heading
+       above it, so it is not one a subject can be taken out of. -->
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Schreiben am Ziel nicht möglich</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Verschieben fehlgeschlagen</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Löschen fehlgeschlagen</value></data>
@@ -1168,7 +1284,9 @@ InstallerClean lief bereits als Administrator, es noch einmal so zu starten hilf
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Das Ziel {0} liegt unterhalb eines Windows-Systemordners. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% und %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Nicht genügend Speicherplatz</value></data>
-  <!-- 0 = destination, 1 = required size, 2 = available size -->
+  <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
+       body under Error.NotEnoughSpaceTitle, so the opening carries the folder
+       rather than the heading's own words again. -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Nicht genügend Speicherplatz unter {0}
 
 Benötigt: {1}
@@ -1245,14 +1363,27 @@ Details in {1}.</value></data>
   <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub hat eine Fehlerantwort zurückgegeben. Versuch es in ein paar Minuten erneut.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Die Antwort von GitHub enthielt keine erkennbare Version. Versuch es später erneut oder öffne die Releases-Seite direkt.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Bei der Prüfung wurde das Zeitlimit überschritten. Deine Verbindung zu GitHub ist vielleicht langsam; versuch es erneut.</value></data>
+  <!-- 0 = the crash log's full path. The pair below is the app's standard shape
+       for a message that offers the log: the first is shown only where the write
+       succeeded and the path is known, the second where it did not, so neither
+       sends anybody to a file that is not there. It names the full path like every
+       other message that offers the log, a bare file name being no use to somebody
+       who has to go and find it. -->
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Die Prüfung ist aus unbekanntem Grund fehlgeschlagen. Details stehen in crash.log, falls du es melden möchtest.</value></data>
+  <data name="UpdateCheck.Failed.Unknown.NoLog" xml:space="preserve"><value>The check failed for an unknown reason. The crash log could not be written.</value></data>
   <!-- 0 = the URL the user was trying to reach. The reason the launch failed
        (this process is elevated, so the browser has to be started from the
        user's own medium-integrity shell, and that chain was unavailable) is
        an internal distinction with no name outside this codebase; the user
        gets what happened and what they can do about it. -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean konnte deinen Browser nicht öffnen. Der Link liegt in deiner Zwischenablage, du kannst ihn also selbst einfügen:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean konnte deinen Browser nicht öffnen und den Link auch nicht in die Zwischenablage kopieren. Der Link lautet:&#10;&#10;{0}</value></data>
+  <!-- 0 = the URL, on a line of its own so a long one stays readable. Both bodies
+       are drawn under BrowserLaunch.FailedTitle, which names the failure, and the
+       dialog announces heading and body joined, so neither opens by naming it
+       again. The second names the app because its sentence needs a subject and
+       that heading, being a verb phrase, has none to lend; "either" takes the
+       heading as its antecedent in both. -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}</value></data>
   <!-- 0 = the backup folder the run was given. Raised when the guard between two
        files of the same Move can no longer confirm that folder, and it says
        nothing about why on purpose: two conditions reach it, the folder being
@@ -1262,6 +1393,12 @@ Details in {1}.</value></data>
        where the user put it and has become unreachable, so any sentence naming a
        cause is wrong for one condition or the other, and what to do next is the
        same either way.
+
+       THE SAME HOLDS FOR WHAT THE STOP AVOIDED, WHICH IS A SEPARATE CLAIM FROM THE
+       CAUSE. On the folder being replaced there is somewhere wrong the files could
+       have gone; on the folder no longer resolving there is nowhere at all, so a
+       sentence about where they would otherwise have ended up is wrong for one
+       condition in the same way. It says what the run did and stops there.
 
        It names the folder the run was GIVEN, because it asks the reader to go and
        check that folder. Where the files that already moved ended up is a
@@ -1302,6 +1439,10 @@ Details in {1}.</value></data>
 
   <!-- Single instance / startup / crash -->
   <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- One consumer, the body under Startup.AlreadyRunningTitle, which is the app
+       name, so the sentence opens on the pronoun rather than naming the app again
+       a line below it. Anything that shows this WITHOUT that heading over it needs
+       a string of its own: the command line has one, Cli.MutexBlocked. -->
   <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean läuft bereits.</value></data>
   <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
   <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
@@ -1422,10 +1563,14 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        window's own screen opens with (Completion.NothingOfferedBody.*): the app
        could not be certain which cached files belong to which programs.
 
-       "Might otherwise have offered" keeps its hedge for the same reason the
-       window's does: some of those files would have been kept back anyway by the
-       per-file screen this branch skips, so "would have offered" claims more than
-       the run established.
+       "Rather than offering them" claims only what the run established, so it says
+       what the scan declined to do rather than what it would have done instead.
+       Some of these files would have been kept back anyway by the per-file screen
+       this branch skips, so any wording promising they would have been offered
+       claims more than the run has. "Rather than listing them" would say something
+       else again: what the run refused was the offer, and on this host the
+       held-back files reach no list at all, the command line carrying their count
+       and not their names.
 
        A PAIR AND NOT A FLAT KEY. A flat key here reads "held back all 1 file" at a
        count of one, which is what the two forms exist to avoid. The one-form names
@@ -1439,8 +1584,21 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        a conclusion the reader has not reached. The tense also differs from the
        window's ("held back" here, "has held back" there) and that is deliberate,
        each being right in its own register. -->
-  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei ({2}) zurückgehalten, die es sonst angeboten hätte.</value></data>
-  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb alle {0} {1} ({2}) zurückgehalten, die es sonst angeboten hätte.</value></data>
+  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb alle {0} {1} ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <!-- The per-file form of the outcome above, for the machine whose offer came out
+       empty because every candidate was judged and kept back on its own, rather than
+       because a finding about the records emptied the whole walk at once. The pair
+       above names that finding, which is false of a file kept back on its own, so
+       this pair states only what holds of all of them.
+
+       0 = files held back, 1 = pluralised "file"/"files", 2 = their size, exactly as
+       above, and both forms are passed all three so the two cannot disagree about
+       which index is which. "All {0} {1}" and "any of the cached files" because
+       nothing was offered on this run; Cli.NothingListedPerFile drops the "all" and
+       says "some" for the machine that was offered something. -->
+  <data name="Cli.NothingOfferedPerFile.Singular" xml:space="preserve"><value>InstallerClean konnte nicht feststellen, dass die gefundene zwischengespeicherte Datei nicht benötigt wird, und hat deshalb die eine Datei ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <data name="Cli.NothingOfferedPerFile.Plural" xml:space="preserve"><value>InstallerClean konnte bei keiner der gefundenen zwischengespeicherten Dateien feststellen, dass sie nicht benötigt wird, und hat deshalb alle {0} {1} ({2}) zurückgehalten, statt sie anzubieten.</value></data>
   <!-- The command line's twin of Summary.NothingListed, for the machine whose
        walk-derived half was withheld wholesale while a superseded row was still
        offered: that run takes the found-files branch, so Cli.NothingOffered is not
@@ -1450,31 +1608,81 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        the size and not the numeral, so it spends {2} and leaves {0} and {1} unused;
        both are passed on either branch so the two forms cannot disagree about which
        index is which. -->
-  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat die eine Datei ({2}) deshalb zurückgehalten, statt sie aufzulisten.</value></data>
-  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat {0} {1} ({2}) deshalb zurückgehalten, statt sie aufzulisten.</value></data>
-  <!-- Introduces the reasons the walk-derived offer was withheld wholesale, under
-       whichever of Cli.NothingOffered or Cli.NothingListed that run printed. It picks
-       up "couldn't be certain" from both of them on purpose, so the reader has the
-       antecedent in the line above. The lines under it are Cli.WithheldReasons.*, one
-       per condition met, and any combination of them can print: they say which
-       conditions the run met and are not a partition of the files, so none of them
-       carries a count and nothing sums. -->
+  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb {0} {1} ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <!-- The per-file form of the pair above, and the command line's twin of
+       Summary.NothingListedPerFile: a run that kept files back one at a time while
+       still offering something, so the sentence names no cause that could be false of
+       any file it counts. Word for word the window's line with the size added, as the
+       pair above is.
+
+       "Some" and no "all", because this machine was offered something and the pair
+       above was not. There is no third variation and none may be added. The one-form
+       names the size and not the numeral, so it spends {2} and leaves {0} and {1}
+       unused; both are passed on either branch so the two forms cannot disagree about
+       which index is which. -->
+  <data name="Cli.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean war sich bei einer der gefundenen zwischengespeicherten Dateien nicht sicher und hat diese eine ({2}) deshalb zurückgehalten, statt sie anzubieten.</value></data>
+  <data name="Cli.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean war sich bei einigen der gefundenen zwischengespeicherten Dateien nicht sicher und hat deshalb {0} {1} ({2}) zurückgehalten, statt sie anzubieten.</value></data>
+  <!-- Introduces the conditions this run met. It prints under whichever of the
+       Cli.NothingOffered and Cli.NothingListed sentences that run chose, the
+       per-file forms included, so it has to read correctly under all four rather
+       than under one. It does not pick a phrase up from the line above, two of
+       those four saying "couldn't establish" instead; what is true of every
+       machine reaching this caption is that the scan could not be certain, which
+       is what the caption itself says.
+
+       The lines under it are Cli.WithheldReasons.*, one per condition met, and any
+       combination of them can print: they say which conditions the run met and are
+       not a partition of the files, so none of them carries a count and nothing
+       sums. -->
   <data name="Cli.WithheldReasons.Header" xml:space="preserve"><value>Warum keine Gewissheit möglich war:</value></data>
-  <!-- One line per leg of the wholesale withholding, each printed only when its own
-       leg is true, each carrying two leading spaces like the Cli.Help.* block. The
-       nine path-resolution counts and the four identity-read outcomes sit underneath
-       legs one and two and are deliberately not printed: they travel in the opt-in
-       report, which reads them apart, and a reader of a console line can do nothing
-       different on one of them than on another. NO LEG CARRIES A COUNT. Leg one's two
-       groups can double-count one value, so their sum is a count of refusals and not
-       of paths; leg three's two members are opposite findings and a single number
-       states a cause over the pair; a count on leg two alone would read as a total.
-       The count and the size of what was held back are on the line above. And no line
-       says whether re-running helps, because each leg holds members that differ on
-       exactly that. -->
-  <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Ein Dateipfad in den eigenen Aufzeichnungen von Windows Installer ließ sich nicht auflösen.</value></data>
-  <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Die Identität einer in den Aufzeichnungen von Windows Installer genannten Datei ließ sich nicht lesen.</value></data>
-  <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Ein Programm ist auf diesem PC möglicherweise mehrfach installiert.</value></data>
+  <!-- The three wholesale legs, each printed only when its own leg is true, each
+       carrying two leading spaces like the Cli.Help.* block. They are findings about
+       the machine's records that withheld the walk-derived offer whole. The four
+       lines after them are the per-file arms and carry their own note; a run that
+       withheld both ways prints from both sets.
+
+       The nine path-resolution counts and the four identity-read outcomes sit
+       underneath legs one and two and are deliberately not printed: they travel in
+       the opt-in report, which reads them apart, and a reader of a console line can
+       do nothing different on one of them than on another.
+
+       No leg carries a count. Leg one's two groups can double-count one value, so
+       their sum is a count of refusals and not of paths; leg three's two members are
+       opposite findings and a single number states a cause over the pair; a count on
+       leg two alone would read as a total. The count and the size of what was held
+       back are on the line above. And no line says whether re-running helps, because
+       each leg holds members that differ on exactly that. -->
+  <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Ein Dateipfad in den eigenen Aufzeichnungen von Windows Installer ließ sich nicht auflösen, sodass ihm nichts zugeordnet werden konnte.</value></data>
+  <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Eine Datei, über die Windows eine Aufzeichnung hat, ließ sich nicht identifizieren und konnte deshalb dem Inhalt des Ordners nicht zugeordnet werden.</value></data>
+  <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Ein Programm ist auf diesem PC möglicherweise mehrfach installiert, und die Aufzeichnungen geben nicht her, zu welcher Kopie eine Datei gehört.</value></data>
+  <!-- The four per-file arms. Each is a decision taken about one candidate, where
+       the three lines above are findings about the machine's records that withheld
+       the walk-derived offer whole. They name four different causes and have to
+       stay four and distinct: a rendering that blurs any two of them makes the app
+       state a cause it cannot support for the other's files.
+
+       CandidateIdentity is the identity pass failing to read one file in the folder,
+       so that file could not be compared against the records at all.
+
+       DeclaredProductInstalled is a file whose own declared product Windows still has
+       a record of, so the file may still be needed.
+
+       DeclaredProductUnestablished is a disjunction and must stay one: either the file
+       would not say which program it belongs to, or Windows would not answer about the
+       program it named. Keeping only one half states a cause the app did not establish
+       for the files the other half holds.
+
+       ScreenUnanswered is the check answering about a different number of files than it
+       was handed, so no answer could be attached to any particular file.
+
+       None of the four carries a count and none may acquire one: each is one fact about
+       one machine, and nothing may add it to another and call the result a cause. The
+       count and the size of what was held back are on the line above. -->
+  <data name="Cli.WithheldReasons.CandidateIdentity" xml:space="preserve"><value>  Eine Datei im Ordner ließ sich nicht identifizieren und konnte deshalb nicht den Aufzeichnungen zugeordnet werden.</value></data>
+  <data name="Cli.WithheldReasons.DeclaredProductInstalled" xml:space="preserve"><value>  Eine Datei gibt an, zu einem noch installierten Programm zu gehören, und wird deshalb möglicherweise noch gebraucht.</value></data>
+  <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Entweder gab eine Datei nicht an, zu welchem Programm sie gehört, oder Windows gab zu diesem Programm keine Auskunft.</value></data>
+  <data name="Cli.WithheldReasons.ScreenUnanswered" xml:space="preserve"><value>  Eine Prüfung, zu welchen Programmen die Dateien gehören, lieferte Antworten, die nicht zu den übergebenen Dateien passten.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three. Every other entry on this channel
@@ -1498,12 +1706,19 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        already ends that way, so a filter watching this channel meets one phrase
        and not two.
 
-       IT HELD BACK {1} {2} RATHER THAN "{1} {2} were held back", AND THE WORD ORDER
+       IT HAS HELD BACK {1} {2} RATHER THAN "{1} {2} were held back", AND THE WORD ORDER
        IS THE PLURALISATION. This line is machine-read and forced English at the
        emit site, so it takes no .Singular/.Plural pair and the passive form read
        "so 1 file were held back" at a count of one. Putting the app back in as the
        subject makes one shape correct at every count, which is what a matched
        surface needs. -->
+  <!-- The per-file twin of the entry above, for the machine whose candidates were
+       each judged and kept rather than emptied wholesale, so the Application channel
+       tells those two apart the way stdout does. It shares Event ID 1000 with its
+       sibling for the reason recorded above, and it takes the same three arguments in
+       the same order. Machine-read and forced English at the emit site, as that entry
+       is, so it takes no .Singular/.Plural pair and keeps the app as the subject:
+       "it has held back {1} {2}" is correct at every count where the passive is not. -->
   <!-- THE NOTICE BESIDE THAT OUTCOME, Event ID 3002, and it exists because the
        outcome band cannot carry the distinction. The entry above sits at 1000 with
        the clean-machine line, since the run did its job either way, so a filter
@@ -1534,6 +1749,16 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        notices, so it also reaches a machine whose walk offer was emptied while a
        superseded registration was still offered beside it. Naming no cause matters
        more here for that reason, not less. -->
+  <!-- The per-file twin of the notice above, at the same Event ID 3002 and for the
+       same reason: the outcome band cannot separate a machine nothing could be judged
+       on from one that is genuinely clean. IT NAMES NO SHARE OF THE FILES IT WAS
+       UNCERTAIN ABOUT, because it is written on both the runs the note above describes:
+       the one that offered something beside the withheld half, and the one that offered
+       nothing at all. On that second run the outcome line one band away says the app
+       could not establish that any of the cached files are unneeded, and the two sit in
+       the same log a band apart, so a word here naming a share of them would describe
+       one machine two ways. Same three arguments, same order, and it names no folder,
+       which is the rule on this channel and is stated above. -->
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does
@@ -1601,20 +1826,22 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
 
        WHAT DOES NOT FOLLOW IS THAT THE TWO HOSTS REPORT THE SAME THINGS. This
        sentence is for a person. The notice in the 3000 band keeps its own
-       condition and its own figure, on records that could not be matched up rather
-       than on files held back, and the two counts are not the same quantity: see
+       condition and its own figure, on products the enumeration could not account
+       for rather than on files held back, and the two counts are not the same
+       quantity: see
        Cli.EventLogScanWithheld and ReportScanSignals. -->
-  <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, dass die eine ersetzte Datei nicht mehr gebraucht wird, und hat sie deshalb zurückgehalten.</value></data>
-  <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>Auf diesem PC konnte InstallerClean nicht sicher feststellen, dass {0} ersetzte Dateien nicht mehr gebraucht werden, und hat sie deshalb zurückgehalten.</value></data>
-  <!-- 0 = mode arg, 1 = entries in the Windows Installer records the scan could
-       not match up. A notice beside the run's summary, not a summary itself
+  <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, dass die eine ersetzte Datei nicht mehr gebraucht wird, und hat sie deshalb zurückgehalten.</value></data>
+  <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>InstallerClean konnte nicht sicher feststellen, dass {0} ersetzte Dateien nicht mehr gebraucht werden, und hat sie deshalb zurückgehalten.</value></data>
+  <!-- 0 = mode arg, 1 = installed products the enumeration could not account
+       for. A notice beside the run's summary, not a summary itself
        (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
        the always-plural "errors:" header the same audience scrapes: a machine
        surface holds one shape, and the grammar is the price of it.
 
        ONE FIGURE, AND THE KEY NAME IS NOT A PROMISE OF A SECOND. What this
-       sentence is about is the unmatched records and what they cost the count of
-       files missing from the cache; a withheld count answers a different
+       sentence is about is the products it could not account for and what they
+       cost the count of files missing from the cache; a withheld count answers a
+       different
        question, so printing it beside that clause would hand an operator a
        number with no stated relation to the words next to it. The withheld count
        travels in the opt-in result log instead, as scan.withheldPatchCount.
@@ -1682,6 +1909,13 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        placeholder, because the {0} in the PendingRenameInCache line above names a
        resolved cache path and this arm has none to name. -->
   <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Fehler: Für den nächsten Neustart ist ein Dateivorgang vorgemerkt, und InstallerClean kann nicht erkennen, welche Dateien darin genannt werden. Damit lässt sich {InstallerFolder} nicht ausschließen. Starte Windows neu, bevor du aufräumst.</value></data>
+  <!-- The command-line twin of Body.PendingReboot.RegistryCheckUnreadable, adapted the
+       way the rest of this family is: opens "Error: ", names the flags rather than the
+       window's buttons, and drops Re-scan, there being nothing to re-scan on a command
+       line. It says "registry values" where the banner says "Windows settings", the
+       reader here being the person who typed the switch. Names neither read, for the
+       reason the banner does not. No placeholder. -->
+  <data name="Cli.PendingRebootBlocked.RegistryCheckUnreadable" xml:space="preserve"><value>Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean.</value></data>
   <!-- What a blocking reason with no line of its own gets, so a reason added
        later cannot leave the command line reporting an unexpected crash for a
        run that was merely held. The command-line twin of Body.PendingReboot.Other,
@@ -1698,6 +1932,11 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <!-- The /m half of the line above, the pair matching the two Error.* pairs in
        the window's family. No placeholders. -->
   <data name="Cli.MoveInstallerLockUnavailable" xml:space="preserve"><value>Fehler: InstallerClean konnte die Windows-Installer-Sperre nicht übernehmen, die verhindert, dass zwei Programme gleichzeitig installierte Software ändern, und konnte deshalb nicht ausschließen, dass eine Datei mittendrin doch gebraucht wird. Es wurde nichts verschoben. Versuche es noch einmal und starte Windows neu, wenn es weiterhin auftritt.</value></data>
+  <!-- The console pair of Error.InstallerLockAccessRefused, /d then /m. Opens
+       "Error: " like the rest of this family, and like it says nothing about
+       trying again. No placeholders. -->
+  <data name="Cli.InstallerLockAccessRefused" xml:space="preserve"><value>Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted.</value></data>
+  <data name="Cli.MoveInstallerLockAccessRefused" xml:space="preserve"><value>Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1705,13 +1944,29 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        entry written to the Application channel) so an Application-channel
        grep can match a known string regardless of OS UI culture. -->
   <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
-       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+       2 = detail (matched path for PendingRenameInCache, otherwise empty).
+
+       The reason label is the whole of what this line says about the condition,
+       and it is why the line names none of its own: the five labels cover an
+       installer running now, a suspended transaction, two queued post-restart
+       renames and a registry read that could not answer, and no one phrase is
+       true of all five. The label carries the difference, so the fixed half
+       carries nothing but the mode and the fact that the run stopped.
+
+       The detail arrives with its own leading separator rather than the template
+       spacing it, so the four reasons that never carry one do not each log a
+       line ending in a space. -->
   <!-- 0 = arg ("/d" or "/m"). The audit twin of the two stdout lines above, and
        ONE line for both modes where they are a pair, because a machine-read line
        is matched on its shape and {0} already carries which mode ran. It cannot
        share Cli.EventLogPendingRebootBlocked: that line names a reason from
        Cli.EventLogReason.*, and every one of those asserts something is in
        progress, which is exactly what nothing here has shown. Machine-read like
+       every Cli.EventLog* line, so it is forced English at the emit site and
+       states the condition rather than the advice. The tail names both actions
+       because the line covers both modes; naming one would be false of a run in
+       the other. -->
+  <!-- 0 = mode arg. The access-refused pair of the line above, machine-read like
        every Cli.EventLog* line, so it is forced English at the emit site and
        states the condition rather than the advice. The tail names both actions
        because the line covers both modes; naming one would be false of a run in
@@ -1752,6 +2007,22 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        event-log twin, which are about whether the move can start. There is
        nothing here for a same-drive form to correct. -->
   <data name="Cli.MoveRestoreHint" xml:space="preserve"><value>Prüfe, ob deine Programme sich weiterhin wie gewohnt aktualisieren und deinstallieren lassen, und lösche dann {0}.</value></data>
+  <!-- The line a cancelled Move prints instead of the one above, where the window's
+       card carries Completion.MoveCancelledRestoreHint. A run that went the distance
+       leaves the reader deciding when to delete the backup; a run somebody stopped
+       part-way leaves them wanting the files put back, and a Move only ever moved
+       them, so putting them back is the whole of the undo.
+
+       IT NAMES BOTH FOLDERS WHERE THE WINDOW'S NAMES ONE, and that is forced rather
+       than a choice. The window's summary line above it says where the files went,
+       so its own sentence needs only where they came from. A cancelled run here
+       prints what it moved and then Cli.Cancelled, and neither names a path, so this
+       sentence carries both ends of the journey or the reader has neither.
+
+       0 = the backup folder the run was given; {InstallerFolder} resolves to the
+       cache folder. Flat at any count, as the line above is, and for the same
+       reason: it talks about the two folders rather than about the files. -->
+  <data name="Cli.MoveCancelledRestoreHint" xml:space="preserve"><value>It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was.</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,
@@ -1766,8 +2037,14 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        rather than the summary above because the counts mean something different:
        the files not in {1} were never attempted, where in the summary they
        failed. The files in {1} have left C:\Windows\Installer and are in {4},
-       which is the fact this entry exists to record. -->
-  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       which is the fact this entry exists to record. The opening has to hold for
+       both of the guard's conditions, because no host selects on which one fired
+       and one of them leaves the destination exactly where the user put it. -->
+  <!-- 0 = mode arg, 1 = processed count, 2 = total count, 3 = pluralised noun.
+       The console cancel handler is raised for either control key and never reads
+       which one it was, so the line says where the cancellation came from rather
+       than which key sent it. -->
+  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
        processed (a cancel during the scan, or before the first delete or
        move), so "each /s, /d or /m run writes one summary entry" holds for
        every run, not only the ones that committed work. -->
