@@ -92,6 +92,13 @@ jobs:
         if: success() || failure()
         run: node scripts/check-version-surfaces.mjs
 
+      # The level both hosts ask for decides what the scan concludes about a
+      # per-user product it would not be entitled to see, so it is checked with
+      # the other build inputs rather than left to whoever next opens a manifest.
+      - name: Check both hosts ask for administrator
+        if: success() || failure()
+        run: node scripts/check-elevation-manifest.mjs
+
       # A French value that lost its narrow no-break space to a plain space,
       # which plenty of editors do silently.
       - name: Lint French spacing
