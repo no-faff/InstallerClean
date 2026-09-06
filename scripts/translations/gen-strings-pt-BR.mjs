@@ -545,6 +545,19 @@ const MAP = {
   'Cli.WithheldReasons.DeclaredProductInstalled': `  Um arquivo diz pertencer a um programa que ainda está instalado, então ainda pode ser necessário.`,
   'Cli.WithheldReasons.DeclaredProductUnestablished': `  Ou um arquivo não informou a qual programa pertence, ou o Windows não respondeu sobre esse programa.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  Uma verificação de a quais programas os arquivos pertencem deu respostas que não correspondiam aos arquivos que lhe foram entregues.`,
+  'Body.PendingReboot.RegistryCheckUnreadable': `O InstallerClean não conseguiu ler uma das configurações do Windows que verifica antes de tocar em {InstallerFolder}, então não dá para saber se há uma operação de instalação em andamento ou aguardando uma reinicialização. Reinicie o Windows e use Reanalisar. Se a configuração continuar ilegível, este não é um computador que o InstallerClean possa limpar.`,
+  'Cli.InstallerLockAccessRefused': `Erro: o Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho. Nada foi excluído.`,
+  'Cli.MoveCancelledRestoreHint': `É simples de desfazer. Mova-os de volta de {0} para {InstallerFolder} e tudo voltará a ser como era.`,
+  'Cli.MoveInstallerLockAccessRefused': `Erro: o Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho. Nada foi movido.`,
+  'Cli.PendingRebootBlocked.RegistryCheckUnreadable': `Erro: o InstallerClean não conseguiu ler um dos valores de registro que verifica antes de tocar em {InstallerFolder}, então não dá para descartar uma operação do Windows Installer em andamento ou na fila para a próxima reinicialização. /m e /d estão bloqueados. Reinicie o Windows e tente de novo. Se a leitura continuar falhando, este não é um computador que o InstallerClean possa limpar.`,
+  'Completion.MoveCancelledRestoreHint': `É simples de desfazer. Mova-os de volta para {InstallerFolder} e tudo voltará a ser como era.`,
+  'Error.InstallerLockAccessRefused': `O Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho, e nada foi excluído.`,
+  'Error.MoveInstallerLockAccessRefused': `O Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho, e nada foi movido.`,
+  'Error.MoveStoppedTitle': `Movimentação interrompida`,
+  'Field.NoNamedProduct': `(sem programa)`,
+  'Summary.RegisteredWindow.Missing.Plural': `{0} ausentes`,
+  'Summary.RegisteredWindow.Missing.Singular': `{0} ausente`,
+  'UpdateCheck.Failed.Unknown.NoLog': `A verificação falhou por um motivo desconhecido. Não foi possível gravar o crash.log.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.

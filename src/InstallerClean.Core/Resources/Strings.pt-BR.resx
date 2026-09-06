@@ -115,7 +115,7 @@
        there is no program to name. Field.UnknownProductName above is the other
        case, a registered product whose display name did not come back, and the two
        never stand in for one another. -->
-  <data name="Field.NoNamedProduct" xml:space="preserve"><value>(no program)</value></data>
+  <data name="Field.NoNamedProduct" xml:space="preserve"><value>(sem programa)</value></data>
   <!-- What goes between items when the app joins a short list into one line, as
        the missing-files line does with the programs it names. A resx value and
        not a hard-coded ", " because the mark is not the same everywhere: a
@@ -432,7 +432,7 @@
        because it clears a transient fault, and the last sentence says plainly what it
        means if it does not, rather than leaving somebody re-scanning at a machine whose
        permissions will refuse the read again tomorrow. -->
-  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>InstallerClean couldn't read one of the Windows settings it checks before touching {InstallerFolder}, so it can't tell whether an installer operation is running or waiting for a restart. Restart Windows and Re-scan. If the setting still won't read, this isn't a machine InstallerClean can clean.</value></data>
+  <data name="Body.PendingReboot.RegistryCheckUnreadable" xml:space="preserve"><value>O InstallerClean não conseguiu ler uma das configurações do Windows que verifica antes de tocar em {InstallerFolder}, então não dá para saber se há uma operação de instalação em andamento ou aguardando uma reinicialização. Reinicie o Windows e use Reanalisar. Se a configuração continuar ilegível, este não é um computador que o InstallerClean possa limpar.</value></data>
   <!-- The catch-all arm, for a reason the app can detect but has no line of its
        own for. It exists so that adding a reason to the enum cannot leave a
        user reading a blank banner over dead buttons, which is what a bound
@@ -847,7 +847,7 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
        The same-drive variant exists to say the space has not come back until the
        backup is deleted, and that has nothing to attach to on a screen asking for
        the opposite. {InstallerFolder} resolves to the cache folder. -->
-  <data name="Completion.MoveCancelledRestoreHint" xml:space="preserve"><value>It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was.</value></data>
+  <data name="Completion.MoveCancelledRestoreHint" xml:space="preserve"><value>É simples de desfazer. Mova-os de volta para {InstallerFolder} e tudo voltará a ser como era.</value></data>
   <!-- The post-Delete summary. 0 = deleted count, 1 = pluralised noun. It
        states the act and stops there: the screen carries no safety claim and
        no recovery advice, because the app's position is not that a delete can
@@ -1034,8 +1034,8 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
        nothing here, because the numeral governs whatever noun a language supplies
        and the paucal bands are declared per key.
        0 = count. -->
-  <data name="Summary.RegisteredWindow.Missing.Singular" xml:space="preserve"><value>{0} missing</value></data>
-  <data name="Summary.RegisteredWindow.Missing.Plural" xml:space="preserve"><value>{0} missing</value></data>
+  <data name="Summary.RegisteredWindow.Missing.Singular" xml:space="preserve"><value>{0} ausente</value></data>
+  <data name="Summary.RegisteredWindow.Missing.Plural" xml:space="preserve"><value>{0} ausentes</value></data>
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Mover {0} {1} ({2})?</value></data>
@@ -1228,14 +1228,14 @@ O InstallerClean já estava em execução como administrador, então iniciá-lo 
        not tell the reader whether to try again: the app was refused the one
        question that would have said. Takes the "Nothing was deleted" heading. No
        placeholders. -->
-  <data name="Error.InstallerLockAccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been deleted.</value></data>
+  <data name="Error.InstallerLockAccessRefused" xml:space="preserve"><value>O Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho, e nada foi excluído.</value></data>
   <!-- The move half of the heading above, and it takes the same wording as
        Completion.NothingMoved for the same reason its sibling takes
        Completion.NothingDeleted's. No placeholders. -->
   <data name="Error.MoveInstallerLockUnavailableTitle" xml:space="preserve"><value>Nada foi movido</value></data>
   <!-- The move half of Error.InstallerLockAccessRefused. Takes the "Nothing was
        moved" heading. No placeholders. -->
-  <data name="Error.MoveInstallerLockAccessRefused" xml:space="preserve"><value>Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through, and nothing has been moved.</value></data>
+  <data name="Error.MoveInstallerLockAccessRefused" xml:space="preserve"><value>O Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho, e nada foi movido.</value></data>
   <!-- Shown when a Delete could not take Global\_MSIExecute and nothing else
        was shown to be holding it (a DACL that refuses the object, or any other
        non-fatal failure to acquire). Without that hold nothing stops a program
@@ -1261,7 +1261,7 @@ O InstallerClean já estava em execução como administrador, então iniciá-lo 
        rather than what the folder is. The four other uses of
        Error.InvalidDestinationTitle are destinations that really are invalid. No
        placeholders. -->
-  <data name="Error.MoveStoppedTitle" xml:space="preserve"><value>Move stopped</value></data>
+  <data name="Error.MoveStoppedTitle" xml:space="preserve"><value>Movimentação interrompida</value></data>
   <!-- Raised only from the Move flow, so the folder it names is the backup folder
        the user nominated. EIGHT BODIES CAN FOLLOW IT and the heading has to hold
        over every one: five open on a form of "cannot write to", and three name a
@@ -1370,7 +1370,7 @@ Detalhes em {1}.</value></data>
        other message that offers the log, a bare file name being no use to somebody
        who has to go and find it. -->
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>A verificação falhou por um motivo desconhecido. Os detalhes estão no crash.log, se você precisar relatar o problema.</value></data>
-  <data name="UpdateCheck.Failed.Unknown.NoLog" xml:space="preserve"><value>The check failed for an unknown reason. The crash log could not be written.</value></data>
+  <data name="UpdateCheck.Failed.Unknown.NoLog" xml:space="preserve"><value>A verificação falhou por um motivo desconhecido. Não foi possível gravar o crash.log.</value></data>
   <!-- 0 = the URL the user was trying to reach. The reason the launch failed
        (this process is elevated, so the browser has to be started from the
        user's own medium-integrity shell, and that chain was unavailable) is
@@ -1915,7 +1915,7 @@ Não foi possível gravar o crash.log.</value></data>
        line. It says "registry values" where the banner says "Windows settings", the
        reader here being the person who typed the switch. Names neither read, for the
        reason the banner does not. No placeholder. -->
-  <data name="Cli.PendingRebootBlocked.RegistryCheckUnreadable" xml:space="preserve"><value>Error: InstallerClean couldn't read one of the registry values it checks before touching {InstallerFolder}, so it can't rule out a Windows Installer operation in flight or queued for the next restart. /m and /d are blocked. Restart Windows and try again. If the read still fails, this isn't a machine InstallerClean can clean.</value></data>
+  <data name="Cli.PendingRebootBlocked.RegistryCheckUnreadable" xml:space="preserve"><value>Erro: o InstallerClean não conseguiu ler um dos valores de registro que verifica antes de tocar em {InstallerFolder}, então não dá para descartar uma operação do Windows Installer em andamento ou na fila para a próxima reinicialização. /m e /d estão bloqueados. Reinicie o Windows e tente de novo. Se a leitura continuar falhando, este não é um computador que o InstallerClean possa limpar.</value></data>
   <!-- What a blocking reason with no line of its own gets, so a reason added
        later cannot leave the command line reporting an unexpected crash for a
        run that was merely held. The command-line twin of Body.PendingReboot.Other,
@@ -1935,8 +1935,8 @@ Não foi possível gravar o crash.log.</value></data>
   <!-- The console pair of Error.InstallerLockAccessRefused, /d then /m. Opens
        "Error: " like the rest of this family, and like it says nothing about
        trying again. No placeholders. -->
-  <data name="Cli.InstallerLockAccessRefused" xml:space="preserve"><value>Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been deleted.</value></data>
-  <data name="Cli.MoveInstallerLockAccessRefused" xml:space="preserve"><value>Error: Windows refused InstallerClean permission to check whether Windows Installer was busy, so it couldn't rule out a file becoming needed part-way through. Nothing has been moved.</value></data>
+  <data name="Cli.InstallerLockAccessRefused" xml:space="preserve"><value>Erro: o Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho. Nada foi excluído.</value></data>
+  <data name="Cli.MoveInstallerLockAccessRefused" xml:space="preserve"><value>Erro: o Windows negou ao InstallerClean permissão para verificar se o Windows Installer estava ocupado, então não deu para descartar que um arquivo viesse a ser necessário no meio do caminho. Nada foi movido.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -2022,7 +2022,7 @@ Não foi possível gravar o crash.log.</value></data>
        0 = the backup folder the run was given; {InstallerFolder} resolves to the
        cache folder. Flat at any count, as the line above is, and for the same
        reason: it talks about the two folders rather than about the files. -->
-  <data name="Cli.MoveCancelledRestoreHint" xml:space="preserve"><value>It's simple to undo. Move them back from {0} into {InstallerFolder} and everything will be back to how it was.</value></data>
+  <data name="Cli.MoveCancelledRestoreHint" xml:space="preserve"><value>É simples de desfazer. Mova-os de volta de {0} para {InstallerFolder} e tudo voltará a ser como era.</value></data>
   <!-- 0 = the backup folder the run was given. The command line's own wording of
        Error.DestinationChangedMidBatch, whose remarks carry why it names no cause
        and why it names the folder the run was given: that one closes on Re-scan,
