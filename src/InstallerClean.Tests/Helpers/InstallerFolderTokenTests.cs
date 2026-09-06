@@ -22,12 +22,6 @@ namespace InstallerClean.Tests.Helpers;
 /// </summary>
 public class InstallerFolderTokenTests
 {
-    // Written to the Application event log and held English at the emit site
-    // (MachineContract), so a run writes the neutral value whatever language the
-    // machine is in. The neutral names the folder in words; the Japanese copy
-    // spells the path, and it is held out of the sweep below for that reason.
-    private const string MachineContractKey = "Cli.EventLogMoveDestinationInsideInstaller";
-
     private const string Literal = "C:\\Windows\\Installer";
 
     [Fact]
@@ -141,7 +135,6 @@ public class InstallerFolderTokenTests
         Assert.NotNull(set);
 
         var offenders = set!.Cast<DictionaryEntry>()
-            .Where(e => (string)e.Key != MachineContractKey)
             .Where(e => e.Value is string v
                         && v.Contains(Literal, StringComparison.OrdinalIgnoreCase))
             .Select(e => (string)e.Key)
