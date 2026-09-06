@@ -68,9 +68,6 @@ const ALSO_KEEP = [
   'Display.Elapsed.Ms',        // {0:F0}ms
   'Display.Elapsed.S',         // {0:F1}s
 
-  // The Application event log is written in English whatever the interface
-  // language is, so this label stays as it is.
-  'Cli.EventLogReason.PendingRenameUnresolved',
 ];
 
 const MAP = {
@@ -357,7 +354,6 @@ const MAP = {
   'Cli.MoveDestinationInsideInstaller': `エラー：移動先を Windows Installer フォルダー内にすることはできません。`,
   'Cli.MoveDestinationRelative': `エラー：移動先は完全修飾パスである必要があります。指定されたもの：{0}`,
   'Cli.MoveDestinationInSystemFolder': `エラー：移動先 {0} は Windows のシステムフォルダー配下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)%、%ProgramData% の外にあるパスを選んでください。`,
-  'Cli.EventLogMoveDestinationInsideInstaller': `{0}モードは中止されました：移動先 {1} はC:\\Windows\\Installer 内にあります。`,
   'Cli.EventLogMoveDestinationRelative': `{0}モードは中止されました：移動先 {1} は完全修飾パスではありません。`,
   'Cli.EventLogMoveDestinationInSystemFolder': `{0}モードは中止されました：移動先 {1} は Windows システムフォルダー内に解決されます。`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `エラー：現在、Windows Update やバックグラウンドでインストール中のプログラムなど、何かが Windows Installer を使用しています。その間 /m と /d はブロックされます。終わってからもう一度お試しください。`,
@@ -366,12 +362,9 @@ const MAP = {
   'Cli.EventLogReason.MsiExecuteMutex': `Windows Installer ミューテックスが保持されています`,
   'Cli.EventLogReason.InstallerInProgress': `インストーラートランザクションが進行中`,
   'Cli.EventLogReason.PendingRenameInCache': `キューに入れられた再起動後のファイル名変更がインストーラーキャッシュを対象としています`,
-  'Cli.EventLogPendingRebootBlocked': `{0}モードは中止されました：保留中の再起動が検出されました。理由：{1}。{2}`,
   'Cli.MovingFiles': `{0} 個の不要な {1} を {2} へ移動しています...`,
   'Cli.MovedFiles': `{0} 個の不要な {1} を移動しました。`,
   'Cli.EventLogMoveSummary': `{0}モード：{2} 個中 {1} 個の {3} を {4} に移動、{5} を移動、{6} 個の {7}。`,
-  'Cli.EventLogCancelledPartial': `{0}モードが Ctrl+C で中断されました：キャンセル前に {2} 個中 {1} 個の {3} を処理しました。ファイルごとの詳細は進捗出力を参照してください。`,
-  'Cli.EventLogCancelledNoWork': `{0}モードが作業実行前に Ctrl+C で中断されました。アクションは実行されていません。`,
   'Cli.MutexBlocked': `別の InstallerClean プロセスが単一インスタンスロックを保持しています (GUIまたは別のCLI実行)。終了コード75 (一時的)。後で再試行しても安全です。`,
   'Cli.EventLogMutexBlocked': `{0}モードはスキップされました：GUI または別の CLI 実行が既に単一インスタンスミューテックスを保持しています。`,
   'Cli.EventLogBadArguments': `実行が中止されました：認識できない、または不正な引数'{0}'。アクションは実行されていません。`,
@@ -469,7 +462,6 @@ const MAP = {
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `エラー: 次回の再起動に向けてファイル操作が予約されていますが、InstallerClean にはそれがどのファイルを指しているか分からないため、{InstallerFolder} を除外できません。クリーンアップの前に Windows を再起動してください。`,
   'Cli.MoveRestoreHint': `プログラムがこれまでどおり更新およびアンインストールできることを確認してから、{0} を削除してください。`,
   'Error.ScanStoppedDetails': `これは {0} にも記録されます。`,
-  'Cli.EventLogReason.PendingRenameUnresolved': `queued post-reboot file rename could not be resolved`,
   'Cli.NothingListedPerFile.Singular': `InstallerClean は、見つけたキャッシュ内のファイルの 1 つについて確信が持てなかったため、そのファイル({2})を提示せずに保留しました。`,
   'Cli.NothingListedPerFile.Plural': `InstallerClean は、見つけたキャッシュ内のファイルの一部について確信が持てなかったため、{0} 個の{1}({2})を提示せずに保留しました。`,
   'Cli.NothingOfferedPerFile.Singular': `InstallerClean は、見つけたキャッシュ内のファイルが不要であることを確認できなかったため、その 1 個のファイル({2})を提示せずに保留しました。`,
@@ -559,6 +551,23 @@ const STRIPPED = new Set([
   // line for them and nobody should.
   'Cli.EventLogNothingOffered',
   'Cli.EventLogNothingOfferedNotice',
+  // Five more that arrived after the PR and sat in English inside a Japanese
+  // file, which is the second way a key earns its place here. Four never had a
+  // MAP entry at all; the fifth carried the English label verbatim.
+  'Cli.EventLogNothingOfferedPerFile',
+  'Cli.EventLogNothingOfferedPerFileNotice',
+  'Cli.EventLogReason.RegistryCheckUnreadable',
+  'Cli.EventLogInstallerLockAccessRefused',
+  'Cli.EventLogReason.PendingRenameUnresolved',
+  // And four that outlived their English, the first way. Two named Ctrl+C where
+  // the entry now covers a cancel however it arrives at the console; one spelled
+  // the cache folder as a literal path where the entry names the folder; and the
+  // last opened by stating a cause, which that entry deliberately no longer does
+  // because the arm it reports carries several.
+  'Cli.EventLogCancelledNoWork',
+  'Cli.EventLogCancelledPartial',
+  'Cli.EventLogMoveDestinationInsideInstaller',
+  'Cli.EventLogPendingRebootBlocked',
 ]);
 let stripped = 0;
 text = text.replace(/[^\S\n]*<data name="(Cli\.[^"]*)"[\s\S]*?<\/data>\n?/g,

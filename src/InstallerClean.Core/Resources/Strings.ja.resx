@@ -1719,7 +1719,6 @@ InstallerClean はすでに管理者として実行されていたため、同�
        the same order. Machine-read and forced English at the emit site, as that entry
        is, so it takes no .Singular/.Plural pair and keeps the app as the subject:
        "it has held back {1} {2}" is correct at every count where the passive is not. -->
-  <data name="Cli.EventLogNothingOfferedPerFile" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not establish that any of the cached files it found are unneeded, so it has held back {1} {2}. No action taken.</value></data>
   <!-- THE NOTICE BESIDE THAT OUTCOME, Event ID 3002, and it exists because the
        outcome band cannot carry the distinction. The entry above sits at 1000 with
        the clean-machine line, since the run did its job either way, so a filter
@@ -1760,7 +1759,6 @@ InstallerClean はすでに管理者として実行されていたため、同�
        the same log a band apart, so a word here naming a share of them would describe
        one machine two ways. Same three arguments, same order, and it names no folder,
        which is the rule on this channel and is stated above. -->
-  <data name="Cli.EventLogNothingOfferedPerFileNotice" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that particular cached files it found are unneeded, so it has held back {1} {2}.</value></data>
   <!-- Retired and unread; see the note at Completion.InstanceRefusal. The command line's
        half of the second-instance pair. It said "a second instance" where the window
        said "a second copy of itself": this audience knows the term and that one does
@@ -1900,10 +1898,6 @@ InstallerClean はすでに管理者として実行されていたため、同�
        destination folder is created, so the cache is untouched. -->
   <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>エラー：{0} の空き容量が不足しています。これらのファイルの移動には {1} が必要ですが、空きは {2} です。何も移動されていません。</value></data>
   <!-- 0 = mode, 1 = destination -->
-  <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve">
-    <value>{0}モードは中止されました：移動先 {1} はC:\Windows\Installer 内にあります。</value>
-    <comment>Application event log, machine-read: MachineContract forces en-GB at the emit site, so the line reads the same whatever language the machine is in. It names the installer folder in words and spells no path, so it needs neither a literal nor the {InstallerFolder} token; the operator-facing lines that name the folder carry the token. 1 is the destination as the run was given it, and this line is the only record of that path: the sentence printed to stdout beside it names none.</comment>
-  </data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} は完全修飾パスではありません。</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} は Windows システムフォルダー内に解決されます。</value></data>
   <!-- 0 = mode, 1 = destination, 2 = size free there, 3 = size the move needs -->
@@ -1956,8 +1950,6 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <data name="Cli.EventLogReason.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer ミューテックスが保持されています</value></data>
   <data name="Cli.EventLogReason.InstallerInProgress" xml:space="preserve"><value>インストーラートランザクションが進行中</value></data>
   <data name="Cli.EventLogReason.PendingRenameInCache" xml:space="preserve"><value>キューに入れられた再起動後のファイル名変更がインストーラーキャッシュを対象としています</value></data>
-  <data name="Cli.EventLogReason.PendingRenameUnresolved" xml:space="preserve"><value>queued post-reboot file rename could not be resolved</value></data>
-  <data name="Cli.EventLogReason.RegistryCheckUnreadable" xml:space="preserve"><value>registry value the pending-reboot check needs could not be read</value></data>
   <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
        2 = detail (matched path for PendingRenameInCache, otherwise empty).
 
@@ -1971,7 +1963,6 @@ InstallerClean はすでに管理者として実行されていたため、同�
        The detail arrives with its own leading separator rather than the template
        spacing it, so the four reasons that never carry one do not each log a
        line ending in a space. -->
-  <data name="Cli.EventLogPendingRebootBlocked" xml:space="preserve"><value>{0}モードは中止されました：保留中の再起動が検出されました。理由：{1}。{2}</value></data>
   <!-- 0 = arg ("/d" or "/m"). The audit twin of the two stdout lines above, and
        ONE line for both modes where they are a pair, because a machine-read line
        is matched on its shape and {0} already carries which mode ran. It cannot
@@ -1987,7 +1978,6 @@ InstallerClean はすでに管理者として実行されていたため、同�
        states the condition rather than the advice. The tail names both actions
        because the line covers both modes; naming one would be false of a run in
        the other. -->
-  <data name="Cli.EventLogInstallerLockAccessRefused" xml:space="preserve"><value>{0} mode aborted: access to the Windows Installer mutex was refused, so whether an installation was in progress could not be established and no files were moved or deleted.</value></data>
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
        Never printed at a count of zero; see Cli.DeletingFiles. -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>{0} 個の不要な {1} を {2} へ移動しています...</value></data>
@@ -2062,12 +2052,10 @@ InstallerClean はすでに管理者として実行されていたため、同�
        The console cancel handler is raised for either control key and never reads
        which one it was, so the line says where the cancellation came from rather
        than which key sent it. -->
-  <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0}モードが Ctrl+C で中断されました：キャンセル前に {2} 個中 {1} 個の {3} を処理しました。ファイルごとの詳細は進捗出力を参照してください。</value></data>
   <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
        processed (a cancel during the scan, or before the first delete or
        move), so "each /s, /d or /m run writes one summary entry" holds for
        every run, not only the ones that committed work. -->
-  <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>{0}モードが作業実行前に Ctrl+C で中断されました。アクションは実行されていません。</value></data>
   <!-- Stdout when the CLI cannot acquire the single-instance mutex.
        The GUI variant (Strings.Startup_AlreadyRunningBody) is written
        for a user who tried to launch a second window; the CLI variant

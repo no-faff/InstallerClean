@@ -5884,9 +5884,6 @@
     "Cli.EventLogMoveNoDestination": {
       "ja": "1741b76d20c7bcbc"
     },
-    "Cli.EventLogMoveDestinationInsideInstaller": {
-      "ja": "2f632f83839a299e"
-    },
     "Cli.EventLogMoveDestinationRelative": {
       "ja": "8c62da80cdf6d106"
     },
@@ -5902,17 +5899,8 @@
     "Cli.EventLogReason.PendingRenameInCache": {
       "ja": "b70ed1d800d1b9e0"
     },
-    "Cli.EventLogPendingRebootBlocked": {
-      "ja": "763e3a4956ee0523"
-    },
     "Cli.EventLogMoveSummary": {
       "ja": "dfdafd92077dd3f2"
-    },
-    "Cli.EventLogCancelledPartial": {
-      "ja": "7eeba7a5cb331dc9"
-    },
-    "Cli.EventLogCancelledNoWork": {
-      "ja": "5a922c6fc61b78a7"
     },
     "Cli.EventLogMutexBlocked": {
       "ja": "97cc3de731f99f7d"
