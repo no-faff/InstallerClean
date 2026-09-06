@@ -1382,8 +1382,8 @@ Detalhes em {1}.</value></data>
        again. The second names the app because its sentence needs a subject and
        that heading, being a verb phrase, has none to lend; "either" takes the
        heading as its antecedent in both. -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>O link está na área de transferência, então você pode colá-lo:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>O InstallerClean também não conseguiu copiar o link para a área de transferência, então aqui está:&#10;&#10;{0}</value></data>
   <!-- 0 = the backup folder the run was given. Raised when the guard between two
        files of the same Move can no longer confirm that folder, and it says
        nothing about why on purpose: two conditions reach it, the folder being

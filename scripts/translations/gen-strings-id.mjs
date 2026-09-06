@@ -379,8 +379,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di {0} jika Anda perlu melaporkannya.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `Tautannya ada di papan klip, jadi Anda bisa menempelkannya sendiri:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean juga tidak bisa menyalin tautannya ke papan klip, jadi ini dia:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti. Periksa {0}, lalu Pindai ulang dan coba lagi.`,

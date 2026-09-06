@@ -364,8 +364,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `A verificação falhou por um motivo desconhecido. Os detalhes estão em {0}, se você precisar relatar o problema.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `O link está na área de transferência, então você pode colá-lo:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `O InstallerClean também não conseguiu copiar o link para a área de transferência, então aqui está:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de backup, então parou. Verifique {0}, depois Reanalisar e tente de novo.`,

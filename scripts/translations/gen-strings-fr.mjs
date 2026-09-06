@@ -387,8 +387,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `La vérification a échoué pour une raison inconnue. Les détails sont dans {0} si vous devez le signaler.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `Le lien est dans le presse-papiers, vous pouvez donc le coller vous-même :&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean n'a pas pu copier le lien dans le presse-papiers non plus, le voici :&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de sauvegarde, il s'est donc arrêté. Vérifiez {0}, puis Réanalyser et réessayez.`,

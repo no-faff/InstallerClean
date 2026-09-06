@@ -358,8 +358,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `Проверка не удалась по неизвестной причине. Подробности в {0}, если нужно сообщить об этом.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `Ссылка в буфере обмена, так что вы можете вставить её сами:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean также не смог скопировать ссылку в буфер обмена, вот она:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `InstallerClean больше не смог подтвердить папку резервных копий и остановился. Проверьте {0}, затем «Повторить сканирование» и попробуйте снова.`,

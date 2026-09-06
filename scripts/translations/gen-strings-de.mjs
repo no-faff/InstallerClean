@@ -380,8 +380,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `Die Prüfung ist aus unbekanntem Grund fehlgeschlagen. Details stehen in {0}, falls du es melden möchtest.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `Der Link ist in der Zwischenablage, du kannst ihn also selbst einfügen:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean konnte den Link auch nicht in die Zwischenablage kopieren, hier ist er:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `InstallerClean konnte den Sicherungsordner nicht mehr bestätigen und hat deshalb angehalten. Prüfe {0}, dann Neu scannen und noch einmal versuchen.`,

@@ -396,8 +396,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `Sprawdzanie nie powiodło się z nieznanej przyczyny. Szczegóły są w {0}, jeśli chcesz to zgłosić.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `Link jest w schowku, więc możesz go wkleić samodzielnie:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean nie zdołał też skopiować linku do schowka, więc oto on:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu kopii zapasowej, więc zatrzymał się. Sprawdź {0}, potem Skanuj ponownie i spróbuj jeszcze raz.`,
