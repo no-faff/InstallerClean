@@ -373,19 +373,13 @@ public partial class CompletionViewModel : ObservableObject
 
     /// <summary>
     /// The failure count line for a completion overlay, or empty when nothing
-    /// failed. The English names the count on its own, one sentence for one
-    /// thing on the cancelled card and on the finished one alike.
-    ///
-    /// A translation may still put that count over a denominator, and the one
-    /// it is given is what the operation TRIED
-    /// (<paramref name="actedCount"/> + <paramref name="failedCount"/>), not
-    /// the batch it was handed: on a run the user cancelled, the files it never
-    /// reached are not files that could not be processed, and on a run that went
-    /// the distance the two numbers are the same anyway. So one formula is
-    /// honest on both, and the cancelled summary line below still names the
-    /// full batch it was working through.
+    /// failed. It names the number that failed and nothing beside it, one
+    /// sentence for one thing on the cancelled card and on the finished one
+    /// alike, in every language the app ships. The cancelled summary line below
+    /// is what names the full batch the run was working through, which is a
+    /// different sentence with a different job.
     /// </summary>
-    private static string FailedCountText(int actedCount, int failedCount, bool deleting)
+    private static string FailedCountText(int failedCount, bool deleting)
     {
         if (failedCount == 0) return string.Empty;
 
@@ -397,14 +391,12 @@ public partial class CompletionViewModel : ObservableObject
                Strings.Completion_FailedCount_Plural,
                "Completion.FailedCount");
 
-        // BOTH ARGUMENTS GO IN, ALTHOUGH THE ENGLISH NOW SPELLS ONLY THE FIRST.
-        // The translated values spell the second, and string.Format throws on an
-        // index it was not handed while an argument nothing reads costs nothing.
-        // So the total stays here until every value has been written without it.
+        // The count of files that failed, and nothing else. Every value in this
+        // family spells one placeholder, so a second argument would be handed to
+        // string.Format and read by none of them.
         return string.Format(
             DisplayHelpers.Pluralise(failedCount, singular, plural, key),
-            DisplayHelpers.FormatCount(failedCount),
-            DisplayHelpers.FormatCount(actedCount + failedCount));
+            DisplayHelpers.FormatCount(failedCount));
     }
 
     /// <summary>
@@ -474,7 +466,7 @@ public partial class CompletionViewModel : ObservableObject
             : string.Format(
                 space == MoveSpaceOutcome.FreedSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
                 DisplayHelpers.FormatSize(movedBytes));
-        FailedCount = FailedCountText(movedCount, errors.Count, deleting: false);
+        FailedCount = FailedCountText(errors.Count, deleting: false);
         var movedLabel = DisplayHelpers.PluraliseFile(movedCount);
         // SummaryDestination must be set before Summary: the WPF host rebuilds
         // the summary line's inlines (splitting the sentence at this substring
@@ -532,7 +524,7 @@ public partial class CompletionViewModel : ObservableObject
         Heading = HeadingIsWarning
             ? Strings.Completion_NothingDeleted
             : string.Format(Strings.Completion_Freed, DisplayHelpers.FormatSize(deletedBytes));
-        FailedCount = FailedCountText(deletedCount, errors.Count, deleting: true);
+        FailedCount = FailedCountText(errors.Count, deleting: true);
         SummaryDestination = string.Empty;
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         // Suppressed when nothing was deleted: see ShowMoveSummary. "0 files
@@ -593,7 +585,7 @@ public partial class CompletionViewModel : ObservableObject
             : string.Format(
                 space == MoveSpaceOutcome.FreedSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
                 DisplayHelpers.FormatSize(movedBytes));
-        FailedCount = FailedCountText(movedCount, errors.Count, deleting: false);
+        FailedCount = FailedCountText(errors.Count, deleting: false);
         // Left empty on purpose, which is what keeps the destination in the flow of
         // the sentence: the WPF host forces SummaryDestination onto a line of its
         // own, and here the path sits mid-sentence with the cancel after it. The
@@ -652,7 +644,7 @@ public partial class CompletionViewModel : ObservableObject
         Heading = HeadingIsWarning
             ? Strings.Completion_NothingDeleted
             : string.Format(Strings.Completion_Freed, DisplayHelpers.FormatSize(deletedBytes));
-        FailedCount = FailedCountText(deletedCount, errors.Count, deleting: true);
+        FailedCount = FailedCountText(errors.Count, deleting: true);
         SummaryDestination = string.Empty;
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_PermanentDeleteCancelledSummary, "Completion.PermanentDeleteCancelledSummary"),
