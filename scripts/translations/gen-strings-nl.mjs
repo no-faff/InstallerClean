@@ -379,7 +379,7 @@ const MAP = {
 
   // Single instance / startup / crash
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean is al actief.`,
+  'Startup.AlreadyRunningBody': `Het is al actief.`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `Er is een onverwachte fout opgetreden en InstallerClean moet worden afgesloten.\n\n{0}\n\nDetails weggeschreven naar:\n{1}`,
   'Startup.UnhandledBody.NoLog': `Er is een onverwachte fout opgetreden en InstallerClean moet worden afgesloten.\n\n{0}\n\nHet crashlog kon niet worden weggeschreven.`,

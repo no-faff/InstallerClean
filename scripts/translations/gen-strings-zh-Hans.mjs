@@ -303,7 +303,7 @@ const MAP = {
   'ConfirmSendResultLog.Reassurance': `它会发送到 nofaff.netlify.app/api/result-log。没有任何内容能识别您或您的机器；它只是让我知道 InstallerClean 是否正常工作，以及[大家释放了多少空间]。`,
   'Automation.ResultLogPreview': `报告预览`,
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean 已在运行。`,
+  'Startup.AlreadyRunningBody': `已在运行。`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `发生了意外错误，InstallerClean 需要关闭。\n\n{0}\n\n详情已写入：\n{1}`,
   'Startup.UnhandledBody.NoLog': `发生了意外错误，InstallerClean 需要关闭。\n\n{0}\n\n无法写入崩溃日志。`,

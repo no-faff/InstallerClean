@@ -385,7 +385,7 @@ const MAP = {
 
   // Single instance / startup / crash
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean đang chạy rồi.`,
+  'Startup.AlreadyRunningBody': `Đang chạy rồi.`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `Đã xảy ra lỗi không mong muốn và InstallerClean cần đóng lại.\n\n{0}\n\nChi tiết đã được ghi vào:\n{1}`,
   'Startup.UnhandledBody.NoLog': `Đã xảy ra lỗi không mong muốn và InstallerClean cần đóng lại.\n\n{0}\n\nKhông thể ghi nhật ký sự cố.`,

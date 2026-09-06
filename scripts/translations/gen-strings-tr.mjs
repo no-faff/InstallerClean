@@ -310,7 +310,7 @@ Ayrıntılar {1} içinde.`,
   'ConfirmSendResultLog.Reassurance': `nofaff.netlify.app/api/result-log adresine gönderilir. Hiçbir şey sizi ya da makinenizi tanımlamaz; yalnızca InstallerClean'in çalıştığını ve [insanların ne kadar yer açtığını] bana bildirir.`,
   'Automation.ResultLogPreview': `Rapor önizlemesi`,
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean zaten çalışıyor.`,
+  'Startup.AlreadyRunningBody': `Zaten çalışıyor.`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `Beklenmeyen bir hata oluştu ve InstallerClean kapanmak zorunda.
 

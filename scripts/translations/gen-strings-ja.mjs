@@ -314,7 +314,7 @@ const MAP = {
   'ConfirmSendResultLog.Reassurance': `送信先は nofaff.netlify.app/api/result-log です。あなたやあなたのマシンを特定するものは何もありません。InstallerClean が動作していることと、[どれだけの容量が解放されているか]を知るためのものです。`,
   'Automation.ResultLogPreview': `レポートのプレビュー`,
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean は既に実行中です。`,
+  'Startup.AlreadyRunningBody': `既に実行中です。`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `予期しないエラーが発生し、InstallerClean を終了する必要があります。\n\n{0}\n\n詳細は以下に書き込まれました：\n{1}`,
   'Startup.UnhandledBody.NoLog': `予期しないエラーが発生し、InstallerClean を終了する必要があります。\n\n{0}\n\nクラッシュログを書き込めませんでした。`,

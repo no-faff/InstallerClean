@@ -401,7 +401,7 @@ const MAP = {
 
   // Single instance / startup / crash
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean sudah berjalan.`,
+  'Startup.AlreadyRunningBody': `Sudah berjalan.`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `Terjadi kesalahan tak terduga dan InstallerClean perlu ditutup.\n\n{0}\n\nDetail ditulis ke:\n{1}`,
   'Startup.UnhandledBody.NoLog': `Terjadi kesalahan tak terduga dan InstallerClean perlu ditutup.\n\n{0}\n\nLog kerusakan tidak bisa ditulis.`,

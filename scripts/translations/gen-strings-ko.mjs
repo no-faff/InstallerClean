@@ -379,7 +379,7 @@ const MAP = {
 
   // Single instance / startup / crash
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean이 이미 실행 중입니다.`,
+  'Startup.AlreadyRunningBody': `이미 실행 중입니다.`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `예기치 않은 오류가 발생하여 InstallerClean을 닫아야 합니다.\n\n{0}\n\n자세한 내용을 기록한 위치:\n{1}`,
   'Startup.UnhandledBody.NoLog': `예기치 않은 오류가 발생하여 InstallerClean을 닫아야 합니다.\n\n{0}\n\n크래시 로그를 기록할 수 없었습니다.`,

@@ -327,7 +327,7 @@ const MAP = {
   'ConfirmSendResultLog.Reassurance': `Se envía a nofaff.netlify.app/api/result-log. Nada te identifica a ti ni a tu equipo; solo sirve para que yo sepa que InstallerClean funciona y [cuánto espacio libera la gente].`,
   'Automation.ResultLogPreview': `Vista previa del informe`,
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean ya se está ejecutando.`,
+  'Startup.AlreadyRunningBody': `Ya se está ejecutando.`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `Se produjo un error inesperado e InstallerClean debe cerrarse.\n\n{0}\n\nDetalles guardados en:\n{1}`,
   'Startup.UnhandledBody.NoLog': `Se produjo un error inesperado e InstallerClean debe cerrarse.\n\n{0}\n\nNo se pudo escribir el archivo crash.log.`,

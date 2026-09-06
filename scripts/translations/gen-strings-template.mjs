@@ -487,7 +487,7 @@ const MAP = {
 
   // Single instance / startup / crash
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean is already running.`,
+  'Startup.AlreadyRunningBody': `It's already running.`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `An unexpected error occurred and InstallerClean needs to close.\n\n{0}\n\nDetails written to:\n{1}`,
   'Startup.UnhandledBody.NoLog': `An unexpected error occurred and InstallerClean needs to close.\n\n{0}\n\nThe crash log could not be written.`,

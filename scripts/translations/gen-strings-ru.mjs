@@ -380,7 +380,7 @@ const MAP = {
 
   // Single instance / startup / crash
   'Startup.AlreadyRunningTitle': `InstallerClean`,
-  'Startup.AlreadyRunningBody': `InstallerClean уже запущен.`,
+  'Startup.AlreadyRunningBody': `Уже запущен.`,
   'Startup.UnhandledTitle': `InstallerClean`,
   'Startup.UnhandledBody': `Произошла непредвиденная ошибка, и InstallerClean необходимо закрыть.\n\n{0}\n\nПодробности записаны в:\n{1}`,
   'Startup.UnhandledBody.NoLog': `Произошла непредвиденная ошибка, и InstallerClean необходимо закрыть.\n\n{0}\n\nНе удалось записать журнал сбоев.`,

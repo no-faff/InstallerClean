@@ -1443,7 +1443,7 @@ InstallerClean уже был запущен от имени администра
        name, so the sentence opens on the pronoun rather than naming the app again
        a line below it. Anything that shows this WITHOUT that heading over it needs
        a string of its own: the command line has one, Cli.MutexBlocked. -->
-  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean уже запущен.</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>Уже запущен.</value></data>
   <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
   <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
        The full exception message is intentionally NOT formatted in here:
