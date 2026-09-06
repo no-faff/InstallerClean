@@ -12,11 +12,18 @@ public partial class UpdateAvailableWindow : Window
         VersionInfo.Text = string.Format(
             Strings.UpdateCheck_UpdateAvailable_Body,
             currentVersion, latestVersion);
-        // Title carries the version specifics so they are spoken when the
-        // dialog opens, matching the Confirm dialogs' Title = on-card text.
-        // ShowInTaskbar=false and the custom chrome mean the Title is never
-        // rendered, so this is announcement-only, not a visible change.
-        Title = VersionInfo.Text;
+        // The window title is what a screen reader announces when a dialog
+        // opens, and ShowInTaskbar is false under custom chrome, so it serves
+        // the announcement and nothing else. Heading then body, the order the
+        // card reads, as the sibling modals compose theirs: on open only the
+        // title and the focused button are spoken, so a heading left on the
+        // card alone would go unheard and the versions under it would arrive
+        // with nothing saying what they are about.
+        //
+        // Joined with a full stop, as MessageWindow joins its own, because
+        // this heading ends in none in any language. The Confirm dialogs join
+        // with a bare space because theirs end in a question mark.
+        Title = Strings.UpdateCheck_UpdateAvailable_Title + ". " + VersionInfo.Text;
 
         // Sized to content; the clamp stops a very large text scale
         // pushing the card past the work area, at which point the
