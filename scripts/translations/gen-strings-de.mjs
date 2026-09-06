@@ -335,7 +335,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `Nicht genügend Speicherplatz`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `Nicht genügend Speicherplatz unter {0}\n\nBenötigt: {1}\nVerfügbar: {2}`,
+  'Error.NotEnoughSpaceBody': `Unter {0} ist zu wenig Platz\n\nBenötigt: {1}\nVerfügbar: {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `Du hast keine Berechtigung, in {0} zu schreiben.\nVersuch einen Ordner in deinem Benutzerprofil oder auf einem Laufwerk, das dir gehört.`,

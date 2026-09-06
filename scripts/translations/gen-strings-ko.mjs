@@ -312,7 +312,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `공간 부족`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `{0}에 공간이 부족합니다\n\n필요: {1}\n사용 가능: {2}`,
+  'Error.NotEnoughSpaceBody': `{0}에 자리가 부족합니다\n\n필요: {1}\n사용 가능: {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `{0}에 쓸 권한이 없습니다.\n사용자 프로필 안의 폴더나 본인 소유의 드라이브를 사용해 보세요.`,

@@ -1287,7 +1287,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
        body under Error.NotEnoughSpaceTitle, so the opening carries the folder
        rather than the heading's own words again. -->
-  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} の空き容量が不足しています
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} に十分な空きがありません
 
 必要：{1}
 利用可能：{2}</value></data>

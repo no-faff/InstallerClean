@@ -1287,7 +1287,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
        body under Error.NotEnoughSpaceTitle, so the opening carries the folder
        rather than the heading's own words again. -->
-  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} 上的空间不足
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} 上放不下
 
 所需：{1}
 可用：{2}</value></data>

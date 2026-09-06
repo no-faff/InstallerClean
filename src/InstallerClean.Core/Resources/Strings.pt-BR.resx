@@ -1287,7 +1287,7 @@ O InstallerClean já estava em execução como administrador, então iniciá-lo 
   <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
        body under Error.NotEnoughSpaceTitle, so the opening carries the folder
        rather than the heading's own words again. -->
-  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Espaço insuficiente em {0}
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Não cabe em {0}
 
 Necessário: {1}
 Disponível: {2}</value></data>

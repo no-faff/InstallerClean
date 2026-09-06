@@ -318,7 +318,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `Không đủ dung lượng`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `Không đủ dung lượng tại {0}\n\nCần: {1}\nCòn trống: {2}`,
+  'Error.NotEnoughSpaceBody': `Không còn đủ chỗ tại {0}\n\nCần: {1}\nCòn trống: {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `Bạn không có quyền ghi vào {0}.\nHãy thử một thư mục trong hồ sơ người dùng của bạn hoặc trên một ổ đĩa bạn sở hữu.`,

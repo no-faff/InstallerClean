@@ -1287,7 +1287,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
   <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
        body under Error.NotEnoughSpaceTitle, so the opening carries the folder
        rather than the heading's own words again. -->
-  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Không đủ dung lượng tại {0}
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Không còn đủ chỗ tại {0}
 
 Cần: {1}
 Còn trống: {2}</value></data>

@@ -258,10 +258,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `Hedef, Windows Installer klasörünün içinde olamaz.`,
   'Error.DestinationInSystemFolder': `{0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% ve %ProgramData% dışında bir yol seçin.`,
   'Error.NotEnoughSpaceTitle': `Yetersiz alan`,
-  'Error.NotEnoughSpaceBody': `{0} konumunda yeterli alan yok
-
-Gerekli: {1}
-Kullanılabilir: {2}`,
+  'Error.NotEnoughSpaceBody': `{0} konumunda yeterince yer yok\n\nGerekli: {1}\nKullanılabilir: {2}`,
   'Error.AccessDeniedDestination': `{0} konumuna yazma izniniz yok.
 Kullanıcı profilinizdeki ya da sahibi olduğunuz bir sürücüdeki bir klasörü deneyin.`,
   'Error.PathTooLong': `{0} yolu Windows için çok uzun. Daha kısa bir yol seçin.`,

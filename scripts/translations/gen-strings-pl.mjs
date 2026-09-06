@@ -351,7 +351,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `Za mało miejsca`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `Za mało miejsca w {0}\n\nWymagane: {1}\nDostępne: {2}`,
+  'Error.NotEnoughSpaceBody': `W {0} brakuje miejsca\n\nWymagane: {1}\nDostępne: {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `Nie masz uprawnień do zapisu w {0}.\nWypróbuj folder w swoim profilu użytkownika lub na własnym dysku.`,

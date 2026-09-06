@@ -1287,7 +1287,7 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
   <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
        body under Error.NotEnoughSpaceTitle, so the opening carries the folder
        rather than the heading's own words again. -->
-  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Ruang tidak cukup di {0}
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Tidak cukup tempat di {0}
 
 Diperlukan: {1}
 Tersedia: {2}</value></data>

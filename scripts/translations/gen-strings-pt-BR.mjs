@@ -319,7 +319,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `Espaço insuficiente`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `Espaço insuficiente em {0}\n\nNecessário: {1}\nDisponível: {2}`,
+  'Error.NotEnoughSpaceBody': `Não cabe em {0}\n\nNecessário: {1}\nDisponível: {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `Você não tem permissão para gravar em {0}.\nTente uma pasta no seu perfil de usuário ou em uma unidade sua.`,

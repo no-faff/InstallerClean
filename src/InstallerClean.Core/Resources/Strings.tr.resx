@@ -1287,7 +1287,7 @@ InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden
   <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
        body under Error.NotEnoughSpaceTitle, so the opening carries the folder
        rather than the heading's own words again. -->
-  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} konumunda yeterli alan yok
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} konumunda yeterince yer yok
 
 Gerekli: {1}
 Kullanılabilir: {2}</value></data>

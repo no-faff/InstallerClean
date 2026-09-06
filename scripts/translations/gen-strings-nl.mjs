@@ -329,7 +329,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `De bestemming mag niet in de Windows Installer-map liggen.`,
   'Error.DestinationInSystemFolder': `De bestemming {0} verwijst naar een locatie onder een Windows-systeemmap. Kies een pad buiten %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% en %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Onvoldoende ruimte`,
-  'Error.NotEnoughSpaceBody': `Onvoldoende ruimte op {0}\n\nVereist: {1}\nBeschikbaar: {2}`,
+  'Error.NotEnoughSpaceBody': `Er is te weinig plek op {0}\n\nVereist: {1}\nBeschikbaar: {2}`,
   'Error.AccessDeniedDestination': `Je hebt geen schrijfrechten voor {0}.\nProbeer een map in je gebruikersprofiel of op een schijf die van jou is.`,
   'Error.PathTooLong': `Het pad {0} is te lang voor Windows. Kies een korter pad.`,
   'Error.DestinationMissing': `De map {0} bestaat niet en kon niet worden aangemaakt. Controleer de stationsletter of het netwerkpad.`,

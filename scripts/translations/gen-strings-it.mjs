@@ -276,7 +276,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `La destinazione non può trovarsi all'interno della cartella di Windows Installer.`,
   'Error.DestinationInSystemFolder': `La destinazione {0} si risolve dentro una cartella di sistema di Windows. Scegli un percorso fuori da %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% e %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Spazio insufficiente`,
-  'Error.NotEnoughSpaceBody': `Spazio insufficiente in {0}\n\nNecessario: {1}\nDisponibile: {2}`,
+  'Error.NotEnoughSpaceBody': `Non c'è abbastanza posto in {0}\n\nNecessario: {1}\nDisponibile: {2}`,
   'Error.AccessDeniedDestination': `Non hai i permessi per scrivere in {0}.\nProva una cartella nel profilo utente o in un'unità di tua proprietà.`,
   'Error.PathTooLong': `Il percorso {0} è troppo lungo per Windows. Scegli un percorso più corto.`,
   'Error.DestinationMissing': `La cartella {0} non esiste e non è stato possibile crearla. Controlla la lettera dell'unità o il percorso di rete.`,

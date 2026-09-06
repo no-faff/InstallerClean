@@ -334,7 +334,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `Ruang tidak cukup`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `Ruang tidak cukup di {0}\n\nDiperlukan: {1}\nTersedia: {2}`,
+  'Error.NotEnoughSpaceBody': `Tidak cukup tempat di {0}\n\nDiperlukan: {1}\nTersedia: {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `Anda tidak punya izin untuk menulis ke {0}.\nCoba folder di profil pengguna Anda atau di drive milik Anda sendiri.`,

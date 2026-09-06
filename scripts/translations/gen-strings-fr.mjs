@@ -342,7 +342,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `Espace insuffisant`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `Espace insuffisant dans {0}\n\nNécessaire : {1}\nDisponible : {2}`,
+  'Error.NotEnoughSpaceBody': `Il n'y a pas assez de place dans {0}\n\nNécessaire : {1}\nDisponible : {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `Vous n'avez pas l'autorisation d'écrire dans {0}.\nEssayez un dossier dans votre profil utilisateur ou sur un lecteur qui vous appartient.`,

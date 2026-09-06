@@ -1287,7 +1287,7 @@ InstallerClean уже працював від імені адміністрат�
   <!-- 0 = destination, 1 = required size, 2 = available size. One consumer, the
        body under Error.NotEnoughSpaceTitle, so the opening carries the folder
        rather than the heading's own words again. -->
-  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Недостатньо місця в {0}
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>У {0} не вистачає місця
 
 Потрібно: {1}
 Доступно: {2}</value></data>

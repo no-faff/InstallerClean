@@ -268,7 +268,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `移動先を Windows Installer フォルダー内にすることはできません。`,
   'Error.DestinationInSystemFolder': `移動先 {0} は Windows のシステムフォルダー配下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)%、%ProgramData% の外にあるパスを選んでください。`,
   'Error.NotEnoughSpaceTitle': `空き容量が不足しています`,
-  'Error.NotEnoughSpaceBody': `{0} の空き容量が不足しています\n\n必要：{1}\n利用可能：{2}`,
+  'Error.NotEnoughSpaceBody': `{0} に十分な空きがありません\n\n必要：{1}\n利用可能：{2}`,
   'Error.AccessDeniedDestination': `{0} に書き込む権限がありません。\nユーザープロファイル内または自分が所有するドライブ上のフォルダーを試してください。`,
   'Error.PathTooLong': `パス{0} は Windows にとって長すぎます。より短いパスを選択してください。`,
   'Error.DestinationMissing': `フォルダー {0} が存在せず、作成できませんでした。ドライブ文字またはネットワークパスを確認してください。`,

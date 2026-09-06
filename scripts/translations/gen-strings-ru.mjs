@@ -313,7 +313,7 @@ const MAP = {
   'Error.NotEnoughSpaceTitle': `Недостаточно места`,
 
   // 0 = destination, 1 = required size, 2 = available size
-  'Error.NotEnoughSpaceBody': `Недостаточно места в {0}\n\nТребуется: {1}\nДоступно: {2}`,
+  'Error.NotEnoughSpaceBody': `В {0} не хватает места\n\nТребуется: {1}\nДоступно: {2}`,
 
   // 0 = destination
   'Error.AccessDeniedDestination': `У вас нет прав на запись в {0}.\nПопробуйте папку в своём профиле пользователя или на диске, которым владеете.`,

@@ -257,7 +257,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `目标不能位于 Windows Installer 文件夹内。`,
   'Error.DestinationInSystemFolder': `目标 {0} 解析到了 Windows 系统文件夹之下。请选择 %SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)% 和 %ProgramData% 之外的路径。`,
   'Error.NotEnoughSpaceTitle': `空间不足`,
-  'Error.NotEnoughSpaceBody': `{0} 上的空间不足\n\n所需：{1}\n可用：{2}`,
+  'Error.NotEnoughSpaceBody': `{0} 上放不下\n\n所需：{1}\n可用：{2}`,
   'Error.AccessDeniedDestination': `您没有写入 {0} 的权限。\n请尝试您的用户配置文件中的文件夹，或您拥有的驱动器。`,
   'Error.PathTooLong': `路径 {0} 对 Windows 来说太长了。请选择更短的路径。`,
   'Error.DestinationMissing': `文件夹 {0} 不存在，且无法创建。请检查驱动器盘符或网络路径。`,
