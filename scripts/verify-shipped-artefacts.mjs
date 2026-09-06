@@ -107,14 +107,140 @@ const culturesIn = (bytes) => {
   return [...new Set([...text.matchAll(re)].map((m) => m[1]))].sort();
 };
 
-// The Win32 manifest is a resource on the executable rather than an entry in the
-// bundle, so it is readable whether or not the bundle was compressed.
-const manifestLevelIn = (bytes) => {
-  const text = bytes.toString('latin1');
-  const tags = text.match(/<requestedExecutionLevel\b[^>]*>/g) ?? [];
-  if (tags.length === 0) return null;
-  const level = tags[0].match(/\blevel="([^"]*)"/);
-  return level ? level[1] : null;
+// THE MANIFEST WINDOWS HONOURS IS A PE RESOURCE, AND A SINGLE-FILE ARTEFACT
+// HOLDS OTHERS THAT IT DOES NOT. The apphost carries the app's own manifest in
+// its resource directory, and a single-file publish appends a bundle after that
+// image. Assemblies inside the bundle can carry manifests of their own asking
+// for a different level, and those are payload bytes the loader never consults.
+// Scanning the file for the first thing shaped like a manifest cannot tell the
+// two apart, so the level is read out of the resource directory instead, which
+// is the same place the loader reads it from. Compression decides how many of
+// the payload copies are legible as text and decides nothing about which
+// manifest starts the process.
+const RT_MANIFEST = 24;
+
+// The resource id Windows reserves for an executable's own manifest. A library
+// declares its isolation-aware manifest under 2, and nothing here reads one.
+const APP_MANIFEST_ID = 1;
+
+// Where the resource table sits among the optional header's data directories.
+const RESOURCE_TABLE_INDEX = 2;
+
+// Walks the PE headers to the resource directory and returns every manifest
+// stored at RT_MANIFEST under the executable's own id. There is normally one.
+// More than one means a copy per language, which is why they are returned as a
+// set rather than reduced here: the caller is entitled to know that two copies
+// of the same manifest ask for different things.
+//
+// Anything unreadable is returned as an error rather than as an absence, for
+// the same reason an absent artefact fails: a guard that cannot see what it
+// came to check has not checked it.
+const manifestsIn = (bytes) => {
+  try {
+    return readManifests(bytes);
+  } catch {
+    return { error: 'the image is malformed: a header read ran off the end of the file' };
+  }
+};
+
+const readManifests = (bytes) => {
+  const u16 = (o) => bytes.readUInt16LE(o);
+  const u32 = (o) => bytes.readUInt32LE(o);
+  const problem = (why) => ({ error: why });
+
+  if (bytes.length < 0x40 || u16(0) !== 0x5a4d) return problem('not a PE image: no MZ signature');
+  const pe = u32(0x3c);
+  if (pe + 24 > bytes.length || u32(pe) !== 0x00004550) return problem('not a PE image: no PE signature');
+
+  const sectionCount = u16(pe + 6);
+  const optionalSize = u16(pe + 20);
+  const optional = pe + 24;
+
+  // PE32 and PE32+ differ only in the width of a few optional-header fields, so
+  // the data directories sit at a different offset in each.
+  const magic = u16(optional);
+  if (magic !== 0x10b && magic !== 0x20b) return problem(`unrecognised optional header magic 0x${magic.toString(16)}`);
+  const wide = magic === 0x20b;
+
+  if (u32(optional + (wide ? 108 : 92)) <= RESOURCE_TABLE_INDEX) {
+    return problem('the optional header declares no resource data directory');
+  }
+  const entry = optional + (wide ? 112 : 96) + RESOURCE_TABLE_INDEX * 8;
+  const rootRva = u32(entry);
+  if (rootRva === 0 || u32(entry + 4) === 0) return problem('the image carries no resource directory');
+
+  // Resource offsets are addresses in the loaded image, so each one has to be
+  // put back through the section table to find the byte in the file.
+  const sections = [];
+  for (let i = 0; i < sectionCount; i += 1) {
+    const s = optional + optionalSize + i * 40;
+    if (s + 40 > bytes.length) return problem('the section table runs past the end of the file');
+    sections.push({ virtual: u32(s + 12), virtualSize: u32(s + 8), raw: u32(s + 20), rawSize: u32(s + 16) });
+  }
+  const fileOffsetOf = (rva) => {
+    for (const s of sections) {
+      const span = Math.max(s.virtualSize, s.rawSize);
+      if (rva >= s.virtual && rva < s.virtual + span) return s.raw + (rva - s.virtual);
+    }
+    return -1;
+  };
+
+  const root = fileOffsetOf(rootRva);
+  if (root < 0) return problem('the resource directory address falls in no section');
+
+  // Every offset inside the resource tree is relative to its root. The top bit
+  // of a name says whether it is a string rather than an id, and the top bit of
+  // an offset says whether it points at another directory rather than at data.
+  const childrenOf = (offset) => {
+    const dir = root + offset;
+    if (dir + 16 > bytes.length) return null;
+    const total = u16(dir + 12) + u16(dir + 14);
+    const out = [];
+    for (let i = 0; i < total; i += 1) {
+      const e = dir + 16 + i * 8;
+      if (e + 8 > bytes.length) return null;
+      const name = u32(e);
+      const to = u32(e + 4);
+      out.push({ named: name >= 0x80000000, id: name & 0x7fffffff, directory: to >= 0x80000000, offset: to & 0x7fffffff });
+    }
+    return out;
+  };
+  const withId = (list, id) => (list ?? []).find((c) => !c.named && c.id === id);
+
+  const types = childrenOf(0);
+  if (!types) return problem('the resource directory could not be read');
+  const manifestType = withId(types, RT_MANIFEST);
+  if (!manifestType) return problem('the image holds no manifest resource');
+  if (!manifestType.directory) return problem('the manifest resource is not a directory');
+
+  const own = withId(childrenOf(manifestType.offset), APP_MANIFEST_ID);
+  if (!own) return problem(`the image holds no manifest at resource id ${APP_MANIFEST_ID}`);
+
+  const leaves = own.directory ? childrenOf(own.offset) : [own];
+  if (!leaves) return problem('the manifest language directory could not be read');
+
+  const found = [];
+  for (const leaf of leaves) {
+    if (leaf.directory) return problem('unexpected directory below the manifest language level');
+    const data = root + leaf.offset;
+    if (data + 16 > bytes.length) return problem('a manifest data entry runs past the end of the file');
+    const start = fileOffsetOf(u32(data));
+    const size = u32(data + 4);
+    if (start < 0 || start + size > bytes.length) return problem('a manifest lies outside the file');
+    found.push(bytes.toString('utf8', start, start + size));
+  }
+  return { manifests: found };
+};
+
+// XML comments go first. Each manifest explains the level in a comment beside
+// it, and those comments name both the level required and the one it must not
+// become, so a reader that matched the raw text would find either spelling
+// whatever the element says. check-elevation-manifest.mjs guards the source
+// files the same way.
+const levelsIn = (xml) => {
+  const declared = xml.replace(/<!--[\s\S]*?-->/g, '');
+  const tags = [...declared.matchAll(/<requestedExecutionLevel\b[^>]*?\blevel="([^"]*)"/g)];
+  return [...new Set(tags.map((m) => m[1]))];
 };
 
 const artefacts = process.argv.slice(2).length ? process.argv.slice(2) : DEFAULT_ARTEFACTS;
@@ -149,14 +275,23 @@ for (const dir of artefacts) {
     if (extra.length) problems.push(`${exe.path}: carries ${extra.join(', ')}, which no source resx provides`);
   }
 
-  const level = manifestLevelIn(bytes);
-  if (level === null) {
-    problems.push(`${exe.path}: no requestedExecutionLevel in the embedded manifest`);
-  } else if (level !== REQUIRED_LEVEL) {
-    problems.push(`${exe.path}: asks for "${level}", expected "${REQUIRED_LEVEL}"`);
+  const embedded = manifestsIn(bytes);
+  let level = 'none';
+  if (embedded.error) {
+    problems.push(`${exe.path}: ${embedded.error}`);
+  } else {
+    const asked = [...new Set(embedded.manifests.flatMap(levelsIn))];
+    if (asked.length) level = asked.join(' and ');
+    if (asked.length === 0) {
+      problems.push(`${exe.path}: no requestedExecutionLevel in the embedded manifest`);
+    } else if (asked.length > 1) {
+      problems.push(`${exe.path}: copies of the embedded manifest ask for ${asked.map((a) => `"${a}"`).join(' and ')}`);
+    } else if (asked[0] !== REQUIRED_LEVEL) {
+      problems.push(`${exe.path}: asks for "${asked[0]}", expected "${REQUIRED_LEVEL}"`);
+    }
   }
 
-  report.push(`${exe.path}: ${cultures.length} languages, level="${level ?? 'none'}"`);
+  report.push(`${exe.path}: ${cultures.length} languages, level="${level}"`);
 }
 
 if (problems.length) fail(problems);
