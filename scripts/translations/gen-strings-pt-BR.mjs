@@ -368,7 +368,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de backup, então parou em vez de gravar no lugar errado. Verifique {0}, depois Reanalisar e tente de novo.`,
+  'Error.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de backup, então parou. Verifique {0}, depois Reanalisar e tente de novo.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Não é possível gravar em {0}.`,
 
@@ -498,7 +498,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Nenhum arquivo desnecessário encontrado.`,
   'Cli.NothingOffered.Singular': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({2}) em vez de oferecê-lo.`,
   'Cli.NothingOffered.Plural': `O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve todos os {0} {1} ({2}) em vez de oferecê-los.`,
-  'Cli.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de backup, então parou em vez de gravar no lugar errado. Verifique {0} e execute o comando de novo.`,
+  'Cli.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de backup, então parou. Verifique {0} e execute o comando de novo.`,
   'Cli.Help.Summary': `Remove arquivos .msi/.msp em cache que nenhum programa instalado precisa.`,
   'Cli.Help.Elevation': `Exige um prompt como administrador; o Windows não vai iniciá-lo.`,
   'Error.InstallerLockUnavailableTitle': `Nada foi excluído`,

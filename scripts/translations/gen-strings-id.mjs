@@ -383,7 +383,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti. Periksa {0}, lalu Pindai ulang dan coba lagi.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Tidak bisa menulis ke {0}.`,
 
@@ -514,7 +514,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Tidak ditemukan file yang tidak diperlukan.`,
   'Cli.NothingOffered.Singular': `InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file ({2}) itu ditahan alih-alih ditawarkan.`,
   'Cli.NothingOffered.Plural': `InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi seluruh {0} {1} ({2}) ditahan alih-alih ditawarkan.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu jalankan perintahnya lagi.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean tidak bisa lagi memastikan folder cadangan, jadi berhenti. Periksa {0}, lalu jalankan perintahnya lagi.`,
   'Cli.Help.Summary': `Menghapus file .msi/.msp cache yang tak lagi dibutuhkan program terpasang.`,
   'Cli.Help.Elevation': `Perlu prompt administrator; Windows tidak akan menjalankannya.`,
   'Error.InstallerLockUnavailableTitle': `Tidak ada yang dihapus`,

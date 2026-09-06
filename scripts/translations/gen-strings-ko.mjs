@@ -361,7 +361,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 중단했습니다. {0}을(를) 확인한 다음 다시 검사하고 다시 시도하세요.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `{0}에 쓸 수 없습니다.`,
 
@@ -492,7 +492,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `불필요한 파일을 찾지 못했습니다.`,
   'Cli.NothingOffered.Singular': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 파일 하나({2})를 제시하지 않고 보류했습니다.`,
   'Cli.NothingOffered.Plural': `InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, {1} {0}개({2}) 전부를 제시하지 않고 보류했습니다.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 엉뚱한 곳에 쓰는 대신 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean이 백업 폴더를 더 이상 확인할 수 없어서, 중단했습니다. {0}을(를) 확인한 다음 명령을 다시 실행하세요.`,
   'Cli.Help.Summary': `설치된 어떤 프로그램도 더는 필요로 하지 않는 .msi/.msp 파일을 제거합니다.`,
   'Cli.Help.Elevation': `관리자 명령 프롬프트가 필요하며, 아니면 Windows가 실행하지 않습니다.`,
   'Error.InstallerLockUnavailableTitle': `삭제된 파일 없음`,

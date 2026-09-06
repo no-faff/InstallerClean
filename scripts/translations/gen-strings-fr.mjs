@@ -391,7 +391,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de sauvegarde, il s'est donc arrêté plutôt que d'écrire au mauvais endroit. Vérifiez {0}, puis Réanalyser et réessayez.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de sauvegarde, il s'est donc arrêté. Vérifiez {0}, puis Réanalyser et réessayez.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Impossible d'écrire dans {0}.`,
 
@@ -519,7 +519,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Aucun fichier inutile trouvé.`,
   'Cli.NothingOffered.Singular': `InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu le seul fichier ({2}) au lieu de le proposer.`,
   'Cli.NothingOffered.Plural': `InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu l'ensemble des {0} {1} ({2}) au lieu de les proposer.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de sauvegarde, il s'est donc arrêté plutôt que d'écrire au mauvais endroit. Vérifiez {0}, puis relancez la commande.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de sauvegarde, il s'est donc arrêté. Vérifiez {0}, puis relancez la commande.`,
   'Cli.Help.Summary': `Retire les .msi et .msp en cache dont aucun programme installé n'a besoin.`,
   'Cli.Help.Elevation': `Exige une invite de commandes administrateur ; Windows ne le lancera pas.`,
   'Error.InstallerLockUnavailableTitle': `Rien n'a été supprimé`,

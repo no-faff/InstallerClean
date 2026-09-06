@@ -389,7 +389,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку резервних копій і зупинився, щоб не записати не туди. Перевірте {0}, потім «Повторити сканування» і спробуйте ще раз.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку резервних копій і зупинився. Перевірте {0}, потім «Повторити сканування» і спробуйте ще раз.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Не вдається записати в {0}.`,
 
@@ -517,7 +517,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Непотрібних файлів не знайдено.`,
   'Cli.NothingOffered.Singular': `InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав єдиний файл ({2}), замість того щоб запропонувати його.`,
   'Cli.NothingOffered.Plural': `InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав усі {0} {1} ({2}), замість того щоб запропонувати їх.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку резервних копій і зупинився, щоб не записати не туди. Перевірте {0}, потім запустіть команду ще раз.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean більше не зміг підтвердити папку резервних копій і зупинився. Перевірте {0}, потім запустіть команду ще раз.`,
   'Cli.Help.Summary': `Прибирає .msi і .msp з кешу, не потрібні жодній встановленій програмі.`,
   'Cli.Help.Elevation': `Потрібен командний рядок адміністратора; інакше Windows не запустить.`,
   'Error.InstallerLockUnavailableTitle': `Нічого не видалено`,

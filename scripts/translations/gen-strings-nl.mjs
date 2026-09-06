@@ -364,7 +364,7 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `De controle is om een onbekende reden mislukt. De details staan in crash.log, mocht je het willen melden.`,
   'BrowserLaunch.ClipboardOk': `The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}`,
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
-  'Error.DestinationChangedMidBatch': `InstallerClean kon de back-upmap niet meer bevestigen en is gestopt in plaats van op de verkeerde plek te schrijven. Controleer {0}, klik daarna op Opnieuw scannen en probeer het opnieuw.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean kon de back-upmap niet meer bevestigen en is gestopt. Controleer {0}, klik daarna op Opnieuw scannen en probeer het opnieuw.`,
   'Error.CannotWriteFolder': `Kan niet schrijven naar {0}.`,
   'Error.DestinationCollision': `Er staat al een bestand met de naam '{0}' in de back-upmap.`,
 
@@ -476,7 +476,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Geen overbodige bestanden gevonden.`,
   'Cli.NothingOffered.Singular': `InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom het ene bestand ({2}) achtergehouden in plaats van het aan te bieden.`,
   'Cli.NothingOffered.Plural': `InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom alle {0} {1} ({2}) achtergehouden in plaats van ze aan te bieden.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean kon de back-upmap niet meer bevestigen en is gestopt in plaats van op de verkeerde plek te schrijven. Controleer {0} en voer de opdracht opnieuw uit.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean kon de back-upmap niet meer bevestigen en is gestopt. Controleer {0} en voer de opdracht opnieuw uit.`,
   'Cli.Help.Summary': `Verwijdert .msi/.msp die geen geïnstalleerd programma meer nodig heeft.`,
   'Cli.Help.Elevation': `Vereist een prompt als administrator; Windows start het anders niet.`,
   'Error.InstallerLockUnavailableTitle': `Er is niets verwijderd`,

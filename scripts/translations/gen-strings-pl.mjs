@@ -400,7 +400,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu kopii zapasowej, więc zatrzymał się, zamiast zapisać w złym miejscu. Sprawdź {0}, potem Skanuj ponownie i spróbuj jeszcze raz.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu kopii zapasowej, więc zatrzymał się. Sprawdź {0}, potem Skanuj ponownie i spróbuj jeszcze raz.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Nie można zapisać w {0}.`,
 
@@ -534,7 +534,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Nie znaleziono niepotrzebnych plików.`,
   'Cli.NothingOffered.Singular': `InstallerClean nie zdołał ustalić z pewnością, które pliki w pamięci podręcznej należą do zainstalowanych tu programów, więc zatrzymał ten jeden plik ({2}), zamiast go zaproponować.`,
   'Cli.NothingOffered.Plural': `InstallerClean nie zdołał ustalić z pewnością, które pliki w pamięci podręcznej należą do zainstalowanych tu programów, więc zatrzymał wszystkie {0} {1} ({2}), zamiast je zaproponować.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu kopii zapasowej, więc zatrzymał się, zamiast zapisać w złym miejscu. Sprawdź {0}, a potem uruchom polecenie ponownie.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean nie mógł już potwierdzić folderu kopii zapasowej, więc zatrzymał się. Sprawdź {0}, a potem uruchom polecenie ponownie.`,
   'Cli.Help.Summary': `Usuwa .msi i .msp z cache, zbędne każdemu zainstalowanemu programowi.`,
   'Cli.Help.Elevation': `Wymaga wiersza polecenia administratora; inaczej Windows go nie uruchomi.`,
   'Error.InstallerLockUnavailableTitle': `Niczego nie usunięto`,

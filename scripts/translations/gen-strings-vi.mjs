@@ -367,7 +367,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't copy the link to your clipboard either, so here it is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lần nữa.`,
+  'Error.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại. Hãy kiểm tra {0}, rồi Quét lại và thử lần nữa.`,
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Không thể ghi vào {0}.`,
 
@@ -495,7 +495,7 @@ const MAP = {
   'Cli.FoundNoOrphans': `Không tìm thấy tệp không cần thiết nào.`,
   'Cli.NothingOffered.Singular': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất ({2}) thay vì đề xuất nó.`,
   'Cli.NothingOffered.Plural': `InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại toàn bộ {0} {1} ({2}) thay vì đề xuất chúng.`,
-  'Cli.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại thay vì ghi nhầm chỗ. Hãy kiểm tra {0}, rồi chạy lại lệnh.`,
+  'Cli.DestinationChangedMidBatch': `InstallerClean không còn xác nhận được thư mục sao lưu, nên đã dừng lại. Hãy kiểm tra {0}, rồi chạy lại lệnh.`,
   'Cli.Help.Summary': `Bỏ các tệp .msi và .msp trong bộ đệm mà không chương trình đã cài nào cần.`,
   'Cli.Help.Elevation': `Cần dấu nhắc quản trị viên; nếu không Windows sẽ không khởi chạy.`,
   'Error.InstallerLockUnavailableTitle': `Không có tệp nào bị xóa`,
