@@ -132,22 +132,6 @@ public partial class CompletionViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(SendResultLogTooltip))]
     private bool _lastResultFreedNothing;
 
-    /// <summary>
-    /// Shows the donate heart in the completion card's corner. True only
-    /// when the operation actually shifted files, so the ask only ever
-    /// follows work done: an all-clear, a run the re-verify held back
-    /// entirely, and a Move or Delete that reached no file all leave it
-    /// false. It measures the bytes the run moved or deleted, NOT whether
-    /// the disk got any emptier, so a same-drive Move earns the heart on
-    /// the strength of having done what the user asked, while its heading
-    /// still says "moved" rather than "freed" because nothing was
-    /// reclaimed. Set from the bytes argument in each Show* method rather
-    /// than derived from <see cref="LastResultFreedNothing"/>, which
-    /// happens to agree today but answers a different question (it picks
-    /// the send-report tooltip's wording) and is free to diverge.
-    /// </summary>
-    [ObservableProperty] private bool _showDonate;
-
     private readonly bool _alreadySentBeforeThisSession;
     private bool _resultLogSentThisSession;
     private bool _promptShownThisSession;
@@ -257,7 +241,6 @@ public partial class CompletionViewModel : ObservableObject
         Skipped = string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = true;
-        ShowDonate = false;
         IsComplete = true;
     }
 
@@ -360,7 +343,6 @@ public partial class CompletionViewModel : ObservableObject
         // please-send-anyway form. This cohort is the one the aggregate most needs
         // and the one least likely to press it.
         LastResultFreedNothing = true;
-        ShowDonate = false;
         IsComplete = true;
     }
 
@@ -516,7 +498,6 @@ public partial class CompletionViewModel : ObservableObject
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = movedBytes <= 0;
-        ShowDonate = movedBytes > 0;
         IsComplete = true;
     }
 
@@ -557,7 +538,6 @@ public partial class CompletionViewModel : ObservableObject
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
-        ShowDonate = deletedBytes > 0;
         IsComplete = true;
     }
 
@@ -632,7 +612,6 @@ public partial class CompletionViewModel : ObservableObject
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = movedBytes <= 0;
-        ShowDonate = movedBytes > 0;
         IsComplete = true;
     }
 
@@ -671,7 +650,6 @@ public partial class CompletionViewModel : ObservableObject
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
-        ShowDonate = deletedBytes > 0;
         IsComplete = true;
     }
 
@@ -718,7 +696,6 @@ public partial class CompletionViewModel : ObservableObject
         Skipped = string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = true;
-        ShowDonate = false;
         IsComplete = true;
     }
 

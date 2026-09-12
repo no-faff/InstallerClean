@@ -872,7 +872,7 @@
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{1} {0}개 영구 삭제됨</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
     <value>도움이 되어 기쁩니다. 너그러운 마음이 있으시면 작은 성의도 반갑습니다.</value>
-    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
+    <comment>Tooltip and screen-reader help on the small heart in the corner of the completion screen. Every completion carries it, including a scan that found nothing to clean up. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
   </data>
 
   <!-- Summaries -->

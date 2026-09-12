@@ -504,9 +504,8 @@ public class CompletionViewModelTests
             vm.Restore);
         Assert.Equal("Scanned 5 files in less than a second", vm.Restore);
 
-        // Nothing was freed, so no donate prompt and the Send tooltip takes its
-        // please-send-anyway form: this cohort is the one the aggregate most needs.
-        Assert.False(vm.ShowDonate);
+        // Nothing was freed, so the Send tooltip takes its please-send-anyway
+        // form: this cohort is the one the aggregate most needs.
         Assert.True(vm.LastResultFreedNothing);
         Assert.Equal(Strings.Tooltip_SendResultLog_NothingFound, vm.SendResultLogTooltip);
     }
@@ -723,45 +722,5 @@ public class CompletionViewModelTests
         // doing its job, and painting that as a failure would contradict the one
         // rule the app is built on.
         Assert.False(vm.HeadingIsWarning);
-    }
-
-    // The donate heart's gate. The ask is only ever made after the app has
-    // actually delivered something, so every path that freed no bytes has to
-    // leave it off, including the two that are outright successes (an
-    // all-clear scan, a run the act-time re-verify held back entirely).
-
-    [Fact]
-    public void ShowDonate_is_set_by_a_delete_that_freed_bytes()
-    {
-        var vm = new CompletionViewModel();
-
-        vm.ShowDeleteSummary(deletedCount: 3, deletedBytes: 4096, errors: []);
-
-        Assert.True(vm.ShowDonate);
-    }
-
-    [Fact]
-    public void ShowDonate_stays_off_for_a_delete_that_freed_nothing()
-    {
-        var vm = new CompletionViewModel();
-
-        vm.ShowDeleteSummary(deletedCount: 0, deletedBytes: 0, errors: []);
-
-        Assert.False(vm.ShowDonate);
-    }
-
-    [Fact]
-    public void ShowDonate_is_cleared_by_an_all_clear_after_a_freeing_run()
-    {
-        // The view-model instance is reused across operations, so a heart left
-        // set by the Delete would follow the user onto the all-clear that the
-        // post-operation rescan produces, asking for money for a scan.
-        var vm = new CompletionViewModel();
-        vm.ShowDeleteSummary(deletedCount: 3, deletedBytes: 4096, errors: []);
-        Assert.True(vm.ShowDonate);
-
-        vm.ShowAllClear(scannedFileCount: 5, scanDurationMs: 10);
-
-        Assert.False(vm.ShowDonate);
     }
 }

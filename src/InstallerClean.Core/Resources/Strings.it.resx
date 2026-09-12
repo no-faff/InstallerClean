@@ -872,7 +872,7 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} eliminati definitivamente</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
     <value>Felice di esserti stato utile. Un caffè è sempre bene accetto, se ti viene dal cuore.</value>
-    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
+    <comment>Tooltip and screen-reader help on the small heart in the corner of the completion screen. Every completion carries it, including a scan that found nothing to clean up. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
   </data>
 
   <!-- Summaries -->

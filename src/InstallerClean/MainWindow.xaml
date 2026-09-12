@@ -1142,12 +1142,9 @@
 
                     <!-- Donate heart. Spans every row and pins itself to the
                          card's bottom-right corner, so it sits level with
-                         "Scan again" without taking a row of its own or
-                         shifting anything when it is absent. Shown only when
-                         the run actually moved or deleted files
-                         (Completion.ShowDonate), so the ask only ever follows
-                         work done; a same-drive Move reclaims no space and
-                         still earns it.
+                         "Scan again" without taking a row of its own. It
+                         carries no visibility condition, so every completion
+                         card has it, whatever the run reached.
 
                          Declared last so it is the final stop in the
                          overlay's Tab cycle: the named actions the user came
@@ -1161,7 +1158,6 @@
                          the ask. -->
                     <Button Grid.Row="0" Grid.RowSpan="7" Style="{StaticResource SmallGhostPill}"
                             HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                            Visibility="{Binding Completion.ShowDonate, Converter={StaticResource BoolToVis}}"
                             Command="{Binding Chrome.DonateCommand}"
                             ToolTipService.InitialShowDelay="0"
                             AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
