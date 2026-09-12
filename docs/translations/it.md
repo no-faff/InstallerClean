@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Elimina definitivamente |
 | _Done | _Fatto |
 | Details | Dettagli |
-| _Buy me a cuppa | _Offrimi un caffè |
+| _Donate | _Offrimi un caffè |
+| Donate | Dona |
 | Leave a _star on GitHub | Lascia una _stella su GitHub |
 | Apache 2.0 licence | Licenza Apache 2.0 |
 | _Move | _Sposta |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Annullarlo è semplice. Rispostali in {InstallerFolder} e tornerà tutto com'era. |
 | {0} {1} permanently deleted | {0} {1} eliminato definitivamente |
 | {0} {1} permanently deleted | {0} {1} eliminati definitivamente |
-| Glad to help. There's a tip jar if you're feeling kind. | Felice di esserti stato utile. Un caffè è sempre bene accetto, se ti viene dal cuore. |
+| Any small donation is much appreciated. | Felice di esserti stato utile. Un caffè è sempre bene accetto, se ti viene dal cuore. |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Italiano |
 | --- | --- |
-| It's thirsty work! | Ci vuole un caffè! |
+| Any small donation is much appreciated. | Ci vuole un caffè! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Annullamento richiesto. InstallerClean sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI. |
 | Close | Chiudi |
 | A star helps other people find it. | Una stella aiuta altre persone a trovare InstallerClean. |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Italiano |
 | --- | --- |
 | Donate | Dona |
-| Buy me a cuppa | Offrimi un caffè |
+| Donate | Offrimi un caffè |
+| Donate | Dona |
 | Cancel operation | Annulla operazione |
 | Cancel scan | Annulla scansione |
 | Cancel startup scan | Annulla scansione all'avvio |

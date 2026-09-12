@@ -145,6 +145,7 @@ const MAP = {
   'Action.Done': `_Terminé`,
   'Action.Details': `Détails`,
   'Action.BuyMeACuppa': `Offrez-moi un _café`,
+  'Action.Donate': `Faire un don`,
   'Action.LeaveStarOnGitHub': `_Laisser une étoile sur GitHub`,
   'Action.Licence': `Licence Apache 2.0`,
   'Action.Move': `_Déplacer`,
@@ -158,6 +159,7 @@ const MAP = {
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Faire un don`,
   'Automation.BuyMeACuppa.About': `Offrez-moi un café`,
+  'Automation.Donate': `Faire un don`,
   'Automation.CancelOperation': `Annuler l'opération`,
   'Automation.CancelScan': `Annuler l'analyse`,
   'Automation.CancelStartupScan': `Annuler l'analyse de démarrage`,

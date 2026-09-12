@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | 영구 삭제(_D) |
 | _Done | 완료(_D) |
 | Details | 세부 정보 |
-| _Buy me a cuppa | 커피 한 잔 사주기(_B) |
+| _Donate | 커피 한 잔 사주기(_B) |
+| Donate | 후원 |
 | Leave a _star on GitHub | GitHub에 별 남기기(_S) |
 | Apache 2.0 licence | Apache 2.0 라이선스 |
 | _Move | 이동(_M) |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 되돌리기는 간단합니다. {InstallerFolder}로 다시 옮기면 모든 것이 원래대로 돌아갑니다. |
 | {0} {1} permanently deleted | {1} {0}개 영구 삭제됨 |
 | {0} {1} permanently deleted | {1} {0}개 영구 삭제됨 |
-| Glad to help. There's a tip jar if you're feeling kind. | 도움이 되어 기쁩니다. 너그러운 마음이 있으시면 작은 성의도 반갑습니다. |
+| Any small donation is much appreciated. | 도움이 되어 기쁩니다. 너그러운 마음이 있으시면 작은 성의도 반갑습니다. |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 한국어 |
 | --- | --- |
-| It's thirsty work! | 이게 생각보다 목마른 일입니다! |
+| Any small donation is much appreciated. | 이게 생각보다 목마른 일입니다! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 취소가 요청되었습니다. InstallerClean이 현재 단계가 멈출 수 있는 지점에 이를 때까지 기다리고 있습니다. I/O가 많거나 MSI 데이터베이스를 호출하는 동안에는 몇 초 걸릴 수 있습니다. |
 | Close | 닫기 |
 | A star helps other people find it. | 별 하나가 다른 사람들이 InstallerClean을 찾는 데 도움이 됩니다. |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | Donate | 후원 |
-| Buy me a cuppa | 커피 한 잔 사주기 |
+| Donate | 커피 한 잔 사주기 |
+| Donate | 후원 |
 | Cancel operation | 작업 취소 |
 | Cancel scan | 검사 취소 |
 | Cancel startup scan | 시작 검사 취소 |

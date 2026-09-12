@@ -128,6 +128,7 @@ const MAP = {
   'Action.Done': `_Selesai`,
   'Action.Details': `Detail`,
   'Action.BuyMeACuppa': `Traktir saya secangkir _kopi`,
+  'Action.Donate': `Donasi`,
   'Action.LeaveStarOnGitHub': `Beri _bintang di GitHub`,
   'Action.Licence': `Lisensi Apache 2.0`,
   'Action.Move': `_Pindahkan`,
@@ -141,6 +142,7 @@ const MAP = {
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Donasi`,
   'Automation.BuyMeACuppa.About': `Traktir saya secangkir kopi`,
+  'Automation.Donate': `Donasi`,
   // The three Cancel names name the button and then say which one, the shape
   // Automation.ViewOrphanedFiles and its sibling already take, rather than the
   // verb batalkan: WCAG 2.5.3 (Label in Name) asks that a control's spoken name

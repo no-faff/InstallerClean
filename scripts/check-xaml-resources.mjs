@@ -165,6 +165,7 @@ const RESOURCE_TYPES = new Map([
   [`{${WPF_NS}}Thickness`, ['Thickness']],
   [`{${WPF_NS}}CornerRadius`, ['CornerRadius']],
   [`{${WPF_NS}}FontFamily`, ['FontFamily']],
+  [`{${WPF_NS}}PathGeometry`, ['PathGeometry', 'Geometry']],
   [`{${WPF_NS}}BooleanToVisibilityConverter`, ['BooleanToVisibilityConverter', 'IValueConverter']],
   ['{clr-namespace:System;assembly=mscorlib}Double', ['Double']],
   ['{clr-namespace:InstallerClean.Helpers}InstallerPathTextConverter',
@@ -183,6 +184,7 @@ const PROPERTY_TYPES = new Map([
   ['Background', 'Brush'],
   ['BorderBrush', 'Brush'],
   ['CaretBrush', 'Brush'],
+  ['Data', 'Geometry'],
   ['Fill', 'Brush'],
   ['Foreground', 'Brush'],
   ['Stroke', 'Brush'],
@@ -216,6 +218,7 @@ const PROPERTY_TYPES = new Map([
 const FRAMEWORK_INHERITANCE = new Map([
   [`{${WPF_NS}}SolidColorBrush`, ['Brush']],
   [`{${WPF_NS}}BooleanToVisibilityConverter`, ['IValueConverter']],
+  [`{${WPF_NS}}PathGeometry`, ['Geometry']],
 ]);
 
 // A resource reached from inside another markup extension fills that

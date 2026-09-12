@@ -129,6 +129,7 @@ public partial class MainWindow : Window
         }
 
         CompletionDonateToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
+        CompletionDonateLabelToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
 
         // Width is explicit, the designed 828 (the content column's 780
         // MaxWidth plus the content margins) multiplied by the
@@ -622,9 +623,10 @@ public partial class MainWindow : Window
     // grows rightward, so a tooltip on a control near the right of the window
     // runs off it (popups respect screen edges, not window edges), and no mode
     // in the enum aligns right edges. This pins the tooltip's right edge to the
-    // target's, flush above. The completion card's donate heart needs it: the
-    // heart sits at the card's right edge and its wrapped two-line tooltip is
-    // wider than the gap from there to the window edge. The second candidate
+    // target's, flush above. Both forms of the completion card's donate button
+    // need it: each sits at the card's right edge, and the wrapped two-line
+    // tooltip they share is wider than the gap from there to the window edge.
+    // The second candidate
     // (flush below) is taken by WPF only when there is no room above, e.g. the
     // window dragged to the top of the screen.
     private static CustomPopupPlacement[] PlaceAboveRightAligned(Size popupSize, Size targetSize, Point offset) =>

@@ -723,4 +723,75 @@ public class CompletionViewModelTests
         // rule the app is built on.
         Assert.False(vm.HeadingIsWarning);
     }
+
+    // The donate button's two forms. It is on every card, and it carries the
+    // word "Donate" only where the run actually shifted files, so the spelled-out
+    // ask follows work done while the wordless heart covers everything else.
+
+    [Fact]
+    public void The_donate_button_is_labelled_by_a_delete_that_freed_bytes()
+    {
+        var vm = new CompletionViewModel();
+
+        vm.ShowDeleteSummary(deletedCount: 3, deletedBytes: 4096, errors: []);
+
+        Assert.True(vm.ShowDonateLabel);
+    }
+
+    [Fact]
+    public void The_donate_button_stays_wordless_for_a_delete_that_freed_nothing()
+    {
+        var vm = new CompletionViewModel();
+
+        vm.ShowDeleteSummary(deletedCount: 0, deletedBytes: 0, errors: []);
+
+        Assert.False(vm.ShowDonateLabel);
+    }
+
+    [Fact]
+    public void A_same_drive_move_labels_the_donate_button_though_it_freed_no_space()
+    {
+        // The gate is the bytes the run shifted, not whether the disk got any
+        // emptier. This is the card that separates the two: the files went to the
+        // drive they came from, so nothing is reclaimed until the user deletes the
+        // backup folder, and the heading says "moved" rather than "freed". The run
+        // did what it was asked, so the ask is earned.
+        var vm = new CompletionViewModel();
+
+        vm.ShowMoveSummary(movedCount: 3, movedBytes: 4096, destination: @"C:\Backup",
+            errors: [], space: MoveSpaceOutcome.SameDrive);
+
+        Assert.True(vm.ShowDonateLabel);
+        Assert.Equal(
+            string.Format(Strings.Completion_Moved, DisplayHelpers.FormatSize(4096)),
+            vm.Heading);
+    }
+
+    [Fact]
+    public void A_run_the_reverify_held_back_entirely_leaves_the_donate_button_wordless()
+    {
+        // Nothing was moved, so nothing is spelled out, even though the screen is
+        // green and the check ahead of the batch did its job.
+        var vm = new CompletionViewModel();
+
+        vm.ShowReverifyAllSkipped(
+            new ReverifyResult([], ["a.msp"], new HeldBackReasons(Reclaimed: 1)), deleting: false);
+
+        Assert.False(vm.ShowDonateLabel);
+    }
+
+    [Fact]
+    public void An_all_clear_takes_the_label_back_off_the_donate_button()
+    {
+        // The view-model instance is reused across operations, so a label left on
+        // by the Delete would follow the user onto the all-clear that the
+        // post-operation rescan produces, spelling out an ask for a scan.
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteSummary(deletedCount: 3, deletedBytes: 4096, errors: []);
+        Assert.True(vm.ShowDonateLabel);
+
+        vm.ShowAllClear(scannedFileCount: 5, scanDurationMs: 10);
+
+        Assert.False(vm.ShowDonateLabel);
+    }
 }

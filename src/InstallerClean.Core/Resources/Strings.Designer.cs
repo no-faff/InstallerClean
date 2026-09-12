@@ -73,6 +73,7 @@ public static class Strings
     public static string Action_Cut => Get("Action.Cut");
     public static string Action_DeletePermanently => Get("Action.DeletePermanently");
     public static string Action_Details => Get("Action.Details");
+    public static string Action_Donate => Get("Action.Donate");
     public static string Action_Done => Get("Action.Done");
     public static string Action_LeaveStarOnGitHub => Get("Action.LeaveStarOnGitHub");
     public static string Action_Licence => Get("Action.Licence");
@@ -104,6 +105,7 @@ public static class Strings
     public static string Automation_ConfirmDelete => Get("Automation.ConfirmDelete");
     public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_ConfirmSendResultLog => Get("Automation.ConfirmSendResultLog");
+    public static string Automation_Donate => Get("Automation.Donate");
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
     public static string Automation_Licence_HelpText => Get("Automation.Licence.HelpText");
     public static string Automation_Minimise => Get("Automation.Minimise");

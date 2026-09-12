@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Hapus permanen |
 | _Done | _Selesai |
 | Details | Detail |
-| _Buy me a cuppa | Traktir saya secangkir _kopi |
+| _Donate | Traktir saya secangkir _kopi |
+| Donate | Donasi |
 | Leave a _star on GitHub | Beri _bintang di GitHub |
 | Apache 2.0 licence | Lisensi Apache 2.0 |
 | _Move | _Pindahkan |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Mudah untuk dibatalkan. Pindahkan kembali ke {InstallerFolder} dan semuanya akan kembali seperti semula. |
 | {0} {1} permanently deleted | {0} {1} dihapus permanen |
 | {0} {1} permanently deleted | {0} {1} dihapus permanen |
-| Glad to help. There's a tip jar if you're feeling kind. | Senang bisa membantu. Kalau Anda berbaik hati, secangkir kopi sangat saya hargai. |
+| Any small donation is much appreciated. | Senang bisa membantu. Kalau Anda berbaik hati, secangkir kopi sangat saya hargai. |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Bahasa Indonesia |
 | --- | --- |
-| It's thirsty work! | Membuat haus! |
+| Any small donation is much appreciated. | Membuat haus! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI. |
 | Close | Tutup |
 | A star helps other people find it. | Bintang membantu orang lain menemukan InstallerClean. |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | Donate | Donasi |
-| Buy me a cuppa | Traktir saya secangkir kopi |
+| Donate | Traktir saya secangkir kopi |
+| Donate | Donasi |
 | Cancel operation | Batal, operasi |
 | Cancel scan | Batal, pemindaian |
 | Cancel startup scan | Batal, pemindaian awal |

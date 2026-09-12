@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Видалити назавжди |
 | _Done | _Готово |
 | Details | Деталі |
-| _Buy me a cuppa | Пригостіть мене _кавою |
+| _Donate | Пригостіть мене _кавою |
+| Donate | Підтримати |
 | Leave a _star on GitHub | Лишити зірку на _GitHub |
 | Apache 2.0 licence | Ліцензія Apache 2.0 |
 | _Move | Пере_містити |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Це легко скасувати. Перемістіть їх назад до {InstallerFolder}, і все повернеться як було. |
 | {0} {1} permanently deleted | Остаточно видалено {0} {1} |
 | {0} {1} permanently deleted | Остаточно видалено {0} {1} |
-| Glad to help. There's a tip jar if you're feeling kind. | Радий, що знадобилося. Якщо ваша ласка, є куди докинути на каву. |
+| Any small donation is much appreciated. | Радий, що знадобилося. Якщо ваша ласка, є куди докинути на каву. |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Українська |
 | --- | --- |
-| It's thirsty work! | Робота не з легких, аж у горлі пересохло! |
+| Any small donation is much appreciated. | Робота не з легких, аж у горлі пересохло! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Скасування запитано. InstallerClean чекає, доки поточний крок дійде до точки зупинки. Це може тривати кілька секунд під час інтенсивного вводу-виводу чи звернення до бази даних MSI. |
 | Close | Закрити |
 | A star helps other people find it. | Зірка допомагає іншим знайти InstallerClean. |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Українська |
 | --- | --- |
 | Donate | Підтримати |
-| Buy me a cuppa | Пригостіть мене кавою |
+| Donate | Пригостіть мене кавою |
+| Donate | Підтримати |
 | Cancel operation | Скасувати операцію |
 | Cancel scan | Скасувати сканування |
 | Cancel startup scan | Скасувати сканування під час запуску |

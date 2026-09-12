@@ -159,6 +159,11 @@
   <data name="Action.Done" xml:space="preserve"><value>_Selesai</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Detail</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Traktir saya secangkir _kopi</value></data>
+  <!-- The label on the completion card's donate button, which carries the word
+       where the run moved or deleted files and is the wordless heart otherwise.
+       It takes no access key: Done, Send report and Scan again carry that card's,
+       and a letter added here lands on one of theirs. -->
+  <data name="Action.Donate" xml:space="preserve"><value>Donasi</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Beri _bintang di GitHub</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Lisensi Apache 2.0</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Pindahkan</value></data>
@@ -192,12 +197,18 @@
 
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Donasi</value></data>
-  <!-- The About window's own star and cuppa buttons. The value says what the
+  <!-- The About window's own star and donate buttons. The value says what the
        button says on screen: a window name in the spoken value would be an
        internal note read out to somebody who can only be in that window to hear
-       it. The unsuffixed Automation.BuyMeACuppa is the main window's donate
-       button and holds a different value, so the two are not one key. -->
+       it. The unsuffixed Automation.BuyMeACuppa names the completion screen's
+       heart, which carries no label of its own, while this one restates the
+       button beside it and moves with it. They hold the same English and are
+       free to differ in any language. -->
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Traktir saya secangkir kopi</value></data>
+  <!-- The spoken name of that same button. Its content is a heart beside a
+       label rather than a string, so WPF derives no name from it and this is
+       the name; it says what the button says on screen. -->
+  <data name="Automation.Donate" xml:space="preserve"><value>Donasi</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Batal, operasi</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Batal, pemindaian</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Batal, pemindaian awal</value></data>
@@ -328,7 +339,10 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Menjelaskan folder ini, dan cara memulihkan file, di README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Membuat haus!</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve">
+    <value>Membuat haus!</value>
+    <comment>Tooltip and screen-reader help on the About window's donate pill. The button it hangs on already reads Donate (Action.BuyMeACuppa), so the tooltip says what the ask is rather than naming the action a second time.</comment>
+  </data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Tutup</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve">
@@ -872,7 +886,7 @@ Untuk mengembalikannya, Anda butuh pemasang versi yang sudah Anda miliki. Dapatk
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} dihapus permanen</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
     <value>Senang bisa membantu. Kalau Anda berbaik hati, secangkir kopi sangat saya hargai.</value>
-    <comment>Tooltip and screen-reader help on the small heart in the corner of the completion screen. Every completion carries it, including a scan that found nothing to clean up. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
+    <comment>Tooltip and screen-reader help on the completion screen's donate button, which every completion carries, including a scan that found nothing to clean up. It is the only text on that button where the run moved or deleted nothing, and where it did the button reads Donate and this sentence sits behind it. Keep it plain, with no word putting the reader under an obligation.</comment>
   </data>
 
   <!-- Summaries -->

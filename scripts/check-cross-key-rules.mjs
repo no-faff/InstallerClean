@@ -41,6 +41,7 @@ const MUST_AGREE = [
   // Content is a StackPanel (icon + AccessText), so there is no string for WPF
   // to derive a name from and the override IS the label.
   { label: 'Action.BuyMeACuppa', name: 'Automation.BuyMeACuppa.About' },
+  { label: 'Action.Donate', name: 'Automation.Donate' },
   { label: 'Action.LeaveStarOnGitHub', name: 'Automation.LeaveStarOnGitHub.About' },
   // Content is a plain string, so the override only restates what WPF derives.
   // It can still drift per language, which is the whole point.

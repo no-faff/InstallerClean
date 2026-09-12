@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Kalıcı olarak sil |
 | _Done | _Tamam |
 | Details | Ayrıntılar |
-| _Buy me a cuppa | _Bana bir çay ısmarla |
+| _Donate | _Bana bir çay ısmarla |
+| Donate | Bağış yap |
 | Leave a _star on GitHub | GitHub'da _yıldız bırak |
 | Apache 2.0 licence | Apache 2.0 lisansı |
 | _Move | _Taşı |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Geri almak kolay. Onları {InstallerFolder} klasörüne geri taşıyın, her şey eskisi gibi olur. |
 | {0} {1} permanently deleted | {0} {1} kalıcı olarak silindi |
 | {0} {1} permanently deleted | {0} {1} kalıcı olarak silindi |
-| Glad to help. There's a tip jar if you're feeling kind. | Yardımcı olabildiğime sevindim. Gönlünüzden koparsa, bir bahşiş kutusu var. |
+| Any small donation is much appreciated. | Yardımcı olabildiğime sevindim. Gönlünüzden koparsa, bir bahşiş kutusu var. |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Türkçe |
 | --- | --- |
-| It's thirsty work! | Susatan bir iş! |
+| Any small donation is much appreciated. | Susatan bir iş! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | İptal istendi. InstallerClean, geçerli adımın durabileceği bir noktaya gelmesini bekliyor. Yoğun G/Ç sırasında ya da bir MSI veritabanı çağrısında bu birkaç saniye sürebilir. |
 | Close | Kapat |
 | A star helps other people find it. | Bir yıldız, başkalarının InstallerClean'i bulmasına yardımcı olur. |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | Donate | Bağış yap |
-| Buy me a cuppa | Bana bir çay ısmarla |
+| Donate | Bana bir çay ısmarla |
+| Donate | Bağış yap |
 | Cancel operation | İşlemi iptal et |
 | Cancel scan | Taramayı iptal et |
 | Cancel startup scan | Başlangıç taramasını iptal et |

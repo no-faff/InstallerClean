@@ -177,7 +177,8 @@ const MAP = {
   'Action.DeletePermanently': `_Delete permanently`,
   'Action.Done': `_Done`,
   'Action.Details': `Details`,
-  'Action.BuyMeACuppa': `_Buy me a cuppa`,
+  'Action.BuyMeACuppa': `_Donate`,
+  'Action.Donate': `Donate`,
   'Action.LeaveStarOnGitHub': `Leave a _star on GitHub`,
   'Action.Licence': `Apache 2.0 licence`,
   'Action.Move': `_Move`,
@@ -193,7 +194,8 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Donate`,
-  'Automation.BuyMeACuppa.About': `Buy me a cuppa`,
+  'Automation.BuyMeACuppa.About': `Donate`,
+  'Automation.Donate': `Donate`,
   'Automation.CancelOperation': `Cancel operation`,
   'Automation.CancelScan': `Cancel scan`,
   'Automation.CancelStartupScan': `Cancel startup scan`,
@@ -237,7 +239,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Explains this folder, and how to recover a file, in the README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `It's thirsty work!`,
+  'Tooltip.BuyMeACuppa.About': `Any small donation is much appreciated.`,
   'Tooltip.CancellingPending': `Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.`,
   'Tooltip.Close': `Close`,
   'Tooltip.LeaveStarOnGitHub.About': `A star helps other people find it.`,
@@ -341,7 +343,7 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
-  'Completion.DonateAsk': `Glad to help. There's a tip jar if you're feeling kind.`,
+  'Completion.DonateAsk': `Any small donation is much appreciated.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,

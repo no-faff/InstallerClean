@@ -882,6 +882,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- Icon -->
@@ -1140,32 +1141,45 @@
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.HelpText="{loc:Translate Automation.RescanInstaller}"/>
 
-                    <!-- Donate heart. Spans every row and pins itself to the
-                         card's bottom-right corner, so it sits level with
-                         "Scan again" without taking a row of its own. It
-                         carries no visibility condition, so every completion
-                         card has it, whatever the run reached.
+                    <!-- The donate ask, in two forms, of which exactly one is
+                         ever on screen. This is the wordless one: it spans
+                         every row above the last and pins itself to the card's
+                         bottom-right corner, so it sits level with "Scan
+                         again" without taking a row of its own. It stands on
+                         any card whose run moved or deleted nothing, which
+                         includes the all-clear, the card raised where the app
+                         could not establish enough to offer anything, and the
+                         two where every file failed.
 
-                         Declared last so it is the final stop in the
-                         overlay's Tab cycle: the named actions the user came
-                         for are reached first, and nothing in the card
-                         carries an explicit TabIndex, so declaration order is
-                         the order.
+                         Both forms are declared after everything else so the
+                         ask is the final stop in the overlay's Tab cycle: the
+                         named actions the user came for are reached first, and
+                         nothing in the card carries an explicit TabIndex, so
+                         declaration order is the order.
 
                          Hover text is invisible to a screen reader, which is
                          why the same sentence is also the HelpText; the Name
                          says what the control does and the HelpText carries
                          the ask. -->
-                    <Button Grid.Row="0" Grid.RowSpan="7" Style="{StaticResource SmallGhostPill}"
+                    <Button Grid.Row="0" Grid.RowSpan="7"
                             HorizontalAlignment="Right" VerticalAlignment="Bottom"
                             Command="{Binding Chrome.DonateCommand}"
                             ToolTipService.InitialShowDelay="0"
                             AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
                             AutomationProperties.HelpText="{loc:Translate Completion.DonateAsk}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SmallGhostPill}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.ShowDonateLabel}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
                         <!-- Scaled for the reason the language globe is: the
                              heart is all this button has, so without it the ask
                              shrinks against everything around it. -->
-                        <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                        <Path Data="{StaticResource Icon.Heart}"
                               Fill="{StaticResource Decoration.Heart}" Stretch="Uniform"
                               Width="{a11y:TextScaled 18}" Height="{a11y:TextScaled 18}"
                               RenderTransformOrigin="0.5,0.5">
@@ -1213,6 +1227,53 @@
                         </Path>
                         <Button.ToolTip>
                             <ToolTip x:Name="CompletionDonateToolTip"
+                                     Style="{StaticResource AccentTooltip}"
+                                     Content="{loc:Translate Completion.DonateAsk}"
+                                     Placement="Custom"/>
+                        </Button.ToolTip>
+                    </Button>
+
+                    <!-- The same ask with the word on it, in a row of its own
+                         under "Scan again", on a card whose run moved or
+                         deleted files. It and the wordless heart above are
+                         never on screen together, so the card carries one
+                         donate control and one tab stop wherever it lands.
+
+                         A row of its own rather than the corner. The corner is
+                         the band "Scan again" is centred in, and a word beside
+                         the heart grows with the language while the button
+                         beside it grows out from the middle, so on the narrow
+                         cards the two meet. Nothing else is drawn across this
+                         row, so no language and no text size can put them into
+                         one another.
+
+                         Right rather than centred: under Done, Send report and
+                         Scan again it would read as a fourth thing to do, and
+                         this is not one of the app's actions. Right is where
+                         the wordless heart sits on every other card.
+
+                         A TextBlock rather than an AccessText: the label takes
+                         no access key, the card's three buttons carrying its
+                         access keys between them, so an underscore reaching
+                         this string is meant to be seen rather than swallowed
+                         into one that clashes. -->
+                    <Button Grid.Row="7" Style="{StaticResource SmallGhostPill}"
+                            HorizontalAlignment="Right"
+                            Margin="{StaticResource GapTop.Lg}"
+                            Visibility="{Binding Completion.ShowDonateLabel, Converter={StaticResource BoolToVis}}"
+                            Command="{Binding Chrome.DonateCommand}"
+                            ToolTipService.InitialShowDelay="0"
+                            AutomationProperties.Name="{loc:Translate Automation.Donate}"
+                            AutomationProperties.HelpText="{loc:Translate Completion.DonateAsk}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource Icon.Heart}"
+                                  Fill="{StaticResource Decoration.Heart}" Stretch="Uniform"
+                                  Width="{a11y:TextScaled 12}" Height="{a11y:TextScaled 12}"
+                                  VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"/>
+                            <TextBlock Text="{loc:Translate Action.Donate}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button.ToolTip>
+                            <ToolTip x:Name="CompletionDonateLabelToolTip"
                                      Style="{StaticResource AccentTooltip}"
                                      Content="{loc:Translate Completion.DonateAsk}"
                                      Placement="Custom"/>

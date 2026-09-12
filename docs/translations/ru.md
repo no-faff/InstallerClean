@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Удалить безвозвратно |
 | _Done | _Готово |
 | Details | Подробности |
-| _Buy me a cuppa | _Угостите меня чаем |
+| _Donate | _Угостите меня чаем |
+| Donate | Поддержать |
 | Leave a _star on GitHub | Поставить з_везду на GitHub |
 | Apache 2.0 licence | Лицензия Apache 2.0 |
 | _Move | _Переместить |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Это легко отменить. Переместите их обратно в {InstallerFolder}, и всё вернётся как было. |
 | {0} {1} permanently deleted | Безвозвратно удалён {0} {1} |
 | {0} {1} permanently deleted | Безвозвратно удалено {0} {1} |
-| Glad to help. There's a tip jar if you're feeling kind. | Рад, что пригодилось. Если захочется проявить щедрость, есть куда оставить на чай. |
+| Any small donation is much appreciated. | Рад, что пригодилось. Если захочется проявить щедрость, есть куда оставить на чай. |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Русский |
 | --- | --- |
-| It's thirsty work! | В горле пересохло! |
+| Any small donation is much appreciated. | В горле пересохло! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Запрошена отмена. InstallerClean ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI. |
 | Close | Закрыть |
 | A star helps other people find it. | Звезда помогает другим найти InstallerClean. |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | Donate | Поддержать |
-| Buy me a cuppa | Угостите меня чаем |
+| Donate | Угостите меня чаем |
+| Donate | Поддержать |
 | Cancel operation | Отмена операции |
 | Cancel scan | Отмена сканирования |
 | Cancel startup scan | Отмена сканирования при запуске |

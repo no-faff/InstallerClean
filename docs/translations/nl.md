@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Definitief verwijderen |
 | _Done | _Klaar |
 | Details | Details |
-| _Buy me a cuppa | Trakteer me op een kopje _koffie |
+| _Donate | Trakteer me op een kopje _koffie |
+| Donate | Doneren |
 | Leave a _star on GitHub | Geef een s_ter op GitHub |
 | Apache 2.0 licence | Apache 2.0-licentie |
 | _Move | Ver_plaatsen |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Het is eenvoudig ongedaan te maken. Verplaats ze terug naar {InstallerFolder} en alles is weer zoals het was. |
 | {0} {1} permanently deleted | {0} {1} definitief verwijderd |
 | {0} {1} permanently deleted | {0} {1} definitief verwijderd |
-| Glad to help. There's a tip jar if you're feeling kind. | Graag gedaan. Er staat een fooienpot klaar, mocht je je gul voelen. |
+| Any small donation is much appreciated. | Graag gedaan. Er staat een fooienpot klaar, mocht je je gul voelen. |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Nederlands |
 | --- | --- |
-| It's thirsty work! | Het is dorstig werk! |
+| Any small donation is much appreciated. | Het is dorstig werk! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Annulering aangevraagd. InstallerClean wacht tot de huidige stap een stoppunt bereikt. Dit kan enkele seconden duren bij zware I/O of een aanroep naar de MSI-database. |
 | Close | Sluiten |
 | A star helps other people find it. | Een ster helpt anderen het te vinden. |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Nederlands |
 | --- | --- |
 | Donate | Doneren |
-| Buy me a cuppa | Trakteer me op een kopje koffie |
+| Donate | Trakteer me op een kopje koffie |
+| Donate | Doneren |
 | Cancel operation | Bewerking annuleren |
 | Cancel scan | Scan annuleren |
 | Cancel startup scan | Opstartscan annuleren |

@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | 永久删除(_D) |
 | _Done | 完成(_D) |
 | Details | 详情 |
-| _Buy me a cuppa | 请我喝杯茶(_B) |
+| _Donate | 请我喝杯茶(_B) |
+| Donate | 捐赠 |
 | Leave a _star on GitHub | 在 GitHub 上点个星(_S) |
 | Apache 2.0 licence | Apache 2.0 许可证 |
 | _Move | 移动(_M) |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 撤销很简单。把它们移回 {InstallerFolder}，一切就会恢复原样。 |
 | {0} {1} permanently deleted | 已永久删除 {0} 个{1} |
 | {0} {1} permanently deleted | 已永久删除 {0} 个{1} |
-| Glad to help. There's a tip jar if you're feeling kind. | 很高兴帮上忙。您若有心，这里可以打赏。 |
+| Any small donation is much appreciated. | 很高兴帮上忙。您若有心，这里可以打赏。 |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 简体中文 |
 | --- | --- |
-| It's thirsty work! | 该来杯茶了！ |
+| Any small donation is much appreciated. | 该来杯茶了！ |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 已请求取消。InstallerClean 正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。 |
 | Close | 关闭 |
 | A star helps other people find it. | 点个星有助于更多人发现 InstallerClean。 |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | Donate | 捐赠 |
-| Buy me a cuppa | 请我喝杯茶 |
+| Donate | 请我喝杯茶 |
+| Donate | 捐赠 |
 | Cancel operation | 取消操作 |
 | Cancel scan | 取消扫描 |
 | Cancel startup scan | 取消启动扫描 |

@@ -159,6 +159,11 @@
   <data name="Action.Done" xml:space="preserve"><value>_Done</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Donate</value></data>
+  <!-- The label on the completion card's donate button, which carries the word
+       where the run moved or deleted files and is the wordless heart otherwise.
+       It takes no access key: Done, Send report and Scan again carry that card's,
+       and a letter added here lands on one of theirs. -->
+  <data name="Action.Donate" xml:space="preserve"><value>Donate</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a _star on GitHub</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
@@ -200,6 +205,10 @@
        button beside it and moves with it. They hold the same English and are
        free to differ in any language. -->
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Donate</value></data>
+  <!-- The spoken name of that same button. Its content is a heart beside a
+       label rather than a string, so WPF derives no name from it and this is
+       the name; it says what the button says on screen. -->
+  <data name="Automation.Donate" xml:space="preserve"><value>Donate</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Cancel operation</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Cancel scan</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Cancel startup scan</value></data>
@@ -876,8 +885,8 @@ To put it back, you need the installer for the version you already have. Get it 
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
-    <value>Glad to help. There's a tip jar if you're feeling kind.</value>
-    <comment>Tooltip and screen-reader help on the small heart in the corner of the completion screen. Every completion carries it, including a scan that found nothing to clean up. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
+    <value>Any small donation is much appreciated.</value>
+    <comment>Tooltip and screen-reader help on the completion screen's donate button, which every completion carries, including a scan that found nothing to clean up. It is the only text on that button where the run moved or deleted nothing, and where it did the button reads Donate and this sentence sits behind it. Keep it plain, with no word putting the reader under an obligation.</comment>
   </data>
 
   <!-- Summaries -->

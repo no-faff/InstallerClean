@@ -89,6 +89,10 @@
          so the margin is acceptable. Brighten to Red.400 if a user
          reports trouble seeing the heart against the sidebar. -->
     <SolidColorBrush x:Key="Decoration.Heart" Color="{StaticResource Primitive.Red.500}"/>
+    <!-- The heart both donate buttons draw. PathGeometry rather than
+         Geometry: a resource element is the type it names, and Geometry is
+         abstract. -->
+    <PathGeometry x:Key="Icon.Heart" Figures="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     <SolidColorBrush x:Key="Decoration.Star"  Color="{StaticResource Primitive.Amber.400}"/>
 
     <!-- Links. SubtleLink is the app's only link, so these are its two
@@ -267,6 +271,7 @@
     <Thickness x:Key="GapBottom.Xl">0,0,0,24</Thickness>
 
     <Thickness x:Key="GapTop.Sm">0,8,0,0</Thickness>
+    <Thickness x:Key="GapTop.Lg">0,16,0,0</Thickness>
 
     <Thickness x:Key="GapRight.Sm">0,0,8,0</Thickness>
     <!-- Icon-after-text spacing: 6 sits below the 8/12/16/24 scale on

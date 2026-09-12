@@ -40,7 +40,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Eliminar definitivamente |
 | _Done | _Listo |
 | Details | Detalles |
-| _Buy me a cuppa | _Invítame a un café |
+| _Donate | _Invítame a un café |
+| Donate | Donar |
 | Leave a _star on GitHub | Deja una e_strella en GitHub |
 | Apache 2.0 licence | Licencia Apache 2.0 |
 | _Move | _Mover |
@@ -174,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Deshacerlo es sencillo. Muévelos de vuelta a {InstallerFolder} y todo quedará como estaba. |
 | {0} {1} permanently deleted | {0} {1} eliminado definitivamente |
 | {0} {1} permanently deleted | {0} {1} eliminados definitivamente |
-| Glad to help. There's a tip jar if you're feeling kind. | Me alegro de haber ayudado. Aquí tienes el bote de propinas, si te nace del corazón. |
+| Any small donation is much appreciated. | Me alegro de haber ayudado. Aquí tienes el bote de propinas, si te nace del corazón. |
 
 ## Summaries and counts
 
@@ -328,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Español |
 | --- | --- |
-| It's thirsty work! | ¡Esto da sed! |
+| Any small donation is much appreciated. | ¡Esto da sed! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Cancelación solicitada. InstallerClean está esperando a que el paso en curso llegue a un punto en el que pueda detenerse. Puede tardar unos segundos durante operaciones intensas de entrada/salida o una llamada a la base de datos MSI. |
 | Close | Cerrar |
 | A star helps other people find it. | Una estrella ayuda a otras personas a encontrar InstallerClean. |
@@ -347,7 +348,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Español |
 | --- | --- |
 | Donate | Donar |
-| Buy me a cuppa | Invítame a un café |
+| Donate | Invítame a un café |
+| Donate | Donar |
 | Cancel operation | Cancelar la operación |
 | Cancel scan | Cancelar el análisis |
 | Cancel startup scan | Cancelar el análisis de inicio |
