@@ -128,8 +128,12 @@ public partial class MainWindow : Window
                 AnnounceLiveRegions(UpdateStatusLineText);
         }
 
-        CompletionDonateToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
-        CompletionDonateLabelToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
+        // Both forms of the completion card's donate button sit at the card's
+        // right edge, so their tooltips line up right edges rather than left.
+        CompletionDonateToolTip.CustomPopupPlacementCallback = TooltipPlacement.KeptInsideWindow(
+            CompletionDonateToolTip, this, ToolTipAnchor.Right, ToolTipEdgeMargin);
+        CompletionDonateLabelToolTip.CustomPopupPlacementCallback = TooltipPlacement.KeptInsideWindow(
+            CompletionDonateLabelToolTip, this, ToolTipAnchor.Right, ToolTipEdgeMargin);
 
         // Width is explicit, the designed 828 (the content column's 780
         // MaxWidth plus the content margins) multiplied by the
@@ -619,21 +623,9 @@ public partial class MainWindow : Window
             RescanButton.Focus();
     }
 
-    // PlacementMode.Top aligns the tooltip's left edge with the target's and
-    // grows rightward, so a tooltip on a control near the right of the window
-    // runs off it (popups respect screen edges, not window edges), and no mode
-    // in the enum aligns right edges. This pins the tooltip's right edge to the
-    // target's, flush above. Both forms of the completion card's donate button
-    // need it: each sits at the card's right edge, and the wrapped two-line
-    // tooltip they share is wider than the gap from there to the window edge.
-    // The second candidate
-    // (flush below) is taken by WPF only when there is no room above, e.g. the
-    // window dragged to the top of the screen.
-    private static CustomPopupPlacement[] PlaceAboveRightAligned(Size popupSize, Size targetSize, Point offset) =>
-    [
-        new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, -popupSize.Height), PopupPrimaryAxis.Horizontal),
-        new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, targetSize.Height), PopupPrimaryAxis.Horizontal)
-    ];
+    // How close a tooltip may come to either edge of this window.
+    private const double ToolTipEdgeMargin = 12;
+
 
     /// <summary>
     /// Queues LiveRegionChanged raises for <paramref name="elements"/> at

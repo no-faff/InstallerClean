@@ -1,4 +1,25 @@
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
+
 namespace InstallerClean.Helpers;
+
+/// <summary>Which edge of its control a tooltip would rather line up with.</summary>
+internal enum ToolTipAnchor
+{
+    /// <summary>
+    /// Its left edge on the control's, plus whatever horizontal offset the
+    /// tooltip itself asks for. What PlacementMode.Top would do.
+    /// </summary>
+    Left,
+
+    /// <summary>
+    /// Its right edge on the control's. No mode in PlacementMode does this,
+    /// and a control at the right of a window wants it.
+    /// </summary>
+    Right,
+}
 
 /// <summary>
 /// Where a tooltip's box sits along the window's width.
@@ -40,4 +61,43 @@ internal static class TooltipPlacement
         var rightmost = windowWidth - margin - popupWidth;
         return Math.Max(margin, Math.Min(preferredLeft, rightmost));
     }
+
+    /// <summary>
+    /// A placement callback that opens <paramref name="toolTip"/> flush above
+    /// its control, lined up with <paramref name="anchor"/> where there is room
+    /// and pulled inside <paramref name="window"/> where there is not. The
+    /// second candidate is the same position flush below, which WPF takes only
+    /// when there is no room above, as when the window is against the top of
+    /// the screen.
+    ///
+    /// The point a callback returns is relative to the control, so the
+    /// control's own position is added on the way into
+    /// <see cref="LeftInsideWindow"/> and taken off again on the way out.
+    /// </summary>
+    public static CustomPopupPlacementCallback KeptInsideWindow(
+        ToolTip toolTip, Window window, ToolTipAnchor anchor, double margin) =>
+        (popupSize, targetSize, offset) =>
+        {
+            var preferred = anchor == ToolTipAnchor.Right
+                ? targetSize.Width - popupSize.Width
+                : offset.X;
+
+            // A control outside the window's tree cannot be transformed into
+            // it. It never is while the window is up, and the anchor alone
+            // still places a tooltip, so this asks rather than assuming: a
+            // placement callback that throws takes the tooltip with it.
+            var x = preferred;
+            if (toolTip.PlacementTarget is UIElement control && control.IsDescendantOf(window))
+            {
+                var controlLeft = control.TransformToAncestor(window).Transform(new Point(0, 0)).X;
+                x = LeftInsideWindow(
+                    controlLeft + preferred, popupSize.Width, window.ActualWidth, margin) - controlLeft;
+            }
+
+            return
+            [
+                new CustomPopupPlacement(new Point(x, -popupSize.Height), PopupPrimaryAxis.Horizontal),
+                new CustomPopupPlacement(new Point(x, targetSize.Height), PopupPrimaryAxis.Horizontal),
+            ];
+        };
 }
