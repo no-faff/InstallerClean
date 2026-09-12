@@ -148,7 +148,7 @@ const MAP = {
   'Action.DeletePermanently': `_Definitief verwijderen`,
   'Action.Done': `_Klaar`,
   'Action.Details': `Details`,
-  'Action.BuyMeACuppa': `Trakteer me op een kopje _koffie`,
+  'Action.BuyMeACuppa': `_Doneren`,
   'Action.Donate': `Doneren`,
   'Action.LeaveStarOnGitHub': `Geef een s_ter op GitHub`,
   'Action.Licence': `Apache 2.0-licentie`,
@@ -165,7 +165,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Doneren`,
-  'Automation.BuyMeACuppa.About': `Trakteer me op een kopje koffie`,
+  'Automation.BuyMeACuppa.About': `Doneren`,
   'Automation.Donate': `Doneren`,
   'Automation.CancelOperation': `Bewerking annuleren`,
   'Automation.CancelScan': `Scan annuleren`,
@@ -209,7 +209,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Legt uit wat deze map is en hoe je een bestand terugzet, in het README-bestand`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Het is dorstig werk!`,
+  'Tooltip.BuyMeACuppa.About': `Elke kleine donatie wordt zeer gewaardeerd.`,
   'Tooltip.CancellingPending': `Annulering aangevraagd. InstallerClean wacht tot de huidige stap een stoppunt bereikt. Dit kan enkele seconden duren bij zware I/O of een aanroep naar de MSI-database.`,
   'Tooltip.Close': `Sluiten`,
   'Tooltip.LeaveStarOnGitHub.About': `Een ster helpt anderen het te vinden.`,
@@ -287,8 +287,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `{0} van {1} {2} definitief verwijderd voordat je annuleerde.`,
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} definitief verwijderd`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} definitief verwijderd`,
-  'Completion.DonateAsk': `Graag gedaan. Er staat een fooienpot klaar, mocht je je gul voelen.`,
-
+  'Completion.DonateAsk': `Elke kleine donatie wordt zeer gewaardeerd.`,
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} bestand ongemoeid gelaten`,
   'Summary.RegisteredStillUsed.Plural': `{0} bestanden ongemoeid gelaten`,

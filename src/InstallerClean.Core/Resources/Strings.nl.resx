@@ -158,7 +158,7 @@
        keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Klaar</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
-  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Trakteer me op een kopje _koffie</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Doneren</value></data>
   <!-- The label on the completion card's donate button, which carries the word
        where the run moved or deleted files and is the wordless heart otherwise.
        It takes no access key: Done, Send report and Scan again carry that card's,
@@ -204,7 +204,7 @@
        heart, which carries no label of its own, while this one restates the
        button beside it and moves with it. They hold the same English and are
        free to differ in any language. -->
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Trakteer me op een kopje koffie</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Doneren</value></data>
   <!-- The spoken name of that same button. Its content is a heart beside a
        label rather than a string, so WPF derives no name from it and this is
        the name; it says what the button says on screen. -->
@@ -340,7 +340,7 @@
 
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve">
-    <value>Het is dorstig werk!</value>
+    <value>Elke kleine donatie wordt zeer gewaardeerd.</value>
     <comment>Tooltip and screen-reader help on the About window's donate pill. The button it hangs on already reads Donate (Action.BuyMeACuppa), so the tooltip says what the ask is rather than naming the action a second time.</comment>
   </data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annulering aangevraagd. InstallerClean wacht tot de huidige stap een stoppunt bereikt. Dit kan enkele seconden duren bij zware I/O of een aanroep naar de MSI-database.</value></data>
@@ -885,7 +885,7 @@ Om het terug te zetten heb je het installatieprogramma nodig van de versie die j
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} definitief verwijderd</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} definitief verwijderd</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
-    <value>Graag gedaan. Er staat een fooienpot klaar, mocht je je gul voelen.</value>
+    <value>Elke kleine donatie wordt zeer gewaardeerd.</value>
     <comment>Tooltip and screen-reader help on the completion screen's donate button, which every completion carries, including a scan that found nothing to clean up. It is the only text on that button where the run moved or deleted nothing, and where it did the button reads Donate and this sentence sits behind it. Keep it plain, with no word putting the reader under an obligation.</comment>
   </data>
 

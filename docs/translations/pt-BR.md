@@ -40,7 +40,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Excluir permanentemente |
 | _Done | _Concluído |
 | Details | Detalhes |
-| _Donate | Me paga um _café |
+| _Donate | D_oar |
 | Donate | Doar |
 | Leave a _star on GitHub | _Deixe uma estrela no GitHub |
 | Apache 2.0 licence | Licença Apache 2.0 |
@@ -175,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | É simples de desfazer. Mova-os de volta para {InstallerFolder} e tudo voltará a ser como era. |
 | {0} {1} permanently deleted | {0} {1} excluído permanentemente |
 | {0} {1} permanently deleted | {0} {1} excluídos permanentemente |
-| Any small donation is much appreciated. | Que bom que ajudou. A caixinha está aqui, se vier do coração. |
+| Any small donation is much appreciated. | Qualquer doação, por menor que seja, é muito bem-vinda. |
 
 ## Summaries and counts
 
@@ -329,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Português (Brasil) |
 | --- | --- |
-| Any small donation is much appreciated. | É trabalho que dá sede! |
+| Any small donation is much appreciated. | Qualquer doação, por menor que seja, é muito bem-vinda. |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Cancelamento solicitado. O InstallerClean está esperando o passo atual chegar a um ponto em que possa parar. Isso pode levar alguns segundos durante operações intensas de E/S ou uma chamada ao banco de dados MSI. |
 | Close | Fechar |
 | A star helps other people find it. | Uma estrela ajuda outras pessoas a encontrar o InstallerClean. |
@@ -348,7 +348,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Português (Brasil) |
 | --- | --- |
 | Donate | Doar |
-| Donate | Me paga um café |
+| Donate | Doar |
 | Donate | Doar |
 | Cancel operation | Cancelar a operação |
 | Cancel scan | Cancelar a análise |

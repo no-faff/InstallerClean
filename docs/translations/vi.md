@@ -40,7 +40,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Xóa vĩnh viễn |
 | _Done | _Xong |
 | Details | Chi tiết |
-| _Donate | _Mời tôi một ly cà phê |
+| _Donate | Ủng _hộ |
 | Donate | Ủng hộ |
 | Leave a _star on GitHub | Gắn _sao trên GitHub |
 | Apache 2.0 licence | Giấy phép Apache 2.0 |
@@ -175,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Hoàn tác rất đơn giản. Hãy chuyển chúng trở lại {InstallerFolder} và mọi thứ sẽ như cũ. |
 | {0} {1} permanently deleted | Đã xóa vĩnh viễn {0} {1} |
 | {0} {1} permanently deleted | Đã xóa vĩnh viễn {0} {1} |
-| Any small donation is much appreciated. | Rất vui vì đã giúp được. Nếu bạn có lòng, một ly cà phê cũng quý. |
+| Any small donation is much appreciated. | Mọi đóng góp dù nhỏ đều rất được trân trọng. |
 
 ## Summaries and counts
 
@@ -329,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Tiếng Việt |
 | --- | --- |
-| Any small donation is much appreciated. | Làm việc này khát nước lắm! |
+| Any small donation is much appreciated. | Mọi đóng góp dù nhỏ đều rất được trân trọng. |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI. |
 | Close | Đóng |
 | A star helps other people find it. | Một ngôi sao giúp người khác tìm thấy InstallerClean. |
@@ -348,7 +348,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | Donate | Ủng hộ |
-| Donate | Mời tôi một ly cà phê |
+| Donate | Ủng hộ |
 | Donate | Ủng hộ |
 | Cancel operation | Hủy thao tác |
 | Cancel scan | Hủy quét |

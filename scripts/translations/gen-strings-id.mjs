@@ -127,7 +127,7 @@ const MAP = {
   'Action.DeletePermanently': `_Hapus permanen`,
   'Action.Done': `_Selesai`,
   'Action.Details': `Detail`,
-  'Action.BuyMeACuppa': `Traktir saya secangkir _kopi`,
+  'Action.BuyMeACuppa': `_Donasi`,
   'Action.Donate': `Donasi`,
   'Action.LeaveStarOnGitHub': `Beri _bintang di GitHub`,
   'Action.Licence': `Lisensi Apache 2.0`,
@@ -141,7 +141,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Donasi`,
-  'Automation.BuyMeACuppa.About': `Traktir saya secangkir kopi`,
+  'Automation.BuyMeACuppa.About': `Donasi`,
   'Automation.Donate': `Donasi`,
   // The three Cancel names name the button and then say which one, the shape
   // Automation.ViewOrphanedFiles and its sibling already take, rather than the
@@ -192,7 +192,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Menjelaskan folder ini, dan cara memulihkan file, di README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Membuat haus!`,
+  'Tooltip.BuyMeACuppa.About': `Donasi sekecil apa pun sangat dihargai.`,
   'Tooltip.CancellingPending': `Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI.`,
   'Tooltip.Close': `Tutup`,
   'Tooltip.LeaveStarOnGitHub.About': `Bintang membantu orang lain menemukan InstallerClean.`,
@@ -497,7 +497,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar program terpasang: InstallerClean membaca {2} {3}, lalu menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar tambalan sebuah program: InstallerClean membaca {2} {3}, lalu menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'UpdateCheck.Status.UpdateAvailable': `Versi {0} tersedia.`,
-  'Completion.DonateAsk': `Senang bisa membantu. Kalau Anda berbaik hati, secangkir kopi sangat saya hargai.`,
+  'Completion.DonateAsk': `Donasi sekecil apa pun sangat dihargai.`,
   'About.Link.Guide': `Panduan dan FAQ`,
   'About.Link.ReportProblem': `Laporkan masalah`,
   'About.AutoUpdateCheck': `Periksa pembaruan secara otomatis`,

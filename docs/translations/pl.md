@@ -40,7 +40,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | Usuń _trwale |
 | _Done | _Gotowe |
 | Details | Szczegóły |
-| _Donate | Postaw mi _kawę |
+| _Donate | _Wesprzyj |
 | Donate | Wesprzyj |
 | Leave a _star on GitHub | Zostaw _gwiazdkę na GitHubie |
 | Apache 2.0 licence | Licencja Apache 2.0 |
@@ -175,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Łatwo to cofnąć. Przenieś je z powrotem do {InstallerFolder}, a wszystko wróci do stanu sprzed. |
 | {0} {1} permanently deleted | Trwale usunięto {0} {1} |
 | {0} {1} permanently deleted | Trwale usunięto {0} {1} |
-| Any small donation is much appreciated. | Cieszę się, że pomogło. Jeśli masz dobre serce, jest miejsce na napiwek. |
+| Any small donation is much appreciated. | Każde, nawet drobne, wsparcie jest bardzo mile widziane. |
 
 ## Summaries and counts
 
@@ -329,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Polski |
 | --- | --- |
-| Any small donation is much appreciated. | Aż zaschło w gardle! |
+| Any small donation is much appreciated. | Każde, nawet drobne, wsparcie jest bardzo mile widziane. |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Zażądano anulowania. InstallerClean czeka, aż bieżący krok dojdzie do punktu, w którym może się zatrzymać. Przy intensywnych operacjach wejścia/wyjścia lub zapytaniu do bazy danych MSI może to potrwać kilka sekund. |
 | Close | Zamknij |
 | A star helps other people find it. | Gwiazdka pomaga innym znaleźć InstallerClean. |
@@ -348,7 +348,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Polski |
 | --- | --- |
 | Donate | Wesprzyj |
-| Donate | Postaw mi kawę |
+| Donate | Wesprzyj |
 | Donate | Wesprzyj |
 | Cancel operation | Anuluj operację |
 | Cancel scan | Anuluj skanowanie |

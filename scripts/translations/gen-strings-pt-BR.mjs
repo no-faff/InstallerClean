@@ -123,7 +123,7 @@ const MAP = {
   'Action.DeletePermanently': `_Excluir permanentemente`,
   'Action.Done': `_Concluído`,
   'Action.Details': `Detalhes`,
-  'Action.BuyMeACuppa': `Me paga um _café`,
+  'Action.BuyMeACuppa': `D_oar`,
   'Action.Donate': `Doar`,
   'Action.LeaveStarOnGitHub': `_Deixe uma estrela no GitHub`,
   'Action.Licence': `Licença Apache 2.0`,
@@ -137,7 +137,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Doar`,
-  'Automation.BuyMeACuppa.About': `Me paga um café`,
+  'Automation.BuyMeACuppa.About': `Doar`,
   'Automation.Donate': `Doar`,
   'Automation.CancelOperation': `Cancelar a operação`,
   'Automation.CancelScan': `Cancelar a análise`,
@@ -178,7 +178,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Explica esta pasta, e como recuperar um arquivo, no README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `É trabalho que dá sede!`,
+  'Tooltip.BuyMeACuppa.About': `Qualquer doação, por menor que seja, é muito bem-vinda.`,
   'Tooltip.CancellingPending': `Cancelamento solicitado. O InstallerClean está esperando o passo atual chegar a um ponto em que possa parar. Isso pode levar alguns segundos durante operações intensas de E/S ou uma chamada ao banco de dados MSI.`,
   'Tooltip.Close': `Fechar`,
   'Tooltip.LeaveStarOnGitHub.About': `Uma estrela ajuda outras pessoas a encontrar o InstallerClean.`,
@@ -480,7 +480,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `O Windows Installer nunca sinalizou o fim da lista de programas instalados: o InstallerClean leu {2} {3} e depois desistiu após {0} entradas (último código de erro {1}). Não dá para confiar em uma lista sem fim, então o InstallerClean parou. Nada foi removido.`,
   'Error.MsiPatchEnumerationNeverEnded': `O Windows Installer nunca sinalizou o fim da lista de patches de um programa: o InstallerClean leu {2} {3} e depois desistiu após {0} entradas (último código de erro {1}). Não dá para confiar em uma lista sem fim, então o InstallerClean parou. Nada foi removido.`,
   'UpdateCheck.Status.UpdateAvailable': `A versão {0} está disponível.`,
-  'Completion.DonateAsk': `Que bom que ajudou. A caixinha está aqui, se vier do coração.`,
+  'Completion.DonateAsk': `Qualquer doação, por menor que seja, é muito bem-vinda.`,
   'About.Link.Guide': `Guia e perguntas frequentes`,
   'About.Link.ReportProblem': `Relatar um problema`,
   'About.AutoUpdateCheck': `Verificar atualizações automaticamente`,

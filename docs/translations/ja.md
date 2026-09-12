@@ -40,7 +40,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | 完全に削除(_D) |
 | _Done | 完了(_D) |
 | Details | 詳細 |
-| _Donate | コーヒーを一杯おごる(_B) |
+| _Donate | 寄付(_D) |
 | Donate | 寄付 |
 | Leave a _star on GitHub | GitHubでスターを付ける(_S) |
 | Apache 2.0 licence | Apache 2.0 ライセンス |
@@ -175,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 元に戻すのは簡単です。{InstallerFolder} に戻せば、すべて元どおりになります。 |
 | {0} {1} permanently deleted | {0} 個の {1} を完全に削除しました |
 | {0} {1} permanently deleted | {0} 個の {1} を完全に削除しました |
-| Any small donation is much appreciated. | お役に立てて何よりです。お心づけをいただけたら幸いです。 |
+| Any small donation is much appreciated. | どんな少額のご寄付でもありがたく思います。 |
 
 ## Summaries and counts
 
@@ -329,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 日本語 |
 | --- | --- |
-| Any small donation is much appreciated. | 喉が渇く仕事です！ |
+| Any small donation is much appreciated. | どんな少額のご寄付でもありがたく思います。 |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。 |
 | Close | 閉じる |
 | A star helps other people find it. | スターを付けると、InstallerClean を見つけてもらいやすくなります。 |
@@ -348,7 +348,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Donate | 寄付 |
-| Donate | コーヒーを一杯おごる |
+| Donate | 寄付 |
 | Donate | 寄付 |
 | Cancel operation | 操作をキャンセル |
 | Cancel scan | スキャンをキャンセル |

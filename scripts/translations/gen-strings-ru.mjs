@@ -103,7 +103,7 @@ const MAP = {
   'Action.DeletePermanently': `_Удалить безвозвратно`,
   'Action.Done': `_Готово`,
   'Action.Details': `Подробности`,
-  'Action.BuyMeACuppa': `_Угостите меня чаем`,
+  'Action.BuyMeACuppa': `_Поддержать`,
   'Action.Donate': `Поддержать`,
   'Action.LeaveStarOnGitHub': `Поставить з_везду на GitHub`,
   'Action.Licence': `Лицензия Apache 2.0`,
@@ -120,7 +120,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Поддержать`,
-  'Automation.BuyMeACuppa.About': `Угостите меня чаем`,
+  'Automation.BuyMeACuppa.About': `Поддержать`,
   'Automation.Donate': `Поддержать`,
   // The three Cancel names are built on the noun Отмена rather than the verb
   // Отменить, which share only a root: WCAG 2.5.3 (Label in Name) asks that a
@@ -169,7 +169,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Объясняет эту папку и то, как восстановить файл, в README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `В горле пересохло!`,
+  'Tooltip.BuyMeACuppa.About': `Любая, даже небольшая, поддержка очень ценна.`,
   'Tooltip.CancellingPending': `Запрошена отмена. InstallerClean ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI.`,
   'Tooltip.Close': `Закрыть`,
   'Tooltip.LeaveStarOnGitHub.About': `Звезда помогает другим найти InstallerClean.`,
@@ -434,7 +434,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прочитал {2} {3}, а затем прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прочитал {2} {3}, а затем прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'UpdateCheck.Status.UpdateAvailable': `Доступна версия {0}.`,
-  'Completion.DonateAsk': `Рад, что пригодилось. Если захочется проявить щедрость, есть куда оставить на чай.`,
+  'Completion.DonateAsk': `Любая, даже небольшая, поддержка очень ценна.`,
   'About.Link.Guide': `Руководство и частые вопросы`,
   'About.Link.ReportProblem': `Сообщить о проблеме`,
   'About.AutoUpdateCheck': `Автоматически проверять обновления`,

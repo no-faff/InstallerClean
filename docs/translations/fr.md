@@ -40,7 +40,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Supprimer définitivement |
 | _Done | _Terminé |
 | Details | Détails |
-| _Donate | Offrez-moi un _café |
+| _Donate | Faire un _don |
 | Donate | Faire un don |
 | Leave a _star on GitHub | _Laisser une étoile sur GitHub |
 | Apache 2.0 licence | Licence Apache 2.0 |
@@ -175,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | C'est simple à annuler. Redéplacez-les dans {InstallerFolder} et tout redeviendra comme avant. |
 | {0} {1} permanently deleted | {0} {1} supprimé définitivement |
 | {0} {1} permanently deleted | {0} {1} supprimés définitivement |
-| Any small donation is much appreciated. | Content d'avoir pu aider. La cagnotte est là, si le cœur vous en dit. |
+| Any small donation is much appreciated. | Tout don, même modeste, est très apprécié. |
 
 ## Summaries and counts
 
@@ -329,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Français |
 | --- | --- |
-| Any small donation is much appreciated. | Ça donne soif ! |
+| Any small donation is much appreciated. | Tout don, même modeste, est très apprécié. |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Annulation demandée. InstallerClean attend que l'étape en cours atteigne un point d'arrêt. Cela peut prendre quelques secondes lors d'opérations d'E/S intensives ou d'un appel à la base de données MSI. |
 | Close | Fermer |
 | A star helps other people find it. | Une étoile aide les autres à découvrir InstallerClean. |
@@ -348,7 +348,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Français |
 | --- | --- |
 | Donate | Faire un don |
-| Donate | Offrez-moi un café |
+| Donate | Faire un don |
 | Donate | Faire un don |
 | Cancel operation | Annuler l'opération |
 | Cancel scan | Annuler l'analyse |

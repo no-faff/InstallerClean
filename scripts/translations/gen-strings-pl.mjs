@@ -155,7 +155,7 @@ const MAP = {
   'Action.DeletePermanently': `Usuń _trwale`,
   'Action.Done': `_Gotowe`,
   'Action.Details': `Szczegóły`,
-  'Action.BuyMeACuppa': `Postaw mi _kawę`,
+  'Action.BuyMeACuppa': `_Wesprzyj`,
   'Action.Donate': `Wesprzyj`,
   'Action.LeaveStarOnGitHub': `Zostaw _gwiazdkę na GitHubie`,
   'Action.Licence': `Licencja Apache 2.0`,
@@ -169,7 +169,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Wesprzyj`,
-  'Automation.BuyMeACuppa.About': `Postaw mi kawę`,
+  'Automation.BuyMeACuppa.About': `Wesprzyj`,
   'Automation.Donate': `Wesprzyj`,
   'Automation.CancelOperation': `Anuluj operację`,
   'Automation.CancelScan': `Anuluj skanowanie`,
@@ -210,7 +210,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Wyjaśnia ten folder i sposób odzyskania pliku w README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Aż zaschło w gardle!`,
+  'Tooltip.BuyMeACuppa.About': `Każde, nawet drobne, wsparcie jest bardzo mile widziane.`,
   'Tooltip.CancellingPending': `Zażądano anulowania. InstallerClean czeka, aż bieżący krok dojdzie do punktu, w którym może się zatrzymać. Przy intensywnych operacjach wejścia/wyjścia lub zapytaniu do bazy danych MSI może to potrwać kilka sekund.`,
   'Tooltip.Close': `Zamknij`,
   'Tooltip.LeaveStarOnGitHub.About': `Gwiazdka pomaga innym znaleźć InstallerClean.`,
@@ -518,7 +518,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `Windows Installer nigdy nie zasygnalizował końca listy zainstalowanych programów: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał. Nic nie zostało usunięte.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer nigdy nie zasygnalizował końca listy poprawek jednego programu: InstallerClean odczytał {2} {3}, a potem poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał. Nic nie zostało usunięte.`,
   'UpdateCheck.Status.UpdateAvailable': `Dostępna jest wersja {0}.`,
-  'Completion.DonateAsk': `Cieszę się, że pomogło. Jeśli masz dobre serce, jest miejsce na napiwek.`,
+  'Completion.DonateAsk': `Każde, nawet drobne, wsparcie jest bardzo mile widziane.`,
   'About.Link.Guide': `Przewodnik i FAQ`,
   'About.Link.ReportProblem': `Zgłoś problem`,
   'About.AutoUpdateCheck': `Automatycznie sprawdzaj aktualizacje`,

@@ -134,7 +134,7 @@ const MAP = {
   'Action.DeletePermanently': `Endgültig _löschen`,
   'Action.Done': `_Fertig`,
   'Action.Details': `Details`,
-  'Action.BuyMeACuppa': `Spendier mir einen _Kaffee`,
+  'Action.BuyMeACuppa': `S_penden`,
   'Action.Donate': `Spenden`,
   'Action.LeaveStarOnGitHub': `Einen Stern auf _GitHub hinterlassen`,
   'Action.Licence': `Apache-2.0-Lizenz`,
@@ -148,7 +148,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Spenden`,
-  'Automation.BuyMeACuppa.About': `Spendier mir einen Kaffee`,
+  'Automation.BuyMeACuppa.About': `Spenden`,
   'Automation.Donate': `Spenden`,
   'Automation.CancelOperation': `Vorgang abbrechen`,
   'Automation.CancelScan': `Scan abbrechen`,
@@ -189,7 +189,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Erklärt diesen Ordner, und wie sich eine Datei wiederherstellen lässt, im README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Das macht durstig!`,
+  'Tooltip.BuyMeACuppa.About': `Über jede kleine Spende freue ich mich sehr.`,
   'Tooltip.CancellingPending': `Abbruch angefordert. InstallerClean wartet, bis der aktuelle Schritt einen Haltepunkt erreicht. Bei starker Datenträgeraktivität oder einem MSI-Datenbankaufruf kann das ein paar Sekunden dauern.`,
   'Tooltip.Close': `Schließen`,
   'Tooltip.LeaveStarOnGitHub.About': `Ein Stern hilft anderen, InstallerClean zu finden.`,
@@ -493,7 +493,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `Windows Installer hat das Ende der Liste der installierten Programme nie signalisiert: InstallerClean hat {2} {3} gelesen und dann nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer hat das Ende der Patch-Liste eines Programms nie signalisiert: InstallerClean hat {2} {3} gelesen und dann nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'UpdateCheck.Status.UpdateAvailable': `Version {0} ist verfügbar.`,
-  'Completion.DonateAsk': `Freut mich, dass es geholfen hat. Die Kaffeekasse steht bereit, falls dir großzügig zumute ist.`,
+  'Completion.DonateAsk': `Über jede kleine Spende freue ich mich sehr.`,
   'About.Link.Guide': `Anleitung und FAQ`,
   'About.Link.ReportProblem': `Ein Problem melden`,
   'About.AutoUpdateCheck': `Automatisch nach Updates suchen`,

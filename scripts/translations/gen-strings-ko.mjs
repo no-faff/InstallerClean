@@ -115,7 +115,7 @@ const MAP = {
   'Action.DeletePermanently': `영구 삭제(_D)`,
   'Action.Done': `완료(_D)`,
   'Action.Details': `세부 정보`,
-  'Action.BuyMeACuppa': `커피 한 잔 사주기(_B)`,
+  'Action.BuyMeACuppa': `후원(_D)`,
   'Action.Donate': `후원`,
   'Action.LeaveStarOnGitHub': `GitHub에 별 남기기(_S)`,
   'Action.Licence': `Apache 2.0 라이선스`,
@@ -129,7 +129,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `후원`,
-  'Automation.BuyMeACuppa.About': `커피 한 잔 사주기`,
+  'Automation.BuyMeACuppa.About': `후원`,
   'Automation.Donate': `후원`,
   'Automation.CancelOperation': `작업 취소`,
   'Automation.CancelScan': `검사 취소`,
@@ -170,7 +170,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `이 폴더에 대한 설명과 파일 복구 방법을 README에서 안내`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `이게 생각보다 목마른 일입니다!`,
+  'Tooltip.BuyMeACuppa.About': `적은 금액의 후원도 정말 감사합니다.`,
   'Tooltip.CancellingPending': `취소가 요청되었습니다. InstallerClean이 현재 단계가 멈출 수 있는 지점에 이를 때까지 기다리고 있습니다. I/O가 많거나 MSI 데이터베이스를 호출하는 동안에는 몇 초 걸릴 수 있습니다.`,
   'Tooltip.Close': `닫기`,
   'Tooltip.LeaveStarOnGitHub.About': `별 하나가 다른 사람들이 InstallerClean을 찾는 데 도움이 됩니다.`,
@@ -475,7 +475,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {2} {3}을(를) 읽은 다음 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {2} {3}을(를) 읽은 다음 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'UpdateCheck.Status.UpdateAvailable': `{0} 버전을 사용할 수 있습니다.`,
-  'Completion.DonateAsk': `도움이 되어 기쁩니다. 너그러운 마음이 있으시면 작은 성의도 반갑습니다.`,
+  'Completion.DonateAsk': `적은 금액의 후원도 정말 감사합니다.`,
   'About.Link.Guide': `안내서 및 자주 묻는 질문`,
   'About.Link.ReportProblem': `문제 신고`,
   'About.AutoUpdateCheck': `자동으로 업데이트 확인`,

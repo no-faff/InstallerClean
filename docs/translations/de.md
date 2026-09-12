@@ -40,7 +40,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | Endgültig _löschen |
 | _Done | _Fertig |
 | Details | Details |
-| _Donate | Spendier mir einen _Kaffee |
+| _Donate | S_penden |
 | Donate | Spenden |
 | Leave a _star on GitHub | Einen Stern auf _GitHub hinterlassen |
 | Apache 2.0 licence | Apache-2.0-Lizenz |
@@ -175,7 +175,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Das lässt sich leicht rückgängig machen. Verschiebe sie zurück nach {InstallerFolder}, und alles ist wieder wie vorher. |
 | {0} {1} permanently deleted | {0} {1} endgültig gelöscht |
 | {0} {1} permanently deleted | {0} {1} endgültig gelöscht |
-| Any small donation is much appreciated. | Freut mich, dass es geholfen hat. Die Kaffeekasse steht bereit, falls dir großzügig zumute ist. |
+| Any small donation is much appreciated. | Über jede kleine Spende freue ich mich sehr. |
 
 ## Summaries and counts
 
@@ -329,7 +329,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Deutsch |
 | --- | --- |
-| Any small donation is much appreciated. | Das macht durstig! |
+| Any small donation is much appreciated. | Über jede kleine Spende freue ich mich sehr. |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Abbruch angefordert. InstallerClean wartet, bis der aktuelle Schritt einen Haltepunkt erreicht. Bei starker Datenträgeraktivität oder einem MSI-Datenbankaufruf kann das ein paar Sekunden dauern. |
 | Close | Schließen |
 | A star helps other people find it. | Ein Stern hilft anderen, InstallerClean zu finden. |
@@ -348,7 +348,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Deutsch |
 | --- | --- |
 | Donate | Spenden |
-| Donate | Spendier mir einen Kaffee |
+| Donate | Spenden |
 | Donate | Spenden |
 | Cancel operation | Vorgang abbrechen |
 | Cancel scan | Scan abbrechen |

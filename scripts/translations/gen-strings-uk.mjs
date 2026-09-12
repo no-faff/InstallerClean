@@ -143,7 +143,7 @@ const MAP = {
   'Action.DeletePermanently': `_Видалити назавжди`,
   'Action.Done': `_Готово`,
   'Action.Details': `Деталі`,
-  'Action.BuyMeACuppa': `Пригостіть мене _кавою`,
+  'Action.BuyMeACuppa': `_Підтримати`,
   'Action.Donate': `Підтримати`,
   'Action.LeaveStarOnGitHub': `Лишити зірку на _GitHub`,
   'Action.Licence': `Ліцензія Apache 2.0`,
@@ -157,7 +157,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Підтримати`,
-  'Automation.BuyMeACuppa.About': `Пригостіть мене кавою`,
+  'Automation.BuyMeACuppa.About': `Підтримати`,
   'Automation.Donate': `Підтримати`,
   'Automation.CancelOperation': `Скасувати операцію`,
   'Automation.CancelScan': `Скасувати сканування`,
@@ -198,7 +198,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Пояснює цю папку і як відновити файл, у README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Робота не з легких, аж у горлі пересохло!`,
+  'Tooltip.BuyMeACuppa.About': `Будь-яка, навіть невелика, підтримка дуже цінна.`,
   'Tooltip.CancellingPending': `Скасування запитано. InstallerClean чекає, доки поточний крок дійде до точки зупинки. Це може тривати кілька секунд під час інтенсивного вводу-виводу чи звернення до бази даних MSI.`,
   'Tooltip.Close': `Закрити`,
   'Tooltip.LeaveStarOnGitHub.About': `Зірка допомагає іншим знайти InstallerClean.`,
@@ -500,7 +500,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `Windows Installer так і не повідомив про кінець списку встановлених програм: InstallerClean прочитав {2} {3}, а потім припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. Нічого не було видалено.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так і не повідомив про кінець списку виправлень однієї програми: InstallerClean прочитав {2} {3}, а потім припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. Нічого не було видалено.`,
   'UpdateCheck.Status.UpdateAvailable': `Доступна версія {0}.`,
-  'Completion.DonateAsk': `Радий, що знадобилося. Якщо ваша ласка, є куди докинути на каву.`,
+  'Completion.DonateAsk': `Будь-яка, навіть невелика, підтримка дуже цінна.`,
   'About.Link.Guide': `Посібник і поширені запитання`,
   'About.Link.ReportProblem': `Повідомити про проблему`,
   'About.AutoUpdateCheck': `Автоматично перевіряти оновлення`,

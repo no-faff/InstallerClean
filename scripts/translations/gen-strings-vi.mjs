@@ -118,7 +118,7 @@ const MAP = {
   'Action.DeletePermanently': `_Xóa vĩnh viễn`,
   'Action.Done': `_Xong`,
   'Action.Details': `Chi tiết`,
-  'Action.BuyMeACuppa': `_Mời tôi một ly cà phê`,
+  'Action.BuyMeACuppa': `Ủng _hộ`,
   'Action.Donate': `Ủng hộ`,
   'Action.LeaveStarOnGitHub': `Gắn _sao trên GitHub`,
   'Action.Licence': `Giấy phép Apache 2.0`,
@@ -132,7 +132,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Ủng hộ`,
-  'Automation.BuyMeACuppa.About': `Mời tôi một ly cà phê`,
+  'Automation.BuyMeACuppa.About': `Ủng hộ`,
   'Automation.Donate': `Ủng hộ`,
   'Automation.CancelOperation': `Hủy thao tác`,
   'Automation.CancelScan': `Hủy quét`,
@@ -173,7 +173,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Giải thích thư mục này, và cách khôi phục một tệp, trong README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Làm việc này khát nước lắm!`,
+  'Tooltip.BuyMeACuppa.About': `Mọi đóng góp dù nhỏ đều rất được trân trọng.`,
   'Tooltip.CancellingPending': `Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI.`,
   'Tooltip.Close': `Đóng`,
   'Tooltip.LeaveStarOnGitHub.About': `Một ngôi sao giúp người khác tìm thấy InstallerClean.`,
@@ -478,7 +478,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã đọc {2} {3}, rồi bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã đọc {2} {3}, rồi bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'UpdateCheck.Status.UpdateAvailable': `Phiên bản {0} đã có.`,
-  'Completion.DonateAsk': `Rất vui vì đã giúp được. Nếu bạn có lòng, một ly cà phê cũng quý.`,
+  'Completion.DonateAsk': `Mọi đóng góp dù nhỏ đều rất được trân trọng.`,
   'About.Link.Guide': `Hướng dẫn và câu hỏi thường gặp`,
   'About.Link.ReportProblem': `Báo cáo vấn đề`,
   'About.AutoUpdateCheck': `Tự động kiểm tra cập nhật`,

@@ -144,7 +144,7 @@ const MAP = {
   'Action.DeletePermanently': `_Supprimer définitivement`,
   'Action.Done': `_Terminé`,
   'Action.Details': `Détails`,
-  'Action.BuyMeACuppa': `Offrez-moi un _café`,
+  'Action.BuyMeACuppa': `Faire un _don`,
   'Action.Donate': `Faire un don`,
   'Action.LeaveStarOnGitHub': `_Laisser une étoile sur GitHub`,
   'Action.Licence': `Licence Apache 2.0`,
@@ -158,7 +158,7 @@ const MAP = {
 
   // Automation names (screen reader / accessibility)
   'Automation.BuyMeACuppa': `Faire un don`,
-  'Automation.BuyMeACuppa.About': `Offrez-moi un café`,
+  'Automation.BuyMeACuppa.About': `Faire un don`,
   'Automation.Donate': `Faire un don`,
   'Automation.CancelOperation': `Annuler l'opération`,
   'Automation.CancelScan': `Annuler l'analyse`,
@@ -199,7 +199,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Explique ce dossier, et comment récupérer un fichier, dans le README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Ça donne soif !`,
+  'Tooltip.BuyMeACuppa.About': `Tout don, même modeste, est très apprécié.`,
   'Tooltip.CancellingPending': `Annulation demandée. InstallerClean attend que l'étape en cours atteigne un point d'arrêt. Cela peut prendre quelques secondes lors d'opérations d'E/S intensives ou d'un appel à la base de données MSI.`,
   'Tooltip.Close': `Fermer`,
   'Tooltip.LeaveStarOnGitHub.About': `Une étoile aide les autres à découvrir InstallerClean.`,
@@ -500,7 +500,7 @@ const MAP = {
   'Error.MsiEnumerationNeverEnded': `Windows Installer n'a jamais signalé la fin de la liste des programmes installés : InstallerClean a lu {2} {3}, puis a renoncé après {0} entrées (dernier code d'erreur {1}). Une liste sans fin n'est pas fiable, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer n'a jamais signalé la fin de la liste des correctifs d'un programme : InstallerClean a lu {2} {3}, puis a renoncé après {0} entrées (dernier code d'erreur {1}). Une liste sans fin n'est pas fiable, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
   'UpdateCheck.Status.UpdateAvailable': `La version {0} est disponible.`,
-  'Completion.DonateAsk': `Content d'avoir pu aider. La cagnotte est là, si le cœur vous en dit.`,
+  'Completion.DonateAsk': `Tout don, même modeste, est très apprécié.`,
   'About.Link.Guide': `Guide et FAQ`,
   'About.Link.ReportProblem': `Signaler un problème`,
   'About.AutoUpdateCheck': `Rechercher des mises à jour automatiquement`,
