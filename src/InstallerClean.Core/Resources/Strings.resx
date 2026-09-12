@@ -158,7 +158,7 @@
        keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Done</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
-  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Buy me a cuppa</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Donate</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a _star on GitHub</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
@@ -192,12 +192,14 @@
 
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Donate</value></data>
-  <!-- The About window's own star and cuppa buttons. The value says what the
+  <!-- The About window's own star and donate buttons. The value says what the
        button says on screen: a window name in the spoken value would be an
        internal note read out to somebody who can only be in that window to hear
-       it. The unsuffixed Automation.BuyMeACuppa is the main window's donate
-       button and holds a different value, so the two are not one key. -->
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Buy me a cuppa</value></data>
+       it. The unsuffixed Automation.BuyMeACuppa names the completion screen's
+       heart, which carries no label of its own, while this one restates the
+       button beside it and moves with it. They hold the same English and are
+       free to differ in any language. -->
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Donate</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Cancel operation</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Cancel scan</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Cancel startup scan</value></data>
@@ -328,7 +330,10 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Explains this folder, and how to recover a file, in the README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>It's thirsty work!</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve">
+    <value>Any small donation is much appreciated.</value>
+    <comment>Tooltip and screen-reader help on the About window's donate pill. The button it hangs on already reads Donate (Action.BuyMeACuppa), so the tooltip says what the ask is rather than naming the action a second time.</comment>
+  </data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve">
