@@ -1,4 +1,3 @@
 # Fills the Sponsor button GitHub shows on the repository page and in the
 # sidebar. Each key adds one entry to the button's list.
 ko_fi: nofaff
-custom: ["https://nofaff.netlify.app/support"]
