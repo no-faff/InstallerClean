@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 using InstallerClean.Services;
@@ -18,6 +20,7 @@ public partial class AboutWindow : Window
     public AboutWindow(ISettingsService settings)
     {
         InitializeComponent();
+        DonateToolTip.CustomPopupPlacementCallback = PlaceDonateToolTip;
         _settings = settings;
         VersionText.Text = DisplayHelpers.GetVersionString();
 
@@ -154,6 +157,37 @@ public partial class AboutWindow : Window
     {
         if (sender is System.Windows.Documents.Hyperlink link && link.NavigateUri is not null)
             UrlLauncher.OpenUrl(link.NavigateUri.AbsoluteUri);
+    }
+
+    // How close the donate tooltip may come to either edge of the window.
+    // Matches where the say-thanks row's own pills start, the WrapPanel's
+    // negative left margin having pulled them in from the window inset.
+    private const double ToolTipEdgeMargin = 12;
+
+    /// <summary>
+    /// Places the donate pill's tooltip flush above it, along the window's
+    /// width rather than against the pill. The pill's own position moves with
+    /// the star label beside it and drops to a second line in the languages
+    /// that need one, and the tooltip is a wrapped sentence, so the offset the
+    /// tooltip asks for is where the box would rather sit and
+    /// <see cref="TooltipPlacement.LeftInsideWindow"/> decides where it can.
+    /// The returned point is relative to the pill, which is what a placement
+    /// callback is asked for, so the window position is taken back off it.
+    /// </summary>
+    private CustomPopupPlacement[] PlaceDonateToolTip(Size popupSize, Size targetSize, Point offset)
+    {
+        var x = offset.X;
+        // A target outside this window's tree cannot be transformed into it.
+        // It never is while the window is up, and the offset alone still
+        // places a tooltip, so this asks rather than assuming.
+        if (DonateToolTip.PlacementTarget is UIElement pill && pill.IsDescendantOf(this))
+        {
+            var pillLeft = pill.TransformToAncestor(this).Transform(new Point(0, 0)).X;
+            x = TooltipPlacement.LeftInsideWindow(
+                pillLeft + offset.X, popupSize.Width, ActualWidth, ToolTipEdgeMargin) - pillLeft;
+        }
+
+        return [new CustomPopupPlacement(new Point(x, -popupSize.Height), PopupPrimaryAxis.Horizontal)];
     }
 
     private void StarClick(object sender, RoutedEventArgs e) =>
