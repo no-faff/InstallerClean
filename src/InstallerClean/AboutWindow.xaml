@@ -133,7 +133,7 @@
                   Content="{loc:Translate About.AutoUpdateCheck}"
                   AutomationProperties.HelpText="{loc:Translate Automation.AutoUpdateCheck.HelpText}"/>
 
-        <!-- Section header above the Star + Buy-me-a-cuppa row. The
+        <!-- Section header above the star and donate row. The
              resx value is already uppercased so screen readers don't
              see SmallCaps glyph mapping at all. Type.Heading.Sm +
              Text.Body matches MOVE LOCATION and the registered-
@@ -146,13 +146,12 @@
              Two columns rather than one cell holding a left-aligned panel and a
              right-aligned button: in a single cell neither child reserves width
              from the other, so once the ask labels are long they simply ran on
-             under Close. German is the worst pair ("Einen Stern auf GitHub
-             hinterlassen" beside "Spendier mir einen Kaffee"), Dutch the next.
-             The window cannot widen to absorb it, its Width being the scaled 500
-             ApplyScaledBounds clamps to the work area, so the asks give way
-             instead: the WrapPanel drops the cuppa onto a second line in the
-             languages that need it and leaves the shorter ones, English among
-             them, on one. The extra line comes out of the star spacer row above,
+             under Close. German is the longest pair, its star label running to
+             "Einen Stern auf GitHub hinterlassen". The window cannot widen to
+             absorb it, its Width being the scaled 500 ApplyScaledBounds clamps
+             to the work area, so the asks give way instead: the WrapPanel drops
+             the donate pill onto a second line in any language that needs it
+             and leaves the rest, English among them, on one. The extra line comes out of the star spacer row above,
              which gives up its slack before the window grows at all.
 
              Two details the layout depends on. The -12 left bleed sits on the
@@ -160,7 +159,7 @@
              left edge as the first; and the panel's -6 bottom cancels the bottom
              margin of the last (or only) line, so an unwrapped row is exactly as
              tall as it was before. Tab order is untouched: a WrapPanel lays out
-             in tree order, so star, cuppa, Close still runs across then down. -->
+             in tree order, so star, donate, Close still runs across then down. -->
         <Grid Grid.Row="15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -168,7 +167,7 @@
             </Grid.ColumnDefinitions>
             <!-- Both asks carry their own tooltip as HelpText. Hover text
                  reaches no screen reader, so the reason for the ask (what a
-                 star is for, that it is thirsty work) was on screen and
+                 star is for, that a donation is welcome) was on screen and
                  nowhere else; the completion overlay's donate heart already
                  pairs the two this way. Same key, so they cannot drift. -->
             <WrapPanel Grid.Column="0" Margin="-12,0,0,-6">
