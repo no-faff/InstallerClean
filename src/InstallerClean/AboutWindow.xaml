@@ -194,8 +194,8 @@
                         Margin="0,0,0,6"
                         ToolTipService.InitialShowDelay="0">
                     <!-- Placement Top puts a tooltip's left edge on its button's,
-                         and the cuppa sits after the star on this row, so the
-                         gap between this tooltip and the Section.SayThanks
+                         and the donate pill sits after the star on this row, so
+                         the gap between this tooltip and the Section.SayThanks
                          heading above is set by two strings: the heading, and
                          the star button's label. Where the heading is long and
                          that label is short the two meet, and the tooltip reads
@@ -205,10 +205,7 @@
                          whichever language the app is running in, and scales so
                          it holds that distance as both strings grow.
 
-                         The star's tooltip takes none. It carries a sentence
-                         where this one carries a phrase, so it is the wider of
-                         the two in every language and sits across the heading
-                         rather than meeting its end. -->
+                         The star's tooltip takes no offset. -->
                     <Button.ToolTip>
                         <ToolTip Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.BuyMeACuppa.About}"
                                  HorizontalOffset="{a11y:TextScaled 32}"/>
