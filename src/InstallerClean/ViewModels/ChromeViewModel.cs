@@ -358,7 +358,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     // Bound to the heart on the completion card, which is the app's only
     // donate control outside the About window's own pill.
     [RelayCommand]
-    private void Donate() => _windowService.OpenUrl("https://nofaff.netlify.app/support");
+    private void Donate() => _windowService.OpenUrl(SupportLink.Url);
 
     [RelayCommand]
     private void CloseApp() => _windowService.CloseMainWindow();
