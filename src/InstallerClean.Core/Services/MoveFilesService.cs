@@ -259,9 +259,8 @@ public sealed class MoveFilesService : IMoveFilesService
             // refusing on a path that merely could not be expanded would strand a
             // user with nowhere to move to.
             //
-            // It does not close the hole named at the per-iteration check below,
-            // where a leaf deleted and replaced inside the window compares equal.
-            // That one is open and stays open.
+            // The per-file check in the loop is what holds each later resolution of
+            // destinationFolder to this capture.
             if (InstallerCacheHelpers.ResolvesInsideInstallerFolder(canonicalDestination))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
@@ -305,42 +304,31 @@ public sealed class MoveFilesService : IMoveFilesService
                     progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
 
                     // Re-resolve and compare to the canonical capture, AFTER the
-                    // report and not before it. The order is what the guard rests
-                    // on: this is a time-of-check-to-time-of-use guard, and the
-                    // report hands control to a consumer that can run for as long as
-                    // it likes, so a check taken before it leaves that consumer's
-                    // whole duration between the check and the move. On the last
-                    // file of a batch there is no next iteration to catch the swap
-                    // at all.
-                    // Every statement between here and File.Move is this service's
-                    // own, which is the claim that holds and the one worth having:
-                    // no consumer gets control again before the move. It is NOT the
-                    // last position the check could occupy. The source Exists test,
-                    // the reparse read, the containment guard's real-filesystem
-                    // resolution and the destination Exists test all sit after it,
-                    // and each of them can go to a network destination inside the
-                    // machine-wide mutex. Small, and not nothing. KEEP THE
-                    // DESTINATION TEST A SINGLE PROBE: a collision loop would make
-                    // the window as many round trips as it is bounded at.
+                    // report and not before it. The report hands control to a
+                    // consumer that can run for as long as it likes, and the check
+                    // comes after it so that no consumer runs between the check and
+                    // the move. Every statement between here and File.Move is this
+                    // service's own, and on the way to the move four of them go to
+                    // the filesystem: the source Exists test, the reparse read, the
+                    // containment guard's real-filesystem resolution and the
+                    // destination Exists test. KEEP THE DESTINATION TEST A SINGLE
+                    // PROBE: a collision loop would put as many round trips between
+                    // the check and the move as it is bounded at.
                     //
-                    // THAT LIST OF FOUR IS A SPECIFICATION AND NOT A DESCRIPTION. It
-                    // is what makes the size of the window a stated figure rather
-                    // than whatever the code happens to do, so a fifth statement
-                    // added between here and File.Move widens the window and nothing
-                    // in the build will say so. Anything going in there belongs in
-                    // this list, or it belongs before the capture.
+                    // THAT LIST OF FOUR IS A SPECIFICATION AND NOT A DESCRIPTION. A
+                    // fifth filesystem call added between here and File.Move puts
+                    // more between the check and the move, and nothing in the build
+                    // will say so. Anything going in there belongs in this list, or
+                    // it belongs above this check.
                     //
-                    // The ordering is not the reach, and the reach has a hole worth
-                    // naming rather than a guarantee. A resolve that DEGRADED is
+                    // WHAT IS COMPARED: whether the kernel expanded the path, and the
+                    // path it expanded to, each against the capture. A re-resolve
+                    // that has lost the proof the capture had stops the batch
+                    // whatever its string says, because a resolve that DEGRADED is
                     // exactly a path whose reparse points went UNexpanded, which is
-                    // the one thing a containment check exists to see through, so a
-                    // re-resolve that has lost the proof the capture had counts as a
-                    // change rather than being compared as a string. What it still
-                    // cannot see is a leaf missing at this instant: resolution then
-                    // runs on the nearest existing ancestor and reattaches the leaf
-                    // name as text, so a leaf deleted and replaced inside the window
-                    // compares equal. That hole is open, and it is named here rather
-                    // than described as closed.
+                    // the one thing a containment check exists to see through. A
+                    // re-resolve naming a different folder stops it too. See
+                    // ClassifyAbort, which keeps the two apart.
                     var resolveProven = InstallerCacheHelpers.TryResolveFinalPath(
                         destinationFolder, out var currentRaw);
                     var currentResolved = currentRaw.TrimEnd(Path.DirectorySeparatorChar);
@@ -579,8 +567,7 @@ public sealed class MoveFilesService : IMoveFilesService
     /// kernel, and on a local disk the walk always finds an existing ancestor to
     /// open, so a real-filesystem test can produce a changed target and cannot
     /// produce a lost one. As a function of the four inputs it is pinned at every
-    /// combination. What that leaves unpinned is which inputs the kernel really
-    /// hands back on a dropped share, and no test here has ever answered that.
+    /// combination.
     /// </summary>
     internal static MoveAbortReason? ClassifyAbort(
         bool canonicalProven, bool resolveProven,
