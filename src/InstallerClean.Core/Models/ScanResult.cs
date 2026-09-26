@@ -296,11 +296,9 @@ namespace InstallerClean.Models;
 /// the walk's unclaimed candidates, and a superseded row reaches the offer from the
 /// registered set without ever having been one.
 ///
-/// IT EXISTS SO THE TWO SUMMARY LINES ACCOUNT FOR EVERY FILE IN THE FOLDER. A
-/// withheld file would otherwise appear in neither: not offered, and not a registered
-/// row either, because no registration names it. The two lines could then add up to
-/// less than the folder holds, with the difference in no line at all and no way for
-/// anyone to notice.
+/// IT EXISTS SO A WITHHELD FILE APPEARS ON ONE OF THE TWO SUMMARY LINES. It would
+/// otherwise appear in neither: not offered, and not a registered row either, because
+/// no registration names it, so it would be counted nowhere and nobody could notice.
 ///
 /// The list rather than a count and a total, so the number shown and the rows shown
 /// cannot come apart: both are read off this. Null means a scan that never reached

@@ -65,9 +65,8 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         var svc = new FileSystemScanService(query, null, _fakeInstallerDir);
         var result = await svc.ScanAsync();
 
-        // Nothing offered, and the files accounted for rather than vanished: the
-        // left-alone line is built from the withheld list, so a file counted nowhere
-        // would make the two summary lines add up to less than the folder holds.
+        // Nothing offered, and both files on the withheld list, which the left-alone
+        // line counts.
         Assert.Empty(result.RemovableFiles);
         Assert.Equal(2, result.WithheldFiles?.Count);
         Assert.Contains(result.WithheldFiles!, f => f.FileName == "one.msi");

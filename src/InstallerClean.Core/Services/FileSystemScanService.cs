@@ -420,8 +420,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // the app was unsure of that was false of every one of them.
         //
         // A CANDIDATE THIS PASS CANNOT IDENTIFY IS A DIFFERENT THING AND IS KEPT
-        // BACK. It leaves the candidate list as well, so the two lists still
-        // account for every file the walk found, but it goes onto the withheld
+        // BACK. It leaves the candidate list as well, but it goes onto the withheld
         // list rather than out of the reckoning. What was read on each side is
         // counted, in the two tallies this returns.
         //
