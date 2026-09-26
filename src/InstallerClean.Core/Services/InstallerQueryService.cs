@@ -4032,10 +4032,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Records that one product's patch enumeration was abandoned after a full run
     /// of unreadable rows. Dev-facing crash-log breadcrumb only, deliberately not
-    /// localised and never surfaced: the user is told through the scan summary's
-    /// kept-patches notice that something in the records could not be matched up,
-    /// which carries no product identity and no count, whereas diagnosing WHY the
-    /// withholding fired needs exactly that identity. Without this line the abandonment leaves no record of which product
+    /// localised and never surfaced: what the user is told is at most a count of the
+    /// superseded files the scan held back, and the count names no product, whereas
+    /// diagnosing WHY the withholding fired needs exactly that identity. Without this
+    /// line the abandonment leaves no record of which product
     /// triggered it, so a field report can be pinned to a product only by the
     /// reporter running the Windows Installer API by hand. Carries the product
     /// code, its install context and SID (the round-trip that fails when the SID

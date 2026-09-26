@@ -15,9 +15,9 @@ namespace InstallerClean.Models;
 /// Uninstallable read failed.
 /// </param>
 /// <param name="UnaccountedProductCount">
-/// Installed products this enumeration did not account for. Surfaced to the user
-/// as the scan summary's kept-patches notice, and the trigger for withholding the
-/// removable class.
+/// Installed products this enumeration did not account for. The trigger for
+/// withholding the removable class, and the figure the command line's
+/// Application-log notice about that withholding carries.
 ///
 /// THREE contributors, and only the first is a failure to read: a product whose
 /// row came back but whose LocalPackage value, or one of whose patch rows, would
@@ -97,13 +97,12 @@ public record InstallerQueryResult(
     /// set of registrations it read may be short of one. Whether that product's
     /// records failed to read or were never reached does not enter into it: what
     /// matters is the missing claim, not the mechanism (see
-    /// <see cref="UnaccountedProductCount"/> for the four).
+    /// <see cref="UnaccountedProductCount"/> for the three).
     ///
-    /// IT BEARS ON THE OFFER AND ON THE MISSING-FILES REPORT, AND ONLY THE SECOND IS
-    /// NEW. It withholds every superseded-patch verdict, which it has always done and
-    /// which is the whole of the superseded offer on a run where it fires; and a
-    /// registration this scan never saw is also one whose file, had it gone, went
-    /// uncounted. Exposed for the copy that says so.
+    /// IT BEARS ON THE OFFER AND ON THE MISSING-FILES REPORT. It withholds every
+    /// superseded-patch verdict, which is the whole of the superseded offer on a run
+    /// where it fires; and a registration this scan never saw is also one whose file,
+    /// had it gone, went uncounted.
     /// </summary>
     public bool RecordsIncomplete => UnaccountedProductCount > 0;
 }
