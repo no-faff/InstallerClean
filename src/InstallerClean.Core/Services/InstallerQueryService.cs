@@ -1850,14 +1850,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (!path.EndsWith(".msp", StringComparison.OrdinalIgnoreCase))
             return Array.Empty<string>();
 
-        // A FILE THAT IS NOT THERE IS LEFT TO THE READ BELOW AND FAILS IT. The
-        // paragraph that stood here said the outcome was the same either way and that
-        // no difference could be observed, and both halves held until the missing-files
-        // split began reading the withheld flag. After that the difference was a
-        // warning on the main window naming the program whose patch this app had just
-        // correctly removed. Nothing is tested for here still: the caller records WHICH
-        // failure this was, and the scan, which is holding the filesystem, decides what
-        // it meant.
+        // A FILE THAT IS NOT THERE IS LEFT TO THE READ BELOW AND FAILS IT. Nothing is
+        // tested for here: the caller records which failure this was, and the scan, which
+        // holds the filesystem, decides what it means. Where the patch is superseded or
+        // obsoleted, its file has gone and every program sharing it has a clean patch
+        // list, the missing-files split reads this failed read as the absence itself and
+        // gives no warning for it. A test for the file here would ask the real disk rather
+        // than the filesystem the scan walks.
         var identity = _identityReader.Read(path, isPatch: true, out var detail);
         if (identity is null)
         {
