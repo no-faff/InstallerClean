@@ -105,7 +105,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0}. Details are in {1}. | {0}。详情见 {1}。 |
 | {0}. The crash log could not be written. | {0}。无法写入崩溃日志。 |
 | Access denied. Windows refused the scan. | 访问被拒绝。Windows 拒绝了扫描。 |
-| Scan failed: couldn't read the Windows Installer records. | 扫描失败：无法读取 Windows Installer 记录。 |
+| Scan stopped. | 扫描已停止。 |
 | Scan cancelled. | 扫描已取消。 |
 | Ready | 就绪 |
 | Scan failed ({0}). Details in {1}. | 扫描失败（{0}）。详情见 {1}。 |
@@ -224,7 +224,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This is also recorded in {0}. | 这也会记录在 {0} 中。 |
 | Access denied | 访问被拒绝 |
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows 拒绝了 InstallerClean 的访问，因此已停止。没有删除任何内容。<br><br>InstallerClean 本来就以管理员身份运行，所以再那样启动一次也无济于事。Windows 没有进一步说明是什么拒绝了访问，因此没有具体可以尝试的办法。 |
-| Couldn't read the Windows Installer records | 无法读取 Windows Installer 记录 |
+| InstallerClean stopped | InstallerClean 已停止 |
 | Scan failed | 扫描失败 |
 | The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer 记录返回的内容完全为空：没有任何一个已安装的程序或更新声称拥有缓存的安装文件。在正常工作的电脑上不会出现这种情况（即使是刚装好的 Windows 也会有一些），所以要么记录已损坏，要么无法读取；而一次相信这个结果的扫描，会把 {InstallerFolder} 中的每个文件都错误地判定为孤立。InstallerClean 没有那样做，而是停了下来。没有删除任何内容。 |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer 不允许 InstallerClean 列出已安装的内容。InstallerClean 本来就以管理员身份运行，所以再以管理员身份运行一次也不会有任何改变。没有这份清单，就无法安全地判断哪些缓存文件仍然需要，因此 InstallerClean 停了下来。没有删除任何内容。 |
@@ -233,6 +233,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows Installer never signalled the end of one program's patch list: InstallerClean read {2} {3}, then gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer 始终没有发出某个程序补丁清单结束的信号：InstallerClean 读取了 {2} {3}，随后在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。 |
 | InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. Almost nothing the records point at is actually there, and almost nothing that's there is named by any record, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。记录所指向的内容几乎都不在那里，而那里的内容几乎都没有被任何记录标明，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。 |
 | InstallerClean couldn't match the Windows Installer records against what's in {InstallerFolder}. The folder has files in it, but not one record points at anything in there, so nothing could be shown to be unneeded. Nothing has been offered and nothing has been removed. | InstallerClean 未能把 Windows Installer 记录与 {InstallerFolder} 中的内容对应起来。文件夹里有文件，但没有任何一条记录指向其中的任何内容，因此无法证明任何文件是不需要的。没有提供任何内容，也没有移除任何内容。 |
+| InstallerClean can't scan {InstallerFolder} on this PC. Windows reports that folder as {0}, and InstallerClean only scans an Installer folder that Windows reports at its own path. Nothing has been offered and nothing has been removed. | InstallerClean 无法在这台电脑上扫描 {InstallerFolder}。Windows 报告该文件夹位于 {0}，而 InstallerClean 只扫描 Windows 在其自身路径上报告的 Installer 文件夹。没有提供任何内容，也没有移除任何内容。 |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean 未能读取到足够的 Windows Installer 记录，无法确定哪些内容仍然需要：已安装程序的清单返回时并不完整，而直接从注册表读取同样的记录也遇到了错误。一个文件可能仅仅因为指明它的那条记录属于读不到的记录之一，就显得像是孤立的，因此 InstallerClean 停了下来。没有删除任何内容。 |
 | InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed. | InstallerClean 未能让 Windows 解析出 {InstallerFolder} 的真实路径，因此无法证明任何文件位于其中，也没有提供任何文件供清理。这次扫描一无所获是因为那项检查失败，而不是因为文件夹是干净的。没有移除任何内容。 |
 | Nothing was deleted | 没有删除任何文件 |

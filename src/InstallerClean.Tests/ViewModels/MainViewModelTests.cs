@@ -636,7 +636,7 @@ public class MainViewModelTests
         _dialogService.Received(1).ShowError(
             Arg.Is<string>(m => m != null
                 && m.StartsWith(Strings.Error_InstallerDbEmpty, StringComparison.Ordinal)),
-            Strings.Error_InstallerDbUnavailableTitle);
+            Strings.Error_StoppedTitle);
     }
 
     [Fact]
@@ -1688,7 +1688,33 @@ public class MainViewModelTests
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         // The failure surfaces through the scan error ladder, not a completion.
-        _dialogService.Received(1).ShowError(Arg.Any<string>(), Strings.Error_InstallerDbUnavailableTitle);
+        _dialogService.Received(1).ShowError(Arg.Any<string>(), Strings.Error_StoppedTitle);
+        Assert.False(vm.Completion.IsComplete);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_reverify_throwing_stops_the_batch_and_surfaces_the_failure()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        // Never act on an un-verified batch: the delete service is not called.
+        await _deleteService.DidNotReceive().DeleteFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        // The same rung and the same heading as a Move that stops here.
+        _dialogService.Received(1).ShowError(
+            Arg.Is<string>(m => m != null
+                && m.StartsWith(Strings.Error_InstallerDbEmpty, StringComparison.Ordinal)),
+            Strings.Error_StoppedTitle);
         Assert.False(vm.Completion.IsComplete);
     }
 
@@ -2962,7 +2988,7 @@ public class MainViewModelTests
 
         // The explicit click still gets its modal (one error ladder, two
         // presentations)...
-        _dialogService.Received(1).ShowError(Arg.Any<string>(), Strings.Error_InstallerDbUnavailableTitle);
+        _dialogService.Received(1).ShowError(Arg.Any<string>(), Strings.Error_StoppedTitle);
         // ...and the same message is recorded inline, so a later re-render of the
         // window shows the diagnosis rather than a stale count.
         Assert.True(vm.Scan.HasScanError);

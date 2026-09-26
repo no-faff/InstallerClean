@@ -1,13 +1,19 @@
+using System.Diagnostics;
 using NSubstitute;
 using InstallerClean.Models;
+using InstallerClean.Resources;
 using InstallerClean.Services;
 
 namespace InstallerClean.Tests.Services.Integration;
 
 public class FileSystemScanServiceIntegrationTests : IDisposable
 {
-    private readonly string _fakeInstallerDir =
-        Path.Combine(Path.GetTempPath(), "ic-tests-" + Guid.NewGuid());
+    // Spelled as the kernel spells it, which is what a cache folder the scan accepts
+    // looks like: the scan stops before its walk where Windows reports the folder at
+    // another path. Where the host keeps its temporary folder is then no part of any
+    // test here.
+    private readonly string _fakeInstallerDir = Path.Combine(
+        InstallerCacheHelpers.ResolveFinalPath(Path.GetTempPath()), "ic-tests-" + Guid.NewGuid());
 
     public FileSystemScanServiceIntegrationTests()
     {
@@ -318,25 +324,22 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     /// The enumeration's own answer, on a machine that could exist: one registration
     /// naming a file that really is in the folder this scan walks.
     ///
-    /// WHY BOTH TESTS ABOVE NEED IT, AND WHY THEY FAILED FOR YEARS OF NIGHTS WITHOUT
-    /// IT. Each drives a real enumeration holding ONE registration, whose recorded
-    /// path is a real Windows path, and then scans a temp folder holding files. So no
-    /// registration named anything in the walked folder while the walk still yielded
-    /// candidates, which is exactly the machine the first correlation gate refuses:
-    /// what Windows says it has and what the folder holds describe different places,
-    /// and the scan is stopped rather than offering the folder as orphans. The guard
-    /// is right and it was the fixture that could not exist, because on a real machine
-    /// the folder being walked IS the cache those registrations name.
+    /// WHY BOTH TESTS ABOVE NEED IT. Each drives a real enumeration holding ONE
+    /// registration, whose recorded path is a real Windows path, and then scans a temp
+    /// folder holding files. Without this row no registration names anything in the
+    /// walked folder while the walk still yields candidates, which is exactly the
+    /// machine the first correlation gate refuses: what Windows says it has and what
+    /// the folder holds describe different places, and the scan is stopped rather than
+    /// offering the folder as orphans. The gate is right, and such a fixture describes
+    /// no real machine, because on a real machine the folder being walked IS the cache
+    /// those registrations name.
     ///
     /// THE ROW IS BUILT HERE RATHER THAN ENUMERATED, and that is deliberate rather
     /// than a shortcut. What these tests are about is the wire between the census a
     /// real enumeration builds and the withholding rule that reads it, and that census
     /// is the real one either way. What the extra row must do is name the walked folder
-    /// in the SPELLING THAT FOLDER IS WALKED IN: a path taken through the enumeration
-    /// is resolved against the filesystem, and a temp folder can be reached through an
-    /// 8.3 alias, so an enumerated row could name the same folder in a spelling that
-    /// does not compare equal to it and would fire the gate again on some machines and
-    /// not others.
+    /// in the SPELLING THAT FOLDER IS WALKED IN, and a row built from the fixture's own
+    /// path does that by construction.
     /// </summary>
     private InstallerQueryResult OnARealMachine(InstallerQueryResult enumerated)
     {
@@ -437,6 +440,117 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         // through from the directory entry instead of being read again.
         foreach (var f in result.RemovableFiles)
             Assert.Equal(new FileInfo(f.FullPath).Length, f.SizeBytes);
+    }
+
+    [Fact]
+    public async Task A_folder_named_in_another_case_than_Windows_reports_it_is_scanned()
+    {
+        // The ordinary machine's shape. The walk spells the folder as Windows gives its
+        // own folder, which can be C:\WINDOWS\Installer, while the kernel reports it as
+        // the disk holds it. The check made before the walk ignores case, as the
+        // correlation counts after it do.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+        var spelled = _fakeInstallerDir.ToUpperInvariant();
+
+        // What makes this test about case: the root is proven, and it differs from the
+        // spelling the scan is given in case and in nothing else. The check is made
+        // only against a proven root, so without the first assertion a pass would show
+        // nothing.
+        var root = InstallerCacheRoot.Resolve(spelled);
+        Assert.True(root.Proven, "The kernel did not resolve the fixture folder, so the check is not made.");
+        Assert.NotEqual(spelled, root.Resolved, StringComparer.Ordinal);
+        Assert.Equal(spelled, root.Resolved, StringComparer.OrdinalIgnoreCase);
+
+        var result = await new FileSystemScanService(
+            QueryReturning(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly())),
+            null, spelled).ScanAsync();
+
+        Assert.Equal("one.msi", Assert.Single(result.RemovableFiles).FileName);
+    }
+
+    [Fact]
+    public async Task A_folder_named_with_a_trailing_separator_is_scanned()
+    {
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+        var spelled = _fakeInstallerDir + Path.DirectorySeparatorChar;
+
+        // The same two conditions as the case test: a proven root, and a spelling that
+        // differs from it by the trailing separator and nothing else.
+        var root = InstallerCacheRoot.Resolve(spelled);
+        Assert.True(root.Proven, "The kernel did not resolve the fixture folder, so the check is not made.");
+        Assert.NotEqual(spelled, root.Resolved, StringComparer.OrdinalIgnoreCase);
+        Assert.Equal(_fakeInstallerDir, root.Resolved, StringComparer.OrdinalIgnoreCase);
+
+        var result = await new FileSystemScanService(
+            QueryReturning(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly())),
+            null, spelled).ScanAsync();
+
+        Assert.Equal("one.msi", Assert.Single(result.RemovableFiles).FileName);
+    }
+
+    [Fact]
+    public async Task A_folder_reached_through_a_junction_is_refused_before_the_records_are_read()
+    {
+        // Windows reports a folder reached through a junction at the junction's
+        // target. Every recorded path the kernel resolves carries that spelling, so the
+        // path comparison could match nothing walked through the link, and the scan
+        // stops before it walks the folder or reads a record.
+        //
+        // THE RECORDS PLAY NO PART, which is why a query service that answers nothing
+        // is enough. The last assertion holds the scan to never asking it.
+        File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
+        var link = _fakeInstallerDir + "-junction";
+        try
+        {
+            MakeJunction(link, _fakeInstallerDir);
+
+            // The link has to be there AS a link, or this is a test of an ordinary
+            // folder. A host that cannot make one fails here rather than passing.
+            Assert.True((File.GetAttributes(link) & FileAttributes.ReparsePoint) != 0,
+                "mklink reported success but the path is not a reparse point.");
+            var root = InstallerCacheRoot.Resolve(link);
+            Assert.True(root.Proven, "The kernel did not resolve the junction, so the check is not made.");
+            Assert.Equal(_fakeInstallerDir, root.Resolved, StringComparer.OrdinalIgnoreCase);
+
+            var query = Substitute.For<IInstallerQueryService>();
+            var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+                new FileSystemScanService(query, null, link).ScanAsync());
+
+            Assert.Equal(string.Format(Strings.Error_ScanInstallerFolderElsewhere, root.Resolved), ex.Message);
+            await query.DidNotReceiveWithAnyArgs().GetRegisteredPackagesAsync(default, default);
+        }
+        finally
+        {
+            // The link alone, and never recursively: removing a junction as a directory
+            // with nothing recursive removes the link and leaves its target alone. The
+            // target is this fixture's own folder, which Dispose removes.
+            if (Directory.Exists(link)) Directory.Delete(link, recursive: false);
+        }
+    }
+
+    /// <summary>
+    /// Makes a directory junction at <paramref name="link"/> pointing at
+    /// <paramref name="target"/>, through cmd's mklink, which needs no elevation for a
+    /// junction. Throws with cmd's own output where it did not make one.
+    /// </summary>
+    private static void MakeJunction(string link, string target)
+    {
+        var start = new ProcessStartInfo("cmd.exe")
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+        foreach (var arg in new[] { "/d", "/c", "mklink", "/J", link, target })
+            start.ArgumentList.Add(arg);
+
+        using var cmd = Process.Start(start)
+            ?? throw new InvalidOperationException("cmd.exe did not start.");
+        var output = cmd.StandardOutput.ReadToEnd() + cmd.StandardError.ReadToEnd();
+        cmd.WaitForExit();
+        if (cmd.ExitCode != 0)
+            throw new InvalidOperationException($"mklink /J exited with {cmd.ExitCode}: {output}");
     }
 
     public void Dispose()

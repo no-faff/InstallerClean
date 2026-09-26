@@ -575,11 +575,11 @@
   <data name="Status.DeleteFailed" xml:space="preserve"><value>{0}. Деталі у {1}.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>{0}. Не вдалося записати журнал збоїв.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Відмовлено в доступі. Windows відхилив сканування.</value></data>
-  <!-- The overlay line for the same ladder branch as
-       Error.InstallerDbUnavailableTitle, passed together in one record, so the
-       two are read together and must use one vocabulary: "records", not
-       "database". -->
-  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Сканування не вдалося: не вдалося прочитати записи Windows Installer.</value></data>
+  <!-- The overlay line after a Re-scan that stopped on its own, shown while
+       Error.StoppedTitle heads the dialog over the account of the stop. Those
+       stops have different causes and each account states its own, so this line
+       names none. -->
+  <data name="Status.ScanStopped" xml:space="preserve"><value>Сканування зупинено.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Сканування скасовано.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Готово</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
@@ -1150,12 +1150,12 @@
   <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows відмовив InstallerClean у доступі, тому роботу було зупинено. Нічого не було видалено.
 
 InstallerClean уже працював від імені адміністратора, тож запускати його так ще раз не допоможе. Windows не повідомляє нічого більше про те, що саме відмовило в доступі, тож немає нічого конкретного, що варто спробувати.</value></data>
-  <!-- Fronts every LocalisedInvalidOperationException in the scan ladder, so it
-       must be true of all of them: InstallerDbEmpty, MsiNonSuccess,
-       MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
-       ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
-       "database" because that is the word every one of those bodies uses. -->
-  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Не вдалося прочитати записи Windows Installer</value></data>
+  <!-- Heads the dialog over every stop the app decides on for itself: every
+       LocalisedInvalidOperationException that reaches the scan's error ladder,
+       from a Re-scan or from the check made just before a Move or Delete. Those
+       stops have different causes and each account states its own, so this
+       heading names none and has to stay true of all of them. -->
+  <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean зупинився</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Збій сканування</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Записи Windows Installer повернулися цілком порожніми: жодна встановлена програма й жодне оновлення не заявляє прав на кешований файл інсталятора. На робочому комп'ютері такого не буває (навіть у щойно встановленої Windows такі файли є), тож записи або пошкоджено, або їх не вдалося прочитати, і сканування, яке повірило б такій відповіді, помилково визнало б осиротілим кожен файл у {InstallerFolder}. Замість цього InstallerClean зупинився. Нічого не було видалено.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer не дозволив InstallerClean перелічити встановлене. InstallerClean уже працював від імені адміністратора, тож запуск від імені адміністратора ще раз нічого не змінить. Без цього списку немає безпечного способу визначити, які кешовані файли ще потрібні, тож InstallerClean зупинився. Нічого не було видалено.</value></data>
@@ -1219,6 +1219,14 @@ InstallerClean уже працював від імені адміністрат�
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
   <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean не зміг зіставити записи Windows Installer із вмістом {InstallerFolder}. У папці є файли, але жоден запис не вказує ні на що всередині неї, тож про жоден файл не вдалося показати, що він непотрібний. Нічого не запропоновано і нічого не прибрано.</value></data>
+  <!-- Shown when the scan stops before its walk because Windows reports the
+       Installer folder at a path other than its own, ignoring case: the folder,
+       or a folder above it, is a junction or a directory symbolic link, and a
+       volume mounted at the folder can do the same. States the path Windows
+       reports and no cause for it, because more than one condition produces it.
+       {0} is that path, a full folder path such as D:\Cache\Installer. Names the
+       folder the app asked about through the {InstallerFolder} token. -->
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean не може просканувати {InstallerFolder} на цьому ПК. Windows повідомляє, що ця папка розташована в {0}, а InstallerClean сканує папку Installer, лише якщо Windows вказує для неї її власний шлях. Нічого не запропоновано і нічого не прибрано.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of

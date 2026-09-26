@@ -2444,23 +2444,6 @@
       "vi": "ffeb02edd22deec3",
       "zh-Hans": "ffeb02edd22deec3"
     },
-    "Status.ScanFailedDb": {
-      "de": "0e196dc17a9605c5",
-      "es": "0e196dc17a9605c5",
-      "fr": "0e196dc17a9605c5",
-      "id": "0e196dc17a9605c5",
-      "it": "0e196dc17a9605c5",
-      "ja": "0e196dc17a9605c5",
-      "ko": "0e196dc17a9605c5",
-      "nl": "0e196dc17a9605c5",
-      "pl": "0e196dc17a9605c5",
-      "pt-BR": "0e196dc17a9605c5",
-      "ru": "0e196dc17a9605c5",
-      "tr": "0e196dc17a9605c5",
-      "uk": "0e196dc17a9605c5",
-      "vi": "0e196dc17a9605c5",
-      "zh-Hans": "0e196dc17a9605c5"
-    },
     "Status.ScanCancelled": {
       "de": "cc6b212aedc7d034",
       "es": "cc6b212aedc7d034",
@@ -3276,23 +3259,6 @@
       "uk": "ff22d1178099b5ac",
       "vi": "ff22d1178099b5ac",
       "zh-Hans": "ff22d1178099b5ac"
-    },
-    "Error.InstallerDbUnavailableTitle": {
-      "de": "a8deeeb62863acf5",
-      "es": "a8deeeb62863acf5",
-      "fr": "a8deeeb62863acf5",
-      "id": "a8deeeb62863acf5",
-      "it": "a8deeeb62863acf5",
-      "ja": "a8deeeb62863acf5",
-      "ko": "a8deeeb62863acf5",
-      "nl": "a8deeeb62863acf5",
-      "pl": "a8deeeb62863acf5",
-      "pt-BR": "a8deeeb62863acf5",
-      "ru": "a8deeeb62863acf5",
-      "tr": "a8deeeb62863acf5",
-      "uk": "a8deeeb62863acf5",
-      "vi": "a8deeeb62863acf5",
-      "zh-Hans": "a8deeeb62863acf5"
     },
     "Error.ScanFailedTitle": {
       "de": "4a490e4bdcc95463",
@@ -6807,6 +6773,57 @@
       "uk": "e810a37de4911290",
       "vi": "e810a37de4911290",
       "zh-Hans": "e810a37de4911290"
+    },
+    "Error.StoppedTitle": {
+      "de": "37e2a1633a1e861c",
+      "es": "37e2a1633a1e861c",
+      "fr": "37e2a1633a1e861c",
+      "id": "37e2a1633a1e861c",
+      "it": "37e2a1633a1e861c",
+      "ja": "37e2a1633a1e861c",
+      "ko": "37e2a1633a1e861c",
+      "nl": "37e2a1633a1e861c",
+      "pl": "37e2a1633a1e861c",
+      "pt-BR": "37e2a1633a1e861c",
+      "ru": "37e2a1633a1e861c",
+      "tr": "37e2a1633a1e861c",
+      "uk": "37e2a1633a1e861c",
+      "vi": "37e2a1633a1e861c",
+      "zh-Hans": "37e2a1633a1e861c"
+    },
+    "Status.ScanStopped": {
+      "de": "16e69e6a7ead1c2a",
+      "es": "16e69e6a7ead1c2a",
+      "fr": "16e69e6a7ead1c2a",
+      "id": "16e69e6a7ead1c2a",
+      "it": "16e69e6a7ead1c2a",
+      "ja": "16e69e6a7ead1c2a",
+      "ko": "16e69e6a7ead1c2a",
+      "nl": "16e69e6a7ead1c2a",
+      "pl": "16e69e6a7ead1c2a",
+      "pt-BR": "16e69e6a7ead1c2a",
+      "ru": "16e69e6a7ead1c2a",
+      "tr": "16e69e6a7ead1c2a",
+      "uk": "16e69e6a7ead1c2a",
+      "vi": "16e69e6a7ead1c2a",
+      "zh-Hans": "16e69e6a7ead1c2a"
+    },
+    "Error.ScanInstallerFolderElsewhere": {
+      "de": "49ce4fd4042b1544",
+      "es": "49ce4fd4042b1544",
+      "fr": "49ce4fd4042b1544",
+      "id": "49ce4fd4042b1544",
+      "it": "49ce4fd4042b1544",
+      "ja": "49ce4fd4042b1544",
+      "ko": "49ce4fd4042b1544",
+      "nl": "49ce4fd4042b1544",
+      "pl": "49ce4fd4042b1544",
+      "pt-BR": "49ce4fd4042b1544",
+      "ru": "49ce4fd4042b1544",
+      "tr": "49ce4fd4042b1544",
+      "uk": "49ce4fd4042b1544",
+      "vi": "49ce4fd4042b1544",
+      "zh-Hans": "49ce4fd4042b1544"
     }
   }
 }

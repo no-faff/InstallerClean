@@ -163,6 +163,45 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_ScanningCache));
 
+        // The folder the walk lists, in the spelling it lists it in. Every walked file
+        // is spelled under it, and the correlation counts measure every registered
+        // path against it (NamesFileDirectlyIn).
+        var walkedFolder = (_installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        // Resolved once for the scan, before the walk, and off the caller's thread:
+        // the GUI calls ScanAsync from the dispatcher, and the resolution opens a
+        // handle on the folder. Both guard sites below resolve their own candidate per
+        // file against it (see InstallerCacheRoot). The cancellation token is not
+        // passed: the resolution is one handle open that nothing can interrupt, and
+        // the walk and the loops below observe cancellation.
+        var cacheRoot = await Task.Run(() => InstallerCacheRoot.Resolve(_installerFolderOverride))
+            .ConfigureAwait(false);
+
+        // THE SCAN STOPS HERE WHERE THE KERNEL SPELLS THE FOLDER SOME OTHER WAY THAN
+        // THE WALK WOULD, as it does where the folder, or a folder above it, is a
+        // junction or a directory symbolic link, and can where a volume is mounted at
+        // the folder, depending on the name Windows gives that volume. Every
+        // registered path the kernel resolves arrives in its spelling
+        // (InstallerQueryService's NormaliseLocalPackagePath), so on such a machine no
+        // resolved record names a file in the walked folder and the path comparison
+        // below could match no walked file to a resolved record. Nothing has been
+        // walked and no record has been read at this point.
+        //
+        // COMPARED EXACTLY AS NamesFileDirectlyIn COMPARES, through the same
+        // SpellsTheSameFolder, so every scan that passes is one whose correlation
+        // counts can see a record naming the walked folder. Case, which can differ
+        // between the two on an ordinary machine, never stops a scan. A wider
+        // comparison here would pass a machine the counts below cannot read, and a
+        // narrower one would stop ordinary machines.
+        //
+        // Only a proven root is compared. A root the kernel never expanded is the
+        // walked spelling made absolute, which says nothing about where Windows
+        // reports the folder.
+        if (cacheRoot.Proven && !SpellsTheSameFolder(walkedFolder, cacheRoot.Resolved))
+            throw new LocalisedInvalidOperationException(string.Format(
+                Strings.Error_ScanInstallerFolderElsewhere, ShownAsAFolder(cacheRoot.Resolved)));
+
         // Walk the disk BEFORE querying the API, and materialise the walk here
         // rather than leaving it lazy. A package cached after the walk finishes
         // is then simply absent from the candidate set. A file the walk found
@@ -184,6 +223,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         }
         else
         {
+            // Untrimmed, because a folder spelled as a bare volume root ("E:\")
+            // trimmed to "E:" names the current directory on that volume.
             var folder = _installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder;
             diskFiles = await Task.Run(() => MaterialiseInstallerFiles(folder, progress, cancellationToken), cancellationToken)
                 .ConfigureAwait(false);
@@ -246,18 +287,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
             "There is no other record of which files these were: a refused candidate is left off the "
             + "list offered for removal and nothing else about it is kept. Fewer files are offered, "
             + "never more.");
-
-        // Resolved once for the scan; both guard sites below resolve their own
-        // candidate per file against it (see InstallerCacheRoot).
-        var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
-
-        // The folder the walk enumerated, in the spelling it enumerated it in, and
-        // read by nothing but the three counts NamesFileDirectlyIn feeds: the two
-        // correlation counts below, and missingInFolder, which is the other term in
-        // the proportional clause that throws Error_ScanCorrelationFailed.
-        // Deliberately NOT cacheRoot.Resolved: see NamesFileDirectlyIn.
-        var walkedFolder = (_installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder)
-            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
         long stillUsedBytes = 0;
         // Registrations Windows reports superseded (2) and obsoleted (4), counted off
@@ -906,8 +935,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // count above the absolute bound, which disarms this gate on exactly the
         // machine whose correlation is broken.
         // Paths are normalised before they are claimed, in InstallerQueryService's
-        // NormaliseLocalPackagePath, which is what makes a lexical test the right
-        // one here.
+        // NormaliseLocalPackagePath, and the scan has already stopped wherever the
+        // kernel spells the walked folder another way, so a lexical test sees every
+        // resolved record naming a file in it. A record the resolver refused keeps
+        // the spelling Windows gave and is counted, and that count withholds the
+        // walk-derived offer.
         //
         // A tool that genuinely wiped the cache would leave no files to be
         // orphans, so the candidate clause rules that benign case out. Refuse the
@@ -1371,16 +1403,16 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// file. This asks whether the two sides of the scan describe the same place,
     /// and they meet as strings: orphanhood is decided by string equality between
     /// a registered path and a walked one, so a spelling the walk never produces
-    /// is exactly what this has to be able to see. Resolving first would hide the
-    /// thing it counts.
+    /// is exactly what this has to be able to see. Resolving the path here would
+    /// hide the thing it counts.
     ///
-    /// Measured against the WALKED folder and not against the run's resolved
-    /// <see cref="InstallerCacheRoot"/>, which is the same point from the other
-    /// end. A junctioned or subst-mapped cache resolves to a spelling no
-    /// registration carries, so a comparison against the resolved root would read
-    /// an ordinary machine as one whose two sides disagree and refuse its scan.
-    /// The walked spelling is the one the registrations have to match to be
-    /// recognised at all, which is what the count is about.
+    /// Measured against the WALKED folder, because the walked spelling is the one a
+    /// registered path has to carry for the path comparison to recognise it. Every
+    /// registered path the kernel resolves arrives in its spelling, and the scan
+    /// stops before its walk wherever the kernel spells the walked folder another way
+    /// (see <see cref="SpellsTheSameFolder"/>), so on every scan that gets here a
+    /// resolved path to a file directly in the folder names the walked folder under
+    /// this comparison.
     /// </summary>
     private static bool NamesFileDirectlyIn(string path, string folder)
     {
@@ -1388,10 +1420,37 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var parent = Path.GetDirectoryName(
             path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-        return parent is not null
-            && parent.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                .Equals(folder, StringComparison.OrdinalIgnoreCase);
+        return parent is not null && SpellsTheSameFolder(parent, folder);
     }
+
+    /// <summary>
+    /// Whether two spellings name one folder as the scan's comparisons read a
+    /// spelling: trailing separators aside, and without regard to case.
+    ///
+    /// ONE RULE FOR THE CHECK BEFORE THE WALK AND FOR THE CORRELATION COUNTS AFTER
+    /// IT. The check stops a scan where the walked folder and the kernel's spelling of
+    /// it differ under this rule, and the counts read every registered path under the
+    /// same rule, so a scan the check lets through is one whose counts can see a
+    /// record naming the walked folder. Changing the rule for one of them alone either
+    /// lets through a scan the counts cannot read or stops one they can.
+    ///
+    /// CASE IS IGNORED BECAUSE THE TWO SPELLINGS CAN DIFFER IN IT ON AN ORDINARY
+    /// MACHINE. The walked folder is spelled as Windows gives its own folder, which
+    /// can be <c>C:\WINDOWS</c>, and the kernel spells it as the disk holds it.
+    /// </summary>
+    private static bool SpellsTheSameFolder(string one, string other) =>
+        one.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            .Equals(other.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// A folder spelling as the user is shown it. <see cref="InstallerCacheRoot"/>
+    /// carries its root without a trailing separator, which leaves a volume root as
+    /// <c>E:</c>, and that spelling names the current folder on the volume rather than
+    /// the volume, so the separator goes back on.
+    /// </summary>
+    private static string ShownAsAFolder(string folder) =>
+        folder.Length == 2 && folder[1] == ':' ? folder + Path.DirectorySeparatorChar : folder;
 
     /// <summary>
     /// Enumerates the walk into a list, checking the cancellation token per

@@ -575,11 +575,11 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
   <data name="Status.DeleteFailed" xml:space="preserve"><value>{0}. Ayrıntılar {1} içinde.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>{0}. Çökme günlüğü yazılamadı.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Erişim reddedildi. Windows taramayı reddetti.</value></data>
-  <!-- The overlay line for the same ladder branch as
-       Error.InstallerDbUnavailableTitle, passed together in one record, so the
-       two are read together and must use one vocabulary: "records", not
-       "database". -->
-  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Tarama başarısız: Windows Installer kayıtları okunamadı.</value></data>
+  <!-- The overlay line after a Re-scan that stopped on its own, shown while
+       Error.StoppedTitle heads the dialog over the account of the stop. Those
+       stops have different causes and each account states its own, so this line
+       names none. -->
+  <data name="Status.ScanStopped" xml:space="preserve"><value>Tarama durduruldu.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Tarama iptal edildi.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Hazır</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
@@ -1150,12 +1150,12 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
   <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows, InstallerClean'in erişimini reddetti, bu yüzden işlem durduruldu. Hiçbir şey kaldırılmadı.
 
 InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden öyle başlatmak işe yaramaz. Windows erişimi neyin reddettiği konusunda başka bir şey söylemiyor, bu yüzden denenecek belirli bir şey yok.</value></data>
-  <!-- Fronts every LocalisedInvalidOperationException in the scan ladder, so it
-       must be true of all of them: InstallerDbEmpty, MsiNonSuccess,
-       MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
-       ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
-       "database" because that is the word every one of those bodies uses. -->
-  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Windows Installer kayıtları okunamadı</value></data>
+  <!-- Heads the dialog over every stop the app decides on for itself: every
+       LocalisedInvalidOperationException that reaches the scan's error ladder,
+       from a Re-scan or from the check made just before a Move or Delete. Those
+       stops have different causes and each account states its own, so this
+       heading names none and has to stay true of all of them. -->
+  <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean durdu</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Tarama başarısız</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer kayıtları tamamen boş döndü: tek bir yüklü program ya da güncelleştirme bile önbellekteki bir kurulum dosyasında hak iddia etmiyor. Çalışan bir makinede bu olmaz (yeni kurulmuş bir Windows'ta bile bunlardan vardır), yani kayıtlar ya bozuk ya da okunamadı, ve bu yanıta inanan bir tarama {InstallerFolder} içindeki her dosyayı yanlışlıkla sahipsiz sayardı. InstallerClean bunun yerine durdu. Hiçbir şey kaldırılmadı.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer, InstallerClean'in yüklü olanları listelemesine izin vermedi. InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden yönetici olarak çalıştırmak bir şey değiştirmez. Bu liste olmadan önbellekteki hangi dosyaların hâlâ gerekli olduğunu güvenle söylemenin yolu yok, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.</value></data>
@@ -1219,6 +1219,14 @@ InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
   <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean, Windows Installer kayıtlarını {InstallerFolder} içeriğiyle eşleştiremedi. Klasörde dosyalar var, ama tek bir kayıt bile içindeki hiçbir şeye işaret etmiyor, bu yüzden hiçbir dosyanın gereksiz olduğu gösterilemedi. Hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı.</value></data>
+  <!-- Shown when the scan stops before its walk because Windows reports the
+       Installer folder at a path other than its own, ignoring case: the folder,
+       or a folder above it, is a junction or a directory symbolic link, and a
+       volume mounted at the folder can do the same. States the path Windows
+       reports and no cause for it, because more than one condition produces it.
+       {0} is that path, a full folder path such as D:\Cache\Installer. Names the
+       folder the app asked about through the {InstallerFolder} token. -->
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean bu bilgisayarda {InstallerFolder} klasörünü tarayamıyor. Windows bu klasörü {0} olarak bildiriyor ve InstallerClean yalnızca, Windows'un klasörün kendi yolunda bildirdiği bir Installer klasörünü tarar. Hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of

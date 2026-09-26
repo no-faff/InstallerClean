@@ -599,9 +599,11 @@ public partial class ScanViewModel : ObservableObject
     };
 
     /// <summary>
-    /// A stop the scan decided on: the installer records came back empty, unreadable,
-    /// or ended in a way nothing could be trusted from. The message is a full account
-    /// of what happened, built from the app's own strings, so it is safe to show.
+    /// A stop the app decided on for itself, at a scan or at the check made just
+    /// before a Move or Delete. The stops have different causes, and the message is a
+    /// full account of this one, built from the app's own strings, so it is safe to
+    /// show. The heading and the status line are the same for every stop and name no
+    /// cause.
     ///
     /// IT GOES TO THE CRASH LOG AS WELL, WHICH IS THE WHOLE REASON THIS ARM IS A
     /// METHOD. The account is shown and then gone: on the overlay it lasts as long
@@ -621,8 +623,8 @@ public partial class ScanViewModel : ObservableObject
             ? ex.Message + Environment.NewLine + Environment.NewLine
                 + string.Format(Strings.Error_ScanStoppedDetails, crash.Path)
             : ex.Message;
-        return new ScanFailure(message, Strings.Error_InstallerDbUnavailableTitle,
-            IsError: true, Strings.Status_ScanFailedDb);
+        return new ScanFailure(message, Strings.Error_StoppedTitle,
+            IsError: true, Strings.Status_ScanStopped);
     }
 
     private static ScanFailure DescribeUnexpectedScanFailure(Exception ex)

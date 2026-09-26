@@ -8,9 +8,8 @@ using NSubstitute;
 namespace InstallerClean.Tests.ViewModels;
 
 /// <summary>
-/// What the window is left holding when a scan stops on its own: the installer
-/// records came back empty, or unreadable, or ended in a way nothing could be
-/// trusted from.
+/// What the window is left holding when a scan stops on its own, whatever the
+/// cause. Every such stop takes the same rung, so one stands for all of them here.
 ///
 /// The account of it is built in Core and arrives as the exception's message. It
 /// reaches a card, and a card lasts as long as the window does, so the same text
@@ -40,8 +39,8 @@ public class ScanViewModelStoppedScanTests
         // The rung matters as much as the text. Falling through to the generic arm
         // would replace this account with a type name, which is what that arm exists
         // to do for an exception nobody anticipated.
-        Assert.Equal(Strings.Error_InstallerDbUnavailableTitle, failure.Title);
-        Assert.Equal(Strings.Status_ScanFailedDb, failure.StatusLine);
+        Assert.Equal(Strings.Error_StoppedTitle, failure.Title);
+        Assert.Equal(Strings.Status_ScanStopped, failure.StatusLine);
         Assert.True(failure.IsError);
     }
 

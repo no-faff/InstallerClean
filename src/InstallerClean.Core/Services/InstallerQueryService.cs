@@ -333,12 +333,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// turned into a path at all.
     ///
     /// THE DENOMINATOR TRAVELS WITH THE FIVE OUTCOMES AND WITHOUT IT THEY CANNOT BE
-    /// READ. The resolver is asked only for a value carrying a prefix or an 8dot3
-    /// alias (<see cref="CarriesFlaggedSpelling"/>), which on most machines is no
-    /// value at all. Four of its five failures would then read zero because nothing
-    /// asked, which is indistinguishable from zero because nothing failed, and a
-    /// receiver would take the second reading. <see cref="ResolverAttempts"/> is
-    /// what separates them.
+    /// READ. The resolver is asked about every recorded path the steps before it
+    /// could turn into a path, so a scan that asked about none reports five zeros
+    /// because nothing was asked, which is indistinguishable from five zeros because
+    /// nothing failed, and a receiver would take the second reading.
+    /// <see cref="ResolverAttempts"/> is what separates them.
     ///
     /// BOTH GROUPS DECIDE THE OFFER. The resolver's five outcomes withhold exactly as
     /// the four normalisation refusals do, on one rule in one place rather than a
@@ -347,16 +346,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <c>EnumerationCensus.AnyRecordedPathUnestablished</c> answers true, and that
     /// property is where every population is added to the question.
     ///
-    /// THE ATTEMPTS COUNT IS STILL MEASUREMENT AND NOT A RULE. Nothing withholds on
-    /// it. It is what makes the five readable, since a machine flagging no path at
-    /// all reports five zeros that are indistinguishable on the wire from five clean
-    /// answers.
+    /// THE ATTEMPTS COUNT IS MEASUREMENT AND NOT A RULE. Nothing withholds on it. It
+    /// is what makes the five readable, since a scan that asked about no path reports
+    /// five zeros that are indistinguishable on the wire from five clean answers.
     /// </summary>
     internal sealed class PathCensus
     {
         /// <summary>
         /// Recorded paths put to the final-path resolver, which is every value that
-        /// got past the embedded-null test and the expansion.
+        /// got past the embedded-null test, the expansion and the prefix strip.
         /// </summary>
         internal int ResolverAttempts;
 
@@ -2080,18 +2078,19 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// the right direction: the normalised form names the same file and names it
     /// the way the rest of the app spells it.
     ///
-    /// TWO SPELLINGS SURVIVE GetFullPath, BECAUSE NEITHER IS DECIDABLE FROM THE
-    /// STRING. Windows Installer names the files it caches itself, as short hex
-    /// (<c>9f05cba.msi</c>, <c>1e4a2f.msp</c>), so the FILENAME cannot have a
-    /// short form that differs; the path also carries the folder, and
+    /// TWO SPELLINGS ARE SETTLED ONLY BY THE FILESYSTEM, BECAUSE NEITHER IS
+    /// DECIDABLE FROM THE STRING. Windows Installer names the files it caches itself,
+    /// as short hex (<c>9f05cba.msi</c>, <c>1e4a2f.msp</c>), so the FILENAME cannot
+    /// have a short form that differs; the path also carries the folder, and
     /// <c>Installer</c> is nine characters, so on a volume still creating 8dot3
     /// aliases the folder has a short form of its own and
     /// <c>C:\Windows\INSTAL~1\1a2b3c.msi</c> names an ordinary file a product
-    /// still needs. A volume-GUID path is the other, keeping its prefix for the
-    /// reason <see cref="InstallerCacheHelpers.StripLongPathPrefix"/> gives.
-    /// Neither matches the walk, and the short form is the worse of the two: it
-    /// answers true to File.Exists, so the row counts as a registered file found
-    /// on disk and the scan's correlation gate reads a healthy machine.
+    /// still needs. On Windows, GetFullPath expands such a name through
+    /// GetLongPathName wherever it exists on disk, which is the filesystem being
+    /// asked, and leaves it as written where it does not. A volume-GUID path is the
+    /// other, keeping its prefix for the reason
+    /// <see cref="InstallerCacheHelpers.StripLongPathPrefix"/> gives, and GetFullPath
+    /// returns a prefixed path unchanged. Neither matches the walk as written.
     ///
     /// Both are settled by asking the filesystem what the path really is, which
     /// is what <see cref="InstallerCacheHelpers.TryResolveFinalPath"/> already
@@ -2138,7 +2137,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// silently withholds its row from that count while the identity pass is
     /// structurally unable to put it back. The missing-from-disk counts and the
     /// registered-files window read the claim the same way. Resolving here is what
-    /// makes all of them true.
+    /// makes all of them true, together with the scan stopping before its walk
+    /// wherever the kernel spells the walked folder another way
+    /// (<c>FileSystemScanService.SpellsTheSameFolder</c>).
     ///
     /// THE PREFIX IS NORMALISED BEFORE THE ASK, and that is not tidying. The NT
     /// object form (<c>\??\</c>) and the Win32 escape (<c>\\?\</c>) name the same

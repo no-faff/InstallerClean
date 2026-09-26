@@ -57,8 +57,9 @@ internal sealed class InstallerCacheRoot
     internal bool Proven { get; }
 
     /// <summary>
-    /// Resolves the root against the real filesystem. Call it once, immediately
-    /// before the loop that will judge candidates against it.
+    /// Resolves the root against the real filesystem. Call it once per run, before
+    /// the first candidate is judged against it. The scan calls it before its walk,
+    /// because it compares the result with the folder the walk will list.
     /// </summary>
     /// <param name="installerFolderRoot">
     /// Test-only real-folder override (null in production, which uses the real

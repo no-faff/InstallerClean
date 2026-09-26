@@ -437,8 +437,11 @@ public class FileSystemScanServiceTests
         // refusal against a root the kernel did expand is a real answer about a
         // real file, however many of them there are. %TEMP% stands in for the
         // cache root because it exists, so it resolves; the candidate sits
-        // somewhere else, so it is refused.
-        var root = Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar);
+        // somewhere else, so it is refused. It is spelled as the kernel spells
+        // it, as a cache folder the scan accepts is: the scan stops before its
+        // walk where Windows reports the folder at another path.
+        var root = InstallerCacheHelpers.ResolveFinalPath(Path.GetTempPath())
+            .TrimEnd(Path.DirectorySeparatorChar);
         const string elsewhere = @"C:\Windows\Installer\elsewhere.msi";
         var query = QueryReturning(new InstallerQueryResult(
             new List<RegisteredPackage> { Registered(Path.Combine(root, "needed.msi")) }.AsReadOnly()));

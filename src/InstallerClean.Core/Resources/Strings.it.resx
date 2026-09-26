@@ -575,11 +575,11 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
   <data name="Status.DeleteFailed" xml:space="preserve"><value>{0}. Dettagli in {1}.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>{0}. Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Accesso negato. Windows ha rifiutato la scansione.</value></data>
-  <!-- The overlay line for the same ladder branch as
-       Error.InstallerDbUnavailableTitle, passed together in one record, so the
-       two are read together and must use one vocabulary: "records", not
-       "database". -->
-  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scansione non riuscita: impossibile leggere i record di Windows Installer.</value></data>
+  <!-- The overlay line after a Re-scan that stopped on its own, shown while
+       Error.StoppedTitle heads the dialog over the account of the stop. Those
+       stops have different causes and each account states its own, so this line
+       names none. -->
+  <data name="Status.ScanStopped" xml:space="preserve"><value>Scansione interrotta.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scansione annullata.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Pronto</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
@@ -1150,12 +1150,12 @@ Per rimetterlo, ti serve il programma di installazione della versione che hai gi
   <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows ha negato l'accesso a InstallerClean, che si è quindi fermato. Non è stato rimosso nulla.
 
 InstallerClean era già in esecuzione come amministratore, quindi riavviarlo in quel modo non serve. Windows non dice altro su che cosa abbia negato l'accesso, quindi non c'è nulla di specifico da provare.</value></data>
-  <!-- Fronts every LocalisedInvalidOperationException in the scan ladder, so it
-       must be true of all of them: InstallerDbEmpty, MsiNonSuccess,
-       MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
-       ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
-       "database" because that is the word every one of those bodies uses. -->
-  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Impossibile leggere i record di Windows Installer</value></data>
+  <!-- Heads the dialog over every stop the app decides on for itself: every
+       LocalisedInvalidOperationException that reaches the scan's error ladder,
+       from a Re-scan or from the check made just before a Move or Delete. Those
+       stops have different causes and each account states its own, so this
+       heading names none and has to stay true of all of them. -->
+  <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean si è fermato</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scansione non riuscita</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>I record di Windows Installer sono tornati completamente vuoti: nemmeno un programma installato o un aggiornamento rivendica un file di installazione nella cache. Su una macchina funzionante questo non succede (perfino un'installazione di Windows appena fatta ne ha qualcuno), quindi o i record sono danneggiati o non è stato possibile leggerli, e una scansione che credesse a questa risposta classificherebbe erroneamente come orfano ogni file in {InstallerFolder}. InstallerClean si è fermato invece di farlo. Non è stato rimosso nulla.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer ha impedito a InstallerClean di elencare ciò che è installato. InstallerClean era già in esecuzione come amministratore, quindi eseguirlo di nuovo come amministratore non cambia nulla. Senza quell'elenco non c'è modo sicuro di sapere quali file nella cache servono ancora, quindi InstallerClean si è fermato. Non è stato rimosso nulla.</value></data>
@@ -1219,6 +1219,14 @@ InstallerClean era già in esecuzione come amministratore, quindi riavviarlo in 
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
   <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean non è riuscito a far corrispondere i record di Windows Installer con il contenuto di {InstallerFolder}. La cartella contiene file, ma nemmeno un record indica qualcosa al suo interno, quindi non si è potuto dimostrare che qualche file fosse non necessario. Non è stato proposto nulla e non è stato rimosso nulla.</value></data>
+  <!-- Shown when the scan stops before its walk because Windows reports the
+       Installer folder at a path other than its own, ignoring case: the folder,
+       or a folder above it, is a junction or a directory symbolic link, and a
+       volume mounted at the folder can do the same. States the path Windows
+       reports and no cause for it, because more than one condition produces it.
+       {0} is that path, a full folder path such as D:\Cache\Installer. Names the
+       folder the app asked about through the {InstallerFolder} token. -->
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean non può eseguire la scansione di {InstallerFolder} su questo PC. Windows indica questa cartella come {0}, e InstallerClean esegue la scansione solo di una cartella Installer che Windows indica nel suo stesso percorso. Non è stato proposto nulla e non è stato rimosso nulla.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of

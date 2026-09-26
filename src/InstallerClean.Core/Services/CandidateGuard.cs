@@ -91,12 +91,12 @@ internal static class CandidateGuard
         // The file is kept either way, and that is not what this decides. It
         // decides which sentence the user is shown for keeping it, and a
         // mismatch against a root the kernel never expanded has not shown the
-        // file to be anywhere: a fully resolved candidate cannot match an
-        // unexpanded root however legitimately it sits in the folder, so
-        // "refused, this file is not directly inside the Windows Installer
-        // folder" would name a cause from a comparison that never happened. The
-        // root's own resolution is the only thing that failed, so Unproven says
-        // what is true and the user is told the check could not be made.
+        // file to be anywhere: that root is only a spelling, which a fully
+        // resolved candidate need not share however legitimately it sits in the
+        // folder, so "refused, this file is not directly inside the Windows
+        // Installer folder" would name a cause the comparison never established.
+        // The root's own resolution is the only thing that failed, so Unproven
+        // says what is true and the user is told the check could not be made.
         return root.Proven ? RemovalSafety.Refused : RemovalSafety.Unproven;
     }
 

@@ -328,7 +328,6 @@ public static class Strings
     public static string Error_FileInUse_Plural => Get("Error.FileInUse.Plural");
     public static string Error_FileInUse_Singular => Get("Error.FileInUse.Singular");
     public static string Error_InstallerDbEmpty => Get("Error.InstallerDbEmpty");
-    public static string Error_InstallerDbUnavailableTitle => Get("Error.InstallerDbUnavailableTitle");
     public static string Error_InstallerLockAccessRefused => Get("Error.InstallerLockAccessRefused");
     public static string Error_InstallerLockUnavailable => Get("Error.InstallerLockUnavailable");
     public static string Error_InstallerLockUnavailableTitle => Get("Error.InstallerLockUnavailableTitle");
@@ -354,12 +353,14 @@ public static class Strings
     public static string Error_ScanCacheRootUnresolved => Get("Error.ScanCacheRootUnresolved");
     public static string Error_ScanCorrelationFailed => Get("Error.ScanCorrelationFailed");
     public static string Error_ScanFailedTitle => Get("Error.ScanFailedTitle");
+    public static string Error_ScanInstallerFolderElsewhere => Get("Error.ScanInstallerFolderElsewhere");
     public static string Error_ScanNoRegisteredFileInFolder => Get("Error.ScanNoRegisteredFileInFolder");
     public static string Error_ScanRecordsUnreadable => Get("Error.ScanRecordsUnreadable");
     public static string Error_ScanStoppedDetails => Get("Error.ScanStoppedDetails");
     public static string Error_SettingNotSavedBody => Get("Error.SettingNotSavedBody");
     public static string Error_SettingNotSavedTitle => Get("Error.SettingNotSavedTitle");
     public static string Error_SourceIsReparsePoint => Get("Error.SourceIsReparsePoint");
+    public static string Error_StoppedTitle => Get("Error.StoppedTitle");
     public static string Error_UnknownError_Plural => Get("Error.UnknownError.Plural");
     public static string Error_UnknownError_Singular => Get("Error.UnknownError.Singular");
     public static string Error_WriteDestination => Get("Error.WriteDestination");
@@ -429,11 +430,11 @@ public static class Strings
     public static string Status_ScanAccessDenied => Get("Status.ScanAccessDenied");
     public static string Status_ScanCancelled => Get("Status.ScanCancelled");
     public static string Status_ScanComplete => Get("Status.ScanComplete");
-    public static string Status_ScanFailedDb => Get("Status.ScanFailedDb");
     public static string Status_ScanFailedDetails => Get("Status.ScanFailedDetails");
     public static string Status_ScanFailedDetails_NoLog => Get("Status.ScanFailedDetails.NoLog");
     public static string Status_Scanning => Get("Status.Scanning");
     public static string Status_ScanningCache => Get("Status.ScanningCache");
+    public static string Status_ScanStopped => Get("Status.ScanStopped");
     public static string Status_StartingScan => Get("Status.StartingScan");
     public static string Summary_MissingFromDisk_OtherPrograms_Plural => Get("Summary.MissingFromDisk.OtherPrograms.Plural");
     public static string Summary_MissingFromDisk_OtherPrograms_Singular => Get("Summary.MissingFromDisk.OtherPrograms.Singular");

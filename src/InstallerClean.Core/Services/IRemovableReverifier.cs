@@ -126,9 +126,9 @@ public readonly record struct UnderLeaseClaims(
 /// can be told apart.
 ///
 /// THE FIRST THREE ARE ABOUT THE REGISTRATION THAT NAMES THIS PATH. The fourth is
-/// about the machine and is reached without reading anything about the path. The
-/// fifth is about the file, read the way the scan read it. Each is counted
-/// separately for that reason.
+/// about the machine and rests on nothing about the file. The fifth is about the
+/// file, read the way the scan read it. Each is counted separately for that
+/// reason.
 /// </summary>
 public enum HeldBackReason
 {
@@ -201,8 +201,8 @@ public enum HeldBackReason
     /// IT IS ABOUT THE MACHINE AND NOT ABOUT THE FILE, which is what separates it
     /// from the three above. Those are findings about the registration that names
     /// this path: a live claim, a registration that has gone, a read that failed.
-    /// This one is reached without looking at the path at all, which is why it earns
-    /// a count of its own even though no sentence names it.
+    /// This one rests on a fact about the machine and on nothing about the file,
+    /// which is why it earns a count of its own even though no sentence names it.
     ///
     /// WHAT REACHES IT is <see cref="WithholdingLegs.Any"/>, the expression the
     /// scan's own withholding asks, put to the re-enumeration's census and to the
@@ -223,15 +223,19 @@ public enum HeldBackReason
     /// <summary>
     /// A check the scan makes on the file itself, made again just before acting, did
     /// not let the file through: the containment guard did not answer Safe, its own
-    /// identity would not read or matches a registration that is still removable,
-    /// the declared-product screen kept it, or its age was not shown to be a day.
+    /// identity would not read or matches only registrations that are still
+    /// removable, the declared-product screen kept it, or its age was not shown to be
+    /// a day old.
     ///
     /// IT IS ABOUT THE FILE AND NOT ABOUT A REGISTRATION NAMING ITS PATH, which is what
     /// separates it from the first three, and it is about one file where
-    /// <see cref="OwnershipUnestablished"/> is about the machine. Only a walk-derived
-    /// file reaches it: a superseded registration's file is judged by its
-    /// registration and is never put to these checks, as the scan never puts it to
-    /// them.
+    /// <see cref="OwnershipUnestablished"/> is about the machine. Only a file whose
+    /// path no registration names reaches it: every walk-derived file, and a
+    /// superseded patch's file whose registration has gone by the time of the check.
+    /// A file a registration still names is judged by that registration and is not
+    /// put to these checks here. The scan puts such a file to the containment guard
+    /// where its registration is removable and the file is on disk, and puts none to
+    /// the other checks.
     /// </summary>
     FileNotConfirmed,
 }
