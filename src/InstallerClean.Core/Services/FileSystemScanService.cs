@@ -401,16 +401,14 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // THE SECOND HALF OF THE PATH COMPARISON, and it is part of that gate
         // rather than of the declared-product screen below. The loop above asked
         // whether any registration's recorded path is SPELLED the same as a walked
-        // file. This
-        // asks whether any registration's recorded path NAMES the same file, which
-        // is the question that was always meant and which no comparison of strings
-        // can settle.
+        // file. This asks whether any registration's recorded path NAMES the same
+        // file, which no comparison of strings can settle.
         //
         // The two are separated by cost, not by principle. Asking the filesystem
-        // costs a handle per file, and this folder reaches millions of them, so the
+        // costs a handle per file, and this folder can hold millions of them, so the
         // string comparison runs over the whole walk and this runs over what it
-        // left: bounded by the candidate count on one side and the registration
-        // count on the other, both small on every machine anybody has measured.
+        // left, which is bounded by the candidate count on one side and the
+        // registration count on the other.
         //
         // A CLAIMED CANDIDATE IS NOT COUNTED ANYWHERE, and that is deliberate
         // rather than an omission. A file the string comparison matched has never
