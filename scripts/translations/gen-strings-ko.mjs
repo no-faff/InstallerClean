@@ -124,7 +124,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `삭제하지 않고 이동할 경우 사용할 폴더 경로입니다.`,
   'Action.OpenReleasePage': `릴리스 페이지 열기(_R)`,
   'Action.Rescan': `다시 검사(_R)`,
-  'Action.ScanAgain': `다시 검사(_S)`,
   'Action.SendResultLog': `보고서 보내기`,
   'Action.SendResultLogConfirm': `보내기(_S)`,
 

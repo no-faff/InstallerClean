@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | Pad naar de map als je verplaatst in plaats van verwijdert. |
 | Open _release page | _Releasepagina openen |
 | _Re-scan | Opnieuw _scannen |
-| _Scan again | _Opnieuw scannen |
 | Send report | Rapport verzenden |
 | _Send | _Verzenden |
 

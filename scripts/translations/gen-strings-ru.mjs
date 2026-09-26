@@ -111,10 +111,8 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Путь к папке, если вы перемещаете, а не удаляете.`,
   'Action.OpenReleasePage': `Открыть страницу _выпуска`,
   // Rescan takes Alt+в (not the natural Alt+П): П collides with Move (Переместить) in the
-  // results view, where Move is the primary action and keeps П; С is taken by ScanAgain
-  // (co-visible at completion), so Rescan moves to в in По_вторить.
+  // results view, where Move is the primary action and keeps П.
   'Action.Rescan': `По_вторить сканирование`,
-  'Action.ScanAgain': `_Сканировать снова`,
   'Action.SendResultLog': `Отправить отчёт`,
   'Action.SendResultLogConfirm': `От_править`,
 

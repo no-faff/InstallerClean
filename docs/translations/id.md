@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | Jalur ke folder jika Anda memindahkan, bukan menghapus. |
 | Open _release page | Buka halaman _rilis |
 | _Re-scan | Pindai _ulang |
-| _Scan again | Pindai _lagi |
 | Send report | Kirim laporan |
 | _Send | _Kirim |
 

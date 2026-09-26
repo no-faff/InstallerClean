@@ -132,7 +132,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Caminho da pasta se você mover em vez de excluir.`,
   'Action.OpenReleasePage': `Abrir a página da _versão`,
   'Action.Rescan': `_Reanalisar`,
-  'Action.ScanAgain': `Analisar de _novo`,
   'Action.SendResultLog': `Enviar relatório`,
   'Action.SendResultLogConfirm': `_Enviar`,
 

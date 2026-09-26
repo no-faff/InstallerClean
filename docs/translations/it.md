@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | Percorso della cartella se sposti anziché eliminare. |
 | Open _release page | Apri pagina _release |
 | _Re-scan | _Ripeti scansione |
-| _Scan again | _Nuova scansione |
 | Send report | Invia rapporto |
 | _Send | _Invia |
 

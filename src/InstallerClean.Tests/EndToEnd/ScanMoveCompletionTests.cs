@@ -133,7 +133,7 @@ public class ScanMoveCompletionTests
     }
 
     [Fact]
-    public async Task Rescan_from_completion_overlay_runs_another_scan()
+    public async Task Rescan_after_Done_on_the_completion_overlay_runs_another_scan()
     {
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0));
@@ -141,8 +141,13 @@ public class ScanMoveCompletionTests
         var vm = CreateMain();
         await vm.Scan.ScanWithProgressAsync(null);
         Assert.True(vm.Completion.IsComplete);
+        Assert.False(vm.Scan.ScanCommand.CanExecute(null));
 
-        await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
+        vm.Completion.DismissCommand.Execute(null);
+
+        Assert.False(vm.Completion.IsComplete);
+        Assert.True(vm.Scan.ScanCommand.CanExecute(null));
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         await _scanService.Received(2).ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());

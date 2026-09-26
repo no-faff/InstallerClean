@@ -143,7 +143,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Pfad zum Ordner, falls du verschiebst statt zu löschen.`,
   'Action.OpenReleasePage': `_Release-Seite öffnen`,
   'Action.Rescan': `_Neu scannen`,
-  'Action.ScanAgain': `Erneut _scannen`,
   'Action.SendResultLog': `Bericht senden`,
   'Action.SendResultLogConfirm': `_Senden`,
 

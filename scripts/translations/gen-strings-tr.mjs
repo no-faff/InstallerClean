@@ -118,7 +118,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Silmek yerine taşıyacaksanız klasörün yolu.`,
   'Action.OpenReleasePage': `_Sürüm sayfasını aç`,
   'Action.Rescan': `_Yeniden tara`,
-  'Action.ScanAgain': `Te_krar tara`,
   'Action.SendResultLog': `Rapor gönder`,
   'Action.SendResultLogConfirm': `_Gönder`,
   'Automation.BuyMeACuppa': `Bağış yap`,

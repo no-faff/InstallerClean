@@ -81,7 +81,6 @@ public static class Strings
     public static string Action_OpenReleasePage => Get("Action.OpenReleasePage");
     public static string Action_Paste => Get("Action.Paste");
     public static string Action_Rescan => Get("Action.Rescan");
-    public static string Action_ScanAgain => Get("Action.ScanAgain");
     public static string Action_SelectAll => Get("Action.SelectAll");
     public static string Action_SendResultLog => Get("Action.SendResultLog");
     public static string Action_SendResultLogConfirm => Get("Action.SendResultLogConfirm");

@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | Silmek yerine taşıyacaksanız klasörün yolu. |
 | Open _release page | _Sürüm sayfasını aç |
 | _Re-scan | _Yeniden tara |
-| _Scan again | Te_krar tara |
 | Send report | Rapor gönder |
 | _Send | _Gönder |
 

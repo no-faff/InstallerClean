@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | Đường dẫn thư mục nếu bạn chuyển thay vì xóa. |
 | Open _release page | _Mở trang phát hành |
 | _Re-scan | _Quét lại |
-| _Scan again | Quét _lại |
 | Send report | Gửi báo cáo |
 | _Send | _Gửi |
 

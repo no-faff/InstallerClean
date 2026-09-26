@@ -50,8 +50,7 @@ const SETS = {
     'Action.About', 'Action.CheckForUpdates'],
   // Overlays. The bar behind each is disabled, so each set is only its own
   // controls; the scanning and operating overlays carry Cancel alone.
-  'MainWindow-completion': ['Action.Done', 'Action.SendResultLog', 'Action.ScanAgain',
-    'Action.Donate'],
+  'MainWindow-completion': ['Action.Done', 'Action.SendResultLog', 'Action.Donate'],
 
   'About': ['About.AutoUpdateCheck', 'Action.Licence', 'Action.LeaveStarOnGitHub',
     'Action.BuyMeACuppa', 'Action.Close'],

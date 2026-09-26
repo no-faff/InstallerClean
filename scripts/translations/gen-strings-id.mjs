@@ -136,7 +136,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Jalur ke folder jika Anda memindahkan, bukan menghapus.`,
   'Action.OpenReleasePage': `Buka halaman _rilis`,
   'Action.Rescan': `Pindai _ulang`,
-  'Action.ScanAgain': `Pindai _lagi`,
   'Action.SendResultLog': `Kirim laporan`,
   'Action.SendResultLogConfirm': `_Kirim`,
 

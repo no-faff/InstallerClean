@@ -157,7 +157,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Pad naar de map als je verplaatst in plaats van verwijdert.`,
   'Action.OpenReleasePage': `_Releasepagina openen`,
   'Action.Rescan': `Opnieuw _scannen`,
-  'Action.ScanAgain': `_Opnieuw scannen`,
   'Action.SendResultLog': `Rapport verzenden`,
   'Action.SendResultLogConfirm': `_Verzenden`,
   'About.Link.Guide': `Handleiding en FAQ`,

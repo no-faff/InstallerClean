@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | 삭제하지 않고 이동할 경우 사용할 폴더 경로입니다. |
 | Open _release page | 릴리스 페이지 열기(_R) |
 | _Re-scan | 다시 검사(_R) |
-| _Scan again | 다시 검사(_S) |
 | Send report | 보고서 보내기 |
 | _Send | 보내기(_S) |
 

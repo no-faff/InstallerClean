@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | 削除ではなく移動する場合のフォルダーのパス。 |
 | Open _release page | リリースページを開く(_R) |
 | _Re-scan | 再スキャン(_R) |
-| _Scan again | 再スキャン(_S) |
 | Send report | レポートを送信 |
 | _Send | 送信(_S) |
 

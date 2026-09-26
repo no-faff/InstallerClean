@@ -161,8 +161,8 @@
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>후원(_D)</value></data>
   <!-- The label on the completion card's donate button, which carries the word
        where the run moved or deleted files and is the wordless heart otherwise.
-       It takes no access key: Done, Send report and Scan again carry that card's,
-       and a letter added here lands on one of theirs. -->
+       It takes no access key. The button shows this text as written, so an
+       underscore here would appear on screen rather than become one. -->
   <data name="Action.Donate" xml:space="preserve"><value>후원</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub에 별 남기기(_S)</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 라이선스</value></data>
@@ -175,7 +175,6 @@
   <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>삭제하지 않고 이동할 경우 사용할 폴더 경로입니다.</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>릴리스 페이지 열기(_R)</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>다시 검사(_R)</value></data>
-  <data name="Action.ScanAgain" xml:space="preserve"><value>다시 검사(_S)</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>보고서 보내기</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>보내기(_S)</value></data>
 

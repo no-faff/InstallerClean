@@ -127,7 +127,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Đường dẫn thư mục nếu bạn chuyển thay vì xóa.`,
   'Action.OpenReleasePage': `_Mở trang phát hành`,
   'Action.Rescan': `_Quét lại`,
-  'Action.ScanAgain': `Quét _lại`,
   'Action.SendResultLog': `Gửi báo cáo`,
   'Action.SendResultLogConfirm': `_Gửi`,
 

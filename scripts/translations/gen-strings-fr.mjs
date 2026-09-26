@@ -152,7 +152,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Chemin du dossier si vous déplacez plutôt que supprimez.`,
   'Action.OpenReleasePage': `Ouvrir la page de la _version`,
   'Action.Rescan': `_Réanalyser`,
-  'Action.ScanAgain': `Analyser à _nouveau`,
   'Action.SendResultLog': `Envoyer le rapport`,
   'Action.SendResultLogConfirm': `_Envoyer`,
 

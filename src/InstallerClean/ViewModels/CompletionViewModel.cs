@@ -33,15 +33,12 @@ public enum MoveSpaceOutcome
 }
 
 /// <summary>
-/// Completion-screen slice. Holds the heading / summary / restore-hint
-/// / errors block shown after a scan-with-no-orphans, a successful
-/// move or a successful delete. The rescan command runs the
-/// <c>rescanRequested</c> constructor delegate so this VM stays
-/// ignorant of the scan service. The Send-result button on the same
-/// overlay routes through <see cref="IResultLogService"/> and
-/// <see cref="IConfirmationService"/>.
+/// Completion-screen slice. Holds what the card shows after a scan that
+/// offers nothing and at the end of a Move or Delete. The Send-result
+/// button on the same card routes through <see cref="IResultLogService"/>
+/// and <see cref="IConfirmationService"/>.
 ///
-/// Visibility of the Send button is gated by three independent locks:
+/// Visibility of the Send button is gated by two independent locks:
 ///
 ///   - Lifetime lock: <c>AppSettings.HasSentResultLog</c> on disk.
 ///     Set to true on a successful POST, never cleared. The flag
@@ -52,13 +49,6 @@ public enum MoveSpaceOutcome
 ///     <see cref="MarkResultLogReady"/> call in a session sets the
 ///     flag; later calls no-op. Each session offers the prompt at
 ///     most once.
-///
-///   - One-shot suppression: <see cref="SuppressNextResultLogPrompt"/>
-///     set by <c>RescanAfterCompletion</c>. The all-clear that
-///     immediately follows a rescan-from-overlay skips the WriteAsync
-///     and MarkResultLogReady call so the rescan's empty result does
-///     not overwrite the prior Move/Delete payload in
-///     <c>last-run.json</c>.
 /// </summary>
 public partial class CompletionViewModel : ObservableObject
 {
@@ -152,7 +142,6 @@ public partial class CompletionViewModel : ObservableObject
     private readonly bool _alreadySentBeforeThisSession;
     private bool _resultLogSentThisSession;
     private bool _promptShownThisSession;
-    private bool _skipNextResultLogPrompt;
     private bool _sendInFlight;
 
     /// <summary>
@@ -203,14 +192,12 @@ public partial class CompletionViewModel : ObservableObject
             ? Strings.Tooltip_SendResultLog_NothingFound
             : Strings.Tooltip_SendResultLog;
 
-    private readonly Func<Task>? _rescanRequested;
     private readonly IResultLogService? _resultLogService;
     private readonly IConfirmationService? _confirmationService;
 
     /// <summary>
-    /// <paramref name="rescanRequested"/> is an awaitable run-a-scan
-    /// hook. <paramref name="resultLogService"/> writes, reads and
-    /// sends the post-cleanup diagnostic log. <paramref name="confirmationService"/>
+    /// <paramref name="resultLogService"/> reads and sends the report
+    /// the last run wrote. <paramref name="confirmationService"/>
     /// shows the modal that lets the user see exactly what would be
     /// sent before pressing Send. <paramref name="hasSentBefore"/> is
     /// the persisted lifetime flag (<see cref="AppSettings.HasSentResultLog"/>)
@@ -218,12 +205,10 @@ public partial class CompletionViewModel : ObservableObject
     /// tests can construct a bare view-model.
     /// </summary>
     public CompletionViewModel(
-        Func<Task>? rescanRequested = null,
         IResultLogService? resultLogService = null,
         IConfirmationService? confirmationService = null,
         bool hasSentBefore = false)
     {
-        _rescanRequested = rescanRequested;
         _resultLogService = resultLogService;
         _confirmationService = confirmationService;
         _alreadySentBeforeThisSession = hasSentBefore;
@@ -746,21 +731,6 @@ public partial class CompletionViewModel : ObservableObject
         IsResultLogReady = true;
     }
 
-    /// <summary>
-    /// One-shot flag set by <c>RescanAfterCompletion</c> so the all-clear
-    /// that follows a rescan from the completion overlay doesn't
-    /// re-write <c>last-run.json</c> with the rescan's empty result.
-    /// </summary>
-    public void SuppressNextResultLogPrompt() => _skipNextResultLogPrompt = true;
-
-    /// <summary>Reads and clears the one-shot suppression flag.</summary>
-    public bool ConsumeSuppressNextResultLogPrompt()
-    {
-        var s = _skipNextResultLogPrompt;
-        _skipNextResultLogPrompt = false;
-        return s;
-    }
-
     [RelayCommand]
     private async Task SendResultLogAsync()
     {
@@ -868,22 +838,6 @@ public partial class CompletionViewModel : ObservableObject
         FailedCount = string.Empty;
         IsResultLogReady = false;
         ResultLogStatusMessage = string.Empty;
-    }
-
-    [RelayCommand]
-    private async Task RescanAfterCompletion()
-    {
-        IsComplete = false;
-        Errors = string.Empty;
-        FailedCount = string.Empty;
-        IsResultLogReady = false;
-        ResultLogStatusMessage = string.Empty;
-        // The next ScanCompleted fires with this rescan in flight; an
-        // all-clear that follows it skips the last-run.json overwrite
-        // so the prior Move/Delete payload survives across the rescan.
-        SuppressNextResultLogPrompt();
-        if (_rescanRequested is { } request)
-            await request();
     }
 
     /// <summary>

@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | 若选择移动而非删除，此处填写文件夹路径。 |
 | Open _release page | 打开发布页面(_R) |
 | _Re-scan | 重新扫描(_R) |
-| _Scan again | 再次扫描(_S) |
 | Send report | 发送报告 |
 | _Send | 发送(_S) |
 

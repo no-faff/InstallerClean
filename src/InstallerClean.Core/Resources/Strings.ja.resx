@@ -161,8 +161,8 @@
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>寄付(_D)</value></data>
   <!-- The label on the completion card's donate button, which carries the word
        where the run moved or deleted files and is the wordless heart otherwise.
-       It takes no access key: Done, Send report and Scan again carry that card's,
-       and a letter added here lands on one of theirs. -->
+       It takes no access key. The button shows this text as written, so an
+       underscore here would appear on screen rather than become one. -->
   <data name="Action.Donate" xml:space="preserve"><value>寄付</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>GitHubでスターを付ける(_S)</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 ライセンス</value></data>
@@ -175,7 +175,6 @@
   <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>削除ではなく移動する場合のフォルダーのパス。</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>リリースページを開く(_R)</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>再スキャン(_R)</value></data>
-  <data name="Action.ScanAgain" xml:space="preserve"><value>再スキャン(_S)</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>レポートを送信</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>送信(_S)</value></data>
 

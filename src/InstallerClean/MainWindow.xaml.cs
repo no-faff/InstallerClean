@@ -319,14 +319,8 @@ public partial class MainWindow : Window
         {
             // Overlay dismissed (Done / Esc / click-dim). The focused button is
             // gone, so move focus to a sensible non-destructive control rather
-            // than letting it drop to the window root. RescanAfterCompletion
-            // also clears IsComplete but immediately starts a scan; the
-            // IsScanning guard defers to the scanning overlay's own focus then.
-            Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
-            {
-                if (!_vm.Scan.IsScanning)
-                    RescanButton.Focus();
-            });
+            // than letting it drop to the window root.
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, () => RescanButton.Focus());
         }
 
         // The Send-summary button collapses the moment the user consents

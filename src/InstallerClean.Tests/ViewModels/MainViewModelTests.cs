@@ -1009,7 +1009,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task RescanAfterCompletion_dismisses_and_triggers_scan()
+    public async Task Rescan_is_refused_under_the_completion_overlay_and_runs_after_Done()
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -1017,8 +1017,13 @@ public class MainViewModelTests
 
         await vm.Scan.ScanWithProgressAsync(null);
         Assert.True(vm.Completion.IsComplete);
+        Assert.False(vm.Scan.ScanCommand.CanExecute(null));
 
-        await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
+        vm.Completion.DismissCommand.Execute(null);
+
+        Assert.False(vm.Completion.IsComplete);
+        Assert.True(vm.Scan.ScanCommand.CanExecute(null));
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         await _scanService.Received(2).ScanAsync(
             Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
@@ -2892,15 +2897,11 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task RescanAfterCompletion_suppresses_the_next_all_clear_prompt()
+    public async Task An_all_clear_writes_the_report_and_offers_Send()
     {
-        // First scan finds zero orphans. The all-clear path calls
-        // WriteAsync (which the mock returns true for) and
-        // MarkResultLogReady, so the Send button becomes visible.
-        // Rescan-from-completion sets the one-shot suppression flag;
-        // the second scan's all-clear path consumes the flag and
-        // does NOT call WriteAsync or MarkResultLogReady. The button
-        // stays hidden even though the second all-clear ran.
+        // The scan finds zero orphans. The all-clear path calls WriteAsync,
+        // which the mock returns true for, and then MarkResultLogReady, so
+        // the Send button becomes visible.
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
@@ -2908,17 +2909,11 @@ public class MainViewModelTests
             .Returns(Task.FromResult(true));
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        await _resultLogService.Received(1).WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsResultLogReady);
         Assert.True(vm.Completion.IsSendResultLogVisible);
-
-        _resultLogService.ClearReceivedCalls();
-
-        await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
-
-        Assert.False(vm.Completion.IsResultLogReady);
-        Assert.False(vm.Completion.IsSendResultLogVisible);
-        await _resultLogService.DidNotReceive().WriteAsync(
-            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]

@@ -16,8 +16,10 @@ namespace InstallerClean.ViewModels;
 ///
 ///   - A scan completing with no orphans pushes the completion overlay:
 ///     the all-clear, or the screen saying what the scan held back.
-///   - The "Scan again" command on the completion overlay invokes
-///     the Scan VM's Scan command via the rescan delegate.
+///   - The Scan command, behind Re-scan and F5, is refused while a Move
+///     or a Delete is in flight and while the completion overlay is up.
+///   - A report sent successfully is saved to settings, so the Send
+///     button stays hidden in later sessions.
 ///
 /// All scan/cleanup/completion/chrome state lives on the child VMs.
 /// XAML binds via the corresponding nested property
@@ -77,7 +79,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Scan = new ScanViewModel(scanService, rebootService, dialogService,
             isExternallyBlocked: () => Cleanup?.IsOperationInFlight == true || Completion?.IsComplete == true);
         Completion = new CompletionViewModel(
-            rescanRequested: () => Scan.ScanCommand.ExecuteAsync(null),
             resultLogService: resultLogService,
             confirmationService: confirmationService,
             hasSentBefore: _hasSentResultLogBefore);
@@ -302,12 +303,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // DispatcherUnhandledException to a process exit.
         try
         {
-            // The suppression flag is consumed up front so a rescan
-            // that returns orphans (rather than another all-clear)
-            // still resets the one-shot for the next MarkResultLogReady
-            // call.
-            var suppress = Completion.ConsumeSuppressNextResultLogPrompt();
-
             if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
                 return;
 
@@ -365,13 +360,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 Completion.ShowAllClear(Scan.RegisteredFileCount, Scan.LastScanDurationMs);
             }
 
-            if (suppress) return;
-            // Either lock (the prior-session persisted flag or the
-            // in-session click flag) hides the Send button for the
-            // rest of the user's time on this machine. Writing
-            // last-run.json on this path produces a file with no
-            // consumer. CleanupViewModel's Move and Delete paths read
-            // the same property.
+            // Either lock (the flag a successful send saved in an earlier
+            // session, or the one Send sets in this session on every
+            // outcome except a cancelled preview) hides the Send button
+            // for the rest of the session, so last-run.json written on
+            // this path would have no consumer. CleanupViewModel's Move
+            // and Delete paths read the same property.
             if (Completion.IsResultLogLocked) return;
 
             // WriteAsync returns false on disk-full / locked-file /

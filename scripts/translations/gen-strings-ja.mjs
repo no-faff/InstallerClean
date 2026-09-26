@@ -120,7 +120,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `削除ではなく移動する場合のフォルダーのパス。`,
   'Action.OpenReleasePage': `リリースページを開く(_R)`,
   'Action.Rescan': `再スキャン(_R)`,
-  'Action.ScanAgain': `再スキャン(_S)`,
   'Action.SendResultLog': `レポートを送信`,
   'Action.SendResultLogConfirm': `送信(_S)`,
   'Automation.BuyMeACuppa': `寄付`,

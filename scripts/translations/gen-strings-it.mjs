@@ -135,7 +135,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Percorso della cartella se sposti anziché eliminare.`,
   'Action.OpenReleasePage': `Apri pagina _release`,
   'Action.Rescan': `_Ripeti scansione`,
-  'Action.ScanAgain': `_Nuova scansione`,
   'Action.SendResultLog': `Invia rapporto`,
   'Action.SendResultLogConfirm': `_Invia`,
   'Automation.BuyMeACuppa': `Dona`,

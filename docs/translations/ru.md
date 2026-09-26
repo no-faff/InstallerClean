@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | Путь к папке, если вы перемещаете, а не удаляете. |
 | Open _release page | Открыть страницу _выпуска |
 | _Re-scan | По_вторить сканирование |
-| _Scan again | _Сканировать снова |
 | Send report | Отправить отчёт |
 | _Send | От_править |
 

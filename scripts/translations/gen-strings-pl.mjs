@@ -163,7 +163,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Ścieżka do folderu, jeśli przenosisz zamiast usuwać.`,
   'Action.OpenReleasePage': `Otwórz stronę _wydania`,
   'Action.Rescan': `_Skanuj ponownie`,
-  'Action.ScanAgain': `Skanuj _ponownie`,
   'Action.SendResultLog': `Wyślij raport`,
   'Action.SendResultLogConfirm': `_Wyślij`,
 

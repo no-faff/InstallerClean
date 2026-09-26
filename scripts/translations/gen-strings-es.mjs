@@ -139,7 +139,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Ruta a la carpeta si mueves en lugar de eliminar.`,
   'Action.OpenReleasePage': `Abrir la página de la _versión`,
   'Action.Rescan': `_Volver a analizar`,
-  'Action.ScanAgain': `Analizar de _nuevo`,
   'Action.SendResultLog': `Enviar informe`,
   'Action.SendResultLogConfirm': `_Enviar`,
   'Automation.BuyMeACuppa': `Donar`,

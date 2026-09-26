@@ -112,7 +112,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `若选择移动而非删除，此处填写文件夹路径。`,
   'Action.OpenReleasePage': `打开发布页面(_R)`,
   'Action.Rescan': `重新扫描(_R)`,
-  'Action.ScanAgain': `再次扫描(_S)`,
   'Action.SendResultLog': `发送报告`,
   'Action.SendResultLogConfirm': `发送(_S)`,
   'Automation.BuyMeACuppa': `捐赠`,

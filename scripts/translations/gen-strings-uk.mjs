@@ -150,7 +150,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Шлях до папки, якщо ви переміщуєте, а не видаляєте.`,
   'Action.OpenReleasePage': `_Відкрити сторінку випуску`,
   'Action.Rescan': `Пов_торити сканування`,
-  'Action.ScanAgain': `_Сканувати знову`,
   'Action.SendResultLog': `Надіслати звіт`,
   'Action.SendResultLogConfirm': `_Надіслати`,
 

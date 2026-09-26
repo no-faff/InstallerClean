@@ -186,7 +186,6 @@ const MAP = {
   'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `Open _release page`,
   'Action.Rescan': `_Re-scan`,
-  'Action.ScanAgain': `_Scan again`,
   'Action.SendResultLog': `Send report`,
   'Action.SendResultLogConfirm': `_Send`,
   'About.Link.Guide': `Guide and FAQ`,

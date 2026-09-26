@@ -161,8 +161,8 @@
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>捐赠(_D)</value></data>
   <!-- The label on the completion card's donate button, which carries the word
        where the run moved or deleted files and is the wordless heart otherwise.
-       It takes no access key: Done, Send report and Scan again carry that card's,
-       and a letter added here lands on one of theirs. -->
+       It takes no access key. The button shows this text as written, so an
+       underscore here would appear on screen rather than become one. -->
   <data name="Action.Donate" xml:space="preserve"><value>捐赠</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>在 GitHub 上点个星(_S)</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 许可证</value></data>
@@ -175,7 +175,6 @@
   <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>若选择移动而非删除，此处填写文件夹路径。</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>打开发布页面(_R)</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>重新扫描(_R)</value></data>
-  <data name="Action.ScanAgain" xml:space="preserve"><value>再次扫描(_S)</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>发送报告</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>发送(_S)</value></data>
 

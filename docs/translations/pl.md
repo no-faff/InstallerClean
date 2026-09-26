@@ -48,7 +48,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you move rather than delete. | Ścieżka do folderu, jeśli przenosisz zamiast usuwać. |
 | Open _release page | Otwórz stronę _wydania |
 | _Re-scan | _Skanuj ponownie |
-| _Scan again | Skanuj _ponownie |
 | Send report | Wyślij raport |
 | _Send | _Wyślij |
 
