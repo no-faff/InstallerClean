@@ -422,6 +422,28 @@ public class ResultLogEntryTests
     }
 
     [Fact]
+    public void Every_held_back_cause_reaches_the_payload_from_a_Move_too()
+    {
+        // FromMove passes the causes on through its own argument list, written apart
+        // from FromDelete's, so each of the two is held to the mapping by a test of
+        // its own. Distinct values for the reason the test above gives.
+        var reasons = new HeldBackReasons(
+            Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3, OwnershipUnestablished: 4,
+            FileNotConfirmed: 5);
+
+        var op = OperationInfo.FromMove(
+            new MoveResult(0, Array.Empty<FileOperationError>()),
+            bytesFreed: 0, durationMs: 0,
+            moveDestinationKind: MoveDestinationKinds.SameDrive, heldBack: reasons);
+
+        Assert.Equal(1, op.HeldBackReclaimed);
+        Assert.Equal(2, op.HeldBackRecordsChanged);
+        Assert.Equal(3, op.HeldBackRecordsUnreadable);
+        Assert.Equal(4, op.HeldBackOwnershipUnestablished);
+        Assert.Equal(5, op.HeldBackFileNotConfirmed);
+    }
+
+    [Fact]
     public void The_tally_totals_every_cause_it_carries()
     {
         // THE DENOMINATOR, ENUMERATED, because Total is a hand-written sum over a
