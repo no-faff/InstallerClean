@@ -79,14 +79,24 @@ namespace InstallerClean.Services;
 /// registration of those products that the enumeration does not list. Either can
 /// only add a registration, and so only add a reason to keep the file.
 ///
+/// EVERY ANSWER ABOUT A PRODUCT IS HELD AGAINST THE CALLER'S OWN ENUMERATION. The
+/// check asks Windows for the installations of one product code at a time, and the
+/// caller's enumeration has already listed the installations of every product. An
+/// answer about a code that leaves out an installation that enumeration listed
+/// contradicts it, whether the answer is that the product is not installed or a list
+/// short of that installation, and the check does not use it: an installation package
+/// declaring the product is kept, and so is a patch naming it.
+///
 /// IT ONLY EVER WITHHOLDS. No answer it can give puts a file on the list, clears
 /// one another gate kept, or weakens anything upstream: a candidate it lets
 /// through is decided by the rest of the scan exactly as if this check had not
 /// run. For an installation package, a file it cannot read, a question it cannot
-/// put, a source that answers off the allowlist and a recorded package it cannot
-/// identify all keep the file. For a patch, a file it cannot read, a registration it
-/// cannot list or ask about, a source that answers off the allowlist and a recorded
-/// copy it cannot identify all keep the file.
+/// put, an answer that contradicts the caller's enumeration, a source that answers
+/// off the allowlist and a recorded package it cannot identify all keep the file. For
+/// a patch, a file it cannot read, a registration it cannot list or ask about, an
+/// answer about a product it names that contradicts the caller's enumeration, a source
+/// that answers off the allowlist and a recorded copy it cannot identify all keep the
+/// file.
 ///
 /// THE SUPERSEDED HALF OF THE OFFER IS NEVER PUT TO IT, AND THAT IS LOAD-BEARING. A
 /// registered superseded patch's cached file is the very file its registrations
@@ -115,6 +125,16 @@ public interface IDeclaredProductCheck
     /// <see cref="IPackageIdentityReader.Read"/> for why that is a precondition
     /// and not a courtesy.
     /// </param>
+    /// <param name="installations">
+    /// Every installation the caller's own enumeration established,
+    /// <see cref="InstallerQueryResult.Installations"/>. The check asks Windows for the
+    /// installations of each product it puts a question about, and an answer leaving
+    /// out one of these is an answer the check cannot use: the product half then gives
+    /// <see cref="DeclaredProductOutcome.Unestablished"/>, and a patch naming that
+    /// product gives <see cref="DeclaredProductOutcome.DeclaredPatchUnestablished"/>.
+    /// An empty list compares nothing, which is right only for an enumeration that
+    /// listed nothing.
+    /// </param>
     /// <param name="recordRefusal">
     /// Where a reader refusal goes, given the exception to log and the reader's own
     /// short note on which refusal it was. Handed in by the scan that owns the crash
@@ -132,6 +152,7 @@ public interface IDeclaredProductCheck
     /// </param>
     IReadOnlyList<DeclaredProductOutcome> Screen(
         IReadOnlyList<OrphanedFile> candidates,
+        IReadOnlyList<ListedInstallation> installations,
         CancellationToken cancellationToken = default,
         Action<Exception, string>? recordRefusal = null,
         Func<string, bool?>? namesAFileInInstallerFolder = null);
@@ -145,7 +166,8 @@ public enum DeclaredProductOutcome
 {
     /// <summary>
     /// An installation package yielded no product code to ask about, or the code was
-    /// read and the question could not be put. Kept back.
+    /// read and the question could not be put or its answer could not be used. Kept
+    /// back.
     ///
     /// IT IS FIRST SO THAT THE DEFAULT VALUE WITHHOLDS. A verdict nobody set is a
     /// verdict nobody established, and this enum's zero has to mean that rather
@@ -155,21 +177,25 @@ public enum DeclaredProductOutcome
     /// CAUSE. One is about the FILE: it would not open, it holds no Property
     /// table, its ProductCode row is absent or is not a GUID. The other is about
     /// the RECORDS: the keyed enumeration answered with something outside the
-    /// returns that mean an answer. They are different things to have found out,
-    /// which is exactly why they are not reported anywhere as one thing; what
-    /// they share, and the whole of what this value claims, is that nothing was
-    /// established. Nothing outside this pass reads which of the two it was.
+    /// returns that mean an answer, or with an answer that leaves out an installation
+    /// of the product the caller's own enumeration listed. They are different things
+    /// to have found out, which is exactly why they are not reported anywhere as one
+    /// thing; what they share, and the whole of what this value claims, is that
+    /// nothing was established. Nothing outside this pass reads which of the two it
+    /// was.
     /// </summary>
     Unestablished,
 
     /// <summary>
-    /// The file declared a product code and Windows positively answered that no
-    /// such product is installed, in any account and any context. The candidate
-    /// goes on being decided by everything else.
+    /// The file declared a product code, Windows positively answered that no such
+    /// product is installed, in any account and any context, and the caller's own
+    /// enumeration listed no installation of it. The candidate goes on being decided by
+    /// everything else.
     ///
     /// A POSITIVE ANSWER AND NOT AN ABSENCE OF ONE, which is the distinction the
     /// whole check turns on. Only a return documented to mean the product is not
-    /// there reaches this; anything else is <see cref="Unestablished"/>.
+    /// there reaches this; anything else is <see cref="Unestablished"/>, and so is
+    /// that return for a product the caller's enumeration listed.
     /// </summary>
     DeclaredProductNotInstalled,
 
@@ -227,7 +253,9 @@ public enum DeclaredProductOutcome
     /// EVERY INSTALLATION, NOT ONE. One code can name a per-machine installation and
     /// per-user installations under several accounts, each recording its own
     /// package, and a single installation whose package cannot be seen gives
-    /// <see cref="DeclaredProductInstalled"/> instead.
+    /// <see cref="DeclaredProductInstalled"/> instead. Every installation the caller's
+    /// own enumeration listed is among them, an answer without one of those giving
+    /// <see cref="Unestablished"/>.
     ///
     /// DIFFERENT IS DECIDED BY FILE IDENTITY, NOT BY SPELLING. A recorded value can
     /// reach this file through a short name, a long-path prefix or a link, so the
@@ -246,9 +274,10 @@ public enum DeclaredProductOutcome
     /// open, its patch code is absent or is not a GUID, or its Template is absent, is not
     /// a list of GUIDs or names no product. The others are about the RECORDS: the
     /// machine-wide patch enumeration did not run to its end, a product the patch names
-    /// would not list its installations, or an installation of one would not answer the
-    /// keyed patch read. That last includes an installation answering that its product
-    /// is not installed, which contradicts the keyed product enumeration that listed it
+    /// would not list its installations or listed them without one the caller's own
+    /// enumeration listed, or an installation of one would not answer the keyed patch
+    /// read. That last includes an installation answering that its product is not
+    /// installed, which contradicts the keyed product enumeration that listed it
     /// moments earlier. What they share, and the whole of what this value claims, is
     /// that nothing was established.
     ///
@@ -262,8 +291,10 @@ public enum DeclaredProductOutcome
     /// The file is a patch, and Windows positively answered that it holds no
     /// registration of the patch the file declares: the machine-wide patch enumeration
     /// ran to its end and listed none, and every installation of every product the
-    /// patch names answered that it holds no record of the patch, or no such product is
-    /// installed. The candidate goes on being decided by everything else.
+    /// patch names, every one the caller's own enumeration listed among them, answered
+    /// that it holds no record of the patch, or no such product is installed and that
+    /// enumeration listed no installation of it. The candidate goes on being decided by
+    /// everything else.
     ///
     /// A POSITIVE ANSWER AND NOT AN ABSENCE OF ONE, as for
     /// <see cref="DeclaredProductNotInstalled"/>. Only ERROR_UNKNOWN_PATCH from the keyed

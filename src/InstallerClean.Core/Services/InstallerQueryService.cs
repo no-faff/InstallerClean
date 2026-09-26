@@ -1188,13 +1188,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 paths.NormalisationRefusedAtFullPath,
                 paths.NormalisationRefusedAtEmbeddedNull,
                 paths.FlaggedSpellings,
-                fallback.Failures));
+                fallback.Failures),
+            ListedInstallations(products, missed.Recovered));
         }
         finally
         {
             abandonedLog.WriteClosingEntry();
             unreadPatchFileLog.WriteClosingEntry();
         }
+    }
+
+    /// <summary>
+    /// Every installation this enumeration established, for
+    /// <see cref="InstallerQueryResult.Installations"/>: each row the product walk
+    /// listed, in walk order, then each installation the recovery by name found.
+    /// </summary>
+    private static List<ListedInstallation> ListedInstallations(
+        List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
+        List<(string ProductCode, string? Sid, MsiInstallContext Context)> recovered)
+    {
+        var installations = new List<ListedInstallation>(products.Count + recovered.Count);
+        foreach (var (code, sid, context) in products)
+            installations.Add(new ListedInstallation(code, sid, (int)context));
+        foreach (var (code, sid, context) in recovered)
+            installations.Add(new ListedInstallation(code, sid, (int)context));
+
+        return installations;
     }
 
     /// <summary>
@@ -1420,8 +1439,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // about no product in particular, which is the only way to hear about a
         // product the product enumeration never returned. Null where it did not
         // run to a clean end, and that withholds rather than reading as nothing
-        // to report: an enumeration that came back empty because it refused,
-        // taken as an answer, is the exact fault this whole pass exists to close.
+        // to report: the API returns no rows both where it refuses and where it
+        // finds nothing, and the null is what tells the two apart.
         var holders = EnumeratePatchHoldersAcrossAllProducts(_msi, ct);
 
         // ROUTE B, READ ONCE PER PATH AND SHARED BY BOTH PASSES BELOW. The file names
@@ -1440,6 +1459,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // installed at all, and, if it is, which account and context to ask in. A
         // code the file names and the machine does not hold contributes nothing and
         // is not a failure; a code that could not be asked about withholds.
+        //
+        // AND EVERY ANSWER IS HELD AGAINST THE INSTALLATIONS THIS RUN LISTED. A declared
+        // target answered "not installed", or answered with a list short of an
+        // installation the product walk or the recovery by name established, withholds
+        // as a code that could not be asked about does
+        // (HoldsEveryListedInstallation).
+        var listed = InstallationsByCode(ListedInstallations(products, recovered));
         var declaredByPath = new Dictionary<string, DeclaredTargets>(StringComparer.OrdinalIgnoreCase);
         DeclaredTargets DeclaredTargetsFor(string patchPath)
         {
@@ -1456,7 +1482,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // cached answer serve both consumers rather than depending on which
                 // of them asked first.
                 var resolved = ResolveProductInstances(_msi, target);
-                if (resolved.Unaskable) { unaskable = true; continue; }
+                if (resolved.Unaskable || !HoldsEveryListedInstallation(listed, target, resolved.Instances))
+                {
+                    unaskable = true;
+                    continue;
+                }
+
                 foreach (var (sid, context) in resolved.Instances)
                     installed.Add((target, sid, context));
             }
@@ -1503,10 +1534,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             toAsk.AddRange(recovered);
             if (holders.TryGetValue(patchCode, out var named)) toAsk.AddRange(named);
 
-            // Both withholdings are the same shape and were the same shape before
-            // this read was shared: a patch whose own declaration will not be read
-            // has been shown to be unneeded by nobody, and a product it names that
-            // Windows will not answer about is a question left open rather than an
+            // Both withholdings are the same shape: a patch whose own declaration will
+            // not be read has been shown to be unneeded by nobody, and a product it
+            // names that Windows will not answer about, or answers about without an
+            // installation this run listed, is a question left open rather than an
             // answer of no.
             var fromFile = DeclaredTargetsFor(path);
             if (fromFile.Unreadable || fromFile.Unaskable)
@@ -1526,10 +1557,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // ask, and must not guess: FileSystemScanService stamps FileExists
                 // against the same filesystem it walks, and the two facts meet there.
                 //
-                // WHAT IT COST WHILE THEY WERE ONE THING. The app offered a superseded
-                // patch, removed it, and the next scan warned that a repair could fail
-                // on that very file, because this read had failed for the only reason
-                // it could: the file was the one the app had just taken away.
+                // SO THIS READ ALONE DOES NOT PUT A SUPERSEDED FILE THAT HAS GONE ON THE
+                // MISSING-FILES REPORT. Where its products' patch sets are clean and this
+                // is the one reason the row was withheld, MissingFilesReport.Affected
+                // reads the failed read as the tautology it is: the file would not read
+                // because it has gone.
                 Downgrade(claimed, path, withheld: true, unreadableFile: fromFile.Unreadable);
                 continue;
             }
@@ -1758,7 +1790,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// answer: nothing on this machine holds it, so nothing on this machine can roll
     /// back onto its file. <paramref name="Unreadable"/> is the file declining to say
     /// what it targets, and <paramref name="Unaskable"/> is Windows declining to say
-    /// where a declared target lives. Both leave the question open and both withhold.
+    /// where a declared target lives, or saying it in an answer that leaves out an
+    /// installation this run listed. Both leave the question open and both withhold.
     /// </summary>
     private readonly record struct DeclaredTargets(
         IReadOnlyList<(string ProductCode, string? Sid, MsiInstallContext Context)> Installed,
@@ -1983,6 +2016,69 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         return (Array.Empty<(string?, MsiInstallContext)>(), true);
+    }
+
+    /// <summary>
+    /// The installations in <paramref name="installations"/>, grouped by product code
+    /// for <see cref="HoldsEveryListedInstallation"/>. Codes are compared without case,
+    /// the enumeration and a package's own declaration each handing back their own
+    /// spelling of one code.
+    /// </summary>
+    internal static Dictionary<string, List<(string? Sid, MsiInstallContext Context)>> InstallationsByCode(
+        IEnumerable<ListedInstallation> installations)
+    {
+        var byCode = new Dictionary<string, List<(string? Sid, MsiInstallContext Context)>>(
+            StringComparer.OrdinalIgnoreCase);
+        foreach (var installation in installations)
+        {
+            if (!byCode.TryGetValue(installation.ProductCode, out var of))
+                byCode[installation.ProductCode] = of = [];
+            of.Add((installation.UserSid, (MsiInstallContext)installation.Context));
+        }
+
+        return byCode;
+    }
+
+    /// <summary>
+    /// Whether <paramref name="instances"/>, the answer
+    /// <see cref="ResolveProductInstances"/> gave for <paramref name="productCode"/>,
+    /// holds every installation of that code in <paramref name="listed"/>, the
+    /// installations an enumeration earlier in the same run listed. Accounts are
+    /// compared without case and the context exactly.
+    ///
+    /// FALSE IS A CONTRADICTION AND EVERY CALLER READS IT AS UNASKABLE. The product walk
+    /// asks for the installations of every product and the keyed question for those of
+    /// one, with the same account and the same contexts, so an answer leaving out an
+    /// installation the walk listed contradicts the walk; and an installation the
+    /// recovery by name established came from this same question earlier in the run, so
+    /// an answer leaving it out contradicts that earlier answer. Either way it is "not
+    /// installed" for a product the run established, or a list stopping short of one of
+    /// its installations. An installation the answer holds and
+    /// <paramref name="listed"/> does not is no contradiction, and is read like any
+    /// other.
+    /// </summary>
+    internal static bool HoldsEveryListedInstallation(
+        IReadOnlyDictionary<string, List<(string? Sid, MsiInstallContext Context)>> listed,
+        string productCode,
+        IReadOnlyList<(string? Sid, MsiInstallContext Context)> instances)
+    {
+        if (!listed.TryGetValue(productCode, out var ofCode)) return true;
+
+        foreach (var (sid, context) in ofCode)
+        {
+            var held = false;
+            foreach (var instance in instances)
+                if (instance.Context == context
+                    && string.Equals(instance.Sid, sid, StringComparison.OrdinalIgnoreCase))
+                {
+                    held = true;
+                    break;
+                }
+
+            if (!held) return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -2343,20 +2439,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// A patch is cached once per code but its State is per product, so one .msp
     /// can be Superseded (removable) under one product and Applied (still
     /// needed) under another, and a corrupt LocalPackage can aim a patch row at
-    /// a product's own cached .msi. First-writer-wins decided both on a coin
-    /// flip of enumeration order. Under this policy, once anything claims a path
-    /// non-removable it stays non-removable, and an existing removable row is
-    /// downgraded by a later non-removable claim; the verdict is never upgraded
-    /// the other way.
+    /// a product's own cached .msi. The order the enumeration reaches the claims in
+    /// decides neither: once anything claims a path non-removable it stays
+    /// non-removable, and an existing removable row is downgraded by a later
+    /// non-removable claim; the verdict is never upgraded the other way.
     ///
-    /// THE SAME COIN FLIP REACHES THE CAUSE AS WELL AS THE VERDICT, which is why
-    /// there is a second rule rather than one. Two non-removable claims on a path
-    /// are not necessarily the same finding: one product's Applied claim names the
-    /// file, and another product's failed State read names nothing at all. Keeping
-    /// whichever the enumeration reached first would make what the app SAYS about
-    /// that file depend on enumeration order, which is the fault the rule above
-    /// closes for what the app DOES. So a claim that establishes something
-    /// displaces a row that establishes nothing, and never the reverse.
+    /// THE CAUSE IS KEPT OUT OF ENUMERATION ORDER AS WELL AS THE VERDICT, which is
+    /// why there is a second rule rather than one. Two non-removable claims on a
+    /// path are not necessarily the same finding: one product's Applied claim names
+    /// the file, and another product's failed State read names nothing at all. So a
+    /// claim that establishes something displaces a row that establishes nothing,
+    /// and never the reverse, and neither what the app DOES with the file nor what it
+    /// SAYS about it turns on which claim the enumeration reached first.
     ///
     /// A fallback claim can only ADD a path, never displace the row on one. That
     /// scoping is load-bearing, not a layering preference. The fallback reads the
@@ -3040,8 +3134,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                             productsByPath[path].Add(productCode);
 
         // THE FOURTH SOURCE: THE PRODUCTS THE ENUMERATION LOST AND THE REGISTRY
-        // COMPARISON RECOVERED BY NAME. The per-pairing pass below has always been
-        // handed these; this condition never was, and the two ask different questions.
+        // COMPARISON RECOVERED BY NAME. The per-pairing pass below is handed these as
+        // well, and the two ask different questions.
         // That one asks a product whether it holds THIS patch and can uninstall it,
         // and is answered truthfully that it cannot. This one asks whether the product
         // holds ANYTHING ELSE that could be uninstalled and roll back onto this file,
@@ -3065,16 +3159,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (!claimed.TryGetValue(path, out var row)) continue;
 
-            // ROUTE B, UNIONED IN HERE TOO. The two sources above are the claims and
-            // route A, and both of them can only name a product some enumeration
-            // returned. The patch file is read from disk and does not care what any
-            // enumeration said, so it is the one source that can name the product
-            // whose removable patch would overturn this verdict and that nothing else
-            // on the machine mentions. It was already unioned into the per-pairing
-            // pass below for exactly that reason; this condition asked a narrower set
-            // than the pass it runs ahead of, and the gap between the two is a file
-            // offered because the product that could roll back onto it was never
-            // asked.
+            // ROUTE B, UNIONED IN HERE TOO. The sources above are the claims, route A
+            // and the products the recovery by name found, and each of them can only
+            // name a product something on the machine already lists: an enumeration,
+            // or the registry's product keys. The patch file is read from disk and does
+            // not care what any of them lists, so it is the one source that can name
+            // the product whose removable patch would overturn this verdict and that
+            // nothing else on the machine mentions. The per-pairing pass below unions
+            // it for the same reason.
             //
             // ONLY WHERE A ROW IS STILL REMOVABLE, which is where widening the set can
             // change what the app does. The verdict is also read by the missing-file
@@ -3488,9 +3580,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// missed and estimating how much it missed.
     ///
     /// Null for anything that is not 32 hex characters, and that is not a
-    /// tidiness check: the caller turns each of these into a question about a real
-    /// machine, and a code invented out of a key name that was never a packed GUID
-    /// would be a question about nothing whose answer withholds.
+    /// tidiness check: every caller turns a code into a question about a real
+    /// machine, and each reads a key name that yields none as something not
+    /// established rather than as a code.
     /// </summary>
     internal static string? UnpackRegistryProductCode(string packed)
     {
@@ -4329,7 +4421,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             value: buffer,
             valueLength: ref bufferLen);
 
-        // See GetProductProperty: the second call's narrower rule, and the
+        // See ReadProductProperty: the second call's narrower rule, and the
         // reason for the clamp.
         return error == MsiError.Success
             ? new PropertyRead(new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length)), Unreadable: false)

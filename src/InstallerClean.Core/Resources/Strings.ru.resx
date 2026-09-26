@@ -1688,16 +1688,20 @@ InstallerClean уже был запущен от имени администра
        stay distinct: a rendering that blurs any two of them makes the app state a
        cause it cannot support for the other's files.
 
-       Files the declared-product-installed arm keeps have no line here:
-       WithholdingSplit.ArmsFired leaves that arm out.
+       Files kept by the declared-product-installed, declared-patch-registered,
+       under-a-day-old and age-unestablished arms have no line here:
+       WithholdingSplit.ArmsFired leaves those arms out.
 
        CandidateIdentity is the identity pass failing to read one file in the folder,
        so that file could not be compared against the records at all.
 
        DeclaredProductUnestablished is a disjunction and must stay one: either the file
-       would not say which program it belongs to, or Windows would not answer about the
-       program it named. Keeping only one half states a cause the app did not establish
-       for the files the other half holds.
+       would not say which program it belongs to, or Windows would not give a clear answer
+       about the program it named. Keeping only one half states a cause the app did not
+       establish for the files the other half holds. "A clear answer" covers both things
+       Windows can do there: give no answer at all, or give one that disagrees with its own
+       list of installed programs. A rendering saying Windows gave no answer is false of the
+       second.
 
        ScreenUnanswered is the check answering about a different number of files than it
        was handed, so no answer could be attached to any particular file.
@@ -1709,8 +1713,8 @@ InstallerClean уже был запущен от имени администра
        patch it is or which programs it is for" reads as the file saying neither, which is
        false of a file whose patch code reads and whose program list does not. The third
        says "in full" because Windows can already have named some programs holding the
-       patch when an answer about another is missing. It is not merged with
-       DeclaredProductUnestablished: a run can print both, and each speaks for its own
+       patch when an answer about another is missing or cannot be used. It is not merged
+       with DeclaredProductUnestablished: a run can print both, and each speaks for its own
        files.
 
        None of them carries a count and none may acquire one: each is one fact about
@@ -2240,7 +2244,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Файл, о котором у Windows есть запись, не удалось опознать, поэтому его не удалось сопоставить с тем, что лежит в папке.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Программа может быть установлена на этом ПК более одного раза, а записи не могут сказать, какой копии принадлежит файл.</value></data>
   <data name="Cli.WithheldReasons.CandidateIdentity" xml:space="preserve"><value>  Файл в папке не удалось опознать, поэтому его не удалось сопоставить с записями.</value></data>
-  <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Либо файл не указал, какой программе он принадлежит, либо Windows не ответил об этой программе.</value></data>
+  <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Либо файл не указал, какой программе он принадлежит, либо Windows не дал ясного ответа об этой программе.</value></data>
   <data name="Cli.WithheldReasons.ScreenUnanswered" xml:space="preserve"><value>  Проверка того, каким программам принадлежат файлы, дала ответы, которые не совпали с переданными ей файлами.</value></data>
   <data name="Cli.WithheldReasons.DeclaredPatchUnestablished" xml:space="preserve"><value>  Либо файл исправления не указал, какое это исправление, либо не указал, для каких программ он предназначен, либо Windows не указал полностью, у каких программ есть это исправление.</value></data>
   <data name="Cli.PendingRebootBlocked.PendingRenameUnresolved" xml:space="preserve"><value>Ошибка: файловая операция поставлена в очередь до следующей перезагрузки, и InstallerClean не может определить, какие файлы в ней названы, поэтому не может исключить {InstallerFolder}. Перезагрузите Windows перед очисткой.</value></data>

@@ -60,18 +60,14 @@ public class InstallerQueryServicePatchTruncationTests
         new InstallerQueryService(msi, NoFallback).GetRegisteredPackagesAsync();
 
     /// <summary>
-    /// Drives the confirmation pass over the state the enumeration used to hand
-    /// it, and returns the claimed set for the assertions.
+    /// Drives the confirmation pass over the state the enumeration hands it, and
+    /// returns the claimed set for the assertions.
     ///
-    /// WHY THESE TESTS DRIVE IT DIRECTLY RATHER THAN THROUGH A SCAN, AND IT IS NO
-    /// LONGER BECAUSE NOTHING REACHES IT. This paragraph said that from 3.0.0 no
-    /// enumeration grants a removable verdict to any patch, so nothing reached this
-    /// pass through a real scan. That was true while the superseded class was out;
-    /// restoring the offer restored the route, the enumeration grants the verdict
-    /// again through IsRemovablePatch, and a full scan does now reach this pass. The
-    /// reason to drive it directly is the ordinary one instead: an assertion about
-    /// this pass should turn on this pass, and a scan puts the whole enumeration,
-    /// the merge and the per-product condition in front of it.
+    /// WHY THESE TESTS DRIVE IT DIRECTLY RATHER THAN THROUGH A SCAN. A full scan
+    /// reaches this pass, the enumeration granting the verdict through
+    /// IsRemovablePatch, and an assertion about this pass should turn on this pass,
+    /// where a scan puts the whole enumeration, the merge and the per-product
+    /// condition in front of it.
     ///
     /// There is deliberately NO production switch that re-grants the verdict
     /// selectively: a flag in a shipped binary that turns a class of file back on is
@@ -123,18 +119,16 @@ public class InstallerQueryServicePatchTruncationTests
         }
 
         // The per-product patch-set reading, and it comes from a DIFFERENT source
-        // from the claims above, which is the correction rather than a detail. These
-        // tests' subject is route A and the confirmation pass, not the
-        // superseded-patch condition: without a clean reading every product would be
-        // unestablished, every path would be withheld for that reason alone, and
-        // every assertion here would pass or fail for something it is not about. The
-        // condition has its own tests.
+        // from the claims above. These tests' subject is route A and the
+        // confirmation pass, not the superseded-patch condition: without a clean
+        // reading every product would be unestablished, every path would be withheld
+        // for that reason alone, and every assertion here would pass or fail for
+        // something it is not about. The condition has its own tests.
         //
-        // BUILT FROM EVERY REGISTRATION RATHER THAN FROM THE ENUMERATED ONES. It was
-        // built from the enumerated rows, which meant a product the walk LOST had no
-        // patch set, read as unestablished, and withheld the path before the pass
-        // could go and find it. That is the exact case these tests exist for, so they
-        // were withholding on the fixture's shape instead of exercising the pass. In
+        // BUILT FROM EVERY REGISTRATION RATHER THAN FROM THE ENUMERATED ONES. Built
+        // from the enumerated rows, a product the walk LOST would have no patch set,
+        // would read as unestablished and would withhold the path before the pass
+        // could go and find it, which is the case these tests exist for. In
         // production the two sources really are different: the claims come from the
         // API walk, and the patch sets are read by walking UserData's own product
         // subkeys, which see a product the walk never returned.
@@ -198,10 +192,8 @@ public class InstallerQueryServicePatchTruncationTests
     /// patch sets null, and a null map answers "unestablished" for every product, so
     /// the per-product condition takes the verdict away and marks the row withheld
     /// before anything downstream of it runs. A test asserting that something FURTHER
-    /// DOWN withheld the row then passes whether or not that thing exists at all. One
-    /// test in this file was doing exactly that, and its own commit named the next CI
-    /// run as what would settle the question; CI cannot settle it, because the
-    /// assertion is green either way.
+    /// DOWN withheld the row then passes whether or not that thing exists at all, and
+    /// no CI run can tell the two apart, the assertion being green either way.
     ///
     /// A CLEAN SET FOR EVERY PRODUCT RATHER THAN FOR THE SHARERS ALONE, deliberately.
     /// It leaves exactly one thing in the run able to withhold, which is whatever the
@@ -1045,6 +1037,108 @@ public class InstallerQueryServicePatchTruncationTests
     }
 
     /// <summary>
+    /// A declared target the product walk listed, answered "not installed" when it is
+    /// asked about by name. The answer contradicts the walk, and the path is withheld as
+    /// it is for a target that could not be located. The test after it is the same
+    /// machine with the answer agreeing with the walk, and the offer standing.
+    /// </summary>
+    [Theory]
+    [InlineData(NoMoreItems)]
+    [InlineData(UnknownProduct)]
+    public async Task A_declared_target_the_walk_listed_that_is_answered_not_installed_withholds(uint notInstalled)
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.AddProduct(StillApplied);
+        msi.ProductResolveResult[StillApplied] = notInstalled;
+
+        var result = await new InstallerQueryService(
+                msi,
+                RegistryWithCleanPatchSets(Superseding, StillApplied),
+                null,
+                Reader(Shared, StillApplied))
+            .GetRegisteredPackagesAsync();
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+    }
+
+    [Fact]
+    public async Task A_declared_target_the_walk_listed_that_is_answered_as_listed_leaves_the_offer_standing()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.AddProduct(StillApplied);
+
+        var result = await new InstallerQueryService(
+                msi,
+                RegistryWithCleanPatchSets(Superseding, StillApplied),
+                null,
+                Reader(Shared, StillApplied))
+            .GetRegisteredPackagesAsync();
+
+        var row = Assert.Single(result.Packages);
+        Assert.True(row.IsRemovable);
+        Assert.False(row.RemovableWithheld);
+    }
+
+    /// <summary>
+    /// The walk lists the target per user under an account, and asked about by name the
+    /// target answers with one per-machine installation and not that one. The answer
+    /// leaves out an installation the walk listed, and the path is withheld.
+    /// </summary>
+    [Fact]
+    public async Task A_declared_target_answered_without_the_installation_the_walk_listed_withholds()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.AddPerUserProduct(StillApplied, PerUserSid);
+
+        var result = await new InstallerQueryService(
+                msi,
+                RegistryWithCleanPatchSets(Superseding, StillApplied),
+                null,
+                Reader(Shared, StillApplied))
+            .GetRegisteredPackagesAsync();
+
+        var row = Assert.Single(result.Packages);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+    }
+
+    /// <summary>
+    /// Every installation the enumeration established reaches the result: each row the
+    /// walk listed, in walk order and with its own account and context, then each
+    /// installation the recovery by name found for a product the walk did not return.
+    /// A code the registry names and Windows answers is not installed is residue and is
+    /// not among them.
+    /// </summary>
+    [Fact]
+    public async Task The_result_carries_every_installation_the_walk_listed_and_the_recovery_found()
+    {
+        var msi = new FakeApi();
+        msi.AddProduct(Superseding);
+        msi.HoldPatch(Superseding, Patch, Shared, state: "2", uninstallable: "0");
+        msi.AddPerUserProduct(AlsoSuperseding, PerUserSid);
+        msi.HiddenFromWalk.Add(StillApplied);
+
+        var result = await Run(msi, Registry(Superseding, AlsoSuperseding, StillApplied, NotInstalled));
+
+        Assert.Equal(
+            new[]
+            {
+                new ListedInstallation(Superseding, null, (int)MsiInstallContext.Machine),
+                new ListedInstallation(AlsoSuperseding, PerUserSid, (int)MsiInstallContext.UserUnmanaged),
+                new ListedInstallation(StillApplied, null, (int)MsiInstallContext.Machine),
+            },
+            result.Installations);
+    }
+
+    /// <summary>
     /// The registry names a product the walk never returned, the keyed ask finds it
     /// installed, and it turns out to be holding the patch. Nothing else on the
     /// machine can reach it: the walk did not return it, so the product loop never
@@ -1261,12 +1355,11 @@ public class InstallerQueryServicePatchTruncationTests
     /// A per-user product must be asked about AS ITSELF: the account and context
     /// the walk handed back have to come round to the keyed read unchanged.
     ///
-    /// THIS IS THE FAULT CLASS THAT HAS COST THIS PASS TWICE, and neither instance
-    /// was a wrong verdict anybody could see. A keyed read given the wrong account
-    /// is refused by Windows, the refusal is read as "could not ask", and every
-    /// candidate is withheld: the app finds nothing, on every machine, while every
-    /// test that only checks which PAIRINGS were asked still passes. Asserting the
-    /// pairing is not asserting the question.
+    /// THE FAULT THIS CATCHES IS NOT A WRONG VERDICT ANYBODY CAN SEE. A keyed read
+    /// given the wrong account is refused by Windows, the refusal is read as "could
+    /// not ask", and every candidate is withheld: the app finds nothing, on every
+    /// machine, while every test that only checks which PAIRINGS were asked still
+    /// passes. Asserting the pairing is not asserting the question.
     /// </summary>
     [Fact]
     public void A_per_user_product_is_asked_under_its_own_account_and_context()
@@ -1336,8 +1429,7 @@ public class InstallerQueryServicePatchTruncationTests
         /// The same asks with the account and context each was made under. Kept
         /// beside the pairing rather than folded into it because the two questions
         /// are different: the pairing asks whether the right product was asked at
-        /// all, and this asks whether it was asked AS ITSELF. Nothing recorded the
-        /// second until a defect turned on it.
+        /// all, and this asks whether it was asked AS ITSELF.
         /// </summary>
         public List<(string Patch, string Product, string? Sid, MsiInstallContext Context)>
             ConfirmationAskIdentities { get; } = new();
@@ -1422,8 +1514,8 @@ public class InstallerQueryServicePatchTruncationTests
         /// models what the REGISTRY holds, and the registry does see a product the
         /// walk lost, because the per-product patch sets are read by walking
         /// UserData's own product subkeys rather than the enumeration's output.
-        /// Building both from one source made every lost product's patch set read
-        /// unestablished, which withheld the path before the pass could reach it.
+        /// Built from one source, every lost product's patch set would read
+        /// unestablished and withhold the path before the pass could reach it.
         /// </summary>
         public IEnumerable<(string Product, string Uninstallable)> AllRegistrations()
         {

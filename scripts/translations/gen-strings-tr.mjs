@@ -473,7 +473,7 @@ Ayrıntılar şuraya yazıldı:
   'Summary.NothingListedPerFile.Singular': `InstallerClean, bulduğu önbellek dosyalarından biri hakkında emin olamadı, bu yüzden o dosyayı sunmak yerine geri tuttu.`,
   'Summary.NothingListedPerFile.Plural': `InstallerClean, bulduğu önbellek dosyalarından bazıları hakkında emin olamadı, bu yüzden {0} {1} sunmak yerine geri tuttu.`,
   'Cli.WithheldReasons.CandidateIdentity': `  Klasördeki bir dosyanın kimliği belirlenemedi, bu yüzden kayıtlarla eşleştirilemedi.`,
-  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Ya bir dosya hangi programa ait olduğunu söylemedi ya da Windows o program hakkında yanıt vermedi.`,
+  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Ya bir dosya hangi programa ait olduğunu söylemedi ya da Windows o program hakkında net bir yanıt vermedi.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  Dosyaların hangi programlara ait olduğuna dair bir denetim, kendisine verilen dosyalarla örtüşmeyen yanıtlar verdi.`,
   'Cli.WithheldReasons.DeclaredPatchUnestablished': `  Ya bir yama dosyası hangi yama olduğunu söylemedi, ya hangi programlar için olduğunu söylemedi ya da Windows o yamanın hangi programlara uygulandığını eksiksiz söylemedi.`,
   'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean, {InstallerFolder} klasörüne dokunmadan önce denetlediği Windows ayarlarından birini okuyamadı, bu yüzden bir yükleyici işleminin sürüp sürmediğini ya da yeniden başlatma beklediğini bilemiyor. Windows'u yeniden başlatın ve yeniden tarayın. Ayar yine okunamıyorsa, burası InstallerClean'in temizleyebileceği bir makine değil.`,

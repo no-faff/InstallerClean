@@ -566,7 +566,7 @@ const MAP = {
   'Summary.NothingListedPerFile.Singular': `InstallerClean tidak yakin tentang salah satu file dalam cache yang ditemukannya, jadi file itu ditahan alih-alih ditawarkan.`,
   'Summary.NothingListedPerFile.Plural': `InstallerClean tidak yakin tentang beberapa file dalam cache yang ditemukannya, jadi {0} {1} ditahan alih-alih ditawarkan.`,
   'Cli.WithheldReasons.CandidateIdentity': `  Sebuah file dalam folder tidak bisa dikenali, jadi file itu tidak bisa dicocokkan dengan catatan.`,
-  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Entah sebuah file tidak menyebutkan ia milik program mana, atau Windows tidak menjawab tentang program itu.`,
+  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Entah sebuah file tidak menyebutkan ia milik program mana, atau Windows tidak memberi jawaban yang jelas tentang program itu.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  Pemeriksaan tentang file-file itu milik program mana memberi jawaban yang tidak cocok dengan file-file yang diserahkan kepadanya.`,
   'Cli.WithheldReasons.DeclaredPatchUnestablished': `  Entah sebuah file patch tidak menyebutkan ia patch yang mana, atau file itu tidak menyebutkan ia ditujukan untuk program mana saja, atau Windows tidak menyebutkan secara lengkap program mana saja yang memiliki patch itu.`,
   'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean tidak bisa membaca salah satu pengaturan Windows yang diperiksanya sebelum menyentuh {InstallerFolder}, jadi tidak bisa tahu apakah ada operasi pemasangan yang sedang berjalan atau menunggu restart. Restart Windows lalu Pindai ulang. Kalau pengaturan itu tetap tidak terbaca, ini bukan komputer yang bisa dibersihkan InstallerClean.`,

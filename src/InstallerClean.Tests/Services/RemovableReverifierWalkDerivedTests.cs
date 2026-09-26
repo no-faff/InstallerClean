@@ -34,6 +34,16 @@ public class RemovableReverifierWalkDerivedTests
 
     private static IInstallerQueryService Query(params RegisteredPackage[] pkgs) => Query(default, pkgs);
 
+    /// <summary>An enumeration that listed <paramref name="installations"/>.</summary>
+    private static IInstallerQueryService QueryListing(
+        IReadOnlyList<ListedInstallation> installations, params RegisteredPackage[] pkgs)
+    {
+        var q = Substitute.For<IInstallerQueryService>();
+        q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(pkgs.ToList().AsReadOnly(), Installations: installations));
+        return q;
+    }
+
     private static RemovableReverifier Reverifier(
         IInstallerQueryService query, IFileIdentityReader ids, IDeclaredProductCheck screen, IFileTimesReader times) =>
         new(query, Substitute.For<IMsiApi>(), ids, screen, times, new FixedClock(Now), null);
@@ -45,8 +55,8 @@ public class RemovableReverifierWalkDerivedTests
     private static IDeclaredProductCheck Screen(params string[] kept)
     {
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<CancellationToken>(),
-                Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>())
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+                Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>())
             .Returns(call => call.ArgAt<IReadOnlyList<OrphanedFile>>(0)
                 .Select(f => kept.Contains(f.FullPath, StringComparer.OrdinalIgnoreCase)
                     ? DeclaredProductOutcome.DeclaredProductInstalled
@@ -116,6 +126,43 @@ public class RemovableReverifierWalkDerivedTests
     }
 
     [Fact]
+    public async Task The_screen_holds_its_answers_against_the_installations_this_check_s_own_enumeration_listed()
+    {
+        // The real screen, with Windows answering that the file's product is not
+        // installed. Where this check's enumeration listed nothing the file survives, and
+        // where it listed that product the answer contradicts it and the file is held.
+        const string orphan = Folder + @"\orphan.msi";
+        const string registered = Folder + @"\registered.msi";
+        var identities = new ScriptedPackageIdentities();
+        identities.Declares(orphan, Product);
+        var msi = new ScriptedMsiProducts();
+        msi.NotInstalled(Product, MsiError.UnknownProduct);
+        var screen = new DeclaredProductCheck(msi, identities);
+
+        static ScriptedFileIdentities Ids()
+        {
+            var ids = new ScriptedFileIdentities();
+            ids.Opens(registered, 1);
+            ids.Opens(orphan, 2);
+            return ids;
+        }
+
+        var unlisted = await Reverifier(Query(Live(registered)), Ids(), screen, OldTimes(orphan))
+            .ReverifyAsync(new[] { orphan });
+
+        Assert.Equal(new[] { orphan }, unlisted.Surviving);
+
+        var listed = await Reverifier(
+                QueryListing([new ListedInstallation(Product, null, (int)MsiInstallContext.Machine)], Live(registered)),
+                Ids(), screen, OldTimes(orphan))
+            .ReverifyAsync(new[] { orphan });
+
+        Assert.Empty(listed.Surviving);
+        Assert.Equal(new[] { orphan }, listed.Dropped);
+        Assert.Equal(new HeldBackReasons(FileNotConfirmed: 1), listed.Reasons);
+    }
+
+    [Fact]
     public async Task A_screen_that_answers_about_a_different_number_of_files_holds_every_one()
     {
         const string a = Folder + @"\a.msi";
@@ -126,8 +173,8 @@ public class RemovableReverifierWalkDerivedTests
         ids.Opens(a, 2);
         ids.Opens(b, 3);
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<CancellationToken>(),
-                Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>())
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+                Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>())
             .Returns(new[] { DeclaredProductOutcome.DeclaredProductNotInstalled });
 
         var result = await Reverifier(Query(Live(registered)), ids, screen, OldTimes(a, b))

@@ -568,7 +568,7 @@ const MAP = {
   'Summary.NothingListedPerFile.Singular': `InstallerClean не був певен щодо одного зі знайдених ним файлів у кеші, тож затримав його, замість того щоб запропонувати.`,
   'Summary.NothingListedPerFile.Plural': `InstallerClean не був певен щодо деяких зі знайдених ним файлів у кеші, тож затримав {0} {1}, замість того щоб запропонувати їх.`,
   'Cli.WithheldReasons.CandidateIdentity': `  Файл у теці не вдалося розпізнати, тож його не вдалося зіставити із записами.`,
-  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Або файл не вказав, якій програмі він належить, або Windows не відповів про цю програму.`,
+  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Або файл не вказав, якій програмі він належить, або Windows не дав чіткої відповіді про цю програму.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  Перевірка того, яким програмам належать файли, дала відповіді, які не збіглися з переданими їй файлами.`,
   'Cli.WithheldReasons.DeclaredPatchUnestablished': `  Або файл виправлення не вказав, яке це виправлення, або не вказав, для яких програм він призначений, або Windows не вказав повністю, які програми мають це виправлення.`,
   'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean не зміг прочитати один із параметрів Windows, які перевіряє перед тим, як торкатися {InstallerFolder}, тож не може визначити, чи операція встановлювача виконується, чи чекає на перезавантаження. Перезавантажте Windows і повторіть сканування. Якщо параметр і далі не читається, це не та машина, яку InstallerClean може очистити.`,

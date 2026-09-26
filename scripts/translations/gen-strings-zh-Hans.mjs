@@ -454,7 +454,7 @@ const MAP = {
   'Summary.NothingListedPerFile.Singular': `InstallerClean 对它找到的缓存文件中的一个没有把握，因此没有提供它，而是把它保留了下来。`,
   'Summary.NothingListedPerFile.Plural': `InstallerClean 对它找到的部分缓存文件没有把握，因此没有提供 {0} 个{1}，而是把它们保留了下来。`,
   'Cli.WithheldReasons.CandidateIdentity': `  无法识别文件夹中的某个文件，因此无法把它与记录对应起来。`,
-  'Cli.WithheldReasons.DeclaredProductUnestablished': `  要么某个文件没有说明它属于哪个程序，要么 Windows 没有就该程序作出回答。`,
+  'Cli.WithheldReasons.DeclaredProductUnestablished': `  要么某个文件没有说明它属于哪个程序，要么 Windows 没有就该程序作出明确的回答。`,
   'Cli.WithheldReasons.ScreenUnanswered': `  一项关于这些文件属于哪些程序的检查，给出的答案与交给它的文件对不上。`,
   'Cli.WithheldReasons.DeclaredPatchUnestablished': `  要么某个补丁文件没有说明它是哪个补丁，要么没有说明它适用于哪些程序，要么 Windows 没有完整说明该补丁已应用到哪些程序。`,
   'Body.PendingReboot.RegistryCheckUnreadable': `InstallerClean 无法读取它在碰 {InstallerFolder} 之前会检查的一项 Windows 设置，因此无法判断是否有安装程序操作正在进行或正在等待重启。请重启 Windows 并重新扫描。如果该设置仍然无法读取，这台机器就不是 InstallerClean 能清理的。`,

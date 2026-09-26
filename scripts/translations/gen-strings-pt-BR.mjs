@@ -549,7 +549,7 @@ const MAP = {
   'Summary.NothingListedPerFile.Singular': `O InstallerClean não teve certeza sobre um dos arquivos em cache que encontrou, então o reteve em vez de oferecê-lo.`,
   'Summary.NothingListedPerFile.Plural': `O InstallerClean não teve certeza sobre alguns dos arquivos em cache que encontrou, então reteve {0} {1} em vez de oferecê-los.`,
   'Cli.WithheldReasons.CandidateIdentity': `  Não foi possível identificar um arquivo da pasta, então não foi possível compará-lo com os registros.`,
-  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Ou um arquivo não informou a qual programa pertence, ou o Windows não respondeu sobre esse programa.`,
+  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Ou um arquivo não informou a qual programa pertence, ou o Windows não deu uma resposta clara sobre esse programa.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  Uma verificação de a quais programas os arquivos pertencem deu respostas que não correspondiam aos arquivos que lhe foram entregues.`,
   'Cli.WithheldReasons.DeclaredPatchUnestablished': `  Ou um arquivo de patch não informou de qual patch se trata, ou não informou a quais programas se destina, ou o Windows não informou de forma completa quais programas têm esse patch.`,
   'Body.PendingReboot.RegistryCheckUnreadable': `O InstallerClean não conseguiu ler uma das configurações do Windows que verifica antes de tocar em {InstallerFolder}, então não dá para saber se há uma operação de instalação em andamento ou aguardando uma reinicialização. Reinicie o Windows e use Reanalisar. Se a configuração continuar ilegível, este não é um computador que o InstallerClean possa limpar.`,

@@ -70,14 +70,27 @@ namespace InstallerClean.Models;
 /// machine where every term was zero; only a real enumeration's result should be
 /// read for these.
 /// </param>
+/// <param name="Installations">
+/// Every installation of a product this enumeration established: each row the product
+/// walk listed, whether or not its records read, and each installation the recovery by
+/// name found for a product the walk did not return. The declared-product screen is
+/// handed it, and an answer about a product that leaves out an installation listed here
+/// contradicts this enumeration (see <see cref="Services.IDeclaredProductCheck"/>). Empty
+/// on a result built by anything that does not enumerate.
+/// </param>
 public record InstallerQueryResult(
     IReadOnlyList<RegisteredPackage> Packages,
     int UnaccountedProductCount = 0,
     IReadOnlyList<PatchClaim>? PatchClaims = null,
-    EnumerationCensus Census = default)
+    EnumerationCensus Census = default,
+    IReadOnlyList<ListedInstallation>? Installations = null)
 {
     /// <summary>Never null: an absent list reads as no claims rather than as a fault.</summary>
     public IReadOnlyList<PatchClaim> PatchClaims { get; init; } = PatchClaims ?? Array.Empty<PatchClaim>();
+
+    /// <summary>Never null: an absent list reads as an enumeration that listed nothing.</summary>
+    public IReadOnlyList<ListedInstallation> Installations { get; init; } =
+        Installations ?? Array.Empty<ListedInstallation>();
 
     /// <summary>
     /// The enumeration did not account for at least one installed product, so the

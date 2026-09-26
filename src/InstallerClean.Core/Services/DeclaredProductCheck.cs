@@ -13,16 +13,18 @@ namespace InstallerClean.Services;
 /// enumeration the patch-target route uses, and for an installed product reads the
 /// <c>LocalPackage</c> each installation records, the package each one's source list
 /// points at and the package in the folder each one records as its
-/// <c>InstallSource</c>. For each candidate patch it reads the patch's own code and the
-/// products its Template names, finds the registrations of that patch through the
-/// machine-wide patch enumeration and the keyed patch read, and reads the
-/// <c>LocalPackage</c> each registration records and the patch package the patch's
-/// source list points at in each registration's account and context. A source list in
-/// a per-user-unmanaged context is not read, and an installation or registration in
-/// one keeps the file. Every source list it does read is read twice, through the API
-/// and from the registry key that holds it, and a list the two do not agree on keeps
-/// the file. Every <c>InstallSource</c> it reads is read the same two ways, and one the
-/// two do not agree on keeps the file too.
+/// <c>InstallSource</c>. Every answer about a product is held against the installations
+/// the caller's own enumeration listed, and one leaving out any of them keeps the file.
+/// For each candidate patch it reads the patch's own code and the products its Template
+/// names, finds the registrations of that patch through the machine-wide patch
+/// enumeration and the keyed patch read, and reads the <c>LocalPackage</c> each
+/// registration records and the patch package the patch's source list points at in
+/// each registration's account and context. A source list in a per-user-unmanaged
+/// context is not read, and an installation or registration in one keeps the file.
+/// Every source list it does read is read twice, through the API and from the registry
+/// key that holds it, and a list the two do not agree on keeps the file. Every
+/// <c>InstallSource</c> it reads is read the same two ways, and one the two do not
+/// agree on keeps the file too.
 ///
 /// IT COMPOSES THINGS THAT ALREADY EXIST. The reading of each file, package or
 /// patch, is the reader's. The asking is
@@ -90,6 +92,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <inheritdoc />
     public IReadOnlyList<DeclaredProductOutcome> Screen(
         IReadOnlyList<OrphanedFile> candidates,
+        IReadOnlyList<ListedInstallation> installations,
         CancellationToken cancellationToken = default,
         Action<Exception, string>? recordRefusal = null,
         Func<string, bool?>? namesAFileInInstallerFolder = null)
@@ -108,8 +111,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var asked = new Dictionary<string, DeclarationAnswer>(StringComparer.Ordinal);
 
         // What the pass has asked about installations and patch registrations, shared
-        // by both halves, for the same reason and with the same lifetime.
-        var pass = new PassAnswers(_msi, cancellationToken);
+        // by both halves, for the same reason and with the same lifetime, and the
+        // installations the caller's enumeration listed, which every answer about a
+        // product is held against.
+        var pass = new PassAnswers(_msi, installations, cancellationToken);
 
         for (var i = 0; i < candidates.Count; i++)
         {
@@ -190,8 +195,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // THE ORDER OF THE ARMS IS THE WHOLE OF IT, and the unaskable one is
         // first because it is the one that reads as an answer if it is left
         // last. A call that could not be made has not shown the product to be
-        // absent, and treating "no answer" as "no product" would offer the
-        // file on the strength of a question that was never really put.
+        // absent, and neither has an answer leaving out an installation the caller's
+        // enumeration listed, whether "not installed" or a list short of it, which
+        // comes back unaskable too (PassAnswers.InstancesOf). Either keeps the file.
         if (resolved.Unaskable)
             return new DeclarationAnswer(DeclaredProductOutcome.Unestablished, null);
 
@@ -790,8 +796,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// add a registration.
     ///
     /// AND EITHER FAILING KEEPS THE FILE. An enumeration that did not run to its end, a
-    /// named product whose installations would not list, and an installation that would
-    /// not answer the keyed read each leave registrations unfound, and the answer is
+    /// named product whose installations would not list or were listed without one the
+    /// caller's enumeration listed, and an installation that would not answer the keyed
+    /// read each leave registrations unfound, and the answer is
     /// <see cref="DeclaredProductOutcome.DeclaredPatchUnestablished"/>. The enumeration
     /// is walked once per pass, so where it fails, every patch copy the pass asks about
     /// is kept.
@@ -989,12 +996,17 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         private readonly IMsiApi _msi;
         private readonly Dictionary<string, (IReadOnlyList<(string? Sid, MsiInstallContext Context)> Instances, bool Unaskable)>
             _instances = new(StringComparer.Ordinal);
+
+        private readonly Dictionary<string, List<(string? Sid, MsiInstallContext Context)>> _listed;
+
         private Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? _holders;
         private bool _holdersRead;
 
-        internal PassAnswers(IMsiApi msi, CancellationToken cancellationToken)
+        internal PassAnswers(
+            IMsiApi msi, IReadOnlyList<ListedInstallation> installations, CancellationToken cancellationToken)
         {
             _msi = msi;
+            _listed = InstallerQueryService.InstallationsByCode(installations);
             CancellationToken = cancellationToken;
         }
 
@@ -1006,6 +1018,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         /// <summary>
         /// Every installation of one product code, asked once per pass whichever half
         /// asks.
+        ///
+        /// AN ANSWER LEAVING OUT AN INSTALLATION THE CALLER'S ENUMERATION LISTED COMES
+        /// BACK UNASKABLE, the answer for a question that could not be put
+        /// (<see cref="InstallerQueryService.HoldsEveryListedInstallation"/>). Held
+        /// against that list, every installation the run knows of is asked about or the
+        /// file is kept.
         /// </summary>
         internal (IReadOnlyList<(string? Sid, MsiInstallContext Context)> Instances, bool Unaskable)
             InstancesOf(string productCode)
@@ -1013,6 +1031,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             if (!_instances.TryGetValue(productCode, out var resolved))
             {
                 resolved = InstallerQueryService.ResolveProductInstances(_msi, productCode);
+                if (!resolved.Unaskable
+                    && !InstallerQueryService.HoldsEveryListedInstallation(_listed, productCode, resolved.Instances))
+                    resolved = (Array.Empty<(string?, MsiInstallContext)>(), true);
+
                 _instances[productCode] = resolved;
             }
 

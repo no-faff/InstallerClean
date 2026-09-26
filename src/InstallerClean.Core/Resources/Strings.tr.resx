@@ -1710,16 +1710,20 @@ Ayrıntılar şuraya yazıldı:
        stay distinct: a rendering that blurs any two of them makes the app state a
        cause it cannot support for the other's files.
 
-       Files the declared-product-installed arm keeps have no line here:
-       WithholdingSplit.ArmsFired leaves that arm out.
+       Files kept by the declared-product-installed, declared-patch-registered,
+       under-a-day-old and age-unestablished arms have no line here:
+       WithholdingSplit.ArmsFired leaves those arms out.
 
        CandidateIdentity is the identity pass failing to read one file in the folder,
        so that file could not be compared against the records at all.
 
        DeclaredProductUnestablished is a disjunction and must stay one: either the file
-       would not say which program it belongs to, or Windows would not answer about the
-       program it named. Keeping only one half states a cause the app did not establish
-       for the files the other half holds.
+       would not say which program it belongs to, or Windows would not give a clear answer
+       about the program it named. Keeping only one half states a cause the app did not
+       establish for the files the other half holds. "A clear answer" covers both things
+       Windows can do there: give no answer at all, or give one that disagrees with its own
+       list of installed programs. A rendering saying Windows gave no answer is false of the
+       second.
 
        ScreenUnanswered is the check answering about a different number of files than it
        was handed, so no answer could be attached to any particular file.
@@ -1731,15 +1735,15 @@ Ayrıntılar şuraya yazıldı:
        patch it is or which programs it is for" reads as the file saying neither, which is
        false of a file whose patch code reads and whose program list does not. The third
        says "in full" because Windows can already have named some programs holding the
-       patch when an answer about another is missing. It is not merged with
-       DeclaredProductUnestablished: a run can print both, and each speaks for its own
+       patch when an answer about another is missing or cannot be used. It is not merged
+       with DeclaredProductUnestablished: a run can print both, and each speaks for its own
        files.
 
        None of them carries a count and none may acquire one: each is one fact about
        one machine, and nothing may add it to another and call the result a cause. The
        count and size of the files these lines explain are on the line above. -->
   <data name="Cli.WithheldReasons.CandidateIdentity" xml:space="preserve"><value>  Klasördeki bir dosyanın kimliği belirlenemedi, bu yüzden kayıtlarla eşleştirilemedi.</value></data>
-  <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Ya bir dosya hangi programa ait olduğunu söylemedi ya da Windows o program hakkında yanıt vermedi.</value></data>
+  <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Ya bir dosya hangi programa ait olduğunu söylemedi ya da Windows o program hakkında net bir yanıt vermedi.</value></data>
   <data name="Cli.WithheldReasons.ScreenUnanswered" xml:space="preserve"><value>  Dosyaların hangi programlara ait olduğuna dair bir denetim, kendisine verilen dosyalarla örtüşmeyen yanıtlar verdi.</value></data>
   <data name="Cli.WithheldReasons.DeclaredPatchUnestablished" xml:space="preserve"><value>  Ya bir yama dosyası hangi yama olduğunu söylemedi, ya hangi programlar için olduğunu söylemedi ya da Windows o yamanın hangi programlara uygulandığını eksiksiz söylemedi.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this

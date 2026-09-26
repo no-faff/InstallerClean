@@ -242,6 +242,40 @@ public class FileSystemScanServiceDeclaredProductTests
         Assert.Equal($@"{Folder}\held.msi", kept.FullPath);
     }
 
+    // ---- The installations the scan's own enumeration listed ----
+
+    [Fact]
+    public async Task A_candidate_whose_listed_product_Windows_answers_not_installed_is_not_offered()
+    {
+        // The scan hands the screen the installations its enumeration listed. One folder
+        // is scanned twice, with Windows answering that neither product is installed:
+        // where the enumeration listed nothing both files are offered, and where it
+        // listed product A the file declaring A is kept and the other is offered.
+        var identities = new ScriptedPackageIdentities();
+        identities.Declares($@"{Folder}\listed.msi", ProductA);
+        identities.Declares($@"{Folder}\gone.msi", ProductB);
+
+        var msi = new ScriptedMsiProducts();
+        msi.NotInstalled(ProductA, MsiError.UnknownProduct);
+        msi.NotInstalled(ProductB, MsiError.UnknownProduct);
+
+        var walked = new[] { $@"{Folder}\listed.msi", $@"{Folder}\gone.msi" };
+
+        var unlisted = await Scan(walked, msi, identities);
+
+        Assert.Equal(walked, unlisted.RemovableFiles.Select(f => f.FullPath));
+        Assert.Empty(unlisted.WithheldFiles!);
+
+        var listed = await Scan(walked, msi, identities,
+            installations: [new ListedInstallation(ProductA, null, (int)MsiInstallContext.Machine)]);
+
+        var offered = Assert.Single(listed.RemovableFiles);
+        Assert.Equal($@"{Folder}\gone.msi", offered.FullPath);
+        var kept = Assert.Single(listed.WithheldFiles!);
+        Assert.Equal($@"{Folder}\listed.msi", kept.FullPath);
+        Assert.Equal(1, listed.WithheldBy.DeclaredProductUnestablishedCount);
+    }
+
     // ---- A patch copy and its patch's registrations ----
 
     [Fact]
@@ -526,12 +560,13 @@ public class FileSystemScanServiceDeclaredProductTests
 
     // ---- Helpers ----
 
-    private static IInstallerQueryService QueryReturning(IReadOnlyList<RegisteredPackage> registered)
+    private static IInstallerQueryService QueryReturning(
+        IReadOnlyList<RegisteredPackage> registered, IReadOnlyList<ListedInstallation>? installations = null)
     {
         var query = Substitute.For<IInstallerQueryService>();
         query.GetRegisteredPackagesAsync(
                 Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new InstallerQueryResult(registered));
+            .Returns(new InstallerQueryResult(registered, Installations: installations));
         return query;
     }
 
@@ -552,14 +587,15 @@ public class FileSystemScanServiceDeclaredProductTests
         IEnumerable<string> walked,
         ScriptedMsiProducts msi,
         ScriptedPackageIdentities identities,
-        IReadOnlyList<RegisteredPackage>? registered = null)
+        IReadOnlyList<RegisteredPackage>? registered = null,
+        IReadOnlyList<ListedInstallation>? installations = null)
     {
         var files = walked.ToArray();
         var fs = FolderHolding(files.Concat(
             (registered ?? Array.Empty<RegisteredPackage>()).Select(p => p.LocalPackagePath)).ToArray());
 
         return new FileSystemScanService(
-            QueryReturning(registered ?? Array.Empty<RegisteredPackage>()), fs, null,
+            QueryReturning(registered ?? Array.Empty<RegisteredPackage>(), installations), fs, null,
             files, null, null,
             new DeclaredProductCheck(msi, identities))
             .ScanAsync();

@@ -625,7 +625,7 @@ const MAP = {
   'Cli.WithheldReasons.FileIdentity': `  A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder.`,
   'Cli.WithheldReasons.SecondInstance': `  A program may be installed more than once on this PC, and the records can't say which copy a file belongs to.`,
   'Cli.WithheldReasons.CandidateIdentity': `  A file in the folder couldn't be identified, so it couldn't be matched against the records.`,
-  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Either a file wouldn't say which program it belongs to, or Windows wouldn't answer about that program.`,
+  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Either a file wouldn't say which program it belongs to, or Windows wouldn't give a clear answer about that program.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  A check on which programs the files belong to gave answers that didn't line up with the files it was handed.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Error: a file operation is queued for the next restart and InstallerClean can't tell which files it names, so it can't rule out {InstallerFolder}. Restart Windows before cleaning.`,
   'Cli.MoveRestoreHint': `Check that your programs still update and uninstall as normal, then delete {0}.`,

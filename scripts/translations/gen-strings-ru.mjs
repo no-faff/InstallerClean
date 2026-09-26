@@ -628,11 +628,13 @@ const CLI = {
   // The four per-file arms. Each names a different cause and the four have to stay
   // four and distinct once translated:
   // DeclaredProductUnestablished is itself a disjunction, either the file would not
-  // say which program it belongs to or Windows would not answer about that program,
-  // and a rendering that keeps one half states a cause the app did not establish for
-  // the files the other half holds. Keep the two leading spaces on all four.
+  // say which program it belongs to or Windows would not give a clear answer about
+  // that program, and a rendering that keeps one half states a cause the app did not
+  // establish for the files the other half holds. Windows falls short of a clear
+  // answer two ways: it gives none, or it gives one that disagrees with its own list
+  // of installed programs. Keep the two leading spaces on all four.
   'Cli.WithheldReasons.CandidateIdentity': `  Файл в папке не удалось опознать, поэтому его не удалось сопоставить с записями.`,
-  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Либо файл не указал, какой программе он принадлежит, либо Windows не ответил об этой программе.`,
+  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Либо файл не указал, какой программе он принадлежит, либо Windows не дал ясного ответа об этой программе.`,
   'Cli.WithheldReasons.ScreenUnanswered': `  Проверка того, каким программам принадлежат файлы, дала ответы, которые не совпали с переданными ей файлами.`,
   'Cli.WithheldReasons.DeclaredPatchUnestablished': `  Либо файл исправления не указал, какое это исправление, либо не указал, для каких программ он предназначен, либо Windows не указал полностью, у каких программ есть это исправление.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Ошибка: файловая операция поставлена в очередь до следующей перезагрузки, и InstallerClean не может определить, какие файлы в ней названы, поэтому не может исключить {InstallerFolder}. Перезагрузите Windows перед очисткой.`,

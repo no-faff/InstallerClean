@@ -127,7 +127,7 @@ public class WithholdingSplitTests
         // verdict above: filing it under one of them would attach a cause the screen
         // never reached.
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>())
             .Returns(new[] { DeclaredProductOutcome.DeclaredProductNotInstalled });
 

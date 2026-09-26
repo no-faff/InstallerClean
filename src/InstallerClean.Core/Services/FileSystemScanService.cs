@@ -612,7 +612,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         else
         {
             WithholdCandidatesByWhatTheyDeclare(
-                unclaimedByPath, withheld, withheldBy, cacheRoot, cancellationToken,
+                unclaimedByPath, withheld, withheldBy, cacheRoot, query.Installations, cancellationToken,
                 (ex, cause) => refusalLog.Record(ex, cause));
 
             // THE LAST DECISION ON THIS HALF, AND IT TAKES WHAT THE SCREEN LET THROUGH.
@@ -1274,15 +1274,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
         List<OrphanedFile> withheld,
         WithholdingSplitTally withheldBy,
         InstallerCacheRoot cacheRoot,
+        IReadOnlyList<ListedInstallation> installations,
         CancellationToken cancellationToken,
         Action<Exception, string>? recordRefusal = null)
     {
         if (_declaredProducts is null || candidates.Count == 0) return;
 
         // The folder a product's or a patch's source list is compared against is the
-        // root this run resolved, the one every candidate was judged against.
+        // root this run resolved, the one every candidate was judged against, and the
+        // installations every answer about a product is held against are the ones this
+        // run's enumeration listed.
         var outcomes = _declaredProducts.Screen(
-            candidates, cancellationToken, recordRefusal,
+            candidates, installations, cancellationToken, recordRefusal,
             path => InstallerCacheHelpers.NamesAFileDirectlyInInstallerFolder(path, cacheRoot));
 
         // A screen that answered a different number of candidates than it was

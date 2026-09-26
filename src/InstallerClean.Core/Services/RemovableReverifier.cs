@@ -302,7 +302,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         }
 
         if (_declaredProducts is not null && cacheRoot is not null && standing.Count > 0)
-            standing = ScreenByWhatTheyDeclare(standing, held, cacheRoot, cancellationToken);
+            standing = ScreenByWhatTheyDeclare(standing, held, cacheRoot, query.Installations, cancellationToken);
 
         if (_fileTimes is not null && standing.Count > 0)
             _ = Keep(standing, held, path =>
@@ -317,14 +317,16 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
     /// <summary>
     /// Puts <paramref name="standing"/> to the declared-product screen as the scan
-    /// does, and returns what it lets through. A screen that answers about a different
-    /// number of files than it was handed has not answered about these files, so all
-    /// of them are held.
+    /// does, holding every answer about a product against the installations this pass's
+    /// own enumeration listed, and returns what it lets through. A screen that answers
+    /// about a different number of files than it was handed has not answered about these
+    /// files, so all of them are held.
     /// </summary>
     private List<string> ScreenByWhatTheyDeclare(
         List<string> standing,
         Dictionary<string, HeldBackReason> held,
         InstallerCacheRoot cacheRoot,
+        IReadOnlyList<ListedInstallation> installations,
         CancellationToken cancellationToken)
     {
         var files = standing
@@ -343,7 +345,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         try
         {
             var outcomes = _declaredProducts!.Screen(
-                files, cancellationToken, (ex, cause) => refusalLog.Record(ex, cause),
+                files, installations, cancellationToken, (ex, cause) => refusalLog.Record(ex, cause),
                 path => InstallerCacheHelpers.NamesAFileDirectlyInInstallerFolder(path, cacheRoot));
 
             if (outcomes.Count != files.Count)
