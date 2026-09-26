@@ -50,7 +50,6 @@ public class CliNothingOfferedTests
         var (exit, stdout) = await Run(Scan(
             withheld: 2,
             split: new WithholdingSplit(WholesaleCount: 2),
-            wholesaleFlag: true,
             census: SecondInstanceUnruled));
 
         Assert.Equal(CliExitCode.Ok, exit);
@@ -143,7 +142,6 @@ public class CliNothingOfferedTests
         var (exit, stdout) = await Run(Scan(
             withheld: 2,
             split: new WithholdingSplit(IdentityUnestablishedCount: 1, WholesaleCount: 1),
-            wholesaleFlag: true,
             census: SecondInstanceUnruled));
 
         Assert.Equal(CliExitCode.Ok, exit);
@@ -161,7 +159,6 @@ public class CliNothingOfferedTests
         var (_, stdout) = await Run(Scan(
             withheld: 2,
             split: new WithholdingSplit(IdentityUnestablishedCount: 1, WholesaleCount: 1),
-            wholesaleFlag: true,
             census: SecondInstanceUnruled));
 
         Assert.Contains(Strings.Cli_WithheldReasons_Header, stdout, StringComparison.Ordinal);
@@ -311,8 +308,8 @@ public class CliNothingOfferedTests
     /// <summary>
     /// A census with the second-instance leg set, so a fixture that wants the wholesale
     /// branch's own reason line has one to print. The legs are read off the census
-    /// rather than off the flag, so setting the flag alone would leave the breakdown
-    /// empty and a test about it passing over nothing.
+    /// rather than off the split, so a wholesale count on its own would leave the
+    /// breakdown empty and a test about it passing over nothing.
     /// </summary>
     private static EnumerationCensus SecondInstanceUnruled =>
         new(InstanceProductCount: 1);
@@ -338,12 +335,11 @@ public class CliNothingOfferedTests
 
     private static ScanResult Scan(
         int withheld, WithholdingSplit split,
-        bool wholesaleFlag = false, EnumerationCensus census = default, long positiveBytes = 0,
+        EnumerationCensus census = default, long positiveBytes = 0,
         long underADayOldBytes = 0, long patchBytes = 0) =>
         new(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
             Census: census,
             WithheldFiles: Held(withheld),
-            WalkOfferWithheldWholesale: wholesaleFlag,
             WithheldBy: split,
             WithheldDeclaredProductInstalledBytes: positiveBytes,
             WithheldUnderADayOldBytes: underADayOldBytes,

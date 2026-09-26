@@ -744,16 +744,16 @@ public class FileSystemScanServiceTests
     }
 
     /// <summary>
-    /// THE LAST CONJUNCT OF THE SPLIT, TESTED DIRECTLY ON THE PREDICATE, because after
-    /// 3.0.0 no machine reaches it as the deciding term any more. A run whose machine-wide
-    /// patch enumeration refused now also carries an Unestablished verdict, so such a row
-    /// fails the verdict test as well and would be reported with this conjunct deleted.
+    /// THE LAST CONJUNCT OF THE SPLIT, TESTED DIRECTLY ON THE PREDICATE. It reports a row
+    /// withheld for some cause OTHER than its own unread file, whatever its verdict says.
+    /// On a run whose machine-wide patch enumeration refused, no superseded or obsoleted
+    /// row carries the AllNonRemovable verdict, so the verdict test reports such a row on
+    /// its own, and a scan-driven test of that run cannot show whether the conjunct is
+    /// there.
     ///
-    /// THAT IS A REASON TO PIN IT HERE AND NOT A REASON TO DROP IT. The conjunct is the
-    /// marker's contract rather than a route: it says a row withheld for some cause OTHER
-    /// than its own unread file is reported, whatever its verdict says. Delete it and the
-    /// app depends on one other mechanism continuing to make the verdict honest, with
-    /// nothing going red if that ever stops.
+    /// THE CONJUNCT IS THE MARKER'S CONTRACT RATHER THAN A ROUTE. Delete it and the app
+    /// depends on the verdict alone to report such a row, with nothing going red if the
+    /// verdict ever stops carrying it.
     ///
     /// THESE TWO BUILD THEIR ROWS BY HAND, WHICH THE INTEGRATION TESTS ABOVE DELIBERATELY
     /// DO NOT. They are about the expression and make no claim that a scan produces either

@@ -64,11 +64,14 @@ namespace InstallerClean.Models;
 /// that does not enumerate patches.
 /// </param>
 /// <param name="Census">
-/// What the enumeration measured about itself and about the machine, for the
-/// opt-in report and for nothing else. Default on a result built by anything that
-/// does not enumerate, which reads as a census nobody took rather than as a
-/// machine where every term was zero; only a real enumeration's result should be
-/// read for these.
+/// What the enumeration measured about itself and about the machine. The scan and the
+/// check made just before a Move or Delete decide from it, with the registration side's
+/// identity reads, whether the walk-derived offer is withheld wholesale (see
+/// <see cref="WithholdingLegs"/>). The scan carries it into its own result, where the
+/// opt-in report reads it and the command line names the withholding legs that fired.
+/// Default on a result built by anything that does not enumerate, which reads as a
+/// census nobody took rather than as a machine where every term was zero; only a real
+/// enumeration's result should be read for these.
 /// </param>
 /// <param name="Installations">
 /// Every installation of a product this enumeration established: each row the product
@@ -91,20 +94,6 @@ public record InstallerQueryResult(
     /// <summary>Never null: an absent list reads as an enumeration that listed nothing.</summary>
     public IReadOnlyList<ListedInstallation> Installations { get; init; } =
         Installations ?? Array.Empty<ListedInstallation>();
-
-    /// <summary>
-    /// The enumeration did not account for at least one installed product, so the
-    /// set of registrations it read may be short of one. Whether that product's
-    /// records failed to read or were never reached does not enter into it: what
-    /// matters is the missing claim, not the mechanism (see
-    /// <see cref="UnaccountedProductCount"/> for the three).
-    ///
-    /// IT BEARS ON THE OFFER AND ON THE MISSING-FILES REPORT. It withholds every
-    /// superseded-patch verdict, which is the whole of the superseded offer on a run
-    /// where it fires; and a registration this scan never saw is also one whose file,
-    /// had it gone, went uncounted.
-    /// </summary>
-    public bool RecordsIncomplete => UnaccountedProductCount > 0;
 }
 
 /// <summary>

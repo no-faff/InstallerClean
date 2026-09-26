@@ -1260,24 +1260,10 @@ public class InstallerQueryServicePatchTruncationTests
         // enumeration cannot account for, which drives the refusal gate and the
         // records-incomplete notice.
         //
-        // AND IT NOW WITHHOLDS SOMETHING, WHICH IS WHAT CHANGED. This asserted the
-        // flag was clear, on a comment saying the withholding had nothing left to
-        // withhold: true while no scan offered a superseded patch at all. 3.0.0
-        // offers that class, so a scan that cannot account for a product takes the
-        // whole removable class back and marks every row it took, which is the
-        // long-standing rule finally having a subject again.
-        //
-        // THE ASSERTION WAS RIGHT AND THE FIXTURE COULD NOT REACH IT, WHICH IS THE
-        // WHOLE OF WHAT WAS WRONG HERE. The withholding is guarded on the row still
-        // being removable when it runs, and it runs after the per-product condition.
-        // Built on a registry read carrying no patch sets, every product read as
-        // unestablished, so the condition had already taken the verdict away and set
-        // this very flag, and the withholding this test is named for was stepped over
-        // on a row it could no longer touch. Delete that withholding outright and the
-        // test still passed. Its own commit named the next CI run as what would settle
-        // the reading; CI cannot settle it, because it is green either way. A clean
-        // patch set for every product is what leaves the row removable, so the flag
-        // below can only have come from the rule in the name.
+        // The withholding takes only a row still removable when it runs, and it runs
+        // after the per-product condition. A clean patch set for every product leaves
+        // that condition nothing to take, so the row reaches the withholding removable
+        // and the flag below can only have come from the rule in the name.
         var result = await Run(msi, RegistryWithCleanPatchSets(Superseding, StillApplied));
 
         Assert.Equal(1, result.UnaccountedProductCount);

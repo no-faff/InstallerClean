@@ -308,7 +308,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: true,
+                WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(WholesaleCount: 2)));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -329,19 +329,17 @@ public class MainViewModelTests
         // would then say it had held back all 0 files, which is absurd and untrue.
         // Nothing in that folder went unclaimed, so the all-clear is right.
         //
-        // THE FIXTURE IS WHERE TO SEE WHICH LAYER ANSWERS IT. This host does not count
-        // the withheld list to reach the all-clear, because that list is written to by
-        // more than one decision and a host counting it would mean something different
-        // the moment any of their memberships moved. The scan reads it where the
-        // withholding happens and this machine arrives with nothing withheld at all,
-        // which is what the fixture below sets. The scan service's own test is what
-        // pins that a walk finding nothing to keep back arrives that way; see
-        // FileSystemScanServiceSecondInstanceTests.
+        // THE FIXTURE IS THE RESULT THE SCAN BUILDS WHEN THE GATE FIRES ON SUCH A WALK:
+        // a leg fired, the withheld list is empty and the wholesale arm took nothing.
+        // The window counts the withheld list, which holds nothing here, so it shows the
+        // all-clear. FileSystemScanServiceSecondInstanceTests pins that the scan builds
+        // this result.
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: Array.Empty<OrphanedFile>(), WalkOfferWithheldWholesale: false));
+                Census: new EnumerationCensus(InstanceProductCount: 1),
+                WithheldFiles: Array.Empty<OrphanedFile>()));
 
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -365,7 +363,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: false,
+                WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(DeclaredProductUnestablishedCount: 1)));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -396,7 +394,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: false,
+                WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 2),
                 WithheldDeclaredProductInstalledBytes: 3072));
 
@@ -421,7 +419,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: false,
+                WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 2),
                 WithheldDeclaredPatchRegisteredBytes: 3072));
 
@@ -446,7 +444,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: false,
+                WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 1, DeclaredPatchUnestablishedCount: 1),
                 WithheldDeclaredPatchRegisteredBytes: 1024));
 
@@ -476,7 +474,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: false,
+                WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, ScreenUnansweredCount: 1),
                 WithheldDeclaredProductInstalledBytes: 1024));
 
@@ -622,7 +620,7 @@ public class MainViewModelTests
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
                 WithheldCount: 1,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: true,
+                WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(WholesaleCount: 2),
                 SupersededWithheldBytes: 4096));
 
@@ -649,7 +647,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
-                WithheldFiles: withheld, WalkOfferWithheldWholesale: true,
+                WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(WholesaleCount: 2)));
 
         await vm.Scan.ScanWithProgressAsync(null);

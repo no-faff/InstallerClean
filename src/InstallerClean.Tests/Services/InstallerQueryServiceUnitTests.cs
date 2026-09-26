@@ -63,17 +63,16 @@ public class InstallerQueryServiceUnitTests
     /// nothing.
     ///
     /// ONE HELPER RATHER THAN THE ASSERTIONS SPELLED OUT AT EACH SITE, because
-    /// two dozen tests below make this claim and what they are each ABOUT is
-    /// something else: what a degraded enumeration counts, which rows survive it,
-    /// which conditions add a product to the unaccounted total. Spelled out at
-    /// every site, one of them drifting would read as a deliberate exception.
+    /// the tests below that make this claim are each ABOUT something else: what a
+    /// degraded enumeration counts, which rows survive it, which conditions add a
+    /// product to the unaccounted total. Spelled out at every site, one of them
+    /// drifting would read as a deliberate exception.
     ///
-    /// The pairing is the point. <c>RemovableWithheld</c> being false is not the
-    /// old "nothing was withheld here" finding, which several of these tests were
-    /// written to make: it is that there was no verdict to withhold, and the two
-    /// look identical from a single assertion. What still distinguishes a degraded
-    /// run from a clean one is <c>UnaccountedProductCount</c>, which the tests
-    /// assert for themselves.
+    /// The pairing is the point. <c>RemovableWithheld</c> being false here says
+    /// there was no verdict to withhold, not that nothing was withheld, and the two
+    /// look identical from a single assertion. What distinguishes a degraded run
+    /// from a clean one is <c>UnaccountedProductCount</c>, which the tests assert
+    /// for themselves.
     /// </summary>
     private static void AssertKeptWithNoVerdict(RegisteredPackage row, int expectedState)
     {
@@ -92,8 +91,8 @@ public class InstallerQueryServiceUnitTests
     /// IT IS THE OPPOSITE CLAIM FROM <see cref="AssertKeptWithNoVerdict"/> AND THE
     /// PAIR IS DELIBERATE. There the row carries no verdict because none was
     /// reached; here a verdict was reached and taken away. A single assertion
-    /// cannot tell those apart, which is how two dozen tests came to make the
-    /// weaker claim while their fixtures were making the stronger one.
+    /// cannot tell those apart, so a test calls the helper naming the claim its
+    /// fixture makes.
     /// </summary>
     private static void AssertWithheldByADegradedEnumeration(RegisteredPackage row, int expectedState)
     {
@@ -107,11 +106,10 @@ public class InstallerQueryServiceUnitTests
     /// a product whose registered patch set was established and holds nothing that
     /// could be uninstalled and roll back onto its file.
     ///
-    /// THIS IS THE PATH PRODUCTION TAKES and almost nothing in this file was
-    /// exercising it. A fixture that supplies no per-product patch sets makes every
-    /// product read unestablished, so every superseded row is withheld and the whole
-    /// file was testing the degraded machine. Supplying them is what makes a test
-    /// about the ordinary one.
+    /// THIS IS THE PATH PRODUCTION TAKES ON AN ORDINARY MACHINE. A fixture that
+    /// supplies no per-product patch sets makes every product read unestablished, so
+    /// every superseded row is withheld and the test is about the degraded machine.
+    /// Supplying them is what makes a test about the ordinary one.
     /// </summary>
     private static void AssertOffered(RegisteredPackage row, int expectedState)
     {
@@ -679,7 +677,6 @@ public class InstallerQueryServiceUnitTests
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
         AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount); // the degraded product counts exactly once
-        Assert.True(result.RecordsIncomplete);
     }
 
     [Fact]
@@ -728,7 +725,6 @@ public class InstallerQueryServiceUnitTests
         var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
         AssertWithheldByADegradedEnumeration(row, expectedState: 2);
         Assert.Equal(1, result.UnaccountedProductCount);
-        Assert.True(result.RecordsIncomplete);
     }
 
     [Fact]
@@ -1397,7 +1393,6 @@ public class InstallerQueryServiceUnitTests
 
         AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
         Assert.Equal(0, result.UnaccountedProductCount);
-        Assert.False(result.RecordsIncomplete);
     }
 
     [Fact]
@@ -1474,9 +1469,9 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        // The scan is a withheld one, which is what makes the assertion after it
-        // mean anything.
-        Assert.True(result.RecordsIncomplete);
+        // A product whose LocalPackage will not read is unaccounted for, which
+        // withholds the removable class on this run.
+        Assert.True(result.UnaccountedProductCount > 0);
         Assert.Contains(result.Packages, r => r.LocalPackagePath == productPackage);
     }
 

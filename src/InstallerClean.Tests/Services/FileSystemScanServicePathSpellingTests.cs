@@ -32,59 +32,50 @@ public class FileSystemScanServicePathSpellingTests
     /// One registration naming a file directly in the walked folder, present on
     /// disk, added to every fixture here by <see cref="Scan"/>.
     ///
-    /// WITHOUT IT NONE OF THESE TESTS REACHES ITS OWN SUBJECT, and for five of them
-    /// that was true from the day they were written. The scan refuses outright when
-    /// the records hold rows, no row names a file in the folder it walked, and the
-    /// walk still produced candidates: two sides that describe different places
-    /// cannot be compared, so nothing is offered and nothing is claimed. Every test
-    /// below that registers a path OUTSIDE the folder (through a junction, or
-    /// somewhere else on the disk, or nowhere at all) builds exactly that shape, so
-    /// the scan threw before the mechanism under test could be read. The scan was
-    /// right and the fixtures were not.
+    /// WITHOUT IT NONE OF THESE TESTS REACHES ITS OWN SUBJECT. The scan refuses
+    /// outright when the records hold rows, no row names a file in the folder it
+    /// walked, and the walk still produced candidates: two sides that describe
+    /// different places cannot be compared, so nothing is offered and nothing is
+    /// claimed. Every test below that registers a path OUTSIDE the folder (through a
+    /// junction, or somewhere else on the disk, or nowhere at all) builds exactly that
+    /// shape, and the anchor is what lets the scan reach the mechanism under test
+    /// rather than refusing first.
     ///
-    /// AND IT CHANGES NOTHING ANY TEST HERE ASSERTS, which is the part to check
-    /// rather than assume, because a fixture added to satisfy a gate can quietly
-    /// alter the pass it was added to protect. It is claimed by the path comparison
-    /// in the walk loop, so it never enters the candidate list and the count of
-    /// candidates the gates are measured against is unmoved. The numeric correlation
-    /// gate needs a folder whose in-folder registrations are almost all missing, and
-    /// this one is present. The only quantity it moves is the number of
+    /// AND IT CHANGES NOTHING ANY TEST HERE IS ABOUT. It is claimed by the path
+    /// comparison in the walk loop, so it never enters the candidate list and the
+    /// count of candidates the gates are measured against is unmoved. The numeric
+    /// correlation gate needs a folder whose in-folder registrations are almost all
+    /// missing, and this one is present. The only quantity it moves is the number of
     /// registrations, and the identity attempts, which two tests read and name.
     ///
-    /// IT READS CLEANLY IN EVERY IDENTITY MAP AND IT USED NOT TO, which is a change
-    /// this file could not have survived. It was absent from every map, yielding no
-    /// identity, on the reasoning that a registration that cannot be identified
-    /// claims nothing extra. That is exactly the reasoning 3.0.0 refutes: an
-    /// unidentifiable registration now withholds the whole walk-derived offer, so
-    /// the old arrangement would have emptied the offer in every test here and each
-    /// of them would have failed for a reason that had nothing to do with its
-    /// subject. It claims its own file, which is already off the candidate list.
+    /// IT READS CLEANLY IN EVERY IDENTITY MAP. A registration nobody could identify
+    /// withholds the whole walk-derived offer, and a path missing from a map reads as
+    /// refused, so an anchor left out would empty the offer in every test here and
+    /// each would fail for a reason that has nothing to do with its subject. It
+    /// claims its own file, which is already off the candidate list.
     ///
-    /// It is what every real machine has and none of these fixtures had: a record
-    /// pointing at a file that is really there.
+    /// It is what a real machine has: a record pointing at a file that is really
+    /// there.
     /// </summary>
     private const string Anchor = @"C:\Windows\Installer\anchor.msi";
 
     // ---- The comparer, which is what actually carries real machines ----
 
     [Theory]
-    // The three spellings one machine's own records carry for one folder, counted
-    // 2026-08-11 across its 138 registrations: 121 upper, 15 mixed, 2 with a
-    // lower-case drive letter. Windows Installer records whatever spelling was in
-    // force when the product was installed and normalises nothing, so all three
-    // are ordinary and none of them is the spelling the folder walk produces.
+    // Spellings a machine's own records carry for one folder: upper case, mixed
+    // case and a lower-case drive letter. Windows Installer records whatever
+    // spelling was in force when the product was installed and normalises nothing,
+    // so all of them are ordinary. The second is the walk's own spelling, and the
+    // other three differ from it by case alone.
     [InlineData(@"C:\WINDOWS\Installer\9f05cba.msi")]
     [InlineData(@"C:\Windows\Installer\9f05cba.msi")]
     [InlineData(@"c:\Windows\Installer\9f05cba.msi")]
     [InlineData(@"C:\windows\installer\9F05CBA.MSI")]
     public async Task A_registration_spelled_in_another_case_still_claims_its_file(string registeredAs)
     {
-        // On the machine this was measured on, 123 of 138 registrations differ
-        // from the walk's spelling by case alone. An ordinal comparison would put
-        // every one of those files into the candidate set on a single scan, so
-        // this is not a nicety about tidy strings: it is the difference between
-        // the app claiming its registrations and the app handing the lot to the
-        // identity check to rescue.
+        // The path comparison ignores case, so a registration that differs from the
+        // walk's spelling by case alone claims its file there, and the file never
+        // reaches the identity check as a candidate.
         var result = await Scan(
             walkedFiles: new[] { Walked },
             registeredPaths: new[] { registeredAs });
@@ -147,7 +138,7 @@ public class FileSystemScanServicePathSpellingTests
         Assert.Single(result.RemovableFiles);
     }
 
-    // ---- What a read that did not answer costs, which is where this file was wrong ----
+    // ---- What a read that did not answer costs ----
 
     [Theory]
     [InlineData(FileIdentityRead.OpenRefused)]
@@ -157,17 +148,9 @@ public class FileSystemScanServicePathSpellingTests
     public async Task A_registration_this_scan_could_not_identify_takes_the_whole_offer_with_it(
         FileIdentityRead outcome)
     {
-        // THIS TEST USED TO ASSERT THE OPPOSITE AND ITS REASONING IS WORTH KEEPING,
-        // because it is the reasoning the whole fix had to refute. It read: no
-        // identity for the registration means nothing to compare against, so the
-        // candidate goes on exactly as it did before this mechanism existed, and the
-        // failure direction is the safety argument for having added it.
-        //
-        // That is true of the PASS, which only ever subtracts, and false about the
-        // MACHINE. The registration nobody could identify is one whose cached file
-        // may be sitting in this candidate list right now, unclaimed, and WHICH file
-        // cannot be established, so every candidate is one it could have meant. The
-        // old assertion was pinning a needed file onto the offer.
+        // THE WHOLE OFFER GOES WITH A REGISTRATION NOBODY COULD IDENTIFY. Its cached
+        // file may be sitting in this candidate list, unclaimed, and which file cannot
+        // be established, so every candidate is one it could have meant.
         var ids = Identities(
             [(Orphan, 3)],
             (@"C:\Elsewhere\registered.msi", outcome));
@@ -178,7 +161,7 @@ public class FileSystemScanServicePathSpellingTests
             fileIds: ids);
 
         Assert.Empty(result.RemovableFiles);
-        Assert.True(result.WalkOfferWithheldWholesale);
+        Assert.True(result.WithheldBy.WholesaleCount > 0);
         Assert.Equal(Orphan, Assert.Single(result.WithheldFiles!).FullPath);
         Assert.Equal(1, result.RegistrationIdentityReads.RefusedTotal);
     }
@@ -191,18 +174,13 @@ public class FileSystemScanServicePathSpellingTests
     public async Task A_candidate_this_scan_could_not_identify_is_kept_back_and_its_neighbours_are_not(
         FileIdentityRead outcome)
     {
-        // THE OTHER HALF OF THE SAME CORRECTION, and this one was never reported to
-        // anybody until the work was nearly finished. The old test said an
-        // unreadable answer must never be read as "not the same file, therefore
-        // offer it" any more than as "the same file, therefore keep it", and left it
-        // on the offer, which is the first of those two readings wearing the
-        // language of the second.
+        // AN UNREADABLE ANSWER IS READ AS NEITHER "NOT THE SAME FILE" NOR "THE SAME
+        // FILE". Nothing compared this candidate against the registrations, so it is
+        // kept back.
         //
-        // AND THE ACTION HERE IS DELIBERATELY NARROWER THAN THE REGISTRATION SIDE'S.
-        // Every other candidate was compared against the registrations by a read
-        // that answered, so only this one is unaccounted for. Emptying the offer
-        // would cost a machine everything for a fact about one of its files, and
-        // that is the accommodation running the wrong way.
+        // AND THE ACTION HERE IS NARROWER THAN THE REGISTRATION SIDE'S. Every other
+        // candidate was compared against the registrations by a read that answered,
+        // so only this one is unaccounted for, and only this one is kept back.
         var ids = Identities(
             [(@"C:\Elsewhere\registered.msi", 9), (Walked, 4)],
             (Orphan, outcome));
@@ -213,7 +191,7 @@ public class FileSystemScanServicePathSpellingTests
             fileIds: ids);
 
         Assert.Equal(Walked, Assert.Single(result.RemovableFiles).FullPath);
-        Assert.False(result.WalkOfferWithheldWholesale);
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
         Assert.Equal(Orphan, Assert.Single(result.WithheldFiles!).FullPath);
         Assert.Equal(1, result.CandidateIdentityReads.RefusedTotal);
         Assert.Equal(0, result.RegistrationIdentityReads.RefusedTotal);
@@ -248,7 +226,7 @@ public class FileSystemScanServicePathSpellingTests
             fileIds: ids);
 
         Assert.Equal(Orphan, Assert.Single(result.RemovableFiles).FullPath);
-        Assert.False(result.WalkOfferWithheldWholesale);
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
         Assert.Empty(result.WithheldFiles!);
         Assert.Equal(0, result.RegistrationIdentityReads.RefusedTotal);
         Assert.Equal(1, result.RegistrationIdentityReads.NamesNothingCount);
@@ -292,7 +270,7 @@ public class FileSystemScanServicePathSpellingTests
             fileIds: ids);
 
         Assert.Single(result.RemovableFiles);
-        Assert.False(result.WalkOfferWithheldWholesale);
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
         Assert.Empty(result.WithheldFiles!);
         // Two registrations: the one named above and the anchor every fixture here
         // carries. One candidate.
@@ -303,12 +281,10 @@ public class FileSystemScanServicePathSpellingTests
     }
 
     [Fact]
-    public async Task No_reader_at_all_leaves_the_scan_exactly_as_it_was()
+    public async Task No_reader_at_all_leaves_the_string_comparison_to_decide()
     {
-        // Every other test in the suite constructs the scan without one, so this
-        // pins what that means rather than leaving it to be assumed: the string
-        // comparison alone, and an offer identical to the one made before any of
-        // this existed.
+        // This pins what a scan built without one does: the string comparison
+        // alone decides which candidates are claimed.
         var result = await Scan(
             walkedFiles: new[] { Orphan },
             registeredPaths: new[] { @"C:\Elsewhere\other.msi" },
@@ -331,7 +307,7 @@ public class FileSystemScanServicePathSpellingTests
     /// same file. <paramref name="answers"/> are paths that do not, each stating
     /// which of the five failures it met, because a fixture that says only "no
     /// answer" cannot tell a file that has gone from one that would not open, and
-    /// the app now treats those as opposite things.
+    /// the app treats those as opposite things.
     ///
     /// A PATH NO FIXTURE LISTED IS A GIVE-UP AND THAT IS NOT ARBITRARY.
     /// <c>FileIdentityRead.Read</c> is the enum's zero value, which is right for the
@@ -392,7 +368,7 @@ public class FileSystemScanServicePathSpellingTests
         // it an ordinary registration rather than a token: walked, on the disk, and
         // in the records. See its own note for why it is here and why it moves
         // nothing. Added centrally so no fixture can omit it and go red at the gate
-        // instead of at its own subject, which is what happened to five of these.
+        // instead of at its own subject.
         var walked = walkedFiles.Append(Anchor).ToArray();
         var registered = registeredPaths.Append(Anchor).ToArray();
 

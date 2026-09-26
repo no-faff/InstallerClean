@@ -879,11 +879,6 @@ public sealed record MachineInfo(
 /// a fact about the machine rather than about any file:
 /// <c>ScanResult.WithheldBy.WholesaleCount</c>.
 ///
-/// IT SUBSUMES THE FLAG AND NO SEPARATE ONE IS SENT.
-/// <c>ScanResult.WalkOfferWithheldWholesale</c> is set as "the list this count came
-/// from was not empty", so this count above zero IS that flag rather than a second
-/// reading of it.
-///
 /// NO CAUSE TRAVELS WITH IT. Three named conditions reach that branch and any
 /// combination of them can be true at once, so nothing may say which one held a
 /// machine's offer back.

@@ -45,7 +45,7 @@ public class FileSystemScanServiceSecondInstanceTests
         var result = await Scan(new EnumerationCensus());
 
         Assert.Equal(Orphan, Assert.Single(result.RemovableFiles).FullPath);
-        Assert.False(result.WalkOfferWithheldWholesale);
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
         Assert.Empty(result.WithheldFiles!);
     }
 
@@ -57,23 +57,21 @@ public class FileSystemScanServiceSecondInstanceTests
         var result = await Scan(new EnumerationCensus(InstanceProductCount: 1));
 
         Assert.Empty(result.RemovableFiles);
-        Assert.True(result.WalkOfferWithheldWholesale);
+        Assert.True(result.WithheldBy.WholesaleCount > 0);
         Assert.Equal(Orphan, Assert.Single(result.WithheldFiles!).FullPath);
     }
 
     [Fact]
     public async Task A_product_that_would_not_answer_the_question_empties_it_on_the_same_terms()
     {
-        // ARM TWO, AND IT IS THE ARM THE VERSION REMOVED IN 3.0.0 GOT WRONG. That one
-        // read a positive only, so an enumeration that failed, was denied or stopped
-        // short left the withholding unfired: the rule was armed by the machines that
-        // answer and disarmed by the machines that do not. A question put and not
-        // answered leaves the machine, as far as this rule can tell, in exactly the
-        // state the positive reading describes.
+        // ARM TWO. An enumeration that failed, was denied or stopped short fires the
+        // withholding just as a positive reading does: a question put and not answered
+        // leaves the machine, as far as this rule can tell, in exactly the state the
+        // positive reading describes.
         var result = await Scan(new EnumerationCensus(InstanceTypeUnreadableCount: 1));
 
         Assert.Empty(result.RemovableFiles);
-        Assert.True(result.WalkOfferWithheldWholesale);
+        Assert.True(result.WithheldBy.WholesaleCount > 0);
         Assert.Equal(Orphan, Assert.Single(result.WithheldFiles!).FullPath);
     }
 
@@ -94,25 +92,21 @@ public class FileSystemScanServiceSecondInstanceTests
             supersededOffer: true);
 
         Assert.Equal(Superseded, Assert.Single(result.RemovableFiles).FullPath);
-        Assert.True(result.WalkOfferWithheldWholesale);
+        Assert.True(result.WithheldBy.WholesaleCount > 0);
     }
 
     [Fact]
     public async Task A_wholesale_withholding_that_caught_nothing_does_not_report_itself()
     {
-        // THE FLAG SAYS THE WITHHOLDING TOOK SOMETHING, NOT THAT THE BRANCH WAS TAKEN,
-        // and the window depends on that: the screen it drives announces a count of
-        // files held back from the offer, which at zero is both absurd and untrue. For
-        // this machine the all-clear is right, nothing in its folder having gone unclaimed.
-        //
-        // A host counting WithheldFiles would be deciding this off a list that more than
-        // one decision writes to, so the guard would change meaning the moment any of
-        // their memberships moved and nothing would fail. This branch is the only thing
-        // that knows what THIS withholding took.
+        // THE WHOLESALE COUNT SAYS WHAT THE WITHHOLDING TOOK, NOT THAT THE BRANCH WAS
+        // TAKEN. The gate fires here on a walk with nothing unclaimed, so the count is
+        // zero and the withheld list is empty. The window's finished screen counts that
+        // list, and at zero it gives the all-clear, which is right for this machine,
+        // nothing in its folder having gone unclaimed.
         var result = await Scan(new EnumerationCensus(InstanceProductCount: 1), walkOrphan: false);
 
         Assert.Empty(result.RemovableFiles);
-        Assert.False(result.WalkOfferWithheldWholesale);
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
         Assert.Empty(result.WithheldFiles!);
     }
 

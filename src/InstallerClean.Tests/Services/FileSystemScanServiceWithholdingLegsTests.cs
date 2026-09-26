@@ -15,20 +15,20 @@ namespace InstallerClean.Tests.Services;
 /// test over the pair can see it. That is a machine whose offer is withheld and whose
 /// breakdown has nothing to say about why: a heading with nothing under it.
 ///
-/// So this drives the real scan, one per member of the census, and asserts the flag
-/// the hosts read implies a leg to explain it. The members are read off the type, so a
-/// member added later is covered the day it lands rather than when somebody remembers.
+/// So this drives the real scan, one per member of the census, and asserts that a
+/// wholesale withholding that took a file has a leg to explain it. The members are read
+/// off the type, so a member added later is covered the day it lands rather than when
+/// somebody remembers.
 ///
 /// THE IMPLICATION RUNS ONE WAY AND ONLY ONE. A gate that fires on a machine whose
-/// walk turned up nothing to withhold sets no flag, because the flag is assigned from
-/// what the withholding actually took. So legs without the flag is an ordinary state
-/// and the flag without legs is the fault.
+/// walk turned up nothing to withhold counts nothing, because the wholesale count is
+/// what the withholding actually took. So legs with a count of zero is an ordinary
+/// state, and a count above zero with no leg is the fault.
 ///
 /// EVERY TEST HERE IS WITNESSED BY WINDOWS CI AND BY NOTHING ELSE. A scan walks a
 /// folder, and the walk goes through the real filesystem whatever is injected, so
-/// these cannot run on a Linux build. That is where the twenty in
-/// FileSystemScanServiceIntegrationTests live too, and the suite runs there on every
-/// push.
+/// these cannot run on a Linux build. FileSystemScanServiceIntegrationTests is in the
+/// same position, and the suite runs on Windows on every push.
 /// </summary>
 public class FileSystemScanServiceWithholdingLegsTests
 {
@@ -49,7 +49,7 @@ public class FileSystemScanServiceWithholdingLegsTests
     {
         var result = await Scan(CensusWithOnly(member));
 
-        if (!result.WalkOfferWithheldWholesale) return;
+        if (result.WithheldBy.WholesaleCount == 0) return;
 
         Assert.True(result.WithholdingLegsFired.Count > 0,
             $"the offer was withheld wholesale on a census whose only member is {member}, "
@@ -65,7 +65,7 @@ public class FileSystemScanServiceWithholdingLegsTests
         // visible as this test failing rather than as a clean sweep.
         var result = await Scan(default);
 
-        Assert.False(result.WalkOfferWithheldWholesale);
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
         Assert.Empty(result.WithholdingLegsFired);
         Assert.Single(result.RemovableFiles);
     }
@@ -78,7 +78,7 @@ public class FileSystemScanServiceWithholdingLegsTests
         // list a host would print.
         var result = await Scan(new EnumerationCensus(InstanceProductCount: 1));
 
-        Assert.True(result.WalkOfferWithheldWholesale);
+        Assert.True(result.WithheldBy.WholesaleCount > 0);
         Assert.Equal(
             new[] { WithholdingLeg.SecondInstanceNotRuledOut },
             result.WithholdingLegsFired);
@@ -94,9 +94,9 @@ public class FileSystemScanServiceWithholdingLegsTests
     }
 
     /// <summary>
-    /// One scan over a single unclaimed file. Unclaimed matters: the flag is assigned
-    /// from what the withholding took, so a fixture whose walk found nothing to withhold
-    /// would leave the flag false whatever the gate decided, and the assertion above
+    /// One scan over a single unclaimed file. Unclaimed matters: the wholesale count is
+    /// what the withholding took, so a fixture whose walk found nothing to withhold
+    /// would leave it at zero whatever the gate decided, and the theory's assertion
     /// would never be reached.
     /// </summary>
     private static Task<ScanResult> Scan(EnumerationCensus census)

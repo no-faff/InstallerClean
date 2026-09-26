@@ -69,7 +69,6 @@ public class WithholdingSplitTests
             registered: Array.Empty<string>(),
             census: new EnumerationCensus(InstanceProductCount: 1));
 
-        Assert.True(result.WalkOfferWithheldWholesale);
         Assert.Equal(2, result.WithheldBy.WholesaleCount);
         Assert.Equal(0, result.WithheldBy.DeclaredProductInstalledCount);
         Assert.Equal(0, result.WithheldBy.DeclaredProductUnestablishedCount);

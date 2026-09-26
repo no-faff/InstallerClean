@@ -47,15 +47,6 @@ public class ScanResultTests
         Assert.Equal(0, emptyList.WithheldTotalBytes);
     }
 
-    [Fact]
-    public void A_scan_defaults_to_not_having_withheld_its_offer_wholesale()
-    {
-        // FALSE IS THE HONEST DEFAULT and it is pinned because the fixtures that omit
-        // it are asserting things about ordinary machines. A default of true would
-        // put every one of them on the wrong completion screen.
-        Assert.False(new ScanResult([], [], 0).WalkOfferWithheldWholesale);
-    }
-
     // ---- Which account the withholding earns ----
     //
     // THE ASYMMETRY IS WHAT THESE ARE ABOUT AND IT IS NOT SYMMETRICAL BY ACCIDENT. The
@@ -84,7 +75,6 @@ public class ScanResultTests
         // put there by the branch that sentence describes.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
-            WalkOfferWithheldWholesale: true,
             WithheldBy: new WithholdingSplit(WholesaleCount: 2));
 
         Assert.Equal(WithholdingAccount.WholeWalkOffer, result.Withholding);
@@ -94,7 +84,8 @@ public class ScanResultTests
     public void A_withholding_with_no_wholesale_share_reads_as_per_file()
     {
         // The declared-product screen failing to settle two files, which is the machine
-        // the per-file reading exists for: the flag is false and the folder is not clean.
+        // the per-file reading exists for: the wholesale arm took nothing and the folder
+        // is not clean.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
             WithheldBy: new WithholdingSplit(DeclaredProductUnestablishedCount: 2));
@@ -459,12 +450,11 @@ public class ScanResultTests
     {
         // THE MIXED RUN, AND IT IS REACHABLE RATHER THAN HYPOTHETICAL: the identity
         // pass keeps files one at a time before the wholesale branch takes the rest, so
-        // the flag is true and the list holds files from both. The wholesale sentence
-        // is false of the half the identity pass took, and the per-file one is true of
-        // every file here, so the superordinate is what this machine gets.
+        // the list holds files from both. The wholesale sentence is false of the half
+        // the identity pass took, and the per-file one is true of every file here, so
+        // the superordinate is what this machine gets.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048), File("c.msi", 512)],
-            WalkOfferWithheldWholesale: true,
             WithheldBy: new WithholdingSplit(IdentityUnestablishedCount: 1, WholesaleCount: 2));
 
         Assert.Equal(WithholdingAccount.PerFile, result.Withholding);
@@ -476,38 +466,13 @@ public class ScanResultTests
         // A file on the list that no arm counted leaves the wholesale arm short of the
         // list's own length, so the reading falls to the sentence that is true of every
         // file rather than sweeping the uncounted one under a cause nobody established.
-        // Written as a fixture rather than as a comment because the direction it fails
-        // in is the whole reason the rule is "the wholesale arm accounts for all of
-        // them" and not "no per-file arm fired".
+        // No per-file arm fired either, so this fixture is where "the wholesale arm
+        // accounts for all of them" and "no per-file arm fired" give different readings.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
-            WalkOfferWithheldWholesale: true,
             WithheldBy: new WithholdingSplit(WholesaleCount: 1));
 
         Assert.Equal(WithholdingAccount.PerFile, result.Withholding);
-    }
-
-    [Fact]
-    public void The_wholesale_flag_on_its_own_does_not_decide_the_reading()
-    {
-        // THE MUST-MISS CONTROL FOR THE WHOLE RULE. Two results carrying the SAME flag
-        // read differently, and two carrying different flags read the same, so nothing
-        // here can be passing because the reading quietly follows the flag.
-        var flagTrueWholesale = new ScanResult([], [], 0,
-            WithheldFiles: [File("a.msi", 1024)],
-            WalkOfferWithheldWholesale: true,
-            WithheldBy: new WithholdingSplit(WholesaleCount: 1));
-        var flagTruePerFile = new ScanResult([], [], 0,
-            WithheldFiles: [File("a.msi", 1024)],
-            WalkOfferWithheldWholesale: true,
-            WithheldBy: new WithholdingSplit(IdentityUnestablishedCount: 1));
-        var flagFalsePerFile = new ScanResult([], [], 0,
-            WithheldFiles: [File("a.msi", 1024)],
-            WithheldBy: new WithholdingSplit(IdentityUnestablishedCount: 1));
-
-        Assert.Equal(WithholdingAccount.WholeWalkOffer, flagTrueWholesale.Withholding);
-        Assert.Equal(WithholdingAccount.PerFile, flagTruePerFile.Withholding);
-        Assert.Equal(WithholdingAccount.PerFile, flagFalsePerFile.Withholding);
     }
 
     // ---- What the window's finished screen counts ----

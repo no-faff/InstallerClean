@@ -180,10 +180,10 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     [Fact]
     public async Task The_scan_reports_WHICH_BRANCH_emptied_the_offer_and_not_merely_that_it_is_empty()
     {
-        // A HOST CANNOT RECOVER THIS FROM THE LISTS, which is why the flag exists. An
-        // empty offer means either that the folder held nothing to offer or that a
-        // rule about the records emptied it, and those are opposite things to tell
-        // somebody. The completion screen picks its heading off this.
+        // A HOST CANNOT RECOVER THIS FROM THE LISTS. An empty offer means either that
+        // the folder held nothing to offer or that a rule about the records emptied it,
+        // and those are opposite things to tell somebody. The split's wholesale count
+        // says which decision took the file.
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
 
         var query = Substitute.For<IInstallerQueryService>();
@@ -194,7 +194,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
 
         var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
 
-        Assert.True(result.WalkOfferWithheldWholesale);
+        Assert.True(result.WithheldBy.WholesaleCount > 0);
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.WithheldFiles!);
         Assert.Equal(1, result.WithheldTotalBytes);
@@ -203,9 +203,9 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     [Fact]
     public async Task A_scan_that_withheld_nothing_wholesale_says_so()
     {
-        // THE MUST-MISS CONTROL FOR THE FLAG, and without it a flag hard-wired to true
-        // would satisfy the test above. This is the ordinary machine: a census with
-        // nothing wrong on it, one candidate, and an offer.
+        // THE MUST-MISS CONTROL FOR THE TEST ABOVE, which a scan counting every
+        // candidate as withheld wholesale would also pass. This is the ordinary machine:
+        // a census with nothing wrong on it, one candidate, and an offer.
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
 
         var query = Substitute.For<IInstallerQueryService>();
@@ -216,7 +216,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
 
         var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
 
-        Assert.False(result.WalkOfferWithheldWholesale);
+        Assert.Equal(0, result.WithheldBy.WholesaleCount);
         Assert.Single(result.RemovableFiles);
     }
 

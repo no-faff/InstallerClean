@@ -242,10 +242,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var removable = new List<OrphanedFile>();
 
-        // Candidates the scan declined to offer, so the left-alone line and the offer
-        // between them still account for every file in the folder. Empty on every
-        // machine whose registrations all spell a path, which is every machine anybody
-        // has measured. See the decision below it for what fills it.
+        // Candidates the scan declined to offer, which the left-alone line counts with
+        // the registrations. The identity comparison, the wholesale withholding, the
+        // declared-product screen and the age check each add to it, and the tally below
+        // records which.
         var withheld = new List<OrphanedFile>();
 
         // Which decision put each of those there, kept apart because the report reads
@@ -326,13 +326,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // candidates for anything to have judged.
         var candidatesFromWalk = 0;
 
-        // Declared out here for the same reason again: it is decided inside the try
-        // and read by the result built after it. FALSE is the honest starting value
-        // in the same way zero is above, a scan that leaves before the branch is
-        // reached having withheld nothing wholesale.
-        var walkOfferWithheldWholesale = false;
-
-        // And these for the same reason once more. A default tally is zero attempts,
+        // And these for the same reason again. A default tally is zero attempts,
         // which reads as a comparison that never ran rather than as one that ran
         // clean, and a scan leaving before the identity pass is exactly that.
         var registrationIdentityReads = default(FileIdentityReadTally);
@@ -593,17 +587,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // withheld list and off this one, so nothing lands on it twice.
             withheld.AddRange(unclaimedByPath);
             withheldBy.Wholesale(unclaimedByPath.Count);
-
-            // THE FLAG RECORDS THAT THE WITHHOLDING CAUGHT SOMETHING, AND NOT MERELY
-            // THAT THIS BRANCH WAS TAKEN. A walk that produced no unclaimed candidates
-            // reaches here having held nothing back, nothing in its folder having gone
-            // unclaimed.
-            //
-            // IT IS DECIDED HERE BECAUSE THIS BRANCH KNOWS WHAT THIS WITHHOLDING TOOK.
-            // ScanResult.WithheldFiles is a list more than one decision contributes to,
-            // so a count of it answers a different question the moment any of their
-            // memberships changes, and nothing fails when it does.
-            walkOfferWithheldWholesale = unclaimedByPath.Count > 0;
         }
         else
         {
@@ -1015,16 +998,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // running count over the lot could only be described by a cause false of some
         // of its members.
         //
-        // WHAT THIS SCAN CAN ANSWER ABOUT ITSELF is in query.Census, which carries
-        // the enumeration's own failures per product. That is a fact about the
-        // records rather than about any file, and it is the shape a count of
-        // withholding has to have: a count of files kept back is only ever
-        // interesting alongside the reason, and the four reasons here have no honest
-        // superordinate to report them under.
+        // The enumeration's own failures are counted in query.Census, and the withheld
+        // list's causes in the split tally, one count per arm. The result carries both,
+        // and the command line and the opt-in report read them apart.
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes,
             missingAffected, missingUnaffected,
-            // WITHHELD IS A REAL FIGURE AGAIN AND WAS A LITERAL ZERO IN THE COMMITS
-            // BETWEEN. It counts what the withholding cost this run: superseded rows on
+            // WITHHELD COUNTS WHAT THE WITHHOLDING COST THIS RUN: superseded rows on
             // disk that the scan would have offered had it been able to establish that
             // nothing on any product sharing them could roll back onto the file.
             // Counted off the kept rows rather than tallied, on the same reasoning as
@@ -1045,23 +1024,16 @@ public sealed class FileSystemScanService : IFileSystemScanService
             supersededRegistrations,
             obsoletedRegistrations,
             withheld.AsReadOnly(),
-            // WHICH BRANCH WAS TAKEN, not what the offer ended up holding. A host
-            // cannot recover this from the lists: an empty offer means either that
-            // the folder held nothing to offer or that the scan could not establish
-            // enough to offer anything, and those are opposite things to tell
-            // somebody. Carried as a bool with no cause attached, because several
-            // conditions reach that branch and a sentence naming one would be false
-            // on the others.
-            walkOfferWithheldWholesale,
             // What the identity comparison was told, per side. The registration
-            // side's refusals are one of the conditions behind the bool above; the
-            // candidate side's are the files it kept back one at a time.
+            // side's refusals are one of the conditions that withhold the walk-derived
+            // offer wholesale; the candidate side's are the files it kept back one at
+            // a time.
             registrationIdentityReads,
             candidateIdentityReads,
-            // Which decision took each file on the list two lines above. Read here
-            // rather than derived, and held to that list's own length by a test:
-            // nine counts that no longer sum to it mean a tenth arm has been
-            // added and is reported by none of them.
+            // Which decision took each file on the withheld list. Read here rather
+            // than derived, and held to that list's own length by a test: nine
+            // counts that no longer sum to it mean a tenth arm has been added and
+            // is reported by none of them.
             withheldBy.Taken(),
             withheldBy.DeclaredProductInstalledBytes,
             withheldBy.UnderADayOldBytes,

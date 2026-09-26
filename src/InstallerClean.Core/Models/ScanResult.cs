@@ -105,14 +105,13 @@ namespace InstallerClean.Models;
 /// the ones to read before quoting this: it is not confined to records that
 /// failed to read, and it is an estimate rather than a headcount.
 ///
-/// IT BEARS ON BOTH HALVES OF THE SCAN AND THE SECOND IS THE ONE USUALLY FORGOTTEN.
-/// A non-zero value withholds every superseded-patch verdict, so the offer is shorter
-/// than the machine would normally give, which is the meaning it has always had. It
-/// also bears on the missing-files report: a product whose records did not fully read
-/// is a product whose registrations this scan may not have seen, so the count of
-/// records naming files that are not there can be short. "No missing files" and "no
-/// missing files that could be seen" are different claims and only the second is
-/// earned on such a run.
+/// IT BEARS ON BOTH HALVES OF THE SCAN. A non-zero value withholds every
+/// superseded-patch verdict, so the offer is shorter than the machine would otherwise
+/// give. It also bears on the missing-files report: a product whose records did not
+/// fully read is a product whose registrations this scan may not have seen, so the
+/// count of records naming files that are not there can be short. "No missing files"
+/// and "no missing files that could be seen" are different claims and only the second
+/// is earned on such a run.
 /// </param>
 /// <param name="WithheldCount">
 /// What withholding the removable class cost a run: superseded packages whose file
@@ -252,9 +251,10 @@ namespace InstallerClean.Models;
 /// that would be false of one of them:
 ///
 /// The scan could not establish which cached files belong to which programs, which
-/// withholds the whole walk-derived set at once (<see cref="WalkOfferWithheldWholesale"/>,
-/// and see it for the three findings that empty the offer wholesale); or this one
-/// candidate's own identity could not be read, so nothing could compare it against the
+/// withholds the whole walk-derived set at once
+/// (<see cref="WithholdingSplit.WholesaleCount"/>, and <see cref="WithholdingLeg"/> for
+/// the three findings that empty the offer wholesale); or this one candidate's own
+/// identity could not be read, so nothing could compare it against the
 /// registrations and it is kept back while the rest stand
 /// (<see cref="CandidateIdentityReads"/>); or the screen kept the candidate on what the
 /// file declares: an installation package whose own declared product Windows still holds
@@ -312,49 +312,12 @@ namespace InstallerClean.Models;
 /// non-zero, obsoleted patches not being offered at all, so it is how a machine's
 /// having any shows. Counting them puts nothing on anyone's list.
 /// </param>
-/// <param name="WalkOfferWithheldWholesale">
-/// True where this scan emptied its walk-derived offer in one go, rather than judging
-/// each candidate and keeping it, AND that emptying actually took a file off a list it
-/// would otherwise have made.
-///
-/// THE SECOND HALF OF THAT IS THE WHOLE OF WHAT THIS FLAG IS FOR, and it is answered
-/// where the withholding happens, that being the only place that knows what the
-/// withholding took. A host may not answer it instead by asking whether
-/// <see cref="WithheldFiles"/> is empty: more than one decision contributes to that
-/// list, so the moment any of their memberships changes, a gate built on it is
-/// asking a different question.
-///
-/// IT IS NOT "THE OFFER IS EMPTY" AND THE TWO MUST NOT BE CONFLATED, which is the
-/// whole reason this exists rather than the hosts asking
-/// <see cref="RemovableFiles"/> whether it is empty. An empty offer has more than one
-/// meaning: the folder can hold nothing this scan can offer, or the scan can have been
-/// unable to establish enough to offer anything, on a machine that may be full of files
-/// nobody has vouched for. A screen saying "nothing to clean up in your Installer
-/// folder" is shown for the first alone.
-///
-/// IT CAN BE TRUE WHILE THE OFFER IS NOT EMPTY. The rule covers the walk-derived half
-/// only; a superseded registration that survived every withholding is offered beside
-/// it, so a host reading this must still ask what the offer holds.
-///
-/// IT CANNOT BE TRUE WITH <see cref="WithheldFiles"/> EMPTY, and that holds by
-/// construction rather than by coincidence. A machine that took the branch and had
-/// nothing to withhold reads false here, nothing in its folder having gone unclaimed.
-/// The reverse does not hold, and no host may assume it: the other decisions put files
-/// in that list on runs where this is false.
-///
-/// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Several conditions can empty an
-/// offer wholesale and they are different facts about a machine, so a bool is the
-/// whole of what may be carried: any sentence naming one cause would be false on the
-/// others, and two named causes is the same fault with more words. The only thing true
-/// of every member is that something this scan asked about did not answer. The census
-/// is where the causes are counted apart.
-/// </param>
 /// <param name="RegistrationIdentityReads">
 /// What the file-identity reader answered when the scan asked which file each
 /// registration's recorded path names. See
 /// <see cref="FileIdentityReadTally"/>; <see cref="FileIdentityReadTally.RefusedTotal"/>
-/// above zero is one of the conditions behind
-/// <see cref="WalkOfferWithheldWholesale"/>.
+/// above zero is <see cref="WithholdingLeg.FileIdentityUnestablished"/>, one of the
+/// conditions that withhold the walk-derived offer wholesale.
 /// </param>
 /// <param name="CandidateIdentityReads">
 /// The same for the other side of that comparison, one read per candidate the
@@ -412,7 +375,6 @@ public record ScanResult(
     int SupersededRegistrationCount = 0,
     int ObsoletedRegistrationCount = 0,
     IReadOnlyList<OrphanedFile>? WithheldFiles = null,
-    bool WalkOfferWithheldWholesale = false,
     FileIdentityReadTally RegistrationIdentityReads = default,
     FileIdentityReadTally CandidateIdentityReads = default,
     WithholdingSplit WithheldBy = default,
@@ -483,10 +445,10 @@ public record ScanResult(
     /// IT IS A SECOND CALLER OF THE GATE'S OWN EXPRESSION AND NOT A SECOND DERIVATION.
     /// The scan computes the gate from these same two values before it builds this
     /// result, so what a host reads here cannot disagree with what the scan acted on.
-    /// The list is empty on any scan whose offer stood, and
-    /// <see cref="WalkOfferWithheldWholesale"/> stays the thing to test for that: the
-    /// gate fires on a machine whose walk found nothing to withhold, and the flag
-    /// answers whether the withholding actually took anything.
+    /// The list is empty on any scan whose offer stood. It does not say whether the
+    /// withholding took anything, because the gate also fires on a machine whose walk
+    /// found nothing to withhold; <see cref="WithholdingSplit.WholesaleCount"/> counts
+    /// what it took.
     /// </summary>
     public IReadOnlyList<WithholdingLeg> WithholdingLegsFired =>
         WithholdingLegs.Fired(Census, RegistrationIdentityReads);
@@ -502,10 +464,10 @@ public record ScanResult(
     /// which of the two sentences the machine has earned. It says nothing for
     /// <see cref="WithholdingAccount.Nothing"/> and
     /// <see cref="WithholdingAccount.KeptWithoutNotice"/> alike. Asking
-    /// whether <see cref="WithheldFiles"/> is empty answers neither question, and
-    /// <see cref="WalkOfferWithheldWholesale"/> cannot answer it either: that flag is
-    /// true of a run whose wholesale branch fired after the identity pass had already
-    /// kept files back one at a time.
+    /// whether <see cref="WithheldFiles"/> is empty answers neither question, and nor
+    /// does asking whether <see cref="WithholdingSplit.WholesaleCount"/> is above zero:
+    /// it is, on a run whose wholesale branch took files after the identity pass had
+    /// already kept some back one at a time.
     ///
     /// THE WHOLESALE SENTENCE NEEDS POSITIVE EVIDENCE AND THE PER-FILE ONE DOES NOT.
     /// That asymmetry is the whole of why this is written as "the wholesale arm
