@@ -70,10 +70,9 @@ public class CountedStringTests
         "Plural.Error", "Plural.File", "Plural.Package", "Plural.Patch", "Plural.Product",
         "Summary.MissingFromDisk", "Summary.MissingFromDisk.OtherPrograms",
         "Summary.MissingFromDisk.Unnamed",
-        "Summary.NothingListed", "Summary.NothingListedPerFile",
         "Summary.OrphanedToCleanUp", "Summary.RegisteredStillUsed",
         "Summary.RegisteredWindow", "Summary.RegisteredWindow.Missing",
-        "Cli.SupersededHeldBack", "Summary.SupersededHeldBack",
+        "Cli.SupersededHeldBack",
     };
 
     /// <summary>
@@ -92,10 +91,9 @@ public class CountedStringTests
         "Completion.PermanentDeleteSummary",
         "Confirm.DeletePermanently", "Confirm.MoveDestination", "Error.FileInUse",
         "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
-        "Summary.NothingListed", "Summary.NothingListedPerFile",
         "Summary.RegisteredStillUsed", "Summary.RegisteredWindow",
         "Summary.RegisteredWindow.Missing",
-        "Cli.SupersededHeldBack", "Summary.SupersededHeldBack",
+        "Cli.SupersededHeldBack",
     };
 
     private static readonly string[] CategorySuffixes = { ".One", ".Few", ".Many" };
@@ -348,14 +346,14 @@ public class CountedStringTests
         // such an override does not exist to be asserted on.
         //
         // SO THE BAND HAS A LIVE CONSUMER, AND THE PIN STILL BELONGS ON THE SELECTOR.
-        // Summary.SupersededHeldBack and Cli.SupersededHeldBack carry a .Few in these
-        // three languages, their counted noun sitting inside the sentence where the
-        // numeral governs it, so collapsing everything that is not One into Other would
-        // put the five-and-up form on a count of three. Pinning one of those renderings
-        // instead would hold only while that language kept that value and would say
-        // nothing about the arm itself. The prefix used below has no override of its
-        // own, which is what makes the null assertion mean something: the band is
-        // checked directly, with no translated value standing in for it.
+        // Cli.SupersededHeldBack carries a .Few in these three languages, its counted
+        // noun sitting inside the sentence where the numeral governs it, so collapsing
+        // everything that is not One into Other would put the five-and-up form on a
+        // count of three. Pinning one of those renderings instead would hold only while
+        // that language kept that value and would say nothing about the arm itself. The
+        // prefix used below has no override of its own, which is what makes the null
+        // assertion mean something: the band is checked directly, with no translated
+        // value standing in for it.
         //
         // Plural.File.Few is NOT what this guards. That prefix is Grammatical, so it
         // goes through CategoryFor and never through CardinalCategoryFor, and it would

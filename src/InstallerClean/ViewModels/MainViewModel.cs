@@ -14,8 +14,8 @@ namespace InstallerClean.ViewModels;
 /// public properties for XAML binding, and wires the inter-VM signals
 /// that coordinate them:
 ///
-///   - A scan completing with no orphans pushes the "all clear"
-///     completion overlay.
+///   - A scan completing with no orphans pushes the completion overlay:
+///     the all-clear, or the screen saying what the scan held back.
 ///   - The "Scan again" command on the completion overlay invokes
 ///     the Scan VM's Scan command via the rescan delegate.
 ///
@@ -89,10 +89,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             updateCheckService, dialogService, Scan,
             isBusy: () => IsBusy);
 
-        // Surface the all-clear overlay when a scan finishes with no
+        // Surface the completion overlay when a scan finishes with no
         // orphans. Cleanup sets IsOperating=false after the post-
         // operation refresh fires ScanCompleted; that ordering keeps
-        // an all-clear from overpainting a Move/Delete summary.
+        // it from overpainting a Move/Delete summary.
         _scanCompletedHandler = OnScanCompleted;
         Scan.ScanCompleted += _scanCompletedHandler;
 
@@ -168,7 +168,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// scan leaves <see cref="ScanViewModel.HasScanned"/> false too but must say
     /// what went wrong rather than "nothing scanned yet". A completed scan gets
     /// the same lead at any count, zero included: "Any unneeded files below" is
-    /// written to read correctly over an empty list, and the all-clear overlay
+    /// written to read correctly over an empty list, and the completion overlay
     /// has already announced the result in its own words by the time this
     /// window is read.
     /// </summary>
@@ -312,12 +312,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 return;
 
             // TWO SCREENS, and which one is shown turns on a fact the lists cannot
-            // carry. An empty offer means EITHER that the scan held nothing back that
-            // it reports, which gets the all-clear, OR that it held files back and
-            // reports them, whether a rule about the machine's records emptied the
-            // walk-derived offer in one go or the files were judged one at a time.
-            // Telling the second machine there is nothing to clean up in its Installer
-            // folder is a claim about that disk the scan never made.
+            // carry. An empty offer means EITHER that the scan held nothing back, or
+            // held back only files the declared-product-installed and
+            // declared-patch-registered arms kept, which gets the all-clear, OR that it
+            // held back any other file, a superseded patch included, which gets the
+            // screen saying so. Telling the second machine there is nothing to clean up
+            // in its Installer folder is a claim about that disk the scan never made.
             //
             // THE READING IS THE SCAN'S AND THIS HOST DOES NOT PARTITION ANYTHING TO
             // GET IT, which is the constraint on anything that replaces these lines.
@@ -328,17 +328,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // the withholding happens, and the host spends the answer rather than
             // deriving it.
             //
-            // A RUN THAT HELD NOTHING BACK IS THE ALL-CLEAR'S, and so is a run whose
-            // every held file was kept for a program Windows still has installed, for
-            // being under a day old or for its patch's registrations: the three arms
-            // WithholdingAccount.KeptWithoutNotice names. HasWithholdingToReport is
-            // false for both.
-            //
-            // THE SCREEN COUNTS ONLY UnestablishedWithheldCount, so a run that held
-            // some files for an installed program, for being under a day old or for
-            // their patch's registrations, and some for anything else, speaks of the
-            // second kind alone. A file whose age could not be established is of the
-            // second kind.
+            // THE SCREEN COUNTS ScanResult.UnsettledHeldBackCount: every file held back
+            // except those kept for a program Windows still has installed or for their
+            // patch's registrations, together with the superseded patches the scan held
+            // back. A file under a day old and a file whose age could not be established
+            // are in it. HasUnsettledHeldBack is that count above zero, and the
+            // all-clear is the machine's where it is not.
 
             // THE RECEIPT SPENDS THE COUNT THE MAIN WINDOW IS ALREADY SHOWING rather
             // than recounting the scan result here, so the overlay and the line behind
@@ -356,12 +351,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // offer it, so a receipt leaving it out would understate what was
             // examined, which is the whole of what the receipt is for: an elapsed time
             // on its own reads as though nothing had happened.
-            if (result.HasWithholdingToReport)
+            if (result.HasUnsettledHeldBack)
             {
                 Completion.ShowNothingOffered(
-                    result.Withholding,
-                    result.UnestablishedWithheldCount,
-                    result.UnestablishedWithheldBytes,
+                    result.UnsettledHeldBackIsWholesale,
+                    result.UnsettledHeldBackCount,
+                    result.UnsettledHeldBackBytes,
                     Scan.RegisteredFileCount,
                     Scan.LastScanDurationMs);
             }

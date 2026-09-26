@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 다른 프로그램 {0}개 |
 | {0} file with no program named in the records | 기록에 프로그램 이름이 없는 파일 {0}개 |
 | {0} files with no program named in the records | 기록에 프로그램 이름이 없는 파일 {0}개 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, 파일 하나를 제시하지 않고 보류했습니다. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean이 캐시에 있는 어떤 파일이 여기 설치된 프로그램에 속하는지 확실히 알 수 없어서, {1} {0}개를 제시하지 않고 보류했습니다. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean이 찾은 캐시 파일 중 하나에 대해 확신할 수 없어서, 그 파일을 제시하지 않고 보류했습니다. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean이 찾은 캐시 파일 중 일부에 대해 확신할 수 없어서, {1} {0}개를 제시하지 않고 보류했습니다. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean이 대체된 그 파일 하나가 더 이상 필요하지 않다고 확실히 알 수 없어서, 그 파일을 보류했습니다. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean이 대체된 파일 {0}개가 더 이상 필요하지 않다고 확실히 알 수 없어서, 그 파일들을 보류했습니다. |
 | {0} of {1} {2} | {2} {1}개 중 {0}개 |
 | {0} unneeded {1} ({2}) | 불필요한 {1} {0}개 ({2}) |
 | {0} file left alone ({1}) | 파일 {0}개 그대로 둠 ({1}) |

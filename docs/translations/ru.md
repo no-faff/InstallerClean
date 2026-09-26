@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | ещё {0} программ |
 | {0} file with no program named in the records | {0} файл, для которого в записях не названа программа |
 | {0} files with no program named in the records | {0} файлов, для которых в записях не названа программа |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean не смог с уверенностью определить, какие файлы в кэше принадлежат установленным здесь программам, поэтому удержал единственный файл, вместо того чтобы предложить его. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean не смог с уверенностью определить, какие файлы в кэше принадлежат установленным здесь программам, поэтому удержал {0} {1}, вместо того чтобы предложить их. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean не был уверен насчёт одного из найденных им файлов в кэше, поэтому удержал его, вместо того чтобы предложить. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean не был уверен насчёт некоторых из найденных им файлов в кэше, поэтому удержал {0} {1}, вместо того чтобы предложить их. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean не смог с уверенностью определить, что единственный замещённый файл больше не нужен, поэтому удержал его. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean не смог с уверенностью определить, что {0} замещённых файлов больше не нужны, поэтому удержал их. |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} для очистки ({2}) |
 | {0} file left alone ({1}) | {0} файл оставлен без изменений ({1}) |

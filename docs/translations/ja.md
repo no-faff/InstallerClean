@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | 他に {0} 個のプログラム |
 | {0} file with no program named in the records | 登録情報にプログラム名がない {0} 個のファイル |
 | {0} files with no program named in the records | 登録情報にプログラム名がない {0} 個のファイル |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、1 個のファイルを提示せずに保留しました。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean は、キャッシュ内のどのファイルがここにインストールされたプログラムのものかを確実には判断できなかったため、{0} 個の{1}を提示せずに保留しました。 |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean は、見つけたキャッシュ内のファイルの 1 つについて確信が持てなかったため、そのファイルを提示せずに保留しました。 |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean は、見つけたキャッシュ内のファイルの一部について確信が持てなかったため、{0} 個の{1}を提示せずに保留しました。 |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean は唯一の置換済みファイルがもう不要だと確実には判断できなかったため、そのファイルを保留しました。 |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean は {0} 個の置換済みファイルがもう不要だと確実には判断できなかったため、それらのファイルを保留しました。 |
 | {0} of {1} {2} | {2} {1} 個中 {0} 個 |
 | {0} unneeded {1} ({2}) | {0} 個の不要な {1} ({2}) |
 | {0} file left alone ({1}) | {0} 個のファイルをそのままにしました ({1}) |

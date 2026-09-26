@@ -254,7 +254,7 @@ internal static class DisplayHelpers
 
         // Oneness asserted in words. "This file will be deleted permanently" names no
         // number and agrees with nothing; it is simply false of twenty-one files and
-        // false of none. Three of these carry a numeral in their PLURAL and none in
+        // false of none. Several of these carry a numeral in their PLURAL and none in
         // their singular, which is why the classification reads the one-form alone.
         "Cli.NothingListed" or "Cli.NothingListedPerFile"
             or "Cli.NothingOffered" or "Cli.NothingOfferedPerFile"
@@ -262,8 +262,7 @@ internal static class DisplayHelpers
             or "Confirm.DeletePermanently" or "Confirm.MoveDestination"
             or "Error.AccessDenied" or "Error.FileInUse" or "Error.IOFailure"
             or "Error.UnknownError"
-            or "Summary.NothingListed" or "Summary.NothingListedPerFile"
-            or "Cli.SupersededHeldBack" or "Summary.SupersededHeldBack"
+            or "Cli.SupersededHeldBack"
             => CountQuestion.Cardinality,
 
         _ => throw new ArgumentOutOfRangeException(nameof(keyPrefix), keyPrefix,
@@ -278,19 +277,19 @@ internal static class DisplayHelpers
     /// One at exactly one, in every language, and at no other count anywhere.
     ///
     /// FEW AND MANY ARE LEFT WHERE CLDR PUT THEM, WHICH IS THE PART THAT IS NOT
-    /// OBVIOUS AND MUST NOT BE TIDIED AWAY. Three of these strings carry a numeral in
+    /// OBVIOUS AND MUST NOT BE TIDIED AWAY. Several of these strings carry a numeral in
     /// their PLURAL and none in their singular, so their plural side is still a numeral
     /// governing a noun and still wants its paucal band.
     ///
-    /// CARDINALITY KEYS SHIP PAUCAL OVERRIDES, SO THE BAND IS LOAD-BEARING RATHER
-    /// THAN THEORETICAL. Summary.SupersededHeldBack and Cli.SupersededHeldBack carry
-    /// a .Few in Polish, Russian and Ukrainian: their counted noun sits inside the
-    /// sentence, so the numeral governs it directly. Where a key's noun arrives
-    /// through a slot Plural.File fills, the noun agrees there instead and an override
-    /// on the outer key would be character-identical to its own .Plural, which is why
-    /// Completion.NothingOfferedBody carries none. Collapsing everything that is not
-    /// One into Other would put the five-and-up form on a count of three wherever the
-    /// first case applies, and the band is pinned on the selector besides, by
+    /// A CARDINALITY KEY SHIPS PAUCAL OVERRIDES, SO THE BAND IS LOAD-BEARING RATHER
+    /// THAN THEORETICAL. Cli.SupersededHeldBack carries a .Few in Polish, Russian and
+    /// Ukrainian: its counted noun sits inside the sentence, so the numeral governs it
+    /// directly. Where a key's noun arrives through a slot Plural.File fills, the noun
+    /// agrees there instead and an override on the outer key would be
+    /// character-identical to its own .Plural, which is why Completion.NothingOfferedBody
+    /// carries none. Collapsing everything that is not One into Other would put the
+    /// five-and-up form on a count of three wherever the first case applies, and the band
+    /// is pinned on the selector besides, by
     /// CountedStringTests.The_cardinality_selector_keeps_its_paucal_band.
     ///
     /// A CLDR One that is not exactly one becomes Other rather than Many. Nothing

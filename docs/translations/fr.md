@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} autres programmes |
 | {0} file with no program named in the records | {0} fichier sans programme nommé dans les enregistrements |
 | {0} files with no program named in the records | {0} fichiers sans programme nommé dans les enregistrements |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu le seul fichier au lieu de le proposer. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu {0} {1} au lieu de les proposer. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean n'a pas eu de certitude au sujet de l'un des fichiers en cache qu'il a trouvés, il l'a donc retenu au lieu de le proposer. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean n'a pas eu de certitude au sujet de certains des fichiers en cache qu'il a trouvés, il a donc retenu {0} {1} au lieu de les proposer. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean n'a pas pu déterminer avec certitude que le seul fichier remplacé n'est plus nécessaire, il l'a donc retenu. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean n'a pas pu déterminer avec certitude que {0} fichiers remplacés ne sont plus nécessaires, il les a donc retenus. |
 | {0} of {1} {2} | {0} sur {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} à nettoyer ({2}) |
 | {0} file left alone ({1}) | {0} fichier laissé de côté ({1}) |

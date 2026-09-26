@@ -130,14 +130,13 @@ public partial class ScanViewModel : ObservableObject
     /// it is the count the line prints as well as the condition that fires it, so the two
     /// cannot disagree.
     ///
-    /// IT IS A HALF, AND WHICH HALF HAS MOVED TWICE. It was once the registrations
-    /// carrying no superseded or obsoleted state, on the reading that such a file having
-    /// gone was its expected end state; that reading is false, Windows opening every
-    /// registered patch's cached file whichever state it carries. It was then every
-    /// missing registration, which alarms past users of this app about files the app
-    /// itself removed. It is now neither axis but the conjunction: benign means the state
-    /// is superseded or obsoleted AND every product sharing the patch was shown to hold
-    /// no patch that could be uninstalled and roll back onto the file.
+    /// IT IS A HALF, AND THE AXIS IS A CONJUNCTION. A missing registration is left out
+    /// only where its patch state is superseded or obsoleted AND every product sharing the
+    /// patch was shown to hold no patch that could be uninstalled and roll back onto the
+    /// file. The state alone does not make an absence harmless, Windows opening every
+    /// registered patch's cached file whichever state it carries. Counting every missing
+    /// registration would warn about files this app removed after establishing exactly
+    /// that condition.
     ///
     /// <see cref="MissingFilesReport.Affected"/> is that expression, named once, and the
     /// programs this line names come off the same predicate. The full total still travels
@@ -150,37 +149,6 @@ public partial class ScanViewModel : ObservableObject
     private int _missingFromDiskCount;
 
     /// <summary>
-    /// How many files this scan held back on a run that still offered something, or
-    /// zero where it offered nothing. Both the flag and the line below are read off
-    /// it, so a machine cannot show the sentence and no number or the reverse.
-    ///
-    /// IT COUNTS EVERY WITHHOLDING AND NOT ONE DECISION'S SHARE. Several decisions keep
-    /// files back and a run can meet more than one of them, so a count of any one alone
-    /// would leave the sentence short of the list the Details window shows.
-    /// <see cref="NothingListedIsPerFile"/> is what says which sentence the number
-    /// goes in, and this is the number.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasNothingListed))]
-    [NotifyPropertyChangedFor(nameof(NothingListedText))]
-    private int _nothingListedCount;
-
-    /// <summary>
-    /// Which of the two sentences the count above goes in, read off the scan rather
-    /// than worked out here.
-    ///
-    /// A SECOND INPUT TO THE LINE, AND IT NOTIFIES THE LINE ITSELF, which is the whole
-    /// of what makes a second one safe. The gate beside it stays a predicate over ONE
-    /// property for the reason its own note gives; this feeds only the text, and the
-    /// text is recomputed from whichever of the two is set last because both say so.
-    /// A second input that did not notify would leave the line rendered once, in
-    /// whichever wording happened to be current, and never asked again.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NothingListedText))]
-    private bool _nothingListedIsPerFile;
-
-    /// <summary>
     /// The programs those files belong to, as the one phrase the line names them
     /// in, already capped and joined by <see cref="MissingFilesReport"/> so the
     /// window and the command line say the same thing. Empty when there are none.
@@ -188,34 +156,6 @@ public partial class ScanViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MissingFromDiskSummaryText))]
     private string _missingFromDiskPrograms = string.Empty;
-
-    /// <summary>
-    /// How many superseded files this scan held back, straight from
-    /// <see cref="ScanResult.WithheldCount"/>: rows the records call superseded
-    /// whose file is on the disk and which the scan would have offered, had it
-    /// been able to say that nothing still needed them. Both the flag and the line
-    /// below are read off it, so a machine cannot show the sentence and no number
-    /// or the reverse.
-    ///
-    /// THE COUNT THE SENTENCE PRINTS IS THE ONLY THING THAT MAY GATE THE SENTENCE.
-    /// Anything else is a condition that TENDS to produce a withholding rather than
-    /// a count of files. The count of products the scan could not account for is the
-    /// trigger for one of the six routes into this, and it is non-zero on machines
-    /// carrying no superseded file at all; a line gated on it would tell such a
-    /// machine something had been kept back when nothing had.
-    ///
-    /// IT IS NOT THE PARTITION MEMBER and must not be pointed at it.
-    /// <see cref="ScanResult.RegisteredWithheldCount"/> counts the same rows
-    /// whether or not their file is still there, because it is a member of a
-    /// partition of the kept list and a member that dropped one would leave a hole
-    /// in it; this one is what the withholding COST, and a row whose file has
-    /// already gone cost nothing. It is the on-disk term that makes this read zero
-    /// on a machine that is simply tidy.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasSupersededHeldBack))]
-    [NotifyPropertyChangedFor(nameof(SupersededHeldBackText))]
-    private int _supersededHeldBackCount;
 
     /// <summary>
     /// Cached result of the most recent successful scan. Null until
@@ -294,93 +234,6 @@ public partial class ScanViewModel : ObservableObject
                 Strings.Summary_MissingFromDisk_Plural,
                 "Summary.MissingFromDisk"),
             DisplayHelpers.FormatCount(MissingFromDiskCount), MissingFromDiskPrograms);
-
-    /// <summary>
-    /// True where this scan held back a superseded file it might otherwise have
-    /// offered. Informational, unlike <see cref="HasMissingFromDisk"/>: nothing is
-    /// wrong with the machine and there is nothing for the user to do. It is shown
-    /// because withholding is this app working and saying nothing about it is not,
-    /// and because the offer above is the only thing the reader can see.
-    ///
-    /// GATED ON THE COUNT IT PRINTS, exactly as <see cref="HasNothingListed"/> is,
-    /// and the two are the same sentence about two populations. THE MACHINE-WIDE
-    /// REFUSAL IS THE ROUTE THAT MATTERS MOST TO THIS LINE, and it is one of six
-    /// routes into the count rather than the count itself: it is the only one of the
-    /// six that reaches the whole population at once, taking the removable verdict
-    /// off every superseded row, so it is what makes this sentence report a large
-    /// number rather than a handful. Its own account is on
-    /// <see cref="InstallerQueryResult.UnaccountedProductCount"/> and on
-    /// <c>CliEventClass.ScanRecordsIncompleteNotice</c>.
-    ///
-    /// NO SECOND TERM, AND THAT IS A DECISION RATHER THAN AN OMISSION. The line
-    /// above folds "something was offered" into its own count, because where
-    /// nothing is offered the completion screen carries that sentence in its own
-    /// words. There is no such copy for this population: a machine whose walk was
-    /// fine and whose every superseded row was withheld reaches ShowAllClear, which
-    /// says the folder is clean. Fold the same term in here and that machine is
-    /// told nothing, anywhere, once the overlay is dismissed.
-    /// </summary>
-    public bool HasSupersededHeldBack => SupersededHeldBackCount > 0;
-
-    /// <summary>
-    /// The sentence, and it is the pair of <see cref="NothingListedText"/> rather
-    /// than a different kind of line: one rule reaching two populations, which is
-    /// why both open the same way. It names no cause, six separate findings
-    /// reaching this count and no sentence naming one of them being true of the
-    /// files the other five contribute.
-    /// </summary>
-    public string SupersededHeldBackText =>
-        string.Format(
-            DisplayHelpers.Pluralise(SupersededHeldBackCount,
-                Strings.Summary_SupersededHeldBack_Singular,
-                Strings.Summary_SupersededHeldBack_Plural,
-                "Summary.SupersededHeldBack"),
-            DisplayHelpers.FormatCount(SupersededHeldBackCount));
-
-    /// <summary>
-    /// True where this scan emptied its walk-derived offer in one go and something
-    /// IS still on the list, which is the only machine that reads this sentence.
-    ///
-    /// WHY THE COUNT GATES IT AS WELL AS CARRYING THE NUMBER. A run that took that
-    /// branch and found no unclaimed candidates held nothing back, and a line saying
-    /// it held back none of them would be absurd on a machine that is simply tidy.
-    /// The scan already answers that question, so this reads its answer rather than
-    /// asking a second time.
-    ///
-    /// AND THE OTHER MACHINE THIS DOES NOT COVER IS COVERED ELSEWHERE. Where nothing
-    /// at all is offered the user never reaches this window's list: the completion
-    /// screen replaces the surface and says the same thing in its own words.
-    ///
-    /// ONE SOURCE, WHICH IS WHY THE OFFER'S OWN STATE IS FOLDED INTO THE COUNT RATHER
-    /// THAN READ HERE. A predicate over two observable properties has to be notified
-    /// from both, and this one is set before the flag that would notify it: it would
-    /// have been computed once, while the offer still read empty, and never asked
-    /// again. The line would then never appear on the one machine it is for.
-    /// </summary>
-    public bool HasNothingListed => NothingListedCount > 0;
-
-    /// <summary>
-    /// The sentence, and it exists because the explanation above the list states two
-    /// criteria for listing a file and on this machine the first one did not run.
-    /// Files no program claims are in that folder and were held back rather than
-    /// listed, so a reader taking that explanation as the rule behind the list would
-    /// conclude there were none. It names no cause, several findings reaching the
-    /// same branch.
-    /// </summary>
-    public string NothingListedText =>
-        string.Format(
-            DisplayHelpers.Pluralise(NothingListedCount,
-                NothingListedIsPerFile
-                    ? Strings.Summary_NothingListedPerFile_Singular
-                    : Strings.Summary_NothingListed_Singular,
-                NothingListedIsPerFile
-                    ? Strings.Summary_NothingListedPerFile_Plural
-                    : Strings.Summary_NothingListed_Plural,
-                NothingListedIsPerFile
-                    ? "Summary.NothingListedPerFile"
-                    : "Summary.NothingListed"),
-            DisplayHelpers.FormatCount(NothingListedCount),
-            DisplayHelpers.PluraliseFile(NothingListedCount));
 
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));
@@ -462,55 +315,12 @@ public partial class ScanViewModel : ObservableObject
             RegisteredSizeDisplay = registeredSize;
             OrphanedFileCount = orphanedCount;
             OrphanedSizeDisplay = orphanedSize;
-            // WHICH SENTENCE FIRST, THEN THE NUMBER THAT GOES IN IT. Both notify the
-            // line, so the order does not decide what a reader ends up seeing; it is
-            // this way round because the count is the gate as well, and a reader
-            // meeting the line the instant it appears meets it in its settled wording.
-            //
-            // Off the scan's own reading rather than off the withheld list's length:
-            // that list is filled by more than one decision and neither the list nor
-            // the wholesale flag says which sentence is true of it. The scan has
-            // nothing to report on a run whose withholding caught nothing, or on one
-            // whose every held file was kept by the three arms
-            // WithholdingAccount.KeptWithoutNotice names: for a program Windows still
-            // has installed, for being under a day old or for its patch's
-            // registrations. That is what keeps the line off both machines.
-            //
-            // THE COUNT IS UnestablishedWithheldCount, NOT THE WHOLE LIST, so a file
-            // kept for an installed program, for being under a day old or for its
-            // patch's registrations is left out of it, and a file whose age could not
-            // be established is in it. Every withheld file is still counted among the
-            // files left alone.
-            //
-            // AND ZERO WHERE NOTHING IS OFFERED, because that machine gets the
-            // completion screen instead and never reads this window's list. Folded in
-            // here rather than into the predicate so the gate has one input; see its
-            // own note for what a second input would have cost.
-            NothingListedIsPerFile = result.Withholding != WithholdingAccount.WholeWalkOffer;
-            NothingListedCount =
-                result.HasWithholdingToReport && orphanedCount > 0
-                    ? result.UnestablishedWithheldCount
-                    : 0;
-            // OFF THE SCAN'S OWN COST FIGURE, never off the machine-wide trigger.
-            // ScanResult.UnaccountedProductCount travels in the opt-in report and the
-            // command line's event log and decides nothing this window says, being the
-            // trigger for one of six routes into the count rather than a count of
-            // files.
-            //
-            // THE THREE FOOTNOTE COUNTS ARE ASSIGNED IN THE ORDER THEIR LINES ARE
-            // DRAWN, and this is the middle one. Each assignment raises the
-            // PropertyChanged the window turns into a live-region announcement, and
-            // the raises queue in the order they arrive, so this order is the order a
-            // screen reader hears them in. The block in MainWindow.xaml.cs that maps
-            // them to elements tests one property name per call, so it says nothing
-            // about sequence; this does.
-            SupersededHeldBackCount = result.WithheldCount;
-            // THE AFFECTED HALF, NOT THE SUM, which is the line item 5 moves back. The
-            // banner fires where something could still reach for a file that is gone, so
-            // a registration whose absence the app positively established to be harmless
-            // is not in the count and its program is not named. Both come off the same
-            // predicate in MissingFilesReport, and the sum still travels in the report
-            // payload, where a public chart reads it with no version gate.
+            // THE AFFECTED HALF, NOT THE SUM. The banner fires where something could
+            // still reach for a file that is gone, so a registration whose absence the
+            // app positively established to be harmless is not in the count and its
+            // program is not named. Both come off the same predicate in
+            // MissingFilesReport, and the sum still travels in the report payload, where
+            // a public chart reads it with no version gate.
             MissingFromDiskCount = result.MissingAffectedCount;
             MissingFromDiskPrograms = missingPrograms;
             HasScanned = true;

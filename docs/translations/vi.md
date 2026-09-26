@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} chương trình khác |
 | {0} file with no program named in the records | {0} tệp không có chương trình nào được nêu tên trong bản ghi |
 | {0} files with no program named in the records | {0} tệp không có chương trình nào được nêu tên trong bản ghi |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại tệp duy nhất đó thay vì đề xuất nó. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean không thể chắc chắn những tệp nào trong bộ nhớ đệm thuộc về các chương trình đã cài ở đây, nên đã giữ lại {0} {1} thay vì đề xuất chúng. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean không chắc chắn về một trong những tệp trong bộ nhớ đệm mà nó tìm thấy, nên đã giữ lại nó thay vì đề xuất. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean không chắc chắn về một số tệp trong bộ nhớ đệm mà nó tìm thấy, nên đã giữ lại {0} {1} thay vì đề xuất chúng. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean không thể chắc chắn rằng tệp bị thay thế duy nhất đó không còn cần đến nữa, nên đã giữ lại nó. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean không thể chắc chắn rằng {0} tệp bị thay thế không còn cần đến nữa, nên đã giữ lại chúng. |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} không cần thiết ({2}) |
 | {0} file left alone ({1}) | {0} tệp được để nguyên ({1}) |

@@ -171,9 +171,10 @@ public static class CachedFileAge
 /// What <see cref="CachedFileAge.Judge"/> established about one file's age. Only
 /// <see cref="ShownADayOld"/> lets the file through.
 ///
-/// THE TWO THAT KEEP IT ARE TOLD APART because the app speaks of them differently: a
-/// file under a day old is left alone without a word, and a file whose age was not
-/// established is among those the held-back sentence counts.
+/// THE TWO THAT KEEP IT ARE COUNTED APART. The opt-in report carries the two counts
+/// separately, and the command line's held-back sentence counts a file whose age was not
+/// established and leaves out a file under a day old. The window's finished screen counts
+/// both among the files it held back.
 /// </summary>
 public enum CachedFileAgeVerdict
 {

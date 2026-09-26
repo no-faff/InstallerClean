@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} program lain |
 | {0} file with no program named in the records | {0} file tanpa nama program dalam catatan |
 | {0} files with no program named in the records | {0} file tanpa nama program dalam catatan |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi satu-satunya file itu ditahan alih-alih ditawarkan. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean tidak bisa memastikan file mana dalam cache yang menjadi milik program-program yang terpasang di sini, jadi {0} {1} ditahan alih-alih ditawarkan. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean tidak yakin tentang salah satu file dalam cache yang ditemukannya, jadi file itu ditahan alih-alih ditawarkan. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean tidak yakin tentang beberapa file dalam cache yang ditemukannya, jadi {0} {1} ditahan alih-alih ditawarkan. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean tidak bisa memastikan bahwa satu-satunya file yang digantikan itu sudah tidak diperlukan, jadi file itu ditahan. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean tidak bisa memastikan bahwa {0} file yang digantikan sudah tidak diperlukan, jadi file-file itu ditahan. |
 | {0} of {1} {2} | {0} dari {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} tidak diperlukan ({2}) |
 | {0} file left alone ({1}) | {0} file dibiarkan apa adanya ({1}) |

@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} altri programmi |
 | {0} file with no program named in the records | {0} file senza alcun programma nominato nei record |
 | {0} files with no program named in the records | {0} file senza alcun programma nominato nei record |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto l'unico file invece di proporlo. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean non è riuscito a stabilire con certezza quali file nella cache appartengono ai programmi installati qui, perciò ha trattenuto {0} {1} invece di proporli. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean non ha avuto la certezza su uno dei file nella cache che ha trovato, perciò l'ha trattenuto invece di proporlo. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean non ha avuto la certezza su alcuni dei file nella cache che ha trovato, perciò ha trattenuto {0} {1} invece di proporli. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean non è riuscito a stabilire con certezza che l'unico file sostituito non serva più, perciò l'ha trattenuto. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean non è riuscito a stabilire con certezza che {0} file sostituiti non servano più, perciò li ha trattenuti. |
 | {0} of {1} {2} | {0} di {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} da eliminare ({2}) |
 | {0} file left alone ({1}) | {0} file lasciato stare ({1}) |

@@ -8,9 +8,9 @@ namespace InstallerClean.Tests.Models;
 /// The derived figures on <see cref="ScanResult"/>, which the hosts read instead of
 /// summing the lists themselves.
 ///
-/// WHY A SUM GETS A TEST AT ALL. The withheld total is what the wholesale completion
-/// screen prints as "held back {1}", and the one thing that figure must never be is
-/// the folder's total: printing that would tell somebody that much was going spare
+/// WHY A SUM GETS A TEST AT ALL. The withheld total is where the size on the
+/// completion screen starts, and the one thing that figure must never be is the
+/// folder's total: printing that would tell somebody that much was going spare
 /// when nothing established it. A sum over the wrong list is not a compile error and
 /// reads as a plausible number on screen.
 /// </summary>
@@ -508,5 +508,211 @@ public class ScanResultTests
         Assert.Equal(WithholdingAccount.WholeWalkOffer, flagTrueWholesale.Withholding);
         Assert.Equal(WithholdingAccount.PerFile, flagTruePerFile.Withholding);
         Assert.Equal(WithholdingAccount.PerFile, flagFalsePerFile.Withholding);
+    }
+
+    // ---- What the window's finished screen counts ----
+    //
+    // EVERY FILE HELD BACK EXCEPT THOSE THE DECLARED-PRODUCT-INSTALLED AND
+    // DECLARED-PATCH-REGISTERED ARMS KEPT, TOGETHER WITH THE SUPERSEDED FILES. Every file
+    // and every arm's size below carries a different value, so a reading that subtracts
+    // an arm it should not, or drops an addend, lands on a figure no assertion accepts.
+    // The day-old fixtures set both the arm's count and its size, and the superseded
+    // fixtures both the count and the size, because a fixture leaving either at zero
+    // passes a reading that wrongly subtracts it.
+    //
+    // THE COMMAND LINE'S MEMBERS ARE ASSERTED BESIDE IT where the two readings part, so
+    // a change reaching them from here fails.
+
+    [Fact]
+    public void A_scan_that_held_nothing_back_gives_the_finished_screen_nothing_to_count()
+    {
+        var noList = new ScanResult([], [], 0);
+        var emptyList = new ScanResult([], [], 0, WithheldFiles: []);
+
+        foreach (var result in new[] { noList, emptyList })
+        {
+            Assert.Equal(0, result.UnsettledHeldBackCount);
+            Assert.Equal(0, result.UnsettledHeldBackBytes);
+            Assert.False(result.HasUnsettledHeldBack);
+            Assert.False(result.UnsettledHeldBackIsWholesale);
+        }
+    }
+
+    [Fact]
+    public void Files_kept_for_an_installed_program_are_not_counted_on_the_finished_screen()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
+            WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 2),
+            WithheldDeclaredProductInstalledBytes: 3072);
+
+        Assert.Equal(0, result.UnsettledHeldBackCount);
+        Assert.Equal(0, result.UnsettledHeldBackBytes);
+        Assert.False(result.HasUnsettledHeldBack);
+    }
+
+    [Fact]
+    public void Patch_copies_kept_for_their_patch_s_registrations_are_not_counted_on_the_finished_screen()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msp", 1024), File("b.msp", 2048)],
+            WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 2),
+            WithheldDeclaredPatchRegisteredBytes: 3072);
+
+        Assert.Equal(0, result.UnsettledHeldBackCount);
+        Assert.Equal(0, result.UnsettledHeldBackBytes);
+        Assert.False(result.HasUnsettledHeldBack);
+    }
+
+    [Fact]
+    public void The_two_arms_together_are_not_counted_on_the_finished_screen()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msi", 1024), File("b.msp", 2048)],
+            WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, DeclaredPatchRegisteredCount: 1),
+            WithheldDeclaredProductInstalledBytes: 1024,
+            WithheldDeclaredPatchRegisteredBytes: 2048);
+
+        Assert.Equal(0, result.UnsettledHeldBackCount);
+        Assert.Equal(0, result.UnsettledHeldBackBytes);
+        Assert.False(result.HasUnsettledHeldBack);
+    }
+
+    [Fact]
+    public void Files_under_a_day_old_are_counted_on_the_finished_screen_and_not_by_the_command_line()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
+            WithheldBy: new WithholdingSplit(UnderADayOldCount: 2),
+            WithheldUnderADayOldBytes: 3072);
+
+        Assert.Equal(2, result.UnsettledHeldBackCount);
+        Assert.Equal(3072, result.UnsettledHeldBackBytes);
+        Assert.True(result.HasUnsettledHeldBack);
+        Assert.False(result.UnsettledHeldBackIsWholesale);
+
+        Assert.Equal(WithholdingAccount.KeptWithoutNotice, result.Withholding);
+        Assert.False(result.HasWithholdingToReport);
+        Assert.Equal(0, result.UnestablishedWithheldCount);
+        Assert.Equal(0, result.UnestablishedWithheldBytes);
+    }
+
+    [Fact]
+    public void A_file_under_a_day_old_is_counted_beside_one_kept_for_an_installed_program()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
+            WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, UnderADayOldCount: 1),
+            WithheldDeclaredProductInstalledBytes: 1024,
+            WithheldUnderADayOldBytes: 2048);
+
+        Assert.Equal(1, result.UnsettledHeldBackCount);
+        Assert.Equal(2048, result.UnsettledHeldBackBytes);
+        Assert.False(result.UnsettledHeldBackIsWholesale);
+    }
+
+    [Fact]
+    public void A_file_under_a_day_old_is_counted_beside_a_patch_copy_kept_for_its_patch_s_registrations()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msp", 1024), File("b.msi", 4096)],
+            WithheldBy: new WithholdingSplit(UnderADayOldCount: 1, DeclaredPatchRegisteredCount: 1),
+            WithheldUnderADayOldBytes: 4096,
+            WithheldDeclaredPatchRegisteredBytes: 1024);
+
+        Assert.Equal(1, result.UnsettledHeldBackCount);
+        Assert.Equal(4096, result.UnsettledHeldBackBytes);
+    }
+
+    [Fact]
+    public void A_file_whose_age_was_not_established_is_counted_on_the_finished_screen()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msi", 1024)],
+            WithheldBy: new WithholdingSplit(AgeUnestablishedCount: 1));
+
+        Assert.Equal(1, result.UnsettledHeldBackCount);
+        Assert.Equal(1024, result.UnsettledHeldBackBytes);
+        Assert.True(result.HasUnsettledHeldBack);
+        Assert.False(result.UnsettledHeldBackIsWholesale);
+    }
+
+    [Fact]
+    public void Superseded_files_held_back_are_counted_on_the_finished_screen_and_not_in_the_command_line_s_walk_sentence()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldCount: 3,
+            WithheldFiles: [],
+            SupersededWithheldBytes: 16384);
+
+        Assert.Equal(3, result.UnsettledHeldBackCount);
+        Assert.Equal(16384, result.UnsettledHeldBackBytes);
+        Assert.True(result.HasUnsettledHeldBack);
+        Assert.False(result.UnsettledHeldBackIsWholesale);
+
+        Assert.Equal(WithholdingAccount.Nothing, result.Withholding);
+        Assert.False(result.HasWithholdingToReport);
+        Assert.Equal(0, result.UnestablishedWithheldCount);
+        Assert.Equal(0, result.UnestablishedWithheldBytes);
+    }
+
+    [Fact]
+    public void A_wholesale_withholding_alone_takes_the_wholesale_reading_on_the_finished_screen()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
+            WithheldBy: new WithholdingSplit(WholesaleCount: 2));
+
+        Assert.Equal(2, result.UnsettledHeldBackCount);
+        Assert.Equal(3072, result.UnsettledHeldBackBytes);
+        Assert.True(result.UnsettledHeldBackIsWholesale);
+    }
+
+    [Fact]
+    public void A_superseded_file_beside_a_wholesale_withholding_takes_the_per_file_reading_and_is_counted_with_it()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldCount: 1,
+            WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
+            WithheldBy: new WithholdingSplit(WholesaleCount: 2),
+            SupersededWithheldBytes: 16384);
+
+        Assert.Equal(3, result.UnsettledHeldBackCount);
+        Assert.Equal(1024 + 2048 + 16384, result.UnsettledHeldBackBytes);
+        Assert.False(result.UnsettledHeldBackIsWholesale);
+
+        Assert.Equal(WithholdingAccount.WholeWalkOffer, result.Withholding);
+        Assert.Equal(2, result.UnestablishedWithheldCount);
+        Assert.Equal(3072, result.UnestablishedWithheldBytes);
+    }
+
+    [Fact]
+    public void Superseded_files_are_counted_with_the_walk_s_files_held_one_at_a_time()
+    {
+        var result = new ScanResult([], [], 0,
+            WithheldCount: 2,
+            WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
+            WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, ScreenUnansweredCount: 1),
+            WithheldDeclaredProductInstalledBytes: 2048,
+            SupersededWithheldBytes: 16384);
+
+        Assert.Equal(3, result.UnsettledHeldBackCount);
+        Assert.Equal(1024 + 16384, result.UnsettledHeldBackBytes);
+        Assert.False(result.UnsettledHeldBackIsWholesale);
+    }
+
+    [Fact]
+    public void A_withheld_file_no_arm_counted_is_counted_on_the_finished_screen()
+    {
+        // THE LIST LESS THE TWO ARMS, NOT A SUM OF THE OTHERS, so a file on the list the
+        // split did not count, or one counted by an arm added later, is spoken of.
+        var result = new ScanResult([], [], 0,
+            WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
+            WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1),
+            WithheldDeclaredProductInstalledBytes: 1024);
+
+        Assert.Equal(1, result.UnsettledHeldBackCount);
+        Assert.Equal(2048, result.UnsettledHeldBackBytes);
+        Assert.True(result.HasUnsettledHeldBack);
     }
 }

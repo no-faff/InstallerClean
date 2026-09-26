@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | jeszcze {0} programów |
 | {0} file with no program named in the records | {0} plik, dla którego rekordy nie wskazują programu |
 | {0} files with no program named in the records | {0} plików, dla których rekordy nie wskazują programu |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean nie zdołał ustalić z pewnością, które pliki w pamięci podręcznej należą do zainstalowanych tu programów, więc zatrzymał ten jeden plik, zamiast go zaproponować. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean nie zdołał ustalić z pewnością, które pliki w pamięci podręcznej należą do zainstalowanych tu programów, więc zatrzymał {0} {1}, zamiast je zaproponować. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean nie miał pewności co do jednego ze znalezionych plików w pamięci podręcznej, więc go zatrzymał, zamiast go zaproponować. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean nie miał pewności co do niektórych ze znalezionych plików w pamięci podręcznej, więc zatrzymał {0} {1}, zamiast je zaproponować. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean nie zdołał ustalić z pewnością, że jedyny zastąpiony plik nie jest już potrzebny, więc go zatrzymał. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean nie zdołał ustalić z pewnością, że {0} zastąpionych plików nie jest już potrzebnych, więc je zatrzymał. |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} do wyczyszczenia ({2}) |
 | {0} file left alone ({1}) | {0} plik pozostawiony bez zmian ({1}) |

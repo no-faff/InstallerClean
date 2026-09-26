@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | ще {0} програм |
 | {0} file with no program named in the records | {0} файл, для якого в записах не названо програми |
 | {0} files with no program named in the records | {0} файлів, для яких у записах не названо програми |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав єдиний файл, замість того щоб запропонувати його. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean не зміг упевнено визначити, які файли в кеші належать встановленим тут програмам, тож затримав {0} {1}, замість того щоб запропонувати їх. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean не був певен щодо одного зі знайдених ним файлів у кеші, тож затримав його, замість того щоб запропонувати. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean не був певен щодо деяких зі знайдених ним файлів у кеші, тож затримав {0} {1}, замість того щоб запропонувати їх. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean не зміг упевнено визначити, що єдиний заміщений файл більше не потрібен, тож затримав його. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean не зміг упевнено визначити, що {0} заміщених файлів більше не потрібні, тож затримав їх. |
 | {0} of {1} {2} | {0} з {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} для очищення ({2}) |
 | {0} file left alone ({1}) | {0} файл залишено без змін ({1}) |

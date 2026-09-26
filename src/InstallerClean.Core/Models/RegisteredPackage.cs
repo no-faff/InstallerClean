@@ -82,21 +82,15 @@ namespace InstallerClean.Models;
 /// wins, a row already withheld is skipped, and one call site sets this flag. So no earlier
 /// cause can be sitting underneath it and no later one can be added on top.
 ///
-/// AND IT IS A PROPERTY ONE PLACE MAINTAINS RATHER THAN ONE THE TYPE ENFORCES, which is the
-/// standing hazard here and the reason this paragraph exists. Anything new that withholds a
-/// row has to decide the same question, and getting it wrong is silent in both directions:
-/// a cause joined to this one makes the flag overstate what it knows, and a row withheld
-/// for something else while this flag stands makes it say an unread file was the whole of
-/// it when it was not.
+/// AND IT IS A PROPERTY ONE PLACE MAINTAINS RATHER THAN ONE THE TYPE ENFORCES. Anything new
+/// that withholds a row has to decide the same question, and getting it wrong is silent in
+/// both directions: a cause joined to this one makes the flag overstate what it knows, and a
+/// row withheld for something else while this flag stands makes it say an unread file was
+/// the whole of it when it was not.
 ///
-/// THE SCAN-WIDE WITHHOLDING USED TO BE THE SECOND PLACE AND NO LONGER IS. It runs after the
-/// confirmation loop and only touches rows still carrying <paramref name="IsRemovable"/>, so
-/// it passes over a row this flag has already taken; until 3.0.0 it had a second arm that
-/// CLEARED the flag on any run that came up short of a product. That arm is gone. What it
-/// produced was a warning about a file whose absence the same scan had positively
-/// established to be harmless, fired on a count that says something about the machine and
-/// nothing about this patch. The run that came up short still withholds the whole removable
-/// class, which is where withholding can still change an outcome.
+/// THE SCAN-WIDE WITHHOLDING NEITHER SETS NOR CLEARS IT. It runs after the confirmation loop
+/// and only touches rows still carrying <paramref name="IsRemovable"/>, so it passes over a
+/// row this flag has already taken.
 /// </param>
 public record RegisteredPackage(
     string LocalPackagePath,

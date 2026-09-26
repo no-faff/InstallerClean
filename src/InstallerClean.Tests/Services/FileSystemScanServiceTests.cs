@@ -18,15 +18,12 @@ public class FileSystemScanServiceTests
     /// defaulting to unestablished. That is a machine the app cannot clear the file
     /// on, so it is kept and, where its file has gone, its absence is reported.
     ///
-    /// IT IS ONE OF THE TWO SUPERSEDED SHAPES AND NOT THE ONLY ONE, which this
-    /// comment claimed until 3.0.0. It said that building a row with IsRemovable set
-    /// would pin behaviour against a row the query service cannot emit. The query
-    /// service emits exactly that row: a positively read Superseded state with a
+    /// IT IS ONE OF THE TWO SUPERSEDED SHAPES. The query service also emits a
+    /// superseded row carrying IsRemovable: a positively read Superseded state with a
     /// positively read Uninstallable of zero grants the verdict, and the per-product
-    /// pass leaves it standing where every product sharing the patch was shown to
-    /// hold nothing that could be uninstalled. The sentence was true only for the
-    /// window in which no scan offered the class at all. See
-    /// <see cref="SupersededAndOffered"/> and <see cref="SupersededAndCleared"/>.
+    /// pass leaves it standing where every product sharing the patch was shown to hold
+    /// nothing that could be uninstalled. See <see cref="SupersededAndOffered"/> and
+    /// <see cref="SupersededAndCleared"/>.
     /// </summary>
     private static RegisteredPackage Superseded(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2);
@@ -53,8 +50,6 @@ public class FileSystemScanServiceTests
     /// <see cref="Superseded"/> is not that shape and the difference is easy to miss:
     /// the verdict defaults to unestablished, deliberately, so a row built without one
     /// models a scan that could not settle the question and its absence is reported.
-    /// Every test here used that helper, so nothing was exercising the other side of
-    /// the split at all.
     /// </summary>
     private static RegisteredPackage SupersededAndCleared(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2,
@@ -65,8 +60,7 @@ public class FileSystemScanServiceTests
 
     /// <summary>
     /// An obsoleted row whose per-product condition WAS established clean, which is
-    /// the second arm of the silent side of the missing-file split and the one
-    /// nothing in this file reached.
+    /// the second arm of the silent side of the missing-file split.
     ///
     /// THE SPLIT'S SILENT SIDE IS A CONJUNCTION WITH TWO STATES UNDER IT, because
     /// the state test is "superseded OR obsoleted". <see cref="SupersededAndCleared"/>
@@ -75,18 +69,19 @@ public class FileSystemScanServiceTests
     /// without looking at which of the two states the patch is in, so an obsoleted
     /// patch on a clean product comes out of a real scan carrying AllNonRemovable.
     ///
-    /// AND COPYING <see cref="Obsoleted"/>'s EXISTING CALL SITES WOULD NOT HAVE
-    /// REACHED IT. Both of them put the file on the filesystem, so neither row is
-    /// missing and neither reaches the split at all.
+    /// THE VERDICT IS WHAT PUTS IT ON THE SILENT SIDE. A row from
+    /// <see cref="Obsoleted"/> carries no verdict, so where its file is absent it is
+    /// reported, as An_obsoleted_patch_the_condition_could_not_clear_is_missing_and_affected
+    /// shows; this one carries AllNonRemovable.
     /// </summary>
     private static RegisteredPackage ObsoletedAndCleared(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 4,
             ProductPatchSetVerdict: ProductPatchSet.AllNonRemovable);
 
     /// <summary>
-    /// A superseded patch carrying the withheld flag, which no enumeration sets
-    /// now. Kept so the scan is still held to handling such a row rather than to
-    /// an assumption that one cannot arrive.
+    /// A superseded patch carrying the withheld flag: a row whose removable verdict the
+    /// enumeration took away because it could not establish that nothing still needs
+    /// the file.
     /// </summary>
     private static RegisteredPackage Withheld(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}",
@@ -516,11 +511,10 @@ public class FileSystemScanServiceTests
         // dropped a row whose file has gone would leave a hole in it.
         //
         // AND ONE WITHHELD ROW'S FILE HAS GONE, WHICH IS THE FIXTURE AND NOT THE
-        // ASSERTION. Until 3.0.0 every withheld row here was present on the disk, so
-        // this test could not have failed at the thing it is named for: the withheld
-        // count is now the one member of the partition that a second, narrower figure
-        // is also computed from, and a fixture with no withheld-and-missing row stays
-        // green whichever population either count takes.
+        // ASSERTION. The withheld count is the one member of the partition that a
+        // second, narrower figure is also computed from, and a fixture with no
+        // withheld-and-missing row stays green whichever population either count
+        // takes.
         var packages = new List<RegisteredPackage>
         {
             Registered(@"C:\Windows\Installer\a.msi"),
@@ -578,20 +572,12 @@ public class FileSystemScanServiceTests
     [Fact]
     public async Task The_withheld_count_reports_the_flagged_rows_on_an_incomplete_run()
     {
-        // ITS SUBJECT WAS PINNED AT ZERO AND THE PREMISE IS GONE. This asserted that
-        // the count stays zero however incomplete the records were, on the reasoning
-        // that nothing was offered on a superseded verdict so there was nothing to
-        // withhold. 3.0.0 offers that class again and the field is a real figure, so
-        // the claim to pin now is the live one: an incomplete run reports the rows
-        // actually carrying the flag, rather than the field going quiet again.
+        // AN INCOMPLETE RUN REPORTS THE ROWS ACTUALLY CARRYING THE FLAG, and the field
+        // does not go quiet on such a run.
         //
-        // BOTH FILES ARE PRESENT, WHICH NOW MEANS THE TWO COUNTS AGREE RATHER THAN
-        // THAT THIS FIXTURE IS KEEPING OUT OF A DISAGREEMENT. It was written while
-        // the code counted every flagged row and the doc said the population was rows
-        // whose file was on disk, and it deliberately sat where both readings gave
-        // two. That is settled: the cost figure takes the on-disk term and the
-        // partition member does not. The row whose file has gone is tested next door,
-        // which is where the two counts come apart.
+        // BOTH FILES ARE PRESENT, SO THE TWO COUNTS OVER THE FLAG AGREE HERE. The cost
+        // figure takes the on-disk term and the partition member does not; the row
+        // whose file has gone is tested next door, which is where the two come apart.
         const string first = @"C:\Windows\Installer\withheld-one.msp";
         const string second = @"C:\Windows\Installer\withheld-two.msp";
         var query = QueryReturning(new InstallerQueryResult(
@@ -622,11 +608,10 @@ public class FileSystemScanServiceTests
         // the kept list, which holds that row like any other, so leaving it out would
         // leave a hole in the partition.
         //
-        // THE DIRECTION IS WHY IT IS WORTH ITS OWN TEST. This count travels in the
-        // opt-in report and nowhere else, and that report is the only instrument this
-        // project has for telling whether the withholding is expensive. Counting rows
-        // that cost nothing inflates it, and an inflated cost invites relaxing the
-        // condition being measured.
+        // THE DIRECTION MATTERS. This count travels in the opt-in report, where it is
+        // what says how much the withholding costs, the command line prints it and the
+        // window's finished screen counts it. Counting rows that cost nothing would
+        // overstate all three.
         const string present = @"C:\Windows\Installer\withheld-present.msp";
         const string gone = @"C:\Windows\Installer\withheld-gone.msp";
         var query = QueryReturning(new InstallerQueryResult(
@@ -643,6 +628,41 @@ public class FileSystemScanServiceTests
         // And the missing one is accounted for where a missing row belongs, rather
         // than having quietly left the scan.
         Assert.Equal(1, result.MissingFromDiskCount);
+    }
+
+    [Fact]
+    public async Task The_size_of_the_withheld_superseded_files_sums_the_cost_figure_s_files_alone()
+    {
+        // THE SAME POPULATION AS WithheldCount, SIZED. Every file on the disk carries a
+        // different size, so a sum over a wider or narrower population lands on a figure
+        // the assertion rejects: the superseded row the scan did not withhold is in
+        // RegisteredSupersededBytes and not here, and the claimed package is in neither.
+        // The row whose file has gone is sized at zero by the scan, and WithheldCount
+        // leaves it out.
+        const string heldOne = @"C:\Windows\Installer\held-one.msp";
+        const string heldTwo = @"C:\Windows\Installer\held-two.msp";
+        const string heldGone = @"C:\Windows\Installer\held-gone.msp";
+        const string supersededKept = @"C:\Windows\Installer\superseded-kept.msp";
+        const string claimed = @"C:\Windows\Installer\claimed.msi";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage>
+            {
+                Withheld(heldOne), Withheld(heldTwo), Withheld(heldGone),
+                Superseded(supersededKept), Registered(claimed),
+            }.AsReadOnly(),
+            UnaccountedProductCount: 1));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(heldOne, new MockFileData(new byte[1000]));
+        fs.AddFile(heldTwo, new MockFileData(new byte[3000]));
+        fs.AddFile(supersededKept, new MockFileData(new byte[5000]));
+        fs.AddFile(claimed, new MockFileData(new byte[7000]));
+
+        var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(2, result.WithheldCount);
+        Assert.Equal(4000, result.SupersededWithheldBytes);
+        Assert.Equal(9000, result.RegisteredSupersededBytes);
     }
 
     [Fact]

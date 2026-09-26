@@ -594,19 +594,15 @@ public sealed class FileSystemScanService : IFileSystemScanService
             withheld.AddRange(unclaimedByPath);
             withheldBy.Wholesale(unclaimedByPath.Count);
 
-            // WHAT THE HOSTS ARE TOLD IS THAT THE WITHHOLDING CAUGHT SOMETHING, AND NOT
-            // MERELY THAT THIS BRANCH WAS TAKEN. A walk that produced no unclaimed
-            // candidates reaches here having held nothing back, and the screen that
-            // reads this flag announces a count of files held back from the offer,
-            // which at zero is both absurd and untrue; for that machine the all-clear
-            // is right, nothing in the folder having gone unclaimed.
+            // THE FLAG RECORDS THAT THE WITHHOLDING CAUGHT SOMETHING, AND NOT MERELY
+            // THAT THIS BRANCH WAS TAKEN. A walk that produced no unclaimed candidates
+            // reaches here having held nothing back, nothing in its folder having gone
+            // unclaimed.
             //
-            // IT IS DECIDED HERE BECAUSE THE HOST CANNOT DECIDE IT SAFELY. A host
-            // counting ScanResult.WithheldFiles would be reading a list more than one
-            // decision contributes to, so the moment any of their memberships changes
-            // the screen's gate changes meaning with it and nothing fails. This
-            // branch is the only thing that knows what THIS withholding took, so this is
-            // where the question is answered.
+            // IT IS DECIDED HERE BECAUSE THIS BRANCH KNOWS WHAT THIS WITHHOLDING TOOK.
+            // ScanResult.WithheldFiles is a list more than one decision contributes to,
+            // so a count of it answers a different question the moment any of their
+            // memberships changes, and nothing fails when it does.
             walkOfferWithheldWholesale = unclaimedByPath.Count > 0;
         }
         else
@@ -865,10 +861,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // The cost figure counts FILES, and only the ones that are there. It answers
         // what the withholding cost this run, and a row whose file is not on the disk
         // cost nothing: an absent file could never have been offered, the branch that
-        // offers a superseded row being gated on its existence. Counting it inflated
-        // the one instrument this project has for telling whether the withholding is
-        // expensive, and inflating that invites relaxing the very condition the
-        // release exists to add.
+        // offers a superseded row being gated on its existence. Counting it would
+        // overstate what the withholding costs, in the figure the opt-in report
+        // carries, the command line prints and the window's finished screen counts.
         //
         // The flag itself is right in both cases and is not narrowed here. It records
         // a true fact about the RECORDS, established in the enumeration, which cannot
@@ -877,16 +872,22 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // which asserts a live claim the app has not established.
         var registeredWithheld = stillUsed.Count(p => p.RemovableWithheld);
         var withheldCost = stillUsed.Count(p => p.RemovableWithheld && p.FileExists);
+        // The size of exactly the files the cost figure counts, over the same test, so
+        // the count and the size describe one population. The enumeration keeps one row
+        // per path, so a patch registered under several products is one row and is sized
+        // once.
+        var withheldCostBytes = stillUsed
+            .Where(p => p.RemovableWithheld && p.FileExists)
+            .Sum(p => p.FileSizeBytes);
         var registeredUnjudged = stillUsed.Count(p => p.VerdictUnreadable);
 
-        // SUPERSEDED AND OBSOLETED ROWS THIS SCAN IS KEEPING, which is a different
-        // population from the one this pair counted before the offer came back. Every
-        // superseded row that passed the per-product condition has left the kept list
-        // for the offer, so what is counted here is the class the app declined to
-        // offer: superseded rows some product could roll back onto or whose patch set
-        // could not be established, plus every obsoleted row, which is not offered at
-        // all. Files on disk only, a registration whose file has already gone having no
-        // space to give back and belonging to the missing counts.
+        // SUPERSEDED AND OBSOLETED ROWS THIS SCAN IS KEEPING. Every superseded row
+        // that passed the per-product condition has left the kept list for the offer,
+        // so what is counted here is the class the app declined to offer: superseded
+        // rows some product could roll back onto or whose patch set could not be
+        // established, plus every obsoleted row, which is not offered at all. Files on
+        // disk only, a registration whose file has already gone having no space to give
+        // back and belonging to the missing counts.
         //
         // A sub-count of the claimed rows rather than a fourth population (one shape
         // falls under the unjudged instead, a State that read 2 or 4 whose Uninstallable
@@ -1064,7 +1065,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             withheldBy.Taken(),
             withheldBy.DeclaredProductInstalledBytes,
             withheldBy.UnderADayOldBytes,
-            withheldBy.DeclaredPatchRegisteredBytes);
+            withheldBy.DeclaredPatchRegisteredBytes,
+            withheldCostBytes);
     }
 
     /// <summary>
@@ -1373,10 +1375,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 continue;
             }
 
-            // Counted by which of the two keeping verdicts it was, because they are
-            // told apart: a file under a day old is kept without a word, and a file
-            // whose age was not established is among those the held-back sentence
-            // counts.
+            // Counted by which of the two keeping verdicts it was. The opt-in report
+            // carries the two counts apart. The command line's held-back sentence counts
+            // a file whose age was not established and leaves out a file under a day
+            // old, whose size is summed here so that the sentence's size can leave it
+            // out too. The window's finished screen counts both.
             withheld.Add(candidate);
             if (verdict == CachedFileAgeVerdict.UnderADayOld)
                 withheldBy.UnderADayOld(candidate.SizeBytes);

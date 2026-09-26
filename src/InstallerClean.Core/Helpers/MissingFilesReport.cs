@@ -28,10 +28,11 @@ namespace InstallerClean.Helpers;
 /// states the part that holds either way and leaves the population to the expression
 /// that decides it.
 ///
-/// AND IT SAYS NOTHING ABOUT WHAT REMOVED THEM, which is not a nicety. Every tool
-/// that has ever deleted from this folder leaves an identical record, this one
-/// included up to v2.3.0, so the app cannot tell whose work it is looking at and
-/// must not imply it can. It fires on machines this app has never run on.
+/// AND IT SAYS NOTHING ABOUT WHAT REMOVED THEM. Every tool that deletes from this
+/// folder leaves an identical record, this one included where it removes a superseded
+/// patch whose registration Windows keeps, so the app cannot tell whose work it is
+/// looking at and must not imply it can. It fires on machines this app has never run
+/// on.
 /// </summary>
 internal static class MissingFilesReport
 {
@@ -58,61 +59,52 @@ internal static class MissingFilesReport
     /// nothing could reach for the file: the state is superseded or obsoleted AND every
     /// product sharing the patch was shown to hold no patch that could be uninstalled.
     ///
-    /// Neither half of that conjunction would do alone. The state alone calls a missing
-    /// superseded file benign because Windows marked the patch replaced, which was
-    /// measured false. The app's own removable verdict alone fires on every missing
-    /// OBSOLETED registration, because such a patch is not removable for a policy reason
-    /// rather than a dangerous one, and that is an alarm at past users about files this
-    /// app itself removed.
+    /// Neither half of that conjunction is enough alone. The state is not: Windows opens
+    /// every patch registered to a product whether or not it has been superseded, so a
+    /// superseded file's absence is harmless only where nothing sharing the patch could
+    /// roll back onto it. Nor is the app's own removable verdict: an obsoleted patch is
+    /// not removable for a policy reason rather than a dangerous one, so that verdict
+    /// says nothing about whether its absence matters.
     ///
     /// AND AN UNESTABLISHED VERDICT IS AFFECTED, deliberately, which is the opposite
     /// direction from the offer. Both refuse to claim what the app has not shown: there
     /// that the file is spare, here that its absence is harmless.
     ///
     /// AND A WITHHELD ROW IS AFFECTED WHATEVER ITS VERDICT SAYS, EXCEPT WHERE THE ONLY
-    /// CAUSE WAS THE UNREAD PATCH FILE. That exception is the last conjunct, and it is a
-    /// tautology rather than a concession. The pass that confirms a removable verdict
-    /// reads the patch file to ask which products it declares, and withholds where it
-    /// cannot. For a row that has REACHED THIS PREDICATE the file is GONE, so the read it
-    /// failed is a read of the very file whose absence is the subject: there is nothing
-    /// there to open, nobody can perform it on any machine ever, and it fails for a file
-    /// this app removed exactly as it fails for one anything else removed. Read as a
-    /// reason to warn, it had the app offer a file, remove it, and then report it as a
-    /// thing a repair could fail on, which is the claim the offer's own condition exists
-    /// to rule out.
+    /// CAUSE WAS THE UNREAD PATCH FILE. That exception is the last conjunct. The pass that
+    /// confirms a removable verdict reads the patch file to ask which products it
+    /// declares, and withholds where it cannot. For a row this exception decides, the
+    /// first conjunct has already found the file GONE, so the read it failed is a read of
+    /// the very file whose absence is the subject: there is nothing there to open, and
+    /// the read fails for a file this app removed exactly as it fails for one anything
+    /// else removed. Such a row is judged on the verdict it was positively given.
     ///
-    /// SO THE ROW KEEPS THE VERDICT IT WAS POSITIVELY GIVEN, and it keeps it on a run that
-    /// came up short elsewhere as much as on one that did not. Until 3.0.0 the scan-wide
-    /// withholding cleared this marker whenever the run lost a claim anywhere, which put
-    /// exactly this row back under the banner. What that fired on was a machine-level
-    /// count whose three terms are a failed read on a product the enumeration DID return,
-    /// a product the registry saw and the enumeration did not, and a registry key Windows
-    /// would not answer about. None of them is "a holder of this patch went unseen", so
-    /// none of them bears on this file. The residual it was reaching for is real and is
-    /// answered where answering still changes an outcome: on such a run the app removes no
-    /// superseded patch at all.
+    /// SO THE ROW KEEPS THAT VERDICT, on a run that came up short elsewhere as much as on
+    /// one that did not. The scan-wide withholding takes the removable verdict off every
+    /// row still carrying one and leaves this marker alone. The count it fires on is
+    /// machine-level, and its terms are a failed read on a product the enumeration DID
+    /// return, a product the registry saw and the enumeration did not, and a registry key
+    /// Windows would not answer about. None of them is "a holder of this patch went
+    /// unseen", so none of them bears on this file. Such a run removes no superseded patch
+    /// at all.
     ///
-    /// AND THE STANDARD IS THE OFFER'S, WHICH IS WHY THAT IS NOT A WEAKENING. The evidence
-    /// that the absence is harmless is evidence of the same kind the app acts on when it
-    /// offers a file for permanent removal, and offering is by far the more consequential
-    /// of the two. A rule strict enough to distrust that evidence here would have had to
-    /// refuse the offer first. It is not the app remembering that it removed the file:
-    /// nothing here has any memory, and the verdict is re-established from the machine's
-    /// own records on the run that goes quiet. Nor can this line cover an offer either
-    /// way: it speaks only about a file that has already gone.
+    /// THE EVIDENCE IS OF THE KIND THE OFFER ACTS ON. The verdict that keeps this row out
+    /// of the count is the per-product verdict a superseded patch has to carry to be
+    /// offered for permanent removal. It is re-established from the machine's own records
+    /// on every run: nothing here remembers what the app removed. And this predicate
+    /// speaks only about a file that has already gone, so it bears on no offer.
     ///
-    /// THE ROUTE THAT STILL DEFEATS THE CARVE-OUT, AND IT IS THE ONE THAT SHOULD. Where
-    /// the machine-wide patch enumeration did not answer, the confirmation pass downgrades
-    /// every removable path with no marker set, so such a row arrives here withheld and
-    /// unmarked and is reported. That is the run on which the app really did fail to
-    /// establish something about THIS patch, rather than the run on which something else
-    /// about the machine failed. A row downgraded because its patch set could not be
-    /// established is reported too, by the verdict clause above rather than by this one.
+    /// A ROW WITHHELD FOR ANY OTHER CAUSE IS REPORTED. Where the machine-wide patch
+    /// enumeration did not answer, the confirmation pass downgrades every removable path
+    /// with no marker set, so such a row arrives here withheld and unmarked and is
+    /// reported: that run failed to establish something about this patch itself. A row
+    /// downgraded because its patch set could not be established is reported too, by the
+    /// verdict clause above rather than by this one.
     ///
     /// THE FLAG NAMES A CAUSE AND THIS LINE DECIDES WHAT THE CAUSE MEANT, because it
     /// carries two meanings and only one is a tautology. A file that is THERE and will not
-    /// give up an identity is a real inability; such a row is not missing, so it never
-    /// reaches this expression at all. See
+    /// give up an identity is a real inability; such a row is not missing, so the first
+    /// conjunct leaves it out. See
     /// <see cref="RegisteredPackage.WithheldOnUnreadableFile"/>.
     /// </summary>
     internal static bool Affected(RegisteredPackage row) =>
@@ -128,22 +120,14 @@ internal static class MissingFilesReport
     /// several programs: the registry fallback names none of its rows, so counting them as
     /// one program each would invent a headcount.
     ///
-    /// IT NAMES THE SAME POPULATION THE BANNER COUNTS, WHICH IS NARROWER THAN "EVERY
-    /// MISSING REGISTRATION" FROM 3.0.0. The banner fires where something could still reach
+    /// IT NAMES THE SAME POPULATION THE BANNER COUNTS, WHICH IS NARROWER THAN EVERY
+    /// MISSING REGISTRATION. The banner fires where something could still reach
     /// for a file that is gone, so a registration whose absence the app has positively
     /// established to be harmless is not one of the programs it should name: listing it
     /// would put a program in front of somebody as affected when the same scan had just
     /// decided it is not. The two filters are the same expression and must stay that way;
     /// see <see cref="Affected"/> for why the conjunction and not either half.
     /// </summary>
-    /// <remarks>
-    /// THIS DOCUMENTATION SAT ON <see cref="Affected"/> FROM 2026-08-17 TO 2026-08-23 and
-    /// described this method from there. The commit that introduced the predicate put its
-    /// summary directly beneath this one, so one member carried two summary blocks and this
-    /// one carried none, and the orphaned text told its reader to "see Affected" from inside
-    /// what had become Affected's own documentation. Nothing about either method changed
-    /// when it was moved back.
-    /// </remarks>
     internal static IReadOnlyList<AffectedProduct> Products(IEnumerable<RegisteredPackage> registered)
     {
         var named = new List<AffectedProduct>();

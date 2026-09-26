@@ -5852,40 +5852,6 @@
     "Cli.EventLogHardError.NoLog": {
       "ja": "fa848ca0c2b0d6dc"
     },
-    "Summary.NothingListed.Singular": {
-      "de": "82705db69088d350",
-      "es": "82705db69088d350",
-      "fr": "82705db69088d350",
-      "id": "82705db69088d350",
-      "it": "82705db69088d350",
-      "ja": "82705db69088d350",
-      "ko": "82705db69088d350",
-      "nl": "82705db69088d350",
-      "pl": "82705db69088d350",
-      "pt-BR": "82705db69088d350",
-      "ru": "82705db69088d350",
-      "tr": "82705db69088d350",
-      "uk": "82705db69088d350",
-      "vi": "82705db69088d350",
-      "zh-Hans": "82705db69088d350"
-    },
-    "Summary.NothingListed.Plural": {
-      "de": "43ac894c61758108",
-      "es": "43ac894c61758108",
-      "fr": "43ac894c61758108",
-      "id": "43ac894c61758108",
-      "it": "43ac894c61758108",
-      "ja": "43ac894c61758108",
-      "ko": "43ac894c61758108",
-      "nl": "43ac894c61758108",
-      "pl": "43ac894c61758108",
-      "pt-BR": "43ac894c61758108",
-      "ru": "43ac894c61758108",
-      "tr": "43ac894c61758108",
-      "uk": "43ac894c61758108",
-      "vi": "43ac894c61758108",
-      "zh-Hans": "43ac894c61758108"
-    },
     "Cli.SupersededHeldBack.Plural": {
       "de": "a5fe99752ff7a949",
       "es": "a5fe99752ff7a949",
@@ -5970,40 +5936,6 @@
       "uk": "66b835786c5f0a5d",
       "vi": "66b835786c5f0a5d",
       "zh-Hans": "66b835786c5f0a5d"
-    },
-    "Summary.SupersededHeldBack.Plural": {
-      "de": "a5fe99752ff7a949",
-      "es": "a5fe99752ff7a949",
-      "fr": "a5fe99752ff7a949",
-      "id": "a5fe99752ff7a949",
-      "it": "a5fe99752ff7a949",
-      "ja": "a5fe99752ff7a949",
-      "ko": "a5fe99752ff7a949",
-      "nl": "a5fe99752ff7a949",
-      "pl": "a5fe99752ff7a949",
-      "pt-BR": "a5fe99752ff7a949",
-      "ru": "a5fe99752ff7a949",
-      "tr": "a5fe99752ff7a949",
-      "uk": "a5fe99752ff7a949",
-      "vi": "a5fe99752ff7a949",
-      "zh-Hans": "a5fe99752ff7a949"
-    },
-    "Summary.SupersededHeldBack.Singular": {
-      "de": "0ac3622f70bc2516",
-      "es": "0ac3622f70bc2516",
-      "fr": "0ac3622f70bc2516",
-      "id": "0ac3622f70bc2516",
-      "it": "0ac3622f70bc2516",
-      "ja": "0ac3622f70bc2516",
-      "ko": "0ac3622f70bc2516",
-      "nl": "0ac3622f70bc2516",
-      "pl": "0ac3622f70bc2516",
-      "pt-BR": "0ac3622f70bc2516",
-      "ru": "0ac3622f70bc2516",
-      "tr": "0ac3622f70bc2516",
-      "uk": "0ac3622f70bc2516",
-      "vi": "0ac3622f70bc2516",
-      "zh-Hans": "0ac3622f70bc2516"
     },
     "Cli.DeletingFiles.One": {
       "de": "unverified",
@@ -6369,11 +6301,6 @@
       "ru": "d1bc73467a24ad8e",
       "uk": "d1bc73467a24ad8e"
     },
-    "Summary.SupersededHeldBack.Few": {
-      "pl": "a5fe99752ff7a949",
-      "ru": "a5fe99752ff7a949",
-      "uk": "a5fe99752ff7a949"
-    },
     "Cli.MissingFromDisk.Few": {
       "uk": "88a2ed420f09143d"
     },
@@ -6529,40 +6456,6 @@
       "uk": "6fc3e769364170a2",
       "vi": "6fc3e769364170a2",
       "zh-Hans": "6fc3e769364170a2"
-    },
-    "Summary.NothingListedPerFile.Plural": {
-      "de": "513dc45ea74cb997",
-      "es": "513dc45ea74cb997",
-      "fr": "513dc45ea74cb997",
-      "id": "513dc45ea74cb997",
-      "it": "513dc45ea74cb997",
-      "ja": "513dc45ea74cb997",
-      "ko": "513dc45ea74cb997",
-      "nl": "513dc45ea74cb997",
-      "pl": "513dc45ea74cb997",
-      "pt-BR": "513dc45ea74cb997",
-      "ru": "513dc45ea74cb997",
-      "tr": "513dc45ea74cb997",
-      "uk": "513dc45ea74cb997",
-      "vi": "513dc45ea74cb997",
-      "zh-Hans": "513dc45ea74cb997"
-    },
-    "Summary.NothingListedPerFile.Singular": {
-      "de": "eeb56a550ba6fad1",
-      "es": "eeb56a550ba6fad1",
-      "fr": "eeb56a550ba6fad1",
-      "id": "eeb56a550ba6fad1",
-      "it": "eeb56a550ba6fad1",
-      "ja": "eeb56a550ba6fad1",
-      "ko": "eeb56a550ba6fad1",
-      "nl": "eeb56a550ba6fad1",
-      "pl": "eeb56a550ba6fad1",
-      "pt-BR": "eeb56a550ba6fad1",
-      "ru": "eeb56a550ba6fad1",
-      "tr": "eeb56a550ba6fad1",
-      "uk": "eeb56a550ba6fad1",
-      "vi": "eeb56a550ba6fad1",
-      "zh-Hans": "eeb56a550ba6fad1"
     },
     "Field.NoNamedProduct": {
       "pl": "f6609b048c2dd142",

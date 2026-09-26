@@ -608,16 +608,16 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
        summary + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Análise de {0} {1} em {2}</value></data>
-  <!-- THE SCREEN FOR A MACHINE WHOSE WHOLE OFFER A RULE EMPTIED, which is a different
-       finding from a folder with nothing in it to remove and must not share a screen
-       with one. Completion.AllClean over Completion.NothingToCleanUp says the folder is
-       clear; this pair says the app could not establish enough to offer anything, on a
-       machine whose folder may be full.
+  <!-- THE SCREEN FOR A RUN THAT OFFERED NOTHING AND HELD BACK FILES IT COULD NOT
+       ESTABLISH ARE UNNEEDED, which is a different finding from a folder with nothing in
+       it to remove and must not share a screen with one. Completion.AllClean over
+       Completion.NothingToCleanUp says the folder is clear; this heading and one of the
+       two bodies say the app could not establish enough to offer the files they count,
+       on a machine whose folder may be full.
 
-       RETIRED FOR ONE RELEASE AND BACK IN SERVICE IN 3.0.0. The pair was written for
-       the cached-package identity check, that check left the tree, and the heading came
-       back unchanged while the body was rewritten: the old one named the identity check
-       as the cause, and naming a cause is the one thing this body may not do.
+       THE BODY BELOW IS FOR THE RUN WHERE A FINDING ABOUT THE RECORDS TOOK THE WHOLE
+       WALK-DERIVED OFFER AT ONCE AND ACCOUNTS FOR EVERY FILE THE SCREEN COUNTS. Every
+       other run takes Completion.NothingOfferedPerFileBody after it.
 
        NO CAUSE, AND IT IS A RULE RATHER THAN A PREFERENCE. Several conditions can empty
        an offer wholesale, they are different facts about a machine, and a sentence
@@ -627,29 +627,28 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
        files belong to the programs installed.
 
        0 = the count of files held back, 1 = the pluralised noun, 2 = their size. That
-       is the set that would otherwise have been offered, never everything in the
-       folder: the folder total there would tell somebody that much was going spare.
+       is the set held back, never everything in the folder: the folder total there
+       would tell somebody that much was going spare.
 
        THE NOUN IS A SLOT AND NOT A WORD IN THE SENTENCE, because a noun spelled into
        the value cannot follow the numeral standing in front of it. Russian and
-       Ukrainian take the nominative singular after 21, 31 and 41, so a value carrying
-       its own plural read "21 файлов" where the language wants "21 файл", at every such
-       count, in both. The slot is filled by PluraliseFile, which answers that question
-       per language and per count, and the fault cannot be reached from a value again.
+       Ukrainian take the nominative singular after 21, 31 and 41, where a value carrying
+       its own plural would read "21 файлов" for "21 файл", at every such count, in both.
+       The slot is filled by PluraliseFile, which answers that question per language and
+       per count.
 
        SINGULAR AND PLURAL SURVIVE THAT, BECAUSE A COUNT SLOT ALONE READS "all 1 files"
-       AND A COUNT OF ONE IS REACHABLE, being a folder holding a single unclaimed file.
+       AND A COUNT OF ONE IS REACHABLE, being a run that held back a single file.
        The noun slot on its own would give "all 1 file": grammatical, and still not what
        a person says. The one-form drops the numeral and the noun both, and names the
        size alone.
 
-       SO THIS IS THE ONE Singular/Plural PAIR HERE WHOSE {N} SETS DIFFER, the singular
-       carrying {2} and neither {0} nor {1}, and that is deliberate rather than a
-       dropped placeholder. The arity check compares each key against its own satellite
-       and never against its sibling, so it is legal. A language that does want the
-       numeral in its one-form adds a satellite-only
-       Completion.NothingOfferedBody.One override, whose arity is checked against the
-       .Plural and may therefore carry {0}.
+       SO THIS PAIR'S {N} SETS DIFFER, the singular carrying {2} and neither {0} nor {1},
+       and that is deliberate rather than a dropped placeholder. The arity check
+       compares each key against its own satellite and never against its sibling, so it
+       is legal. A language that does want the numeral in its one-form adds a
+       satellite-only Completion.NothingOfferedBody.One override, whose arity is checked
+       against the .Plural and may therefore carry {0}.
 
        Cli.NothingOffered IS THE SAME SENTENCE WITH THE SAME ARGUMENTS AND IT IS THE
        CONTROL FOR WHERE A LANGUAGE PUTS THE SLOT, never the English. Japanese keeps its
@@ -658,49 +657,39 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
        and that is correct. An editor pattern-matching on the English gets all three
        wrong.
 
-       TURKISH TAKES THE SLOT BY RECASTING, AND THE RECAST IS NOT INVENTED HERE. Its
-       old value read "sunabileceği {0} dosyanın ({1}) tamamını tuttu", whose counted
-       noun is genitive because "tamamını" governs the genitive, while Plural.File
-       supplies the nominative alone. Leaving the noun spelled and skipping {1} was the
-       obvious way out and it is not available: every satellite generator compares a
-       value's placeholder set against the neutral's and fails on a missing index, with
-       no exemption anywhere. So the wording here is its own Cli.NothingOffered's,
-       already shipping, which drops "tamamını" and moves to the passive "geri tutuldu"
-       so the counted noun can stand in the nominative the slot fills.
+       IN TURKISH THE SLOT HAS TO STAND WHERE THE NOMINATIVE IS RIGHT, because
+       Plural.File supplies the nominative alone. A construction ending on "tamamını"
+       governs the genitive, which the slot cannot give. Spelling the noun into the value
+       and leaving {1} out is not available either: every satellite generator compares a
+       value's placeholder set against the neutral's and fails on a missing index. The
+       Turkish Cli.NothingOffered carries the same wording as this body, and the two move
+       together.
 
-       FOUR THINGS WERE CUT FROM THE DRAFTED BODY AND THE REASONS ARE THE OWNER'S, so do
-       not put them back. "Nothing is wrong with your PC" cannot be known, and it is
-       false in the worst direction: the conditions that reach this screen include a
-       malformed registration, a drive that is not attached and a permission refusal, so
-       the screen can be the one sign that something IS wrong. "Nothing was removed or
-       changed" plants the worry it settles, this screen appearing straight after a scan
-       and before anything has been pressed. "Sorry to send you away empty-handed" went
-       with them. And "rather than guess" describes something the app never does, which
-       raises a possibility that was never on the table. -->
+       THE BODY SAYS WHAT THE APP DID AND NOTHING MORE, IN EVERY LANGUAGE. It does not
+       say that nothing is wrong with the PC, which cannot be known: the conditions that
+       reach this screen include a malformed registration, a drive that is not attached
+       and a permission refusal, so the screen can be the one sign that something is. It
+       does not say that nothing was removed or changed: the screen appears straight
+       after a scan, before anything has been pressed, and that sentence would plant the
+       worry it settles. It carries no apology. And it does not say the app held the
+       files back rather than guess: the app does not guess, so the phrase would raise a
+       possibility that is not there. -->
   <data name="Completion.NothingOffered" xml:space="preserve"><value>Nada oferecido neste PC</value></data>
   <data name="Completion.NothingOfferedBody.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({2}) em vez de oferecê-lo.</value></data>
   <data name="Completion.NothingOfferedBody.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve todos os {0} {1} ({2}) em vez de oferecê-los.</value></data>
-  <!-- The same screen for a machine whose offer was not emptied wholesale. The body
-       above is for a run where a finding about the records took the whole walk-derived
-       offer at once; this one is for a run that kept every candidate back on its own
-       verdict, where that finding is false of the files it kept. It states only what
-       is true of all of them.
+  <!-- The same screen's body for every run the pair above does not cover: files the
+       scan judged one at a time, a file under a day old, a superseded patch the scan
+       held back, and any mix of those with the finding about the records, whose sentence
+       is false of every file that finding did not take. It states only what is true of
+       all of them.
 
        0 = files held back, 1 = pluralised "file"/"files", 2 = their size, and the
        one-form names the size rather than the numeral, exactly as the pair above
        does. "All {0} {1}" and "any of the cached files" because this machine was
-       offered nothing; the main window's line under an offer says "some". -->
+       offered nothing; the command line's sentence under an offer,
+       Cli.NothingListedPerFile, says "some". -->
   <data name="Completion.NothingOfferedPerFileBody.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu estabelecer que o arquivo em cache que encontrou não é necessário, então reteve esse único arquivo ({2}) em vez de oferecê-lo.</value></data>
   <data name="Completion.NothingOfferedPerFileBody.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu estabelecer de nenhum dos arquivos em cache que encontrou que não seja necessário, então reteve todos os {0} {1} ({2}) em vez de oferecê-los.</value></data>
-  <!-- RETIRED AND UNREAD. No code reads this key. It sits on check-dead-resx-keys.mjs's
-       retired list with the four that follow, and why the retired strings are kept
-       rather than deleted is written out there rather than repeated here.
-
-       The act-time twin of the pair above, in the pending-reboot gate's shape: the batch
-       was confirmed and nothing ran. It was separate from the scan-time pair because it
-       had to explain a button press that did nothing, where those explained an empty
-       list. It went with the cached-package identity check and did not come back with
-       them: nothing refuses a confirmed batch that way now. -->
   <!-- The line under the post-Move summary, in its two forms: the backup folder
        is on another drive, or on the drive the files came from. Delete has no
        counterpart, and deliberately: nothing is left in a folder after a delete,
@@ -948,91 +937,6 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
   <data name="Summary.MissingFromDisk.OtherPrograms.Plural" xml:space="preserve"><value>{0} outros programas</value></data>
   <data name="Summary.MissingFromDisk.Unnamed.Singular" xml:space="preserve"><value>{0} arquivo sem nenhum programa nomeado nos registros</value></data>
   <data name="Summary.MissingFromDisk.Unnamed.Plural" xml:space="preserve"><value>{0} arquivos sem nenhum programa nomeado nos registros</value></data>
-  <!-- THE LINE THAT SAYS THE WALK-DERIVED LIST IS NOT THE ANSWER TO THE QUESTION
-       ABOVE IT. Body.MainExplanation.Why states two criteria for listing a file,
-       and on this machine the first one did not run: files no program claims are
-       sitting in the folder and were held back rather than listed. Without this
-       line a user reads a rule the scan suspended, sees none of the first kind and
-       concludes there were none, which is the same fault as the command line's old
-       "Found no unneeded files" and gets the same answer.
-
-       0 = files held back, 1 = pluralised "file"/"files".
-
-       WHERE NOTHING AT ALL IS OFFERED THIS LINE DOES NOT APPEAR, AND THE COUNT IS
-       WHAT DOES THAT RATHER THAN THE SCREEN IN FRONT OF IT. The completion screen
-       replaces the surface and says the honest thing there, but it is dismissible
-       (CompletionViewModel.Dismiss), so the window underneath is reachable and a
-       line left switched on would be read there. What keeps it off is the term in
-       ScanViewModel that zeroes the number this line prints when nothing was
-       offered. This is for the machine that IS offered something: a superseded
-       registration surviving every withholding, offered beside a walk-derived half
-       that was emptied.
-
-       IT NAMES NO CAUSE. Several different findings empty a walk offer this way and
-       any sentence naming one is false on the others; the opening clause is what is
-       true of all of them, and it is the clause both the completion screen and the
-       command line already use.
-
-       "Rather than offering them" and not "rather than listing them", because the
-       held-back files are listed: the Details window shows them among the
-       registrations, in one list. What this scan declined to do is offer them, and
-       that is what the sentence says. The one-form spends neither placeholder and names the file
-       instead of the numeral, as the other one-forms here do. -->
-  <data name="Summary.NothingListed.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo em vez de oferecê-lo.</value></data>
-  <data name="Summary.NothingListed.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve {0} {1} em vez de oferecê-los.</value></data>
-  <!-- The same line for a machine whose withholding was not wholesale. The pair
-       above is for a run whose walk-derived offer was emptied in one go; this pair is
-       for a run that judged candidates one at a time and kept some of them back, so
-       no single finding about the machine's records accounts for the list. The pair
-       above names such a finding and it would be false of these files, so this pair
-       says only what is true of every file on the list whatever kept it there: the
-       app could not be certain about them.
-
-       "Some of the cached files" and not "any of them", because something was offered
-       beside these. The screen for a machine that was offered nothing at all
-       (Completion.NothingOfferedPerFileBody.*) says "any", and the two must not be
-       swapped. The one-form spends neither placeholder, and where the pair above has
-       to name the file in its second clause, this one has already named it in the
-       first and points back at it, so no noun in it has to agree with a numeral. -->
-  <data name="Summary.NothingListedPerFile.Singular" xml:space="preserve"><value>O InstallerClean não teve certeza sobre um dos arquivos em cache que encontrou, então o reteve em vez de oferecê-lo.</value></data>
-  <data name="Summary.NothingListedPerFile.Plural" xml:space="preserve"><value>O InstallerClean não teve certeza sobre alguns dos arquivos em cache que encontrou, então reteve {0} {1} em vez de oferecê-los.</value></data>
-  <!-- THE SECOND HELD-BACK LINE, AND IT IS THE PAIR OF THE ONE ABOVE RATHER THAN
-       A DIFFERENT KIND OF SENTENCE. Summary.NothingListed reports what the
-       walk-derived half of the scan held back; this reports what the superseded
-       half held back. One rule reaching two populations, which is why both open
-       the same way. That opening is a frame rather than a shortage of words, so do
-       not vary it in any language.
-
-       0 = files held back. The one-form spends no placeholder and names the file
-       instead of the numeral, as the other one-forms here do.
-
-       IT NAMES NO CAUSE, AND THE SUPERORDINATE WAS CHECKED AGAINST EVERY ROUTE
-       RATHER THAN ASSUMED. Six separate findings set RemovableWithheld, five of
-       them about one patch and one a sweep over the whole machine, so a sentence
-       naming any one of them is false of the files the other five put in the
-       count. What is true on all six is that the app could not establish that
-       nothing still needs the file, which is the rule the whole app runs on and so
-       does not read as a phrase invented to cover a gap. Do not narrow it, do not
-       name a mechanism and do not add a cause in any language.
-
-       "SUPERSEDED" IS EARNED AND THE COUNT CANNOT HOLD AN OBSOLETED ROW. Every
-       route to RemovableWithheld guards on IsRemovable, the only grant of which is
-       IsRemovablePatch, and that reads a patch state of 2. An obsoleted patch is
-       never offered, so it is never withheld either.
-
-       NO CLOSING CLAUSE, AND BOTH HOSTS SAY THE SAME SENTENCE. Line one closes on
-       "rather than listing them" because the list is what its reader is looking
-       at. Stacked, the two then ended on the same four words in the same grey
-       italic four rows apart, each spending a second row on a two-word tail;
-       without the clause each sits on one row. There is no list at all on a /d or
-       an /m, so the command line could not have carried it either.
-
-       THE GATE IS THE COUNT THIS LINE PRINTS, and not the machine-wide refusal.
-       That refusal is one of six routes into the count rather than the count
-       itself, so gating on it would put this line in front of somebody holding
-       back no superseded file at all. See ScanViewModel.HasSupersededHeldBack. -->
-  <data name="Summary.SupersededHeldBack.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de que o único arquivo substituído não é mais necessário, então o reteve.</value></data>
-  <data name="Summary.SupersededHeldBack.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de que {0} arquivos substituídos não são mais necessários, então os reteve.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} de {1} {2}</value></data>
   <!-- Orphaned-window footer summary. 0 = file count, 1 = pluralised
@@ -1048,9 +952,9 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
   <!-- Registered-window footer summary, over the same set the main window counts.
        Says what the scan did, not what the files are: that set is three
        populations (a live registration claims it; the records called it
-       superseded or obsoleted and this scan could not clear it; no read
-       established a verdict), and "needed" is true of the first alone.
-       ScanResult documents the partition and a test holds it.
+       superseded or obsoleted and this scan could not establish that nothing still
+       needs it; no read established a verdict), and "needed" is true of the first
+       alone. ScanResult documents the partition and a test holds it.
        Still split singular/plural though the verb has gone, for the noun and for
        the .Few overrides pl, ru and uk declare on this key.
        0 = count, 1 = size display. -->
@@ -1626,12 +1530,10 @@ Não foi possível gravar o crash.log.</value></data>
        {2} and leaves {0} and {1} unused; both are passed on either branch so the two
        forms cannot disagree about which index is which.
 
-       IT CLOSED ON "That is not the same as finding nothing to clean up" AND THAT
-       SENTENCE WAS TAKEN OUT. The first sentence already says what happened in
-       full, so the second added no fact: what it added was the app arguing against
-       a conclusion the reader has not reached. The tense also differs from the
-       window's ("held back" here, "has held back" there) and that is deliberate,
-       each being right in its own register. -->
+       ONE SENTENCE AND NO SECOND. It says what happened in full, so a sentence after
+       it, such as one saying this is not the same as finding nothing to clean up,
+       adds no fact: it has the app arguing against a conclusion the reader has not
+       reached. -->
   <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({2}) em vez de oferecê-lo.</value></data>
   <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve todos os {0} {1} ({2}) em vez de oferecê-los.</value></data>
   <!-- The per-file form of the outcome above, for the machine whose offer came out
@@ -1647,28 +1549,26 @@ Não foi possível gravar o crash.log.</value></data>
        says "some" for the machine that was offered something. -->
   <data name="Cli.NothingOfferedPerFile.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu estabelecer que o arquivo em cache que encontrou não é necessário, então reteve esse único arquivo ({2}) em vez de oferecê-lo.</value></data>
   <data name="Cli.NothingOfferedPerFile.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu estabelecer de nenhum dos arquivos em cache que encontrou que não seja necessário, então reteve todos os {0} {1} ({2}) em vez de oferecê-los.</value></data>
-  <!-- The command line's twin of Summary.NothingListed, for the machine whose
-       walk-derived half was withheld wholesale while a superseded row was still
-       offered: that run takes the found-files branch, so Cli.NothingOffered is not
-       printed and this line is the only place the withholding is stated. Word for
-       word the window's sentence, as Cli.SupersededHeldBack is, with the size added
-       because this host already gives one in Cli.NothingOffered. The one-form names
+  <!-- For the machine whose walk-derived half was withheld wholesale while a
+       superseded patch was still offered: that run takes the found-files branch, so
+       Cli.NothingOffered is not printed and this line is where stdout states the
+       withholding. It opens on Cli.NothingOffered's clause and gives the size as that
+       sentence does, and it has no "all" because something was offered beside these
+       files. The one-form names the size and not the numeral, so it spends {2} and
+       leaves {0} and {1} unused; both are passed on either branch so the two forms
+       cannot disagree about which index is which. -->
+  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({2}) em vez de oferecê-lo.</value></data>
+  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve {0} {1} ({2}) em vez de oferecê-los.</value></data>
+  <!-- The per-file form of the pair above: a run that kept files back one at a time
+       while still offering something, so the sentence names no cause that could be
+       false of any file it counts.
+
+       "Some" and no "all", because this machine was offered something, where
+       Cli.NothingOfferedPerFile says "all" and "any" for the machine that was offered
+       nothing. There is no third variation and none may be added. The one-form names
        the size and not the numeral, so it spends {2} and leaves {0} and {1} unused;
        both are passed on either branch so the two forms cannot disagree about which
        index is which. -->
-  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve o único arquivo ({2}) em vez de oferecê-lo.</value></data>
-  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de quais arquivos em cache pertencem aos programas instalados aqui, então reteve {0} {1} ({2}) em vez de oferecê-los.</value></data>
-  <!-- The per-file form of the pair above, and the command line's twin of
-       Summary.NothingListedPerFile: a run that kept files back one at a time while
-       still offering something, so the sentence names no cause that could be false of
-       any file it counts. Word for word the window's line with the size added, as the
-       pair above is.
-
-       "Some" and no "all", because this machine was offered something and the pair
-       above was not. There is no third variation and none may be added. The one-form
-       names the size and not the numeral, so it spends {2} and leaves {0} and {1}
-       unused; both are passed on either branch so the two forms cannot disagree about
-       which index is which. -->
   <data name="Cli.NothingListedPerFile.Singular" xml:space="preserve"><value>O InstallerClean não teve certeza sobre um dos arquivos em cache que encontrou, então reteve esse ({2}) em vez de oferecê-lo.</value></data>
   <data name="Cli.NothingListedPerFile.Plural" xml:space="preserve"><value>O InstallerClean não teve certeza sobre alguns dos arquivos em cache que encontrou, então reteve {0} {1} ({2}) em vez de oferecê-los.</value></data>
   <!-- Introduces the conditions this run met. It prints under whichever of the
@@ -1879,22 +1779,33 @@ Não foi possível gravar o crash.log.</value></data>
        holds it. -->
   <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>O Windows tem um registro de {0} arquivo que não está em {InstallerFolder}: {1}. No dia a dia não causa problema, mas uma atualização ou desinstalação desse programa pode falhar. Para recolocar o arquivo, você precisa do instalador da versão que já tem. Consiga-o com o fabricante do programa e execute-o por cima da sua cópia atual. Uma versão mais nova não serve: ela teria que remover primeiro a que você tem, e é justamente essa etapa que precisa deste arquivo. Desinstalar primeiro também não funciona, pelo mesmo motivo. Isso deve restaurar o arquivo e deixar suas configurações intactas, mas a Microsoft não garante.</value></data>
   <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>O Windows tem registros de {0} arquivos que não estão em {InstallerFolder}: {1}. No dia a dia não causam problema, mas uma atualização ou desinstalação desses programas pode falhar. Para recolocar um arquivo, você precisa do instalador da versão desse programa que já tem. Consiga-o com o fabricante do programa e execute-o por cima da sua cópia atual. Uma versão mais nova não serve: ela teria que remover primeiro a que você tem, e é justamente essa etapa que precisa do arquivo. Desinstalar primeiro também não funciona, pelo mesmo motivo. Isso deve restaurar o arquivo e deixar suas configurações intactas, mas a Microsoft não garante.</value></data>
-  <!-- The command line's own copy of Summary.SupersededHeldBack, whose remarks
-       carry the placeholder, why no cause is named, why "superseded" is earned and
-       why neither host closes on a clause about listing.
+  <!-- Superseded files this run held back. 0 = files held back. The one-form spends
+       no placeholder and names the file instead of the numeral, as the other one-forms
+       here do.
 
-       IT IS THE SAME SENTENCE WORD FOR WORD, WHICH IS NEW. The window's old
-       version closed on "Re-scan to try again", a button this surface has not got,
-       so the two had to differ; the replacement closes on what the app did, which
-       is true wherever it is read. The clause that would still have forced them
-       apart came off both, there being no list at all on a /d or an /m.
+       IT NAMES NO CAUSE, AND THE SUPERORDINATE HOLDS ON EVERY ROUTE INTO THE COUNT. Six
+       separate findings set RemovableWithheld, five of them about one patch and one a
+       sweep over the whole machine, so a sentence naming any one of them is false of
+       the files the other five put in the count. What is true on all six is that the
+       app could not establish that nothing still needs the file, which is the rule the
+       whole app runs on. Do not narrow it, do not name a mechanism and do not add a
+       cause in any language.
 
-       WHAT DOES NOT FOLLOW IS THAT THE TWO HOSTS REPORT THE SAME THINGS. This
-       sentence is for a person. The notice in the 3000 band keeps its own
-       condition and its own figure, on products the enumeration could not account
-       for rather than on files held back, and the two counts are not the same
-       quantity: see
-       Cli.EventLogScanWithheld and ReportScanSignals. -->
+       "SUPERSEDED" IS EARNED AND THE COUNT CANNOT HOLD AN OBSOLETED ROW. Every route to
+       RemovableWithheld guards on IsRemovable, the only grant of which is
+       IsRemovablePatch, and that reads a patch state of 2. An obsoleted patch is never
+       offered, so it is never withheld either.
+
+       IT IS GATED ON THE COUNT IT CARRIES, and never on the machine-wide refusal.
+       That refusal is one of six routes into the count rather than the count itself,
+       so gating on it would tell somebody holding back no superseded file at all that
+       one was held back.
+
+       THIS SENTENCE AND THE NOTICE IN THE 3000 BAND ARE NOT ONE REPORT. This sentence
+       is for a person. The notice keeps its own condition and its own figure, on
+       products the enumeration could not account for rather than on files held back,
+       and the two counts are not the same quantity: see Cli.EventLogScanWithheld and
+       ReportScanSignals. -->
   <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de que o único arquivo substituído não é mais necessário, então o reteve.</value></data>
   <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>O InstallerClean não conseguiu ter certeza de que {0} arquivos substituídos não são mais necessários, então os reteve.</value></data>
   <!-- 0 = mode arg, 1 = installed products the enumeration could not account
@@ -1914,12 +1825,11 @@ Não foi possível gravar o crash.log.</value></data>
        The count this line prints is an estimate that can come out high as well
        as low, which
        MachineContract's remarks set out: it is sound to alert on and to trend,
-       and it is not a headcount of programs. The window says nothing about it at
-       all, for that reason and then for a larger one, and this line keeps it, an
-       RMM having a filter to hang on a number. THE WINDOW'S LINE IS NOT THIS
-       FIGURE IN OTHER WORDS: Summary.SupersededHeldBack counts files held back,
-       which is a different quantity reached by six routes, of which the count
-       here is one. -->
+       and it is not a headcount of programs. The window does not show it, and
+       this line keeps it, an RMM having a filter to hang on a number.
+       Cli.SupersededHeldBack IS NOT THIS FIGURE IN OTHER WORDS: it counts files
+       held back, which is a different quantity reached by six routes, of which
+       the condition here is one. -->
   <!-- 0 = mode arg, 1 = registrations naming a file that is not in the cache. The
        second notice (Event ID 3001), and the actionable one. A pair, because the
        numeral governs a noun and a verb: one entry NAMES a file and affects one

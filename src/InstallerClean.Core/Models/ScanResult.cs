@@ -125,9 +125,9 @@ namespace InstallerClean.Models;
 /// they are simply not offered, and they have their own count. The predicate settles
 /// it: nothing reaches the flag without having
 /// carried IsRemovable, and IsRemovablePatch requires state 2. THAT IS A
-/// USER-FACING CLAIM RATHER THAN AN INTERNAL ONE: both hosts name the class in
-/// as many words (<c>Summary.SupersededHeldBack</c>, <c>Cli.SupersededHeldBack</c>),
-/// so this count and that noun have to agree.
+/// USER-FACING CLAIM RATHER THAN AN INTERNAL ONE: the command line names the class
+/// in as many words (<c>Cli.SupersededHeldBack</c>), so this count and that noun
+/// have to agree.
 ///
 /// AND A PRODUCT THAT COULD ROLL BACK ONTO THE FILE IS NOT IN IT EITHER. That
 /// condition is
@@ -338,9 +338,9 @@ namespace InstallerClean.Models;
 ///
 /// IT CANNOT BE TRUE WITH <see cref="WithheldFiles"/> EMPTY, and that holds by
 /// construction rather than by coincidence. A machine that took the branch and had
-/// nothing to withhold reads false here, and the all-clear is right for it, nothing in
-/// its folder having gone unclaimed. The reverse does not hold, and no host may assume
-/// it: the other decisions put files in that list on runs where this is false.
+/// nothing to withhold reads false here, nothing in its folder having gone unclaimed.
+/// The reverse does not hold, and no host may assume it: the other decisions put files
+/// in that list on runs where this is false.
 ///
 /// NO CAUSE TRAVELS WITH IT AND NONE MAY BE ADDED. Several conditions can empty an
 /// offer wholesale and they are different facts about a machine, so a bool is the
@@ -368,16 +368,30 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="WithheldDeclaredProductInstalledBytes">
 /// The size of the files <see cref="WithholdingSplit.DeclaredProductInstalledCount"/>
-/// counts, so that <see cref="UnestablishedWithheldBytes"/> can be the size of the rest.
-/// Carried here rather than on the split, which holds counts and nothing else.
+/// counts, so that <see cref="UnestablishedWithheldBytes"/> and
+/// <see cref="UnsettledHeldBackBytes"/> can each leave them out. Carried here rather
+/// than on the split, which holds counts and nothing else.
 /// </param>
 /// <param name="WithheldUnderADayOldBytes">
-/// The size of the files <see cref="WithholdingSplit.UnderADayOldCount"/> counts, for
-/// the same reason and carried the same way.
+/// The size of the files <see cref="WithholdingSplit.UnderADayOldCount"/> counts, so
+/// that <see cref="UnestablishedWithheldBytes"/> can leave them out, carried the same
+/// way.
 /// </param>
 /// <param name="WithheldDeclaredPatchRegisteredBytes">
 /// The size of the files <see cref="WithholdingSplit.DeclaredPatchRegisteredCount"/>
-/// counts, for the same reason and carried the same way.
+/// counts, so that <see cref="UnestablishedWithheldBytes"/> and
+/// <see cref="UnsettledHeldBackBytes"/> can each leave them out, carried the same way.
+/// </param>
+/// <param name="SupersededWithheldBytes">
+/// The size of the files <see cref="WithheldCount"/> counts, summed over the same rows:
+/// superseded rows held back whose file is on disk. <see cref="UnsettledHeldBackBytes"/>
+/// adds it to the size of the walk-derived files.
+///
+/// IT IS NOT <see cref="RegisteredSupersededBytes"/>, which sizes every superseded or
+/// obsoleted row the scan is keeping, held back or not.
+///
+/// APPENDED AFTER EVERY OTHER MEMBER, so a positional construction of the rest still
+/// means what it meant.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
@@ -404,7 +418,8 @@ public record ScanResult(
     WithholdingSplit WithheldBy = default,
     long WithheldDeclaredProductInstalledBytes = 0,
     long WithheldUnderADayOldBytes = 0,
-    long WithheldDeclaredPatchRegisteredBytes = 0)
+    long WithheldDeclaredPatchRegisteredBytes = 0,
+    long SupersededWithheldBytes = 0)
 {
     /// <summary>
     /// Every registration naming a file that is not on disk, the sum of the two
@@ -431,8 +446,9 @@ public record ScanResult(
         WithheldFiles?.Sum(f => f.SizeBytes) ?? 0;
 
     /// <summary>
-    /// How many withheld files the held-back sentences speak of: every withheld file
-    /// except those <see cref="WithholdingSplit.DeclaredProductInstalledCount"/>,
+    /// How many withheld files the command line's held-back sentences speak of: every
+    /// withheld file except those
+    /// <see cref="WithholdingSplit.DeclaredProductInstalledCount"/>,
     /// <see cref="WithholdingSplit.UnderADayOldCount"/> and
     /// <see cref="WithholdingSplit.DeclaredPatchRegisteredCount"/> count.
     /// <see cref="UnestablishedWithheldBytes"/> is their size.
@@ -476,12 +492,14 @@ public record ScanResult(
         WithholdingLegs.Fired(Census, RegistrationIdentityReads);
 
     /// <summary>
-    /// What this run's withholding amounts to, for a host deciding what to tell
-    /// somebody about it.
+    /// What this run's withholding amounts to, for the command line deciding what to
+    /// tell somebody about it. The window's finished screen reads
+    /// <see cref="UnsettledHeldBackCount"/> and <see cref="UnsettledHeldBackIsWholesale"/>
+    /// instead.
     ///
-    /// A SURFACE MAKES TWO DECISIONS AND NOT ONE: whether to say anything about a
+    /// THE COMMAND LINE MAKES TWO DECISIONS AND NOT ONE: whether to say anything about a
     /// withholding at all, which <see cref="HasWithholdingToReport"/> answers, and
-    /// which of the two sentences the machine has earned. A surface says nothing for
+    /// which of the two sentences the machine has earned. It says nothing for
     /// <see cref="WithholdingAccount.Nothing"/> and
     /// <see cref="WithholdingAccount.KeptWithoutNotice"/> alike. Asking
     /// whether <see cref="WithheldFiles"/> is empty answers neither question, and
@@ -535,8 +553,8 @@ public record ScanResult(
     }
 
     /// <summary>
-    /// Whether a surface has anything to say about this run's withholding: false for
-    /// <see cref="WithholdingAccount.Nothing"/> and
+    /// Whether the command line has anything to say about this run's withholding: false
+    /// for <see cref="WithholdingAccount.Nothing"/> and
     /// <see cref="WithholdingAccount.KeptWithoutNotice"/>, true for every other
     /// reading. Written as the two silent readings excluded, so a reading added to the
     /// enum is reported rather than silenced.
@@ -545,15 +563,15 @@ public record ScanResult(
         Withholding is not (WithholdingAccount.Nothing or WithholdingAccount.KeptWithoutNotice);
 
     /// <summary>
-    /// Whether the conditions a host can name account for every file
+    /// Whether the conditions the command line can name account for every file
     /// <see cref="UnestablishedWithheldCount"/> counts: the wholesale arm, spoken for by
     /// <see cref="WithholdingLegsFired"/>, and the arms
     /// <see cref="WithholdingSplit.ArmsFired"/> can return.
     ///
     /// WHERE IT IS FALSE, A LIST OF REASONS UNDER THE HELD-BACK SENTENCE WOULD BE SHORT
-    /// OF THE FILES THAT SENTENCE COUNTS, so a host prints the sentence on its own. The
-    /// age-unestablished arm has no reason line and is the arm that makes it false; a
-    /// file no arm counted makes it false too.
+    /// OF THE FILES THAT SENTENCE COUNTS, so the command line prints the sentence on its
+    /// own. The age-unestablished arm has no reason line and is the arm that makes it
+    /// false; a file no arm counted makes it false too.
     ///
     /// WRITTEN AS THE NAMED ARMS ADDING UP TO THE COUNT, so an arm added to
     /// <see cref="WithholdingSplit"/> later without a reason line makes it false rather
@@ -566,16 +584,83 @@ public record ScanResult(
         + WithheldBy.ScreenUnansweredCount
         + WithheldBy.DeclaredPatchUnestablishedCount
         == UnestablishedWithheldCount;
+
+    /// <summary>
+    /// How many files the window's finished screen says were held back: every file on
+    /// <see cref="WithheldFiles"/> except those
+    /// <see cref="WithholdingSplit.DeclaredProductInstalledCount"/> and
+    /// <see cref="WithholdingSplit.DeclaredPatchRegisteredCount"/> count, together with
+    /// the superseded files <see cref="WithheldCount"/> counts.
+    /// <see cref="UnsettledHeldBackBytes"/> is their size.
+    ///
+    /// THE TWO ARMS LEFT OUT KEEP A FILE BECAUSE WINDOWS HOLDS A RECORD OF THE PROGRAM OR
+    /// PATCH IT DECLARES. Every other file held back, and every superseded file
+    /// <see cref="WithheldCount"/> counts, was kept without the scan establishing either
+    /// way whether anything needs it: a file under a day old, a file whose age was not
+    /// established, a superseded patch the scan held back, and a file kept on any other
+    /// verdict alike.
+    ///
+    /// IT IS THE LIST LESS THOSE TWO ARMS, NOT A SUM OF THE OTHERS, so a walk-derived file
+    /// no arm counted, or one counted by an arm added to <see cref="WithholdingSplit"/>
+    /// later, is counted here.
+    ///
+    /// THE COMMAND LINE DOES NOT READ IT. It speaks
+    /// <see cref="UnestablishedWithheldCount"/> and <see cref="WithheldCount"/> in separate
+    /// sentences, and the first of those leaves out a file under a day old.
+    /// </summary>
+    public int UnsettledHeldBackCount =>
+        Math.Max(0, (WithheldFiles?.Count ?? 0)
+            - WithheldBy.DeclaredProductInstalledCount
+            - WithheldBy.DeclaredPatchRegisteredCount)
+        + WithheldCount;
+
+    /// <summary>
+    /// The size of the files <see cref="UnsettledHeldBackCount"/> counts, on the same
+    /// reading: the withheld list's size less that of the files the
+    /// declared-product-installed and declared-patch-registered arms count, together with
+    /// <see cref="SupersededWithheldBytes"/>.
+    /// </summary>
+    public long UnsettledHeldBackBytes =>
+        Math.Max(0, WithheldTotalBytes
+            - WithheldDeclaredProductInstalledBytes
+            - WithheldDeclaredPatchRegisteredBytes)
+        + SupersededWithheldBytes;
+
+    /// <summary>
+    /// Whether the window's finished screen, on a run that offered nothing, speaks of
+    /// files held back rather than giving the all-clear: true wherever
+    /// <see cref="UnsettledHeldBackCount"/> is above zero.
+    /// </summary>
+    public bool HasUnsettledHeldBack => UnsettledHeldBackCount > 0;
+
+    /// <summary>
+    /// Whether the wholesale arm accounts for every file
+    /// <see cref="UnsettledHeldBackCount"/> counts. Where it does, the window's finished
+    /// screen gives the sentence naming what the scan could not establish about the
+    /// machine's records; on any other run with files to count, it gives the sentence
+    /// true of every one of them, on the reasoning <see cref="Withholding"/> sets out.
+    ///
+    /// A SUPERSEDED FILE ALWAYS TAKES THE OTHER SENTENCE. The wholesale arm counts
+    /// walk-derived files alone, so it cannot account for a superseded one.
+    ///
+    /// FALSE WHERE NOTHING IS COUNTED. A wholesale arm of zero equals a count of zero, and
+    /// that equality is evidence of nothing.
+    /// </summary>
+    public bool UnsettledHeldBackIsWholesale =>
+        UnsettledHeldBackCount > 0 && WithheldBy.WholesaleCount == UnsettledHeldBackCount;
 }
 
 /// <summary>
-/// What a scan's withholding amounts to, in the terms a host has to speak it.
+/// What a scan's withholding amounts to, in the terms the command line has to speak it.
+/// The window's finished screen does not read it; its reading is
+/// <see cref="ScanResult.UnsettledHeldBackCount"/>.
 ///
-/// A HOST STAYS SILENT FOR <see cref="Nothing"/> AND <see cref="KeptWithoutNotice"/>
-/// AND FOR NOTHING ELSE, through <see cref="ScanResult.HasWithholdingToReport"/>, and
-/// speaks the wholesale sentence for <see cref="WholeWalkOffer"/> and the per-file one
-/// for every other member. A member added later is therefore spoken of in the sentence
-/// true of every file, rather than passed over.
+/// THE COMMAND LINE STAYS SILENT FOR <see cref="Nothing"/> AND
+/// <see cref="KeptWithoutNotice"/> AND FOR NOTHING ELSE, through
+/// <see cref="ScanResult.HasWithholdingToReport"/>, and speaks the wholesale sentence for
+/// <see cref="WholeWalkOffer"/> and the per-file one for every other member. A member
+/// added later is therefore spoken of in the sentence true of every file, rather than
+/// passed over.
 ///
 /// IT IS A READING OF A RESULT AND NOT A DECISION OF ITS OWN. Nothing sets one of
 /// these; <see cref="ScanResult.Withholding"/> derives it from the withheld list and
@@ -584,8 +669,8 @@ public record ScanResult(
 public enum WithholdingAccount
 {
     /// <summary>
-    /// This scan kept nothing back, so there is nothing for a surface to say and the
-    /// all-clear is the machine's to have.
+    /// This scan kept nothing back from the folder walk, so the command line's walk
+    /// sentence has nothing to count.
     /// </summary>
     Nothing,
 
@@ -602,9 +687,10 @@ public enum WithholdingAccount
     /// were unneeded. A run that kept files back both ways reads as this, the wholesale
     /// sentence being false of the half it did not cover.
     ///
-    /// THE SENTENCE COUNTS <see cref="ScanResult.UnestablishedWithheldCount"/>, NOT THE
-    /// WHOLE LIST, so a file any of those three arms kept is left out of it. A file the
-    /// age check kept because its age was not established is in it.
+    /// THE COMMAND LINE'S SENTENCE COUNTS
+    /// <see cref="ScanResult.UnestablishedWithheldCount"/>, NOT THE WHOLE LIST, so a file
+    /// any of those three arms kept is left out of it. A file the age check kept because
+    /// its age was not established is in it.
     /// </summary>
     PerFile,
 
@@ -619,8 +705,10 @@ public enum WithholdingAccount
     /// afresh. The third is a patch copy whose declared patch Windows holds a
     /// registration of, where at least one registration opens a copy of the patch, its
     /// cached copy or its original at a source, that the check could not show is a
-    /// different file. A surface says what it says on a run that kept nothing back, and
-    /// the files stay among those left alone.
+    /// different file. The command line says what it says on a run that kept nothing
+    /// back, and the files stay among those left alone. The window's finished screen
+    /// counts a file under a day old among those held back, through
+    /// <see cref="ScanResult.UnsettledHeldBackCount"/>.
     /// </summary>
     KeptWithoutNotice,
 }
@@ -771,12 +859,16 @@ public static class ShortNameCreationLabels
 /// about one machine, and nothing may add any two of them and call the result a
 /// cause: what is true of every file on the list is only that the scan declined to
 /// offer it. The opt-in report carries all nine, each under its own key, and a member
-/// added here goes there too. Inside the app, the under-a-day-old and
-/// declared-patch-registered counts are read by
+/// added here goes there too. Inside the app, the declared-product-installed,
+/// under-a-day-old and declared-patch-registered counts are read by
 /// <see cref="ScanResult.UnestablishedWithheldCount"/> and
-/// <see cref="ScanResult.Withholding"/>, the age-unestablished count by
-/// <see cref="Total"/> alone, and the declared-patch-unestablished count by
-/// <see cref="ArmsFired"/> and <see cref="ScanResult.NamedConditionsCoverEveryHeldBackFile"/>.
+/// <see cref="ScanResult.Withholding"/>, and the first and last of those three by
+/// <see cref="ScanResult.UnsettledHeldBackCount"/> as well. The wholesale count is read
+/// by <see cref="ScanResult.Withholding"/>,
+/// <see cref="ScanResult.NamedConditionsCoverEveryHeldBackFile"/> and
+/// <see cref="ScanResult.UnsettledHeldBackIsWholesale"/>. The age-unestablished count is
+/// read by <see cref="Total"/> alone, and the other four by <see cref="ArmsFired"/> and
+/// <see cref="ScanResult.NamedConditionsCoverEveryHeldBackFile"/>.
 ///
 /// <see cref="Total"/> IS WHAT HOLDS THE PARTITION HONEST, and it is asserted against
 /// the list's own length rather than trusted. A partition is a partition until
@@ -848,8 +940,8 @@ public readonly record struct WithholdingSplit(
 
     /// <summary>
     /// Which of the per-file decisions the scan could not settle kept anything back,
-    /// in declaration order, for a host that explains the withholding rather than only
-    /// reporting it.
+    /// in declaration order, for the command line, which explains the withholding
+    /// rather than only reporting it.
     ///
     /// THE WHOLESALE ARM IS NOT AMONG THEM. <see cref="WholesaleCount"/> counts files
     /// kept back on a condition about the machine's records, and
@@ -858,11 +950,13 @@ public readonly record struct WithholdingSplit(
     /// would say it a second time.
     ///
     /// NOR ARE THE DECLARED-PRODUCT-INSTALLED, UNDER-A-DAY-OLD, DECLARED-PATCH-REGISTERED
-    /// AND AGE-UNESTABLISHED ARMS, so a host reading this list names no reason for the
-    /// files those four count. The first three are silent. The fourth is spoken of in
-    /// the per-file sentence with no line of its own, and
-    /// <see cref="ScanResult.NamedConditionsCoverEveryHeldBackFile"/> is what tells a
-    /// host that such files are among those the sentence counts.
+    /// AND AGE-UNESTABLISHED ARMS, so the command line names no reason for the files
+    /// those four count. It says nothing of the first three. The fourth is spoken of in
+    /// its per-file sentence with no line of its own, and
+    /// <see cref="ScanResult.NamedConditionsCoverEveryHeldBackFile"/> is what tells it
+    /// that such files are among those the sentence counts. The window's finished screen
+    /// names no reasons at all, and counts the under-a-day-old and age-unestablished arms'
+    /// files among those it says were held back.
     ///
     /// A MEMBER MEANS ONE DECISION KEPT AT LEAST ONE FILE, AND NEVER A CAUSE FOR ANY
     /// PARTICULAR ONE. Any combination of them can hold at once, so nothing sums over

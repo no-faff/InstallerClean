@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} weitere Programme |
 | {0} file with no program named in the records | {0} Datei, zu der die Einträge kein Programm nennen |
 | {0} files with no program named in the records | {0} Dateien, zu denen die Einträge kein Programm nennen |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb die eine Datei zurückgehalten, statt sie anzubieten. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean konnte nicht sicher feststellen, welche zwischengespeicherten Dateien zu den hier installierten Programmen gehören, und hat deshalb {0} {1} zurückgehalten, statt sie anzubieten. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean war sich bei einer der gefundenen zwischengespeicherten Dateien nicht sicher und hat diese eine deshalb zurückgehalten, statt sie anzubieten. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean war sich bei einigen der gefundenen zwischengespeicherten Dateien nicht sicher und hat deshalb {0} {1} zurückgehalten, statt sie anzubieten. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean konnte nicht sicher feststellen, dass die eine ersetzte Datei nicht mehr gebraucht wird, und hat sie deshalb zurückgehalten. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean konnte nicht sicher feststellen, dass {0} ersetzte Dateien nicht mehr gebraucht werden, und hat sie deshalb zurückgehalten. |
 | {0} of {1} {2} | {0} von {1} {2} |
 | {0} unneeded {1} ({2}) | {0} nicht benötigte {1} ({2}) |
 | {0} file left alone ({1}) | {0} Datei unangetastet ({1}) |

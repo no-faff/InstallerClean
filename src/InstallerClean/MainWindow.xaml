@@ -317,84 +317,16 @@
                             AutomationProperties.HelpText="{loc:Translate Automation.ViewRegisteredFiles.HelpText}"/>
                 </Grid>
 
-                <!-- FIRST OF THE TWO HELD-BACK FOOTNOTES, AND THEY ARE ADJACENT
-                     BECAUSE THEY ARE ONE SENTENCE ABOUT TWO POPULATIONS. This line and
-                     the one below it each open on what the scan could not establish
-                     and close on what it held back, and carry the same italic caption
-                     treatment with no icon on either: one rule reaching the walk side
-                     and the registered side of the same scan. A reader meets them as a
-                     pair or not at all.
-
-                     THE WARNING GOES UNDER BOTH, and it is the only line in the block
-                     carrying something to act on, so it ends up nearest the buttons.
-                     Its own note places it under the left-alone count, which is where
-                     it now is.
-
-                     WHAT THIS ONE SAYS AND WHY IT HAS TO. The explanation at the top of
-                     this window states two criteria for listing a file, and on this
-                     machine the first one did not run: files no program claims are in
-                     that folder and were held back rather than listed, so a reader
-                     taking that explanation as the rule behind the list concludes there
-                     were none of them.
-
-                     Same low-emphasis treatment as the two below and the same Polite
-                     live setting, being a fact about the scan rather than something to
-                     act on. It cannot appear on the all-clear, and its own count is
-                     what does that rather than the screen in front of it: the
-                     completion screen is dismissible, so a line left switched on would
-                     be read on the window underneath. -->
-                <TextBlock x:Name="NothingListedText"
-                           Visibility="{Binding Scan.HasNothingListed, Converter={StaticResource BoolToVis}}"
-                           Text="{Binding Scan.NothingListedText}"
-                           Foreground="{StaticResource Text.Muted}"
-                           FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
-                           TextWrapping="Wrap"
-                           Margin="{StaticResource GapTop.Sm}"
-                           AutomationProperties.LiveSetting="Polite"/>
-
-                <!-- Superseded files this scan held back (informational), and the
-                     pair of the line directly above rather than a different kind of
-                     line: the same sentence about the other half of the scan. The app could
-                     not establish that nothing still needed them, so it kept them.
-                     Same low-emphasis treatment as the line above and for the same
-                     reason, nothing being wrong with the machine and there being
-                     nothing for the user to do.
-
-                     IT NAMES NO CAUSE, AND THE STRING'S OWN REMARKS CARRY WHY: six
-                     separate findings reach this count, so a sentence naming one of
-                     them is false of the files the other five contribute.
-
-                     GATED ON THE COUNT IT PRINTS. It was gated on the count of
-                     products the scan could not account for, which is the trigger for
-                     one of those six routes rather than a count of files at all, so it
-                     could appear on a machine that had held nothing back and tell its
-                     owner otherwise. -->
-                <TextBlock x:Name="SupersededHeldBackText"
-                           Visibility="{Binding Scan.HasSupersededHeldBack, Converter={StaticResource BoolToVis}}"
-                           Text="{Binding Scan.SupersededHeldBackText}"
-                           Foreground="{StaticResource Text.Muted}"
-                           FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
-                           TextWrapping="Wrap"
-                           Margin="{StaticResource GapTop.Sm}"
-                           AutomationProperties.LiveSetting="Polite"/>
-
                 <!-- Registered files missing from disk. Sits as a footnote
                      under the left-alone count: a missing file is one of the
                      needed files, Windows still expects it, it just isn't on
                      disk. DockPanel (not a horizontal StackPanel) so the
                      advisory wraps; icon docks left, aligned to the first line.
 
-                     LAST OF THE THREE, BECAUSE IT IS THE ONLY ONE WITH ANYTHING TO
-                     DO IN IT. The two held-back lines above are facts about the scan
-                     and stay together; this one names programs whose update or
-                     uninstall can fail, so it sits closest to the buttons and it is
-                     the line the amber icon marks out.
-
-                     The text takes Type.Caption, as the two footnotes above it
-                     do, and it has to be a size token rather than
-                     nothing: the icon beside it is TextScaled, so an unsized
-                     TextBlock leaves the warning growing with the OS text-size
-                     setting while the sentence it belongs to stays put. -->
+                     The text takes Type.Caption, and it has to be a size token
+                     rather than nothing: the icon beside it is TextScaled, so an
+                     unsized TextBlock leaves the warning growing with the OS
+                     text-size setting while the sentence it belongs to stays put. -->
                 <DockPanel Margin="{StaticResource GapTop.Sm}"
                            Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"

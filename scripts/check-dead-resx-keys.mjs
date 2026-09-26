@@ -61,31 +61,12 @@ const ALLOWLIST = new Set([
   // FILE declares about itself, and a file that yielded no code to ask about.
   'Completion.ReverifyIdentityClaimed',
   'Completion.ReverifyIdentityUnreadable',
-
-  // Completion.NothingOffered and its body STOOD HERE AND ARE IN SERVICE AGAIN FROM
-  // 3.0.0, read by CompletionViewModel.ShowNothingOffered. The body is now a
-  // .Singular/.Plural pair rather than the single key that stood here. Their entries
-  // are gone because the stale-entry check below would have failed on them, which is
-  // that check doing exactly what it was added for: the revival made the entries
-  // allow nothing, and an entry that allows nothing reads as a checked decision and
-  // is not one. Named here rather than silently dropped so the next reader can see
-  // that the pair left this list deliberately and is not missing from it.
 ]);
 
-// FIVE INSTANCE-REFUSAL KEYS ARE GONE FROM THE RESX, NOT FROM THIS LIST ONLY.
-// Completion.InstanceRefusal, Cli.NothingOfferedInstance,
-// Cli.EventLogNothingOfferedInstance, Cli.InstanceRefusal and
-// Cli.EventLogInstanceRefusal, all surfaces for the second-instance condition.
-// They stood in the neutral and in none of the satellites, so removing the
-// English threw away no translation and there is nothing here to put back.
-//
-// AND THE OTHER REASON DOES NOT REACH THEM EITHER. All five NAME A CAUSE. A
-// cause-naming string for a mechanism that has left the tree cannot be brought
-// back into service, only re-read as licence to name that cause again: this
-// release proved it when Completion.NothingOffered returned and its heading was
-// reusable while its body had to be thrown away and written afresh, the old body
-// having named the identity check. A heading can wait for a new condition. A
-// sentence about a condition cannot outlive it.
+// A KEY THAT NAMES A CAUSE LEAVES THE RESX WITH ITS MECHANISM RATHER THAN JOINING
+// THIS LIST. Kept, it can only be re-read as licence to name that cause again. A
+// heading can wait for a new condition; a sentence about a condition cannot
+// outlive it.
 
 // Every .cs / .xaml under src/, minus bin/ and obj/ (build output mirrors source)
 // and minus the generated Designer (it defines an accessor for every key).

@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} program daha |
 | {0} file with no program named in the records | kayıtlarda hiçbir program adı geçmeyen {0} dosya |
 | {0} files with no program named in the records | kayıtlarda hiçbir program adı geçmeyen {0} dosya |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden tek dosyayı sunmak yerine geri tuttu. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean, önbellekteki dosyalardan hangisinin buradaki yüklü programlara ait olduğundan emin olamadı, bu yüzden {0} {1} sunmak yerine geri tuttu. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean, bulduğu önbellek dosyalarından biri hakkında emin olamadı, bu yüzden o dosyayı sunmak yerine geri tuttu. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean, bulduğu önbellek dosyalarından bazıları hakkında emin olamadı, bu yüzden {0} {1} sunmak yerine geri tuttu. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean, yerine geçilmiş tek dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onu geri tuttu. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean, yerine geçilmiş {0} dosyanın artık gerekli olmadığından emin olamadı, bu yüzden onları geri tuttu. |
 | {0} of {1} {2} | {1} {2} içinden {0} |
 | {0} unneeded {1} ({2}) | {0} gereksiz {1} ({2}) |
 | {0} file left alone ({1}) | {0} dosya olduğu gibi bırakıldı ({1}) |

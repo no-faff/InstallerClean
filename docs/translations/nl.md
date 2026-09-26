@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} andere programma's |
 | {0} file with no program named in the records | {0} bestand waarbij de records geen programma noemen |
 | {0} files with no program named in the records | {0} bestanden waarbij de records geen programma noemen |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom het ene bestand achtergehouden in plaats van het aan te bieden. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean kon niet met zekerheid vaststellen welke bestanden in de cache bij de hier geïnstalleerde programma's horen, en heeft daarom {0} {1} achtergehouden in plaats van ze aan te bieden. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean was niet zeker over een van de gevonden bestanden in de cache, en heeft het daarom achtergehouden in plaats van het aan te bieden. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean was niet zeker over sommige van de gevonden bestanden in de cache, en heeft daarom {0} {1} achtergehouden in plaats van ze aan te bieden. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean kon niet met zekerheid vaststellen dat het ene vervangen bestand niet meer nodig is, en heeft het daarom achtergehouden. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean kon niet met zekerheid vaststellen dat {0} vervangen bestanden niet meer nodig zijn, en heeft ze daarom achtergehouden. |
 | {0} of {1} {2} | {0} van {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} om op te ruimen ({2}) |
 | {0} file left alone ({1}) | {0} bestand ongemoeid gelaten ({1}) |

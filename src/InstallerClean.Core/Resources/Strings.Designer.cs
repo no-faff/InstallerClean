@@ -442,10 +442,6 @@ public static class Strings
     public static string Summary_MissingFromDisk_Singular => Get("Summary.MissingFromDisk.Singular");
     public static string Summary_MissingFromDisk_Unnamed_Plural => Get("Summary.MissingFromDisk.Unnamed.Plural");
     public static string Summary_MissingFromDisk_Unnamed_Singular => Get("Summary.MissingFromDisk.Unnamed.Singular");
-    public static string Summary_NothingListedPerFile_Plural => Get("Summary.NothingListedPerFile.Plural");
-    public static string Summary_NothingListedPerFile_Singular => Get("Summary.NothingListedPerFile.Singular");
-    public static string Summary_NothingListed_Plural => Get("Summary.NothingListed.Plural");
-    public static string Summary_NothingListed_Singular => Get("Summary.NothingListed.Singular");
     public static string Summary_OperationFiles => Get("Summary.OperationFiles");
     public static string Summary_OrphanedToCleanUp_Plural => Get("Summary.OrphanedToCleanUp.Plural");
     public static string Summary_OrphanedToCleanUp_Singular => Get("Summary.OrphanedToCleanUp.Singular");
@@ -456,8 +452,6 @@ public static class Strings
     public static string Summary_RegisteredWindow_Missing_Singular => Get("Summary.RegisteredWindow.Missing.Singular");
     public static string Summary_RegisteredWindow_Plural => Get("Summary.RegisteredWindow.Plural");
     public static string Summary_RegisteredWindow_Singular => Get("Summary.RegisteredWindow.Singular");
-    public static string Summary_SupersededHeldBack_Plural => Get("Summary.SupersededHeldBack.Plural");
-    public static string Summary_SupersededHeldBack_Singular => Get("Summary.SupersededHeldBack.Singular");
     public static string Tooltip_BuyMeACuppa_About => Get("Tooltip.BuyMeACuppa.About");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_ChangeLanguage => Get("Tooltip.ChangeLanguage");

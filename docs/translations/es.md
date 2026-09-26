@@ -192,12 +192,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} other programs | {0} programas más |
 | {0} file with no program named in the records | {0} archivo sin ningún programa nombrado en los registros |
 | {0} files with no program named in the records | {0} archivos sin ningún programa nombrado en los registros |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file rather than offering it. | InstallerClean no pudo determinar con certeza qué archivos en caché pertenecen a los programas instalados aquí, así que ha retenido el único archivo en lugar de ofrecerlo. |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} rather than offering them. | InstallerClean no pudo determinar con certeza qué archivos en caché pertenecen a los programas instalados aquí, así que ha retenido {0} {1} en lugar de ofrecerlos. |
-| InstallerClean couldn't be certain about one of the cached files it found, so it has held that one back rather than offering it. | InstallerClean no tuvo la certeza sobre uno de los archivos en caché que encontró, así que lo ha retenido en lugar de ofrecerlo. |
-| InstallerClean couldn't be certain about some of the cached files it found, so it has held back {0} {1} rather than offering them. | InstallerClean no tuvo la certeza sobre algunos de los archivos en caché que encontró, así que ha retenido {0} {1} en lugar de ofrecerlos. |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean no pudo determinar con certeza que el único archivo sustituido ya no haga falta, así que lo ha retenido. |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean no pudo determinar con certeza que {0} archivos sustituidos ya no hagan falta, así que los ha retenido. |
 | {0} of {1} {2} | {0} de {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} para limpiar ({2}) |
 | {0} file left alone ({1}) | {0} archivo dejado en paz ({1}) |

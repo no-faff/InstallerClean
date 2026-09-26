@@ -580,27 +580,22 @@ public partial class MainWindow : Window
         // scan-mode reading once the overlay dismisses.
         if (_vm.Cleanup.IsOperating || _vm.Completion.IsComplete)
             return;
-        // THE PENDING-REBOOT WARNING, THE TWO HELD-BACK LINES AND THE WARNING FOR FILES
-        // MISSING FROM DISK ARE RAISED HERE. Each arrives by a Collapsed-to-Visible
-        // transition, which is the transition the bridge does not announce on its own,
-        // so a line with a live setting and no raise is marked for speech and never
-        // spoken. The window's other live regions are raised on that same reveal,
-        // each at the point the window makes it. The rest carry no raise because the
-        // bridge announces a text change on its own once the element is in the
-        // rendered tree.
+        // THE PENDING-REBOOT WARNING AND THE WARNING FOR FILES MISSING FROM DISK ARE
+        // RAISED HERE. Each arrives by a Collapsed-to-Visible transition, which is the
+        // transition the bridge does not announce on its own, so a line with a live
+        // setting and no raise is marked for speech and never spoken. The window's other
+        // live regions are raised on that same reveal, each at the point the window makes
+        // it. The rest carry no raise because the bridge announces a text change on its
+        // own once the element is in the rendered tree.
         //
         // These branches are listed top to bottom as the lines are drawn, and that is
         // for whoever reads them next rather than for the reader of the screen: one
         // PropertyChanged carries one name, so at most one arm runs per call and their
         // order decides nothing. What a screen reader hears them in is the order
-        // ScanViewModel assigns the counts, each assignment queueing its raise behind
-        // the last.
+        // ScanViewModel assigns the values behind them, each assignment queueing its
+        // raise behind the last.
         if (e.PropertyName == nameof(ScanViewModel.HasPendingReboot) && _vm.Scan.HasPendingReboot)
             AnnounceLiveRegions(PendingRebootBannerText);
-        if (e.PropertyName == nameof(ScanViewModel.HasNothingListed) && _vm.Scan.HasNothingListed)
-            AnnounceLiveRegions(NothingListedText);
-        if (e.PropertyName == nameof(ScanViewModel.HasSupersededHeldBack) && _vm.Scan.HasSupersededHeldBack)
-            AnnounceLiveRegions(SupersededHeldBackText);
         if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
             AnnounceLiveRegions(MissingFromDiskBannerText);
     }
@@ -688,10 +683,9 @@ public partial class MainWindow : Window
     /// Inlines, so the breaks are ones this method made rather than ones a text
     /// formatter is trusted to find.
     ///
-    /// THE HELD-BACK BLOCK CARRIED A LINE PER CAUSE UNTIL 3.0.0 AND IS ONE SENTENCE
-    /// NOW, which changes nothing here and is said so nobody removes the splitting
-    /// on that reading: a value with no newline yields exactly one Run and no break,
-    /// which is what the all-skipped overlay renders today.
+    /// A value with no newline yields exactly one Run and no break, so the one-line
+    /// held-back sentence on the all-skipped overlay passes through the splitting
+    /// unchanged.
     /// </summary>
     private void BuildCompletionSummaryLine()
     {

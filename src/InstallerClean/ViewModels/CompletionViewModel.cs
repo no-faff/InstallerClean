@@ -263,27 +263,26 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// The second empty-offer screen, for a machine where the scan offered nothing and
-    /// kept back files from the folder walk that it could not settle, whether a rule
-    /// about the RECORDS kept them all in one go or each was judged and kept.
+    /// The second empty-offer screen, for a run that offered nothing and held back files
+    /// it could not establish are unneeded: files from the folder walk, whether a rule
+    /// about the RECORDS kept them all in one go or each was judged and kept, and
+    /// superseded patches.
     ///
     /// TWO FINDINGS BOTH END WITH AN EMPTY OFFER AND THEY ARE OPPOSITE THINGS TO TELL
     /// SOMEBODY. <see cref="ShowAllClear"/> says the folder holds nothing to remove.
-    /// This says the app could not establish enough to offer anything, on a machine
-    /// whose folder may be full of files nobody has vouched for. The caller chooses
-    /// between them from the walk-derived withheld list alone, through
-    /// <see cref="ScanResult.HasWithholdingToReport"/>, and on that list a file kept for
-    /// one of three reasons does not choose this screen: for a program Windows still
-    /// holds a record of, for being under a day old or for its patch's registrations,
-    /// the three arms <see cref="WithholdingAccount.KeptWithoutNotice"/> names. Any
-    /// other file on the list chooses it.
+    /// This says the app could not establish enough to offer the files it counts, on a
+    /// machine whose folder may be full of files nobody has vouched for. The caller
+    /// chooses between them through <see cref="ScanResult.HasUnsettledHeldBack"/>, and a
+    /// file kept because Windows holds a record of the program or patch it declares
+    /// does not choose this screen. Every other file held back chooses it, a file under
+    /// a day old and a superseded patch included.
     ///
-    /// ONE SCREEN WITH TWO BODIES, CHOSEN BY <paramref name="account"/> AND NOT HERE.
+    /// ONE SCREEN WITH TWO BODIES, CHOSEN BY <paramref name="wholesale"/> AND NOT HERE.
     /// The two say what the scan could not establish, and they could not establish
     /// different things: one that it could not tell which cached files belong to which
-    /// installed programs, the other only that it could not clear the files it judged
-    /// one at a time. Each is false of the other's machine, so the reading is made
-    /// where the withholding happened and this method spends it.
+    /// installed programs, the other only that it could not establish the files it
+    /// counts are unneeded. Each is false of the other's machine, so the reading is made
+    /// on the scan result and this method spends it.
     ///
     /// NEITHER BODY NAMES A CAUSE FOR ANY PARTICULAR FILE AND NEITHER MAY ACQUIRE ONE.
     /// Several conditions reach each of them, they are different facts about a machine,
@@ -293,36 +292,39 @@ public partial class CompletionViewModel : ObservableObject
     /// with a heading and a body and no evidence that a scan ran reads as a failure
     /// rather than as a result, which is the opposite of what it has to say.
     /// </summary>
-    /// <param name="account">
-    /// Which of the two bodies this machine has earned, read off the scan result. The
-    /// wholesale body is shown for <see cref="WithholdingAccount.WholeWalkOffer"/> alone
-    /// and the per-file body for anything else, the wholesale sentence being the one
-    /// that names a cause. A run that kept files back both wholesale and one at a time
-    /// reads as the per-file one, that being the only sentence true of every file it
-    /// counts.
+    /// <param name="wholesale">
+    /// Whether the wholesale body is true of every file this screen counts: the scan
+    /// result's <see cref="ScanResult.UnsettledHeldBackIsWholesale"/>. The wholesale
+    /// sentence names a cause, so it is shown only there, and every other run takes the
+    /// per-file body, that being the only sentence true of every file it counts. A run
+    /// that kept files back both wholesale and one at a time, or held back a superseded
+    /// patch beside a wholesale withholding, takes the per-file body.
     /// </param>
-    /// <param name="withheldCount">
-    /// How many files the body speaks of, and <paramref name="withheldBytes"/> their
-    /// size: the scan result's <see cref="ScanResult.UnestablishedWithheldCount"/> and
-    /// <see cref="ScanResult.UnestablishedWithheldBytes"/>. The command line reads the
-    /// same two, and the main window's held-back line the same count.
+    /// <param name="heldBackCount">
+    /// How many files the body speaks of, and <paramref name="heldBackBytes"/> their
+    /// size: the scan result's <see cref="ScanResult.UnsettledHeldBackCount"/> and
+    /// <see cref="ScanResult.UnsettledHeldBackBytes"/>.
     ///
-    /// A FILE THE DECLARED-PRODUCT-INSTALLED, UNDER-A-DAY-OLD OR DECLARED-PATCH-REGISTERED
-    /// ARM KEPT IS NOT AMONG THEM. A file the age check kept because its age was not
-    /// established is.
+    /// A FILE THE DECLARED-PRODUCT-INSTALLED OR DECLARED-PATCH-REGISTERED ARM KEPT IS NOT
+    /// AMONG THEM. A file under a day old, a file whose age was not established and a
+    /// superseded patch the scan held back are.
+    ///
+    /// THE COMMAND LINE COUNTS THESE FILES IN TWO SENTENCES RATHER THAN ONE, and leaves a
+    /// file under a day old out of both, so its figures for one machine need not match
+    /// this screen's.
     /// </param>
     /// <param name="scannedFileCount">
     /// The receipt's own count, on the terms <see cref="ShowAllClear"/> sets out: how
     /// many cached files the scan accounted for, in files rather than in programs.
     ///
-    /// IT CONTAINS <paramref name="withheldCount"/> AND IS MEANT TO. A held-back file
+    /// IT CONTAINS <paramref name="heldBackCount"/> AND IS MEANT TO. A held-back file
     /// is in the folder and this scan judged it, so the receipt for what was examined
     /// covers it, while the body above says how many of them were kept back. The two
     /// numbers answer different questions about one machine and neither is a share of
     /// the other.
     /// </param>
     public void ShowNothingOffered(
-        WithholdingAccount account, int withheldCount, long withheldBytes,
+        bool wholesale, int heldBackCount, long heldBackBytes,
         int scannedFileCount, long scanDurationMs)
     {
         HeadingIsWarning = false;
@@ -339,10 +341,10 @@ public partial class CompletionViewModel : ObservableObject
         // picks the sentence and PluraliseFile picks the noun, and they answer two
         // different questions, so both are needed here. See the key's own note in
         // Strings.resx for which language puts the slot where.
-        var perFile = account != WithholdingAccount.WholeWalkOffer;
+        var perFile = !wholesale;
         Summary = string.Format(
             DisplayHelpers.Pluralise(
-                withheldCount,
+                heldBackCount,
                 perFile
                     ? Strings.Completion_NothingOfferedPerFileBody_Singular
                     : Strings.Completion_NothingOfferedBody_Singular,
@@ -352,9 +354,9 @@ public partial class CompletionViewModel : ObservableObject
                 perFile
                     ? "Completion.NothingOfferedPerFileBody"
                     : "Completion.NothingOfferedBody"),
-            DisplayHelpers.FormatCount(withheldCount),
-            DisplayHelpers.PluraliseFile(withheldCount),
-            DisplayHelpers.FormatSize(withheldBytes));
+            DisplayHelpers.FormatCount(heldBackCount),
+            DisplayHelpers.PluraliseFile(heldBackCount),
+            DisplayHelpers.FormatSize(heldBackBytes));
         Restore = string.Format(
             Strings.Completion_NothingToCleanUpReceipt,
             DisplayHelpers.FormatCount(scannedFileCount),

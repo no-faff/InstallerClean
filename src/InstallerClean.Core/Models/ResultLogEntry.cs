@@ -831,12 +831,12 @@ public sealed record MachineInfo(
 /// The bytes of the files behind <paramref name="WithheldCandidateCount"/>, summed
 /// off the same list so the count sent and the size sent cannot come apart.
 ///
-/// IT IS THE QUESTION A COUNT CANNOT ANSWER, AND BOTH HOSTS ALREADY SHOW IT. The
-/// command line prints it beside the count and the window's nothing-offered screen
-/// carries it, so a person at the machine can see how much was held back where
-/// these reports could not: forty megabytes and forty gigabytes are the same file
-/// count. Several conditions withhold, and a count alone cannot say how much any of
-/// them holds back.
+/// IT IS THE QUESTION A COUNT CANNOT ANSWER: forty megabytes and forty gigabytes are
+/// the same file count. Several conditions withhold, and a count alone cannot say how
+/// much any of them holds back. The window's finished screen prints a size beside the
+/// count it gives, and so does the command line's sentence about files held back from
+/// the folder walk, each the size of the files that sentence counts rather than this
+/// whole-list figure, so a person at the machine can see how much was held back.
 ///
 /// NO CAUSE TRAVELS WITH IT, on the same rule as the count it belongs to. It is a
 /// long rather than an int because a byte total over a whole cache folder is not
@@ -915,13 +915,14 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="WithheldUnderADayOldCount">
 /// Candidates the age check kept back because their times show them to be under a day
-/// old: <c>ScanResult.WithheldBy.UnderADayOldCount</c>. Neither host's held-back line
-/// counts them; they are among the files left alone.
+/// old: <c>ScanResult.WithheldBy.UnderADayOldCount</c>. The command line's held-back
+/// sentence does not count them and the window's finished screen does; either way they
+/// are among the files left alone.
 /// </param>
 /// <param name="WithheldAgeUnestablishedCount">
 /// Candidates the age check kept back because their age was not established:
-/// <c>ScanResult.WithheldBy.AgeUnestablishedCount</c>. Both hosts' held-back lines count
-/// them, and no reason line names them.
+/// <c>ScanResult.WithheldBy.AgeUnestablishedCount</c>. Both hosts' held-back sentences
+/// count them, and no reason line names them.
 ///
 /// A DIFFERENT FINDING FROM THE ONE ABOVE AND THE TWO MUST NOT BE ADDED. That one is an
 /// age the scan established; this is an age it did not, and a total over the pair would
@@ -932,7 +933,7 @@ public sealed record MachineInfo(
 /// registration of the patch each declares, and for at least one registration the screen
 /// could not show that every copy of the patch it opens, cached or original at a source,
 /// is a different file: <c>ScanResult.WithheldBy.DeclaredPatchRegisteredCount</c>.
-/// Neither host's held-back line counts them, as with
+/// Neither host's held-back sentence counts them, as with
 /// <paramref name="WithheldDeclaredProductInstalledCount"/>.
 /// </param>
 /// <param name="WithheldDeclaredPatchUnestablishedCount">
@@ -940,8 +941,8 @@ public sealed record MachineInfo(
 /// patch code and target products to ask about, or the registrations of the patch it
 /// declares could not all be found:
 /// <c>ScanResult.WithheldBy.DeclaredPatchUnestablishedCount</c>. Both
-/// hosts' held-back lines count them, and the command line names them in a reason line
-/// of their own.
+/// hosts' held-back sentences count them, and the command line names them in a reason
+/// line of their own.
 ///
 /// NOT TO BE ADDED TO THE ONE ABOVE, for the reason given at the product half's pair.
 ///

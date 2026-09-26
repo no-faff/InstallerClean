@@ -476,7 +476,7 @@ public class CompletionViewModelTests
         var vm = new CompletionViewModel();
 
         vm.ShowNothingOffered(
-            WithholdingAccount.WholeWalkOffer, withheldCount: 3, withheldBytes: 3072,
+            wholesale: true, heldBackCount: 3, heldBackBytes: 3072,
             scannedFileCount: 5, scanDurationMs: 10);
 
         Assert.True(vm.IsComplete);
@@ -521,7 +521,7 @@ public class CompletionViewModelTests
         var vm = new CompletionViewModel();
 
         vm.ShowNothingOffered(
-            WithholdingAccount.WholeWalkOffer, withheldCount: 1, withheldBytes: 1024,
+            wholesale: true, heldBackCount: 1, heldBackBytes: 1024,
             scannedFileCount: 5, scanDurationMs: 10);
 
         Assert.Equal(
@@ -552,7 +552,7 @@ public class CompletionViewModelTests
 
         allClear.ShowAllClear(scannedFileCount: 5, scanDurationMs: 10);
         nothingOffered.ShowNothingOffered(
-            WithholdingAccount.WholeWalkOffer, withheldCount: 3, withheldBytes: 3072,
+            wholesale: true, heldBackCount: 3, heldBackBytes: 3072,
             scannedFileCount: 5, scanDurationMs: 10);
 
         Assert.NotEqual(allClear.Heading, nothingOffered.Heading);
@@ -567,7 +567,7 @@ public class CompletionViewModelTests
         // THE SAME POINT ONE LEVEL DOWN, and the level where it is easiest to lose.
         // One heading carries two bodies: one says the scan could not tell which
         // cached files belong to which installed programs, the other only that it
-        // could not clear the files it judged one at a time. Each is false of the
+        // could not establish the files it counts are unneeded. Each is false of the
         // other's machine, so a tidy that collapsed them would put a cause on a set
         // that did not earn it, with the heading and the receipt still matching and
         // nothing else to notice.
@@ -575,10 +575,10 @@ public class CompletionViewModelTests
         var perFile = new CompletionViewModel();
 
         wholesale.ShowNothingOffered(
-            WithholdingAccount.WholeWalkOffer, withheldCount: 3, withheldBytes: 3072,
+            wholesale: true, heldBackCount: 3, heldBackBytes: 3072,
             scannedFileCount: 5, scanDurationMs: 10);
         perFile.ShowNothingOffered(
-            WithholdingAccount.PerFile, withheldCount: 3, withheldBytes: 3072,
+            wholesale: false, heldBackCount: 3, heldBackBytes: 3072,
             scannedFileCount: 5, scanDurationMs: 10);
 
         Assert.NotEqual(wholesale.Summary, perFile.Summary);
@@ -586,31 +586,6 @@ public class CompletionViewModelTests
         // only thing carrying the difference and the only thing worth pinning.
         Assert.Equal(wholesale.Heading, perFile.Heading);
         Assert.Equal(wholesale.Restore, perFile.Restore);
-    }
-
-    [Fact]
-    public void Every_reading_but_the_wholesale_one_renders_the_per_file_body()
-    {
-        // The wholesale body names a cause and is the one that has to be earned, so a
-        // reading this screen is handed that is not WholeWalkOffer gets the body true
-        // of every file it counts. The two silent readings never reach this screen in
-        // the app; they are passed here to pin which body a stray one would get.
-        var perFile = new CompletionViewModel();
-        perFile.ShowNothingOffered(
-            WithholdingAccount.PerFile, withheldCount: 3, withheldBytes: 3072,
-            scannedFileCount: 5, scanDurationMs: 10);
-
-        foreach (var account in Enum.GetValues<WithholdingAccount>())
-        {
-            if (account == WithholdingAccount.WholeWalkOffer) continue;
-
-            var vm = new CompletionViewModel();
-            vm.ShowNothingOffered(
-                account, withheldCount: 3, withheldBytes: 3072,
-                scannedFileCount: 5, scanDurationMs: 10);
-
-            Assert.True(perFile.Summary == vm.Summary, $"{account} rendered another body");
-        }
     }
 
     [Fact]
@@ -622,7 +597,7 @@ public class CompletionViewModelTests
         var vm = new CompletionViewModel();
 
         vm.ShowNothingOffered(
-            WithholdingAccount.PerFile, withheldCount: 3, withheldBytes: 3072,
+            wholesale: false, heldBackCount: 3, heldBackBytes: 3072,
             scannedFileCount: 5, scanDurationMs: 10);
 
         Assert.Equal(

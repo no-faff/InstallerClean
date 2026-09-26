@@ -444,9 +444,10 @@ internal static class Program
             // The count and the size are UnestablishedWithheldCount and
             // UnestablishedWithheldBytes, which leave out any file kept because it
             // declares an installed program, is under a day old or is a copy of a
-            // patch Windows holds a registration of, and they are the figures the
-            // window's screen uses, so the two hosts cannot disagree about one
-            // machine.
+            // patch Windows holds a registration of. Superseded files held back are
+            // printed in a line of their own. The window's finished screen counts
+            // differently, in one sentence that also takes in a file under a day old
+            // and a superseded file.
             var withheldCount = scanResult.UnestablishedWithheldCount;
 
             // The one-form names the size and not the numeral ("the one file"), so it
@@ -487,13 +488,12 @@ internal static class Program
                 // tool watching the Application channel is not told a machine is
                 // clean when the scan could not judge it.
                 //
-                // ONE EVENT CLASS FOR BOTH, WHICH IS A LIMIT AND NOT AN OVERSIGHT.
-                // The run did its job either way, so both belong in the outcome
-                // band, and telling the two apart means reading the message rather
-                // than filtering on the number. Splitting them would put a new Event
-                // ID on the wire, which is a change to the machine contract and a
-                // decision of its own; the alternative, leaving the clean line to
-                // cover both, is the false statement this branch exists to stop.
+                // ONE EVENT CLASS FOR BOTH. The run did its job either way, so both
+                // belong in the outcome band, and a monitoring tool tells the two
+                // apart by the message rather than by the number. A second Event ID
+                // for the withholding would be a change to the machine contract. The
+                // message has to differ: the clean line over a machine the scan
+                // could not judge is the statement this branch exists to stop.
                 MachineContract.WriteEventLog(CliEventClass.Ok,
                     () => !scanResult.HasWithholdingToReport
                         ? string.Format(Strings.Cli_EventLogScanNoOrphans, arg)
@@ -1035,8 +1035,8 @@ internal static class Program
             // that earns it.
             //
             // THE COUNT AND THE SIZE ARE UnestablishedWithheldCount AND
-            // UnestablishedWithheldBytes: the count the window's line uses, and the
-            // count and size its screen uses.
+            // UnestablishedWithheldBytes, the same figures the empty-offer line above
+            // this method prints.
             var perFile = scanResult.Withholding != WithholdingAccount.WholeWalkOffer;
             var heldBack = scanResult.UnestablishedWithheldCount;
 
@@ -1051,8 +1051,8 @@ internal static class Program
             // is empty the branch above this method has already said this in the line
             // it printed instead of the clean one. Where something WAS offered beside
             // the withheld half, that branch printed "Found N unneeded files" and said
-            // nothing at all about the half that went; this is that machine's only
-            // statement of it, and the window has had a line for exactly it.
+            // nothing at all about the half that went; this line is where stdout
+            // states it on that machine.
             if (scanResult.RemovableFiles.Count > 0)
                 Console.WriteLine(string.Format(
                     DisplayHelpers.Pluralise(heldBack,
@@ -1097,13 +1097,10 @@ internal static class Program
             }
         }
 
-        // SUPERSEDED FILES HELD BACK. Word for word the sentence the window prints,
-        // which it did not used to be: the window's old version closed on Re-scan and
-        // this surface has no such button, and the clause that would still have forced
-        // them apart came off both. It names no cause, six separate findings reaching
-        // this count and no sentence naming one of them being true of the files the
-        // other five contribute; the string's own remarks carry that and why
-        // "superseded" is earned.
+        // SUPERSEDED FILES HELD BACK, printed wherever the count this line carries is
+        // above zero. It names no cause, six separate findings reaching this count and no
+        // sentence naming one of them being true of the files the other five contribute;
+        // the string's own remarks carry that and why "superseded" is earned.
         if (scanResult.WithheldCount > 0)
             Console.WriteLine(string.Format(
                 DisplayHelpers.Pluralise(scanResult.WithheldCount,
@@ -1112,12 +1109,11 @@ internal static class Program
                     "Cli.SupersededHeldBack"),
                 DisplayHelpers.FormatCount(scanResult.WithheldCount)));
 
-        // AND THE NOTICE IS ITS OWN CONDITION NOW, WHICH IS THE WHOLE POINT OF THE
-        // SPLIT. The two sat in one branch for as long as the human line was gated on
-        // this figure. That line has moved onto the count of files held back and this
-        // has not moved at all, deliberately: Event ID 3000 is a machine surface with
-        // an RMM filter downstream and this figure is its payload, so re-gating it
-        // would have changed which machines log it with every test still green. A
+        // THE NOTICE HAS ITS OWN CONDITION, SEPARATE FROM THE LINE ABOVE. The line is
+        // printed on the count of superseded files held back; this is written on the
+        // count of installed products the enumeration could not account for, the
+        // payload of Event ID 3000, a machine surface with an RMM filter downstream.
+        // Re-gating it changes which machines log it with every test still green, and a
         // measurement that goes quiet reads exactly like nothing being wrong.
         //
         // THEY ARE NOT TWO VIEWS OF ONE QUANTITY. This counts installed products the

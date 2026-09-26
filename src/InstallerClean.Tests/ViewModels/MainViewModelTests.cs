@@ -490,6 +490,197 @@ public class MainViewModelTests
             vm.Completion.Summary);
     }
 
+    // THE FILES THE SCREEN COUNTS THAT THE COMMAND LINE'S HELD-BACK SENTENCE DOES NOT. A
+    // file under a day old and a superseded patch the scan held back are both counted
+    // here, and each fixture gives every figure a different value, so a reading that
+    // dropped an addend or subtracted the wrong arm lands on a number no assertion
+    // accepts.
+
+    [Fact]
+    public async Task Files_under_a_day_old_get_the_per_file_screen_and_not_the_all_clear()
+    {
+        var vm = CreateViewModel();
+        var withheld = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2048, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                WithheldFiles: withheld,
+                WithheldBy: new WithholdingSplit(UnderADayOldCount: 2),
+                WithheldUnderADayOldBytes: 3072));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(Strings.Completion_NothingOffered, vm.Completion.Heading);
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingOfferedPerFileBody_Plural,
+                DisplayHelpers.FormatCount(2), DisplayHelpers.PluraliseFile(2),
+                DisplayHelpers.FormatSize(3072)),
+            vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task A_file_under_a_day_old_is_counted_and_a_file_kept_for_an_installed_program_is_not()
+    {
+        var vm = CreateViewModel();
+        var withheld = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2048, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                WithheldFiles: withheld,
+                WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, UnderADayOldCount: 1),
+                WithheldDeclaredProductInstalledBytes: 1024,
+                WithheldUnderADayOldBytes: 2048));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(Strings.Completion_NothingOffered, vm.Completion.Heading);
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingOfferedPerFileBody_Singular,
+                DisplayHelpers.FormatCount(1), DisplayHelpers.PluraliseFile(1),
+                DisplayHelpers.FormatSize(2048)),
+            vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task Superseded_files_held_back_get_the_per_file_screen_and_not_the_all_clear()
+    {
+        // The rows are on the kept list with their files on disk, as the scan leaves
+        // them, so the receipt counts them among the files the scan examined.
+        var vm = CreateViewModel();
+        var kept = new[]
+        {
+            new RegisteredPackage(@"C:\Windows\Installer\p1.msp", "Contoso", "{aaa}",
+                PatchState: 2, RemovableWithheld: true, FileSizeBytes: 1000),
+            new RegisteredPackage(@"C:\Windows\Installer\p2.msp", "Contoso", "{aaa}",
+                PatchState: 2, RemovableWithheld: true, FileSizeBytes: 3000),
+            new RegisteredPackage(@"C:\Windows\Installer\p3.msp", "Contoso", "{aaa}",
+                PatchState: 2, RemovableWithheld: true, FileSizeBytes: 5000),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), kept, 9000,
+                WithheldCount: 3,
+                WithheldFiles: Array.Empty<OrphanedFile>(),
+                SupersededWithheldBytes: 9000));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(Strings.Completion_NothingOffered, vm.Completion.Heading);
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingOfferedPerFileBody_Plural,
+                DisplayHelpers.FormatCount(3), DisplayHelpers.PluraliseFile(3),
+                DisplayHelpers.FormatSize(9000)),
+            vm.Completion.Summary);
+        Assert.StartsWith("Scanned 3 files in ", vm.Completion.Restore, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task One_superseded_file_held_back_takes_the_one_form()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                WithheldCount: 1,
+                SupersededWithheldBytes: 4096));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(Strings.Completion_NothingOffered, vm.Completion.Heading);
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingOfferedPerFileBody_Singular,
+                DisplayHelpers.FormatCount(1), DisplayHelpers.PluraliseFile(1),
+                DisplayHelpers.FormatSize(4096)),
+            vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task A_wholesale_withholding_beside_a_superseded_file_gets_the_per_file_body_counting_both()
+    {
+        // The wholesale body names a finding about the machine's records, and the
+        // wholesale arm holds back the walk's files alone, so a count with a superseded
+        // file in it takes the body true of every file.
+        var vm = CreateViewModel();
+        var withheld = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2048, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                WithheldCount: 1,
+                WithheldFiles: withheld, WalkOfferWithheldWholesale: true,
+                WithheldBy: new WithholdingSplit(WholesaleCount: 2),
+                SupersededWithheldBytes: 4096));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(Strings.Completion_NothingOffered, vm.Completion.Heading);
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingOfferedPerFileBody_Plural,
+                DisplayHelpers.FormatCount(3), DisplayHelpers.PluraliseFile(3),
+                DisplayHelpers.FormatSize(1024 + 2048 + 4096)),
+            vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task A_wholesale_withholding_alone_gets_the_wholesale_body()
+    {
+        var vm = CreateViewModel();
+        var withheld = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2048, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                WithheldFiles: withheld, WalkOfferWithheldWholesale: true,
+                WithheldBy: new WithholdingSplit(WholesaleCount: 2)));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(
+            string.Format(
+                Strings.Completion_NothingOfferedBody_Plural,
+                DisplayHelpers.FormatCount(2), DisplayHelpers.PluraliseFile(2),
+                DisplayHelpers.FormatSize(3072)),
+            vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task Records_that_did_not_all_read_get_the_all_clear_where_nothing_was_held_back()
+    {
+        // The count of products the scan could not account for is a trigger for
+        // withholding superseded files, not a count of files held back. Set high here
+        // with nothing held back, so a screen gated on it rather than on the files
+        // fails this.
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+                UnaccountedProductCount: 3,
+                WithheldCount: 0));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(Strings.Completion_AllClean, vm.Completion.Heading);
+    }
+
     [Fact]
     public async Task ScanAsync_does_not_show_completion_when_orphans_exist()
     {
@@ -2826,92 +3017,6 @@ public class MainViewModelTests
         Assert.DoesNotContain("another tool", line, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("deleted", line, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("removed", line, StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public async Task ScanViewModel_HasSupersededHeldBack_tracks_WithheldCount()
-    {
-        // A scan that held a superseded file back says so, and says how many. The
-        // count both gates the line and appears in it, which is the whole of why it
-        // reaches the VM at all.
-        var vm = CreateViewModel();
-
-        var scan = new ScanResult(
-            RemovableFiles: Array.Empty<OrphanedFile>(),
-            RegisteredPackages: Array.Empty<RegisteredPackage>(),
-            RegisteredTotalBytes: 0,
-            WithheldCount: 3);
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(scan);
-
-        await vm.Scan.ScanCommand.ExecuteAsync(null);
-
-        Assert.True(vm.Scan.HasSupersededHeldBack);
-        Assert.Equal(3, vm.Scan.SupersededHeldBackCount);
-        Assert.Equal(
-            string.Format(Strings.Summary_SupersededHeldBack_Plural, 3),
-            vm.Scan.SupersededHeldBackText);
-        Assert.Contains("3", vm.Scan.SupersededHeldBackText, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task ScanViewModel_SupersededHeldBackText_asserts_oneness_in_words_at_one()
-    {
-        // The one-form carries no numeral, which is what makes the prefix a
-        // cardinality string rather than a grammatical one (DisplayHelpers.
-        // QuestionFor). Pinned here as well as in CountedStringTests because this is
-        // the surface that renders it, and the two questions are answered by
-        // different code.
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new ScanResult(
-                RemovableFiles: Array.Empty<OrphanedFile>(),
-                RegisteredPackages: Array.Empty<RegisteredPackage>(),
-                RegisteredTotalBytes: 0,
-                WithheldCount: 1));
-
-        await vm.Scan.ScanCommand.ExecuteAsync(null);
-
-        Assert.Equal(Strings.Summary_SupersededHeldBack_Singular, vm.Scan.SupersededHeldBackText);
-        Assert.DoesNotContain("1", vm.Scan.SupersededHeldBackText, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task ScanViewModel_HasSupersededHeldBack_is_false_on_a_healthy_scan()
-    {
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new ScanResult(
-                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0));
-
-        await vm.Scan.ScanCommand.ExecuteAsync(null);
-
-        Assert.False(vm.Scan.HasSupersededHeldBack);
-    }
-
-    [Fact]
-    public async Task ScanViewModel_says_nothing_was_held_back_where_the_records_did_not_read_and_none_was()
-    {
-        // THE FAULT THIS CHANGE EXISTS TO CLOSE, AND THE FIXTURE IS THE TEST. The
-        // line was gated on UnaccountedProductCount, which is the trigger for one of
-        // the six routes into the withheld count rather than a count of files, so a
-        // machine meeting that condition with no superseded file on it was told
-        // something had been kept back when nothing had. The two counts are set
-        // apart here on purpose: the old gate is high and the new one is zero, and
-        // no assertion below can pass if the gate goes back to reading the first.
-        var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new ScanResult(
-                RemovableFiles: Array.Empty<OrphanedFile>(),
-                RegisteredPackages: Array.Empty<RegisteredPackage>(),
-                RegisteredTotalBytes: 0,
-                UnaccountedProductCount: 3,
-                WithheldCount: 0));
-
-        await vm.Scan.ScanCommand.ExecuteAsync(null);
-
-        Assert.False(vm.Scan.HasSupersededHeldBack);
-        Assert.Equal(0, vm.Scan.SupersededHeldBackCount);
     }
 
     [Fact]
