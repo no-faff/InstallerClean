@@ -4,8 +4,9 @@ namespace InstallerClean.Services;
 
 /// <summary>
 /// Default <see cref="IRemovableReverifier"/>: re-runs
-/// <see cref="IInstallerQueryService.GetRegisteredPackagesAsync"/> and drops any
-/// candidate whose path a currently-registered, non-removable package claims.
+/// <see cref="IInstallerQueryService.GetRegisteredPackagesAsync"/>, drops any
+/// candidate whose path a currently-registered, non-removable package claims, and
+/// judges every candidate no registration names the way the scan judged it.
 /// Testable through the same <c>IMsiApi</c> seam the query service uses.
 ///
 /// The full re-enumeration is the cost of the answer for the question this asks.
@@ -16,29 +17,80 @@ namespace InstallerClean.Services;
 /// A per-candidate re-read of the same question would answer nothing at all for
 /// every orphan while still reporting itself as a re-verification.
 ///
-/// THAT ARGUMENT IS ABOUT THE PATH QUESTION, AND IT IS THE ONLY QUESTION HERE.
-/// Nothing in this class opens a candidate or asks Windows about the code a file
-/// declares about itself: what re-verifies a candidate is this full
-/// re-enumeration and the under-lease re-read below it, both of which ask about
-/// registrations rather than about file contents.
+/// AN ORPHAN IS THEN PUT TO EVERY OTHER STEP THE SCAN DECIDED IT BY, in the scan's
+/// order: the containment guard, the file-identity comparison
+/// (<see cref="RegistrationIdentityMatch"/>), the withholding legs
+/// (<see cref="WithholdingLegs"/>), the declared-product screen
+/// (<see cref="IDeclaredProductCheck"/>) and the age check
+/// (<see cref="CachedFileAge"/>). Each step can only keep a file back. The
+/// under-lease re-read below asks about registrations alone.
 /// </summary>
 public sealed class RemovableReverifier : IRemovableReverifier
 {
     private readonly IInstallerQueryService _queryService;
     private readonly Interop.IMsiApi _msi;
+    private readonly IFileIdentityReader? _fileIds;
+    private readonly IDeclaredProductCheck? _declaredProducts;
+    private readonly IFileTimesReader? _fileTimes;
+    private readonly TimeProvider _clock;
+    private readonly string? _installerFolderOverride;
 
     /// <summary>
-    /// The query service answers the pre-lease pass; the raw API answers the
-    /// under-lease one. Two seams rather than one because the second cannot go
-    /// through the first: <see cref="IInstallerQueryService"/> offers a whole
-    /// enumeration and nothing narrower, and an enumeration is the one thing that
-    /// must not run inside a machine-wide installer lock.
+    /// Production constructor. The query service answers the pre-lease pass and the
+    /// raw API the under-lease one, two seams rather than one because
+    /// <see cref="IInstallerQueryService"/> offers a whole enumeration and nothing
+    /// narrower, and an enumeration is kept outside the machine-wide installer lock.
+    /// The three readers and the clock are the scan's own, for the steps this pass
+    /// re-runs on a file no registration names.
     /// </summary>
-    public RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi)
+    public RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi,
+        IFileIdentityReader fileIdentities, IDeclaredProductCheck declaredProducts,
+        IFileTimesReader fileTimes, TimeProvider clock)
+        : this(queryService, msi, fileIdentities, declaredProducts, fileTimes, clock, null) { }
+
+    /// <summary>
+    /// Test constructor for the tests whose subject is the registrations: no file
+    /// is opened, so a file no registration names is judged on the enumeration's
+    /// own two legs alone. A pass built this way can only keep back less than one
+    /// built with its readers, never more.
+    /// </summary>
+    internal RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi)
+        : this(queryService, msi, null, null, null, null, null) { }
+
+    /// <summary>
+    /// Test constructor for the steps that open a file.
+    /// </summary>
+    /// <param name="fileIdentities">
+    /// Null runs no identity comparison. With any of the three readers present, the
+    /// containment guard runs first on every file no registration names, against the
+    /// real filesystem, as the scan's does.
+    /// </param>
+    /// <param name="declaredProducts">Null runs no screen.</param>
+    /// <param name="fileTimes">Null runs no age check.</param>
+    /// <param name="clock">The clock the age check judges against. Null means the system clock.</param>
+    /// <param name="installerFolderOverride">
+    /// A real folder standing in for <c>C:\Windows\Installer</c>, as the scan's test
+    /// constructors take one. The guard still asks the real filesystem.
+    /// </param>
+    internal RemovableReverifier(IInstallerQueryService queryService, Interop.IMsiApi msi,
+        IFileIdentityReader? fileIdentities, IDeclaredProductCheck? declaredProducts,
+        IFileTimesReader? fileTimes, TimeProvider? clock, string? installerFolderOverride)
     {
         _queryService = queryService;
         _msi = msi;
+        _fileIds = fileIdentities;
+        _declaredProducts = declaredProducts;
+        _fileTimes = fileTimes;
+        _clock = clock ?? TimeProvider.System;
+        _installerFolderOverride = installerFolderOverride;
     }
+
+    /// <summary>
+    /// Whether this pass opens the files no registration names, for the test that
+    /// holds the hosts' pass to doing so. Both test constructors can leave it off.
+    /// </summary>
+    internal bool ChecksFiles =>
+        _fileIds is not null && _declaredProducts is not null && _fileTimes is not null;
 
     public async Task<ReverifyResult> ReverifyAsync(
         IReadOnlyList<string> candidatePaths,
@@ -46,6 +98,11 @@ public sealed class RemovableReverifier : IRemovableReverifier
     {
         if (candidatePaths.Count == 0)
             return new ReverifyResult(candidatePaths, Array.Empty<string>());
+
+        // The age check's clock, read once and before anything else is read, as the
+        // scan reads its own: a file created or changed while this pass runs is later
+        // than it.
+        var clock = _clock.GetUtcNow();
 
         // ConfigureAwait(false): Core has no thread affinity; the caller runs this
         // off the dispatcher (behind the operating overlay), exactly as the scan does.
@@ -87,60 +144,45 @@ public sealed class RemovableReverifier : IRemovableReverifier
         var nonRemovable = new Dictionary<string, HeldBackReason>(StringComparer.OrdinalIgnoreCase);
         foreach (var pkg in query.Packages)
             if (!pkg.IsRemovable)
-                nonRemovable[pkg.LocalPackagePath] =
-                    pkg.RemovableWithheld || pkg.VerdictUnreadable
-                        ? HeldBackReason.RecordsUnreadable
-                        : HeldBackReason.Reclaimed;
-
-        // THE SCAN'S OWN WHOLESALE WITHHOLDING, RE-APPLIED. The scan offers no
-        // walk-derived file on a machine whose recorded paths it could not settle, or
-        // where it could not establish that no program is installed twice. This pass
-        // asks both questions again of the enumeration it has just read, and where
-        // either holds it drops every candidate no registration names, which is the
-        // walk-derived half of the batch, and counts each one held back. The
-        // condition is asked of the census where its members live, so a cause added
-        // to either question is re-applied here without this file being edited.
-        //
-        // IT ASKS THE TWO CONDITIONS AN ENUMERATION ANSWERS. The third, a
-        // registration whose cached file would not identify, is read against the
-        // filesystem in the scan and is not asked here. A condition added to the
-        // scan's withholding that the census does not answer is re-applied here only
-        // once this pass is given its own question for it.
-        var ownershipUnestablished =
-            query.Census.AnyRecordedPathUnestablished
-            || query.Census.SecondInstanceNotRuledOut;
+                nonRemovable[pkg.LocalPackagePath] = CauseOfNonRemovable(pkg);
 
         // Every path any registration names, removable or not, which is the test for
         // which half of the batch a candidate came from. A superseded registration
         // reaches the offer FROM this set and is judged by product code and patch
-        // code, so neither condition above touches it; a walk-derived candidate is
-        // one no registration names at all, which is the half the scan withholds.
-        // Dropping the whole batch instead would keep back files the same scan would
-        // still offer a moment later.
-        var claimedPaths = ownershipUnestablished
-            ? new HashSet<string>(
-                query.Packages.Select(p => p.LocalPackagePath), StringComparer.OrdinalIgnoreCase)
-            : null;
+        // code; a walk-derived candidate is one no registration names at all, and it
+        // is the half the steps below judge, as the scan judged it. Judging the whole
+        // batch that way instead would keep back files the same scan would still offer
+        // a moment later.
+        var claimedPaths = new HashSet<string>(
+            query.Packages.Select(p => p.LocalPackagePath), StringComparer.OrdinalIgnoreCase);
 
+        // The path's own finding first where there is one, because it is the stronger
+        // thing to have found out: a live claim on this file says more than anything
+        // the steps below find. Nothing the user reads names either, so what the
+        // order decides is which counter the file lands in, and the counters are what
+        // the opt-in report carries.
+        var held = new Dictionary<string, HeldBackReason>(StringComparer.OrdinalIgnoreCase);
+        var walkDerived = new List<string>();
+        var walkSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var path in candidatePaths)
+        {
+            if (nonRemovable.TryGetValue(path, out var reason)) held.TryAdd(path, reason);
+            else if (!claimedPaths.Contains(path) && walkSeen.Add(path)) walkDerived.Add(path);
+        }
+
+        HoldWalkDerivedFilesTheScanWouldHold(walkDerived, query, clock, held, cancellationToken);
+
+        // In the order the batch was handed over, so the two lists read as the batch
+        // does.
         var surviving = new List<string>(candidatePaths.Count);
         var dropped = new List<string>();
         var reasons = default(HeldBackReasons);
         foreach (var path in candidatePaths)
         {
-            // The path's own finding first where there is one, because it is the
-            // stronger thing to have found out: a live claim on this file says more
-            // than a fact about the machine. Nothing the user reads names either, so
-            // what the order decides is which counter the file lands in, and the
-            // counters are what the opt-in report carries.
-            if (nonRemovable.TryGetValue(path, out var reason))
+            if (held.TryGetValue(path, out var reason))
             {
                 dropped.Add(path);
                 reasons = reasons.Plus(reason);
-            }
-            else if (claimedPaths is not null && !claimedPaths.Contains(path))
-            {
-                dropped.Add(path);
-                reasons = reasons.Plus(HeldBackReason.OwnershipUnestablished);
             }
             else
             {
@@ -164,9 +206,9 @@ public sealed class RemovableReverifier : IRemovableReverifier
         // fact the offer rests on is not a re-verify.
         //
         // Collected here rather than under the lease because collecting them needs the
-        // enumeration this pass has just run, and an enumeration is the one thing that
-        // must not happen inside the machine-wide installer lock. What crosses into the
-        // lock is a list of codes to re-read by key.
+        // enumeration this pass has just run, and an enumeration is kept outside the
+        // machine-wide installer lock. What crosses into the lock is a list of codes to
+        // re-read by key.
         //
         // It includes the surviving claims themselves, a patch's own removability being
         // part of the condition, and it is deduplicated by pairing rather than by patch:
@@ -180,6 +222,185 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
         return new ReverifyResult(surviving.AsReadOnly(), dropped.AsReadOnly(), reasons,
             survivingClaims.AsReadOnly(), siblingClaims.AsReadOnly());
+    }
+
+    /// <summary>
+    /// The cause a non-removable row supports: records that were not read to a
+    /// verdict for a row whose verdict was unread or withheld, a live claim for any
+    /// other.
+    /// </summary>
+    private static HeldBackReason CauseOfNonRemovable(RegisteredPackage pkg) =>
+        pkg.RemovableWithheld || pkg.VerdictUnreadable
+            ? HeldBackReason.RecordsUnreadable
+            : HeldBackReason.Reclaimed;
+
+    /// <summary>
+    /// Adds to <paramref name="held"/> every file in <paramref name="walkDerived"/>
+    /// the scan would keep back from its offer now, with the cause it is kept under.
+    /// The steps are the scan's, in the scan's order, and each one is handed only
+    /// what the steps before it let through.
+    ///
+    /// THE CONTAINMENT GUARD COMES FIRST, because every step after it opens the file
+    /// and a path the guard does not answer Safe for is not opened. Such a path is
+    /// held rather than left for the action services' own guard, which runs later
+    /// against a root of its own and could answer differently.
+    ///
+    /// WHERE A LEG FIRES, EVERY FILE STILL STANDING IS HELD AND THE LAST TWO STEPS DO
+    /// NOT RUN, as in the scan: each file is already kept on a fact about the machine.
+    /// </summary>
+    private void HoldWalkDerivedFilesTheScanWouldHold(
+        List<string> walkDerived,
+        InstallerQueryResult query,
+        DateTimeOffset clock,
+        Dictionary<string, HeldBackReason> held,
+        CancellationToken cancellationToken)
+    {
+        if (walkDerived.Count == 0) return;
+
+        var standing = walkDerived;
+        var opensFiles = _fileIds is not null || _declaredProducts is not null || _fileTimes is not null;
+
+        // Resolved once for the pass, as the scan resolves it once for the run.
+        var cacheRoot = opensFiles ? InstallerCacheRoot.Resolve(_installerFolderOverride) : null;
+        if (cacheRoot is not null)
+            standing = Keep(standing, held, path =>
+                CandidateGuard.CheckSafeToRemove(path, cacheRoot) == CandidateGuard.RemovalSafety.Safe
+                    ? null
+                    : HeldBackReason.FileNotConfirmed);
+
+        var registrationReads = default(FileIdentityReadTally);
+        if (_fileIds is not null && standing.Count > 0)
+        {
+            var comparison = RegistrationIdentityMatch.Compare(
+                _fileIds, query.Packages, standing, cancellationToken);
+            registrationReads = comparison.Registrations;
+
+            var answers = comparison.Answers;
+            var index = 0;
+            standing = Keep(standing, held, _ =>
+            {
+                var answer = answers[index++];
+                return answer.Verdict switch
+                {
+                    CandidateIdentityVerdict.Unclaimed => null,
+                    CandidateIdentityVerdict.Claimed => CauseOfIdentityClaim(answer.ClaimedBy!),
+                    CandidateIdentityVerdict.Unestablished => HeldBackReason.FileNotConfirmed,
+                    _ => throw new ArgumentOutOfRangeException(nameof(walkDerived), answer.Verdict,
+                        "An identity verdict with no arm here. Name it in the same edit as the enum member."),
+                };
+            });
+        }
+
+        // THE SCAN'S OWN WHOLESALE WITHHOLDING, asked through the expression the scan
+        // asks it through, so a leg added there is acted on here without this file
+        // being edited. Where the identity comparison did not run, its tally is zero
+        // attempts and the enumeration's two legs answer alone.
+        if (WithholdingLegs.Any(query.Census, registrationReads))
+        {
+            foreach (var path in standing) held.TryAdd(path, HeldBackReason.OwnershipUnestablished);
+            return;
+        }
+
+        if (_declaredProducts is not null && cacheRoot is not null && standing.Count > 0)
+            standing = ScreenByWhatTheyDeclare(standing, held, cacheRoot, cancellationToken);
+
+        if (_fileTimes is not null && standing.Count > 0)
+            _ = Keep(standing, held, path =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var outcome = _fileTimes.ReadOutcome(path, out var times);
+                return CachedFileAge.Judge(outcome, times, clock) == CachedFileAgeVerdict.ShownADayOld
+                    ? null
+                    : HeldBackReason.FileNotConfirmed;
+            });
+    }
+
+    /// <summary>
+    /// Puts <paramref name="standing"/> to the declared-product screen as the scan
+    /// does, and returns what it lets through. A screen that answers about a different
+    /// number of files than it was handed has not answered about these files, so all
+    /// of them are held.
+    /// </summary>
+    private List<string> ScreenByWhatTheyDeclare(
+        List<string> standing,
+        Dictionary<string, HeldBackReason> held,
+        InstallerCacheRoot cacheRoot,
+        CancellationToken cancellationToken)
+    {
+        var files = standing
+            .Select(path => new OrphanedFile(
+                FullPath: path,
+                SizeBytes: 0,
+                IsPatch: Path.GetExtension(path).Equals(".msp", StringComparison.OrdinalIgnoreCase),
+                IsRemovablePatch: false,
+                IsObsoleted: false,
+                Reason: Resources.Strings.Reason_Orphaned))
+            .ToList();
+
+        var refusalLog = new PerItemFailureLog("Re-verify",
+            "There is no other record of which files these were: a file the screen could not read is held "
+            + "back from the batch and nothing else about it is kept.");
+        try
+        {
+            var outcomes = _declaredProducts!.Screen(
+                files, cancellationToken, (ex, cause) => refusalLog.Record(ex, cause),
+                path => InstallerCacheHelpers.NamesAFileDirectlyInInstallerFolder(path, cacheRoot));
+
+            if (outcomes.Count != files.Count)
+            {
+                foreach (var path in standing) held.TryAdd(path, HeldBackReason.FileNotConfirmed);
+                return new List<string>();
+            }
+
+            var index = 0;
+            return Keep(standing, held, _ =>
+                outcomes[index++].Withholds() ? HeldBackReason.FileNotConfirmed : null);
+        }
+        finally
+        {
+            refusalLog.WriteClosingEntry();
+        }
+    }
+
+    /// <summary>
+    /// The cause for a walk-derived file whose identity matches a registration: the
+    /// cause of the strongest non-removable row among
+    /// <paramref name="claimedBy"/>, a live claim before an unread verdict, and
+    /// <see cref="HeldBackReason.FileNotConfirmed"/> where every row naming the file
+    /// is still removable.
+    /// </summary>
+    private static HeldBackReason CauseOfIdentityClaim(IReadOnlyList<RegisteredPackage> claimedBy)
+    {
+        var cause = HeldBackReason.FileNotConfirmed;
+        foreach (var row in claimedBy)
+        {
+            if (row.IsRemovable) continue;
+            if (CauseOfNonRemovable(row) == HeldBackReason.Reclaimed) return HeldBackReason.Reclaimed;
+            cause = HeldBackReason.RecordsUnreadable;
+        }
+
+        return cause;
+    }
+
+    /// <summary>
+    /// Returns the paths <paramref name="decide"/> answers null for, in order, and
+    /// adds every other path to <paramref name="held"/> under the cause it answered.
+    /// <paramref name="decide"/> is called once per path, in order.
+    /// </summary>
+    private static List<string> Keep(
+        List<string> paths,
+        Dictionary<string, HeldBackReason> held,
+        Func<string, HeldBackReason?> decide)
+    {
+        var kept = new List<string>(paths.Count);
+        foreach (var path in paths)
+        {
+            var reason = decide(path);
+            if (reason is null) kept.Add(path);
+            else held.TryAdd(path, reason.Value);
+        }
+
+        return kept;
     }
 
     /// <inheritdoc />

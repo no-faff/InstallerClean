@@ -6,19 +6,17 @@ namespace InstallerClean.Services;
 /// Crash-log budget for one run that can fail, or refuse, once per item of
 /// whatever it repeats over: a file, a registry key, an installed product. A
 /// per-item failure is caught, categorised and either shown to the user or
-/// counted, and before this existed the exception itself was dropped on the
-/// floor: on 2026-07-18 two moves failed as IOException and left no trace
-/// anywhere, which is the opposite of the rule that a catch block logs the full
-/// exception.
+/// counted, and its exception is written here rather than dropped, as every catch
+/// block logs the full exception.
 ///
-/// Logging every one unconditionally trades that for a worse failure. crash.log
+/// Logging every one unconditionally would trade that for a worse failure. crash.log
 /// rotates at 512 KB with a single archive, and every-item failure modes are
 /// reachable in both directions. On the Move and Delete side, the destination
 /// write probe writes a zero-byte file, so a volume with room for that and not
 /// for the batch fails on every remaining file. On the scan side, anything that
-/// makes the containment guard refuse wholesale refuses every candidate; driven
-/// at 100,000 refusals it wrote 19 MB across 37 rotations, and the crash history
-/// that was in the file before the run did not survive. In the query service, a
+/// makes the containment guard refuse wholesale refuses every candidate, which
+/// over a large folder rotates the log many times in one run and loses the crash
+/// history that was in it before. In the query service, a
 /// DACL or hive problem across the UserData subtree fails a read per registered
 /// product and per registered patch, and those entries carry a real stack trace
 /// each. A few hundred of them are enough to evict the history behind

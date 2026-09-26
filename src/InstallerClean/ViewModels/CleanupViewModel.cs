@@ -878,12 +878,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         try
         {
-            // Re-verify the removable set against the API immediately before
-            // acting, behind the overlay. This closes the one window neither the
-            // fresh gate nor the mutex hold can see: a patch whose state changed
-            // AND settled between the scan and the click (a superseded patch
-            // reverted to Applied because its superseding patch was uninstalled).
-            // It re-runs the enumeration (a beat) and can fail; a failure must STOP
+            // Re-verify the removable set immediately before acting, behind the
+            // overlay: the Windows Installer records are enumerated again, and
+            // every file no record names is judged again the way the scan judged
+            // it (see IRemovableReverifier). It can fail; a failure must STOP
             // the batch, never act on an un-verified set, so it is surfaced through
             // the scan's own error ladder. A cancellation propagates to the outer
             // OCE catch.
@@ -1295,11 +1293,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         try
         {
-            // Re-verify the removable set against the API immediately before
-            // acting, as the Move path does: a patch reverted to Applied between
-            // the scan and the click must not be deleted. A failure STOPS the
-            // batch (surfaced through the scan's error ladder); a cancellation
-            // propagates to the outer OCE catch.
+            // Re-verify the removable set immediately before acting, as the Move
+            // path does, so nothing the check no longer confirms is deleted. A
+            // failure STOPS the batch (surfaced through the scan's error ladder);
+            // a cancellation propagates to the outer OCE catch.
             ReverifyResult reverify;
             try
             {

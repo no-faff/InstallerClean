@@ -165,13 +165,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         // Walk the disk BEFORE querying the API, and materialise the walk here
         // rather than leaving it lazy. A package cached after the walk finishes
-        // is then simply absent from the candidate set, so a fast install
-        // completing during the scan cannot land its freshly cached, still-needed
-        // file in the orphan list. It is not a guarantee for every interleaving
-        // (a registration that completes in the gap between the query passing its
-        // position and the post-scan reboot probe can still slip through); the
-        // action-time gates close that sliver, being the pending-reboot re-check,
-        // the removable re-verify and the Global\_MSIExecute hold. Task.Run keeps
+        // is then simply absent from the candidate set. A file the walk found
+        // that is registered while the scan runs meets the age check, which keeps
+        // a file created, written or changed within a day, and then the check
+        // made just before a Move or Delete, which reads the records again and
+        // re-runs this decision on it. Task.Run keeps
         // the walk off the calling thread: the GUI calls ScanAsync from the
         // dispatcher, and a synchronous directory walk here would freeze the very
         // window the scan keeps free.
@@ -235,11 +233,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // the lot: the cache root's own resolution degrading leaves every path
         // measured against an unexpanded root, and a filter driver refusing
         // CreateFile, or an attribute read failing across the folder, leaves
-        // every verdict unproven. One full CrashLog.Write each is then a
-        // self-inflicted denial of the log: driven at 100,000 refusals it wrote
-        // 19 MB across 37 rotations, and crash.log holds 512 KB with one
-        // archive, so nothing that was in the file before the scan survived. The
-        // refusals are also the least informative entries possible, being
+        // every verdict unproven. One full CrashLog.Write each would rotate
+        // crash.log, which holds 512 KB with one archive, many times over in one
+        // scan, and nothing that was in the file before the scan would survive.
+        // The refusals are also the least informative entries possible, being
         // near-identical restatements of one condition.
         // Cause strings, rather than the bare exception, because both sites
         // synthesise an InvalidOperationException: all four kinds carry the same
@@ -1055,72 +1052,15 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private readonly record struct WalkedFile(string FullPath, long SizeBytes);
 
     /// <summary>
-    /// Removes from <paramref name="candidates"/> every file that some
-    /// registration's recorded path actually names, whatever that path was spelled
-    /// as. Mutates the list in place, keeping the walk order of the survivors.
+    /// Moves out of <paramref name="candidates"/> every file some registration's
+    /// recorded path names, whatever either was spelled as, and moves into
+    /// <paramref name="withheld"/> every candidate whose own identity would not read.
+    /// Both lists keep walk order. The rule is <see cref="RegistrationIdentityMatch"/>,
+    /// which the check made just before a Move or Delete runs again on the same half.
     ///
-    /// The registration side is walked first and the candidate side second, so a
-    /// machine whose registrations all resolve to files the walk already matched
-    /// costs one handle per registration and nothing more. Nothing is opened at all
-    /// where there are no candidates, or where no registration yielded an identity.
-    ///
-    /// A FAILED READ KEEPS FILES BACK. The cached file of a registration this pass
-    /// could not identify can be any candidate in the list, so both reads are counted
-    /// and both answers are acted on.
-    ///
-    /// THE TWO SIDES ACT DIFFERENTLY AND THE ASYMMETRY IS THE WHOLE DESIGN. A
-    /// registration nobody could identify might name ANY candidate in the list, and
-    /// which one cannot be established, so its tally withholds the walk-derived
-    /// offer entire, at the branch below the caller. A candidate nobody could
-    /// identify is one file: every other candidate was compared against the
-    /// registrations by a read that answered, so this one is moved to
-    /// <paramref name="withheld"/> and the rest stand. Emptying an offer over one
-    /// unidentifiable file would cost a machine everything for a fact about one of
-    /// its files.
-    ///
-    /// A FILE THAT IS NOT THERE IS NOT A FAILURE OF EITHER KIND. See
-    /// <c>FileIdentityRead.NamesNothing</c>: a registration whose cached file has
-    /// gone claims none of the walked files, and reading that as a give-up would
-    /// empty the offer on most machines that have ever uninstalled anything.
-    ///
-    /// EVERY REGISTRATION IS READ, INCLUDING THE ONES THE TEXT COMPARISON ALREADY
-    /// MATCHED, so a single registration this cannot identify costs the scan its
-    /// whole walk-derived offer on an otherwise ordinary machine. That is the cost
-    /// and it is deliberate. The obvious narrowing is to read only the registrations
-    /// whose recorded path failed to match the walk by text, on the reasoning that a
-    /// matched one has already claimed its file and can claim nothing extra.
-    ///
-    /// WHAT ACTUALLY REFUSES IS NOT A FILE SOMETHING ELSE HAS OPEN, and getting that
-    /// wrong makes the cost sound both commoner and smaller than it is. The read
-    /// asks for no access bits, so there is nothing for another opener's share mode
-    /// to exclude. Once absence is carved out, what is left is an ACL refusing an
-    /// already-elevated process, a call that threw, and a volume or Windows build
-    /// that will not answer <c>FileIdInfo</c>.
-    ///
-    /// THAT LAST ONE IS A PROPERTY OF THE VOLUME RATHER THAN OF A FILE, so it does
-    /// not cost such a machine one scan. Every registration fails on it, every time,
-    /// and that machine is offered nothing from the folder walk until something
-    /// about it changes. A whole class of machines told sorry is a defensible thing
-    /// to say and a different thing from one unlucky file, so say the one that is
-    /// true.
-    ///
-    /// THE COUNTER-EXAMPLE THAT KILLS IT, recorded here because it is not
-    /// reconstructible from anything else: take registration R whose recorded path
-    /// matches walked file W by text, so W is off the candidate list and R looks
-    /// harmless. If R's path is a reparse point resolving to candidate C, then a
-    /// successful identity read would have returned C's identity and dropped C. A
-    /// failed read leaves C on the offer, and C is the data behind a registered
-    /// package. The narrow version therefore leaves a route to a needed file open,
-    /// and holding files back is this app working.
-    ///
-    /// A HARD LINK IS DROPPED AND THAT IS THE RIGHT ANSWER HERE, though it is a
-    /// stricter one than strictly necessary. Two names for one file share an
-    /// identity, so a candidate hard-linked to a registered package is treated as
-    /// that package. Removing one link would in fact leave the data reachable
-    /// through the other, so the file could safely have been offered; withholding
-    /// it costs an offer and claims nothing untrue, and no machine measured up to
-    /// 2026-08-11 held one (every cached file's link count read 1). The date is part
-    /// of the reading: it says what had been looked at, not what every machine holds.
+    /// A CLAIMED CANDIDATE IS NOT COUNTED ANYWHERE: a registration names it, which is
+    /// the ordinary answer, and it simply leaves the list as a file the string
+    /// comparison matched does.
     /// </summary>
     private (FileIdentityReadTally Registrations, FileIdentityReadTally Candidates)
         DropCandidatesRegisteredUnderAnotherSpelling(
@@ -1130,88 +1070,35 @@ public sealed class FileSystemScanService : IFileSystemScanService
             IReadOnlyList<RegisteredPackage> registered,
             CancellationToken cancellationToken)
     {
-        var registrations = new IdentityReadTally();
-        var candidateReads = new IdentityReadTally();
+        // No reader, no comparison: the tallies leave at zero attempts.
+        if (_fileIds is null) return (default, default);
 
-        // Nothing was asked, so nothing was given up: the tallies leave here at zero
-        // attempts, which is what tells a report the pass was skipped rather than
-        // that it answered cleanly.
-        if (_fileIds is null || candidates.Count == 0 || registered.Count == 0)
-            return (registrations.Taken(), candidateReads.Taken());
+        var comparison = RegistrationIdentityMatch.Compare(
+            _fileIds, registered, candidates.Select(c => c.FullPath).ToList(), cancellationToken);
 
-        var registeredIds = new HashSet<FileIdentity>();
-        foreach (var pkg in registered)
+        var survivors = new List<OrphanedFile>(candidates.Count);
+        for (var i = 0; i < candidates.Count; i++)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (registrations.Record(_fileIds.ReadOutcome(pkg.LocalPackagePath, out var id))
-                == FileIdentityRead.Read)
-                registeredIds.Add(id);
-        }
-
-        // No identity to compare against, so the candidate side is not asked and its
-        // tally says so. A give-up on the registration side has already been counted
-        // and is about to withhold the whole offer whichever way this returns.
-        if (registeredIds.Count == 0) return (registrations.Taken(), candidateReads.Taken());
-
-        candidates.RemoveAll(c =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var outcome = candidateReads.Record(_fileIds.ReadOutcome(c.FullPath, out var id));
-
-            // Claimed: a registration names this file, whatever either of them was
-            // spelled as. Dropped rather than withheld, and not counted anywhere,
-            // because the pass working is not a file anybody was unsure about.
-            if (outcome == FileIdentityRead.Read) return registeredIds.Contains(id);
-
-            // Kept back rather than left on the offer, which is the fix. Removed
-            // from the candidate list in the same step so the two lists still
-            // account for every file the walk found.
-            if (!outcome.GivesUpAWithholding()) return false;
-            withheld.Add(c);
-            withheldBy.IdentityUnestablished();
-            return true;
-        });
-
-        return (registrations.Taken(), candidateReads.Taken());
-    }
-
-    /// <summary>
-    /// One side's running count of what the identity reader answered, folded into
-    /// the immutable <see cref="FileIdentityReadTally"/> the result carries.
-    ///
-    /// <see cref="Record"/> hands the outcome straight back so that counting it and
-    /// acting on it are one expression at both call sites, rather than two
-    /// statements a later edit can separate. A give-up nothing counted is the fault
-    /// this whole pass exists to close.
-    /// </summary>
-    internal sealed class IdentityReadTally
-    {
-        private int _attempts;
-        private int _namesNothing;
-        private int _notAPath;
-        private int _openRefused;
-        private int _identityUnavailable;
-        private int _faulted;
-
-        internal FileIdentityRead Record(FileIdentityRead outcome)
-        {
-            _attempts++;
-            switch (outcome)
+            switch (comparison.Answers[i].Verdict)
             {
-                case FileIdentityRead.NamesNothing: _namesNothing++; break;
-                case FileIdentityRead.NotAPath: _notAPath++; break;
-                case FileIdentityRead.OpenRefused: _openRefused++; break;
-                case FileIdentityRead.IdentityUnavailable: _identityUnavailable++; break;
-                case FileIdentityRead.Faulted: _faulted++; break;
-                    // Read is not counted: it is the attempts less the five, and a
-                    // stored copy could disagree with them.
+                case CandidateIdentityVerdict.Unclaimed:
+                    survivors.Add(candidates[i]);
+                    break;
+                case CandidateIdentityVerdict.Claimed:
+                    break;
+                case CandidateIdentityVerdict.Unestablished:
+                    withheld.Add(candidates[i]);
+                    withheldBy.IdentityUnestablished();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(candidates), comparison.Answers[i].Verdict,
+                        "An identity verdict with no arm here. Name it in the same edit as the enum member.");
             }
-
-            return outcome;
         }
 
-        internal FileIdentityReadTally Taken() => new(
-            _attempts, _namesNothing, _notAPath, _openRefused, _identityUnavailable, _faulted);
+        candidates.Clear();
+        candidates.AddRange(survivors);
+        return (comparison.Registrations, comparison.Candidates);
     }
 
     /// <summary>

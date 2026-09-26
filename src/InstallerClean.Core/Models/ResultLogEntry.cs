@@ -60,10 +60,11 @@ public sealed record ResultLogEntry(
     /// KEY WHOSE MEANING CHANGES IS NOT, which is why the missing-files split was
     /// added beside its total rather than over it.
     ///
-    /// SCHEMA 5 ADDS SIX KEYS AND TAKES NONE AWAY: the registry side's failed reads
-    /// under <c>machine</c>, and under <c>scan</c> the four arms of the withholding
-    /// split that schema 4 does not carry, so that from 5 the split's nine counts add up
-    /// to <c>withheldCandidateCount</c>. Under <c>app</c> it adds
+    /// SCHEMA 5 ADDS SEVEN KEYS AND TAKES NONE AWAY: the registry side's failed reads
+    /// under <c>machine</c>; under <c>scan</c> the four arms of the withholding split
+    /// that schema 4 does not carry, so that from 5 the split's nine counts add up to
+    /// <c>withheldCandidateCount</c>; and under <c>operation</c> a fifth held-back
+    /// cause, <c>heldBackFileNotConfirmed</c>. Under <c>app</c> it adds
     /// <c>windowsLanguage</c>, the Windows display language with no country, AND
     /// <c>app.language</c> CHANGES WHAT IT MEANS AT 5: it is the language the app was
     /// showing, one of the languages it ships, where schema 4 carries the UI culture's
@@ -1055,26 +1056,26 @@ public sealed record ScanInfo(
 /// / <c>uncShare</c> / <c>unknown</c>.
 ///
 /// <see cref="DurationMs"/> is THIS operation's, and the payload also carries the
-/// scan's own under <c>scan</c>. Two durations, and the one that has never been
-/// reported is this one: whether a three-thousand-file delete is a pleasant thing
-/// to sit through is not otherwise knowable. Zero on a scan-only run, where no
-/// operation ran to time.
+/// scan's own under <c>scan</c>. This one answers whether a three-thousand-file
+/// delete is a pleasant thing to sit through, which nothing else can. Zero on a
+/// scan-only run, where no operation ran to time.
 ///
 /// The held-back counts are the act-time re-verify's, and they are NOT the scan's
-/// withholding: this is what stopped qualifying between the list appearing and the
-/// button being pressed, where <c>scan.withheldPatchCount</c> is what never reached
-/// the list at all. They are several numbers rather than one because a single batch
+/// withholding: they count what the check made just before acting did not confirm,
+/// where <c>scan.withheldPatchCount</c> and <c>scan.withheldCandidateCount</c> count
+/// what never reached the list at all. They are several numbers rather than one because a single batch
 /// can meet more than one cause and a cause named for the set would be false of some
 /// of its members; they are not summed here for the same reason.
 ///
 /// THE COUNT IS DELIBERATELY NOT WRITTEN HERE. A figure in prose beside a list that
 /// moves is a figure that goes stale silently. The list below is the count.
 ///
-/// THE FOURTH ARRIVED AS A REQUIRED KEY RATHER THAN AN OPTIONAL ONE, and the window
-/// for that closes at the tag. The receiver may only start requiring a key while no
-/// schema-4 client has shipped; after that, requiring it would reject the very
-/// version that introduced it, so it could never be required at all and a machine
-/// could stop sending it with nothing to see. Receiver deployed first, client second.
+/// EACH IS A REQUIRED KEY IN THE VERSION THAT CARRIES IT. Schema 4 carries the first
+/// four and schema 5 adds <see cref="HeldBackFileNotConfirmed"/>. A receiver can start
+/// requiring a key only while no release sends its version; after that, requiring it
+/// would reject every report from that release, so it could never be required at all
+/// and a machine could stop sending it with nothing to see. Receiver deployed first,
+/// client second.
 /// </summary>
 public sealed record OperationInfo(
     string Kind,
@@ -1088,11 +1089,12 @@ public sealed record OperationInfo(
     int HeldBackReclaimed,
     int HeldBackRecordsChanged,
     int HeldBackRecordsUnreadable,
-    int HeldBackOwnershipUnestablished)
+    int HeldBackOwnershipUnestablished,
+    int HeldBackFileNotConfirmed)
 {
     public static OperationInfo ScanOnly() =>
         new(OperationKinds.Scan, OperationOutcomes.NoFiles, 0, 0, 0, 0,
-            Array.Empty<ErrorBucket>(), null, 0, 0, 0, 0);
+            Array.Empty<ErrorBucket>(), null, 0, 0, 0, 0, 0);
 
     public static OperationInfo FromMove(MoveResult result, long bytesFreed, long durationMs,
         string moveDestinationKind, HeldBackReasons heldBack) =>
@@ -1108,7 +1110,8 @@ public sealed record OperationInfo(
             heldBack.Reclaimed,
             heldBack.RecordsChanged,
             heldBack.RecordsUnreadable,
-            heldBack.OwnershipUnestablished);
+            heldBack.OwnershipUnestablished,
+            heldBack.FileNotConfirmed);
 
     public static OperationInfo FromDelete(DeleteResult result, long bytesFreed, long durationMs,
         HeldBackReasons heldBack) =>
@@ -1124,7 +1127,8 @@ public sealed record OperationInfo(
             heldBack.Reclaimed,
             heldBack.RecordsChanged,
             heldBack.RecordsUnreadable,
-            heldBack.OwnershipUnestablished);
+            heldBack.OwnershipUnestablished,
+            heldBack.FileNotConfirmed);
 
     /// <summary>
     /// The outcome label, decided from the two counts the finished batch

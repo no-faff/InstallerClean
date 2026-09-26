@@ -122,8 +122,8 @@ public static class FileIdentityReadOutcomes
 /// A FAILED READ IS NOT A NEUTRAL ANSWER. A path that will not open yields no
 /// identity, so the registration behind it claims nothing through this reader and
 /// its cached file can be any file in the folder. Every outcome above is counted at
-/// <c>FileSystemScanService.DropCandidatesRegisteredUnderAnotherSpelling</c>, and
-/// each of the four failures keeps files back.
+/// <c>RegistrationIdentityMatch.Compare</c>, and each of the four failures keeps
+/// files back.
 ///
 /// A WRONG ANSWER IN HERE CAN ONLY EVER COST AN OFFER: an identity that matches
 /// nothing changes nothing, an identity that matches wrongly keeps a file back, and

@@ -63,7 +63,7 @@ public class FileIdentityReadTallyTests
 
     private static FileIdentityReadTally Recording(FileIdentityRead outcome)
     {
-        var tally = new FileSystemScanService.IdentityReadTally();
+        var tally = new RegistrationIdentityMatch.IdentityReadTally();
         tally.Record(outcome);
         return tally.Taken();
     }

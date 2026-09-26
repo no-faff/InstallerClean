@@ -4006,13 +4006,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// is still withheld unless every product sharing the patch passes that.
     /// **Nothing may read this alone as permission to remove a file.**
     ///
-    /// SUPERSEDED ONLY, WHICH IS STATE 2 AND NOT <c>2 or 4</c>. Obsoleted patches are
-    /// off the offer for a reason that is not about safety: the class is rare enough
-    /// that offering it would reclaim next to nothing, and a list whose whole claim is
-    /// certainty has no room for a class that buys so little. They are counted at scan
-    /// time instead, off the machine rather than off the offer, so the question of
-    /// whether anybody has any gets answered without anything appearing on anyone's
-    /// list.
+    /// SUPERSEDED ONLY, WHICH IS STATE 2 AND NOT <c>2 or 4</c>. An obsoleted patch is not
+    /// offered. It is counted at scan time, off the machine rather than off the offer.
+    /// Widening this test to 4 would offer every obsoleted patch that passes the same
+    /// tests, under the superseded label.
     ///
     /// WHAT EACH HALF IS WORTH, because the two are not the same kind of fact. The
     /// State half carries real information: Windows has computed that a later patch

@@ -72,8 +72,9 @@ public static class CoreComposition
         services.AddSingleton<IFileTimesReader, FileTimesReader>();
         // The clock the age check judges against.
         services.AddSingleton(TimeProvider.System);
-        // Re-verifies removable candidates against the API at action time; the
-        // GUI and CLI call it just before a Move/Delete batch.
+        // Re-checks a batch just before a Move or Delete: the records again, and
+        // the scan's own steps on every file no record names, which is why it
+        // takes the scan's readers.
         services.AddSingleton<IRemovableReverifier, RemovableReverifier>();
 
         // File-mutating services.

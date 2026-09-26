@@ -10,23 +10,18 @@ namespace InstallerClean.Helpers;
 /// It lives in Core rather than in either host because the two must answer
 /// identically for one machine state and they do not share the code that prints
 /// it: the window composes a block for the completion overlay, the command line
-/// writes to stdout. The rule has drifted between them before, three of the
-/// command line's held-back paths having gone without a fold the window had on
-/// all three of its own.
+/// writes to stdout.
 ///
-/// IT WAS A PARTITION OF FOUR SENTENCES UNTIL 3.0.0, one per cause, on the
-/// reading that the causes have no honest superordinate. They need none, because
-/// the sentence is not a superordinate over the four. Every file on this line
-/// arrived the same way: the scan offered it, and the check made immediately
-/// before acting did not confirm it. Both producers only ever drop out of the
-/// batch the scan produced, <c>RemovableReverifier.ReverifyAsync</c> over the
-/// candidate paths it was handed and the under-lease re-read over the action
-/// service's own list, so that is true of every file by construction.
+/// ONE SENTENCE OVER EVERY CAUSE, AND IT NAMES NONE OF THEM. It is not a
+/// superordinate over the causes and needs none. Every file on this line arrived
+/// the same way: the scan offered it, and the check made immediately before acting
+/// did not confirm it. Both producers only ever drop out of the batch the scan
+/// produced, <c>RemovableReverifier.ReverifyAsync</c> over the candidate paths it
+/// was handed and the under-lease re-read over the action service's own list, so
+/// that is true of every file by construction.
 ///
-/// THE FOUR COUNTS ARE NOT GONE, only the four sentences.
-/// <see cref="HeldBackReasons"/> still carries one per cause and they still
-/// travel in the opt-in result log, so nothing about diagnosing a machine is
-/// lost.
+/// <see cref="HeldBackReasons"/> carries one count per cause, and the counts travel
+/// in the opt-in result log, which is where a machine's causes are told apart.
 ///
 /// WHO READS IT DECIDES THE WORDING, and it is a narrower audience than it looks.
 /// Somebody who has already pressed Move or Delete, on the completion screen
@@ -41,13 +36,8 @@ internal static class HeldBackReport
     /// <summary>
     /// The sentence, or empty when nothing was held back.
     ///
-    /// ONE STRING RATHER THAN A LIST, which is what it returned while there were
-    /// four sentences to put in order. Ordering was the only thing the list
-    /// carried, so with one sentence a collection would be machinery outliving its
-    /// reason. A string also makes the drift this class exists to prevent
-    /// impossible rather than unlikely: there is nothing left for the two hosts to
-    /// join differently. A second sentence would bring the list back with it, and
-    /// with an ordering rule that is alive.
+    /// ONE STRING RATHER THAN A LIST, so there is nothing for the two hosts to join
+    /// differently. A second sentence would need a list and a rule for its order.
     ///
     /// A COUNT OF ZERO MUST NEVER REACH THE SENTENCE. A run that held nothing back
     /// prints nothing at all, which is the commonest run by far, and that is what

@@ -55,8 +55,8 @@ namespace InstallerClean.Models;
 /// not hold, and now never will.
 /// </param>
 /// <param name="Reason">
-/// Localised tag shown in the Reason column of the orphan list, and there are two
-/// again: <c>Reason.Orphaned</c> for a file no registration names, and
+/// Localised tag shown in the Reason column of the orphan list, and there are two:
+/// <c>Reason.Orphaned</c> for a file no registration names, and
 /// <c>Reason.Superseded</c> for a registered patch that passed the per-product
 /// condition. Callers pass a localised value rather than relying on a default, so a
 /// non-en-GB UI never shows a stray English fragment.

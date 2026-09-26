@@ -3,47 +3,35 @@ using InstallerClean.Models;
 namespace InstallerClean.Services;
 
 /// <summary>
-/// Re-checks a set of removal candidates against the Windows Installer API
-/// immediately before a Move or Delete acts on them, to catch the one window
-/// neither the fresh pending-reboot gate nor the <c>Global\_MSIExecute</c> hold
-/// can see: a patch
-/// whose state changed AND settled between the scan and the click (a superseded
-/// patch reverted to Applied because its superseding patch was uninstalled).
+/// Re-checks a Move or Delete batch against the machine immediately before the
+/// action services act on it, and drops every file the check does not confirm.
 ///
 /// It re-runs the full classifier (<see cref="IInstallerQueryService"/>) rather
 /// than re-querying a single retained product code, because after the
 /// shared-patch verdict merge a patch can revert to Applied for a DIFFERENT
-/// product than the one whose code survived the merge; re-enumerating is correct
-/// across every product for nothing but a few seconds spent before a rare,
-/// destructive batch.
+/// product than the one whose code survived the merge, as a superseded patch does
+/// when the patch that superseded it is uninstalled.
 ///
-/// A true orphan can be dropped here too, and that is the second reason the
-/// enumeration is full rather than per candidate. A file the API never claimed is
-/// not a file it can never claim: an install that wrote its package into the cache
-/// before the folder walk reached it, and registered that package after the query
-/// had already passed, leaves a file that is an orphan by every measurement the
-/// scan made and is claimed by the time the user clicks. Only re-walking the whole
-/// registered set finds it, and finding it is the last thing between that file and
-/// a permanent delete.
+/// A FILE NO REGISTRATION NAMES IS JUDGED AGAIN THE WAY THE SCAN JUDGED IT. A file
+/// the API never claimed is not a file it can never claim, and only re-walking the
+/// whole registered set can re-establish that nothing claims it. So the enumeration
+/// is full rather than per candidate, and on the files it leaves unclaimed the
+/// check re-runs, in the scan's order, every other step the scan decided them by:
+/// the containment guard, the file-identity comparison, the withholding legs, the
+/// declared-product screen and the age check.
 ///
-/// WHAT THAT DOES NOT ESTABLISH, and no copy built on this may assume: that the
-/// claim is new. An install completing inside the session and the scan's own
-/// reading having missed a claim that was there all along produce the identical
-/// observation, a candidate no query claimed and a re-verify that finds one
-/// claiming it, and nothing here can separate them. The second is the very failure
-/// this app is being hardened against, so a sentence asserting the first would have
-/// the app quietly ruling it out on the one screen where it had just fired. All
-/// that is shown is the present state of the records.
+/// WHAT A CLAIM FOUND HERE DOES NOT ESTABLISH, and no copy built on this may say:
+/// that the claim is new. Nothing here records when a registration was written, so
+/// all that is shown is the present state of the records.
 /// </summary>
 public interface IRemovableReverifier
 {
     /// <summary>
     /// Re-enumerates the registered set and splits <paramref name="candidatePaths"/>
-    /// into those still safe to remove and those a currently-registered,
-    /// non-removable package now claims (which must be dropped from the batch and
-    /// reported as skipped). An empty input short-circuits without querying.
-    /// Propagates any exception the enumeration raises (an inability to
-    /// re-verify must stop the batch, not silently pass it).
+    /// into those the check confirms and those it does not, which must be dropped
+    /// from the batch and reported as held back. An empty input short-circuits
+    /// without querying. Propagates any exception the enumeration raises: an
+    /// inability to re-verify stops the batch rather than passing it.
     /// </summary>
     Task<ReverifyResult> ReverifyAsync(
         IReadOnlyList<string> candidatePaths,
@@ -57,18 +45,10 @@ public interface IRemovableReverifier
     /// nothing either way, and it keeps the file for want of a verdict rather than on
     /// one.
     ///
-    /// It exists because <see cref="ReverifyAsync"/> cannot be the last word. The
-    /// hold is taken inside the action service, so every caller runs the full
-    /// re-verify before it, and the window the batch acts across is that
-    /// enumeration's whole duration rather than the instant after it. Windows
-    /// writes a patch's registration during the execute sequence, and
-    /// <c>_MSIExecute</c> is documented as set only while the execute-sequence
-    /// tables are being processed, so the write falls inside the phase the mutex
-    /// covers.
-    ///
-    /// The re-read does not turn on whether an info API can return a registration
-    /// its own transaction has written and not yet committed: it is taken either
-    /// way.
+    /// It is the read of the records made closest to the act. The hold is taken
+    /// inside the action service, after every caller's full re-verify has finished,
+    /// so a verdict that moved while that enumeration ran is read again here,
+    /// immediately before the first file is touched.
     ///
     /// Synchronous, and that is a requirement rather than a convenience: the
     /// lease must be released by the thread that took it, so the whole hold is one
@@ -79,8 +59,8 @@ public interface IRemovableReverifier
     /// reverting superseded patch the full re-verify is for. A product that held no
     /// claim then gives it nothing to re-ask about, and the full re-verify's own
     /// enumeration, moments earlier, is what reads such a product. Do not move that
-    /// enumeration inside the hold: it would keep a machine-wide installer lock for
-    /// a whole enumeration on every run.
+    /// enumeration inside the hold: it would hold the machine-wide installer lock
+    /// for the length of an enumeration on every run.
     /// </summary>
     /// <param name="claims">
     /// The batch's own pairings and the sibling pairings on the products they name, as
@@ -100,20 +80,13 @@ public interface IRemovableReverifier
 /// <summary>
 /// The two claim lists the under-lease re-read needs, carried as ONE argument.
 ///
-/// THAT IS THE WHOLE POINT OF THE TYPE AND IT REPLACED A GUARD. The re-read needs the
-/// batch's own pairings and the sibling pairings on the products those name, because
-/// the offer rests on a fact about other patches. As two arguments, a caller could
-/// supply the first and forget the second and silently receive a weaker check, so this
-/// first shipped with a consistency guard that detected the mismatch and refused the
-/// batch. The guard was the wrong answer: it could only ever fire on a programming
-/// error, and refusing a batch puts a sentence on somebody's screen, so it would have
-/// had to name a cause about their machine that had not occurred.
-///
-/// One argument removes the mistake instead of detecting it, which is the rule this
-/// project states as handling beating guarding: establish that a limit cannot simply be
-/// removed before designing around it. <see cref="From"/> is how production builds one,
-/// out of the pre-lease pass's own result, so the two halves cannot come from different
-/// places.
+/// THAT IS THE WHOLE POINT OF THE TYPE. The re-read needs the batch's own pairings and
+/// the sibling pairings on the products those name, because the offer rests on a fact
+/// about other patches. As one argument, no caller can hand over the first and leave
+/// out the second. <see cref="From"/> is how production builds one, out of the
+/// pre-lease pass's own result, so the two halves cannot come from different places.
+/// Do not split it into two parameters: a caller could then supply one and receive a
+/// weaker check with nothing to show for it.
 /// </summary>
 /// <param name="Batch">
 /// Every claim naming a path still in the batch. Empty short-circuits the re-read
@@ -141,20 +114,21 @@ public readonly record struct UnderLeaseClaims(
 }
 
 /// <summary>
-/// Why one file was held back. Four states, because they are four different things
-/// to have found out: a confirmed positive, an inability, neither, and one that is
-/// not about the file at all.
+/// Why one file was held back. Five, because they are five different things to have
+/// found out: a confirmed positive, an inability, neither, one about the machine
+/// rather than the file, and one about the file itself.
 ///
 /// NOTHING THE USER READS NAMES ANY OF THEM. The screen and stdout carry one
 /// counted sentence naming no cause, on the ground that every file on it was
 /// offered by the scan and not confirmed by the check made immediately before
-/// acting, which is true of all four by construction. These four are COUNTS: they
-/// travel in the opt-in result log and are the only place a machine's causes can be
-/// told apart.
+/// acting, which is true of every member by construction. The members are COUNTS:
+/// they travel in the opt-in result log and are the only place a machine's causes
+/// can be told apart.
 ///
 /// THE FIRST THREE ARE ABOUT THE REGISTRATION THAT NAMES THIS PATH. The fourth is
-/// about the machine and is reached without reading anything about the path, which
-/// is why it is counted separately.
+/// about the machine and is reached without reading anything about the path. The
+/// fifth is about the file, read the way the scan read it. Each is counted
+/// separately for that reason.
 /// </summary>
 public enum HeldBackReason
 {
@@ -172,7 +146,8 @@ public enum HeldBackReason
     /// TWO ROUTES REACH IT and what is said of it has to hold for both. A patch the
     /// scan found superseded or obsoleted whose claim now says needed, back at Applied
     /// or still uninstallable and so needed to roll back with; and a candidate the
-    /// scan found no claim on at all, which the re-enumeration finds claimed. The
+    /// scan found no claim on at all, which the re-enumeration finds claimed, by its
+    /// path or by the file its path names. The
     /// second is the one the name flatters: nothing was reclaimed, because nothing
     /// this app saw ever held it, and whether the claim is new is not something
     /// either route can be told apart on (see this file's interface remarks). What
@@ -196,19 +171,22 @@ public enum HeldBackReason
     RecordsChanged,
 
     /// <summary>
-    /// A read failed, so nothing was established either way. It has not shown the
-    /// file to be removable, which is what keeps it in place.
+    /// The records were not read to a verdict on the file, so nothing was
+    /// established either way. It has not shown the file to be removable, which is
+    /// what keeps it in place.
     ///
-    /// TWO MECHANISMS REACH IT and the sentence is a superordinate over both
-    /// rather than a convenience: a patch's own State or Uninstallable read
-    /// failing during the re-verify's enumeration
-    /// (<see cref="Models.RegisteredPackage.VerdictUnreadable"/>), and a read under
-    /// the installer lease failing: the same pairing's, or the Uninstallable read of
-    /// a patch on a product the batch's pairings name, where an answer that the
+    /// THREE MECHANISMS REACH IT and the sentence is a superordinate over all three
+    /// rather than a convenience: a patch's own State or Uninstallable read failing
+    /// during the re-verify's enumeration
+    /// (<see cref="Models.RegisteredPackage.VerdictUnreadable"/>); a superseded patch
+    /// whose product's patch set that enumeration could not establish
+    /// (<see cref="Models.RegisteredPackage.RemovableWithheld"/>); and a read under the
+    /// installer lease failing: the same pairing's, or the Uninstallable read of a
+    /// patch on a product the batch's pairings name, where an answer that the
     /// installation holds no record of the patch or that the product is not installed
-    /// counts as failing too. Each is a keyed property read of the Windows Installer
-    /// records that did not answer with the property asked for, which is what the
-    /// sentence says, and the merged count does not distinguish them.
+    /// counts as failing too. A walk-derived file whose identity matches a row of
+    /// either of the first two kinds is counted here as well, the row deciding the
+    /// cause. The merged count does not distinguish them.
     ///
     /// Anything else that reaches it is held to the same test against the code that
     /// builds the set, never against this list.
@@ -221,19 +199,17 @@ public enum HeldBackReason
     /// not put on a list now.
     ///
     /// IT IS ABOUT THE MACHINE AND NOT ABOUT THE FILE, which is what separates it
-    /// from the three above and is why it could not fold into any of them. Those
-    /// are findings about the registration that names this path: a live claim, a
-    /// registration that has gone, a read that failed. This one is reached without
-    /// looking at the path at all, which is why it earns a count of its own even
-    /// though no sentence names it.
+    /// from the three above. Those are findings about the registration that names
+    /// this path: a live claim, a registration that has gone, a read that failed.
+    /// This one is reached without looking at the path at all, which is why it earns
+    /// a count of its own even though no sentence names it.
     ///
-    /// WHAT REACHES IT is asked of the census where the members live
-    /// (<see cref="Models.EnumerationCensus.AnyRecordedPathUnestablished"/> and
-    /// <see cref="Models.EnumerationCensus.SecondInstanceNotRuledOut"/>), on the
-    /// same rule as the scan's own withholding: a condition added to either is
-    /// acted on here without this file being edited. Several different findings
-    /// reach it, which is one reason among several that the copy names no cause at
-    /// all.
+    /// WHAT REACHES IT is <see cref="WithholdingLegs.Any"/>, the expression the
+    /// scan's own withholding asks, put to the re-enumeration's census and to the
+    /// registration side of the identity comparison this check re-runs: a leg added
+    /// there is acted on here without this file being edited. Several different
+    /// findings reach it, which is one reason among several that the copy names no
+    /// cause at all.
     ///
     /// IT DROPS THE WALK-DERIVED HALF OF A BATCH AND NOT THE WHOLE OF IT, as the scan
     /// does. A superseded registration is offered beside the walk-derived files, and
@@ -243,27 +219,41 @@ public enum HeldBackReason
     /// half, and that is the test used.
     /// </summary>
     OwnershipUnestablished,
+
+    /// <summary>
+    /// A check the scan makes on the file itself, made again just before acting, did
+    /// not let the file through: the containment guard did not answer Safe, its own
+    /// identity would not read or matches a registration that is still removable,
+    /// the declared-product screen kept it, or its age was not shown to be a day.
+    ///
+    /// IT IS ABOUT THE FILE AND NOT ABOUT A REGISTRATION NAMING ITS PATH, which is what
+    /// separates it from the first three, and it is about one file where
+    /// <see cref="OwnershipUnestablished"/> is about the machine. Only a walk-derived
+    /// file reaches it: a superseded registration's file is judged by its
+    /// registration and is never put to these checks, as the scan never puts it to
+    /// them.
+    /// </summary>
+    FileNotConfirmed,
 }
 
 /// <summary>
 /// How many files were held back for each cause. Counts rather than one cause for
 /// the set, because a batch can meet more than one.
 ///
-/// THEY ARE INSTRUMENTATION NOW RATHER THAN COPY. The report reads
-/// <see cref="Total"/> and nothing else, one sentence naming no cause; these four
-/// travel in the opt-in result log, which is the only place the causes can still be
-/// told apart on a real machine.
+/// THEY ARE INSTRUMENTATION, NOT COPY. The report reads <see cref="Total"/> and
+/// nothing else, one sentence naming no cause; the counts travel in the opt-in result
+/// log, which is the only place the causes can be told apart on a real machine.
 ///
 /// The paths themselves are carried alongside by whichever result holds this. Every
 /// producer increments at the point it adds the path, so the two cannot come apart,
-/// and
-/// <see cref="Total"/> is what a test holds them to.
+/// and <see cref="Total"/> is what a test holds them to.
 /// </summary>
 public readonly record struct HeldBackReasons(
     int Reclaimed = 0,
     int RecordsChanged = 0,
     int RecordsUnreadable = 0,
-    int OwnershipUnestablished = 0)
+    int OwnershipUnestablished = 0,
+    int FileNotConfirmed = 0)
 {
     /// <summary>
     /// Files held back for any cause, and the ONLY member the report reads: the
@@ -271,7 +261,7 @@ public readonly record struct HeldBackReasons(
     /// list's count.
     /// </summary>
     public int Total =>
-        Reclaimed + RecordsChanged + RecordsUnreadable + OwnershipUnestablished;
+        Reclaimed + RecordsChanged + RecordsUnreadable + OwnershipUnestablished + FileNotConfirmed;
 
     /// <summary>
     /// This tally with one more file counted against <paramref name="reason"/>.
@@ -295,10 +285,11 @@ public readonly record struct HeldBackReasons(
         HeldBackReason.RecordsUnreadable => this with { RecordsUnreadable = RecordsUnreadable + 1 },
         HeldBackReason.OwnershipUnestablished =>
             this with { OwnershipUnestablished = OwnershipUnestablished + 1 },
+        HeldBackReason.FileNotConfirmed => this with { FileNotConfirmed = FileNotConfirmed + 1 },
         _ => throw new ArgumentOutOfRangeException(nameof(reason), reason,
-            "A held-back cause with no counter. Add it to HeldBackReasons in the "
-            + "same edit as the enum member. The report needs nothing: it counts "
-            + "Total and names no cause."),
+            "A held-back cause with no counter. Add it to HeldBackReasons, and a "
+            + "field for it to the opt-in report's operation block, in the same edit "
+            + "as the enum member."),
     };
 
     /// <summary>
@@ -315,7 +306,8 @@ public readonly record struct HeldBackReasons(
         new(a.Reclaimed + b.Reclaimed,
             a.RecordsChanged + b.RecordsChanged,
             a.RecordsUnreadable + b.RecordsUnreadable,
-            a.OwnershipUnestablished + b.OwnershipUnestablished);
+            a.OwnershipUnestablished + b.OwnershipUnestablished,
+            a.FileNotConfirmed + b.FileNotConfirmed);
 }
 
 /// <summary>
@@ -339,8 +331,8 @@ public record UnderLeaseRecheck(
 
 /// <summary>
 /// Result of a re-verify. <see cref="Surviving"/> + <see cref="Dropped"/> partition
-/// the input: <see cref="Surviving"/> is still safe to act on, <see cref="Dropped"/>
-/// is now claimed by a non-removable registered package and must be skipped.
+/// the input: <see cref="Surviving"/> is what the check confirmed, and
+/// <see cref="Dropped"/> is what it did not and must be skipped.
 /// </summary>
 /// <param name="Reasons">
 /// How many of <see cref="Dropped"/> fell to each cause. Per file rather than per

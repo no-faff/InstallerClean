@@ -118,10 +118,10 @@ public interface IMoveFilesService
 /// </param>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,
-/// and therefore never touched. They are the same conditions the caller's pre-act
-/// re-verify reports and are meant to be folded into it: a program claims the file
-/// again, the records no longer hold the registration, or a read failed and
-/// nothing has shown the file is not needed. <see cref="HeldBackReasons"/> says
+/// and therefore never touched. Their causes are three of the ones the caller's
+/// pre-act re-verify reports, and they are meant to be folded into it: a program
+/// claims the file again, the records no longer hold the registration, or a read
+/// failed and nothing has shown the file is not needed. <see cref="HeldBackReasons"/> says
 /// how many fell to each. They are NOT errors and NOT failures, so they are not in
 /// <see cref="Errors"/>, and a caller summing input against
 /// <see cref="MovedCount"/> + <see cref="Errors"/> must subtract them.

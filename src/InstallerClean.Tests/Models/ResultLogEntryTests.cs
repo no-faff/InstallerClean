@@ -39,7 +39,8 @@ public class ResultLogEntryTests
         HeldBackReclaimed: 0,
         HeldBackRecordsChanged: 0,
         HeldBackRecordsUnreadable: 0,
-        HeldBackOwnershipUnestablished: 0);
+        HeldBackOwnershipUnestablished: 0,
+        HeldBackFileNotConfirmed: 0);
 
     private static ScanInfo SampleScan() => new(
         DurationMs: 100,
@@ -280,6 +281,9 @@ public class ResultLogEntryTests
                 // records said about the file that was dropped, and this one is
                 // reached without reading anything about the file at all.
                 "heldBackOwnershipUnestablished",
+                // Schema 5's, and a fifth kind: a check the scan makes on the file
+                // itself, made again just before acting.
+                "heldBackFileNotConfirmed",
             ],
             root.GetProperty("operation").EnumerateObject().Select(p => p.Name));
     }
@@ -390,17 +394,15 @@ public class ResultLogEntryTests
     {
         // A batch can meet several causes at once, and one cause named for the set
         // would be false of some of its members. THAT IS WHY THERE ARE SEVERAL COUNTS
-        // RATHER THAN ONE, and it has been as true at three as it was at five.
-        // Distinct values so a transposition between two of them fails rather than
-        // cancelling out.
+        // RATHER THAN ONE. Distinct values so a transposition between two of them
+        // fails rather than cancelling out.
         //
-        // KEEP THE COUNT OUT OF THE NAME. A name saying "all three" goes on passing
-        // over three of four while a fourth cause is added, its own name claiming it
-        // covered the lot: a count in a name is a claim nothing checks. The tally's
-        // own Total is the only figure here, and it is asserted against the sum of
-        // what was set rather than against a literal.
+        // KEEP THE COUNT OUT OF THE NAME. A name saying "all four" goes on passing
+        // over four of five once a fifth cause is added, its own name claiming it
+        // covered the lot: a count in a name is a claim nothing checks.
         var reasons = new HeldBackReasons(
-            Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3, OwnershipUnestablished: 4);
+            Reclaimed: 1, RecordsChanged: 2, RecordsUnreadable: 3, OwnershipUnestablished: 4,
+            FileNotConfirmed: 5);
 
         var op = OperationInfo.FromDelete(
             new DeleteResult(0, Array.Empty<FileOperationError>()),
@@ -410,10 +412,11 @@ public class ResultLogEntryTests
         Assert.Equal(2, op.HeldBackRecordsChanged);
         Assert.Equal(3, op.HeldBackRecordsUnreadable);
         Assert.Equal(4, op.HeldBackOwnershipUnestablished);
+        Assert.Equal(5, op.HeldBackFileNotConfirmed);
 
         // The tally knows its own total and the payload deliberately does not
         // carry it: a total invites one sentence over causes that need one each.
-        Assert.Equal(10, reasons.Total);
+        Assert.Equal(1 + 2 + 3 + 4 + 5, reasons.Total);
         var json = JsonSerializer.Serialize(op, JsonOptions);
         Assert.DoesNotContain("heldBackTotal", json);
     }
@@ -422,7 +425,7 @@ public class ResultLogEntryTests
     public void The_tally_totals_every_cause_it_carries()
     {
         // THE DENOMINATOR, ENUMERATED, because Total is a hand-written sum over a
-        // record that has now moved twice and a member left out of it reads as a
+        // record whose members can grow, and a member left out of it reads as a
         // batch that lost fewer files than it did. One member at 1 and the rest at
         // their default, so what each contributes is attributable to it alone.
         var members = typeof(HeldBackReasons).GetConstructors()
@@ -611,7 +614,10 @@ public class ResultLogEntryTests
         // answer rather than an absent field, which is what keeps the receiver's
         // required-key check the same on all three run kinds.
         Assert.Equal(0, op.HeldBackReclaimed);
+        Assert.Equal(0, op.HeldBackRecordsChanged);
         Assert.Equal(0, op.HeldBackRecordsUnreadable);
+        Assert.Equal(0, op.HeldBackOwnershipUnestablished);
+        Assert.Equal(0, op.HeldBackFileNotConfirmed);
     }
 
     [Fact]

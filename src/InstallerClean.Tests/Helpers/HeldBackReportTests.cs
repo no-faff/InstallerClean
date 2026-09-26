@@ -115,8 +115,22 @@ public class HeldBackReportTests
         var reasons = default(HeldBackReasons)
             .Plus(HeldBackReason.Reclaimed)
             .Plus(HeldBackReason.RecordsChanged)
-            .Plus(HeldBackReason.RecordsChanged);
+            .Plus(HeldBackReason.RecordsChanged)
+            .Plus(HeldBackReason.FileNotConfirmed);
 
-        Assert.Equal(new HeldBackReasons(Reclaimed: 1, RecordsChanged: 2), reasons);
+        Assert.Equal(new HeldBackReasons(Reclaimed: 1, RecordsChanged: 2, FileNotConfirmed: 1), reasons);
+    }
+
+    [Fact]
+    public void Every_cause_has_a_counter_that_Total_and_addition_carry()
+    {
+        // Walked off the enum, so a cause added without a counter fails here by name
+        // rather than at the first file a user's batch holds back under it.
+        foreach (var reason in Enum.GetValues<HeldBackReason>())
+        {
+            var one = default(HeldBackReasons).Plus(reason);
+            Assert.True(one.Total == 1, $"{reason} is not counted in Total");
+            Assert.True((one + one).Total == 2, $"{reason} is not carried by addition");
+        }
     }
 }

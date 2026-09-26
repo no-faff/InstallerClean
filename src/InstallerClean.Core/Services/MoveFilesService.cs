@@ -124,11 +124,10 @@ public sealed class MoveFilesService : IMoveFilesService
             // when an install begins and drops it when the install ends, so
             // between installs the create-or-open path below makes the object and
             // succeeds, and the only object that can refuse this process is one
-            // something else has already made. And a move's exposure to the hazard
-            // is the delete's: a moved file is as absent from the cache as a
-            // deleted one, so a transaction that starts mid-batch fails to find it
-            // either way. Only the recovery differs, and the recovery a move leaves
-            // the user is not a reason to run without the hold.
+            // something else has already made. A move refuses on the same answers
+            // as a delete because a moved file is as absent from the cache as a
+            // deleted one; only the recovery differs, and the recovery a move
+            // leaves the user is not a reason to act without the hold.
             //
             // What the hold costs, so nobody widens it and nobody removes it:
             // _MSIExecute is the machine-wide Windows Installer serialisation
@@ -143,10 +142,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // control to a consumer that can run for as long as it likes, which
             // is the property the destination re-check is ordered around; in the
             // command-line host that consumer is a console write, and a console
-            // in QuickEdit selection blocks one until the operator clears it. It
-            // predates the range that wrote this block. Whether it belongs inside
-            // the hold is an open behaviour question and is not settled by
-            // anything here.
+            // in QuickEdit selection blocks one until the operator clears it.
             //
             // Delete acquires immediately, having nothing to set up first, and
             // this cannot: everything between here and the loop is the
@@ -192,29 +188,14 @@ public sealed class MoveFilesService : IMoveFilesService
             // The act-time re-read, before any destination work so a batch it
             // empties leaves no folder behind. It is HERE and not at the caller
             // because the caller's full re-verify runs before this method is
-            // entered: the mutex is taken after it, so the batch acts on an
-            // answer read outside the hold, across the whole of that
-            // enumeration's duration rather than the instant after it. Windows
-            // writes a patch's registration while it processes the install
-            // script, and _MSIExecute is documented as set only while the
-            // execute-sequence tables are being processed, so the write falls
-            // inside the phase this mutex covers.
+            // entered, so this is the read of the records made closest to the
+            // first file operation: a verdict that moved while that enumeration
+            // ran is read again here.
             //
-            // What is NOT established, and must not be written here as though it
-            // were: whether an info API can return a registration its own
-            // transaction has written and not yet committed. That answer decides
-            // how WIDE the window this closes really was; it does not decide
-            // whether the re-read is worth taking, which is why this was built
-            // without it.
-            //
-            // Only the claims, never the enumeration. Re-walking the whole
-            // registered set here would put an API enumeration inside a
-            // machine-wide installer lock on every run, which the note above asks
-            // in as many words that nobody do, and it would buy little: with the
-            // mutex held no orphan can acquire a NEW claim, because acquiring one
-            // takes a Windows Installer transaction and a transaction takes this
-            // mutex. What can still have moved is a verdict on a claim that
-            // already existed, and those carry an identity to ask about.
+            // Only the claims, never the enumeration. An enumeration is kept
+            // outside the machine-wide installer lock, so what this re-reads is the
+            // set of claims the caller's enumeration built, each asked about by
+            // key.
             //
             // Synchronous on the acquiring thread by necessity, not by taste: the
             // lease is released by the thread that took it, so nothing between the

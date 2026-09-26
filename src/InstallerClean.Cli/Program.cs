@@ -544,17 +544,15 @@ internal static class Program
                     return EmitPendingRebootBlocked(arg, rebootCheck.Reason!.Value, rebootCheck.Detail);
             }
 
-            // Re-verify the removable set against the Windows Installer API
-            // immediately before acting. This is the one window neither the
-            // pending-reboot gate above nor the Global\_MSIExecute hold the action
-            // services take can see: a patch whose state changed AND settled
-            // between the scan and now (a superseded patch reverted to
-            // Applied because its superseding patch was uninstalled). It runs inside
-            // this try, so a re-verify that throws (the enumeration can fail, e.g.
-            // LocalisedAccessException) stops the batch through the existing error
-            // path rather than acting on an un-verified set, and a cancellation
-            // routes to the OCE catch. It runs synchronously before the batch; the
-            // CLI blocks on it naturally.
+            // Re-verify the removable set immediately before acting: the Windows
+            // Installer records are enumerated again, and every file no record
+            // names is judged again the way the scan judged it (see
+            // IRemovableReverifier). It runs inside this try, so a re-verify that
+            // throws (the enumeration can fail, e.g. LocalisedAccessException)
+            // stops the batch through the existing error path rather than acting
+            // on an un-verified set, and a cancellation routes to the OCE catch.
+            // It runs synchronously before the batch; the CLI blocks on it
+            // naturally.
             var reverifier = services.GetRequiredService<IRemovableReverifier>();
             var reverify = await reverifier.ReverifyAsync(
                 scanResult.RemovableFiles.Select(f => f.FullPath).ToList(), token);
@@ -571,29 +569,21 @@ internal static class Program
             // account of one batch, so the tally is carried down in heldBack and
             // printed ONCE beside the service's, which is what the window does when
             // it folds both into a single ReverifyResult before the completion
-            // overlay reads it. Printing here as well put two sentences on stdout
-            // for one batch, and since the four cause-specific sentences became one
-            // they are the SAME sentence, so a run meeting both read as a repeat
-            // with nothing to tell the two numbers apart.
+            // overlay reads it. The two producers print the same sentence, so
+            // printing here as well would put it on stdout twice for one batch with
+            // nothing to tell the two numbers apart.
             //
-            // THE PATHS THAT NOW PRINT NOTHING ARE THE ONES THE WINDOW IS ALSO
-            // SILENT ON, which is the point rather than a loss: an installer-busy
-            // refusal, a refused lock, an unavailable lock and a free-space refusal
-            // all return before the print, and none of them commits anything, so
-            // there is no completed-of-intended count for the sentence to sit
-            // beside. The window reaches no completion screen on any of the four
-            // either.
-            // A WHOLE-BATCH REFUSAL STOOD HERE UNTIL 3.0.0 and its shape is worth
-            // keeping in mind rather than rediscovering. It fired when the machine
-            // gained a product installed as a second instance of itself between the
-            // scan and the click, which is a fact about the machine and not about any
-            // file, so it printed one sentence, wrote a HardError audit line and
-            // returned ExitError rather than dropping files from the batch with
-            // per-file causes none of them had earned. HardError and not
-            // TransientSkip, because the condition does not clear on its own and a
-            // retry-on-transient policy would have come back nightly to be refused
-            // every time. It went with the identity check that detected it. No exit
-            // code changed: ExitError is still 1 and every other route to it stands.
+            // THE PATHS THAT PRINT NOTHING ARE THE ONES THE WINDOW IS ALSO SILENT
+            // ON: an installer-busy refusal, a refused lock, an unavailable lock and
+            // a free-space refusal all return before the print, and none of them
+            // commits anything, so there is no completed-of-intended count for the
+            // sentence to sit beside. The window reaches no completion screen on
+            // any of the four either.
+            //
+            // A MACHINE THE SCAN WOULD NOW OFFER NO WALKED FILE ON DOES NOT REFUSE
+            // THE RUN. The re-verify drops the walk-derived half of the batch, each
+            // file counted in heldBack, and the superseded half goes on, as a fresh
+            // scan would offer it.
             var heldBack = reverify.Reasons;
 
             var filePaths = survivingFiles.Select(f => f.FullPath).ToList();
