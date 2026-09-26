@@ -270,13 +270,14 @@ public partial class ScanViewModel : ObservableObject
             var pendingRebootResult = await Task.Run(() => _rebootService.Check(), cancellationToken);
 
             // THE LEFT-ALONE LINE COUNTS THE WITHHELD FILES TOO, so that it and the
-            // offer between them account for every file in the folder. THE PROPERTY
-            // IS THE ACCOUNTING, NOT THE NUMBER OF TERMS: a withheld file is in
-            // neither population otherwise, being neither offered nor a registered
-            // row, because no registration names it. The two lines would then add up
-            // to less than the folder holds with the difference shown nowhere, which
-            // is exactly what this term exists to prevent. Anything added here later
-            // has to close it again.
+            // offer between them take in every file a registration names and every
+            // file on the scan's candidate list. THE PROPERTY IS THE ACCOUNTING, NOT
+            // THE NUMBER OF TERMS: a withheld file is in neither population
+            // otherwise, being neither offered nor a registered row, because no
+            // registration names it. The two lines would then leave every withheld
+            // file out, with the difference shown nowhere, which is exactly what this
+            // term exists to prevent. Anything added here later has to close it
+            // again.
             //
             // NO CAUSE TRAVELS WITH IT to this line, and none may be added. What the
             // user sees is that the app left these alone, which is true of every file
