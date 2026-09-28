@@ -35,40 +35,40 @@
       },
       "System.IO.Abstractions": {
         "type": "Transitive",
-        "resolved": "22.2.0",
-        "contentHash": "fwnNXyIPb7ABPLae6K9YZz0FAkRjb2s/nElRWrg73usMveY/qdOHjKaNvAF7iAfmzTl1W4wa7S/SnmIc4LDvTg==",
+        "resolved": "22.3.0",
+        "contentHash": "dHMHwd6rl1CFJvdD9jnahy3ZjU67huvUCNhitH+7mzg8ZfLocc5ZQyKmUQMUJiQdElARWJBw0XQQzP6BCKsglA==",
         "dependencies": {
-          "TestableIO.System.IO.Abstractions": "22.2.0",
-          "TestableIO.System.IO.Abstractions.Wrappers": "22.2.0"
+          "TestableIO.System.IO.Abstractions": "22.3.0",
+          "TestableIO.System.IO.Abstractions.Wrappers": "22.3.0"
         }
       },
       "TestableIO.System.IO.Abstractions": {
         "type": "Transitive",
-        "resolved": "22.2.0",
-        "contentHash": "BQPyr0A1s2HvpVTZIyolrZ3ZdPn8DU2tqciaK1oco3pjm76fiKIk75eup4R9reZjNS75M+WJIICOlNX5OFt50g==",
+        "resolved": "22.3.0",
+        "contentHash": "2dqQ5AEE61NkQ/0F31mhOXYhgzZOtC+RUuJajwYa7gPgZBqJVe9Mc/hnqXEbBSDOxGZ7hYsmULjzK3yqewB3FA==",
         "dependencies": {
-          "Testably.Abstractions.FileSystem.Interface": "10.3.0"
+          "Testably.Abstractions.FileSystem.Interface": "10.4.0"
         }
       },
       "TestableIO.System.IO.Abstractions.Wrappers": {
         "type": "Transitive",
-        "resolved": "22.2.0",
-        "contentHash": "0GW9i46ozm687WGAWsBHWMhLR7l1HmKwhiSU2hQrbFnI5m2YRfqXwqTQNjnOwT8BdbvcGqwMr97/zlnPWa1u1Q==",
+        "resolved": "22.3.0",
+        "contentHash": "9TsOEcwIGJXHjkZ/lIpg6KnoRjxpZZ/LpMvNddcXEvmcxWKZdbhSy2UWMpy3oN8klbQ3dcpxbp9AddQk0zE+Kg==",
         "dependencies": {
-          "Testably.Abstractions.FileSystem.Interface": "10.3.0"
+          "Testably.Abstractions.FileSystem.Interface": "10.4.0"
         }
       },
       "Testably.Abstractions.FileSystem.Interface": {
         "type": "Transitive",
-        "resolved": "10.3.0",
-        "contentHash": "5ebMaoADkzjfW7GnZYKaUebV8XmUn++C/4sKk1PTzCiddEgbSKBq3pW4EWEi70rYJAK0gA1yDWrYFeHq18FvHQ=="
+        "resolved": "10.4.0",
+        "contentHash": "7G5NzIjs7544Dit0uuvYOOAzD8E4alQS2ENPGT3HV1Ks/1r55O7X4d9g6L273n70IDkgqNdBCmrkWxJLn0xCZA=="
       },
       "installerclean.core": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.7, )",
           "System.Diagnostics.EventLog": "[10.0.7, )",
-          "System.IO.Abstractions": "[22.2.0, )"
+          "System.IO.Abstractions": "[22.3.0, )"
         }
       }
     },
