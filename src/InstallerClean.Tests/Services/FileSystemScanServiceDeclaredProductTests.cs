@@ -220,16 +220,43 @@ public class FileSystemScanServiceDeclaredProductTests
     }
 
     [Fact]
-    public async Task A_copy_whose_installed_product_records_no_package_is_kept_by_the_same_screen()
+    public async Task A_copy_whose_installed_product_records_no_package_is_offered_where_its_sources_name_another_file()
     {
-        // The same scan as the test above, with product A recording no package. The
-        // screen cannot see which package A opens, so a.msi could be it.
+        // The same scan as the test above, with product A recording no package. A product
+        // recording none opens what its sources name, and its one source names a package that
+        // is no longer there, so a.msi is not a package it opens.
         var identities = new ScriptedPackageIdentities();
         identities.Declares($@"{Folder}\a.msi", ProductA);
 
         var msi = new ScriptedMsiProducts();
         msi.Installed(ProductA);
         msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, "");
+        msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, "setup.msi", SetupFolder);
+
+        var files = new ScriptedFileIdentities();
+        files.Opens($@"{Folder}\a.msi", 1);
+        files.Answers(SetupFolder + "setup.msi", FileIdentityRead.NamesNothing);
+
+        var result = await ScanWithRecordedPackage(msi, identities, files);
+
+        var offered = Assert.Single(result.RemovableFiles);
+        Assert.Equal($@"{Folder}\a.msi", offered.FullPath);
+        Assert.Empty(result.WithheldFiles!);
+        Assert.Contains(SetupFolder + "setup.msi", files.Reads);
+    }
+
+    [Fact]
+    public async Task A_copy_whose_installed_product_records_no_package_is_kept_where_its_sources_cannot_be_ruled_out()
+    {
+        // The same scan with product A's package name not reading. The screen cannot see
+        // which package A opens, so a.msi could be it.
+        var identities = new ScriptedPackageIdentities();
+        identities.Declares($@"{Folder}\a.msi", ProductA);
+
+        var msi = new ScriptedMsiProducts();
+        msi.Installed(ProductA);
+        msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, "");
+        msi.PackageNameAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
         var result = await ScanWithRecordedPackage(msi, identities, new ScriptedFileIdentities());
 
