@@ -132,6 +132,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         Action<SourceFolderWait?>? waitingOn = null)
     {
         var outcomes = new DeclaredProductOutcome[candidates.Count];
+        var causes = new DeclaredProductInstalledCause[candidates.Count];
 
         // Per pass, so it cannot outlive the machine state it describes. A folder
         // holding six cached packages of one program declares one product code
@@ -209,14 +210,15 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             // code; whether the recorded packages are OTHER files is a question about
             // this candidate, so it is asked per file.
             outcomes[i] = Settle(
-                candidate.FullPath, answer, pass, namesAFileInInstallerFolder, recordRefusal, out var givenUp);
+                candidate.FullPath, answer, pass, namesAFileInInstallerFolder, recordRefusal, out var givenUp,
+                out causes[i]);
 
             // A file kept where its check stopped at a read refused for a root given up
             // counts towards that root. A patch reads no source folder, so it never does.
             if (givenUp is not null && outcomes[i].Withholds()) pass.CountKept(givenUp);
         }
 
-        return new DeclaredProductScreening(outcomes, pass.GivenUp(), pass.WaitCount, pass.Census.Census());
+        return new DeclaredProductScreening(outcomes, pass.GivenUp(), pass.WaitCount, pass.Census.Census(), causes);
     }
 
     /// <summary>
@@ -260,9 +262,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (installations.Count == 0)
             return new DeclarationAnswer(DeclaredProductOutcome.DeclaredProductNotInstalled, null);
 
-        var packages = PackagesOpenedBy(code, installations, pass, namesAFileInInstallerFolder, out var givenUp);
+        var packages = PackagesOpenedBy(
+            code, installations, pass, namesAFileInInstallerFolder, out var givenUp, out var cause);
         return new DeclarationAnswer(
-            DeclaredProductOutcome.DeclaredProductInstalled, packages?.Identities, packages?.ByName, givenUp);
+            DeclaredProductOutcome.DeclaredProductInstalled, packages?.Identities, packages?.ByName, givenUp,
+            packages?.Cached, cause);
     }
 
     /// <summary>
@@ -311,6 +315,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// cached package unsettled (<see cref="InstallationLinks.GivenUp"/>), and null for every
     /// other verdict, among them that of a candidate its own comparison keeps while the second
     /// copies' packages cannot be seen.
+    ///
+    /// <paramref name="cause"/> is why a candidate given
+    /// <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/> is kept, and
+    /// <see cref="DeclaredProductInstalledCause.None"/> for every other verdict: the package it
+    /// opens as (<see cref="CompareWithOpened"/>), a package in a folder on the network it could be
+    /// by its name (<see cref="DeclaredProductInstalledCause.ByName"/>), or the step that could not
+    /// see its own product's packages (<see cref="DeclarationAnswer.Cause"/>).
     /// </summary>
     private DeclaredProductOutcome Settle(
         string candidatePath,
@@ -318,12 +329,15 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         PassAnswers pass,
         Func<string, bool?>? namesAFileInInstallerFolder,
         Action<Exception, string>? recordRefusal,
-        out string? givenUp)
+        out string? givenUp,
+        out DeclaredProductInstalledCause cause)
     {
         givenUp = null;
+        cause = DeclaredProductInstalledCause.None;
         var candidate = new CandidateNames(candidatePath, NamesInFolderOf);
 
         IReadOnlyList<FileIdentity> recorded;
+        IReadOnlyList<FileIdentity> recordedCached;
         DeclaredProductOutcome letThrough;
         switch (answer.Outcome)
         {
@@ -331,21 +345,28 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 if (WithPackagesItCouldBe(
                         candidate, packages, answer.ByName ?? [], pass, namesAFileInInstallerFolder, out givenUp)
                     is not { } own)
+                {
+                    cause = DeclaredProductInstalledCause.ByName;
                     return DeclaredProductOutcome.DeclaredProductInstalled;
+                }
 
                 recorded = own;
+                recordedCached = answer.Cached ?? [];
                 letThrough = DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile;
                 break;
             case DeclaredProductOutcome.DeclaredProductNotInstalled:
                 recorded = [];
+                recordedCached = [];
                 letThrough = DeclaredProductOutcome.DeclaredProductNotInstalled;
                 break;
             default:
                 givenUp = answer.GivenUp;
+                if (answer.Outcome == DeclaredProductOutcome.DeclaredProductInstalled) cause = answer.Cause;
                 return answer.Outcome;
         }
 
         IReadOnlyList<FileIdentity>? secondCopies = null;
+        IReadOnlyList<FileIdentity> secondCopiesCached = [];
         string? secondCopiesGivenUp;
         var unseenByName = false;
         var links = LinksOf(pass, namesAFileInInstallerFolder, recordRefusal);
@@ -357,6 +378,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             secondCopies = WithPackagesItCouldBe(
                 candidate, second.Identities, second.ByName, pass, namesAFileInInstallerFolder, out secondCopiesGivenUp);
+            secondCopiesCached = second.Cached;
             unseenByName = secondCopies is null;
         }
 
@@ -364,7 +386,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             var verdict = recorded.Count == 0
                 ? letThrough
-                : CompareWithRecorded(candidatePath, recorded, letThrough, DeclaredProductOutcome.DeclaredProductInstalled);
+                : CompareWithOpened(candidatePath, recorded, recordedCached, [], [], letThrough, out cause);
             if (verdict.Withholds()) return verdict;
 
             if (unseenByName) pass.Census.UnseenByName();
@@ -372,10 +394,66 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             return DeclaredProductOutcome.SecondCopyUnestablished;
         }
 
-        IReadOnlyList<FileIdentity> opened = secondCopies.Count == 0 ? recorded : [.. recorded, .. secondCopies];
-        return opened.Count == 0
+        return recorded.Count == 0 && secondCopies.Count == 0
             ? letThrough
-            : CompareWithRecorded(candidatePath, opened, letThrough, DeclaredProductOutcome.DeclaredProductInstalled);
+            : CompareWithOpened(
+                candidatePath, recorded, recordedCached, secondCopies, secondCopiesCached, letThrough, out cause);
+    }
+
+    /// <summary>
+    /// The verdict for the candidate at <paramref name="candidatePath"/> against every package an
+    /// installation opens: those of its own product's installations, <paramref name="own"/>, and
+    /// those of the installations a second copy could be, <paramref name="others"/>, each with the
+    /// cached packages among them (<paramref name="ownCached"/>, <paramref name="othersCached"/>),
+    /// which are compared only as members of the list they are among.
+    /// <paramref name="differentFromEvery"/> where the candidate is shown to be a different file
+    /// from all of them, and <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/> where it
+    /// opens as one of them, with <paramref name="cause"/> saying which, in this order: its own
+    /// product's cached package, a package at its own product's sources, a second copy's cached
+    /// package, and any other of <paramref name="others"/>. A file that is a package of both kinds
+    /// takes the first. <paramref name="cause"/> is
+    /// <see cref="DeclaredProductInstalledCause.None"/> for every other verdict.
+    ///
+    /// A CANDIDATE WHOSE OWN IDENTITY DOES NOT READ IS
+    /// <see cref="DeclaredProductOutcome.CandidateIdentityUnestablished"/>, which keeps
+    /// it. Every package compared with was identified, so what was not established is about
+    /// this file alone. A candidate gone by the time it is read answers the same way. Do not
+    /// let it through with <paramref name="differentFromEvery"/>: that verdict says the
+    /// candidate is a different file from every package, and nothing at a path that names no
+    /// file shows that.
+    ///
+    /// A check without its file identity reader compares nothing and keeps the candidate as
+    /// <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/> with no cause.
+    /// </summary>
+    private DeclaredProductOutcome CompareWithOpened(
+        string candidatePath,
+        IReadOnlyList<FileIdentity> own,
+        IReadOnlyList<FileIdentity> ownCached,
+        IReadOnlyList<FileIdentity> others,
+        IReadOnlyList<FileIdentity> othersCached,
+        DeclaredProductOutcome differentFromEvery,
+        out DeclaredProductInstalledCause cause)
+    {
+        cause = DeclaredProductInstalledCause.None;
+        if (_fileIdentities is null) return DeclaredProductOutcome.DeclaredProductInstalled;
+        if (_fileIdentities.ReadOutcome(candidatePath, out var candidate) != FileIdentityRead.Read)
+            return DeclaredProductOutcome.CandidateIdentityUnestablished;
+
+        // The cached packages are among the packages they sit beside, so a candidate is matched
+        // against those two lists and the cached ones say which kind it matched.
+        cause = own.Contains(candidate)
+            ? ownCached.Contains(candidate)
+                ? DeclaredProductInstalledCause.IsItsCachedPackage
+                : DeclaredProductInstalledCause.IsAtItsSources
+            : others.Contains(candidate)
+                ? othersCached.Contains(candidate)
+                    ? DeclaredProductInstalledCause.IsAnotherCachedPackage
+                    : DeclaredProductInstalledCause.IsAtAnotherInstallationsSources
+                : DeclaredProductInstalledCause.None;
+
+        return cause == DeclaredProductInstalledCause.None
+            ? differentFromEvery
+            : DeclaredProductOutcome.DeclaredProductInstalled;
     }
 
     /// <summary>
@@ -424,13 +502,14 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         givenUp = null;
         List<FileIdentity>? identities = [.. links.Opened.Identities];
         List<NetworkPackage> byName = [.. links.Opened.ByName];
+        List<FileIdentity> cached = [.. links.Opened.Cached];
         foreach (var installation in pass.Installations)
         {
             pass.CancellationToken.ThrowIfCancellationRequested();
             if (!installation.SecondCopyNotRuledOut) continue;
 
             var seen = AddSecondCopyPackages(
-                installation, pass, namesAFileInInstallerFolder, identities, byName, out givenUp, out var reading);
+                installation, pass, namesAFileInInstallerFolder, identities, byName, cached, out givenUp, out var reading);
             pass.Census.SecondCopyRead(reading, (MsiInstallContext)installation.Context);
             if (!seen)
             {
@@ -439,7 +518,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             }
         }
 
-        pass.SecondCopies = identities is null ? null : new OpenedPackages(identities, byName);
+        pass.SecondCopies = identities is null ? null : new OpenedPackages(identities, byName, cached);
         pass.SecondCopiesGivenUp = givenUp;
         pass.SecondCopiesRead = true;
         return pass.SecondCopies;
@@ -447,9 +526,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
     /// <summary>
     /// Adds to <paramref name="opened"/> the identity of the cached package one
-    /// installation records and of the package at each folder its sources name, and
-    /// answers false where any of them cannot be seen. A package in a folder on the
-    /// network goes into <paramref name="byName"/> instead (<see cref="AddSourcePackages"/>).
+    /// installation records, and to <paramref name="cached"/> as well, and of the package at
+    /// each folder its sources name, and answers false where any of them cannot be seen. A
+    /// package in a folder on the network goes into <paramref name="byName"/> instead
+    /// (<see cref="AddSourcePackages"/>).
     /// The cached package has to be a file that is there, that identifies, and that
     /// yields a product code: a value naming anything else shows nothing about which
     /// package the installation opens. An installation that records none adds the packages
@@ -465,6 +545,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         Func<string, bool?>? namesAFileInInstallerFolder,
         List<FileIdentity> opened,
         List<NetworkPackage> byName,
+        List<FileIdentity> cached,
         out string? givenUp,
         out SecondCopyReading reading)
     {
@@ -507,6 +588,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (declared is null || declared.Value.IsPatch || declared.Value.Code.Length == 0) return false;
 
         opened.Add(recorded);
+        cached.Add(recorded);
 
         var sourcesSeen = AddSourcePackages(installation.ProductCode, installation.UserSid, context, noneRecorded: false,
             pass, namesAFileInInstallerFolder, opened, byName, out givenUp, out var sourceRefusal);
@@ -654,7 +736,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         return pass.Links = new InstallationLinks(
             byDeclaredCode,
             unread is not null,
-            new OpenedPackages(opened, byName),
+            new OpenedPackages(opened, byName, []),
             unread is not null && !keptOtherwise ? givenUp : null);
     }
 
@@ -1019,7 +1101,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         /// <summary>
         /// Its sources could not be ruled out for any other reason, a check with no way to read
-        /// them included (<see cref="SourceRefusal.NotRuledOut"/>).
+        /// them included (<see cref="AddSourcePackages"/>).
         /// </summary>
         SourceNotRuledOut,
     }
@@ -1047,12 +1129,38 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         CachedPackageNotRuledOut,
 
         /// <summary>
-        /// Any other check: the check has no way to read the sources, or the package name, the
-        /// source list or the installed-from folder would not read, held a form that is not
-        /// compared or differed from what the registry holds, or a package would not identify
-        /// or could be a file in the Installer folder.
+        /// The check has no way to read the sources: no test for a file in the Installer folder,
+        /// no file identity reader or no registry reader.
         /// </summary>
-        NotRuledOut,
+        NoWayToRead,
+
+        /// <summary>
+        /// The package name, the source list, a property of the list, a registry key holding them
+        /// or the <c>InstallSource</c> would not read, the list holding an empty entry or not
+        /// ending among them, or a key's path would not make.
+        /// </summary>
+        WouldNotRead,
+
+        /// <summary>
+        /// The registry holds the source list, the package name, the media package path, the
+        /// source used last or the <c>InstallSource</c> otherwise than Windows Installer answers,
+        /// or holds none of the key it answers from.
+        /// </summary>
+        RegistryDiffers,
+
+        /// <summary>
+        /// The sources hold something not compared: a URL, a media package path, a package name
+        /// that is empty or holds a '\', a '/', a ':', a '%' or a null, or an entry, a source used
+        /// last or an <c>InstallSource</c> naming a variable, holding a null or in a form not
+        /// compared, or a source used last that is not a network folder.
+        /// </summary>
+        FormNotCompared,
+
+        /// <summary>
+        /// A package at a source would not identify, could be a file directly in the Installer
+        /// folder, or could not be established not to be one.
+        /// </summary>
+        PackageNotRuledOut,
     }
 
     /// <summary>
@@ -1237,25 +1345,35 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// source the check cannot rule out, which <see cref="AddSourcePackages"/> sets out. One
     /// such installation is enough, because its package is the one this candidate could be.
     /// <paramref name="givenUp"/> is the root whose give-up refused the read that made it null
-    /// (<see cref="ReadSourcePackage"/>), and null otherwise.
+    /// (<see cref="ReadSourcePackage"/>), and null otherwise. <paramref name="cause"/> is the step
+    /// that made it null, at the first installation whose package could not be seen, and
+    /// <see cref="DeclaredProductInstalledCause.None"/> where it is not null or the check has no
+    /// way to look.
     /// </summary>
     private OpenedPackages? PackagesOpenedBy(
         string code,
         IReadOnlyList<(string RegisteredCode, string? Sid, MsiInstallContext Context)> installations,
         PassAnswers pass,
         Func<string, bool?>? namesAFileInInstallerFolder,
-        out string? givenUp)
+        out string? givenUp,
+        out DeclaredProductInstalledCause cause)
     {
         givenUp = null;
+        cause = DeclaredProductInstalledCause.None;
         if (_fileIdentities is null || _fileSystem is null) return null;
 
         var identities = new List<FileIdentity>(installations.Count);
         var byName = new List<NetworkPackage>();
+        var cached = new List<FileIdentity>(installations.Count);
         foreach (var (registeredCode, sid, context) in installations)
         {
             var read = InstallerQueryService.ReadProductProperty(
                 _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage);
-            if (read.Unreadable) return null;
+            if (read.Unreadable)
+            {
+                cause = DeclaredProductInstalledCause.PathUnreadable;
+                return null;
+            }
 
             // An installation recording no cached package adds the packages its sources name,
             // read once its InstallProperties key shows it records none as well, and nothing
@@ -1265,39 +1383,76 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             {
                 if (OpensNoPackage(registeredCode, sid, context, pass)) continue;
                 if (!AddSourcePackages(registeredCode, sid, context, noneRecorded: true,
-                        pass, namesAFileInInstallerFolder, identities, byName, out givenUp, out _))
+                        pass, namesAFileInInstallerFolder, identities, byName, out givenUp, out var noneRefusal))
+                {
+                    cause = CauseOf(noneRefusal);
                     return null;
+                }
+
                 continue;
             }
 
             // File.Exists is false for a folder and for a path that will not parse,
             // and the identity read below opens folders too, so this is what keeps a
             // value naming a folder from standing in for a package.
-            if (!_fileSystem.File.Exists(path)) return null;
+            if (!_fileSystem.File.Exists(path))
+            {
+                cause = DeclaredProductInstalledCause.NotThere;
+                return null;
+            }
 
             if (_fileIdentities.ReadOutcome(path, out var recorded) != FileIdentityRead.Read)
+            {
+                cause = DeclaredProductInstalledCause.WouldNotIdentify;
                 return null;
+            }
 
             // THE RECORDED PACKAGE HAS TO DECLARE THE SAME PRODUCT. The Windows Installer
             // record says which file the installation uses and this reads the file
             // itself, so the verdict rests on the two agreeing: a value naming a file that
             // is not this product's package shows nothing about where the package is, and
             // keeps the candidate.
-            var declared = _identityReader.Read(path, isPatch: false, out _);
+            var declared = _identityReader.Read(path, isPatch: false, out _, out var readRefusal);
             if (declared is null
                 || declared.Value.IsPatch
                 || !string.Equals(declared.Value.Code, code, StringComparison.Ordinal))
+            {
+                cause = declared is null && readRefusal == PackageReadRefusal.WouldNotRead
+                    ? DeclaredProductInstalledCause.WouldNotRead
+                    : DeclaredProductInstalledCause.NotThisProduct;
                 return null;
+            }
 
             identities.Add(recorded);
+            cached.Add(recorded);
 
             if (!AddSourcePackages(registeredCode, sid, context, noneRecorded: false,
-                    pass, namesAFileInInstallerFolder, identities, byName, out givenUp, out _))
+                    pass, namesAFileInInstallerFolder, identities, byName, out givenUp, out var refusal))
+            {
+                cause = CauseOf(refusal);
                 return null;
+            }
         }
 
-        return new OpenedPackages(identities, byName);
+        return new OpenedPackages(identities, byName, cached);
     }
+
+    /// <summary>
+    /// The cause a file declaring a product is kept for where <see cref="AddSourcePackages"/>
+    /// answered <paramref name="refusal"/> for one of its installations
+    /// (<see cref="PackagesOpenedBy"/>). A check with no way to read the sources gives none.
+    /// </summary>
+    private static DeclaredProductInstalledCause CauseOf(SourceRefusal refusal) => refusal switch
+    {
+        SourceRefusal.PerUserUnmanaged => DeclaredProductInstalledCause.SourcesPerUserUnmanaged,
+        SourceRefusal.GivenUp => DeclaredProductInstalledCause.SourcesGivenUp,
+        SourceRefusal.CachedPackageNotRuledOut => DeclaredProductInstalledCause.NoneRecordedRegistryDisagrees,
+        SourceRefusal.WouldNotRead => DeclaredProductInstalledCause.SourcesWouldNotRead,
+        SourceRefusal.RegistryDiffers => DeclaredProductInstalledCause.SourcesRegistryDiffers,
+        SourceRefusal.FormNotCompared => DeclaredProductInstalledCause.SourcesFormNotCompared,
+        SourceRefusal.PackageNotRuledOut => DeclaredProductInstalledCause.SourcePackageNotRuledOut,
+        _ => DeclaredProductInstalledCause.None,
+    };
 
     /// <summary>
     /// Adds to <paramref name="opened"/> the identity of the original package at each
@@ -1397,8 +1552,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         out SourceRefusal refusal)
     {
         givenUp = null;
-        refusal = SourceRefusal.NotRuledOut;
-        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return false;
+        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null)
+            return Refuse(SourceRefusal.NoWayToRead, out refusal);
 
         // A PER-USER-UNMANAGED SOURCE LIST IS NOT READ, IN ANY ACCOUNT, AND THE COPY IS
         // KEPT. Microsoft documents that an administrator cannot enumerate another
@@ -1408,27 +1563,20 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // is kept whatever the list would say. The account this process runs as is not
         // compared with the installation's, so its own per-user-unmanaged installations
         // are kept the same way.
-        if (context == MsiInstallContext.UserUnmanaged)
-        {
-            refusal = SourceRefusal.PerUserUnmanaged;
-            return false;
-        }
+        if (context == MsiInstallContext.UserUnmanaged) return Refuse(SourceRefusal.PerUserUnmanaged, out refusal);
 
         // An installation whose cached package reads as none is judged by its sources only
         // where its InstallProperties key records none as well. A key holding a cached package,
         // or one that will not read, keeps the copy, and no source of it is read.
         if (noneRecorded && !RegistryRecordsNoCachedPackage(code, sid, context))
-        {
-            refusal = SourceRefusal.CachedPackageNotRuledOut;
-            return false;
-        }
+            return Refuse(SourceRefusal.CachedPackageNotRuledOut, out refusal);
 
         var name = InstallerQueryService.ReadProductProperty(
             _msi, code, sid, context, MsiInstallProperty.PackageName);
-        if (name.Unreadable) return false;
+        if (name.Unreadable) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
         var packageName = name.Value.TrimEnd('\0');
-        if (packageName.Length == 0) return false;
+        if (packageName.Length == 0) return Refuse(SourceRefusal.FormNotCompared, out refusal);
 
         // A package name holding a '\', a '/' or a ':' names a folder, a drive or a stream
         // as well as a file, so the file it opens need not be the one its last part spells,
@@ -1437,40 +1585,49 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // name holding a '%' names a variable, which whoever reads the name may expand in its
         // own environment, and one holding a null is cut short at the null wherever it is read
         // as a path. Both keep the copy as well.
-        if (packageName.IndexOfAny(['\\', '/', ':', '%', '\0']) >= 0) return false;
+        if (packageName.IndexOfAny(['\\', '/', ':', '%', '\0']) >= 0)
+            return Refuse(SourceRefusal.FormNotCompared, out refusal);
 
         var sources = SourcesOf(code, sid, context, MsiSourceListOptions.Network);
-        if (sources is null) return false;
+        if (sources is null) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
         var urls = SourcesOf(code, sid, context, MsiSourceListOptions.Url);
-        if (urls is null || urls.Count > 0) return false;
+        if (urls is null) return Refuse(SourceRefusal.WouldNotRead, out refusal);
+        if (urls.Count > 0) return Refuse(SourceRefusal.FormNotCompared, out refusal);
 
         // An entry naming an environment variable keeps the copy, and so does one holding
         // a null, which would cut the entry short wherever it is read as a path, and one of
         // a form this check does not compare.
         foreach (var entry in sources)
-            if (entry.Contains('%') || entry.Contains('\0') || !IsOnADriveOrAShare(entry)) return false;
+            if (entry.Contains('%') || entry.Contains('\0') || !IsOnADriveOrAShare(entry))
+                return Refuse(SourceRefusal.FormNotCompared, out refusal);
 
         var path = SourceListKeyPath(code, sid, context);
-        if (path is null) return false;
+        if (path is null) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
         var sourceList = _registry.LocalMachineValues(path);
-        if (sourceList.Presence != RegistryKeyPresence.Present || sourceList.Values is null) return false;
+        if (sourceList.Presence != RegistryKeyPresence.Present || sourceList.Values is null)
+            return Refuse(KeyRefusal(sourceList), out refusal);
 
         // The name the key holds has to be the one the API answered, text for text, so
         // a '\', a '/', a ':', a '%' or a null keeps the copy whichever of the two holds it.
         // Loosen that comparison and the stored name needs the character test of its own.
-        if (!HoldsThePackageName(sourceList.Values, packageName)) return false;
+        if (!HoldsThePackageName(sourceList.Values, packageName))
+            return Refuse(SourceRefusal.RegistryDiffers, out refusal);
 
-        if (!IsTheList(_registry.LocalMachineValues(path + @"\Net"), sources)
-            || !IsTheList(_registry.LocalMachineValues(path + @"\URL"), urls)
-            || !NamesNoMediaPackagePath(code, sid, context, _registry.LocalMachineValues(path + @"\Media")))
+        var net = _registry.LocalMachineValues(path + @"\Net");
+        if (!IsTheList(net, sources)) return Refuse(KeyRefusal(net), out refusal);
+
+        var urlKey = _registry.LocalMachineValues(path + @"\URL");
+        if (!IsTheList(urlKey, urls)) return Refuse(KeyRefusal(urlKey), out refusal);
+
+        if (!NamesNoMediaPackagePath(code, sid, context, _registry.LocalMachineValues(path + @"\Media"), out refusal))
             return false;
 
-        var usedLast = SourceUsedLastOf(code, sid, context, sourceList.Values);
+        var usedLast = SourceUsedLastOf(code, sid, context, sourceList.Values, out refusal);
         if (usedLast is null) return false;
 
-        var installSource = InstallSourceOf(_registry, code, sid, context);
+        var installSource = InstallSourceOf(_registry, code, sid, context, out refusal);
         if (installSource is null) return false;
 
         // The source used last and the InstallSource join the folders compared, each
@@ -1496,16 +1653,33 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             var inInstallerFolder = IsLocalDrive(RootOf(package), pass) ? null : namesAFileInInstallerFolder;
             if (!ReadSourcePackage(package, pass, inInstallerFolder, out var identity, out givenUp))
-            {
-                if (givenUp is not null) refusal = SourceRefusal.GivenUp;
-                return false;
-            }
+                return Refuse(givenUp is null ? SourceRefusal.PackageNotRuledOut : SourceRefusal.GivenUp, out refusal);
 
             if (identity is { } read) opened.Add(read);
         }
 
         refusal = SourceRefusal.None;
         return true;
+    }
+
+    /// <summary>
+    /// False, with <paramref name="refusal"/> set to <paramref name="reason"/>: the answer of a
+    /// check that refuses (<see cref="AddSourcePackages"/>, <see cref="NamesNoMediaPackagePath"/>).
+    /// </summary>
+    private static bool Refuse(SourceRefusal reason, out SourceRefusal refusal)
+    {
+        refusal = reason;
+        return false;
+    }
+
+    /// <summary>
+    /// Null, with <paramref name="refusal"/> set to <paramref name="reason"/>: the answer of a
+    /// read that refuses (<see cref="SourceUsedLastOf"/>, <see cref="InstallSourceOf"/>).
+    /// </summary>
+    private static string? Refused(SourceRefusal reason, out SourceRefusal refusal)
+    {
+        refusal = reason;
+        return null;
     }
 
     /// <summary>
@@ -2060,18 +2234,28 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// value of the list's <c>Media</c> key, <paramref name="media"/>. A key that is not
     /// there names none. A read of the property that fails, a key that will not read and
     /// a value of a type other than a string all answer false, which keeps the file.
+    /// <paramref name="refusal"/> says which kind of check answered false, and is
+    /// <see cref="SourceRefusal.None"/> where the answer is true.
     /// </summary>
-    private bool NamesNoMediaPackagePath(string code, string? sid, MsiInstallContext context, RegistryKeyValues media)
+    private bool NamesNoMediaPackagePath(
+        string code, string? sid, MsiInstallContext context, RegistryKeyValues media, out SourceRefusal refusal)
     {
         var answered = InstallerQueryService.ReadSourceListProperty(
             _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.MediaPackagePath);
-        if (answered.Unreadable || answered.Value.TrimEnd('\0').Length > 0) return false;
+        if (answered.Unreadable) return Refuse(SourceRefusal.WouldNotRead, out refusal);
+        if (answered.Value.TrimEnd('\0').Length > 0) return Refuse(SourceRefusal.FormNotCompared, out refusal);
 
-        if (media.Presence == RegistryKeyPresence.Absent) return true;
-        if (media.Presence != RegistryKeyPresence.Present || media.Values is null) return false;
+        if (media.Presence != RegistryKeyPresence.Absent)
+        {
+            if (media.Presence != RegistryKeyPresence.Present || media.Values is null)
+                return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
-        var stored = ValueNamed(media.Values, "MediaPackage", out var count)?.Text;
-        return count == 0 || stored is { Length: 0 };
+            var stored = ValueNamed(media.Values, "MediaPackage", out var count)?.Text;
+            if (count != 0 && stored is not { Length: 0 }) return Refuse(SourceRefusal.RegistryDiffers, out refusal);
+        }
+
+        refusal = SourceRefusal.None;
+        return true;
     }
 
     /// <summary>
@@ -2094,37 +2278,50 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// NULL for: a read through the API that fails; a URL or a media source, or a source
     /// of any other kind; one the registry holds differently; and a folder holding a '%'
     /// or a null, or starting neither with a drive letter, a ':' and a '\' nor with two
-    /// '\', for the reasons a list entry like it keeps the file.
+    /// '\', for the reasons a list entry like it keeps the file. <paramref name="refusal"/>
+    /// says which kind of check answered null, and is <see cref="SourceRefusal.None"/> for
+    /// every other answer.
     /// </summary>
     private string? SourceUsedLastOf(
         string code,
         string? sid,
         MsiInstallContext context,
-        IReadOnlyList<RegistryValue> sourceList)
+        IReadOnlyList<RegistryValue> sourceList,
+        out SourceRefusal refusal)
     {
         var source = InstallerQueryService.ReadSourceListProperty(
             _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedSource);
         var type = InstallerQueryService.ReadSourceListProperty(
             _msi, code, sid, context, MsiSourceListOptions.Product, MsiInstallProperty.LastUsedType);
-        if (source.Unreadable || type.Unreadable) return null;
+        if (source.Unreadable || type.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var folder = source.Value.TrimEnd('\0');
         var folderType = type.Value.TrimEnd('\0');
 
         var stored = ValueNamed(sourceList, MsiInstallProperty.LastUsedSource, out var count)?.Text;
-        if (count > 0 && stored is null) return null;
-        if (string.IsNullOrEmpty(stored)) return folder.Length == 0 && folderType.Length == 0 ? string.Empty : null;
+        if (count > 0 && stored is null) return Refused(SourceRefusal.RegistryDiffers, out refusal);
+        if (string.IsNullOrEmpty(stored))
+        {
+            if (folder.Length != 0 || folderType.Length != 0) return Refused(SourceRefusal.RegistryDiffers, out refusal);
+
+            refusal = SourceRefusal.None;
+            return string.Empty;
+        }
 
         var parts = stored.Split(';', 3);
         if (parts.Length != 3
             || !string.Equals(parts[0], folderType, StringComparison.Ordinal)
-            || !string.Equals(parts[2], folder, StringComparison.Ordinal)
-            || folder.Length == 0
-            || !string.Equals(folderType, "n", StringComparison.Ordinal))
-            return null;
+            || !string.Equals(parts[2], folder, StringComparison.Ordinal))
+            return Refused(SourceRefusal.RegistryDiffers, out refusal);
 
-        if (folder.Contains('%') || folder.Contains('\0') || !IsOnADriveOrAShare(folder)) return null;
+        if (folder.Length == 0
+            || !string.Equals(folderType, "n", StringComparison.Ordinal)
+            || folder.Contains('%')
+            || folder.Contains('\0')
+            || !IsOnADriveOrAShare(folder))
+            return Refused(SourceRefusal.FormNotCompared, out refusal);
 
+        refusal = SourceRefusal.None;
         return folder;
     }
 
@@ -2142,20 +2339,24 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// REG_EXPAND_SZ is refused even where its text is the same, being a value its reader
     /// may expand in the reader's own environment. Only those two forms of folder are
     /// compared, so a URL and any form not named here keep the file.
+    /// <paramref name="refusal"/> says which kind of check answered null, and is
+    /// <see cref="SourceRefusal.None"/> for every other answer.
     /// </summary>
-    private string? InstallSourceOf(IRegistryReader registry, string code, string? sid, MsiInstallContext context)
+    private string? InstallSourceOf(
+        IRegistryReader registry, string code, string? sid, MsiInstallContext context, out SourceRefusal refusal)
     {
         var read = InstallerQueryService.ReadProductProperty(
             _msi, code, sid, context, MsiInstallProperty.InstallSource);
-        if (read.Unreadable) return null;
+        if (read.Unreadable) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var folder = read.Value.TrimEnd('\0');
 
         var path = InstallPropertiesKeyPath(code, sid, context);
-        if (path is null) return null;
+        if (path is null) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
         var properties = registry.LocalMachineValues(path);
-        if (properties.Presence != RegistryKeyPresence.Present || properties.Values is null) return null;
+        if (properties.Presence != RegistryKeyPresence.Present || properties.Values is null)
+            return Refused(KeyRefusal(properties), out refusal);
 
         var stored = ValueNamed(properties.Values, MsiInstallProperty.InstallSource, out var count);
         var agrees = count == 0
@@ -2163,13 +2364,26 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             : count == 1
                 && stored is { Kind: RegistryValueKind.String } value
                 && string.Equals(value.Text, folder, StringComparison.Ordinal);
-        if (!agrees) return null;
+        if (!agrees) return Refused(SourceRefusal.RegistryDiffers, out refusal);
 
-        if (folder.Length == 0) return folder;
-        if (folder.Contains('%') || folder.Contains('\0')) return null;
+        if (folder.Length > 0 && (folder.Contains('%') || folder.Contains('\0') || !IsOnADriveOrAShare(folder)))
+            return Refused(SourceRefusal.FormNotCompared, out refusal);
 
-        return IsOnADriveOrAShare(folder) ? folder : null;
+        refusal = SourceRefusal.None;
+        return folder;
     }
+
+    /// <summary>
+    /// The kind of check a registry key, <paramref name="key"/>, failed for
+    /// <see cref="AddSourcePackages"/>: <see cref="SourceRefusal.WouldNotRead"/> where it would
+    /// not read, and otherwise <see cref="SourceRefusal.RegistryDiffers"/>, the key being absent
+    /// or holding what it holds otherwise than Windows Installer answers.
+    /// </summary>
+    private static SourceRefusal KeyRefusal(RegistryKeyValues key) =>
+        key.Presence == RegistryKeyPresence.Absent
+        || (key.Presence == RegistryKeyPresence.Present && key.Values is not null)
+            ? SourceRefusal.RegistryDiffers
+            : SourceRefusal.WouldNotRead;
 
     /// <summary>
     /// Whether <paramref name="folder"/> starts with a drive letter, a ':' and a '\', or
@@ -2357,8 +2571,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // patch, and whether the copies they record are OTHER files is asked per file.
         return answer.Outcome == DeclaredProductOutcome.DeclaredPatchRegistered
             && answer.RecordedPackages is { } recorded
-                ? CompareWithRecorded(path, recorded,
-                    DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, answer.Outcome)
+                ? CompareWithRecorded(path, recorded)
                 : answer.Outcome;
     }
 
@@ -2561,35 +2774,22 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// The verdict for the candidate at <paramref name="candidatePath"/> against every
-    /// file in <paramref name="recorded"/>: every package an installation of a product
-    /// opens, or the cached copy every registration of a patch records.
-    /// <paramref name="differentFromEvery"/> where the candidate is shown to be a
-    /// different file from all of them, and <paramref name="matched"/> where it opens as
-    /// one of them.
-    ///
-    /// A CANDIDATE WHOSE OWN IDENTITY DOES NOT READ IS
-    /// <see cref="DeclaredProductOutcome.CandidateIdentityUnestablished"/>, which keeps
-    /// it. Every recorded file was identified, so what was not established is about this
-    /// file alone. A candidate gone by the time it is read answers the same way. Do not
-    /// let it through with <paramref name="differentFromEvery"/>: that verdict says the
-    /// candidate is a different file from every recorded one, and nothing at a path that
-    /// names no file shows that.
+    /// The verdict for the patch copy at <paramref name="candidatePath"/> against every
+    /// file in <paramref name="recorded"/>, the cached copy every registration of its patch
+    /// records: <see cref="DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile"/> where
+    /// the copy is shown to be a different file from all of them,
+    /// <see cref="DeclaredProductOutcome.DeclaredPatchRegistered"/> where it opens as one of
+    /// them, and <see cref="DeclaredProductOutcome.CandidateIdentityUnestablished"/> where its
+    /// own identity does not read, as <see cref="CompareWithOpened"/> answers for an
+    /// installation package.
     /// </summary>
-    private DeclaredProductOutcome CompareWithRecorded(
-        string candidatePath,
-        IReadOnlyList<FileIdentity> recorded,
-        DeclaredProductOutcome differentFromEvery,
-        DeclaredProductOutcome matched)
+    private DeclaredProductOutcome CompareWithRecorded(string candidatePath, IReadOnlyList<FileIdentity> recorded)
     {
-        if (_fileIdentities is null) return matched;
-        if (_fileIdentities.ReadOutcome(candidatePath, out var candidate) != FileIdentityRead.Read)
-            return DeclaredProductOutcome.CandidateIdentityUnestablished;
-
-        foreach (var package in recorded)
-            if (package == candidate) return matched;
-
-        return differentFromEvery;
+        var verdict = CompareWithOpened(
+            candidatePath, recorded, [], [], [], DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, out _);
+        return verdict == DeclaredProductOutcome.DeclaredProductInstalled
+            ? DeclaredProductOutcome.DeclaredPatchRegistered
+            : verdict;
     }
 
     /// <param name="Outcome">The verdict the declared code alone gives.</param>
@@ -2609,18 +2809,37 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// package read was refused for a root given up for the pass, that root
     /// (<see cref="PackagesOpenedBy"/>). Null for every other answer.
     /// </param>
+    /// <param name="Cached">
+    /// Beside <paramref name="RecordedPackages"/> for an installed product, the cached packages
+    /// among them (<see cref="OpenedPackages.Cached"/>). Null for every other verdict.
+    /// </param>
+    /// <param name="Cause">
+    /// For an installed product whose <paramref name="RecordedPackages"/> is null, the step that
+    /// could not see a package (<see cref="PackagesOpenedBy"/>), which every candidate declaring
+    /// the product is kept for. <see cref="DeclaredProductInstalledCause.None"/> for every other
+    /// answer.
+    /// </param>
     private readonly record struct DeclarationAnswer(
         DeclaredProductOutcome Outcome,
         IReadOnlyList<FileIdentity>? RecordedPackages,
         IReadOnlyList<NetworkPackage>? ByName = null,
-        string? GivenUp = null);
+        string? GivenUp = null,
+        IReadOnlyList<FileIdentity>? Cached = null,
+        DeclaredProductInstalledCause Cause = DeclaredProductInstalledCause.None);
 
     /// <param name="Identities">The identity of every package read for every candidate.</param>
     /// <param name="ByName">
     /// Every package in a folder on the network, read only for a candidate whose name it
     /// could be (<see cref="WithPackagesItCouldBe"/>).
     /// </param>
-    private sealed record OpenedPackages(IReadOnlyList<FileIdentity> Identities, IReadOnlyList<NetworkPackage> ByName);
+    /// <param name="Cached">
+    /// The cached packages among <paramref name="Identities"/>, each the <c>LocalPackage</c> an
+    /// installation records. The rest are packages its sources name.
+    /// </param>
+    private sealed record OpenedPackages(
+        IReadOnlyList<FileIdentity> Identities,
+        IReadOnlyList<NetworkPackage> ByName,
+        IReadOnlyList<FileIdentity> Cached);
 
     /// <param name="Path">The path Windows Installer opens: the source folder and the package name.</param>
     /// <param name="Name">The package name.</param>

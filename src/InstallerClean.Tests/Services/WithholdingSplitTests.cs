@@ -222,6 +222,68 @@ public class WithholdingSplitTests
     }
 
     /// <summary>
+    /// A screen keeping a.msi to c.msi because the product each declares is installed and d.msi
+    /// with nothing settled, giving <paramref name="causes"/> beside those verdicts.
+    /// </summary>
+    private static IDeclaredProductCheck ScreenGivingCauses(IReadOnlyList<DeclaredProductInstalledCause> causes)
+    {
+        var screen = Substitute.For<IDeclaredProductCheck>();
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+                Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(),
+                Arg.Any<Func<string, bool?>?>(), Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>())
+            .Returns(new DeclaredProductScreening(
+                [
+                    DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductOutcome.DeclaredProductInstalled,
+                    DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductOutcome.Unestablished,
+                ],
+                [],
+                WaitCount: 0,
+                InstalledCauses: causes));
+        return screen;
+    }
+
+    private static readonly string[] FourFiles =
+        [$@"{Folder}\a.msi", $@"{Folder}\b.msi", $@"{Folder}\c.msi", $@"{Folder}\d.msi"];
+
+    [Fact]
+    public async Task Why_the_screen_kept_each_file_whose_program_is_installed_travels_on_the_result()
+    {
+        var result = await Scan(
+            walked: FourFiles,
+            registered: Array.Empty<string>(),
+            screen: ScreenGivingCauses(
+            [
+                DeclaredProductInstalledCause.SourcesGivenUp, DeclaredProductInstalledCause.ByName,
+                DeclaredProductInstalledCause.SourcesGivenUp, DeclaredProductInstalledCause.None,
+            ]));
+
+        Assert.Equal(3, result.WithheldBy.DeclaredProductInstalledCount);
+        Assert.Equal(
+            DeclaredProductInstalledCauses.None with { SourcesGivenUp = 2, ByName = 1 },
+            result.WithheldDeclaredProductInstalledCauses);
+        var info = ScanInfo.From(result, 10);
+        Assert.Equal(2, info.DeclaredInstalledSourcesGivenUpCount);
+        Assert.Equal(1, info.DeclaredInstalledByNameCount);
+        AssertPartitions(result);
+    }
+
+    [Fact]
+    public async Task A_screen_giving_causes_for_some_of_its_verdicts_only_has_none_of_them_counted()
+    {
+        // Two causes beside four verdicts cannot be lined up with the files they are about, so
+        // none is read, and the files are counted in the arm and under no cause.
+        var result = await Scan(
+            walked: FourFiles,
+            registered: Array.Empty<string>(),
+            screen: ScreenGivingCauses(
+                [DeclaredProductInstalledCause.SourcesGivenUp, DeclaredProductInstalledCause.ByName]));
+
+        Assert.Equal(3, result.WithheldBy.DeclaredProductInstalledCount);
+        Assert.Equal(DeclaredProductInstalledCauses.None, result.WithheldDeclaredProductInstalledCauses);
+        AssertPartitions(result);
+    }
+
+    /// <summary>
     /// What a screen holding a file because a second copy's packages could not all be seen says
     /// it found: no installation setting the hold on every installation package, three second
     /// copies checked, and the read of one per-machine copy stopped at its sources.

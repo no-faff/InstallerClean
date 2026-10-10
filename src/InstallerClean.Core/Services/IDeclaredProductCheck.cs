@@ -244,14 +244,25 @@ public interface IDeclaredProductCheck
 /// What the pass found of the two conditions under which it holds back every installation
 /// package it would otherwise let through (<see cref="CachedPackageCensus"/>).
 /// </param>
+/// <param name="InstalledCauses">
+/// Why each candidate given <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/> was
+/// kept, entry <c>i</c> answering candidate <c>i</c> as <paramref name="Outcomes"/> does, and
+/// <see cref="DeclaredProductInstalledCause.None"/> for every other verdict
+/// (<see cref="DeclaredProductInstalledCause"/>). Empty from a screening that gives none, which
+/// a caller reads as no cause for any candidate.
+/// </param>
 public sealed record DeclaredProductScreening(
     IReadOnlyList<DeclaredProductOutcome> Outcomes,
     IReadOnlyList<SourceRootGivenUp> RootsGivenUp,
     int WaitCount,
-    CachedPackageCensus? CachedPackages = null)
+    CachedPackageCensus? CachedPackages = null,
+    IReadOnlyList<DeclaredProductInstalledCause>? InstalledCauses = null)
 {
     /// <summary>Never null: a screening built without one reads as a pass that read no installation.</summary>
     public CachedPackageCensus CachedPackages { get; init; } = CachedPackages ?? CachedPackageCensus.None;
+
+    /// <summary>Never null: a screening built without them reads as one giving no cause for any candidate.</summary>
+    public IReadOnlyList<DeclaredProductInstalledCause> InstalledCauses { get; init; } = InstalledCauses ?? [];
 }
 
 /// <summary>

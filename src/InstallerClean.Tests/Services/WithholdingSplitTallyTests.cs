@@ -85,19 +85,19 @@ public class WithholdingSplitTallyTests
         tally.IdentityUnestablished();
         // A candidate whose own identity the screen could not read counts in the
         // identity comparison's arm.
-        tally.Screened(DeclaredProductOutcome.CandidateIdentityUnestablished, 512);
+        tally.Screened(DeclaredProductOutcome.CandidateIdentityUnestablished, 512, DeclaredProductInstalledCause.None);
         tally.Wholesale(7);
         tally.ScreenUnanswered(3);
-        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1024);
-        tally.Screened(DeclaredProductOutcome.Unestablished, 2048);
-        tally.Screened(DeclaredProductOutcome.Unestablished, 4096);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 8192);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 8192);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 8192);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 16384);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 16384);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 16384);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 16384);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1024, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.Unestablished, 2048, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.Unestablished, 4096, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 8192, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 8192, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 8192, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 16384, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 16384, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 16384, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 16384, DeclaredProductInstalledCause.None);
         tally.Contained(CandidateGuard.RemovalSafety.Refused);
         tally.Contained(CandidateGuard.RemovalSafety.Refused);
         tally.Contained(CandidateGuard.RemovalSafety.Refused);
@@ -132,14 +132,14 @@ public class WithholdingSplitTallyTests
         // size shown for files the scan could not settle.
         var tally = new FileSystemScanService.WithholdingSplitTally();
 
-        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1000);
-        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 200);
-        tally.Screened(DeclaredProductOutcome.Unestablished, 30);
-        tally.Screened(DeclaredProductOutcome.DeclaredProductNotInstalled, 4);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 60000);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 700000);
-        tally.Screened(DeclaredProductOutcome.CandidateIdentityUnestablished, 8000000);
-        tally.Screened((DeclaredProductOutcome)99, 5);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1000, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 200, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.Unestablished, 30, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductNotInstalled, 4, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 60000, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 700000, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.CandidateIdentityUnestablished, 8000000, DeclaredProductInstalledCause.None);
+        tally.Screened((DeclaredProductOutcome)99, 5, DeclaredProductInstalledCause.None);
 
         Assert.Equal(1200, tally.DeclaredProductInstalledBytes);
     }
@@ -150,14 +150,14 @@ public class WithholdingSplitTallyTests
         // The same rule for the other arm the held-back sentences leave out.
         var tally = new FileSystemScanService.WithholdingSplitTally();
 
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 1000);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 200);
-        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 60000);
-        tally.Screened(DeclaredProductOutcome.Unestablished, 30);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchNotRegistered, 4);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 700000);
-        tally.Screened(DeclaredProductOutcome.CandidateIdentityUnestablished, 8000000);
-        tally.Screened((DeclaredProductOutcome)99, 5);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 1000, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchRegistered, 200, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 60000, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.Unestablished, 30, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchNotRegistered, 4, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchUnestablished, 700000, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.CandidateIdentityUnestablished, 8000000, DeclaredProductInstalledCause.None);
+        tally.Screened((DeclaredProductOutcome)99, 5, DeclaredProductInstalledCause.None);
 
         Assert.Equal(1200, tally.DeclaredPatchRegisteredBytes);
     }
@@ -170,10 +170,10 @@ public class WithholdingSplitTallyTests
         // withholding arm if that call site is ever restructured.
         var tally = new FileSystemScanService.WithholdingSplitTally();
 
-        tally.Screened(DeclaredProductOutcome.DeclaredProductNotInstalled, 1024);
-        tally.Screened(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, 1024);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchNotRegistered, 1024);
-        tally.Screened(DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, 1024);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductNotInstalled, 1024, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, 1024, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchNotRegistered, 1024, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, 1024, DeclaredProductInstalledCause.None);
 
         Assert.Equal(default, tally.Taken());
         Assert.Equal(0, tally.DeclaredProductInstalledBytes);
@@ -189,7 +189,7 @@ public class WithholdingSplitTallyTests
         // their causes was established for it.
         var tally = new FileSystemScanService.WithholdingSplitTally();
 
-        tally.Screened((DeclaredProductOutcome)99, 1024);
+        tally.Screened((DeclaredProductOutcome)99, 1024, DeclaredProductInstalledCause.None);
 
         var split = tally.Taken();
 
@@ -231,7 +231,7 @@ public class WithholdingSplitTallyTests
         {
             var tally = new FileSystemScanService.WithholdingSplitTally();
 
-            tally.Screened(outcome, 1024);
+            tally.Screened(outcome, 1024, DeclaredProductInstalledCause.None);
 
             var moved = Moved(tally.Taken());
 
@@ -244,6 +244,91 @@ public class WithholdingSplitTallyTests
                 + "verdict's cause over the other's file.");
             seen[moved[0]] = outcome;
         }
+    }
+
+    /// <summary>The counts by cause, by member name, read off the record's primary constructor.</summary>
+    private static Dictionary<string, int> ByCause(DeclaredProductInstalledCauses causes) =>
+        typeof(DeclaredProductInstalledCauses)
+            .GetConstructors()
+            .OrderByDescending(c => c.GetParameters().Length)
+            .First()
+            .GetParameters()
+            .ToDictionary(
+                p => p.Name!,
+                p => (int)typeof(DeclaredProductInstalledCauses)
+                    .GetProperty(p.Name!, BindingFlags.Instance | BindingFlags.Public)!.GetValue(causes)!,
+                StringComparer.Ordinal);
+
+    [Fact]
+    public void Every_cause_the_enum_declares_counts_into_the_member_of_its_own_name()
+    {
+        // Driven from the enum, so a cause added to it arrives asking for a member of its own
+        // instead of being counted in the arm and under no cause.
+        var causes = Enum.GetValues<DeclaredProductInstalledCause>()
+            .Where(c => c != DeclaredProductInstalledCause.None)
+            .ToArray();
+
+        // A list that came back empty would leave the loop below checking nothing.
+        Assert.True(causes.Length >= 2, "the cause list came back short");
+        Assert.Equal(
+            causes.Select(c => c.ToString()).Order(StringComparer.Ordinal),
+            ByCause(DeclaredProductInstalledCauses.None).Keys.Order(StringComparer.Ordinal));
+
+        foreach (var cause in causes)
+        {
+            var tally = new FileSystemScanService.WithholdingSplitTally();
+
+            tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1024, cause);
+
+            var moved = ByCause(tally.DeclaredProductInstalledCauses).Where(m => m.Value != 0).ToArray();
+            Assert.Equal(cause.ToString(), Assert.Single(moved).Key);
+            Assert.Equal(1, moved[0].Value);
+            Assert.Equal(1, tally.Taken().DeclaredProductInstalledCount);
+        }
+    }
+
+    [Fact]
+    public void The_counts_by_cause_add_up_to_the_arm_where_every_file_has_a_cause()
+    {
+        var tally = new FileSystemScanService.WithholdingSplitTally();
+
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1, DeclaredProductInstalledCause.IsItsCachedPackage);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 2, DeclaredProductInstalledCause.SourcesGivenUp);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 4, DeclaredProductInstalledCause.SourcesGivenUp);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 8, DeclaredProductInstalledCause.ByName);
+
+        Assert.Equal(4, tally.Taken().DeclaredProductInstalledCount);
+        Assert.Equal(4, ByCause(tally.DeclaredProductInstalledCauses).Values.Sum());
+        Assert.Equal(2, tally.DeclaredProductInstalledCauses.SourcesGivenUp);
+        Assert.Equal(15, tally.DeclaredProductInstalledBytes);
+    }
+
+    [Fact]
+    public void A_file_with_no_cause_is_counted_in_the_arm_and_under_no_cause()
+    {
+        // None, and values cast past the enum's members either side, are counted in the arm, which
+        // is the verdict's, and under none of the causes, none of which was given.
+        var tally = new FileSystemScanService.WithholdingSplitTally();
+
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1024, DeclaredProductInstalledCause.None);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1024, (DeclaredProductInstalledCause)99);
+        tally.Screened(DeclaredProductOutcome.DeclaredProductInstalled, 1024, (DeclaredProductInstalledCause)(-1));
+
+        Assert.Equal(3, tally.Taken().DeclaredProductInstalledCount);
+        Assert.Equal(DeclaredProductInstalledCauses.None, tally.DeclaredProductInstalledCauses);
+    }
+
+    [Fact]
+    public void A_cause_given_with_any_other_verdict_is_counted_under_no_cause()
+    {
+        var tally = new FileSystemScanService.WithholdingSplitTally();
+
+        foreach (var outcome in Enum.GetValues<DeclaredProductOutcome>()
+                     .Where(o => o != DeclaredProductOutcome.DeclaredProductInstalled))
+            tally.Screened(outcome, 1024, DeclaredProductInstalledCause.IsItsCachedPackage);
+
+        Assert.Equal(0, tally.Taken().DeclaredProductInstalledCount);
+        Assert.Equal(DeclaredProductInstalledCauses.None, tally.DeclaredProductInstalledCauses);
     }
 
     [Fact]

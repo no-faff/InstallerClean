@@ -102,7 +102,7 @@ public sealed record ResultLogEntry(
     /// screen found with no package for Windows Installer to open
     /// (<see cref="ScanInfo.SecondCopyReleasedOpensNoPackageCount"/>).
     ///
-    /// SCHEMA 8 ADDS FOUR KEYS UNDER <c>scan</c> AND TAKES NONE AWAY: what the declared-product
+    /// SCHEMA 8 ADDS KEYS UNDER <c>scan</c> AND TAKES NONE AWAY. First, what the declared-product
     /// screen found of the installations recording no cached package that set the hold or would
     /// have (<see cref="ScanInfo.SecondCopyReleasedBySourcesCount"/> to
     /// <see cref="ScanInfo.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount"/>): those it released
@@ -111,7 +111,10 @@ public sealed record ResultLogEntry(
     /// <c>scan.secondCopyKeepNoneRecordedCount</c> AND <c>scan.secondCopyUnseenNoneRecordedCount</c>
     /// NARROW AT 8. From 8 an installation recording no cached package is counted in either only
     /// where its <c>InstallProperties</c> key does not show it records none as well, or a source it
-    /// names could not be ruled out.
+    /// names could not be ruled out. After those come the keys saying why the screen kept each file
+    /// counted in <c>scan.withheldDeclaredProductInstalledCount</c>, one key to a file
+    /// (<see cref="ScanInfo.DeclaredInstalledIsItsCachedPackageCount"/> to
+    /// <see cref="ScanInfo.DeclaredInstalledByNameCount"/>).
     ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
@@ -939,7 +942,9 @@ public sealed record MachineInfo(
 /// a source, that the screen could not show is another file; or because an
 /// installation the scan could not rule out as a second copy of a program opens the
 /// file as its package:
-/// <c>ScanResult.WithheldBy.DeclaredProductInstalledCount</c>.
+/// <c>ScanResult.WithheldBy.DeclaredProductInstalledCount</c>. The keys from
+/// <paramref name="DeclaredInstalledIsItsCachedPackageCount"/> to
+/// <paramref name="DeclaredInstalledByNameCount"/> split it by why the screen kept each file.
 /// </param>
 /// <param name="WithheldDeclaredProductUnestablishedCount">
 /// Candidates the same screen kept back having settled nothing about them:
@@ -1304,6 +1309,93 @@ public sealed record MachineInfo(
 /// name, and in each case, the <c>InstallProperties</c> key recording none as well, a source the
 /// screen could not rule out, a drive or share given up for the scan included.
 /// </param>
+/// <param name="DeclaredInstalledIsItsCachedPackageCount">
+/// Of the files in <paramref name="WithheldDeclaredProductInstalledCount"/>, those that open as the
+/// cached package an installation of their own program records, under another path
+/// (<see cref="DeclaredProductInstalledCauses.IsItsCachedPackage"/>).
+///
+/// THE KEYS FROM THIS ONE TO <paramref name="DeclaredInstalledByNameCount"/> SAY WHY THE SCREEN KEPT
+/// EACH FILE IN <paramref name="WithheldDeclaredProductInstalledCount"/>, one key for each file, and
+/// they add up to it (<see cref="Services.DeclaredProductInstalledCause"/>). Those to
+/// <paramref name="DeclaredInstalledIsAtAnotherInstallationsSourcesCount"/> are files that are a
+/// package an installation opens. Those from <paramref name="DeclaredInstalledPathUnreadableCount"/>
+/// to <paramref name="DeclaredInstalledSourcePackageNotRuledOutCount"/> are files whose own
+/// program's packages could not all be seen, every file declaring that program counted under the
+/// step that stopped the read at its first installation that could not be seen.
+/// </param>
+/// <param name="DeclaredInstalledIsAtItsSourcesCount">
+/// Those that open as the package at a source of one of their own program's installations
+/// (<see cref="DeclaredProductInstalledCauses.IsAtItsSources"/>).
+/// </param>
+/// <param name="DeclaredInstalledIsAnotherCachedPackageCount">
+/// Those that open as the cached package of an installation not ruled out as a second copy of a
+/// program (<see cref="DeclaredProductInstalledCauses.IsAnotherCachedPackage"/>).
+/// </param>
+/// <param name="DeclaredInstalledIsAtAnotherInstallationsSourcesCount">
+/// Those that open as the package at a source of an installation not ruled out as a second copy, or
+/// of one recording no cached package that its sources released
+/// (<see cref="DeclaredProductInstalledCauses.IsAtAnotherInstallationsSources"/>).
+/// </param>
+/// <param name="DeclaredInstalledPathUnreadableCount">
+/// Those whose program has an installation whose cached package's path would not read
+/// (<see cref="DeclaredProductInstalledCauses.PathUnreadable"/>).
+/// </param>
+/// <param name="DeclaredInstalledNoneRecordedRegistryDisagreesCount">
+/// Those whose program has an installation recording no cached package whose
+/// <c>InstallProperties</c> key holds one, would not read, or has a path that would not make
+/// (<see cref="DeclaredProductInstalledCauses.NoneRecordedRegistryDisagrees"/>).
+/// </param>
+/// <param name="DeclaredInstalledNotThereCount">
+/// Those whose program has an installation whose cached package's path names no file that is
+/// there, a folder included (<see cref="DeclaredProductInstalledCauses.NotThere"/>).
+/// </param>
+/// <param name="DeclaredInstalledWouldNotIdentifyCount">
+/// Those whose program has an installation whose cached package's volume and file ID would not
+/// read (<see cref="DeclaredProductInstalledCauses.WouldNotIdentify"/>).
+/// </param>
+/// <param name="DeclaredInstalledWouldNotReadCount">
+/// Those whose program has an installation whose cached package would not give up its product code
+/// (<see cref="DeclaredProductInstalledCauses.WouldNotRead"/>).
+/// </param>
+/// <param name="DeclaredInstalledNotThisProductCount">
+/// Those whose program has an installation whose cached package declares no product code, another
+/// product's or a patch (<see cref="DeclaredProductInstalledCauses.NotThisProduct"/>).
+/// </param>
+/// <param name="DeclaredInstalledSourcesPerUserUnmanagedCount">
+/// Those whose program has a per-user unmanaged installation, whose source list is not read
+/// (<see cref="DeclaredProductInstalledCauses.SourcesPerUserUnmanaged"/>).
+/// </param>
+/// <param name="DeclaredInstalledSourcesGivenUpCount">
+/// Those whose program has an installation with a package at a source, read for every file
+/// declaring the program, under a drive or share the screen gave up
+/// (<see cref="DeclaredProductInstalledCauses.SourcesGivenUp"/>). Each is also one of the files in
+/// <paramref name="FilesKeptForSourcesGivenUpCount"/>, which counts files of other keys as well.
+/// </param>
+/// <param name="DeclaredInstalledSourcesWouldNotReadCount">
+/// Those whose program has an installation whose package name, source list, a property of the list,
+/// a registry key holding them or <c>InstallSource</c> would not read
+/// (<see cref="DeclaredProductInstalledCauses.SourcesWouldNotRead"/>).
+/// </param>
+/// <param name="DeclaredInstalledSourcesRegistryDiffersCount">
+/// Those whose program has an installation whose source list, package name, media package path,
+/// source used last or <c>InstallSource</c> the registry holds otherwise than Windows Installer
+/// answers (<see cref="DeclaredProductInstalledCauses.SourcesRegistryDiffers"/>).
+/// </param>
+/// <param name="DeclaredInstalledSourcesFormNotComparedCount">
+/// Those whose program has an installation whose sources hold something the screen does not
+/// compare: a URL, a media package path, a variable, a form not compared, or a source used last
+/// that is not a network folder (<see cref="DeclaredProductInstalledCauses.SourcesFormNotCompared"/>).
+/// </param>
+/// <param name="DeclaredInstalledSourcePackageNotRuledOutCount">
+/// Those whose program has an installation with a package at a source that would not identify or
+/// could be a file directly in the Installer folder
+/// (<see cref="DeclaredProductInstalledCauses.SourcePackageNotRuledOut"/>).
+/// </param>
+/// <param name="DeclaredInstalledByNameCount">
+/// Those a package in a folder on the network, at a source of their own program, could be by their
+/// name, where that package could not be ruled out, one under a drive or share the screen gave up
+/// among them (<see cref="DeclaredProductInstalledCauses.ByName"/>).
+/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -1377,7 +1469,24 @@ public sealed record ScanInfo(
     int SecondCopyReleasedBySourcesCount,
     int SecondCopyKeepNoneRecordedOtherAnswerCount,
     int SecondCopyKeepNoneRecordedRegistryDisagreesCount,
-    int SecondCopyKeepNoneRecordedSourcesNotRuledOutCount)
+    int SecondCopyKeepNoneRecordedSourcesNotRuledOutCount,
+    int DeclaredInstalledIsItsCachedPackageCount,
+    int DeclaredInstalledIsAtItsSourcesCount,
+    int DeclaredInstalledIsAnotherCachedPackageCount,
+    int DeclaredInstalledIsAtAnotherInstallationsSourcesCount,
+    int DeclaredInstalledPathUnreadableCount,
+    int DeclaredInstalledNoneRecordedRegistryDisagreesCount,
+    int DeclaredInstalledNotThereCount,
+    int DeclaredInstalledWouldNotIdentifyCount,
+    int DeclaredInstalledWouldNotReadCount,
+    int DeclaredInstalledNotThisProductCount,
+    int DeclaredInstalledSourcesPerUserUnmanagedCount,
+    int DeclaredInstalledSourcesGivenUpCount,
+    int DeclaredInstalledSourcesWouldNotReadCount,
+    int DeclaredInstalledSourcesRegistryDiffersCount,
+    int DeclaredInstalledSourcesFormNotComparedCount,
+    int DeclaredInstalledSourcePackageNotRuledOutCount,
+    int DeclaredInstalledByNameCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -1395,6 +1504,7 @@ public sealed record ScanInfo(
         var supersededCount = scan.RemovableFiles.Count(f => f.IsRemovablePatch) - obsoletedCount;
         var givenUp = SourcesGivenUpCounts.Of(scan);
         var cachedPackages = scan.CachedPackageCensus;
+        var installedBy = scan.WithheldDeclaredProductInstalledCauses;
         return new(
             durationMs,
             scan.RegisteredPackages.Count,
@@ -1498,7 +1608,26 @@ public sealed record ScanInfo(
             cachedPackages.ReleasedBySources,
             cachedPackages.KeptNoneRecordedOtherAnswer,
             cachedPackages.KeptNoneRecordedRegistryDisagrees,
-            cachedPackages.KeptNoneRecordedSourcesNotRuledOut);
+            cachedPackages.KeptNoneRecordedSourcesNotRuledOut,
+            // Why the screen kept each file counted under the declared-product-installed arm
+            // of the split, one cause to a file, so they add up to that arm.
+            installedBy.IsItsCachedPackage,
+            installedBy.IsAtItsSources,
+            installedBy.IsAnotherCachedPackage,
+            installedBy.IsAtAnotherInstallationsSources,
+            installedBy.PathUnreadable,
+            installedBy.NoneRecordedRegistryDisagrees,
+            installedBy.NotThere,
+            installedBy.WouldNotIdentify,
+            installedBy.WouldNotRead,
+            installedBy.NotThisProduct,
+            installedBy.SourcesPerUserUnmanaged,
+            installedBy.SourcesGivenUp,
+            installedBy.SourcesWouldNotRead,
+            installedBy.SourcesRegistryDiffers,
+            installedBy.SourcesFormNotCompared,
+            installedBy.SourcePackageNotRuledOut,
+            installedBy.ByName);
     }
 }
 

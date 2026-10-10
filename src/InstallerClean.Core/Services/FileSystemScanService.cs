@@ -1097,7 +1097,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             sourceRootsGivenUp,
             sourceWaitCount,
             cachedPackageCensus,
-            withheldBy.UnderADayOldAllADayOldAtUtc);
+            withheldBy.UnderADayOldAllADayOldAtUtc,
+            withheldBy.DeclaredProductInstalledCauses);
     }
 
     /// <summary>
@@ -1196,6 +1197,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         private long _declaredPatchRegisteredBytes;
         private int _declaredPatchUnestablished;
         private int _secondCopyUnestablished;
+        private readonly int[] _declaredProductInstalledBy =
+            new int[Enum.GetValues<DeclaredProductInstalledCause>().Max(cause => (int)cause) + 1];
         private readonly ContainmentTally _containment = new();
 
         internal void IdentityUnestablished() => _identityUnestablished++;
@@ -1245,14 +1248,23 @@ public sealed class FileSystemScanService : IFileSystemScanService
         /// uncounted, so only the screen's share of this arm holds one. The command
         /// line's line for the arm, that a file in the folder couldn't be identified, is
         /// true of every file in it.
+        ///
+        /// A FILE KEPT AS <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/> IS
+        /// COUNTED BY ITS CAUSE AS WELL, <paramref name="cause"/>, in the same arm, so the
+        /// counts by cause add up to the arm's count wherever every such file has a cause
+        /// (<see cref="Models.DeclaredProductInstalledCauses"/>). A file with
+        /// <see cref="DeclaredProductInstalledCause.None"/>, or with a value the enum does not
+        /// declare, is counted in the arm and under no cause. Every other verdict takes no cause.
         /// </summary>
-        internal void Screened(DeclaredProductOutcome outcome, long sizeBytes)
+        internal void Screened(DeclaredProductOutcome outcome, long sizeBytes, DeclaredProductInstalledCause cause)
         {
             switch (outcome)
             {
                 case DeclaredProductOutcome.DeclaredProductInstalled:
                     _declaredProductInstalled++;
                     _declaredProductInstalledBytes += sizeBytes;
+                    if (cause != DeclaredProductInstalledCause.None && Enum.IsDefined(cause))
+                        _declaredProductInstalledBy[(int)cause]++;
                     break;
                 case DeclaredProductOutcome.Unestablished:
                     _declaredProductUnestablished++;
@@ -1279,6 +1291,31 @@ public sealed class FileSystemScanService : IFileSystemScanService
         /// give the size of the files they speak of and no others.
         /// </summary>
         internal long DeclaredProductInstalledBytes => _declaredProductInstalledBytes;
+
+        /// <summary>
+        /// The files counted under the declared-product-installed arm, by the cause each was
+        /// screened with (<see cref="Screened"/>).
+        /// </summary>
+        internal DeclaredProductInstalledCauses DeclaredProductInstalledCauses => new(
+            IsItsCachedPackage: By(DeclaredProductInstalledCause.IsItsCachedPackage),
+            IsAtItsSources: By(DeclaredProductInstalledCause.IsAtItsSources),
+            IsAnotherCachedPackage: By(DeclaredProductInstalledCause.IsAnotherCachedPackage),
+            IsAtAnotherInstallationsSources: By(DeclaredProductInstalledCause.IsAtAnotherInstallationsSources),
+            PathUnreadable: By(DeclaredProductInstalledCause.PathUnreadable),
+            NoneRecordedRegistryDisagrees: By(DeclaredProductInstalledCause.NoneRecordedRegistryDisagrees),
+            NotThere: By(DeclaredProductInstalledCause.NotThere),
+            WouldNotIdentify: By(DeclaredProductInstalledCause.WouldNotIdentify),
+            WouldNotRead: By(DeclaredProductInstalledCause.WouldNotRead),
+            NotThisProduct: By(DeclaredProductInstalledCause.NotThisProduct),
+            SourcesPerUserUnmanaged: By(DeclaredProductInstalledCause.SourcesPerUserUnmanaged),
+            SourcesGivenUp: By(DeclaredProductInstalledCause.SourcesGivenUp),
+            SourcesWouldNotRead: By(DeclaredProductInstalledCause.SourcesWouldNotRead),
+            SourcesRegistryDiffers: By(DeclaredProductInstalledCause.SourcesRegistryDiffers),
+            SourcesFormNotCompared: By(DeclaredProductInstalledCause.SourcesFormNotCompared),
+            SourcePackageNotRuledOut: By(DeclaredProductInstalledCause.SourcePackageNotRuledOut),
+            ByName: By(DeclaredProductInstalledCause.ByName));
+
+        private int By(DeclaredProductInstalledCause cause) => _declaredProductInstalledBy[(int)cause];
 
         /// <summary>
         /// The size of the files counted under the declared-patch-registered arm,
@@ -1431,6 +1468,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
             wait => progress?.Report(ScanProgressUpdate.Waiting(wait)));
         var outcomes = screening.Outcomes;
 
+        // Read beside the verdicts only where there is one cause for each, so no cause is read
+        // against another file's verdict. A screening giving no causes, or a list of another
+        // length, gives none for any candidate.
+        var causes = screening.InstalledCauses.Count == outcomes.Count ? screening.InstalledCauses : [];
+
         // A screen that answered a different number of candidates than it was
         // given has not answered about these files, and reading it positionally
         // would attach one file's verdict to another. Every candidate is kept
@@ -1460,7 +1502,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             if (outcomes[i].Withholds())
             {
                 withheld.Add(candidates[i]);
-                withheldBy.Screened(outcomes[i], candidates[i].SizeBytes);
+                withheldBy.Screened(outcomes[i], candidates[i].SizeBytes,
+                    causes.Count == 0 ? DeclaredProductInstalledCause.None : causes[i]);
             }
             else survivors.Add(candidates[i]);
         }

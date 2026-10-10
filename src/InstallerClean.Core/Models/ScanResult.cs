@@ -428,6 +428,15 @@ namespace InstallerClean.Models;
 /// APPENDED AFTER <see cref="CachedPackageCensus"/>, so a positional construction of the
 /// members above still means what it meant.
 /// </param>
+/// <param name="WithheldDeclaredProductInstalledCauses">
+/// The files <see cref="WithholdingSplit.DeclaredProductInstalledCount"/> counts, by why the
+/// declared-product screen kept each one (<see cref="Services.DeclaredProductScreening.InstalledCauses"/>).
+/// None counted where the screen did not run, kept no file for that reason, or its answer was not
+/// used.
+///
+/// APPENDED AFTER <see cref="WithheldUnderADayOldAllADayOldAtUtc"/>, so a positional construction
+/// of the members above still means what it meant.
+/// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
@@ -460,11 +469,16 @@ public record ScanResult(
     IReadOnlyList<SourceRootGivenUp>? SourceRootsGivenUp = null,
     int SourceWaitCount = 0,
     CachedPackageCensus? CachedPackageCensus = null,
-    DateTime? WithheldUnderADayOldAllADayOldAtUtc = null)
+    DateTime? WithheldUnderADayOldAllADayOldAtUtc = null,
+    DeclaredProductInstalledCauses? WithheldDeclaredProductInstalledCauses = null)
 {
     /// <summary>Never null: a result built without the list reads as one that gave nothing up.</summary>
     public IReadOnlyList<SourceRootGivenUp> SourceRootsGivenUp { get; init; }
         = SourceRootsGivenUp ?? Array.Empty<SourceRootGivenUp>();
+
+    /// <summary>Never null: a result built without them reads as a scan that kept no file for that reason.</summary>
+    public DeclaredProductInstalledCauses WithheldDeclaredProductInstalledCauses { get; init; }
+        = WithheldDeclaredProductInstalledCauses ?? DeclaredProductInstalledCauses.None;
 
     /// <summary>Never null: a result built without one reads as a scan that read no installation.</summary>
     public CachedPackageCensus CachedPackageCensus { get; init; }

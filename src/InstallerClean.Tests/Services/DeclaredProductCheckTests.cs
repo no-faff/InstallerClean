@@ -427,6 +427,73 @@ public class DeclaredProductCheckTests
             .Screen(new[] { Package(Candidate) }, installations ?? [], default, null,
                 namesAFileInInstallerFolder ?? InInstallerFolder).Outcomes[0];
 
+    /// <summary>
+    /// Screens the copy as <see cref="ScreenTheCopy"/> does and asserts it is kept as
+    /// <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/> for <paramref name="cause"/>.
+    /// </summary>
+    private static void AssertKeptFor(
+        DeclaredProductInstalledCause cause,
+        (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+            ScriptedFileIdentities Files, MockFileSystem Disk) f,
+        Func<string, bool?>? namesAFileInInstallerFolder = null,
+        IReadOnlyList<ListedInstallation>? installations = null)
+    {
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen(new[] { Package(Candidate) }, installations ?? [], default, null,
+                namesAFileInInstallerFolder ?? InInstallerFolder);
+
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, cause),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
+    }
+
+    [Fact]
+    public void Every_verdict_but_installed_has_no_cause()
+    {
+        // One screen gives the copy beside the recorded package its let-through verdict, a copy
+        // declaring a product that is not installed its own, a copy that declares nothing and a
+        // patch that declares nothing theirs, and a copy that opens as the recorded package
+        // the one verdict with a cause.
+        const string NotInstalledCopy = @"C:\Windows\Installer\b2.msi";
+        const string Unreadable = @"C:\Windows\Installer\c3.msi";
+        const string UnreadablePatch = @"C:\Windows\Installer\d4.msp";
+        const string RecordedAgain = @"C:\Windows\Installer\A~1.MSI";
+        var f = ACopyBesideTheRecordedPackage();
+        f.Packages.Declares(NotInstalledCopy, ProductB);
+        f.Msi.NotInstalled(ProductB, MsiError.UnknownProduct);
+        f.Packages.YieldsNothing(Unreadable);
+        f.Packages.YieldsNothing(UnreadablePatch);
+        f.Packages.Declares(RecordedAgain, ProductA);
+        f.Files.Opens(RecordedAgain, 2);
+        f.Disk.AddFile(RecordedAgain, new MockFileData(new byte[100]));
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen(
+                [Package(Candidate), Package(NotInstalledCopy), Package(Unreadable), Patch(UnreadablePatch),
+                    Package(RecordedAgain)],
+                [], default, null, InInstallerFolder);
+
+        Assert.Equal(
+            new[]
+            {
+                DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile,
+                DeclaredProductOutcome.DeclaredProductNotInstalled,
+                DeclaredProductOutcome.Unestablished,
+                DeclaredProductOutcome.DeclaredPatchUnestablished,
+                DeclaredProductOutcome.DeclaredProductInstalled,
+            },
+            screening.Outcomes);
+        Assert.Equal(
+            new[]
+            {
+                DeclaredProductInstalledCause.None,
+                DeclaredProductInstalledCause.None,
+                DeclaredProductInstalledCause.None,
+                DeclaredProductInstalledCause.None,
+                DeclaredProductInstalledCause.IsItsCachedPackage,
+            },
+            screening.InstalledCauses);
+    }
+
     [Fact]
     public void A_copy_beside_the_package_its_installed_product_records_is_let_through()
     {
@@ -481,10 +548,7 @@ public class DeclaredProductCheckTests
         f.Files.Opens(UsersPackage, 3);
         f.Disk.AddFile(UsersPackage, new MockFileData(new byte[100]));
 
-        var outcome = ScreenTheCopy(f);
-
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
-        Assert.True(outcome.Withholds());
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesPerUserUnmanaged, f);
         // The machine's list was read and the user's was not.
         var machineOnly = new[] { (ProductA, (string?)null, MsiInstallContext.Machine) };
         Assert.Equal(machineOnly, f.Msi.PackageNameReads);
@@ -505,10 +569,7 @@ public class DeclaredProductCheckTests
         f.Msi.Registry.Holds(InstallPropertiesKey("11111111111111111111111111111111", UserSid));
         f.Msi.PackageNameAnswers(ProductA, UserSid, MsiInstallContext.UserManaged, MsiError.AccessDenied);
 
-        var outcome = ScreenTheCopy(f);
-
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
-        Assert.True(outcome.Withholds());
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -564,7 +625,7 @@ public class DeclaredProductCheckTests
         RecordsNoPackage(f, answer);
         f.Msi.SourceListAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -573,7 +634,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.PackageReadAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.PathUnreadable, f);
     }
 
     [Fact]
@@ -584,7 +645,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Disk.RemoveFile(Recorded);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.NotThere, f);
     }
 
     [Fact]
@@ -598,7 +659,7 @@ public class DeclaredProductCheckTests
         f.Files.Opens(AFolder, 4);
         f.Disk.AddDirectory(AFolder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.NotThere, f);
     }
 
     [Fact]
@@ -613,7 +674,7 @@ public class DeclaredProductCheckTests
         f.Files.Opens(ShortName, 1);
         f.Disk.AddFile(ShortName, new MockFileData(new byte[100]));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.IsItsCachedPackage, f);
     }
 
     [Fact]
@@ -622,7 +683,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Files.Answers(Recorded, FileIdentityRead.OpenRefused);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.WouldNotIdentify, f);
     }
 
     [Fact]
@@ -633,7 +694,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Packages.Declares(Recorded, ProductB);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.NotThisProduct, f);
     }
 
     [Fact]
@@ -645,7 +706,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Packages.Yields(Recorded, new PackageIdentity(ProductA, IsPatch: true, Array.Empty<string>()));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.NotThisProduct, f);
     }
 
     [Fact]
@@ -654,7 +715,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Packages.YieldsNothing(Recorded, "no Property table");
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.WouldNotRead, f);
     }
 
     [Fact]
@@ -707,16 +768,17 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, "c.msi", InstallerFolder + @"\");
         AddSecondCandidate(f);
 
-        var outcomes = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
             .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, path =>
             {
                 asked.Add(path);
                 return InInstallerFolder(path);
-            }).Outcomes;
+            });
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
-            outcomes);
+            screening.Outcomes);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAtItsSources }, screening.InstalledCauses);
         Assert.Empty(asked);
     }
 
@@ -740,7 +802,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, packageName, folder);
         f.Files.Opens(folder + packageName, 1);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f, _ => true));
+        AssertKeptFor(DeclaredProductInstalledCause.IsAtItsSources, f, _ => true);
         Assert.Contains(folder + packageName, f.Files.Reads);
     }
 
@@ -767,10 +829,11 @@ public class DeclaredProductCheckTests
         AddSecondCandidate(f);
         f.Files.Answers(SecondCandidate, outcome);
 
-        var outcomes = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder).Outcomes;
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
 
-        Assert.All(outcomes, o => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, o));
+        Assert.All(screening.Outcomes, o => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, o));
+        Assert.All(screening.InstalledCauses, cause => Assert.Equal(DeclaredProductInstalledCause.SourcePackageNotRuledOut, cause));
     }
 
     [Theory]
@@ -800,7 +863,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Files.Opens(SetupPackage, 1);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.IsAtItsSources, f);
     }
 
     [Fact]
@@ -808,10 +871,12 @@ public class DeclaredProductCheckTests
     {
         var f = ACopyBesideTheRecordedPackage();
 
-        var outcome = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen(new[] { Package(Candidate) }, []).Outcomes[0];
+        // The check has no way to look, so it gives the verdict no cause.
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen(new[] { Package(Candidate) }, []);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.None),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
     }
 
     [Fact]
@@ -820,7 +885,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.SourceListAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -829,7 +894,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.SourceListNeverEnds(ProductA, null, MsiInstallContext.Machine);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -838,7 +903,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, SetupName, "");
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -852,7 +917,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, SetupName, entry);
         f.Files.Answers(entry + SetupName, FileIdentityRead.NamesNothing);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     [Fact]
@@ -861,7 +926,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.PackageNameAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -870,7 +935,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, "", SetupFolder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     [Fact]
@@ -879,7 +944,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Files.Answers(SetupPackage, FileIdentityRead.OpenRefused);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcePackageNotRuledOut, f);
     }
 
     [Fact]
@@ -936,12 +1001,13 @@ public class DeclaredProductCheckTests
         f.Files.Answers(SetupFolder + "c.msi", FileIdentityRead.NamesNothing);
         AddSecondCandidate(f);
 
-        var outcomes = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder).Outcomes;
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
-            outcomes);
+            screening.Outcomes);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAtItsSources }, screening.InstalledCauses);
         Assert.Contains(SetupFolder + "c.msi", f.Files.Reads);
     }
 
@@ -956,7 +1022,7 @@ public class DeclaredProductCheckTests
         f.Msi.SourceListEntryAnswers(ProductA, null, MsiInstallContext.Machine, 1,
             ScriptedMsiProducts.InvalidParameter);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -970,7 +1036,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, SetupName, entry);
         f.Files.Answers(entry + SetupName, FileIdentityRead.NamesNothing);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -987,7 +1053,7 @@ public class DeclaredProductCheckTests
         Environment.SetEnvironmentVariable(Variable, @"D:\Setup");
         try
         {
-            Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+            AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
         }
         finally
         {
@@ -1012,7 +1078,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, SetupName, SetupFolder, entry);
         f.Files.Answers(package, FileIdentityRead.NamesNothing);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
         Assert.DoesNotContain(SetupPackage, f.Files.Reads);
     }
 
@@ -1029,7 +1095,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, packageName, SetupFolder);
         f.Files.Answers(SetupFolder + packageName, FileIdentityRead.NamesNothing);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     // ---- The registry key holding the list ----
@@ -1112,7 +1178,7 @@ public class DeclaredProductCheckTests
             Sz(MsiInstallProperty.PackageName, stored),
             ExpandSz(MsiInstallProperty.LastUsedSource, "n;1;" + SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1121,7 +1187,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Holds(ProductAKey, ExpandSz(MsiInstallProperty.LastUsedSource, "n;1;" + SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1133,7 +1199,7 @@ public class DeclaredProductCheckTests
             ExpandSz(MsiInstallProperty.PackageName, SetupName),
             ExpandSz(MsiInstallProperty.LastUsedSource, "n;1;" + SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1144,7 +1210,7 @@ public class DeclaredProductCheckTests
             Dword(MsiInstallProperty.PackageName),
             ExpandSz(MsiInstallProperty.LastUsedSource, "n;1;" + SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1156,7 +1222,7 @@ public class DeclaredProductCheckTests
         f.Msi.Registry.Holds(ProductAKey + @"\Net",
             ExpandSz("1", SetupFolder), ExpandSz("3", InstallerFolder + @"\"));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1166,7 +1232,7 @@ public class DeclaredProductCheckTests
         f.Msi.Registry.Holds(ProductAKey + @"\Net",
             ExpandSz("1", SetupFolder), ExpandSz("2", MediaFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1178,7 +1244,7 @@ public class DeclaredProductCheckTests
         f.Files.Opens(MediaPackage, 9);
         f.Msi.Registry.Holds(ProductAKey + @"\Net", ExpandSz("1", SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Theory]
@@ -1191,7 +1257,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Holds(ProductAKey + @"\Net", ExpandSz(name, SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Theory]
@@ -1205,7 +1271,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Holds(ProductAKey + @"\Net", text is null ? Dword("1") : ExpandSz("1", text));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Theory]
@@ -1216,7 +1282,11 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Answers(ProductAKey, presence);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        // A key that is not there holds otherwise than the API answers, and one that will not
+        // read was not read.
+        AssertKeptFor(presence == RegistryKeyPresence.Absent
+            ? DeclaredProductInstalledCause.SourcesRegistryDiffers
+            : DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Theory]
@@ -1228,7 +1298,11 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Answers(ProductAKey + @"\Net", presence);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        // A key that is not there holds otherwise than the API answers, and one that will not
+        // read was not read.
+        AssertKeptFor(presence == RegistryKeyPresence.Absent
+            ? DeclaredProductInstalledCause.SourcesRegistryDiffers
+            : DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -1252,7 +1326,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.RecordsUrls(ProductA, isPatch: false, null, MsiInstallContext.Machine, url);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     [Fact]
@@ -1261,7 +1335,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.UrlListAnswers(ProductA, isPatch: false, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -1270,7 +1344,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Holds(ProductAKey + @"\URL", ExpandSz("2", "file:///C:/Windows/Installer/"));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Theory]
@@ -1283,7 +1357,7 @@ public class DeclaredProductCheckTests
         f.Msi.ListPropertyAnswers(ProductA, isPatch: false, null, MsiInstallContext.Machine, property,
             MsiError.AccessDenied);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -1298,7 +1372,7 @@ public class DeclaredProductCheckTests
             MsiInstallProperty.LastUsedType, MsiError.AccessDenied);
         f.Msi.Registry.Holds(ProductAKey, Sz(MsiInstallProperty.PackageName, SetupName));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Theory]
@@ -1314,7 +1388,7 @@ public class DeclaredProductCheckTests
         f.Msi.ListProperty(ProductA, isPatch: false, null, MsiInstallContext.Machine,
             MsiInstallProperty.LastUsedSource, source);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     [Fact]
@@ -1372,7 +1446,7 @@ public class DeclaredProductCheckTests
         var f = ACopyWithTheSourceUsedLast(OtherFolder);
         f.Files.Opens(OtherPackage, 1);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.IsAtItsSources, f);
     }
 
     [Fact]
@@ -1381,7 +1455,7 @@ public class DeclaredProductCheckTests
         var f = ACopyWithTheSourceUsedLast(OtherFolder);
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcePackageNotRuledOut, f);
     }
 
     [Theory]
@@ -1397,7 +1471,7 @@ public class DeclaredProductCheckTests
         // copy is kept without any of them being read.
         var f = ACopyWithTheSourceUsedLast(folder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     [Fact]
@@ -1412,12 +1486,13 @@ public class DeclaredProductCheckTests
         f.Files.Opens(Named, 5);
         f.Disk.AddFile(Named, new MockFileData(new byte[100]));
 
-        var outcomes = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(Named)], [], default, null, InInstallerFolder).Outcomes;
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen([Package(Candidate), Package(Named)], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
-            outcomes);
+            screening.Outcomes);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAtItsSources }, screening.InstalledCauses);
     }
 
     [Fact]
@@ -1442,9 +1517,10 @@ public class DeclaredProductCheckTests
         f.Files.Answers(SetupFolder + CopysName, FileIdentityRead.NamesNothing);
         f.Files.Opens(NasFolder + CopysName, 1);
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var screening = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAtItsSources),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
         Assert.Contains(NasFolder + CopysName, f.Files.Reads);
     }
 
@@ -1525,7 +1601,7 @@ public class DeclaredProductCheckTests
                 ? Dword(MsiInstallProperty.LastUsedSource)
                 : ExpandSz(MsiInstallProperty.LastUsedSource, stored));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Theory]
@@ -1540,7 +1616,7 @@ public class DeclaredProductCheckTests
             ? new[] { Sz(MsiInstallProperty.PackageName, SetupName), ExpandSz(MsiInstallProperty.LastUsedSource, "") }
             : new[] { Sz(MsiInstallProperty.PackageName, SetupName) });
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1555,7 +1631,7 @@ public class DeclaredProductCheckTests
             Sz(MsiInstallProperty.PackageName, SetupName),
             ExpandSz(MsiInstallProperty.LastUsedSource, "n;1;" + SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1567,7 +1643,7 @@ public class DeclaredProductCheckTests
             MsiInstallProperty.MediaPackagePath, "disk1");
         f.Msi.Registry.Holds(ProductAKey + @"\Media", Sz("1", ";"));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     [Theory]
@@ -1581,7 +1657,7 @@ public class DeclaredProductCheckTests
         f.Msi.Registry.Holds(ProductAKey + @"\Media",
             Sz("1", ";"), text is null ? Dword("MediaPackage") : Sz("MediaPackage", text));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1590,7 +1666,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Answers(ProductAKey + @"\Media", RegistryKeyPresence.Unreadable);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Fact]
@@ -1631,7 +1707,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsPackage(ProductA, sid, MsiInstallContext.UserManaged, Recorded);
         f.Msi.RecordsSources(ProductA, sid, MsiInstallContext.UserManaged, SetupName, SetupFolder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
         Assert.Empty(f.Msi.Registry.Reads);
     }
 
@@ -1640,10 +1716,12 @@ public class DeclaredProductCheckTests
     {
         var f = ACopyBesideTheRecordedPackage();
 
-        var outcome = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk)
-            .Screen(new[] { Package(Candidate) }, [], default, null, InInstallerFolder).Outcomes[0];
+        // The check has no way to look, so it gives the verdict no cause.
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk)
+            .Screen(new[] { Package(Candidate) }, [], default, null, InInstallerFolder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.None),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
         Assert.Empty(f.Msi.Registry.Reads);
     }
 
@@ -1666,10 +1744,12 @@ public class DeclaredProductCheckTests
         // happened.
         var f = ACopyBesideTheRecordedPackage();
 
-        var outcome = ScriptedCheck(f.Msi, f.Packages)
-            .Screen(new[] { Package(Candidate) }, []).Outcomes[0];
+        // The check has no way to look, so it gives the verdict no cause.
+        var screening = ScriptedCheck(f.Msi, f.Packages)
+            .Screen(new[] { Package(Candidate) }, []);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.None),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
         Assert.Empty(f.Msi.PackageReads);
         Assert.Empty(f.Files.Reads);
     }
@@ -1731,12 +1811,13 @@ public class DeclaredProductCheckTests
         f.Files.Opens(Named, 5);
         f.Disk.AddFile(Named, new MockFileData(new byte[100]));
 
-        var outcomes = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(Named)], [], default, null, InInstallerFolder).Outcomes;
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen([Package(Candidate), Package(Named)], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
-            outcomes);
+            screening.Outcomes);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAtItsSources }, screening.InstalledCauses);
     }
 
     [Fact]
@@ -1746,7 +1827,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsInstallSource(ProductA, null, MsiInstallContext.Machine, OtherFolder);
         f.Files.Opens(OtherPackage, 1);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.IsAtItsSources, f);
     }
 
     [Fact]
@@ -1756,7 +1837,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsInstallSource(ProductA, null, MsiInstallContext.Machine, OtherFolder);
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcePackageNotRuledOut, f);
     }
 
     [Fact]
@@ -1818,7 +1899,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.InstallSourceAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Theory]
@@ -1829,7 +1910,11 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Answers(ProductAProperties, presence);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        // A key that is not there holds otherwise than the API answers, and one that will not
+        // read was not read.
+        AssertKeptFor(presence == RegistryKeyPresence.Absent
+            ? DeclaredProductInstalledCause.SourcesRegistryDiffers
+            : DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
     [Theory]
@@ -1843,7 +1928,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Holds(ProductAProperties, Sz(MsiInstallProperty.InstallSource, stored));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1852,7 +1937,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Holds(ProductAProperties);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1862,7 +1947,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Holds(ProductAProperties, ExpandSz(MsiInstallProperty.InstallSource, SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1871,7 +1956,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Registry.Holds(ProductAProperties, Dword(MsiInstallProperty.InstallSource));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Fact]
@@ -1881,7 +1966,7 @@ public class DeclaredProductCheckTests
         f.Msi.InstallSourceAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
         f.Msi.Registry.Holds(ProductAProperties, Sz(MsiInstallProperty.InstallSource, SetupFolder));
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesRegistryDiffers, f);
     }
 
     [Theory]
@@ -1895,7 +1980,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsInstallSource(ProductA, null, MsiInstallContext.Machine, folder);
         f.Files.Answers(folder + SetupName, FileIdentityRead.NamesNothing);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     [Theory]
@@ -1914,7 +1999,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsInstallSource(ProductA, null, MsiInstallContext.Machine, folder);
         f.Files.Answers(package, FileIdentityRead.NamesNothing);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        AssertKeptFor(DeclaredProductInstalledCause.SourcesFormNotCompared, f);
     }
 
     // ---- A patch copy and its patch's registrations ----
@@ -3080,8 +3165,17 @@ public class DeclaredProductCheckTests
         OrphanedFile[]? candidates = null,
         Action<Exception, string>? recordRefusal = null,
         IRunningAccount? account = null) =>
+        ScreeningBesideTheSecondCopy(f, candidates, recordRefusal, account).Outcomes;
+
+    /// <summary>The whole screening <see cref="ScreenBesideTheSecondCopy"/> takes the verdicts from.</summary>
+    private static DeclaredProductScreening ScreeningBesideTheSecondCopy(
+        (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+            ScriptedFileIdentities Files, MockFileSystem Disk, ListedInstallation[] Listed) f,
+        OrphanedFile[]? candidates = null,
+        Action<Exception, string>? recordRefusal = null,
+        IRunningAccount? account = null) =>
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, account)
-            .Screen(candidates ?? [Package(Candidate)], f.Listed, default, recordRefusal, InInstallerFolder).Outcomes;
+            .Screen(candidates ?? [Package(Candidate)], f.Listed, default, recordRefusal, InInstallerFolder);
 
     /// <summary>A running account as a test names it.</summary>
     private sealed class Account(string? sid) : IRunningAccount
@@ -4221,6 +4315,7 @@ public class DeclaredProductCheckTests
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductOutcome.DeclaredProductNotInstalled },
             screening.Outcomes);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.IsAtAnotherInstallationsSources, DeclaredProductInstalledCause.None }, screening.InstalledCauses);
         Assert.Equal(Census(releasedBySources: 1), screening.CachedPackages);
     }
 
@@ -4330,7 +4425,10 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
         f.Msi.RecordsSources(NoCachedPackage, null, MsiInstallContext.Machine, CandidateName, InstallerFolder + @"\");
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenBesideIt(f).Outcomes[0]);
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAtItsSources),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
     }
 
     [Fact]
@@ -4342,7 +4440,10 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
         f.Msi.RecordsUrls(NoCachedPackage, isPatch: false, null, MsiInstallContext.Machine, SetupUrl);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenBesideIt(f).Outcomes[0]);
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcesFormNotCompared),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
     }
 
     [Fact]
@@ -4366,7 +4467,10 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
         f.Msi.RecordsSources(NoCachedPackage, null, MsiInstallContext.Machine, CandidateName, InstallerFolder + @"\");
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenBesideIt(f).Outcomes[0]);
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAtAnotherInstallationsSources),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
     }
 
     [Fact]
@@ -4393,7 +4497,8 @@ public class DeclaredProductCheckTests
 
         var screening = ScreenBesideIt(f);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[0]);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAtAnotherInstallationsSources),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
         Assert.Equal(Census(releasedBySources: 1, unruled: 1), screening.CachedPackages);
     }
 
@@ -4499,7 +4604,10 @@ public class DeclaredProductCheckTests
         f.Files.Opens(SetupPackage, 9);
         PropertiesShow(f.Msi.Registry, NoCachedPackageProperties, fault);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenBesideIt(f).Outcomes[0]);
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.NoneRecordedRegistryDisagrees),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
         Assert.Empty(f.Msi.PackageNameReads);
     }
 
@@ -4633,10 +4741,11 @@ public class DeclaredProductCheckTests
         var f = AMarkedSecondCopy();
         f.Files.Opens(OtherCandidate, 2);
 
-        var outcomes = ScreenBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate)]);
+        var screening = ScreeningBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate)]);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, outcomes[0]);
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcomes[1]);
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[1]);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAnotherCachedPackage }, screening.InstalledCauses);
     }
 
     [Fact]
@@ -4645,10 +4754,11 @@ public class DeclaredProductCheckTests
         var f = AMarkedSecondCopy();
         f.Files.Opens(SetupPackage, 3);
 
-        var outcomes = ScreenBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate)]);
+        var screening = ScreeningBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate)]);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, outcomes[0]);
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcomes[1]);
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[1]);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAtAnotherInstallationsSources }, screening.InstalledCauses);
     }
 
     [Fact]
@@ -4663,7 +4773,7 @@ public class DeclaredProductCheckTests
         f.Files.Opens(Named, 5);
         f.Disk.AddFile(Named, new MockFileData(new byte[100]));
 
-        var outcomes = ScreenBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate), Package(Named)]);
+        var screening = ScreeningBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate), Package(Named)]);
 
         Assert.Equal(
             new[]
@@ -4672,7 +4782,8 @@ public class DeclaredProductCheckTests
                 DeclaredProductOutcome.DeclaredProductNotInstalled,
                 DeclaredProductOutcome.DeclaredProductInstalled,
             },
-            outcomes);
+            screening.Outcomes);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.IsAtAnotherInstallationsSources }, screening.InstalledCauses);
     }
 
     [Fact]
@@ -4756,9 +4867,10 @@ public class DeclaredProductCheckTests
         AlsoInstallProductA(f);
         f.Files.Opens(Candidate, 2);
 
-        var outcome = ScreenBesideTheSecondCopy(f)[0];
+        var screening = ScreeningBesideTheSecondCopy(f);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAnotherCachedPackage),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
     }
 
     [Fact]
@@ -4774,6 +4886,50 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.Single(f.Files.Reads, read => read == Candidate);
         Assert.Contains((SecondCopy, (string?)null, MsiInstallContext.Machine), f.Msi.PackageNameReads);
+    }
+
+    [Fact]
+    public void A_candidate_that_is_its_own_products_cached_package_and_a_second_copys_is_counted_as_its_own()
+    {
+        // Its own product's cached package and the second copy's both open as the candidate.
+        var f = AMarkedSecondCopy();
+        AlsoInstallProductA(f);
+        f.Files.Opens(Recorded, 1);
+        f.Files.Opens(SecondCopysPackage, 1);
+
+        var screening = ScreeningBesideTheSecondCopy(f);
+
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsItsCachedPackage),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
+    }
+
+    [Fact]
+    public void A_candidate_at_its_own_products_sources_and_a_second_copys_cached_package_is_counted_as_its_own()
+    {
+        // The package both products were installed from and the second copy's cached package
+        // open as the candidate, and its own product's cached package does not.
+        var f = AMarkedSecondCopy();
+        AlsoInstallProductA(f);
+        f.Files.Opens(SetupPackage, 1);
+        f.Files.Opens(SecondCopysPackage, 1);
+
+        var screening = ScreeningBesideTheSecondCopy(f);
+
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAtItsSources),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
+    }
+
+    [Fact]
+    public void A_candidate_at_a_second_copys_sources_and_its_cached_package_is_counted_as_its_cached_package()
+    {
+        var f = AMarkedSecondCopy();
+        f.Files.Opens(SetupPackage, 1);
+        f.Files.Opens(SecondCopysPackage, 1);
+
+        var screening = ScreeningBesideTheSecondCopy(f);
+
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAnotherCachedPackage),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
     }
 
     /// <summary>
@@ -4808,10 +4964,11 @@ public class DeclaredProductCheckTests
         f.Disk.AddFile(ThirdCopysPackage, new MockFileData(new byte[100]));
         f = f with { Listed = [.. f.Listed, new ListedInstallation(ThirdCopy, null, (int)MsiInstallContext.Machine, true)] };
 
-        var outcomes = ScreenBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate)]);
+        var screening = ScreeningBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate)]);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcomes[0]);
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, outcomes[1]);
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[0]);
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[1]);
+        Assert.Equal(new[] { DeclaredProductInstalledCause.IsAtAnotherInstallationsSources, DeclaredProductInstalledCause.None }, screening.InstalledCauses);
     }
 
     [Fact]
@@ -4828,9 +4985,10 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(SecondCopy, null, MsiInstallContext.Machine, SetupName, OtherFolder);
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);
 
-        var outcome = ScreenBesideTheSecondCopy(f)[0];
+        var screening = ScreeningBesideTheSecondCopy(f);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcesWouldNotRead),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
     }
 
     [Fact]
@@ -4859,9 +5017,10 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsSources(SecondCopy, null, MsiInstallContext.Machine, SetupName, OtherFolder);
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);
 
-        var outcome = ScreenBesideTheSecondCopy(f)[0];
+        var screening = ScreeningBesideTheSecondCopy(f);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsItsCachedPackage),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
     }
 
     [Fact]
@@ -5134,11 +5293,13 @@ public class DeclaredProductCheckTests
         files.Holds(SharePackage, HeldFor);
 
         var clock = System.Diagnostics.Stopwatch.StartNew();
-        var outcome = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
+        var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+            .Screen([Package(Candidate)], [], default, null, InInstallerFolder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
+        // A package on a share is read for the candidate whose name it could be.
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.ByName),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
         Assert.True(clock.Elapsed < HeldFor, $"the screen took {clock.Elapsed}");
         Assert.Contains(SharePackage, files.Started);
     }
@@ -6394,7 +6555,8 @@ public class DeclaredProductCheckTests
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
             .Screen([Package(Candidate)], [], default, null, InInstallerFolder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[0]);
+        Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.ByName),
+            (screening.Outcomes[0], screening.InstalledCauses[0]));
         Assert.Equal([new(@"\\nas\share", SourceRootGiveUpRoute.NoAnswer, 1)], GivenUp(screening));
     }
 
@@ -6415,8 +6577,11 @@ public class DeclaredProductCheckTests
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
             .Screen([Package(Candidate), Package(AnotherCopy)], [], default, null, InInstallerFolder);
 
+        // Each copy kept for a drive given up is one of the files counted towards it.
         Assert.All(screening.Outcomes,
             outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome));
+        Assert.All(screening.InstalledCauses,
+            cause => Assert.Equal(DeclaredProductInstalledCause.SourcesGivenUp, cause));
         Assert.Equal([new("D:", SourceRootGiveUpRoute.NoAnswer, 2)], GivenUp(screening));
         Assert.Single(files.Started, read => read == SetupPackage);
     }

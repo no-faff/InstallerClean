@@ -123,7 +123,24 @@ public class ResultLogEntryTests
         SecondCopyReleasedBySourcesCount: 0,
         SecondCopyKeepNoneRecordedOtherAnswerCount: 0,
         SecondCopyKeepNoneRecordedRegistryDisagreesCount: 0,
-        SecondCopyKeepNoneRecordedSourcesNotRuledOutCount: 0);
+        SecondCopyKeepNoneRecordedSourcesNotRuledOutCount: 0,
+        DeclaredInstalledIsItsCachedPackageCount: 0,
+        DeclaredInstalledIsAtItsSourcesCount: 0,
+        DeclaredInstalledIsAnotherCachedPackageCount: 0,
+        DeclaredInstalledIsAtAnotherInstallationsSourcesCount: 0,
+        DeclaredInstalledPathUnreadableCount: 0,
+        DeclaredInstalledNoneRecordedRegistryDisagreesCount: 0,
+        DeclaredInstalledNotThereCount: 0,
+        DeclaredInstalledWouldNotIdentifyCount: 0,
+        DeclaredInstalledWouldNotReadCount: 0,
+        DeclaredInstalledNotThisProductCount: 0,
+        DeclaredInstalledSourcesPerUserUnmanagedCount: 0,
+        DeclaredInstalledSourcesGivenUpCount: 0,
+        DeclaredInstalledSourcesWouldNotReadCount: 0,
+        DeclaredInstalledSourcesRegistryDiffersCount: 0,
+        DeclaredInstalledSourcesFormNotComparedCount: 0,
+        DeclaredInstalledSourcePackageNotRuledOutCount: 0,
+        DeclaredInstalledByNameCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -203,7 +220,7 @@ public class ResultLogEntryTests
         // release sends to its exact set of keys, every count in it required; a version it
         // does not know goes to its lenient v<n>-unknown/ path. So a key added to or taken
         // from what a version carries moves the version once a release sends it, and this
-        // pin makes that move a deliberate, reviewed act. Schema 8 is schema 7 with four keys
+        // pin makes that move a deliberate, reviewed act. Schema 8 is schema 7 with keys
         // appended under scan, from secondCopyReleasedBySourcesCount.
         Assert.Equal(8, ResultLogEntry.CurrentSchemaVersion);
     }
@@ -373,6 +390,19 @@ public class ResultLogEntryTests
                 "secondCopyReleasedBySourcesCount",
                 "secondCopyKeepNoneRecordedOtherAnswerCount", "secondCopyKeepNoneRecordedRegistryDisagreesCount",
                 "secondCopyKeepNoneRecordedSourcesNotRuledOutCount",
+                // Then why the screen kept each file counted in
+                // withheldDeclaredProductInstalledCount, one key to a file, adding up to it.
+                "declaredInstalledIsItsCachedPackageCount", "declaredInstalledIsAtItsSourcesCount",
+                "declaredInstalledIsAnotherCachedPackageCount",
+                "declaredInstalledIsAtAnotherInstallationsSourcesCount",
+                "declaredInstalledPathUnreadableCount",
+                "declaredInstalledNoneRecordedRegistryDisagreesCount", "declaredInstalledNotThereCount",
+                "declaredInstalledWouldNotIdentifyCount", "declaredInstalledWouldNotReadCount",
+                "declaredInstalledNotThisProductCount", "declaredInstalledSourcesPerUserUnmanagedCount",
+                "declaredInstalledSourcesGivenUpCount", "declaredInstalledSourcesWouldNotReadCount",
+                "declaredInstalledSourcesRegistryDiffersCount",
+                "declaredInstalledSourcesFormNotComparedCount",
+                "declaredInstalledSourcePackageNotRuledOutCount", "declaredInstalledByNameCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 
@@ -708,6 +738,69 @@ public class ResultLogEntryTests
                 info.SecondCopyReleasedOpensNoPackageCount, info.SecondCopyReleasedBySourcesCount,
                 info.SecondCopyKeepNoneRecordedOtherAnswerCount, info.SecondCopyKeepNoneRecordedRegistryDisagreesCount,
                 info.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount,
+            ],
+            count => Assert.Equal(0, count));
+    }
+
+    [Fact]
+    public void Why_the_screen_kept_each_installed_product_s_file_travels_member_by_member()
+    {
+        // The causes' ints in a row, each given a different value, so an argument that lands on its
+        // neighbour's key fails here rather than sending one count under another's name.
+        var scan = new ScanResult(
+            Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
+            WithheldDeclaredProductInstalledCauses: new DeclaredProductInstalledCauses(
+                IsItsCachedPackage: 1, IsAtItsSources: 2, IsAnotherCachedPackage: 3,
+                IsAtAnotherInstallationsSources: 4, PathUnreadable: 5, NoneRecordedRegistryDisagrees: 6,
+                NotThere: 7, WouldNotIdentify: 8, WouldNotRead: 9, NotThisProduct: 10,
+                SourcesPerUserUnmanaged: 11, SourcesGivenUp: 12, SourcesWouldNotRead: 13,
+                SourcesRegistryDiffers: 14, SourcesFormNotCompared: 15, SourcePackageNotRuledOut: 16,
+                ByName: 17));
+
+        var info = ScanInfo.From(scan, 10);
+
+        Assert.Equal(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+            [
+                info.DeclaredInstalledIsItsCachedPackageCount, info.DeclaredInstalledIsAtItsSourcesCount,
+                info.DeclaredInstalledIsAnotherCachedPackageCount,
+                info.DeclaredInstalledIsAtAnotherInstallationsSourcesCount,
+                info.DeclaredInstalledPathUnreadableCount,
+                info.DeclaredInstalledNoneRecordedRegistryDisagreesCount, info.DeclaredInstalledNotThereCount,
+                info.DeclaredInstalledWouldNotIdentifyCount, info.DeclaredInstalledWouldNotReadCount,
+                info.DeclaredInstalledNotThisProductCount, info.DeclaredInstalledSourcesPerUserUnmanagedCount,
+                info.DeclaredInstalledSourcesGivenUpCount, info.DeclaredInstalledSourcesWouldNotReadCount,
+                info.DeclaredInstalledSourcesRegistryDiffersCount,
+                info.DeclaredInstalledSourcesFormNotComparedCount,
+                info.DeclaredInstalledSourcePackageNotRuledOutCount, info.DeclaredInstalledByNameCount,
+            ]);
+
+        using var doc = JsonDocument.Parse(JsonSerializer.Serialize(info, JsonOptions));
+        Assert.Equal(1, doc.RootElement.GetProperty("declaredInstalledIsItsCachedPackageCount").GetInt32());
+        Assert.Equal(7, doc.RootElement.GetProperty("declaredInstalledNotThereCount").GetInt32());
+        Assert.Equal(12, doc.RootElement.GetProperty("declaredInstalledSourcesGivenUpCount").GetInt32());
+        Assert.Equal(17, doc.RootElement.GetProperty("declaredInstalledByNameCount").GetInt32());
+    }
+
+    [Fact]
+    public void A_scan_that_kept_no_installed_product_s_file_sends_a_zero_for_every_cause()
+    {
+        var info = ScanInfo.From(
+            new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0), 10);
+
+        Assert.All(
+            [
+                info.DeclaredInstalledIsItsCachedPackageCount, info.DeclaredInstalledIsAtItsSourcesCount,
+                info.DeclaredInstalledIsAnotherCachedPackageCount,
+                info.DeclaredInstalledIsAtAnotherInstallationsSourcesCount,
+                info.DeclaredInstalledPathUnreadableCount,
+                info.DeclaredInstalledNoneRecordedRegistryDisagreesCount, info.DeclaredInstalledNotThereCount,
+                info.DeclaredInstalledWouldNotIdentifyCount, info.DeclaredInstalledWouldNotReadCount,
+                info.DeclaredInstalledNotThisProductCount, info.DeclaredInstalledSourcesPerUserUnmanagedCount,
+                info.DeclaredInstalledSourcesGivenUpCount, info.DeclaredInstalledSourcesWouldNotReadCount,
+                info.DeclaredInstalledSourcesRegistryDiffersCount,
+                info.DeclaredInstalledSourcesFormNotComparedCount,
+                info.DeclaredInstalledSourcePackageNotRuledOutCount, info.DeclaredInstalledByNameCount,
             ],
             count => Assert.Equal(0, count));
     }
