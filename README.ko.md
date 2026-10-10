@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.1.2-blue" alt="GitHub 릴리스"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-95k-brightgreen" alt="총 다운로드 수"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-96k-brightgreen" alt="총 다운로드 수"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,7 +37,7 @@
 
 - **개요:** InstallerClean은 한 가지 일만 합니다. 소프트웨어를 설치하고 업데이트하는 동안 점점 차오르는 숨겨진 폴더 `C:\Windows\Installer`에서 불필요한 파일을 제거합니다. 빠른 검사를 마치면 그런 파일이 있는지 알려 주고, 궁금한 분께는 더 자세한 내용을 보여 주며, 그 파일을 다른 곳으로 옮기거나 삭제해 C: 드라이브 공간을 확보할 수 있게 합니다.
 - **이래서 오셨을지도 모릅니다:** [WinDirStat](https://github.com/windirstat/windirstat)나 WizTree, TreeSize를 써 보니 `C:\Windows\Installer`가 공간을 많이 차지하고 있는데, 그 안에 무엇이 들어 있는지는 알 수 없으셨을 겁니다. 그렇다면 InstallerClean이 바로 필요한 도구입니다. `9f05cba.msi`처럼 알 수 없는 이름의 파일 안에 무엇이 들어 있는지 알고 있어서, 어느 것을 안전하게 제거할 수 있는지 빠르게 알려 줍니다.
-- **얼마나 비워지나:** 위 그래프는 v1.8.0부터 꾸준히 들어오고 있는 선택적 보고서의 결과입니다. (보고서를 보내 주신 모든 분께 감사드립니다. 여러분이 아니었다면 위 그래프는 없었을 겁니다.) 공간을 확보한 <!-- reports-freedpct-start -->56%<!-- reports-freedpct-end --> 가운데, 확보된 공간의 중앙값은 <!-- reports-median-start -->6.5GB<!-- reports-median-end -->입니다. <!-- reports-biggest-start -->한 대는 무려 791GB를 되찾았습니다.<!-- reports-biggest-end --> 나머지 <!-- reports-nothingpct-start -->44%<!-- reports-nothingpct-end -->는 아무것도 확보하지 못했으니, 결국 컴퓨터에 따라 다릅니다. 추가 소프트웨어 없이 갓 설치한 Windows 11에는 제거할 것이 없습니다. 불필요한 파일이 가장 많은 쪽은 몇 년째 돌아가고 있는 컴퓨터, 덩치 큰 MSI 기반 소프트웨어가 깔린 컴퓨터(Acrobat, Office, LibreOffice, 대형 개발 도구), 그리고 소프트웨어를 자주 설치하고 제거하는 분들입니다. 정확히 얼마인지는 실행하는 순간 보입니다.
+- **얼마나 비워지나:** 위 그래프는 v1.8.0부터 꾸준히 들어오고 있는 선택적 보고서의 결과입니다. (보고서를 보내 주신 모든 분께 감사드립니다. 여러분이 아니었다면 위 그래프는 없었을 겁니다.) 공간을 확보한 <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> 가운데, 확보된 공간의 중앙값은 <!-- reports-median-start -->6.3GB<!-- reports-median-end -->입니다. <!-- reports-biggest-start -->한 대는 무려 791GB를 되찾았습니다.<!-- reports-biggest-end --> 나머지 <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end -->는 아무것도 확보하지 못했으니, 결국 컴퓨터에 따라 다릅니다. 추가 소프트웨어 없이 갓 설치한 Windows 11에는 제거할 것이 없습니다. 불필요한 파일이 가장 많은 쪽은 몇 년째 돌아가고 있는 컴퓨터, 덩치 큰 MSI 기반 소프트웨어가 깔린 컴퓨터(Acrobat, Office, LibreOffice, 대형 개발 도구), 그리고 소프트웨어를 자주 설치하고 제거하는 분들입니다. 정확히 얼마인지는 실행하는 순간 보입니다.
 - **안전한가요:** 네. InstallerClean은 `C:\Windows\Installer` 안의 파일만 건드립니다. 무엇이 아직 필요한지를 Windows Installer에 물어보고, 같은 기록을 레지스트리에서도 읽습니다. 컴퓨터에 설치된 어떤 것도 그 파일을 자기 것이라고 하지 않을 때, 또는 더 새로운 패치가 그 파일을 대체했고 여기 있는 어떤 프로그램도 옛 파일로 되돌아갈 수 없을 때에만 그 파일을 제시합니다. 분명한 답을 얻지 못한 것을 모두 보류합니다. [자세한 내용은 아래](#작동-방식)에 있습니다.
 - **사용자에 대해서는 아무것도 모릅니다:** 오픈 소스(Apache 2.0)입니다. 계정도, 광고도, 추적도 없고, 백그라운드에서 도는 것도 없습니다. 실행할 때 GitHub에 새 버전이 있는지 확인하는데, 이는 끌 수 있습니다. 그리고 어떤 PC에서 처음으로 작업을 마치면 그 실행이 어땠는지를 담은 익명 보고서를 한 건 보냅니다. 단, 결과 화면에서 체크 상자의 선택을 해제하면 보내지 않습니다.
 - **받기:** [최신 릴리스를 다운로드하세요](../../releases/latest). 실행하고, [Windows가 표시하는 경고](#unknown-publisher)와 [관리자 권한 요청](#admin)을 클릭해 넘어가세요. 찾아낸 파일을 이동하거나 삭제하세요. 끝입니다.
@@ -223,7 +223,7 @@ InstallerClean은 서명되어 있지 않습니다. 실행하기 전에 확인�
 - VirusTotal: 모든 빌드는 나가기 전에 검사하며, 릴리스 페이지에 파일별 엔진 전체 결과가 실려 있습니다.
 - 소스는 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)에 있습니다. 검사, 질의, 이동, 삭제, 설정, 재부팅 대기 확인 서비스는 `main`에 푸시할 때마다, 그리고 풀 리퀘스트마다 Windows에서 실행되는 자동화된 테스트 모음이 검증하며, 이 페이지 위쪽의 CI 배지가 그 결과를 알려 줍니다.
 - 릴리스 빌드는 결정적입니다. 같은 소스, 같은 SDK, 같은 게시 플래그는 같은 바이트를 냅니다. 그리고 모든 빌드 입력이 해당 태그의 소스와 일치하지 않으면 릴리스에 태그를 달 수 없습니다. 그래서 태그를 체크아웃해 직접 빌드한 뒤 공개된 해시와 비교해 보실 수 있습니다. 그러는 데 필요한 것은 각 릴리스의 노트에 있습니다. 빌드에 쓴 SDK 버전, 그리고 기본값이 아닌 플래그로 빌드한 파일이 있다면 그 게시 플래그입니다. Setup은 예외입니다. SDK가 아니라 Inno Setup이 컴파일하고 빌드 연도를 스스로 새겨 넣으므로, 해시를 재현하려면 같은 Inno 버전과 같은 연도까지 필요합니다.
-- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->95,000+<!-- downloads-end --> 회 내려받았습니다.
+- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->96,000+<!-- downloads-end --> 회 내려받았습니다.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 인증 100% 클린" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 검토한 뒤 스파이웨어와 애드웨어, 바이러스가 없음을 인증했습니다.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% 무료 수상, 스파이웨어와 애드웨어와 바이러스가 없음을 인증" width="190"></a>
 
