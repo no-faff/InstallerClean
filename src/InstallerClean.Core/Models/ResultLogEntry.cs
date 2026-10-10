@@ -102,6 +102,15 @@ public sealed record ResultLogEntry(
     /// screen found with no package for Windows Installer to open
     /// (<see cref="ScanInfo.SecondCopyReleasedOpensNoPackageCount"/>).
     ///
+    /// SCHEMA 8 ADDS FOUR KEYS UNDER <c>scan</c> AND TAKES NONE AWAY: what the declared-product
+    /// screen found of the installations recording no cached package whose sources it read
+    /// (<see cref="ScanInfo.SecondCopyReleasedBySourcesCount"/> to
+    /// <see cref="ScanInfo.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount"/>), those it released
+    /// because every package their sources name was seen, and for each of the others what kept it.
+    /// AND <c>scan.secondCopyKeepNoneRecordedCount</c> AND <c>scan.secondCopyUnseenNoneRecordedCount</c>
+    /// COUNT ONLY THOSE OTHERS AT 8: from 8 an installation recording no cached package is counted
+    /// there only where a source it names could not be ruled out.
+    ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
     /// never loses data even if the allowlist has not caught up. THAT LENIENCE
@@ -110,7 +119,7 @@ public sealed record ResultLogEntry(
     /// <c>machine</c> arriving before the receiving end knows the name is a
     /// rejected report and a user told sending failed. The receiver ships first.
     /// </summary>
-    public const int CurrentSchemaVersion = 7;
+    public const int CurrentSchemaVersion = 8;
 
     // Each factory takes windowsRegion as IWindowsRegion.Read returned it for the
     // report box, so the report carries the value the box started from.
@@ -1256,6 +1265,36 @@ public sealed record MachineInfo(
 /// <paramref name="SecondCopyReleasedOrdinaryCount"/>. Counted where the screen reads them,
 /// before any file's verdict.
 /// </param>
+/// <param name="SecondCopyReleasedBySourcesCount">
+/// Installations recording no cached package, with a package to open and a record that does not
+/// show an ordinary installation, which do not set the hold because every package their sources
+/// name was seen (<see cref="CachedPackageCensus.ReleasedBySources"/>). Every installation package
+/// the screen would otherwise let through is compared with those packages instead. Each is also
+/// counted in <paramref name="SecondCopyListedCheckedCount"/>, and in none of the keys from
+/// <paramref name="SecondCopyKeepPathUnreadableCount"/> to
+/// <paramref name="SecondCopyReleasedOrdinaryCount"/> nor in
+/// <paramref name="SecondCopyReleasedOpensNoPackageCount"/>. Counted where the screen reads them,
+/// before any file's verdict.
+/// </param>
+/// <param name="SecondCopyKeepNoneRecordedOtherAnswerCount">
+/// Of the installations in <paramref name="SecondCopyKeepNoneRecordedCount"/>, those per machine
+/// for which Windows Installer answered the question of the installation's package name, asked of
+/// its source list, with an error other than <c>ERROR_BAD_CONFIGURATION</c>
+/// (<see cref="CachedPackageCensus.KeptNoneRecordedOtherAnswer"/>).
+///
+/// THE THREE KEYS FROM THIS ONE SAY WHAT KEPT EACH INSTALLATION IN
+/// <paramref name="SecondCopyKeepNoneRecordedCount"/>, and they add up to it.
+/// </param>
+/// <param name="SecondCopyKeepNoneRecordedRegistryDisagreesCount">
+/// The same, per machine, where Windows Installer answered <c>ERROR_BAD_CONFIGURATION</c> and the
+/// registry holds a cached package in the installation's <c>InstallProperties</c> key or holds
+/// its <c>SourceList</c> key, or either key would not read.
+/// </param>
+/// <param name="SecondCopyKeepNoneRecordedSourcesNotRuledOutCount">
+/// The rest of them: per user, or per machine where Windows Installer answered with the package
+/// name, and in each case a source the screen could not rule out, a drive or share given up for
+/// the scan included.
+/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -1325,7 +1364,11 @@ public sealed record ScanInfo(
     int SecondCopyUnseenSourceNotRuledOutCount,
     int SecondCopyUnseenPerMachineCount,
     int SecondCopyUnseenByNameFileCount,
-    int SecondCopyReleasedOpensNoPackageCount)
+    int SecondCopyReleasedOpensNoPackageCount,
+    int SecondCopyReleasedBySourcesCount,
+    int SecondCopyKeepNoneRecordedOtherAnswerCount,
+    int SecondCopyKeepNoneRecordedRegistryDisagreesCount,
+    int SecondCopyKeepNoneRecordedSourcesNotRuledOutCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -1442,7 +1485,11 @@ public sealed record ScanInfo(
             cachedPackages.UnseenSourceNotRuledOut,
             cachedPackages.UnseenPerMachine,
             cachedPackages.UnseenByNameFiles,
-            cachedPackages.ReleasedOpensNoPackage);
+            cachedPackages.ReleasedOpensNoPackage,
+            cachedPackages.ReleasedBySources,
+            cachedPackages.KeptNoneRecordedOtherAnswer,
+            cachedPackages.KeptNoneRecordedRegistryDisagrees,
+            cachedPackages.KeptNoneRecordedSourcesNotRuledOut);
     }
 }
 

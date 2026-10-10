@@ -119,7 +119,11 @@ public class ResultLogEntryTests
         SecondCopyUnseenSourceNotRuledOutCount: 0,
         SecondCopyUnseenPerMachineCount: 0,
         SecondCopyUnseenByNameFileCount: 0,
-        SecondCopyReleasedOpensNoPackageCount: 0);
+        SecondCopyReleasedOpensNoPackageCount: 0,
+        SecondCopyReleasedBySourcesCount: 0,
+        SecondCopyKeepNoneRecordedOtherAnswerCount: 0,
+        SecondCopyKeepNoneRecordedRegistryDisagreesCount: 0,
+        SecondCopyKeepNoneRecordedSourcesNotRuledOutCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -193,16 +197,15 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void Schema_version_is_seven()
+    public void Schema_version_is_eight()
     {
         // The receiving Edge Function field-validates per version and holds each version a
         // release sends to its exact set of keys, every count in it required; a version it
         // does not know goes to its lenient v<n>-unknown/ path. So a key added to or taken
         // from what a version carries moves the version once a release sends it, and this
-        // pin makes that move a deliberate, reviewed act. Schema 7 is schema 6 with
-        // windowsRegion appended under app and secondCopyReleasedOpensNoPackageCount under
-        // scan.
-        Assert.Equal(7, ResultLogEntry.CurrentSchemaVersion);
+        // pin makes that move a deliberate, reviewed act. Schema 8 is schema 7 with four keys
+        // appended under scan, from secondCopyReleasedBySourcesCount.
+        Assert.Equal(8, ResultLogEntry.CurrentSchemaVersion);
     }
 
     [Fact]
@@ -365,6 +368,11 @@ public class ResultLogEntryTests
                 // And the installations it found with no package for Windows Installer to
                 // open, which set no hold.
                 "secondCopyReleasedOpensNoPackageCount",
+                // Then the installations recording no cached package whose sources it read: those
+                // whose packages it saw, which set no hold, and of those setting it, what kept each.
+                "secondCopyReleasedBySourcesCount",
+                "secondCopyKeepNoneRecordedOtherAnswerCount", "secondCopyKeepNoneRecordedRegistryDisagreesCount",
+                "secondCopyKeepNoneRecordedSourcesNotRuledOutCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 
@@ -638,12 +646,13 @@ public class ResultLogEntryTests
                 UnseenNotThere: 14, UnseenWouldNotIdentify: 15, UnseenWouldNotRead: 16,
                 UnseenNoProductCode: 17, UnseenPerUserUnmanaged: 18, UnseenSourcesGivenUp: 19,
                 UnseenSourceNotRuledOut: 20, UnseenPerMachine: 21, UnseenByNameFiles: 22,
-                ReleasedOpensNoPackage: 23));
+                ReleasedOpensNoPackage: 23, ReleasedBySources: 24, KeptNoneRecordedOtherAnswer: 25,
+                KeptNoneRecordedRegistryDisagrees: 26, KeptNoneRecordedSourcesNotRuledOut: 27));
 
         var info = ScanInfo.From(scan, 10);
 
         Assert.Equal(
-            [64, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+            [64, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
             [
                 info.SecondCopyListedCheckedCount, info.SecondCopyKeepPathUnreadableCount,
                 info.SecondCopyKeepNoneRecordedCount, info.SecondCopyKeepNotThereCount,
@@ -657,7 +666,9 @@ public class ResultLogEntryTests
                 info.SecondCopyUnseenNoProductCodeCount, info.SecondCopyUnseenPerUserUnmanagedCount,
                 info.SecondCopyUnseenSourcesGivenUpCount, info.SecondCopyUnseenSourceNotRuledOutCount,
                 info.SecondCopyUnseenPerMachineCount, info.SecondCopyUnseenByNameFileCount,
-                info.SecondCopyReleasedOpensNoPackageCount,
+                info.SecondCopyReleasedOpensNoPackageCount, info.SecondCopyReleasedBySourcesCount,
+                info.SecondCopyKeepNoneRecordedOtherAnswerCount, info.SecondCopyKeepNoneRecordedRegistryDisagreesCount,
+                info.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount,
             ]);
 
         using var doc = JsonDocument.Parse(JsonSerializer.Serialize(info, JsonOptions));
@@ -668,6 +679,10 @@ public class ResultLogEntryTests
         Assert.Equal(21, doc.RootElement.GetProperty("secondCopyUnseenPerMachineCount").GetInt32());
         Assert.Equal(22, doc.RootElement.GetProperty("secondCopyUnseenByNameFileCount").GetInt32());
         Assert.Equal(23, doc.RootElement.GetProperty("secondCopyReleasedOpensNoPackageCount").GetInt32());
+        Assert.Equal(24, doc.RootElement.GetProperty("secondCopyReleasedBySourcesCount").GetInt32());
+        Assert.Equal(25, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedOtherAnswerCount").GetInt32());
+        Assert.Equal(26, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedRegistryDisagreesCount").GetInt32());
+        Assert.Equal(27, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedSourcesNotRuledOutCount").GetInt32());
     }
 
     [Fact]
@@ -690,7 +705,9 @@ public class ResultLogEntryTests
                 info.SecondCopyUnseenNoProductCodeCount, info.SecondCopyUnseenPerUserUnmanagedCount,
                 info.SecondCopyUnseenSourcesGivenUpCount, info.SecondCopyUnseenSourceNotRuledOutCount,
                 info.SecondCopyUnseenPerMachineCount, info.SecondCopyUnseenByNameFileCount,
-                info.SecondCopyReleasedOpensNoPackageCount,
+                info.SecondCopyReleasedOpensNoPackageCount, info.SecondCopyReleasedBySourcesCount,
+                info.SecondCopyKeepNoneRecordedOtherAnswerCount, info.SecondCopyKeepNoneRecordedRegistryDisagreesCount,
+                info.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount,
             ],
             count => Assert.Equal(0, count));
     }

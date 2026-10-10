@@ -189,10 +189,10 @@ public sealed record CachedPackageCensus(
     int UnseenPerMachine,
     int UnseenByNameFiles,
     int ReleasedOpensNoPackage,
-    int ReleasedBySources = 0,
-    int KeptNoneRecordedOtherAnswer = 0,
-    int KeptNoneRecordedRegistryDisagrees = 0,
-    int KeptNoneRecordedSourcesNotRuledOut = 0)
+    int ReleasedBySources,
+    int KeptNoneRecordedOtherAnswer,
+    int KeptNoneRecordedRegistryDisagrees,
+    int KeptNoneRecordedSourcesNotRuledOut)
 {
     /// <summary>A pass that looked for no installation's packages.</summary>
     public static CachedPackageCensus None { get; } =
