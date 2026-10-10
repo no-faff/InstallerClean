@@ -492,16 +492,17 @@ public class DeclaredProductCheckTests
     }
 
     [Fact]
-    public void A_copy_is_kept_when_one_installation_records_no_package()
+    public void A_copy_is_kept_when_one_installation_records_no_package_and_its_sources_cannot_be_ruled_out()
     {
         // The per-machine installation records another file; the per-user one records
-        // nothing, so the package that installation opens cannot be seen and this copy
-        // could be it.
+        // nothing and its package name will not read, so the package that installation
+        // opens cannot be seen and this copy could be it.
         var f = ACopyBesideTheRecordedPackage();
         f.Msi.Installed(ProductA,
             (null, MsiInstallContext.Machine),
             (UserSid, MsiInstallContext.UserManaged));
         f.Msi.RecordsPackage(ProductA, UserSid, MsiInstallContext.UserManaged, "");
+        f.Msi.PackageNameAnswers(ProductA, UserSid, MsiInstallContext.UserManaged, MsiError.AccessDenied);
 
         var outcome = ScreenTheCopy(f);
 
@@ -510,21 +511,57 @@ public class DeclaredProductCheckTests
     }
 
     [Fact]
-    public void A_copy_is_kept_when_the_only_installation_records_no_package()
+    public void A_copy_is_let_through_when_one_installation_records_no_package_and_its_sources_name_another_file()
     {
+        // The must-miss half of the test above: the per-user installation's sources name a
+        // package that is no longer there, which is all it can open.
         var f = ACopyBesideTheRecordedPackage();
-        f.Msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, "");
+        f.Msi.Installed(ProductA,
+            (null, MsiInstallContext.Machine),
+            (UserSid, MsiInstallContext.UserManaged));
+        f.Msi.RecordsPackage(ProductA, UserSid, MsiInstallContext.UserManaged, "");
+        f.Msi.RecordsSources(ProductA, UserSid, MsiInstallContext.UserManaged, SetupName, SetupFolder);
 
-        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
     }
 
-    [Fact]
-    public void A_copy_is_kept_when_the_record_carries_no_package_property_at_all()
+    /// <summary>
+    /// Product A's only installation records no package: an empty value, or ERROR_UNKNOWN_PROPERTY,
+    /// a record that never carried the value, which reads as an empty value rather than a failure.
+    /// </summary>
+    private static void RecordsNoPackage(
+        (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+            ScriptedFileIdentities Files, MockFileSystem Disk) f,
+        uint answer)
     {
-        // ERROR_UNKNOWN_PROPERTY is a record that never carried the value. It reads as
-        // an empty value rather than a failure, and an empty value names no package.
+        if (answer == MsiError.Success) f.Msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, "");
+        else f.Msi.PackageReadAnswers(ProductA, null, MsiInstallContext.Machine, answer);
+    }
+
+    [Theory]
+    [InlineData(MsiError.Success)]
+    [InlineData(MsiError.UnknownProperty)]
+    public void A_copy_is_let_through_when_the_only_installation_records_no_package_and_its_sources_name_another_file(
+        uint answer)
+    {
+        // An installation recording no package opens what its sources name, here a package
+        // that is no longer there.
         var f = ACopyBesideTheRecordedPackage();
-        f.Msi.PackageReadAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
+        RecordsNoPackage(f, answer);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
+        Assert.Contains(SetupPackage, f.Files.Reads);
+    }
+
+    [Theory]
+    [InlineData(MsiError.Success)]
+    [InlineData(MsiError.UnknownProperty)]
+    public void A_copy_is_kept_when_the_only_installation_records_no_package_and_its_sources_cannot_be_ruled_out(
+        uint answer)
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        RecordsNoPackage(f, answer);
+        f.Msi.SourceListAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenTheCopy(f));
     }
@@ -3435,12 +3472,14 @@ public class DeclaredProductCheckTests
         int unruled = 0, int unseenPathUnreadable = 0, int unseenNoneRecorded = 0, int unseenNotThere = 0,
         int unseenWouldNotIdentify = 0, int unseenWouldNotRead = 0, int unseenNoProductCode = 0,
         int unseenPerUserUnmanaged = 0, int unseenSourcesGivenUp = 0, int unseenSourceNotRuledOut = 0,
-        int unseenPerMachine = 0, int unseenByName = 0, int opensNoPackage = 0) =>
+        int unseenPerMachine = 0, int unseenByName = 0, int opensNoPackage = 0, int releasedBySources = 0,
+        int keptOtherAnswer = 0, int keptRegistryDisagrees = 0, int keptSourcesNotRuledOut = 0) =>
         new(read, pathUnreadable, noneRecorded, notThere, wouldNotRead, noProductCode,
             anotherAccount, packageCodeUnanswered, instanceTypeNotOrdinary, perMachine, released,
             unruled, unseenPathUnreadable, unseenNoneRecorded, unseenNotThere, unseenWouldNotIdentify,
             unseenWouldNotRead, unseenNoProductCode, unseenPerUserUnmanaged, unseenSourcesGivenUp,
-            unseenSourceNotRuledOut, unseenPerMachine, unseenByName, opensNoPackage);
+            unseenSourceNotRuledOut, unseenPerMachine, unseenByName, opensNoPackage, releasedBySources,
+            keptOtherAnswer, keptRegistryDisagrees, keptSourcesNotRuledOut);
 
     [Theory]
     [InlineData(CachedPackageFault.ReadFails)]
@@ -3463,7 +3502,7 @@ public class DeclaredProductCheckTests
         var expected = fault switch
         {
             CachedPackageFault.ReadFails => Census(pathUnreadable: 1, anotherAccount: 1),
-            CachedPackageFault.NamesNoPackage => Census(noneRecorded: 1, anotherAccount: 1),
+            CachedPackageFault.NamesNoPackage => Census(noneRecorded: 1, anotherAccount: 1, keptSourcesNotRuledOut: 1),
             CachedPackageFault.NotAFile => Census(notThere: 1, anotherAccount: 1),
             CachedPackageFault.NoIdentity => Census(wouldNotRead: 1, anotherAccount: 1),
             _ => Census(noProductCode: 1, anotherAccount: 1),
@@ -3539,13 +3578,15 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsPackage(ProductB, null, MsiInstallContext.Machine, string.Empty);
         f.Msi.PackageCodeAnswers(ProductB, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
         f.Msi.InstanceTypeAnswers(ProductB, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
+        f.Msi.PackageNameAnswers(ProductB, null, MsiInstallContext.Machine, MsiError.UnknownProduct);
         f = f with { Listed = [.. f.Listed, ListedPerMachine(ProductB)] };
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
             .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[1]);
-        Assert.Equal(Census(read: 2, noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1), screening.CachedPackages);
+        Assert.Equal(Census(read: 2, noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptOtherAnswer: 1),
+            screening.CachedPackages);
         Assert.Single(f.Msi.RecordReads,
             read => read == (MsiInstallProperty.PackageCode, ProductB, (string?)null, MsiInstallContext.Machine));
     }
@@ -3583,7 +3624,8 @@ public class DeclaredProductCheckTests
     // Office Click-to-Run can register Office's features with Windows Installer as a product
     // of its own, per machine, recording no cached package, no package code and no source
     // list. Windows Installer has nothing to open for it, so it sets no hold. Where any one
-    // of the answers that show it changes, it keeps every installation package as before.
+    // of the answers that show it changes, its sources are read instead, and as they cannot be
+    // ruled out, it keeps every installation package.
     // The tests after the first change those answers one at a time, or set the registration
     // beside a copy declaring its own code, beside other installations, or beside a source
     // list that appears or goes while the pass runs.
@@ -3605,9 +3647,10 @@ public class DeclaredProductCheckTests
     /// <summary>
     /// The candidate declares product A, which is not installed. The one installation listed
     /// is Office's feature registration, per machine, answering as Windows answers for it: no
-    /// LocalPackage (ERROR_UNKNOWN_PROPERTY), an empty PackageCode and InstanceType, its
-    /// package name off the source list ERROR_BAD_CONFIGURATION, and neither its
-    /// InstallProperties key nor its SourceList key there. Each test starts from it.
+    /// LocalPackage or InstallSource (ERROR_UNKNOWN_PROPERTY), an empty PackageCode and
+    /// InstanceType, its package name ERROR_UNKNOWN_PRODUCT as a product property and
+    /// ERROR_BAD_CONFIGURATION off the source list, and neither its InstallProperties key nor
+    /// its SourceList key there. Each test starts from it.
     /// </summary>
     private static (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
         ScriptedFileIdentities Files, MockFileSystem Disk, ListedInstallation[] Listed)
@@ -3641,6 +3684,8 @@ public class DeclaredProductCheckTests
         msi.PackageReadAnswers(code, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
         msi.PackageCodeAnswers(code, null, MsiInstallContext.Machine, MsiError.Success);
         msi.InstanceTypeAnswers(code, null, MsiInstallContext.Machine, MsiError.Success);
+        msi.PackageNameAnswers(code, null, MsiInstallContext.Machine, MsiError.UnknownProduct);
+        msi.InstallSourceAnswers(code, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
         msi.SourceListPackageNameAnswers(code, null, MsiInstallContext.Machine, MsiError.BadConfiguration);
     }
 
@@ -3686,7 +3731,9 @@ public class DeclaredProductCheckTests
         switch (fault)
         {
             case NoPackageFault.InstallPropertiesThere:
-                f.Msi.Registry.Holds(OfficeFeaturesInstallProperties);
+                f.Msi.Registry.Holds(OfficeFeaturesInstallProperties,
+                    new RegistryValue(MsiInstallProperty.LocalPackage, RegistryValueKind.String,
+                        @"C:\Windows\Installer\gone.msi"));
                 break;
             case NoPackageFault.InstallPropertiesUnreadable:
                 f.Msi.Registry.Answers(OfficeFeaturesInstallProperties, RegistryKeyPresence.Unreadable);
@@ -3739,22 +3786,31 @@ public class DeclaredProductCheckTests
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Single(recorded);
-        Assert.Equal(
-            fault == NoPackageFault.LocalPackageUnreadable
-                ? Census(pathUnreadable: 1, packageCodeUnanswered: 1, perMachine: 1)
-                : Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1),
-            screening.CachedPackages);
+        // Each is counted by the answer that kept it: one that shows a source list, or none
+        // where the registry disagrees or the API answers otherwise. Its sources are read all
+        // the same and cannot be ruled out.
+        var keptBy = fault switch
+        {
+            NoPackageFault.PackageNameUnknownProduct or NoPackageFault.PackageNameAccessDenied =>
+                Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptOtherAnswer: 1),
+            NoPackageFault.PackageNameEmpty or NoPackageFault.PackageNameRead =>
+                Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptSourcesNotRuledOut: 1),
+            NoPackageFault.LocalPackageUnreadable => Census(pathUnreadable: 1, packageCodeUnanswered: 1, perMachine: 1),
+            _ => Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptRegistryDisagrees: 1),
+        };
+        Assert.Equal(keptBy, screening.CachedPackages);
     }
 
     [Fact]
     public void A_per_user_registration_answering_the_same_keeps_every_installation_package()
     {
-        // Per user and managed, in the running account, so its own record is read, and its
-        // source list is not asked about.
+        // Per user and managed, in the running account, so its own record is read. Whether it
+        // has a source list is not asked, and its sources do not read.
         const MsiInstallContext Managed = MsiInstallContext.UserManaged;
         var f = ACopyBesideOfficesFeatureRegistration();
         f.Msi.PackageReadAnswers(OfficeFeatures, OtherUserSid, Managed, MsiError.UnknownProperty);
         f.Msi.PackageCodeAnswers(OfficeFeatures, OtherUserSid, Managed, MsiError.Success);
+        f.Msi.PackageNameAnswers(OfficeFeatures, OtherUserSid, Managed, MsiError.UnknownProduct);
         f.Msi.SourceListPackageNameAnswers(OfficeFeatures, OtherUserSid, Managed, MsiError.BadConfiguration);
         f = f with { Listed = [new ListedInstallation(OfficeFeatures, OtherUserSid, (int)Managed, false)] };
 
@@ -3807,7 +3863,8 @@ public class DeclaredProductCheckTests
             Assert.Equal(
                 otherHasNoSources
                     ? Census(read: 2, opensNoPackage: 2)
-                    : Census(read: 2, noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, opensNoPackage: 1),
+                    : Census(read: 2, noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, opensNoPackage: 1,
+                        keptRegistryDisagrees: 1),
                 screening.CachedPackages);
         }
     }
@@ -3994,6 +4051,341 @@ public class DeclaredProductCheckTests
         Assert.True(check.KnowsTheRunningAccount);
     }
 
+    [Fact]
+    public void An_InstallProperties_key_holding_no_cached_package_shows_there_is_none_as_an_absent_key_does()
+    {
+        var f = ACopyBesideOfficesFeatureRegistration();
+        f.Msi.Registry.Holds(OfficeFeaturesInstallProperties,
+            new RegistryValue("DisplayName", RegistryValueKind.String, "Office"));
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
+        Assert.Equal(Census(opensNoPackage: 1), screening.CachedPackages);
+    }
+
+    [Theory]
+    [InlineData("LocalPackage")]
+    [InlineData("ManagedLocalPackage")]
+    [InlineData("localpackage")]
+    public void An_InstallProperties_key_holding_a_cached_package_keeps_every_installation_package(string valueName)
+    {
+        // The API answers that the registration records no cached package and the registry
+        // holds one, so the two do not agree that it has none.
+        var f = ACopyBesideOfficesFeatureRegistration();
+        f.Msi.Registry.Holds(OfficeFeaturesInstallProperties,
+            new RegistryValue(valueName, RegistryValueKind.String, @"C:\Windows\Installer\gone.msi"));
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Equal(Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptRegistryDisagrees: 1),
+            screening.CachedPackages);
+    }
+
+    [Theory]
+    [InlineData(NoPackageFault.PackageNameUnknownProduct,
+        "the installation records no cached package, and Windows Installer answered 1605 when asked its "
+        + "source list's package name")]
+    [InlineData(NoPackageFault.SourceListThere,
+        "the installation records no cached package, and the registry holds a cached package or a source "
+        + "list where Windows Installer answers that it has none, or a key would not read")]
+    [InlineData(NoPackageFault.PackageNameRead,
+        "the installation records no cached package, and a source it names could not be ruled out")]
+    public void A_registration_with_no_cached_package_is_logged_by_the_answer_that_kept_it(
+        NoPackageFault fault, string detail)
+    {
+        var f = ACopyBesideOfficesFeatureRegistration();
+        Break(f, fault);
+        var recorded = new List<string>();
+
+        ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen([Package(Candidate)], f.Listed, default, (_, note) => recorded.Add(note), InInstallerFolder);
+
+        Assert.Equal(new[] { detail }, recorded);
+    }
+
+    // ---- An installation with no cached package, judged by its sources ----
+    //
+    // An installation that records no cached package, and is not shown to have no package to
+    // open, can open only what its source list names, so its sources are read. Where every
+    // package they name is seen, the installation sets no hold, and every installation package
+    // is compared with those packages instead. Where one cannot be ruled out, the installation
+    // keeps every installation package. Each test starts from the fixture below and changes
+    // one thing.
+
+    /// <summary>The code the installation recording no cached package is registered under.</summary>
+    private const string NoCachedPackage = "{99999999-9999-9999-9999-999999999999}";
+
+    /// <summary>A second installation of the same shape, registered under another code.</summary>
+    private const string AnotherWithNoCachedPackage = "{BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB}";
+
+    /// <summary>A URL entry, which no source list read here can rule out.</summary>
+    private const string SetupUrl = "https://example.com/setup/";
+
+    /// <summary>
+    /// The candidate declares product A, which is not installed. The one installation listed is
+    /// registered per machine under <see cref="NoCachedPackage"/>, records no cached package
+    /// (ERROR_UNKNOWN_PROPERTY) and answers an empty PackageCode, so its record does not show an
+    /// ordinary installation. It was installed from <see cref="SetupPackage"/>, which is no
+    /// longer there. Its source list and its InstallProperties key are held in the registry as
+    /// the API answers them, the key holding its InstallSource and no cached package.
+    /// </summary>
+    private static (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+        ScriptedFileIdentities Files, MockFileSystem Disk, ListedInstallation[] Listed)
+        ACopyBesideAnInstallationWithNoCachedPackage(bool marked = false)
+    {
+        var packages = new ScriptedPackageIdentities();
+        packages.Declares(Candidate, ProductA);
+
+        var msi = new ScriptedMsiProducts();
+        msi.NotInstalled(ProductA, MsiError.UnknownProduct);
+        RecordsNoCachedPackage(msi, NoCachedPackage);
+
+        var files = new ScriptedFileIdentities();
+        files.Opens(Candidate, 1);
+        files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+
+        var disk = new MockFileSystem();
+        disk.AddFile(Candidate, new MockFileData(new byte[100]));
+
+        return (packages, msi, files, disk,
+            [new ListedInstallation(NoCachedPackage, null, (int)MsiInstallContext.Machine, marked)]);
+    }
+
+    /// <summary>
+    /// The answers of a per-machine installation under <paramref name="code"/> that records no
+    /// cached package, answers an empty PackageCode and InstanceType, and was installed from
+    /// <see cref="SetupFolder"/>.
+    /// </summary>
+    private static void RecordsNoCachedPackage(ScriptedMsiProducts msi, string code)
+    {
+        const MsiInstallContext Machine = MsiInstallContext.Machine;
+        msi.PackageReadAnswers(code, null, Machine, MsiError.UnknownProperty);
+        msi.PackageCodeAnswers(code, null, Machine, MsiError.Success);
+        msi.InstanceTypeAnswers(code, null, Machine, MsiError.Success);
+        msi.RecordsSources(code, null, Machine, SetupName, SetupFolder);
+    }
+
+    private static DeclaredProductScreening ScreenBesideIt(
+        (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+            ScriptedFileIdentities Files, MockFileSystem Disk, ListedInstallation[] Listed) f,
+        OrphanedFile[]? candidates = null,
+        Action<Exception, string>? recordRefusal = null) =>
+        ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen(candidates ?? [Package(Candidate)], f.Listed, default, recordRefusal, InInstallerFolder);
+
+    [Fact]
+    public void An_installation_with_no_cached_package_whose_sources_are_all_seen_keeps_nothing()
+    {
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        var recorded = new List<Exception>();
+
+        var screening = ScreenBesideIt(f, recordRefusal: (ex, _) => recorded.Add(ex));
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
+        Assert.Empty(recorded);
+        Assert.Equal(Census(releasedBySources: 1), screening.CachedPackages);
+        Assert.Contains(SetupPackage, f.Files.Reads);
+    }
+
+    [Fact]
+    public void A_copy_its_source_in_the_Installer_folder_opens_as_is_kept_and_another_copy_let_through()
+    {
+        // Installed from a.msi in the Installer folder, which is the candidate. The other
+        // candidate declares another product and is another file, so it goes on to the rest of
+        // the check.
+        const string OtherCandidate = @"C:\Windows\Installer\b2.msi";
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Msi.RecordsSources(NoCachedPackage, null, MsiInstallContext.Machine, CandidateName, InstallerFolder + @"\");
+        f.Packages.Declares(OtherCandidate, ProductB);
+        f.Msi.NotInstalled(ProductB, MsiError.UnknownProduct);
+        f.Files.Opens(OtherCandidate, 2);
+        f.Disk.AddFile(OtherCandidate, new MockFileData(new byte[100]));
+
+        var screening = ScreenBesideIt(f, [Package(Candidate), Package(OtherCandidate)]);
+
+        Assert.Equal(
+            new[] { DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductOutcome.DeclaredProductNotInstalled },
+            screening.Outcomes);
+        Assert.Equal(Census(releasedBySources: 1), screening.CachedPackages);
+    }
+
+    [Fact]
+    public void An_installation_with_no_cached_package_and_a_source_not_ruled_out_keeps_every_installation_package()
+    {
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Msi.RecordsUrls(NoCachedPackage, isPatch: false, null, MsiInstallContext.Machine, SetupUrl);
+        var recorded = new List<Exception>();
+
+        var screening = ScreenBesideIt(f, recordRefusal: (ex, _) => recorded.Add(ex));
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Single(recorded);
+        Assert.Equal(
+            Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptSourcesNotRuledOut: 1),
+            screening.CachedPackages);
+    }
+
+    [Fact]
+    public void An_ordinary_installation_with_no_cached_package_keeps_nothing_and_its_sources_are_not_read()
+    {
+        // Its record shows an ordinary installation, so it sets no hold, and a URL on its list
+        // would keep every installation package if its sources were read for the hold.
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+        f.Msi.RecordsUrls(NoCachedPackage, isPatch: false, null, MsiInstallContext.Machine, SetupUrl);
+
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
+        Assert.Equal(Census(released: 1), screening.CachedPackages);
+        Assert.Empty(f.Msi.PackageNameReads);
+    }
+
+    [Fact]
+    public void Every_installation_with_no_cached_package_is_counted_by_what_its_sources_showed()
+    {
+        // The first installation's sources are all seen and the second's hold a URL, so the
+        // second keeps every installation package and both are counted.
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        RecordsNoCachedPackage(f.Msi, AnotherWithNoCachedPackage);
+        f.Msi.RecordsUrls(AnotherWithNoCachedPackage, isPatch: false, null, MsiInstallContext.Machine, SetupUrl);
+        f = f with { Listed = [.. f.Listed, ListedPerMachine(AnotherWithNoCachedPackage)] };
+
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Equal(
+            Census(read: 2, noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, releasedBySources: 1,
+                keptSourcesNotRuledOut: 1),
+            screening.CachedPackages);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void A_hold_set_at_a_drive_given_up_counts_its_files_there_only_where_nothing_else_set_it(
+        bool heldOtherwiseToo)
+    {
+        // The installation's source package on drive D: does not answer within the time limit.
+        // Where a second installation, read after it, keeps every installation package for a
+        // URL on its list, the file is kept whatever the drive answers, so it is not counted
+        // towards the drive.
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Files.Opens(SetupPackage, 9);
+        if (heldOtherwiseToo)
+        {
+            RecordsNoCachedPackage(f.Msi, AnotherWithNoCachedPackage);
+            f.Msi.RecordsUrls(AnotherWithNoCachedPackage, isPatch: false, null, MsiInstallContext.Machine, SetupUrl);
+            f = f with { Listed = [.. f.Listed, ListedPerMachine(AnotherWithNoCachedPackage)] };
+        }
+        using var files = new HeldFileIdentities(f.Files);
+        files.Holds(SetupPackage, HeldFor);
+
+        var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry, TheOwner)
+            { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
+            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Equal([new("D:", SourceRootGiveUpRoute.NoAnswer, heldOtherwiseToo ? 0 : 1)], GivenUp(screening));
+    }
+
+    [Fact]
+    public void A_copy_declaring_the_code_of_an_installation_with_no_cached_package_is_let_through_where_its_sources_are_another_file()
+    {
+        // The candidate declares the installation's own code. Its record reads ordinary, so the
+        // installation sets no hold, and the candidate is compared with what its sources name.
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Packages.Declares(Candidate, NoCachedPackage);
+        f.Msi.Installed(NoCachedPackage);
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+        f.Files.Opens(SetupPackage, 9);
+
+        var outcome = ScreenBesideIt(f).Outcomes[0];
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
+        Assert.Contains(SetupPackage, f.Files.Reads);
+    }
+
+    [Fact]
+    public void A_copy_declaring_the_code_of_an_installation_with_no_cached_package_is_kept_where_its_source_is_the_copy()
+    {
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Packages.Declares(Candidate, NoCachedPackage);
+        f.Msi.Installed(NoCachedPackage);
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+        f.Msi.RecordsSources(NoCachedPackage, null, MsiInstallContext.Machine, CandidateName, InstallerFolder + @"\");
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenBesideIt(f).Outcomes[0]);
+    }
+
+    [Fact]
+    public void A_copy_declaring_the_code_of_an_installation_with_no_cached_package_is_kept_where_a_source_is_not_ruled_out()
+    {
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Packages.Declares(Candidate, NoCachedPackage);
+        f.Msi.Installed(NoCachedPackage);
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+        f.Msi.RecordsUrls(NoCachedPackage, isPatch: false, null, MsiInstallContext.Machine, SetupUrl);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenBesideIt(f).Outcomes[0]);
+    }
+
+    [Fact]
+    public void A_possible_second_copy_with_no_cached_package_opens_what_its_sources_name()
+    {
+        // Its record reads ordinary, so it sets no hold, and it is listed as not ruled out as a
+        // second copy, so its packages are read for every candidate.
+        var f = ACopyBesideAnInstallationWithNoCachedPackage(marked: true);
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
+        Assert.Equal(Census(released: 1, unruled: 1), screening.CachedPackages);
+    }
+
+    [Fact]
+    public void A_possible_second_copy_with_no_cached_package_keeps_the_copy_its_source_opens_as()
+    {
+        var f = ACopyBesideAnInstallationWithNoCachedPackage(marked: true);
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+        f.Msi.RecordsSources(NoCachedPackage, null, MsiInstallContext.Machine, CandidateName, InstallerFolder + @"\");
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenBesideIt(f).Outcomes[0]);
+    }
+
+    [Fact]
+    public void A_possible_second_copy_with_no_cached_package_and_a_source_not_ruled_out_keeps_every_installation_package()
+    {
+        var f = ACopyBesideAnInstallationWithNoCachedPackage(marked: true);
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+        f.Msi.RecordsUrls(NoCachedPackage, isPatch: false, null, MsiInstallContext.Machine, SetupUrl);
+
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Equal(Census(released: 1, unruled: 1, unseenNoneRecorded: 1, unseenPerMachine: 1),
+            screening.CachedPackages);
+    }
+
+    [Fact]
+    public void An_installation_with_no_cached_package_read_by_both_steps_keeps_the_copy_its_source_opens_as()
+    {
+        // Its record does not show an ordinary installation and it is listed as not ruled out
+        // as a second copy, so its sources are read for the hold and again as a second copy's.
+        var f = ACopyBesideAnInstallationWithNoCachedPackage(marked: true);
+        f.Msi.RecordsSources(NoCachedPackage, null, MsiInstallContext.Machine, CandidateName, InstallerFolder + @"\");
+
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[0]);
+        Assert.Equal(Census(releasedBySources: 1, unruled: 1), screening.CachedPackages);
+    }
+
     // ---- An installation the caller could not rule out as a second copy ----
     //
     // The caller lists every installation with whether its InstanceType read as an
@@ -4133,7 +4525,6 @@ public class DeclaredProductCheckTests
 
     [Theory]
     [InlineData(CachedPackageFault.ReadFails)]
-    [InlineData(CachedPackageFault.NamesNoPackage)]
     [InlineData(CachedPackageFault.NotAFile)]
     [InlineData(CachedPackageFault.NoIdentity)]
     [InlineData(CachedPackageFault.APatch)]
@@ -4145,6 +4536,7 @@ public class DeclaredProductCheckTests
         // The installation's own record answers as an ordinary installation, so its
         // cached package failing to read keeps nothing through the links. The caller
         // listed it as not ruled out as a second copy, and that is what keeps every file.
+        // One recording no cached package opens what its sources name (the test after this).
         var f = AMarkedSecondCopy();
         Break(f, fault, null, MsiInstallContext.Machine);
         f.Msi.AnswersItsOwnRecord(SecondCopy, null, MsiInstallContext.Machine);
@@ -4152,6 +4544,28 @@ public class DeclaredProductCheckTests
         var outcomes = ScreenBesideTheSecondCopy(f, [Package(Candidate), Package(OtherCandidate)]);
 
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome));
+    }
+
+    [Theory]
+    [InlineData(MsiInstallContext.Machine)]
+    [InlineData(MsiInstallContext.UserManaged)]
+    public void A_second_copy_recording_no_cached_package_opens_what_its_sources_name(MsiInstallContext context)
+    {
+        // Its own record answers as an ordinary installation, so it sets no hold, and its
+        // sources name a package that is no longer there, so every candidate goes on.
+        var f = AMarkedSecondCopy(context);
+        var sid = f.Listed[0].UserSid;
+        Break(f, CachedPackageFault.NamesNoPackage, sid, context);
+        f.Msi.AnswersItsOwnRecord(SecondCopy, sid, context);
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder);
+
+        Assert.Equal(
+            new[] { DeclaredProductOutcome.DeclaredProductNotInstalled, DeclaredProductOutcome.DeclaredProductNotInstalled },
+            screening.Outcomes);
+        Assert.Equal(Census(released: 1, unruled: 1), screening.CachedPackages);
+        Assert.Contains(SetupPackage, f.Files.Reads);
     }
 
     [Fact]
@@ -4239,11 +4653,13 @@ public class DeclaredProductCheckTests
     [Fact]
     public void A_candidate_its_own_product_keeps_stays_kept_for_that_where_a_second_copys_packages_cannot_be_seen()
     {
-        // Product A is installed and records no cached package, so the candidate is kept
-        // on its own product's answer whatever the second copy opens.
+        // Product A is installed, records no cached package and its package name will not
+        // read, so the candidate is kept on its own product's answer whatever the second copy
+        // opens.
         var f = AMarkedSecondCopy();
         f.Msi.Installed(ProductA);
         f.Msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, string.Empty);
+        f.Msi.PackageNameAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
         f.Msi.RecordsSources(SecondCopy, null, MsiInstallContext.Machine, SetupName, OtherFolder);
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);
 
@@ -4320,7 +4736,6 @@ public class DeclaredProductCheckTests
 
     [Theory]
     [InlineData(CachedPackageFault.ReadFails)]
-    [InlineData(CachedPackageFault.NamesNoPackage)]
     [InlineData(CachedPackageFault.NotAFile)]
     [InlineData(CachedPackageFault.NoIdentity)]
     [InlineData(CachedPackageFault.APatch)]
@@ -4330,7 +4745,9 @@ public class DeclaredProductCheckTests
         CachedPackageFault fault)
     {
         // Its own record shows an ordinary installation, so it does not set the hold through
-        // the links, and the read of its packages stops at its cached package.
+        // the links, and the read of its packages stops at its cached package. One recording no
+        // cached package is read on to its sources, and its count is under "An installation
+        // with no cached package, judged by its sources".
         var f = AMarkedSecondCopy();
         Break(f, fault, null, MsiInstallContext.Machine);
         f.Msi.AnswersItsOwnRecord(SecondCopy, null, MsiInstallContext.Machine);
@@ -4343,7 +4760,6 @@ public class DeclaredProductCheckTests
             fault switch
             {
                 CachedPackageFault.ReadFails => Census(released: 1, unruled: 1, unseenPathUnreadable: 1, unseenPerMachine: 1),
-                CachedPackageFault.NamesNoPackage => Census(released: 1, unruled: 1, unseenNoneRecorded: 1, unseenPerMachine: 1),
                 CachedPackageFault.NotAFile => Census(released: 1, unruled: 1, unseenNotThere: 1, unseenPerMachine: 1),
                 CachedPackageFault.NoIdentity => Census(released: 1, unruled: 1, unseenWouldNotRead: 1, unseenPerMachine: 1),
                 _ => Census(released: 1, unruled: 1, unseenNoProductCode: 1, unseenPerMachine: 1),

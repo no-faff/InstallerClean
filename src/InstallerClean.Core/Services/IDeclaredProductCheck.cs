@@ -37,11 +37,14 @@ namespace InstallerClean.Services;
 /// product's source list. The folder can hold further copies that declare the same
 /// product code while nothing in either place names them, and those are not a package
 /// any installation of the product opens. So the file is kept while some installation's
-/// package cannot be seen: a value that is empty, that will not read, that names
-/// nothing identifiable, that names a file declaring another product, or that names
-/// this file under another spelling. It is kept too while some source cannot be ruled
-/// out: one in the Installer folder itself, one naming this file, one that cannot be
-/// read, one whose package does not answer within the check's time limit, and one on a
+/// package cannot be seen: a value that will not read, that names nothing identifiable,
+/// that names a file declaring another product, or that names this file under another
+/// spelling. An installation whose value is empty records no cached package and opens
+/// what its sources name, so it keeps the file only where a source cannot be ruled out,
+/// and not at all where it is shown to have no source list either. It is kept too while
+/// some source cannot be ruled out: one in the Installer folder itself, one naming this
+/// file, one that cannot be read, one whose package does not answer within the check's
+/// time limit, and one on a
 /// drive or share the pass has stopped reading: because a read there did not answer
 /// within that limit or failed only after a long wait, because the reads that failed
 /// there took more time between them than the check allows, because all the reads there
@@ -106,8 +109,12 @@ namespace InstallerClean.Services;
 /// by the code it is registered under. Where an installation's cached package does not
 /// say which product it declares, every installation package is kept unless that
 /// installation's own record, read by this process, shows it to be an ordinary
-/// installation. A per-user installation keeps that record under its owner's account,
-/// and it is read only where the owner is the account this process runs as.
+/// installation, or it records no cached package and has no package to open at all. A
+/// per-user installation keeps that record under its owner's account, and it is read only
+/// where the owner is the account this process runs as. One that records no cached package
+/// and has a source list opens what its sources name, so where every package they name can
+/// be seen, every installation package is compared with those packages instead, as with
+/// the installations below.
 ///
 /// AND AN INSTALLATION THE CALLER COULD NOT RULE OUT AS A SECOND COPY ANSWERS FOR EVERY
 /// FILE. Its cached package and its original package need not declare any code the check
@@ -124,12 +131,13 @@ namespace InstallerClean.Services;
 /// run. For an installation package, a file it cannot read, a question it cannot
 /// put, an answer that contradicts the caller's enumeration, an installation whose
 /// cached package does not say which product it declares, unless its own record shows an
-/// ordinary installation or it is shown to record no cached package and have no source
-/// list, an installation not ruled out as a second copy whose packages cannot all be
-/// seen, a source that answers off the allowlist and a recorded package it cannot
-/// identify all keep the file. For a patch, a file it cannot read, a registration it
-/// cannot list or ask about, an answer about a product it names that contradicts the
-/// caller's enumeration and a recorded copy it cannot identify all keep the file.
+/// ordinary installation or it is shown to record no cached package and either have no
+/// source list or have sources whose packages can all be seen, an installation not ruled
+/// out as a second copy whose packages cannot all be seen, a source that answers off the
+/// allowlist and a recorded package it cannot identify all keep the file. For a patch, a
+/// file it cannot read, a registration it cannot list or ask about, an answer about a
+/// product it names that contradicts the caller's enumeration and a recorded copy it
+/// cannot identify all keep the file.
 ///
 /// THE SUPERSEDED HALF OF THE OFFER IS NEVER PUT TO IT, AND THAT IS LOAD-BEARING. A
 /// registered superseded patch's cached file is the very file its registrations
@@ -279,10 +287,11 @@ public enum DeclaredProductOutcome
     /// enumeration listed no installation of it, and no cached package the check read,
     /// of the installations it listed, declares it, every one whose cached package did
     /// not read being shown by its own record to be an ordinary installation, or shown to
-    /// record no cached package and have no source list, so that it opens none. Every
-    /// installation the caller could not rule out as a second copy opens packages the
-    /// check saw, and this file is shown to be a different file from all of them. The
-    /// candidate goes on being decided by everything else.
+    /// record no cached package and have no source list, so that it opens none, or to record
+    /// none and open only packages its sources name that the check saw. Every installation
+    /// the caller could not rule out as a second copy opens packages the check saw, and this
+    /// file is shown to be a different file from all of those packages. The candidate goes
+    /// on being decided by everything else.
     ///
     /// A POSITIVE ANSWER AND NOT AN ABSENCE OF ONE, which is the distinction the
     /// whole check turns on. Only a return documented to mean the product is not
@@ -298,9 +307,11 @@ public enum DeclaredProductOutcome
     /// a different file; or an installation the caller could not rule out as a second copy
     /// of a program opens this file as its package. Kept back.
     ///
-    /// That covers a recorded <c>LocalPackage</c> value that is empty or will not read, one
-    /// naming a folder or a file that is absent or cannot be identified, one naming a file
-    /// that declares another product, and one naming this very file under another spelling.
+    /// That covers a recorded <c>LocalPackage</c> value that will not read, one naming a
+    /// folder or a file that is absent or cannot be identified, one naming a file that
+    /// declares another product, and one naming this very file under another spelling. An
+    /// empty value is covered through the installation's sources alone, below, and not at all
+    /// for an installation that has no source list either.
     /// It covers a source list or package name that will not read, a source whose package
     /// is this file, will not identify or does not answer within the check's time limit, a
     /// source on a drive or share the check has stopped reading for the pass (a read there
@@ -341,8 +352,8 @@ public enum DeclaredProductOutcome
     /// Windows still holds a record of the product this file declares, or of an
     /// installation whose cached package declares it, every such installation records a
     /// cached package that is present, is a different file, and itself declares the
-    /// same product, no installation is in a per-user-unmanaged context, and no package
-    /// in a folder on an installation's source list, in the folder it used last as a
+    /// same product, or records none, no installation is in a per-user-unmanaged context,
+    /// and no package in a folder on an installation's source list, in the folder it used last as a
     /// source or in its <c>InstallSource</c> is this file or, on a root other than a local
     /// drive, would be a file directly in the Installer folder, a package in a folder on
     /// the network counting only where its package name could be this file's name. Every
@@ -360,6 +371,9 @@ public enum DeclaredProductOutcome
     /// package through the package name in the folders on the source list, so a copy
     /// that none of those names is not a package any installation of the product
     /// opens.
+    ///
+    /// AN INSTALLATION RECORDING NO CACHED PACKAGE OPENS WHAT ITS SOURCES NAME, so its sources
+    /// are read as above and no cached package is asked of it.
     ///
     /// AN INSTALLATION WITH NEITHER IS LEFT OUT OF ALL OF THIS. A per-machine installation
     /// that records no cached package and has no source list, by the API's answer and in
@@ -485,7 +499,8 @@ public enum DeclaredProductOutcome
     /// of a program opens packages the check could not all see, or an installation's
     /// cached package does not say which product it declares, its own record does not
     /// show it to be an ordinary installation, and it is not shown to record no cached
-    /// package and have no source list. Kept back.
+    /// package and either have no source list or have sources whose packages the check saw.
+    /// Kept back.
     ///
     /// IT IS ABOUT ANOTHER INSTALLATION AND NOT ABOUT THIS FILE. Such an installation
     /// could be a second copy of a program installed under an instance transform, whose
@@ -496,10 +511,11 @@ public enum DeclaredProductOutcome
     /// whose name that package's name could be.
     ///
     /// Where a single installation's packages cannot all be seen it covers what
-    /// <see cref="DeclaredProductInstalled"/> covers for one: a cached package that is
-    /// empty, will not read, names nothing identifiable or yields no product code, and
-    /// every source the check cannot rule out, a per-user-unmanaged context and a source
-    /// in the Installer folder among them. A check constructed without its two file
+    /// <see cref="DeclaredProductInstalled"/> covers for one: a cached package that will
+    /// not read, names nothing identifiable or yields no product code, and every source the
+    /// check cannot rule out, a per-user-unmanaged context and a source in the Installer
+    /// folder among them, an installation recording no cached package being read by its
+    /// sources alone. A check constructed without its two file
     /// readers or its registry reader, or screening without the Installer folder to
     /// compare against, answers this beside every such installation, having no way to
     /// look.

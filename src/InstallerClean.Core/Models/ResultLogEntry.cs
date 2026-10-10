@@ -1146,7 +1146,8 @@ public sealed record MachineInfo(
 /// Installations that set the hold counted in
 /// <paramref name="WithheldSecondCopyUnestablishedCount"/>: their cached package did not say
 /// which product it declares, their own record did not show an ordinary installation, and
-/// they are not shown to have no package for Windows Installer to open.
+/// they are not shown to have no package for Windows Installer to open, nor, where they record
+/// none, to open only packages their sources name that the screen saw.
 /// Counted where the screen reads them, before any file's verdict, so they are counted
 /// whether or not any file was then held back for them. This one counts those for which
 /// Windows gave no answer about the cached package's path: a read that failed, or an answer
@@ -1157,7 +1158,8 @@ public sealed record MachineInfo(
 /// each, so the five and the three add up to the same figure, which is not sent.
 /// </param>
 /// <param name="SecondCopyKeepNoneRecordedCount">
-/// The same installations, where the installation records no cached package.
+/// The same installations, where the installation records no cached package, and a source it
+/// names could not be ruled out.
 /// </param>
 /// <param name="SecondCopyKeepNotThereCount">
 /// The same, where the cached package's path names no file that is there.
@@ -1207,7 +1209,9 @@ public sealed record MachineInfo(
 /// Windows gave no answer about the cached package's path, as for
 /// <paramref name="SecondCopyKeepPathUnreadableCount"/>.
 /// </param>
-/// <param name="SecondCopyUnseenNoneRecordedCount">The installation records no cached package.</param>
+/// <param name="SecondCopyUnseenNoneRecordedCount">
+/// The installation records no cached package, and a source it names could not be ruled out.
+/// </param>
 /// <param name="SecondCopyUnseenNotThereCount">The cached package's path names no file that is there.</param>
 /// <param name="SecondCopyUnseenWouldNotIdentifyCount">
 /// The cached package's volume and file ID would not read.
@@ -1237,8 +1241,9 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="SecondCopyUnseenByNameFileCount">
 /// Files held back because a package in a folder on the network, which the sources of an
-/// installation not ruled out as a second copy name and which the file could be by its name,
-/// could not be ruled out. Each is also counted in
+/// installation not ruled out as a second copy name, or those of an installation recording no
+/// cached package whose record does not show an ordinary installation, and which the file could
+/// be by its name, could not be ruled out. Each is also counted in
 /// <paramref name="WithheldSecondCopyUnestablishedCount"/>.
 /// </param>
 /// <param name="SecondCopyReleasedOpensNoPackageCount">

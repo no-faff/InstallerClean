@@ -31,7 +31,9 @@ namespace InstallerClean.Services;
 /// installation's cached package does not say which product it declares, unless its own
 /// record shows it to be an ordinary installation, or it records no cached package and
 /// has no source list, by the API's answer and in the registry, so that Windows Installer
-/// has no package to open for it.
+/// has no package to open for it. An installation that records no cached package and has
+/// a source list opens what its sources name, and every candidate is compared with those
+/// packages where they can all be seen.
 /// For each candidate patch it reads the patch's own code and the products its Template
 /// names, finds the registrations of that patch through the machine-wide patch
 /// enumeration and the keyed patch read, and reads the <c>LocalPackage</c> each
@@ -248,7 +250,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (resolved.Unaskable)
             return new DeclarationAnswer(DeclaredProductOutcome.Unestablished, null);
 
-        var links = LinksOf(pass, recordRefusal);
+        var links = LinksOf(pass, namesAFileInInstallerFolder, recordRefusal);
 
         var installations = new List<(string RegisteredCode, string? Sid, MsiInstallContext Context)>();
         foreach (var (sid, context) in resolved.Instances) installations.Add((code, sid, context));
@@ -277,16 +279,17 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// and the package it was installed from, and the package cached for it, need not
     /// declare that code or any code the check can link it by. So the candidate is
     /// compared by file identity with every package such an installation opens, its
-    /// cached package and the packages its sources name, whatever each declares. A
-    /// candidate that opens as one of them is kept as
-    /// <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/>, and a candidate
-    /// shown to be a different file from all of them is given the answer it already had.
-    /// Where those packages cannot all be seen
+    /// cached package and the packages its sources name, whatever each declares, and with
+    /// the packages the sources name of an installation recording no cached package whose
+    /// record does not show an ordinary installation. A candidate that opens as one of them
+    /// is kept as <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/>, and a
+    /// candidate shown to be a different file from all of them is given the answer it
+    /// already had. Where those packages cannot all be seen
     /// (<see cref="PackagesSecondCopiesOpen"/>), or an installation's cached package does
     /// not say what it declares and its own record does not show an ordinary installation
-    /// nor that it opens no package (<see cref="LinksOf"/>), every candidate the answer lets
-    /// through is
-    /// <see cref="DeclaredProductOutcome.SecondCopyUnestablished"/>.
+    /// nor that it opens no package, nor, where it records none, that every package its
+    /// sources name can be seen (<see cref="LinksOf"/>), every candidate the answer lets
+    /// through is <see cref="DeclaredProductOutcome.SecondCopyUnestablished"/>.
     ///
     /// A PACKAGE IN A FOLDER ON THE NETWORK IS READ HERE, FOR THIS CANDIDATE, and only
     /// where its package name could be this candidate's name
@@ -302,9 +305,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// identity being read, having nothing to be compared with.
     ///
     /// <paramref name="givenUp"/> is the root whose give-up refused the read the verdict
-    /// stopped at (<see cref="ReadSourcePackage"/>), and null for every other verdict, among
-    /// them that of a candidate its own comparison keeps while the second copies' packages
-    /// cannot be seen.
+    /// stopped at (<see cref="ReadSourcePackage"/>), or that alone left an installation's
+    /// cached package unsettled (<see cref="InstallationLinks.GivenUp"/>), and null for every
+    /// other verdict, among them that of a candidate its own comparison keeps while the second
+    /// copies' packages cannot be seen.
     /// </summary>
     private DeclaredProductOutcome Settle(
         string candidatePath,
@@ -340,10 +344,14 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         IReadOnlyList<FileIdentity>? secondCopies = null;
-        string? secondCopiesGivenUp = null;
+        string? secondCopiesGivenUp;
         var unseenByName = false;
-        if (!LinksOf(pass, recordRefusal).UnreadPackageNotRuledOut
-            && PackagesSecondCopiesOpen(pass, namesAFileInInstallerFolder, out secondCopiesGivenUp) is { } second)
+        var links = LinksOf(pass, namesAFileInInstallerFolder, recordRefusal);
+        if (links.UnreadPackageNotRuledOut)
+        {
+            secondCopiesGivenUp = links.GivenUp;
+        }
+        else if (PackagesSecondCopiesOpen(pass, links, namesAFileInInstallerFolder, out secondCopiesGivenUp) is { } second)
         {
             secondCopies = WithPackagesItCouldBe(
                 candidate, second.Identities, second.ByName, pass, namesAFileInInstallerFolder, out secondCopiesGivenUp);
@@ -374,19 +382,22 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// (<see cref="ListedInstallation.SecondCopyNotRuledOut"/>): the cached package each
     /// records, and the original package at each folder its sources name, a package in a
     /// folder on the network being left to be read for each candidate whose name it could
-    /// be (<see cref="OpenedPackages.ByName"/>). Empty where no such installation is
-    /// listed, and null where any package read here cannot be seen. Read once per pass,
-    /// the first time a candidate the answer lets through is put to them, and kept for
-    /// every candidate after it.
+    /// be (<see cref="OpenedPackages.ByName"/>); with them, the packages the sources name of
+    /// each installation recording no cached package whose record does not show an ordinary
+    /// installation, read for the pass's links (<see cref="InstallationLinks.Opened"/>). Those
+    /// alone where no such installation is listed, and null where any package read here
+    /// cannot be seen. Read once per pass, the first time a candidate the answer lets through
+    /// is put to them, and kept for every candidate after it.
     ///
     /// NULL IS THE ANSWER THAT KEEPS EVERY CANDIDATE, and every way such an
     /// installation's packages can fail to be seen reaches it: a <c>LocalPackage</c> read
-    /// that failed, or came back empty for an installation not shown to open no package
-    /// (<see cref="OpensNoPackage"/>), a value that names nothing, names a folder, will not
-    /// open to an identity, or names a file that yields no product code; any source
+    /// that failed, a value that names nothing, names a folder, will not open to an
+    /// identity, or names a file that yields no product code; any source
     /// <see cref="AddSourcePackages"/> cannot rule out, a per-user-unmanaged context among
-    /// them; and a check built without its file readers, having no way to look. One such
-    /// installation is enough, because any candidate could be the package it opens.
+    /// them, an installation recording no cached package being judged by its sources alone
+    /// unless it has no package to open at all (<see cref="OpensNoPackage"/>); and a check
+    /// built without its file readers, having no way to look. One such installation is
+    /// enough, because any candidate could be the package it opens.
     ///
     /// EACH INSTALLATION IS READ BY THE CODE IT IS REGISTERED UNDER, in its own account
     /// and context, and its cached package is not required to declare that code.
@@ -399,7 +410,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// the step that stopped it (<see cref="CensusTally.SecondCopyRead"/>).
     /// </summary>
     private OpenedPackages? PackagesSecondCopiesOpen(
-        PassAnswers pass, Func<string, bool?>? namesAFileInInstallerFolder, out string? givenUp)
+        PassAnswers pass, InstallationLinks links, Func<string, bool?>? namesAFileInInstallerFolder, out string? givenUp)
     {
         if (pass.SecondCopiesRead)
         {
@@ -408,8 +419,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         givenUp = null;
-        List<FileIdentity>? identities = [];
-        List<NetworkPackage> byName = [];
+        List<FileIdentity>? identities = [.. links.Opened.Identities];
+        List<NetworkPackage> byName = [.. links.Opened.ByName];
         foreach (var installation in pass.Installations)
         {
             pass.CancellationToken.ThrowIfCancellationRequested();
@@ -438,9 +449,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// network goes into <paramref name="byName"/> instead (<see cref="AddSourcePackages"/>).
     /// The cached package has to be a file that is there, that identifies, and that
     /// yields a product code: a value naming anything else shows nothing about which
-    /// package the installation opens. An installation that records none and has no
-    /// package to open at all (<see cref="OpensNoPackage"/>) adds nothing and answers true.
-    /// <paramref name="givenUp"/> is as
+    /// package the installation opens. An installation that records none adds the packages
+    /// its sources name, and nothing where it has no package to open at all
+    /// (<see cref="OpensNoPackage"/>). <paramref name="givenUp"/> is as
     /// <see cref="AddSourcePackages"/> gives it, and <paramref name="reading"/> says which
     /// step answered false, or <see cref="SecondCopyReading.Seen"/>.
     /// </summary>
@@ -463,19 +474,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         reading = SecondCopyReading.PathUnreadable;
         if (read.Unreadable) return false;
 
-        // An installation recording no cached package opens nothing to compare where it has no
-        // package to open at all (OpensNoPackage), and keeps every file otherwise.
+        // An installation recording no cached package opens what its sources name, and nothing
+        // where it has no package to open at all (OpensNoPackage).
         var path = read.Value.TrimEnd('\0');
         if (path.Length == 0)
         {
-            if (!OpensNoPackage(installation.ProductCode, installation.UserSid, context, pass))
-            {
-                reading = SecondCopyReading.NoneRecorded;
-                return false;
-            }
-
-            reading = SecondCopyReading.Seen;
-            return true;
+            var seen = OpensNoPackage(installation.ProductCode, installation.UserSid, context, pass)
+                || AddSourcePackages(installation.ProductCode, installation.UserSid, context, pass,
+                    namesAFileInInstallerFolder, opened, byName, out givenUp, out _);
+            reading = seen ? SecondCopyReading.Seen : SecondCopyReading.NoneRecorded;
+            return seen;
         }
 
         // File.Exists is false for a folder and for a path that will not parse, and the
@@ -509,12 +517,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
     /// <summary>
     /// Every installation the caller listed that is registered under a code other than
-    /// the one its cached package declares, keyed by the declared code, whether an
+    /// the one its cached package declares, keyed by the declared code; whether an
     /// installation whose cached package did not say what it declares is not shown by its
-    /// own record to be an ordinary installation nor shown to open no package, each
-    /// installation being counted in the pass's census by what its cached package gave,
-    /// whether it opens no package, and otherwise what its record showed
-    /// (<see cref="CensusTally"/>).
+    /// own record to be an ordinary installation nor shown to open no package, nor, where it
+    /// records no cached package, shown to open nothing but packages that can all be seen;
+    /// and those packages. Each installation is counted in the pass's census by what its
+    /// cached package gave, whether it opens no package, what its record showed, and, for
+    /// one recording no cached package, what its sources showed (<see cref="CensusTally"/>).
     /// Read once per pass, the first time it is needed.
     ///
     /// EVERY CONTEXT IS READ, AND A FAILED READ KEEPS UNLESS THE RECORD RULES IT OUT. A
@@ -527,19 +536,36 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="Settle"/> then gives every candidate the answer would let through
     /// <see cref="DeclaredProductOutcome.SecondCopyUnestablished"/>.
     ///
+    /// AN INSTALLATION RECORDING NO CACHED PACKAGE OPENS WHAT ITS SOURCES NAME. Where it has a
+    /// package to open and its record does not show an ordinary installation, its sources are
+    /// read (<see cref="AddSourcePackages"/>). Where every package they name can be seen, the
+    /// installation keeps no file, and every candidate the answer would let through is
+    /// compared by identity with those packages instead (<see cref="PackagesSecondCopiesOpen"/>);
+    /// where one cannot, it keeps every file as above.
+    ///
+    /// A FILE KEPT HERE COUNTS TOWARDS A DRIVE OR SHARE GIVEN UP ONLY WHERE THAT IS ALL THAT KEPT
+    /// IT: where every installation keeping every file does so because a read of its sources was
+    /// refused for a root given up for the pass, the first such root, and otherwise none
+    /// (<see cref="InstallationLinks.GivenUp"/>).
+    ///
     /// The codes are compared as GUIDs, because the reader canonicalises the declared
     /// code and the listed code is in whatever spelling the caller's enumeration gave.
     /// Compared as text, an ordinary installation listed in lower case would be linked
     /// to its own code.
     /// </summary>
-    private InstallationLinks LinksOf(PassAnswers pass, Action<Exception, string>? recordRefusal)
+    private InstallationLinks LinksOf(
+        PassAnswers pass, Func<string, bool?>? namesAFileInInstallerFolder, Action<Exception, string>? recordRefusal)
     {
         if (pass.Links is { } read) return read;
 
         var byDeclaredCode =
             new Dictionary<string, List<(string RegisteredCode, string? Sid, MsiInstallContext Context)>>(
                 StringComparer.Ordinal);
+        List<FileIdentity> opened = [];
+        List<NetworkPackage> byName = [];
         string? unread = null;
+        string? givenUp = null;
+        var keptOtherwise = false;
 
         foreach (var installation in pass.Installations)
         {
@@ -550,15 +576,44 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 installation.ProductCode, installation.UserSid, context, out var reading, out var detail);
             if (declared is null)
             {
-                if (reading == CachedPackageReading.NoneRecorded
-                    && OpensNoPackage(installation.ProductCode, installation.UserSid, context, pass))
+                var noPackage = reading == CachedPackageReading.NoneRecorded
+                    ? NoPackageReadingOf(installation.ProductCode, installation.UserSid, context, pass)
+                    : default(NoPackageReading?);
+                if (noPackage?.Answer == NoPackageAnswer.OpensNone)
                 {
                     pass.Census.OpensNoPackage();
                     continue;
                 }
 
                 var record = WhatItsOwnRecordShows(installation.ProductCode, installation.UserSid, context);
-                if (record != RecordReading.Ordinary) unread ??= detail;
+                if (record != RecordReading.Ordinary)
+                {
+                    if (noPackage is { } found)
+                    {
+                        List<FileIdentity> itsPackages = [];
+                        List<NetworkPackage> itsByName = [];
+                        if (AddSourcePackages(installation.ProductCode, installation.UserSid, context, pass,
+                                namesAFileInInstallerFolder, itsPackages, itsByName, out var sourceGivenUp, out _))
+                        {
+                            opened.AddRange(itsPackages);
+                            byName.AddRange(itsByName);
+                            pass.Census.ReleasedBySources();
+                            continue;
+                        }
+
+                        detail = WhyItsSourcesKeep(found);
+                        pass.Census.NoneRecordedKept(found.Answer);
+                        if (sourceGivenUp is null) keptOtherwise = true;
+                        else givenUp ??= sourceGivenUp;
+                    }
+                    else
+                    {
+                        keptOtherwise = true;
+                    }
+
+                    unread ??= detail;
+                }
+
                 pass.Census.Undeclared(reading, record, context);
                 continue;
             }
@@ -581,8 +636,29 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     + "is kept rather than offered. Detail: " + unread + "."),
                 unread);
 
-        return pass.Links = new InstallationLinks(byDeclaredCode, unread is not null);
+        return pass.Links = new InstallationLinks(
+            byDeclaredCode,
+            unread is not null,
+            new OpenedPackages(opened, byName),
+            unread is not null && !keptOtherwise ? givenUp : null);
     }
+
+    /// <summary>
+    /// The detail the log gives for an installation that records no cached package and keeps
+    /// every installation package, its sources not ruled out: what <paramref name="reading"/>
+    /// shows kept it.
+    /// </summary>
+    private static string WhyItsSourcesKeep(NoPackageReading reading) => reading.Answer switch
+    {
+        NoPackageAnswer.OtherAnswer =>
+            "the installation records no cached package, and Windows Installer answered "
+            + reading.Error.ToString(CultureInfo.InvariantCulture)
+            + " when asked its source list's package name",
+        NoPackageAnswer.RegistryDisagrees =>
+            "the installation records no cached package, and the registry holds a cached package or a source "
+            + "list where Windows Installer answers that it has none, or a key would not read",
+        _ => "the installation records no cached package, and a source it names could not be ruled out",
+    };
 
     /// <summary>
     /// What Windows answers, to this process, of the record one installation keeps of
@@ -631,21 +707,23 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Whether Windows Installer has no package to open for one installation that records
     /// no cached package: whether it has no source list either, by the API's answer and by
     /// the registry alike. Asked only where the installation's <c>LocalPackage</c> has
-    /// already read as none.
+    /// already read as none. An installation for which this answers false can open only what
+    /// its sources name, and is judged by them (<see cref="AddSourcePackages"/>).
     ///
     /// WINDOWS INSTALLER OPENS A PRODUCT'S PACKAGE IN TWO WAYS ONLY: the cached copy its
     /// <c>LocalPackage</c> names, and the file named by its package name in a folder on its
     /// source list. An installation with neither opens no file in the Installer folder, so
     /// it is no reason to keep one.
     ///
-    /// TRUE ONLY WHERE ALL OF THESE HOLD, and anything short of them answers false, which
-    /// leaves the installation to keep files as one whose package cannot be seen:
+    /// TRUE ONLY WHERE ALL OF THESE HOLD, and anything short of them answers false
+    /// (<see cref="NoPackageReadingOf"/> says which):
     /// - the installation is per machine, with no account;
     /// - <c>MsiSourceListGetInfo</c> answers <see cref="MsiError.BadConfiguration"/> for its
     ///   package name, and no other return;
-    /// - its <c>InstallProperties</c> key (<see cref="InstallPropertiesKeyPath"/>) and its
-    ///   <c>SourceList</c> key (<see cref="SourceListKeyPath"/>) are both absent, a key that
-    ///   will not read answering false.
+    /// - its <c>InstallProperties</c> key (<see cref="InstallPropertiesKeyPath"/>) is absent or
+    ///   records no cached package (<see cref="RecordsNoCachedPackage"/>), and its
+    ///   <c>SourceList</c> key (<see cref="SourceListKeyPath"/>) is absent, a key that will not
+    ///   read answering false.
     /// The API is asked first, so a registry read is made only for an installation whose
     /// source list the API has already answered for. A check built without its registry
     /// reader answers false for every installation.
@@ -657,29 +735,96 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="PackagesSecondCopiesOpen"/> each reach their conclusion once in a pass, and
     /// <see cref="PackagesOpenedBy"/> once for each declared code, and every later candidate
     /// takes that conclusion without a further call. A source list that appears while the pass
-    /// runs is found by the next step that asks, and that step keeps the files it reaches.
+    /// runs is found by the next step that asks, and that step reads the sources it names.
     /// </summary>
-    private bool OpensNoPackage(string code, string? sid, MsiInstallContext context, PassAnswers pass)
+    private bool OpensNoPackage(string code, string? sid, MsiInstallContext context, PassAnswers pass) =>
+        NoPackageReadingOf(code, sid, context, pass).Answer == NoPackageAnswer.OpensNone;
+
+    /// <summary>
+    /// What <see cref="OpensNoPackage"/> finds for one installation that records no cached
+    /// package: <see cref="NoPackageAnswer.OpensNone"/> where it answers true, and otherwise
+    /// the first of its conditions that does not hold.
+    /// </summary>
+    private NoPackageReading NoPackageReadingOf(string code, string? sid, MsiInstallContext context, PassAnswers pass)
     {
-        if (context != MsiInstallContext.Machine || sid is not null || _registry is null) return false;
+        if (context != MsiInstallContext.Machine || sid is not null || _registry is null)
+            return new NoPackageReading(NoPackageAnswer.NotAsked);
 
         return pass.OpensNoPackageOf(code, sid, context, () => AsksAndFindsNoPackage(code, sid, context));
     }
 
     /// <summary>The questions <see cref="OpensNoPackage"/> puts, for one installation it has not yet asked about.</summary>
-    private bool AsksAndFindsNoPackage(string code, string? sid, MsiInstallContext context)
+    private NoPackageReading AsksAndFindsNoPackage(string code, string? sid, MsiInstallContext context)
     {
         uint length = 0;
-        if (_msi.GetSourceListInfo(code, sid, context, MsiSourceListOptions.Product,
-                MsiInstallProperty.PackageName, null, ref length) != MsiError.BadConfiguration)
-            return false;
+        var answered = _msi.GetSourceListInfo(code, sid, context, MsiSourceListOptions.Product,
+            MsiInstallProperty.PackageName, null, ref length);
+        if (answered is MsiError.Success or MsiError.MoreData)
+            return new NoPackageReading(NoPackageAnswer.ListAnswered, answered);
+        if (answered != MsiError.BadConfiguration)
+            return new NoPackageReading(NoPackageAnswer.OtherAnswer, answered);
 
         var properties = InstallPropertiesKeyPath(code, sid, context);
         var sourceList = SourceListKeyPath(code, sid, context);
         return properties is not null
             && sourceList is not null
-            && _registry!.LocalMachineValues(properties).Presence == RegistryKeyPresence.Absent
-            && _registry.LocalMachineValues(sourceList).Presence == RegistryKeyPresence.Absent;
+            && RecordsNoCachedPackage(_registry!.LocalMachineValues(properties))
+            && _registry.LocalMachineValues(sourceList).Presence == RegistryKeyPresence.Absent
+                ? new NoPackageReading(NoPackageAnswer.OpensNone, answered)
+                : new NoPackageReading(NoPackageAnswer.RegistryDisagrees, answered);
+    }
+
+    /// <summary>
+    /// Whether an installation's <c>InstallProperties</c> key, <paramref name="key"/>, records no
+    /// cached package: the key is not there, or it is there and holds no value of either name a
+    /// cached package is recorded under (<see cref="InstallerQueryService.CachedPackageValueNames"/>),
+    /// of any type and any content. A key that will not read answers false.
+    /// </summary>
+    private static bool RecordsNoCachedPackage(RegistryKeyValues key)
+    {
+        if (key.Presence == RegistryKeyPresence.Absent) return true;
+        if (key.Presence != RegistryKeyPresence.Present || key.Values is null) return false;
+
+        foreach (var name in InstallerQueryService.CachedPackageValueNames)
+            if (ValueNamed(key.Values, name, out _) is not null) return false;
+
+        return true;
+    }
+
+    /// <summary>What <see cref="OpensNoPackage"/> found for one installation (<see cref="NoPackageReadingOf"/>).</summary>
+    /// <param name="Answer">Which of its conditions answered.</param>
+    /// <param name="Error">
+    /// What <c>MsiSourceListGetInfo</c> answered for the installation's package name, where it was asked.
+    /// </param>
+    private readonly record struct NoPackageReading(NoPackageAnswer Answer, uint Error = MsiError.Success);
+
+    /// <summary>Which of the conditions of <see cref="OpensNoPackage"/> answered for one installation.</summary>
+    private enum NoPackageAnswer
+    {
+        /// <summary>All of them: it has no package to open.</summary>
+        OpensNone,
+
+        /// <summary>None was asked: a per-user installation, or a check without its registry reader.</summary>
+        NotAsked,
+
+        /// <summary>
+        /// <c>MsiSourceListGetInfo</c> answered the installation's package name, with
+        /// <see cref="MsiError.Success"/> or <see cref="MsiError.MoreData"/>.
+        /// </summary>
+        ListAnswered,
+
+        /// <summary>
+        /// <c>MsiSourceListGetInfo</c> answered with an error other than
+        /// <see cref="MsiError.BadConfiguration"/>.
+        /// </summary>
+        OtherAnswer,
+
+        /// <summary>
+        /// <c>MsiSourceListGetInfo</c> answered <see cref="MsiError.BadConfiguration"/>, and the
+        /// installation's <c>InstallProperties</c> key records a cached package or its
+        /// <c>SourceList</c> key is there, or either key would not read.
+        /// </summary>
+        RegistryDisagrees,
     }
 
     /// <summary>
@@ -802,8 +947,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     private enum SecondCopyReading
     {
         /// <summary>
-        /// Its cached package and the packages its sources name can all be seen, or it records no
-        /// cached package and has no package to open at all.
+        /// Its cached package, where it records one, and the packages its sources name can all be
+        /// seen, or it records no cached package and has no package to open at all.
         /// </summary>
         Seen,
 
@@ -813,7 +958,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         /// <summary>Its cached package's path would not read.</summary>
         PathUnreadable,
 
-        /// <summary>It records no cached package, and is not shown to have no package to open.</summary>
+        /// <summary>
+        /// It records no cached package, and a source it names could not be ruled out, it not
+        /// being shown to have no package to open.
+        /// </summary>
         NoneRecorded,
 
         /// <summary>Its cached package's path names no file that is there.</summary>
@@ -882,6 +1030,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         private readonly int[] _bySecondCopyReading = new int[Enum.GetValues<SecondCopyReading>().Length];
         private int _listedChecked;
         private int _opensNoPackage;
+        private int _releasedBySources;
+        private int _keptNoneRecordedOtherAnswer;
+        private int _keptNoneRecordedRegistryDisagrees;
+        private int _keptNoneRecordedSourcesNotRuledOut;
         private int _perMachine;
         private int _unruledChecked;
         private int _unseenPerMachine;
@@ -899,6 +1051,41 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             _listedChecked++;
             _opensNoPackage++;
+        }
+
+        /// <summary>
+        /// An installation that records no cached package, has a package to open and a record
+        /// that does not show an ordinary installation, and whose sources name packages that
+        /// can all be seen, so it does not set the hold.
+        /// </summary>
+        internal void ReleasedBySources()
+        {
+            _listedChecked++;
+            _releasedBySources++;
+        }
+
+        /// <summary>
+        /// An installation that records no cached package and sets the hold, its sources not
+        /// ruled out, by what <paramref name="answer"/> shows kept it: an answer of the
+        /// source-list API other than <see cref="MsiError.BadConfiguration"/> or a package name,
+        /// the registry disagreeing with that answer, or otherwise its sources. It is counted by
+        /// what its cached package gave and its record showed as well
+        /// (<see cref="Undeclared"/>).
+        /// </summary>
+        internal void NoneRecordedKept(NoPackageAnswer answer)
+        {
+            switch (answer)
+            {
+                case NoPackageAnswer.OtherAnswer:
+                    _keptNoneRecordedOtherAnswer++;
+                    break;
+                case NoPackageAnswer.RegistryDisagrees:
+                    _keptNoneRecordedRegistryDisagrees++;
+                    break;
+                default:
+                    _keptNoneRecordedSourcesNotRuledOut++;
+                    break;
+            }
         }
 
         /// <summary>
@@ -939,7 +1126,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         /// <summary>
         /// A file held back because a package in a folder on the network, which a second copy's
-        /// sources name and which the file could be by its name, could not be ruled out.
+        /// sources name, or those of an installation released by its sources, and which the file
+        /// could be by its name, could not be ruled out.
         /// </summary>
         internal void UnseenByName() => _unseenByNameFiles++;
 
@@ -968,7 +1156,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             UnseenSourceNotRuledOut: _bySecondCopyReading[(int)SecondCopyReading.SourceNotRuledOut],
             UnseenPerMachine: _unseenPerMachine,
             UnseenByNameFiles: _unseenByNameFiles,
-            ReleasedOpensNoPackage: _opensNoPackage);
+            ReleasedOpensNoPackage: _opensNoPackage,
+            ReleasedBySources: _releasedBySources,
+            KeptNoneRecordedOtherAnswer: _keptNoneRecordedOtherAnswer,
+            KeptNoneRecordedRegistryDisagrees: _keptNoneRecordedRegistryDisagrees,
+            KeptNoneRecordedSourcesNotRuledOut: _keptNoneRecordedSourcesNotRuledOut);
     }
 
     /// <summary>Whether two spellings name one product code.</summary>
@@ -989,19 +1181,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// copy is not <paramref name="code"/>, and its cached package has to declare
     /// <paramref name="code"/> all the same.
     ///
-    /// AN INSTALLATION RECORDING NO CACHED PACKAGE AND HAVING NO PACKAGE TO OPEN AT ALL
-    /// (<see cref="OpensNoPackage"/>) ADDS NOTHING, and every other installation of the code
-    /// is still read.
+    /// AN INSTALLATION RECORDING NO CACHED PACKAGE ADDS THE PACKAGES ITS SOURCES NAME, its
+    /// sources being all it can open a package from, and nothing where it has no package to
+    /// open at all (<see cref="OpensNoPackage"/>). Every other installation of the code is read
+    /// as well.
     ///
     /// NULL IS THE ANSWER THAT KEEPS THE FILE, and every way an installation's package
-    /// can fail to be seen reaches it: a <c>LocalPackage</c> read that failed, or came
-    /// back empty for any other installation, a value that names nothing, names a folder,
-    /// will not open to an identity, or names a file that does not declare
-    /// <paramref name="code"/>; and
-    /// any source the check cannot rule out, which <see cref="AddSourcePackages"/>
-    /// sets out. One such installation is enough, because its package is the one this
-    /// candidate could be. <paramref name="givenUp"/> is the root whose give-up refused the
-    /// read that made it null (<see cref="ReadSourcePackage"/>), and null otherwise.
+    /// can fail to be seen reaches it: a <c>LocalPackage</c> read that failed, a value that
+    /// names nothing, names a folder, will not open to an identity, or names a file that
+    /// does not declare <paramref name="code"/>; and any source the check cannot rule out,
+    /// which <see cref="AddSourcePackages"/> sets out. One such installation is enough,
+    /// because its package is the one this candidate could be. <paramref name="givenUp"/> is
+    /// the root whose give-up refused the read that made it null
+    /// (<see cref="ReadSourcePackage"/>), and null otherwise.
     /// </summary>
     private OpenedPackages? PackagesOpenedBy(
         string code,
@@ -1021,13 +1213,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 _msi, registeredCode, sid, context, MsiInstallProperty.LocalPackage);
             if (read.Unreadable) return null;
 
-            // An installation recording no cached package adds nothing where it has no
-            // package to open at all (OpensNoPackage), and keeps the file otherwise.
+            // An installation recording no cached package adds the packages its sources name,
+            // and nothing where it has no package to open at all (OpensNoPackage).
             var path = read.Value.TrimEnd('\0');
             if (path.Length == 0)
             {
                 if (OpensNoPackage(registeredCode, sid, context, pass)) continue;
-                return null;
+                if (!AddSourcePackages(
+                        registeredCode, sid, context, pass, namesAFileInInstallerFolder, identities, byName, out givenUp, out _))
+                    return null;
+                continue;
             }
 
             // File.Exists is false for a folder and for a path that will not parse,
@@ -1320,11 +1515,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// WHAT FALSE KEEPS IS WHAT THE PACKAGE WAS READ FOR. Read for the installations answering
     /// for a product code (<see cref="PackagesOpenedBy"/>), it keeps every candidate declaring
     /// that code. Read for the installations not ruled out as second copies
-    /// (<see cref="PackagesSecondCopiesOpen"/>), it keeps every installation package the
-    /// answer about its own product would let through. Read for one candidate whose name it
-    /// could be (<see cref="WithPackagesItCouldBe"/>), it keeps that candidate. A package on a
-    /// local drive is never left to be read by name (<see cref="ComparedByName"/>), so it is
-    /// read for one of the first two.
+    /// (<see cref="PackagesSecondCopiesOpen"/>), or for an installation recording no cached
+    /// package whose record does not show an ordinary installation (<see cref="LinksOf"/>), it
+    /// keeps every installation package the answer about its own product would let through.
+    /// Read for one candidate whose name it could be (<see cref="WithPackagesItCouldBe"/>), it
+    /// keeps that candidate. A package on a local drive is never left to be read by name
+    /// (<see cref="ComparedByName"/>), so it is read for one of the others.
     ///
     /// THE READ IS WAITED FOR UP TO THE TIME LIMIT (<see cref="AnswersWithin"/>). A source
     /// folder can be on a server that does not answer, or on a drive that does not, and an
@@ -2439,11 +2635,24 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <param name="UnreadPackageNotRuledOut">
     /// Whether an installation whose cached package did not say what it declares is not
     /// shown by its own record to be an ordinary installation, nor shown to open no package
-    /// (<see cref="OpensNoPackage"/>).
+    /// (<see cref="OpensNoPackage"/>), nor, where it records no cached package, shown to open
+    /// nothing but packages that can all be seen.
+    /// </param>
+    /// <param name="Opened">
+    /// The packages the sources of each installation recording no cached package name, where
+    /// its record does not show an ordinary installation and every one of them was seen, which
+    /// every candidate the answer would let through is compared with.
+    /// </param>
+    /// <param name="GivenUp">
+    /// Where <paramref name="UnreadPackageNotRuledOut"/> is true only because reads of sources
+    /// were refused for roots given up for the pass, the first of those roots, and null
+    /// otherwise (<see cref="LinksOf"/>).
     /// </param>
     private sealed record InstallationLinks(
         Dictionary<string, List<(string RegisteredCode, string? Sid, MsiInstallContext Context)>> ByDeclaredCode,
-        bool UnreadPackageNotRuledOut);
+        bool UnreadPackageNotRuledOut,
+        OpenedPackages Opened,
+        string? GivenUp);
 
     /// <summary>
     /// What one pass has asked Windows about installations and patch registrations,
@@ -2557,27 +2766,29 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         private readonly Dictionary<(string PatchCode, string ProductCode, string? Sid, MsiInstallContext Context),
             InstallerQueryService.PropertyRead> _patchStates = new();
 
-        private readonly HashSet<(string ProductCode, string? Sid, MsiInstallContext Context)> _hasAPackage = new();
+        private readonly Dictionary<(string ProductCode, string? Sid, MsiInstallContext Context), NoPackageReading>
+            _hasAPackage = new();
 
         /// <summary>
-        /// Whether one installation has no package to open
-        /// (<see cref="DeclaredProductCheck.OpensNoPackage"/>): false without asking where an
-        /// earlier ask in this pass found one, and otherwise <paramref name="ask"/>'s answer,
-        /// a false one being kept for the rest of the pass. The code and the account compare
-        /// without case, as <see cref="PatchStateOf"/>'s do.
+        /// What one installation was found to have to open
+        /// (<see cref="DeclaredProductCheck.NoPackageReadingOf"/>): the answer of an earlier ask in
+        /// this pass that found a package, without asking again, and otherwise
+        /// <paramref name="ask"/>'s answer, one finding a package being kept for the rest of the
+        /// pass. The code and the account compare without case, as <see cref="PatchStateOf"/>'s do.
         ///
         /// Only an answer finding a package is remembered, so an installation with none is asked
         /// again at the next call and a source list that appears while the pass runs is found
         /// there (<see cref="DeclaredProductCheck.OpensNoPackage"/>).
         /// </summary>
-        internal bool OpensNoPackageOf(string productCode, string? sid, MsiInstallContext context, Func<bool> ask)
+        internal NoPackageReading OpensNoPackageOf(
+            string productCode, string? sid, MsiInstallContext context, Func<NoPackageReading> ask)
         {
             var key = (productCode.ToUpperInvariant(), sid?.ToUpperInvariant(), context);
-            if (_hasAPackage.Contains(key)) return false;
-            if (ask()) return true;
+            if (_hasAPackage.TryGetValue(key, out var found)) return found;
 
-            _hasAPackage.Add(key);
-            return false;
+            var answer = ask();
+            if (answer.Answer != NoPackageAnswer.OpensNone) _hasAPackage[key] = answer;
+            return answer;
         }
 
         /// <summary>
