@@ -103,13 +103,15 @@ public sealed record ResultLogEntry(
     /// (<see cref="ScanInfo.SecondCopyReleasedOpensNoPackageCount"/>).
     ///
     /// SCHEMA 8 ADDS FOUR KEYS UNDER <c>scan</c> AND TAKES NONE AWAY: what the declared-product
-    /// screen found of the installations recording no cached package whose sources it read
-    /// (<see cref="ScanInfo.SecondCopyReleasedBySourcesCount"/> to
-    /// <see cref="ScanInfo.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount"/>), those it released
-    /// because every package their sources name was seen, and for each of the others what kept it.
-    /// AND <c>scan.secondCopyKeepNoneRecordedCount</c> AND <c>scan.secondCopyUnseenNoneRecordedCount</c>
-    /// COUNT ONLY THOSE OTHERS AT 8: from 8 an installation recording no cached package is counted
-    /// there only where a source it names could not be ruled out.
+    /// screen found of the installations recording no cached package that set the hold or would
+    /// have (<see cref="ScanInfo.SecondCopyReleasedBySourcesCount"/> to
+    /// <see cref="ScanInfo.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount"/>): those it released
+    /// because their <c>InstallProperties</c> key records none as well and every package their
+    /// sources name was seen, and for each of the rest what kept it.
+    /// <c>scan.secondCopyKeepNoneRecordedCount</c> AND <c>scan.secondCopyUnseenNoneRecordedCount</c>
+    /// NARROW AT 8. From 8 an installation recording no cached package is counted in either only
+    /// where its <c>InstallProperties</c> key does not show it records none as well, or a source it
+    /// names could not be ruled out.
     ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
@@ -1156,7 +1158,8 @@ public sealed record MachineInfo(
 /// <paramref name="WithheldSecondCopyUnestablishedCount"/>: their cached package did not say
 /// which product it declares, their own record did not show an ordinary installation, and
 /// they are not shown to have no package for Windows Installer to open, nor, where they record
-/// none, to open only packages their sources name that the screen saw.
+/// none, in their <c>InstallProperties</c> key as well, to open only packages their sources name
+/// that the screen saw.
 /// Counted where the screen reads them, before any file's verdict, so they are counted
 /// whether or not any file was then held back for them. This one counts those for which
 /// Windows gave no answer about the cached package's path: a read that failed, or an answer
@@ -1167,8 +1170,9 @@ public sealed record MachineInfo(
 /// each, so the five and the three add up to the same figure, which is not sent.
 /// </param>
 /// <param name="SecondCopyKeepNoneRecordedCount">
-/// The same installations, where the installation records no cached package, and a source it
-/// names could not be ruled out.
+/// The same installations, where the installation records no cached package, and its
+/// <c>InstallProperties</c> key does not show it records none as well, or a source it names could
+/// not be ruled out.
 /// </param>
 /// <param name="SecondCopyKeepNotThereCount">
 /// The same, where the cached package's path names no file that is there.
@@ -1219,7 +1223,8 @@ public sealed record MachineInfo(
 /// <paramref name="SecondCopyKeepPathUnreadableCount"/>.
 /// </param>
 /// <param name="SecondCopyUnseenNoneRecordedCount">
-/// The installation records no cached package, and a source it names could not be ruled out.
+/// The installation records no cached package, and its <c>InstallProperties</c> key does not show
+/// it records none as well, or a source it names could not be ruled out.
 /// </param>
 /// <param name="SecondCopyUnseenNotThereCount">The cached package's path names no file that is there.</param>
 /// <param name="SecondCopyUnseenWouldNotIdentifyCount">
@@ -1267,8 +1272,9 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="SecondCopyReleasedBySourcesCount">
 /// Installations recording no cached package, with a package to open and a record that does not
-/// show an ordinary installation, which do not set the hold because every package their sources
-/// name was seen (<see cref="CachedPackageCensus.ReleasedBySources"/>). Every installation package
+/// show an ordinary installation, which do not set the hold because their <c>InstallProperties</c>
+/// key records none as well and every package their sources name was seen
+/// (<see cref="CachedPackageCensus.ReleasedBySources"/>). Every installation package
 /// the screen would otherwise let through is compared with those packages instead. Each is also
 /// counted in <paramref name="SecondCopyListedCheckedCount"/>, and in none of the keys from
 /// <paramref name="SecondCopyKeepPathUnreadableCount"/> to
@@ -1279,21 +1285,24 @@ public sealed record MachineInfo(
 /// <param name="SecondCopyKeepNoneRecordedOtherAnswerCount">
 /// Of the installations in <paramref name="SecondCopyKeepNoneRecordedCount"/>, those per machine
 /// for which Windows Installer answered the question of the installation's package name, asked of
-/// its source list, with an error other than <c>ERROR_BAD_CONFIGURATION</c>
+/// its source list, with an error other than <c>ERROR_BAD_CONFIGURATION</c>, whichever of its
+/// <c>InstallProperties</c> key and its sources then kept it
 /// (<see cref="CachedPackageCensus.KeptNoneRecordedOtherAnswer"/>).
 ///
 /// THE THREE KEYS FROM THIS ONE SAY WHAT KEPT EACH INSTALLATION IN
 /// <paramref name="SecondCopyKeepNoneRecordedCount"/>, and they add up to it.
 /// </param>
 /// <param name="SecondCopyKeepNoneRecordedRegistryDisagreesCount">
-/// The same, per machine, where Windows Installer answered <c>ERROR_BAD_CONFIGURATION</c> and the
-/// registry holds a cached package in the installation's <c>InstallProperties</c> key or holds
-/// its <c>SourceList</c> key, or either key would not read.
+/// The same, not counted in <paramref name="SecondCopyKeepNoneRecordedOtherAnswerCount"/>, where
+/// the registry does not agree with Windows Installer: the installation's <c>InstallProperties</c>
+/// key holds a cached package, or, per machine where Windows Installer answered
+/// <c>ERROR_BAD_CONFIGURATION</c>, its <c>SourceList</c> key is there; or a key could not be read.
+/// Per user as well as per machine.
 /// </param>
 /// <param name="SecondCopyKeepNoneRecordedSourcesNotRuledOutCount">
 /// The rest of them: per user, or per machine where Windows Installer answered with the package
-/// name, and in each case a source the screen could not rule out, a drive or share given up for
-/// the scan included.
+/// name, and in each case, the <c>InstallProperties</c> key recording none as well, a source the
+/// screen could not rule out, a drive or share given up for the scan included.
 /// </param>
 public sealed record ScanInfo(
     long DurationMs,

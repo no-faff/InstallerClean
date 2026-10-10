@@ -248,14 +248,18 @@ public class FileSystemScanServiceDeclaredProductTests
     [Fact]
     public async Task A_copy_whose_installed_product_records_no_package_is_kept_where_its_sources_cannot_be_ruled_out()
     {
-        // The same scan with product A's package name not reading. The screen cannot see
-        // which package A opens, so a.msi could be it.
+        // The same scan with product A's package name not reading. Its InstallProperties key
+        // holds no cached package, so its sources are read, and the screen cannot see which
+        // package A opens, so a.msi could be it.
         var identities = new ScriptedPackageIdentities();
         identities.Declares($@"{Folder}\a.msi", ProductA);
 
         var msi = new ScriptedMsiProducts();
         msi.Installed(ProductA);
         msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, "");
+        msi.Registry.Holds(
+            @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\"
+            + @"11111111111111111111111111111111\InstallProperties");
         msi.PackageNameAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
         var result = await ScanWithRecordedPackage(msi, identities, new ScriptedFileIdentities());

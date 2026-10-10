@@ -502,6 +502,7 @@ public class DeclaredProductCheckTests
             (null, MsiInstallContext.Machine),
             (UserSid, MsiInstallContext.UserManaged));
         f.Msi.RecordsPackage(ProductA, UserSid, MsiInstallContext.UserManaged, "");
+        f.Msi.Registry.Holds(InstallPropertiesKey("11111111111111111111111111111111", UserSid));
         f.Msi.PackageNameAnswers(ProductA, UserSid, MsiInstallContext.UserManaged, MsiError.AccessDenied);
 
         var outcome = ScreenTheCopy(f);
@@ -1046,6 +1047,13 @@ public class DeclaredProductCheckTests
     private const string ProductAProperties =
         @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\"
         + @"11111111111111111111111111111111\InstallProperties";
+
+    /// <summary>
+    /// The InstallProperties key of an installation, by its code in the packed form the registry
+    /// holds it under and the account subtree it is in, <c>S-1-5-18</c> per machine.
+    /// </summary>
+    private static string InstallPropertiesKey(string packedCode, string account = "S-1-5-18") =>
+        $@"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\{account}\Products\{packedCode}\InstallProperties";
 
     /// <summary>A REG_SZ value, the type a source list's package name and media entries have.</summary>
     private static RegistryValue Sz(string name, string text) => new(name, RegistryValueKind.String, text);
@@ -3578,6 +3586,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsPackage(ProductB, null, MsiInstallContext.Machine, string.Empty);
         f.Msi.PackageCodeAnswers(ProductB, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
         f.Msi.InstanceTypeAnswers(ProductB, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
+        f.Msi.Registry.Holds(InstallPropertiesKey("22222222222222222222222222222222"));
         f.Msi.PackageNameAnswers(ProductB, null, MsiInstallContext.Machine, MsiError.UnknownProduct);
         f = f with { Listed = [.. f.Listed, ListedPerMachine(ProductB)] };
 
@@ -3810,6 +3819,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideOfficesFeatureRegistration();
         f.Msi.PackageReadAnswers(OfficeFeatures, OtherUserSid, Managed, MsiError.UnknownProperty);
         f.Msi.PackageCodeAnswers(OfficeFeatures, OtherUserSid, Managed, MsiError.Success);
+        f.Msi.Registry.Holds(InstallPropertiesKey("99E80CA9B0328E74791254777B1F42AE", OtherUserSid));
         f.Msi.PackageNameAnswers(OfficeFeatures, OtherUserSid, Managed, MsiError.UnknownProduct);
         f.Msi.SourceListPackageNameAnswers(OfficeFeatures, OtherUserSid, Managed, MsiError.BadConfiguration);
         f = f with { Listed = [new ListedInstallation(OfficeFeatures, OtherUserSid, (int)Managed, false)] };
@@ -4110,11 +4120,12 @@ public class DeclaredProductCheckTests
     // ---- An installation with no cached package, judged by its sources ----
     //
     // An installation that records no cached package, and is not shown to have no package to
-    // open, can open only what its source list names, so its sources are read. Where every
-    // package they name is seen, the installation sets no hold, and every installation package
-    // is compared with those packages instead. Where one cannot be ruled out, the installation
-    // keeps every installation package. Each test starts from the fixture below and changes
-    // one thing.
+    // open, can open only what its source list names, so its sources are read once its
+    // InstallProperties key shows it records none as well. Where every package they name is
+    // seen, the installation sets no hold, and every installation package is compared with
+    // those packages instead. Where one cannot be ruled out, or the key holds a cached package
+    // or will not read, the installation keeps every installation package. Each test starts
+    // from the fixture below and changes one thing.
 
     /// <summary>The code the installation recording no cached package is registered under.</summary>
     private const string NoCachedPackage = "{99999999-9999-9999-9999-999999999999}";
@@ -4384,6 +4395,159 @@ public class DeclaredProductCheckTests
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[0]);
         Assert.Equal(Census(releasedBySources: 1, unruled: 1), screening.CachedPackages);
+    }
+
+    /// <summary>The InstallProperties key of the per-machine installation under <see cref="NoCachedPackage"/>.</summary>
+    private const string NoCachedPackageProperties =
+        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\"
+        + @"99999999999999999999999999999999\InstallProperties";
+
+    /// <summary>
+    /// The InstallProperties key of the installation under <see cref="NoCachedPackage"/> per user and
+    /// managed in <see cref="UserSid"/>'s account, which is not the account the check runs as.
+    /// </summary>
+    private const string NoCachedPackageUsersProperties =
+        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\" + UserSid + @"\Products\"
+        + @"99999999999999999999999999999999\InstallProperties";
+
+    /// <summary>What an installation's InstallProperties key is scripted to show against an empty LocalPackage.</summary>
+    public enum PropertiesFault
+    {
+        /// <summary>The key holds a cached package beside its InstallSource.</summary>
+        HoldsACachedPackage,
+
+        /// <summary>The key will not read.</summary>
+        WillNotRead,
+    }
+
+    /// <summary>
+    /// The InstallProperties key at <paramref name="key"/> shows <paramref name="fault"/>. A key
+    /// holding a cached package holds the installation's InstallSource as the API answers it too, so
+    /// the InstallSource agrees and the cached package is all that differs.
+    /// </summary>
+    private static void PropertiesShow(ScriptedSourceListRegistry registry, string key, PropertiesFault fault,
+        string valueName = MsiInstallProperty.LocalPackage)
+    {
+        if (fault == PropertiesFault.WillNotRead)
+        {
+            registry.Answers(key, RegistryKeyPresence.Unreadable);
+            return;
+        }
+
+        registry.Holds(key,
+            new RegistryValue(MsiInstallProperty.InstallSource, RegistryValueKind.String, SetupFolder),
+            new RegistryValue(valueName, RegistryValueKind.String, @"C:\Windows\Installer\gone.msi"));
+    }
+
+    [Theory]
+    [InlineData("LocalPackage")]
+    [InlineData("ManagedLocalPackage")]
+    [InlineData("localpackage")]
+    public void An_installation_with_no_cached_package_whose_key_holds_one_keeps_every_installation_package(
+        string valueName)
+    {
+        // Windows Installer answers that it records no cached package and its InstallProperties
+        // key holds one, so the two do not agree that it records none, and its sources are not
+        // read.
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        PropertiesShow(f.Msi.Registry, NoCachedPackageProperties, PropertiesFault.HoldsACachedPackage, valueName);
+
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Equal(
+            Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptRegistryDisagrees: 1),
+            screening.CachedPackages);
+        Assert.Empty(f.Msi.PackageNameReads);
+    }
+
+    [Fact]
+    public void An_installation_with_no_cached_package_whose_key_will_not_read_keeps_every_installation_package()
+    {
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        PropertiesShow(f.Msi.Registry, NoCachedPackageProperties, PropertiesFault.WillNotRead);
+        var recorded = new List<string>();
+
+        var screening = ScreenBesideIt(f, recordRefusal: (_, note) => recorded.Add(note));
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Equal(
+            Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptRegistryDisagrees: 1),
+            screening.CachedPackages);
+        Assert.Equal(
+            new[]
+            {
+                "the installation records no cached package, and the registry holds a cached package or a source "
+                + "list where Windows Installer answers that it has none, or a key would not read",
+            },
+            recorded);
+        Assert.Empty(f.Msi.PackageNameReads);
+    }
+
+    [Theory]
+    [InlineData(PropertiesFault.HoldsACachedPackage)]
+    [InlineData(PropertiesFault.WillNotRead)]
+    public void A_copy_declaring_the_code_of_an_installation_with_no_cached_package_is_kept_where_its_key_does_not_agree(
+        PropertiesFault fault)
+    {
+        // The must-hit pair of the copy let through where its sources are another file: the same
+        // installation, with its InstallProperties key not showing that it records no cached package.
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Packages.Declares(Candidate, NoCachedPackage);
+        f.Msi.Installed(NoCachedPackage);
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+        f.Files.Opens(SetupPackage, 9);
+        PropertiesShow(f.Msi.Registry, NoCachedPackageProperties, fault);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, ScreenBesideIt(f).Outcomes[0]);
+        Assert.Empty(f.Msi.PackageNameReads);
+    }
+
+    [Theory]
+    [InlineData(PropertiesFault.HoldsACachedPackage)]
+    [InlineData(PropertiesFault.WillNotRead)]
+    public void A_possible_second_copy_with_no_cached_package_whose_key_does_not_agree_keeps_every_installation_package(
+        PropertiesFault fault)
+    {
+        var f = ACopyBesideAnInstallationWithNoCachedPackage(marked: true);
+        f.Msi.AnswersItsOwnRecord(NoCachedPackage, null, MsiInstallContext.Machine);
+        PropertiesShow(f.Msi.Registry, NoCachedPackageProperties, fault);
+
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
+        Assert.Equal(Census(released: 1, unruled: 1, unseenNoneRecorded: 1, unseenPerMachine: 1),
+            screening.CachedPackages);
+        Assert.Empty(f.Msi.PackageNameReads);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Another_accounts_installation_with_no_cached_package_is_judged_by_its_sources_only_where_its_key_holds_none(
+        bool keyHoldsOne)
+    {
+        // Per user and managed, in an account the check does not run as, so its own record is not
+        // read. Its InstallProperties key is in that account's part of the machine's registry and
+        // holds a ManagedLocalPackage where it records a cached package. Its sources name a package
+        // that is no longer there.
+        const MsiInstallContext Managed = MsiInstallContext.UserManaged;
+        var f = ACopyBesideAnInstallationWithNoCachedPackage();
+        f.Msi.PackageReadAnswers(NoCachedPackage, UserSid, Managed, MsiError.UnknownProperty);
+        f.Msi.RecordsSources(NoCachedPackage, UserSid, Managed, SetupName, SetupFolder);
+        f = f with { Listed = [new ListedInstallation(NoCachedPackage, UserSid, (int)Managed, false)] };
+        if (keyHoldsOne)
+            PropertiesShow(f.Msi.Registry, NoCachedPackageUsersProperties, PropertiesFault.HoldsACachedPackage,
+                "ManagedLocalPackage");
+
+        var screening = ScreenBesideIt(f);
+
+        Assert.Equal(
+            keyHoldsOne ? DeclaredProductOutcome.SecondCopyUnestablished : DeclaredProductOutcome.DeclaredProductNotInstalled,
+            screening.Outcomes[0]);
+        Assert.Equal(
+            keyHoldsOne ? Census(noneRecorded: 1, anotherAccount: 1, keptRegistryDisagrees: 1) : Census(releasedBySources: 1),
+            screening.CachedPackages);
     }
 
     // ---- An installation the caller could not rule out as a second copy ----
@@ -4659,6 +4823,7 @@ public class DeclaredProductCheckTests
         var f = AMarkedSecondCopy();
         f.Msi.Installed(ProductA);
         f.Msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, string.Empty);
+        f.Msi.Registry.Holds(ProductAProperties);
         f.Msi.PackageNameAnswers(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
         f.Msi.RecordsSources(SecondCopy, null, MsiInstallContext.Machine, SetupName, OtherFolder);
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);

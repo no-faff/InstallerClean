@@ -10,11 +10,13 @@ namespace InstallerClean.Models;
 /// not say which product it declares, whose own record does not show an ordinary
 /// installation, which is not shown to have no package for Windows Installer to open
 /// (<see cref="ReleasedOpensNoPackage"/>), and which, where it records no cached package, has
-/// a source the check cannot rule out (<see cref="ReleasedBySources"/>). The check looks for
-/// the cached package of every installation the caller listed, once, the first time an
-/// installation package reaches that step, reads the record of each one whose cached package
-/// gave no product code, other than one with no package to open, and reads the sources of each
-/// of those recording no cached package whose record does not show an ordinary installation.
+/// an <c>InstallProperties</c> key that does not show it records none as well, or a source the
+/// check cannot rule out (<see cref="ReleasedBySources"/>). The check looks for the cached
+/// package of every installation the caller listed, once, the first time an installation
+/// package reaches that step, reads the record of each one whose cached package gave no product
+/// code, other than one with no package to open, and reads the <c>InstallProperties</c> key, and
+/// where that records none the sources, of each of those recording no cached package whose
+/// record does not show an ordinary installation.
 /// The count is taken there, before any file's verdict, so an installation is counted as
 /// setting the hold whether or not any installation package was then let through for it to
 /// hold back. Each such installation is counted once among the five members saying what its
@@ -49,7 +51,8 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="KeptNoneRecorded">
 /// Installations setting the hold that record no cached package: the path read as empty, or as
-/// a value the record does not carry. Each has a source the check cannot rule out.
+/// a value the record does not carry. Each has an <c>InstallProperties</c> key that does not show
+/// it records none as well, or a source the check cannot rule out.
 /// </param>
 /// <param name="KeptNotThere">
 /// Installations setting the hold whose cached package's path names no file that is there, a
@@ -92,8 +95,9 @@ namespace InstallerClean.Models;
 /// package's path.
 /// </param>
 /// <param name="UnseenNoneRecorded">
-/// The read stopped at an installation that records no cached package, has a package to open,
-/// and has a source the check cannot rule out.
+/// The read stopped at an installation that records no cached package and has a package to open,
+/// and has an <c>InstallProperties</c> key that does not show it records none as well, or a
+/// source the check cannot rule out.
 /// </param>
 /// <param name="UnseenNotThere">
 /// The read stopped at an installation whose cached package's path names no file that is there.
@@ -142,26 +146,29 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="ReleasedBySources">
 /// Installations recording no cached package, with a package to open and a record that does not
-/// show an ordinary installation, which do not set the hold because every package their sources
-/// name was seen. Every installation package the answer about its own product lets through is
-/// compared with those packages instead.
+/// show an ordinary installation, which do not set the hold because their <c>InstallProperties</c>
+/// key records none as well and every package their sources name was seen. Every installation
+/// package the answer about its own product lets through is compared with those packages instead.
 /// </param>
 /// <param name="KeptNoneRecordedOtherAnswer">
 /// Of the installations counted in <see cref="KeptNoneRecorded"/>, those per machine for which the
 /// source-list API answered the question of its package name with an error other than
-/// <c>ERROR_BAD_CONFIGURATION</c>.
+/// <c>ERROR_BAD_CONFIGURATION</c>, whichever of their <c>InstallProperties</c> key and their sources
+/// then kept them.
 /// </param>
 /// <param name="KeptNoneRecordedRegistryDisagrees">
-/// Of the installations counted in <see cref="KeptNoneRecorded"/>, those per machine for which the
-/// source-list API answered <c>ERROR_BAD_CONFIGURATION</c> while the registry holds a cached package
-/// in the installation's <c>InstallProperties</c> key or holds its <c>SourceList</c> key, or either
-/// key would not read.
+/// Of the installations counted in <see cref="KeptNoneRecorded"/> and not in
+/// <see cref="KeptNoneRecordedOtherAnswer"/>, those whose registry does not agree with Windows
+/// Installer: the installation's <c>InstallProperties</c> key holds a cached package, or, per
+/// machine where the source-list API answered <c>ERROR_BAD_CONFIGURATION</c>, its
+/// <c>SourceList</c> key is there; or a key could not be read. Per user as well as per machine.
 /// </param>
 /// <param name="KeptNoneRecordedSourcesNotRuledOut">
 /// Of the installations counted in <see cref="KeptNoneRecorded"/>, the rest: per user, or checked
 /// without a registry reader, where the source-list API is not asked, or per machine with a package
 /// name the API answered, and in each case a source that could not be ruled out, a drive or share
-/// given up for the pass included. The three members from
+/// given up for the pass included, where the <c>InstallProperties</c> key records none as well or
+/// was not read. The three members from
 /// <see cref="KeptNoneRecordedOtherAnswer"/> add up to <see cref="KeptNoneRecorded"/>.
 /// </param>
 public sealed record CachedPackageCensus(
