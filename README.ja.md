@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.1.2-blue" alt="GitHub リリース"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-96k-brightgreen" alt="総ダウンロード数"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-97k-brightgreen" alt="総ダウンロード数"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,7 +37,7 @@
 
 - **概要：** InstallerClean がすることは 1 つだけです。ソフトウェアをインストールしたり更新したりするたびに膨らんでいく隠しフォルダー `C:\Windows\Installer` から、不要なファイルを取り除きます。ほぼ一瞬で終わるスキャンのあと、不要なファイルがあるかどうかを知らせ、詳しく知りたい人にはさらに詳細を示し、それらを別の場所へ移動するか削除して C: ドライブの空き容量を増やせるようにします。
 - **こんな覚えはありませんか：** [WinDirStat](https://github.com/windirstat/windirstat)、WizTree、TreeSize などを使っていて、`C:\Windows\Installer` が大量の容量を占めているのに気づいたものの、中に何が入っているのか分からなかった。InstallerClean は、まさにそんなあなたのためのツールです。`9f05cba.msi` のような一見ランダムな名前のファイルの中身を把握していて、どれなら安全に取り除けるのかをすぐに教えてくれます。
-- **どれくらい空くか：** 上のグラフは、v1.8.0 以降ぽつぽつと届き続けている任意のレポートの結果です。（レポートを送ってくださったみなさん、ありがとうございます。みなさんがいなければ、上のグラフは存在しません。）レポートのうち容量を解放できたのは <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> で、その中央値は <!-- reports-median-start -->6.2 GB<!-- reports-median-end --> です。<!-- reports-biggest-start -->1 台はなんと 791 GB を取り戻しました。<!-- reports-biggest-end -->残りの <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> は何も解放できませんでした。つまりマシン次第で、追加のソフトを入れていないまっさらな Windows 11 には取り除くものがありません。不要なファイルがいちばん多いのは、何年も動き続けているマシン、MSI ベースの大きなソフトが入っているマシン（Acrobat、Office、LibreOffice、大規模な開発ツール）、そしてソフトウェアのインストールとアンインストールを繰り返す人です。実行した瞬間に、どれだけ空くかが正確にわかります。
+- **どれくらい空くか：** 上のグラフは、v1.8.0 以降ぽつぽつと届き続けている任意のレポートの結果です。（レポートを送ってくださったみなさん、ありがとうございます。みなさんがいなければ、上のグラフは存在しません。）レポートのうち容量を解放できたのは <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> で、その中央値は <!-- reports-median-start -->5.9 GB<!-- reports-median-end --> です。<!-- reports-biggest-start -->1 台はなんと 791 GB を取り戻しました。<!-- reports-biggest-end -->残りの <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> は何も解放できませんでした。つまりマシン次第で、追加のソフトを入れていないまっさらな Windows 11 には取り除くものがありません。不要なファイルがいちばん多いのは、何年も動き続けているマシン、MSI ベースの大きなソフトが入っているマシン（Acrobat、Office、LibreOffice、大規模な開発ツール）、そしてソフトウェアのインストールとアンインストールを繰り返す人です。実行した瞬間に、どれだけ空くかが正確にわかります。
 - **安全ですか：** はい。触れるのは `C:\Windows\Installer` の中のファイルだけです。何がまだ必要かを Windows Installer に問い合わせ、同じ登録情報をレジストリからも読み取ります。ファイルを提示するのは、このマシンにあるどのプログラムもそのファイルを自分のものだと示さないとき、または新しいパッチが置き換えていて、ここにあるどのプログラムも古いほうへ戻れないときだけです。はっきりした答えが得られないものは、InstallerClean がすべて保留します。[詳しくは下をご覧ください](#仕組み)。
 - **あなたについては何も：** オープンソース（Apache 2.0）です。アカウントも、広告も、追跡もなく、バックグラウンドで動くものもありません。起動したときに GitHub で新しいバージョンがないか確認し（これはオフにできます）、ある PC で初めて処理を終えたときには、その実行がどうだったかを伝える匿名レポートを 1 件送ります。ただし、結果画面でチェックを外せば送られません。
 - **入手方法：** [最新リリースをダウンロード](../../releases/latest)してください。実行し、[Windows が出す警告](#unknown-publisher)と[管理者権限の確認](#admin)をクリックして進みます。見つかったものを移動するか削除します。これで完了です。
@@ -223,7 +223,7 @@ InstallerClean には署名がありません。実行する前に確かめら�
 - VirusTotal：ビルドはどれも公開前にスキャンしており、リリースページにはダウンロードごとのエンジン別の結果が全部載っています。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあります。スキャン、クエリ、移動、削除、設定、再起動保留の各サービスは自動テストで覆われており、そのテストは `main` へのプッシュごと、プルリクエストごとに Windows 上で実行されます。結果はこのページ上部の CI バッジが伝えています。
 - リリースビルドは決定論的です。同じソース、同じ SDK、同じ publish のフラグからは同じバイト列が生成されますし、ビルドの入力がすべてそのタグ時点のソースと一致していなければ、リリースにタグを打つことはできません。ですからタグをチェックアウトしてご自身でビルドし、公開されているハッシュと突き合わせられます。そのために必要なものを、各リリースのノートに載せています。どの SDK バージョンでビルドしたか、そして既定のままでビルドしていないダウンロードについては、その publish のフラグです。セットアップ版だけは例外で、SDK ではなく Inno Setup がコンパイルするうえ、セットアップ版自身がビルドした年を刻み込むため、ハッシュを再現するには Inno のバージョンと暦の年も揃える必要があります。
-- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->96,000+<!-- downloads-end --> 回ダウンロードされています。
+- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->97,000+<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は提出物を一つずつ仮想マシンでテストし、審査を通過したものだけを掲載します。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認証済み 100% クリーン" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は InstallerClean をレビューし、スパイウェア・アドウェア・ウイルスがないことを認定しました。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% FREE アワード。スパイウェアもアドウェアもウイルスもないことの認定" width="190"></a>
 
