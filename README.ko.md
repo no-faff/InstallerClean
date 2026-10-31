@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>보고서 2,794건이 모든 다운로드를 정확히 반영한다면</summary>
+<summary>보고서 2,823건이 모든 다운로드를 정확히 반영한다면</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="보고서를 바탕으로 늘려 계산한, 공간을 확보했을 다운로드 수와 확보했을 용량을 보여 주는 막대그래프" src="docs/reports-ko-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>위의 모든 수치를 43.06배로 늘린 것이며, 다운로드 수를 보고서 수로 나눈 값입니다.</sub>
+  <sub>위의 모든 수치를 42.73배로 늘린 것이며, 다운로드 수를 보고서 수로 나눈 값입니다.</sub>
 </p>
 
 </details>

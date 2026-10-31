@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>如果这 2,794 份报告能准确反映每一次下载</summary>
+<summary>如果这 2,823 份报告能准确反映每一次下载</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="柱状图，按报告等比例放大，显示有多少次下载会清出空间，以及各自会清出多少" src="docs/reports-zh-CN-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>上面每个数字都乘以 43.06，也就是下载次数除以报告数。</sub>
+  <sub>上面每个数字都乘以 42.73，也就是下载次数除以报告数。</sub>
 </p>
 
 </details>
