@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Si les 2 786 rapports étaient le reflet exact de chaque téléchargement</summary>
+<summary>Si les 2 794 rapports étaient le reflet exact de chaque téléchargement</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Diagramme en barres du nombre de téléchargements qui auraient libéré de l'espace et de la quantité libérée, extrapolé à partir des rapports" src="docs/reports-fr-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Chaque nombre ci-dessus multiplié par 43,19, soit les téléchargements divisés par les rapports.</sub>
+  <sub>Chaque nombre ci-dessus multiplié par 43,06, soit les téléchargements divisés par les rapports.</sub>
 </p>
 
 </details>

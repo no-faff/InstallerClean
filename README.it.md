@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Se i 2786 rapporti fossero un'immagine esatta di ogni download</summary>
+<summary>Se i 2794 rapporti fossero un'immagine esatta di ogni download</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Grafico a barre di quanti download avrebbero liberato spazio e di quanto avrebbero liberato, ingrandito a partire dai rapporti" src="docs/reports-it-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Ogni conteggio qui sopra moltiplicato per 43,19, i download divisi per i rapporti.</sub>
+  <sub>Ogni conteggio qui sopra moltiplicato per 43,06, i download divisi per i rapporti.</sub>
 </p>
 
 </details>
