@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Gdyby raporty (2763) były dokładnym obrazem każdego pobrania</summary>
+<summary>Gdyby raporty (2786) były dokładnym obrazem każdego pobrania</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Wykres słupkowy pokazujący, ile pobrań zwolniłoby miejsce i ile by go zwolniło, przeliczony na podstawie raportów" src="docs/reports-pl-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Każda liczba powyżej pomnożona przez 43,45, czyli pobrania podzielone przez raporty.</sub>
+  <sub>Każda liczba powyżej pomnożona przez 43,19, czyli pobrania podzielone przez raporty.</sub>
 </p>
 
 </details>

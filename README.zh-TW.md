@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>如果這 2,763 份報告能準確反映每一次下載</summary>
+<summary>如果這 2,786 份報告能準確反映每一次下載</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="長條圖，依報告等比例放大，顯示有多少次下載會釋放空間，以及各自會釋放多少" src="docs/reports-zh-TW-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>上方每個數字都乘以 43.45，也就是下載次數除以報告數。</sub>
+  <sub>上方每個數字都乘以 43.19，也就是下載次數除以報告數。</sub>
 </p>
 
 </details>
