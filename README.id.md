@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="Rilis GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="Total unduhan"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="Total unduhan"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Jika 2.869 laporan itu gambaran persis dari setiap unduhan</summary>
+<summary>Jika 2.873 laporan itu gambaran persis dari setiap unduhan</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Diagram batang tentang berapa banyak unduhan yang akan mengosongkan ruang dan seberapa banyak, diperbesar dari laporan" src="docs/reports-id-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Setiap angka di atas dikalikan 42,17, yaitu unduhan dibagi laporan.</sub>
+  <sub>Setiap angka di atas dikalikan 42,13, yaitu unduhan dibagi laporan.</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean tidak ditandatangani. Berikut yang bisa Anda periksa sebelum menj
 - VirusTotal: setiap build dipindai sebelum dirilis, dan halaman rilis memuat hasil lengkap per mesin pemindai untuk tiap unduhan.
 - Kode sumbernya ada di sini, di [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Layanan pindai, kueri, pindah, hapus, pengaturan dan mulai-ulang-tertunda dicakup oleh rangkaian pengujian otomatis yang berjalan di Windows pada setiap push ke `main` dan pada setiap pull request, dan lencana CI di bagian atas halaman ini melaporkan hasilnya.
 - Build rilis bersifat deterministik: kode sumber yang sama, SDK yang sama dan flag publish yang sama menghasilkan byte yang sama, dan sebuah rilis tidak bisa diberi tag kecuali setiap masukan build cocok dengan kode sumber pada tag tersebut. Jadi Anda bisa checkout tag itu, membangunnya sendiri, lalu membandingkan hash-nya dengan yang dipublikasikan. Catatan tiap rilis memuat apa yang Anda perlukan untuk itu: versi SDK yang dipakai membangunnya, dan flag publish untuk unduhan mana pun yang tidak dibangun dengan flag bawaan. Setup adalah pengecualiannya: ia dikompilasi oleh Inno Setup dan bukan oleh SDK, dan menanamkan tahun pembuatan ke dalam dirinya sendiri, jadi mereproduksi hash-nya juga memerlukan versi Inno yang sama dan tahun kalender yang sama.
-- <!-- downloads-start -->120.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks dan Softpedia.
+- <!-- downloads-start -->121.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya kalau lolos tinjauan mereka.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Disertifikasi MajorGeeks 100% bersih" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) meninjaunya dan menyatakannya bebas spyware, adware dan virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Penghargaan Softpedia 100% gratis, disertifikasi tanpa spyware, tanpa adware dan tanpa virus" width="190"></a>
 

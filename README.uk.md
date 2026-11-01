@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="Реліз на GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="Усього завантажень"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="Усього завантажень"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Якби звіти (їх 2 869) точно відображали кожне завантаження</summary>
+<summary>Якби звіти (їх 2 873) точно відображали кожне завантаження</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Стовпчаста діаграма, перерахована за звітами: у скількох завантаженнях звільнилося б місце і скільки саме" src="docs/reports-uk-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Кожне число вище помножено на 42,17: завантаження, поділені на звіти.</sub>
+  <sub>Кожне число вище помножено на 42,13: завантаження, поділені на звіти.</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean не підписано. Ось що ви можете перев
 - VirusTotal: кожну збірку скановано перед випуском, а сторінка релізу містить повний результат за кожним рушієм для кожного завантаження.
 - Вихідний код тут, на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Служби сканування, запиту, переміщення, видалення, налаштувань і перевірки очікуваного перезавантаження покриті автоматизованим набором тестів, який виконується у Windows на кожен push до `main` і на кожен pull request, а значок CI вгорі цієї сторінки повідомляє результат.
 - Релізні збірки детерміновані: той самий вихідний код, той самий SDK і ті самі прапорці публікації дають ті самі байти, а реліз не можна позначити тегом, якщо кожен вхідний елемент збірки не збігається з вихідним кодом на тому тегу. Тож ви можете перемкнутися на тег, зібрати все самотужки й звірити хеші з оприлюдненими. У примітках до кожного релізу є все потрібне для цього: версія SDK, з якою його зібрано, і прапорці публікації для будь-якого завантаження, зібраного не з типовими налаштуваннями. Виняток — Setup: його компілює Inno Setup, а не SDK, і він вкарбовує в себе рік збірки, тож щоб відтворити його хеш, потрібні ще й та сама версія Inno і той самий календарний рік.
-- <!-- downloads-start -->120 000+<!-- downloads-end --> завантажень через GitHub, MajorGeeks і Softpedia.
+- <!-- downloads-start -->121 000+<!-- downloads-end --> завантажень через GitHub, MajorGeeks і Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) перевіряє кожну подачу у віртуальній машині й додає її до каталогу лише після проходження перевірки.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Сертифіковано MajorGeeks як 100% чисте" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) перевірила його й засвідчила, що він не містить шпигунського, рекламного ПЗ і вірусів.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Нагорода Softpedia «100% безкоштовно»: засвідчено, що немає ні шпигунського ПЗ, ні рекламного ПЗ, ні вірусів" width="190"></a>
 

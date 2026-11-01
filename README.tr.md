@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="GitHub sürümü"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="Toplam indirme"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="Toplam indirme"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>2.869 rapor, her indirmenin birebir bir yansıması olsaydı</summary>
+<summary>2.873 rapor, her indirmenin birebir bir yansıması olsaydı</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Raporlardan büyütülerek hesaplanmış, kaç indirmenin yer açacağını ve ne kadar açacağını gösteren çubuk grafik" src="docs/reports-tr-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Yukarıdaki her sayı 42,17 ile çarpıldı; bu çarpan, indirme sayısının rapor sayısına bölünmesiyle bulunur.</sub>
+  <sub>Yukarıdaki her sayı 42,13 ile çarpıldı; bu çarpan, indirme sayısının rapor sayısına bölünmesiyle bulunur.</sub>
 </p>
 
 </details>
@@ -241,7 +241,7 @@ InstallerClean imzasızdır. Çalıştırmadan önce neleri denetleyebileceğini
 - VirusTotal: her yapı çıkmadan önce taranır ve sürüm sayfası her indirme için motor motor tam sonucu taşır.
 - Kaynak kod burada, [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) adresinde. Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmetleri, `main` dalına her gönderimde ve her çekme isteğinde Windows üzerinde çalışan otomatik bir test paketiyle kapsanır; bu sayfanın başındaki CI rozeti de sonucu bildirir.
 - Sürüm yapıları deterministiktir: aynı kaynak, aynı SDK ve aynı yayımlama bayrakları aynı baytları üretir; ayrıca her yapı girdisi o etiketteki kaynakla eşleşmedikçe bir sürüme etiket konulamaz. Yani etikete geçip kendiniz derleyebilir, karmaları yayımlananlarla karşılaştırabilirsiniz. Bunun için gerekenler her sürümün notlarındadır: hangi SDK sürümüyle derlendiği ve varsayılanlarla derlenmemiş indirmeler için yayımlama bayrakları. Kurulum bunun dışındadır: SDK ile değil Inno Setup ile derlenir ve yapım yılını kendi içine damgalar, dolayısıyla karmasını yeniden üretmek aynı Inno sürümünü ve aynı takvim yılını da gerektirir.
-- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->120.000+<!-- downloads-end --> indirme.
+- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->121.000+<!-- downloads-end --> indirme.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks tarafından %100 temiz olarak onaylandı" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) inceledi ve casus yazılım, reklam yazılımı ile virüs içermediğini onayladı.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia %100 ücretsiz ödülü; casus yazılım, reklam yazılımı ve virüs içermediği onaylı" width="190"></a>
 

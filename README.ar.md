@@ -22,7 +22,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="إصدار GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="إجمالي التنزيلات"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="إجمالي التنزيلات"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,7 +37,7 @@
 </p>
 
 <details dir="rtl">
-<summary>لو كانت التقارير (وعددها 2,869) صورة دقيقة لكل عملية تنزيل</summary>
+<summary>لو كانت التقارير (وعددها 2,873) صورة دقيقة لكل عملية تنزيل</summary>
 
 <p align="center">
   <picture>
@@ -46,7 +46,7 @@
     <img alt="رسم بياني بالأعمدة يبيّن عدد عمليات التنزيل التي كانت ستحرّر مساحة ومقدار ما كانت ستحرّره، بعد تكبيره انطلاقاً من التقارير" src="docs/reports-ar-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>كل رقم أعلاه مضروب في 42.17، أي عدد مرات التنزيل مقسوماً على عدد التقارير.</sub>
+  <sub>كل رقم أعلاه مضروب في 42.13، أي عدد مرات التنزيل مقسوماً على عدد التقارير.</sub>
 </p>
 
 </details>
@@ -242,7 +242,7 @@ scoop install installerclean
 - تُفحص كل نسخة على VirusTotal قبل خروجها، وتحمل صفحة الإصدار النتيجة الكاملة لكل محرك عن كل تنزيل.
 - الشيفرة المصدرية هنا على [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). وخدمات الفحص والاستعلام والنقل والحذف والإعدادات وإعادة التشغيل المعلّقة مغطاة بمجموعة اختبارات آلية تعمل على Windows مع كل دفع إلى `main` ومع كل طلب سحب، وتُبلّغ شارة CI أعلى هذه الصفحة بالنتيجة.
 - بناء الإصدارات حتمي: الشيفرة نفسها والـ SDK نفسه وأعلام النشر نفسها تُنتج البايتات نفسها، ولا يمكن وضع tag على إصدار ما لم يطابق كل مُدخَل بناء الشيفرةَ عند ذلك الـ tag. فيمكنك جلب الشيفرة عند الـ tag وبناءها بنفسك ومقارنة البصمات بالمنشورة. وتحمل ملاحظات كل إصدار ما تحتاج إليه لذلك: إصدار الـ SDK الذي بُني به، وأعلام النشر لأي تنزيل لم يُبنَ بالإعدادات الافتراضية. والمثبّت هو الاستثناء: إذ يصرّفه Inno Setup لا الـ SDK ويطبع سنة البناء في نفسه، فإعادة إنتاج بصمته تحتاج إلى إصدار Inno نفسه وإلى السنة الميلادية نفسها كذلك.
-- <!-- downloads-start -->120,000+<!-- downloads-end --> عملية تنزيل عبر GitHub وMajorGeeks وSoftpedia.
+- <!-- downloads-start -->121,000+<!-- downloads-end --> عملية تنزيل عبر GitHub وMajorGeeks وSoftpedia.
 - يختبر [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) كل نسخة مُرسَلة في جهاز افتراضي ولا يدرجها إلا إذا اجتازت مراجعتهم.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="شهادة MajorGeeks بنظافة 100%" width="263"></a>
 - راجعته [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) وشهدت بخلوّه من برامج التجسس والبرامج الإعلانية والفيروسات.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="جائزة Softpedia بنظافة 100%: خلوّ من برامج التجسس والبرامج الإعلانية والفيروسات" width="190"></a>
 

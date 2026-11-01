@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="Релиз на GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="Всего загрузок"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="Всего загрузок"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Если бы отчёты (их 2 869) точно отражали каждую загрузку</summary>
+<summary>Если бы отчёты (их 2 873) точно отражали каждую загрузку</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Столбчатая диаграмма, пересчитанная по отчётам: в скольких загрузках освободилось бы место и сколько именно" src="docs/reports-ru-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Каждое число выше умножено на 42,17: загрузки, делённые на отчёты.</sub>
+  <sub>Каждое число выше умножено на 42,13: загрузки, делённые на отчёты.</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean не подписан. Вот что можно проверит�
 - VirusTotal: каждая сборка сканируется перед выпуском, и на странице выпуска есть полный результат по каждому движку для каждой загрузки.
 - Исходный код здесь, на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Службы сканирования, запросов, перемещения, удаления, настроек и проверки отложенной перезагрузки покрыты набором автоматических тестов, который выполняется на Windows при каждой отправке в `main` и при каждом пул-реквесте, а значок CI вверху этой страницы показывает результат.
 - Сборки выпусков детерминированы: одни и те же исходники, тот же SDK и те же флаги публикации дают одни и те же байты, а поставить тег на выпуск нельзя, пока все входные данные сборки не совпадают с исходным кодом на этом теге. Так что вы можете переключиться на тег, собрать всё сами и сверить хеши с опубликованными. В примечаниях к каждому выпуску есть всё, что для этого нужно: версия SDK, с которой собран выпуск, и флаги публикации для любой загрузки, собранной не со значениями по умолчанию. Исключение — установщик: его компилирует Inno Setup, а не SDK, и год сборки установщик вписывает в себя сам, поэтому для воспроизведения его хеша нужны ещё и та же версия Inno, и тот же календарный год.
-- <!-- downloads-start -->120 000+<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
+- <!-- downloads-start -->121 000+<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) тестирует каждую присланную сборку в виртуальной машине и публикует её, только если она прошла их проверку.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks: сертифицировано как 100 % чистое" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) проверила InstallerClean и подтвердила, что в нём нет ни шпионского, ни рекламного ПО, ни вирусов.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Награда Softpedia «100 % бесплатно»: подтверждено отсутствие шпионского и рекламного ПО и вирусов" width="190"></a>
 

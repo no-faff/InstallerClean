@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="Versione di GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="Download totali"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="Download totali"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Se i 2869 rapporti fossero un'immagine esatta di ogni download</summary>
+<summary>Se i 2873 rapporti fossero un'immagine esatta di ogni download</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Grafico a barre di quanti download avrebbero liberato spazio e di quanto avrebbero liberato, ingrandito a partire dai rapporti" src="docs/reports-it-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Ogni conteggio qui sopra moltiplicato per 42,17, i download divisi per i rapporti.</sub>
+  <sub>Ogni conteggio qui sopra moltiplicato per 42,13, i download divisi per i rapporti.</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean non è firmato. Ecco cosa puoi controllare prima di eseguirlo:
 - VirusTotal: ogni build viene analizzata prima di uscire, e la pagina della versione riporta il risultato completo motore per motore di ogni file scaricabile.
 - Il codice sorgente è qui, su [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). I servizi di scansione, interrogazione, spostamento, eliminazione, impostazioni e riavvio in sospeso sono coperti da una suite di test automatici che gira su Windows a ogni push su `main` e a ogni pull request, e il badge CI in cima a questa pagina ne riporta l'esito.
 - Le build di rilascio sono deterministiche: lo stesso codice sorgente, lo stesso SDK e gli stessi parametri di pubblicazione producono gli stessi byte, e non si può assegnare il tag a una versione a meno che ogni elemento in ingresso della build non corrisponda al codice sorgente di quel tag. Puoi quindi fare il checkout del tag, compilare tu stesso e confrontare gli hash con quelli pubblicati. Le note di ogni versione portano quello che ti serve per farlo: la versione dell'SDK con cui è stata compilata, e i parametri di pubblicazione di ogni file scaricabile che non sia stato compilato con quelli predefiniti. Il setup è l'eccezione: lo compila Inno Setup e non l'SDK, e ci stampa dentro l'anno di compilazione, quindi per riprodurne l'hash servono anche la stessa versione di Inno e lo stesso anno di calendario.
-- <!-- downloads-start -->120.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
+- <!-- downloads-start -->121.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prova ogni invio in una macchina virtuale e pubblica solo quelli che superano la loro revisione.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificato 100% pulito da MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) lo ha esaminato e lo ha certificato privo di spyware, adware e virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Premio «100% gratuito» di Softpedia, certificato senza spyware, senza adware e senza virus" width="190"></a>
 

@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="GitHub-release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="Totaal aantal downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="Totaal aantal downloads"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Als de 2.869 rapporten een exact beeld van elke download gaven</summary>
+<summary>Als de 2.873 rapporten een exact beeld van elke download gaven</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Staafdiagram van hoeveel downloads ruimte zouden hebben vrijgemaakt en hoeveel, opgeschaald vanuit de rapporten" src="docs/reports-nl-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Elk aantal hierboven vermenigvuldigd met 42,17, de downloads gedeeld door de rapporten.</sub>
+  <sub>Elk aantal hierboven vermenigvuldigd met 42,13, de downloads gedeeld door de rapporten.</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean is niet ondertekend. Dit kun je controleren voordat je het uitvoe
 - VirusTotal: elke build wordt gescand voordat hij uitgaat, en op de releasepagina staat voor elke download het volledige resultaat per engine.
 - De broncode staat hier op [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). De services voor scannen, opvragen, verplaatsen, verwijderen, instellingen en een openstaande herstart worden gedekt door een geautomatiseerde testsuite die op Windows draait bij elke push naar `main` en bij elke pull request, en de CI-badge boven aan deze pagina meldt de uitkomst.
 - Release-builds zijn deterministisch: dezelfde broncode, dezelfde SDK en dezelfde publicatieopties leveren dezelfde bytes op, en een release kan pas worden getagd als elke bouwinvoer overeenkomt met de broncode op die tag. Je kunt de tag dus uitchecken, zelf bouwen en de hashes vergelijken met de gepubliceerde. De release-notes van elke versie dragen wat je daarvoor nodig hebt: de SDK-versie waarmee is gebouwd, en de publicatieopties voor elke download die niet met de standaardopties is gebouwd. De setup is de uitzondering: die wordt door Inno Setup gecompileerd in plaats van door de SDK en stempelt het bouwjaar in zichzelf, dus om die hash te reproduceren heb je ook dezelfde Inno-versie en hetzelfde kalenderjaar nodig.
-- <!-- downloads-start -->120.000+<!-- downloads-end --> downloads via GitHub, MajorGeeks en Softpedia.
+- <!-- downloads-start -->121.000+<!-- downloads-end --> downloads via GitHub, MajorGeeks en Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) test elke inzending in een virtuele machine en neemt haar alleen op als ze hun beoordeling doorstaat.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Door MajorGeeks gecertificeerd: 100% schoon" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) heeft het beoordeeld en gecertificeerd als vrij van spyware, adware en virussen.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia-award 100% gratis, gecertificeerd vrij van spyware, adware en virussen" width="190"></a>
 

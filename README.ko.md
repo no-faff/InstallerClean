@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="GitHub 릴리스"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="총 다운로드 수"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="총 다운로드 수"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>보고서 2,869건이 모든 다운로드를 정확히 반영한다면</summary>
+<summary>보고서 2,873건이 모든 다운로드를 정확히 반영한다면</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="보고서를 바탕으로 늘려 계산한, 공간을 확보했을 다운로드 수와 확보했을 용량을 보여 주는 막대그래프" src="docs/reports-ko-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>위의 모든 수치를 42.17배로 늘린 것이며, 다운로드 수를 보고서 수로 나눈 값입니다.</sub>
+  <sub>위의 모든 수치를 42.13배로 늘린 것이며, 다운로드 수를 보고서 수로 나눈 값입니다.</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean은 서명되어 있지 않습니다. 실행하기 전에 확인�
 - VirusTotal: 모든 빌드는 나가기 전에 검사하며, 릴리스 페이지에 파일별 엔진 전체 결과가 실려 있습니다.
 - 소스는 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)에 있습니다. 검사, 질의, 이동, 삭제, 설정, 재부팅 대기 확인 서비스는 `main`에 푸시할 때마다, 그리고 풀 리퀘스트마다 Windows에서 실행되는 자동화된 테스트 모음이 검증하며, 이 페이지 위쪽의 CI 배지가 그 결과를 알려 줍니다.
 - 릴리스 빌드는 결정적입니다. 같은 소스, 같은 SDK, 같은 게시 플래그는 같은 바이트를 냅니다. 그리고 모든 빌드 입력이 해당 태그의 소스와 일치하지 않으면 릴리스에 태그를 달 수 없습니다. 그래서 태그를 체크아웃해 직접 빌드한 뒤 공개된 해시와 비교해 보실 수 있습니다. 그러는 데 필요한 것은 각 릴리스의 노트에 있습니다. 빌드에 쓴 SDK 버전, 그리고 기본값이 아닌 플래그로 빌드한 파일이 있다면 그 게시 플래그입니다. Setup은 예외입니다. SDK가 아니라 Inno Setup이 컴파일하고 빌드 연도를 스스로 새겨 넣으므로, 해시를 재현하려면 같은 Inno 버전과 같은 연도까지 필요합니다.
-- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->120,000+<!-- downloads-end --> 회 내려받았습니다.
+- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->121,000+<!-- downloads-end --> 회 내려받았습니다.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 인증 100% 클린" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 검토한 뒤 스파이웨어와 애드웨어, 바이러스가 없음을 인증했습니다.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% 무료 수상, 스파이웨어와 애드웨어와 바이러스가 없음을 인증" width="190"></a>
 

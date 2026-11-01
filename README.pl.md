@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="Wydanie GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="Łączna liczba pobrań"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="Łączna liczba pobrań"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Gdyby raporty (2869) były dokładnym obrazem każdego pobrania</summary>
+<summary>Gdyby raporty (2873) były dokładnym obrazem każdego pobrania</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Wykres słupkowy pokazujący, ile pobrań zwolniłoby miejsce i ile by go zwolniło, przeliczony na podstawie raportów" src="docs/reports-pl-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Każda liczba powyżej pomnożona przez 42,17, czyli pobrania podzielone przez raporty.</sub>
+  <sub>Każda liczba powyżej pomnożona przez 42,13, czyli pobrania podzielone przez raporty.</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean jest niepodpisany. Oto, co możesz sprawdzić, zanim go uruchomis
 - VirusTotal: każdy build jest skanowany przed publikacją, a strona wydania zawiera pełny wynik dla każdego silnika i każdego pliku.
 - Kod źródłowy jest tutaj: [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Usługi skanowania, odpytywania, przenoszenia, usuwania, ustawień i oczekującego ponownego uruchomienia są objęte automatycznym zestawem testów, który uruchamia się w Windows przy każdym pushu do `main` i przy każdym pull requeście, a plakietka CI u góry tej strony pokazuje wynik.
 - Buildy wydań są deterministyczne: ten sam kod źródłowy, ten sam SDK i te same flagi publikowania dają te same bajty, a wydania nie da się otagować, jeśli którykolwiek składnik buildu nie zgadza się ze źródłem na tym tagu. Możesz więc przełączyć się na ten tag, zbudować go samodzielnie i porównać skróty z opublikowanymi. Opis każdego wydania zawiera to, co jest do tego potrzebne: wersję SDK, którą je zbudowano, oraz flagi publikowania dla każdego pliku, którego nie zbudowano z ustawieniami domyślnymi. Wyjątkiem jest instalator: kompiluje go Inno Setup, a nie SDK, i wpisuje w siebie rok, w którym powstał, więc odtworzenie jego skrótu wymaga także tej samej wersji Inno i tego samego roku kalendarzowego.
-- <!-- downloads-start -->120 000+<!-- downloads-end --> pobrań w serwisach GitHub, MajorGeeks i Softpedia.
+- <!-- downloads-start -->121 000+<!-- downloads-end --> pobrań w serwisach GitHub, MajorGeeks i Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testuje każde zgłoszenie w maszynie wirtualnej i umieszcza je na liście tylko wtedy, gdy przejdzie ich kontrolę.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks: certyfikat 100% czystości" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) sprawdziła aplikację i wystawiła certyfikat potwierdzający brak programów szpiegujących, adware i wirusów.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Nagroda Softpedia 100% FREE, certyfikat: brak programów szpiegujących, adware i wirusów" width="190"></a>
 

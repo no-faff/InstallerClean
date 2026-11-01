@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="GitHub 版本"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="总下载量"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="总下载量"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>如果这 2,869 份报告能准确反映每一次下载</summary>
+<summary>如果这 2,873 份报告能准确反映每一次下载</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="柱状图，按报告等比例放大，显示有多少次下载会清出空间，以及各自会清出多少" src="docs/reports-zh-CN-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>上面每个数字都乘以 42.17，也就是下载次数除以报告数。</sub>
+  <sub>上面每个数字都乘以 42.13，也就是下载次数除以报告数。</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean 没有签名。在运行它之前，您可以核对这些：
 - VirusTotal：每个构建在发出去之前都会扫描，发布页面上带有每个下载文件逐引擎的完整结果。
 - 源代码就在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)。扫描、查询、移动、删除、设置和待重启这几项服务都有一套自动化测试覆盖，每次推送到 `main` 以及每个 pull request 都会在 Windows 上运行，本页顶部的 CI 徽章报告运行结果。
 - 发布版本的构建是确定性的：相同的源代码、相同的 SDK 和相同的发布参数会产出相同的字节，而且除非每一项构建输入都与该标签处的源代码一致，否则一个版本无法被打上标签。所以您可以检出标签、自己构建一遍，再把算出的哈希值和公布的哈希值对比。每个版本的发布说明里都有您需要的东西：构建时用的 SDK 版本，以及任何不是用默认参数构建的下载文件所用的发布参数。setup 是例外：它由 Inno Setup 而不是 SDK 编译，并且会把构建的年份打进文件本身，所以要复现它的哈希值，还需要同一个 Inno 版本和同一个年份。
-- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->120,000+<!-- downloads-end --> 次下载。
+- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->121,000+<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过他们的审核才会收录。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 认证 100% 干净" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 审核过它，并认证它不含间谍软件、广告软件和病毒。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% 免费奖，认证不含间谍软件、广告软件和病毒" width="190"></a>
 

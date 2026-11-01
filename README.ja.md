@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="GitHub リリース"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-120k-brightgreen" alt="総ダウンロード数"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="総ダウンロード数"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>もし 2,869 件のレポートが、すべてのダウンロードを正確に映していたら</summary>
+<summary>もし 2,873 件のレポートが、すべてのダウンロードを正確に映していたら</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="レポートから拡大して、容量を解放できたはずのダウンロードの件数と、解放できたはずの容量を示す棒グラフ" src="docs/reports-ja-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>上の数字はすべて 42.17 倍にしています。ダウンロード数をレポート数で割った値です。</sub>
+  <sub>上の数字はすべて 42.13 倍にしています。ダウンロード数をレポート数で割った値です。</sub>
 </p>
 
 </details>
@@ -240,7 +240,7 @@ InstallerClean には署名がありません。実行する前に確かめら�
 - VirusTotal：ビルドはどれも公開前にスキャンしており、リリースページにはダウンロードごとのエンジン別の結果が全部載っています。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあります。スキャン、クエリ、移動、削除、設定、再起動保留の各サービスは自動テストで覆われており、そのテストは `main` へのプッシュごと、プルリクエストごとに Windows 上で実行されます。結果はこのページ上部の CI バッジが伝えています。
 - リリースビルドは決定論的です。同じソース、同じ SDK、同じ publish のフラグからは同じバイト列が生成されますし、ビルドの入力がすべてそのタグ時点のソースと一致していなければ、リリースにタグを打つことはできません。ですからタグをチェックアウトしてご自身でビルドし、公開されているハッシュと突き合わせられます。そのために必要なものを、各リリースのノートに載せています。どの SDK バージョンでビルドしたか、そして既定のままでビルドしていないダウンロードについては、その publish のフラグです。セットアップ版だけは例外で、SDK ではなく Inno Setup がコンパイルするうえ、セットアップ版自身がビルドした年を刻み込むため、ハッシュを再現するには Inno のバージョンと暦の年も揃える必要があります。
-- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->120,000+<!-- downloads-end --> 回ダウンロードされています。
+- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->121,000+<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は提出物を一つずつ仮想マシンでテストし、審査を通過したものだけを掲載します。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認証済み 100% クリーン" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は InstallerClean をレビューし、スパイウェア・アドウェア・ウイルスがないことを認定しました。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% FREE アワード。スパイウェアもアドウェアもウイルスもないことの認定" width="190"></a>
 
