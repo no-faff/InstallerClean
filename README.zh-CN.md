@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="GitHub 版本"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-121k-brightgreen" alt="总下载量"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-122k-brightgreen" alt="总下载量"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,10 +37,10 @@
 
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这个隐藏文件夹会随着您安装和更新软件而越来越满。快速扫描之后，它会告诉您有没有这类文件，想细看的还能查看更多细节，并让您把它们移到别处，或者删掉，给 C: 盘腾出空间。
 - **您可能正是为此而来：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 时，看到 `C:\Windows\Installer` 占了很大空间，却不知道里面都是些什么。这种情况下，InstallerClean 正是您需要的工具。像 `9f05cba.msi` 这样名字看起来毫无规律的文件，InstallerClean 清楚里面装的是什么，并很快告诉您哪些可以安全清除。
-- **能腾出多少空间：** 上面的图表来自通过应用发送的可选报告（谢谢大家）。在释放了空间的那 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 当中，释放空间的中位数是 <!-- reports-median-start -->1.8 GB<!-- reports-median-end -->。这些文件您很可能根本不知道它们的存在，它们只是白白占着空间。在*所有*机器中，有 <!-- reports-over5gb-start -->22.4%<!-- reports-over5gb-end --> 清出了超过 5 GB，还有不少人释放了数百 GB。基本上，安装的 MSI 软件越多，不需要的文件就越多。一运行 InstallerClean，您就知道了。
+- **能腾出多少空间：** 上面的图表来自通过应用发送的可选报告（谢谢大家）。在释放了空间的那 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 当中，释放空间的中位数是 <!-- reports-median-start -->1.8 GB<!-- reports-median-end -->。这些文件您很可能根本不知道它们的存在，它们只是白白占着空间。在*所有*机器中，有 <!-- reports-over5gb-start -->22.5%<!-- reports-over5gb-end --> 清出了超过 5 GB，还有不少人释放了数百 GB。基本上，安装的 MSI 软件越多，不需要的文件就越多。一运行 InstallerClean，您就知道了。
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>点击查看</kbd> 如果报告能准确反映全部 121,770 次下载，图表会是什么样</summary>
+  <summary><kbd>点击查看</kbd> 如果报告能准确反映全部 122,015 次下载，图表会是什么样</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-zh-CN-scaled-dark.svg" />
@@ -237,7 +237,7 @@ InstallerClean 没有签名。在运行它之前，您可以核对这些：
 - VirusTotal：每个构建在发出去之前都会扫描，发布页面上带有每个下载文件逐引擎的完整结果。
 - 源代码就在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)。扫描、查询、移动、删除、设置和待重启这几项服务都有一套自动化测试覆盖，每次推送到 `main` 以及每个 pull request 都会在 Windows 上运行，本页顶部的 CI 徽章报告运行结果。
 - 发布版本的构建是确定性的：相同的源代码、相同的 SDK 和相同的发布参数会产出相同的字节，而且除非每一项构建输入都与该标签处的源代码一致，否则一个版本无法被打上标签。所以您可以检出标签、自己构建一遍，再把算出的哈希值和公布的哈希值对比。每个版本的发布说明里都有您需要的东西：构建时用的 SDK 版本，以及任何不是用默认参数构建的下载文件所用的发布参数。setup 是例外：它由 Inno Setup 而不是 SDK 编译，并且会把构建的年份打进文件本身，所以要复现它的哈希值，还需要同一个 Inno 版本和同一个年份。
-- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->121,000+<!-- downloads-end --> 次下载。
+- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->122,000+<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过他们的审核才会收录。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 认证 100% 干净" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 审核过它，并认证它不含间谍软件、广告软件和病毒。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% 免费奖，认证不含间谍软件、广告软件和病毒" width="190"></a>
 
