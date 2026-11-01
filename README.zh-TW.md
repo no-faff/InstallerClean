@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>如果這 2,823 份報告能準確反映每一次下載</summary>
+<summary>如果這 2,869 份報告能準確反映每一次下載</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="長條圖，依報告等比例放大，顯示有多少次下載會釋放空間，以及各自會釋放多少" src="docs/reports-zh-TW-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>上方每個數字都乘以 42.73，也就是下載次數除以報告數。</sub>
+  <sub>上方每個數字都乘以 42.17，也就是下載次數除以報告數。</sub>
 </p>
 
 </details>
@@ -52,7 +52,7 @@
 
 - **簡介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 裡不需要的檔案，這個隱藏資料夾會隨著您安裝和更新軟體而越塞越滿。快速掃描之後，它會告訴您有沒有這類檔案，想細看的人還能看到更多詳細資料，並讓您把它們移到別處，或者刪掉，替 C: 磁碟機騰出空間。
 - **您可能是為了這個而來：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 時，看到 `C:\Windows\Installer` 佔了一大堆空間，卻不知道裡面是什麼。這種情況下，InstallerClean 正是您需要的。像 `9f05cba.msi` 這種名字看起來毫無規則的檔案，它知道裡面是什麼，而且很快就會告訴您哪些可以安全清除。
-- **能騰出多少空間：** 上面的圖表來自 v1.8.0 以來陸續傳回來的選擇性報告。（謝謝每一位傳送過報告的人。沒有你們，就沒有上面這張圖。）在釋放了空間的那 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.9 GB<!-- reports-median-end -->。<!-- reports-biggest-start -->有一台電腦足足釋放了 819 GB。<!-- reports-biggest-end -->另外 <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> 什麼也沒釋放，所以要看是哪台電腦：一台沒裝額外軟體、剛裝好的 Windows 11 就沒有什麼可清的。不需要的檔案最多的，是用了好多年的電腦、裝著大型 MSI 軟體的電腦（Acrobat、Office、LibreOffice、大型開發工具），以及經常裝了又解除安裝的人。一執行，您就會看到自己這台到底有多少。
+- **能騰出多少空間：** 上面的圖表來自 v1.8.0 以來陸續傳回來的選擇性報告。（謝謝每一位傳送過報告的人。沒有你們，就沒有上面這張圖。）在釋放了空間的那 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.8 GB<!-- reports-median-end -->。<!-- reports-biggest-start -->有一台電腦足足釋放了 819 GB。<!-- reports-biggest-end -->另外 <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> 什麼也沒釋放，所以要看是哪台電腦：一台沒裝額外軟體、剛裝好的 Windows 11 就沒有什麼可清的。不需要的檔案最多的，是用了好多年的電腦、裝著大型 MSI 軟體的電腦（Acrobat、Office、LibreOffice、大型開發工具），以及經常裝了又解除安裝的人。一執行，您就會看到自己這台到底有多少。
 - **安全嗎：** 安全。它動到的只有 `C:\Windows\Installer` 裡的檔案。它會問 Windows Installer 哪些還需要，同時也從登錄把同一批記錄再讀一遍。只有當這台電腦上沒有任何已安裝的東西認領某個檔案，或者較新的修補程式已經取代了它、而且這裡沒有任何程式還能退回到舊的那個時，它才會把這個檔案提供出來。凡是它得不到明確答案的，一律保留。[詳見下文](#運作原理)。
 - **不碰您的任何資訊：** 開源（Apache 2.0）。不用帳戶，沒有廣告，沒有追蹤，也沒有任何東西在背景執行。它會在您執行時到 GitHub 查一下有沒有新版本，這可以關掉；它在一台電腦上第一次執行完成時，會傳送一份關於這次執行情況的匿名報告，除非您在結果畫面上取消勾選那個方塊。
 - **取得方式：** [下載最新版本](../../releases/latest)。執行它；按過 [Windows 顯示的任何警告](#unknown-publisher)和[系統管理員提示](#admin)。把它找到的檔案移走或刪掉。完成。
