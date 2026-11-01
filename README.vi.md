@@ -44,7 +44,7 @@
     <img alt="Biểu đồ cột cho biết có bao nhiêu lượt tải sẽ giải phóng được dung lượng và được bao nhiêu, phóng to từ các báo cáo" src="docs/reports-vi-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Số liệu thực tế đã được nhân với 42,14 (121.067 lượt tải chia cho 2.873 báo cáo tùy chọn)</sub>
+  <sub>Số liệu thực tế đã được nhân với 42,07 (121.067 lượt tải chia cho 2.878 báo cáo tùy chọn)</sub>
 </p>
 
 </details>

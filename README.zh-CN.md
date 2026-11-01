@@ -44,7 +44,7 @@
     <img alt="柱状图，按报告等比例放大，显示有多少次下载会清出空间，以及各自会清出多少" src="docs/reports-zh-CN-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>实际数字已乘以 42.14（121,067 次下载除以 2,873 份可选报告）</sub>
+  <sub>实际数字已乘以 42.07（121,067 次下载除以 2,878 份可选报告）</sub>
 </p>
 
 </details>

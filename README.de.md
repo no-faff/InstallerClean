@@ -44,7 +44,7 @@
     <img alt="Balkendiagramm, wie viele Downloads Speicher freigegeben hätten und wie viel, hochgerechnet aus den Berichten" src="docs/reports-de-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Die echten Zahlen wurden mit 42,14 multipliziert (121.067 Downloads geteilt durch die 2.873 optionalen Berichte)</sub>
+  <sub>Die echten Zahlen wurden mit 42,07 multipliziert (121.067 Downloads geteilt durch die 2.878 optionalen Berichte)</sub>
 </p>
 
 </details>

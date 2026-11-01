@@ -44,7 +44,7 @@
     <img alt="Gráfico de barras de quantos downloads teriam liberado espaço e de quanto teriam liberado, ampliado a partir dos relatórios" src="docs/reports-pt-BR-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Os números verdadeiros foram multiplicados por 42,14 (121.067 downloads divididos pelos 2.873 relatórios opcionais)</sub>
+  <sub>Os números verdadeiros foram multiplicados por 42,07 (121.067 downloads divididos pelos 2.878 relatórios opcionais)</sub>
 </p>
 
 </details>

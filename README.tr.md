@@ -44,7 +44,7 @@
     <img alt="Raporlardan büyütülerek hesaplanmış, kaç indirmenin yer açacağını ve ne kadar açacağını gösteren çubuk grafik" src="docs/reports-tr-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Gerçek rakamlar 42,14 ile çarpıldı (121.067 indirmenin 2.873 isteğe bağlı rapora bölümü)</sub>
+  <sub>Gerçek rakamlar 42,07 ile çarpıldı (121.067 indirmenin 2.878 isteğe bağlı rapora bölümü)</sub>
 </p>
 
 </details>

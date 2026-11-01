@@ -44,7 +44,7 @@
     <img alt="Diagramme en barres du nombre de téléchargements qui auraient libéré de l'espace et de la quantité libérée, extrapolé à partir des rapports" src="docs/reports-fr-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Les chiffres réels ont été multipliés par 42,14 (121 067 téléchargements divisés par les 2 873 rapports facultatifs)</sub>
+  <sub>Les chiffres réels ont été multipliés par 42,07 (121 067 téléchargements divisés par les 2 878 rapports facultatifs)</sub>
 </p>
 
 </details>

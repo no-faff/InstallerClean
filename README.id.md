@@ -44,7 +44,7 @@
     <img alt="Diagram batang tentang berapa banyak unduhan yang akan mengosongkan ruang dan seberapa banyak, diperbesar dari laporan" src="docs/reports-id-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Angka sebenarnya telah dikalikan 42,14 (121.067 unduhan dibagi 2.873 laporan opsional)</sub>
+  <sub>Angka sebenarnya telah dikalikan 42,07 (121.067 unduhan dibagi 2.878 laporan opsional)</sub>
 </p>
 
 </details>

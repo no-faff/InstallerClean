@@ -44,7 +44,7 @@
     <img alt="Staafdiagram van hoeveel downloads ruimte zouden hebben vrijgemaakt en hoeveel, opgeschaald vanuit de rapporten" src="docs/reports-nl-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>De echte aantallen zijn vermenigvuldigd met 42,14 (121.067 downloads gedeeld door de 2.873 optionele rapporten)</sub>
+  <sub>De echte aantallen zijn vermenigvuldigd met 42,07 (121.067 downloads gedeeld door de 2.878 optionele rapporten)</sub>
 </p>
 
 </details>
