@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Als de 2.873 rapporten een exact beeld van elke download gaven</summary>
+<summary>Als de ontvangen rapporten een exact beeld gaven van alle 121.067 downloads</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Staafdiagram van hoeveel downloads ruimte zouden hebben vrijgemaakt en hoeveel, opgeschaald vanuit de rapporten" src="docs/reports-nl-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Elk aantal hierboven vermenigvuldigd met 42,13, de downloads gedeeld door de rapporten.</sub>
+  <sub>De echte aantallen zijn vermenigvuldigd met 42,14 (121.067 downloads gedeeld door de 2.873 optionele rapporten)</sub>
 </p>
 
 </details>

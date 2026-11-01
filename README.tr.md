@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>2.873 rapor, her indirmenin birebir bir yansıması olsaydı</summary>
+<summary>Alınan raporlar, 121.067 indirmenin tamamının birebir bir yansıması olsaydı</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Raporlardan büyütülerek hesaplanmış, kaç indirmenin yer açacağını ve ne kadar açacağını gösteren çubuk grafik" src="docs/reports-tr-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Yukarıdaki her sayı 42,13 ile çarpıldı; bu çarpan, indirme sayısının rapor sayısına bölünmesiyle bulunur.</sub>
+  <sub>Gerçek rakamlar 42,14 ile çarpıldı (121.067 indirmenin 2.873 isteğe bağlı rapora bölümü)</sub>
 </p>
 
 </details>

@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Si los 2873 informes fueran un reflejo exacto de cada descarga</summary>
+<summary>Si los informes recibidos fueran un reflejo exacto de todas las 121.067 descargas</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Gráfico de barras de cuántas descargas habrían liberado espacio y de cuánto habrían liberado, ampliado a partir de los informes" src="docs/reports-es-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Cada cifra de arriba multiplicada por 42,13: las descargas divididas entre los informes.</sub>
+  <sub>Las cifras reales se han multiplicado por 42,14 (121.067 descargas divididas entre los 2873 informes opcionales)</sub>
 </p>
 
 </details>

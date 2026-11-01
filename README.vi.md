@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Nếu 2.873 báo cáo phản ánh chính xác từng lượt tải</summary>
+<summary>Nếu các báo cáo nhận được phản ánh chính xác toàn bộ 121.067 lượt tải</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Biểu đồ cột cho biết có bao nhiêu lượt tải sẽ giải phóng được dung lượng và được bao nhiêu, phóng to từ các báo cáo" src="docs/reports-vi-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Mọi số liệu ở trên được nhân với 42,13, tức là số lượt tải chia cho số báo cáo.</sub>
+  <sub>Số liệu thực tế đã được nhân với 42,14 (121.067 lượt tải chia cho 2.873 báo cáo tùy chọn)</sub>
 </p>
 
 </details>

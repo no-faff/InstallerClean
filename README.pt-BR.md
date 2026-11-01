@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Se os 2.873 relatórios fossem um retrato exato de cada download</summary>
+<summary>Se os relatórios recebidos fossem um retrato exato de todos os 121.067 downloads</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Gráfico de barras de quantos downloads teriam liberado espaço e de quanto teriam liberado, ampliado a partir dos relatórios" src="docs/reports-pt-BR-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Cada contagem acima multiplicada por 42,13, os downloads divididos pelos relatórios.</sub>
+  <sub>Os números verdadeiros foram multiplicados por 42,14 (121.067 downloads divididos pelos 2.873 relatórios opcionais)</sub>
 </p>
 
 </details>

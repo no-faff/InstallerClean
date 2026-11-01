@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>If the 2,873 reports were an exact picture of every download</summary>
+<summary>If the reports received were an exact picture of all 121,067 downloads</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Bar chart of how many downloads would have freed space and how much they would have freed, scaled up from the reports" src="docs/reports-en-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Every count above multiplied by 42.13, the downloads divided by the reports.</sub>
+  <sub>The real numbers have been multiplied by 42.14 (121,067 downloads divided by the 2,873 optional reports)</sub>
 </p>
 
 </details>

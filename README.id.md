@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Jika 2.873 laporan itu gambaran persis dari setiap unduhan</summary>
+<summary>Jika laporan yang diterima itu gambaran persis dari semua 121.067 unduhan</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Diagram batang tentang berapa banyak unduhan yang akan mengosongkan ruang dan seberapa banyak, diperbesar dari laporan" src="docs/reports-id-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Setiap angka di atas dikalikan 42,13, yaitu unduhan dibagi laporan.</sub>
+  <sub>Angka sebenarnya telah dikalikan 42,14 (121.067 unduhan dibagi 2.873 laporan opsional)</sub>
 </p>
 
 </details>

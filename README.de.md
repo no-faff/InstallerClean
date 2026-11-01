@@ -35,7 +35,7 @@
 </p>
 
 <details>
-<summary>Wenn die 2.873 Berichte ein genaues Abbild aller Downloads wären</summary>
+<summary>Wenn die eingegangenen Berichte ein genaues Abbild aller 121.067 Downloads wären</summary>
 
 <p align="center">
   <picture>
@@ -44,7 +44,7 @@
     <img alt="Balkendiagramm, wie viele Downloads Speicher freigegeben hätten und wie viel, hochgerechnet aus den Berichten" src="docs/reports-de-scaled-light.svg" width="800" />
   </picture>
   <br>
-  <sub>Jede Zahl oben mit 42,13 multipliziert, also die Downloads geteilt durch die Berichte.</sub>
+  <sub>Die echten Zahlen wurden mit 42,14 multipliziert (121.067 Downloads geteilt durch die 2.873 optionalen Berichte)</sub>
 </p>
 
 </details>
