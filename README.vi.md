@@ -37,10 +37,10 @@
 
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn cứ đầy dần lên khi bạn cài và cập nhật phần mềm. Sau một lượt quét nhanh, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn chuyển chúng đi nơi khác hoặc xóa chúng để giải phóng dung lượng trên ổ C: của bạn.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. Nếu vậy thì InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể loại bỏ an toàn.
-- **Giải phóng được bao nhiêu:** Biểu đồ ở trên cho thấy kết quả của các báo cáo tùy chọn gửi qua ứng dụng (cảm ơn mọi người). Trong số <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> đã giải phóng được dung lượng, trung vị giải phóng được là <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Đó là những tệp có lẽ bạn không hề biết là tồn tại, cứ nằm đó chiếm chỗ. <!-- reports-over5gb-start -->22,6%<!-- reports-over5gb-end --> trong *tất cả* các máy đã thu hồi hơn 5 GB, và nhiều người đã giải phóng hàng trăm GB. Nói chung, càng cài nhiều phần mềm dựa trên MSI thì càng có nhiều tệp không cần thiết. Ngay khi chạy InstallerClean, bạn sẽ biết.
+- **Giải phóng được bao nhiêu:** Biểu đồ ở trên cho thấy kết quả của các báo cáo tùy chọn gửi qua ứng dụng (cảm ơn mọi người). Trong số <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> đã giải phóng được dung lượng, trung vị giải phóng được là <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Đó là những tệp có lẽ bạn không hề biết là tồn tại, cứ nằm đó chiếm chỗ. <!-- reports-over5gb-start -->22,4%<!-- reports-over5gb-end --> trong *tất cả* các máy đã thu hồi hơn 5 GB, và nhiều người đã giải phóng hàng trăm GB. Nói chung, càng cài nhiều phần mềm dựa trên MSI thì càng có nhiều tệp không cần thiết. Ngay khi chạy InstallerClean, bạn sẽ biết.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Nhấp để xem</kbd> biểu đồ sẽ trông thế nào nếu các báo cáo phản ánh chính xác toàn bộ 121.210 lượt tải</summary>
+  <summary><kbd>Nhấp để xem</kbd> biểu đồ sẽ trông thế nào nếu các báo cáo phản ánh chính xác toàn bộ 121.770 lượt tải</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-vi-scaled-dark.svg" />
