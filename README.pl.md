@@ -33,26 +33,23 @@
     <img alt="Wykres słupkowy pokazujący, ile raportów zwolniło miejsce i ile miejsca zwolniły" src="docs/reports-pl-light.svg" width="800" />
   </picture>
 </p>
-
-<details>
-<summary>Gdyby otrzymane raporty były dokładnym obrazem wszystkich pobrań (121 067)</summary>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-pl-scaled-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-pl-scaled-light.svg" />
-    <img alt="Wykres słupkowy pokazujący, ile pobrań zwolniłoby miejsce i ile by go zwolniło, przeliczony na podstawie raportów" src="docs/reports-pl-scaled-light.svg" width="800" />
-  </picture>
-  <br>
-  <sub>Prawdziwe liczby pomnożono przez 42,07 (liczba pobrań 121 067 podzielona przez liczbę opcjonalnych raportów 2878)</sub>
-</p>
-
-</details>
 <!-- reports-stats-end -->
 
 - **Co:** InstallerClean robi jedną rzecz: usuwa niepotrzebne pliki z `C:\Windows\Installer`, ukrytego folderu, który zapełnia się, gdy instalujesz i aktualizujesz oprogramowanie. Po szybkim skanowaniu mówi ci, czy w ogóle jakieś masz, pokazuje więcej szczegółów ciekawskim i pozwala przenieść je gdzie indziej albo usunąć, żeby zwolnić miejsce na dysku C:.
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. W takim razie InstallerClean to dokładnie to, czego potrzebujesz. Wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i szybko mówi ci, które z nich możesz bezpiecznie usunąć.
-- **Ile miejsca:** Wykres powyżej pokazuje wyniki opcjonalnych raportów, które powoli, ale stale napływają od wersji v1.8.0. (Dziękuję wszystkim, którzy wysłali raport. Bez was tego wykresu by nie było.) Wśród tych <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end -->, które zwolniły miejsce, mediana zwolnionego miejsca to <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. <!-- reports-biggest-start -->Jedna maszyna odzyskała bagatela 819 GB.<!-- reports-biggest-end --> Pozostałe <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> nie zwolniły nic, więc wszystko zależy od maszyny: czysta instalacja Windows 11 bez dodatkowego oprogramowania nie ma czego usuwać. Najwięcej niepotrzebnych plików mają maszyny działające od lat, te z rozbudowanym oprogramowaniem opartym na MSI (Acrobat, Office, LibreOffice, duże narzędzia deweloperskie) i komputery osób, które dużo instalują i odinstalowują. Dokładnie zobaczysz ile, w chwili gdy go uruchomisz.
+- **Ile miejsca:** Wykres powyżej pokazuje wyniki opcjonalnych raportów wysłanych z aplikacji (dzięki wszystkim). Wśród tych <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end -->, które zwolniły miejsce, mediana zwolnionego miejsca to <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. To pliki, o których istnieniu pewnie nie masz pojęcia i które po prostu zajmują miejsce. <!-- reports-over5gb-start -->22,8%<!-- reports-over5gb-end --> *wszystkich* maszyn odzyskało ponad 5 GB, a wiele osób zwolniło setki GB. W skrócie: im więcej oprogramowania opartego na MSI instalujesz, tym więcej niepotrzebnych plików będziesz mieć. Dowiesz się tego, gdy tylko uruchomisz InstallerClean.
+  <!-- reports-scaled-start -->
+  <details>
+  <summary><kbd>Kliknij, aby zobaczyć</kbd>, jak wyglądałby wykres, gdyby raporty były dokładnym obrazem wszystkich pobrań (121 067)</summary>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/reports-pl-scaled-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="docs/reports-pl-scaled-light.svg" />
+      <img alt="Wykres słupkowy pokazujący, ile pobrań zwolniłoby miejsce i ile by go zwolniło, przeliczony na podstawie raportów" src="docs/reports-pl-scaled-light.svg" width="800" />
+    </picture>
+  </p>
+  </details>
+  <!-- reports-scaled-end -->
 - **Czy to bezpieczne:** Tak. InstallerClean rusza wyłącznie pliki w `C:\Windows\Installer`, pyta Windows Installer, co jest jeszcze potrzebne, i czyta te same rekordy również wprost z rejestru. Proponuje plik tylko wtedy, gdy żaden program na komputerze się do niego nie przyznaje albo gdy zastąpiła go nowsza poprawka i żaden program nie mógłby do niego wrócić. Wszystko, co do czego nie dostaje jasnej odpowiedzi, zatrzymuje. [Więcej niżej](#jak-to-działa).
 - **Nic o tobie:** Otwarty kod źródłowy (Apache 2.0). Bez konta, bez reklam, bez śledzenia, bez niczego działającego w tle. Przy uruchomieniu sprawdza, czy na GitHubie jest nowsza wersja, co możesz wyłączyć, a gdy po raz pierwszy ukończy przebieg na danym komputerze, wysyła jeden anonimowy raport o tym, jak ten przebieg poszedł, chyba że na ekranie wyników odznaczysz pole.
 - **Pobierz:** [Pobierz najnowszą wersję](../../releases/latest). Uruchom; przeklikaj się przez [ostrzeżenie, jakie pokaże Windows](#unknown-publisher) i [monit administratora](#admin). Przenieś albo usuń to, co znajdzie. Gotowe.

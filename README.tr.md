@@ -33,26 +33,23 @@
     <img alt="Kaç raporun yer açtığını ve ne kadar yer açtıklarını gösteren çubuk grafik" src="docs/reports-tr-light.svg" width="800" />
   </picture>
 </p>
-
-<details>
-<summary>Alınan raporlar, 121.067 indirmenin tamamının birebir bir yansıması olsaydı</summary>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-tr-scaled-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-tr-scaled-light.svg" />
-    <img alt="Raporlardan büyütülerek hesaplanmış, kaç indirmenin yer açacağını ve ne kadar açacağını gösteren çubuk grafik" src="docs/reports-tr-scaled-light.svg" width="800" />
-  </picture>
-  <br>
-  <sub>Gerçek rakamlar 42,07 ile çarpıldı (121.067 indirmenin 2.878 isteğe bağlı rapora bölümü)</sub>
-</p>
-
-</details>
 <!-- reports-stats-end -->
 
 - **Ne yapar:** InstallerClean tek bir iş yapar: yazılım kurdukça ve güncelledikçe dolan gizli bir klasör olan `C:\Windows\Installer` içindeki gereksiz dosyaları kaldırır. Kısa bir taramanın ardından böyle dosyalarınız olup olmadığını size söyler, merak edenler için daha fazla ayrıntı gösterir ve C: sürücünüzde yer açmak için onları başka bir yere taşımanıza ya da silmenize olanak tanır.
 - **Buraya gelme nedeniniz belki de şu:** [WinDirStat](https://github.com/windirstat/windirstat), WizTree ya da TreeSize kullandınız, `C:\Windows\Installer`'ın çok yer kapladığını gördünüz ama içinde ne olduğunu bilmiyordunuz. Öyleyse InstallerClean tam da ihtiyacınız olan şey. `9f05cba.msi` gibi rastgele görünen adlara sahip o dosyaların içinde ne olduğunu bilir ve hangilerini güvenle kaldırabileceğinizi size hızlıca söyler.
-- **Ne kadar yer:** Yukarıdaki grafik, v1.8.0'dan beri damla damla gelmeyi sürdüren isteğe bağlı raporların sonuçlarını gösteriyor. (Rapor gönderen herkese teşekkürler. Siz olmasaydınız yukarıdaki grafik de olmazdı.) Yer açan raporların oranı <!-- reports-freedpct-start -->%59<!-- reports-freedpct-end -->; bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. <!-- reports-biggest-start -->Bir makine koskoca 819 GB geri kazandı.<!-- reports-biggest-end --> Geri kalan <!-- reports-nothingpct-start -->%41<!-- reports-nothingpct-end --> hiç yer açmadı; yani makineye bağlı: ek yazılımı olmayan temiz bir Windows 11 kurulumunda kaldırılacak bir şey yoktur. En çok gereksiz dosya, yıllardır çalışan makinelerde, MSI tabanlı ağır yazılım barındıran her makinede (Acrobat, Office, LibreOffice, büyük geliştirme araçları) ve bol bol yazılım kurup kaldıran herkeste birikir. Ne kadar olduğunu, çalıştırdığınız anda tam olarak görürsünüz.
+- **Ne kadar yer:** Yukarıdaki grafik, uygulamadan gönderilen isteğe bağlı raporların sonuçlarını gösteriyor (herkese teşekkürler). Yer açan raporların oranı <!-- reports-freedpct-start -->%59<!-- reports-freedpct-end -->; bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Bunlar, muhtemelen varlığından haberiniz bile olmayan, öylece yer kaplayan dosyalar. *Tüm* makinelerin <!-- reports-over5gb-start -->%22,8<!-- reports-over5gb-end --> kadarı 5 GB üzerinde yer kazandı, birçok kişi de yüzlerce GB açtı. Özetle, ne kadar çok MSI tabanlı yazılım kurarsanız o kadar çok gereksiz dosyanız olur. InstallerClean'i çalıştırdığınız anda öğrenirsiniz.
+  <!-- reports-scaled-start -->
+  <details>
+  <summary><kbd>Görmek için tıklayın</kbd>: raporlar 121.067 indirmenin tamamının birebir bir yansıması olsaydı grafik nasıl görünürdü</summary>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/reports-tr-scaled-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="docs/reports-tr-scaled-light.svg" />
+      <img alt="Raporlardan büyütülerek hesaplanmış, kaç indirmenin yer açacağını ve ne kadar açacağını gösteren çubuk grafik" src="docs/reports-tr-scaled-light.svg" width="800" />
+    </picture>
+  </p>
+  </details>
+  <!-- reports-scaled-end -->
 - **Güvenli mi:** Evet. InstallerClean yalnızca `C:\Windows\Installer` içindeki dosyalara dokunur. Hâlâ nelerin gerekli olduğunu Windows Installer'a sorar, aynı kayıtları bir de kayıt defterinden okur. Bir dosyayı ancak makinede kurulu hiçbir şey onu sahiplenmiyorsa ya da daha yeni bir yama onun yerine geçmişse ve buradaki hiçbir program eskisine geri dönemiyorsa sunar. Net bir yanıt alamadığı her şeyi geri tutar. [Daha fazlası aşağıda](#nasıl-çalışır).
 - **InstallerClean sizinle ilgili hiçbir şey öğrenmez:** Açık kaynak (Apache 2.0). Hesap yok, reklam yok, takip yok, arka planda çalışan hiçbir şey yok. Siz çalıştırdığınızda GitHub'da daha yeni bir sürüm olup olmadığına bakar, bunu kapatabilirsiniz; bir bilgisayarda işini ilk kez bitirdiğinde de çalıştırmanın nasıl geçtiğine dair tek bir anonim rapor gönderir, sonuç ekranındaki kutunun işaretini kaldırırsanız göndermez.
 - **Edinme:** [En son sürümü indirin](../../releases/latest). Çalıştırın; [Windows'un göstereceği uyarıya](#unknown-publisher) ve [yönetici istemine](#admin) tıklayıp geçin. Bulduklarını taşıyın ya da silin. Bu kadar.

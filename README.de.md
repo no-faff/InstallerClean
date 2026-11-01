@@ -33,26 +33,23 @@
     <img alt="Balkendiagramm, wie viele Berichte Speicherplatz freigegeben haben und wie viel jeweils frei wurde" src="docs/reports-de-light.svg" width="800" />
   </picture>
 </p>
-
-<details>
-<summary>Wenn die eingegangenen Berichte ein genaues Abbild aller 121.067 Downloads wären</summary>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-de-scaled-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-de-scaled-light.svg" />
-    <img alt="Balkendiagramm, wie viele Downloads Speicher freigegeben hätten und wie viel, hochgerechnet aus den Berichten" src="docs/reports-de-scaled-light.svg" width="800" />
-  </picture>
-  <br>
-  <sub>Die echten Zahlen wurden mit 42,07 multipliziert (121.067 Downloads geteilt durch die 2.878 optionalen Berichte)</sub>
-</p>
-
-</details>
 <!-- reports-stats-end -->
 
 - **Was:** InstallerClean tut eine Sache: Es entfernt nicht benötigte Dateien aus `C:\Windows\Installer`, einem versteckten Ordner, der sich füllt, während du Software installierst und aktualisierst. Nach einem kurzen Scan sagt es dir, ob du welche hast, zeigt Neugierigen mehr Details und lässt dich die Dateien anderswohin verschieben oder löschen, um Platz auf deinem Laufwerk C: freizugeben.
 - **Warum du vielleicht hier bist:** Du hast [WinDirStat](https://github.com/windirstat/windirstat), WizTree oder TreeSize benutzt, gesehen, dass `C:\Windows\Installer` viel Platz belegt, und nicht gewusst, was darin steckt. Dann ist InstallerClean genau das Richtige. Es weiß, was in diesen Dateien mit ihren zufällig wirkenden Namen wie `9f05cba.msi` steckt, und sagt dir schnell, welche du bedenkenlos entfernen kannst.
-- **Wie viel Platz:** Das Diagramm oben zeigt die Ergebnisse der optionalen Berichte, die seit v1.8.0 stetig eintrudeln. (Danke an alle, die einen gesendet haben. Ohne euch gäbe es das Diagramm oben nicht.) Bei den <!-- reports-freedpct-start -->59 %<!-- reports-freedpct-end -->, die Speicherplatz freigegeben haben, liegt der Median des Freigegebenen bei <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. <!-- reports-biggest-start -->Ein Rechner hat sich satte 819 GB zurückgeholt.<!-- reports-biggest-end --> Die übrigen <!-- reports-nothingpct-start -->41 %<!-- reports-nothingpct-end --> haben nichts freigegeben, es hängt also vom Rechner ab: Eine frische Windows-11-Installation ohne zusätzliche Software hat nichts zu entfernen. Die meisten nicht benötigten Dateien haben Rechner, die seit Jahren laufen, Rechner mit umfangreicher MSI-basierter Software (Acrobat, Office, LibreOffice, große Entwicklungswerkzeuge) und alle, die viel Software installieren und wieder deinstallieren. Wie viel es bei dir genau ist, siehst du in dem Moment, in dem du es startest.
+- **Wie viel Platz:** Das Diagramm oben zeigt die Ergebnisse der optionalen Berichte, die über die App gesendet wurden (danke an alle). Bei den <!-- reports-freedpct-start -->59 %<!-- reports-freedpct-end -->, die Speicherplatz freigegeben haben, liegt der Median des Freigegebenen bei <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Das sind Dateien, von denen du wahrscheinlich nichts wusstest und die einfach nur Platz belegen. <!-- reports-over5gb-start -->22,8 %<!-- reports-over5gb-end --> *aller* Rechner haben mehr als 5 GB zurückgeholt, und viele Leute haben Hunderte GB freigegeben. Im Grunde gilt: Je mehr MSI-basierte Software du installierst, desto mehr nicht benötigte Dateien hast du. Sobald du InstallerClean startest, weißt du es.
+  <!-- reports-scaled-start -->
+  <details>
+  <summary><kbd>Klick hier</kbd>, um zu sehen, wie das Diagramm aussähe, wenn die Berichte ein genaues Abbild aller 121.067 Downloads wären</summary>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/reports-de-scaled-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="docs/reports-de-scaled-light.svg" />
+      <img alt="Balkendiagramm, wie viele Downloads Speicher freigegeben hätten und wie viel, hochgerechnet aus den Berichten" src="docs/reports-de-scaled-light.svg" width="800" />
+    </picture>
+  </p>
+  </details>
+  <!-- reports-scaled-end -->
 - **Ist es sicher:** Ja. Es rührt nur Dateien in `C:\Windows\Installer` an. Es fragt Windows Installer, was noch gebraucht wird, und liest dieselben Einträge zusätzlich aus der Registrierung. Es bietet eine Datei nur dann an, wenn nichts von dem, was auf dem Rechner installiert ist, sie beansprucht oder wenn ein neuerer Patch sie ersetzt hat und kein Programm hier auf die alte zurückgehen könnte. Alles, wozu es keine klare Antwort bekommt, hält es zurück. [Mehr dazu weiter unten](#wie-es-funktioniert).
 - **Nichts über dich:** Quelloffen (Apache 2.0). Kein Konto, keine Werbung, kein Tracking, nichts, was im Hintergrund läuft. Es sucht bei jedem Start auf GitHub nach einer neueren Version, was du abschalten kannst, und wenn es auf einem PC seinen ersten Lauf abschließt, sendet es einen anonymen Bericht darüber, wie es gelaufen ist, es sei denn, du entfernst auf dem Ergebnisbildschirm das Häkchen im Kästchen.
 - **Holen:** [Lade die neueste Version herunter](../../releases/latest). Führe sie aus; klick dich durch [eine etwaige Warnung von Windows](#unknown-publisher) und [die Administrator-Abfrage](#admin). Verschiebe oder lösche, was es findet. Fertig.

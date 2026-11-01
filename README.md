@@ -33,26 +33,23 @@
     <img alt="Bar chart of how many reports freed space and how much they freed" src="docs/reports-en-light.svg" width="800" />
   </picture>
 </p>
-
-<details>
-<summary>If the reports received were an exact picture of all 121,067 downloads</summary>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-scaled-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-scaled-light.svg" />
-    <img alt="Bar chart of how many downloads would have freed space and how much they would have freed, scaled up from the reports" src="docs/reports-en-scaled-light.svg" width="800" />
-  </picture>
-  <br>
-  <sub>The real numbers have been multiplied by 42.07 (121,067 downloads divided by the 2,878 optional reports)</sub>
-</p>
-
-</details>
 <!-- reports-stats-end -->
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder that fills up as you install and update software. After a quick scan it tells you whether you have any, shows more detail for the curious, and lets you move them somewhere else or delete them to free up space on your C: drive.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. In that case, InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely remove.
-- **How much space:** The chart above shows the results of the optional reports that have been steadily trickling in since v1.8.0. (Thank you to everyone who's sent one. Without you, the chart above wouldn't exist.) Of the <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> that freed space, the median freed is <!-- reports-median-start -->1.8 GB<!-- reports-median-end -->. <!-- reports-biggest-start -->One machine reclaimed a whopping 819 GB.<!-- reports-biggest-end --> The other <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> freed nothing, so it depends on the machine: a clean Windows 11 install with no extra software has nothing to remove. The ones that will have the most unneeded files are machines that have been going for years, anything with heavy MSI-based software on it (Acrobat, Office, LibreOffice, large dev tools), and anyone who installs and uninstalls a lot of software. You'll see exactly how much the moment you run it.
+- **How much space:** The chart above shows the results of the optional reports sent in via the app (thanks, everyone). Of the <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> that freed space, the median reclaimed is <!-- reports-median-start -->1.8 GB<!-- reports-median-end -->. That's files you probably didn't know existed just sitting there taking up space. <!-- reports-over5gb-start -->22.8%<!-- reports-over5gb-end --> of *all* machines reclaimed more than 5 GB, with many people freeing hundreds of GB. Essentially the more MSI-based software you install, the more unneeded files you'll have. As soon as you run InstallerClean, you'll find out.
+  <!-- reports-scaled-start -->
+  <details>
+  <summary><kbd>Click to see</kbd> how the chart would look if the reports were an exact picture of all 121,067 downloads</summary>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-scaled-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-scaled-light.svg" />
+      <img alt="Bar chart of how many downloads would have freed space and how much they would have freed, scaled up from the reports" src="docs/reports-en-scaled-light.svg" width="800" />
+    </picture>
+  </p>
+  </details>
+  <!-- reports-scaled-end -->
 - **Is it safe:** Yes. All it touches is files in `C:\Windows\Installer`. It asks Windows Installer what's still needed, and reads the same records out of the registry as well. It offers a file only when nothing installed on the machine claims it, or a newer patch has replaced it and no program here could go back to the old one. Anything it can't get a straight answer about, it holds back. [More below](#how-it-works).
 - **Nothing about you:** Open source (Apache 2.0). No account, no ads, no tracking, nothing running in the background. It checks GitHub for a newer version when you run it, which you can turn off, and the first time it finishes on a PC it sends one anonymous report of how the run went, unless you untick the box on the result screen.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; click through [any warning Windows shows](#unknown-publisher) and [the admin prompt](#admin). Move or delete what it finds. Done.

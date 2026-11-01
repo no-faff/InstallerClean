@@ -33,26 +33,23 @@
     <img alt="Diagram batang berapa banyak laporan yang mengosongkan ruang dan berapa banyak yang mereka kosongkan" src="docs/reports-id-light.svg" width="800" />
   </picture>
 </p>
-
-<details>
-<summary>Jika laporan yang diterima itu gambaran persis dari semua 121.067 unduhan</summary>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-id-scaled-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-id-scaled-light.svg" />
-    <img alt="Diagram batang tentang berapa banyak unduhan yang akan mengosongkan ruang dan seberapa banyak, diperbesar dari laporan" src="docs/reports-id-scaled-light.svg" width="800" />
-  </picture>
-  <br>
-  <sub>Angka sebenarnya telah dikalikan 42,07 (121.067 unduhan dibagi 2.878 laporan opsional)</sub>
-</p>
-
-</details>
 <!-- reports-stats-end -->
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang terus terisi saat Anda memasang dan memperbarui perangkat lunak. Setelah pemindaian singkat, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda memindahkannya ke tempat lain atau menghapusnya untuk mengosongkan ruang di drive C: Anda.
 - **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. Kalau begitu, InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman untuk dihapus.
-- **Berapa banyak ruang:** Diagram di atas menunjukkan hasil laporan opsional yang terus berdatangan sejak v1.8.0. (Terima kasih kepada semua yang sudah mengirim laporan. Tanpa Anda, diagram di atas tidak akan ada.) Dari <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> yang mengosongkan ruang, median yang dikosongkan adalah <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. <!-- reports-biggest-start -->Satu mesin bahkan mengosongkan 819 GB.<!-- reports-biggest-end --> Sisanya, <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end -->, tidak mengosongkan apa pun, jadi hasilnya tergantung mesinnya: pemasangan Windows 11 yang masih bersih tanpa perangkat lunak tambahan tidak punya apa pun untuk dihapus. Yang paling banyak menyimpan file tidak diperlukan adalah mesin yang sudah bertahun-tahun dipakai, mesin dengan perangkat lunak berbasis MSI yang berat (Acrobat, Office, LibreOffice, alat pengembangan besar), dan siapa pun yang sering memasang dan mencopot perangkat lunak. Anda akan melihat persis berapa banyak begitu menjalankannya.
+- **Berapa banyak ruang:** Diagram di atas menunjukkan hasil laporan opsional yang dikirim lewat aplikasi (terima kasih, semuanya). Dari <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> yang mengosongkan ruang, median yang dikosongkan adalah <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Itu file yang mungkin tidak Anda ketahui keberadaannya dan hanya memakan ruang. <!-- reports-over5gb-start -->22,8%<!-- reports-over5gb-end --> dari *semua* mesin mengosongkan lebih dari 5 GB, dan banyak orang mengosongkan ratusan GB. Pada dasarnya, makin banyak perangkat lunak berbasis MSI yang Anda pasang, makin banyak file tidak diperlukan yang Anda miliki. Begitu menjalankan InstallerClean, Anda akan tahu.
+  <!-- reports-scaled-start -->
+  <details>
+  <summary><kbd>Klik untuk melihat</kbd> seperti apa diagramnya jika laporan itu gambaran persis dari semua 121.067 unduhan</summary>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/reports-id-scaled-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="docs/reports-id-scaled-light.svg" />
+      <img alt="Diagram batang tentang berapa banyak unduhan yang akan mengosongkan ruang dan seberapa banyak, diperbesar dari laporan" src="docs/reports-id-scaled-light.svg" width="800" />
+    </picture>
+  </p>
+  </details>
+  <!-- reports-scaled-end -->
 - **Apakah aman:** Ya. Yang disentuhnya hanya file di `C:\Windows\Installer`. Aplikasi menanyakan kepada Windows Installer apa yang masih diperlukan, dan membaca catatan yang sama dari registri juga. InstallerClean baru menawarkan sebuah file kalau tidak ada program terpasang di mesin ini yang mengakuinya, atau kalau patch yang lebih baru sudah menggantikannya dan tidak ada program di sini yang bisa kembali ke yang lama. Apa pun yang tidak bisa dijawab dengan jelas, ditahannya. [Selengkapnya di bawah](#cara-kerjanya).
 - **Tidak ada apa pun soal Anda:** Sumber terbuka (Apache 2.0). Tanpa akun, tanpa iklan, tanpa pelacakan, tidak ada yang berjalan di latar belakang. Aplikasi memeriksa GitHub untuk versi yang lebih baru saat Anda menjalankannya, dan itu bisa Anda matikan, lalu saat pertama kali selesai berjalan di sebuah PC, aplikasi mengirim satu laporan anonim tentang bagaimana prosesnya berjalan, kecuali Anda menghapus centang kotak di layar hasil.
 - **Dapatkan:** [Unduh rilis terbaru](../../releases/latest). Jalankan; lewati [peringatan apa pun yang ditampilkan Windows](#unknown-publisher) dan [permintaan administrator](#admin). Pindahkan atau hapus apa yang ditemukannya. Selesai.

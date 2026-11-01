@@ -33,26 +33,23 @@
     <img alt="Biểu đồ cột cho biết bao nhiêu báo cáo đã giải phóng được dung lượng và giải phóng được bao nhiêu" src="docs/reports-vi-light.svg" width="800" />
   </picture>
 </p>
-
-<details>
-<summary>Nếu các báo cáo nhận được phản ánh chính xác toàn bộ 121.067 lượt tải</summary>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-vi-scaled-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-vi-scaled-light.svg" />
-    <img alt="Biểu đồ cột cho biết có bao nhiêu lượt tải sẽ giải phóng được dung lượng và được bao nhiêu, phóng to từ các báo cáo" src="docs/reports-vi-scaled-light.svg" width="800" />
-  </picture>
-  <br>
-  <sub>Số liệu thực tế đã được nhân với 42,07 (121.067 lượt tải chia cho 2.878 báo cáo tùy chọn)</sub>
-</p>
-
-</details>
 <!-- reports-stats-end -->
 
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn cứ đầy dần lên khi bạn cài và cập nhật phần mềm. Sau một lượt quét nhanh, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn chuyển chúng đi nơi khác hoặc xóa chúng để giải phóng dung lượng trên ổ C: của bạn.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. Nếu vậy thì InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể loại bỏ an toàn.
-- **Giải phóng được bao nhiêu:** Biểu đồ ở trên cho thấy kết quả của những báo cáo tùy chọn vẫn đều đặn gửi về từ v1.8.0. (Cảm ơn tất cả những ai đã gửi báo cáo. Không có các bạn thì biểu đồ ở trên đã không tồn tại.) Trong số <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> đã giải phóng được dung lượng, trung vị giải phóng được là <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. <!-- reports-biggest-start -->Một máy đã thu hồi tận 819 GB.<!-- reports-biggest-end --> <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> còn lại không giải phóng được gì, nên chuyện này tùy vào từng máy: một bản Windows 11 cài mới không có phần mềm nào thêm thì chẳng có gì để loại bỏ. Những máy có nhiều tệp không cần thiết nhất là những máy đã chạy nhiều năm, những máy có phần mềm nặng dựa trên MSI (Acrobat, Office, LibreOffice, các công cụ phát triển lớn), và những ai cài rồi gỡ rất nhiều phần mềm. Bạn sẽ thấy chính xác là bao nhiêu ngay khi chạy nó.
+- **Giải phóng được bao nhiêu:** Biểu đồ ở trên cho thấy kết quả của các báo cáo tùy chọn gửi qua ứng dụng (cảm ơn mọi người). Trong số <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> đã giải phóng được dung lượng, trung vị giải phóng được là <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Đó là những tệp có lẽ bạn không hề biết là tồn tại, cứ nằm đó chiếm chỗ. <!-- reports-over5gb-start -->22,8%<!-- reports-over5gb-end --> trong *tất cả* các máy đã thu hồi hơn 5 GB, và nhiều người đã giải phóng hàng trăm GB. Nói chung, càng cài nhiều phần mềm dựa trên MSI thì càng có nhiều tệp không cần thiết. Ngay khi chạy InstallerClean, bạn sẽ biết.
+  <!-- reports-scaled-start -->
+  <details>
+  <summary><kbd>Nhấp để xem</kbd> biểu đồ sẽ trông thế nào nếu các báo cáo phản ánh chính xác toàn bộ 121.067 lượt tải</summary>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/reports-vi-scaled-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="docs/reports-vi-scaled-light.svg" />
+      <img alt="Biểu đồ cột cho biết có bao nhiêu lượt tải sẽ giải phóng được dung lượng và được bao nhiêu, phóng to từ các báo cáo" src="docs/reports-vi-scaled-light.svg" width="800" />
+    </picture>
+  </p>
+  </details>
+  <!-- reports-scaled-end -->
 - **Có an toàn không:** Có. Thứ duy nhất nó động đến là các tệp trong `C:\Windows\Installer`. Nó hỏi Windows Installer xem những gì vẫn còn cần, và nó cũng đọc chính những bản ghi đó từ registry. Nó chỉ đề xuất một tệp khi không có gì đã cài trên máy nhận tệp đó là của mình, hoặc khi một bản vá mới hơn đã thay thế nó và không chương trình nào ở đây có thể quay lại dùng bản cũ. Bất cứ thứ gì nó không có được câu trả lời rõ ràng thì nó giữ lại. [Chi tiết ở bên dưới](#cách-hoạt-động).
 - **Không thu thập gì về bạn:** Mã nguồn mở (Apache 2.0). Không tài khoản, không quảng cáo, không theo dõi, không có gì chạy ngầm. Nó kiểm tra GitHub xem có phiên bản mới hơn không mỗi khi bạn chạy nó, việc này bạn có thể tắt, và lần đầu tiên nó chạy xong trên một máy tính, nó gửi một báo cáo ẩn danh về việc lượt chạy đó diễn ra thế nào, trừ khi bạn bỏ chọn ô trên màn hình kết quả.
 - **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [mọi cảnh báo Windows hiện ra](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Chuyển hoặc xóa những gì nó tìm được. Xong.

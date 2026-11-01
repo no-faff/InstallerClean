@@ -33,26 +33,23 @@
     <img alt="Staafdiagram van hoeveel rapporten ruimte hebben vrijgemaakt en hoeveel dat was" src="docs/reports-nl-light.svg" width="800" />
   </picture>
 </p>
-
-<details>
-<summary>Als de ontvangen rapporten een exact beeld gaven van alle 121.067 downloads</summary>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-nl-scaled-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-nl-scaled-light.svg" />
-    <img alt="Staafdiagram van hoeveel downloads ruimte zouden hebben vrijgemaakt en hoeveel, opgeschaald vanuit de rapporten" src="docs/reports-nl-scaled-light.svg" width="800" />
-  </picture>
-  <br>
-  <sub>De echte aantallen zijn vermenigvuldigd met 42,07 (121.067 downloads gedeeld door de 2.878 optionele rapporten)</sub>
-</p>
-
-</details>
 <!-- reports-stats-end -->
 
 - **Wat:** InstallerClean doet één ding: het verwijdert overbodige bestanden uit `C:\Windows\Installer`, een verborgen map die voller wordt naarmate je software installeert en bijwerkt. Na een snelle scan vertelt het je of je die hebt, laat het meer detail zien voor wie nieuwsgierig is, en kun je ze ergens anders naartoe verplaatsen of verwijderen om ruimte vrij te maken op je C:-schijf.
 - **Je bent hier misschien omdat:** je [WinDirStat](https://github.com/windirstat/windirstat), WizTree of TreeSize hebt gebruikt, zag dat `C:\Windows\Installer` veel ruimte innam en niet wist wat erin zat. In dat geval is InstallerClean precies wat je nodig hebt. Het weet wat er in die bestanden met willekeurig ogende namen als `9f05cba.msi` zit en vertelt je snel welke je veilig kunt verwijderen.
-- **Hoeveel ruimte:** De grafiek hierboven toont de uitkomsten van de optionele rapporten die sinds v1.8.0 gestaag binnendruppelen. (Dank aan iedereen die er een heeft verstuurd. Zonder jullie zou die grafiek niet bestaan.) Van de <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> die ruimte heeft vrijgemaakt, is de mediaan van wat er vrijkwam <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. <!-- reports-biggest-start -->Eén machine haalde er maar liefst 819 GB uit.<!-- reports-biggest-end --> De overige <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> maakte niets vrij, dus het hangt van de machine af: een schone Windows 11-installatie zonder extra software heeft niets te verwijderen. De meeste overbodige bestanden zitten op machines die al jaren meegaan, op alles waar zware MSI-software op staat (Acrobat, Office, LibreOffice, grote ontwikkeltools), en bij iedereen die veel software installeert en weer verwijdert. Hoeveel het bij jou is, zie je meteen als je het draait.
+- **Hoeveel ruimte:** De grafiek hierboven toont de uitkomsten van de optionele rapporten die via de app zijn verstuurd (bedankt allemaal). Van de <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> die ruimte heeft vrijgemaakt, is de mediaan van wat er vrijkwam <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Dat zijn bestanden waarvan je waarschijnlijk niet wist dat ze bestonden en die alleen maar ruimte innemen. <!-- reports-over5gb-start -->22,8%<!-- reports-over5gb-end --> van *alle* machines haalde er meer dan 5 GB uit, en veel mensen maakten honderden GB vrij. Kort gezegd: hoe meer MSI-software je installeert, hoe meer overbodige bestanden je krijgt. Zodra je InstallerClean draait, weet je het.
+  <!-- reports-scaled-start -->
+  <details>
+  <summary><kbd>Klik om te zien</kbd> hoe de grafiek eruit zou zien als de rapporten een exact beeld gaven van alle 121.067 downloads</summary>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/reports-nl-scaled-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="docs/reports-nl-scaled-light.svg" />
+      <img alt="Staafdiagram van hoeveel downloads ruimte zouden hebben vrijgemaakt en hoeveel, opgeschaald vanuit de rapporten" src="docs/reports-nl-scaled-light.svg" width="800" />
+    </picture>
+  </p>
+  </details>
+  <!-- reports-scaled-end -->
 - **Is het veilig:** Ja. Het komt alleen aan bestanden in `C:\Windows\Installer`. Het vraagt Windows Installer wat er nog nodig is, en leest dezelfde records ook uit het register. Het biedt een bestand alleen aan wanneer niets wat op de machine geïnstalleerd is het opeist, of wanneer een nieuwere patch het heeft vervangen en geen enkel programma hier op het oude terug zou kunnen vallen. Alles waar het geen helder antwoord over krijgt, houdt het achter. [Meer hieronder](#hoe-het-werkt).
 - **Niets over jou:** Open source (Apache 2.0). Geen account, geen advertenties, geen tracking, niets dat op de achtergrond draait. Het kijkt bij het starten op GitHub of er een nieuwere versie is, wat je kunt uitzetten, en de eerste keer dat het op een pc een run afrondt, verstuurt het één anoniem rapport over hoe de run ging, tenzij je op het resultaatscherm het vinkje weghaalt.
 - **Downloaden:** [Download de nieuwste versie](../../releases/latest). Voer hem uit; klik je door [een eventuele waarschuwing van Windows](#unknown-publisher) en [de beheerdersvraag](#admin) heen. Verplaats of verwijder wat het vindt. Klaar.

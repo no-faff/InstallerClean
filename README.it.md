@@ -33,26 +33,23 @@
     <img alt="Grafico a barre di quanti rapporti hanno liberato spazio e di quanto ne hanno liberato" src="docs/reports-it-light.svg" width="800" />
   </picture>
 </p>
-
-<details>
-<summary>Se i rapporti ricevuti fossero un'immagine esatta di tutti i 121.067 download</summary>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-it-scaled-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-it-scaled-light.svg" />
-    <img alt="Grafico a barre di quanti download avrebbero liberato spazio e di quanto avrebbero liberato, ingrandito a partire dai rapporti" src="docs/reports-it-scaled-light.svg" width="800" />
-  </picture>
-  <br>
-  <sub>I numeri effettivi sono stati moltiplicati per 42,07 (121.067 download divisi per i 2878 rapporti facoltativi)</sub>
-</p>
-
-</details>
 <!-- reports-stats-end -->
 
 - **Cosa fa:** InstallerClean fa una cosa sola: rimuove i file non necessari da `C:\Windows\Installer`, una cartella nascosta che si riempie man mano che installi e aggiorni software. Dopo una scansione rapida ti dice se ne hai, mostra qualche dettaglio in più per i curiosi e ti lascia spostarli altrove oppure eliminarli per liberare spazio sull'unità C:.
 - **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. In quel caso InstallerClean è proprio quello che ti serve. Sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice rapidamente quali puoi rimuovere in sicurezza.
-- **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi che arrivano alla spicciolata dalla v1.8.0. (Grazie a tutti quelli che ne hanno inviato uno. Senza di voi quel grafico non esisterebbe.) Del <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. <!-- reports-biggest-start -->Un computer ha recuperato ben 819 GB.<!-- reports-biggest-end --> Il restante <!-- reports-nothingpct-start -->41%<!-- reports-nothingpct-end --> non ha liberato niente, quindi dipende dal computer: un'installazione pulita di Windows 11 senza software aggiuntivo non ha niente da rimuovere. Quelli che avranno più file non necessari sono i computer che vanno avanti da anni, qualunque macchina con sopra grossi programmi basati su MSI (Acrobat, Office, LibreOffice, grandi strumenti di sviluppo) e chiunque installi e disinstalli molto software. Vedrai esattamente quanto nel momento in cui lo esegui.
+- **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi inviati dall'app (grazie a tutti). Del <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Sono file di cui probabilmente non conoscevi l'esistenza e che stanno lì a occupare spazio. Il <!-- reports-over5gb-start -->22,8%<!-- reports-over5gb-end --> di *tutti* i computer ha recuperato più di 5 GB, e molte persone hanno liberato centinaia di GB. In sostanza, più software basato su MSI installi, più file non necessari avrai. Appena esegui InstallerClean, lo scoprirai.
+  <!-- reports-scaled-start -->
+  <details>
+  <summary><kbd>Clicca per vedere</kbd> come sarebbe il grafico se i rapporti fossero un'immagine esatta di tutti i 121.067 download</summary>
+  <p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/reports-it-scaled-dark.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="docs/reports-it-scaled-light.svg" />
+      <img alt="Grafico a barre di quanti download avrebbero liberato spazio e di quanto avrebbero liberato, ingrandito a partire dai rapporti" src="docs/reports-it-scaled-light.svg" width="800" />
+    </picture>
+  </p>
+  </details>
+  <!-- reports-scaled-end -->
 - **È sicuro:** Sì. Tocca soltanto i file dentro `C:\Windows\Installer`. Chiede a Windows Installer cosa serve ancora e legge gli stessi record anche dal registro di sistema. Propone un file solo quando niente di installato sul computer lo rivendica, oppure quando una patch più recente lo ha sostituito e nessun programma qui presente potrebbe tornare a quella vecchia. Tutto ciò su cui non ottiene una risposta chiara, lo trattiene. [Più sotto i dettagli](#come-funziona).
 - **Niente su di te:** Open source (Apache 2.0). Nessun account, nessuna pubblicità, nessun tracciamento, niente che giri in background. Controlla su GitHub se c'è una versione più recente quando lo avvii, cosa che puoi disattivare, e la prima volta che completa un'esecuzione su un PC invia un rapporto anonimo su com'è andata l'esecuzione, a meno che tu non tolga la spunta alla casella nella schermata dei risultati.
 - **Come ottenerlo:** [Scarica l'ultima versione](../../releases/latest). Avvialo; supera [l'eventuale avviso di Windows](#unknown-publisher) e [la richiesta di amministratore](#admin). Sposta o elimina quello che trova. Fatto.
