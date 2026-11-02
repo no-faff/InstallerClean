@@ -405,7 +405,7 @@ public sealed record AppInfo(
 /// The app derives nothing from the difference between the two. Each product the
 /// registry names with a code and the enumeration did not return is asked about by
 /// name: one found installed travels as the recovered count, one Windows would not
-/// answer about as the unanswered count, and one not installed in neither. A key whose
+/// answer about as the unanswered count, and one the keyed walk does not list in neither. A key whose
 /// name yields no code travels as the unparseable count. The pair travels because
 /// how far a machine's registry runs ahead of its enumeration is a fact only these
 /// reports can establish.

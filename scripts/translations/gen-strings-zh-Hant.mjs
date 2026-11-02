@@ -444,6 +444,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Windows Installer 自己的記錄中有一個檔案路徑無法解析，因此沒有任何內容能與它對應。`,
   'Cli.WithheldReasons.FileIdentity': `  Windows 有記錄的某個檔案無法辨識，因此無法與資料夾中的內容對應。`,
   'Cli.WithheldReasons.SecondInstance': `  某個程式可能在這台電腦上安裝了不只一次，而記錄無法說明某個檔案屬於哪一份。`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Windows Installer 記錄的一部分無法讀取，因此某個檔案可能屬於記錄在其中的某個程式。`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `錯誤：有一項檔案作業已排定在下次重新啟動時執行，而 InstallerClean 無法得知它涉及哪些檔案，因此無法排除 {InstallerFolder}。請先重新啟動 Windows 再清理。`,
   'Cli.MoveRestoreHint': `請確認您的程式仍能照常更新和解除安裝，然後刪除 {0}。`,
   'Error.ScanStoppedDetails': `這也會記錄在 {0}。`,

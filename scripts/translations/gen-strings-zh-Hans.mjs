@@ -436,6 +436,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Windows Installer 自身记录中的一个文件路径无法解析，因此没有任何内容能与它对应起来。`,
   'Cli.WithheldReasons.FileIdentity': `  无法识别 Windows 有记录的某个文件，因此无法把它与文件夹中的内容对应起来。`,
   'Cli.WithheldReasons.SecondInstance': `  某个程序可能在这台电脑上安装了不止一次，而记录无法说明某个文件属于哪一份。`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Windows Installer 记录的一部分无法读取，因此某个文件可能属于记录在其中的某个程序。`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `错误：有一项文件操作已排入下次重启的队列，InstallerClean 无法得知它指名了哪些文件，因此无法排除 {InstallerFolder}。请在清理前重启 Windows。`,
   'Cli.MoveRestoreHint': `请确认您的程序仍能照常更新和卸载，然后删除 {0}。`,
   'Error.ScanStoppedDetails': `这也会记录在 {0} 中。`,

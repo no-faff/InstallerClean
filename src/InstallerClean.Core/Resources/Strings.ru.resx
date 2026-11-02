@@ -2658,6 +2658,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Путь к файлу из собственных записей Windows Installer не удалось разрешить, поэтому с ним ничего не удалось сопоставить.</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Файл, о котором у Windows есть запись, не удалось опознать, поэтому его не удалось сопоставить с тем, что лежит в папке.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Программа может быть установлена на этом ПК более одного раза, а записи не могут сказать, какой копии принадлежит файл.</value></data>
+  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Часть записей Windows Installer не удалось прочитать, поэтому файл может принадлежать программе, записанной там.</value></data>
   <data name="Cli.WithheldReasons.CandidateIdentity" xml:space="preserve"><value>  Файл в папке не удалось опознать, поэтому его не удалось сопоставить с записями.</value></data>
   <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Либо файл не указал, какой программе он принадлежит, либо Windows не дал ясного ответа об этой программе.</value></data>
   <data name="Cli.WithheldReasons.ScreenUnanswered" xml:space="preserve"><value>  Проверка того, каким программам принадлежат файлы, дала ответы, которые не совпали с переданными ей файлами.</value></data>

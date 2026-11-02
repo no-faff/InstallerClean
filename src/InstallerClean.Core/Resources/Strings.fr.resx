@@ -1890,6 +1890,7 @@ Relancez InstallerClean en tant qu'administrateur.</value></data>
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Un chemin de fichier issu des propres enregistrements de Windows Installer n'a pas pu être résolu, rien n'a donc pu lui être rapproché.</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Un fichier dont Windows garde un enregistrement n'a pas pu être identifié, il n'a donc pas pu être rapproché du contenu du dossier.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Un programme est peut-être installé plusieurs fois sur ce PC, et les enregistrements ne peuvent pas dire à quelle copie appartient un fichier.</value></data>
+  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Une partie des enregistrements de Windows Installer n'a pas pu être lue, un fichier pourrait donc appartenir à un programme qui y est enregistré.</value></data>
   <!-- The per-file arms that have a line. Each is a decision taken about one
        candidate, where the lines above are findings about the machine's records that
        withheld the walk-derived offer whole. They name different causes and have to

@@ -57,7 +57,7 @@ public class RemovableReverifierWalkDerivedTests
     private static IDeclaredProductCheck Screen(params string[] kept)
     {
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>(),
                 Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())
@@ -122,6 +122,25 @@ public class RemovableReverifierWalkDerivedTests
     // ---- The screen ----
 
     [Fact]
+    public async Task The_screen_is_handed_the_keys_the_enumeration_at_the_click_left_unlisted()
+    {
+        const string orphan = Folder + @"\orphan.msi";
+        var key = new UnlistedProductKey("S-1-5-18", "{11111111-1111-1111-1111-111111111111}", [], [], true);
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult([], UnlistedProductKeys: [key]));
+        var ids = new ScriptedFileIdentities();
+        ids.Opens(orphan, 1);
+        var screen = Screen(orphan);
+
+        var result = await Reverifier(query, ids, screen, OldTimes(orphan)).ReverifyAsync(new[] { orphan });
+
+        Assert.Empty(result.Surviving);
+        var handed = (IReadOnlyList<UnlistedProductKey>)screen.ReceivedCalls().Single().GetArguments()[2]!;
+        Assert.Equal([key], handed);
+    }
+
+    [Fact]
     public async Task A_wait_the_screen_tells_of_is_reported_to_the_caller_as_a_wait_and_its_end()
     {
         const string orphan = Folder + @"\orphan.msi";
@@ -131,7 +150,7 @@ public class RemovableReverifierWalkDerivedTests
         ids.Opens(orphan, 2);
         var onTheShare = new SourceFolderWait(@"\\fileserver\apps", () => { });
         var screen = Screen();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>(),
                 Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())
@@ -200,7 +219,7 @@ public class RemovableReverifierWalkDerivedTests
         ids.Opens(installed, 3);
         ids.Opens(spare, 4);
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>(),
                 Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())
@@ -237,7 +256,7 @@ public class RemovableReverifierWalkDerivedTests
         var givenUp = new SourceRootGivenUp(@"\\nas\apps", SourceRootGiveUpRoute.SlowFailure, 1);
         var keptNothing = new SourceRootGivenUp("E:", SourceRootGiveUpRoute.StoppedWaiting, 0);
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>(),
                 Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())
@@ -301,7 +320,7 @@ public class RemovableReverifierWalkDerivedTests
         ids.Opens(a, 2);
         ids.Opens(b, 3);
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>(),
                 Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())

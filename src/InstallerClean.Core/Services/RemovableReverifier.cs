@@ -364,7 +364,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
         if (_declaredProducts is not null && cacheRoot is not null && standing.Count > 0)
             standing = ScreenByWhatTheyDeclare(
-                standing, held, cacheRoot, query.Installations, cancellationToken, progress, out givenUp, out waitCount);
+                standing, held, cacheRoot, query.Installations, query.UnlistedProductKeys, cancellationToken, progress, out givenUp, out waitCount);
 
         // The age check, as the scan runs it: every file held, and no file's times read, where
         // an in-progress signal was set just after the clock, and otherwise every file whose
@@ -421,6 +421,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         Dictionary<string, HeldBackReason> held,
         InstallerCacheRoot cacheRoot,
         IReadOnlyList<ListedInstallation> installations,
+        IReadOnlyList<UnlistedProductKey> unlisted,
         CancellationToken cancellationToken,
         IProgress<ScanProgressUpdate>? progress,
         out IReadOnlyList<SourceRootGivenUp> givenUp,
@@ -444,7 +445,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
         try
         {
             var screening = _declaredProducts!.Screen(
-                files, installations, cancellationToken, (ex, cause) => refusalLog.Record(ex, cause),
+                files, installations, unlisted, cancellationToken, (ex, cause) => refusalLog.Record(ex, cause),
                 path => InstallerCacheHelpers.NamesAFileDirectlyInInstallerFolder(path, cacheRoot),
                 waitingOn: wait => progress?.Report(ScanProgressUpdate.Waiting(wait)),
                 installerFolder: cacheRoot.Proven ? cacheRoot.Resolved : null,

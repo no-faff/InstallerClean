@@ -83,6 +83,17 @@ public class WithholdingLegsTests
         Assert.Equal(fires, WithholdingLegs.Any(census, reads));
     }
 
+    [Fact]
+    public void The_fourth_leg_fires_for_a_read_of_the_records_that_failed_and_comes_last()
+    {
+        var census = Census(recordedPath: true, unaskable: false) with { RegistryKeyReadFailures = 1 };
+
+        Assert.Equal(
+            [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.RegistryRecordsUnread],
+            WithholdingLegs.Fired(census, default));
+        Assert.True(WithholdingLegs.Any(census with { PathResolverFaultedCount = 0 }, default));
+    }
+
     [Theory]
     [MemberData(nameof(Table))]
     public void The_result_reads_the_same_legs_the_gate_was_given(

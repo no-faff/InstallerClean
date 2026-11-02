@@ -91,7 +91,7 @@ public class DeclaredProductCheckTests
         msi.Installed(ProductA);
 
         var outcomes = ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcomes[0]);
         Assert.True(outcomes[0].Withholds());
@@ -112,7 +112,7 @@ public class DeclaredProductCheckTests
         msi.NotInstalled(ProductA, MsiError.UnknownProduct);
 
         var outcomes = ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, outcomes[0]);
         Assert.False(outcomes[0].Withholds());
@@ -132,7 +132,7 @@ public class DeclaredProductCheckTests
         msi.NotInstalled(ProductA, MsiError.NoMoreItems);
 
         var outcomes = ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, outcomes[0]);
     }
@@ -154,7 +154,7 @@ public class DeclaredProductCheckTests
         msi.Answers(ProductA, MsiError.AccessDenied);
 
         var outcomes = ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
         Assert.True(outcomes[0].Withholds());
@@ -171,7 +171,7 @@ public class DeclaredProductCheckTests
         identities.YieldsNothing(@"C:\Windows\Installer\a.msi");
 
         var outcomes = ScriptedCheck(new ScriptedMsiProducts(), identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
         Assert.True(outcomes[0].Withholds());
@@ -189,7 +189,7 @@ public class DeclaredProductCheckTests
             new PackageIdentity(string.Empty, IsPatch: false, Array.Empty<string>()));
 
         var outcomes = ScriptedCheck(new ScriptedMsiProducts(), identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
     }
@@ -206,7 +206,7 @@ public class DeclaredProductCheckTests
             new PackageIdentity(ProductA, IsPatch: true, new[] { ProductB }));
 
         var outcomes = ScriptedCheck(new ScriptedMsiProducts(), identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
     }
@@ -232,7 +232,7 @@ public class DeclaredProductCheckTests
         {
             Patch(@"C:\Windows\Installer\p.msp"),
             Package(@"C:\Windows\Installer\a.msi"),
-        }, []).Outcomes;
+        }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchNotRegistered, outcomes[0]);
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcomes[1]);
@@ -257,7 +257,7 @@ public class DeclaredProductCheckTests
             ("S-1-5-21-9-9-9-1001", MsiInstallContext.UserUnmanaged));
 
         var outcomes = ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcomes[0]);
         Assert.True(outcomes[0].Withholds());
@@ -280,7 +280,7 @@ public class DeclaredProductCheckTests
         msi.AnswersAtRow(ProductA, index: 1, MsiError.AccessDenied);
 
         var outcomes = ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, []).Outcomes;
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], []).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
         Assert.True(outcomes[0].Withholds());
@@ -309,7 +309,7 @@ public class DeclaredProductCheckTests
             Package(@"C:\Windows\Installer\gone.msi"),
             Package(@"C:\Windows\Installer\unreadable.msi"),
             Package(@"C:\Windows\Installer\held.msi"),
-        }, []).Outcomes;
+        }, [], []).Outcomes;
 
         Assert.Equal(new[]
         {
@@ -339,7 +339,7 @@ public class DeclaredProductCheckTests
             Package(@"C:\Windows\Installer\v1.msi"),
             Package(@"C:\Windows\Installer\v2.msi"),
             Package(@"C:\Windows\Installer\v3.msi"),
-        }, []).Outcomes;
+        }, [], []).Outcomes;
 
         Assert.All(outcomes, o => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, o));
         Assert.Equal(new[] { ProductA }, msi.Asked);
@@ -359,7 +359,7 @@ public class DeclaredProductCheckTests
 
         Assert.Throws<OperationCanceledException>(() =>
             ScriptedCheck(new ScriptedMsiProducts(), new ScriptedPackageIdentities())
-                .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], cts.Token).Outcomes);
+                .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], [], cts.Token).Outcomes);
     }
 
     // ---- An installed product whose recorded package is another file ----
@@ -425,7 +425,7 @@ public class DeclaredProductCheckTests
         IReadOnlyList<ListedInstallation>? installations = null,
         IRunningAccount? runningAccount = null) =>
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, runningAccount)
-            .Screen(new[] { Package(Candidate) }, installations ?? [], default, null,
+            .Screen(new[] { Package(Candidate) }, installations ?? [], [], default, null,
                 namesAFileInInstallerFolder ?? InInstallerFolder).Outcomes[0];
 
     /// <summary>
@@ -441,7 +441,7 @@ public class DeclaredProductCheckTests
         IRunningAccount? runningAccount = null)
     {
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, runningAccount)
-            .Screen(new[] { Package(Candidate) }, installations ?? [], default, null,
+            .Screen(new[] { Package(Candidate) }, installations ?? [], [], default, null,
                 namesAFileInInstallerFolder ?? InInstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, cause),
@@ -472,7 +472,7 @@ public class DeclaredProductCheckTests
             .Screen(
                 [Package(Candidate), Package(NotInstalledCopy), Package(Unreadable), Patch(UnreadablePatch),
                     Package(RecordedAgain)],
-                [], default, null, InInstallerFolder);
+                [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[]
@@ -652,7 +652,7 @@ public class DeclaredProductCheckTests
         IReadOnlyList<ListedInstallation>? installations = null) =>
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry,
                 runningAs is null ? null : new Account(runningAs))
-            .Screen(new[] { Package(Candidate) }, installations ?? [], default, null, InInstallerFolder);
+            .Screen(new[] { Package(Candidate) }, installations ?? [], [], default, null, InInstallerFolder);
 
     [Fact]
     public void The_running_accounts_own_list_read_with_every_package_seen_is_counted_as_read()
@@ -1278,7 +1278,7 @@ public class DeclaredProductCheckTests
                 return DriveType.Fixed;
             },
             NamesInFolderOf = NameOnly,
-        }.Screen(new[] { Package(Candidate) }, [], default, null, InInstallerFolder);
+        }.Screen(new[] { Package(Candidate) }, [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.NotThereUnestablished),
@@ -1350,7 +1350,7 @@ public class DeclaredProductCheckTests
                 return DriveType.Fixed;
             },
             NamesInFolderOf = NameOnly,
-        }.Screen([Package(OtherCandidate), Package(Candidate)], [], default, null, InInstallerFolder);
+        }.Screen([Package(OtherCandidate), Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         Assert.All(
             screening.Outcomes.Zip(screening.InstalledCauses),
@@ -1381,7 +1381,7 @@ public class DeclaredProductCheckTests
                 return DriveType.Fixed;
             },
             NamesInFolderOf = NameOnly,
-        }.Screen([Package(Candidate)], [], default, null, InInstallerFolder);
+        }.Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.NotThereUnestablished),
@@ -1418,7 +1418,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, held, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = driveKindOf, NamesInFolderOf = NameOnly }
-            .Screen([Package(OtherCandidate), Package(Candidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(OtherCandidate), Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         return (screening, [.. held.Calls]);
     }
@@ -1436,7 +1436,7 @@ public class DeclaredProductCheckTests
         {
             DriveKindOf = drive => drive.StartsWith('C') ? kind : DriveType.Fixed,
             NamesInFolderOf = NameOnly,
-        }.Screen(new[] { Package(Candidate) }, [], default, null, InInstallerFolder);
+        }.Screen(new[] { Package(Candidate) }, [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.NotThereUnestablished),
@@ -1624,7 +1624,7 @@ public class DeclaredProductCheckTests
         AddSecondCandidate(f);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, path =>
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, path =>
             {
                 asked.Add(path);
                 return InInstallerFolder(path);
@@ -1685,7 +1685,7 @@ public class DeclaredProductCheckTests
         f.Files.Answers(SecondCandidate, outcome);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.All(screening.Outcomes, o => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, o));
         Assert.All(screening.InstalledCauses, cause => Assert.Equal(DeclaredProductInstalledCause.SourcePackageNotRuledOut, cause));
@@ -1728,7 +1728,7 @@ public class DeclaredProductCheckTests
 
         // The check has no way to look, so it gives the verdict no cause.
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen(new[] { Package(Candidate) }, []);
+            .Screen(new[] { Package(Candidate) }, [], []);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.None),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -1857,7 +1857,7 @@ public class DeclaredProductCheckTests
         AddSecondCandidate(f);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -2454,7 +2454,7 @@ public class DeclaredProductCheckTests
         f.Disk.AddFile(Named, new MockFileData(new byte[100]));
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(Named)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(Named)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -2468,7 +2468,7 @@ public class DeclaredProductCheckTests
         var f = ACopyWithTheSourceUsedLast(NasFolder);
         f.Files.Answers(NasFolder + SetupName, FileIdentityRead.OpenRefused);
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.DoesNotContain(NasFolder + SetupName, f.Files.Reads);
@@ -2484,7 +2484,7 @@ public class DeclaredProductCheckTests
         f.Files.Answers(SetupFolder + CopysName, FileIdentityRead.NamesNothing);
         f.Files.Opens(NasFolder + CopysName, 1);
 
-        var screening = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder);
+        var screening = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAtItsSources),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -2543,7 +2543,7 @@ public class DeclaredProductCheckTests
         disk.AddFile(Cached, new MockFileData(new byte[100]));
 
         var outcome = ScriptedCheck(msi, packages, files, disk, msi.Registry)
-            .Screen([Package(OlderCopy)], [], default, null, InInstallerFolder).Outcomes[0];
+            .Screen([Package(OlderCopy)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.Contains(IntegrationFolderUsedLast + IntegrationPackageName, files.Reads);
@@ -2759,7 +2759,7 @@ public class DeclaredProductCheckTests
         var f = TwoCopiesBesideAMediaPackagePath(mediaPath);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -2780,7 +2780,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = path => path.EndsWith("c.msi", StringComparison.Ordinal) ? ["c.msi", "SETUP~1.MSI"] : NameOnly(path),
             }
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.ByName }, screening.InstalledCauses);
     }
@@ -2793,7 +2793,7 @@ public class DeclaredProductCheckTests
             ScriptedSourceListRegistry.RemoteToLocal, new RegistryDwordRead(RegistryDwordState.Read, 1));
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.All(screening.InstalledCauses, cause => Assert.Equal(DeclaredProductInstalledCause.SourcesFormMedia, cause));
     }
@@ -2836,7 +2836,7 @@ public class DeclaredProductCheckTests
         }
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -2850,7 +2850,7 @@ public class DeclaredProductCheckTests
         var f = TwoCopiesBesideAMediaPackagePath(string.Empty);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.All(screening.Outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome));
     }
@@ -2864,7 +2864,7 @@ public class DeclaredProductCheckTests
             ScriptedSourceListRegistry.RemoteToLocal, new RegistryDwordRead(RegistryDwordState.Read, 1));
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.ByName }, screening.InstalledCauses);
     }
@@ -2912,7 +2912,7 @@ public class DeclaredProductCheckTests
         var f = ACopyInstalledFromDriveE(where, SetupName);
 
         var outcome = CheckWithDriveE(f, DriveType.NoRootDirectory)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolderWithNoDriveE).Outcomes[0];
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolderWithNoDriveE).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.DoesNotContain(DiscFolder + SetupName, f.Files.Reads);
@@ -2928,7 +2928,7 @@ public class DeclaredProductCheckTests
         AddSecondCandidate(f);
 
         var screening = CheckWithDriveE(f, DriveType.NoRootDirectory)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -2946,7 +2946,7 @@ public class DeclaredProductCheckTests
             ScriptedSourceListRegistry.RemoteToLocal, new RegistryDwordRead(RegistryDwordState.Read, 1));
 
         var screening = CheckWithDriveE(f, DriveType.NoRootDirectory)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.All(screening.InstalledCauses, cause => Assert.Equal(DeclaredProductInstalledCause.SourcePackageNotRuledOut, cause));
     }
@@ -2963,7 +2963,7 @@ public class DeclaredProductCheckTests
         AddSecondCandidate(f);
 
         var screening = CheckWithDriveE(f, eKind)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.All(screening.InstalledCauses, cause => Assert.Equal(DeclaredProductInstalledCause.SourcePackageNotRuledOut, cause));
     }
@@ -2979,7 +2979,7 @@ public class DeclaredProductCheckTests
         var f = ACopyInstalledFromDriveE(where, SetupName);
 
         var outcome = CheckWithDriveE(f, eKind, eNotReady: true)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolderWithNoDriveE).Outcomes[0];
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolderWithNoDriveE).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.DoesNotContain(DiscFolder + SetupName, f.Files.Reads);
@@ -3001,7 +3001,7 @@ public class DeclaredProductCheckTests
         var asked = new List<string>();
 
         var screening = CheckWithDriveE(f, eKind, eNotReady: true, askedIfReady: asked)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -3021,7 +3021,7 @@ public class DeclaredProductCheckTests
         var asked = new List<string>();
 
         var screening = CheckWithDriveE(f, eKind, eNotReady: true, askedIfReady: asked)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.All(screening.InstalledCauses, cause => Assert.Equal(DeclaredProductInstalledCause.SourcePackageNotRuledOut, cause));
         Assert.Empty(asked);
@@ -3036,7 +3036,7 @@ public class DeclaredProductCheckTests
             ScriptedSourceListRegistry.RemoteToLocal, new RegistryDwordRead(RegistryDwordState.Read, 1));
 
         var screening = CheckWithDriveE(f, DriveType.CDRom, eNotReady: true)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.All(screening.InstalledCauses, cause => Assert.Equal(DeclaredProductInstalledCause.SourcePackageNotRuledOut, cause));
     }
@@ -3056,7 +3056,7 @@ public class DeclaredProductCheckTests
                 return true;
             },
             NamesInFolderOf = NameOnly,
-        }.Screen([Package(Candidate)], [], default, null, InInstallerFolderWithNoDriveE);
+        }.Screen([Package(Candidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.Equal(
             (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcesGivenUp),
@@ -3073,10 +3073,10 @@ public class DeclaredProductCheckTests
         var f = ACopyInstalledFromDriveE("list", SetupName);
 
         var scan = CheckWithDriveE(f, DriveType.NoRootDirectory)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
         f.Files.Opens(DiscFolder + SetupName, 1);
         var check = CheckWithDriveE(f, DriveType.CDRom)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, scan.Outcomes[0]);
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.IsAtItsSources),
@@ -3095,7 +3095,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = drive => drive.StartsWith('E') ? DriveType.NoRootDirectory : DriveType.Fixed,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolderWithNoDriveE);
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolderWithNoDriveE);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.DeclaredProductNotInstalled },
@@ -3144,7 +3144,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideADiscInTheDrive(where, SetupName, FileIdentityRead.IdentityUnavailable, DiscVolume, InstallerVolume);
 
         var outcome = CheckWithDriveE(f, eKind)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder, installerFolder: InstallerFolder)
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder, installerFolder: InstallerFolder)
             .Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
@@ -3167,7 +3167,7 @@ public class DeclaredProductCheckTests
             "list", SetupName, FileIdentityRead.IdentityUnavailable, discVolume, installerVolume, discSerial);
 
         var screening = CheckWithDriveE(f, DriveType.CDRom)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder, installerFolder: InstallerFolder);
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder, installerFolder: InstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcePackageNotRuledOut),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -3179,7 +3179,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideADiscInTheDrive("list", SetupName, FileIdentityRead.IdentityUnavailable, DiscVolume, InstallerVolume);
 
         var screening = CheckWithDriveE(f, DriveType.CDRom)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcePackageNotRuledOut),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -3195,7 +3195,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideADiscInTheDrive("list", SetupName, answer, DiscVolume, InstallerVolume);
 
         var screening = CheckWithDriveE(f, DriveType.CDRom)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder, installerFolder: InstallerFolder);
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder, installerFolder: InstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcePackageNotRuledOut),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -3213,7 +3213,7 @@ public class DeclaredProductCheckTests
         AddSecondCandidate(f);
 
         var screening = CheckWithDriveE(f, DriveType.CDRom)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder,
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder,
                 installerFolder: InstallerFolder);
 
         Assert.Equal(
@@ -3262,7 +3262,7 @@ public class DeclaredProductCheckTests
 
         // The check has no way to look, so it gives the verdict no cause.
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk)
-            .Screen(new[] { Package(Candidate) }, [], default, null, InInstallerFolder);
+            .Screen(new[] { Package(Candidate) }, [], [], default, null, InInstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.None),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -3290,7 +3290,7 @@ public class DeclaredProductCheckTests
 
         // The check has no way to look, so it gives the verdict no cause.
         var screening = ScriptedCheck(f.Msi, f.Packages)
-            .Screen(new[] { Package(Candidate) }, []);
+            .Screen(new[] { Package(Candidate) }, [], []);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.None),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -3308,7 +3308,7 @@ public class DeclaredProductCheckTests
         f.Disk.AddFile(SecondCopy, new MockFileData(new byte[100]));
 
         var outcomes = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen(new[] { Package(Candidate), Package(SecondCopy) }, [], default, null, InInstallerFolder).Outcomes;
+            .Screen(new[] { Package(Candidate), Package(SecondCopy) }, [], [], default, null, InInstallerFolder).Outcomes;
 
         Assert.All(outcomes, o => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, o));
         Assert.Single(f.Msi.Asked);
@@ -3356,7 +3356,7 @@ public class DeclaredProductCheckTests
         f.Disk.AddFile(Named, new MockFileData(new byte[100]));
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate), Package(Named)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(Named)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -3614,7 +3614,7 @@ public class DeclaredProductCheckTests
         Func<string, bool?>? namesAFileInInstallerFolder = null,
         IReadOnlyList<ListedInstallation>? installations = null) =>
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen(new[] { Patch(PatchCopy) }, installations ?? [], default, null,
+            .Screen(new[] { Patch(PatchCopy) }, installations ?? [], [], default, null,
                 namesAFileInInstallerFolder ?? InInstallerFolder).Outcomes[0];
 
     [Fact]
@@ -3885,7 +3885,7 @@ public class DeclaredProductCheckTests
         var f = APatchCopyBesideTheRecordedCopy();
 
         var outcome = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, outcome);
     }
@@ -3898,7 +3898,7 @@ public class DeclaredProductCheckTests
         var f = APatchCopyBesideTheRecordedCopy();
 
         var outcome = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk)
-            .Screen(new[] { Patch(PatchCopy) }, [], default, null, InInstallerFolder).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, outcome);
         Assert.Empty(f.Msi.Registry.Reads);
@@ -3925,7 +3925,7 @@ public class DeclaredProductCheckTests
         msi.PatchStateAnswers(PatchQ, ProductA, null, MsiInstallContext.Machine, MsiError.UnknownPatch);
 
         var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchNotRegistered, outcome);
         Assert.False(outcome.Withholds());
@@ -3944,7 +3944,7 @@ public class DeclaredProductCheckTests
         msi.HoldsNoPatches();
 
         var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchNotRegistered, outcome);
         Assert.Empty(msi.PatchStateReads);
@@ -3966,7 +3966,7 @@ public class DeclaredProductCheckTests
         msi.RecordsPatchPackage(PatchQ, ProductA, null, MsiInstallContext.Machine, "");
 
         var outcome = ScriptedCheck(msi, packages, new ScriptedFileIdentities(), new MockFileSystem(), msi.Registry)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchRegistered, outcome);
         Assert.True(outcome.Withholds());
@@ -3993,7 +3993,7 @@ public class DeclaredProductCheckTests
         msi.RecordsPatchPackage(PatchQ, ProductB, null, MsiInstallContext.Machine, "");
 
         var outcomes = ScriptedCheck(msi, packages, new ScriptedFileIdentities(), new MockFileSystem(), msi.Registry)
-            .Screen(new[] { Patch(PatchCopy), Patch(OtherCopy) }, []).Outcomes;
+            .Screen(new[] { Patch(PatchCopy), Patch(OtherCopy) }, [], []).Outcomes;
 
         Assert.Equal(new[]
         {
@@ -4012,7 +4012,7 @@ public class DeclaredProductCheckTests
         f.Disk.AddFile(SecondCopy, new MockFileData(new byte[100]));
 
         var outcomes = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen(new[] { Patch(PatchCopy), Patch(SecondCopy) }, [], default, null, InInstallerFolder).Outcomes;
+            .Screen(new[] { Patch(PatchCopy), Patch(SecondCopy) }, [], [], default, null, InInstallerFolder).Outcomes;
 
         Assert.All(outcomes, o => Assert.Equal(DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, o));
         Assert.Equal(1, f.Msi.PatchEnumerations);
@@ -4033,7 +4033,7 @@ public class DeclaredProductCheckTests
         f.Msi.NotInstalled(ProductB, MsiError.UnknownProduct);
 
         var outcomes = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen(new[] { Patch(PatchCopy), Patch(OtherPatchCopy) }, [], default, null, InInstallerFolder).Outcomes;
+            .Screen(new[] { Patch(PatchCopy), Patch(OtherPatchCopy) }, [], [], default, null, InInstallerFolder).Outcomes;
 
         Assert.Equal(new[]
         {
@@ -4052,7 +4052,7 @@ public class DeclaredProductCheckTests
         var f = APatchCopyBesideTheRecordedCopy();
 
         var outcome = ScriptedCheck(f.Msi, f.Packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchRegistered, outcome);
         Assert.Empty(f.Msi.PatchPackageReads);
@@ -4073,7 +4073,7 @@ public class DeclaredProductCheckTests
         packages.YieldsNothing(PatchCopy, "patch summary stream would not open (1627)");
 
         var outcome = ScriptedCheck(new ScriptedMsiProducts(), packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
         Assert.True(outcome.Withholds());
@@ -4087,7 +4087,7 @@ public class DeclaredProductCheckTests
         packages.Yields(PatchCopy, new PackageIdentity(string.Empty, IsPatch: true, new[] { ProductA }));
 
         var outcome = ScriptedCheck(new ScriptedMsiProducts(), packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
     }
@@ -4101,7 +4101,7 @@ public class DeclaredProductCheckTests
         packages.Yields(PatchCopy, new PackageIdentity(PatchQ, IsPatch: false, new[] { ProductA }));
 
         var outcome = ScriptedCheck(new ScriptedMsiProducts(), packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
     }
@@ -4114,7 +4114,7 @@ public class DeclaredProductCheckTests
         packages.Yields(PatchCopy, new PackageIdentity(PatchQ, IsPatch: true, Array.Empty<string>()));
 
         var outcome = ScriptedCheck(new ScriptedMsiProducts(), packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
     }
@@ -4169,7 +4169,7 @@ public class DeclaredProductCheckTests
         msi.PatchStateAnswers(PatchQ, ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
 
         var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
     }
@@ -4192,7 +4192,7 @@ public class DeclaredProductCheckTests
         msi.PatchStateAnswers(PatchQ, ProductA, null, MsiInstallContext.Machine, MsiError.UnknownProduct);
 
         var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, []).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
         Assert.True(outcome.Withholds());
@@ -4217,7 +4217,7 @@ public class DeclaredProductCheckTests
         msi.NotInstalled(ProductB, MsiError.UnknownProduct);
 
         var outcomes = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy), Package(ThePackage), Patch(OtherPatchCopy) }, []).Outcomes;
+            .Screen(new[] { Patch(PatchCopy), Package(ThePackage), Patch(OtherPatchCopy) }, [], []).Outcomes;
 
         Assert.Equal(new[]
         {
@@ -4238,7 +4238,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<(Exception Ex, string Cause)>();
 
         var outcomes = ScriptedCheck(new ScriptedMsiProducts(), packages)
-            .Screen(new[] { Patch(PatchCopy) }, [],
+            .Screen(new[] { Patch(PatchCopy) }, [], [],
                 recordRefusal: (ex, cause) => recorded.Add((ex, cause))).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcomes[0]);
@@ -4269,7 +4269,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<Exception>();
 
         var outcomes = ScriptedCheck(new ScriptedMsiProducts(), packages)
-            .Screen(new[] { Patch(EmptyCode), Patch(AsAProduct), Patch(NoTarget) }, [],
+            .Screen(new[] { Patch(EmptyCode), Patch(AsAProduct), Patch(NoTarget) }, [], [],
                 recordRefusal: (ex, _) => recorded.Add(ex)).Outcomes;
 
         Assert.All(outcomes, o => Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, o));
@@ -4285,7 +4285,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<Exception>();
 
         var outcome = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen(new[] { Patch(PatchCopy) }, [], default, (ex, _) => recorded.Add(ex), InInstallerFolder).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [], [], default, (ex, _) => recorded.Add(ex), InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, outcome);
         Assert.Empty(recorded);
@@ -4322,7 +4322,7 @@ public class DeclaredProductCheckTests
         msi.NotInstalled(ProductA, absence);
 
         var outcome = ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [ListedPerMachine(ProductA)]).Outcomes[0];
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [ListedPerMachine(ProductA)], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcome);
         Assert.True(outcome.Withholds());
@@ -4342,7 +4342,7 @@ public class DeclaredProductCheckTests
         msi.AnswersItsOwnRecord(ProductB, null, MsiInstallContext.Machine);
 
         var outcome = ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [ListedPerMachine(ProductB)]).Outcomes[0];
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [ListedPerMachine(ProductB)], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, outcome);
         Assert.False(outcome.Withholds());
@@ -4361,7 +4361,7 @@ public class DeclaredProductCheckTests
 
         var outcome = ScriptedCheck(msi, identities)
             .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") },
-                [ListedPerMachine(LetteredProduct.ToLowerInvariant())]).Outcomes[0];
+                [ListedPerMachine(LetteredProduct.ToLowerInvariant())], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcome);
     }
@@ -4428,7 +4428,7 @@ public class DeclaredProductCheckTests
 
         var outcome = ScriptedCheck(msi, identities)
             .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") },
-                [new ListedInstallation(ProductA, UserSid, (int)MsiInstallContext.UserManaged, SecondCopyNotRuledOut: false)]).Outcomes[0];
+                [new ListedInstallation(ProductA, UserSid, (int)MsiInstallContext.UserManaged, SecondCopyNotRuledOut: false)], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcome);
     }
@@ -4446,7 +4446,7 @@ public class DeclaredProductCheckTests
         msi.HoldsNoPatches();
 
         var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, [ListedPerMachine(ProductA)]).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, [ListedPerMachine(ProductA)], []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
         Assert.True(outcome.Withholds());
@@ -4513,7 +4513,7 @@ public class DeclaredProductCheckTests
         msi.PatchState(PatchQ, ProductB, null, MsiInstallContext.Machine, "1");
 
         var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, ListedAAndB).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, ListedAAndB, []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchRegistered, outcome);
         Assert.True(outcome.Withholds());
@@ -4526,7 +4526,7 @@ public class DeclaredProductCheckTests
         msi.PatchStateAnswers(PatchQ, ProductB, null, MsiInstallContext.Machine, MsiError.UnknownPatch);
 
         var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, ListedAAndB).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, ListedAAndB, []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchNotRegistered, outcome);
         Assert.Contains((PatchQ, ProductB, (string?)null, MsiInstallContext.Machine), msi.PatchStateReads);
@@ -4539,7 +4539,7 @@ public class DeclaredProductCheckTests
         msi.PatchStateAnswers(PatchQ, ProductB, null, MsiInstallContext.Machine, 1610);
 
         var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, ListedAAndB).Outcomes[0];
+            .Screen(new[] { Patch(PatchCopy) }, ListedAAndB, []).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcome);
     }
@@ -4556,7 +4556,7 @@ public class DeclaredProductCheckTests
         msi.PatchStateAnswers(PatchQ, ProductB, null, MsiInstallContext.Machine, MsiError.UnknownPatch);
 
         var outcomes = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy), Patch(SecondCopy) }, ListedAAndB).Outcomes;
+            .Screen(new[] { Patch(PatchCopy), Patch(SecondCopy) }, ListedAAndB, []).Outcomes;
 
         Assert.All(outcomes, o => Assert.Equal(DeclaredProductOutcome.DeclaredPatchNotRegistered, o));
         Assert.Equal(2, msi.PatchStateReads.Count);
@@ -4614,7 +4614,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<(Exception Ex, string Cause)>();
 
         var outcomes = ScriptedCheck(new ScriptedMsiProducts(), identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [],
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], [],
                 recordRefusal: (ex, cause) => recorded.Add((ex, cause))).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
@@ -4644,7 +4644,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<Exception>();
 
         var outcomes = ScriptedCheck(new ScriptedMsiProducts(), identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [],
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], [],
                 recordRefusal: (ex, _) => recorded.Add(ex)).Outcomes;
 
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
@@ -4665,7 +4665,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<Exception>();
 
         ScriptedCheck(msi, identities)
-            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [],
+            .Screen(new[] { Package(@"C:\Windows\Installer\a.msi") }, [], [],
                 recordRefusal: (ex, _) => recorded.Add(ex));
 
         Assert.Empty(recorded);
@@ -4736,7 +4736,7 @@ public class DeclaredProductCheckTests
         Action<Exception, string>? recordRefusal = null,
         IRunningAccount? account = null) =>
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, account)
-            .Screen(candidates ?? [Package(Candidate)], f.Listed, default, recordRefusal, InInstallerFolder);
+            .Screen(candidates ?? [Package(Candidate)], f.Listed, [], default, recordRefusal, InInstallerFolder);
 
     /// <summary>A running account as a test names it.</summary>
     private sealed class Account(string? sid) : IRunningAccount
@@ -5137,7 +5137,7 @@ public class DeclaredProductCheckTests
             ScriptedFileIdentities Files, MockFileSystem Disk, ListedInstallation[] Listed) f,
         IRunningAccount? account = null) =>
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, account)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder).CachedPackages;
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder).CachedPackages;
 
     private static CachedPackageCensus Census(
         int read = 1, int pathUnreadable = 0, int noneRecorded = 0, int notThere = 0, int wouldNotRead = 0,
@@ -5257,7 +5257,7 @@ public class DeclaredProductCheckTests
         f = f with { Listed = [.. f.Listed, ListedPerMachine(ProductB)] };
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, SomebodyElse)
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[1]);
         Assert.Equal(Census(read: 2, noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptOtherAnswer: 1),
@@ -5288,7 +5288,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideASecondCopy();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, runningAccount: SomebodyElse)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(CachedPackageCensus.None, screening.CachedPackages);
         Assert.True(screening.Outcomes[0].Withholds());
@@ -5371,7 +5371,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<Exception>();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, (ex, _) => recorded.Add(ex), InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, (ex, _) => recorded.Add(ex), InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
         Assert.Empty(recorded);
@@ -5457,7 +5457,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<Exception>();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, (ex, _) => recorded.Add(ex), InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, (ex, _) => recorded.Add(ex), InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Single(recorded);
@@ -5502,7 +5502,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideOfficesFeatureRegistration();
 
         var outcome = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, runningAccount: TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder).Outcomes[0];
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome);
     }
@@ -5529,7 +5529,7 @@ public class DeclaredProductCheckTests
             f = f with { Listed = [.. f.Listed, ListedPerMachine(Other)] };
 
             var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-                .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+                .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
             Assert.Equal(
                 otherHasNoSources
@@ -5589,7 +5589,7 @@ public class DeclaredProductCheckTests
         if (!noSources) f.Msi.Registry.Holds(OfficeFeaturesSourceList);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(
             noSources
@@ -5637,7 +5637,7 @@ public class DeclaredProductCheckTests
         if (!noSources) f.Msi.Registry.Holds(OfficeFeaturesSourceList);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(
             noSources ? DeclaredProductOutcome.DeclaredProductNotInstalled : DeclaredProductOutcome.SecondCopyUnestablished,
@@ -5661,7 +5661,7 @@ public class DeclaredProductCheckTests
             MsiError.BadConfiguration, MsiError.Success);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[0]);
         Assert.Equal(Census(opensNoPackage: 1), screening.CachedPackages);
@@ -5678,7 +5678,7 @@ public class DeclaredProductCheckTests
             MsiError.BadConfiguration, MsiError.Success);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(Census(opensNoPackage: 1, unruled: 1, unseenSourceNotRuledOut: 1, unseenPerMachine: 1),
@@ -5709,7 +5709,7 @@ public class DeclaredProductCheckTests
         f.Msi.Installed(declared);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[0]);
         Assert.Equal(Census(released: 1), screening.CachedPackages);
@@ -5802,7 +5802,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<Exception>();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, (ex, _) => recorded.Add(ex), InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, (ex, _) => recorded.Add(ex), InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
         Assert.Empty(recorded);
@@ -5823,7 +5823,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<string>();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, (_, note) => recorded.Add(note), InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, (_, note) => recorded.Add(note), InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptSourcesNotRuledOut: 1),
@@ -5844,7 +5844,7 @@ public class DeclaredProductCheckTests
         var f = ARegistrationWithNoSourceListInstalledFrom(SetupFolder);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, _ => null, isTheInstallerFolder: _ => null);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, _ => null, isTheInstallerFolder: _ => null);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptSourcesNotRuledOut: 1),
@@ -5860,7 +5860,7 @@ public class DeclaredProductCheckTests
         var f = ARegistrationWithNoSourceListInstalledFrom(@"E:\Setup\");
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder,
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder,
                 isTheInstallerFolder: folder => folder.StartsWith("E:", StringComparison.OrdinalIgnoreCase)
                     ? null
                     : IsInstallerFolder(folder));
@@ -5884,7 +5884,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
             { SourceFolderSlowFailure = TimeSpan.Zero, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder,
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder,
                 isTheInstallerFolder: _ =>
                 {
                     Thread.Sleep(20);
@@ -5910,7 +5910,7 @@ public class DeclaredProductCheckTests
         var asked = new List<string>();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder,
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder,
                 isTheInstallerFolder: folder =>
                 {
                     asked.Add(folder);
@@ -5987,7 +5987,7 @@ public class DeclaredProductCheckTests
         }
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptSourcesNotRuledOut: 1),
@@ -6004,7 +6004,7 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(OfficeFeatures, null, MsiInstallContext.Machine);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, screening.Outcomes[0]);
         Assert.Equal(Census(opensNoPackage: 1), screening.CachedPackages);
@@ -6019,7 +6019,7 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(OfficeFeatures, null, MsiInstallContext.Machine);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcePackageNotRuledOut),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -6039,7 +6039,7 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(OfficeFeatures, null, MsiInstallContext.Machine);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder, isTheInstallerFolder: IsInstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, cause),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -6056,7 +6056,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolderWithAStalledShare, isTheInstallerFolder: IsInstallerFolderWithAStalledShare);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolderWithAStalledShare, isTheInstallerFolder: IsInstallerFolderWithAStalledShare);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcesGivenUp),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -6072,7 +6072,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolderWithAStalledShare, isTheInstallerFolder: IsInstallerFolderWithAStalledShare);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolderWithAStalledShare, isTheInstallerFolder: IsInstallerFolderWithAStalledShare);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptSourcesNotRuledOut: 1),
@@ -6093,7 +6093,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolderWithAStalledShare, isTheInstallerFolder: IsInstallerFolderWithAStalledShare);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolderWithAStalledShare, isTheInstallerFolder: IsInstallerFolderWithAStalledShare);
 
         switch (folder)
         {
@@ -6131,7 +6131,7 @@ public class DeclaredProductCheckTests
             new RegistryValue(valueName, RegistryValueKind.String, @"C:\Windows\Installer\gone.msi"));
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(Census(noneRecorded: 1, packageCodeUnanswered: 1, perMachine: 1, keptRegistryDisagrees: 1),
@@ -6156,7 +6156,7 @@ public class DeclaredProductCheckTests
         var recorded = new List<string>();
 
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, (_, note) => recorded.Add(note), InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, (_, note) => recorded.Add(note), InInstallerFolder);
 
         Assert.Equal(new[] { detail }, recorded);
     }
@@ -6230,7 +6230,7 @@ public class DeclaredProductCheckTests
         OrphanedFile[]? candidates = null,
         Action<Exception, string>? recordRefusal = null) =>
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen(candidates ?? [Package(Candidate)], f.Listed, default, recordRefusal, InInstallerFolder);
+            .Screen(candidates ?? [Package(Candidate)], f.Listed, [], default, recordRefusal, InInstallerFolder);
 
     [Fact]
     public void An_installation_with_no_cached_package_whose_sources_are_all_seen_keeps_nothing()
@@ -6343,7 +6343,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry, TheOwner)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal([new("D:", SourceRootGiveUpRoute.NoAnswer, heldOtherwiseToo ? 0 : 1)], GivenUp(screening));
@@ -6785,7 +6785,7 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(SecondCopy, sid, context);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductNotInstalled, DeclaredProductOutcome.DeclaredProductNotInstalled },
@@ -6803,7 +6803,7 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(SecondCopy, null, MsiInstallContext.Machine);
 
         var outcomes = ScriptedCheck(f.Msi, f.Packages)
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed).Outcomes;
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, []).Outcomes;
 
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome));
         Assert.Empty(f.Files.Reads);
@@ -7003,7 +7003,7 @@ public class DeclaredProductCheckTests
         var f = AMarkedSecondCopy();
 
         var census = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder)
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder)
             .CachedPackages;
 
         Assert.Equal(Census(unruled: 1), census);
@@ -7028,7 +7028,7 @@ public class DeclaredProductCheckTests
         f.Msi.AnswersItsOwnRecord(SecondCopy, null, MsiInstallContext.Machine);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.All(screening.Outcomes, outcome => Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome));
         Assert.Equal(
@@ -7050,7 +7050,7 @@ public class DeclaredProductCheckTests
         var f = AMarkedSecondCopy();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, registry: null, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(Census(unruled: 1, unseenSourceNotRuledOut: 1, unseenPerMachine: 1), screening.CachedPackages);
@@ -7065,7 +7065,7 @@ public class DeclaredProductCheckTests
         var f = AMarkedSecondCopy();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, namesAFileInInstallerFolder: null);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, namesAFileInInstallerFolder: null);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(Census(unruled: 1, unseenSourceNotRuledOut: 1, unseenPerMachine: 1), screening.CachedPackages);
@@ -7081,7 +7081,7 @@ public class DeclaredProductCheckTests
         f.Files.Answers(SecondCopysPackage, FileIdentityRead.OpenRefused);
 
         var census = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder).CachedPackages;
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder).CachedPackages;
 
         Assert.Equal(Census(unruled: 1, unseenWouldNotIdentify: 1, unseenPerMachine: 1), census);
     }
@@ -7093,7 +7093,7 @@ public class DeclaredProductCheckTests
         var f = AMarkedSecondCopy(MsiInstallContext.UserUnmanaged);
 
         var census = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, SomebodyElse)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder).CachedPackages;
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder).CachedPackages;
 
         Assert.Equal(Census(unruled: 1, unseenPerUserUnmanaged: 1), census);
     }
@@ -7106,7 +7106,7 @@ public class DeclaredProductCheckTests
         var f = AMarkedSecondCopy(MsiInstallContext.UserUnmanaged);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, screening.Outcomes[0]);
         Assert.Equal(Census(unruled: 1), screening.CachedPackages);
@@ -7127,7 +7127,7 @@ public class DeclaredProductCheckTests
             PropertiesShow(f.Msi.Registry, SecondCopysProperties(OtherUserSid), PropertiesFault.HoldsACachedPackage);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, SomebodyElse)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, screening.Outcomes[0]);
         Assert.Equal(
@@ -7156,7 +7156,7 @@ public class DeclaredProductCheckTests
             f.Msi.Registry.Holds(SecondCopysProperties(OtherUserSid), Sz(MsiInstallProperty.InstallSource, SetupFolder));
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(
             keyHoldsOne ? DeclaredProductOutcome.SecondCopyUnestablished : DeclaredProductOutcome.DeclaredProductNotInstalled,
@@ -7177,7 +7177,7 @@ public class DeclaredProductCheckTests
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);
 
         var census = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, SomebodyElse)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder).CachedPackages;
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder).CachedPackages;
 
         Assert.Equal(Census(unruled: 1, unseenSourceNotRuledOut: 1), census);
     }
@@ -7190,7 +7190,7 @@ public class DeclaredProductCheckTests
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);
 
         var census = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder).CachedPackages;
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder).CachedPackages;
 
         Assert.Equal(Census(unruled: 1, unseenSourceNotRuledOut: 1, unseenPerMachine: 1), census);
     }
@@ -7205,7 +7205,7 @@ public class DeclaredProductCheckTests
 
         var census = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder)
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder)
             .CachedPackages;
 
         Assert.Equal(Census(unruled: 1, unseenSourcesGivenUp: 1, unseenPerMachine: 1), census);
@@ -7232,7 +7232,7 @@ public class DeclaredProductCheckTests
         f = f with { Listed = unseenFirst ? [third, .. f.Listed] : [.. f.Listed, third] };
 
         var census = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder).CachedPackages;
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder).CachedPackages;
 
         Assert.Equal(Census(read: 2, unruled: checkedCount, unseenSourceNotRuledOut: 1, unseenPerMachine: 1), census);
     }
@@ -7245,7 +7245,7 @@ public class DeclaredProductCheckTests
         f.Files.Answers(OtherPackage, FileIdentityRead.OpenRefused);
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.All(screening.Outcomes, outcome => Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome));
         Assert.Equal(Census(unruled: 1, unseenSourceNotRuledOut: 1, unseenPerMachine: 1), screening.CachedPackages);
@@ -7261,7 +7261,7 @@ public class DeclaredProductCheckTests
         f.Msi.PackageCodeAnswers(SecondCopy, null, MsiInstallContext.Machine, MsiError.UnknownProperty);
 
         var census = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder).CachedPackages;
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder).CachedPackages;
 
         Assert.Equal(Census(pathUnreadable: 1, packageCodeUnanswered: 1, perMachine: 1), census);
         Assert.Empty(f.Msi.PackageNameReads);
@@ -7276,7 +7276,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
             { DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.DeclaredProductNotInstalled },
@@ -7318,7 +7318,7 @@ public class DeclaredProductCheckTests
         var clock = System.Diagnostics.Stopwatch.StartNew();
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         // A package on a share is read for the candidate whose name it could be.
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.ByName),
@@ -7339,7 +7339,7 @@ public class DeclaredProductCheckTests
 
         var outcome = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = HeldFor, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.Contains(SharePackage, f.Files.Reads);
@@ -7363,7 +7363,7 @@ public class DeclaredProductCheckTests
 
         var outcome = new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], [], default, null, HeldInInstallerFolder).Outcomes[0];
+            .Screen([Package(Candidate)], [], [], default, null, HeldInInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
         Assert.DoesNotContain(SharePackage, f.Files.Reads);
@@ -7381,7 +7381,7 @@ public class DeclaredProductCheckTests
 
         var outcomes = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder).Outcomes;
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder).Outcomes;
 
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome));
         Assert.Single(files.Started, read => read == SetupPackage);
@@ -7401,7 +7401,7 @@ public class DeclaredProductCheckTests
         Assert.ThrowsAny<OperationCanceledException>(() =>
             new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
                 { SourceFolderTimeLimit = TimeSpan.FromMinutes(1), DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-                .Screen([Package(Candidate)], [], cts.Token, null, InInstallerFolder).Outcomes);
+                .Screen([Package(Candidate)], [], [], cts.Token, null, InInstallerFolder).Outcomes);
 
         Assert.True(clock.Elapsed < HeldFor, $"the screen took {clock.Elapsed}");
     }
@@ -7447,7 +7447,7 @@ public class DeclaredProductCheckTests
         Func<string, DriveType> driveKind) =>
         new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = driveKind, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder).Outcomes;
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder).Outcomes;
 
     /// <summary>How long a read can take to answer false before its root is given up, in the tests of a slow answer.</summary>
     private static readonly TimeSpan SlowFailure = TimeSpan.FromMilliseconds(500);
@@ -7471,7 +7471,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder).Outcomes;
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder).Outcomes;
 
     [Theory]
     [InlineData(@"\\nas\share\b\", false)]
@@ -7540,10 +7540,10 @@ public class DeclaredProductCheckTests
         var check = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly };
 
-        check.Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder);
+        check.Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder);
         Assert.DoesNotContain(otherPackage, files.Calls);
 
-        var outcome = check.Screen([Package(OtherCandidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var outcome = check.Screen([Package(OtherCandidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.Contains(otherPackage, files.Calls);
@@ -7576,7 +7576,7 @@ public class DeclaredProductCheckTests
 
         var outcomes = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(OtherCandidate), Package(CopyOfC)], f.Listed, default, null, InInstallerFolder).Outcomes;
+            .Screen([Package(OtherCandidate), Package(CopyOfC)], f.Listed, [], default, null, InInstallerFolder).Outcomes;
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -7739,7 +7739,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([.. copies.Select(Package)], [], default, null, InInstallerFolder, waitingOn: wait => told.Add(wait?.Root));
+            .Screen([.. copies.Select(Package)], [], [], default, null, InInstallerFolder, waitingOn: wait => told.Add(wait?.Root));
 
         Assert.All(screening.Outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome));
         Assert.Equal(sourcePackages, files.Started);
@@ -7818,7 +7818,7 @@ public class DeclaredProductCheckTests
             { Clock = clock, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly };
 
     private static IReadOnlyList<DeclaredProductOutcome> ScreenEvery(DeclaredProductCheck check, IEnumerable<string> copies) =>
-        check.Screen([.. copies.Select(Package)], [], default, null, InInstallerFolder).Outcomes;
+        check.Screen([.. copies.Select(Package)], [], [], default, null, InInstallerFolder).Outcomes;
 
     [Theory]
     [InlineData(@"D:\Setup\")]
@@ -8065,7 +8065,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], cancellationToken, null, InInstallerFolder,
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], cancellationToken, null, InInstallerFolder,
                 waitingOn: wait => told.Add(wait?.Root));
 
     [Theory]
@@ -8150,7 +8150,7 @@ public class DeclaredProductCheckTests
                 },
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder,
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder,
                 waitingOn: wait => told.Add(wait?.Root));
 
         Assert.Equal(new[] { "Z:", null }, told);
@@ -8200,8 +8200,8 @@ public class DeclaredProductCheckTests
         var check = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly };
 
-        check.Screen([Package(Candidate)], [], default, null, InInstallerFolder);
-        check.Screen([Package(Candidate)], [], default, null, InInstallerFolder);
+        check.Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
+        check.Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(2, files.Started.Count(read => read == SharePackage));
     }
@@ -8238,7 +8238,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder,
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder,
                 candidateReached, waitingOn);
 
     [Theory]
@@ -8337,7 +8337,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder,
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder,
                 waitingOn: wait => wait?.StopWaiting());
 
         Assert.True(clock.Elapsed < HeldFor, $"the screen took {clock.Elapsed}");
@@ -8366,7 +8366,7 @@ public class DeclaredProductCheckTests
                 },
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder,
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder,
                 waitingOn: wait =>
                 {
                     told.Add(wait?.Root);
@@ -8440,7 +8440,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder,
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder,
                 waitingOn: wait =>
                 {
                     if (wait is not null) shown = wait;
@@ -8511,7 +8511,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder,
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder,
                 waitingOn: wait =>
                 {
                     told.Add(wait?.Root);
@@ -8542,10 +8542,10 @@ public class DeclaredProductCheckTests
             };
         SourceFolderWait? shown = null;
 
-        check.Screen([Package(Candidate)], [], default, null, InInstallerFolder, waitingOn: wait => shown ??= wait);
+        check.Screen([Package(Candidate)], [], [], default, null, InInstallerFolder, waitingOn: wait => shown ??= wait);
         Assert.NotNull(shown);
         shown.StopWaiting();
-        var screening = check.Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder);
+        var screening = check.Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.All(screening.Outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome));
         Assert.Contains(otherPackage, files.Calls);
@@ -8576,7 +8576,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal((DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.ByName),
             (screening.Outcomes[0], screening.InstalledCauses[0]));
@@ -8598,7 +8598,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(AnotherCopy)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(AnotherCopy)], [], [], default, null, InInstallerFolder);
 
         // Each copy kept for a drive given up is one of the files counted towards it.
         Assert.All(screening.Outcomes,
@@ -8627,7 +8627,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal([new(root, SourceRootGiveUpRoute.SlowFailure, 2)], GivenUp(screening));
     }
@@ -8647,7 +8647,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, screening.Outcomes[0]);
         Assert.Empty(screening.RootsGivenUp);
@@ -8668,7 +8668,7 @@ public class DeclaredProductCheckTests
         using var held = files;
 
         var screening = CheckOnTheClock(f, files, clock)
-            .Screen([.. copies.Select(Package)], [], default, null, InInstallerFolder);
+            .Screen([.. copies.Select(Package)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal([new(root, SourceRootGiveUpRoute.FailedReadsAddUp, kept)], GivenUp(screening));
     }
@@ -8688,7 +8688,7 @@ public class DeclaredProductCheckTests
         using var held = files;
 
         var screening = CheckOnTheClock(f, files, clock)
-            .Screen([.. copies.Select(Package)], [], default, null, InInstallerFolder);
+            .Screen([.. copies.Select(Package)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal([new(root, SourceRootGiveUpRoute.ReadsAddUp, kept)], GivenUp(screening));
     }
@@ -8709,7 +8709,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([.. copies.Select(Package)], [], default, null, InInstallerFolder);
+            .Screen([.. copies.Select(Package)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal([new("D:", SourceRootGiveUpRoute.SlowFailure, 3)], GivenUp(screening));
     }
@@ -8730,7 +8730,7 @@ public class DeclaredProductCheckTests
                 DriveKindOf = FixedDrive,
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([.. copies.Select(Package)], [], default, null, InInstallerFolder);
+            .Screen([.. copies.Select(Package)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal([new("D:", SourceRootGiveUpRoute.FailedReadsAddUp, 3)], GivenUp(screening));
     }
@@ -8752,7 +8752,7 @@ public class DeclaredProductCheckTests
                 },
                 NamesInFolderOf = NameOnly,
             }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal([new("Z:", SourceRootGiveUpRoute.NoAnswer, 2)], GivenUp(screening));
         released.Set();
@@ -8767,7 +8767,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(OtherCandidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal([new(@"\\nas\share", SourceRootGiveUpRoute.NoAnswer, 2)], GivenUp(screening));
     }
@@ -8781,7 +8781,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([.. copies.Select(Package)], [], default, null, InInstallerFolder);
+            .Screen([.. copies.Select(Package)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             [
@@ -8803,7 +8803,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.All(screening.Outcomes,
             outcome => Assert.Equal(DeclaredProductOutcome.SecondCopyUnestablished, outcome));
@@ -8829,7 +8829,7 @@ public class DeclaredProductCheckTests
 
         var screening = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate)], f.Listed, default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], f.Listed, [], default, null, InInstallerFolder);
 
         Assert.Equal(expected, screening.Outcomes[0]);
         Assert.Equal([new("D:", SourceRootGiveUpRoute.NoAnswer, kept)], GivenUp(screening));
@@ -8841,7 +8841,7 @@ public class DeclaredProductCheckTests
         var f = ACopyBesideTheRecordedPackage();
 
         var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder);
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, screening.Outcomes[0]);
         Assert.Empty(screening.RootsGivenUp);
@@ -8913,7 +8913,7 @@ public class DeclaredProductCheckTests
         var (f, package) = ACopyBesideASource(folder, SetupName);
 
         var outcome = CheckBesideASource(f, driveKind)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.DoesNotContain(package, f.Files.Reads);
@@ -8928,7 +8928,7 @@ public class DeclaredProductCheckTests
         f.Msi.RecordsInstallSource(ProductA, null, MsiInstallContext.Machine, NasFolder);
         f.Files.Answers(NasFolder + SetupName, FileIdentityRead.OpenRefused);
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.DoesNotContain(NasFolder + SetupName, f.Files.Reads);
@@ -8944,7 +8944,7 @@ public class DeclaredProductCheckTests
 
         var outcomes = new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
             { DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder).Outcomes;
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder).Outcomes;
 
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductNotInstalled, outcome));
         Assert.DoesNotContain(NasFolder + SetupName, f.Files.Reads);
@@ -8957,7 +8957,7 @@ public class DeclaredProductCheckTests
         AddSecondCandidate(f);
 
         var outcomes = CheckBesideASource(f)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder).Outcomes;
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder).Outcomes;
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
@@ -8976,7 +8976,7 @@ public class DeclaredProductCheckTests
 
         var outcomes = new DeclaredProductCheck(f.Msi, f.Packages, files, f.Disk, f.Msi.Registry)
             { SourceFolderTimeLimit = ShortLimit, DriveKindOf = FixedDrive, NamesInFolderOf = NameOnly }
-            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, default, null, InInstallerFolder).Outcomes;
+            .Screen([Package(Candidate), Package(OtherCandidate)], f.Listed, [], default, null, InInstallerFolder).Outcomes;
 
         Assert.Equal(
             new[] { DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.DeclaredProductNotInstalled },
@@ -8996,7 +8996,7 @@ public class DeclaredProductCheckTests
         var asked = new List<string>();
 
         var outcomes = CheckBesideASource(f).Screen(
-            [Package(Candidate), Package(SecondCandidate)], [], default, null, path =>
+            [Package(Candidate), Package(SecondCandidate)], [], [], default, null, path =>
             {
                 asked.Add(path);
                 return path.StartsWith(AdminShare, StringComparison.OrdinalIgnoreCase) ? true : InInstallerFolder(path);
@@ -9032,7 +9032,7 @@ public class DeclaredProductCheckTests
                 ScriptedSourceListRegistry.RemoteToLocal, new RegistryDwordRead(RegistryDwordState.Read, 1));
 
         var outcomes = CheckBesideASource(f, driveKind).Screen(
-            [Package(Candidate), Package(SecondCandidate)], [], default, null,
+            [Package(Candidate), Package(SecondCandidate)], [], [], default, null,
             path => path.StartsWith(folder, StringComparison.OrdinalIgnoreCase) ? true : InInstallerFolder(path)).Outcomes;
 
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome));
@@ -9054,7 +9054,7 @@ public class DeclaredProductCheckTests
             f.Msi.Registry.HoldsLinkSetting(ScriptedSourceListRegistry.LinkSettingsKey,
                 ScriptedSourceListRegistry.RemoteToLocal, new RegistryDwordRead(RegistryDwordState.Read, 1));
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, _ => null).Outcomes[0];
+        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, _ => null).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
         Assert.DoesNotContain(SharePackage, f.Files.Reads);
@@ -9073,7 +9073,7 @@ public class DeclaredProductCheckTests
         // its name cut short by a null.
         var (f, package) = ACopyBesideASource(NasFolder, packageName);
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
         Assert.DoesNotContain(package, f.Files.Reads);
@@ -9095,7 +9095,7 @@ public class DeclaredProductCheckTests
         // alone, and a name holding a letter outside ASCII.
         var (f, package) = ACopyBesideASource(NasFolder, packageName);
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
         Assert.Contains(package, f.Files.Reads);
@@ -9110,7 +9110,7 @@ public class DeclaredProductCheckTests
         var (f, package) = ACopyBesideASource(NasFolder, packageName);
 
         var outcome = CheckBesideASource(f, namesInFolder: _ => [CandidateName, shortName])
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
         Assert.Contains(package, f.Files.Reads);
@@ -9122,7 +9122,7 @@ public class DeclaredProductCheckTests
         var (f, package) = ACopyBesideASource(NasFolder, SetupName);
 
         var outcome = CheckBesideASource(f, namesInFolder: _ => null)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
         Assert.Contains(package, f.Files.Reads);
@@ -9138,7 +9138,7 @@ public class DeclaredProductCheckTests
         AddSecondCandidate(f);
 
         var outcomes = CheckBesideASource(f, namesInFolder: _ => null)
-            .Screen([Package(Candidate), Package(SecondCandidate)], [], default, null, InInstallerFolder).Outcomes;
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder).Outcomes;
 
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome));
         Assert.Single(f.Files.Reads, read => read == package);
@@ -9155,7 +9155,7 @@ public class DeclaredProductCheckTests
         var (f, package) = ACopyBesideASource(@"Z:\apps\", SetupName);
 
         var outcome = CheckBesideASource(f, driveKind)
-            .Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+            .Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
         Assert.Contains(package, f.Files.Reads);
@@ -9175,7 +9175,7 @@ public class DeclaredProductCheckTests
         var (f, package) = ACopyBesideASource(NasFolder, SetupName);
         f.Msi.Registry.HoldsLinkSetting(key, value, new RegistryDwordRead(state, number));
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome);
         Assert.Contains(package, f.Files.Reads);
@@ -9189,7 +9189,7 @@ public class DeclaredProductCheckTests
         var (f, package) = ACopyBesideASource(NasFolder, SetupName);
         f.Msi.Registry.HoldsLinkSetting(key, value, new RegistryDwordRead(RegistryDwordState.Read, 0));
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.DoesNotContain(package, f.Files.Reads);
@@ -9202,7 +9202,7 @@ public class DeclaredProductCheckTests
         var (f, _) = ACopyBesideASource(NasFolder, SetupName);
         f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, SetupName, NasFolder, MoreFolder);
 
-        CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder);
+        CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder);
 
         Assert.Equal(
             new[]
@@ -9220,7 +9220,7 @@ public class DeclaredProductCheckTests
     {
         var f = ACopyBesideTheRecordedPackage();
 
-        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], default, null, InInstallerFolder).Outcomes[0];
+        var outcome = CheckBesideASource(f).Screen([Package(Candidate)], [], [], default, null, InInstallerFolder).Outcomes[0];
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome);
         Assert.Empty(f.Msi.Registry.LinkSettingReads);
@@ -10465,6 +10465,16 @@ internal sealed class ScriptedSourceListRegistry : IRegistryReader
     private readonly ScriptedMsiProducts _msi;
     private readonly Dictionary<string, RegistryKeyValues> _keys = new(StringComparer.Ordinal);
     private readonly Dictionary<(string Key, string Value), RegistryDwordRead> _linkSettings = new();
+    private readonly Dictionary<string, RegistryKeyPresence> _hives = new(StringComparer.Ordinal);
+
+    /// <summary>The hive of account <paramref name="sid"/> answers <paramref name="presence"/>.</summary>
+    public void HiveIs(string sid, RegistryKeyPresence presence) => _hives[sid] = presence;
+
+    /// <inheritdoc />
+    public RegistryKeyPresence UserHivePresence(string sid) =>
+        _hives.TryGetValue(sid, out var presence)
+            ? presence
+            : throw new InvalidOperationException($"A hive this test did not script was read: {sid}");
 
     /// <summary>This PC's own symbolic link settings.</summary>
     public const string LinkSettingsKey = @"SYSTEM\CurrentControlSet\Control\FileSystem";

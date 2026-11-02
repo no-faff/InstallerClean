@@ -1080,7 +1080,8 @@ public static class ShortNameCreationLabels
 /// not rule out as a second copy of a program opens packages that could not all be
 /// seen, or because an installation's cached package did not say which product it
 /// declares, its own record did not show it to be an ordinary installation, and it is not
-/// shown to have no package for Windows Installer to open. See
+/// shown to have no package for Windows Installer to open, or because a product key no
+/// installation accounts for left a second copy not ruled out. See
 /// <see cref="Services.DeclaredProductOutcome.SecondCopyUnestablished"/>.
 ///
 /// NOT TO BE ADDED TO <see cref="DeclaredProductUnestablishedCount"/>. That one is about
@@ -1259,9 +1260,10 @@ public enum WithholdingSplitArm
     /// An installation the scan could not rule out as a second copy of a program opens
     /// packages that could not all be seen, or an installation's cached package would not
     /// say which program it belongs to, its own record did not show it to be an ordinary
-    /// installation, and it is not shown to have no package for Windows Installer to open.
-    /// Either way a file could be the package such an installation opens. Two findings
-    /// under one arm, as the verdict they come from keeps them.
+    /// installation, and it is not shown to have no package for Windows Installer to open,
+    /// or a product key no installation accounts for left a second copy not ruled out. Each
+    /// way a file could be a package such an installation opens. Several findings under one
+    /// arm, as the verdict they come from keeps them.
     /// </summary>
     SecondCopyUnestablished,
 }
@@ -1291,6 +1293,13 @@ public enum WithholdingLeg
     /// (<see cref="EnumerationCensus.RegistryProductUnaskable"/>).
     /// </summary>
     RegistryProductUnaskable,
+
+    /// <summary>
+    /// A read of Windows Installer's own records in the registry failed, so nothing shows
+    /// what the key that would not read would have kept
+    /// (<see cref="EnumerationCensus.RegistryRecordsUnread"/>).
+    /// </summary>
+    RegistryRecordsUnread,
 }
 
 /// <summary>
@@ -1309,15 +1318,15 @@ public static class WithholdingLegs
     /// <summary>
     /// Every leg that fired, in declaration order.
     ///
-    /// The census is asked about two of them and the registration side of the identity
-    /// comparison about the third, each through the property that owns the question
+    /// The census is asked about three of them and the registration side of the identity
+    /// comparison about the other, each through the property that owns the question
     /// rather than by naming its members here: a rule that named them itself would be
     /// one edit away from silently not acting on a member added later.
     /// </summary>
     public static IReadOnlyList<WithholdingLeg> Fired(
         EnumerationCensus census, FileIdentityReadTally registrationIdentityReads)
     {
-        var fired = new List<WithholdingLeg>(3);
+        var fired = new List<WithholdingLeg>(4);
 
         if (census.AnyRecordedPathUnestablished)
             fired.Add(WithholdingLeg.RecordedPathUnestablished);
@@ -1325,6 +1334,8 @@ public static class WithholdingLegs
             fired.Add(WithholdingLeg.FileIdentityUnestablished);
         if (census.RegistryProductUnaskable)
             fired.Add(WithholdingLeg.RegistryProductUnaskable);
+        if (census.RegistryRecordsUnread)
+            fired.Add(WithholdingLeg.RegistryRecordsUnread);
 
         return fired;
     }
@@ -1334,7 +1345,7 @@ public static class WithholdingLegs
     /// patch files alike: any leg at all.
     ///
     /// It calls <see cref="Fired"/> rather than repeating its conditions, which is the
-    /// whole point of the type. The list is at most three entries and is built once per
+    /// whole point of the type. The list is at most four entries and is built once per
     /// scan.
     /// </summary>
     public static bool Any(

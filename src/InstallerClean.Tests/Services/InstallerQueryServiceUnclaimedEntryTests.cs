@@ -298,8 +298,33 @@ public class InstallerQueryServiceUnclaimedEntryTests
     // Windows lists no installation of the program and its keyed walk ends at once. The
     // registry holds its product key under an account subtree, the key's Patches listing,
     // its cached package and the patch's own record, which is the shape a program installed
-    // per user by SYSTEM leaves. No Windows Installer call answers about it for an elevated
-    // ordinary account, so what the registry says can keep a file and never release one.
+    // per user by SYSTEM leaves. No walk lists it, so no pass in the scan asks it anything, and
+    // what the registry says can keep a file and never release one.
+
+    [Fact]
+    public void An_unlisted_key_is_handed_on_with_its_own_accounts_cached_package_and_what_its_properties_key_shows()
+    {
+        const string own = @"C:\Windows\Installer\own.msi";
+        const string other = @"C:\Windows\Installer\other.msi";
+
+        var keys = InstallerQueryService.UnlistedProductKeysOf(
+            [
+                new RegistryProductEntry(MachineAccount, Unlisted, [Superseded]),
+                new RegistryProductEntry(UserAccount, Unlisted, [], HasInstallProperties: false),
+            ],
+            [
+                new(own, IsPatch: false, Unlisted, MachineAccount),
+                new(other, IsPatch: false, Unlisted, "S-1-5-21-1-2-3-1002"),
+                new(@"C:\Windows\Installer\p.msp", IsPatch: true, Unlisted, MachineAccount),
+            ]);
+
+        Assert.Equal(2, keys.Count);
+        Assert.Equal([own], keys[0].CachedPackages);
+        Assert.True(keys[0].HasInstallProperties);
+        Assert.Equal([Superseded], keys[0].PatchCodes);
+        Assert.Empty(keys[1].CachedPackages);
+        Assert.False(keys[1].HasInstallProperties);
+    }
 
     [Fact]
     public async Task A_patch_a_program_Windows_does_not_list_holds_by_its_registry_listing_is_held_back()

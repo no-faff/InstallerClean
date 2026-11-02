@@ -52,6 +52,14 @@ public interface IRegistryReader
     /// as a key that is not there.
     /// </summary>
     RegistryKeyValues UserValues(string sid, string keyPath);
+
+    /// <summary>
+    /// Whether the hive of the account <paramref name="sid"/> is loaded at
+    /// <c>HKEY_USERS\&lt;sid&gt;</c>. <see cref="UserValues"/> reads an account whose hive is not
+    /// loaded as a key that is not there, and this is what tells the two apart. Three-state
+    /// for the reason <see cref="LocalMachineKeyPresence"/> is.
+    /// </summary>
+    RegistryKeyPresence UserHivePresence(string sid);
 }
 
 /// <summary>

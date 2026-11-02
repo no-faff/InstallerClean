@@ -512,6 +512,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Windows Installer 自己的記錄中有一個檔案路徑無法解析，因此沒有任何內容能與它對應。 |
 |   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Windows 有記錄的某個檔案無法辨識，因此無法與資料夾中的內容對應。 |
 |   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   某個程式可能在這台電腦上安裝了不只一次，而記錄無法說明某個檔案屬於哪一份。 |
+|   Part of Windows Installer's records wouldn't read, so a file could belong to a program recorded there. |   Windows Installer 記錄的一部分無法讀取，因此某個檔案可能屬於記錄在其中的某個程式。 |
 |   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   資料夾中的某個檔案無法辨識，因此無法與記錄對應。 |
 |   Either a file wouldn't say which program it belongs to, or Windows wouldn't give a clear answer about that program. |   可能是某個檔案沒有說明它屬於哪個程式，也可能是 Windows 對該程式沒有給出明確的答覆。 |
 |   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   一項檢查這些檔案屬於哪些程式的作業，給出的答覆與交給它的檔案對不上。 |

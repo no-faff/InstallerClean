@@ -456,6 +456,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Windows Installer 自身の記録にあるファイルパスを解決できなかったため、それに何も照合できませんでした。`,
   'Cli.WithheldReasons.FileIdentity': `  Windows に記録のあるファイルを識別できなかったため、フォルダー内のものと照合できませんでした。`,
   'Cli.WithheldReasons.SecondInstance': `  この PC には同じプログラムが複数回インストールされている可能性があり、記録ではファイルがどのコピーのものか分かりません。`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Windows Installer の記録の一部を読み取れなかったため、ファイルがそこに記録されているプログラムのものである可能性があります。`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `エラー: 次回の再起動に向けてファイル操作が予約されていますが、InstallerClean にはそれがどのファイルを指しているか分からないため、{InstallerFolder} を除外できません。クリーンアップの前に Windows を再起動してください。`,
   'Cli.MoveRestoreHint': `プログラムがこれまでどおり更新およびアンインストールできることを確認してから、{0} を削除してください。`,
   'Error.ScanStoppedDetails': `これは {0} にも記録されます。`,

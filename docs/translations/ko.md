@@ -512,6 +512,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Windows Installer 자체 기록에 있는 파일 경로를 확인할 수 없어서, 그 경로에 아무것도 대조할 수 없었습니다. |
 |   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Windows에 기록이 있는 파일 하나의 신원을 확인할 수 없어서, 폴더에 있는 것과 대조할 수 없었습니다. |
 |   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   이 PC에 같은 프로그램이 두 번 이상 설치되어 있을 수 있고, 기록만으로는 파일이 어느 사본에 속하는지 알 수 없습니다. |
+|   Part of Windows Installer's records wouldn't read, so a file could belong to a program recorded there. |   Windows Installer 기록의 일부를 읽을 수 없어서, 파일이 그곳에 기록된 프로그램에 속할 수 있습니다. |
 |   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   폴더에 있는 파일 하나의 신원을 확인할 수 없어서, 기록과 대조할 수 없었습니다. |
 |   Either a file wouldn't say which program it belongs to, or Windows wouldn't give a clear answer about that program. |   어떤 파일이 어느 프로그램에 속하는지 밝히지 않았거나, Windows가 그 프로그램에 대해 분명하게 답하지 않았습니다. |
 |   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   파일이 어느 프로그램에 속하는지 확인하는 검사가, 건네받은 파일과 맞지 않는 답을 내놓았습니다. |

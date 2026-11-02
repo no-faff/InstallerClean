@@ -1890,6 +1890,7 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Windows Installer 自己的記錄中有一個檔案路徑無法解析，因此沒有任何內容能與它對應。</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Windows 有記錄的某個檔案無法辨識，因此無法與資料夾中的內容對應。</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  某個程式可能在這台電腦上安裝了不只一次，而記錄無法說明某個檔案屬於哪一份。</value></data>
+  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Windows Installer 記錄的一部分無法讀取，因此某個檔案可能屬於記錄在其中的某個程式。</value></data>
   <!-- The per-file arms that have a line. Each is a decision taken about one
        candidate, where the lines above are findings about the machine's records that
        withheld the walk-derived offer whole. They name different causes and have to

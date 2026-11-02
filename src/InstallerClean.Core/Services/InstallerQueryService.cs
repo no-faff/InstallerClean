@@ -255,8 +255,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// The patch codes the key's own <c>Patches</c> key lists, empty where it has no such
     /// key, and null where that listing was not established.
     /// </param>
+    /// <param name="HasInstallProperties">
+    /// Whether the key has an <c>InstallProperties</c> key. It stays true where that read
+    /// fails, which is counted as a failed read and withholds on its own.
+    /// </param>
     internal readonly record struct RegistryProductEntry(
-        string Account, string Code, IReadOnlyCollection<string>? PatchCodes);
+        string Account, string Code, IReadOnlyCollection<string>? PatchCodes, bool HasInstallProperties = true);
 
     /// <summary>
     /// A product or patch code under one account subtree of <c>UserData</c>. Both halves
@@ -1103,10 +1107,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         WithholdOnRegistryPackageRecords(claimed, patchClaims, fallback.PackageRecords);
+        var unlistedEntries = UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered));
         WithholdOnUnlistedEntries(
-            claimed, patchClaims, fallback.PackageRecords,
-            UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered)),
-            fallback.Failures > 0);
+            claimed, patchClaims, fallback.PackageRecords, unlistedEntries, fallback.Failures > 0);
 
         var heldByName = new List<PatchClaim>();
         ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered,
@@ -1452,7 +1455,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts, patchClaims.AsReadOnly(),
             census, listed,
             pairingsHeldByName,
-            PairingsOfHoldersWithNoClaims(pairingsHeldByName, patchClaims, ct, abandonedLog));
+            PairingsOfHoldersWithNoClaims(pairingsHeldByName, patchClaims, ct, abandonedLog),
+            UnlistedProductKeysOf(unlistedEntries, fallback.PackageRecords));
         }
         finally
         {
@@ -1715,9 +1719,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// THE WALKS DO NOT LIST EVERY PROGRAM THE REGISTRY HOLDS. A program installed per user by
     /// SYSTEM has its key under <c>S-1-5-18</c>, with a cached package and a <c>Patches</c>
     /// listing, and neither the product walk nor the keyed walk lists it, whichever elevated
-    /// account asks, SYSTEM included. An elevated ordinary account has no way to read about it
-    /// by name: a keyed read in the account <c>S-1-5-18</c> answers ERROR_INVALID_PARAMETER,
-    /// and one with no account is about the account asking. Microsoft documents a second such
+    /// account asks, SYSTEM included, and a keyed read in the account <c>S-1-5-18</c> answers
+    /// ERROR_INVALID_PARAMETER. Microsoft documents a second such
     /// gap: "The
     /// enumeration skips products that are advertised only (such as products not installed)
     /// in the per-user-unmanaged context when enumerating across all users or a user other
@@ -1748,17 +1751,46 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
+    /// <paramref name="unlisted"/> as the declared-product screen is handed it: each key with
+    /// the cached-package paths <paramref name="records"/> holds for its own account and code.
+    /// Two accounts can hold one code, so a record of another account's key is not its.
+    /// </summary>
+    internal static IReadOnlyList<UnlistedProductKey> UnlistedProductKeysOf(
+        IReadOnlyList<RegistryProductEntry> unlisted,
+        IReadOnlyList<RegistryPackageRecord>? records)
+    {
+        if (unlisted.Count == 0) return [];
+
+        var paths = new Dictionary<AccountCode, List<string>>();
+        foreach (var record in records ?? [])
+        {
+            if (record.IsPatch || record.Code is null || record.Account is null) continue;
+
+            var key = new AccountCode(record.Account, record.Code);
+            if (!paths.TryGetValue(key, out var held)) paths[key] = held = [];
+            held.Add(record.Path);
+        }
+
+        return unlisted
+            .Select(entry => new UnlistedProductKey(
+                entry.Account, entry.Code, entry.PatchCodes,
+                paths.TryGetValue(new AccountCode(entry.Account, entry.Code), out var held) ? held : [],
+                entry.HasInstallProperties))
+            .ToList();
+    }
+
+    /// <summary>
     /// Takes the removable verdict off every row of a patch an unlisted entry's own listing
     /// names, whichever path a claim or a package record gives for the patch, and marks every
     /// superseded or obsoleted row among them for the missing-files warning
     /// (<see cref="Hold"/>).
     ///
-    /// THE REGISTRY KEEPS THE FILE AND NOTHING HERE RELEASES ONE. No Windows Installer call
-    /// answers about such a program, so a row it holds is withheld, the state "this scan could
-    /// not prove it", and the <c>State</c> its listing records is not read: a registry value
-    /// can hold a file back and cannot show that a file may go. Nothing separates a program
-    /// from a key an uninstall left behind here either, so a leftover key keeps what its
-    /// listing names.
+    /// THE REGISTRY KEEPS THE FILE AND NOTHING HERE RELEASES ONE. No walk lists such a program,
+    /// so no pass in this scan asks it about the patch, and a row it holds is withheld, the
+    /// state "this scan could not prove it". The <c>State</c> its listing records is not read:
+    /// a registry value can hold a file back and cannot show that a file may go. This pass does
+    /// not separate a program from a key an uninstall left behind, so a leftover key keeps what
+    /// its listing names.
     ///
     /// A claim is read as well as the package records because a repair or a removal can take
     /// the patch's own record and leave the listing.
@@ -3727,9 +3759,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // holds; a key name that would not unpack has no code to ask
                     // about and is already counted above as withholding for that
                     // reason.
+                    IReadOnlyCollection<string>? entryCodes = null;
+                    var hasInstallProperties = true;
                     if (unpacked is not null)
                     {
-                        IReadOnlyCollection<string>? entryCodes = null;
                         try
                         {
                             var set = ReadProductPatchSet(productsKey, prodGuid,
@@ -3762,13 +3795,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                             patchCodesByProduct[unpacked] = null;
                             failureLog.Record(ex, cause: "product-patches");
                         }
-
-                        productEntries.Add(new RegistryProductEntry(sidName, unpacked, entryCodes));
                     }
 
                     try
                     {
                         using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
+                        hasInstallProperties = ipKey is not null;
 
                         // Both names are read, and each one present is claimed: see
                         // CachedPackageValueNames for which installation writes which.
@@ -3811,6 +3843,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         failures++;
                         failureLog.Record(ex, cause: "product-entry");
                     }
+
+                    if (unpacked is not null)
+                        productEntries.Add(
+                            new RegistryProductEntry(sidName, unpacked, entryCodes, hasInstallProperties));
                 }
             }
         }

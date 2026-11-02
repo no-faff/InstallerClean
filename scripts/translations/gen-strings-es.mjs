@@ -468,6 +468,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Una ruta de archivo de los propios registros de Windows Installer no se pudo resolver, así que no se le pudo cotejar nada.`,
   'Cli.WithheldReasons.FileIdentity': `  No se pudo identificar un archivo del que Windows tiene registro, así que no se pudo cotejar con lo que hay en la carpeta.`,
   'Cli.WithheldReasons.SecondInstance': `  Puede que un programa esté instalado más de una vez en este PC, y los registros no pueden decir a qué copia pertenece un archivo.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Una parte de los registros de Windows Installer no se pudo leer, así que un archivo podría pertenecer a un programa registrado allí.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Error: hay una operación de archivos en cola para el próximo reinicio e InstallerClean no puede saber qué archivos nombra, así que no puede descartar {InstallerFolder}. Reinicia Windows antes de limpiar.`,
   'Cli.MoveRestoreHint': `Comprueba que tus programas siguen actualizándose y desinstalándose con normalidad, y luego elimina {0}.`,
   'Error.ScanStoppedDetails': `Esto también queda registrado en {0}.`,

@@ -532,6 +532,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Windows Installer 자체 기록에 있는 파일 경로를 확인할 수 없어서, 그 경로에 아무것도 대조할 수 없었습니다.`,
   'Cli.WithheldReasons.FileIdentity': `  Windows에 기록이 있는 파일 하나의 신원을 확인할 수 없어서, 폴더에 있는 것과 대조할 수 없었습니다.`,
   'Cli.WithheldReasons.SecondInstance': `  이 PC에 같은 프로그램이 두 번 이상 설치되어 있을 수 있고, 기록만으로는 파일이 어느 사본에 속하는지 알 수 없습니다.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Windows Installer 기록의 일부를 읽을 수 없어서, 파일이 그곳에 기록된 프로그램에 속할 수 있습니다.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `오류: 다음 재시작을 위해 예약된 파일 작업이 있는데 InstallerClean은 그 작업이 어떤 파일을 가리키는지 알 수 없으므로, {InstallerFolder}를 배제할 수 없습니다. 정리하기 전에 Windows를 다시 시작하세요.`,
   'Cli.MoveRestoreHint': `프로그램이 여전히 정상적으로 업데이트되고 제거되는지 확인한 다음 {0}을(를) 삭제하세요.`,
   'Error.ScanStoppedDetails': `이 내용은 {0}에도 기록됩니다.`,

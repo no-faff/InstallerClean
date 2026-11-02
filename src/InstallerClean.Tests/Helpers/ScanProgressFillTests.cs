@@ -314,7 +314,7 @@ public class ScanProgressAgainstTheScanTests
             (_, _) => new InstallerQueryService.FallbackRead(0, 0),
             crashLogSink: null);
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(), Arg.Any<Func<string, bool?>?>(),
                 Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())

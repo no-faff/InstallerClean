@@ -457,6 +457,7 @@ Ayrıntılar şuraya yazıldı:
   'Cli.WithheldReasons.RecordedPath': `  Windows Installer'ın kendi kayıtlarındaki bir dosya yolu çözümlenemedi, bu yüzden onunla hiçbir şey eşleştirilemedi.`,
   'Cli.WithheldReasons.FileIdentity': `  Windows'un kaydı bulunan bir dosyanın kimliği belirlenemedi, bu yüzden klasörde bulunanlarla eşleştirilemedi.`,
   'Cli.WithheldReasons.SecondInstance': `  Bir program bu bilgisayara birden fazla kez yüklenmiş olabilir ve kayıtlar bir dosyanın hangi kopyaya ait olduğunu söyleyemiyor.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Windows Installer kayıtlarının bir kısmı okunamadı, bu yüzden bir dosya orada kayıtlı bir programa ait olabilir.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Hata: bir sonraki yeniden başlatma için sıraya alınmış bir dosya işlemi var ve InstallerClean bu işlemin hangi dosyaları adlandırdığını bilemiyor, bu yüzden {InstallerFolder} klasörünü dışlayamıyor. Temizlemeden önce Windows'u yeniden başlatın.`,
   'Cli.MoveRestoreHint': `Programlarınızın hâlâ normal şekilde güncellendiğini ve kaldırıldığını doğrulayın, sonra {0} klasörünü silin.`,
   'Error.ScanStoppedDetails': `Bu ayrıca {0} içine kaydedilir.`,

@@ -126,7 +126,7 @@ public class WithholdingSplitTests
         // verdict above: filing it under one of them would attach a cause the screen
         // never reached.
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(),
                 Arg.Any<Func<string, bool?>?>(), Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())
@@ -143,6 +143,23 @@ public class WithholdingSplitTests
         AssertPartitions(result);
     }
 
+    [Fact]
+    public async Task The_screen_is_handed_the_keys_the_scans_enumeration_left_unlisted()
+    {
+        var key = new UnlistedProductKey("S-1-5-18", ProductA, [], [], HasInstallProperties: true);
+        var screen = Substitute.For<IDeclaredProductCheck>();
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
+                Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(),
+                Arg.Any<Func<string, bool?>?>(), Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
+                Arg.Any<Func<string, bool?>?>())
+            .Returns(new DeclaredProductScreening([DeclaredProductOutcome.DeclaredProductNotInstalled], [], WaitCount: 0));
+
+        await Scan(walked: new[] { $@"{Folder}\a.msi" }, registered: Array.Empty<string>(), screen: screen, unlisted: [key]);
+
+        var handed = (IReadOnlyList<UnlistedProductKey>)screen.ReceivedCalls().Single().GetArguments()[2]!;
+        Assert.Equal([key], handed);
+    }
+
     /// <summary>
     /// A screen that keeps every file it is handed as one whose program is installed, and
     /// reports a share given up with as many files kept at it as it was handed, three waits,
@@ -152,7 +169,7 @@ public class WithholdingSplitTests
     private static IDeclaredProductCheck ScreenGivingUpAShare(int? answered = null)
     {
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(),
                 Arg.Any<Func<string, bool?>?>(), Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())
@@ -208,7 +225,7 @@ public class WithholdingSplitTests
     public async Task What_the_screen_read_of_the_second_copies_travels_on_the_result()
     {
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(),
                 Arg.Any<Func<string, bool?>?>(), Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())
@@ -236,7 +253,7 @@ public class WithholdingSplitTests
     private static IDeclaredProductCheck ScreenGivingCauses(IReadOnlyList<DeclaredProductInstalledCause> causes)
     {
         var screen = Substitute.For<IDeclaredProductCheck>();
-        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(),
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
                 Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(),
                 Arg.Any<Func<string, bool?>?>(), Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
                 Arg.Any<Func<string, bool?>?>())
@@ -442,7 +459,8 @@ public class WithholdingSplitTests
         IDeclaredProductCheck? screen = null,
         EnumerationCensus census = default,
         IFileTimesReader? times = null,
-        TimeProvider? clock = null)
+        TimeProvider? clock = null,
+        IReadOnlyList<UnlistedProductKey>? unlisted = null)
     {
         var fs = new MockFileSystem();
         fs.AddDirectory(Folder);
@@ -456,7 +474,7 @@ public class WithholdingSplitTests
         var query = Substitute.For<IInstallerQueryService>();
         query.GetRegisteredPackagesAsync(
                 Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new InstallerQueryResult(packages.AsReadOnly(), Census: census));
+            .Returns(new InstallerQueryResult(packages.AsReadOnly(), Census: census, UnlistedProductKeys: unlisted));
 
         return new FileSystemScanService(query, fs, null, walked, null, identities, screen, times, clock)
             .ScanAsync();

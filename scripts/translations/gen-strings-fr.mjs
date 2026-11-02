@@ -550,6 +550,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Un chemin de fichier issu des propres enregistrements de Windows Installer n'a pas pu être résolu, rien n'a donc pu lui être rapproché.`,
   'Cli.WithheldReasons.FileIdentity': `  Un fichier dont Windows garde un enregistrement n'a pas pu être identifié, il n'a donc pas pu être rapproché du contenu du dossier.`,
   'Cli.WithheldReasons.SecondInstance': `  Un programme est peut-être installé plusieurs fois sur ce PC, et les enregistrements ne peuvent pas dire à quelle copie appartient un fichier.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Une partie des enregistrements de Windows Installer n'a pas pu être lue, un fichier pourrait donc appartenir à un programme qui y est enregistré.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Erreur : une opération sur fichiers est en file d'attente pour le prochain redémarrage et InstallerClean ne peut pas savoir quels fichiers elle nomme, il ne peut donc pas exclure {InstallerFolder}. Redémarrez Windows avant de nettoyer.`,
   'Cli.MoveRestoreHint': `Vérifiez que vos programmes se mettent toujours à jour et se désinstallent normalement, puis supprimez {0}.`,
   'Error.ScanStoppedDetails': `Cela est également consigné dans {0}.`,

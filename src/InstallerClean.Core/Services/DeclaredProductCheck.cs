@@ -45,7 +45,9 @@ namespace InstallerClean.Services;
 /// in the account this process runs as is read like any other. Every source list it does read is
 /// read twice, through the API and from the registry key that holds it, and a list the two do not
 /// agree on keeps the file. Every <c>InstallSource</c> it reads is read the same two ways, and one
-/// the two do not agree on keeps the file too.
+/// the two do not agree on keeps the file too. A file all of that would let through is put to the
+/// product keys no installation accounts for (<see cref="PutToUnlistedKeys"/>), whose sources are
+/// read from the registry alone.
 ///
 /// IT COMPOSES THINGS THAT ALREADY EXIST. The reading of each file, package or
 /// patch, is the reader's. The asking is
@@ -128,6 +130,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     public DeclaredProductScreening Screen(
         IReadOnlyList<OrphanedFile> candidates,
         IReadOnlyList<ListedInstallation> installations,
+        IReadOnlyList<UnlistedProductKey> unlisted,
         CancellationToken cancellationToken = default,
         Action<Exception, string>? recordRefusal = null,
         Func<string, bool?>? namesAFileInInstallerFolder = null,
@@ -161,6 +164,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     ? null
                     : _fileIdentities.VolumeOf(installerFolder)),
             IsTheInstallerFolder = isTheInstallerFolder,
+            UnlistedKeys = unlisted,
         };
 
         for (var i = 0; i < candidates.Count; i++)
@@ -224,6 +228,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             outcomes[i] = Settle(
                 candidate.FullPath, answer, pass, namesAFileInInstallerFolder, recordRefusal, out var givenUp,
                 out causes[i]);
+
+            // The last step, and it only ever adds a hold: a file this answer lets through is
+            // put to the product keys no installation accounts for.
+            if (!outcomes[i].Withholds())
+                outcomes[i] = PutToUnlistedKeys(
+                    candidate.FullPath, code, outcomes[i], pass, namesAFileInInstallerFolder, out givenUp);
 
             // A file kept where its check stopped at a read refused for a root given up
             // counts towards that root. A patch reads no source folder, so it never does.
@@ -2042,7 +2052,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // and it keeps the copy. A package name holding a '%' names a variable, which whoever
         // reads the name may expand in its own environment, and one holding a null is cut short
         // at the null wherever it is read as a path. Both keep the copy as well.
-        if (packageName.IndexOfAny(['\\', '/', ':', '%', '\0']) >= 0)
+        if (SpellsMoreThanAName(packageName))
             return Refuse(SourceRefusal.FormPackageName, out refusal);
 
         var sources = SourcesOf(code, sid, context, MsiSourceListOptions.Network);
@@ -2111,11 +2121,35 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (installSource.Length > 0 && !folders.Contains(installSource, StringComparer.Ordinal))
             folders.Add(installSource);
 
+        if (!AddPackagesInFolders(
+                folders, packageName, pass, namesAFileInInstallerFolder, registry, opened, byName, out givenUp))
+            return Refuse(givenUp is null ? SourceRefusal.PackageNotRuledOut : SourceRefusal.GivenUp, out refusal);
+
+        refusal = SourceRefusal.None;
+        return true;
+    }
+
+    /// <summary>
+    /// The package named <paramref name="packageName"/> in each of <paramref name="folders"/>:
+    /// a package in a folder compared by name goes to <paramref name="byName"/>
+    /// (<see cref="ComparedByName"/>), and any other is read, its identity going to
+    /// <paramref name="opened"/> where it is there. False where a read does not settle, with
+    /// <paramref name="givenUp"/> the root whose give-up refused it, if any.
+    /// </summary>
+    private bool AddPackagesInFolders(
+        IReadOnlyList<string> folders,
+        string packageName,
+        PassAnswers pass,
+        Func<string, bool?> namesAFileInInstallerFolder,
+        IRegistryReader registry,
+        List<FileIdentity> opened,
+        List<PackageByName> byName,
+        out string? givenUp)
+    {
+        givenUp = null;
         foreach (var folder in folders)
         {
-            // Joined with a backslash by hand rather than with Path.Combine, whose
-            // separator is the host's.
-            var package = folder.EndsWith('\\') ? folder + packageName : folder + '\\' + packageName;
+            var package = PathOfPackage(folder, packageName);
 
             if (ComparedByName(package, registry, pass))
             {
@@ -2124,15 +2158,27 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             }
 
             var inInstallerFolder = IsLocalDrive(RootOf(package), pass) ? null : namesAFileInInstallerFolder;
-            if (!ReadSourcePackage(package, pass, inInstallerFolder, out var identity, out givenUp))
-                return Refuse(givenUp is null ? SourceRefusal.PackageNotRuledOut : SourceRefusal.GivenUp, out refusal);
+            if (!ReadSourcePackage(package, pass, inInstallerFolder, out var identity, out givenUp)) return false;
 
             if (identity is { } read) opened.Add(read);
         }
 
-        refusal = SourceRefusal.None;
         return true;
     }
+
+    /// <summary>
+    /// <paramref name="name"/> in <paramref name="folder"/>, joined with a backslash by hand
+    /// rather than with <c>Path.Combine</c>, whose separator is the host's.
+    /// </summary>
+    private static string PathOfPackage(string folder, string name) =>
+        folder.EndsWith('\\') ? folder + name : folder + '\\' + name;
+
+    /// <summary>
+    /// Whether <paramref name="packageName"/> holds a '\', a '/', a ':', a '%' or a null, each of
+    /// which makes it something other than the name of one file (<see cref="AddPackagesAtSources"/>).
+    /// </summary>
+    private static bool SpellsMoreThanAName(string packageName) =>
+        packageName.IndexOfAny(['\\', '/', ':', '%', '\0']) >= 0;
 
     /// <summary>
     /// False, with <paramref name="refusal"/> set to <paramref name="reason"/>: the answer of a
@@ -3255,11 +3301,400 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         // As for a product: the registrations are shared by every copy declaring the
         // patch, and whether the copies they record are OTHER files is asked per file.
-        return answer.Outcome == DeclaredProductOutcome.DeclaredPatchRegistered
+        var verdict = answer.Outcome == DeclaredProductOutcome.DeclaredPatchRegistered
             && answer.RecordedPackages is { } recorded
                 ? CompareWithRecorded(path, recorded)
                 : answer.Outcome;
+
+        return verdict.Withholds() ? verdict : PutPatchToUnlistedKeys(code, verdict, pass);
     }
+
+    /// <summary>
+    /// A patch file <paramref name="letThrough"/> would let through, put to the
+    /// <c>Patches</c> listing of every product key no installation accounts for. A listing
+    /// naming the patch keeps the file, and so does a listing that was not established, which
+    /// may name it. A listing that does not name it adds nothing.
+    /// </summary>
+    private static DeclaredProductOutcome PutPatchToUnlistedKeys(
+        string patchCode, DeclaredProductOutcome letThrough, PassAnswers pass)
+    {
+        foreach (var key in pass.UnlistedKeys)
+            if (key.PatchCodes is null || key.PatchCodes.Contains(patchCode, StringComparer.OrdinalIgnoreCase))
+                return DeclaredProductOutcome.DeclaredPatchUnestablished;
+
+        return letThrough;
+    }
+
+    /// <summary>
+    /// An installation package <paramref name="letThrough"/> would let through, put to the
+    /// product keys no installation accounts for (<see cref="ReadUnlistedKeys"/>): a candidate
+    /// declaring a code they give is kept; where they leave a second copy not ruled out every
+    /// candidate is kept; and a candidate that is a package they open, or that a package name
+    /// reaches (<see cref="ReachedByName"/>), is kept.
+    ///
+    /// <paramref name="givenUp"/> is the root whose give-up alone left the keys not all seen.
+    /// </summary>
+    private DeclaredProductOutcome PutToUnlistedKeys(
+        string candidatePath,
+        string code,
+        DeclaredProductOutcome letThrough,
+        PassAnswers pass,
+        Func<string, bool?>? namesAFileInInstallerFolder,
+        out string? givenUp)
+    {
+        givenUp = null;
+        if (pass.UnlistedKeys.Count == 0) return letThrough;
+
+        var read = pass.UnlistedRead ??= ReadUnlistedKeys(pass, namesAFileInInstallerFolder);
+
+        if (read.Codes.Contains(code)) return DeclaredProductOutcome.Unestablished;
+
+        if (read.NotAllSeen)
+        {
+            givenUp = read.GivenUp;
+            return DeclaredProductOutcome.SecondCopyUnestablished;
+        }
+
+        if ((read.Packages.Count == 0 && read.PackageNames.Count == 0) || _fileIdentities is null)
+            return letThrough;
+
+        if (_fileIdentities.ReadOutcome(candidatePath, out var candidate) != FileIdentityRead.Read)
+            return DeclaredProductOutcome.CandidateIdentityUnestablished;
+
+        return read.Packages.Contains(candidate) || ReachedByName(candidatePath, candidate, read.PackageNames)
+            ? DeclaredProductOutcome.Unestablished
+            : letThrough;
+    }
+
+    /// <summary>
+    /// Whether one of <paramref name="packageNames"/> opens the candidate in its own folder.
+    /// THE FILESYSTEM ANSWERS, by the file that name opens there, so the volume's own case
+    /// table, short names and treatment of trailing dots decide and this process's do not.
+    /// A name opening nothing there, or a different file, does not reach the candidate. Any
+    /// other answer keeps this candidate.
+    /// </summary>
+    private bool ReachedByName(string candidatePath, FileIdentity candidate, IReadOnlyCollection<string> packageNames)
+    {
+        var folder = candidatePath[..(candidatePath.LastIndexOfAny(['\\', '/']) + 1)];
+        foreach (var name in packageNames)
+        {
+            switch (_fileIdentities!.ReadOutcome(folder + name, out var named))
+            {
+                case FileIdentityRead.NamesNothing:
+                    continue;
+                case FileIdentityRead.Read when named != candidate:
+                    continue;
+                default:
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// What the product keys no installation accounts for say, read once for the pass, on the
+    /// first package let through, so a pass with none reads nothing.
+    ///
+    /// A KEY WITH AN <c>InstallProperties</c> KEY gives its code, what its cached packages
+    /// declare and the packages its sources open. Its sources are read from the registry alone
+    /// (<see cref="AddRegistrySources"/>), which can keep a file and never release one.
+    ///
+    /// A KEY WITHOUT ONE gives only the package at a local folder on its source list
+    /// (<see cref="AddPackagesAtLocalSources"/>).
+    /// </summary>
+    private UnlistedKeysRead ReadUnlistedKeys(PassAnswers pass, Func<string, bool?>? namesAFileInInstallerFolder)
+    {
+        var codes = new HashSet<string>(StringComparer.Ordinal);
+        var packages = new List<FileIdentity>();
+        var byName = new List<PackageByName>();
+        var notAllSeen = false;
+        var keptOtherwise = false;
+        string? firstGivenUp = null;
+
+        foreach (var key in pass.UnlistedKeys)
+        {
+            pass.CancellationToken.ThrowIfCancellationRequested();
+
+            if (!key.HasInstallProperties)
+            {
+                AddPackagesAtLocalSources(key, pass, packages);
+                continue;
+            }
+
+            codes.Add(PackageIdentityReader.Canonicalise(key.Code) ?? key.Code);
+
+            var cachedSaid = true;
+            foreach (var path in key.CachedPackages)
+                if (!AddCachedPackage(path, packages, codes)) cachedSaid = false;
+
+            var sourcesRead = AddRegistrySources(
+                key, pass, namesAFileInInstallerFolder, packages, byName, out var givenUp);
+
+            // Only a key recording a cached package can leave a second copy not ruled out.
+            if (key.CachedPackages.Count == 0 || (cachedSaid && sourcesRead)) continue;
+
+            notAllSeen = true;
+            if (!cachedSaid || givenUp is null) keptOtherwise = true;
+            else firstGivenUp ??= givenUp;
+        }
+
+        return new UnlistedKeysRead(
+            codes, packages, byName.Select(package => package.Name).ToHashSet(StringComparer.Ordinal),
+            notAllSeen, keptOtherwise ? null : firstGivenUp);
+    }
+
+    /// <summary>
+    /// The identity of the cached package at <paramref name="path"/> and the product code it
+    /// declares. False where it is gone, will not read or declares no product code.
+    /// </summary>
+    private bool AddCachedPackage(string path, List<FileIdentity> packages, HashSet<string> codes)
+    {
+        if (_fileIdentities is null
+            || _fileIdentities.ReadOutcome(path, out var identity) != FileIdentityRead.Read)
+            return false;
+
+        var declared = _identityReader.Read(path, isPatch: false, out _);
+        if (declared is null || declared.Value.Code.Length == 0 || declared.Value.IsPatch) return false;
+
+        packages.Add(identity);
+        codes.Add(declared.Value.Code);
+        return true;
+    }
+
+    /// <summary>
+    /// The places a product key's source list can be, by the account subtree the key sits
+    /// under: per machine and per user for <c>S-1-5-18</c>, per user for any other account.
+    /// </summary>
+    private static (string? Sid, MsiInstallContext Context)[] SourceListPlaces(string account) =>
+        string.Equals(account, DirectoryGuard.SystemSid, StringComparison.OrdinalIgnoreCase)
+            ?
+            [
+                (null, MsiInstallContext.Machine),
+                (account, MsiInstallContext.UserUnmanaged),
+                (account, MsiInstallContext.UserManaged),
+            ]
+            : [(account, MsiInstallContext.UserUnmanaged), (account, MsiInstallContext.UserManaged)];
+
+    /// <summary>
+    /// The sources of a key no installation accounts for, read from the registry alone, as
+    /// <see cref="AddPackagesAtSources"/> reads a listed installation's with the comparison
+    /// with the API left out, because no API call is put to such a key. False where they
+    /// cannot be read, with <paramref name="givenUp"/> the root whose give-up refused a read,
+    /// if any: an account whose hive is not loaded, a key that will not read, a value in a form
+    /// this check does not compare, and a package that does not settle.
+    ///
+    /// A LIST THAT IS NOT THERE, under a hive that is loaded, names nothing to compare. A key
+    /// with no list and an <c>InstallSource</c> has no package name to look for there, so
+    /// that folder has to be shown not to be the Installer folder.
+    /// </summary>
+    private bool AddRegistrySources(
+        UnlistedProductKey key,
+        PassAnswers pass,
+        Func<string, bool?>? namesAFileInInstallerFolder,
+        List<FileIdentity> opened,
+        List<PackageByName> byName,
+        out string? givenUp)
+    {
+        givenUp = null;
+        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return false;
+
+        if (!RecordedInstallSource(key, out var installSource)) return false;
+
+        var listFound = false;
+        foreach (var (sid, context) in SourceListPlaces(key.Account))
+        {
+            if (!SourceListAt(key.Code, sid, context, out var listKey, out var values)) return false;
+            if (values is null) continue;
+
+            listFound = true;
+            if (ReadSourceList(listKey, values, pass) is not { } sources) return false;
+
+            if (sources.MediaSearch) byName.Add(new PackageByName(null, sources.PackageName));
+
+            var folders = sources.Folders;
+            if (installSource.Length > 0 && !folders.Contains(installSource, StringComparer.Ordinal))
+                folders.Add(installSource);
+
+            if (!AddPackagesInFolders(
+                    folders, sources.PackageName, pass, namesAFileInInstallerFolder, _registry, opened, byName,
+                    out givenUp))
+                return false;
+        }
+
+        return listFound || installSource.Length == 0 || IsNotTheInstallerFolder(installSource, pass, out givenUp);
+    }
+
+    /// <summary>
+    /// The package a key with no <c>InstallProperties</c> key names at each local folder on its
+    /// source list, by identity. A candidate that is that package is kept, and this is the one
+    /// way such a key keeps a file.
+    /// </summary>
+    private void AddPackagesAtLocalSources(UnlistedProductKey key, PassAnswers pass, List<FileIdentity> packages)
+    {
+        if (_fileIdentities is null || _registry is null) return;
+
+        foreach (var (sid, context) in SourceListPlaces(key.Account))
+        {
+            if (!SourceListAt(key.Code, sid, context, out var listKey, out var values) || values is null) continue;
+            if (ReadSourceList(listKey, values, pass) is not { } sources) continue;
+
+            foreach (var folder in sources.Folders)
+            {
+                var package = PathOfPackage(folder, sources.PackageName);
+                if (ComparedByName(package, _registry, pass)) continue;
+
+                if (_fileIdentities.ReadOutcome(package, out var identity) == FileIdentityRead.Read)
+                    packages.Add(identity);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Where a key's <c>SourceList</c> key is in one account and context, and its values, which
+    /// are null where the key is not there. False where that is not established: a key name
+    /// that cannot be made, an account whose hive is not loaded, and a key that will not read.
+    /// </summary>
+    private bool SourceListAt(
+        string code, string? sid, MsiInstallContext context,
+        out KeyAt listKey, out IReadOnlyList<RegistryValue>? values)
+    {
+        listKey = default;
+        values = null;
+        if (_registry is null || SourceListKeyPath(code, sid, context) is not { } path) return false;
+
+        listKey = path;
+        if (path.Account is { } account && _registry.UserHivePresence(account) != RegistryKeyPresence.Present)
+            return false;
+
+        var list = ValuesOf(_registry, path);
+        if (list.Presence == RegistryKeyPresence.Absent) return true;
+        if (list.Presence != RegistryKeyPresence.Present || list.Values is null) return false;
+
+        values = list.Values;
+        return true;
+    }
+
+    /// <summary>
+    /// The folder a key's <c>InstallProperties</c> key records as its <c>InstallSource</c>,
+    /// empty where it records none or a web address. False where that is not established, or
+    /// the value is one this check does not compare, by the rules of
+    /// <see cref="InstallSourceIn"/>.
+    /// </summary>
+    private bool RecordedInstallSource(UnlistedProductKey key, out string folder)
+    {
+        folder = string.Empty;
+        var (sid, context) = SourceListPlaces(key.Account)[0];
+        if (_registry is null || InstallPropertiesKeyPath(key.Code, sid, context) is not { } path) return false;
+
+        var properties = _registry.LocalMachineValues(path);
+        if (properties.Presence == RegistryKeyPresence.Absent) return true;
+        if (properties.Presence != RegistryKeyPresence.Present || properties.Values is null) return false;
+
+        var stored = ValueNamed(properties.Values, MsiInstallProperty.InstallSource, out var count);
+        if (count == 0) return true;
+        if (count != 1 || stored is not { Kind: RegistryValueKind.String, Text: { } text }) return false;
+
+        if (IsWebAddress(text)) return true;
+        if (text.Contains('%') || text.Contains('\0')) return false;
+        if (text.Length > 0 && !IsOnADriveOrAShare(text)) return false;
+
+        folder = text;
+        return true;
+    }
+
+    /// <summary>
+    /// A <c>SourceList</c> key read from the registry alone, by the form tests
+    /// <see cref="AddPackagesAtSources"/> applies, or null where a value is not in a form this
+    /// check compares. A <c>Net</c> entry and a <c>LastUsedSource</c> are stored as REG_EXPAND_SZ
+    /// and read unexpanded, so the '%' test is what keeps one naming a variable.
+    /// </summary>
+    private ListedSources? ReadSourceList(KeyAt listKey, IReadOnlyList<RegistryValue> values, PassAnswers pass)
+    {
+        var name = ValueNamed(values, MsiInstallProperty.PackageName, out var nameCount);
+        if (nameCount != 1
+            || name is not { Kind: RegistryValueKind.String, Text: { } packageName }
+            || !IsAFileName(packageName))
+            return null;
+
+        var net = ValuesOf(_registry!, listKey.Below("Net"));
+        var folders = new List<string>();
+        if (net.Presence != RegistryKeyPresence.Absent)
+        {
+            if (net.Presence != RegistryKeyPresence.Present || net.Values is null) return null;
+
+            foreach (var value in net.Values)
+            {
+                if (value.Name.Length == 0 || !value.Name.All(char.IsAsciiDigit)) return null;
+                if (value.Text is not { } entry || !IsAComparedFolder(entry)) return null;
+                folders.Add(entry);
+            }
+        }
+
+        var urls = ValuesOf(_registry!, listKey.Below("URL"));
+        if (urls.Presence != RegistryKeyPresence.Absent)
+        {
+            if (urls.Presence != RegistryKeyPresence.Present || urls.Values is null) return null;
+
+            foreach (var value in urls.Values)
+                if (value.Text is not { } url || !IsWebAddress(url)) return null;
+        }
+
+        var mediaSearch = false;
+        var media = ValuesOf(_registry!, listKey.Below("Media"));
+        if (media.Presence != RegistryKeyPresence.Absent)
+        {
+            if (media.Presence != RegistryKeyPresence.Present || media.Values is null) return null;
+
+            var mediaPath = ValueNamed(media.Values, "MediaPackage", out var pathCount);
+            if (pathCount != 0 && mediaPath?.Text is null) return null;
+
+            var hasPath = pathCount != 0 && mediaPath!.Value.Text!.Length > 0;
+            if (hasPath && RemoteLinksCanBeFollowed(_registry!, pass)) return null;
+
+            mediaSearch = hasPath
+                || media.Values.Any(value => value.Name.Length > 0 && value.Name.All(char.IsAsciiDigit));
+        }
+
+        var last = ValueNamed(values, MsiInstallProperty.LastUsedSource, out var lastCount);
+        if (lastCount > 0 && last?.Text is null) return null;
+
+        if (!string.IsNullOrEmpty(last?.Text))
+        {
+            var parts = last.Value.Text.Split(';', 3);
+            if (parts.Length != 3) return null;
+
+            if (parts[0] == "u")
+            {
+                if (!IsWebAddress(parts[2])) return null;
+            }
+            else
+            {
+                if (parts[0] is not ("n" or "m") || !IsAComparedFolder(parts[2])) return null;
+                if (!folders.Contains(parts[2], StringComparer.Ordinal)) folders.Add(parts[2]);
+            }
+        }
+
+        return new ListedSources(packageName, folders, mediaSearch);
+    }
+
+    /// <summary>
+    /// Whether <paramref name="folder"/> is in a form this check compares: on a drive or a
+    /// share, with no '%' and no null.
+    /// </summary>
+    private static bool IsAComparedFolder(string folder) =>
+        !folder.Contains('%') && !folder.Contains('\0') && IsOnADriveOrAShare(folder);
+
+    /// <summary>
+    /// Whether <paramref name="name"/> can be the name of a file on Windows: it spells nothing
+    /// more than a name, it is not empty once trailing dots and spaces are taken off, as
+    /// Windows takes them off a path's last component, and it holds none of the characters
+    /// Windows refuses in a file name. No package carries any other name.
+    /// </summary>
+    private static bool IsAFileName(string name) =>
+        !SpellsMoreThanAName(name)
+        && !name.AsSpan().TrimEnd(". ").IsEmpty
+        && name.IndexOfAny(['*', '?', '"', '<', '>', '|']) < 0;
 
     /// <summary>
     /// What Windows holds for one declared patch, asked once per patch code and target
@@ -3556,6 +3991,37 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// </param>
     /// <param name="Name">The package name.</param>
     private readonly record struct PackageByName(string? Path, string Name);
+
+    /// <summary>
+    /// What a <c>SourceList</c> key read from the registry holds (<see cref="ReadSourceList"/>).
+    /// </summary>
+    /// <param name="PackageName">The package name.</param>
+    /// <param name="Folders">The list's folders, and the folder used last where it is one.</param>
+    /// <param name="MediaSearch">
+    /// Whether the list has a media source or a media package path, either of which sends
+    /// Windows Installer looking for the package by its name on the drives it tries.
+    /// </param>
+    private readonly record struct ListedSources(string PackageName, List<string> Folders, bool MediaSearch);
+
+    /// <summary>
+    /// What the product keys no installation accounts for say (<see cref="ReadUnlistedKeys"/>).
+    /// </summary>
+    /// <param name="Codes">The product codes that keep a candidate declaring one.</param>
+    /// <param name="Packages">The packages the keys open, by identity.</param>
+    /// <param name="PackageNames">Every package name compared by name.</param>
+    /// <param name="NotAllSeen">
+    /// Whether a key recording a cached package left a second copy not ruled out.
+    /// </param>
+    /// <param name="GivenUp">
+    /// Where <paramref name="NotAllSeen"/> is true only because reads were refused for roots
+    /// given up for the pass, the first of those roots, and null otherwise.
+    /// </param>
+    private sealed record UnlistedKeysRead(
+        HashSet<string> Codes,
+        List<FileIdentity> Packages,
+        HashSet<string> PackageNames,
+        bool NotAllSeen,
+        string? GivenUp);
 
     /// <summary>
     /// The names one candidate has, for comparing with a package name: the last component
@@ -3949,6 +4415,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         /// <summary>Each declared patch's answer, keyed by patch code and target list.</summary>
         internal Dictionary<string, DeclarationAnswer> Patches { get; } = new(StringComparer.Ordinal);
+
+        /// <summary>The product keys no installation accounts for.</summary>
+        internal IReadOnlyList<UnlistedProductKey> UnlistedKeys { get; init; } = [];
+
+        /// <summary>What those keys say, read once (<see cref="ReadUnlistedKeys"/>).</summary>
+        internal UnlistedKeysRead? UnlistedRead { get; set; }
 
         /// <summary>
         /// Every installation of one product code, asked once per pass whichever half

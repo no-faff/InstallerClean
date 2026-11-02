@@ -1890,6 +1890,7 @@ Execute o InstallerClean novamente como administrador.</value></data>
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Um caminho de arquivo nos próprios registros do Windows Installer não pôde ser resolvido, então nada pôde ser associado a ele.</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Não foi possível identificar um arquivo do qual o Windows tem registro, então não foi possível compará-lo com o que há na pasta.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Um programa pode estar instalado mais de uma vez neste PC, e os registros não conseguem dizer a qual cópia um arquivo pertence.</value></data>
+  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Parte dos registros do Windows Installer não pôde ser lida, então um arquivo pode pertencer a um programa registrado ali.</value></data>
   <!-- The per-file arms that have a line. Each is a decision taken about one
        candidate, where the lines above are findings about the machine's records that
        withheld the walk-derived offer whole. They name different causes and have to

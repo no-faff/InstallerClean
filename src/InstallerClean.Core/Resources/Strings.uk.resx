@@ -1890,6 +1890,7 @@ InstallerClean уже працював від імені адміністрат�
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Шлях до файлу з власних записів Windows Installer не вдалося розв'язати, тож із ним нічого не вдалося зіставити.</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Файл, про який Windows має запис, не вдалося розпізнати, тож його не вдалося зіставити з тим, що є в теці.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Програму може бути встановлено на цьому ПК більше одного разу, а записи не можуть сказати, якій копії належить файл.</value></data>
+  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Частину записів Windows Installer не вдалося прочитати, тож файл може належати програмі, записаній там.</value></data>
   <!-- The per-file arms that have a line. Each is a decision taken about one
        candidate, where the lines above are findings about the machine's records that
        withheld the walk-derived offer whole. They name different causes and have to

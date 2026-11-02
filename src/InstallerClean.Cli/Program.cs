@@ -2652,6 +2652,7 @@ internal static class Program
         WithholdingLeg.RecordedPathUnestablished => Strings.Cli_WithheldReasons_RecordedPath,
         WithholdingLeg.FileIdentityUnestablished => Strings.Cli_WithheldReasons_FileIdentity,
         WithholdingLeg.RegistryProductUnaskable => Strings.Cli_WithheldReasons_SecondInstance,
+        WithholdingLeg.RegistryRecordsUnread => Strings.Cli_WithheldReasons_RegistryRecordsUnread,
         _ => Strings.Cli_WithheldReasons_Header,
     };
 
@@ -2664,7 +2665,7 @@ internal static class Program
     /// here is one whose files the list cannot account for, which keeps the list off
     /// every run holding them.
     ///
-    /// THE WHOLESALE ARM HAS NO MEMBER AND SO CANNOT REACH THIS. The three leg lines
+    /// THE WHOLESALE ARM HAS NO MEMBER AND SO CANNOT REACH THIS. The leg lines
     /// speak for it, and a line here as well would say the same thing twice about one
     /// machine.
     ///

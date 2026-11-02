@@ -531,6 +531,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Một đường dẫn tệp trong chính hồ sơ của Windows Installer không phân giải được, nên không thể đối chiếu gì với nó.`,
   'Cli.WithheldReasons.FileIdentity': `  Không nhận dạng được một tệp mà Windows có hồ sơ, nên không thể đối chiếu nó với những gì có trong thư mục.`,
   'Cli.WithheldReasons.SecondInstance': `  Một chương trình có thể đã được cài nhiều hơn một lần trên máy này, và hồ sơ không cho biết một tệp thuộc về bản sao nào.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Một phần hồ sơ của Windows Installer không đọc được, nên một tệp có thể thuộc về một chương trình được ghi ở đó.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Lỗi: có một thao tác tệp đang xếp hàng chờ lần khởi động lại tới và InstallerClean không biết được thao tác đó nêu tên những tệp nào, nên không thể loại trừ {InstallerFolder}. Hãy khởi động lại Windows trước khi dọn dẹp.`,
   'Cli.MoveRestoreHint': `Hãy kiểm tra xem các chương trình của bạn vẫn cập nhật và gỡ cài đặt bình thường, rồi xóa {0}.`,
   'Error.ScanStoppedDetails': `Điều này cũng được ghi lại trong {0}.`,

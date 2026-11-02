@@ -515,6 +515,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Een bestandspad uit de eigen administratie van Windows Installer was niet te herleiden, en er kon daarom niets aan worden gekoppeld.`,
   'Cli.WithheldReasons.FileIdentity': `  Een bestand waarvan Windows een administratie heeft, was niet te identificeren, en kon daarom niet worden vergeleken met wat er in de map staat.`,
   'Cli.WithheldReasons.SecondInstance': `  Een programma is mogelijk meer dan één keer op deze pc geïnstalleerd, en de administratie kan niet zeggen bij welke kopie een bestand hoort.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Een deel van de administratie van Windows Installer was niet te lezen, en een bestand kan daarom bij een daarin vastgelegd programma horen.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Fout: er staat een bestandsbewerking in de wachtrij voor de volgende herstart en InstallerClean kan niet zien welke bestanden die noemt, dus kan het {InstallerFolder} niet uitsluiten. Start Windows opnieuw op voordat je opruimt.`,
   'Cli.MoveRestoreHint': `Controleer of je programma's nog gewoon bijwerken en verwijderen, en verwijder daarna {0}.`,
   'Error.ScanStoppedDetails': `Dit wordt ook vastgelegd in {0}.`,

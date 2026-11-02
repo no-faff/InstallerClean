@@ -82,6 +82,11 @@ namespace InstallerClean.Models;
 /// holds no claim, for that check to read as the installation's other patches. They carry
 /// no path.
 /// </param>
+/// <param name="UnlistedProductKeys">
+/// Every product key under <c>UserData</c> no installation in <see cref="Installations"/>
+/// accounts for. The declared-product screen is handed it beside that list, and holds a
+/// file such a key could need.
+/// </param>
 public record InstallerQueryResult(
     IReadOnlyList<RegisteredPackage> Packages,
     int UnaccountedProductCount = 0,
@@ -89,7 +94,8 @@ public record InstallerQueryResult(
     EnumerationCensus Census = default,
     IReadOnlyList<ListedInstallation>? Installations = null,
     IReadOnlyList<PatchClaim>? PairingsHeldByName = null,
-    IReadOnlyList<PatchClaim>? PairingsOfHoldersWithNoClaims = null)
+    IReadOnlyList<PatchClaim>? PairingsOfHoldersWithNoClaims = null,
+    IReadOnlyList<UnlistedProductKey>? UnlistedProductKeys = null)
 {
     /// <summary>Never null: an absent list reads as no claims rather than as a fault.</summary>
     public IReadOnlyList<PatchClaim> PatchClaims { get; init; } = PatchClaims ?? Array.Empty<PatchClaim>();
@@ -105,6 +111,10 @@ public record InstallerQueryResult(
     /// <summary>Never null: an absent list reads as no other patches to re-read.</summary>
     public IReadOnlyList<PatchClaim> PairingsOfHoldersWithNoClaims { get; init; } =
         PairingsOfHoldersWithNoClaims ?? Array.Empty<PatchClaim>();
+
+    /// <summary>Never null: an absent list reads as no key left out of the enumeration.</summary>
+    public IReadOnlyList<UnlistedProductKey> UnlistedProductKeys { get; init; } =
+        UnlistedProductKeys ?? Array.Empty<UnlistedProductKey>();
 }
 
 /// <summary>
@@ -221,7 +231,7 @@ public record InstallerQueryResult(
 /// <see cref="RecoveredEnumeratedInstallationCount"/>, and are not in this one.
 ///
 /// Zero is the answer on a machine whose enumeration was whole, and it is also
-/// the answer on a machine whose registry holds nothing but residue, so a
+/// the answer on a machine whose registry names nothing else, so a
 /// non-zero reading is the interesting one. It withholds nothing, the products
 /// behind it having been asked rather than guessed at, which is why it is only
 /// here and nowhere in the arithmetic.
@@ -259,9 +269,9 @@ public record InstallerQueryResult(
 /// code cannot be matched to any product that was asked, so nothing shows the product it
 /// belongs to was asked its <c>InstanceType</c> or whether it holds a patch.
 ///
-/// Between them these three report, per machine, what proportion of its registry
-/// keys really were residue. The difference between the two product totals cannot
-/// answer that, since it cannot tell residue from a truncated enumeration.
+/// Between them these three report, per machine, how many of its registry keys no walk
+/// and no keyed ask lists. The difference between the two product totals cannot answer
+/// that, since it cannot tell such a key from a truncated enumeration.
 /// </param>
 /// <param name="InstanceProductCount">
 /// Products that answered a non-zero <c>InstanceType</c>: installed as a second
@@ -622,4 +632,17 @@ public readonly record struct EnumerationCensus(
     public bool RegistryProductUnaskable =>
         UnansweredProductCount > 0
         || UnparseableProductKeyNames > 0;
+
+    /// <summary>
+    /// Whether a read of Windows Installer's own records in the registry failed
+    /// (<see cref="RegistryKeyReadFailures"/>). THE ONE THING THE FOURTH WITHHOLDING LEG
+    /// FIRES ON, here for the reason <see cref="RegistryProductUnaskable"/> is.
+    ///
+    /// WHY IT WITHHOLDS THE WHOLE WALK-DERIVED OFFER. A key that would not read may be the
+    /// only claim on a cached file, and it may be a program the walks leave out, so the
+    /// list of keys no installation accounts for can be short with nothing else showing it
+    /// (<see cref="InstallerQueryResult.UnlistedProductKeys"/>). So nothing shows what such
+    /// a key would have kept.
+    /// </summary>
+    public bool RegistryRecordsUnread => RegistryKeyReadFailures > 0;
 }

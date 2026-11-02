@@ -690,6 +690,7 @@ const CLI = {
   'Cli.WithheldReasons.RecordedPath': `  Путь к файлу из собственных записей Windows Installer не удалось разрешить, поэтому с ним ничего не удалось сопоставить.`,
   'Cli.WithheldReasons.FileIdentity': `  Файл, о котором у Windows есть запись, не удалось опознать, поэтому его не удалось сопоставить с тем, что лежит в папке.`,
   'Cli.WithheldReasons.SecondInstance': `  Программа может быть установлена на этом ПК более одного раза, а записи не могут сказать, какой копии принадлежит файл.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Часть записей Windows Installer не удалось прочитать, поэтому файл может принадлежать программе, записанной там.`,
   // The four per-file arms. Each names a different cause and the four have to stay
   // four and distinct once translated:
   // DeclaredProductUnestablished is itself a disjunction, either the file would not

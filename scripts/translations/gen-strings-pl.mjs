@@ -573,6 +573,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Nie udało się rozwiązać ścieżki pliku z własnych rejestrów Windows Installer, więc nie dało się do niej niczego dopasować.`,
   'Cli.WithheldReasons.FileIdentity': `  Nie udało się zidentyfikować pliku, o którym Windows ma zapis, więc nie dało się go dopasować do zawartości folderu.`,
   'Cli.WithheldReasons.SecondInstance': `  Program może być zainstalowany na tym komputerze więcej niż raz, a rejestry nie potrafią powiedzieć, do której kopii należy plik.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Nie udało się odczytać części rejestrów Windows Installer, więc plik może należeć do programu zapisanego w tej części.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Błąd: operacja na plikach czeka w kolejce na następny restart, a InstallerClean nie potrafi ustalić, których plików dotyczy, więc nie może wykluczyć {InstallerFolder}. Uruchom Windows ponownie przed czyszczeniem.`,
   'Cli.MoveRestoreHint': `Sprawdź, czy twoje programy nadal normalnie się aktualizują i odinstalowują, a potem skasuj {0}.`,
   'Error.ScanStoppedDetails': `Jest to zapisywane także w {0}.`,

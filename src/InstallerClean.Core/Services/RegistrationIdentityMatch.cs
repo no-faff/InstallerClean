@@ -157,7 +157,7 @@ internal static class RegistrationIdentityMatch
 /// <summary>What one <see cref="RegistrationIdentityMatch.Compare"/> read.</summary>
 /// <param name="Registrations">
 /// The registration side's reads. Its <see cref="FileIdentityReadTally.AnyUnestablished"/>
-/// is the third of the <see cref="WithholdingLegs"/>.
+/// is one of the <see cref="WithholdingLegs"/>.
 /// </param>
 /// <param name="Candidates">The candidate side's reads.</param>
 /// <param name="Answers">One per candidate, in the order the candidates were given.</param>

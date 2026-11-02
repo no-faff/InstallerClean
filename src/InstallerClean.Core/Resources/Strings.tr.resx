@@ -1890,6 +1890,7 @@ InstallerClean'i yönetici olarak yeniden çalıştırın.</value></data>
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Windows Installer'ın kendi kayıtlarındaki bir dosya yolu çözümlenemedi, bu yüzden onunla hiçbir şey eşleştirilemedi.</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Windows'un kaydı bulunan bir dosyanın kimliği belirlenemedi, bu yüzden klasörde bulunanlarla eşleştirilemedi.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Bir program bu bilgisayara birden fazla kez yüklenmiş olabilir ve kayıtlar bir dosyanın hangi kopyaya ait olduğunu söyleyemiyor.</value></data>
+  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Windows Installer kayıtlarının bir kısmı okunamadı, bu yüzden bir dosya orada kayıtlı bir programa ait olabilir.</value></data>
   <!-- The per-file arms that have a line. Each is a decision taken about one
        candidate, where the lines above are findings about the machine's records that
        withheld the walk-derived offer whole. They name different causes and have to

@@ -549,6 +549,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Ein Dateipfad in den eigenen Aufzeichnungen von Windows Installer ließ sich nicht auflösen, sodass ihm nichts zugeordnet werden konnte.`,
   'Cli.WithheldReasons.FileIdentity': `  Eine Datei, über die Windows eine Aufzeichnung hat, ließ sich nicht identifizieren und konnte deshalb dem Inhalt des Ordners nicht zugeordnet werden.`,
   'Cli.WithheldReasons.SecondInstance': `  Ein Programm ist auf diesem PC möglicherweise mehrfach installiert, und die Aufzeichnungen geben nicht her, zu welcher Kopie eine Datei gehört.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Ein Teil der Aufzeichnungen von Windows Installer ließ sich nicht lesen, sodass eine Datei zu einem dort aufgezeichneten Programm gehören könnte.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Fehler: Für den nächsten Neustart ist ein Dateivorgang vorgemerkt, und InstallerClean kann nicht erkennen, welche Dateien darin genannt werden. Damit lässt sich {InstallerFolder} nicht ausschließen. Starte Windows neu, bevor du aufräumst.`,
   'Cli.MoveRestoreHint': `Prüfe, ob deine Programme sich weiterhin wie gewohnt aktualisieren und deinstallieren lassen, und lösche dann {0}.`,
   'Error.ScanStoppedDetails': `Das wird auch in {0} festgehalten.`,

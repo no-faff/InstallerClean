@@ -634,7 +634,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // failure on either side withholds.
         //
         // AND THE THIRD, A PRODUCT THE REGISTRY NAMES THAT THIS SCAN COULD NOT ASK ABOUT.
-        // What all three share is that something this scan could not establish leaves
+        // What all of these share is that something this scan could not establish leaves
         // it unable to say which cached files belong to which programs. Such a product
         // was never asked its InstanceType, so nothing shows it is not a second copy of a
         // program, registered under a code an instance transform produced while the
@@ -647,13 +647,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // question is asked of the census, where its members live, on the same rule as
         // the other two.
         //
+        // AND THE FOURTH, A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED. The key that
+        // would not read may be the only claim on a cached file, and it may be a program no
+        // walk lists, so the keys handed to the screen below can be short by it. It is
+        // asked of the census too.
+        //
         // A SECOND COPY THE SCAN LISTED IS NOT A CONDITION HERE. Each listed
         // installation carries whether its own InstanceType reading ruled it out as one,
         // and the screen below compares the files with the packages each such
         // installation opens and keeps every installation package where those cannot
         // all be seen.
         //
-        // AND IT IS ONE CALL RATHER THAN THREE CONDITIONS SPELLED OUT HERE. A host names
+        // AND IT IS ONE CALL RATHER THAN A CONDITION PER LEG SPELLED OUT HERE. A host names
         // which of these held, so the gate and that host read the same expression: a
         // condition added to WithholdingLeg is one this line acts on and one that host
         // prints. A condition written in beside this call instead, which would withhold
@@ -681,7 +686,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         progress?.Report(new ScanProgressUpdate(Strings.Status_CheckingRemaining));
 
         (sourceRootsGivenUp, sourceWaitCount, cachedPackageCensus, ownPerUserSourceLists) = WithholdCandidatesByWhatTheyDeclare(
-            unclaimedByPath, withheld, withheldBy, cacheRoot, query.Installations, cancellationToken,
+            unclaimedByPath, withheld, withheldBy, cacheRoot, query.Installations, query.UnlistedProductKeys, cancellationToken,
             (ex, cause) => refusalLog.Record(ex, cause), progress);
 
         // THE LAST DECISION ON THIS HALF, AND IT TAKES WHAT THE SCREEN LET THROUGH.
@@ -1481,6 +1486,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         WithholdingSplitTally withheldBy,
         InstallerCacheRoot cacheRoot,
         IReadOnlyList<ListedInstallation> installations,
+        IReadOnlyList<UnlistedProductKey> unlisted,
         CancellationToken cancellationToken,
         Action<Exception, string>? recordRefusal = null,
         IProgress<ScanProgressUpdate>? progress = null)
@@ -1508,7 +1514,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // and as it ends, so the host can say what the scan is waiting for and offer to
         // stop waiting for it.
         var screening = _declaredProducts.Screen(
-            candidates, installations, cancellationToken, recordRefusal,
+            candidates, installations, unlisted, cancellationToken, recordRefusal,
             path => InstallerCacheHelpers.NamesAFileDirectlyInInstallerFolder(path, cacheRoot),
             Reached,
             wait => progress?.Report(ScanProgressUpdate.Waiting(wait)),

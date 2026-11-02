@@ -92,6 +92,20 @@ internal sealed class RegistryReader : IRegistryReader
     public RegistryKeyValues UserValues(string sid, string keyPath) =>
         ValuesOf(RegistryHive.Users, sid + @"\" + keyPath);
 
+    public RegistryKeyPresence UserHivePresence(string sid)
+    {
+        try
+        {
+            using var hive = RegistryKey.OpenBaseKey(RegistryHive.Users, RegistryView.Registry64);
+            using var key = hive.OpenSubKey(sid);
+            return key is not null ? RegistryKeyPresence.Present : RegistryKeyPresence.Absent;
+        }
+        catch (SecurityException) { return RegistryKeyPresence.Unreadable; }
+        catch (IOException) { return RegistryKeyPresence.Unreadable; }
+        catch (UnauthorizedAccessException) { return RegistryKeyPresence.Unreadable; }
+        catch (ObjectDisposedException) { return RegistryKeyPresence.Unreadable; }
+    }
+
     private static RegistryKeyValues ValuesOf(RegistryHive root, string keyPath)
     {
         try

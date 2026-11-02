@@ -512,6 +512,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Windows Installer 自身の記録にあるファイルパスを解決できなかったため、それに何も照合できませんでした。 |
 |   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Windows に記録のあるファイルを識別できなかったため、フォルダー内のものと照合できませんでした。 |
 |   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   この PC には同じプログラムが複数回インストールされている可能性があり、記録ではファイルがどのコピーのものか分かりません。 |
+|   Part of Windows Installer's records wouldn't read, so a file could belong to a program recorded there. |   Windows Installer の記録の一部を読み取れなかったため、ファイルがそこに記録されているプログラムのものである可能性があります。 |
 |   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   フォルダー内のファイルを識別できなかったため、記録と照合できませんでした。 |
 |   Either a file wouldn't say which program it belongs to, or Windows wouldn't give a clear answer about that program. |   ファイルがどのプログラムのものか示さなかったか、Windows がそのプログラムについて明確に応答しませんでした。 |
 |   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   ファイルがどのプログラムのものかを調べたところ、渡されたファイルと合わない答えが返りました。 |

@@ -107,6 +107,16 @@ namespace InstallerClean.Services;
 /// short of that installation, and the check does not use it: an installation package
 /// declaring the product is kept, and so is a patch naming it.
 ///
+/// THE PRODUCT KEYS NO INSTALLATION ACCOUNTS FOR ARE ASKED LAST, OF A FILE THE CHECK WOULD
+/// LET THROUGH (<see cref="UnlistedProductKey"/>). A key with an <c>InstallProperties</c> key
+/// keeps an installation package declaring its code or the code its cached package declares,
+/// a package its sources open, and a file one of its package names opens from that file's own
+/// folder. Where such a key's cached package does not say what it is, or a key recording a
+/// cached package has sources that will not read, every installation package is kept. A key
+/// without one keeps the package at a local folder on its source list. A patch file is kept
+/// where a key's <c>Patches</c> listing names it or was not established. All of this comes off
+/// the registry, so it keeps a file and never releases one.
+///
 /// AN INSTALLATION ANSWERS FOR THE CODE ITS CACHED PACKAGE DECLARES, WHATEVER CODE IT IS
 /// REGISTERED UNDER. A second copy of a program, installed under an instance transform,
 /// is registered under the code the transform produced, while the original package it was
@@ -189,6 +199,11 @@ public interface IDeclaredProductCheck
     /// every installation package with. An empty list compares nothing, which is right
     /// only for an enumeration that listed nothing.
     /// </param>
+    /// <param name="unlisted">
+    /// Every product key no installation in <paramref name="installations"/> accounts for,
+    /// <see cref="InstallerQueryResult.UnlistedProductKeys"/>. Asked last, of a file the check
+    /// would let through, and read at most once per pass.
+    /// </param>
     /// <param name="recordRefusal">
     /// Where a reader refusal goes, given the exception to log and the reader's own
     /// short note on which refusal it was. Handed in by the scan that owns the crash
@@ -235,6 +250,7 @@ public interface IDeclaredProductCheck
     DeclaredProductScreening Screen(
         IReadOnlyList<OrphanedFile> candidates,
         IReadOnlyList<ListedInstallation> installations,
+        IReadOnlyList<UnlistedProductKey> unlisted,
         CancellationToken cancellationToken = default,
         Action<Exception, string>? recordRefusal = null,
         Func<string, bool?>? namesAFileInInstallerFolder = null,
@@ -335,12 +351,13 @@ public enum DeclaredProductOutcome
     /// verdict nobody established, and this enum's zero has to mean that rather
     /// than mean an answer.
     ///
-    /// TWO INABILITIES UNDER ONE NAME, DELIBERATELY, AND THE NAME STATES NEITHER
+    /// TWO KINDS OF INABILITY UNDER ONE NAME, DELIBERATELY, AND THE NAME STATES NEITHER
     /// CAUSE. One is about the FILE: it would not open, it holds no Property
     /// table, its ProductCode row is absent or is not a GUID. The other is about
     /// the RECORDS: the keyed enumeration answered with something outside the
     /// returns that mean an answer, or with an answer that leaves out an installation
-    /// of the product the caller's own enumeration listed. They are different things to
+    /// of the product the caller's own enumeration listed, or a product key no installation
+    /// accounts for keeps the file. They are different things to
     /// have found out, which is exactly why they are not reported
     /// anywhere as one thing; what they share, and the whole of what this value claims,
     /// is that nothing was established. Nothing outside this pass reads which of the two
@@ -349,9 +366,10 @@ public enum DeclaredProductOutcome
     Unestablished,
 
     /// <summary>
-    /// The file declared a product code, Windows positively answered that no such
-    /// product is installed, in any account and any context, the caller's own
-    /// enumeration listed no installation of it, and no cached package the check read,
+    /// The file declared a product code, the keyed enumeration across every account and
+    /// context positively answered that it lists no such product, the caller's own
+    /// enumeration listed no installation of it, no product key with an
+    /// <c>InstallProperties</c> key holds the code, and no cached package the check read,
     /// of the installations it listed, declares it, every one whose cached package did
     /// not read being shown by its own record to be an ordinary installation, or shown to
     /// record no cached package and have no source list and no <c>InstallProperties</c> key
@@ -506,8 +524,9 @@ public enum DeclaredProductOutcome
     /// enumeration listed, or an installation of one, or one the caller's enumeration
     /// listed, would not answer the keyed patch read. That last includes an installation
     /// answering that its product is not installed, which contradicts the enumeration
-    /// that listed it. What they share, and the whole of what this value claims, is
-    /// that nothing was established.
+    /// that listed it. A <c>Patches</c> listing of a product key no installation accounts for
+    /// can name the patch, or not have been established. What they share, and the whole of what
+    /// this value claims, is that nothing was established.
     ///
     /// A PATCH HAS A VERDICT OF ITS OWN FOR THIS RATHER THAN SHARING
     /// <see cref="Unestablished"/>, so that everything counting the two can tell a
@@ -609,6 +628,10 @@ public enum DeclaredProductOutcome
     /// let through is given this verdict, on the same pass, whatever it declares. A
     /// package compared by name that cannot be ruled out gives it only to a file whose name
     /// that package's name could be.
+    ///
+    /// A product key no installation accounts for gives it the same way, where its cached
+    /// package does not say what it is or a key recording a cached package has sources that
+    /// will not read.
     ///
     /// Where a single installation's packages cannot all be seen it covers what
     /// <see cref="DeclaredProductInstalled"/> covers for one: a cached package that will

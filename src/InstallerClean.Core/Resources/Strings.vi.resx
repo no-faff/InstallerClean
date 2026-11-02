@@ -1890,6 +1890,7 @@ Hãy chạy lại InstallerClean với tư cách quản trị viên.</value></da
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Một đường dẫn tệp trong chính hồ sơ của Windows Installer không phân giải được, nên không thể đối chiếu gì với nó.</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Không nhận dạng được một tệp mà Windows có hồ sơ, nên không thể đối chiếu nó với những gì có trong thư mục.</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Một chương trình có thể đã được cài nhiều hơn một lần trên máy này, và hồ sơ không cho biết một tệp thuộc về bản sao nào.</value></data>
+  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Một phần hồ sơ của Windows Installer không đọc được, nên một tệp có thể thuộc về một chương trình được ghi ở đó.</value></data>
   <!-- The per-file arms that have a line. Each is a decision taken about one
        candidate, where the lines above are findings about the machine's records that
        withheld the walk-derived offer whole. They name different causes and have to

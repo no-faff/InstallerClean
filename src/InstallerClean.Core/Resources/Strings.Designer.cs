@@ -349,6 +349,7 @@ public static class Strings
     public static string Cli_WithheldReasons_FileIdentity => Get("Cli.WithheldReasons.FileIdentity");
     public static string Cli_WithheldReasons_Header => Get("Cli.WithheldReasons.Header");
     public static string Cli_WithheldReasons_RecordedPath => Get("Cli.WithheldReasons.RecordedPath");
+    public static string Cli_WithheldReasons_RegistryRecordsUnread => Get("Cli.WithheldReasons.RegistryRecordsUnread");
     public static string Cli_WithheldReasons_ScreenUnanswered => Get("Cli.WithheldReasons.ScreenUnanswered");
     public static string Cli_WithheldReasons_SecondInstance => Get("Cli.WithheldReasons.SecondInstance");
     public static string Completion_AllClean => Get("Completion.AllClean");

@@ -464,6 +464,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Un percorso di file negli archivi di Windows Installer non si è risolto, perciò non è stato possibile associarvi nulla.`,
   'Cli.WithheldReasons.FileIdentity': `  Non è stato possibile identificare un file di cui Windows ha un archivio, perciò non è stato possibile confrontarlo con il contenuto della cartella.`,
   'Cli.WithheldReasons.SecondInstance': `  Un programma potrebbe essere installato più di una volta su questo PC, e gli archivi non possono dire a quale copia appartenga un file.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Non è stato possibile leggere una parte degli archivi di Windows Installer, perciò un file potrebbe appartenere a un programma registrato lì.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Errore: un'operazione sui file è in coda per il prossimo riavvio e InstallerClean non riesce a sapere quali file nomina, quindi non può escludere {InstallerFolder}. Riavvia Windows prima di pulire.`,
   'Cli.MoveRestoreHint': `Verifica che i tuoi programmi si aggiornino e si disinstallino ancora normalmente, poi elimina {0}.`,
   'Error.ScanStoppedDetails': `Questo viene registrato anche in {0}.`,

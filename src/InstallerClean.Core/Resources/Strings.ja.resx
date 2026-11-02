@@ -1890,6 +1890,7 @@ InstallerClean を管理者としてもう一度実行してください。</val
   <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Windows Installer 自身の記録にあるファイルパスを解決できなかったため、それに何も照合できませんでした。</value></data>
   <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Windows に記録のあるファイルを識別できなかったため、フォルダー内のものと照合できませんでした。</value></data>
   <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  この PC には同じプログラムが複数回インストールされている可能性があり、記録ではファイルがどのコピーのものか分かりません。</value></data>
+  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Windows Installer の記録の一部を読み取れなかったため、ファイルがそこに記録されているプログラムのものである可能性があります。</value></data>
   <!-- The per-file arms that have a line. Each is a decision taken about one
        candidate, where the lines above are findings about the machine's records that
        withheld the walk-derived offer whole. They name different causes and have to

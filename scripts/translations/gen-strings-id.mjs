@@ -556,6 +556,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Sebuah jalur file dalam catatan Windows Installer sendiri tidak bisa diuraikan, jadi tidak ada yang bisa dicocokkan dengannya.`,
   'Cli.WithheldReasons.FileIdentity': `  Sebuah file yang dicatat Windows tidak bisa dikenali, jadi file itu tidak bisa dicocokkan dengan isi folder.`,
   'Cli.WithheldReasons.SecondInstance': `  Sebuah program mungkin terpasang lebih dari sekali di PC ini, dan catatan tidak bisa menyebutkan sebuah file milik salinan yang mana.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Sebagian catatan Windows Installer tidak bisa dibaca, jadi sebuah file bisa saja milik program yang tercatat di sana.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Kesalahan: ada operasi file yang mengantre untuk restart berikutnya dan InstallerClean tidak bisa mengetahui file mana saja yang disebutkannya, jadi tidak bisa mengesampingkan {InstallerFolder}. Restart Windows sebelum membersihkan.`,
   'Cli.MoveRestoreHint': `Pastikan program Anda masih bisa diperbarui dan dicopot seperti biasa, lalu hapus {0}.`,
   'Error.ScanStoppedDetails': `Ini juga dicatat di {0}.`,

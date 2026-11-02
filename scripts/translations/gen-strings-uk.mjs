@@ -551,6 +551,7 @@ const MAP = {
   'Cli.WithheldReasons.RecordedPath': `  Шлях до файлу з власних записів Windows Installer не вдалося розв'язати, тож із ним нічого не вдалося зіставити.`,
   'Cli.WithheldReasons.FileIdentity': `  Файл, про який Windows має запис, не вдалося розпізнати, тож його не вдалося зіставити з тим, що є в теці.`,
   'Cli.WithheldReasons.SecondInstance': `  Програму може бути встановлено на цьому ПК більше одного разу, а записи не можуть сказати, якій копії належить файл.`,
+  'Cli.WithheldReasons.RegistryRecordsUnread': `  Частину записів Windows Installer не вдалося прочитати, тож файл може належати програмі, записаній там.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Помилка: файлову операцію поставлено в чергу до наступного перезавантаження, і InstallerClean не може визначити, які файли в ній названо, тож не може виключити {InstallerFolder}. Перезавантажте Windows перед очищенням.`,
   'Cli.MoveRestoreHint': `Переконайтеся, що ваші програми досі оновлюються та видаляються як звичайно, а потім видаліть {0}.`,
   'Error.ScanStoppedDetails': `Це також записується до {0}.`,
