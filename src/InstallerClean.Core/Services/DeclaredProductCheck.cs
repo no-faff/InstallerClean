@@ -3525,9 +3525,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// to look for there, so that folder has to be shown not to be the Installer folder.
     ///
     /// WITH <paramref name="recordsNone"/>, FOR A KEY RECORDING NO CACHED PACKAGE, what is
-    /// collected stays and the answer is narrower: false only where no place gave a package name
-    /// and the key was installed from the Installer folder
-    /// (<see cref="WasInstalledFromTheInstallerFolder"/>).
+    /// collected stays and the answer is narrower: where the sources are read at all, false only
+    /// where no place gave a package name and the key was installed from the Installer folder
+    /// (<see cref="WasInstalledFromTheInstallerFolder"/>). Where a place did give a name, that
+    /// name goes on keeping a file carrying it. A check that cannot read sources answers false for
+    /// every key.
     /// </summary>
     private bool AddRegistrySources(
         UnlistedProductKey key,
@@ -3554,7 +3556,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         var listFound = false;
-        var packageNamed = false;
+        var packageNames = new List<string>();
         foreach (var (sid, context) in SourceListPlaces(key.Account))
         {
             if (!SourceListAt(key.Code, sid, context, out var listKey, out var values))
@@ -3572,7 +3574,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 continue;
             }
 
-            packageNamed = true;
+            packageNames.Add(sources.PackageName);
             if (sources.MediaSearch) byName.Add(new PackageByName(null, sources.PackageName));
 
             var folders = sources.Folders;
@@ -3593,7 +3595,17 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             }
         }
 
-        if (recordsNone) return packageNamed || !WasInstalledFromTheInstallerFolder(installSource, properties, pass);
+        if (recordsNone)
+        {
+            if (packageNames.Count == 0) return !WasInstalledFromTheInstallerFolder(installSource, properties, pass);
+
+            // A value this check does not compare is on no list of folders, so a name found on
+            // a list keeps the file carrying it.
+            if (installSource.Length == 0 && WasInstalledFromTheInstallerFolder(installSource, properties, pass))
+                byName.AddRange(packageNames.Select(name => new PackageByName(null, name)));
+
+            return true;
+        }
 
         if (!listFound && installSource.Length > 0 && !IsNotTheInstallerFolder(installSource, pass, out var folderGivenUp))
             NotRead(folderGivenUp);
@@ -3688,9 +3700,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// names once expanded from this process's environment, or null where it is not one string
     /// expanding to a path on a drive or a share.
     ///
-    /// THIS ANSWER ONLY EVER KEEPS A FILE. It is asked about for the Installer folder and nothing
-    /// is compared with it, so it is never read as a source a package could be at, where a
-    /// variable keeps the file (<see cref="RecordedInstallSource"/>). Do not use it to compare one.
+    /// THIS ANSWER ONLY EVER KEEPS A FILE. It is put to the test for the Installer folder and no
+    /// package is read at it. Do not compare a package with it.
     /// </summary>
     private static string? ExpandedInstallSource(RegistryKeyValues properties)
     {

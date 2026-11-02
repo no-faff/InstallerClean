@@ -439,6 +439,28 @@ public class DeclaredProductCheckUnlistedKeyTests
         Assert.Equal(NothingKept, ScreenExpanding(kind, installSource));
 
     [Fact]
+    public void A_key_whose_InstallSource_expands_to_the_Installer_folder_keeps_the_package_its_list_names()
+    {
+        Environment.SetEnvironmentVariable(RootVariable, @"C:\Windows");
+        try
+        {
+            var pc = new Pc();
+            pc.InstalledFrom("%" + RootVariable + @"%\Installer\");
+            pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+            pc.Registry.Answers(MachineList(KeyCode) + @"\Media", RegistryKeyPresence.Absent);
+            pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+
+            Assert.Equal(
+                [DeclaredProductOutcome.Unestablished, LetThrough],
+                pc.Screen([Installed()], Package(First), Package(Second)));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(RootVariable, null);
+        }
+    }
+
+    [Fact]
     public void An_InstallSource_expanding_to_no_drive_or_share_is_not_put_to_the_folder_test()
     {
         var pc = new Pc { IsTheInstallerFolder = _ => true };
