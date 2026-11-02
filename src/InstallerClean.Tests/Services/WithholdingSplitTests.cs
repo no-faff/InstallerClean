@@ -160,6 +160,51 @@ public class WithholdingSplitTests
         Assert.Equal([key], handed);
     }
 
+    /// <summary>A screen answering <paramref name="outcomes"/> and reporting two files held for keys.</summary>
+    private static IDeclaredProductCheck ScreenHoldingForKeys(params DeclaredProductOutcome[] outcomes)
+    {
+        var screen = Substitute.For<IDeclaredProductCheck>();
+        screen.Screen(Arg.Any<IReadOnlyList<OrphanedFile>>(), Arg.Any<IReadOnlyList<ListedInstallation>>(), Arg.Any<IReadOnlyList<UnlistedProductKey>>(),
+                Arg.Any<CancellationToken>(), Arg.Any<Action<Exception, string>?>(),
+                Arg.Any<Func<string, bool?>?>(), Arg.Any<Action<int>?>(), Arg.Any<Action<SourceFolderWait?>?>(), Arg.Any<string?>(),
+                Arg.Any<Func<string, bool?>?>())
+            .Returns(new DeclaredProductScreening(outcomes, [], WaitCount: 0, UnlistedHolds: new UnlistedKeyHolds(1, 1)));
+        return screen;
+    }
+
+    private static readonly UnlistedProductKey[] KeysOfBothKinds =
+    [
+        new("S-1-5-18", ProductA, [], [], HasInstallProperties: true),
+        new("S-1-5-18", ProductB, [], [], HasInstallProperties: false),
+        new("S-1-5-21-1-2-3-1001", ProductB, [], [], HasInstallProperties: false),
+    ];
+
+    [Fact]
+    public async Task The_keys_and_what_the_screen_held_for_them_reach_the_result()
+    {
+        var result = await Scan(
+            walked: new[] { $@"{Folder}\a.msi", $@"{Folder}\b.msi" }, registered: Array.Empty<string>(),
+            screen: ScreenHoldingForKeys(DeclaredProductOutcome.Unestablished, DeclaredProductOutcome.Unestablished),
+            unlisted: KeysOfBothKinds);
+
+        Assert.Equal(1, result.UnlistedKeysWithInstallProperties);
+        Assert.Equal(2, result.UnlistedKeysWithoutInstallProperties);
+        Assert.Equal(new UnlistedKeyHolds(1, 1), result.UnlistedKeyHolds);
+    }
+
+    [Fact]
+    public async Task A_screen_whose_answer_is_not_used_holds_nothing_for_a_key_and_the_keys_are_still_counted()
+    {
+        var result = await Scan(
+            walked: new[] { $@"{Folder}\a.msi", $@"{Folder}\b.msi" }, registered: Array.Empty<string>(),
+            screen: ScreenHoldingForKeys(DeclaredProductOutcome.Unestablished),
+            unlisted: KeysOfBothKinds);
+
+        Assert.Equal(1, result.UnlistedKeysWithInstallProperties);
+        Assert.Equal(2, result.UnlistedKeysWithoutInstallProperties);
+        Assert.Equal(UnlistedKeyHolds.None, result.UnlistedKeyHolds);
+    }
+
     /// <summary>
     /// A screen that keeps every file it is handed as one whose program is installed, and
     /// reports a share given up with as many files kept at it as it was handed, three waits,

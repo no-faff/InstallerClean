@@ -241,7 +241,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         return new DeclaredProductScreening(
-            outcomes, pass.GivenUp(), pass.WaitCount, pass.Census.Census(), causes, pass.OwnPerUserLists());
+            outcomes, pass.GivenUp(), pass.WaitCount, pass.Census.Census(), causes, pass.OwnPerUserLists(),
+            pass.UnlistedHolds());
     }
 
     /// <summary>
@@ -3328,22 +3329,30 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     private static DeclaredProductOutcome PutPatchToUnlistedKeys(
         string patchCode, DeclaredProductOutcome letThrough, PassAnswers pass)
     {
-        if (pass.UnlistedListings is not { } listings)
-        {
-            var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var notEstablished = false;
-            foreach (var key in pass.UnlistedKeys)
-            {
-                if (key.PatchCodes is null) notEstablished = true;
-                else named.UnionWith(key.PatchCodes);
-            }
+        var listings = pass.UnlistedListings ??= (
+            ListingsOf(pass.UnlistedKeys.Where(key => key.HasInstallProperties)),
+            ListingsOf(pass.UnlistedKeys.Where(key => !key.HasInstallProperties)));
 
-            pass.UnlistedListings = listings = (named, notEstablished);
+        if (listings.With.CouldName(patchCode))
+            return pass.KeptForAKey(DeclaredProductOutcome.DeclaredPatchUnestablished, withInstallProperties: true);
+
+        return listings.Without.CouldName(patchCode)
+            ? pass.KeptForAKey(DeclaredProductOutcome.DeclaredPatchUnestablished, withInstallProperties: false)
+            : letThrough;
+    }
+
+    /// <summary>What the <c>Patches</c> listings of <paramref name="keys"/> say, taken together.</summary>
+    private static UnlistedListings ListingsOf(IEnumerable<UnlistedProductKey> keys)
+    {
+        var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var notEstablished = false;
+        foreach (var key in keys)
+        {
+            if (key.PatchCodes is null) notEstablished = true;
+            else named.UnionWith(key.PatchCodes);
         }
 
-        return listings.NotEstablished || listings.Named.Contains(patchCode)
-            ? DeclaredProductOutcome.DeclaredPatchUnestablished
-            : letThrough;
+        return new UnlistedListings(named, notEstablished);
     }
 
     /// <summary>
@@ -3351,7 +3360,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// product keys no installation accounts for (<see cref="ReadUnlistedKeys"/>): a candidate
     /// declaring a code they give is kept; where they leave a second copy not ruled out every
     /// candidate is kept; and a candidate that is a package they open, or that a package name
-    /// reaches (<see cref="ReachedByName"/>), is kept.
+    /// reaches (<see cref="ReachedByName"/>), is kept. Each file kept is counted for the kind of
+    /// key that kept it (<see cref="PassAnswers.KeptForAKey"/>), a key with an
+    /// <c>InstallProperties</c> key first.
     ///
     /// <paramref name="givenUp"/> is the root whose give-up alone left the keys not all seen.
     /// </summary>
@@ -3368,22 +3379,27 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         var read = pass.UnlistedRead ??= ReadUnlistedKeys(pass, namesAFileInInstallerFolder);
 
-        if (read.Codes.Contains(code)) return DeclaredProductOutcome.Unestablished;
+        if (read.Codes.Contains(code))
+            return pass.KeptForAKey(DeclaredProductOutcome.Unestablished, withInstallProperties: true);
 
         if (read.NotAllSeen)
         {
             givenUp = read.GivenUp;
-            return DeclaredProductOutcome.SecondCopyUnestablished;
+            return pass.KeptForAKey(DeclaredProductOutcome.SecondCopyUnestablished, withInstallProperties: true);
         }
 
-        if ((read.Packages.Count == 0 && read.PackageNames.Count == 0) || _fileIdentities is null)
+        var comparedWith = read.Packages.Count > 0 || read.PackageNames.Count > 0;
+        if ((!comparedWith && read.PackagesOfKeysWithout.Count == 0) || _fileIdentities is null)
             return letThrough;
 
         if (_fileIdentities.ReadOutcome(candidatePath, out var candidate) != FileIdentityRead.Read)
-            return DeclaredProductOutcome.CandidateIdentityUnestablished;
+            return pass.KeptForAKey(DeclaredProductOutcome.CandidateIdentityUnestablished, comparedWith);
 
-        return read.Packages.Contains(candidate) || ReachedByName(candidatePath, candidate, read.PackageNames, pass)
-            ? DeclaredProductOutcome.Unestablished
+        if (read.Packages.Contains(candidate) || ReachedByName(candidatePath, candidate, read.PackageNames, pass))
+            return pass.KeptForAKey(DeclaredProductOutcome.Unestablished, withInstallProperties: true);
+
+        return read.PackagesOfKeysWithout.Contains(candidate)
+            ? pass.KeptForAKey(DeclaredProductOutcome.Unestablished, withInstallProperties: false)
             : letThrough;
     }
 
@@ -3439,6 +3455,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     {
         var codes = new HashSet<string>(StringComparer.Ordinal);
         var packages = new List<FileIdentity>();
+        var advertised = new List<FileIdentity>();
         var byName = new List<PackageByName>();
         var notAllSeen = false;
         var keptOtherwise = false;
@@ -3450,7 +3467,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             if (!key.HasInstallProperties)
             {
-                AddPackagesAtLocalSources(key, pass, namesAFileInInstallerFolder, packages);
+                AddPackagesAtLocalSources(key, pass, namesAFileInInstallerFolder, advertised);
                 continue;
             }
 
@@ -3476,7 +3493,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         return new UnlistedKeysRead(
             codes, packages, byName.Select(package => package.Name).ToHashSet(StringComparer.Ordinal),
-            notAllSeen, keptOtherwise ? null : firstGivenUp);
+            advertised, notAllSeen, keptOtherwise ? null : firstGivenUp);
     }
 
     /// <summary>
@@ -4145,8 +4162,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// What the product keys no installation accounts for say (<see cref="ReadUnlistedKeys"/>).
     /// </summary>
     /// <param name="Codes">The product codes that keep a candidate declaring one.</param>
-    /// <param name="Packages">The packages the keys open, by identity.</param>
+    /// <param name="Packages">
+    /// The packages the keys with an <c>InstallProperties</c> key open, by identity.
+    /// </param>
     /// <param name="PackageNames">Every package name compared by name.</param>
+    /// <param name="PackagesOfKeysWithout">
+    /// The packages at local folders on the source lists of keys without one, by identity.
+    /// </param>
     /// <param name="NotAllSeen">
     /// Whether a key left a second copy not ruled out (<see cref="ReadUnlistedKeys"/>).
     /// </param>
@@ -4158,8 +4180,21 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         HashSet<string> Codes,
         List<FileIdentity> Packages,
         HashSet<string> PackageNames,
+        List<FileIdentity> PackagesOfKeysWithout,
         bool NotAllSeen,
         string? GivenUp);
+
+    /// <summary>
+    /// What the <c>Patches</c> listings of a set of product keys say
+    /// (<see cref="ListingsOf"/>).
+    /// </summary>
+    /// <param name="Named">Every patch code a listing names.</param>
+    /// <param name="NotEstablished">Whether a listing was not established, so may name any patch.</param>
+    private sealed record UnlistedListings(HashSet<string> Named, bool NotEstablished)
+    {
+        /// <summary>Whether these listings could name <paramref name="patchCode"/>.</summary>
+        internal bool CouldName(string patchCode) => NotEstablished || Named.Contains(patchCode);
+    }
 
     /// <summary>
     /// The names one candidate has, for comparing with a package name: the last component
@@ -4385,6 +4420,21 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             Kept: _ownPerUserLists.Values.Count(seen => !seen));
 
         /// <summary>
+        /// Counts one file kept for a product key no installation accounts for, and answers
+        /// <paramref name="kept"/>, the verdict that keeps it.
+        /// </summary>
+        internal DeclaredProductOutcome KeptForAKey(DeclaredProductOutcome kept, bool withInstallProperties)
+        {
+            if (withInstallProperties) _heldForKeysWith++;
+            else _heldForKeysWithout++;
+
+            return kept;
+        }
+
+        /// <summary>The files counted so far (<see cref="KeptForAKey"/>).</summary>
+        internal UnlistedKeyHolds UnlistedHolds() => new(_heldForKeysWith, _heldForKeysWithout);
+
+        /// <summary>
         /// What the pass has found about the two conditions that hold back every installation
         /// package it would otherwise let through (<see cref="CachedPackageCensus"/>).
         /// </summary>
@@ -4557,14 +4607,18 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         /// <summary>The product keys no installation accounts for.</summary>
         internal IReadOnlyList<UnlistedProductKey> UnlistedKeys { get; init; } = [];
 
+        private int _heldForKeysWith;
+        private int _heldForKeysWithout;
+
         /// <summary>What those keys say, read once (<see cref="ReadUnlistedKeys"/>).</summary>
         internal UnlistedKeysRead? UnlistedRead { get; set; }
 
         /// <summary>
-        /// Every patch code those keys' <c>Patches</c> listings name, and whether one of those
-        /// listings was not established, gathered once (<see cref="PutPatchToUnlistedKeys"/>).
+        /// What the <c>Patches</c> listings of those keys say, for the keys with an
+        /// <c>InstallProperties</c> key and the keys without one, gathered once
+        /// (<see cref="PutPatchToUnlistedKeys"/>).
         /// </summary>
-        internal (HashSet<string> Named, bool NotEstablished)? UnlistedListings { get; set; }
+        internal (UnlistedListings With, UnlistedListings Without)? UnlistedListings { get; set; }
 
         /// <summary>What each path a package name opens read as (<see cref="ReachedByName"/>).</summary>
         internal Dictionary<string, (FileIdentityRead Outcome, FileIdentity Identity)> NamedFileReads { get; } =

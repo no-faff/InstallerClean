@@ -158,6 +158,12 @@ public sealed record ResultLogEntry(
     /// that sent the report (<see cref="AppInfo.Host"/>), and <c>copyKind</c>, the kind of copy
     /// of it that was running (<see cref="AppInfo.CopyKind"/>).
     ///
+    /// SCHEMA 11 ADDS FIVE KEYS UNDER <c>scan</c> AND TAKES NONE AWAY: the product keys no
+    /// installation the scan listed accounts for, with and without an <c>InstallProperties</c>
+    /// key, the files the declared-product screen kept for keys of each kind, and the superseded
+    /// files a key held back (<see cref="ScanInfo.UnlistedKeysWithInstallPropertiesCount"/> to
+    /// <see cref="ScanInfo.SupersededHeldForUnlistedKeyCount"/>).
+    ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
     /// never loses data even if the allowlist has not caught up. THAT LENIENCE
@@ -166,7 +172,7 @@ public sealed record ResultLogEntry(
     /// <c>machine</c> arriving before the receiving end knows the name is a
     /// rejected report and a user told sending failed. The receiver ships first.
     /// </summary>
-    public const int CurrentSchemaVersion = 10;
+    public const int CurrentSchemaVersion = 11;
 
     // Each factory takes windowsRegion as IWindowsRegion.Read returned it when the
     // report box was put on the card, so the report carries that reading. The host is the
@@ -1573,6 +1579,26 @@ public sealed record MachineInfo(
 /// The same installations whose source lists the screen read and could not all see, so each kept
 /// the files its packages could be (<see cref="Services.OwnPerUserSourceLists.Kept"/>).
 /// </param>
+/// <param name="UnlistedKeysWithInstallPropertiesCount">
+/// The product keys no installation the scan listed accounts for that have an
+/// <c>InstallProperties</c> key (<c>ScanResult.UnlistedKeysWithInstallProperties</c>). Keys, not
+/// files, and part of no count above.
+/// </param>
+/// <param name="UnlistedKeysWithoutInstallPropertiesCount">The same keys without one.</param>
+/// <param name="FilesHeldForKeysWithInstallPropertiesCount">
+/// The files the declared-product screen kept for a key with an <c>InstallProperties</c> key
+/// (<see cref="Services.UnlistedKeyHolds.WithInstallProperties"/>). A file kept for keys of both
+/// kinds counts here. A SUB-COUNT OF <paramref name="WithheldCandidateCount"/>, never added to it.
+/// </param>
+/// <param name="FilesHeldForKeysWithoutInstallPropertiesCount">
+/// The files it kept for a key without one and for no key with one
+/// (<see cref="Services.UnlistedKeyHolds.WithoutInstallProperties"/>). A SUB-COUNT OF
+/// <paramref name="WithheldCandidateCount"/>, never added to it.
+/// </param>
+/// <param name="SupersededHeldForUnlistedKeyCount">
+/// Superseded files on disk such a key held back (<c>ScanResult.SupersededHeldForUnlistedKeyCount</c>).
+/// A SUB-COUNT OF <paramref name="WithheldPatchCount"/>, never added to it.
+/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -1675,7 +1701,12 @@ public sealed record ScanInfo(
     int DeclaredInstalledSourcesFormPackageNameCount,
     int DeclaredInstalledSourcesFormOtherCount,
     int DeclaredSourcesOwnPerUserReadCount,
-    int DeclaredSourcesOwnPerUserKeptCount)
+    int DeclaredSourcesOwnPerUserKeptCount,
+    int UnlistedKeysWithInstallPropertiesCount,
+    int UnlistedKeysWithoutInstallPropertiesCount,
+    int FilesHeldForKeysWithInstallPropertiesCount,
+    int FilesHeldForKeysWithoutInstallPropertiesCount,
+    int SupersededHeldForUnlistedKeyCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -1832,7 +1863,13 @@ public sealed record ScanInfo(
             installedBy.SourcesFormPackageName,
             installedBy.SourcesFormOther,
             scan.OwnPerUserSourceLists.Read,
-            scan.OwnPerUserSourceLists.Kept);
+            scan.OwnPerUserSourceLists.Kept,
+            // The product keys no listed installation accounts for, and what they held back.
+            scan.UnlistedKeysWithInstallProperties,
+            scan.UnlistedKeysWithoutInstallProperties,
+            scan.UnlistedKeyHolds.WithInstallProperties,
+            scan.UnlistedKeyHolds.WithoutInstallProperties,
+            scan.SupersededHeldForUnlistedKeyCount);
     }
 }
 

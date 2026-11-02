@@ -357,6 +357,66 @@ public class InstallerQueryServiceUnclaimedEntryTests
     }
 
     [Fact]
+    public async Task A_patch_a_keys_listing_names_is_marked_as_held_for_a_key()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [Superseded])));
+
+        Assert.True(Row(result).WithheldOnUnlistedKey);
+    }
+
+    [Fact]
+    public async Task A_patch_a_listing_not_established_may_name_is_marked_as_held_for_a_key()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, null)));
+
+        Assert.True(Row(result).WithheldOnUnlistedKey);
+    }
+
+    [Fact]
+    public async Task A_patch_a_failed_read_holds_back_is_not_marked_as_held_for_a_key()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback() with { Failures = 1 });
+
+        AssertWithheldScanWide(Row(result));
+        Assert.False(Row(result).WithheldOnUnlistedKey);
+    }
+
+    [Fact]
+    public async Task A_patch_a_listing_names_with_no_removable_verdict_to_take_is_not_marked()
+    {
+        const string AppliedFile = @"C:\Windows\Installer\unclaimed-entry-applied.msp";
+        var msi = MachineWithAnUnlistedProgram();
+        msi.AddPatch(Listed, OtherPatch, AppliedFile, state: "1", uninstallable: "0");
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [OtherPatch])));
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath.EndsWith(
+            Path.GetFileName(AppliedFile), StringComparison.OrdinalIgnoreCase));
+        Assert.False(row.IsRemovable);
+        Assert.False(row.WithheldOnUnlistedKey);
+    }
+
+    [Fact]
+    public async Task A_listing_not_naming_the_patch_marks_nothing()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [OtherPatch])));
+
+        Assert.False(Row(result).WithheldOnUnlistedKey);
+    }
+
+    [Fact]
     public async Task A_second_key_of_a_code_Windows_lists_under_another_account_holds_the_patch_back()
     {
         // Windows lists this code per user under an ordinary account, so the code is not

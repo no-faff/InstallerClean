@@ -386,6 +386,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var sourceWaitCount = 0;
         var cachedPackageCensus = CachedPackageCensus.None;
         var ownPerUserSourceLists = OwnPerUserSourceLists.None;
+        var unlistedKeyHolds = UnlistedKeyHolds.None;
 
         // The closing entry is owed on every exit, not just the clean one: a
         // cancel and the correlation gate both leave through here, and the gate
@@ -685,7 +686,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // bar by the milestones divides it the same way on every machine.
         progress?.Report(new ScanProgressUpdate(Strings.Status_CheckingRemaining));
 
-        (sourceRootsGivenUp, sourceWaitCount, cachedPackageCensus, ownPerUserSourceLists) = WithholdCandidatesByWhatTheyDeclare(
+        (sourceRootsGivenUp, sourceWaitCount, cachedPackageCensus, ownPerUserSourceLists, unlistedKeyHolds) = WithholdCandidatesByWhatTheyDeclare(
             unclaimedByPath, withheld, withheldBy, cacheRoot, query.Installations, query.UnlistedProductKeys, cancellationToken,
             (ex, cause) => refusalLog.Record(ex, cause), progress);
 
@@ -1141,7 +1142,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
             cachedPackageCensus,
             withheldBy.DeclaredProductInstalledCauses,
             installerActivity,
-            ownPerUserSourceLists);
+            ownPerUserSourceLists,
+            query.UnlistedProductKeys.Count(key => key.HasInstallProperties),
+            query.UnlistedProductKeys.Count(key => !key.HasInstallProperties),
+            unlistedKeyHolds);
     }
 
     /// <summary>
@@ -1476,10 +1480,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// (<see cref="DeclaredProductScreening.CachedPackages"/>), a pass that looked at no
     /// installation where it handed the screen nothing or did not use its answer, and the
     /// running account's own per-user source lists the screen read
-    /// (<see cref="DeclaredProductScreening.OwnPerUserLists"/>), none on the same terms.
+    /// (<see cref="DeclaredProductScreening.OwnPerUserLists"/>), none on the same terms, and the
+    /// files it kept for product keys no installation accounts for
+    /// (<see cref="DeclaredProductScreening.UnlistedHolds"/>), none on the same terms.
     /// </summary>
     private (IReadOnlyList<SourceRootGivenUp> RootsGivenUp, int WaitCount, CachedPackageCensus CachedPackages,
-        OwnPerUserSourceLists OwnPerUserLists)
+        OwnPerUserSourceLists OwnPerUserLists, UnlistedKeyHolds UnlistedHolds)
         WithholdCandidatesByWhatTheyDeclare(
         List<OrphanedFile> candidates,
         List<OrphanedFile> withheld,
@@ -1492,7 +1498,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         IProgress<ScanProgressUpdate>? progress = null)
     {
         if (_declaredProducts is null || candidates.Count == 0)
-            return ([], 0, CachedPackageCensus.None, OwnPerUserSourceLists.None);
+            return ([], 0, CachedPackageCensus.None, OwnPerUserSourceLists.None, UnlistedKeyHolds.None);
 
         // Reported on the same stride rule as the matching count, and the last candidate
         // whatever the stride, so the position ends on the total.
@@ -1539,7 +1545,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             withheld.AddRange(candidates);
             withheldBy.ScreenUnanswered(candidates.Count);
             candidates.Clear();
-            return ([], screening.WaitCount, CachedPackageCensus.None, OwnPerUserSourceLists.None);
+            return ([], screening.WaitCount, CachedPackageCensus.None, OwnPerUserSourceLists.None, UnlistedKeyHolds.None);
         }
 
         // Partitioned forward into a second list rather than removed in place from
@@ -1564,7 +1570,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         candidates.Clear();
         candidates.AddRange(survivors);
-        return (screening.RootsGivenUp, screening.WaitCount, screening.CachedPackages, screening.OwnPerUserLists);
+        return (screening.RootsGivenUp, screening.WaitCount, screening.CachedPackages, screening.OwnPerUserLists,
+            screening.UnlistedHolds);
     }
 
     /// <summary>

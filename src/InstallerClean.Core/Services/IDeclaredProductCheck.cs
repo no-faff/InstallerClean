@@ -299,13 +299,18 @@ public interface IDeclaredProductCheck
 /// The source lists of the running account's own per-user-unmanaged installations the pass
 /// read, each installation once (<see cref="OwnPerUserSourceLists"/>).
 /// </param>
+/// <param name="UnlistedHolds">
+/// The files the pass's last step kept for product keys no installation accounts for, by the
+/// kind of key (<see cref="UnlistedKeyHolds"/>).
+/// </param>
 public sealed record DeclaredProductScreening(
     IReadOnlyList<DeclaredProductOutcome> Outcomes,
     IReadOnlyList<SourceRootGivenUp> RootsGivenUp,
     int WaitCount,
     CachedPackageCensus? CachedPackages = null,
     IReadOnlyList<DeclaredProductInstalledCause>? InstalledCauses = null,
-    OwnPerUserSourceLists? OwnPerUserLists = null)
+    OwnPerUserSourceLists? OwnPerUserLists = null,
+    UnlistedKeyHolds? UnlistedHolds = null)
 {
     /// <summary>Never null: a screening built without one reads as a pass that read no installation.</summary>
     public CachedPackageCensus CachedPackages { get; init; } = CachedPackages ?? CachedPackageCensus.None;
@@ -315,6 +320,23 @@ public sealed record DeclaredProductScreening(
 
     /// <summary>Never null: a screening built without them reads as a pass that read no such list.</summary>
     public OwnPerUserSourceLists OwnPerUserLists { get; init; } = OwnPerUserLists ?? OwnPerUserSourceLists.None;
+
+    /// <summary>Never null: a screening built without them reads as a pass that kept nothing for a key.</summary>
+    public UnlistedKeyHolds UnlistedHolds { get; init; } = UnlistedHolds ?? UnlistedKeyHolds.None;
+}
+
+/// <summary>
+/// The files one pass of the declared-product check kept at its last step, for the product keys
+/// no installation accounts for (<see cref="UnlistedProductKey"/>), each file once. A file kept
+/// for keys of both kinds counts under the first. These files are all among the ones the pass
+/// withholds, so these are parts of those counts.
+/// </summary>
+/// <param name="WithInstallProperties">Files kept for a key with an <c>InstallProperties</c> key.</param>
+/// <param name="WithoutInstallProperties">Files kept for a key without one.</param>
+public sealed record UnlistedKeyHolds(int WithInstallProperties, int WithoutInstallProperties)
+{
+    /// <summary>A pass that kept nothing for such a key.</summary>
+    public static UnlistedKeyHolds None { get; } = new(0, 0);
 }
 
 /// <summary>

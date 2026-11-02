@@ -93,6 +93,12 @@ namespace InstallerClean.Models;
 /// and only touches rows still carrying <paramref name="IsRemovable"/>, so it passes over a
 /// row this flag has already taken.
 /// </param>
+/// <param name="WithheldOnUnlistedKey">
+/// A product key no installation accounts for took this row's removable verdict away: its own
+/// listing names the patch, or a listing was not established and may name it. Set where the
+/// row still carried the verdict, so a row an earlier pass had already withheld never carries
+/// it. A failed read of the registry takes the verdict with no key to name, and does not set it.
+/// </param>
 /// <param name="WithheldOnRecordedPathUnestablished">
 /// The scan-wide withholding took this row's removable verdict away on a scan where a
 /// recorded path could not be settled
@@ -152,7 +158,8 @@ public record RegisteredPackage(
     bool WithheldOnUnreadableFile = false,
     bool WithheldOnRecordedPathUnestablished = false,
     bool WithheldScanWide = false,
-    bool OtherHoldNotRuledOut = false)
+    bool OtherHoldNotRuledOut = false,
+    bool WithheldOnUnlistedKey = false)
 {
     /// <summary>
     /// Windows holds a record naming this file and the file is not there. The one

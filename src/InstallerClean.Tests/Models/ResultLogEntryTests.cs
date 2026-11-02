@@ -152,7 +152,12 @@ public class ResultLogEntryTests
         DeclaredInstalledSourcesFormPackageNameCount: 0,
         DeclaredInstalledSourcesFormOtherCount: 0,
         DeclaredSourcesOwnPerUserReadCount: 0,
-        DeclaredSourcesOwnPerUserKeptCount: 0);
+        DeclaredSourcesOwnPerUserKeptCount: 0,
+        UnlistedKeysWithInstallPropertiesCount: 0,
+        UnlistedKeysWithoutInstallPropertiesCount: 0,
+        FilesHeldForKeysWithInstallPropertiesCount: 0,
+        FilesHeldForKeysWithoutInstallPropertiesCount: 0,
+        SupersededHeldForUnlistedKeyCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -226,15 +231,15 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void Schema_version_is_ten()
+    public void Schema_version_is_eleven()
     {
         // The receiving Edge Function field-validates per version and holds each version a
         // release sends to its exact set of keys, every count in it required; a version it
         // does not know goes to its lenient v<n>-unknown/ path. So a key added to or taken
         // from what a version carries moves the version once a release sends it, and this
-        // pin makes that move a deliberate, reviewed act. Schema 10 is schema 9 with two keys
-        // appended under app, host and copyKind.
-        Assert.Equal(10, ResultLogEntry.CurrentSchemaVersion);
+        // pin makes that move a deliberate, reviewed act. Schema 11 is schema 10 with five keys
+        // appended under scan.
+        Assert.Equal(11, ResultLogEntry.CurrentSchemaVersion);
     }
 
     [Fact]
@@ -432,6 +437,10 @@ public class ResultLogEntryTests
                 // The running account's own per-user source lists the screen read, by whether
                 // every package each names was seen.
                 "declaredSourcesOwnPerUserReadCount", "declaredSourcesOwnPerUserKeptCount",
+                // The product keys no listed installation accounts for, and what they held back.
+                "unlistedKeysWithInstallPropertiesCount", "unlistedKeysWithoutInstallPropertiesCount",
+                "filesHeldForKeysWithInstallPropertiesCount", "filesHeldForKeysWithoutInstallPropertiesCount",
+                "supersededHeldForUnlistedKeyCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 
@@ -533,7 +542,7 @@ public class ResultLogEntryTests
         var json = JsonSerializer.Serialize(info, JsonOptions);
         Assert.DoesNotContain("unaccounted", json, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("shortfall", json, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("unlisted", json, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("unlistedProduct", json, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -828,6 +837,33 @@ public class ResultLogEntryTests
     }
 
     [Fact]
+    public void The_product_keys_no_listed_installation_accounts_for_reach_the_scan_block()
+    {
+        var scan = new ScanResult(
+            Array.Empty<OrphanedFile>(),
+            [
+                new RegisteredPackage(
+                    @"C:\Windows\Installer\a.msp", "", "", WithheldOnUnlistedKey: true, FileExists: true),
+                new RegisteredPackage(
+                    @"C:\Windows\Installer\b.msp", "", "", WithheldOnUnlistedKey: true, FileExists: false),
+            ],
+            0,
+            UnlistedKeysWithInstallProperties: 3,
+            UnlistedKeysWithoutInstallProperties: 4,
+            UnlistedKeyHolds: new UnlistedKeyHolds(5, 6));
+
+        var info = ScanInfo.From(scan, 10);
+
+        Assert.Equal(
+            [3, 4, 5, 6, 1],
+            [
+                info.UnlistedKeysWithInstallPropertiesCount, info.UnlistedKeysWithoutInstallPropertiesCount,
+                info.FilesHeldForKeysWithInstallPropertiesCount, info.FilesHeldForKeysWithoutInstallPropertiesCount,
+                info.SupersededHeldForUnlistedKeyCount,
+            ]);
+    }
+
+    [Fact]
     public void A_scan_that_kept_no_installed_product_s_file_sends_a_zero_for_every_cause()
     {
         var info = ScanInfo.From(
@@ -853,6 +889,9 @@ public class ResultLogEntryTests
                 info.DeclaredInstalledSourcesFormVariableCount, info.DeclaredInstalledSourcesFormPackageNameCount,
                 info.DeclaredInstalledSourcesFormOtherCount,
                 info.DeclaredSourcesOwnPerUserReadCount, info.DeclaredSourcesOwnPerUserKeptCount,
+                info.UnlistedKeysWithInstallPropertiesCount, info.UnlistedKeysWithoutInstallPropertiesCount,
+                info.FilesHeldForKeysWithInstallPropertiesCount, info.FilesHeldForKeysWithoutInstallPropertiesCount,
+                info.SupersededHeldForUnlistedKeyCount,
             ],
             count => Assert.Equal(0, count));
     }

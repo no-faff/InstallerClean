@@ -1800,6 +1800,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <paramref name="registryReadFailed"/> a key that would not read may be an unlisted
     /// program's, whose record nothing else holds. So either withholds every removable row,
     /// scan wide, and marks every superseded or obsoleted row.
+    ///
+    /// A ROW WHOSE VERDICT A LISTING TOOK IS MARKED
+    /// (<see cref="RegisteredPackage.WithheldOnUnlistedKey"/>), and the report counts those rows.
+    /// A failed read names no key and marks none.
     /// </summary>
     private static void WithholdOnUnlistedEntries(
         Dictionary<string, RegisteredPackage> claimed,
@@ -1808,20 +1812,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IReadOnlyList<RegistryProductEntry> unlisted,
         bool registryReadFailed)
     {
-        var everyPatch = registryReadFailed;
+        var listingNotEstablished = false;
         var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var entry in unlisted)
         {
-            if (entry.PatchCodes is null) everyPatch = true;
+            if (entry.PatchCodes is null) listingNotEstablished = true;
             else named.UnionWith(entry.PatchCodes);
         }
 
-        if (everyPatch)
+        if (listingNotEstablished || registryReadFailed)
         {
             foreach (var path in claimed.Keys.ToList())
             {
+                var removable = claimed[path].IsRemovable;
                 Downgrade(claimed, path, withheld: true, scanWide: true);
                 claimed[path] = Hold(claimed[path], claimState: 0);
+                if (removable && listingNotEstablished)
+                    claimed[path] = claimed[path] with { WithheldOnUnlistedKey = true };
             }
 
             return;
@@ -1829,9 +1836,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         void HoldBack(string path)
         {
-            if (!claimed.ContainsKey(path)) return;
+            if (!claimed.TryGetValue(path, out var row)) return;
             Downgrade(claimed, path, withheld: true);
             claimed[path] = Hold(claimed[path], claimState: 0);
+            if (row.IsRemovable) claimed[path] = claimed[path] with { WithheldOnUnlistedKey = true };
         }
 
         foreach (var claim in patchClaims)

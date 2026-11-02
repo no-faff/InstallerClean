@@ -428,6 +428,16 @@ namespace InstallerClean.Models;
 /// APPENDED AFTER <see cref="InstallerActivityAtScan"/>, so a positional construction of the
 /// members above still means what it meant.
 /// </param>
+/// <param name="UnlistedKeysWithInstallProperties">
+/// The product keys no installation in this scan's enumeration accounts for that have an
+/// <c>InstallProperties</c> key (<see cref="InstallerQueryResult.UnlistedProductKeys"/>).
+/// </param>
+/// <param name="UnlistedKeysWithoutInstallProperties">The same keys without one.</param>
+/// <param name="UnlistedKeyHolds">
+/// The files the declared-product screen kept for those keys
+/// (<see cref="Services.DeclaredProductScreening.UnlistedHolds"/>). None where the screen did not
+/// run, kept nothing for one, or its answer was not used.
+/// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
@@ -460,8 +470,15 @@ public record ScanResult(
     CachedPackageCensus? CachedPackageCensus = null,
     DeclaredProductInstalledCauses? WithheldDeclaredProductInstalledCauses = null,
     Services.PendingRebootResult? InstallerActivityAtScan = null,
-    Services.OwnPerUserSourceLists? OwnPerUserSourceLists = null)
+    Services.OwnPerUserSourceLists? OwnPerUserSourceLists = null,
+    int UnlistedKeysWithInstallProperties = 0,
+    int UnlistedKeysWithoutInstallProperties = 0,
+    Services.UnlistedKeyHolds? UnlistedKeyHolds = null)
 {
+    /// <summary>Never null: a result built without them reads as a scan that kept nothing for a key.</summary>
+    public Services.UnlistedKeyHolds UnlistedKeyHolds { get; init; }
+        = UnlistedKeyHolds ?? Services.UnlistedKeyHolds.None;
+
     /// <summary>Never null: a result built without them reads as a scan that read no such list.</summary>
     public Services.OwnPerUserSourceLists OwnPerUserSourceLists { get; init; }
         = OwnPerUserSourceLists ?? Services.OwnPerUserSourceLists.None;
@@ -739,6 +756,16 @@ public record ScanResult(
     /// </summary>
     public int SupersededRecordedPathUnestablishedCount =>
         RegisteredPackages.Count(p => p.WithheldOnRecordedPathUnestablished && p.FileExists);
+
+    /// <summary>
+    /// How many superseded files a product key no installation accounts for held back: rows
+    /// carrying <see cref="RegisteredPackage.WithheldOnUnlistedKey"/> whose file is on disk. The
+    /// opt-in report carries it as a count of its own.
+    ///
+    /// A SUB-COUNT OF <see cref="WithheldCount"/>, over the same on-disk test.
+    /// </summary>
+    public int SupersededHeldForUnlistedKeyCount =>
+        RegisteredPackages.Count(p => p.WithheldOnUnlistedKey && p.FileExists);
 
     /// <summary>
     /// How many superseded files a condition on the whole machine held back: rows carrying

@@ -811,6 +811,127 @@ public class DeclaredProductCheckUnlistedKeyTests
         Assert.Equal([DeclaredProductOutcome.DeclaredPatchNotRegistered], pc.Screen([key], Patch(Spare)));
     }
 
+    // ---------------------------------------------------------------- what the report counts
+
+    private const string SecondKey = "{55555555-5555-5555-5555-555555555555}";
+
+    private static UnlistedKeyHolds HoldsOf(Pc pc, IReadOnlyList<UnlistedProductKey> keys, params OrphanedFile[] files) =>
+        pc.ScreeningOf(keys, files).UnlistedHolds;
+
+    [Fact]
+    public void A_pass_with_no_key_counts_nothing()
+    {
+        Assert.Equal(UnlistedKeyHolds.None, HoldsOf(new Pc(), [], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_file_declaring_a_keys_code_counts_for_a_key_with_InstallProperties()
+    {
+        var pc = new Pc();
+        pc.Packages.Declares(First, KeyCode);
+
+        Assert.Equal(new UnlistedKeyHolds(1, 0), HoldsOf(pc, [Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void Every_file_a_key_keeps_counts_once()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+
+        Assert.Equal(new UnlistedKeyHolds(2, 0), HoldsOf(pc, [Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_file_reached_by_a_keys_package_name_counts_for_a_key_with_InstallProperties()
+    {
+        var pc = new Pc();
+        pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+        pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+
+        Assert.Equal(new UnlistedKeyHolds(1, 0), HoldsOf(pc, [Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_file_whose_identity_will_not_read_counts_for_the_kind_of_key_comparing_it()
+    {
+        var pc = new Pc();
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Opens(SetupPackage, 1);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(First, FileIdentityRead.OpenRefused);
+
+        Assert.Equal(new UnlistedKeyHolds(0, 1), HoldsOf(pc, [NoProperties()], Package(First), Package(Second)));
+        Assert.Equal(new UnlistedKeyHolds(1, 0), HoldsOf(pc, [Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void The_package_at_a_key_with_no_InstallProperties_counts_for_that_kind()
+    {
+        var pc = new Pc();
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Opens(SetupPackage, 1);
+
+        Assert.Equal(new UnlistedKeyHolds(0, 1), HoldsOf(pc, [NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_file_kept_for_both_kinds_of_key_counts_for_a_key_with_InstallProperties()
+    {
+        var pc = new Pc();
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.HasList(MachineList(SecondKey), SetupName, Setup);
+        pc.Registry.Answers(HiveList(System, SecondKey), RegistryKeyPresence.Absent);
+        pc.Registry.Answers(ManagedList(System, SecondKey), RegistryKeyPresence.Absent);
+        pc.Files.Opens(SetupPackage, 1);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(
+            new UnlistedKeyHolds(1, 0),
+            HoldsOf(pc, [Installed(), NoProperties(System, SecondKey)], Package(First), Package(Second)));
+    }
+
+    [Theory]
+    [InlineData(true, 1, 0)]
+    [InlineData(false, 0, 1)]
+    public void A_spare_patch_a_listing_names_counts_for_that_keys_kind(bool properties, int with, int without)
+    {
+        var key = new UnlistedProductKey(System, KeyCode, [PatchCode], [], properties);
+
+        Assert.Equal(new UnlistedKeyHolds(with, without), HoldsOf(PcWithASparePatch(), [key], Patch(Spare)));
+    }
+
+    [Theory]
+    [InlineData(true, 1, 0)]
+    [InlineData(false, 0, 1)]
+    public void A_spare_patch_a_listing_not_established_may_name_counts_for_that_keys_kind(
+        bool properties, int with, int without)
+    {
+        var key = new UnlistedProductKey(System, KeyCode, null, [], properties);
+
+        Assert.Equal(new UnlistedKeyHolds(with, without), HoldsOf(PcWithASparePatch(), [key], Patch(Spare)));
+    }
+
+    [Fact]
+    public void A_spare_patch_both_kinds_of_key_name_counts_for_a_key_with_InstallProperties()
+    {
+        UnlistedProductKey[] keys =
+        [
+            new(System, SecondKey, [PatchCode], [], false),
+            new(System, KeyCode, [PatchCode], [], true),
+        ];
+
+        Assert.Equal(new UnlistedKeyHolds(1, 0), HoldsOf(PcWithASparePatch(), keys, Patch(Spare)));
+    }
+
+    [Fact]
+    public void A_listing_not_naming_a_spare_patch_counts_nothing()
+    {
+        var key = new UnlistedProductKey(System, KeyCode, [OtherCode], [], true);
+
+        Assert.Equal(UnlistedKeyHolds.None, HoldsOf(PcWithASparePatch(), [key], Patch(Spare)));
+    }
+
     [Fact]
     public void A_patch_Windows_holds_a_registration_of_keeps_that_answer_whatever_a_listing_says()
     {
