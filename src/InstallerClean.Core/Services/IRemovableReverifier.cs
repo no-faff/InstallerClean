@@ -241,9 +241,10 @@ public enum HeldBackReason
     /// does. A superseded registration is offered beside the walk-derived files and is
     /// judged by its own row. Where the re-enumeration could not settle a recorded path,
     /// that row comes back withheld and its path is held under
-    /// <see cref="RecordsUnreadable"/>; the other legs do not touch the row, so dropping
-    /// it here on them would keep back a file the scan would still offer on the same
-    /// machine a moment later. A path no registration names is the walk-derived half,
+    /// <see cref="RecordsUnreadable"/>; a failed read of the records withholds the row too
+    /// and is held the same way. The other legs do not touch the row, so dropping it here on
+    /// them would keep back a file the scan would still offer on the same machine a moment
+    /// later. A path no registration names is the walk-derived half,
     /// and that is the test used.
     /// </summary>
     OwnershipUnestablished,

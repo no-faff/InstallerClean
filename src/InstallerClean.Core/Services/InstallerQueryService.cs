@@ -1181,7 +1181,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // AND WHERE THE REGISTRY READ ITSELF FAILS. ProductKeys is counted from the
         // subkeys the fallback actually walked, so a fallback that failed reports
         // FEWER keys, and the names asked about are the codes that side handed over.
-        // The failed read is counted in fallback.Failures, which with an unreadable
+        // The failed read is counted in fallback.Failures, which withholds every removable
+        // row and, through the census, the walk-derived offer, and which with an unreadable
         // product refuses the scan at the gate above.
         //
         // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,

@@ -122,9 +122,9 @@ public record InstallerQueryResult(
 /// plus the shape facts one enumeration can see, carried separately so a report
 /// never has to state one cause for a quantity built from several.
 ///
-/// THE FIELDS THAT DECIDE ANYTHING ARE READ THROUGH THE TWO PROPERTIES AT THE END,
-/// <see cref="AnyRecordedPathUnestablished"/> and
-/// <see cref="RegistryProductUnaskable"/>, and the rest decide nothing. A count
+/// THE FIELDS THAT DECIDE ANYTHING ARE READ THROUGH THE THREE PROPERTIES AT THE END,
+/// <see cref="AnyRecordedPathUnestablished"/>, <see cref="RegistryProductUnaskable"/> and
+/// <see cref="RegistryRecordsUnread"/>, and the rest decide nothing. A count
 /// that gained a consumer anywhere else would be a second, quieter copy of a rule
 /// that already exists in one place.
 ///
@@ -492,7 +492,8 @@ public readonly record struct EnumerationCensus(
     // reads leaves that refusal unarmed, and the count is how the opt-in report
     // records that the reads failed, as registryKeyReadFailureCount. The crash log
     // writes the first twenty in full, then each cause not yet seen, and counts
-    // the rest in a closing entry.
+    // the rest in a closing entry. Above zero it withholds the whole walk-derived offer
+    // (RegistryRecordsUnread).
     int RegistryKeyReadFailures = 0,
     // The three below are appended for the same reason.
     //

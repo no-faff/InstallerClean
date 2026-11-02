@@ -380,6 +380,60 @@ public class DeclaredProductCheckUnlistedKeyTests
         Assert.Equal([LetThrough, LetThrough], pc.Screen([Installed()], Package(First), Package(Second)));
     }
 
+    [Fact]
+    public void A_folder_that_does_not_settle_leaves_the_next_folder_read_and_keeps_a_file_carrying_the_name()
+    {
+        // No cached package, so nothing is held class-wide, and what the key names still keeps
+        // a file: the package in the second folder by identity, and the file carrying the name.
+        const string name = "pkg.msi";
+        var pc = new Pc();
+        pc.Registry.Holds(
+            MachineList(KeyCode),
+            new RegistryValue("PackageName", RegistryValueKind.String, name));
+        pc.Registry.Holds(
+            MachineList(KeyCode) + @"\Net",
+            new RegistryValue("1", RegistryValueKind.ExpandString, @"D:\One\"),
+            new RegistryValue("2", RegistryValueKind.ExpandString, Setup));
+        pc.Registry.Answers(MachineList(KeyCode) + @"\URL", RegistryKeyPresence.Absent);
+        pc.Registry.Answers(MachineList(KeyCode) + @"\Media", RegistryKeyPresence.Absent);
+        pc.Files.Answers(@"D:\One\" + name, FileIdentityRead.OpenRefused);
+        pc.Files.Opens(Setup + name, 1);
+        pc.Files.Opens(Folder + name, 2);
+
+        Assert.Equal(
+            [DeclaredProductOutcome.Unestablished, DeclaredProductOutcome.Unestablished],
+            pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void An_InstallSource_in_a_form_not_compared_leaves_the_keys_list_read()
+    {
+        var pc = new Pc();
+        pc.Registry.Holds(
+            Properties(System, KeyCode),
+            new RegistryValue("InstallSource", RegistryValueKind.String, "%TEMP%"));
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Opens(SetupPackage, 1);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(
+            [DeclaredProductOutcome.Unestablished, LetThrough],
+            pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_package_name_is_read_once_beside_a_folder_of_files()
+    {
+        var pc = new Pc();
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+
+        pc.Screen([Installed()], Package(First), Package(Second));
+
+        Assert.Single(pc.Files.Reads, Folder + SetupName);
+    }
+
     // A name no file can carry is refused as a form, so no read of a file's folder and that
     // name can keep every file.
     [Theory]
@@ -469,6 +523,19 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.Files.Answers(SetupPackage, FileIdentityRead.OpenRefused);
 
         Assert.Equal([LetThrough, LetThrough], pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_reads_its_package_by_the_rules_of_every_source_read()
+    {
+        // Only the source read asks a volume of a path that gives no file id.
+        var pc = new Pc();
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Files.Answers(SetupPackage, FileIdentityRead.IdentityUnavailable);
+
+        pc.Screen([NoProperties()], Package(First));
+
+        Assert.Contains(SetupPackage, pc.Files.VolumeReads);
     }
 
     [Fact]

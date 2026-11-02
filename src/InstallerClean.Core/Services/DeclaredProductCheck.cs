@@ -3318,11 +3318,22 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     private static DeclaredProductOutcome PutPatchToUnlistedKeys(
         string patchCode, DeclaredProductOutcome letThrough, PassAnswers pass)
     {
-        foreach (var key in pass.UnlistedKeys)
-            if (key.PatchCodes is null || key.PatchCodes.Contains(patchCode, StringComparer.OrdinalIgnoreCase))
-                return DeclaredProductOutcome.DeclaredPatchUnestablished;
+        if (pass.UnlistedListings is not { } listings)
+        {
+            var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var notEstablished = false;
+            foreach (var key in pass.UnlistedKeys)
+            {
+                if (key.PatchCodes is null) notEstablished = true;
+                else named.UnionWith(key.PatchCodes);
+            }
 
-        return letThrough;
+            pass.UnlistedListings = listings = (named, notEstablished);
+        }
+
+        return listings.NotEstablished || listings.Named.Contains(patchCode)
+            ? DeclaredProductOutcome.DeclaredPatchUnestablished
+            : letThrough;
     }
 
     /// <summary>
@@ -3361,7 +3372,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (_fileIdentities.ReadOutcome(candidatePath, out var candidate) != FileIdentityRead.Read)
             return DeclaredProductOutcome.CandidateIdentityUnestablished;
 
-        return read.Packages.Contains(candidate) || ReachedByName(candidatePath, candidate, read.PackageNames)
+        return read.Packages.Contains(candidate) || ReachedByName(candidatePath, candidate, read.PackageNames, pass)
             ? DeclaredProductOutcome.Unestablished
             : letThrough;
     }
@@ -3371,22 +3382,25 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// THE FILESYSTEM ANSWERS, by the file that name opens there, so the volume's own case
     /// table, short names and treatment of trailing dots decide and this process's do not.
     /// A name opening nothing there, or a different file, does not reach the candidate. Any
-    /// other answer keeps this candidate.
+    /// other answer keeps this candidate. Each path is read once per pass.
     /// </summary>
-    private bool ReachedByName(string candidatePath, FileIdentity candidate, IReadOnlyCollection<string> packageNames)
+    private bool ReachedByName(
+        string candidatePath, FileIdentity candidate, IReadOnlyCollection<string> packageNames, PassAnswers pass)
     {
         var folder = candidatePath[..(candidatePath.LastIndexOfAny(['\\', '/']) + 1)];
         foreach (var name in packageNames)
         {
-            switch (_fileIdentities!.ReadOutcome(folder + name, out var named))
+            var path = folder + name;
+            if (!pass.NamedFileReads.TryGetValue(path, out var answer))
             {
-                case FileIdentityRead.NamesNothing:
-                    continue;
-                case FileIdentityRead.Read when named != candidate:
-                    continue;
-                default:
-                    return true;
+                var outcome = _fileIdentities!.ReadOutcome(path, out var named);
+                pass.NamedFileReads[path] = answer = (outcome, named);
             }
+
+            if (answer.Outcome == FileIdentityRead.NamesNothing) continue;
+            if (answer.Outcome == FileIdentityRead.Read && answer.Identity != candidate) continue;
+
+            return true;
         }
 
         return false;
@@ -3418,7 +3432,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             if (!key.HasInstallProperties)
             {
-                AddPackagesAtLocalSources(key, pass, packages);
+                AddPackagesAtLocalSources(key, pass, namesAFileInInstallerFolder, packages);
                 continue;
             }
 
@@ -3482,7 +3496,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// with the API left out, because no API call is put to such a key. False where they
     /// cannot be read, with <paramref name="givenUp"/> the root whose give-up refused a read,
     /// if any: an account whose hive is not loaded, a key that will not read, a value in a form
-    /// this check does not compare, and a package that does not settle.
+    /// this check does not compare, and a package that does not settle. A refusal in one place
+    /// leaves every other place read, so what the key does name still keeps a file.
     ///
     /// A LIST THAT IS NOT THERE, under a hive that is loaded, names nothing to compare. A key
     /// with no list and an <c>InstallSource</c> has no package name to look for there, so
@@ -3499,16 +3514,34 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         givenUp = null;
         if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return false;
 
-        if (!RecordedInstallSource(key, out var installSource)) return false;
+        var allRead = RecordedInstallSource(key, out var installSource);
+        var keptOtherwise = !allRead;
+        string? firstGivenUp = null;
+
+        void Refused(string? root)
+        {
+            allRead = false;
+            if (root is null) keptOtherwise = true;
+            else firstGivenUp ??= root;
+        }
 
         var listFound = false;
         foreach (var (sid, context) in SourceListPlaces(key.Account))
         {
-            if (!SourceListAt(key.Code, sid, context, out var listKey, out var values)) return false;
+            if (!SourceListAt(key.Code, sid, context, out var listKey, out var values))
+            {
+                Refused(null);
+                continue;
+            }
+
             if (values is null) continue;
 
             listFound = true;
-            if (ReadSourceList(listKey, values, pass) is not { } sources) return false;
+            if (ReadSourceList(listKey, values, pass) is not { } sources)
+            {
+                Refused(null);
+                continue;
+            }
 
             if (sources.MediaSearch) byName.Add(new PackageByName(null, sources.PackageName));
 
@@ -3516,13 +3549,25 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             if (installSource.Length > 0 && !folders.Contains(installSource, StringComparer.Ordinal))
                 folders.Add(installSource);
 
-            if (!AddPackagesInFolders(
-                    folders, sources.PackageName, pass, namesAFileInInstallerFolder, _registry, opened, byName,
-                    out givenUp))
-                return false;
+            // Each folder on its own, so one that does not settle leaves the others read, and
+            // its package name goes on keeping a file that carries it.
+            foreach (var folder in folders)
+            {
+                if (AddPackagesInFolders(
+                        [folder], sources.PackageName, pass, namesAFileInInstallerFolder, _registry, opened, byName,
+                        out var refusedFor))
+                    continue;
+
+                byName.Add(new PackageByName(null, sources.PackageName));
+                Refused(refusedFor);
+            }
         }
 
-        return listFound || installSource.Length == 0 || IsNotTheInstallerFolder(installSource, pass, out givenUp);
+        if (!listFound && installSource.Length > 0 && !IsNotTheInstallerFolder(installSource, pass, out var folderGivenUp))
+            Refused(folderGivenUp);
+
+        givenUp = keptOtherwise ? null : firstGivenUp;
+        return allRead;
     }
 
     /// <summary>
@@ -3530,9 +3575,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// source list, by identity. A candidate that is that package is kept, and this is the one
     /// way such a key keeps a file.
     /// </summary>
-    private void AddPackagesAtLocalSources(UnlistedProductKey key, PassAnswers pass, List<FileIdentity> packages)
+    private void AddPackagesAtLocalSources(
+        UnlistedProductKey key,
+        PassAnswers pass,
+        Func<string, bool?>? namesAFileInInstallerFolder,
+        List<FileIdentity> packages)
     {
-        if (_fileIdentities is null || _registry is null) return;
+        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return;
 
         foreach (var (sid, context) in SourceListPlaces(key.Account))
         {
@@ -3544,8 +3593,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 var package = PathOfPackage(folder, sources.PackageName);
                 if (ComparedByName(package, _registry, pass)) continue;
 
-                if (_fileIdentities.ReadOutcome(package, out var identity) == FileIdentityRead.Read)
-                    packages.Add(identity);
+                var inInstallerFolder = IsLocalDrive(RootOf(package), pass) ? null : namesAFileInInstallerFolder;
+                if (ReadSourcePackage(package, pass, inInstallerFolder, out var identity, out _)
+                    && identity is { } read)
+                    packages.Add(read);
             }
         }
     }
@@ -4421,6 +4472,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         /// <summary>What those keys say, read once (<see cref="ReadUnlistedKeys"/>).</summary>
         internal UnlistedKeysRead? UnlistedRead { get; set; }
+
+        /// <summary>
+        /// Every patch code those keys' <c>Patches</c> listings name, and whether one of those
+        /// listings was not established, gathered once (<see cref="PutPatchToUnlistedKeys"/>).
+        /// </summary>
+        internal (HashSet<string> Named, bool NotEstablished)? UnlistedListings { get; set; }
+
+        /// <summary>What each path a package name opens read as (<see cref="ReachedByName"/>).</summary>
+        internal Dictionary<string, (FileIdentityRead Outcome, FileIdentity Identity)> NamedFileReads { get; } =
+            new(StringComparer.Ordinal);
 
         /// <summary>
         /// Every installation of one product code, asked once per pass whichever half
