@@ -40,7 +40,7 @@
 - **Combien d'espace :** Le graphique ci-dessus montre les résultats des rapports facultatifs envoyés depuis l'application (merci à tous). Sur les <!-- reports-freedpct-start -->59 %<!-- reports-freedpct-end --> qui ont libéré de l'espace, la médiane libérée est de <!-- reports-median-start -->1,8 Go<!-- reports-median-end -->. Ce sont des fichiers dont vous ignoriez sans doute l'existence et qui prennent de la place pour rien. <!-- reports-over5gb-start -->22,5 %<!-- reports-over5gb-end --> de *toutes* les machines ont récupéré plus de 5 Go, et beaucoup de gens ont libéré des centaines de Go. En gros, plus vous installez de logiciels basés sur MSI, plus vous aurez de fichiers inutiles. Dès que vous lancerez InstallerClean, vous serez fixé.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Cliquez pour voir</kbd> à quoi ressemblerait le graphique si les rapports étaient le reflet exact de la totalité des 122 015 téléchargements</summary>
+  <summary><kbd>Cliquez pour voir</kbd> à quoi ressemblerait le graphique si les rapports étaient le reflet exact de la totalité des 122 231 téléchargements</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-fr-scaled-dark.svg" />

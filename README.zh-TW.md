@@ -40,7 +40,7 @@
 - **能騰出多少空間：** 上面的圖表來自透過應用程式傳送的選擇性報告（謝謝大家）。在釋放了空間的那 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.8 GB<!-- reports-median-end -->。這些檔案您很可能根本不知道它們的存在，它們只是白白占著空間。在*所有*電腦中，有 <!-- reports-over5gb-start -->22.5%<!-- reports-over5gb-end --> 釋放了超過 5 GB，還有不少人釋放了數百 GB。基本上，安裝的 MSI 軟體越多，不需要的檔案就越多。一執行 InstallerClean，您就知道了。
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>點擊查看</kbd> 如果報告能準確反映全部 122,015 次下載，圖表會是什麼樣</summary>
+  <summary><kbd>點擊查看</kbd> 如果報告能準確反映全部 122,231 次下載，圖表會是什麼樣</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-zh-TW-scaled-dark.svg" />
