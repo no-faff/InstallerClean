@@ -37,10 +37,10 @@
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder that fills up as you install and update software. After a quick scan it tells you whether you have any, shows more detail for the curious, and lets you move them somewhere else or delete them to free up space on your C: drive.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. In that case, InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely remove.
-- **How much space:** The chart above shows the results of the optional reports sent in via the app (thanks, everyone). Of the <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> that freed space, the median reclaimed is <!-- reports-median-start -->1.8 GB<!-- reports-median-end -->. That's files you probably didn't know existed just sitting there taking up space. <!-- reports-over5gb-start -->22.4%<!-- reports-over5gb-end --> of *all* machines reclaimed more than 5 GB, with many people freeing hundreds of GB. Essentially the more MSI-based software you install, the more unneeded files you'll have. As soon as you run InstallerClean, you'll find out.
+- **How much space:** The chart above shows the results of the optional reports sent in via the app (thanks, everyone). Of the <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> that freed space, the median reclaimed is <!-- reports-median-start -->1.8 GB<!-- reports-median-end -->. That's files you probably didn't know existed just sitting there taking up space. <!-- reports-over5gb-start -->22.3%<!-- reports-over5gb-end --> of *all* machines reclaimed more than 5 GB, with many people freeing hundreds of GB. Essentially the more MSI-based software you install, the more unneeded files you'll have. As soon as you run InstallerClean, you'll find out.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Click to see</kbd> how the chart would look if the reports were an exact picture of all 122,466 downloads</summary>
+  <summary><kbd>Click to see</kbd> how the chart would look if the reports were an exact picture of all 122,796 downloads</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-scaled-dark.svg" />
