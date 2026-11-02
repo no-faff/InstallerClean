@@ -118,7 +118,7 @@ const ALLOWED = [
   {
     file: 'src/InstallerClean.Core/Services/InstallerCacheHelpers.cs',
     text: 'Environment.ExpandEnvironmentVariables(value);',
-    what: 'ExpandRecordedPath, expanding the cached-package path Windows Installer recorded',
+    what: 'ExpandRecordedPath, expanding a path Windows Installer recorded',
   },
   {
     file: 'src/InstallerClean.Core/Services/InstallerQueryService.cs',

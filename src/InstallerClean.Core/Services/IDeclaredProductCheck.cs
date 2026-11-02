@@ -111,10 +111,12 @@ namespace InstallerClean.Services;
 /// LET THROUGH (<see cref="UnlistedProductKey"/>). A key with an <c>InstallProperties</c> key
 /// keeps an installation package declaring its code or the code its cached package declares,
 /// a package its sources open, and a file one of its package names opens from that file's own
-/// folder. Where such a key's cached package does not say what it is, a key recording a cached
-/// package has sources that will not read, or a key was installed from the Installer folder with
-/// no source list naming its package, every installation package is kept. A key without one
-/// keeps the package at a local folder on its source list. A patch file is kept
+/// folder. Every installation package is kept where such a key's cached package does not say
+/// what it is, which covers a cached package value with no path in it and an
+/// <c>InstallProperties</c> key that will not read, where a key recording a cached package has
+/// sources that will not read, and where a key was installed from the Installer folder with no
+/// source list naming its package. A key without one keeps the package at a local folder on its
+/// source list. A patch file is kept
 /// where a key's <c>Patches</c> listing names it or was not established. All of this comes off
 /// the registry, so it keeps a file and never releases one.
 ///
@@ -246,7 +248,8 @@ public interface IDeclaredProductCheck
     /// before a Move or Delete, as <paramref name="namesAFileInInstallerFolder"/> is. It is asked
     /// of the folder an installation with no source list was installed from; without it, such an
     /// installation whose <c>InstallProperties</c> key records that folder keeps every candidate
-    /// it would otherwise let through.
+    /// it would otherwise let through. A product key no installation accounts for, recording no
+    /// cached package, keeps every candidate only on an answer of true.
     /// </param>
     DeclaredProductScreening Screen(
         IReadOnlyList<OrphanedFile> candidates,
@@ -631,9 +634,10 @@ public enum DeclaredProductOutcome
     /// that package's name could be.
     ///
     /// A product key no installation accounts for gives it the same way, where its cached
-    /// package does not say what it is, a key recording a cached package has sources that
-    /// will not read, or a key was installed from the Installer folder with no source list
-    /// naming its package.
+    /// package does not say what it is, which covers a cached package value with no path in it
+    /// and an <c>InstallProperties</c> key that will not read, where a key recording a cached
+    /// package has sources that will not read, and where a key was installed from the Installer
+    /// folder with no source list naming its package.
     ///
     /// Where a single installation's packages cannot all be seen it covers what
     /// <see cref="DeclaredProductInstalled"/> covers for one: a cached package that will

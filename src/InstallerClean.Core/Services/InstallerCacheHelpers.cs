@@ -169,10 +169,11 @@ internal static class InstallerCacheHelpers
     /// such a value at the null and does not throw, and what comes back is a shorter,
     /// well-formed path that can name a real file.
     ///
-    /// The recorded cached-package path is expanded here. Do not pass a source-list
-    /// entry through it: an entry naming a variable keeps its copy in
-    /// <see cref="DeclaredProductCheck"/> (<c>AddSourcePackages</c>), and an expanded one
-    /// would be compared instead.
+    /// The recorded cached-package path is expanded here, and so is the <c>InstallSource</c>
+    /// of a product key no installation accounts for, where the answer only ever keeps a
+    /// file (<c>ExpandedInstallSource</c>). Do not pass a source-list entry through it: an entry
+    /// naming a variable keeps its copy in <see cref="DeclaredProductCheck"/>
+    /// (<c>AddSourcePackages</c>), and an expanded one would be compared instead.
     /// </summary>
     internal static string ExpandRecordedPath(string value) =>
         Environment.ExpandEnvironmentVariables(value);

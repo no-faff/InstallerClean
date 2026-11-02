@@ -404,15 +404,68 @@ public class DeclaredProductCheckUnlistedKeyTests
         Assert.Equal(NothingKept, pc.Screen([Installed()], Package(First), Package(Second)));
     }
 
-    [Theory]
-    [InlineData(RegistryValueKind.String, @"%SystemRoot%\Installer\")]
-    [InlineData(RegistryValueKind.ExpandString, Folder)]
-    public void A_key_whose_InstallSource_is_in_a_form_not_compared_keeps_nothing(RegistryValueKind kind, string folder)
+    /// <summary>A variable of this test's own, so the expansion does not rest on the host.</summary>
+    private const string RootVariable = "IC_UNLISTED_KEY_TEST_ROOT";
+
+    private static DeclaredProductOutcome[] ScreenExpanding(RegistryValueKind kind, string installSource)
     {
-        var pc = new Pc();
-        pc.InstalledFrom(folder, kind: kind);
+        Environment.SetEnvironmentVariable(RootVariable, @"C:\Windows");
+        try
+        {
+            var pc = new Pc();
+            pc.InstalledFrom(installSource, kind: kind);
+            return pc.Screen([Installed()], Package(First), Package(Second));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(RootVariable, null);
+        }
+    }
+
+    [Theory]
+    [InlineData(RegistryValueKind.String, "%" + RootVariable + @"%\Installer\")]
+    [InlineData(RegistryValueKind.ExpandString, "%" + RootVariable + @"%\Installer\")]
+    [InlineData(RegistryValueKind.ExpandString, Folder)]
+    public void A_key_whose_InstallSource_expands_to_the_Installer_folder_keeps_every_file(
+        RegistryValueKind kind, string installSource) =>
+        Assert.Equal(EveryFileKept, ScreenExpanding(kind, installSource));
+
+    [Theory]
+    [InlineData(RegistryValueKind.String, "%" + RootVariable + @"%\Other\")]
+    [InlineData(RegistryValueKind.ExpandString, Setup)]
+    [InlineData(RegistryValueKind.String, @"%IC_UNLISTED_KEY_TEST_NOT_SET%\Installer\")]
+    public void A_key_whose_InstallSource_does_not_expand_to_the_Installer_folder_keeps_nothing(
+        RegistryValueKind kind, string installSource) =>
+        Assert.Equal(NothingKept, ScreenExpanding(kind, installSource));
+
+    [Fact]
+    public void An_InstallSource_expanding_to_no_drive_or_share_is_not_put_to_the_folder_test()
+    {
+        var pc = new Pc { IsTheInstallerFolder = _ => true };
+        pc.InstalledFrom(@"Installer\", kind: RegistryValueKind.ExpandString);
 
         Assert.Equal(NothingKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_recording_a_cached_package_with_a_list_that_will_not_read_asks_nothing_about_its_InstallSource()
+    {
+        var asked = 0;
+        var pc = new Pc
+        {
+            IsTheInstallerFolder = _ =>
+            {
+                asked++;
+                return false;
+            },
+        };
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(Setup);
+        pc.HasList(MachineList(KeyCode), "...", Setup);
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed(System, KeyCode, Cached)], Package(First), Package(Second)));
+        Assert.Equal(0, asked);
     }
 
     [Fact]

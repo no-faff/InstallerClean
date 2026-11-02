@@ -3427,9 +3427,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// SUCH A KEY LEAVES A SECOND COPY NOT RULED OUT, WHICH KEEPS EVERY INSTALLATION PACKAGE, where
     /// a cached package it records does not say what it is, where it records one and its sources
     /// will not read, where it holds a cached package value with no path in it, by the test a
-    /// listed installation is put to (<see cref="RecordsNoCachedPackage"/>), and where it records
-    /// none and was installed from the Installer folder with no source list naming its package,
-    /// so any file there could be the one it opens.
+    /// listed installation is put to (<see cref="RecordsNoCachedPackage"/>), or an
+    /// <c>InstallProperties</c> key that will not read, and where it records none and was installed
+    /// from the Installer folder with no source list naming its package, so any file there could be
+    /// the one it opens.
     ///
     /// A KEY WITHOUT ONE gives only the package at a local folder on its source list
     /// (<see cref="AddPackagesAtLocalSources"/>).
@@ -3463,11 +3464,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             foreach (var path in key.CachedPackages)
                 if (!AddCachedPackage(path, packages, codes)) cachedSaid = false;
 
-            var sourcesRead = AddRegistrySources(
-                key, properties, pass, namesAFileInInstallerFolder, packages, byName,
-                out var unnamedInInstallerFolder, out var givenUp);
+            var sourcesSeen = AddRegistrySources(
+                key, properties, recordsNone, pass, namesAFileInInstallerFolder, packages, byName, out var givenUp);
 
-            if (recordsNone ? !unnamedInInstallerFolder : cachedSaid && sourcesRead) continue;
+            if (cachedSaid && sourcesSeen) continue;
 
             notAllSeen = true;
             if (!cachedSaid || givenUp is null) keptOtherwise = true;
@@ -3521,23 +3521,24 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// leaves every other place read, so what the key does name still keeps a file.
     ///
     /// A LIST THAT IS NOT THERE, under a hive that is loaded, names nothing to compare. A key
-    /// with no list and an <c>InstallSource</c> has no package name to look for there, so
-    /// that folder has to be shown not to be the Installer folder.
+    /// recording a cached package, with no list and an <c>InstallSource</c>, has no package name
+    /// to look for there, so that folder has to be shown not to be the Installer folder.
     ///
-    /// <paramref name="unnamedInInstallerFolder"/> is true where the test for the Installer folder
-    /// answers that its <c>InstallSource</c> is that folder and no place gave a package name.
+    /// WITH <paramref name="recordsNone"/>, FOR A KEY RECORDING NO CACHED PACKAGE, what is
+    /// collected stays and the answer is narrower: false only where no place gave a package name
+    /// and the key was installed from the Installer folder
+    /// (<see cref="WasInstalledFromTheInstallerFolder"/>).
     /// </summary>
     private bool AddRegistrySources(
         UnlistedProductKey key,
         RegistryKeyValues properties,
+        bool recordsNone,
         PassAnswers pass,
         Func<string, bool?>? namesAFileInInstallerFolder,
         List<FileIdentity> opened,
         List<PackageByName> byName,
-        out bool unnamedInInstallerFolder,
         out string? givenUp)
     {
-        unnamedInInstallerFolder = false;
         givenUp = null;
         if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return false;
 
@@ -3592,12 +3593,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             }
         }
 
-        if (!packageNamed && installSource.Length > 0)
-        {
-            var folder = InstallerFolderAnswer(installSource, pass);
-            unnamedInInstallerFolder = folder.IsIt == true;
-            if (!listFound && folder.IsIt != false) NotRead(folder.GivenUp);
-        }
+        if (recordsNone) return packageNamed || !WasInstalledFromTheInstallerFolder(installSource, properties, pass);
+
+        if (!listFound && installSource.Length > 0 && !IsNotTheInstallerFolder(installSource, pass, out var folderGivenUp))
+            NotRead(folderGivenUp);
 
         givenUp = keptOtherwise ? null : firstGivenUp;
         return allRead;
@@ -3669,6 +3668,42 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         return _registry is not null && InstallPropertiesKeyPath(key.Code, sid, context) is { } path
             ? _registry.LocalMachineValues(path)
             : default;
+    }
+
+    /// <summary>
+    /// Whether the test for the Installer folder answers true of the folder a key was installed
+    /// from: <paramref name="installSource"/>, or, where that is empty, the folder its
+    /// <c>InstallSource</c> names once expanded (<see cref="ExpandedInstallSource"/>). A null
+    /// answer, and a root given up, are not a true one.
+    /// </summary>
+    private bool WasInstalledFromTheInstallerFolder(
+        string installSource, RegistryKeyValues properties, PassAnswers pass)
+    {
+        var folder = installSource.Length > 0 ? installSource : ExpandedInstallSource(properties);
+        return folder is not null && InstallerFolderAnswer(folder, pass).IsIt == true;
+    }
+
+    /// <summary>
+    /// The folder an <c>InstallSource</c> value holding a variable, or stored as REG_EXPAND_SZ,
+    /// names once expanded from this process's environment, or null where it is not one string
+    /// expanding to a path on a drive or a share.
+    ///
+    /// THIS ANSWER ONLY EVER KEEPS A FILE. It is asked about for the Installer folder and nothing
+    /// is compared with it, so it is never read as a source a package could be at, where a
+    /// variable keeps the file (<see cref="RecordedInstallSource"/>). Do not use it to compare one.
+    /// </summary>
+    private static string? ExpandedInstallSource(RegistryKeyValues properties)
+    {
+        if (properties.Values is null) return null;
+
+        var stored = ValueNamed(properties.Values, MsiInstallProperty.InstallSource, out var count);
+        if (count != 1
+            || stored is not { Kind: RegistryValueKind.String or RegistryValueKind.ExpandString, Text: { } text }
+            || text.Contains('\0'))
+            return null;
+
+        var expanded = InstallerCacheHelpers.ExpandRecordedPath(text);
+        return IsOnADriveOrAShare(expanded) ? expanded : null;
     }
 
     /// <summary>
