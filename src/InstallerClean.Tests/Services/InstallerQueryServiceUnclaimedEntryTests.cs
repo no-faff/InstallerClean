@@ -1,9 +1,11 @@
+using InstallerClean.Helpers;
 using InstallerClean.Interop;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
 using EstablishedPatchReach = InstallerClean.Services.InstallerQueryService.EstablishedPatchReach;
 using RegistryPackageRecord = InstallerClean.Services.InstallerQueryService.RegistryPackageRecord;
+using RegistryProductEntry = InstallerClean.Services.InstallerQueryService.RegistryProductEntry;
 
 namespace InstallerClean.Tests.Services;
 
@@ -33,8 +35,14 @@ public class InstallerQueryServiceUnclaimedEntryTests
     private const string Superseded = "{CCCCCCCC-0000-0000-0000-00000000000C}";
     private const string OtherPatch = "{DDDDDDDD-0000-0000-0000-00000000000D}";
 
+    private const string Unlisted = "{F1F1F1F1-0000-0000-0000-0000000000F1}";
+
+    private const string MachineAccount = "S-1-5-18";
+    private const string UserAccount = "S-1-5-21-1-2-3-1001";
+
     private const string SupersededFile = @"C:\Windows\Installer\unclaimed-entry-superseded.msp";
     private const string ProductFile = @"C:\Windows\Installer\unclaimed-entry-product.msi";
+    private const string UnlistedFile = @"C:\Windows\Installer\unclaimed-entry-unlisted.msi";
 
     // ---- A cached file a product entry names ----
 
@@ -285,6 +293,186 @@ public class InstallerQueryServiceUnclaimedEntryTests
         AssertOffered(Row(result));
     }
 
+    // ---- A product key no listed installation accounts for ----
+    //
+    // Windows lists no installation of the program and its keyed walk ends at once. The
+    // registry holds its product key under an account subtree, the key's Patches listing,
+    // its cached package and the patch's own record, which is the shape a program installed
+    // per user by SYSTEM leaves. No Windows Installer call answers about it for an elevated
+    // ordinary account, so what the registry says can keep a file and never release one.
+
+    [Fact]
+    public async Task A_patch_a_program_Windows_does_not_list_holds_by_its_registry_listing_is_held_back()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [Superseded]),
+            records:
+            [
+                new(Path.GetFullPath(SupersededFile), IsPatch: true, Superseded, MachineAccount),
+                new(Path.GetFullPath(UnlistedFile), IsPatch: false, Unlisted, MachineAccount),
+            ],
+            unclaimedProductFiles: [Unlisted]));
+
+        AssertHeldBackOnItsOwn(Row(result));
+        Assert.Equal(0, result.UnaccountedProductCount);
+    }
+
+    [Fact]
+    public async Task The_hold_needs_no_record_of_the_patch_only_the_programs_listing()
+    {
+        // A repair or removal can take the patch's own record and leave the listing.
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [Superseded])));
+
+        AssertHeldBackOnItsOwn(Row(result));
+    }
+
+    [Fact]
+    public async Task A_second_key_of_a_code_Windows_lists_under_another_account_holds_the_patch_back()
+    {
+        // Windows lists this code per user under an ordinary account, so the code is not
+        // missing from anything, and the key under another subtree is what no installation
+        // accounts for.
+        var msi = Machine();
+        ListUnderTheUsersAccount(msi);
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [Superseded]),
+            new RegistryProductEntry(UserAccount, Unlisted, [])));
+
+        AssertHeldBackOnItsOwn(Row(result));
+    }
+
+    [Fact]
+    public async Task The_listing_of_a_listed_installation_holds_nothing_under_its_own_account()
+    {
+        // The per-user installation's own key lists the patch, and Windows lists that
+        // installation, so it is asked and its answer decides. It answers that it holds no
+        // record of the patch.
+        var msi = Machine();
+        ListUnderTheUsersAccount(msi);
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(UserAccount, Unlisted, [Superseded])));
+
+        AssertOffered(Row(result));
+    }
+
+    [Fact]
+    public async Task An_installation_the_recovery_finds_accounts_for_its_own_key()
+    {
+        var msi = Machine();
+        msi.KeyedInstances[Unlisted] = [(UserAccount, MsiInstallContext.UserUnmanaged)];
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(UserAccount, Unlisted, [Superseded])));
+
+        Assert.Equal(1, result.Census.RecoveredProductCount);
+        AssertOffered(Row(result));
+    }
+
+    [Fact]
+    public async Task A_program_Windows_does_not_list_holds_nothing_its_listing_does_not_name()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [OtherPatch]),
+            records: [new(Path.GetFullPath(UnlistedFile), IsPatch: false, Unlisted, MachineAccount)],
+            unclaimedProductFiles: [Unlisted]));
+
+        AssertOffered(Row(result));
+    }
+
+    [Fact]
+    public async Task A_key_with_no_Patches_key_holds_nothing()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [])));
+
+        AssertOffered(Row(result));
+    }
+
+    [Theory]
+    [InlineData("2")]
+    [InlineData("4")]
+    public async Task A_row_the_hold_finds_superseded_or_obsoleted_is_not_a_harmless_absence(string state)
+    {
+        // An obsoleted row is never removable, so nothing withholds it, and it is what the
+        // missing-files warning would exempt.
+        var msi = new FakeMsiApi();
+        msi.AddProduct(Listed);
+        msi.SetProductProperty(Listed, "LocalPackage", ProductFile);
+        msi.AddPatch(Listed, Superseded, SupersededFile, state, uninstallable: "0");
+        msi.KeyedRowResult[(Unlisted, 0)] = MsiError.NoMoreItems;
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [Superseded])));
+
+        Assert.False(MissingFilesReport.AbsenceShownHarmless(Row(result)));
+    }
+
+    [Fact]
+    public async Task A_listing_that_did_not_read_holds_every_superseded_patch_back()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, null)));
+
+        AssertWithheldScanWide(Row(result));
+        Assert.Equal(0, result.UnaccountedProductCount);
+    }
+
+    [Fact]
+    public async Task A_failed_read_of_the_registry_records_holds_every_superseded_patch_back()
+    {
+        // The key that would not read may be the only record of a program the walks leave
+        // out, so nothing says which patches that program holds.
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback() with { Failures = 1 });
+
+        AssertWithheldScanWide(Row(result));
+        Assert.Equal(0, result.UnaccountedProductCount);
+    }
+
+    [Fact]
+    public async Task The_check_before_a_Move_or_Delete_drops_a_patch_such_a_program_holds()
+    {
+        // Every Move and Delete, from the window and the command line, passes through this
+        // re-verify, which runs the enumeration again. The check under the lease re-reads
+        // only pairings the scan found, and this holder is not one.
+        var msi = MachineWithAnUnlistedProgram();
+        var fallback = UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [Superseded]));
+        var path = Row(await Scan(msi, fallback)).LocalPackagePath;
+        var reverifier = new RemovableReverifier(new InstallerQueryService(msi, (_, _) => fallback), msi);
+
+        var result = await reverifier.ReverifyAsync([path]);
+
+        Assert.Empty(result.Surviving);
+        Assert.Equal([path], result.Dropped);
+        Assert.Equal(1, result.Reasons.RecordsUnreadable);
+    }
+
+    [Fact]
+    public async Task A_listing_Windows_could_answer_for_is_not_read_as_a_program_it_cannot()
+    {
+        // Control: the listed program's own key names the patch it holds superseded.
+        var msi = Machine();
+
+        var result = await Scan(msi, UnlistedProgramFallback());
+
+        AssertOffered(Row(result));
+    }
+
     // ---- Which withholding took the row ----
 
     [Fact]
@@ -320,6 +508,61 @@ public class InstallerQueryServiceUnclaimedEntryTests
         msi.SetProductProperty(Listed, "ProductName", "A Program");
         msi.AddPatch(Listed, Superseded, SupersededFile, state: "2", uninstallable: "0");
         return msi;
+    }
+
+    /// <summary>
+    /// <see cref="Machine"/> with a program Windows does not list: the keyed walk for its
+    /// code ends at its first row, the return the real walk gives for such a program.
+    /// </summary>
+    private static FakeMsiApi MachineWithAnUnlistedProgram()
+    {
+        var msi = Machine();
+        msi.KeyedRowResult[(Unlisted, 0)] = MsiError.NoMoreItems;
+        return msi;
+    }
+
+    /// <summary>
+    /// Has the walk list the second program per user under the ordinary account, and the
+    /// keyed walk answer for that installation.
+    /// </summary>
+    private static void ListUnderTheUsersAccount(FakeMsiApi msi)
+    {
+        msi.AddProduct(Unlisted);
+        msi.WalkInstances[Unlisted] = (UserAccount, MsiInstallContext.UserUnmanaged);
+        msi.KeyedInstances[Unlisted] = [(UserAccount, MsiInstallContext.UserUnmanaged)];
+    }
+
+    /// <summary>
+    /// <see cref="Fallback"/> with the listed program's own key under the machine's
+    /// subtree, naming the superseded patch, and each of <paramref name="entries"/>. Their
+    /// codes are named to the registry comparison and their listings are the merged listing,
+    /// as the real reader hands them over.
+    /// </summary>
+    private static InstallerQueryService.FallbackRead UnlistedProgramFallback(
+        params RegistryProductEntry[] entries) =>
+        UnlistedProgramFallback(entries, null, null);
+
+    private static InstallerQueryService.FallbackRead UnlistedProgramFallback(
+        RegistryProductEntry entry, RegistryPackageRecord[]? records = null, string?[]? unclaimedProductFiles = null) =>
+        UnlistedProgramFallback([entry], records, unclaimedProductFiles);
+
+    private static InstallerQueryService.FallbackRead UnlistedProgramFallback(
+        RegistryProductEntry[] entries, RegistryPackageRecord[]? records, string?[]? unclaimedProductFiles)
+    {
+        var codes = new List<string> { Listed };
+        var listings = new Dictionary<string, IReadOnlyCollection<string>?>(StringComparer.OrdinalIgnoreCase);
+        foreach (var entry in entries)
+        {
+            if (!codes.Contains(entry.Code)) codes.Add(entry.Code);
+            listings[entry.Code] = listings.TryGetValue(entry.Code, out var seen)
+                ? InstallerQueryService.MergeEstablishedNames(seen, entry.PatchCodes)
+                : entry.PatchCodes;
+        }
+
+        return Fallback([.. codes], unclaimedProductFiles, listings: listings, records: records) with
+        {
+            ProductEntries = [new RegistryProductEntry(MachineAccount, Listed, [Superseded]), .. entries],
+        };
     }
 
     /// <summary>
@@ -383,6 +626,13 @@ public class InstallerQueryServiceUnclaimedEntryTests
         Assert.False(row.IsRemovable);
         Assert.True(row.RemovableWithheld);
         Assert.True(row.WithheldScanWide);
+    }
+
+    private static void AssertHeldBackOnItsOwn(RegisteredPackage row)
+    {
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.False(row.WithheldScanWide);
     }
 
     private static void AssertKeptOnAClaim(RegisteredPackage row)

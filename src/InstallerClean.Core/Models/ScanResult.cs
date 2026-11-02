@@ -124,12 +124,13 @@ namespace InstallerClean.Models;
 /// rather than failing to establish anything. Worse() lets it beat Unestablished
 /// where a row meets both, so the mixed case is excluded with it. What is left is the
 /// scan failing to establish something: a read about the patch that established
-/// nothing, in Downgrade's own words, or one of the four conditions on the whole
+/// nothing, in Downgrade's own words, or one of the five conditions on the whole
 /// machine that withhold every such row at once, a program entry the scan could not
 /// check, a cached patch file it could not match to a program it asks about, a recorded
-/// path it could not settle and a machine-wide list of patch registrations that did not
-/// run to its end. <see cref="SupersededScanWideWithheldCount"/> counts the rows those
-/// four withheld, and <see cref="SupersededRecordedPathUnestablishedCount"/> those the
+/// path it could not settle, a machine-wide list of patch registrations that did not
+/// run to its end, and a registry record that would not read
+/// (<see cref="RegisteredPackage.WithheldScanWide"/>).
+/// <see cref="SupersededScanWideWithheldCount"/> counts the rows those five withheld, and <see cref="SupersededRecordedPathUnestablishedCount"/> those the
 /// scan-wide withholding took while the third held.
 ///
 /// THE ON-DISK QUALIFIER IS THE WHOLE DIFFERENCE FROM
@@ -741,7 +742,7 @@ public record ScanResult(
 
     /// <summary>
     /// How many superseded files a condition on the whole machine held back: rows carrying
-    /// <see cref="RegisteredPackage.WithheldScanWide"/> whose file is on disk. The four
+    /// <see cref="RegisteredPackage.WithheldScanWide"/> whose file is on disk. The
     /// conditions are named there. The opt-in report carries it as a count of its own.
     ///
     /// A SUB-COUNT OF <see cref="WithheldCount"/>, over the same on-disk test. The rest of

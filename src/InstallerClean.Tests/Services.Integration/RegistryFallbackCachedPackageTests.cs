@@ -79,6 +79,40 @@ public class RegistryFallbackCachedPackageTests
         });
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void A_product_key_is_an_entry_under_its_account_whether_or_not_it_has_a_Patches_key(bool patchesKey)
+    {
+        WithSubtree(f =>
+        {
+            f.Account.CreateSubKey($@"Products\{PackedProduct}", writable: true)!.Dispose();
+            if (patchesKey)
+                f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!.Dispose();
+
+            var (read, _) = Read(f);
+
+            var entry = Assert.Single(read.ProductEntries!);
+            Assert.Equal(Sid, entry.Account);
+            Assert.Equal(InstallerQueryService.UnpackRegistryProductCode(PackedProduct), entry.Code);
+            Assert.Equal(patchesKey ? [PatchCode] : [], entry.PatchCodes);
+            Assert.Equal(0, read.Failures);
+        });
+    }
+
+    [Fact]
+    public void A_listing_holding_a_name_that_is_no_code_is_an_entry_with_no_listing()
+    {
+        WithSubtree(f =>
+        {
+            f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\not-a-packed-code", writable: true)!.Dispose();
+
+            var (read, _) = Read(f);
+
+            Assert.Null(Assert.Single(read.ProductEntries!).PatchCodes);
+        });
+    }
+
     [Fact]
     public void A_product_recording_both_values_claims_both_and_counts_once()
     {

@@ -1161,8 +1161,8 @@ public sealed record MachineInfo(
 /// Superseded files a condition on the whole machine held back, whose file is on disk
 /// (<c>ScanResult.SupersededScanWideWithheldCount</c>): a program entry the scan could not
 /// check, a cached patch file it could not match to a program it asks about, a recorded
-/// path it could not settle, or a machine-wide list of patch registrations that did not
-/// run to its end.
+/// path it could not settle, a machine-wide list of patch registrations that did not
+/// run to its end, or a registry record that would not read.
 ///
 /// A SUB-COUNT OF <paramref name="WithheldPatchCount"/>, never added to it. The rest of
 /// that count is files a check of the file's own patch withheld, so the two tell a hold

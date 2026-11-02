@@ -1202,7 +1202,7 @@ public class InstallerQueryServiceUnitTests
     // ---- The abandonment breadcrumb is budgeted ----
     //
     // What makes it one entry per product is a property of the registration, not
-    // of a product: a SID the enumerator emits and then rejects as input refuses
+    // of a product: an account the patch enumeration refuses as input refuses
     // every index for every product recorded under it. crash.log holds 512 KB
     // with a single archive, and each of these carries a message and a stack
     // trace, so the machine that most needs its crash history is the one whose

@@ -107,12 +107,14 @@ namespace InstallerClean.Models;
 /// It decides nothing.
 /// </param>
 /// <param name="WithheldScanWide">
-/// A condition on the whole machine took this row's removable verdict away. There are four:
+/// A condition on the whole machine took this row's removable verdict away. There are five:
 /// a program entry the scan could not check, a cached patch file it could not match to a
-/// program it asks about, a recorded path it could not settle, and a machine-wide list of
-/// patch registrations that did not run to its end. The scan-wide withholding sets it on
-/// the first three, and the two passes that judge a patch against its products set it on
-/// the fourth, wherever they withhold the row while that list is short.
+/// program it asks about, a recorded path it could not settle, a machine-wide list of
+/// patch registrations that did not run to its end, and a product key no installation
+/// accounts for whose listing did not read, or a failed read of the registry's product
+/// and patch records. The scan-wide withholding sets it on the first three, the two passes that judge a patch
+/// against its products set it on the fourth, wherever they withhold the row while that
+/// list is short, and the pass over those keys sets it on the fifth.
 ///
 /// A row withheld for a reason about its own patch alone, or downgraded on a claim, never
 /// carries it. It separates the superseded files a condition on the whole machine holds back
@@ -123,8 +125,9 @@ namespace InstallerClean.Models;
 /// Something besides a superseded or obsoleted registration of a patch holds this file, or
 /// may. A claim that brought no patch state named it: a product's own package record, read
 /// through the API or out of the registry, a registry record of a patch the claims do not
-/// name for the path, or a patch registration whose State would not read. Or an
-/// installation asked about the row's patch did not answer.
+/// name for the path, a patch registration whose State would not read, or the listing of a
+/// product key no installation accounts for. Or an installation asked about the row's
+/// patch did not answer.
 ///
 /// SUCH A CLAIM LEAVES <paramref name="PatchState"/> AS IT WAS, having none of its own to
 /// bring, so the row can still read superseded. This is what tells

@@ -17,7 +17,7 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="UnaccountedProductCount">
 /// Program entries in Windows Installer's records this enumeration could not check. One
-/// of the three triggers for withholding the removable class, the others being
+/// of the triggers for withholding the removable class, with
 /// <see cref="EnumerationCensus.UnattributedPatchFileCount"/> and
 /// <see cref="EnumerationCensus.AnyRecordedPathUnestablished"/>, and the figure the
 /// command line's Application-log notice carries.

@@ -21,9 +21,9 @@ namespace InstallerClean.Services;
 public sealed class InstallerQueryService : IInstallerQueryService
 {
     /// <summary>
-    /// SID meaning "all users". When passed to MsiEnumProductsEx /
-    /// MsiEnumPatchesEx / MsiEnumComponentsEx, the API enumerates across
-    /// every user profile on the machine. Requires admin elevation.
+    /// SID meaning "all users". Passed to MsiEnumProductsEx or MsiEnumPatchesEx, it
+    /// asks for enumeration across all users, which needs admin elevation. What that
+    /// leaves out is read from the registry (<see cref="UnlistedEntries"/>).
     /// </summary>
     private const string AllUsersSid = "S-1-1-0";
 
@@ -189,6 +189,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// is no code, nor a product key whose own name is no code. Null where the caller
     /// supplied no reader, which establishes no listing anywhere.
     /// </param>
+    /// <param name="ProductEntries">
+    /// One member per product key under <c>UserData</c> whose name is a code, by the
+    /// account subtree it sits under. Null where the caller supplied no reader.
+    /// </param>
     internal readonly record struct FallbackRead(
         int Failures,
         int ProductKeys,
@@ -205,7 +209,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         PathCensus? Paths = null,
         EstablishedPatchReach Reach = default,
         IReadOnlyList<RegistryPackageRecord>? PackageRecords = null,
-        IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchListings = null)
+        IReadOnlyDictionary<AccountCode, IReadOnlyCollection<string>>? PatchListings = null,
+        IReadOnlyList<RegistryProductEntry>? ProductEntries = null)
     {
         /// <summary>
         /// Product entries naming a cached file the API's own loop never claimed and
@@ -238,6 +243,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </param>
     internal readonly record struct RegistryPackageRecord(
         string Path, bool IsPatch, string? Code, string? Account = null);
+
+    /// <summary>
+    /// One product key under <c>UserData</c>, as the registry fallback read it.
+    /// </summary>
+    /// <param name="Account">
+    /// The name of the account subtree the key sits under, as the registry spells it.
+    /// </param>
+    /// <param name="Code">The product code unpacked out of the key's name.</param>
+    /// <param name="PatchCodes">
+    /// The patch codes the key's own <c>Patches</c> key lists, empty where it has no such
+    /// key, and null where that listing was not established.
+    /// </param>
+    internal readonly record struct RegistryProductEntry(
+        string Account, string Code, IReadOnlyCollection<string>? PatchCodes);
 
     /// <summary>
     /// A product or patch code under one account subtree of <c>UserData</c>. Both halves
@@ -785,8 +804,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         // Budgeted, because the abandonment breadcrumb is one full entry per
         // product and its trigger is a property of the registration rather than
-        // of one product: a SID the enumerator emits and then rejects as input
-        // refuses every index for every product recorded under it. Each entry
+        // of one product: an account the patch enumeration refuses as input refuses
+        // every index for every product recorded under it. Each entry
         // carries a real message and stack trace, so a machine in that state
         // spends crash.log on near-identical copies of one already-recorded
         // condition, which is the very history a report of it would need.
@@ -1084,6 +1103,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         WithholdOnRegistryPackageRecords(claimed, patchClaims, fallback.PackageRecords);
+        WithholdOnUnlistedEntries(
+            claimed, patchClaims, fallback.PackageRecords,
+            UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered)),
+            fallback.Failures > 0);
 
         var heldByName = new List<PatchClaim>();
         ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered,
@@ -1137,8 +1160,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // installations the answer lists with the ones the enumeration listed. So a
         // truncation is not estimated from how far two totals disagree; the
         // installations behind the disagreement are named, and each is either
-        // recovered into the questions the confirmation pass asks, or shown not to be
-        // installed, or left open because Windows would not say, which is counted in
+        // recovered into the questions the confirmation pass asks, or listed under no
+        // account, or left open because Windows would not say, which is counted in
         // missed.Unresolved for a code the enumeration never returned and recorded in
         // missed.UnsettledEnumerated for one it did. Only the last of these withholds,
         // on the terms below.
@@ -1147,8 +1170,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // failed or partial uninstall, so the registry legitimately holds more keys
         // than the machine has products, and against a TOTAL that residue cannot be
         // told from a truncation: both read as the registry running ahead. Asked by
-        // name, the same key answers "not installed", which settles it outright and
-        // costs nothing, because a product that is not there holds no patches.
+        // name, the same key lists no installation, which settles that it is no
+        // truncation, and nothing is recovered from it. A key the walks leave out need
+        // not be residue (UnlistedEntries), so what its own listing names is held back
+        // (WithholdOnUnlistedEntries).
         //
         // AND WHERE THE REGISTRY READ ITSELF FAILS. ProductKeys is counted from the
         // subkeys the fallback actually walked, so a fallback that failed reports
@@ -1171,10 +1196,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // API loop, so a path it is the first to claim is one no installation the loop
         // reached ever named. The recovery above then asks about every code the registry
         // names: the code is one the enumeration returned and asked again, one the
-        // recovery found installed and that is asked like any other, one Windows says is
-        // not installed and that holds nothing, or one Windows would not answer about, and
-        // a key whose name is no code is counted where it is read. Those last two withhold
-        // below on their own.
+        // recovery found installed and that is asked like any other, one no walk lists an
+        // installation of, whose key keeps what its own listing names
+        // (WithholdOnUnlistedEntries), or one Windows would not answer about, and a key
+        // whose name is no code is counted where it is read. Those last two withhold below
+        // on their own.
         //
         // THE ONE ENTRY THAT STILL WITHHOLDS is under a code the enumeration returned whose
         // own keyed answer did not settle, because an installation of it that nothing lists
@@ -1185,10 +1211,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // listing of which patches each product holds. Where the listing of a product this
         // scan asks by name names the patch, that product is put the question about every
         // superseded patch in the confirmation pass, and the entry adds nothing. Anywhere
-        // else the patch may be held by a product nothing on this machine names, and every
+        // else no product this scan asks is recorded as holding the patch, and every
         // superseded patch is withheld. A listing that could not be read names nothing. So
         // does the listing of a code whose own keyed answer did not settle: the listing is
-        // merged across accounts, so what it names may be the unasked installation's.
+        // merged across accounts, so what it names may be the unasked installation's. A
+        // code no installation is listed under is not added: its program is asked nothing.
         var namedPatches = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         void AddListing(string productCode)
         {
@@ -1681,6 +1708,108 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
+    /// The product keys under <c>UserData</c> that no installation in
+    /// <paramref name="installations"/> accounts for: each key whose account subtree and code
+    /// no listed installation maps to (<see cref="UserDataAccount"/>).
+    ///
+    /// THE WALKS DO NOT LIST EVERY PROGRAM THE REGISTRY HOLDS. A program installed per user by
+    /// SYSTEM has its key under <c>S-1-5-18</c>, with a cached package and a <c>Patches</c>
+    /// listing, and neither the product walk nor the keyed walk lists it, whichever elevated
+    /// account asks, SYSTEM included. An elevated ordinary account has no way to read about it
+    /// by name: a keyed read in the account <c>S-1-5-18</c> answers ERROR_INVALID_PARAMETER,
+    /// and one with no account is about the account asking. Microsoft documents a second such
+    /// gap: "The
+    /// enumeration skips products that are advertised only (such as products not installed)
+    /// in the per-user-unmanaged context when enumerating across all users or a user other
+    /// than the current user." A key an uninstall left behind is in this list too, and nothing
+    /// in the walks tells the two apart.
+    ///
+    /// BY ACCOUNT AND CODE, NOT BY CODE. The walks can list a code under one account while a
+    /// key under another holds a program of its own, and a comparison of codes would read
+    /// that key as accounted for.
+    /// </summary>
+    internal static IReadOnlyList<RegistryProductEntry> UnlistedEntries(
+        IReadOnlyList<RegistryProductEntry>? entries,
+        IEnumerable<(string ProductCode, string? Sid, MsiInstallContext Context)> installations)
+    {
+        if (entries is null || entries.Count == 0) return [];
+
+        var listed = new HashSet<AccountCode>();
+        foreach (var (code, sid, context) in installations)
+            if (UserDataAccount(sid, context) is { } account)
+                listed.Add(new AccountCode(account, code));
+
+        var unlisted = new List<RegistryProductEntry>();
+        foreach (var entry in entries)
+            if (!listed.Contains(new AccountCode(entry.Account, entry.Code)))
+                unlisted.Add(entry);
+
+        return unlisted;
+    }
+
+    /// <summary>
+    /// Takes the removable verdict off every row of a patch an unlisted entry's own listing
+    /// names, whichever path a claim or a package record gives for the patch, and marks every
+    /// superseded or obsoleted row among them for the missing-files warning
+    /// (<see cref="Hold"/>).
+    ///
+    /// THE REGISTRY KEEPS THE FILE AND NOTHING HERE RELEASES ONE. No Windows Installer call
+    /// answers about such a program, so a row it holds is withheld, the state "this scan could
+    /// not prove it", and the <c>State</c> its listing records is not read: a registry value
+    /// can hold a file back and cannot show that a file may go. Nothing separates a program
+    /// from a key an uninstall left behind here either, so a leftover key keeps what its
+    /// listing names.
+    ///
+    /// A claim is read as well as the package records because a repair or a removal can take
+    /// the patch's own record and leave the listing.
+    ///
+    /// A LISTING NOT ESTABLISHED MAY NAME ANY PATCH, and with
+    /// <paramref name="registryReadFailed"/> a key that would not read may be an unlisted
+    /// program's, whose record nothing else holds. So either withholds every removable row,
+    /// scan wide, and marks every superseded or obsoleted row.
+    /// </summary>
+    private static void WithholdOnUnlistedEntries(
+        Dictionary<string, RegisteredPackage> claimed,
+        List<PatchClaim> patchClaims,
+        IReadOnlyList<RegistryPackageRecord>? records,
+        IReadOnlyList<RegistryProductEntry> unlisted,
+        bool registryReadFailed)
+    {
+        var everyPatch = registryReadFailed;
+        var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var entry in unlisted)
+        {
+            if (entry.PatchCodes is null) everyPatch = true;
+            else named.UnionWith(entry.PatchCodes);
+        }
+
+        if (everyPatch)
+        {
+            foreach (var path in claimed.Keys.ToList())
+            {
+                Downgrade(claimed, path, withheld: true, scanWide: true);
+                claimed[path] = Hold(claimed[path], claimState: 0);
+            }
+
+            return;
+        }
+
+        void HoldBack(string path)
+        {
+            if (!claimed.ContainsKey(path)) return;
+            Downgrade(claimed, path, withheld: true);
+            claimed[path] = Hold(claimed[path], claimState: 0);
+        }
+
+        foreach (var claim in patchClaims)
+            if (named.Contains(claim.PatchCode)) HoldBack(claim.LocalPackagePath);
+
+        foreach (var record in records ?? [])
+            if (record.IsPatch && record.Code is not null && named.Contains(record.Code))
+                HoldBack(record.Path);
+    }
+
+    /// <summary>
     /// Which installations of the products the registry names the product enumeration
     /// did not list, asked as a question about named products rather than inferred from
     /// two headcounts.
@@ -1698,10 +1827,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// for it, because nothing needed to be: the gap was closed rather than
     /// estimated.
     ///
-    /// NOT INSTALLED. A UserData key outliving its product, which is the ordinary
-    /// residue of a failed or partial uninstall. It establishes nothing and costs
-    /// nothing. This is where comparing names is worth the most: a count cannot tell
-    /// this state from the one above.
+    /// NOT LISTED. The answer lists no installation. That is a UserData key outliving its
+    /// product, the ordinary residue of a failed or partial uninstall, or a program the
+    /// walks leave out (<see cref="UnlistedEntries"/>), and nothing here tells the two
+    /// apart. Nothing is recovered, and what the key's own listing names is held back
+    /// (<see cref="WithholdOnUnlistedEntries"/>). This is where comparing names is worth
+    /// the most: a count cannot tell this state from the one above.
     ///
     /// UNASKABLE. The registry names a product and Windows would not say whether it
     /// is installed. Nothing about the enumeration's completeness can be
@@ -2108,8 +2239,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // target is a product code and nothing more, and the two things a caller
         // needs to know about it are decided by the same call: whether it is
         // installed at all, and, if it is, which account and context to ask in. A
-        // code the file names and the machine does not hold contributes nothing and
-        // is not a failure; a code that could not be asked about withholds.
+        // code the file names that no walk lists an installation of contributes nothing
+        // here and is not a failure, what the registry holds for it being read apart
+        // (WithholdOnUnlistedEntries); a code that could not be asked about withholds.
         //
         // AND EVERY ANSWER IS HELD AGAINST THE INSTALLATIONS THIS RUN LISTED. A declared
         // target answered "not installed", or answered with a list short of an
@@ -2366,7 +2498,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// The patch file's own declared targets are read alongside, and the keyed
     /// <c>MsiGetPatchInfoEx</c> reads both routes feed carry no such limitation: the
     /// administrator group may query patch data for any product instance and any user
-    /// on the computer.
+    /// on the computer. A keyed read is put to an installation a walk listed, and a key
+    /// the walks leave out is read apart (<see cref="WithholdOnUnlistedEntries"/>).
     ///
     /// NULL MEANS THE ANSWER IS NOT AVAILABLE AND EVERY REMOVABLE VERDICT IS
     /// WITHHELD, which is deliberate and is the more expensive direction. A short
@@ -2473,10 +2606,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// both consumers of it need.
     ///
     /// THE TWO FLAGS ARE NOT THE SAME FINDING AND NEITHER IS AN EMPTY LIST. A patch
-    /// that declares targets none of which are installed yields an empty
-    /// <paramref name="Installed"/> with both flags clear, and that is a positive
-    /// answer: nothing on this machine holds it, so nothing on this machine can roll
-    /// back onto its file. <paramref name="Unreadable"/> is the file declining to say
+    /// none of whose declared targets the walks list yields an empty
+    /// <paramref name="Installed"/> with both flags clear, and that is a positive answer
+    /// about every installation Windows lists: none of them is a target of it. A key the
+    /// walks leave out is read apart (<see cref="WithholdOnUnlistedEntries"/>).
+    /// <paramref name="Unreadable"/> is the file declining to say
     /// what it targets, and <paramref name="Unaskable"/> is Windows declining to say
     /// where a declared target lives, or saying it in an answer that leaves out an
     /// installation this run listed. Both leave the question open and both withhold.
@@ -2599,11 +2733,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     /// <returns>
     /// <c>Instances</c>, one per installation, each carrying the account and
-    /// context to ask it in; empty with no <c>Unaskable</c>, meaning the code is
-    /// positively not installed, which is a clean answer because a product that is
-    /// not there holds no patches; or <c>Unaskable</c>, which withholds. Which
-    /// returns say "not installed" is <see cref="IsProductNotInstalled"/>'s, and
-    /// there is more than one of them.
+    /// context to ask it in; empty with no <c>Unaskable</c>, meaning Windows lists no
+    /// installation of the code, which is a clean answer about what can be asked and no
+    /// answer about what the registry holds (<see cref="UnlistedEntries"/>); or
+    /// <c>Unaskable</c>, which withholds. Which returns end the list is
+    /// <see cref="IsProductNotInstalled"/>'s, and there is more than one of them.
     /// </returns>
     /// <remarks>
     /// A ROW THIS WALK CANNOT READ MAKES THE WHOLE CODE UNASKABLE RATHER THAN
@@ -2615,18 +2749,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// it is unread.
     /// </remarks>
     /// <remarks>
-    /// THE "NOT INSTALLED" ANSWER IS AN ADMINISTRATOR'S. The question is put with the
-    /// Everyone SID across all contexts, which Microsoft documents as needing
-    /// administrator privileges, and both hosts refuse to scan in a process without them
-    /// (<see cref="Helpers.AdministratorRights"/>). An administrator may enumerate the
-    /// products installed for every account on the computer, which is what lets a code
-    /// the answer leaves out be read as installed for no account. ERROR_ACCESS_DENIED, the
-    /// return Microsoft documents for a caller without the rights, is not on
+    /// THE ANSWER IS AN ADMINISTRATOR'S. The question is put with the Everyone SID across
+    /// all contexts, which Microsoft documents as needing administrator privileges, and
+    /// both hosts refuse to scan in a process without them
+    /// (<see cref="Helpers.AdministratorRights"/>). ERROR_ACCESS_DENIED, the return
+    /// Microsoft documents for a caller without the rights, is not on
     /// <see cref="IsProductNotInstalled"/>'s list, so it makes the code unaskable.
     ///
-    /// A NEW CALLER RUNS BEHIND THAT CHECK TOO. No caller adds a product this answer
-    /// leaves out to the sets the per-product condition judges a cached patch against,
-    /// so the answer has to be one that sees every account's products.
+    /// AN ANSWER LISTING NOTHING IS NOT AN ANSWER THAT NO ACCOUNT HOLDS THE PROGRAM. An
+    /// administrator's walk leaves some programs out (<see cref="UnlistedEntries"/>), and a
+    /// caller reading such an answer as nothing being there has to read what the registry
+    /// holds for that code beside it, as <see cref="WithholdOnUnlistedEntries"/> does. A
+    /// new caller runs behind the administrator check too.
     /// </remarks>
     /// <remarks>
     /// STATIC AND SHARED RATHER THAN COPIED, because
@@ -2777,8 +2911,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// can say which. See <see cref="RegisteredPackage.WithheldOnUnreadableFile"/>.
     /// </param>
     /// <param name="scanWide">
-    /// Records that the read which established nothing was the machine-wide list of
-    /// patch registrations, which did not run to its end. Like
+    /// Records that what established nothing was a condition on the whole machine and not
+    /// this file's own patch. Like
     /// <paramref name="unreadableFile"/>, every caller passing it also passes
     /// <paramref name="withheld"/> true. See <see cref="RegisteredPackage.WithheldScanWide"/>.
     /// </param>
@@ -3307,8 +3441,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
     /// <summary>
     /// What one more claim on a superseded or obsoleted row's file says to the missing-files
-    /// warning, where the claim is not a row of its own: a registry package record, or an
-    /// installation that answered, asked by the patch's code, that it holds the patch. A
+    /// warning, where the claim is not a row of its own: a registry package record, the
+    /// listing of a product key no installation accounts for, or an installation that
+    /// answered, asked by the patch's code, that it holds the patch. A
     /// stronger reading than the row's (<see cref="ReadingRank"/>) replaces the row's state,
     /// and the row takes the claimant's product code and name where the name read. No state
     /// at all marks the row <see cref="RegisteredPackage.OtherHoldNotRuledOut"/>. Anything
@@ -3369,6 +3504,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unclaimedPatchFileCodes = new List<string?>();
         var packageRecords = new List<RegistryPackageRecord>();
         var patchListings = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
+        var productEntries = new List<RegistryProductEntry>();
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
         var productCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -3418,6 +3554,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     if (sidRead.PatchListings is not null)
                         foreach (var (key, listed) in sidRead.PatchListings)
                             patchListings[key] = listed;
+                    if (sidRead.ProductEntries is not null)
+                        productEntries.AddRange(sidRead.ProductEntries);
                     nonStringValues += sidRead.NonStringLocalPackageValues;
                     unparseableKeyNames += sidRead.UnparseableProductKeyNames;
                     productPatchKeys += sidRead.ProductPatchKeys;
@@ -3481,7 +3619,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             pathCensus,
             new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode),
             packageRecords,
-            patchListings);
+            patchListings,
+            productEntries);
     }
 
     /// <summary>
@@ -3529,6 +3668,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var unclaimedPatchFileCodes = new List<string?>();
         var packageRecords = new List<RegistryPackageRecord>();
         var patchListings = new Dictionary<AccountCode, IReadOnlyCollection<string>>();
+        var productEntries = new List<RegistryProductEntry>();
         var nonStringValues = 0;
         var unparseableKeyNames = 0;
         var productPatchKeys = 0;
@@ -3589,11 +3729,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // reason.
                     if (unpacked is not null)
                     {
+                        IReadOnlyCollection<string>? entryCodes = null;
                         try
                         {
                             var set = ReadProductPatchSet(productsKey, prodGuid,
                                 ref productPatchKeys, ref productPatchRegistrations,
                                 out var heldCodes, out var patchesKeyPresent);
+                            entryCodes = heldCodes;
                             patchSets[unpacked] = patchSets.TryGetValue(unpacked, out var existing)
                                 ? Worse(existing, set)
                                 : set;
@@ -3620,6 +3762,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                             patchCodesByProduct[unpacked] = null;
                             failureLog.Record(ex, cause: "product-patches");
                         }
+
+                        productEntries.Add(new RegistryProductEntry(sidName, unpacked, entryCodes));
                     }
 
                     try
@@ -3786,7 +3930,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             Paths: pathCensus,
             Reach: new EstablishedPatchReach(patchCodesByProduct, cachedPathsByPatchCode),
             PackageRecords: packageRecords,
-            PatchListings: patchListings);
+            PatchListings: patchListings,
+            ProductEntries: productEntries);
     }
 
     /// <summary>
@@ -4778,9 +4923,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// runs contains it: the product counts once in the unreadable tally, the
     /// registry fallback still claims that product's cached files so none are
     /// offered, and each superseded patch is either asked about by name or withheld
-    /// with the rest of the removable class. This is the honest
-    /// answer to a per-user instance recorded under a SID the enumerator emits but
-    /// then rejects as input, where every index refuses identically: the scan
+    /// with the rest of the removable class. So where every index of a per-user
+    /// installation refuses identically, the scan
     /// declines to assert a patch list Windows will not hand over, rather than
     /// losing the whole scan over it. The AccessDenied and never-ended-cap throws
     /// below are a machine-level breakdown, and the product loop lets them refuse
@@ -5125,13 +5269,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
     /// <summary>
     /// The returns of a KEYED <c>MsiEnumProductsEx</c> that positively establish
-    /// the product asked about is not installed. A third ALLOWLIST for the reason
+    /// Windows Installer lists no further installation of the product asked about. A
+    /// third ALLOWLIST for the reason
     /// the two above are ones: only a code documented to mean absence may be read
     /// as absence, and an unlisted one stays unaskable and withholds.
     ///
     /// ERROR_UNKNOWN_PRODUCT belongs on it because that function's return table
     /// glosses it "The product is not installed on the computer in the specified
-    /// context", which is an answer about the machine rather than a failure to
+    /// context", which is an answer rather than a failure to
     /// read one. Reading it as a failure to read is the expensive direction here
     /// and not the safe one: the products a cached patch declares as targets are
     /// mostly products the machine does not have, so it would withhold on the
@@ -5145,8 +5290,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// them lets the scan act on the code as an absence.
     ///
     /// Nothing has established it here, which is what the paragraph above is
-    /// about: the question this call puts is whether the machine holds the code
-    /// at all, so a no is the machine answering.
+    /// about: the question this call puts is whether Windows Installer lists the code
+    /// at all, so a no is Windows Installer answering. It answers for what it lists, and
+    /// what it leaves out is read from the registry (<see cref="UnlistedEntries"/>).
     ///
     /// <see cref="EnumerateProducts"/> and
     /// <see cref="EnumeratePatchHoldersAcrossAllProducts"/> both pass a null
