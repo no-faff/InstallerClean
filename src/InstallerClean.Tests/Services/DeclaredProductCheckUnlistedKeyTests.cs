@@ -75,6 +75,9 @@ public class DeclaredProductCheckUnlistedKeyTests
         public MockFileSystem Disk { get; } = new();
         public ScriptedSourceListRegistry Registry => Msi.Registry;
 
+        /// <summary>The test for the Installer folder, which the scan hands every pass.</summary>
+        public Func<string, bool?> IsTheInstallerFolder { get; set; } = folder => folder == Folder;
+
         public Pc(string account = System)
         {
             Packages.Declares(First, OtherCode);
@@ -106,6 +109,11 @@ public class DeclaredProductCheckUnlistedKeyTests
             Registry.Holds(list + @"\Media", new RegistryValue("1", RegistryValueKind.String, ";"));
         }
 
+        /// <summary>The key's <c>InstallProperties</c> key, recording this <c>InstallSource</c>.</summary>
+        public void InstalledFrom(
+            string folder, string account = System, RegistryValueKind kind = RegistryValueKind.String) =>
+            Registry.Holds(Properties(account, KeyCode), new RegistryValue("InstallSource", kind, folder));
+
         public void CachedPackageDeclares(string code)
         {
             Packages.Declares(Cached, code);
@@ -120,7 +128,7 @@ public class DeclaredProductCheckUnlistedKeyTests
             {
                 DriveKindOf = _ => DriveType.Fixed,
                 NamesInFolderOf = path => [path[(path.LastIndexOf('\\') + 1)..]],
-            }.Screen(files, [], keys, default, null, InInstallerFolder);
+            }.Screen(files, [], keys, default, null, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
     }
 
     private const DeclaredProductOutcome LetThrough = DeclaredProductOutcome.DeclaredProductNotInstalled;
@@ -295,15 +303,147 @@ public class DeclaredProductCheckUnlistedKeyTests
         var pc = new Pc();
         pc.CachedPackageDeclares(ThirdCode);
         pc.Packages.Declares(Second, OtherCode);
-        pc.Registry.Holds(
-            Properties(System, KeyCode),
-            new RegistryValue("InstallSource", RegistryValueKind.String, Folder));
+        pc.InstalledFrom(Folder);
 
         var check = pc.ScreeningOf([Installed(System, KeyCode, Cached)], [Package(First), Package(Second)]);
 
         Assert.Equal(
             [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished],
             check.Outcomes);
+    }
+
+    // ---------------------------------------------------------------- recording no cached package
+
+    private static readonly DeclaredProductOutcome[] EveryFileKept =
+        [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished];
+
+    private static readonly DeclaredProductOutcome[] NothingKept = [LetThrough, LetThrough];
+
+    [Fact]
+    public void A_key_installed_from_the_Installer_folder_with_no_list_keeps_every_file()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+
+        var check = pc.ScreeningOf([Installed()], [Package(First), Package(Second)]);
+
+        Assert.Equal(EveryFileKept, check.Outcomes);
+        Assert.Empty(check.RootsGivenUp);
+    }
+
+    [Fact]
+    public void A_key_installed_from_the_Installer_folder_whose_list_will_not_read_keeps_every_file()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        pc.Registry.Answers(MachineList(KeyCode), RegistryKeyPresence.Unreadable);
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_installed_from_the_Installer_folder_whose_list_holds_a_name_no_file_can_carry_keeps_every_file()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        pc.HasList(MachineList(KeyCode), "...", Setup);
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_installed_from_the_Installer_folder_under_an_unloaded_hive_keeps_every_file()
+    {
+        var pc = new Pc(User);
+        pc.Registry.HiveIs(User, RegistryKeyPresence.Absent);
+        pc.InstalledFrom(Folder, User);
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed(User)], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_file_declaring_the_code_of_a_key_installed_from_the_Installer_folder_is_kept_for_that_code()
+    {
+        var pc = new Pc();
+        pc.Packages.Declares(First, KeyCode);
+        pc.InstalledFrom(Folder);
+
+        Assert.Equal(
+            [DeclaredProductOutcome.Unestablished, DeclaredProductOutcome.SecondCopyUnestablished],
+            pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_installed_from_the_Installer_folder_whose_list_names_a_package_keeps_that_package_alone()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+        pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+
+        Assert.Equal(
+            [DeclaredProductOutcome.Unestablished, LetThrough],
+            pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_installed_from_another_folder_keeps_nothing()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Setup);
+
+        Assert.Equal(NothingKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_whose_InstallSource_the_folder_test_does_not_answer_for_keeps_nothing()
+    {
+        var pc = new Pc { IsTheInstallerFolder = _ => null };
+        pc.InstalledFrom(Folder);
+
+        Assert.Equal(NothingKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Theory]
+    [InlineData(RegistryValueKind.String, @"%SystemRoot%\Installer\")]
+    [InlineData(RegistryValueKind.ExpandString, Folder)]
+    public void A_key_whose_InstallSource_is_in_a_form_not_compared_keeps_nothing(RegistryValueKind kind, string folder)
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(folder, kind: kind);
+
+        Assert.Equal(NothingKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_keeps_nothing_for_an_InstallSource()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Theory]
+    [InlineData("LocalPackage", RegistryValueKind.String, "")]
+    [InlineData("ManagedLocalPackage", RegistryValueKind.String, "")]
+    [InlineData("LocalPackage", RegistryValueKind.DWord, null)]
+    public void A_key_holding_a_cached_package_value_with_no_path_in_it_keeps_every_file(
+        string name, RegistryValueKind kind, string? text)
+    {
+        var pc = new Pc();
+        pc.Registry.Holds(Properties(System, KeyCode), new RegistryValue(name, kind, text));
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_whose_InstallProperties_will_not_read_keeps_every_file()
+    {
+        var pc = new Pc();
+        pc.Registry.Answers(Properties(System, KeyCode), RegistryKeyPresence.Unreadable);
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed()], Package(First), Package(Second)));
     }
 
     // ---------------------------------------------------------------- names, asked of the filesystem

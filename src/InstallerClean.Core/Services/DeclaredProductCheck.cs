@@ -1048,8 +1048,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// </summary>
     private bool IsNotTheInstallerFolder(string folder, PassAnswers pass, out string? givenUp)
     {
-        givenUp = null;
-        if (pass.IsTheInstallerFolder is not { } isTheInstallerFolder) return false;
+        var asked = InstallerFolderAnswer(folder, pass);
+        givenUp = asked.GivenUp;
+        return asked.IsIt == false;
+    }
+
+    /// <summary>
+    /// What the pass's test answers about <paramref name="folder"/>: whether it is the Installer
+    /// folder, null where the test did not answer or was not read, and the root whose give-up
+    /// refused the read (<see cref="IsNotTheInstallerFolder"/>).
+    /// </summary>
+    private (bool? IsIt, string? GivenUp) InstallerFolderAnswer(string folder, PassAnswers pass)
+    {
+        if (pass.IsTheInstallerFolder is not { } isTheInstallerFolder) return (null, null);
 
         // A definite answer, that the folder is the Installer folder or that it is not, is the
         // read answering, and only an answer of null counts as a read that failed under its root.
@@ -1057,15 +1068,14 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             var answered = ReadUnderRoot(
                 folder,
-                () => isTheInstallerFolder(folder) is { } isIt ? (true, !isIt) : (false, false),
+                () => isTheInstallerFolder(folder) is { } isIt ? (true, isIt) : (false, false),
                 pass,
-                out var notIt,
+                out var isTheFolder,
                 out var refusedFor);
-            pass.InstallSourceFolders[folder] = asked = (answered && notIt, refusedFor);
+            pass.InstallSourceFolders[folder] = asked = (answered ? isTheFolder : null, refusedFor);
         }
 
-        givenUp = asked.GivenUp;
-        return asked.NotIt;
+        return asked;
     }
 
     /// <summary>
@@ -3414,6 +3424,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// declare and the packages its sources open. Its sources are read from the registry alone
     /// (<see cref="AddRegistrySources"/>), which can keep a file and never release one.
     ///
+    /// SUCH A KEY LEAVES A SECOND COPY NOT RULED OUT, WHICH KEEPS EVERY INSTALLATION PACKAGE, where
+    /// a cached package it records does not say what it is, where it records one and its sources
+    /// will not read, where it holds a cached package value with no path in it, by the test a
+    /// listed installation is put to (<see cref="RecordsNoCachedPackage"/>), and where it records
+    /// none and was installed from the Installer folder with no source list naming its package,
+    /// so any file there could be the one it opens.
+    ///
     /// A KEY WITHOUT ONE gives only the package at a local folder on its source list
     /// (<see cref="AddPackagesAtLocalSources"/>).
     /// </summary>
@@ -3438,15 +3455,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             codes.Add(PackageIdentityReader.Canonicalise(key.Code) ?? key.Code);
 
-            var cachedSaid = true;
+            // A key gone since the walk reads as absent, and a path the walk read still counts.
+            var properties = InstallPropertiesOf(key);
+            var recordsNone = key.CachedPackages.Count == 0 && RecordsNoCachedPackage(properties);
+
+            var cachedSaid = key.CachedPackages.Count > 0 || recordsNone;
             foreach (var path in key.CachedPackages)
                 if (!AddCachedPackage(path, packages, codes)) cachedSaid = false;
 
             var sourcesRead = AddRegistrySources(
-                key, pass, namesAFileInInstallerFolder, packages, byName, out var givenUp);
+                key, properties, pass, namesAFileInInstallerFolder, packages, byName,
+                out var unnamedInInstallerFolder, out var givenUp);
 
-            // Only a key recording a cached package can leave a second copy not ruled out.
-            if (key.CachedPackages.Count == 0 || (cachedSaid && sourcesRead)) continue;
+            if (recordsNone ? !unnamedInInstallerFolder : cachedSaid && sourcesRead) continue;
 
             notAllSeen = true;
             if (!cachedSaid || givenUp is null) keptOtherwise = true;
@@ -3502,23 +3523,29 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// A LIST THAT IS NOT THERE, under a hive that is loaded, names nothing to compare. A key
     /// with no list and an <c>InstallSource</c> has no package name to look for there, so
     /// that folder has to be shown not to be the Installer folder.
+    ///
+    /// <paramref name="unnamedInInstallerFolder"/> is true where the test for the Installer folder
+    /// answers that its <c>InstallSource</c> is that folder and no place gave a package name.
     /// </summary>
     private bool AddRegistrySources(
         UnlistedProductKey key,
+        RegistryKeyValues properties,
         PassAnswers pass,
         Func<string, bool?>? namesAFileInInstallerFolder,
         List<FileIdentity> opened,
         List<PackageByName> byName,
+        out bool unnamedInInstallerFolder,
         out string? givenUp)
     {
+        unnamedInInstallerFolder = false;
         givenUp = null;
         if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return false;
 
-        var allRead = RecordedInstallSource(key, out var installSource);
+        var allRead = RecordedInstallSource(properties, out var installSource);
         var keptOtherwise = !allRead;
         string? firstGivenUp = null;
 
-        void Refused(string? root)
+        void NotRead(string? root)
         {
             allRead = false;
             if (root is null) keptOtherwise = true;
@@ -3526,11 +3553,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         var listFound = false;
+        var packageNamed = false;
         foreach (var (sid, context) in SourceListPlaces(key.Account))
         {
             if (!SourceListAt(key.Code, sid, context, out var listKey, out var values))
             {
-                Refused(null);
+                NotRead(null);
                 continue;
             }
 
@@ -3539,10 +3567,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             listFound = true;
             if (ReadSourceList(listKey, values, pass) is not { } sources)
             {
-                Refused(null);
+                NotRead(null);
                 continue;
             }
 
+            packageNamed = true;
             if (sources.MediaSearch) byName.Add(new PackageByName(null, sources.PackageName));
 
             var folders = sources.Folders;
@@ -3559,12 +3588,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     continue;
 
                 byName.Add(new PackageByName(null, sources.PackageName));
-                Refused(refusedFor);
+                NotRead(refusedFor);
             }
         }
 
-        if (!listFound && installSource.Length > 0 && !IsNotTheInstallerFolder(installSource, pass, out var folderGivenUp))
-            Refused(folderGivenUp);
+        if (!packageNamed && installSource.Length > 0)
+        {
+            var folder = InstallerFolderAnswer(installSource, pass);
+            unnamedInInstallerFolder = folder.IsIt == true;
+            if (!listFound && folder.IsIt != false) NotRead(folder.GivenUp);
+        }
 
         givenUp = keptOtherwise ? null : firstGivenUp;
         return allRead;
@@ -3627,18 +3660,26 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// The folder a key's <c>InstallProperties</c> key records as its <c>InstallSource</c>,
-    /// empty where it records none or a web address. False where that is not established, or
-    /// the value is one this check does not compare, by the rules of
+    /// A key's <c>InstallProperties</c> key, which is <see cref="RegistryKeyPresence.Unreadable"/>
+    /// where a check has no registry reader or the key's path cannot be made.
+    /// </summary>
+    private RegistryKeyValues InstallPropertiesOf(UnlistedProductKey key)
+    {
+        var (sid, context) = SourceListPlaces(key.Account)[0];
+        return _registry is not null && InstallPropertiesKeyPath(key.Code, sid, context) is { } path
+            ? _registry.LocalMachineValues(path)
+            : default;
+    }
+
+    /// <summary>
+    /// The folder <paramref name="properties"/>, a key's <c>InstallProperties</c> key, records as
+    /// its <c>InstallSource</c>, empty where it records none or a web address. False where that
+    /// is not established, or the value is one this check does not compare, by the rules of
     /// <see cref="InstallSourceIn"/>.
     /// </summary>
-    private bool RecordedInstallSource(UnlistedProductKey key, out string folder)
+    private static bool RecordedInstallSource(RegistryKeyValues properties, out string folder)
     {
         folder = string.Empty;
-        var (sid, context) = SourceListPlaces(key.Account)[0];
-        if (_registry is null || InstallPropertiesKeyPath(key.Code, sid, context) is not { } path) return false;
-
-        var properties = _registry.LocalMachineValues(path);
         if (properties.Presence == RegistryKeyPresence.Absent) return true;
         if (properties.Presence != RegistryKeyPresence.Present || properties.Values is null) return false;
 
@@ -4061,7 +4102,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <param name="Packages">The packages the keys open, by identity.</param>
     /// <param name="PackageNames">Every package name compared by name.</param>
     /// <param name="NotAllSeen">
-    /// Whether a key recording a cached package left a second copy not ruled out.
+    /// Whether a key left a second copy not ruled out (<see cref="ReadUnlistedKeys"/>).
     /// </param>
     /// <param name="GivenUp">
     /// Where <paramref name="NotAllSeen"/> is true only because reads were refused for roots
@@ -4260,11 +4301,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         /// <summary>
         /// Each <c>InstallSource</c> folder the pass has asked about, by its spelling, case
-        /// included: whether it was shown not to be the Installer folder, and the root whose
-        /// give-up refused it where that is what answered
-        /// (<see cref="DeclaredProductCheck.IsNotTheInstallerFolder"/>).
+        /// included: whether it is the Installer folder, null where that was not answered, and
+        /// the root whose give-up refused it where that is what answered
+        /// (<see cref="DeclaredProductCheck.InstallerFolderAnswer"/>).
         /// </summary>
-        internal Dictionary<string, (bool NotIt, string? GivenUp)> InstallSourceFolders { get; } =
+        internal Dictionary<string, (bool? IsIt, string? GivenUp)> InstallSourceFolders { get; } =
             new(StringComparer.Ordinal);
 
         /// <summary>The pass's links, once the first declared code has been asked about.</summary>

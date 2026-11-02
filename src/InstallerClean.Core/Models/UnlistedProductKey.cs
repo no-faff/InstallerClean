@@ -19,7 +19,7 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="CachedPackages">
 /// The path each value of its <c>InstallProperties</c> key records a cached package under,
-/// empty where it records none.
+/// empty where no value holds a path.
 /// </param>
 /// <param name="HasInstallProperties">
 /// Whether the key has an <c>InstallProperties</c> key, which decides what the declared-product

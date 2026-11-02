@@ -111,9 +111,10 @@ namespace InstallerClean.Services;
 /// LET THROUGH (<see cref="UnlistedProductKey"/>). A key with an <c>InstallProperties</c> key
 /// keeps an installation package declaring its code or the code its cached package declares,
 /// a package its sources open, and a file one of its package names opens from that file's own
-/// folder. Where such a key's cached package does not say what it is, or a key recording a
-/// cached package has sources that will not read, every installation package is kept. A key
-/// without one keeps the package at a local folder on its source list. A patch file is kept
+/// folder. Where such a key's cached package does not say what it is, a key recording a cached
+/// package has sources that will not read, or a key was installed from the Installer folder with
+/// no source list naming its package, every installation package is kept. A key without one
+/// keeps the package at a local folder on its source list. A patch file is kept
 /// where a key's <c>Patches</c> listing names it or was not established. All of this comes off
 /// the registry, so it keeps a file and never releases one.
 ///
@@ -630,8 +631,9 @@ public enum DeclaredProductOutcome
     /// that package's name could be.
     ///
     /// A product key no installation accounts for gives it the same way, where its cached
-    /// package does not say what it is or a key recording a cached package has sources that
-    /// will not read.
+    /// package does not say what it is, a key recording a cached package has sources that
+    /// will not read, or a key was installed from the Installer folder with no source list
+    /// naming its package.
     ///
     /// Where a single installation's packages cannot all be seen it covers what
     /// <see cref="DeclaredProductInstalled"/> covers for one: a cached package that will
