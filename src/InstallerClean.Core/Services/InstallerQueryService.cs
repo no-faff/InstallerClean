@@ -1803,7 +1803,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// A ROW WHOSE VERDICT A LISTING TOOK IS MARKED
     /// (<see cref="RegisteredPackage.WithheldOnUnlistedKey"/>), and the report counts those rows.
-    /// A failed read names no key and marks none.
+    /// A failed read alone names no key and marks none.
     /// </summary>
     private static void WithholdOnUnlistedEntries(
         Dictionary<string, RegisteredPackage> claimed,
@@ -1820,6 +1820,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
             else named.UnionWith(entry.PatchCodes);
         }
 
+        var namedPaths = new HashSet<string>(claimed.Comparer);
+        foreach (var claim in patchClaims)
+            if (named.Contains(claim.PatchCode)) namedPaths.Add(claim.LocalPackagePath);
+
+        foreach (var record in records ?? [])
+            if (record.IsPatch && record.Code is not null && named.Contains(record.Code))
+                namedPaths.Add(record.Path);
+
         if (listingNotEstablished || registryReadFailed)
         {
             foreach (var path in claimed.Keys.ToList())
@@ -1827,27 +1835,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 var removable = claimed[path].IsRemovable;
                 Downgrade(claimed, path, withheld: true, scanWide: true);
                 claimed[path] = Hold(claimed[path], claimState: 0);
-                if (removable && listingNotEstablished)
+                if (removable && (listingNotEstablished || namedPaths.Contains(path)))
                     claimed[path] = claimed[path] with { WithheldOnUnlistedKey = true };
             }
 
             return;
         }
 
-        void HoldBack(string path)
+        foreach (var path in namedPaths)
         {
-            if (!claimed.TryGetValue(path, out var row)) return;
+            if (!claimed.TryGetValue(path, out var row)) continue;
             Downgrade(claimed, path, withheld: true);
             claimed[path] = Hold(claimed[path], claimState: 0);
             if (row.IsRemovable) claimed[path] = claimed[path] with { WithheldOnUnlistedKey = true };
         }
-
-        foreach (var claim in patchClaims)
-            if (named.Contains(claim.PatchCode)) HoldBack(claim.LocalPackagePath);
-
-        foreach (var record in records ?? [])
-            if (record.IsPatch && record.Code is not null && named.Contains(record.Code))
-                HoldBack(record.Path);
     }
 
     /// <summary>

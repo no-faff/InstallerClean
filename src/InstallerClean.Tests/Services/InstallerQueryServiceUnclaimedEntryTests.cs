@@ -406,6 +406,18 @@ public class InstallerQueryServiceUnclaimedEntryTests
     }
 
     [Fact]
+    public async Task A_patch_a_listing_names_is_marked_on_a_scan_whose_registry_read_failed_too()
+    {
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [Superseded])) with { Failures = 1 });
+
+        AssertWithheldScanWide(Row(result));
+        Assert.True(Row(result).WithheldOnUnlistedKey);
+    }
+
+    [Fact]
     public async Task A_listing_not_naming_the_patch_marks_nothing()
     {
         var msi = MachineWithAnUnlistedProgram();

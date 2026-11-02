@@ -542,7 +542,11 @@ public class ResultLogEntryTests
         var json = JsonSerializer.Serialize(info, JsonOptions);
         Assert.DoesNotContain("unaccounted", json, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("shortfall", json, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("unlistedProduct", json, StringComparison.OrdinalIgnoreCase);
+        var withoutTheKeyCounts = json
+            .Replace("unlistedKeysWithInstallPropertiesCount", "")
+            .Replace("unlistedKeysWithoutInstallPropertiesCount", "")
+            .Replace("supersededHeldForUnlistedKeyCount", "");
+        Assert.DoesNotContain("unlisted", withoutTheKeyCounts, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
