@@ -101,7 +101,7 @@ namespace InstallerClean.Services;
 ///
 /// EVERY ANSWER ABOUT A PRODUCT IS HELD AGAINST THE CALLER'S OWN ENUMERATION. The
 /// check asks Windows for the installations of one product code at a time, and the
-/// caller's enumeration has already listed the installations of every product. An
+/// caller's enumeration has already listed the installations it found. An
 /// answer about a code that leaves out an installation that enumeration listed
 /// contradicts it, whether the answer is that the product is not installed or a list
 /// short of that installation, and the check does not use it: an installation package
@@ -564,8 +564,8 @@ public enum DeclaredProductOutcome
     /// The file is a patch, and Windows positively answered that it holds no
     /// registration of the patch the file declares: the machine-wide patch enumeration
     /// ran to its end and listed none, every installation of every product the patch
-    /// names answered that it holds no record of the patch, or no such product is
-    /// installed and the caller's own enumeration listed no installation of it, and every
+    /// names answered that it holds no record of the patch, or the keyed read lists no
+    /// such product and the caller's own enumeration listed no installation of it, and every
     /// installation that enumeration listed answered the same. The candidate goes on
     /// being decided by everything else.
     ///

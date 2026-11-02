@@ -19,8 +19,8 @@
            Moving and deleting need them to write to the Installer folder, and the scan
            needs them to read Windows Installer's records: it asks about products and
            patches across every account on the machine, which Microsoft documents as
-           needing administrator privileges, and it reads a product missing from the
-           answer as installed for no account.
+           needing administrator privileges, and a product left out of the answer can
+           then be read off the registry.
 
            Windows can still start the app without the rights, a compatibility setting
            being one way, so App.OnStartup also checks its own token

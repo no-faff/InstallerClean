@@ -4771,7 +4771,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private const int MaxProductIndex = 10_000;
 
     /// <summary>
-    /// Enumerates every installed product across all contexts, or refuses the scan.
+    /// Enumerates the products Windows Installer lists across all contexts, or refuses the scan.
     /// The walk reads rows until Windows reports the end of the list, and a row it
     /// cannot read stops it, the scan then refusing with <c>Error.MsiNonSuccess</c>.
     /// <c>UnreadableRows</c> counts the rows the walk passed without reading, so it is

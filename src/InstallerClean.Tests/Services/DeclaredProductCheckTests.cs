@@ -4293,7 +4293,7 @@ public class DeclaredProductCheckTests
 
     // ---- Every answer about a product, held against the caller's own enumeration ----
     //
-    // The caller has listed the installations of every product before the screen runs,
+    // The caller has listed the installations it found before the screen runs,
     // and the screen asks Windows for the installations of one product at a time. An
     // answer leaving out an installation the caller listed keeps the file: "not
     // installed" for a listed product, and a list short of a listed installation, for a
