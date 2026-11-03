@@ -512,7 +512,7 @@ jobs:
       # against the button it quotes, the installer-folder token, a window title
       # whose only consumer overwrites it. Every other check here holds one key's
       # structure or one key's sameness across files, so none of them can see a
-      # rule of that shape, and the About window's donate button consequently
+      # rule of that shape, and the About window's tip button consequently
       # showed one phrase and spoke another in two languages across four
       # releases.
       #

@@ -134,7 +134,7 @@
                   Content="{loc:Translate About.AutoUpdateCheck}"
                   AutomationProperties.HelpText="{loc:Translate Automation.AutoUpdateCheck.HelpText}"/>
 
-        <!-- Section header above the star and donate row. The
+        <!-- Section header above the star and tip row. The
              resx value is already uppercased so screen readers don't
              see SmallCaps glyph mapping at all. Type.Heading.Sm +
              Text.Body matches MOVE LOCATION and the registered-
@@ -151,7 +151,7 @@
              "Einen Stern auf GitHub hinterlassen". The window cannot widen to
              absorb it, its Width being the scaled 500 ApplyScaledBounds clamps
              to the work area, so the asks give way instead: the WrapPanel drops
-             the donate pill onto a second line in any language that needs it
+             the tip pill onto a second line in any language that needs it
              and leaves the rest, English among them, on one. The extra line comes out of the star spacer row above,
              which gives up its slack before the window grows at all.
 
@@ -160,7 +160,7 @@
              left edge as the first; and the panel's -6 bottom cancels the bottom
              margin of the last (or only) line, so an unwrapped row is exactly as
              tall as it was before. Tab order is untouched: a WrapPanel lays out
-             in tree order, so star, donate, Close still runs across then down. -->
+             in tree order, so star, tip, Close still runs across then down. -->
         <Grid Grid.Row="15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -168,8 +168,8 @@
             </Grid.ColumnDefinitions>
             <!-- Both asks carry their own tooltip as HelpText. Hover text
                  reaches no screen reader, so the reason for the ask (what a
-                 star is for, that a donation is welcome) was on screen and
-                 nowhere else; the completion card's donate buttons already
+                 star is for, that a tip is welcome) was on screen and
+                 nowhere else; the completion card's tip buttons already
                  pair the two this way. Same key, so they cannot drift. -->
             <WrapPanel Grid.Column="0" Margin="-12,0,0,-6">
                 <Button Style="{StaticResource CompactGhostPill}"
@@ -189,20 +189,20 @@
                     </StackPanel>
                 </Button>
                 <Button Style="{StaticResource CompactGhostPill}"
-                        Click="DonateClick" AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa.About}"
-                        AutomationProperties.HelpText="{loc:Translate Tooltip.BuyMeACuppa.About}"
+                        Click="DonateClick" AutomationProperties.Name="{loc:Translate Automation.LeaveATip.About}"
+                        AutomationProperties.HelpText="{loc:Translate Tooltip.LeaveATip.About}"
                         Margin="0,0,0,6"
                         ToolTipService.InitialShowDelay="0">
                     <Button.ToolTip>
                         <ToolTip x:Name="DonateToolTip" Style="{StaticResource AccentTooltip}"
-                                 Content="{loc:Translate Tooltip.BuyMeACuppa.About}" Placement="Custom"/>
+                                 Content="{loc:Translate Tooltip.LeaveATip.About}" Placement="Custom"/>
                     </Button.ToolTip>
                     <StackPanel Orientation="Horizontal">
                         <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
                               Fill="{StaticResource Decoration.Heart}"
                               Width="{a11y:TextScaled 12}" Height="{a11y:TextScaled 12}" Stretch="Uniform"
                               VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"/>
-                        <AccessText Text="{loc:Translate Action.BuyMeACuppa}" VerticalAlignment="Center"/>
+                        <AccessText Text="{loc:Translate Action.LeaveATip}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
             </WrapPanel>

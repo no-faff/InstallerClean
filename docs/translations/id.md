@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | Lanjutkan _tanpa menunggu |
 | Check for _updates | Periksa pem_baruan |
 | _Close | _Tutup |
-| _Close without donating | _Tutup tanpa berdonasi |
+| _Close without tipping | _Tutup tanpa memberi tip |
 | _Delete permanently | _Hapus permanen |
 | _Done | _Selesai |
 | Details | Detail |
-| _Donate | _Donasi |
-| _Donate $3 | _Donasi US$3 |
-| Donate | Donasi |
+| _Leave a tip | _Beri tip |
+| Leave a tip | Beri tip |
+| _Leave a tip | Beri t_ip |
 | Leave a _star on GitHub | Beri _bintang di GitHub |
 | Apache 2.0 licence | Lisensi Apache 2.0 |
 | _Move | _Pindahkan |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Mudah untuk dibatalkan. Pindahkan kembali ke {InstallerFolder} dan semuanya akan kembali seperti semula. |
 | {0} {1} permanently deleted | {0} {1} dihapus permanen |
 | {0} {1} permanently deleted | {0} {1} dihapus permanen |
-| Any small donation is much appreciated | Donasi sekecil apa pun sangat dihargai |
+| Any tip is much appreciated | Tip berapa pun sangat dihargai |
 | Send _anonymous report | Kirim laporan _anonim |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | Laporan ini menambahkan hasil Anda ke [grafik ini] di GitHub, yang menunjukkan berapa banyak ruang yang dikosongkan orang dengan InstallerClean. Laporan ini juga memuat detail teknis berikut untuk membantu saya menemukan bug: |
 | How much space was freed, and how many files were moved or deleted | Berapa banyak ruang yang dikosongkan, dan berapa banyak file yang dipindahkan atau dihapus |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Bahasa Indonesia |
 | --- | --- |
-| Any small donation is much appreciated | Donasi sekecil apa pun sangat dihargai |
+| Any tip is much appreciated | Tip berapa pun sangat dihargai |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI. |
 | Close | Tutup |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | Sebenarnya saya seharusnya memungut biaya untuk InstallerClean, karena pembuatannya memakan banyak sekali tenaga, tetapi saya ingin tetap menggratiskannya agar bisa membantu sebanyak mungkin orang. Donasi Anda membuat semua itu sepadan dan sangat saya hargai. |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Bahasa Indonesia |
 | --- | --- |
-| Donate | Donasi |
-| Donate $3 | Donasi US$3 |
-| Donate | Donasi |
+| Leave a tip | Beri tip |
+| Leave a tip | Beri tip |
+| Leave a tip | Beri tip |
 | Cancel operation | Batal, operasi |
 | Cancel scan | Batal, pemindaian |
 | Cancel startup scan | Batal, pemindaian awal |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | Memindahkan {0} {1} yang tidak diperlukan ke {2}... |
 | Moved {0} unneeded {1}. | {0} {1} yang tidak diperlukan telah dipindahkan. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Pastikan program Anda masih bisa diperbarui dan dicopot seperti biasa, lalu hapus {0}. |
-| InstallerClean is free. If it helped, please donate $3: {0} | InstallerClean gratis. Jika bermanfaat, silakan berdonasi US$3: {0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean gratis. Jika bermanfaat, tip sangat dihargai: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Perbarui sekarang? Sangat disarankan untuk memakai versi terbaru. [{0}/{1}] |
 | Y | Y |
 | N | T |

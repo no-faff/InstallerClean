@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | 不再等候，繼續進行(_W) |
 | Check for _updates | 檢查更新(_U) |
 | _Close | 關閉(_C) |
-| _Close without donating | 不贊助，直接關閉(_C) |
+| _Close without tipping | 不打賞，直接關閉(_C) |
 | _Delete permanently | 永久刪除(_D) |
 | _Done | 完成(_D) |
 | Details | 詳細資料 |
-| _Donate | 贊助(_D) |
-| _Donate $3 | 贊助 3 美元(_D) |
-| Donate | 贊助 |
+| _Leave a tip | 打賞(_L) |
+| Leave a tip | 打賞 |
+| _Leave a tip | 打賞(_L) |
 | Leave a _star on GitHub | 在 GitHub 上給個星星(_S) |
 | Apache 2.0 licence | Apache 2.0 授權條款 |
 | _Move | 移動(_M) |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 要復原很簡單。把它們移回 {InstallerFolder}，一切就會恢復原狀。 |
 | {0} {1} permanently deleted | 已永久刪除 {0} 個{1} |
 | {0} {1} permanently deleted | 已永久刪除 {0} 個{1} |
-| Any small donation is much appreciated | 任何小額贊助都非常感謝 |
+| Any tip is much appreciated | 任何打賞都非常感謝 |
 | Send _anonymous report | 傳送匿名報告(_A) |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | 報告會把您的結果加到 GitHub 上的[這張圖表]，圖表顯示人們用 InstallerClean 釋放了多少空間。報告也包含以下技術細節，幫助我發現程式錯誤： |
 | How much space was freed, and how many files were moved or deleted | 釋放了多少空間，以及移動或刪除了多少個檔案 |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 繁體中文 |
 | --- | --- |
-| Any small donation is much appreciated | 任何小額贊助都非常感謝 |
+| Any tip is much appreciated | 任何打賞都非常感謝 |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 已要求取消。InstallerClean 正在等候目前的步驟到達可以停下來的地方。在大量 I/O 或 MSI 資料庫呼叫期間，這可能需要幾秒鐘。 |
 | Close | 關閉 |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | InstallerClean 花了我大量心血，我其實應該收費，但我希望它保持免費，好幫助越多人越好。您的贊助讓這一切值得，我非常感激。 |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 繁體中文 |
 | --- | --- |
-| Donate | 贊助 |
-| Donate $3 | 贊助 3 美元 |
-| Donate | 贊助 |
+| Leave a tip | 打賞 |
+| Leave a tip | 打賞 |
+| Leave a tip | 打賞 |
 | Cancel operation | 取消作業 |
 | Cancel scan | 取消掃描 |
 | Cancel startup scan | 取消啟動時的掃描 |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | 正在將 {0} 個不需要的{1}移到 {2}... |
 | Moved {0} unneeded {1}. | 已移動 {0} 個不需要的{1}。 |
 | Check that your programs still update and uninstall as normal, then delete {0}. | 請確認您的程式仍能照常更新和解除安裝，然後刪除 {0}。 |
-| InstallerClean is free. If it helped, please donate $3: {0} | InstallerClean 是免費的。如果它幫上了忙，請贊助 3 美元：{0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean 是免費的。如果它幫上了忙，歡迎打賞，非常感謝：{0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | 立即更新？強烈建議使用最新版本。[{0}/{1}] |
 | Y | Y |
 | N | N |

@@ -140,9 +140,9 @@ const MAP = {
   'Action.DeletePermanently': `_Hapus permanen`,
   'Action.Done': `_Selesai`,
   'Action.Details': `Detail`,
-  'Action.BuyMeACuppa': `_Donasi`,
-  'Action.Donate': `_Donasi US\$3`,
-  'Action.DonateSmall': `Donasi`,
+  'Action.LeaveATip': `Beri t_ip`,
+  'Action.Donate': `_Beri tip`,
+  'Action.DonateSmall': `Beri tip`,
   'Action.LeaveStarOnGitHub': `Beri _bintang di GitHub`,
   'Action.Licence': `Lisensi Apache 2.0`,
   'Action.Move': `_Pindahkan`,
@@ -150,9 +150,9 @@ const MAP = {
   'Action.Rescan': `Pindai _ulang`,
 
   // Automation names (screen reader / accessibility)
-  'Automation.BuyMeACuppa.About': `Donasi`,
-  'Automation.Donate': `Donasi US\$3`,
-  'Automation.DonateSmall': `Donasi`,
+  'Automation.LeaveATip.About': `Beri tip`,
+  'Automation.Donate': `Beri tip`,
+  'Automation.DonateSmall': `Beri tip`,
   // The three Cancel names name the button and then say which one, the shape
   // Automation.ViewOrphanedFiles and its sibling already take, rather than the
   // verb batalkan: WCAG 2.5.3 (Label in Name) asks that a control's spoken name
@@ -200,7 +200,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Menjelaskan folder ini, dan cara memulihkan file, di README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Donasi sekecil apa pun sangat dihargai`,
+  'Tooltip.LeaveATip.About': `Tip berapa pun sangat dihargai`,
   'Tooltip.CancellingPending': `Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI.`,
   'Tooltip.Close': `Tutup`,
   'Tooltip.LeaveStarOnGitHub.About': `Bintang membantu orang lain menemukan InstallerClean`,
@@ -496,7 +496,7 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `InstallerClean tidak bisa membaca cukup banyak catatan Windows Installer untuk memastikan apa yang masih diperlukan: daftar program terpasang kembali tidak lengkap, dan membaca catatan yang sama langsung dari registri juga menemui kesalahan. Sebuah file bisa tampak terisolasi hanya karena catatan yang menyebutkannya termasuk yang tidak terbaca, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar program terpasang: InstallerClean membaca {2} {3}, lalu menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar patch sebuah program: InstallerClean membaca {2} {3}, lalu menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
-  'Completion.DonateAsk': `Donasi sekecil apa pun sangat dihargai`,
+  'Completion.DonateAsk': `Tip berapa pun sangat dihargai`,
   'About.Link.Guide': `Panduan dan FAQ`,
   'About.Link.ReportProblem': `Laporkan masalah`,
   'About.AutoUpdateCheck': `Periksa pembaruan secara otomatis`,
@@ -616,9 +616,9 @@ const MAP = {
   'Cli.SourceGivenUp.Drive': `InstallerClean berhenti menunggu drive {0} dan membiarkan apa adanya setiap file yang masih harus diperiksa terhadapnya. Setelah drive itu kembali merespons dengan normal, jalankan perintahnya lagi.`,
   'Cli.SourceGivenUp.Path': `InstallerClean berhenti menunggu {0} dan membiarkan apa adanya setiap file yang masih harus diperiksa terhadapnya. Setelah lokasi itu kembali merespons dengan normal, jalankan perintahnya lagi.`,
   'Cli.SourcesGivenUp': `InstallerClean berhenti menunggu lebih dari satu drive atau berbagi jaringan ({0}) dan membiarkan apa adanya setiap file yang masih harus diperiksa terhadap salah satunya. Setelah semuanya kembali merespons dengan normal, jalankan perintahnya lagi.`,
-  'Action.CloseWithoutDonating': `_Tutup tanpa berdonasi`,
+  'Action.CloseWithoutDonating': `_Tutup tanpa memberi tip`,
   'Tooltip.Donate': `Sebenarnya saya seharusnya memungut biaya untuk InstallerClean, karena pembuatannya memakan banyak sekali tenaga, tetapi saya ingin tetap menggratiskannya agar bisa membantu sebanyak mungkin orang. Donasi Anda membuat semua itu sepadan dan sangat saya hargai.`,
-  'Cli.DonateAsk': `InstallerClean gratis. Jika bermanfaat, silakan berdonasi US\$3: {0}`,
+  'Cli.DonateAsk': `InstallerClean gratis. Jika bermanfaat, tip sangat dihargai: {0}`,
   'Completion.SendReport': `Kirim laporan _anonim`,
   'Completion.ReportPanel.Intro': `Laporan ini menambahkan hasil Anda ke [grafik ini] di GitHub, yang menunjukkan berapa banyak ruang yang dikosongkan orang dengan InstallerClean. Laporan ini juga memuat detail teknis berikut untuk membantu saya menemukan bug:`,
   'Completion.ReportPanel.Freed': `Berapa banyak ruang yang dikosongkan, dan berapa banyak file yang dipindahkan atau dihapus`,

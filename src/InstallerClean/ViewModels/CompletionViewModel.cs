@@ -132,13 +132,13 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _scanStartLine = string.Empty;
 
     /// <summary>
-    /// Puts the large Donate and Close without donating on the completion card in
-    /// place of Done and the small Donate under it. True where a Move or Delete moved
+    /// Puts the large tip button and Close without tipping on the completion card in
+    /// place of Done and the small tip button under it. True where a Move or Delete moved
     /// or deleted files, a run the user cancelled part-way included. An
     /// all-clear, a run the re-verify held back entirely, a run every file
     /// errored on, a Move or Delete that reached no file and a Move the app
     /// stopped itself all leave it false, and those cards keep Done and the
-    /// small Donate. It measures the bytes the run moved or deleted, not whether the
+    /// small tip button. It measures the bytes the run moved or deleted, not whether the
     /// disk got any emptier, so a same-drive Move sets it while its heading
     /// says "moved" rather than "freed". Set from the bytes argument in each
     /// Show* method.
@@ -244,8 +244,9 @@ public partial class CompletionViewModel : ObservableObject
     /// <paramref name="settingsService"/> records whether it is waiting to go or has
     /// gone, once the person has answered. <paramref name="earlierRunCheck"/> and
     /// <paramref name="firstRunMark"/> decide which card is the PC's first, and
-    /// <paramref name="windowsRegion"/> gives the Country or region the report carries.
-    /// <paramref name="windowService"/> opens the donate page and the report window. <paramref name="copy"/> is the kind of copy of the
+    /// <paramref name="windowsRegion"/> gives the Country or region the report carries
+    /// and the tip page is opened with. <paramref name="windowService"/> opens the tip
+    /// page and the report window. <paramref name="copy"/> is the kind of copy of the
     /// app that is running, which the report carries. <paramref name="lastScan"/> answers
     /// with the scan the window shows at the moment it is asked, which the card after a
     /// Move or Delete speaks for.
@@ -1009,15 +1010,22 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// The card's large Donate button: opens the donate page in the browser and
-    /// closes the card, which returns the user to the main window as Done does.
+    /// The card's large tip button: opens the tip page in the browser and closes
+    /// the card, which returns the user to the main window as Done does.
     /// </summary>
     [RelayCommand]
     private void Donate()
     {
-        _windowService.OpenUrl(SupportLink.Url);
+        _windowService.OpenUrl(SupportLink.TipPage(_windowsRegion));
         Dismiss();
     }
+
+    /// <summary>
+    /// The small tip button under Done: opens the tip page in the browser and
+    /// leaves the card up.
+    /// </summary>
+    [RelayCommand]
+    private void DonateSmall() => _windowService.OpenUrl(SupportLink.TipPage(_windowsRegion));
 
     [RelayCommand]
     private void Dismiss()

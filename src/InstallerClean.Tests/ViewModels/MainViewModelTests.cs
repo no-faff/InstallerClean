@@ -3883,13 +3883,15 @@ public class MainViewModelTests : IDisposable
     }
 
     [Fact]
-    public void Donate_opens_no_faff_url()
+    public void The_small_tip_button_opens_the_tip_page_with_the_windows_region()
     {
+        _windowsRegion.Read().Returns("SE");
         var vm = CreateViewModel();
 
-        vm.Chrome.DonateCommand.Execute(null);
+        vm.Completion.DonateSmallCommand.Execute(null);
 
-        _windowService.Received(1).OpenUrl(SupportLink.Url);
+        _windowService.Received(1).OpenUrl(SupportLink.TipPage(Localisation.UiCulture, "SE"));
+        _windowService.Received(1).OpenUrl(Arg.Is<string>(u => u.EndsWith("&region=SE", StringComparison.Ordinal)));
     }
 
     // The report box. The start check, the mark and the Windows region are faked, so each

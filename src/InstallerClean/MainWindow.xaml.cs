@@ -82,7 +82,7 @@ public partial class MainWindow : Window
         else
             ShowStartupScan();
 
-        // Both of the completion card's donate buttons are centred on the card,
+        // Both of the completion card's tip buttons are centred on the card,
         // and each tooltip is centred over its button.
         CompletionDonateToolTip.CustomPopupPlacementCallback = TooltipPlacement.KeptInsideWindow(
             CompletionDonateToolTip, this, ToolTipAnchor.Centre, ToolTipEdgeMargin);
@@ -271,8 +271,8 @@ public partial class MainWindow : Window
         Width = DetailWindowSizing.ClampWidthToWorkArea(
             this, 828 * AccessibilitySettings.Current.TextScaleFactor, 0);
 
-        // The small Donate's tooltip is one sentence and is given the window's width
-        // rather than the accent tooltip's wrap width. The large Donate's is a
+        // The small tip button's tooltip is one sentence and is given the window's width
+        // rather than the accent tooltip's wrap width. The large one's is a
         // paragraph and keeps the wrap width.
         TooltipPlacement.WidenToWindow(CompletionDonateToolTip, Width, ToolTipEdgeMargin);
     }
@@ -472,7 +472,7 @@ public partial class MainWindow : Window
             AnnounceCompletionOutcome();
         }
 
-        // Overlay dismissed (Done, Close without donating, the large Donate, Esc or a
+        // Overlay dismissed (Done, Close without tipping, the large tip button, Esc or a
         // click on the dim margin). The focused button is gone, so move focus to a
         // sensible non-destructive control rather than letting it drop to the window
         // root.
@@ -964,8 +964,8 @@ public partial class MainWindow : Window
         _liveRegions.Queue(element, stillShown);
 
     /// <summary>
-    /// The completion card's button that closes it: Close without donating on the
-    /// card carrying the large Donate, Done on every other. Read when focus is placed, so
+    /// The completion card's button that closes it: Close without tipping on the
+    /// card carrying the large tip button, Done on every other. Read when focus is placed, so
     /// <see cref="CompletionViewModel.AsksForDonation"/> has to be settled before
     /// <see cref="CompletionViewModel.IsComplete"/> reveals the card, as every Show*
     /// method settles it.

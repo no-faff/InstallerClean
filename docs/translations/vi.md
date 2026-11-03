@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | Tiếp tục mà _không chờ |
 | Check for _updates | _Kiểm tra cập nhật |
 | _Close | Đón_g |
-| _Close without donating | Đóng mà _không ủng hộ |
+| _Close without tipping | Đóng mà _không gửi tip |
 | _Delete permanently | _Xóa vĩnh viễn |
 | _Done | _Xong |
 | Details | Chi tiết |
-| _Donate | Ủng _hộ |
-| _Donate $3 | Ủng _hộ 3 USD |
-| Donate | Ủng hộ |
+| _Leave a tip | Gửi tiền _tip |
+| Leave a tip | Gửi tiền tip |
+| _Leave a tip | Gửi tiền _tip |
 | Leave a _star on GitHub | Gắn _sao trên GitHub |
 | Apache 2.0 licence | Giấy phép Apache 2.0 |
 | _Move | _Chuyển |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Hoàn tác rất đơn giản. Hãy chuyển chúng trở lại {InstallerFolder} và mọi thứ sẽ như cũ. |
 | {0} {1} permanently deleted | Đã xóa vĩnh viễn {0} {1} |
 | {0} {1} permanently deleted | Đã xóa vĩnh viễn {0} {1} |
-| Any small donation is much appreciated | Mọi đóng góp dù nhỏ đều rất được trân trọng |
+| Any tip is much appreciated | Mọi khoản tip đều rất được trân trọng |
 | Send _anonymous report | _Gửi báo cáo ẩn danh |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | Báo cáo sẽ thêm kết quả của bạn vào [biểu đồ này] trên GitHub, cho thấy mọi người đang giải phóng được bao nhiêu dung lượng với InstallerClean. Báo cáo cũng chứa các chi tiết kỹ thuật sau để giúp tôi phát hiện lỗi: |
 | How much space was freed, and how many files were moved or deleted | Đã giải phóng bao nhiêu dung lượng, và đã chuyển hoặc xóa bao nhiêu tệp |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Tiếng Việt |
 | --- | --- |
-| Any small donation is much appreciated | Mọi đóng góp dù nhỏ đều rất được trân trọng |
+| Any tip is much appreciated | Mọi khoản tip đều rất được trân trọng |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI. |
 | Close | Đóng |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | Lẽ ra tôi nên thu phí InstallerClean, vì nó đã tốn rất nhiều công sức, nhưng tôi muốn giữ nó miễn phí để giúp được càng nhiều người càng tốt. Sự ủng hộ của bạn khiến mọi công sức trở nên xứng đáng và tôi rất trân trọng điều đó. |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Tiếng Việt |
 | --- | --- |
-| Donate | Ủng hộ |
-| Donate $3 | Ủng hộ 3 USD |
-| Donate | Ủng hộ |
+| Leave a tip | Gửi tiền tip |
+| Leave a tip | Gửi tiền tip |
+| Leave a tip | Gửi tiền tip |
 | Cancel operation | Hủy thao tác |
 | Cancel scan | Hủy quét |
 | Cancel startup scan | Hủy quét khi khởi động |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | Đang chuyển {0} {1} không cần thiết tới {2}... |
 | Moved {0} unneeded {1}. | Đã chuyển {0} {1} không cần thiết. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Hãy kiểm tra xem các chương trình của bạn vẫn cập nhật và gỡ cài đặt bình thường, rồi xóa {0}. |
-| InstallerClean is free. If it helped, please donate $3: {0} | InstallerClean miễn phí. Nếu nó có ích, hãy ủng hộ 3 USD: {0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean miễn phí. Nếu nó có ích, một chút tiền tip sẽ rất được trân trọng: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Cập nhật ngay bây giờ? Chúng tôi đặc biệt khuyên bạn dùng phiên bản mới nhất. [{0}/{1}] |
 | Y | C |
 | N | K |

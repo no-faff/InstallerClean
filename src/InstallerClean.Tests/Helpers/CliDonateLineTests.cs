@@ -8,7 +8,7 @@ using NSubstitute;
 namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
-/// The command line's donate line: printed last, after a blank line, by a Delete that
+/// The command line's tip line: printed last, after a blank line, by a Delete that
 /// deleted files and a Move that moved files, and only to a console somebody is
 /// watching. Where the run goes on to ask about its report or to send one, the line
 /// follows that instead (CliReportCarryTests). Driven through the real work method with
@@ -41,10 +41,10 @@ public class CliDonateLineTests
     private static readonly PatchClaim SurvivingB =
         new(File2, "{AAAA1111-0000-0000-0000-000000000002}", "{PPPP1111-0000-0000-0000-000000000001}", null, 2);
 
-    private static string DonateLine => string.Format(Strings.Cli_DonateAsk, SupportLink.KoFiUrl);
+    private static string DonateLine => string.Format(Strings.Cli_DonateAsk, SupportLink.Url);
 
     [Fact]
-    public async Task A_delete_that_deleted_files_ends_with_the_donate_line()
+    public async Task A_delete_that_deleted_files_ends_with_the_tip_line()
     {
         var (exitCode, stdout) = await Run("/d", null, Services(delete: DeleteThatDeletes(2)), watched: true);
         var (unwatchedExitCode, _) = await Run("/d", null, Services(delete: DeleteThatDeletes(2)), watched: false);
@@ -61,7 +61,7 @@ public class CliDonateLineTests
     }
 
     [Fact]
-    public async Task The_donate_line_never_reaches_the_application_log()
+    public async Task The_tip_line_never_reaches_the_application_log()
     {
         EventLogRecorder.Clear();
         var (_, stdout) = await Run("/d", null, Services(delete: DeleteThatDeletes(2)), watched: true);
@@ -70,11 +70,11 @@ public class CliDonateLineTests
         Assert.Contains(DonateLine, stdout);
         // The run's summary entry is there, so the recorder was listening to this run.
         Assert.NotEmpty(entries);
-        Assert.All(entries, e => Assert.DoesNotContain(SupportLink.KoFiUrl, e.Text));
+        Assert.All(entries, e => Assert.DoesNotContain(SupportLink.Url, e.Text));
     }
 
     [Fact]
-    public async Task A_delete_nobody_is_watching_prints_no_donate_line()
+    public async Task A_delete_nobody_is_watching_prints_no_tip_line()
     {
         // The control for the test above: the same run, the same services, and only
         // the watched answer differs.
@@ -83,11 +83,11 @@ public class CliDonateLineTests
         Assert.Contains(string.Format(
             DisplayHelpers.Pluralise(2, Strings.Cli_DeletedFiles, "Cli.DeletedFiles"),
             DisplayHelpers.FormatCount(2), DisplayHelpers.PluraliseFile(2)), stdout);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, stdout);
+        Assert.DoesNotContain(SupportLink.Url, stdout);
     }
 
     [Fact]
-    public async Task A_move_that_moved_files_ends_with_the_donate_line_after_the_restore_hint()
+    public async Task A_move_that_moved_files_ends_with_the_tip_line_after_the_restore_hint()
     {
         var move = Substitute.For<IMoveFilesService>();
         move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
@@ -108,7 +108,7 @@ public class CliDonateLineTests
     }
 
     [Fact]
-    public async Task A_delete_that_deleted_nothing_prints_no_donate_line()
+    public async Task A_delete_that_deleted_nothing_prints_no_tip_line()
     {
         var delete = Substitute.For<IDeleteFilesService>();
         delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
@@ -118,12 +118,12 @@ public class CliDonateLineTests
         var (exitCode, stdout) = await Run("/d", null, Services(delete: delete), watched: true);
         var (unwatchedExitCode, _) = await Run("/d", null, Services(delete: delete), watched: false);
 
-        Assert.DoesNotContain(SupportLink.KoFiUrl, stdout);
+        Assert.DoesNotContain(SupportLink.Url, stdout);
         Assert.Equal(exitCode, unwatchedExitCode);
     }
 
     [Fact]
-    public async Task A_move_the_app_stopped_prints_no_donate_line()
+    public async Task A_move_the_app_stopped_prints_no_tip_line()
     {
         // Files reached the folder before the stop, so the count alone would ask.
         var move = Substitute.For<IMoveFilesService>();
@@ -137,12 +137,12 @@ public class CliDonateLineTests
         var (exitCode, stdout) = await Run("/m", Destination, Services(move: move), watched: true);
         var (unwatchedExitCode, _) = await Run("/m", Destination, Services(move: move), watched: false);
 
-        Assert.DoesNotContain(SupportLink.KoFiUrl, stdout);
+        Assert.DoesNotContain(SupportLink.Url, stdout);
         Assert.Equal(exitCode, unwatchedExitCode);
     }
 
     [Fact]
-    public async Task A_cancelled_delete_that_deleted_files_prints_no_donate_line()
+    public async Task A_cancelled_delete_that_deleted_files_prints_no_tip_line()
     {
         // The cancellation stays the last thing on the screen.
         using var cts = new CancellationTokenSource();
@@ -158,12 +158,12 @@ public class CliDonateLineTests
         var (exitCode, stdout) = await Run("/d", null, Services(delete: delete), watched: true, cts.Token);
 
         Assert.Contains(Strings.Cli_Cancelled, stdout);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, stdout);
+        Assert.DoesNotContain(SupportLink.Url, stdout);
         Assert.Equal(CliExitCode.Partial, exitCode);
     }
 
     [Fact]
-    public async Task A_cancelled_move_that_moved_files_prints_no_donate_line()
+    public async Task A_cancelled_move_that_moved_files_prints_no_tip_line()
     {
         // The undo stays the last thing on the screen.
         using var cts = new CancellationTokenSource();
@@ -180,17 +180,17 @@ public class CliDonateLineTests
         var (exitCode, stdout) = await Run("/m", Destination, Services(move: move), watched: true, cts.Token);
 
         Assert.Contains(string.Format(Strings.Cli_MoveCancelledRestoreHint, Destination), stdout);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, stdout);
+        Assert.DoesNotContain(SupportLink.Url, stdout);
         Assert.Equal(CliExitCode.Partial, exitCode);
     }
 
     [Fact]
-    public void The_donate_line_prints_the_address_as_given()
+    public void The_tip_line_prints_the_address_as_given()
     {
         // The address goes in through a slot, so a value that dropped or doubled the
         // slot would print a line with no address, or throw where the run prints it.
-        Assert.Contains(SupportLink.KoFiUrl, DonateLine, StringComparison.Ordinal);
-        Assert.Equal(1, DonateLine.Split(SupportLink.KoFiUrl).Length - 1);
+        Assert.Contains(SupportLink.Url, DonateLine, StringComparison.Ordinal);
+        Assert.Equal(1, DonateLine.Split(SupportLink.Url).Length - 1);
     }
 
     // ---- fixtures ----

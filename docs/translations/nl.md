@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | Doorgaan _zonder te wachten |
 | Check for _updates | Controleren op _updates |
 | _Close | _Sluiten |
-| _Close without donating | _Sluiten zonder te doneren |
+| _Close without tipping | _Sluiten zonder fooi |
 | _Delete permanently | _Definitief verwijderen |
 | _Done | _Klaar |
 | Details | Details |
-| _Donate | _Doneren |
-| _Donate $3 | $ 3 _doneren |
-| Donate | Doneren |
+| _Leave a tip | _Fooi geven |
+| Leave a tip | Fooi geven |
+| _Leave a tip | _Fooi geven |
 | Leave a _star on GitHub | Geef een s_ter op GitHub |
 | Apache 2.0 licence | Apache 2.0-licentie |
 | _Move | Ver_plaatsen |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Het is eenvoudig ongedaan te maken. Verplaats ze terug naar {InstallerFolder} en alles is weer zoals het was. |
 | {0} {1} permanently deleted | {0} {1} definitief verwijderd |
 | {0} {1} permanently deleted | {0} {1} definitief verwijderd |
-| Any small donation is much appreciated | Elke kleine donatie wordt zeer gewaardeerd |
+| Any tip is much appreciated | Elke fooi wordt zeer gewaardeerd |
 | Send _anonymous report | _Anoniem rapport versturen |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | Het rapport voegt je resultaat toe aan [deze grafiek] op GitHub, die laat zien hoeveel ruimte mensen met InstallerClean vrijmaken. Het bevat ook deze technische gegevens, die me helpen eventuele bugs op te sporen: |
 | How much space was freed, and how many files were moved or deleted | Hoeveel ruimte er is vrijgemaakt en hoeveel bestanden er zijn verplaatst of verwijderd |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Nederlands |
 | --- | --- |
-| Any small donation is much appreciated | Elke kleine donatie wordt zeer gewaardeerd |
+| Any tip is much appreciated | Elke fooi wordt zeer gewaardeerd |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Annulering aangevraagd. InstallerClean wacht tot de huidige stap een stoppunt bereikt. Dit kan enkele seconden duren bij zware I/O of een aanroep naar de MSI-database. |
 | Close | Sluiten |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | Eigenlijk zou ik geld moeten vragen voor InstallerClean, want het is ontzettend veel werk geweest, maar ik wil het gratis houden zodat het zoveel mogelijk mensen helpt. Jouw donatie maakt het de moeite waard en wordt zeer gewaardeerd. |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Nederlands |
 | --- | --- |
-| Donate | Doneren |
-| Donate $3 | $ 3 doneren |
-| Donate | Doneren |
+| Leave a tip | Fooi geven |
+| Leave a tip | Fooi geven |
+| Leave a tip | Fooi geven |
 | Cancel operation | Bewerking annuleren |
 | Cancel scan | Scan annuleren |
 | Cancel startup scan | Opstartscan annuleren |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | {0} overbodige {1} verplaatsen naar {2}... |
 | Moved {0} unneeded {1}. | {0} overbodige {1} verplaatst. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Controleer of je programma's nog gewoon bijwerken en verwijderen, en verwijder daarna {0}. |
-| InstallerClean is free. If it helped, please donate $3: {0} | InstallerClean is gratis. Heb je er iets aan gehad, doneer dan $ 3: {0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean is gratis. Heb je er iets aan gehad, dan wordt een fooi zeer gewaardeerd: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Nu bijwerken? Het wordt sterk aangeraden om de nieuwste versie te gebruiken. [{0}/{1}] |
 | Y | J |
 | N | N |

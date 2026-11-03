@@ -42,7 +42,7 @@ const LANGS = ['en-GB', 'zh-Hans', 'ru', 'es', 'ja', 'pt-BR', 'pl', 'tr',
 const MUST_AGREE = [
   // Content is a StackPanel (icon + AccessText), so there is no string for WPF
   // to derive a name from and the override IS the label.
-  { label: 'Action.BuyMeACuppa', name: 'Automation.BuyMeACuppa.About' },
+  { label: 'Action.LeaveATip', name: 'Automation.LeaveATip.About' },
   { label: 'Action.Donate', name: 'Automation.Donate' },
   { label: 'Action.DonateSmall', name: 'Automation.DonateSmall' },
   { label: 'Action.LeaveStarOnGitHub', name: 'Automation.LeaveStarOnGitHub.About' },

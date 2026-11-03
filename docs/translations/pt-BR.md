@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | Continuar _sem esperar |
 | Check for _updates | Verificar _atualizações |
 | _Close | _Fechar |
-| _Close without donating | _Fechar sem doar |
+| _Close without tipping | _Fechar sem dar gorjeta |
 | _Delete permanently | _Excluir permanentemente |
 | _Done | _Concluído |
 | Details | Detalhes |
-| _Donate | D_oar |
-| _Donate $3 | _Doar US$ 3 |
-| Donate | Doar |
+| _Leave a tip | Deixar uma _gorjeta |
+| Leave a tip | Deixar uma gorjeta |
+| _Leave a tip | Deixar uma _gorjeta |
 | Leave a _star on GitHub | _Deixe uma estrela no GitHub |
 | Apache 2.0 licence | Licença Apache 2.0 |
 | _Move | _Mover |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | É simples de desfazer. Mova-os de volta para {InstallerFolder} e tudo voltará a ser como era. |
 | {0} {1} permanently deleted | {0} {1} excluído permanentemente |
 | {0} {1} permanently deleted | {0} {1} excluídos permanentemente |
-| Any small donation is much appreciated | Qualquer doação, por menor que seja, é muito bem-vinda |
+| Any tip is much appreciated | Qualquer gorjeta é muito bem-vinda |
 | Send _anonymous report | Enviar relatório _anônimo |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | O relatório adiciona o seu resultado a [este gráfico] no GitHub, que mostra quanto espaço as pessoas estão recuperando com o InstallerClean. Ele também contém estes detalhes técnicos, que me ajudam a encontrar bugs: |
 | How much space was freed, and how many files were moved or deleted | Quanto espaço foi liberado e quantos arquivos foram movidos ou excluídos |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Português (Brasil) |
 | --- | --- |
-| Any small donation is much appreciated | Qualquer doação, por menor que seja, é muito bem-vinda |
+| Any tip is much appreciated | Qualquer gorjeta é muito bem-vinda |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Cancelamento solicitado. O InstallerClean está esperando o passo atual chegar a um ponto em que possa parar. Isso pode levar alguns segundos durante operações intensas de E/S ou uma chamada ao banco de dados MSI. |
 | Close | Fechar |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | Eu realmente deveria cobrar pelo InstallerClean, porque deu um trabalho enorme, mas quero mantê-lo gratuito para que ajude o maior número possível de pessoas. Sua doação faz o esforço valer a pena, e eu agradeço muito. |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Português (Brasil) |
 | --- | --- |
-| Donate | Doar |
-| Donate $3 | Doar US$ 3 |
-| Donate | Doar |
+| Leave a tip | Deixar uma gorjeta |
+| Leave a tip | Deixar uma gorjeta |
+| Leave a tip | Deixar uma gorjeta |
 | Cancel operation | Cancelar a operação |
 | Cancel scan | Cancelar a análise |
 | Cancel startup scan | Cancelar a análise inicial |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | Movendo {0} {1} desnecessários para {2}... |
 | Moved {0} unneeded {1}. | Foram movidos {0} {1} desnecessários. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Confirme que seus programas ainda atualizam e desinstalam normalmente e depois exclua {0}. |
-| InstallerClean is free. If it helped, please donate $3: {0} | O InstallerClean é gratuito. Se ele ajudou, faça uma doação de US$ 3: {0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | O InstallerClean é gratuito. Se ele ajudou, uma gorjeta é muito bem-vinda: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Atualizar agora? É altamente recomendável usar a versão mais recente. [{0}/{1}] |
 | Y | S |
 | N | N |

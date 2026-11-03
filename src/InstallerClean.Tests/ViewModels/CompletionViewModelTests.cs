@@ -907,8 +907,8 @@ public class CompletionViewModelTests
     }
 
     // The card's two sets of buttons. After a Move or Delete that moved or
-    // deleted files it carries the large Donate over Close without donating; every
-    // other card carries Done and the small Donate under it.
+    // deleted files it carries the large tip button over Close without tipping;
+    // every other card carries Done and the small tip button under it.
 
     [Fact]
     public void A_delete_that_freed_bytes_asks_for_a_donation()
@@ -999,17 +999,46 @@ public class CompletionViewModelTests
     }
 
     [Fact]
-    public void Donate_opens_the_donate_page_and_closes_the_card()
+    public void The_large_tip_button_opens_the_tip_page_and_closes_the_card()
     {
         var windowService = Substitute.For<IWindowService>();
-        var vm = TestCompletion.Create(windowService);
+        var vm = CardWithRegion(windowService, "kr");
         vm.ShowDeleteSummary(deletedCount: 3, deletedBytes: 4096, errors: []);
         Assert.True(vm.IsComplete);
 
-        vm.DonateCommand.Execute(null);
+        using (new LocalisationScope(CultureInfo.GetCultureInfo("ko-KR")))
+            vm.DonateCommand.Execute(null);
 
-        windowService.Received(1).OpenUrl(SupportLink.Url);
+        windowService.Received(1).OpenUrl(SupportLink.Url + "?lang=ko&region=KR");
+        windowService.Received(1).OpenUrl(Arg.Any<string>());
         Assert.False(vm.IsComplete);
+    }
+
+    [Fact]
+    public void The_small_tip_button_opens_the_tip_page_and_leaves_the_card_up()
+    {
+        var windowService = Substitute.For<IWindowService>();
+        var vm = CardWithRegion(windowService, "BR");
+        vm.ShowAllClear(scannedFileCount: 10, scanDurationMs: 100);
+        Assert.True(vm.IsComplete);
+        Assert.False(vm.AsksForDonation);
+
+        using (new LocalisationScope(CultureInfo.GetCultureInfo("pt-BR")))
+            vm.DonateSmallCommand.Execute(null);
+
+        windowService.Received(1).OpenUrl(SupportLink.Url + "?lang=pt-BR&region=BR");
+        windowService.Received(1).OpenUrl(Arg.Any<string>());
+        Assert.True(vm.IsComplete);
+    }
+
+    private static CompletionViewModel CardWithRegion(IWindowService windowService, string region)
+    {
+        var windowsRegion = Substitute.For<IWindowsRegion>();
+        windowsRegion.Read().Returns(region);
+        return new CompletionViewModel(
+            Substitute.For<IResultLogService>(), Substitute.For<ISettingsService>(),
+            Substitute.For<IEarlierRunCheck>(), FirstRunMarks.Claiming(),
+            windowsRegion, windowService, AppCopyKind.FromSource, () => null);
     }
 
     [Fact]
@@ -1030,7 +1059,7 @@ public class CompletionViewModelTests
     {
         // The view-model instance is reused across operations, so a flag left on
         // by the Delete would follow the user onto the all-clear that the
-        // post-operation rescan produces, asking for a donation for a scan.
+        // post-operation rescan produces, asking for a tip for a scan.
         var vm = TestCompletion.Create();
         vm.ShowDeleteSummary(deletedCount: 3, deletedBytes: 4096, errors: []);
         Assert.True(vm.AsksForDonation);

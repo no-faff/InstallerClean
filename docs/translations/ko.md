@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | 기다리지 않고 계속(_W) |
 | Check for _updates | 업데이트 확인(_U) |
 | _Close | 닫기(_C) |
-| _Close without donating | 후원하지 않고 닫기(_C) |
+| _Close without tipping | 후원하지 않고 닫기(_C) |
 | _Delete permanently | 영구 삭제(_D) |
 | _Done | 완료(_D) |
 | Details | 세부 정보 |
-| _Donate | 후원(_D) |
-| _Donate $3 | 3달러 후원(_D) |
-| Donate | 후원 |
+| _Leave a tip | 후원하기(_L) |
+| Leave a tip | 후원하기 |
+| _Leave a tip | 후원하기(_L) |
 | Leave a _star on GitHub | GitHub에 별 남기기(_S) |
 | Apache 2.0 licence | Apache 2.0 라이선스 |
 | _Move | 이동(_M) |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 되돌리기는 간단합니다. {InstallerFolder}로 다시 옮기면 모든 것이 원래대로 돌아갑니다. |
 | {0} {1} permanently deleted | {1} {0}개 영구 삭제됨 |
 | {0} {1} permanently deleted | {1} {0}개 영구 삭제됨 |
-| Any small donation is much appreciated | 적은 금액의 후원도 정말 감사합니다 |
+| Any tip is much appreciated | 어떤 후원이든 정말 감사합니다 |
 | Send _anonymous report | 익명 보고서 보내기(_A) |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | 보고서는 사용자의 결과를 GitHub의 [이 차트]에 추가하며, 이 차트는 사람들이 InstallerClean으로 얼마나 많은 공간을 확보하고 있는지 보여 줍니다. 또한 버그를 찾는 데 도움이 되는 다음 기술 정보도 포함됩니다: |
 | How much space was freed, and how many files were moved or deleted | 확보된 공간의 양과 이동하거나 삭제한 파일 수 |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 한국어 |
 | --- | --- |
-| Any small donation is much appreciated | 적은 금액의 후원도 정말 감사합니다 |
+| Any tip is much appreciated | 어떤 후원이든 정말 감사합니다 |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 취소가 요청되었습니다. InstallerClean이 현재 단계가 멈출 수 있는 지점에 이를 때까지 기다리고 있습니다. I/O가 많거나 MSI 데이터베이스를 호출하는 동안에는 몇 초 걸릴 수 있습니다. |
 | Close | 닫기 |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | 정말 많은 노력이 들어갔기 때문에 InstallerClean을 유료로 해야 마땅하지만, 최대한 많은 사람에게 도움이 되도록 무료로 유지하고 싶습니다. 후원해 주시면 큰 보람이 되고 정말 감사하겠습니다. |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 한국어 |
 | --- | --- |
-| Donate | 후원 |
-| Donate $3 | 3달러 후원 |
-| Donate | 후원 |
+| Leave a tip | 후원하기 |
+| Leave a tip | 후원하기 |
+| Leave a tip | 후원하기 |
 | Cancel operation | 작업 취소 |
 | Cancel scan | 검사 취소 |
 | Cancel startup scan | 시작 검사 취소 |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | 불필요한 {1} {0}개를 {2}(으)로 이동 중... |
 | Moved {0} unneeded {1}. | 불필요한 {1} {0}개를 이동했습니다. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | 프로그램이 여전히 정상적으로 업데이트되고 제거되는지 확인한 다음 {0}을(를) 삭제하세요. |
-| InstallerClean is free. If it helped, please donate $3: {0} | InstallerClean은 무료입니다. 도움이 되었다면 3달러를 후원해 주세요: {0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean은 무료입니다. 도움이 되었다면 후원해 주시면 정말 감사하겠습니다: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | 지금 업데이트할까요? 최신 버전을 사용할 것을 강력히 권장합니다. [{0}/{1}] |
 | Y | Y |
 | N | N |

@@ -178,8 +178,8 @@ const MAP = {
   'Action.DeletePermanently': `_Delete permanently`,
   'Action.Done': `_Done`,
   'Action.Details': `Details`,
-  'Action.BuyMeACuppa': `_Donate`,
-  'Action.Donate': `_Donate \$3`,
+  'Action.LeaveATip': `_Leave a tip`,
+  'Action.Donate': `_Leave a tip`,
   'Action.LeaveStarOnGitHub': `Leave a _star on GitHub`,
   'Action.Licence': `Apache 2.0 licence`,
   'Action.Move': `_Move`,
@@ -190,8 +190,8 @@ const MAP = {
   'About.AutoUpdateCheck': `Check for updates automatically`,
 
   // Automation names (screen reader / accessibility)
-  'Automation.BuyMeACuppa.About': `Donate`,
-  'Automation.Donate': `Donate \$3`,
+  'Automation.LeaveATip.About': `Leave a tip`,
+  'Automation.Donate': `Leave a tip`,
   'Automation.CancelOperation': `Cancel operation`,
   'Automation.CancelScan': `Cancel scan`,
   'Automation.CancelStartupScan': `Cancel startup scan`,
@@ -233,7 +233,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Explains this folder, and how to recover a file, in the README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Any small donation is much appreciated`,
+  'Tooltip.LeaveATip.About': `Any tip is much appreciated`,
   'Tooltip.CancellingPending': `Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.`,
   'Tooltip.Close': `Close`,
   'Tooltip.LeaveStarOnGitHub.About': `A star helps other people find it`,
@@ -339,7 +339,7 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
-  'Completion.DonateAsk': `Any small donation is much appreciated`,
+  'Completion.DonateAsk': `Any tip is much appreciated`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} file left alone`,
@@ -653,11 +653,11 @@ const MAP = {
   'Cli.SourceGivenUp.Drive': `InstallerClean stopped waiting for drive {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again.`,
   'Cli.SourceGivenUp.Path': `InstallerClean stopped waiting for {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again.`,
   'Cli.SourcesGivenUp': `InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again.`,
-  'Action.CloseWithoutDonating': `_Close without donating`,
+  'Action.CloseWithoutDonating': `_Close without tipping`,
   'Tooltip.Donate': `I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated.`,
-  'Action.DonateSmall': `Donate`,
-  'Automation.DonateSmall': `Donate`,
-  'Cli.DonateAsk': `InstallerClean is free. If it helped, please donate \$3: {0}`,
+  'Action.DonateSmall': `Leave a tip`,
+  'Automation.DonateSmall': `Leave a tip`,
+  'Cli.DonateAsk': `InstallerClean is free. If it helped, a tip is much appreciated: {0}`,
   'Completion.SendReport': `Send _anonymous report`,
   'Completion.ReportPanel.Intro': `The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs:`,
   'Completion.ReportPanel.Freed': `How much space was freed, and how many files were moved or deleted`,

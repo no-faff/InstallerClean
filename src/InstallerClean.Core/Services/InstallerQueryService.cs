@@ -1440,9 +1440,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // A WITHHELD ROW WITH NO UNREAD-FILE MARKER IS REPORTED BY THE SPLIT WHERE ITS
         // FILE HAS GONE. Every row this loop withholds is one. So is every removable path
         // on a run whose machine-wide patch enumeration did not answer, which downgrades
-        // them with no unread-file marker set (see ConfirmRemovableAgainstEveryProduct),
-        // and marks them scan-wide: a condition on the whole machine, which still bears on
-        // the patch itself, since a holder of it may have gone unseen. A superseded file
+        // them with no unread-file marker set (see ConfirmRemovableAgainstEveryProduct).
+        // Unlike this loop's conditions, that one bears on the patch itself: a holder of it
+        // may have gone unseen. A superseded file
         // that read cleanly when the pass above opened it, and had gone by the time the
         // scan looked for it on the disk, is one way such a row reaches the split from
         // this loop.
@@ -2960,8 +2960,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// can say which. See <see cref="RegisteredPackage.WithheldOnUnreadableFile"/>.
     /// </param>
     /// <param name="scanWide">
-    /// Records that what established nothing was a condition on the whole machine and not
-    /// this file's own patch. Like
+    /// Records that what established nothing was a condition on the whole machine rather than
+    /// a read about this file's own patch. It records where the cause lies, not whether the
+    /// cause bears on this file. Like
     /// <paramref name="unreadableFile"/>, every caller passing it also passes
     /// <paramref name="withheld"/> true. See <see cref="RegisteredPackage.WithheldScanWide"/>.
     /// </param>

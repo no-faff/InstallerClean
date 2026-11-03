@@ -65,7 +65,7 @@ public class TooltipPlacementTests
     [Fact]
     public void A_box_widened_to_the_window_is_kept_inside_it_wherever_its_control_sits()
     {
-        // A one-sentence tooltip given the window's width, as the donate tooltips
+        // A one-sentence tooltip given the window's width, as the tip tooltips
         // are, can be as wide as WidthInsideWindow allows, and must still keep both
         // margins from any position its control can ask for.
         var failures = new List<string>();

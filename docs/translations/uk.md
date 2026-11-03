@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | Продовжити _без очікування |
 | Check for _updates | Перевірити о_новлення |
 | _Close | _Закрити |
-| _Close without donating | _Закрити без підтримки |
+| _Close without tipping | _Закрити без чайових |
 | _Delete permanently | _Видалити назавжди |
 | _Done | _Готово |
 | Details | Деталі |
-| _Donate | _Підтримати |
-| _Donate $3 | _Підтримати на 3 $ |
-| Donate | Підтримати |
+| _Leave a tip | Залишити _чайові |
+| Leave a tip | Залишити чайові |
+| _Leave a tip | Залишити _чайові |
 | Leave a _star on GitHub | Лишити зірку на _GitHub |
 | Apache 2.0 licence | Ліцензія Apache 2.0 |
 | _Move | Пере_містити |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Це легко скасувати. Перемістіть їх назад до {InstallerFolder}, і все повернеться як було. |
 | {0} {1} permanently deleted | Остаточно видалено {0} {1} |
 | {0} {1} permanently deleted | Остаточно видалено {0} {1} |
-| Any small donation is much appreciated | Будь-яка, навіть невелика, підтримка дуже цінна |
+| Any tip is much appreciated | Будь-які чайові дуже цінні |
 | Send _anonymous report | Надіслати _анонімний звіт |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | Звіт додає ваш результат до [цього графіка] на GitHub, який показує, скільки місця люди звільняють за допомогою InstallerClean. У ньому також є ці технічні відомості, які допомагають мені знаходити помилки: |
 | How much space was freed, and how many files were moved or deleted | Скільки місця звільнено і скільки файлів переміщено або видалено |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Українська |
 | --- | --- |
-| Any small donation is much appreciated | Будь-яка, навіть невелика, підтримка дуже цінна |
+| Any tip is much appreciated | Будь-які чайові дуже цінні |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Скасування запитано. InstallerClean чекає, доки поточний крок дійде до точки зупинки. Це може тривати кілька секунд під час інтенсивного вводу-виводу чи звернення до бази даних MSI. |
 | Close | Закрити |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | Насправді за InstallerClean варто було б брати гроші: на нього пішло дуже багато праці. Але я хочу, щоб він залишався безкоштовним і допомагав якомога більшій кількості людей. Ваша підтримка надає всьому цьому сенсу, і я дуже за неї вдячний. |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Українська |
 | --- | --- |
-| Donate | Підтримати |
-| Donate $3 | Підтримати на 3 $ |
-| Donate | Підтримати |
+| Leave a tip | Залишити чайові |
+| Leave a tip | Залишити чайові |
+| Leave a tip | Залишити чайові |
 | Cancel operation | Скасувати операцію |
 | Cancel scan | Скасувати сканування |
 | Cancel startup scan | Скасувати сканування під час запуску |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | Триває переміщення до {2}: {0} непотрібних {1}... |
 | Moved {0} unneeded {1}. | Переміщено {0} непотрібних {1}. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Переконайтеся, що ваші програми досі оновлюються та видаляються як звичайно, а потім видаліть {0}. |
-| InstallerClean is free. If it helped, please donate $3: {0} | InstallerClean безкоштовний. Якщо він допоміг, будь ласка, підтримайте його на 3 $: {0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean безкоштовний. Якщо він допоміг, чайові будуть дуже доречні: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Оновити зараз? Настійно рекомендуємо використовувати найновішу версію. [{0}/{1}] |
 | Y | Т |
 | N | Н |

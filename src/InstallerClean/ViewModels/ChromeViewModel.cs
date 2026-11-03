@@ -10,7 +10,7 @@ namespace InstallerClean.ViewModels;
 
 /// <summary>
 /// Window-management slice. Holds the commands wired to the chrome
-/// (About / Donate / Close), the two "open the details
+/// (About / Close), the two "open the details
 /// window" commands that take the user from the main scan summary
 /// into the registered- or orphaned-files detail windows, the
 /// update check (the manual button and the once-per-session
@@ -871,12 +871,6 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
     [RelayCommand]
     private void ShowAbout() => _windowService.ShowAbout();
-
-    // Bound to the small Donate under Done on the completion card, which leaves
-    // the card up. The card's large Donate button goes through CompletionViewModel,
-    // which closes the card as well.
-    [RelayCommand]
-    private void Donate() => _windowService.OpenUrl(SupportLink.Url);
 
     [RelayCommand]
     private void CloseApp() => _windowService.CloseMainWindow();

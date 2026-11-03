@@ -364,7 +364,7 @@
 
     <!-- The 28px small ghost pill: the bottom-bar language globe, a
          wordless icon button in a busy row, the splash Cancel, and the
-         completion card's small Donate and Close without donating. BasedOn GhostPill so the
+         completion card's small tip button and Close without tipping. BasedOn GhostPill so the
          look stays the ghost's; what changes is the tighter geometry
          and, with it, the ring: Radius.SmallPillFocus's derivation pins
          the 28px height to its 16 ring, so the height and the focus
@@ -1133,7 +1133,7 @@
     </Style>
 
     <!-- Tooltips. AccentTooltip is the indigo accent tooltip for
-         the donate / star buttons that shouts a little; the implicit
+         the tip / star buttons that shouts a little; the implicit
          ToolTip style below is the default for everything else. -->
 
     <Style x:Key="AccentTooltip" TargetType="ToolTip">
@@ -1152,13 +1152,13 @@
                          it is drawn over an accent pill: fill on fill, the two
                          indigos are the same colour and the tooltip reads as
                          part of the button under it rather than as something
-                         on top. The completion card's small Donate's is the
+                         on top. The completion card's small tip button's is the
                          one that reliably crosses one: it opens flush above
                          that button, across Done.
 
                          One brush has to serve four consumers on two surfaces:
-                         the completion card's two donate tooltips open over the
-                         card, and the About window's star and donate pills sit
+                         the completion card's two tip tooltips open over the
+                         card, and the About window's star and tip pills sit
                          straight on the lighter window background.
                          So the constraint is a single brush dark enough to
                          read against the accent fill and quiet enough on
@@ -1177,7 +1177,7 @@
                          of pixels there is covered partly by the edge and
                          partly by the fill, and a tooltip is a popup
                          composited per pixel, so such a row lets the control
-                         beneath show through: for the small Donate's tooltip
+                         beneath show through: for the small tip button's tooltip
                          that is Done and its label. The fill is therefore a
                          Border of its own under the whole outline, and the
                          hairline Border over it has no fill. -->

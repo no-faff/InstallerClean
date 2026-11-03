@@ -68,9 +68,9 @@ const SETS = {
   'MainWindow-updateCard': ['UpdateNotice.UpdateNow', 'UpdateNotice.ContinueWithoutUpdating'],
   // The card shown while an update downloads carries Cancel alone.
   'MainWindow-updating': ['Action.Cancel'],
-  // The completion card carries Done with the small Donate under it, or, after a
-  // Move or Delete that moved or deleted files, the large Donate over Close without
-  // donating. Never both pairs. Either card, where it is the PC's first, carries
+  // The completion card carries Done with the small tip button under it, or, after a
+  // Move or Delete that moved or deleted files, the large tip button over Close
+  // without tipping. Never both pairs. Either card, where it is the PC's first, carries
   // the report box under them.
   'MainWindow-completion': ['Action.Done', 'Action.DonateSmall', 'Completion.SendReport'],
   'MainWindow-completionDonate': ['Action.Donate', 'Action.CloseWithoutDonating', 'Completion.SendReport'],
@@ -80,7 +80,7 @@ const SETS = {
   'Splash': ['Action.Cancel', 'Action.StopWaiting'],
 
   'About': ['About.AutoUpdateCheck', 'Action.Licence', 'Action.LeaveStarOnGitHub',
-    'Action.BuyMeACuppa', 'Action.Close'],
+    'Action.LeaveATip', 'Action.Close'],
   'ConfirmDelete': ['Action.Cancel', 'Action.DeletePermanently'],
   'ConfirmMove': ['Action.Cancel', 'Action.Move'],
 };

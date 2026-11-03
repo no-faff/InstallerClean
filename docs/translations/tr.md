@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | _Beklemeden devam et |
 | Check for _updates | Güncelleştirmeleri _denetle |
 | _Close | _Kapat |
-| _Close without donating | Bağış yapmadan _kapat |
+| _Close without tipping | Bahşiş bırakmadan _kapat |
 | _Delete permanently | _Kalıcı olarak sil |
 | _Done | _Tamam |
 | Details | Ayrıntılar |
-| _Donate | _Bağış yap |
-| _Donate $3 | 3 $ _bağış yap |
-| Donate | Bağış yap |
+| _Leave a tip | _Bahşiş bırak |
+| Leave a tip | Bahşiş bırak |
+| _Leave a tip | _Bahşiş bırak |
 | Leave a _star on GitHub | GitHub'da _yıldız bırak |
 | Apache 2.0 licence | Apache 2.0 lisansı |
 | _Move | _Taşı |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | Geri almak kolay. Onları {InstallerFolder} klasörüne geri taşıyın, her şey eskisi gibi olur. |
 | {0} {1} permanently deleted | {0} {1} kalıcı olarak silindi |
 | {0} {1} permanently deleted | {0} {1} kalıcı olarak silindi |
-| Any small donation is much appreciated | Küçük de olsa her bağış çok makbule geçer |
+| Any tip is much appreciated | Her bahşiş çok makbule geçer |
 | Send _anonymous report | _Anonim rapor gönder |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | Rapor, sonucunuzu GitHub'daki [bu grafiğe] ekler; bu grafik, insanların InstallerClean ile ne kadar yer açtığını gösterir. Ayrıca hataları fark etmeme yardımcı olacak şu teknik ayrıntıları da içerir: |
 | How much space was freed, and how many files were moved or deleted | Ne kadar yer açıldığı ve kaç dosyanın taşındığı ya da silindiği |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Türkçe |
 | --- | --- |
-| Any small donation is much appreciated | Küçük de olsa her bağış çok makbule geçer |
+| Any tip is much appreciated | Her bahşiş çok makbule geçer |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | İptal istendi. InstallerClean, geçerli adımın durabileceği bir noktaya gelmesini bekliyor. Yoğun G/Ç sırasında ya da bir MSI veritabanı çağrısında bu birkaç saniye sürebilir. |
 | Close | Kapat |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | Aslında InstallerClean için ücret almam gerekirdi, çünkü çok büyük bir emek harcandı; ama olabildiğince çok kişiye yardımcı olsun diye ücretsiz kalmasını istiyorum. Bağışınız tüm bu emeğe değmesini sağlıyor ve çok makbule geçiyor. |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Türkçe |
 | --- | --- |
-| Donate | Bağış yap |
-| Donate $3 | 3 $ bağış yap |
-| Donate | Bağış yap |
+| Leave a tip | Bahşiş bırak |
+| Leave a tip | Bahşiş bırak |
+| Leave a tip | Bahşiş bırak |
 | Cancel operation | İşlemi iptal et |
 | Cancel scan | Taramayı iptal et |
 | Cancel startup scan | Başlangıç taramasını iptal et |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | {0} gereksiz {1} şuraya taşınıyor: {2}... |
 | Moved {0} unneeded {1}. | {0} gereksiz {1} taşındı. |
 | Check that your programs still update and uninstall as normal, then delete {0}. | Programlarınızın hâlâ normal şekilde güncellendiğini ve kaldırıldığını doğrulayın, sonra {0} klasörünü silin. |
-| InstallerClean is free. If it helped, please donate $3: {0} | InstallerClean ücretsizdir. İşinize yaradıysa lütfen 3 $ bağış yapın: {0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean ücretsizdir. İşinize yaradıysa bir bahşiş çok makbule geçer: {0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | Şimdi güncellensin mi? En son sürümü kullanmanız önemle tavsiye edilir. [{0}/{1}] |
 | Y | E |
 | N | H |

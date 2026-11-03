@@ -18,10 +18,17 @@ namespace InstallerClean.Services;
 public sealed class WindowService : IWindowService
 {
     private readonly ISettingsService _settingsService;
+    private readonly IWindowsRegion _windowsRegion;
 
-    public WindowService(ISettingsService settingsService)
+    /// <summary>
+    /// <paramref name="settingsService"/> and <paramref name="windowsRegion"/> go to
+    /// the About window: the first for its update-check box, the second for the
+    /// address its tip pill opens.
+    /// </summary>
+    public WindowService(ISettingsService settingsService, IWindowsRegion windowsRegion)
     {
         _settingsService = settingsService;
+        _windowsRegion = windowsRegion;
     }
 
     public void ShowOrphanedDetails(OrphanedFilesViewModel viewModel)
@@ -47,7 +54,7 @@ public sealed class WindowService : IWindowService
     public void ShowAbout()
     {
         if (Application.Current is null) return;
-        var window = new AboutWindow(_settingsService)
+        var window = new AboutWindow(_settingsService, _windowsRegion)
         {
             Owner = Application.Current.MainWindow,
         };

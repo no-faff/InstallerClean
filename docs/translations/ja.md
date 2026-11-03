@@ -40,13 +40,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | 待たずに続行(_W) |
 | Check for _updates | 更新の確認(_U) |
 | _Close | 閉じる(_C) |
-| _Close without donating | 寄付せずに閉じる(_C) |
+| _Close without tipping | 投げ銭せずに閉じる(_C) |
 | _Delete permanently | 完全に削除(_D) |
 | _Done | 完了(_D) |
 | Details | 詳細 |
-| _Donate | 寄付(_D) |
-| _Donate $3 | 3 ドルを寄付(_D) |
-| Donate | 寄付 |
+| _Leave a tip | 投げ銭する(_L) |
+| Leave a tip | 投げ銭する |
+| _Leave a tip | 投げ銭する(_L) |
 | Leave a _star on GitHub | GitHubでスターを付ける(_S) |
 | Apache 2.0 licence | Apache 2.0 ライセンス |
 | _Move | 移動(_M) |
@@ -185,7 +185,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 元に戻すのは簡単です。{InstallerFolder} に戻せば、すべて元どおりになります。 |
 | {0} {1} permanently deleted | {0} 個の {1} を完全に削除しました |
 | {0} {1} permanently deleted | {0} 個の {1} を完全に削除しました |
-| Any small donation is much appreciated | どんな少額のご寄付でもありがたく思います |
+| Any tip is much appreciated | どんな額の投げ銭でもありがたく思います |
 | Send _anonymous report | 匿名レポートを送信(_A) |
 | The report adds your result to [this chart] on GitHub, which shows how much space people are reclaiming with InstallerClean. It also holds these technical details, to help me spot any bugs: | レポートは、あなたの結果を GitHub の[このグラフ]に追加します。このグラフには、InstallerClean でどれだけの容量が取り戻されているかが示されています。また、バグを見つけるのに役立つ、次の技術情報も含まれます： |
 | How much space was freed, and how many files were moved or deleted | 解放された容量と、移動または削除されたファイルの数 |
@@ -370,7 +370,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 日本語 |
 | --- | --- |
-| Any small donation is much appreciated | どんな少額のご寄付でもありがたく思います |
+| Any tip is much appreciated | どんな額の投げ銭でもありがたく思います |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。 |
 | Close | 閉じる |
 | I really should charge for InstallerClean - because it's been a huge amount of work - but I want to keep it free so it helps as many people as possible. Your donation makes it worthwhile and is very much appreciated. | 膨大な手間がかかっているので、本当は InstallerClean を有料にすべきなのですが、できるだけ多くの人の役に立つよう無料のままにしたいと思っています。ご寄付をいただけると報われますし、とてもありがたく思います。 |
@@ -387,9 +387,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 日本語 |
 | --- | --- |
-| Donate | 寄付 |
-| Donate $3 | 3 ドルを寄付 |
-| Donate | 寄付 |
+| Leave a tip | 投げ銭する |
+| Leave a tip | 投げ銭する |
+| Leave a tip | 投げ銭する |
 | Cancel operation | 操作をキャンセル |
 | Cancel scan | スキャンをキャンセル |
 | Cancel startup scan | 起動時スキャンをキャンセル |
@@ -556,7 +556,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moving {0} unneeded {1} to {2}... | {0} 個の不要な {1} を {2} へ移動しています... |
 | Moved {0} unneeded {1}. | {0} 個の不要な {1} を移動しました。 |
 | Check that your programs still update and uninstall as normal, then delete {0}. | プログラムがこれまでどおり更新およびアンインストールできることを確認してから、{0} を削除してください。 |
-| InstallerClean is free. If it helped, please donate $3: {0} | InstallerClean は無料です。お役に立てたなら、3 ドルのご寄付をお願いします：{0} |
+| InstallerClean is free. If it helped, a tip is much appreciated: {0} | InstallerClean は無料です。お役に立てたなら、投げ銭をいただけるとありがたいです：{0} |
 | Update now? It's strongly recommended to use the latest version. [{0}/{1}] | 今すぐ更新しますか？最新バージョンの使用を強くおすすめします。 [{0}/{1}] |
 | Y | Y |
 | N | N |

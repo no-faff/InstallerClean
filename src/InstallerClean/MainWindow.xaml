@@ -1324,24 +1324,25 @@
                     </StackPanel>
                     </ScrollViewer>
 
-                    <!-- The card's buttons. Done with a small Donate under it on
+                    <!-- The card's buttons. Done with a small tip button under it on
                          every card but one, and on that one, the card after a
-                         Move or Delete that moved or deleted files, the large Donate
-                         over "Close without donating". Exactly one of Done and
-                         Close without donating is ever on screen, and one of
-                         the two donate buttons.
+                         Move or Delete that moved or deleted files, the large tip
+                         button over "Close without tipping". Exactly one of Done and
+                         Close without tipping is ever on screen, and one of
+                         the two tip buttons.
 
-                         Done and Close without donating close the result
+                         Done and Close without tipping close the result
                          overlay and not the app: exiting from here would trap the
                          user with no way to re-scan or open About. Whichever is
                          showing is focused on overlay show, so a keyboard user
                          lands on the dismiss action with a visible ring; Enter
                          follows from IsDefault and Esc from the window's own key
-                         handler, so neither needs the focus. Neither donate
+                         handler, so neither needs the focus. Neither tip
                          button is focused or the default, so Enter closes the
-                         card on every card. Alt+D is Done on the cards that
-                         carry it and the large Donate on the one that does not, and the
-                         small Donate takes no access key. -->
+                         card on every card. In English Alt+D is Done on the cards
+                         that carry it, Alt+L the large tip button and Alt+C Close
+                         without tipping on the one that does not, and the small
+                         tip button takes no access key. -->
                     <StackPanel Grid.Row="3" HorizontalAlignment="Center">
                         <Button x:Name="CompletionCloseButton"
                                 Content="{loc:Translate Action.Done}" ContentTemplate="{StaticResource WrappingCentredLabel}"
@@ -1362,13 +1363,13 @@
                         </Button>
 
                         <!-- Under Done, on every card that carries it. It opens
-                             the donate page and leaves the card up. Hover text is
+                             the tip page and leaves the card up. Hover text is
                              invisible to a screen reader, which is why the same
                              sentence is also the HelpText. A TextBlock rather than
                              an AccessText: the label takes no access key, Done
                              being beside it, so an underscore reaching this string
                              is shown as written. -->
-                        <Button Command="{Binding Chrome.DonateCommand}"
+                        <Button Command="{Binding Completion.DonateSmallCommand}"
                                 HorizontalAlignment="Center" Padding="12,0"
                                 Margin="{StaticResource GapBottom.Sm}"
                                 ToolTipService.InitialShowDelay="0"

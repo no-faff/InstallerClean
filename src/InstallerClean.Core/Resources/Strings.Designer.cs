@@ -65,7 +65,6 @@ public static class Strings
     public static string Action_About => Get("Action.About");
     public static string Action_BackupFolderPlaceholder => Get("Action.BackupFolderPlaceholder");
     public static string Action_Browse => Get("Action.Browse");
-    public static string Action_BuyMeACuppa => Get("Action.BuyMeACuppa");
     public static string Action_Cancel => Get("Action.Cancel");
     public static string Action_CheckForUpdates => Get("Action.CheckForUpdates");
     public static string Action_Close => Get("Action.Close");
@@ -77,6 +76,7 @@ public static class Strings
     public static string Action_Donate => Get("Action.Donate");
     public static string Action_DonateSmall => Get("Action.DonateSmall");
     public static string Action_Done => Get("Action.Done");
+    public static string Action_LeaveATip => Get("Action.LeaveATip");
     public static string Action_LeaveStarOnGitHub => Get("Action.LeaveStarOnGitHub");
     public static string Action_Licence => Get("Action.Licence");
     public static string Action_Move => Get("Action.Move");
@@ -88,7 +88,6 @@ public static class Strings
     public static string Automation_About_ReportProblem_HelpText => Get("Automation.About.ReportProblem.HelpText");
     public static string Automation_AutoUpdateCheck_HelpText => Get("Automation.AutoUpdateCheck.HelpText");
     public static string Automation_BackupFolder => Get("Automation.BackupFolder");
-    public static string Automation_BuyMeACuppa_About => Get("Automation.BuyMeACuppa.About");
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");
     public static string Automation_CancelScan => Get("Automation.CancelScan");
     public static string Automation_CancelStartupScan => Get("Automation.CancelStartupScan");
@@ -104,6 +103,7 @@ public static class Strings
     public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_Donate => Get("Automation.Donate");
     public static string Automation_DonateSmall => Get("Automation.DonateSmall");
+    public static string Automation_LeaveATip_About => Get("Automation.LeaveATip.About");
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
     public static string Automation_Licence_HelpText => Get("Automation.Licence.HelpText");
     public static string Automation_Minimise => Get("Automation.Minimise");
@@ -576,12 +576,12 @@ public static class Strings
     public static string Summary_SourceGivenUp_Drive => Get("Summary.SourceGivenUp.Drive");
     public static string Summary_SourceGivenUp_Path => Get("Summary.SourceGivenUp.Path");
     public static string Summary_SourcesGivenUp => Get("Summary.SourcesGivenUp");
-    public static string Tooltip_BuyMeACuppa_About => Get("Tooltip.BuyMeACuppa.About");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_ChangeLanguage => Get("Tooltip.ChangeLanguage");
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_Delete => Get("Tooltip.Delete");
     public static string Tooltip_Donate => Get("Tooltip.Donate");
+    public static string Tooltip_LeaveATip_About => Get("Tooltip.LeaveATip.About");
     public static string Tooltip_LeaveStarOnGitHub_About => Get("Tooltip.LeaveStarOnGitHub.About");
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_Move => Get("Tooltip.Move");

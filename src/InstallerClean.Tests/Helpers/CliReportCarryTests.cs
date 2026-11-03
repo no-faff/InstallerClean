@@ -333,9 +333,9 @@ public class CliReportCarryTests
         Assert.Empty(settings.ReceivedCalls());
     }
 
-    // ---- the donate line, held for the end of a run that goes on to the report ----
+    // ---- the tip line, held for the end of a run that goes on to the report ----
 
-    private static string DonateLine => string.Format(Strings.Cli_DonateAsk, SupportLink.KoFiUrl);
+    private static string DonateLine => string.Format(Strings.Cli_DonateAsk, SupportLink.Url);
 
     private static Rig WatchedRigWhoseDeleteDeletes()
     {
@@ -347,7 +347,7 @@ public class CliReportCarryTests
     }
 
     [Fact]
-    public async Task A_delete_that_carries_a_report_holds_its_donate_line_for_the_end_of_the_run()
+    public async Task A_delete_that_carries_a_report_holds_its_tip_line_for_the_end_of_the_run()
     {
         var rig = WatchedRigWhoseDeleteDeletes();
 
@@ -355,11 +355,11 @@ public class CliReportCarryTests
 
         Assert.NotNull(rig.Report.Entry);
         Assert.True(rig.Report.DonationHeld);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, rig.Stdout);
+        Assert.DoesNotContain(SupportLink.Url, rig.Stdout);
     }
 
     [Fact]
-    public async Task A_move_that_carries_a_report_holds_its_donate_line_for_the_end_of_the_run()
+    public async Task A_move_that_carries_a_report_holds_its_tip_line_for_the_end_of_the_run()
     {
         var rig = new Rig { Watched = true };
         rig.Move.MoveFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
@@ -371,11 +371,11 @@ public class CliReportCarryTests
 
         Assert.NotNull(rig.Report.Entry);
         Assert.True(rig.Report.DonationHeld);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, rig.Stdout);
+        Assert.DoesNotContain(SupportLink.Url, rig.Stdout);
     }
 
     [Fact]
-    public async Task A_delete_on_a_PC_where_an_earlier_run_left_a_report_waiting_holds_its_donate_line()
+    public async Task A_delete_on_a_PC_where_an_earlier_run_left_a_report_waiting_holds_its_tip_line()
     {
         var rig = WatchedRigWhoseDeleteDeletes();
         rig.EarlierRun = true;
@@ -385,11 +385,11 @@ public class CliReportCarryTests
 
         Assert.Null(rig.Report.Entry);
         Assert.True(rig.Report.DonationHeld);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, rig.Stdout);
+        Assert.DoesNotContain(SupportLink.Url, rig.Stdout);
     }
 
     [Fact]
-    public async Task A_delete_with_no_report_to_ask_about_or_send_prints_its_donate_line_as_it_always_did()
+    public async Task A_delete_with_no_report_to_ask_about_or_send_prints_its_tip_line_as_it_always_did()
     {
         var rig = WatchedRigWhoseDeleteDeletes();
         rig.EarlierRun = true;
@@ -401,7 +401,7 @@ public class CliReportCarryTests
     }
 
     [Fact]
-    public async Task A_delete_whose_claim_is_refused_prints_its_donate_line_in_place()
+    public async Task A_delete_whose_claim_is_refused_prints_its_tip_line_in_place()
     {
         var rig = WatchedRigWhoseDeleteDeletes();
         rig.ClaimGranted = false;
@@ -413,7 +413,7 @@ public class CliReportCarryTests
     }
 
     [Fact]
-    public async Task A_delete_at_a_console_nobody_can_answer_in_prints_its_donate_line_in_place()
+    public async Task A_delete_at_a_console_nobody_can_answer_in_prints_its_tip_line_in_place()
     {
         // Output is watched and input is redirected, so nothing is asked.
         var rig = WatchedRigWhoseDeleteDeletes();
@@ -427,7 +427,7 @@ public class CliReportCarryTests
     }
 
     [Fact]
-    public async Task A_delete_that_deleted_nothing_and_a_scan_hold_no_donate_line()
+    public async Task A_delete_that_deleted_nothing_and_a_scan_hold_no_tip_line()
     {
         var nothing = new Rig { Watched = true, Offered = false };
         await nothing.Run("/d");
@@ -436,15 +436,15 @@ public class CliReportCarryTests
 
         Assert.False(nothing.Report.DonationHeld);
         Assert.False(scan.Report.DonationHeld);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, nothing.Stdout);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, scan.Stdout);
+        Assert.DoesNotContain(SupportLink.Url, nothing.Stdout);
+        Assert.DoesNotContain(SupportLink.Url, scan.Stdout);
     }
 
     [Theory]
     [InlineData("y", ResultLogSendOutcome.Sent, "sent")]
     [InlineData("n", ResultLogSendOutcome.Sent, "declined")]
     [InlineData("y", ResultLogSendOutcome.NetworkUnavailable, "not sent")]
-    public void The_held_donate_line_is_the_last_thing_printed_after_the_question(
+    public void The_held_tip_line_is_the_last_thing_printed_after_the_question(
         string answer, ResultLogSendOutcome sendOutcome, string how)
     {
         var report = new RunReport(canAsk: true) { Entry = AnEntry(), DonationHeld = true };
@@ -463,7 +463,7 @@ public class CliReportCarryTests
     }
 
     [Fact]
-    public void The_held_donate_line_follows_the_send_of_a_report_an_earlier_run_left_waiting()
+    public void The_held_tip_line_follows_the_send_of_a_report_an_earlier_run_left_waiting()
     {
         var report = new RunReport(canAsk: true) { DonationHeld = true };
 
@@ -476,7 +476,7 @@ public class CliReportCarryTests
     }
 
     [Fact]
-    public void Ctrl_C_at_the_question_leaves_the_held_donate_line_out()
+    public void Ctrl_C_at_the_question_leaves_the_held_tip_line_out()
     {
         using var cts = new CancellationTokenSource();
         var report = new RunReport(canAsk: true) { Entry = AnEntry(), DonationHeld = true };
@@ -484,11 +484,11 @@ public class CliReportCarryTests
         var stdout = EndOfRun(report, ResultLogSendOutcome.Sent, cts.Token, cancelAtTheQuestion: cts);
 
         Assert.Contains(Strings.Cli_ReportNotSent, stdout);
-        Assert.DoesNotContain(SupportLink.KoFiUrl, stdout);
+        Assert.DoesNotContain(SupportLink.Url, stdout);
     }
 
     [Fact]
-    public void An_offer_that_ended_in_a_cancel_leaves_the_held_donate_line_out_whatever_the_token_says()
+    public void An_offer_that_ended_in_a_cancel_leaves_the_held_tip_line_out_whatever_the_token_says()
     {
         var report = new RunReport(canAsk: true) { DonationHeld = true };
         var original = Console.Out;
@@ -507,7 +507,7 @@ public class CliReportCarryTests
     }
 
     [Fact]
-    public void A_Ctrl_C_that_came_before_the_question_leaves_the_held_donate_line_out()
+    public void A_Ctrl_C_that_came_before_the_question_leaves_the_held_tip_line_out()
     {
         using var cts = new CancellationTokenSource();
         cts.Cancel();
@@ -519,13 +519,13 @@ public class CliReportCarryTests
     }
 
     [Fact]
-    public void A_donate_line_nothing_held_is_not_printed_after_the_question()
+    public void A_tip_line_nothing_held_is_not_printed_after_the_question()
     {
         var report = new RunReport(canAsk: true) { Entry = AnEntry() };
 
         var stdout = EndOfRun(report, ResultLogSendOutcome.Sent, CancellationToken.None, "n");
 
-        Assert.DoesNotContain(SupportLink.KoFiUrl, stdout);
+        Assert.DoesNotContain(SupportLink.Url, stdout);
     }
 
     private static ResultLogEntry AnEntry() => ResultLogEntry.ForScanOnly(
@@ -534,7 +534,7 @@ public class CliReportCarryTests
 
     /// <summary>
     /// The end of a run as Main does it, through the offer over substitute services, and
-    /// what it printed. The console prints into the same buffer as the donate line does,
+    /// what it printed. The console prints into the same buffer as the tip line does,
     /// so the order is what is read back. <paramref name="cancelAtTheQuestion"/>, where
     /// given, is cancelled as the question is read, which ends the read with no answer, as
     /// Ctrl+C at the prompt does. <paramref name="reportWaiting"/> is an earlier run's

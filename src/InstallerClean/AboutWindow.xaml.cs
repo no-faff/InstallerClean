@@ -9,16 +9,18 @@ namespace InstallerClean;
 public partial class AboutWindow : Window
 {
     private readonly ISettingsService _settings;
+    private readonly IWindowsRegion _windowsRegion;
 
     // Set only while the auto-update box is being put back to what disk
     // holds, so that assignment's own Checked/Unchecked raise is not read as
     // a second click.
     private bool _revertingAutoUpdateCheck;
 
-    public AboutWindow(ISettingsService settings)
+    public AboutWindow(ISettingsService settings, IWindowsRegion windowsRegion)
     {
         InitializeComponent();
         _settings = settings;
+        _windowsRegion = windowsRegion;
         VersionText.Text = DisplayHelpers.GetVersionString();
 
         // Resolved here, not in XAML: each supported language has its own
@@ -36,7 +38,7 @@ public partial class AboutWindow : Window
         AutoUpdateCheckBox.Checked += AutoUpdateCheckChanged;
         AutoUpdateCheckBox.Unchecked += AutoUpdateCheckChanged;
 
-        // The donate pill sits beside the star at the left of the window. Its tooltip
+        // The tip pill sits beside the star at the left of the window. Its tooltip
         // lines up with the pill's left edge and is pulled inside the window where it
         // would hang off.
         DonateToolTip.CustomPopupPlacementCallback = TooltipPlacement.KeptInsideWindow(
@@ -92,7 +94,7 @@ public partial class AboutWindow : Window
         var reference = Owner ?? Application.Current?.MainWindow;
         var factor = AccessibilitySettings.Current.TextScaleFactor;
         Width = DetailWindowSizing.ClampWidthToWorkArea(reference, 500 * factor, 0);
-        // The donate tooltip is one sentence and is given the window's width rather
+        // The tip tooltip is one sentence and is given the window's width rather
         // than the accent tooltip's wrap width. The star's keeps the wrap width.
         TooltipPlacement.WidenToWindow(DonateToolTip, Width, ToolTipEdgeMargin);
         // MinHeight can never exceed MaxHeight: ClampHeightToWorkArea caps
@@ -172,7 +174,7 @@ public partial class AboutWindow : Window
         UrlLauncher.OpenUrl("https://github.com/no-faff/InstallerClean");
 
     private void DonateClick(object sender, RoutedEventArgs e) =>
-        UrlLauncher.OpenUrl(SupportLink.Url);
+        UrlLauncher.OpenUrl(SupportLink.TipPage(_windowsRegion));
 
     protected override void OnClosed(EventArgs e)
     {

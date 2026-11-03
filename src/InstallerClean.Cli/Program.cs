@@ -416,7 +416,7 @@ internal static class Program
 
         // The question comes after the mutex is released, so a person reading it holds up
         // neither the window nor another run, and after the run's summary entry, so the
-        // exit code and the entry are the work's whatever the answer is. The donate line
+        // exit code and the entry are the work's whatever the answer is. The tip line
         // a Delete or Move held back follows it.
         OfferReport(report, updateHost, cts.Token);
         return exitCode;
@@ -439,7 +439,7 @@ internal static class Program
     /// After the work of a run, at a console somebody can answer in: offers to send the
     /// report of a run that was the PC's first and finished
     /// (<see cref="RunReport.Entry"/>), or sends the report an earlier run was told to
-    /// send and could not, and then prints the donate line a Delete or Move held back
+    /// send and could not, and then prints the tip line a Delete or Move held back
     /// (<see cref="WriteHeldDonation"/>). Nothing is asked or sent where nobody can answer,
     /// or where Ctrl+C has come. Never throws.
     /// </summary>
@@ -457,7 +457,7 @@ internal static class Program
         }
     }
 
-    /// <summary>The offer and the donate line over the services they use, which a test supplies.</summary>
+    /// <summary>The offer and the tip line over the services they use, which a test supplies.</summary>
     internal static void OfferReport(
         RunReport report, IConsolePrompt console, IResultLogService resultLog, ISettingsService settings,
         CancellationToken token)
@@ -978,7 +978,7 @@ internal static class Program
     /// </param>
     /// <param name="consoleWatched">
     /// Asked once a Delete or Move that was not cancelled has acted on files: whether
-    /// somebody is watching the console. Where it answers false the run gives no donate
+    /// somebody is watching the console. Where it answers false the run gives no tip
     /// line; where true, the line prints there or is held in <paramref name="report"/> for
     /// after the report question or the send of a waiting report. Null asks
     /// <see cref="ConsoleIsWatched"/>, as every production path does. A test that reads
@@ -1109,7 +1109,7 @@ internal static class Program
                 }
             }
 
-            // The donate line of a Delete or Move that acted on files. Where the run goes on
+            // The tip line of a Delete or Move that acted on files. Where the run goes on
             // to print about its report, a question about the one it carried or the send of
             // one an earlier run left waiting, the line is held in the report and Main
             // prints it after that, so it is the last thing on the screen. Anywhere else it
@@ -1938,13 +1938,14 @@ internal static class Program
         !Console.IsOutputRedirected && Interop.Native.WindowStation.IsInteractive();
 
     /// <summary>
-    /// The donate line, after a blank line, on standard output only. Never written to the
+    /// The tip line, after a blank line, on standard output only. It prints the tip
+    /// page's address as it stands, with nothing added. Never written to the
     /// Application log, and nothing about the run's outcome or exit code depends on it.
     /// </summary>
     private static void WriteDonation()
     {
         Console.WriteLine();
-        Console.WriteLine(string.Format(Strings.Cli_DonateAsk, SupportLink.KoFiUrl));
+        Console.WriteLine(string.Format(Strings.Cli_DonateAsk, SupportLink.Url));
     }
 
     /// <summary>
@@ -1957,7 +1958,7 @@ internal static class Program
         && ConsoleReportOffer.IsWaiting(current);
 
     /// <summary>
-    /// The donate line a Delete or Move held back for the end of the run
+    /// The tip line a Delete or Move held back for the end of the run
     /// (<see cref="RunReport.DonationHeld"/>), printed after the report question and what
     /// followed it, so it is the last thing the run prints. A report offer ended by Ctrl+C,
     /// or a Ctrl+C that has come by then, leaves the line out: the cancellation stays the

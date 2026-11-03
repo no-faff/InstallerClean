@@ -174,7 +174,7 @@
        window, as Action.Done does on every other card, and like Done it has the
        focus and answers Enter when the card appears. Its access key must differ
        from Action.Donate's, the two being on that card together. -->
-  <data name="Action.CloseWithoutDonating" xml:space="preserve"><value>Bağış yapmadan _kapat</value></data>
+  <data name="Action.CloseWithoutDonating" xml:space="preserve"><value>Bahşiş bırakmadan _kapat</value></data>
   <!-- The label on both delete surfaces: the main window's button and the
        confirmation dialog's. It says "permanently" because Delete here does
        not mean what Delete means elsewhere in Windows, and the label is the
@@ -187,18 +187,25 @@
        keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Tamam</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Ayrıntılar</value></data>
-  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Bağış yap</value></data>
-  <!-- The label on the large donate button on the completion card after a Move or
+  <!-- The label on the large tip button on the completion card after a Move or
        Delete that moved or deleted files, where it and Action.CloseWithoutDonating
-       stand in place of Done. The amount is in US dollars, written the way the
-       language writes a dollar amount. Its access key must differ from
-       Action.CloseWithoutDonating's, the two being on that card together. -->
-  <data name="Action.Donate" xml:space="preserve"><value>3 $ _bağış yap</value></data>
-  <!-- The label on the small donate button under Done, on every completion card
-       that carries Done. It takes no access key: Done is on screen beside it. The
-       button shows this text as written, so an underscore here would appear on
-       screen rather than become one. -->
-  <data name="Action.DonateSmall" xml:space="preserve"><value>Bağış yap</value></data>
+       stand in place of Done. It opens the tip page and closes the card. A tip here
+       is what somebody leaves for a person's work, not a donation to a charity, so a
+       translation uses the word its language uses for tipping a creator, the same
+       word in every tip string, and names no amount. Its access key must differ
+       from Action.CloseWithoutDonating's, the two being on that card together. -->
+  <data name="Action.Donate" xml:space="preserve"><value>_Bahşiş bırak</value></data>
+  <!-- The label on the small tip button under Done, on every completion card
+       that carries Done. It opens the tip page and leaves the card up. It takes
+       no access key: Done is on screen beside it. The button shows this text as
+       written, so an underscore here would appear on screen rather than become
+       one. -->
+  <data name="Action.DonateSmall" xml:space="preserve"><value>Bahşiş bırak</value></data>
+  <!-- The label on the tip pill beside the star in the About window. It opens the
+       tip page. Its access key must differ from those of About.AutoUpdateCheck,
+       Action.Licence, Action.LeaveStarOnGitHub and Action.Close, all of them being
+       in that window together. -->
+  <data name="Action.LeaveATip" xml:space="preserve"><value>_Bahşiş bırak</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub'da _yıldız bırak</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 lisansı</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Taşı</value></data>
@@ -227,19 +234,19 @@
   </data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <!-- The About window's own star and donate buttons. The value says what the
+  <!-- The About window's own star and tip buttons. The value says what the
        button says on screen: a window name in the spoken value would be an
        internal note read out to somebody who can only be in that window to hear
        it. -->
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Bağış yap</value></data>
+  <data name="Automation.LeaveATip.About" xml:space="preserve"><value>Bahşiş bırak</value></data>
   <!-- The spoken name of the button Action.Donate labels. Its content is a heart
        beside a label rather than a string, so WPF derives no name from it and
        this is the name; it says what the button says on screen, without the
        access-key marker. -->
-  <data name="Automation.Donate" xml:space="preserve"><value>3 $ bağış yap</value></data>
+  <data name="Automation.Donate" xml:space="preserve"><value>Bahşiş bırak</value></data>
   <!-- The spoken name of the button Action.DonateSmall labels, for the same
        reason as Automation.Donate's. -->
-  <data name="Automation.DonateSmall" xml:space="preserve"><value>Bağış yap</value></data>
+  <data name="Automation.DonateSmall" xml:space="preserve"><value>Bahşiş bırak</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>İşlemi iptal et</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Taramayı iptal et</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Başlangıç taramasını iptal et</value></data>
@@ -399,9 +406,9 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Bu klasörü açıklar ve bir dosyanın nasıl kurtarılacağını README'de anlatır</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve">
-    <value>Küçük de olsa her bağış çok makbule geçer</value>
-    <comment>Tooltip and screen-reader help on the About window's donate pill. The button it hangs on already reads Donate (Action.BuyMeACuppa), so the tooltip says what the ask is rather than naming the action a second time. The tooltip is one sentence and carries no closing full stop.</comment>
+  <data name="Tooltip.LeaveATip.About" xml:space="preserve">
+    <value>Her bahşiş çok makbule geçer</value>
+    <comment>Tooltip and screen-reader help on the About window's tip pill. The button it hangs on already reads Leave a tip (Action.LeaveATip), so the tooltip says what the ask is rather than naming the action a second time. The tooltip is one sentence and carries no closing full stop.</comment>
   </data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>İptal istendi. InstallerClean, geçerli adımın durabileceği bir noktaya gelmesini bekliyor. Yoğun G/Ç sırasında ya da bir MSI veritabanı çağrısında bu birkaç saniye sürebilir.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Kapat</value></data>
@@ -951,8 +958,8 @@ Geri koymak için, halihazırda sahip olduğunuz sürümün kurulum programına 
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} kalıcı olarak silindi</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} kalıcı olarak silindi</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
-    <value>Küçük de olsa her bağış çok makbule geçer</value>
-    <comment>Tooltip and screen-reader help on the small donate button under Done (Action.DonateSmall), which stands on every completion card that carries Done, including a scan that found nothing to clean up. Keep it plain, with no word putting the reader under an obligation. The tooltip is one sentence and carries no closing full stop.</comment>
+    <value>Her bahşiş çok makbule geçer</value>
+    <comment>Tooltip and screen-reader help on the small tip button under Done (Action.DonateSmall), which stands on every completion card that carries Done, including a scan that found nothing to clean up. Keep it plain, with no word putting the reader under an obligation. The tooltip is one sentence and carries no closing full stop.</comment>
   </data>
   <data name="Completion.SendReport" xml:space="preserve">
     <value>_Anonim rapor gönder</value>
@@ -2369,9 +2376,8 @@ InstallerClean'i yönetici olarak yeniden çalıştırın.</value></data>
   <data name="Cli.MoveRestoreHint" xml:space="preserve"><value>Programlarınızın hâlâ normal şekilde güncellendiğini ve kaldırıldığını doğrulayın, sonra {0} klasörünü silin.</value></data>
   <!-- The last line of a Delete that deleted files or a Move that moved files, after
        a blank line, printed only to a console somebody is watching and never to the
-       Application log. 0 = the donation page's address, printed as written. The
-       amount is in US dollars, written the way the language writes a dollar amount. -->
-  <data name="Cli.DonateAsk" xml:space="preserve"><value>InstallerClean ücretsizdir. İşinize yaradıysa lütfen 3 $ bağış yapın: {0}</value></data>
+       Application log. 0 = the tip page's address, printed as written. -->
+  <data name="Cli.DonateAsk" xml:space="preserve"><value>InstallerClean ücretsizdir. İşinize yaradıysa bir bahşiş çok makbule geçer: {0}</value></data>
   <!-- The command line's update, printed before the scan where a newer version is out.
        The question follows UpdateNotice.Available, and is asked only where a person can see
        it and answer it. 0 = the letter for yes, shown

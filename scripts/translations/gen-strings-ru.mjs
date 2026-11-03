@@ -109,9 +109,9 @@ const MAP = {
   'Action.DeletePermanently': `_Удалить безвозвратно`,
   'Action.Done': `_Готово`,
   'Action.Details': `Подробности`,
-  'Action.BuyMeACuppa': `_Поддержать`,
-  'Action.Donate': `_Поддержать на 3 \$`,
-  'Action.DonateSmall': `Поддержать`,
+  'Action.LeaveATip': `_Оставить чаевые`,
+  'Action.Donate': `_Оставить чаевые`,
+  'Action.DonateSmall': `Оставить чаевые`,
   'Action.LeaveStarOnGitHub': `Поставить з_везду на GitHub`,
   'Action.Licence': `Лицензия Apache 2.0`,
   'Action.Move': `_Переместить`,
@@ -121,9 +121,9 @@ const MAP = {
   'Action.Rescan': `По_вторить сканирование`,
 
   // Automation names (screen reader / accessibility)
-  'Automation.BuyMeACuppa.About': `Поддержать`,
-  'Automation.Donate': `Поддержать на 3 \$`,
-  'Automation.DonateSmall': `Поддержать`,
+  'Automation.LeaveATip.About': `Оставить чаевые`,
+  'Automation.Donate': `Оставить чаевые`,
+  'Automation.DonateSmall': `Оставить чаевые`,
   // The three Cancel names are built on the noun Отмена rather than the verb
   // Отменить, which share only a root: WCAG 2.5.3 (Label in Name) asks that a
   // control's spoken name contain the word drawn on it, so speech input can
@@ -169,7 +169,7 @@ const MAP = {
   'Automation.RegisteredMissingSeeAlso': `Объясняет эту папку и то, как восстановить файл, в README`,
 
   // Tooltips
-  'Tooltip.BuyMeACuppa.About': `Любая, даже небольшая, поддержка очень ценна`,
+  'Tooltip.LeaveATip.About': `Любые чаевые очень ценны`,
   'Tooltip.CancellingPending': `Запрошена отмена. InstallerClean ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI.`,
   'Tooltip.Close': `Закрыть`,
   'Tooltip.LeaveStarOnGitHub.About': `Звезда помогает другим найти InstallerClean`,
@@ -425,7 +425,7 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прочитал {2} {3}, а затем прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прочитал {2} {3}, а затем прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
-  'Completion.DonateAsk': `Любая, даже небольшая, поддержка очень ценна`,
+  'Completion.DonateAsk': `Любые чаевые очень ценны`,
   'About.Link.Guide': `Руководство и частые вопросы`,
   'About.Link.ReportProblem': `Сообщить о проблеме`,
   'About.AutoUpdateCheck': `Автоматически проверять обновления`,
@@ -493,7 +493,7 @@ const MAP = {
   'Summary.ScanSignal.Other': `Когда началось сканирование, у Windows Installer что-то выполнялось или ожидало, поэтому InstallerClean удержал файлы в {InstallerFolder}, которые не названы в записях ни одной установленной программы, вместо того чтобы предложить их. Когда это разрешится, нажмите «Повторить сканирование».`,
   'Summary.ScanSignal.ClockSetBack': `Во время сканирования часы этого компьютера ушли назад или отстали, поэтому InstallerClean удержал файлы в {InstallerFolder}, которые не названы в записях ни одной установленной программы, вместо того чтобы предложить их. Нажмите «Повторить сканирование».`,
   'Display.DriveName': `диск {0}`,
-  'Action.CloseWithoutDonating': `_Закрыть без поддержки`,
+  'Action.CloseWithoutDonating': `_Закрыть без чаевых`,
   'Tooltip.Donate': `Вообще-то за InstallerClean стоило бы брать деньги: на него ушло огромное количество труда. Но я хочу, чтобы он оставался бесплатным и помогал как можно большему числу людей. Ваша поддержка придаёт всему этому смысл, и я очень за неё благодарен.`,
   'Completion.SendReport': `Отправить _анонимный отчёт`,
   'Completion.ReportPanel.Intro': `Отчёт добавляет ваш результат в [этот график] на GitHub, который показывает, сколько места люди освобождают с помощью InstallerClean. В нём есть и эти технические сведения, которые помогают мне находить ошибки:`,
@@ -715,7 +715,7 @@ const CLI = {
   'Cli.SourceGivenUp.Drive': `InstallerClean перестал ждать диск {0} и оставил без изменений все файлы, которые ещё нужно было сверить с ним. Когда он начнёт отвечать нормально, запустите команду снова.`,
   'Cli.SourceGivenUp.Path': `InstallerClean перестал ждать {0} и оставил без изменений все файлы, которые ещё нужно было сверить с тем, что там находится. Когда доступ станет нормальным, запустите команду снова.`,
   'Cli.SourcesGivenUp': `InstallerClean перестал ждать несколько дисков или сетевых ресурсов ({0}) и оставил без изменений все файлы, которые ещё нужно было сверить с одним из них. Когда они начнут отвечать нормально, запустите команду снова.`,
-  'Cli.DonateAsk': `InstallerClean бесплатен. Если он помог, пожалуйста, поддержите его на 3 \$: {0}`,
+  'Cli.DonateAsk': `InstallerClean бесплатен. Если он помог, чаевые будут очень кстати: {0}`,
   'Cli.UpdatePrompt': `Обновить сейчас? Настоятельно рекомендуется использовать последнюю версию. [{0}/{1}]`,
   'Cli.UpdateAnswerYes': `Д`,
   'Cli.UpdateAnswerNo': `Н`,
