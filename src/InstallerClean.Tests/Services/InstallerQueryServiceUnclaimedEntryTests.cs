@@ -418,6 +418,26 @@ public class InstallerQueryServiceUnclaimedEntryTests
     }
 
     [Fact]
+    public async Task A_patch_an_installation_holds_stays_a_claim_where_a_keys_listing_names_it_too()
+    {
+        // The recovery lists a second program, and asked about the patch by its code it
+        // answers that it holds it applied. That answer is a claim on the file. The listing
+        // of a key no installation accounts for names the same patch, and it does not turn
+        // the claim into a hold.
+        var msi = MachineWithAnUnlistedProgram();
+        msi.SetPatchProperty(Superseded, Recovered, "State", "1");
+        msi.SetPatchProperty(Superseded, Recovered, "LocalPackage", SupersededFile);
+
+        var result = await Scan(msi, UnlistedProgramFallback(
+            new RegistryProductEntry(MachineAccount, Unlisted, [Superseded]),
+            new RegistryProductEntry(MachineAccount, Recovered, [Superseded])));
+
+        Assert.Equal(1, result.Census.RecoveredProductCount);
+        AssertKeptOnAClaim(Row(result));
+        Assert.False(Row(result).WithheldOnUnlistedKey);
+    }
+
+    [Fact]
     public async Task A_listing_not_naming_the_patch_marks_nothing()
     {
         var msi = MachineWithAnUnlistedProgram();

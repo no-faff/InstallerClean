@@ -1107,14 +1107,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         WithholdOnRegistryPackageRecords(claimed, patchClaims, fallback.PackageRecords);
-        var unlistedEntries = UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered));
-        WithholdOnUnlistedEntries(
-            claimed, patchClaims, fallback.PackageRecords, unlistedEntries, fallback.Failures > 0);
 
         var heldByName = new List<PatchClaim>();
         ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered,
             fallback.Reach, fallback.ProductPatchSets, apiPatchSets, ct, unreadPatchFileLog,
             heldByName);
+
+        // After the confirmation pass, so a row an installation it asked holds stays that
+        // installation's claim, and a key's listing takes the verdict only from rows still removable.
+        var unlistedEntries = UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered));
+        WithholdOnUnlistedEntries(
+            claimed, patchClaims, fallback.PackageRecords, unlistedEntries, fallback.Failures > 0);
 
         // Both sources degraded at once: the scan is refused outright rather than
         // reported short.
