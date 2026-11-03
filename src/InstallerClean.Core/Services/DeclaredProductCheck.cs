@@ -233,7 +233,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             // put to the product keys no installation accounts for.
             if (!outcomes[i].Withholds())
                 outcomes[i] = PutToUnlistedKeys(
-                    candidate.FullPath, code, outcomes[i], pass, namesAFileInInstallerFolder, out givenUp);
+                    candidate.FullPath, code, outcomes[i], pass, namesAFileInInstallerFolder, recordRefusal,
+                    out givenUp);
 
             // A file kept where its check stopped at a read refused for a root given up
             // counts towards that root. A patch reads no source folder, so it never does.
@@ -3372,12 +3373,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         DeclaredProductOutcome letThrough,
         PassAnswers pass,
         Func<string, bool?>? namesAFileInInstallerFolder,
+        Action<Exception, string>? recordRefusal,
         out string? givenUp)
     {
         givenUp = null;
         if (pass.UnlistedKeys.Count == 0) return letThrough;
 
-        var read = pass.UnlistedRead ??= ReadUnlistedKeys(pass, namesAFileInInstallerFolder);
+        var read = pass.UnlistedRead ??= ReadUnlistedKeys(pass, namesAFileInInstallerFolder, recordRefusal);
 
         if (read.Codes.Contains(code))
             return pass.KeptForAKey(DeclaredProductOutcome.Unestablished, withInstallProperties: true);
@@ -3450,8 +3452,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///
     /// A KEY WITHOUT ONE gives only the package at a folder on its source list
     /// (<see cref="AddPackagesAtLocalSources"/>).
+    ///
+    /// Where a key keeps every installation package, the log says why once, for the first such
+    /// key, as <see cref="LinksOf"/> does for a listed installation.
     /// </summary>
-    private UnlistedKeysRead ReadUnlistedKeys(PassAnswers pass, Func<string, bool?>? namesAFileInInstallerFolder)
+    private UnlistedKeysRead ReadUnlistedKeys(
+        PassAnswers pass, Func<string, bool?>? namesAFileInInstallerFolder, Action<Exception, string>? recordRefusal)
     {
         var codes = new HashSet<string>(StringComparer.Ordinal);
         var packages = new List<FileIdentity>();
@@ -3460,6 +3466,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var notAllSeen = false;
         var keptOtherwise = false;
         string? firstGivenUp = null;
+        string? why = null;
 
         foreach (var key in pass.UnlistedKeys)
         {
@@ -3478,8 +3485,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             var recordsNone = key.CachedPackages.Count == 0 && RecordsNoCachedPackage(properties);
 
             var cachedSaid = key.CachedPackages.Count > 0 || recordsNone;
+            var cachedUnsaid = cachedSaid
+                ? null
+                : "its InstallProperties key did not show that it records no cached package";
             foreach (var path in key.CachedPackages)
-                if (!AddCachedPackage(path, packages, codes)) cachedSaid = false;
+            {
+                if (AddCachedPackage(path, packages, codes, out var unsaid)) continue;
+
+                cachedSaid = false;
+                cachedUnsaid ??= unsaid;
+            }
 
             var sourcesSeen = AddRegistrySources(
                 key, properties, recordsNone, pass, namesAFileInInstallerFolder, packages, byName, out var givenUp);
@@ -3489,7 +3504,21 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             notAllSeen = true;
             if (!cachedSaid || givenUp is null) keptOtherwise = true;
             else firstGivenUp ??= givenUp;
+
+            why ??= !cachedSaid
+                ? cachedUnsaid
+                : recordsNone
+                    ? "it records no cached package, no source list names its package, and the folder it was "
+                      + "installed from could not be ruled out as the Installer folder"
+                    : "it records a cached package, and its sources could not all be read";
         }
+
+        if (why is not null)
+            recordRefusal?.Invoke(
+                new InvalidOperationException(
+                    "A product key no installation Windows lists accounts for did not show which package it "
+                    + "opens, so every installation package is kept rather than offered. Detail: " + why + "."),
+                why);
 
         return new UnlistedKeysRead(
             codes, packages, byName.Select(package => package.Name).ToHashSet(StringComparer.Ordinal),
@@ -3498,17 +3527,27 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
     /// <summary>
     /// The identity of the cached package at <paramref name="path"/> and the product code it
-    /// declares. False where it is gone, will not read or declares no product code.
+    /// declares. False where it is gone, will not read or declares no product code, with
+    /// <paramref name="unsaid"/> saying which for the log.
     /// </summary>
-    private bool AddCachedPackage(string path, List<FileIdentity> packages, HashSet<string> codes)
+    private bool AddCachedPackage(string path, List<FileIdentity> packages, HashSet<string> codes, out string? unsaid)
     {
+        unsaid = "the cached package it records could not be identified";
         if (_fileIdentities is null
             || _fileIdentities.ReadOutcome(path, out var identity) != FileIdentityRead.Read)
             return false;
 
-        var declared = _identityReader.Read(path, isPatch: false, out _);
-        if (declared is null || declared.Value.Code.Length == 0 || declared.Value.IsPatch) return false;
+        var declared = _identityReader.Read(path, isPatch: false, out var detail);
+        if (declared is null || declared.Value.Code.Length == 0 || declared.Value.IsPatch)
+        {
+            unsaid = declared is null
+                ? "the cached package it records did not yield a product code. Reader detail: "
+                  + (detail.Length == 0 ? "none given" : detail)
+                : "the cached package it records is not an installation package declaring a product code";
+            return false;
+        }
 
+        unsaid = null;
         packages.Add(identity);
         codes.Add(declared.Value.Code);
         return true;

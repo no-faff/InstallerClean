@@ -123,12 +123,13 @@ public class DeclaredProductCheckUnlistedKeyTests
         public DeclaredProductOutcome[] Screen(IReadOnlyList<UnlistedProductKey> keys, params OrphanedFile[] files) =>
             ScreeningOf(keys, files).Outcomes.ToArray();
 
-        public DeclaredProductScreening ScreeningOf(IReadOnlyList<UnlistedProductKey> keys, OrphanedFile[] files) =>
+        public DeclaredProductScreening ScreeningOf(
+            IReadOnlyList<UnlistedProductKey> keys, OrphanedFile[] files, Action<Exception, string>? recordRefusal = null) =>
             new DeclaredProductCheck(Msi, Packages, Files, Disk, Registry, null)
             {
                 DriveKindOf = _ => DriveType.Fixed,
                 NamesInFolderOf = path => [path[(path.LastIndexOf('\\') + 1)..]],
-            }.Screen(files, [], keys, default, null, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
+            }.Screen(files, [], keys, default, recordRefusal, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
     }
 
     private const DeclaredProductOutcome LetThrough = DeclaredProductOutcome.DeclaredProductNotInstalled;
@@ -272,6 +273,57 @@ public class DeclaredProductCheckUnlistedKeyTests
         Assert.Equal(
             [DeclaredProductOutcome.Unestablished, LetThrough],
             pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_keeping_every_file_is_logged_once_for_the_pass_with_why()
+    {
+        var pc = new Pc();
+        pc.Files.Answers(Cached, FileIdentityRead.NamesNothing);
+        var recorded = new List<(Exception Error, string Detail)>();
+
+        var check = pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (ex, detail) => recorded.Add((ex, detail)));
+
+        Assert.Equal(
+            [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished],
+            check.Outcomes);
+        var entry = Assert.Single(recorded);
+        Assert.Equal("the cached package it records could not be identified", entry.Detail);
+        Assert.Contains("every installation package is kept rather than offered", entry.Error.Message);
+        Assert.DoesNotContain(Cached, entry.Error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void A_key_whose_sources_will_not_read_is_logged_as_that()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.Registry.Answers(MachineList(KeyCode), RegistryKeyPresence.Unreadable);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(["it records a cached package, and its sources could not all be read"], recorded);
+    }
+
+    [Fact]
+    public void A_key_that_shows_its_package_logs_nothing()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Empty(recorded);
     }
 
     [Fact]
