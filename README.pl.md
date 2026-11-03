@@ -208,7 +208,7 @@ Mimo wszystko aplikacja zachęca, żeby przenieść pliki do folderu kopii zapas
 Trzy warianty, wybierz jeden:
 
 - **Portable** (`InstallerClean-portable.exe`): jeden plik ze środowiskiem uruchomieniowym .NET 10 w środku. Bez instalacji, bez deinstalatora: kliknij dwa razy i działa. Zachowaj plik na następny raz albo usuń go, gdy skończysz.
-- **Setup** (`InstallerClean-3.5.0-setup.exe`): zwykły instalator Windows z dołączonym środowiskiem uruchomieniowym .NET 10. Dodaje wpis w menu Start i odinstalowuje się czysto. Schowany wśród programów, więc łatwo go znaleźć za pół roku albo uruchamiać częściej, jeśli dużo instalujesz i odinstalowujesz.
+- **Setup** (`InstallerClean-3.6.0-setup.exe`): zwykły instalator Windows z dołączonym środowiskiem uruchomieniowym .NET 10. Dodaje wpis w menu Start i odinstalowuje się czysto. Schowany wśród programów, więc łatwo go znaleźć za pół roku albo uruchamiać częściej, jeśli dużo instalujesz i odinstalowujesz.
 - **CLI** (`installerclean-cli.exe`): sama wersja wiersza poleceń, jeden plik ze środowiskiem uruchomieniowym w środku. Bez instalacji, bez deinstalatora. Wrzuć go na komputer kliencki, uruchom skanowanie albo czyszczenie, usuń. Stworzony do skryptowania, zaplanowanych zadań i masowego wdrażania, gdy chcesz wykonać operacje bez aplikacji desktopowej na komputerze klienta. Zob. [Wiersz poleceń](#wiersz-poleceń), aby poznać argumenty i kody wyjścia.
 
 Od wersji 2.2.0 nazwy plików instalatora i wersji przenośnej zawierają numer wersji, więc pobrana kopia zawsze mówi, czym jest; wersja wiersza poleceń zachowuje zwykłą nazwę `installerclean-cli.exe`, żeby zaplanowane zadania i skrypty, które na nią wskazują, działały dalej mimo aktualizacji.
