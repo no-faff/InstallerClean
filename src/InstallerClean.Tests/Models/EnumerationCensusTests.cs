@@ -157,10 +157,10 @@ public class EnumerationCensusTests
     }
 
     /// <summary>
-    /// The census members the RegistryProductUnaskable withholding leg fires on. Two, and they are not one
-    /// kind of finding: a product the registry names that Windows would not say was
-    /// installed, and a registry product key whose name yields no code. Nothing shows
-    /// either was asked its InstanceType or whether it holds a patch.
+    /// The census members the RegistryProductUnaskable withholding leg fires on, which
+    /// are not one kind of finding: a product the registry names that Windows would not
+    /// say was installed, and a registry product key whose name yields no code. Nothing
+    /// shows either was asked its InstanceType or whether it holds a patch.
     ///
     /// <see cref="EnumerationCensus.RecoveredProductCount"/> IS DELIBERATELY ABSENT and
     /// is this list's trap, for the reason the attempts count is the other list's. A

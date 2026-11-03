@@ -112,9 +112,9 @@ namespace InstallerClean.Models;
 /// could not match to a program it asks about, and a recorded path it could not settle. The
 /// two passes that judge a patch against its products set it on a machine-wide list of patch
 /// registrations that did not run to its end, wherever they withhold the row while that list
-/// is short. The pass over the product keys no installation accounts for sets it on such a
-/// key whose patch listing was not established, and on a failed read of the registry's
-/// product and patch records.
+/// is short. The pass over the product keys no installation accounts for sets it on every
+/// row it withholds where such a key's patch listing was not established, or where a read of
+/// the registry's product and patch records failed.
 ///
 /// A row withheld for a reason about its own patch alone, or downgraded on a claim, never
 /// carries it. It separates the superseded files a condition on the whole machine holds back

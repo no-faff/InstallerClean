@@ -1797,7 +1797,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// The patch's rows are found through a claim and through a package record alike, so a row
     /// either one names for the patch is held, and the listing holds with no record of the
-    /// patch's own. Leave either out and a row only the other names stays removable.
+    /// patch's own. Reading both is what holds a row only one of them names.
     ///
     /// A LISTING NOT ESTABLISHED MAY NAME ANY PATCH, and with
     /// <paramref name="registryReadFailed"/> a key that would not read may be an unlisted

@@ -32,10 +32,10 @@ public interface IInstallerQueryService
     /// <remarks>
     /// The result also reports whether the enumeration read every product it lists. Where
     /// it did not, no row comes back removable: a verdict that no product still needs a
-    /// file cannot be drawn from a product set short of a member. A product key the walks
-    /// do not list is judged from the registry's records alone: a superseded patch its
-    /// listing names comes back withheld, and every superseded patch does where such a
-    /// listing, or any read of those records, did not settle
+    /// file cannot be drawn from a product set short of a member. A product key no
+    /// installation accounts for keeps what its own listing names: a removable patch the
+    /// listing names comes back withheld. Every removable patch does where such a listing
+    /// was not established, or a read of Windows Installer's records in the registry failed
     /// (<see cref="InstallerQueryResult.UnlistedProductKeys"/>).
     /// Every consumer of a removable verdict therefore inherits the withholding by
     /// consuming this method, including the act-time re-verify, which is the same call.
