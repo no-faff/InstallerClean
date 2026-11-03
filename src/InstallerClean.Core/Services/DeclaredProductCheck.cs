@@ -3470,6 +3470,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// SUCH A KEY LEAVES A SECOND COPY NOT RULED OUT, WHICH KEEPS EVERY INSTALLATION PACKAGE:
     /// - where a cached package it records does not say what it is;
     /// - where it records one and its sources will not read;
+    /// - where it records one, has no source list, and was installed from a folder not shown not
+    ///   to be the Installer folder;
     /// - where its <c>InstallProperties</c> key will not read, or holds a cached package value
     ///   with no path in it, by the test a listed installation is put to
     ///   (<see cref="RecordsNoCachedPackage"/>);
@@ -3605,7 +3607,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <paramref name="unsaid"/> saying which for the log, in the words
     /// <see cref="CodeTheCachedPackageDeclares"/> gives a listed installation's wherever it has
     /// them. Only a file that is there and cannot be identified has words of its own, because a
-    /// listed installation's cached package is not read for its identity.
+    /// listed installation's cached package is checked for being there and never put to the
+    /// file-identity reader.
     /// </summary>
     private bool AddCachedPackage(string path, List<FileIdentity> packages, HashSet<string> codes, out string? unsaid)
     {

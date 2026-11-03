@@ -215,9 +215,8 @@ public interface IDeclaredProductCheck
     /// entries for the listed installations and for the product keys no installation accounts
     /// for are written at most once for the pass each, about every installation package the step
     /// keeps. Handed in by the scan that owns the crash log for the run rather than made here, so
-    /// a test calling this pass directly
-    /// has no run and writes nothing. A delegate rather than the log itself because
-    /// this interface is public and that type is not.
+    /// a test calling this pass directly has no run and writes nothing. A delegate rather than
+    /// the log itself because this interface is public and that type is not.
     /// </param>
     /// <param name="namesAFileInInstallerFolder">
     /// Whether a path, once the kernel has expanded it, names a file directly in the
