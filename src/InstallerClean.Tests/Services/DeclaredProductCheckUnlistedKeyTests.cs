@@ -701,6 +701,57 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
+    public void A_key_whose_account_hive_is_not_loaded_beside_a_managed_list_naming_a_package_keeps_every_file()
+    {
+        var pc = new Pc(User);
+        pc.Registry.HiveIs(User, RegistryKeyPresence.Absent);
+        pc.InstalledFrom(Folder, User);
+        pc.HasList(ManagedList(User, KeyCode), "a.msi", Setup);
+        pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed(User)], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_whose_other_list_will_not_read_and_whose_InstallSource_expands_to_the_Installer_folder_keeps_every_file()
+    {
+        Environment.SetEnvironmentVariable(RootVariable, @"C:\Windows");
+        try
+        {
+            var pc = new Pc();
+            pc.InstalledFrom("%" + RootVariable + @"%\Installer\", kind: RegistryValueKind.ExpandString);
+            pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+            pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+            pc.Registry.Answers(HiveList(System, KeyCode), RegistryKeyPresence.Unreadable);
+
+            Assert.Equal(EveryFileKept, pc.Screen([Installed()], Package(First), Package(Second)));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(RootVariable, null);
+        }
+    }
+
+    [Fact]
+    public void An_unread_list_beside_an_earlier_folder_that_did_not_settle_names_both()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+        pc.Files.Answers(Setup + "a.msi", FileIdentityRead.OpenRefused);
+        pc.Registry.Answers(HiveList(System, KeyCode), RegistryKeyPresence.Unreadable);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(ReasonIn(detail)));
+
+        Assert.Equal(
+            ["the key records no cached package, a source list could not be read, its key not reading or its "
+             + "account's hive not loaded, and the folder it was installed from is the Installer folder; also, a "
+             + "package at a folder on its source list could not be ruled out"],
+            recorded);
+    }
+
+    [Fact]
     public void A_key_installed_from_another_folder_whose_other_list_will_not_read_keeps_only_what_its_name_reaches()
     {
         var pc = new Pc();
