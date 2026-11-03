@@ -121,9 +121,11 @@ namespace InstallerClean.Models;
 /// a downgrade on a claim. It separates the superseded files a condition on the whole
 /// machine holds back from those held back for a reason about the one file, which is what
 /// <see cref="ScanResult.SupersededScanWideWithheldCount"/> counts. It records where the cause
-/// lies, not whether the cause bears on this file: several of these conditions can hide a
-/// holder of this very patch, a machine-wide list of patch registrations that did not run to
-/// its end among them. It decides nothing.
+/// lies, not whether the cause bears on this file. A recorded path the scan could not settle,
+/// a machine-wide list of patch registrations that did not run to its end, a key's patch
+/// listing not established and a failed read of the registry's records can each stand for a
+/// holder of this very patch; a program entry the scan could not check and a cached patch
+/// file it could not match name no holder of it. It decides nothing.
 /// </param>
 /// <param name="OtherHoldNotRuledOut">
 /// Something besides a superseded or obsoleted registration of a patch holds this file, or

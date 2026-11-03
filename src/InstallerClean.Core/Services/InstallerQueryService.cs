@@ -1442,7 +1442,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // on a run whose machine-wide patch enumeration did not answer, which downgrades
         // them with no unread-file marker set (see ConfirmRemovableAgainstEveryProduct).
         // Unlike a product or a cached patch file this loop fires on, that condition bears
-        // on the patch itself: a holder of it may have gone unseen. A superseded file that
+        // on the patch itself: a holder of it may have gone unseen. (So can a recorded path
+        // this loop fires on, whose registration reaches the split through the row it lands
+        // on, as above.) A superseded file that
         // read cleanly when the pass above opened it, and had gone by the time the scan
         // looked for it on the disk, is one way such a row reaches the split from this
         // loop.
