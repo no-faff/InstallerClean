@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.5.0-blue" alt="Versione di GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-122k-brightgreen" alt="Download totali"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-123k-brightgreen" alt="Download totali"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,10 +37,10 @@
 
 - **Cosa fa:** InstallerClean fa una cosa sola: rimuove i file non necessari da `C:\Windows\Installer`, una cartella nascosta che si riempie man mano che installi e aggiorni software. Dopo una scansione rapida ti dice se ne hai, mostra qualche dettaglio in più per i curiosi e ti lascia spostarli altrove oppure eliminarli per liberare spazio sull'unità C:.
 - **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. In quel caso InstallerClean è proprio quello che ti serve. Sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice rapidamente quali puoi rimuovere in sicurezza.
-- **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi inviati dall'app (grazie a tutti). Del <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,8 GB<!-- reports-median-end -->. Sono file di cui probabilmente non conoscevi l'esistenza e che stanno lì a occupare spazio. Il <!-- reports-over5gb-start -->22,3%<!-- reports-over5gb-end --> di *tutti* i computer ha recuperato più di 5 GB, e molte persone hanno liberato centinaia di GB. In sostanza, più software basato su MSI installi, più file non necessari avrai. Appena esegui InstallerClean, lo scoprirai.
+- **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi inviati dall'app (grazie a tutti). Del <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Sono file di cui probabilmente non conoscevi l'esistenza e che stanno lì a occupare spazio. Il <!-- reports-over5gb-start -->22,3%<!-- reports-over5gb-end --> di *tutti* i computer ha recuperato più di 5 GB, e molte persone hanno liberato centinaia di GB. In sostanza, più software basato su MSI installi, più file non necessari avrai. Appena esegui InstallerClean, lo scoprirai.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Clicca per vedere</kbd> come sarebbe il grafico se i rapporti fossero un'immagine esatta di tutti i 122.796 download</summary>
+  <summary><kbd>Clicca per vedere</kbd> come sarebbe il grafico se i rapporti fossero un'immagine esatta di tutti i 123.054 download</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-it-scaled-dark.svg" />
@@ -237,7 +237,7 @@ InstallerClean non è firmato. Ecco cosa puoi controllare prima di eseguirlo:
 - VirusTotal: ogni build viene analizzata prima di uscire, e la pagina della versione riporta il risultato completo motore per motore di ogni file scaricabile.
 - Il codice sorgente è qui, su [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). I servizi di scansione, interrogazione, spostamento, eliminazione, impostazioni e riavvio in sospeso sono coperti da una suite di test automatici che gira su Windows a ogni push su `main` e a ogni pull request, e il badge CI in cima a questa pagina ne riporta l'esito.
 - Le build di rilascio sono deterministiche: lo stesso codice sorgente, lo stesso SDK e gli stessi parametri di pubblicazione producono gli stessi byte, e non si può assegnare il tag a una versione a meno che ogni elemento in ingresso della build non corrisponda al codice sorgente di quel tag. Puoi quindi fare il checkout del tag, compilare tu stesso e confrontare gli hash con quelli pubblicati. Le note di ogni versione portano quello che ti serve per farlo: la versione dell'SDK con cui è stata compilata, e i parametri di pubblicazione di ogni file scaricabile che non sia stato compilato con quelli predefiniti. Il setup è l'eccezione: lo compila Inno Setup e non l'SDK, e ci stampa dentro l'anno di compilazione, quindi per riprodurne l'hash servono anche la stessa versione di Inno e lo stesso anno di calendario.
-- <!-- downloads-start -->122.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
+- <!-- downloads-start -->123.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prova ogni invio in una macchina virtuale e pubblica solo quelli che superano la loro revisione.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificato 100% pulito da MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) lo ha esaminato e lo ha certificato privo di spyware, adware e virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Premio «100% gratuito» di Softpedia, certificato senza spyware, senza adware e senza virus" width="190"></a>
 
