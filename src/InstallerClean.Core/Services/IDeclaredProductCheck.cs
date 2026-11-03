@@ -118,7 +118,8 @@ namespace InstallerClean.Services;
 /// not to be the Installer folder; and where a key recording none was installed from the
 /// Installer folder with no source list naming its package or with a source list that did not
 /// read. A key without one keeps the package its source list names at a folder on that list,
-/// read by identity, a folder compared by name excepted. Where keys of either kind give a
+/// read by identity, a folder compared by name excepted, and every installation package where
+/// the check has no way to read source lists. Where keys of either kind give a
 /// package to compare with, a file whose own identity will not read is kept. A patch file is
 /// kept where a key's <c>Patches</c> listing names it or was not established. All of this
 /// comes off the registry, so it keeps a file and never releases one.
@@ -671,7 +672,8 @@ public enum DeclaredProductOutcome
     /// package has sources that will not read, or has no source list and was installed from a
     /// folder not shown not to be the Installer folder; and where a key recording none was
     /// installed from the Installer folder with no source list naming its package or with a
-    /// source list that did not read.
+    /// source list that did not read. A key without an <c>InstallProperties</c> key gives it
+    /// where the check has no way to read source lists.
     ///
     /// Where a single installation's packages cannot all be seen it covers what
     /// <see cref="DeclaredProductInstalled"/> covers for one: a cached package that will

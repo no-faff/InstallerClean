@@ -1137,6 +1137,42 @@ public class DeclaredProductCheckUnlistedKeyTests
         Assert.Equal([LetThrough, LetThrough], pc.Screen([NoProperties()], Package(First), Package(Second)));
     }
 
+    [Theory]
+    [InlineData("registry reader")]
+    [InlineData("file-identity reader")]
+    [InlineData("test for a file in the Installer folder")]
+    public void A_key_with_no_InstallProperties_keeps_every_file_where_the_check_cannot_read_its_list(string missing)
+    {
+        var pc = new Pc();
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        var check = new DeclaredProductCheck(
+            pc.Msi, pc.Packages, missing == "file-identity reader" ? null : pc.Files, pc.Disk,
+            missing == "registry reader" ? null : pc.Registry, null)
+        {
+            DriveKindOf = _ => DriveType.Fixed,
+            NamesInFolderOf = path => [path[(path.LastIndexOf('\\') + 1)..]],
+        };
+
+        var screening = check.Screen(
+            [Package(First), Package(Second)], [], [NoProperties()], default, null,
+            missing == "test for a file in the Installer folder" ? null : InInstallerFolder,
+            isTheInstallerFolder: pc.IsTheInstallerFolder);
+
+        Assert.Equal(EveryFileKept, screening.Outcomes);
+        Assert.Equal(new UnlistedKeyHolds(0, 2), screening.UnlistedHolds);
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_the_check_reads_keeps_nothing_it_does_not_open()
+    {
+        var pc = new Pc();
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
     [Fact]
     public void A_key_with_no_InstallProperties_reads_its_package_by_the_rules_of_every_source_read()
     {

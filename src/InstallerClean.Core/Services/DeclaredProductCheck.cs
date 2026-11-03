@@ -3386,8 +3386,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <summary>
     /// An installation package <paramref name="letThrough"/> would let through, put to the
     /// product keys no installation accounts for (<see cref="ReadUnlistedKeys"/>): a candidate
-    /// declaring a code they give is kept; where they leave a second copy not ruled out every
-    /// candidate is kept; where they give a package to compare with, a candidate whose own
+    /// declaring a code they give is kept; where they leave a second copy not ruled out, or the
+    /// check has no way to read the source lists of a key without an <c>InstallProperties</c>
+    /// key, every candidate is kept; where they give a package to compare with, a candidate whose own
     /// identity will not read is kept; and a candidate that is a package they open, or that a
     /// package name reaches (<see cref="ReachedByName"/>), is kept. Each file kept is counted
     /// for the kind of key that kept it (<see cref="PassAnswers.KeptForAKey"/>), a key with an
@@ -3417,6 +3418,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             givenUp = read.GivenUp;
             return pass.KeptForAKey(DeclaredProductOutcome.SecondCopyUnestablished, withInstallProperties: true);
         }
+
+        if (read.KeysWithoutUnread)
+            return pass.KeptForAKey(DeclaredProductOutcome.SecondCopyUnestablished, withInstallProperties: false);
 
         var comparedWith = read.Packages.Count > 0 || read.PackageNames.Count > 0;
         if ((!comparedWith && read.PackagesOfKeysWithout.Count == 0) || _fileIdentities is null)
@@ -3484,6 +3488,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///
     /// A KEY WITHOUT ONE gives only the package it names at a folder on its source list, read by
     /// identity, a folder compared by name excepted (<see cref="AddPackagesAtListedFolders"/>).
+    /// Where the check has no way to read source lists, such a key keeps every installation
+    /// package.
     ///
     /// Where a key keeps every installation package, the log says why once, for the first such
     /// key, as <see cref="LinksOf"/> does for a listed installation.
@@ -3496,6 +3502,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var advertised = new List<FileIdentity>();
         var byName = new List<PackageByName>();
         var notAllSeen = false;
+        var keysWithoutUnread = false;
         var keptOtherwise = false;
         string? firstGivenUp = null;
         string? why = null;
@@ -3506,7 +3513,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             if (!key.HasInstallProperties)
             {
-                AddPackagesAtListedFolders(key, pass, namesAFileInInstallerFolder, advertised);
+                if (!AddPackagesAtListedFolders(key, pass, namesAFileInInstallerFolder, advertised))
+                    keysWithoutUnread = true;
                 continue;
             }
 
@@ -3553,7 +3561,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         return new UnlistedKeysRead(
             codes, packages, byName.Select(package => package.Name).ToHashSet(StringComparer.Ordinal),
-            advertised, notAllSeen, keptOtherwise ? null : firstGivenUp);
+            advertised, notAllSeen, keptOtherwise ? null : firstGivenUp, keysWithoutUnread);
     }
 
     /// <summary>
@@ -3821,15 +3829,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// list, by identity, a folder on a drive or share compared by name excepted. A candidate
     /// that is that package is kept, and this is the one way such a key keeps an installation
     /// package. A patch file its <c>Patches</c> listing could name is kept by
-    /// <see cref="PutPatchToUnlistedKeys"/>.
+    /// <see cref="PutPatchToUnlistedKeys"/>. False, with nothing read, where the check has no
+    /// way to read a source list, and every installation package is then kept for the key.
     /// </summary>
-    private void AddPackagesAtListedFolders(
+    private bool AddPackagesAtListedFolders(
         UnlistedProductKey key,
         PassAnswers pass,
         Func<string, bool?>? namesAFileInInstallerFolder,
         List<FileIdentity> packages)
     {
-        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return;
+        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return false;
 
         foreach (var (sid, context) in SourceListPlaces(key.Account))
         {
@@ -3847,6 +3856,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     packages.Add(read);
             }
         }
+
+        return true;
     }
 
     /// <summary>
@@ -4366,13 +4377,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Where <paramref name="NotAllSeen"/> is true only because reads were refused for roots
     /// given up for the pass, the first of those roots, and null otherwise.
     /// </param>
+    /// <param name="KeysWithoutUnread">
+    /// Whether the check had no way to read the source lists of a key without an
+    /// <c>InstallProperties</c> key (<see cref="AddPackagesAtListedFolders"/>), which keeps every
+    /// installation package.
+    /// </param>
     private sealed record UnlistedKeysRead(
         HashSet<string> Codes,
         List<FileIdentity> Packages,
         HashSet<string> PackageNames,
         List<FileIdentity> PackagesOfKeysWithout,
         bool NotAllSeen,
-        string? GivenUp);
+        string? GivenUp,
+        bool KeysWithoutUnread);
 
     /// <summary>
     /// What the <c>Patches</c> listings of a set of product keys say
