@@ -1202,10 +1202,10 @@ public class InstallerQueryServiceUnitTests
     // ---- The abandonment breadcrumb is budgeted ----
     //
     // What makes it one entry per product is a property of the registration, not
-    // of a product: an account the patch enumeration refuses as input refuses
-    // every index for every product recorded under it. crash.log holds 512 KB
-    // with a single archive, and each of these carries a message and a stack
-    // trace, so the machine that most needs its crash history is the one whose
+    // of a product: where the patch enumeration refuses an account as input, it
+    // refuses every index for every product recorded under that account. crash.log
+    // holds 512 KB with a single archive, and each of these carries a message and a
+    // stack trace, so the machine that most needs its crash history is the one whose
     // history this evicts.
 
     /// <summary>
@@ -2170,11 +2170,11 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
-    public async Task A_failing_fallback_with_a_clean_enumeration_scans_and_holds_every_superseded_patch()
+    public async Task A_failing_fallback_with_a_clean_enumeration_scans_and_holds_every_removable_patch()
     {
         // The scan goes ahead, because the API read every product cleanly. A key in
         // UserData that would not read may be the only record of a program no walk
-        // lists, whose listing could name the patch, so every superseded patch is held
+        // lists, whose listing could name the patch, so every removable patch is held
         // back, scan wide.
         const string dead = @"C:\Windows\Installer\fallback-noise.msp";
         var msi = new FakeMsiApi();

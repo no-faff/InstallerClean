@@ -808,8 +808,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         // Budgeted, because the abandonment breadcrumb is one full entry per
         // product and its trigger is a property of the registration rather than
-        // of one product: an account the patch enumeration refuses as input refuses
-        // every index for every product recorded under it. Each entry
+        // of one product: where the patch enumeration refuses an account as input, it
+        // refuses every index for every product recorded under that account. Each entry
         // carries a real message and stack trace, so a machine in that state
         // spends crash.log on near-identical copies of one already-recorded
         // condition, which is the very history a report of it would need.
