@@ -2380,8 +2380,8 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
   <data name="Cli.DonateAsk" xml:space="preserve"><value>InstallerClean은 무료입니다. 도움이 되었다면 후원해 주시면 정말 감사하겠습니다: {0}</value></data>
   <!-- The command line's update, printed before the scan where a newer version is out.
        The question follows UpdateNotice.Available, and is asked only where a person can see
-       it and answer it. 0 = the letter for yes, shown
-       in capitals because Enter answers yes; 1 = the letter for no, in lower case. Both
+       it and answer it. 0 = the letter for yes and
+       1 = the letter for no, both in lower case, as neither is a default. Both
        come from Cli.UpdateAnswerYes and Cli.UpdateAnswerNo, so the brackets always show
        the letters the reader takes. -->
   <data name="Cli.UpdatePrompt" xml:space="preserve"><value>지금 업데이트할까요? 최신 버전을 사용할 것을 강력히 권장합니다. [{0}/{1}]</value></data>

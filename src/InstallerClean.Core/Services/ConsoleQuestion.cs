@@ -6,7 +6,7 @@ namespace InstallerClean.Services;
 /// <summary>How a question put to the console was answered.</summary>
 internal enum ConsoleAnswer
 {
-    /// <summary>Enter, or an answer starting with this language's letter for yes or with Y.</summary>
+    /// <summary>An answer starting with this language's letter for yes or with Y.</summary>
     Yes,
 
     /// <summary>An answer starting with this language's letter for no or with N, or the end of input.</summary>
@@ -18,7 +18,7 @@ internal enum ConsoleAnswer
     /// <summary>Nothing was answered within <see cref="ConsoleQuestion.AnswerBound"/>.</summary>
     TimedOut,
 
-    /// <summary>Anything else, which the caller reads or asks again.</summary>
+    /// <summary>Anything else, an empty answer included, which the caller reads or asks again.</summary>
     Other,
 }
 
@@ -37,10 +37,12 @@ internal static class ConsoleQuestion
     internal static readonly TimeSpan AnswerBound = TimeSpan.FromMinutes(1);
 
     /// <summary>
-    /// Prints the question and reads one answer. <paramref name="prompt"/> builds the
-    /// question from the letters shown in its brackets: this language's letter for yes in
-    /// capitals, since Enter answers yes, and its letter for no in lower case
-    /// (<c>Cli.UpdateAnswerYes</c> and <c>Cli.UpdateAnswerNo</c>). The read is handed the
+    /// Discards what was typed before the question appears, prints the question and reads
+    /// one answer, so nothing typed once the question is on screen is lost. <paramref name="prompt"/> builds the question from the letters shown in its
+    /// brackets, this language's letters for yes and for no, both in lower case
+    /// (<c>Cli.UpdateAnswerYes</c> and <c>Cli.UpdateAnswerNo</c>). Neither is a default:
+    /// an empty answer is <see cref="ConsoleAnswer.Other"/>, so an Enter pressed while a
+    /// scan ran, or one pressed at the question, answers nothing. The read is handed the
     /// token and ends as it is cancelled, by Ctrl+C or by the console being closed, and
     /// the answer is then <see cref="ConsoleAnswer.Cancelled"/>. The end of input is
     /// <see cref="ConsoleAnswer.No"/>, unless the token is cancelled while the question
@@ -56,8 +58,9 @@ internal static class ConsoleQuestion
     {
         var yes = Strings.Cli_UpdateAnswerYes.Trim();
         var no = Strings.Cli_UpdateAnswerNo.Trim();
+        console.DiscardTypedAhead();
         console.Write(prompt(
-            yes.ToUpper(CultureInfo.CurrentUICulture), no.ToLower(CultureInfo.CurrentUICulture)) + " ");
+            yes.ToLower(CultureInfo.CurrentUICulture), no.ToLower(CultureInfo.CurrentUICulture)) + " ");
         string? line;
         using (var bound = CancellationTokenSource.CreateLinkedTokenSource(token))
         {
@@ -74,7 +77,7 @@ internal static class ConsoleQuestion
         answer = line?.Trim() ?? string.Empty;
         if (token.IsCancellationRequested) return ConsoleAnswer.Cancelled;
         if (line is null) return ConsoleAnswer.No;
-        if (answer.Length == 0 || StartsWith(answer, yes) || StartsWith(answer, "Y")) return ConsoleAnswer.Yes;
+        if (StartsWith(answer, yes) || StartsWith(answer, "Y")) return ConsoleAnswer.Yes;
         if (StartsWith(answer, no) || StartsWith(answer, "N")) return ConsoleAnswer.No;
         return ConsoleAnswer.Other;
 

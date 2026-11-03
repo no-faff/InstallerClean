@@ -42,10 +42,10 @@ internal sealed class ConsoleReportOffer(
     TimeSpan answerBound)
 {
     /// <summary>
-    /// Saves <paramref name="entry"/> and asks whether to send it. Enter or Y, or this
-    /// language's letter for yes, sends; N or its letter for no does not; a question
-    /// mark prints what the report holds and the report itself, then asks again;
-    /// anything else asks again. The end of input is no, unless the token is cancelled
+    /// Saves <paramref name="entry"/> and asks whether to send it. Y, or this language's
+    /// letter for yes, sends; N or its letter for no does not; a question mark prints what
+    /// the report holds and the report itself, then asks again; anything else, an empty
+    /// answer included, asks again. The end of input is no, unless the token is cancelled
     /// within the bound this offer was given for it, since Ctrl+C at the prompt can
     /// itself be read as the end of input. Nothing answered within the bound this offer was
     /// given for an answer is no, said as such. Where the report cannot be saved nothing is

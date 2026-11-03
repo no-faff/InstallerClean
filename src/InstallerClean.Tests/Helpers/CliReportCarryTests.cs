@@ -580,6 +580,8 @@ public class CliReportCarryTests
 
         public void Write(string text) => Console.Write(text);
 
+        public void DiscardTypedAhead() { }
+
         public string? ReadLine(CancellationToken token)
         {
             cancelling?.Cancel();
@@ -595,6 +597,8 @@ public class CliReportCarryTests
         public void WriteLine(string line) { }
 
         public void Write(string text) { }
+
+        public void DiscardTypedAhead() { }
 
         public string? ReadLine(CancellationToken token) => _next < answers.Length ? answers[_next++] : null;
     }

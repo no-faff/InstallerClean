@@ -57,6 +57,43 @@ internal sealed class ConsoleUpdateHost(string arg, Func<InstanceLock>? newLock 
     public void Write(string text) => Console.Write(text);
 
     /// <summary>
+    /// Empties the console's input buffer where standard input is the console, so key
+    /// presses typed during a scan do not answer the question that follows. A question is
+    /// put only where input is not redirected (Program.ConsoleCanAsk); the check here keeps
+    /// a redirected input's lines, which are answers somebody wrote on purpose, safe from
+    /// any later caller. A read already waiting from an earlier question has taken its
+    /// keys from the buffer itself, so this reaches only keys no read has started on. A
+    /// failure is recorded in crash.log once a process, as the question is asked again
+    /// and would record the same failure each time, and the question is asked anyway.
+    /// </summary>
+    public void DiscardTypedAhead()
+    {
+        try
+        {
+            if (Console.IsInputRedirected) return;
+            var input = Interop.Native.Kernel32.GetStdHandle(Interop.Native.Kernel32.STD_INPUT_HANDLE);
+            if (input == IntPtr.Zero || input == new IntPtr(-1))
+            {
+                NoteDiscardFailed(new InvalidOperationException("Standard input has no console handle to empty."));
+                return;
+            }
+            if (!Interop.Native.Kernel32.FlushConsoleInputBuffer(input))
+                NoteDiscardFailed(new System.ComponentModel.Win32Exception());
+        }
+        catch (Exception ex)
+        {
+            NoteDiscardFailed(ex);
+        }
+    }
+
+    private static int s_discardFailureNoted;
+
+    private static void NoteDiscardFailed(Exception ex)
+    {
+        if (Interlocked.Exchange(ref s_discardFailureNoted, 1) == 0) CrashLog.TryWrite(ex);
+    }
+
+    /// <summary>
     /// Reads a line on a thread of its own and waits for it or for <paramref name="token"/>.
     /// A console being closed cancels the token and leaves the read waiting, so the run goes
     /// on to end as cancelled while the read is left to end with the process. A later read

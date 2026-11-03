@@ -23,7 +23,6 @@ public class ConsoleReportOfferTests
         5, "GB", ReportHost.CommandLine, AppCopyKind.CommandLineDownload);
 
     [Theory]
-    [InlineData("")]
     [InlineData("y")]
     [InlineData("Y")]
     [InlineData("  yes ")]
@@ -38,6 +37,28 @@ public class ConsoleReportOfferTests
         Assert.True(rig.Settings.State.HasSentResultLog);
         Assert.False(rig.Settings.State.ReportSendPending);
         Assert.Equal(Strings.Cli_ReportSent, rig.Console.Lines[^1]);
+    }
+
+    [Fact]
+    public void An_empty_answer_is_not_yes_and_the_question_is_asked_again()
+    {
+        var rig = new Rig("", "n");
+
+        var outcome = rig.Offer();
+
+        Assert.Equal(ReportOfferOutcome.Declined, outcome);
+        Assert.Equal(2, rig.Console.Writes.Count);
+        rig.Log.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public void Keys_typed_before_the_question_are_discarded_before_it_is_printed()
+    {
+        var rig = new Rig("n");
+
+        rig.Offer();
+
+        Assert.Equal(["discard", "write", "read"], rig.Console.Steps);
     }
 
     [Theory]
@@ -81,7 +102,7 @@ public class ConsoleReportOfferTests
         rig.Log.Received(1).WriteAsync(Entry, Arg.Any<CancellationToken>());
         var question = Assert.Single(rig.Console.Writes);
         Assert.Contains(ReportPath, question);
-        Assert.Contains("[" + Strings.Cli_UpdateAnswerYes.Trim().ToUpper() + "/"
+        Assert.Contains("[" + Strings.Cli_UpdateAnswerYes.Trim().ToLower() + "/"
             + Strings.Cli_UpdateAnswerNo.Trim().ToLower() + "/?]", question);
     }
 
@@ -354,10 +375,20 @@ public class ConsoleReportOfferTests
 
         public void WriteLine(string line) => Lines.Add(line);
 
-        public void Write(string text) => Writes.Add(text);
+        public void Write(string text)
+        {
+            Steps.Add("write");
+            Writes.Add(text);
+        }
+
+        /// <summary>What happened at the console, in order: "write", "discard" or "read".</summary>
+        public List<string> Steps { get; } = [];
+
+        public void DiscardTypedAhead() => Steps.Add("discard");
 
         public string? ReadLine(CancellationToken token)
         {
+            Steps.Add("read");
             rig.OnRead?.Invoke();
             var answer = _next < answers.Length ? answers[_next++] : null;
             if (answer != NoAnswer) return answer;

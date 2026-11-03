@@ -837,6 +837,24 @@ internal static partial class Kernel32
     public static partial bool SetDefaultDllDirectories(uint directoryFlags);
 
     /// <summary>
+    /// The process's standard input, output or error handle, as <paramref name="nStdHandle"/>
+    /// names it (<see cref="STD_INPUT_HANDLE"/>). Not to be closed: the process owns it.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "GetStdHandle", SetLastError = true)]
+    public static partial IntPtr GetStdHandle(int nStdHandle);
+
+    /// <summary>What <see cref="GetStdHandle"/> takes for standard input.</summary>
+    public const int STD_INPUT_HANDLE = -10;
+
+    /// <summary>
+    /// Discards every input record waiting in a console's input buffer: key presses typed
+    /// before a read starts. Fails on a handle that is not a console's input.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "FlushConsoleInputBuffer", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool FlushConsoleInputBuffer(IntPtr hConsoleInput);
+
+    /// <summary>
     /// The least access <see cref="QueryFullProcessImageName"/> needs, asked for in place
     /// of fuller access a process of another account can refuse.
     /// </summary>

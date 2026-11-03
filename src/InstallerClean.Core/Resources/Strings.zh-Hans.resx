@@ -2380,8 +2380,8 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <data name="Cli.DonateAsk" xml:space="preserve"><value>InstallerClean 是免费的。如果它帮到了您，欢迎打赏，非常感谢：{0}</value></data>
   <!-- The command line's update, printed before the scan where a newer version is out.
        The question follows UpdateNotice.Available, and is asked only where a person can see
-       it and answer it. 0 = the letter for yes, shown
-       in capitals because Enter answers yes; 1 = the letter for no, in lower case. Both
+       it and answer it. 0 = the letter for yes and
+       1 = the letter for no, both in lower case, as neither is a default. Both
        come from Cli.UpdateAnswerYes and Cli.UpdateAnswerNo, so the brackets always show
        the letters the reader takes. -->
   <data name="Cli.UpdatePrompt" xml:space="preserve"><value>立即更新？强烈建议使用最新版本。[{0}/{1}]</value></data>
