@@ -157,7 +157,7 @@ public class EnumerationCensusTests
     }
 
     /// <summary>
-    /// The census members the third withholding leg fires on. Two, and they are not one
+    /// The census members the RegistryProductUnaskable withholding leg fires on. Two, and they are not one
     /// kind of finding: a product the registry names that Windows would not say was
     /// installed, and a registry product key whose name yields no code. Nothing shows
     /// either was asked its InstanceType or whether it holds a patch.

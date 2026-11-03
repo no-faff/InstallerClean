@@ -122,9 +122,9 @@ public record InstallerQueryResult(
 /// plus the shape facts one enumeration can see, carried separately so a report
 /// never has to state one cause for a quantity built from several.
 ///
-/// THE FIELDS THAT DECIDE ANYTHING ARE READ THROUGH THE PROPERTIES AT THE END,
-/// <see cref="AnyRecordedPathUnestablished"/>, <see cref="RegistryProductUnaskable"/> and
-/// <see cref="RegistryRecordsUnread"/>, and the rest decide nothing. A count
+/// THE FIELDS THAT DECIDE ANYTHING ARE READ THROUGH <see cref="AnyRecordedPathUnestablished"/>,
+/// <see cref="RegistryProductUnaskable"/> and <see cref="RegistryRecordsUnread"/>, and the
+/// rest decide nothing except through them. A count
 /// that gained a consumer anywhere else would be a second, quieter copy of a rule
 /// that already exists in one place.
 ///
@@ -592,8 +592,8 @@ public readonly record struct EnumerationCensus(
     /// Whether the registry names a product this scan could not put a question to by
     /// name: a code Windows would not say was installed
     /// (<see cref="UnansweredProductCount"/>), or a product key whose name yields no code
-    /// (<see cref="UnparseableProductKeyNames"/>). THE ONE THING THE THIRD WITHHOLDING LEG
-    /// FIRES ON, and it is here rather than in the service that acts on it for the reason
+    /// (<see cref="UnparseableProductKeyNames"/>). THE ONE THING THE WITHHOLDING LEG OF THE
+    /// SAME NAME FIRES ON, and it is here rather than in the service that acts on it for the reason
     /// <see cref="AnyRecordedPathUnestablished"/> is: a rule that named the members itself
     /// would be one edit away from silently not acting on a member added later, with a
     /// green build and a counter still reporting.
@@ -644,6 +644,11 @@ public readonly record struct EnumerationCensus(
     /// list of keys no installation accounts for can be short with nothing else showing it
     /// (<see cref="InstallerQueryResult.UnlistedProductKeys"/>). So nothing shows what such
     /// a key would have kept.
+    ///
+    /// THE SUPERSEDED HALF READS THE SAME COUNT AT ITS SOURCE. The enumeration withholds every
+    /// still-removable superseded row on a failed read before this census is built, from the
+    /// registry read's own tally (<c>InstallerQueryService.WithholdOnUnlistedEntries</c>). Widen
+    /// what this property fires on and that call has to widen with it.
     /// </summary>
     public bool RegistryRecordsUnread => RegistryKeyReadFailures > 0;
 }

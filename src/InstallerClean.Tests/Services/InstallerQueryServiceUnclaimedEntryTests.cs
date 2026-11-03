@@ -347,7 +347,8 @@ public class InstallerQueryServiceUnclaimedEntryTests
     [Fact]
     public async Task The_hold_needs_no_record_of_the_patch_only_the_programs_listing()
     {
-        // The registry holds the program's listing and no record of the patch's own.
+        // The registry holds the program's listing and no record of the patch's own, so the
+        // listing is the only thing naming the patch, and it holds the row.
         var msi = MachineWithAnUnlistedProgram();
 
         var result = await Scan(msi, UnlistedProgramFallback(

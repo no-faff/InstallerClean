@@ -33,9 +33,10 @@ public interface IInstallerQueryService
     /// The result also reports whether the enumeration read every product it lists. Where
     /// it did not, no row comes back removable: a verdict that no product still needs a
     /// file cannot be drawn from a product set short of a member. A product key the walks
-    /// do not list is read off the registry instead, and a superseded patch its listing
-    /// names comes back withheld, as does every one where such a listing or any read of
-    /// those records did not settle (<see cref="InstallerQueryResult.UnlistedProductKeys"/>).
+    /// do not list is judged from the registry's records alone: a superseded patch its
+    /// listing names comes back withheld, and every superseded patch does where such a
+    /// listing, or any read of those records, did not settle
+    /// (<see cref="InstallerQueryResult.UnlistedProductKeys"/>).
     /// Every consumer of a removable verdict therefore inherits the withholding by
     /// consuming this method, including the act-time re-verify, which is the same call.
     /// </remarks>

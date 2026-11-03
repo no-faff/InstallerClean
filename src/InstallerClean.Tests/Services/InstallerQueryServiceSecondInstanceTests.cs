@@ -26,7 +26,7 @@ namespace InstallerClean.Tests.Services;
 /// AND THE PRODUCTS NOTHING SHOWS WERE ASKED. A product the registry names that Windows
 /// would not say is installed is never recovered, so it is never put the question, and
 /// a registry key whose name yields no code cannot be matched to any product that was.
-/// The third withholding leg reads both counts, and two fixtures are those two states.
+/// The RegistryProductUnaskable withholding leg reads both counts, and two fixtures are those two states.
 ///
 /// READ WHAT EACH FIXTURE SETS UP. Every one of them differs from its neighbour in a
 /// single reading, so a count that moved for any other reason would show up as the
