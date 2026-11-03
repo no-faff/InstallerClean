@@ -19,8 +19,8 @@
            Moving and deleting need them to write to the Installer folder, and the scan
            needs them to read Windows Installer's records: it asks about products and
            patches across every account on the machine, which Microsoft documents as
-           needing administrator privileges, and a product the registry names that the
-           answers include no installation of is read off the registry.
+           needing administrator privileges. A product key no installation in those
+           answers accounts for, matched by account and code, is read off the registry.
 
            Windows can still start the tool without the rights, a compatibility setting
            being one way, so Program.Run also checks its own token (AdministratorRights)
