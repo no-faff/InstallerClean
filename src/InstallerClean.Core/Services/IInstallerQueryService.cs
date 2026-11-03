@@ -29,8 +29,7 @@ public interface IInstallerQueryService
     /// superseded, obsoleted) and an <c>IsRemovable</c> flag set only where
     /// Windows reports the patch superseded, its own <c>Uninstallable</c> reads
     /// zero and nothing on any product sharing it could roll back onto its file
-    /// (<see cref="RegisteredPackage.ProductPatchSetVerdict"/>). The remarks below
-    /// name conditions that take the flag off as well.
+    /// (<see cref="RegisteredPackage.ProductPatchSetVerdict"/>).
     /// </summary>
     /// <remarks>
     /// The result also reports whether the enumeration read every product it lists. Where

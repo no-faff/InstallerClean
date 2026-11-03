@@ -122,13 +122,14 @@ public record InstallerQueryResult(
 /// plus the shape facts one enumeration can see, carried separately so a report
 /// never has to state one cause for a quantity built from several.
 ///
-/// WHAT DECIDES ON THESE FIELDS. Three withholding legs read a property each:
+/// WHAT DECIDES ON THESE FIELDS. Three of the withholding legs read a property each:
 /// <see cref="AnyRecordedPathUnestablished"/>, <see cref="RegistryProductUnaskable"/> and
-/// <see cref="RegistryRecordsUnread"/>. The enumeration's scan-wide loop reads the first.
-/// The enumeration refuses a scan, and withholds every removable row, on its own tallies of
-/// counts this census records, taken before the census is built. The command line chooses
-/// its Application-log notice on <see cref="InstallerQueryResult.UnaccountedProductCount"/>,
-/// the sum of three of these counts, and where that is nought on
+/// <see cref="RegistryRecordsUnread"/>. The enumeration decides on its own tallies of counts
+/// this census records: its refusal of a scan, its pass over the product keys no
+/// installation accounts for, and its scan-wide loop, which reads
+/// <see cref="AnyRecordedPathUnestablished"/> beside them. The command line chooses its
+/// Application-log notice on <see cref="ScanResult.UnaccountedProductCount"/>, the sum of
+/// three of these counts, and where that is nought on
 /// <see cref="UnattributedPatchFileCount"/>. The other fields are carried for the report
 /// and decide nothing. A new reader outside the enumeration that decides on one of these
 /// counts reads the property carrying its rule, and a count with no such property gets one
