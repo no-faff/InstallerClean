@@ -1194,7 +1194,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (!ComparesRecordedPackages)
         {
             reading = CachedPackageReading.NoReaders;
-            detail = "no way to read a cached package";
+            detail = NoReadersDetail;
             return null;
         }
 
@@ -1218,7 +1218,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (!_fileSystem!.File.Exists(path))
         {
             reading = CachedPackageReading.NotThere;
-            detail = "the cached package is not a file that is there";
+            detail = NotThereDetail;
             return null;
         }
 
@@ -1255,6 +1255,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
     /// <summary>What the log says of a cached package that declares no product code.</summary>
     private const string NoProductCodeDetail = "the cached package declares no product code";
+
+    /// <summary>What the log says where the check has no way to read a cached package.</summary>
+    private const string NoReadersDetail = "no way to read a cached package";
+
+    /// <summary>What the log says of a recorded cached package that is not a file that is there.</summary>
+    private const string NotThereDetail = "the cached package is not a file that is there";
 
     /// <summary>What an installation's cached package gave (<see cref="CodeTheCachedPackageDeclares"/>).</summary>
     private enum CachedPackageReading
@@ -3497,7 +3503,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             var cachedSaid = key.CachedPackages.Count > 0 || recordsNone;
             var cachedUnsaid = cachedSaid
                 ? null
-                : "the key's InstallProperties key would not read, or holds a cached package value naming no file";
+                : "the key's InstallProperties key would not read, or holds a cached package value the scan read "
+                  + "no path from";
             foreach (var path in key.CachedPackages)
             {
                 if (AddCachedPackage(path, packages, codes, out var unsaid)) continue;
@@ -3516,7 +3523,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             if (!cachedSaid || givenUp is null) keptOtherwise = true;
             else firstGivenUp ??= givenUp;
 
-            why ??= cachedSaid ? sourcesUnsaid : cachedUnsaid;
+            // Every false answer above carries its reason. The fallback keeps the entry written
+            // should one not.
+            why ??= (cachedSaid ? sourcesUnsaid : cachedUnsaid) ?? "a read of the key did not settle";
         }
 
         if (why is not null)
@@ -3535,13 +3544,15 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// The identity of the cached package at <paramref name="path"/> and the product code it
     /// declares. False where it is gone, will not read or declares no product code, with
     /// <paramref name="unsaid"/> saying which for the log, in the words
-    /// <see cref="CodeTheCachedPackageDeclares"/> gives a listed installation's.
+    /// <see cref="CodeTheCachedPackageDeclares"/> gives a listed installation's wherever it has
+    /// them. Only a file that is there and cannot be identified has words of its own, the listed
+    /// path reading no identity.
     /// </summary>
     private bool AddCachedPackage(string path, List<FileIdentity> packages, HashSet<string> codes, out string? unsaid)
     {
         if (_fileIdentities is null)
         {
-            unsaid = "no way to read a cached package";
+            unsaid = NoReadersDetail;
             return false;
         }
 
@@ -3549,7 +3560,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (outcome != FileIdentityRead.Read)
         {
             unsaid = outcome == FileIdentityRead.NamesNothing
-                ? "the cached package is not a file that is there"
+                ? NotThereDetail
                 : "the cached package could not be identified";
             return false;
         }
@@ -3627,7 +3638,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var allRead = RecordedInstallSource(properties, out var installSource);
         var keptOtherwise = !allRead;
         string? firstGivenUp = null;
-        string? firstUnsaid = allRead ? null : "the key's InstallSource is in a form the check does not compare";
+        string? firstUnsaid = allRead ? null
+            : properties.Presence is RegistryKeyPresence.Present or RegistryKeyPresence.Absent
+                ? "the key's InstallSource is in a form the check does not compare"
+                : "the key's InstallProperties key would not read";
 
         void NotRead(string? root, string why)
         {
@@ -3686,7 +3700,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 if (!WasInstalledFromTheInstallerFolder(installSource, properties, pass)) return true;
 
                 unsaid = "the key records no cached package, no source list that read names its package, and the "
-                    + "folder it was installed from is the Installer folder";
+                    + "folder it was installed from is the Installer folder"
+                    + (firstUnsaid is null ? string.Empty : "; also, " + firstUnsaid);
                 return false;
             }
 
@@ -3698,9 +3713,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             return true;
         }
 
-        if (!listFound && installSource.Length > 0 && !IsNotTheInstallerFolder(installSource, pass, out var folderGivenUp))
-            NotRead(folderGivenUp, "the key has no source list, and the folder it was installed from could not be "
-                + "ruled out as the Installer folder");
+        if (!listFound && installSource.Length > 0 && InstallerFolderAnswer(installSource, pass) is { IsIt: not false } installedFrom)
+            NotRead(installedFrom.GivenUp, installedFrom.IsIt == true
+                ? "the key has no source list, and the folder it was installed from is the Installer folder"
+                : "the key has no source list, and the folder it was installed from could not be ruled out as the "
+                  + "Installer folder");
 
         givenUp = keptOtherwise ? null : firstGivenUp;
         unsaid = firstUnsaid;

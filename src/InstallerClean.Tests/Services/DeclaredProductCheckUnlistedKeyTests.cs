@@ -354,7 +354,8 @@ public class DeclaredProductCheckUnlistedKeyTests
             [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished],
             check.Outcomes);
         Assert.Equal(
-            ["the key's InstallProperties key would not read, or holds a cached package value naming no file"],
+            ["the key's InstallProperties key would not read, or holds a cached package value the scan read no "
+             + "path from"],
             recorded);
     }
 
@@ -387,8 +388,105 @@ public class DeclaredProductCheckUnlistedKeyTests
             (_, detail) => recorded.Add(detail));
 
         Assert.Equal(
+            ["the key has no source list, and the folder it was installed from is the Installer folder"], recorded);
+    }
+
+    [Fact]
+    public void A_key_with_no_list_whose_install_folder_the_test_cannot_answer_is_logged_as_not_ruled_out()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(Setup);
+        pc.IsTheInstallerFolder = _ => null;
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(
             ["the key has no source list, and the folder it was installed from could not be ruled out as the "
              + "Installer folder"],
+            recorded);
+    }
+
+    [Fact]
+    public void A_key_recording_a_cached_package_whose_InstallProperties_will_not_read_is_logged_as_that()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.Registry.Answers(Properties(System, KeyCode), RegistryKeyPresence.Unreadable);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(["the key's InstallProperties key would not read"], recorded);
+    }
+
+    [Fact]
+    public void A_key_whose_InstallSource_names_a_variable_is_logged_as_a_form_not_compared()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(@"%SystemRoot%\Installer\");
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(["the key's InstallSource is in a form the check does not compare"], recorded);
+    }
+
+    [Fact]
+    public void A_key_whose_list_holds_a_folder_naming_a_variable_is_logged_as_a_form_not_compared()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.HasList(MachineList(KeyCode), SetupName, @"%SystemRoot%\Installer\");
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(["a source list holds a value in a form the check does not compare"], recorded);
+    }
+
+    [Fact]
+    public void A_cached_package_that_is_there_and_will_not_identify_is_logged_as_that()
+    {
+        var pc = new Pc();
+        pc.Files.Answers(Cached, FileIdentityRead.OpenRefused);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(["the cached package could not be identified"], recorded);
+    }
+
+    [Fact]
+    public void An_Installer_folder_hold_after_a_list_that_would_not_read_names_both()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        pc.Registry.Answers(MachineList(KeyCode), RegistryKeyPresence.Unreadable);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(
+            ["the key records no cached package, no source list that read names its package, and the folder it "
+             + "was installed from is the Installer folder; also, a source list could not be read, its key not "
+             + "reading or its account's hive not loaded"],
             recorded);
     }
 
