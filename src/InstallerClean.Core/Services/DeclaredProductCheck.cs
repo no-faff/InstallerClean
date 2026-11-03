@@ -3475,7 +3475,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// the one it opens.
     ///
     /// A KEY WITHOUT ONE gives only the package at a folder on its source list
-    /// (<see cref="AddPackagesAtLocalSources"/>).
+    /// (<see cref="AddPackagesAtListedFolders"/>).
     ///
     /// Where a key keeps every installation package, the log says why once, for the first such
     /// key, as <see cref="LinksOf"/> does for a listed installation.
@@ -3498,7 +3498,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             if (!key.HasInstallProperties)
             {
-                AddPackagesAtLocalSources(key, pass, namesAFileInInstallerFolder, advertised);
+                AddPackagesAtListedFolders(key, pass, namesAFileInInstallerFolder, advertised);
                 continue;
             }
 
@@ -3783,7 +3783,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// list, by identity, a folder on a drive or share compared by name excepted. A candidate
     /// that is that package is kept, and this is the one way such a key keeps a file.
     /// </summary>
-    private void AddPackagesAtLocalSources(
+    private void AddPackagesAtListedFolders(
         UnlistedProductKey key,
         PassAnswers pass,
         Func<string, bool?>? namesAFileInInstallerFolder,
