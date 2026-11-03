@@ -320,7 +320,7 @@ public class ScanProgressAgainstTheScanTests
                 Arg.Any<Func<string, bool?>?>())
             .Returns(call =>
             {
-                var waitingOn = call.ArgAt<Action<SourceFolderWait?>?>(6);
+                var waitingOn = call.Args().OfType<Action<SourceFolderWait?>>().Single();
                 waitingOn?.Invoke(onD);
                 waitingOn?.Invoke(null);
                 return new DeclaredProductScreening(

@@ -4,57 +4,62 @@ namespace InstallerClean.Tests.Models;
 
 /// <summary>
 /// The expressions that decide whether the walk-derived offer is withheld wholesale,
-/// pinned over every combination of their three conditions.
+/// pinned over every combination of their four conditions.
 ///
-/// THE TABLE IS WRITTEN OUT BY HAND AND NOT COMPUTED. Eight rows, each carrying the
+/// THE TABLE IS WRITTEN OUT BY HAND AND NOT COMPUTED. Sixteen rows, each carrying the
 /// legs it expects and the verdict it expects, all as literals. A test that worked
 /// out its expectation from the thing under test would agree with itself over any
 /// behaviour at all, and the assertions would look exactly the same. This is the one
 /// place a reader can check what the gate does without reading the gate.
 ///
-/// WHAT IT IS FOR IS THE WIRING AND NOT THE ARITHMETIC. The three conditions are one
+/// WHAT IT IS FOR IS THE WIRING AND NOT THE ARITHMETIC. The four conditions are one
 /// call that the gate and the host explaining it both read, and this table says what
-/// that call answers. It is also what a fourth condition has to be added to, which is
+/// that call answers. It is also what a fifth condition has to be added to, which is
 /// the point at which somebody has to decide what the host says about it.
 /// </summary>
 public class WithholdingLegsTests
 {
     /// <summary>
-    /// A census whose recorded-path question, and whose question about a product nobody
-    /// could ask, answer the way the row wants.
+    /// A census whose recorded-path question, whose question about a product nobody could
+    /// ask, and whose question about a read of the records that failed, answer the way the
+    /// row wants.
     /// </summary>
-    private static EnumerationCensus Census(bool recordedPath, bool unaskable) =>
+    private static EnumerationCensus Census(bool recordedPath, bool unaskable, bool unread = false) =>
         new(PathResolverFaultedCount: recordedPath ? 1 : 0,
-            UnansweredProductCount: unaskable ? 1 : 0);
+            UnansweredProductCount: unaskable ? 1 : 0,
+            RegistryKeyReadFailures: unread ? 1 : 0);
 
     /// <summary>The registration side of the identity comparison, likewise.</summary>
     private static FileIdentityReadTally Reads(bool unestablished) =>
         new(AttemptCount: 1, OpenRefusedCount: unestablished ? 1 : 0);
 
-    public static TheoryData<bool, bool, bool, WithholdingLeg[], bool> Table() => new()
+    public static TheoryData<bool, bool, bool, bool, WithholdingLeg[], bool> Table() => new()
     {
-        // recordedPath, identity, unaskable,  legs expected,  gate expected
-        { false, false, false, [], false },
-        { true,  false, false, [WithholdingLeg.RecordedPathUnestablished], true },
-        { false, true,  false, [WithholdingLeg.FileIdentityUnestablished], true },
-        { false, false, true,  [WithholdingLeg.RegistryProductUnaskable], true },
-        { true,  true,  false, [WithholdingLeg.RecordedPathUnestablished,
-                                WithholdingLeg.FileIdentityUnestablished], true },
-        { true,  false, true,  [WithholdingLeg.RecordedPathUnestablished,
-                                WithholdingLeg.RegistryProductUnaskable], true },
-        { false, true,  true,  [WithholdingLeg.FileIdentityUnestablished,
-                                WithholdingLeg.RegistryProductUnaskable], true },
-        { true,  true,  true,  [WithholdingLeg.RecordedPathUnestablished,
-                                WithholdingLeg.FileIdentityUnestablished,
-                                WithholdingLeg.RegistryProductUnaskable], true },
+        // recordedPath, identity, unaskable, unread,  legs expected,  gate expected
+        { false, false, false, false, [], false },
+        { true,  false, false, false, [WithholdingLeg.RecordedPathUnestablished], true },
+        { false, true,  false, false, [WithholdingLeg.FileIdentityUnestablished], true },
+        { true,  true,  false, false, [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.FileIdentityUnestablished], true },
+        { false, false, true,  false, [WithholdingLeg.RegistryProductUnaskable], true },
+        { true,  false, true,  false, [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.RegistryProductUnaskable], true },
+        { false, true,  true,  false, [WithholdingLeg.FileIdentityUnestablished, WithholdingLeg.RegistryProductUnaskable], true },
+        { true,  true,  true,  false, [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.FileIdentityUnestablished, WithholdingLeg.RegistryProductUnaskable], true },
+        { false, false, false, true,  [WithholdingLeg.RegistryRecordsUnread], true },
+        { true,  false, false, true,  [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.RegistryRecordsUnread], true },
+        { false, true,  false, true,  [WithholdingLeg.FileIdentityUnestablished, WithholdingLeg.RegistryRecordsUnread], true },
+        { true,  true,  false, true,  [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.FileIdentityUnestablished, WithholdingLeg.RegistryRecordsUnread], true },
+        { false, false, true,  true,  [WithholdingLeg.RegistryProductUnaskable, WithholdingLeg.RegistryRecordsUnread], true },
+        { true,  false, true,  true,  [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.RegistryProductUnaskable, WithholdingLeg.RegistryRecordsUnread], true },
+        { false, true,  true,  true,  [WithholdingLeg.FileIdentityUnestablished, WithholdingLeg.RegistryProductUnaskable, WithholdingLeg.RegistryRecordsUnread], true },
+        { true,  true,  true,  true,  [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.FileIdentityUnestablished, WithholdingLeg.RegistryProductUnaskable, WithholdingLeg.RegistryRecordsUnread], true },
     };
 
     [Theory]
     [MemberData(nameof(Table))]
     public void Every_combination_fires_the_legs_the_table_says(
-        bool recordedPath, bool identity, bool unaskable, WithholdingLeg[] expected, bool expectedGate)
+        bool recordedPath, bool identity, bool unaskable, bool unread, WithholdingLeg[] expected, bool expectedGate)
     {
-        var census = Census(recordedPath, unaskable);
+        var census = Census(recordedPath, unaskable, unread);
         var reads = Reads(identity);
 
         // Order as well as membership: the host prints them in this order, so a change
@@ -97,7 +102,7 @@ public class WithholdingLegsTests
     [Theory]
     [MemberData(nameof(Table))]
     public void The_result_reads_the_same_legs_the_gate_was_given(
-        bool recordedPath, bool identity, bool unaskable, WithholdingLeg[] expected, bool expectedGate)
+        bool recordedPath, bool identity, bool unaskable, bool unread, WithholdingLeg[] expected, bool expectedGate)
     {
         // The host reads them off the result rather than off the two values, so the
         // property is held to the same table. It calls the same static, which is what
@@ -107,7 +112,7 @@ public class WithholdingLegsTests
             Array.Empty<OrphanedFile>(),
             Array.Empty<RegisteredPackage>(),
             RegisteredTotalBytes: 0,
-            Census: Census(recordedPath, unaskable),
+            Census: Census(recordedPath, unaskable, unread),
             RegistrationIdentityReads: Reads(identity));
 
         Assert.Equal(expected, result.WithholdingLegsFired);
@@ -210,7 +215,7 @@ public class WithholdingLegsTests
     public void The_table_covers_every_combination_of_the_legs_there_are()
     {
         // A row per combination, and the number of combinations derived from the enum
-        // rather than written as eight: a leg added to the enum leaves this table
+        // rather than written as a number: a leg added to the enum leaves this table
         // short, and a table that no longer covers its subject is the failure this
         // whole class exists to prevent.
         var legs = Enum.GetValues<WithholdingLeg>().Length;

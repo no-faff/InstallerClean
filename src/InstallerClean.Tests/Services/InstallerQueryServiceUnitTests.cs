@@ -2170,12 +2170,12 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
-    public async Task A_failing_fallback_with_a_clean_enumeration_still_scans()
+    public async Task A_failing_fallback_with_a_clean_enumeration_scans_and_holds_every_superseded_patch()
     {
-        // The control that matters most in the other direction. The fallback is
-        // a second source, not a check on the first: if the API read every
-        // product cleanly, a bad key in UserData proves nothing about the
-        // verdicts and must not cost superseded-patch detection.
+        // The scan goes ahead, because the API read every product cleanly. A key in
+        // UserData that would not read may be the only record of a program no walk
+        // lists, whose listing could name the patch, so every superseded patch is held
+        // back, scan wide.
         const string dead = @"C:\Windows\Installer\fallback-noise.msp";
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
@@ -2183,7 +2183,10 @@ public class InstallerQueryServiceUnitTests
 
         var result = await RunHealthy(msi, fallbackFailures: 3);
 
-        AssertOffered(Assert.Single(result.Packages, r => r.LocalPackagePath == dead), expectedState: 2);
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.True(row.WithheldScanWide);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
