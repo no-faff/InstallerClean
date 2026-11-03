@@ -134,6 +134,13 @@ public class DeclaredProductCheckUnlistedKeyTests
 
     private const DeclaredProductOutcome LetThrough = DeclaredProductOutcome.DeclaredProductNotInstalled;
 
+    /// <summary>The reason a product key's log cause gives, once its own prefix is checked and taken off.</summary>
+    private static string ReasonIn(string cause)
+    {
+        Assert.StartsWith(DeclaredProductCheck.UnlistedKeyCause, cause, StringComparison.Ordinal);
+        return cause[DeclaredProductCheck.UnlistedKeyCause.Length..];
+    }
+
     // ---------------------------------------------------------------- with no keys
 
     [Fact]
@@ -290,7 +297,7 @@ public class DeclaredProductCheckUnlistedKeyTests
             [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished],
             check.Outcomes);
         var entry = Assert.Single(recorded);
-        Assert.Equal("the cached package is not a file that is there", entry.Detail);
+        Assert.Equal("the cached package is not a file that is there", ReasonIn(entry.Detail));
         Assert.Contains("every installation package is kept rather than offered", entry.Error.Message);
         Assert.DoesNotContain(Cached, entry.Error.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -306,7 +313,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["a source list could not be read, its key not reading or its account's hive not loaded"], recorded);
     }
@@ -321,7 +328,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["the Property table would not open"], recorded);
     }
@@ -336,7 +343,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["the cached package declares no product code"], recorded);
     }
@@ -348,7 +355,7 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.Registry.Answers(Properties(System, KeyCode), RegistryKeyPresence.Unreadable);
         var recorded = new List<string>();
 
-        var check = pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+        var check = pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(
             [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished],
@@ -366,7 +373,7 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.InstalledFrom(Folder);
         var recorded = new List<string>();
 
-        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(
             ["the key records no cached package, no source list that read names its package, and the folder it "
@@ -385,7 +392,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(
             ["the key has no source list, and the folder it was installed from is the Installer folder"], recorded);
@@ -403,7 +410,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(
             ["the key has no source list, and the folder it was installed from could not be ruled out as the "
@@ -422,7 +429,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["the key's InstallProperties key would not read"], recorded);
     }
@@ -438,7 +445,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["the key's InstallSource is in a form the check does not compare"], recorded);
     }
@@ -454,7 +461,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["a source list holds a value in a form the check does not compare"], recorded);
     }
@@ -468,7 +475,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["the cached package could not be identified"], recorded);
     }
@@ -480,7 +487,7 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.InstalledFrom(Folder, kind: RegistryValueKind.ExpandString);
         var recorded = new List<string>();
 
-        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(
             ["the key records no cached package, no source list that read names its package, and the folder it "
@@ -496,7 +503,7 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.Registry.Answers(MachineList(KeyCode), RegistryKeyPresence.Unreadable);
         var recorded = new List<string>();
 
-        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(
             ["the key records no cached package, no source list that read names its package, and the folder it "
@@ -513,13 +520,29 @@ public class DeclaredProductCheckUnlistedKeyTests
         pc.Registry.Answers(MachineList(KeyCode), RegistryKeyPresence.Unreadable);
         var recorded = new List<string>();
 
-        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(
             ["the key records no cached package, no source list that read names its package, and the folder it "
              + "was installed from is the Installer folder; also, a source list could not be read, its key not "
              + "reading or its account's hive not loaded"],
             recorded);
+    }
+
+    [Fact]
+    public void A_keys_entry_is_written_after_the_budget_behind_a_listed_installations_entry_in_the_same_words()
+    {
+        var pc = new Pc();
+        pc.Files.Answers(Cached, FileIdentityRead.NamesNothing);
+        var written = new List<Exception>();
+        var log = new PerItemFailureLog("Scan", "trail", written.Add);
+        for (var i = 0; i < 20; i++)
+            log.Record(new InvalidOperationException("listed " + i), "the cached package is not a file that is there");
+
+        pc.ScreeningOf([Installed(System, KeyCode, Cached)], [Package(First), Package(Second)], log.Record);
+
+        Assert.Equal(21, written.Count);
+        Assert.Contains("every installation package is kept rather than offered", written[20].Message);
     }
 
     [Fact]
@@ -532,7 +555,7 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         pc.ScreeningOf(
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
-            (_, detail) => recorded.Add(detail));
+            (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Empty(recorded);
     }

@@ -3541,12 +3541,20 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 new InvalidOperationException(
                     "A product key no installation Windows lists accounts for did not show which package it "
                     + "opens, so every installation package is kept rather than offered. Detail: " + why + "."),
-                why);
+                UnlistedKeyCause + why);
 
         return new UnlistedKeysRead(
             codes, packages, byName.Select(package => package.Name).ToHashSet(StringComparer.Ordinal),
             advertised, notAllSeen, keptOtherwise ? null : firstGivenUp);
     }
+
+    /// <summary>
+    /// What the refusal log's cause for a product key's entry starts with. Three of the reasons are
+    /// worded as <see cref="LinksOf"/> words a listed installation's, and the log writes a cause it
+    /// has seen only while its budget lasts, so without this the key's entry would be counted
+    /// rather than written behind a listed installation's.
+    /// </summary>
+    internal const string UnlistedKeyCause = "unlisted-key: ";
 
     /// <summary>
     /// Fails a Debug build where a false answer of <see cref="AddCachedPackage"/> or
