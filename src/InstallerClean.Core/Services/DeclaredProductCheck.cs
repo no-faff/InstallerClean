@@ -1270,6 +1270,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// </summary>
     private const string NotIdentifiedDetail = "the cached package could not be identified";
 
+    /// <summary>What the log says where the check has no way to read a product key's source lists.</summary>
+    private const string NoSourceReadersDetail = "no way to read a source list";
+
     /// <summary>What the log says of a recorded cached package that is not a file that is there.</summary>
     private const string NotThereDetail = "the cached package is not a file that is there";
 
@@ -3388,9 +3391,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// product keys no installation accounts for (<see cref="ReadUnlistedKeys"/>): a candidate
     /// declaring a code they give is kept; where they leave a second copy not ruled out, or the
     /// check has no way to read the source lists of a key without an <c>InstallProperties</c>
-    /// key, every candidate is kept; where they give a package to compare with, a candidate whose own
-    /// identity will not read is kept; and a candidate that is a package they open, or that a
-    /// package name reaches (<see cref="ReachedByName"/>), is kept. Each file kept is counted
+    /// key, every candidate is kept; where they give a package to compare with, a candidate
+    /// whose own identity will not read is kept; and a candidate that is a package they open, or
+    /// that a package name reaches (<see cref="ReachedByName"/>), is kept. Each file kept is counted
     /// for the kind of key that kept it (<see cref="PassAnswers.KeptForAKey"/>), a key with an
     /// <c>InstallProperties</c> key first.
     ///
@@ -3514,7 +3517,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             if (!key.HasInstallProperties)
             {
                 if (!AddPackagesAtListedFolders(key, pass, namesAFileInInstallerFolder, advertised))
+                {
                     keysWithoutUnread = true;
+                    why ??= NoSourceReadersDetail;
+                }
+
                 continue;
             }
 
@@ -3712,7 +3719,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         unsaid = null;
         if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null)
         {
-            unsaid = "no way to read a source list";
+            unsaid = NoSourceReadersDetail;
             return false;
         }
 
@@ -3827,10 +3834,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <summary>
     /// The package a key with no <c>InstallProperties</c> key names at each folder on its source
     /// list, by identity, a folder on a drive or share compared by name excepted. A candidate
-    /// that is that package is kept, and this is the one way such a key keeps an installation
-    /// package. A patch file its <c>Patches</c> listing could name is kept by
-    /// <see cref="PutPatchToUnlistedKeys"/>. False, with nothing read, where the check has no
-    /// way to read a source list, and every installation package is then kept for the key.
+    /// that is that package is kept. False, with nothing read, where the check has no way to
+    /// read a source list, and every installation package is then kept for the key; those are
+    /// the two ways such a key keeps an installation package. A patch file its <c>Patches</c>
+    /// listing could name is kept by <see cref="PutPatchToUnlistedKeys"/>.
     /// </summary>
     private bool AddPackagesAtListedFolders(
         UnlistedProductKey key,

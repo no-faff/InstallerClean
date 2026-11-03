@@ -1154,23 +1154,17 @@ public class DeclaredProductCheckUnlistedKeyTests
             NamesInFolderOf = path => [path[(path.LastIndexOf('\\') + 1)..]],
         };
 
+        var recorded = new List<string>();
+
         var screening = check.Screen(
-            [Package(First), Package(Second)], [], [NoProperties()], default, null,
+            [Package(First), Package(Second)], [], [NoProperties()], default,
+            (_, detail) => recorded.Add(ReasonIn(detail)),
             missing == "test for a file in the Installer folder" ? null : InInstallerFolder,
             isTheInstallerFolder: pc.IsTheInstallerFolder);
 
         Assert.Equal(EveryFileKept, screening.Outcomes);
         Assert.Equal(new UnlistedKeyHolds(0, 2), screening.UnlistedHolds);
-    }
-
-    [Fact]
-    public void A_key_with_no_InstallProperties_whose_list_the_check_reads_keeps_nothing_it_does_not_open()
-    {
-        var pc = new Pc();
-        pc.HasList(MachineList(KeyCode), SetupName, Setup);
-        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
-
-        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+        Assert.Equal(["no way to read a source list"], recorded);
     }
 
     [Fact]
