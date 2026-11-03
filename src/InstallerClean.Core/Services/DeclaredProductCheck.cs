@@ -81,9 +81,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// folder is not taken for a package.
     /// </param>
     /// <param name="registry">
-    /// Reads the registry key each source list is held in, which the list the API
-    /// returns is checked against, and, for a product key no installation accounts for,
-    /// its source lists and its <c>InstallProperties</c> key, read from the registry alone.
+    /// Reads the registry, among it the key each source list is held in, which the list the
+    /// API returns is checked against, and the source lists and <c>InstallProperties</c> key of
+    /// a product key no installation accounts for, read from the registry alone.
     /// </param>
     /// <param name="runningAccount">
     /// The account this process runs as, which a per-user installation's account is held

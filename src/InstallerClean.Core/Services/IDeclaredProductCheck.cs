@@ -111,17 +111,17 @@ namespace InstallerClean.Services;
 /// LET THROUGH (<see cref="UnlistedProductKey"/>). A key with an <c>InstallProperties</c> key
 /// keeps an installation package declaring its code or the code its cached package declares,
 /// a package its sources open, and a file one of its package names opens from that file's own
-/// folder; and, where it gives a package to compare with, a file whose own identity will not
-/// read. Every installation package is kept where such a key's cached package does not say
+/// folder. Every installation package is kept where such a key's cached package does not say
 /// what it is, which covers a cached package value with no path in it and an
 /// <c>InstallProperties</c> key that will not read; where a key recording a cached package has
 /// sources that will not read, or has no source list and was installed from a folder not shown
 /// not to be the Installer folder; and where a key recording none was installed from the
 /// Installer folder with no source list naming its package or with a source list that did not
 /// read. A key without one keeps the package its source list names at a folder on that list,
-/// read by identity, a folder compared by name excepted. A patch file is kept where a key's
-/// <c>Patches</c> listing names it or was not established. All of this comes off the
-/// registry, so it keeps a file and never releases one.
+/// read by identity, a folder compared by name excepted. Where keys of either kind give a
+/// package to compare with, a file whose own identity will not read is kept. A patch file is
+/// kept where a key's <c>Patches</c> listing names it or was not established. All of this
+/// comes off the registry, so it keeps a file and never releases one.
 ///
 /// AN INSTALLATION ANSWERS FOR THE CODE ITS CACHED PACKAGE DECLARES, WHATEVER CODE IT IS
 /// REGISTERED UNDER. A second copy of a program, installed under an instance transform,
@@ -256,7 +256,9 @@ public interface IDeclaredProductCheck
     /// of the folder an installation with no source list was installed from; without it, such an
     /// installation whose <c>InstallProperties</c> key records that folder keeps every candidate
     /// it would otherwise let through. A product key no installation accounts for, recording no
-    /// cached package, keeps every candidate only on an answer of true.
+    /// cached package, keeps every candidate only on an answer of true; one recording a cached
+    /// package with no source list keeps every candidate on any answer but false, so without the
+    /// test it keeps them.
     /// </param>
     DeclaredProductScreening Screen(
         IReadOnlyList<OrphanedFile> candidates,
@@ -627,10 +629,11 @@ public enum DeclaredProductOutcome
 
     /// <summary>
     /// Windows holds a record of the product this installation package declares, or a
-    /// registration of the patch this patch copy declares, the check saw every package
-    /// or copy each installation or registration opens that this file could be, and this
-    /// file's own identity did not read, so it could not be compared with any of them.
-    /// Kept back.
+    /// registration of the patch this patch copy declares, or a product key no installation
+    /// accounts for gives a package to compare this file with, whatever Windows says of the
+    /// product; the check saw every package or copy each of them opens that this file could
+    /// be, and this file's own identity did not read, so it could not be compared with any of
+    /// them. Kept back.
     ///
     /// IT IS ABOUT THE FILE AND NOT ABOUT THE RECORDS. Everything the records name that
     /// this file could be was read and identified; what the comparison lacks is this
