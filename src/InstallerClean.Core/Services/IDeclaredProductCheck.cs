@@ -111,14 +111,17 @@ namespace InstallerClean.Services;
 /// LET THROUGH (<see cref="UnlistedProductKey"/>). A key with an <c>InstallProperties</c> key
 /// keeps an installation package declaring its code or the code its cached package declares,
 /// a package its sources open, and a file one of its package names opens from that file's own
-/// folder. Every installation package is kept where such a key's cached package does not say
+/// folder; and, where it gives a package to compare with, a file whose own identity will not
+/// read. Every installation package is kept where such a key's cached package does not say
 /// what it is, which covers a cached package value with no path in it and an
-/// <c>InstallProperties</c> key that will not read, where a key recording a cached package has
-/// sources that will not read, and where a key was installed from the Installer folder with no
-/// source list naming its package. A key without one keeps the package at a folder on its
-/// source list. A patch file is kept
-/// where a key's <c>Patches</c> listing names it or was not established. All of this comes off
-/// the registry, so it keeps a file and never releases one.
+/// <c>InstallProperties</c> key that will not read; where a key recording a cached package has
+/// sources that will not read, or has no source list and was installed from a folder not shown
+/// not to be the Installer folder; and where a key recording none was installed from the
+/// Installer folder with no source list naming its package or with a source list that did not
+/// read. A key without one keeps the package its source list names at a folder on that list,
+/// read by identity, a folder compared by name excepted. A patch file is kept where a key's
+/// <c>Patches</c> listing names it or was not established. All of this comes off the
+/// registry, so it keeps a file and never releases one.
 ///
 /// AN INSTALLATION ANSWERS FOR THE CODE ITS CACHED PACKAGE DECLARES, WHATEVER CODE IT IS
 /// REGISTERED UNDER. A second copy of a program, installed under an instance transform,
@@ -398,8 +401,8 @@ public enum DeclaredProductOutcome
     /// <summary>
     /// The file declared a product code, the keyed enumeration across every account and
     /// context positively answered that it lists no such product, the caller's own
-    /// enumeration listed no installation of it, no product key with an
-    /// <c>InstallProperties</c> key holds the code, and no cached package the check read,
+    /// enumeration listed no installation of it, no product key no installation accounts for
+    /// keeps the file, and no cached package the check read,
     /// of the installations it listed, declares it, every one whose cached package did
     /// not read being shown by its own record to be an ordinary installation, or shown to
     /// record no cached package and have no source list and no <c>InstallProperties</c> key
@@ -661,9 +664,11 @@ public enum DeclaredProductOutcome
     ///
     /// A product key no installation accounts for gives it the same way, where its cached
     /// package does not say what it is, which covers a cached package value with no path in it
-    /// and an <c>InstallProperties</c> key that will not read, where a key recording a cached
-    /// package has sources that will not read, and where a key was installed from the Installer
-    /// folder with no source list naming its package.
+    /// and an <c>InstallProperties</c> key that will not read; where a key recording a cached
+    /// package has sources that will not read, or has no source list and was installed from a
+    /// folder not shown not to be the Installer folder; and where a key recording none was
+    /// installed from the Installer folder with no source list naming its package or with a
+    /// source list that did not read.
     ///
     /// Where a single installation's packages cannot all be seen it covers what
     /// <see cref="DeclaredProductInstalled"/> covers for one: a cached package that will

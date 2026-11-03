@@ -82,7 +82,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// </param>
     /// <param name="registry">
     /// Reads the registry key each source list is held in, which the list the API
-    /// returns is checked against.
+    /// returns is checked against, and, for a product key no installation accounts for,
+    /// its source lists and its <c>InstallProperties</c> key, read from the registry alone.
     /// </param>
     /// <param name="runningAccount">
     /// The account this process runs as, which a per-user installation's account is held
@@ -1046,8 +1047,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// (<see cref="ReadUnderRoot"/>), and <paramref name="givenUp"/> is that root where a
     /// refusal for it answered false. A definite answer, true or false, is the read answering,
     /// however long it took; only a test that answers null counts against the folder's root as a
-    /// read that failed. Asked once per folder per pass, by its spelling, case included, and that
-    /// answer kept for every later ask. A pass with no such test answers false.
+    /// read that failed. Asked once per folder per pass (<see cref="InstallerFolderAnswer"/>). A
+    /// pass with no such test answers false.
     /// </summary>
     private bool IsNotTheInstallerFolder(string folder, PassAnswers pass, out string? givenUp)
     {
@@ -1059,7 +1060,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <summary>
     /// What the pass's test answers about <paramref name="folder"/>: whether it is the Installer
     /// folder, null where the test did not answer or was not read, and the root whose give-up
-    /// refused the read (<see cref="IsNotTheInstallerFolder"/>).
+    /// refused the read (<see cref="IsNotTheInstallerFolder"/>). Each folder is asked once per
+    /// pass, by its spelling, case included, and that answer is kept for every later ask
+    /// (<see cref="PassAnswers.InstallSourceFolders"/>).
     /// </summary>
     private (bool? IsIt, string? GivenUp) InstallerFolderAnswer(string folder, PassAnswers pass)
     {
