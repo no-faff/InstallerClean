@@ -1002,10 +1002,10 @@ public class FileSystemScanServiceTests
         Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
         Assert.False(row.IsRemovable);
         // AND THE MARKER STANDS, WHICH IS NOT BELT AND BRACES. The confirmation pass reads
-        // the patch file, a file that has gone cannot be read by anybody on any machine
-        // ever, so a missing superseded row arrives here already withheld and already
-        // marked. The marker says that unread file was the only reason, and for this row
-        // that is a tautology rather than a finding.
+        // the patch file, and a file that has gone cannot be read by anybody on any
+        // machine ever, so a missing superseded row arrives here already withheld and
+        // already marked. The marker says that unread file was the only reason, and for
+        // this row that is a tautology rather than a finding.
         Assert.True(row.WithheldOnUnreadableFile);
 
         var result = await ScanWithThePatchFileGone(enumerated, fs);
@@ -1060,8 +1060,9 @@ public class FileSystemScanServiceTests
         // confirmation pass downgrades every removable path before the patch file is read,
         // setting no unread-file marker, so the row reaches the split withheld without it.
         // The condition is on the whole machine, but it bears on THIS patch: a holder of
-        // it may have gone unseen. A condition about something else on the machine does
-        // not, and that is the difference the split exists to draw.
+        // it may have gone unseen. A cached patch file the scan could not attribute, the
+        // condition the run that lost a claim meets here, does not, and that is the
+        // difference the split exists to draw.
         //
         // ERROR_ACCESS_DENIED is one of the returns that call can make. Nothing here turns
         // on which: the code treats any answer that is not a clean end as a refusal.
