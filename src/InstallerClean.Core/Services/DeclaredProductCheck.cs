@@ -3835,9 +3835,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// The package a key with no <c>InstallProperties</c> key names at each folder on its source
     /// list, by identity, a folder on a drive or share compared by name excepted. A candidate
     /// that is that package is kept. False, with nothing read, where the check has no way to
-    /// read a source list, and every installation package is then kept for the key; those are
-    /// the two ways such a key keeps an installation package. A patch file its <c>Patches</c>
-    /// listing could name is kept by <see cref="PutPatchToUnlistedKeys"/>.
+    /// read a source list, and every installation package is then kept for the key. A patch
+    /// file its <c>Patches</c> listing could name is kept by <see cref="PutPatchToUnlistedKeys"/>.
     /// </summary>
     private bool AddPackagesAtListedFolders(
         UnlistedProductKey key,

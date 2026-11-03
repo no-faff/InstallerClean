@@ -1168,6 +1168,17 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_the_check_reads_keeps_nothing_it_does_not_open()
+    {
+        // The fixture the missing-reader theory above uses, with every reader there.
+        var pc = new Pc();
+        pc.HasList(MachineList(KeyCode), SetupName, Setup);
+        pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+
+        Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+    }
+
+    [Fact]
     public void A_key_with_no_InstallProperties_reads_its_package_by_the_rules_of_every_source_read()
     {
         // Only the source read asks a volume of a path that gives no file id.
