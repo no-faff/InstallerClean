@@ -654,8 +654,8 @@ public readonly record struct EnumerationCensus(
     ///
     /// THE SUPERSEDED HALF ASKS THE SAME RULE. The enumeration withholds every
     /// still-removable superseded row on a failed read before this census is built, asking
-    /// <see cref="RegistryRecordsUnreadAt"/> of the registry read's own tally
-    /// (<c>InstallerQueryService.WithholdOnUnlistedEntries</c>), so a change to the rule there
+    /// <see cref="RegistryRecordsUnreadAt"/> of the registry read's own tally where it calls
+    /// <c>InstallerQueryService.WithholdOnUnlistedEntries</c>, so a change to the rule
     /// reaches both halves.
     /// </summary>
     public bool RegistryRecordsUnread => RegistryRecordsUnreadAt(RegistryKeyReadFailures);

@@ -1185,10 +1185,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // AND WHERE THE REGISTRY READ ITSELF FAILS. ProductKeys is counted from the
         // subkeys the fallback actually walked, so a fallback that failed reports
         // FEWER keys, and the names asked about are the codes that side handed over.
-        // The failed read is counted in fallback.Failures. Through one rule
-        // (EnumerationCensus.RegistryRecordsUnreadAt) it withholds every removable row here
-        // and, in the census, the walk-derived offer. With an unreadable product it refuses
-        // the scan at the gate above.
+        // The failed read is counted in fallback.Failures. One rule,
+        // EnumerationCensus.RegistryRecordsUnreadAt, decides on it for every removable row, at
+        // the call to WithholdOnUnlistedEntries above, and for the walk-derived offer, in the
+        // census. The gate above refuses the scan where it is non-zero beside an unreadable
+        // product, a rule of its own.
         //
         // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,
         // which is worth spelling out beside this because they count different
