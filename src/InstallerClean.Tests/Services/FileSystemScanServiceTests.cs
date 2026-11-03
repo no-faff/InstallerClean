@@ -987,9 +987,8 @@ public class FileSystemScanServiceTests
         //
         // WHAT FIRED IT WAS NOTHING TO DO WITH THIS FILE. Here it is a cached patch file
         // the enumeration never claimed and the scan could not match to any program it
-        // asks about, which is not "a holder of this patch went unseen". Where any of the
-        // scan-wide conditions holds, this run removes no superseded patch at all, which the
-        // sibling test below pins.
+        // asks about, which is not "a holder of this patch went unseen". Where it holds,
+        // this run removes no superseded patch at all, which the sibling test below pins.
         var (fs, reader) = MachineWithThePatchFileGone();
         var enumerated = await EnumerateWithSupersededPatch(aClaimWasLost: true, reader);
 
