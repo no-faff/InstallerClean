@@ -1172,9 +1172,8 @@ public sealed record MachineInfo(
 /// established, or a failed read of Windows Installer's records in the registry.
 ///
 /// A SUB-COUNT OF <paramref name="WithheldPatchCount"/>, never added to it. The rest of
-/// that count is files withheld for a reason about the file's own patch, a key's listing
-/// naming it among them, so the two tell a hold on the whole machine from a hold on one
-/// file.
+/// that count is files withheld for a reason about the file's own patch alone, so the two
+/// tell a hold on the whole machine from a hold on one file.
 /// <paramref name="SupersededRecordedPathUnestablishedCount"/> is a sub-count of this.
 /// </param>
 /// <param name="WithheldSecondCopyUnestablishedCount">
@@ -1601,7 +1600,8 @@ public sealed record MachineInfo(
 /// Superseded files on disk such a key held back (<c>ScanResult.SupersededHeldForUnlistedKeyCount</c>).
 /// A SUB-COUNT OF <paramref name="WithheldPatchCount"/>, never added to it. It can overlap
 /// <paramref name="SupersededScanWideWithheldCount"/>: a file withheld where a key's listing
-/// was not established, or on a failed read of the registry's records, is in both.
+/// was not established is in both, and so is one a key's listing names on a scan whose read
+/// of the registry's records failed.
 /// </param>
 public sealed record ScanInfo(
     long DurationMs,

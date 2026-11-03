@@ -136,9 +136,9 @@ public class CliWithholdingReasonsTests
     public void Only_the_unaskable_product_leg_and_the_second_copy_arm_print_the_same_line()
     {
         // ONE HEADING CARRIES BOTH SETS. The RegistryProductUnaskable leg and the second-copy
-        // arm print the same line, and the list under the heading prints each distinct line once, so
-        // the sentence never appears twice under it. No other pair shares a line, so a
-        // line two conditions come to share without anybody choosing it fails here.
+        // arm print the same line, and the list under the heading prints each distinct line
+        // once, so the sentence never appears twice under it. No other pair shares a line, so
+        // a line two conditions come to share without anybody choosing it fails here.
         var lines = Enum.GetValues<WithholdingLeg>()
             .Select(leg => (Name: $"leg {leg}", Line: Program.LineFor(leg)))
             .Concat(Enum.GetValues<WithholdingSplitArm>()

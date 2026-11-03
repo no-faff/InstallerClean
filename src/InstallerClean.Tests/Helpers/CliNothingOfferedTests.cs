@@ -467,9 +467,9 @@ public class CliNothingOfferedTests
     /// <summary>
     /// A census with the RegistryProductUnaskable leg set, a product the registry names that
     /// the scan could not ask about, so a fixture that wants the wholesale branch's own
-    /// reason line has one to print. The legs are read off the census rather than off the split, so a
-    /// wholesale count on its own would leave the breakdown empty and a test about it
-    /// passing over nothing.
+    /// reason line has one to print. The legs are read off the census rather than off the
+    /// split, so a wholesale count on its own would leave the breakdown empty and a test
+    /// about it passing over nothing.
     /// </summary>
     private static EnumerationCensus ProductNobodyCouldAsk =>
         new(UnansweredProductCount: 1);
