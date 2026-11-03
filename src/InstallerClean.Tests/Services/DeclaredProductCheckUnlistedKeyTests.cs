@@ -474,6 +474,21 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
+    public void An_Installer_folder_hold_on_an_expanded_InstallSource_names_no_source_read()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder, kind: RegistryValueKind.ExpandString);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(
+            ["the key records no cached package, no source list that read names its package, and the folder it "
+             + "was installed from is the Installer folder"],
+            recorded);
+    }
+
+    [Fact]
     public void An_Installer_folder_hold_after_a_list_that_would_not_read_names_both()
     {
         var pc = new Pc();

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.Runtime.ExceptionServices;
@@ -1258,6 +1259,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
     /// <summary>What the log says where the check has no way to read a cached package.</summary>
     private const string NoReadersDetail = "no way to read a cached package";
+
+    /// <summary>
+    /// What the log says of a cached package that is there and cannot be identified, which only
+    /// a product key no installation accounts for reads (<see cref="AddCachedPackage"/>).
+    /// </summary>
+    private const string NotIdentifiedDetail = "the cached package could not be identified";
 
     /// <summary>What the log says of a recorded cached package that is not a file that is there.</summary>
     private const string NotThereDetail = "the cached package is not a file that is there";
@@ -3523,9 +3530,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             if (!cachedSaid || givenUp is null) keptOtherwise = true;
             else firstGivenUp ??= givenUp;
 
-            // Every false answer above carries its reason. The fallback keeps the entry written
-            // should one not.
-            why ??= (cachedSaid ? sourcesUnsaid : cachedUnsaid) ?? "a read of the key did not settle";
+            var reason = cachedSaid ? sourcesUnsaid : cachedUnsaid;
+            Debug.Assert(reason is not null, "every false answer of the two reads carries its reason");
+            why ??= reason ?? "a read of the key did not settle";
         }
 
         if (why is not null)
@@ -3561,7 +3568,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             unsaid = outcome == FileIdentityRead.NamesNothing
                 ? NotThereDetail
-                : "the cached package could not be identified";
+                : NotIdentifiedDetail;
             return false;
         }
 
@@ -3614,7 +3621,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///
     /// <paramref name="unsaid"/> is what the log says of a false answer: the first read that did
     /// not settle, or, for a key recording no cached package, that it was installed from the
-    /// Installer folder.
+    /// Installer folder, followed by the first source read that did not settle where one did not.
     /// </summary>
     private bool AddRegistrySources(
         UnlistedProductKey key,
@@ -3643,10 +3650,12 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 ? "the key's InstallSource is in a form the check does not compare"
                 : "the key's InstallProperties key would not read";
 
+        string? firstListUnsaid = null;
         void NotRead(string? root, string why)
         {
             allRead = false;
             firstUnsaid ??= why;
+            firstListUnsaid ??= why;
             if (root is null) keptOtherwise = true;
             else firstGivenUp ??= root;
         }
@@ -3701,7 +3710,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
                 unsaid = "the key records no cached package, no source list that read names its package, and the "
                     + "folder it was installed from is the Installer folder"
-                    + (firstUnsaid is null ? string.Empty : "; also, " + firstUnsaid);
+                    + (firstListUnsaid is null ? string.Empty : "; also, " + firstListUnsaid);
                 return false;
             }
 
