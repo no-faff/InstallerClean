@@ -7,15 +7,17 @@
 // THE LEVEL IS PART OF THE SCAN'S CORRECTNESS, NOT ONLY ITS WRITE ACCESS, which
 // is the half that would not be guessed from the element. The scan asks Windows
 // Installer whether a product a patch file declares is installed, and takes
-// ERROR_UNKNOWN_PRODUCT as the answer for every installation the walks can list,
-// reading a program they leave out off the registry. Only a caller entitled to
-// see every user's installs gets that answer: an administrator may query product and patch data for any instance and any
-// user on the computer, and a non-administrator may not. A caller that cannot
-// see a per-user product belonging to another account is told exactly that about
-// a product which is in fact there, so the same answer stops meaning the same
-// thing. Lowering the level would therefore change what the scan concludes about
-// whether a cached patch is still needed, with the build green and every test
-// still passing, because no test starts a process at a different level.
+// ERROR_UNKNOWN_PRODUCT as a positive answer that no installation of it is there,
+// wherever the product enumerations returned none; a product the registry names
+// that they returned no installation of is read off the registry. Only a caller
+// entitled to see every user's installs gets that answer: an administrator may
+// query product and patch data for any instance and any user on the computer, and
+// a non-administrator may not. A caller that cannot see a per-user product
+// belonging to another account is told exactly that about a product which is in
+// fact there, so the same answer stops meaning the same thing. Lowering the level
+// would therefore change what the scan concludes about whether a cached patch is
+// still needed, with the build green and every test still passing, because no test
+// starts a process at a different level.
 //
 // The element carries the same weight in both hosts and neither is the lesser
 // case: the command-line tool runs unattended from scheduled tasks, where a

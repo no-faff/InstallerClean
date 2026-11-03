@@ -8,10 +8,11 @@ namespace InstallerClean.Helpers;
 /// the rights they refuse to scan.
 ///
 /// WHAT THE SCAN ASKS IS WHAT RESTS ON IT. The scan asks Windows Installer about products
-/// and patches across all users, and Microsoft documents that asking across accounts
-/// needs administrator privileges. An administrator is shown a product installed for
-/// another account like any other, and a product left out of the answer can then be
-/// read off the registry (<c>InstallerQueryService.UnlistedEntries</c>).
+/// and patches across every account on the machine, and Microsoft documents that asking
+/// across accounts needs administrator privileges. An administrator is shown a product
+/// installed for another account like any other, and a product the registry names that
+/// the answers include no installation of is read off the registry
+/// (<c>InstallerQueryService.UnlistedEntries</c>).
 ///
 /// ENABLED MEMBERSHIP, NOT MEMBERSHIP. IsInRole checks the token with
 /// CheckTokenMembership, which counts the group only where it is enabled. Under UAC,
