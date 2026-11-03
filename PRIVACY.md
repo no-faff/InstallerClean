@@ -54,7 +54,7 @@ Where someone is at the console, it asks whether to send the same anonymous repo
 
 ## The tip buttons
 
-The Leave a tip buttons open the tip page, nofaff.netlify.app/support, in your browser, and only when you click one. The address they open carries two short codes: the language InstallerClean is showing, and the Country or region Windows is set to, for example `?lang=de&region=AT`. The page uses them to show itself in that language and to list the way of paying used in that country straight after Ko-fi. Where Windows gives no two-letter code for your Country or region, the address carries the language alone. The page, and any page it sends you on to for the payment, sees that address and, as any website does, your IP address. The command-line tool prints the tip page's address with neither code.
+The Leave a tip buttons open the tip page, nofaff.netlify.app/support, in your browser, and only when you click one. The address they open carries two short codes: the language InstallerClean is showing, and the Country or region Windows is set to, for example `?lang=de&region=AT`. The page uses them to show itself in that language and, where it has a way of paying for that country, to list it straight after Ko-fi. Where Windows gives no two-letter code for your Country or region, the address carries the language alone. The page, and any page it sends you on to for the payment, sees that address and, as any website does, your IP address. The command-line tool prints the tip page's address with neither code.
 
 ## Everything else stays on your PC
 
