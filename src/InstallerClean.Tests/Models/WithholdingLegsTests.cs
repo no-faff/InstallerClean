@@ -73,7 +73,7 @@ public class WithholdingLegsTests
     [InlineData(nameof(EnumerationCensus.InstanceTypeUnreadableCount), false)]
     [InlineData(nameof(EnumerationCensus.UnansweredProductCount), true)]
     [InlineData(nameof(EnumerationCensus.UnparseableProductKeyNames), true)]
-    public void The_third_leg_fires_for_a_product_nobody_could_ask_and_not_for_a_second_copy_the_scan_listed(
+    public void The_unaskable_product_leg_fires_for_a_product_nobody_could_ask_and_not_for_a_second_copy_the_scan_listed(
         string member, bool fires)
     {
         // The two InstanceType counts are installations the scan listed and marked, which

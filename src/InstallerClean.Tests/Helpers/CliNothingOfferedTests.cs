@@ -207,10 +207,10 @@ public class CliNothingOfferedTests
     }
 
     [Fact]
-    public async Task A_run_meeting_the_third_leg_and_the_second_copy_arm_prints_their_one_line_once()
+    public async Task A_run_meeting_the_unaskable_product_leg_and_the_second_copy_arm_prints_their_one_line_once()
     {
-        // The second-copy arm prints the third leg's line. A run holding files both ways
-        // prints it once, under one heading, beside the other lines it met.
+        // The second-copy arm prints the RegistryProductUnaskable leg's line. A run holding
+        // files both ways prints it once, under one heading, beside the other lines it met.
         var (_, stdout) = await Run(Scan(
             withheld: 2,
             split: new WithholdingSplit(WholesaleCount: 1, SecondCopyUnestablishedCount: 1),
@@ -465,9 +465,9 @@ public class CliNothingOfferedTests
     // ---- fixtures ----
 
     /// <summary>
-    /// A census with the third leg set, a product the registry names that the scan could
-    /// not ask about, so a fixture that wants the wholesale branch's own reason line has
-    /// one to print. The legs are read off the census rather than off the split, so a
+    /// A census with the RegistryProductUnaskable leg set, a product the registry names that
+    /// the scan could not ask about, so a fixture that wants the wholesale branch's own
+    /// reason line has one to print. The legs are read off the census rather than off the split, so a
     /// wholesale count on its own would leave the breakdown empty and a test about it
     /// passing over nothing.
     /// </summary>

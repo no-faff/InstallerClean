@@ -2674,10 +2674,10 @@ internal static class Program
     /// files they count. The first three are not in the held-back lead's count; the
     /// fourth is, and a run holding one prints the lead with no list under it.
     ///
-    /// THE SECOND-COPY ARM PRINTS THE THIRD LEG'S LINE, which is true of both: each is a
-    /// program that may be installed more than once, whose packages nothing could compare
-    /// a file with. The list prints each distinct line once, so the line never appears
-    /// twice under the heading.
+    /// THE SECOND-COPY ARM PRINTS THE LINE OF THE RegistryProductUnaskable LEG, which is true
+    /// of both: each is a program that may be installed more than once, whose packages
+    /// nothing could compare a file with. The list prints each distinct line once, so the
+    /// line never appears twice under the heading.
     ///
     /// The fallback is the heading's own antecedent rather than a blank, on the same
     /// reasoning as above, and it is unreachable while every arm is handled.

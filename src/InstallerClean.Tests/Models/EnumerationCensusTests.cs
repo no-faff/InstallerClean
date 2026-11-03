@@ -207,7 +207,7 @@ public class EnumerationCensusTests
     }
 
     [Fact]
-    public void A_census_with_nothing_wrong_withholds_nothing_on_the_third_leg()
+    public void A_census_with_nothing_wrong_withholds_nothing_on_the_unaskable_product_leg()
     {
         // The floor under the walk above, and the one that keeps this rule off every
         // ordinary machine.

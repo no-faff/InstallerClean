@@ -634,7 +634,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // is spelled where the members are declared, and this line only says that a
         // failure on either side withholds.
         //
-        // AND THE THIRD, A PRODUCT THE REGISTRY NAMES THAT THIS SCAN COULD NOT ASK ABOUT.
+        // AND A PRODUCT THE REGISTRY NAMES THAT THIS SCAN COULD NOT ASK ABOUT.
         // What all of these share is that something this scan could not establish leaves
         // it unable to say which cached files belong to which programs. Such a product
         // was never asked its InstanceType, so nothing shows it is not a second copy of a
@@ -646,9 +646,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // compares a file with it. Nor does the screen's question about a patch file
         // reach it, which may hold the patch. So no walk-derived file is offered. The
         // question is asked of the census, where its members live, on the same rule as
-        // the other two.
+        // the two above.
         //
-        // AND THE FOURTH, A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED. The key that
+        // AND A READ OF WINDOWS INSTALLER'S RECORDS THAT FAILED. The key that
         // would not read may be the only claim on a cached file, and it may be a program no
         // walk lists, so the keys handed to the screen below can be short by it. It is
         // asked of the census too.

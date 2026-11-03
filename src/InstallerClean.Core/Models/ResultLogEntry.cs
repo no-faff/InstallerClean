@@ -411,8 +411,8 @@ public sealed record AppInfo(
 /// The app derives nothing from the difference between the two. Each product the
 /// registry names with a code and the enumeration did not return is asked about by
 /// name: one found installed travels as the recovered count, one Windows would not
-/// answer about as the unanswered count, and one the keyed walk does not list in neither. A key whose
-/// name yields no code travels as the unparseable count. The pair travels because
+/// answer about as the unanswered count, and one the keyed walk does not list in neither.
+/// A key whose name yields no code travels as the unparseable count. The pair travels because
 /// how far a machine's registry runs ahead of its enumeration is a fact only these
 /// reports can establish.
 /// </param>
@@ -1168,11 +1168,13 @@ public sealed record MachineInfo(
 /// (<c>ScanResult.SupersededScanWideWithheldCount</c>): a program entry the scan could not
 /// check, a cached patch file it could not match to a program it asks about, a recorded
 /// path it could not settle, a machine-wide list of patch registrations that did not
-/// run to its end, or a registry record that would not read.
+/// run to its end, a product key no installation accounts for whose patch listing was not
+/// established, or a failed read of Windows Installer's records in the registry.
 ///
 /// A SUB-COUNT OF <paramref name="WithheldPatchCount"/>, never added to it. The rest of
-/// that count is files a check of the file's own patch withheld, so the two tell a hold
-/// on the whole machine from a hold on one file.
+/// that count is files withheld for a reason about the file's own patch, a key's listing
+/// naming it among them, so the two tell a hold on the whole machine from a hold on one
+/// file.
 /// <paramref name="SupersededRecordedPathUnestablishedCount"/> is a sub-count of this.
 /// </param>
 /// <param name="WithheldSecondCopyUnestablishedCount">
@@ -1597,7 +1599,9 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="SupersededHeldForUnlistedKeyCount">
 /// Superseded files on disk such a key held back (<c>ScanResult.SupersededHeldForUnlistedKeyCount</c>).
-/// A SUB-COUNT OF <paramref name="WithheldPatchCount"/>, never added to it.
+/// A SUB-COUNT OF <paramref name="WithheldPatchCount"/>, never added to it. It can overlap
+/// <paramref name="SupersededScanWideWithheldCount"/>: a file withheld where a key's listing
+/// was not established, or on a failed read of the registry's records, is in both.
 /// </param>
 public sealed record ScanInfo(
     long DurationMs,
