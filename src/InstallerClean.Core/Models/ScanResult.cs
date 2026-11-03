@@ -771,8 +771,8 @@ public record ScanResult(
     /// not established carries both marks, and so does a row a key's listing names on a scan
     /// whose read of the registry's records failed. A row a key's listing names, on a scan with
     /// neither, carries this one alone, and a failed read alone sets only the scan-wide mark.
-    /// A row an earlier pass had already withheld carries neither, the listing having taken
-    /// nothing from it.
+    /// A row an earlier pass had already withheld carries no unlisted-key mark, the listing
+    /// having taken nothing from it.
     /// </summary>
     public int SupersededHeldForUnlistedKeyCount =>
         RegisteredPackages.Count(p => p.WithheldOnUnlistedKey && p.FileExists);

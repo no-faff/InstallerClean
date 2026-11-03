@@ -3392,10 +3392,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// declaring a code they give is kept; where they leave a second copy not ruled out, or the
     /// check has no way to read the source lists of a key without an <c>InstallProperties</c>
     /// key, every candidate is kept; where they give a package or a package name to compare
-    /// with, a candidate whose own identity will not read is kept; and a candidate that is a package they open, or
-    /// that a package name reaches (<see cref="ReachedByName"/>), is kept. Each file kept is counted
-    /// for the kind of key that kept it (<see cref="PassAnswers.KeptForAKey"/>), a key with an
-    /// <c>InstallProperties</c> key first.
+    /// with, a candidate whose own identity will not read is kept; and a candidate that is a
+    /// package they open, or that a package name reaches (<see cref="ReachedByName"/>), is kept.
+    /// Each file kept is counted for the kind of key that kept it
+    /// (<see cref="PassAnswers.KeptForAKey"/>), a key with an <c>InstallProperties</c> key first.
     ///
     /// <paramref name="givenUp"/> is the root whose give-up alone left the keys not all seen.
     /// </summary>

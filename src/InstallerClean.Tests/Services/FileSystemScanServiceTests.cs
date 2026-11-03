@@ -281,19 +281,18 @@ public class FileSystemScanServiceTests
     [Fact]
     public async Task ScanAsync_weighs_a_missing_superseded_registration_in_the_correlation_gate()
     {
-        // A DELIBERATE WIDENING, PINNED SO NOBODY LATER READS IT AS AN ACCIDENT.
-        // The gate's own comment says both sides of its proportion ask about one
-        // population, the registrations naming a file directly in the walked
-        // folder. They did not: the survivor side counted every such registration
-        // whose file was there, superseded ones included, and the missing side
-        // took only the rows carrying no superseded or obsoleted state, on the
-        // reading that such a file having gone was its expected end state. That
-        // reading is what 3.0.0 removes, so the exclusion goes with it.
+        // THE MISSING SIDE COUNTS SUPERSEDED ROWS, PINNED SO NOBODY READS IT AS AN
+        // ACCIDENT. Both sides of the gate's proportion ask about one population, the
+        // registrations naming a file directly in the walked folder: the survivor side
+        // counts every such registration whose file is there, superseded ones included,
+        // and the missing side every such registration whose file has gone, superseded
+        // ones included. A superseded file having gone is not read as its expected end
+        // state.
         //
-        // This machine could not reach the bound before and reaches it now: one
-        // registered file present in the folder, twenty absent and all of them
-        // superseded, and an offer with something in it. Refusing is the safe
-        // direction, and the shape is not one a healthy machine takes.
+        // So this machine reaches the bound: one registered file present in the folder,
+        // twenty absent and all of them superseded, and an offer with something in it.
+        // Refusing is the safe direction, and the shape is not one a healthy machine
+        // takes.
         const string orphan = @"C:\Windows\Installer\orphan.msi";
         const string present = @"C:\Windows\Installer\present.msi";
         var fs = new MockFileSystem();
@@ -1002,8 +1001,8 @@ public class FileSystemScanServiceTests
         Assert.True(row.RemovableWithheld);
         Assert.Equal(ProductPatchSet.AllNonRemovable, row.ProductPatchSetVerdict);
         Assert.False(row.IsRemovable);
-        // AND THE MARKER STANDS, WHICH IS THE WHOLE CHANGE AND IS NOT BELT AND BRACES.
-        // This line read False until 3.0.0. The confirmation pass reads the patch file, a
+        // AND THE MARKER STANDS, WHICH IS NOT BELT AND BRACES. The confirmation pass reads
+        // the patch file, a
         // file that has gone cannot be read by anybody on any machine ever, so a missing
         // superseded row arrives here already withheld and already marked. The marker says
         // that unread file was the only reason, and for this row that is a tautology
@@ -1052,20 +1051,19 @@ public class FileSystemScanServiceTests
     [Fact]
     public async Task A_superseded_patch_is_affected_when_the_machine_wide_enumeration_did_not_answer()
     {
-        // THE CONTROL THAT KEEPS THE TWO SIDES OF THE SPLIT APART, and it had to be built
-        // because 3.0.0 took away the old one. The pair used to be "a run that lost a
-        // claim" against "a run that lost nothing", and those two now answer the same, so
-        // the pair stopped being a pair the moment the clearing arm went. A split with
-        // nothing left to separate it would collapse to one answer and every test would
-        // still pass.
+        // THE CONTROL THAT KEEPS THE TWO SIDES OF THE SPLIT APART. A run that lost a claim
+        // and a run that lost nothing answer the same about a missing row, so without this
+        // case a split with nothing left to separate it would collapse to one answer and
+        // every test would still pass.
         //
         // IN THIS FIXTURE IT IS THE ONE WAY A MISSING ROW IS WITHHELD WITHOUT THE
         // UNREAD-FILE MARKER. When the machine-wide patch enumeration does not answer, the
         // confirmation pass downgrades every removable path before the patch file is read,
-        // setting no unread-file marker, so the row reaches the split withheld and
-        // unmarked. That is the run on which the app really did fail to establish something
-        // about THIS patch, rather than the run on which something else about the machine
-        // failed, and it is the difference the split exists to draw.
+        // setting no unread-file marker, so the row reaches the split withheld without it.
+        // The condition is on the whole machine, and the row is marked scan-wide
+        // for it, but it bears on THIS patch: a holder of it may have gone unseen. A
+        // condition about something else on the machine does not, and that is the
+        // difference the split exists to draw.
         //
         // ERROR_ACCESS_DENIED is one of the returns that call can make. Nothing here turns
         // on which: the code treats any answer that is not a clean end as a refusal.
@@ -1078,11 +1076,10 @@ public class FileSystemScanServiceTests
         Assert.False(row.WithheldOnUnreadableFile);
         // AND THE VERDICT SAYS UNESTABLISHED RATHER THAN CLEAN, which is the judging pass
         // refusing to read a clean answer off a product set it has just been told is short
-        // by an unknown amount. It said AllNonRemovable until that was fixed, so this row
-        // was reported by the withheld clause alone; it is now reported by both, and the
-        // two are not the same statement. This assertion is what stops the fix being
-        // quietly undone: a verdict that went back to clean here would leave the test
-        // green, because the row is still reported either way.
+        // by an unknown amount. The row is reported by the withheld clause and by the
+        // verdict clause, and the two are not the same statement. Without this assertion a
+        // verdict that went back to clean here would leave the test green, because the row
+        // is still reported either way.
         Assert.Equal(ProductPatchSet.Unestablished, row.ProductPatchSetVerdict);
 
         var result = await ScanWithThePatchFileGone(enumerated, fs);

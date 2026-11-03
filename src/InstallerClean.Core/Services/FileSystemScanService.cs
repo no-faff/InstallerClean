@@ -856,7 +856,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // WHAT STILL FIRES FROM THE WITHHELD SIDE. A row whose patch set could not be
             // established carries an Unestablished verdict, so the state-and-verdict test
             // reports it without the flag being consulted. And a row withheld with no
-            // unread-file marker set reaches here withheld and unmarked and is reported:
+            // unread-file marker set reaches here withheld without it and is reported:
             // every row the scan-wide withholding took is one, and so is every removable
             // path on a run whose machine-wide patch enumeration did not answer. See
             // MissingFilesReport.Affected, which owns the expression; this comment
