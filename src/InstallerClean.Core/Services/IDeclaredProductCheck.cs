@@ -115,7 +115,7 @@ namespace InstallerClean.Services;
 /// what it is, which covers a cached package value with no path in it and an
 /// <c>InstallProperties</c> key that will not read, where a key recording a cached package has
 /// sources that will not read, and where a key was installed from the Installer folder with no
-/// source list naming its package. A key without one keeps the package at a local folder on its
+/// source list naming its package. A key without one keeps the package at a folder on its
 /// source list. A patch file is kept
 /// where a key's <c>Patches</c> listing names it or was not established. All of this comes off
 /// the registry, so it keeps a file and never releases one.

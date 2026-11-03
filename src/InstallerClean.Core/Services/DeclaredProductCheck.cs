@@ -3448,7 +3448,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// from the Installer folder with no source list naming its package, so any file there could be
     /// the one it opens.
     ///
-    /// A KEY WITHOUT ONE gives only the package at a local folder on its source list
+    /// A KEY WITHOUT ONE gives only the package at a folder on its source list
     /// (<see cref="AddPackagesAtLocalSources"/>).
     /// </summary>
     private UnlistedKeysRead ReadUnlistedKeys(PassAnswers pass, Func<string, bool?>? namesAFileInInstallerFolder)
@@ -3632,9 +3632,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// The package a key with no <c>InstallProperties</c> key names at each local folder on its
-    /// source list, by identity. A candidate that is that package is kept, and this is the one
-    /// way such a key keeps a file.
+    /// The package a key with no <c>InstallProperties</c> key names at each folder on its source
+    /// list, by identity, a folder on a drive or share compared by name excepted. A candidate
+    /// that is that package is kept, and this is the one way such a key keeps a file.
     /// </summary>
     private void AddPackagesAtLocalSources(
         UnlistedProductKey key,
@@ -4167,7 +4167,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// </param>
     /// <param name="PackageNames">Every package name compared by name.</param>
     /// <param name="PackagesOfKeysWithout">
-    /// The packages at local folders on the source lists of keys without one, by identity.
+    /// The packages at the folders on the source lists of keys without one, by identity.
     /// </param>
     /// <param name="NotAllSeen">
     /// Whether a key left a second copy not ruled out (<see cref="ReadUnlistedKeys"/>).
