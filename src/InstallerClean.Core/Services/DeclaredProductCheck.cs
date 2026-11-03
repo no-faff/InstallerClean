@@ -1228,16 +1228,14 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             reading = refusal == PackageReadRefusal.WouldNotRead
                 ? CachedPackageReading.WouldNotRead
                 : CachedPackageReading.NoProductCode;
-            detail = readerDetail.Length != 0 ? readerDetail
-                : reading == CachedPackageReading.WouldNotRead ? "the cached package would not read"
-                : "the cached package declares no product code";
+            detail = UnreadCachedPackageDetail(readerDetail, refusal);
             return null;
         }
 
         if (identity.Value.IsPatch || identity.Value.Code.Length == 0)
         {
             reading = CachedPackageReading.NoProductCode;
-            detail = "the cached package declares no product code";
+            detail = NoProductCodeDetail;
             return null;
         }
 
@@ -1245,6 +1243,18 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         detail = string.Empty;
         return identity.Value.Code;
     }
+
+    /// <summary>
+    /// What the log says of a cached package the reader gave no identity for: the reader's own
+    /// detail where it wrote one, and otherwise which of its two refusals it was.
+    /// </summary>
+    private static string UnreadCachedPackageDetail(string readerDetail, PackageReadRefusal refusal) =>
+        readerDetail.Length != 0 ? readerDetail
+        : refusal == PackageReadRefusal.WouldNotRead ? "the cached package would not read"
+        : NoProductCodeDetail;
+
+    /// <summary>What the log says of a cached package that declares no product code.</summary>
+    private const string NoProductCodeDetail = "the cached package declares no product code";
 
     /// <summary>What an installation's cached package gave (<see cref="CodeTheCachedPackageDeclares"/>).</summary>
     private enum CachedPackageReading
@@ -3487,7 +3497,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             var cachedSaid = key.CachedPackages.Count > 0 || recordsNone;
             var cachedUnsaid = cachedSaid
                 ? null
-                : "its InstallProperties key did not show that it records no cached package";
+                : "the key's InstallProperties key would not read, or holds a cached package value naming no file";
             foreach (var path in key.CachedPackages)
             {
                 if (AddCachedPackage(path, packages, codes, out var unsaid)) continue;
@@ -3497,7 +3507,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             }
 
             var sourcesSeen = AddRegistrySources(
-                key, properties, recordsNone, pass, namesAFileInInstallerFolder, packages, byName, out var givenUp);
+                key, properties, recordsNone, pass, namesAFileInInstallerFolder, packages, byName, out var givenUp,
+                out var sourcesUnsaid);
 
             if (cachedSaid && sourcesSeen) continue;
 
@@ -3505,12 +3516,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             if (!cachedSaid || givenUp is null) keptOtherwise = true;
             else firstGivenUp ??= givenUp;
 
-            why ??= !cachedSaid
-                ? cachedUnsaid
-                : recordsNone
-                    ? "it records no cached package, no source list names its package, and the folder it was "
-                      + "installed from could not be ruled out as the Installer folder"
-                    : "it records a cached package, and its sources could not all be read";
+            why ??= cachedSaid ? sourcesUnsaid : cachedUnsaid;
         }
 
         if (why is not null)
@@ -3528,22 +3534,30 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <summary>
     /// The identity of the cached package at <paramref name="path"/> and the product code it
     /// declares. False where it is gone, will not read or declares no product code, with
-    /// <paramref name="unsaid"/> saying which for the log.
+    /// <paramref name="unsaid"/> saying which for the log, in the words
+    /// <see cref="CodeTheCachedPackageDeclares"/> gives a listed installation's.
     /// </summary>
     private bool AddCachedPackage(string path, List<FileIdentity> packages, HashSet<string> codes, out string? unsaid)
     {
-        unsaid = "the cached package it records could not be identified";
-        if (_fileIdentities is null
-            || _fileIdentities.ReadOutcome(path, out var identity) != FileIdentityRead.Read)
+        if (_fileIdentities is null)
+        {
+            unsaid = "no way to read a cached package";
             return false;
+        }
 
-        var declared = _identityReader.Read(path, isPatch: false, out var detail);
+        var outcome = _fileIdentities.ReadOutcome(path, out var identity);
+        if (outcome != FileIdentityRead.Read)
+        {
+            unsaid = outcome == FileIdentityRead.NamesNothing
+                ? "the cached package is not a file that is there"
+                : "the cached package could not be identified";
+            return false;
+        }
+
+        var declared = _identityReader.Read(path, isPatch: false, out var detail, out var refusal);
         if (declared is null || declared.Value.Code.Length == 0 || declared.Value.IsPatch)
         {
-            unsaid = declared is null
-                ? "the cached package it records did not yield a product code. Reader detail: "
-                  + (detail.Length == 0 ? "none given" : detail)
-                : "the cached package it records is not an installation package declaring a product code";
+            unsaid = declared is null ? UnreadCachedPackageDetail(detail, refusal) : NoProductCodeDetail;
             return false;
         }
 
@@ -3586,6 +3600,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// (<see cref="WasInstalledFromTheInstallerFolder"/>). Where a place did give a name, that
     /// name goes on keeping a file carrying it. A check that cannot read sources answers false for
     /// every key.
+    ///
+    /// <paramref name="unsaid"/> is what the log says of a false answer: the first read that did
+    /// not settle, or, for a key recording no cached package, that it was installed from the
+    /// Installer folder.
     /// </summary>
     private bool AddRegistrySources(
         UnlistedProductKey key,
@@ -3595,18 +3613,26 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         Func<string, bool?>? namesAFileInInstallerFolder,
         List<FileIdentity> opened,
         List<PackageByName> byName,
-        out string? givenUp)
+        out string? givenUp,
+        out string? unsaid)
     {
         givenUp = null;
-        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return false;
+        unsaid = null;
+        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null)
+        {
+            unsaid = "no way to read a source list";
+            return false;
+        }
 
         var allRead = RecordedInstallSource(properties, out var installSource);
         var keptOtherwise = !allRead;
         string? firstGivenUp = null;
+        string? firstUnsaid = allRead ? null : "the key's InstallSource is in a form the check does not compare";
 
-        void NotRead(string? root)
+        void NotRead(string? root, string why)
         {
             allRead = false;
+            firstUnsaid ??= why;
             if (root is null) keptOtherwise = true;
             else firstGivenUp ??= root;
         }
@@ -3617,7 +3643,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             if (!SourceListAt(key.Code, sid, context, out var listKey, out var values))
             {
-                NotRead(null);
+                NotRead(null, "a source list could not be read, its key not reading or its account's hive not loaded");
                 continue;
             }
 
@@ -3626,7 +3652,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             listFound = true;
             if (ReadSourceList(listKey, values, pass) is not { } sources)
             {
-                NotRead(null);
+                NotRead(null, "a source list holds a value in a form the check does not compare");
                 continue;
             }
 
@@ -3647,13 +3673,22 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     continue;
 
                 byName.Add(new PackageByName(null, sources.PackageName));
-                NotRead(refusedFor);
+                NotRead(refusedFor, refusedFor is null
+                    ? "a package at a folder on its source list could not be ruled out"
+                    : "a package at a folder on its source list was not read, its root given up for the pass");
             }
         }
 
         if (recordsNone)
         {
-            if (packageNames.Count == 0) return !WasInstalledFromTheInstallerFolder(installSource, properties, pass);
+            if (packageNames.Count == 0)
+            {
+                if (!WasInstalledFromTheInstallerFolder(installSource, properties, pass)) return true;
+
+                unsaid = "the key records no cached package, no source list that read names its package, and the "
+                    + "folder it was installed from is the Installer folder";
+                return false;
+            }
 
             // A value this check does not compare is on no list of folders, so a name found on
             // a list keeps the file carrying it.
@@ -3664,9 +3699,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         if (!listFound && installSource.Length > 0 && !IsNotTheInstallerFolder(installSource, pass, out var folderGivenUp))
-            NotRead(folderGivenUp);
+            NotRead(folderGivenUp, "the key has no source list, and the folder it was installed from could not be "
+                + "ruled out as the Installer folder");
 
         givenUp = keptOtherwise ? null : firstGivenUp;
+        unsaid = firstUnsaid;
         return allRead;
     }
 

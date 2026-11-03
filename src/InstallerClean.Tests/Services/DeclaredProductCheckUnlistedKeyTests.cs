@@ -290,7 +290,7 @@ public class DeclaredProductCheckUnlistedKeyTests
             [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished],
             check.Outcomes);
         var entry = Assert.Single(recorded);
-        Assert.Equal("the cached package it records could not be identified", entry.Detail);
+        Assert.Equal("the cached package is not a file that is there", entry.Detail);
         Assert.Contains("every installation package is kept rather than offered", entry.Error.Message);
         Assert.DoesNotContain(Cached, entry.Error.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -308,7 +308,88 @@ public class DeclaredProductCheckUnlistedKeyTests
             [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
             (_, detail) => recorded.Add(detail));
 
-        Assert.Equal(["it records a cached package, and its sources could not all be read"], recorded);
+        Assert.Equal(["a source list could not be read, its key not reading or its account's hive not loaded"], recorded);
+    }
+
+    [Fact]
+    public void A_key_whose_cached_package_will_not_read_is_logged_with_the_readers_detail()
+    {
+        var pc = new Pc();
+        pc.Files.Opens(Cached, 3);
+        pc.Packages.YieldsNothing(Cached, "the Property table would not open");
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(["the Property table would not open"], recorded);
+    }
+
+    [Fact]
+    public void A_key_whose_cached_package_declares_no_code_is_logged_as_that()
+    {
+        var pc = new Pc();
+        pc.Files.Opens(Cached, 3);
+        pc.Packages.DeclaresNoCode(Cached);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(["the cached package declares no product code"], recorded);
+    }
+
+    [Fact]
+    public void A_key_whose_InstallProperties_will_not_read_is_logged_as_that()
+    {
+        var pc = new Pc();
+        pc.Registry.Answers(Properties(System, KeyCode), RegistryKeyPresence.Unreadable);
+        var recorded = new List<string>();
+
+        var check = pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(
+            [DeclaredProductOutcome.SecondCopyUnestablished, DeclaredProductOutcome.SecondCopyUnestablished],
+            check.Outcomes);
+        Assert.Equal(
+            ["the key's InstallProperties key would not read, or holds a cached package value naming no file"],
+            recorded);
+    }
+
+    [Fact]
+    public void A_key_recording_no_cached_package_installed_from_the_Installer_folder_is_logged_as_that()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(
+            ["the key records no cached package, no source list that read names its package, and the folder it "
+             + "was installed from is the Installer folder"],
+            recorded);
+    }
+
+    [Fact]
+    public void A_key_with_no_list_installed_from_the_Installer_folder_is_logged_as_that()
+    {
+        var pc = new Pc();
+        pc.CachedPackageDeclares(ThirdCode);
+        pc.Packages.Declares(Second, OtherCode);
+        pc.InstalledFrom(Folder);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf(
+            [Installed(System, KeyCode, Cached)], [Package(First), Package(Second)],
+            (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(
+            ["the key has no source list, and the folder it was installed from could not be ruled out as the "
+             + "Installer folder"],
+            recorded);
     }
 
     [Fact]
