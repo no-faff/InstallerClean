@@ -2320,8 +2320,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// package whose record does not show an ordinary installation (<see cref="LinksOf"/>), it
     /// keeps every installation package the answer about its own product would let through.
     /// Read for one candidate whose name it could be (<see cref="WithPackagesItCouldBe"/>), it
-    /// keeps that candidate. A package on a local drive is never left to be read by name
-    /// (<see cref="ComparedByName"/>), so it is read for one of the others.
+    /// keeps that candidate. Read for a product key no installation accounts for, it keeps what
+    /// <see cref="ReadUnlistedKeys"/> sets out. A package on a local drive is never left to be
+    /// read by name (<see cref="ComparedByName"/>), so it is read for one of the others.
     ///
     /// THE READ IS MADE UNDER ITS ROOT'S RULES (<see cref="ReadUnderRoot"/>): waited for up to the
     /// time limit, and refused for a root given up for the pass.
@@ -3213,9 +3214,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// NULL, WHICH KEEPS THE FILE, for any other context, per machine with an account, per
     /// user without one, and a code or an account that will not make a key name. An account is
     /// taken only as 'S-' followed by digits and hyphens, so no account names a key outside its
-    /// own. Which account's hive is read is not decided here: a per-user-unmanaged key is read
-    /// only for the account this process runs as (<see cref="AddSourcePackages"/>,
-    /// <see cref="RecordedPackageCode"/>).
+    /// own. Which account's hive is read is not decided here. For an installation the caller's
+    /// enumeration listed, a per-user-unmanaged key is read only for the account this process
+    /// runs as (<see cref="AddSourcePackages"/>, <see cref="RecordedPackageCode"/>). For a product
+    /// key no installation accounts for, it is read in the hive of the account the key sits
+    /// under, where that hive is loaded (<see cref="SourceListAt"/>).
     /// </summary>
     private static KeyAt? ProductKeyPath(string code, string? sid, MsiInstallContext context)
     {
@@ -3389,13 +3392,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <summary>
     /// An installation package <paramref name="letThrough"/> would let through, put to the
     /// product keys no installation accounts for (<see cref="ReadUnlistedKeys"/>): a candidate
-    /// declaring a code they give is kept; where they leave a second copy not ruled out, or the
-    /// check has no way to read the source lists of a key without an <c>InstallProperties</c>
-    /// key, every candidate is kept; where they give a package or a package name to compare
-    /// with, a candidate whose own identity will not read is kept; and a candidate that is a
-    /// package they open, or that a package name reaches (<see cref="ReachedByName"/>), is kept.
-    /// Each file kept is counted for the kind of key that kept it
-    /// (<see cref="PassAnswers.KeptForAKey"/>), a key with an <c>InstallProperties</c> key first.
+    /// declaring a code they give is kept; where they leave a second copy not ruled out, or a key
+    /// without an <c>InstallProperties</c> key leaves its source lists not all read, every
+    /// candidate is kept; where they give a package or a package name to compare with, a
+    /// candidate whose own identity will not read is kept; and a candidate that is a package they
+    /// open, or that a package name reaches (<see cref="ReachedByName"/>), is kept. Each file kept
+    /// is counted for the kind of key that kept it (<see cref="PassAnswers.KeptForAKey"/>), a key
+    /// with an <c>InstallProperties</c> key first.
     ///
     /// <paramref name="givenUp"/> is the root whose give-up alone left the keys not all seen.
     /// </summary>
@@ -3423,10 +3426,14 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         if (read.KeysWithoutUnread)
+        {
+            givenUp = read.GivenUp;
             return pass.KeptForAKey(DeclaredProductOutcome.SecondCopyUnestablished, withInstallProperties: false);
+        }
 
         var comparedWith = read.Packages.Count > 0 || read.PackageNames.Count > 0;
-        if ((!comparedWith && read.PackagesOfKeysWithout.Count == 0) || _fileIdentities is null)
+        var comparedWithout = read.PackagesOfKeysWithout.Count > 0 || read.PackageNamesOfKeysWithout.Count > 0;
+        if ((!comparedWith && !comparedWithout) || _fileIdentities is null)
             return letThrough;
 
         if (_fileIdentities.ReadOutcome(candidatePath, out var candidate) != FileIdentityRead.Read)
@@ -3436,6 +3443,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             return pass.KeptForAKey(DeclaredProductOutcome.Unestablished, withInstallProperties: true);
 
         return read.PackagesOfKeysWithout.Contains(candidate)
+            || ReachedByName(candidatePath, candidate, read.PackageNamesOfKeysWithout, pass)
             ? pass.KeptForAKey(DeclaredProductOutcome.Unestablished, withInstallProperties: false)
             : letThrough;
     }
@@ -3489,10 +3497,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///   list naming its package or with a source list that did not read, so any file there
     ///   could be the one it opens.
     ///
-    /// A KEY WITHOUT ONE gives only the package it names at a folder on its source list, read by
-    /// identity, a folder compared by name excepted (<see cref="AddPackagesAtListedFolders"/>).
-    /// Where the check has no way to read source lists, such a key keeps every installation
-    /// package.
+    /// A KEY WITHOUT ONE gives the package it names at a folder on its source lists, read by
+    /// identity, and its package name where a folder on a list is compared by name or the list
+    /// searches media (<see cref="AddPackagesAtListedFolders"/>). SUCH A KEY KEEPS EVERY
+    /// INSTALLATION PACKAGE where a list does not read, its account's hive not loaded among the
+    /// reasons, where a list holds a value in a form not compared, where the read of a package on
+    /// a list does not settle, and where the check has no way to read source lists.
+    ///
+    /// Where only roots given up for the pass refused the reads that keep every installation
+    /// package, for keys of either kind, the files kept are counted towards the first of those
+    /// roots, and otherwise towards none.
     ///
     /// Where a key keeps every installation package, the log says why once, for the first such
     /// key, as <see cref="LinksOf"/> does for a listed installation.
@@ -3503,6 +3517,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var codes = new HashSet<string>(StringComparer.Ordinal);
         var packages = new List<FileIdentity>();
         var advertised = new List<FileIdentity>();
+        var advertisedNames = new List<string>();
         var byName = new List<PackageByName>();
         var notAllSeen = false;
         var keysWithoutUnread = false;
@@ -3516,10 +3531,21 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             if (!key.HasInstallProperties)
             {
-                if (!AddPackagesAtListedFolders(key, pass, namesAFileInInstallerFolder, advertised))
+                // Where every installation package is already kept and no root given up accounts
+                // for that alone, nothing a key without one names changes what any file is given,
+                // so its lists are not read: a read of a package on one can wait out the time limit.
+                if ((notAllSeen || keysWithoutUnread) && keptOtherwise) continue;
+
+                if (!AddPackagesAtListedFolders(
+                        key, pass, namesAFileInInstallerFolder, advertised, advertisedNames, out var listGivenUp,
+                        out var listUnsaid))
                 {
                     keysWithoutUnread = true;
-                    why ??= NoSourceReadersDetail;
+                    if (listGivenUp is null) keptOtherwise = true;
+                    else firstGivenUp ??= listGivenUp;
+
+                    ReasonGiven(listUnsaid);
+                    why ??= listUnsaid ?? "a read of the key did not settle";
                 }
 
                 continue;
@@ -3568,7 +3594,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         return new UnlistedKeysRead(
             codes, packages, byName.Select(package => package.Name).ToHashSet(StringComparer.Ordinal),
-            advertised, notAllSeen, keptOtherwise ? null : firstGivenUp, keysWithoutUnread);
+            advertised, advertisedNames.ToHashSet(StringComparer.Ordinal), notAllSeen,
+            keptOtherwise ? null : firstGivenUp, keysWithoutUnread);
     }
 
     /// <summary>
@@ -3676,12 +3703,14 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <summary>
     /// The sources of a key no installation accounts for, read from the registry alone, as
     /// <see cref="AddPackagesAtSources"/> reads a listed installation's with the comparison
-    /// with the API left out, because no API call is put to such a key. False where they
-    /// cannot be read, with <paramref name="givenUp"/> the root whose give-up refused a read,
-    /// if any: an account whose hive is not loaded, a key that will not read, a value in a form
-    /// this check does not compare, and a package that does not settle. A refusal in one place
-    /// leaves every other place read, so what the key does name still keeps a file. A check that
-    /// cannot read sources answers false for every key.
+    /// with the API left out, because no API call is put to such a key. A key without an
+    /// <c>InstallProperties</c> key is read here too, with <paramref name="properties"/> absent
+    /// and <paramref name="recordsNone"/> false (<see cref="AddPackagesAtListedFolders"/>).
+    /// False where they cannot be read, with <paramref name="givenUp"/> the root whose give-up
+    /// refused a read, if any: an account whose hive is not loaded, a key that will not read, a
+    /// value in a form this check does not compare, and a package that does not settle. A
+    /// refusal in one place leaves every other place read, so what the key does name still keeps
+    /// a file. A check that cannot read sources answers false for every key.
     ///
     /// A LIST THAT IS NOT THERE, under a hive that is loaded, names nothing to compare. A key
     /// recording a cached package, with no list and an <c>InstallSource</c>, has no package name
@@ -3832,38 +3861,41 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// The package a key with no <c>InstallProperties</c> key names at each folder on its source
-    /// list, by identity, a folder on a drive or share compared by name excepted. A candidate
-    /// that is that package is kept. False, with nothing read, where the check has no way to
-    /// read a source list, and every installation package is then kept for the key. A patch
-    /// file its <c>Patches</c> listing could name is kept by <see cref="PutPatchToUnlistedKeys"/>.
+    /// What a key with no <c>InstallProperties</c> key names on its source lists, read by
+    /// <see cref="AddRegistrySources"/> as the lists of a key with one are, with no
+    /// <c>InstallSource</c> to add and without the narrower answer for a key recording no cached
+    /// package. The package at each folder on a list is read by its identity and goes to
+    /// <paramref name="packages"/>. The package name goes to <paramref name="packageNames"/>
+    /// where the list searches media for it, where a folder on it is compared by name
+    /// (<see cref="ComparedByName"/>) and where the read of a package on it does not settle, so
+    /// the file that name opens in the Installer folder is kept (<see cref="ReachedByName"/>).
+    ///
+    /// FALSE, WHICH KEEPS EVERY INSTALLATION PACKAGE, where a list does not read, its account's
+    /// hive not loaded among the reasons; where a list holds a value in a form this check does
+    /// not compare; where the read of a package on a list does not settle; and where the check has
+    /// no way to read source lists. A list nobody has read may name any file in the Installer
+    /// folder. <paramref name="givenUp"/> and <paramref name="unsaid"/> are as
+    /// <see cref="AddRegistrySources"/> gives them.
+    ///
+    /// A LIST THAT IS NOT THERE, under a hive that is loaded, names nothing and keeps nothing. A
+    /// patch file its <c>Patches</c> listing could name is kept by
+    /// <see cref="PutPatchToUnlistedKeys"/>.
     /// </summary>
     private bool AddPackagesAtListedFolders(
         UnlistedProductKey key,
         PassAnswers pass,
         Func<string, bool?>? namesAFileInInstallerFolder,
-        List<FileIdentity> packages)
+        List<FileIdentity> packages,
+        List<string> packageNames,
+        out string? givenUp,
+        out string? unsaid)
     {
-        if (namesAFileInInstallerFolder is null || _fileIdentities is null || _registry is null) return false;
-
-        foreach (var (sid, context) in SourceListPlaces(key.Account))
-        {
-            if (!SourceListAt(key.Code, sid, context, out var listKey, out var values) || values is null) continue;
-            if (ReadSourceList(listKey, values, pass) is not { } sources) continue;
-
-            foreach (var folder in sources.Folders)
-            {
-                var package = PathOfPackage(folder, sources.PackageName);
-                if (ComparedByName(package, _registry, pass)) continue;
-
-                var inInstallerFolder = IsLocalDrive(RootOf(package), pass) ? null : namesAFileInInstallerFolder;
-                if (ReadSourcePackage(package, pass, inInstallerFolder, out var identity, out _)
-                    && identity is { } read)
-                    packages.Add(read);
-            }
-        }
-
-        return true;
+        var byName = new List<PackageByName>();
+        var allRead = AddRegistrySources(
+            key, new RegistryKeyValues(RegistryKeyPresence.Absent), recordsNone: false, pass,
+            namesAFileInInstallerFolder, packages, byName, out givenUp, out unsaid);
+        packageNames.AddRange(byName.Select(package => package.Name));
+        return allRead;
     }
 
     /// <summary>
@@ -4372,27 +4404,35 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <param name="Packages">
     /// The packages the keys with an <c>InstallProperties</c> key open, by identity.
     /// </param>
-    /// <param name="PackageNames">Every package name compared by name.</param>
+    /// <param name="PackageNames">
+    /// Every package name the keys with an <c>InstallProperties</c> key give to compare by name.
+    /// </param>
     /// <param name="PackagesOfKeysWithout">
     /// The packages at the folders on the source lists of keys without one, by identity.
+    /// </param>
+    /// <param name="PackageNamesOfKeysWithout">
+    /// The package names the source lists of keys without one give to compare by name: a list
+    /// searching media, a folder compared by name, and a package whose read did not settle
+    /// (<see cref="AddPackagesAtListedFolders"/>).
     /// </param>
     /// <param name="NotAllSeen">
     /// Whether a key left a second copy not ruled out (<see cref="ReadUnlistedKeys"/>).
     /// </param>
     /// <param name="GivenUp">
-    /// Where <paramref name="NotAllSeen"/> is true only because reads were refused for roots
-    /// given up for the pass, the first of those roots, and null otherwise.
+    /// Where <paramref name="NotAllSeen"/> or <paramref name="KeysWithoutUnread"/> is true only
+    /// because reads were refused for roots given up for the pass, the first of those roots, and
+    /// null otherwise.
     /// </param>
     /// <param name="KeysWithoutUnread">
-    /// Whether the check had no way to read the source lists of a key without an
-    /// <c>InstallProperties</c> key (<see cref="AddPackagesAtListedFolders"/>), which keeps every
-    /// installation package.
+    /// Whether a key without an <c>InstallProperties</c> key left its source lists not all read
+    /// (<see cref="AddPackagesAtListedFolders"/>), which keeps every installation package.
     /// </param>
     private sealed record UnlistedKeysRead(
         HashSet<string> Codes,
         List<FileIdentity> Packages,
         HashSet<string> PackageNames,
         List<FileIdentity> PackagesOfKeysWithout,
+        HashSet<string> PackageNamesOfKeysWithout,
         bool NotAllSeen,
         string? GivenUp,
         bool KeysWithoutUnread);

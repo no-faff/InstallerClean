@@ -78,6 +78,12 @@ public class DeclaredProductCheckUnlistedKeyTests
         /// <summary>The test for the Installer folder, which the scan hands every pass.</summary>
         public Func<string, bool?> IsTheInstallerFolder { get; set; } = folder => folder == Folder;
 
+        /// <summary>The kind of each drive, which a test can make slow to answer.</summary>
+        public Func<string, DriveType> DriveKindOf { get; set; } = _ => DriveType.Fixed;
+
+        /// <summary>How long the check waits for a read under one root.</summary>
+        public TimeSpan SourceFolderTimeLimit { get; set; } = TimeSpan.FromSeconds(30);
+
         public Pc(string account = System)
         {
             Packages.Declares(First, OtherCode);
@@ -127,7 +133,8 @@ public class DeclaredProductCheckUnlistedKeyTests
             IReadOnlyList<UnlistedProductKey> keys, OrphanedFile[] files, Action<Exception, string>? recordRefusal = null) =>
             new DeclaredProductCheck(Msi, Packages, Files, Disk, Registry, null)
             {
-                DriveKindOf = _ => DriveType.Fixed,
+                DriveKindOf = DriveKindOf,
+                SourceFolderTimeLimit = SourceFolderTimeLimit,
                 NamesInFolderOf = path => [path[(path.LastIndexOf('\\') + 1)..]],
             }.Screen(files, [], keys, default, recordRefusal, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
     }
@@ -1107,34 +1114,157 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
-    public void A_key_with_no_InstallProperties_keeps_nothing_by_a_name()
+    public void A_key_with_no_InstallProperties_keeps_the_file_its_package_name_opens_where_its_list_searches_media()
     {
+        // The name is outside ASCII, so a comparison of names alone could not rule out either
+        // file. The filesystem answers which file the name opens in the Installer folder.
         const string name = "安装.msi";
         var pc = new Pc();
         pc.HasList(HiveList(System, KeyCode), name, Setup);
         pc.Files.Answers(Setup + name, FileIdentityRead.NamesNothing);
+        pc.Files.Opens(Folder + name, 2);
 
-        Assert.Equal([LetThrough, LetThrough], pc.Screen([NoProperties()], Package(First), Package(Second)));
-        Assert.DoesNotContain(Folder + name, pc.Files.Reads);
+        var screening = pc.ScreeningOf([NoProperties()], [Package(First), Package(Second)]);
+
+        Assert.Equal([LetThrough, DeclaredProductOutcome.Unestablished], screening.Outcomes);
+        Assert.Equal(new UnlistedKeyHolds(0, 1), screening.UnlistedHolds);
+    }
+
+    private const string ListUnread =
+        "a source list could not be read, its key not reading or its account's hive not loaded";
+
+    /// <summary>
+    /// What <paramref name="pc"/> answers for <paramref name="keys"/>, with every reason the log
+    /// is given for a product key, its prefix checked and taken off.
+    /// </summary>
+    private static (DeclaredProductScreening Screening, List<string> Reasons) ScreenedWithReasons(
+        Pc pc, params UnlistedProductKey[] keys)
+    {
+        var reasons = new List<string>();
+        var screening = pc.ScreeningOf(
+            keys, [Package(First), Package(Second)], (_, detail) => reasons.Add(ReasonIn(detail)));
+        return (screening, reasons);
+    }
+
+    [Theory]
+    [InlineData(RegistryKeyPresence.Absent)]
+    [InlineData(RegistryKeyPresence.Unreadable)]
+    public void A_key_with_no_InstallProperties_under_a_hive_not_loaded_keeps_every_file(RegistryKeyPresence hive)
+    {
+        // A program another account advertised per user from a copy in the Installer folder,
+        // that account signed out: its key holds Patches alone, and its source list is in its
+        // own hive, which is not loaded. The copy declares the program's own code.
+        var pc = new Pc(User);
+        pc.Registry.HiveIs(User, hive);
+        pc.Packages.Declares(First, KeyCode);
+
+        var (screening, reasons) = ScreenedWithReasons(
+            pc, new UnlistedProductKey(User, KeyCode, [], [], HasInstallProperties: false));
+
+        Assert.Equal(EveryFileKept, screening.Outcomes);
+        Assert.Equal(new UnlistedKeyHolds(0, 2), screening.UnlistedHolds);
+        Assert.Empty(screening.RootsGivenUp);
+        Assert.Equal([ListUnread], reasons);
     }
 
     [Fact]
-    public void A_key_with_no_InstallProperties_keeps_nothing_where_its_list_will_not_read()
+    public void A_key_with_no_InstallProperties_after_one_that_keeps_every_file_is_not_read()
+    {
+        var pc = new Pc();
+        pc.Registry.HiveIs(User, RegistryKeyPresence.Absent);
+        pc.Registry.Answers(ManagedList(User, KeyCode), RegistryKeyPresence.Absent);
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Files.Opens(SetupPackage, 1);
+
+        var (screening, reasons) = ScreenedWithReasons(pc, NoProperties(User), NoProperties());
+
+        Assert.Equal(EveryFileKept, screening.Outcomes);
+        Assert.Equal([ListUnread], reasons);
+        Assert.DoesNotContain(SetupPackage, pc.Files.Reads);
+        Assert.DoesNotContain(HiveList(System, KeyCode), pc.Registry.Reads);
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_keeps_every_file_where_its_list_will_not_read()
     {
         var pc = new Pc();
         pc.Registry.Answers(HiveList(System, KeyCode), RegistryKeyPresence.Unreadable);
 
-        Assert.Equal([LetThrough, LetThrough], pc.Screen([NoProperties()], Package(First), Package(Second)));
+        var (screening, reasons) = ScreenedWithReasons(pc, NoProperties());
+
+        Assert.Equal(EveryFileKept, screening.Outcomes);
+        Assert.Equal([ListUnread], reasons);
     }
 
     [Fact]
-    public void A_key_with_no_InstallProperties_keeps_nothing_where_the_read_of_its_package_does_not_settle()
+    public void A_key_with_no_InstallProperties_keeps_every_file_where_its_list_holds_a_value_in_a_form_not_compared()
+    {
+        var pc = new Pc();
+        pc.HasList(HiveList(System, KeyCode), SetupName, @"D:\%Folder%\");
+
+        var (screening, reasons) = ScreenedWithReasons(pc, NoProperties());
+
+        Assert.Equal(EveryFileKept, screening.Outcomes);
+        Assert.Equal(["a source list holds a value in a form the check does not compare"], reasons);
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_keeps_every_file_where_the_read_of_its_package_does_not_settle()
     {
         var pc = new Pc();
         pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
         pc.Files.Answers(SetupPackage, FileIdentityRead.OpenRefused);
 
-        Assert.Equal([LetThrough, LetThrough], pc.Screen([NoProperties()], Package(First), Package(Second)));
+        var (screening, reasons) = ScreenedWithReasons(pc, NoProperties());
+
+        Assert.Equal(EveryFileKept, screening.Outcomes);
+        Assert.Empty(screening.RootsGivenUp);
+        Assert.Equal(["a package at a folder on its source list could not be ruled out"], reasons);
+    }
+
+    /// <summary>
+    /// A PC whose key has its list at <see cref="Setup"/>, on a drive whose kind does not answer
+    /// within the time limit, so the drive is given up and the package there is not read.
+    /// </summary>
+    private static Pc PcWithItsPackageOnADriveGivenUp()
+    {
+        var pc = new Pc
+        {
+            SourceFolderTimeLimit = TimeSpan.FromMilliseconds(100),
+            DriveKindOf = drive =>
+            {
+                if (drive.StartsWith('D')) Thread.Sleep(TimeSpan.FromSeconds(5));
+                return DriveType.Fixed;
+            },
+        };
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        return pc;
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_package_is_on_a_drive_given_up_keeps_every_file_and_counts_them_there()
+    {
+        var pc = PcWithItsPackageOnADriveGivenUp();
+
+        var (screening, reasons) = ScreenedWithReasons(pc, NoProperties());
+
+        Assert.Equal(EveryFileKept, screening.Outcomes);
+        Assert.Equal([("D:", 2)], screening.RootsGivenUp.Select(given => (given.Root, given.FilesKept)));
+        Assert.Equal(["a package at a folder on its source list was not read, its root given up for the pass"], reasons);
+        Assert.DoesNotContain(SetupPackage, pc.Files.Reads);
+    }
+
+    [Fact]
+    public void A_file_a_second_key_keeps_for_another_reason_is_not_counted_towards_a_drive_given_up()
+    {
+        var pc = PcWithItsPackageOnADriveGivenUp();
+        pc.Registry.HiveIs(User, RegistryKeyPresence.Absent);
+        pc.Registry.Answers(ManagedList(User, KeyCode), RegistryKeyPresence.Absent);
+
+        var (screening, _) = ScreenedWithReasons(pc, NoProperties(), NoProperties(User));
+
+        Assert.Equal(EveryFileKept, screening.Outcomes);
+        Assert.Equal([("D:", 0)], screening.RootsGivenUp.Select(given => (given.Root, given.FilesKept)));
     }
 
     [Theory]
@@ -1170,10 +1300,12 @@ public class DeclaredProductCheckUnlistedKeyTests
     [Fact]
     public void A_key_with_no_InstallProperties_whose_list_the_check_reads_keeps_nothing_it_does_not_open()
     {
-        // The fixture the missing-reader theory above uses, with every reader there.
+        // The fixture the missing-reader theory above uses, with every reader there. Its list
+        // searches media, so the package name is looked for in the Installer folder as well.
         var pc = new Pc();
         pc.HasList(MachineList(KeyCode), SetupName, Setup);
         pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
 
         Assert.Equal(NothingKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
     }
@@ -1192,22 +1324,22 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
-    public void A_key_with_no_InstallProperties_keeps_nothing_at_a_remote_folder()
+    public void A_key_with_no_InstallProperties_keeps_the_file_its_package_name_opens_where_its_folder_is_remote()
     {
+        // A list with no media source, so the folder on the share alone gives the name.
+        var list = HiveList(System, KeyCode);
         var pc = new Pc();
-        pc.HasList(HiveList(System, KeyCode), SetupName, Share);
+        pc.Registry.Holds(list, new RegistryValue("PackageName", RegistryValueKind.String, SetupName));
+        pc.Registry.Holds(list + @"\Net", new RegistryValue("1", RegistryValueKind.ExpandString, Share));
+        pc.Registry.Answers(list + @"\URL", RegistryKeyPresence.Absent);
+        pc.Registry.Answers(list + @"\Media", RegistryKeyPresence.Absent);
+        pc.Files.Opens(Folder + SetupName, 2);
 
-        Assert.Equal([LetThrough, LetThrough], pc.Screen([NoProperties()], Package(First), Package(Second)));
+        var screening = pc.ScreeningOf([NoProperties()], [Package(First), Package(Second)]);
+
+        Assert.Equal([LetThrough, DeclaredProductOutcome.Unestablished], screening.Outcomes);
+        Assert.Equal(new UnlistedKeyHolds(0, 1), screening.UnlistedHolds);
         Assert.DoesNotContain(Share + SetupName, pc.Files.Reads);
-    }
-
-    [Fact]
-    public void A_key_with_no_InstallProperties_under_an_unloaded_hive_keeps_nothing()
-    {
-        var pc = new Pc(User);
-        pc.Registry.HiveIs(User, RegistryKeyPresence.Absent);
-
-        Assert.Equal([LetThrough, LetThrough], pc.Screen([NoProperties(User)], Package(First), Package(Second)));
     }
 
     // ---------------------------------------------------------------- the spare patch
@@ -1309,6 +1441,7 @@ public class DeclaredProductCheckUnlistedKeyTests
         var pc = new Pc();
         pc.HasList(MachineList(KeyCode), SetupName, Setup);
         pc.Files.Opens(SetupPackage, 1);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
 
         Assert.Equal(new UnlistedKeyHolds(0, 1), HoldsOf(pc, [NoProperties()], Package(First), Package(Second)));
     }

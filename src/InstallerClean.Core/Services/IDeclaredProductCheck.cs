@@ -117,9 +117,12 @@ namespace InstallerClean.Services;
 /// sources that will not read, or has no source list and was installed from a folder not shown
 /// not to be the Installer folder; and where a key recording none was installed from the
 /// Installer folder with no source list naming its package or with a source list that did not
-/// read. A key without one keeps the package its source list names at a folder on that list,
-/// read by identity, a folder compared by name excepted, and every installation package where
-/// the check has no way to read source lists. Where keys of either kind give a
+/// read. A key without one keeps the package its source lists name at a folder on them, read
+/// by identity, and a file its package name opens from that file's own folder where a folder on
+/// a list is compared by name or the list searches media. It keeps every installation package
+/// where a source list will not read, its account's hive not loaded among the reasons, where a
+/// list holds a value in a form not compared, where the read of a package on a list does not
+/// settle, and where the check has no way to read source lists. Where keys of either kind give a
 /// package to compare with, a file whose own identity will not read is kept. A patch file is
 /// kept where a key's <c>Patches</c> listing names it or was not established. All of this
 /// comes off the registry, so it keeps a file and never releases one.
@@ -674,7 +677,9 @@ public enum DeclaredProductOutcome
     /// folder not shown not to be the Installer folder; and where a key recording none was
     /// installed from the Installer folder with no source list naming its package or with a
     /// source list that did not read. A key without an <c>InstallProperties</c> key gives it
-    /// where the check has no way to read source lists.
+    /// where a source list will not read, its account's hive not loaded among the reasons, where
+    /// a list holds a value in a form not compared, where the read of a package on a list does
+    /// not settle, and where the check has no way to read source lists.
     ///
     /// Where a single installation's packages cannot all be seen it covers what
     /// <see cref="DeclaredProductInstalled"/> covers for one: a cached package that will
