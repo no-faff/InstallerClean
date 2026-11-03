@@ -1414,15 +1414,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // warn, and a run that came up short somewhere ELSE would print an alarm about
         // a file this scan had positively established nothing could reach for.
         //
-        // AND THE CONDITIONS THIS LOOP FIRES ON DO NOT NAME THAT ROW'S RISK. They are a
-        // product the enumeration DID return whose lost records the registry does not
-        // hold, a product it returned whose installations the keyed ask did not settle
-        // and whose registry entry names a cached file the enumeration never claimed that
-        // is on the disk, a product the registry names that this scan could not settle,
-        // and a cached patch file no product the scan asks is recorded as holding. None
-        // of them is "a holder of this patch went unseen", which is the condition that
-        // would bear on this file. They are signs of a degraded machine, not a per-file
-        // verdict.
+        // AND THE PRODUCT AND CACHED-FILE CONDITIONS THIS LOOP FIRES ON DO NOT NAME THAT
+        // ROW'S RISK. They are a product the enumeration DID return whose lost records the
+        // registry does not hold, a product it returned whose installations the keyed ask
+        // did not settle and whose registry entry names a cached file the enumeration never
+        // claimed that is on the disk, a product the registry names that this scan could
+        // not settle, and a cached patch file no product the scan asks is recorded as
+        // holding. None of them is "a holder of this patch went unseen", which is the
+        // condition that would bear on this file. They are signs of a degraded machine, not
+        // a per-file verdict.
         //
         // A RECORDED PATH THE SCAN COULD NOT SETTLE CAN BE THAT HOLDER, and the split
         // still needs nothing from this loop, because the holder's registration reaches
@@ -1441,13 +1441,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // FILE HAS GONE. Every row this loop withholds is one. So is every removable path
         // on a run whose machine-wide patch enumeration did not answer, which downgrades
         // them with no unread-file marker set (see ConfirmRemovableAgainstEveryProduct).
-        // Unlike a product or a cached patch file this loop fires on, that condition bears
-        // on the patch itself: a holder of it may have gone unseen. (So can a recorded path
-        // this loop fires on, whose registration reaches the split through the row it lands
-        // on, as above.) A superseded file that
-        // read cleanly when the pass above opened it, and had gone by the time the scan
-        // looked for it on the disk, is one way such a row reaches the split from this
-        // loop.
+        // That condition bears on the patch itself: a holder of it may have gone unseen. A
+        // superseded file that read cleanly when the pass above opened it, and had gone by
+        // the time the scan looked for it on the disk, is one way such a row reaches the
+        // split from this loop.
         var pathUnestablished = census.AnyRecordedPathUnestablished;
         if (withheldProducts > 0 || unattributedPatchFiles > 0 || pathUnestablished)
             for (var i = 0; i < packages.Count; i++)
