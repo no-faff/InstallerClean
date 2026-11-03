@@ -1724,12 +1724,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// SYSTEM has its key under <c>S-1-5-18</c>, with a cached package and a <c>Patches</c>
     /// listing, and neither the product walk nor the keyed walk lists it, whichever elevated
     /// account asks, SYSTEM included, and a keyed read in the account <c>S-1-5-18</c> answers
-    /// ERROR_INVALID_PARAMETER. Microsoft documents a second such
-    /// gap: "The
-    /// enumeration skips products that are advertised only (such as products not installed)
-    /// in the per-user-unmanaged context when enumerating across all users or a user other
-    /// than the current user." A key an uninstall left behind is in this list too, and nothing
-    /// in the walks tells the two apart.
+    /// ERROR_INVALID_PARAMETER. Microsoft documents a second such gap: "The enumeration skips
+    /// products that are advertised only (such as products not installed) in the
+    /// per-user-unmanaged context when enumerating across all users or a user other than the
+    /// current user." A key an uninstall left behind is in this list too, and nothing in the
+    /// walks tells the two apart.
     ///
     /// BY ACCOUNT AND CODE, NOT BY CODE. The walks can list a code under one account while a
     /// key under another holds a program of its own, and a comparison of codes would read
@@ -1796,8 +1795,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// not separate a program from a key an uninstall left behind, so a leftover key keeps what
     /// its listing names.
     ///
-    /// A claim is read as well as the package records because a repair or a removal can take
-    /// the patch's own record and leave the listing.
+    /// The patch's rows are found through a claim and through a package record alike, so a row
+    /// either one names for the patch is held, and the listing holds with no record of the
+    /// patch's own.
     ///
     /// A LISTING NOT ESTABLISHED MAY NAME ANY PATCH, and with
     /// <paramref name="registryReadFailed"/> a key that would not read may be an unlisted
@@ -3487,8 +3487,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// What one more claim on a superseded or obsoleted row's file says to the missing-files
     /// warning, where the claim is not a row of its own: a registry package record, the
-    /// listing of a product key no installation accounts for, or an installation that
-    /// answered, asked by the patch's code, that it holds the patch. A
+    /// listing of a product key no installation accounts for, a failed read of the registry
+    /// records that may have held such a listing, or an installation that answered, asked by
+    /// the patch's code, that it holds the patch. A
     /// stronger reading than the row's (<see cref="ReadingRank"/>) replaces the row's state,
     /// and the row takes the claimant's product code and name where the name read. No state
     /// at all marks the row <see cref="RegisteredPackage.OtherHoldNotRuledOut"/>. Anything

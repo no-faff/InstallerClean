@@ -347,7 +347,7 @@ public class InstallerQueryServiceUnclaimedEntryTests
     [Fact]
     public async Task The_hold_needs_no_record_of_the_patch_only_the_programs_listing()
     {
-        // A repair or removal can take the patch's own record and leave the listing.
+        // The registry holds the program's listing and no record of the patch's own.
         var msi = MachineWithAnUnlistedProgram();
 
         var result = await Scan(msi, UnlistedProgramFallback(

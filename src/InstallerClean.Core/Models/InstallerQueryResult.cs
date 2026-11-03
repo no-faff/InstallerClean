@@ -122,7 +122,7 @@ public record InstallerQueryResult(
 /// plus the shape facts one enumeration can see, carried separately so a report
 /// never has to state one cause for a quantity built from several.
 ///
-/// THE FIELDS THAT DECIDE ANYTHING ARE READ THROUGH THE THREE PROPERTIES AT THE END,
+/// THE FIELDS THAT DECIDE ANYTHING ARE READ THROUGH THE PROPERTIES AT THE END,
 /// <see cref="AnyRecordedPathUnestablished"/>, <see cref="RegistryProductUnaskable"/> and
 /// <see cref="RegistryRecordsUnread"/>, and the rest decide nothing. A count
 /// that gained a consumer anywhere else would be a second, quieter copy of a rule
@@ -636,8 +636,8 @@ public readonly record struct EnumerationCensus(
 
     /// <summary>
     /// Whether a read of Windows Installer's own records in the registry failed
-    /// (<see cref="RegistryKeyReadFailures"/>). THE ONE THING THE FOURTH WITHHOLDING LEG
-    /// FIRES ON, here for the reason <see cref="RegistryProductUnaskable"/> is.
+    /// (<see cref="RegistryKeyReadFailures"/>). THE ONE THING THE WITHHOLDING LEG OF THE SAME
+    /// NAME FIRES ON, here for the reason <see cref="RegistryProductUnaskable"/> is.
     ///
     /// WHY IT WITHHOLDS THE WHOLE WALK-DERIVED OFFER. A key that would not read may be the
     /// only claim on a cached file, and it may be a program the walks leave out, so the
