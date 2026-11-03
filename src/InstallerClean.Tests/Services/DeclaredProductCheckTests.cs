@@ -4952,7 +4952,7 @@ public class DeclaredProductCheckTests
     }
 
     [Fact]
-    public void A_listed_installations_entry_is_written_past_the_budget_behind_a_candidates_in_the_same_words()
+    public void A_listed_installations_entry_is_written_past_the_budget_behind_a_candidate_package_in_the_same_words()
     {
         var f = ACopyBesideASecondCopy();
         Break(f, CachedPackageFault.NoIdentity, OtherUserSid, MsiInstallContext.UserUnmanaged);

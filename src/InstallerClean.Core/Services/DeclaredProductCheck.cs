@@ -3549,24 +3549,32 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// What each step's cause in the refusal log starts with, ahead of the detail it gives: a
-    /// candidate package the reader gave no identity for, a candidate patch the same, a listed
-    /// installation that keeps every installation package (<see cref="LinksOf"/>), and a product
-    /// key no installation accounts for that does (<see cref="ReadUnlistedKeys"/>).
-    ///
-    /// THE LOG WRITES A CAUSE IT HAS ALREADY SEEN ONLY WHILE ITS BUDGET LASTS, so two steps
-    /// giving the same detail under one cause would leave the second counted rather than written
-    /// once the budget is spent. The steps share wording, so each keeps a cause of its own.
+    /// What the refusal log's cause starts with for a candidate package the reader gave no
+    /// identity for, ahead of the reader's detail.
     /// </summary>
+    /// <remarks>
+    /// EACH STEP OF THE CHECK LOGS UNDER A CAUSE OF ITS OWN. The log writes a cause it has
+    /// already seen only while its budget lasts, and the steps share wording, so two steps under
+    /// one cause would leave the second counted rather than written once the budget is spent.
+    /// </remarks>
     internal const string CandidateCause = "declared-product/";
 
-    /// <inheritdoc cref="CandidateCause"/>
+    /// <summary>
+    /// The same for a candidate patch the reader gave no identity for
+    /// (<see cref="CandidateCause"/>).
+    /// </summary>
     internal const string PatchCause = "declared-patch/";
 
-    /// <inheritdoc cref="CandidateCause"/>
+    /// <summary>
+    /// The same for a listed installation keeping every installation package, ahead of what
+    /// kept them (<see cref="LinksOf"/>, <see cref="CandidateCause"/>).
+    /// </summary>
     internal const string LinksCause = "installation-links/";
 
-    /// <inheritdoc cref="CandidateCause"/>
+    /// <summary>
+    /// The same for a product key no installation accounts for keeping every installation
+    /// package, ahead of what kept them (<see cref="ReadUnlistedKeys"/>, <see cref="CandidateCause"/>).
+    /// </summary>
     internal const string UnlistedKeyCause = "unlisted-key/";
 
     /// <summary>

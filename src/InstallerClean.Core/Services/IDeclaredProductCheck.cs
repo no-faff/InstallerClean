@@ -208,9 +208,10 @@ public interface IDeclaredProductCheck
     /// would let through, and read at most once per pass.
     /// </param>
     /// <param name="recordRefusal">
-    /// Where a reader refusal goes, given the exception to log and its cause: the step that
-    /// refused, then the reader's own short note on which refusal it was. Handed in by the scan that owns the crash
-    /// log for the run rather than made here, so a test calling this pass directly
+    /// Where a refusal goes, given the exception to log and its cause: the step that kept the
+    /// file, then the reader's own short note on which refusal it was, or the check's own
+    /// account of what kept every installation package. Handed in by the scan that owns the
+    /// crash log for the run rather than made here, so a test calling this pass directly
     /// has no run and writes nothing. A delegate rather than the log itself because
     /// this interface is public and that type is not.
     /// </param>

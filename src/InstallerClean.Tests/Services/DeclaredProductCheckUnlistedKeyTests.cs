@@ -530,7 +530,7 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
-    public void A_keys_entry_is_written_after_the_budget_behind_a_listed_installations_entry_in_the_same_words()
+    public void A_keys_entry_is_written_past_the_budget_behind_a_listed_installation_in_the_same_words()
     {
         var pc = new Pc();
         pc.Files.Answers(Cached, FileIdentityRead.NamesNothing);
