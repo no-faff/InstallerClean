@@ -635,10 +635,10 @@ public enum DeclaredProductOutcome
     /// be, and this file's own identity did not read, so it could not be compared with any of
     /// them. Kept back.
     ///
-    /// IT IS ABOUT THE FILE AND NOT ABOUT THE RECORDS. Everything the records name that
-    /// this file could be was read and identified; what the comparison lacks is this
-    /// file's own volume and file ID. So both halves give this one verdict, and the scan
-    /// counts it with the files the identity comparison could not identify.
+    /// IT IS ABOUT THE FILE AND NOT ABOUT THE RECORDS. The records gave something to compare
+    /// this file with; what the comparison lacks is this file's own volume and file ID. So
+    /// both halves give this one verdict, and the scan counts it with the files the identity
+    /// comparison could not identify.
     ///
     /// A FILE GONE BY THE TIME ITS IDENTITY IS READ IS GIVEN IT TOO. It declared its
     /// product or patch earlier in the same pass, and nothing at its path shows it to be
