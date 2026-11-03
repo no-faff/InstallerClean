@@ -1442,10 +1442,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // on a run whose machine-wide patch enumeration did not answer, which downgrades
         // them with no unread-file marker set (see ConfirmRemovableAgainstEveryProduct).
         // Unlike this loop's conditions, that one bears on the patch itself: a holder of it
-        // may have gone unseen. A superseded file
-        // that read cleanly when the pass above opened it, and had gone by the time the
-        // scan looked for it on the disk, is one way such a row reaches the split from
-        // this loop.
+        // may have gone unseen. A superseded file that read cleanly when the pass above
+        // opened it, and had gone by the time the scan looked for it on the disk, is one
+        // way such a row reaches the split from this loop.
         var pathUnestablished = census.AnyRecordedPathUnestablished;
         if (withheldProducts > 0 || unattributedPatchFiles > 0 || pathUnestablished)
             for (var i = 0; i < packages.Count; i++)

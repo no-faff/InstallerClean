@@ -114,8 +114,9 @@ internal static class MissingFilesReport
     /// enumeration did not answer, the confirmation pass downgrades every removable path
     /// before its patch file is read, with no unread-file marker set, so such a row arrives
     /// here withheld without that marker and is reported. That condition bears on this patch
-    /// itself: a holder of it may have gone unseen. A row downgraded because its patch set could not be established is
-    /// reported too, by the verdict clause above rather than by this one.
+    /// itself: a holder of it may have gone unseen. A row downgraded because its patch set
+    /// could not be established is reported too, by the verdict clause above rather than by
+    /// this one.
     ///
     /// THE FLAG NAMES A CAUSE AND THIS LINE DECIDES WHAT THE CAUSE MEANT, because it
     /// carries two meanings and only one is a tautology. A file that is THERE and will not
