@@ -208,10 +208,14 @@ public interface IDeclaredProductCheck
     /// would let through, and read at most once per pass.
     /// </param>
     /// <param name="recordRefusal">
-    /// Where a refusal goes, given the exception to log and its cause: the step that kept the
-    /// file, then the reader's own short note on which refusal it was, or the check's own
-    /// account of what kept every installation package. Handed in by the scan that owns the
-    /// crash log for the run rather than made here, so a test calling this pass directly
+    /// Where a refusal goes, given the exception to log and its cause. The cause opens with a
+    /// prefix naming the step that wrote it and goes on with that step's detail: the reader's
+    /// own short note on which refusal it was, or the check's account of what kept every
+    /// installation package. A candidate's and a patch's entry is about that one file. The
+    /// entries for the listed installations and for the product keys no installation accounts
+    /// for are written at most once for the pass each, about every installation package the step
+    /// keeps. Handed in by the scan that owns the crash log for the run rather than made here, so
+    /// a test calling this pass directly
     /// has no run and writes nothing. A delegate rather than the log itself because
     /// this interface is public and that type is not.
     /// </param>

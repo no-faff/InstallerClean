@@ -530,7 +530,7 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
-    public void A_keys_entry_is_written_past_the_budget_behind_a_listed_installation_in_the_same_words()
+    public void A_keys_entry_is_written_past_the_budget_where_the_listed_installations_cause_has_the_same_words()
     {
         var pc = new Pc();
         pc.Files.Answers(Cached, FileIdentityRead.NamesNothing);
@@ -818,7 +818,7 @@ public class DeclaredProductCheckUnlistedKeyTests
     [InlineData(SetupName)]
     public void A_package_name_opening_nothing_beside_a_file_keeps_nothing_whatever_it_spells(string name)
     {
-        // Every real list has a Media entry, so the name reaches the check. A name outside
+        // The list has a numbered Media entry, so the name reaches the check. A name outside
         // ASCII could be any file by a comparison of names, and only the filesystem can say.
         var pc = new Pc();
         pc.HasList(MachineList(KeyCode), name, Setup);

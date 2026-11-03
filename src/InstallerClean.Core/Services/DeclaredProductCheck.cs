@@ -3384,9 +3384,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// An installation package <paramref name="letThrough"/> would let through, put to the
     /// product keys no installation accounts for (<see cref="ReadUnlistedKeys"/>): a candidate
     /// declaring a code they give is kept; where they leave a second copy not ruled out every
-    /// candidate is kept; and a candidate that is a package they open, or that a package name
-    /// reaches (<see cref="ReachedByName"/>), is kept. Each file kept is counted for the kind of
-    /// key that kept it (<see cref="PassAnswers.KeptForAKey"/>), a key with an
+    /// candidate is kept; where they give a package to compare with, a candidate whose own
+    /// identity will not read is kept; and a candidate that is a package they open, or that a
+    /// package name reaches (<see cref="ReachedByName"/>), is kept. Each file kept is counted
+    /// for the kind of key that kept it (<see cref="PassAnswers.KeptForAKey"/>), a key with an
     /// <c>InstallProperties</c> key first.
     ///
     /// <paramref name="givenUp"/> is the root whose give-up alone left the keys not all seen.
@@ -3466,16 +3467,17 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// declare and the packages its sources open. Its sources are read from the registry alone
     /// (<see cref="AddRegistrySources"/>), which can keep a file and never release one.
     ///
-    /// SUCH A KEY LEAVES A SECOND COPY NOT RULED OUT, WHICH KEEPS EVERY INSTALLATION PACKAGE, where
-    /// a cached package it records does not say what it is, where it records one and its sources
-    /// will not read, where it holds a cached package value with no path in it, by the test a
-    /// listed installation is put to (<see cref="RecordsNoCachedPackage"/>), or an
-    /// <c>InstallProperties</c> key that will not read, and where it records none and was installed
-    /// from the Installer folder with no source list naming its package, so any file there could be
-    /// the one it opens.
+    /// SUCH A KEY LEAVES A SECOND COPY NOT RULED OUT, WHICH KEEPS EVERY INSTALLATION PACKAGE:
+    /// - where a cached package it records does not say what it is;
+    /// - where it records one and its sources will not read;
+    /// - where its <c>InstallProperties</c> key will not read, or holds a cached package value
+    ///   with no path in it, by the test a listed installation is put to
+    ///   (<see cref="RecordsNoCachedPackage"/>);
+    /// - and where it records none and was installed from the Installer folder with no source
+    ///   list naming its package, so any file there could be the one it opens.
     ///
-    /// A KEY WITHOUT ONE gives only the package at a folder on its source list
-    /// (<see cref="AddPackagesAtListedFolders"/>).
+    /// A KEY WITHOUT ONE gives only the package it names at a folder on its source list, read by
+    /// identity, a folder compared by name excepted (<see cref="AddPackagesAtListedFolders"/>).
     ///
     /// Where a key keeps every installation package, the log says why once, for the first such
     /// key, as <see cref="LinksOf"/> does for a listed installation.
@@ -3560,20 +3562,24 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     internal const string CandidateCause = "declared-product/";
 
     /// <summary>
-    /// The same for a candidate patch the reader gave no identity for
-    /// (<see cref="CandidateCause"/>).
+    /// What the refusal log's cause starts with for a candidate patch the reader gave no
+    /// identity for, ahead of the reader's detail. A prefix of its own, for the reason on
+    /// <see cref="CandidateCause"/>.
     /// </summary>
     internal const string PatchCause = "declared-patch/";
 
     /// <summary>
-    /// The same for a listed installation keeping every installation package, ahead of what
-    /// kept them (<see cref="LinksOf"/>, <see cref="CandidateCause"/>).
+    /// What the refusal log's cause starts with for a listed installation keeping every
+    /// installation package, ahead of what kept them, as <see cref="LinksOf"/> writes it. A
+    /// prefix of its own, for the reason on <see cref="CandidateCause"/>.
     /// </summary>
     internal const string LinksCause = "installation-links/";
 
     /// <summary>
-    /// The same for a product key no installation accounts for keeping every installation
-    /// package, ahead of what kept them (<see cref="ReadUnlistedKeys"/>, <see cref="CandidateCause"/>).
+    /// What the refusal log's cause starts with for a product key no installation accounts for
+    /// keeping every installation package, ahead of what kept them, as
+    /// <see cref="ReadUnlistedKeys"/> writes it. A prefix of its own, for the reason on
+    /// <see cref="CandidateCause"/>.
     /// </summary>
     internal const string UnlistedKeyCause = "unlisted-key/";
 
@@ -3598,8 +3604,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// declares. False where it is gone, will not read or declares no product code, with
     /// <paramref name="unsaid"/> saying which for the log, in the words
     /// <see cref="CodeTheCachedPackageDeclares"/> gives a listed installation's wherever it has
-    /// them. Only a file that is there and cannot be identified has words of its own, the listed
-    /// path reading no identity.
+    /// them. Only a file that is there and cannot be identified has words of its own, because a
+    /// listed installation's cached package is not read for its identity.
     /// </summary>
     private bool AddCachedPackage(string path, List<FileIdentity> packages, HashSet<string> codes, out string? unsaid)
     {
@@ -3652,7 +3658,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// cannot be read, with <paramref name="givenUp"/> the root whose give-up refused a read,
     /// if any: an account whose hive is not loaded, a key that will not read, a value in a form
     /// this check does not compare, and a package that does not settle. A refusal in one place
-    /// leaves every other place read, so what the key does name still keeps a file.
+    /// leaves every other place read, so what the key does name still keeps a file. A check that
+    /// cannot read sources answers false for every key.
     ///
     /// A LIST THAT IS NOT THERE, under a hive that is loaded, names nothing to compare. A key
     /// recording a cached package, with no list and an <c>InstallSource</c>, has no package name
@@ -3661,9 +3668,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// WITH <paramref name="recordsNone"/>, FOR A KEY RECORDING NO CACHED PACKAGE, what is
     /// collected stays and the answer is narrower: where the sources are read at all, false only
     /// where no place gave a package name and the key was installed from the Installer folder
-    /// (<see cref="WasInstalledFromTheInstallerFolder"/>). Where a place did give a name, that
-    /// name goes on keeping a file carrying it. A check that cannot read sources answers false for
-    /// every key.
+    /// (<see cref="WasInstalledFromTheInstallerFolder"/>). Where a place did give a name the answer
+    /// is true, and the name keeps a file carrying it where the list searches media for it, where
+    /// its folder is compared by name or did not settle, and where the key's <c>InstallSource</c>,
+    /// in a form not compared, expands to the Installer folder. A package read at a folder by its
+    /// identity keeps that file.
     ///
     /// <paramref name="unsaid"/> is what the log says of a false answer: the first read that did
     /// not settle, or, for a key recording no cached package, that it was installed from the
@@ -3759,8 +3768,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 return false;
             }
 
-            // A value this check does not compare is on no list of folders, so a name found on
-            // a list keeps the file carrying it.
+            // An InstallSource in a form this check does not compare is on no list of folders,
+            // so where it expands to the Installer folder a name found on a list keeps the file
+            // carrying it.
             if (installSource.Length == 0 && WasInstalledFromTheInstallerFolder(installSource, properties, pass))
                 byName.AddRange(packageNames.Select(name => new PackageByName(null, name)));
 
@@ -3781,7 +3791,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <summary>
     /// The package a key with no <c>InstallProperties</c> key names at each folder on its source
     /// list, by identity, a folder on a drive or share compared by name excepted. A candidate
-    /// that is that package is kept, and this is the one way such a key keeps a file.
+    /// that is that package is kept, and this is the one way such a key keeps an installation
+    /// package. A patch file its <c>Patches</c> listing could name is kept by
+    /// <see cref="PutPatchToUnlistedKeys"/>.
     /// </summary>
     private void AddPackagesAtListedFolders(
         UnlistedProductKey key,
@@ -3835,8 +3847,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// A key's <c>InstallProperties</c> key, which is <see cref="RegistryKeyPresence.Unreadable"/>
-    /// where a check has no registry reader or the key's path cannot be made.
+    /// A key's <c>InstallProperties</c> key, under the account subtree the key itself sits in
+    /// (the first of <see cref="SourceListPlaces"/>), which is
+    /// <see cref="RegistryKeyPresence.Unreadable"/> where a check has no registry reader or the
+    /// key's path cannot be made.
     /// </summary>
     private RegistryKeyValues InstallPropertiesOf(UnlistedProductKey key)
     {
@@ -3883,9 +3897,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
     /// <summary>
     /// The folder <paramref name="properties"/>, a key's <c>InstallProperties</c> key, records as
-    /// its <c>InstallSource</c>, empty where it records none or a web address. False where that
-    /// is not established, or the value is one this check does not compare, by the rules of
-    /// <see cref="InstallSourceIn"/>.
+    /// its <c>InstallSource</c>, empty where the key or the value is not there or the value is
+    /// empty or a web address. False where that is not established, or the value is in a form
+    /// this check does not compare, by the form rules of <see cref="InstallSourceIn"/>. No API is
+    /// asked about such a key, so there is no answer for the registry to agree with.
     /// </summary>
     private static bool RecordedInstallSource(RegistryKeyValues properties, out string folder)
     {
