@@ -26,8 +26,11 @@ public interface IInstallerQueryService
     /// Enumerate every registered product and patch. Returns one
     /// <see cref="RegisteredPackage"/> per <c>LocalPackage</c> path,
     /// with patch entries decorated with their state (applied,
-    /// superseded, obsoleted) and an <c>IsRemovable</c> flag set when
-    /// Windows itself has marked the patch unused.
+    /// superseded, obsoleted) and an <c>IsRemovable</c> flag set only where
+    /// Windows reports the patch superseded, its own <c>Uninstallable</c> reads
+    /// zero and nothing on any product sharing it could roll back onto its file
+    /// (<see cref="RegisteredPackage.ProductPatchSetVerdict"/>). The remarks below
+    /// name conditions that take the flag off as well.
     /// </summary>
     /// <remarks>
     /// The result also reports whether the enumeration read every product it lists. Where

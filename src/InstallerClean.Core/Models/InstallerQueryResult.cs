@@ -122,15 +122,17 @@ public record InstallerQueryResult(
 /// plus the shape facts one enumeration can see, carried separately so a report
 /// never has to state one cause for a quantity built from several.
 ///
-/// WHAT DECIDES ON THESE FIELDS. The withholding legs read three properties:
+/// WHAT DECIDES ON THESE FIELDS. Three withholding legs read a property each:
 /// <see cref="AnyRecordedPathUnestablished"/>, <see cref="RegistryProductUnaskable"/> and
-/// <see cref="RegistryRecordsUnread"/>, and the enumeration's scan-wide loop reads the
-/// first. The enumeration refuses a scan, and withholds every removable row, on its own
-/// tallies of counts this census records, taken before the census is built. The command
-/// line raises its Application-log notice on <see cref="UnattributedPatchFileCount"/>. The
-/// other fields are carried for the report and decide nothing. A new reader that decides
-/// on one of these counts reads the property or tally that already carries its rule,
-/// rather than writing the rule again.
+/// <see cref="RegistryRecordsUnread"/>. The enumeration's scan-wide loop reads the first.
+/// The enumeration refuses a scan, and withholds every removable row, on its own tallies of
+/// counts this census records, taken before the census is built. The command line chooses
+/// its Application-log notice on <see cref="InstallerQueryResult.UnaccountedProductCount"/>,
+/// the sum of three of these counts, and where that is nought on
+/// <see cref="UnattributedPatchFileCount"/>. The other fields are carried for the report
+/// and decide nothing. A new reader outside the enumeration that decides on one of these
+/// counts reads the property carrying its rule, and a count with no such property gets one
+/// rather than having its rule written again.
 ///
 /// They travel in the opt-in report because how each one runs across machines is a
 /// fact only reports from many machines can establish. Each is a count or a fixed
