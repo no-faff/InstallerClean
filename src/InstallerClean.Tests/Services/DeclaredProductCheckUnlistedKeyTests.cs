@@ -675,6 +675,64 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
+    public void A_key_installed_from_the_Installer_folder_whose_other_list_will_not_read_keeps_every_file()
+    {
+        // The machine's list names a.msi, and the account's own list, which may name another
+        // package, will not read.
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+        pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+        pc.Registry.Answers(HiveList(System, KeyCode), RegistryKeyPresence.Unreadable);
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_installed_from_the_Installer_folder_whose_other_list_holds_a_form_not_compared_keeps_every_file()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+        pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+        pc.HasList(HiveList(System, KeyCode), "...", Setup);
+
+        Assert.Equal(EveryFileKept, pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_installed_from_another_folder_whose_other_list_will_not_read_keeps_only_what_its_name_reaches()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Setup);
+        pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+        pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+        pc.Registry.Answers(HiveList(System, KeyCode), RegistryKeyPresence.Unreadable);
+
+        Assert.Equal(
+            [DeclaredProductOutcome.Unestablished, LetThrough],
+            pc.Screen([Installed()], Package(First), Package(Second)));
+    }
+
+    [Fact]
+    public void A_key_installed_from_the_Installer_folder_whose_other_list_will_not_read_names_that_list()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder);
+        pc.HasList(MachineList(KeyCode), "a.msi", Setup);
+        pc.Files.Answers(Setup + "a.msi", FileIdentityRead.NamesNothing);
+        pc.Registry.Answers(HiveList(System, KeyCode), RegistryKeyPresence.Unreadable);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(ReasonIn(detail)));
+
+        Assert.Equal(
+            ["the key records no cached package, a source list could not be read, its key not reading or its "
+             + "account's hive not loaded, and the folder it was installed from is the Installer folder"],
+            recorded);
+    }
+
+    [Fact]
     public void A_key_installed_from_another_folder_keeps_nothing()
     {
         var pc = new Pc();

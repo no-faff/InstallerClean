@@ -3475,8 +3475,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// - where its <c>InstallProperties</c> key will not read, or holds a cached package value
     ///   with no path in it, by the test a listed installation is put to
     ///   (<see cref="RecordsNoCachedPackage"/>);
-    /// - and where it records none and was installed from the Installer folder with no source
-    ///   list naming its package, so any file there could be the one it opens.
+    /// - and where it records none and was installed from the Installer folder, with no source
+    ///   list naming its package or with a source list that did not read, so any file there
+    ///   could be the one it opens.
     ///
     /// A KEY WITHOUT ONE gives only the package it names at a folder on its source list, read by
     /// identity, a folder compared by name excepted (<see cref="AddPackagesAtListedFolders"/>).
@@ -3670,16 +3671,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///
     /// WITH <paramref name="recordsNone"/>, FOR A KEY RECORDING NO CACHED PACKAGE, what is
     /// collected stays and the answer is narrower: where the sources are read at all, false only
-    /// where no place gave a package name and the key was installed from the Installer folder
-    /// (<see cref="WasInstalledFromTheInstallerFolder"/>). Where a place did give a name the answer
-    /// is true, and the name keeps a file carrying it where the list searches media for it, where
-    /// its folder is compared by name or did not settle, and where the key's <c>InstallSource</c>,
-    /// in a form not compared, expands to the Installer folder. A package read at a folder by its
-    /// identity keeps that file.
+    /// where the key was installed from the Installer folder
+    /// (<see cref="WasInstalledFromTheInstallerFolder"/>) and either no place gave a package name
+    /// or a place's source list did not read, which may name a package no other list names.
+    /// Otherwise the answer is true. Where a place did give a name, the name keeps a file
+    /// carrying it where the list searches media for it, where its folder is compared by name
+    /// or did not settle, and where the key's <c>InstallSource</c>, in a form not compared,
+    /// expands to the Installer folder. A package read at a folder by its identity keeps that
+    /// file.
     ///
     /// <paramref name="unsaid"/> is what the log says of a false answer: the first read that did
     /// not settle, or, for a key recording no cached package, that it was installed from the
-    /// Installer folder, followed, where a source read did not settle, by the first that did not.
+    /// Installer folder, with the first source list that did not read where that is why, and
+    /// otherwise followed, where a source read did not settle, by the first that did not.
     /// </summary>
     private bool AddRegistrySources(
         UnlistedProductKey key,
@@ -3719,11 +3723,18 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         var listFound = false;
         var packageNames = new List<string>();
+        string? listUnread = null;
+        void ListNotRead(string why)
+        {
+            listUnread ??= why;
+            NotRead(null, why);
+        }
+
         foreach (var (sid, context) in SourceListPlaces(key.Account))
         {
             if (!SourceListAt(key.Code, sid, context, out var listKey, out var values))
             {
-                NotRead(null, "a source list could not be read, its key not reading or its account's hive not loaded");
+                ListNotRead("a source list could not be read, its key not reading or its account's hive not loaded");
                 continue;
             }
 
@@ -3732,7 +3743,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             listFound = true;
             if (ReadSourceList(listKey, values, pass) is not { } sources)
             {
-                NotRead(null, "a source list holds a value in a form the check does not compare");
+                ListNotRead("a source list holds a value in a form the check does not compare");
                 continue;
             }
 
@@ -3768,6 +3779,15 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 unsaid = "the key records no cached package, no source list that read names its package, and the "
                     + "folder it was installed from is the Installer folder"
                     + (firstUnsaid is null ? string.Empty : "; also, " + firstUnsaid);
+                return false;
+            }
+
+            // A list that did not read may name another package, so a name from a list that
+            // did read does not settle a key installed from the Installer folder.
+            if (listUnread is not null && WasInstalledFromTheInstallerFolder(installSource, properties, pass))
+            {
+                unsaid = "the key records no cached package, " + listUnread
+                    + ", and the folder it was installed from is the Installer folder";
                 return false;
             }
 
