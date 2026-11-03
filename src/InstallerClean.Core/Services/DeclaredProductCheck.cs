@@ -3683,7 +3683,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <paramref name="unsaid"/> is what the log says of a false answer: the first read that did
     /// not settle, or, for a key recording no cached package, that it was installed from the
     /// Installer folder, with no list naming its package or the first source list that did not
-    /// read, followed, where the first source read that did not settle is another, by that one.
+    /// read, followed by the first source read that did not settle where the entry has not
+    /// already named it.
     /// </summary>
     private bool AddRegistrySources(
         UnlistedProductKey key,
@@ -3772,15 +3773,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         if (recordsNone)
         {
-            // Asked at most once, and only where an answer turns on it, as each ask can wait on
-            // a folder's root.
-            bool? fromInstallerFolder = null;
-            bool FromInstallerFolder() =>
-                fromInstallerFolder ??= WasInstalledFromTheInstallerFolder(installSource, properties, pass);
-
             if (packageNames.Count == 0)
             {
-                if (!FromInstallerFolder()) return true;
+                if (!WasInstalledFromTheInstallerFolder(installSource, properties, pass)) return true;
 
                 unsaid = "the key records no cached package, no source list that read names its package, and the "
                     + "folder it was installed from is the Installer folder"
@@ -3790,7 +3785,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             // A list that did not read may name another package, so a name from a list that
             // did read does not settle a key installed from the Installer folder.
-            if (listUnread is not null && FromInstallerFolder())
+            if (listUnread is not null && WasInstalledFromTheInstallerFolder(installSource, properties, pass))
             {
                 unsaid = "the key records no cached package, " + listUnread
                     + ", and the folder it was installed from is the Installer folder"
@@ -3801,7 +3796,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             // An InstallSource in a form this check does not compare is on no list of folders,
             // so where it expands to the Installer folder a name found on a list keeps the file
             // carrying it.
-            if (installSource.Length == 0 && FromInstallerFolder())
+            if (installSource.Length == 0 && WasInstalledFromTheInstallerFolder(installSource, properties, pass))
                 byName.AddRange(packageNames.Select(name => new PackageByName(null, name)));
 
             return true;
