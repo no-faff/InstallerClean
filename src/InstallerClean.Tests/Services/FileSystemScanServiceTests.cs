@@ -912,7 +912,8 @@ public class FileSystemScanServiceTests
     /// <summary>
     /// Builds the state a scan reaches, through the real enumeration rather than by
     /// writing the row out here, because the row's shape is the whole subject:
-    /// superseded, withheld, and carrying a CLEAN per-product verdict at the same time.
+    /// superseded, withheld, and carrying a CLEAN per-product verdict at the same time,
+    /// wherever the machine-wide patch enumeration answers.
     /// A hand-built row would let a later reader assume the combination is hypothetical.
     /// It is what the query service emits.
     ///
@@ -1058,13 +1059,13 @@ public class FileSystemScanServiceTests
         // nothing left to separate it would collapse to one answer and every test would
         // still pass.
         //
-        // THIS IS THE ONE REMAINING WAY A MISSING ROW IS WITHHELD WITHOUT THE MARKER. When
-        // the machine-wide patch enumeration does not answer, the confirmation pass
-        // downgrades every removable path with no marker set, so the row reaches the split
-        // withheld, unmarked, and carrying a clean per-product verdict. That is the run on
-        // which the app really did fail to establish something about THIS patch, rather
-        // than the run on which something else about the machine failed, and it is the
-        // difference the split exists to draw.
+        // IN THIS FIXTURE IT IS THE ONE WAY A MISSING ROW IS WITHHELD WITHOUT THE
+        // UNREAD-FILE MARKER. When the machine-wide patch enumeration does not answer, the
+        // confirmation pass downgrades every removable path before the patch file is read,
+        // setting no unread-file marker, so the row reaches the split withheld and
+        // unmarked. That is the run on which the app really did fail to establish something
+        // about THIS patch, rather than the run on which something else about the machine
+        // failed, and it is the difference the split exists to draw.
         //
         // ERROR_ACCESS_DENIED is one of the returns that call can make. Nothing here turns
         // on which: the code treats any answer that is not a clean end as a refusal.

@@ -112,8 +112,8 @@ internal static class MissingFilesReport
     ///
     /// A ROW WITHHELD FOR ANY OTHER CAUSE IS REPORTED. Where the machine-wide patch
     /// enumeration did not answer, the confirmation pass downgrades every removable path
-    /// with no marker set, so such a row arrives here withheld and unmarked and is
-    /// reported: that run failed to establish something about this patch itself. A row
+    /// with no unread-file marker set, so such a row arrives here withheld and unmarked and
+    /// is reported: that run failed to establish something about this patch itself. A row
     /// downgraded because its patch set could not be established is reported too, by the
     /// verdict clause above rather than by this one.
     ///

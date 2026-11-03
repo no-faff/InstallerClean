@@ -116,9 +116,10 @@ namespace InstallerClean.Models;
 /// row it withholds where such a key's patch listing was not established, or where a read of
 /// the registry's product and patch records failed.
 ///
-/// A row withheld for a reason about its own patch alone, or downgraded on a claim, never
-/// carries it. It separates the superseded files a condition on the whole machine holds back
-/// from those a check of the file's own patch held back, which is what
+/// A row withheld for a reason about that one file, a read about its patch that established
+/// nothing or such a key's listing naming its patch, or downgraded on a claim, never carries
+/// it. It separates the superseded files a condition on the whole machine holds back from
+/// those held back for a reason about the one file, which is what
 /// <see cref="ScanResult.SupersededScanWideWithheldCount"/> counts. It decides nothing.
 /// </param>
 /// <param name="OtherHoldNotRuledOut">

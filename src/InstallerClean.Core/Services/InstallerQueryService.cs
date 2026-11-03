@@ -1437,11 +1437,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // offers no superseded patch at all. A file already gone is not kept by printing a
         // sentence about it.
         //
-        // A WITHHELD ROW WITH NO MARKER IS REPORTED BY THE SPLIT WHERE ITS FILE HAS
-        // GONE. Every row this loop withholds is one. So is every removable path on a
-        // run whose machine-wide patch enumeration did not answer, which downgrades
-        // them with no marker set (see ConfirmRemovableAgainstEveryProduct), that run
-        // having failed to establish something about the patch itself. A superseded
+        // A WITHHELD ROW WITH NO UNREAD-FILE MARKER IS REPORTED BY THE SPLIT WHERE ITS
+        // FILE HAS GONE. Every row this loop withholds is one. So is every removable path
+        // on a run whose machine-wide patch enumeration did not answer, which downgrades
+        // them with no unread-file marker set (see ConfirmRemovableAgainstEveryProduct),
+        // that run having failed to establish something about the patch itself. A superseded
         // file that read cleanly when the pass above opened it, and had gone by the
         // time the scan looked for it on the disk, is one way such a row reaches the
         // split from this loop.

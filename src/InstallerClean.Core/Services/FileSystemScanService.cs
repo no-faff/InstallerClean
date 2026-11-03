@@ -604,10 +604,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // IT IS NOT WITHHELD ON A SECOND COPY. A second copy is registered under its own
         // product code and is therefore asked by the per-product condition like any
         // other product, whatever the cached patch's own Template names, so a patch it
-        // still holds takes the offer away. The condition below of a product the
-        // registry names that this scan could not ask about, is also a product the scan
-        // could not account for, and the enumeration withholds the superseded half on
-        // that count.
+        // still holds takes the offer away. A product the registry names that this scan
+        // could not ask about, a condition below, is also a product the scan could not
+        // account for, and the enumeration withholds the superseded half on that count.
         //
         // THE QUESTION IS ASKED OF THE CENSUS RATHER THAN ASSEMBLED HERE. Naming the
         // members one by one at this line is correct and is one edit away from not
@@ -857,9 +856,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // WHAT STILL FIRES FROM THE WITHHELD SIDE. A row whose patch set could not be
             // established carries an Unestablished verdict, so the state-and-verdict test
             // reports it without the flag being consulted. And a row withheld with no
-            // marker set reaches here withheld and unmarked and is reported: every row
-            // the scan-wide withholding took is one, and so is every removable path on a
-            // run whose machine-wide patch enumeration did not answer. See
+            // unread-file marker set reaches here withheld and unmarked and is reported:
+            // every row the scan-wide withholding took is one, and so is every removable
+            // path on a run whose machine-wide patch enumeration did not answer. See
             // MissingFilesReport.Affected, which owns the expression; this comment
             // explains the branch and must never grow a second copy of it.
             if (exists)

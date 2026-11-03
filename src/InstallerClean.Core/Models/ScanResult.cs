@@ -123,15 +123,16 @@ namespace InstallerClean.Models;
 /// passes withheld FALSE, because the scan positively established a live claim
 /// rather than failing to establish anything. Worse() lets it beat Unestablished
 /// where a row meets both, so the mixed case is excluded with it. What is left is the
-/// scan failing to establish something: a read about the patch that established
-/// nothing, in Downgrade's own words; a product key no installation accounts for whose
-/// patch listing names the patch; or one of the conditions on the whole machine that
-/// withhold every such row at once, which are a program entry the scan could not check; a
-/// cached patch file it could not match to a program it asks about; a recorded path it
-/// could not settle; a machine-wide list of patch registrations that did not run to its
-/// end; a product key no installation accounts for whose patch listing was not
-/// established; and a failed read of Windows Installer's records in the registry
-/// (<see cref="RegisteredPackage.WithheldScanWide"/>).
+/// scan failing to establish something, about one file or about the whole machine.
+/// About one file, it is a read about the patch that established nothing, in
+/// Downgrade's own words, or a product key no installation accounts for whose patch
+/// listing names the patch. About the whole machine, it is one of the conditions that
+/// withhold every such row at once (<see cref="RegisteredPackage.WithheldScanWide"/>): a
+/// program entry the scan could not check, a cached patch file it could not match to a
+/// program it asks about, a recorded path it could not settle, a machine-wide list of
+/// patch registrations that did not run to its end, a product key no installation
+/// accounts for whose patch listing was not established, or a failed read of Windows
+/// Installer's records in the registry.
 /// <see cref="SupersededScanWideWithheldCount"/> counts the rows those withheld, and
 /// <see cref="SupersededRecordedPathUnestablishedCount"/> those the scan-wide withholding
 /// took while a recorded path went unsettled.
@@ -770,6 +771,8 @@ public record ScanResult(
     /// not established carries both marks, and so does a row a key's listing names on a scan
     /// whose read of the registry's records failed. A row a key's listing names, on a scan with
     /// neither, carries this one alone, and a failed read alone sets only the scan-wide mark.
+    /// A row an earlier pass had already withheld carries neither, the listing having taken
+    /// nothing from it.
     /// </summary>
     public int SupersededHeldForUnlistedKeyCount =>
         RegisteredPackages.Count(p => p.WithheldOnUnlistedKey && p.FileExists);
@@ -780,8 +783,10 @@ public record ScanResult(
     /// conditions are named there. The opt-in report carries it as a count of its own.
     ///
     /// A SUB-COUNT OF <see cref="WithheldCount"/>, over the same on-disk test. The rest of
-    /// that count is superseded files withheld for a reason about the file's own patch
-    /// alone, so the two together tell a hold on the whole machine from a hold on one file.
+    /// that count is superseded files withheld for a reason about that one file, a read about
+    /// its patch that established nothing or a product key no installation accounts for whose
+    /// patch listing names its patch, so the two together tell a hold on the whole machine
+    /// from a hold on one file.
     /// <see cref="SupersededRecordedPathUnestablishedCount"/> is a sub-count of this one.
     /// </summary>
     public int SupersededScanWideWithheldCount =>
@@ -1354,8 +1359,9 @@ public static class WithholdingLegs
     ///
     /// The census is asked about every leg but the file-identity one, and the registration
     /// side of the identity comparison about that one, each through the property that owns
-    /// the question rather than by naming its members here: a rule that named them itself
-    /// would be one edit away from silently not acting on a member added later.
+    /// the question rather than by naming the census's or the tally's members here: a rule
+    /// that named them itself would be one edit away from silently not acting on a member
+    /// added later.
     /// </summary>
     public static IReadOnlyList<WithholdingLeg> Fired(
         EnumerationCensus census, FileIdentityReadTally registrationIdentityReads)

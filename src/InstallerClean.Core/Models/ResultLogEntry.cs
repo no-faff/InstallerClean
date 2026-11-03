@@ -1172,8 +1172,10 @@ public sealed record MachineInfo(
 /// established, or a failed read of Windows Installer's records in the registry.
 ///
 /// A SUB-COUNT OF <paramref name="WithheldPatchCount"/>, never added to it. The rest of
-/// that count is files withheld for a reason about the file's own patch alone, so the two
-/// tell a hold on the whole machine from a hold on one file.
+/// that count is files withheld for a reason about that one file, a read about its patch
+/// that established nothing or a product key no installation accounts for whose patch
+/// listing names its patch, so the two tell a hold on the whole machine from a hold on one
+/// file.
 /// <paramref name="SupersededRecordedPathUnestablishedCount"/> is a sub-count of this.
 /// </param>
 /// <param name="WithheldSecondCopyUnestablishedCount">

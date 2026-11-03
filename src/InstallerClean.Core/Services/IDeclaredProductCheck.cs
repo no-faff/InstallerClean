@@ -631,10 +631,11 @@ public enum DeclaredProductOutcome
     /// <summary>
     /// Windows holds a record of the product this installation package declares, or a
     /// registration of the patch this patch copy declares, or a product key no installation
-    /// accounts for gives a package to compare this file with, whatever Windows says of the
-    /// product; the check saw every package or copy each of them opens that this file could
-    /// be, and this file's own identity did not read, so it could not be compared with any of
-    /// them. Kept back.
+    /// accounts for gives a package or a package name to compare this file with, whatever
+    /// Windows says of the product; and this file's own identity did not read, so it could not
+    /// be compared with any of them. Kept back. Where Windows holds the record, the check saw
+    /// every package or copy it opens that this file could be; a package name a key gives is
+    /// not followed where this file's identity did not read.
     ///
     /// IT IS ABOUT THE FILE AND NOT ABOUT THE RECORDS. The records gave something to compare
     /// this file with; what the comparison lacks is this file's own volume and file ID. So
