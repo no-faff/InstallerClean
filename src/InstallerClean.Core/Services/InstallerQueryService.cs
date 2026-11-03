@@ -1117,7 +1117,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // installation's claim, and a key's listing takes the verdict only from rows still removable.
         var unlistedEntries = UnlistedEntries(fallback.ProductEntries, products.Concat(missed.Recovered));
         WithholdOnUnlistedEntries(
-            claimed, patchClaims, fallback.PackageRecords, unlistedEntries, fallback.Failures > 0);
+            claimed, patchClaims, fallback.PackageRecords, unlistedEntries,
+            EnumerationCensus.RegistryRecordsUnreadAt(fallback.Failures));
 
         // Both sources degraded at once: the scan is refused outright rather than
         // reported short.
@@ -1184,9 +1185,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // AND WHERE THE REGISTRY READ ITSELF FAILS. ProductKeys is counted from the
         // subkeys the fallback actually walked, so a fallback that failed reports
         // FEWER keys, and the names asked about are the codes that side handed over.
-        // The failed read is counted in fallback.Failures, which withholds every removable
-        // row and, through the census, the walk-derived offer, and which with an unreadable
-        // product refuses the scan at the gate above.
+        // The failed read is counted in fallback.Failures. Through one rule
+        // (EnumerationCensus.RegistryRecordsUnreadAt) it withholds every removable row here
+        // and, in the census, the walk-derived offer. With an unreadable product it refuses
+        // the scan at the gate above.
         //
         // AND THE GATE ABOVE WEIGHS TWO TERMS, REFUSING WHEN BOTH ARE NON-ZERO,
         // which is worth spelling out beside this because they count different

@@ -561,6 +561,25 @@ public class InstallerQueryServiceUnclaimedEntryTests
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(1, true)]
+    [InlineData(2, true)]
+    public async Task The_superseded_rows_and_the_census_read_a_failed_registry_read_alike(
+        int failures, bool unread)
+    {
+        // The fallback hands over no key the walks leave out, so the failed read is the only
+        // thing that can take the row scan wide. The rows and the census's leg each ask one
+        // rule of the same count.
+        var msi = MachineWithAnUnlistedProgram();
+
+        var result = await Scan(msi, UnlistedProgramFallback() with { Failures = failures });
+
+        Assert.Equal(unread, result.Census.RegistryRecordsUnread);
+        Assert.Equal(unread, Row(result).WithheldScanWide);
+        Assert.Equal(!unread, Row(result).IsRemovable);
+    }
+
     [Fact]
     public async Task The_check_before_a_Move_or_Delete_drops_a_patch_such_a_program_holds()
     {

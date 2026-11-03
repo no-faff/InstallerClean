@@ -652,10 +652,19 @@ public readonly record struct EnumerationCensus(
     /// (<see cref="InstallerQueryResult.UnlistedProductKeys"/>). So nothing shows what such
     /// a key would have kept.
     ///
-    /// THE SUPERSEDED HALF READS THE SAME COUNT AT ITS SOURCE. The enumeration withholds every
-    /// still-removable superseded row on a failed read before this census is built, from the
-    /// registry read's own tally (<c>InstallerQueryService.WithholdOnUnlistedEntries</c>). Widen
-    /// what this property fires on and that call has to widen with it.
+    /// THE SUPERSEDED HALF ASKS THE SAME RULE. The enumeration withholds every
+    /// still-removable superseded row on a failed read before this census is built, asking
+    /// <see cref="RegistryRecordsUnreadAt"/> of the registry read's own tally
+    /// (<c>InstallerQueryService.WithholdOnUnlistedEntries</c>), so a change to the rule there
+    /// reaches both halves.
     /// </summary>
-    public bool RegistryRecordsUnread => RegistryKeyReadFailures > 0;
+    public bool RegistryRecordsUnread => RegistryRecordsUnreadAt(RegistryKeyReadFailures);
+
+    /// <summary>
+    /// The rule behind <see cref="RegistryRecordsUnread"/>, for a count of failed reads of
+    /// Windows Installer's own records in the registry. The enumeration asks it of its own
+    /// tally before this census is built, and the property asks it of the census's copy.
+    /// </summary>
+    internal static bool RegistryRecordsUnreadAt(int registryKeyReadFailures) =>
+        registryKeyReadFailures > 0;
 }
