@@ -1,6 +1,6 @@
 # InstallerClean privacy policy
 
-Last updated 24 October 2026.
+Last updated 3 November 2026.
 
 InstallerClean never collects anything that could identify you, your PC or your files. No ads, no tracking. It can send me one anonymous report of how its first run on your PC went, which you can stop by unticking a box, or by answering no in the command-line tool, and it checks GitHub for updates, which you can turn off. That's all it sends.
 
@@ -52,6 +52,10 @@ To know a PC has had its first run, InstallerClean sets a value named `FirstRunR
 
 Where someone is at the console, it asks whether to send the same anonymous report as InstallerClean, once, after the PC's first finished run, and sends it only if the answer is yes. The question names the file the report is saved in, and typing `?` shows what the report holds and the report itself. If the report can't be sent, it is kept, and the next run at a console sends it without asking again. Where nobody is, such as a scheduled task or a script, it sends no report, and checks for updates as set out above. It writes one summary line per run to the Windows Application event log, with further lines for conditions it found on the PC and for each newer version it runs or can't run, and where one could not be put in its place. After a Move or Delete that moves or deletes files, or ends where how far it got isn't known, or when it asks to send the report, it sets the `FirstRunRecorded` value described above. The summary lines, the notices and the value stay on your PC.
 
+## The tip buttons
+
+The Leave a tip buttons open the tip page, nofaff.netlify.app/support, in your browser, and only when you click one. The address they open carries two short codes: the language InstallerClean is showing, and the Country or region Windows is set to, for example `?lang=de&region=AT`. The page uses them to show itself in that language and to list the way of paying used in that country straight after Ko-fi. Where Windows gives no two-letter code for your Country or region, the address carries the language alone. The page, and any page it sends you on to for the payment, sees that address and, as any website does, your IP address. The command-line tool prints the tip page's address with neither code.
+
 ## Everything else stays on your PC
 
 In `%LOCALAPPDATA%\InstallerClean`, for your Windows account:
@@ -61,6 +65,6 @@ In `%LOCALAPPDATA%\InstallerClean`, for your Windows account:
 
 On a PC where an earlier version kept these files in `%LOCALAPPDATA%\NoFaff\InstallerClean`, InstallerClean moves them here the first time it starts.
 
-None of them ever leaves your PC. The buttons for the documentation, the project page and the donate page open your browser, and only when you click them.
+None of them ever leaves your PC. The buttons for the documentation, the project page and the tip page open your browser, and only when you click them.
 
 The source is public at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), so you can check every word of this for yourself.
