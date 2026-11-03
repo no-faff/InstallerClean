@@ -489,6 +489,23 @@ public class DeclaredProductCheckUnlistedKeyTests
     }
 
     [Fact]
+    public void An_Installer_folder_hold_on_an_expanded_InstallSource_names_the_list_that_would_not_read()
+    {
+        var pc = new Pc();
+        pc.InstalledFrom(Folder, kind: RegistryValueKind.ExpandString);
+        pc.Registry.Answers(MachineList(KeyCode), RegistryKeyPresence.Unreadable);
+        var recorded = new List<string>();
+
+        pc.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, detail) => recorded.Add(detail));
+
+        Assert.Equal(
+            ["the key records no cached package, no source list that read names its package, and the folder it "
+             + "was installed from is the Installer folder; also, a source list could not be read, its key not "
+             + "reading or its account's hive not loaded"],
+            recorded);
+    }
+
+    [Fact]
     public void An_Installer_folder_hold_after_a_list_that_would_not_read_names_both()
     {
         var pc = new Pc();

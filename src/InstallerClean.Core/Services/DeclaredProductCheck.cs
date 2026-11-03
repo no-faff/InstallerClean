@@ -1261,8 +1261,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     private const string NoReadersDetail = "no way to read a cached package";
 
     /// <summary>
-    /// What the log says of a cached package that is there and cannot be identified, which only
-    /// a product key no installation accounts for reads (<see cref="AddCachedPackage"/>).
+    /// What the log says of a cached package that is there and cannot be identified. Used only
+    /// for the cached package of a product key no installation accounts for
+    /// (<see cref="AddCachedPackage"/>).
     /// </summary>
     private const string NotIdentifiedDetail = "the cached package could not be identified";
 
@@ -3531,7 +3532,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             else firstGivenUp ??= givenUp;
 
             var reason = cachedSaid ? sourcesUnsaid : cachedUnsaid;
-            Debug.Assert(reason is not null, "every false answer of the two reads carries its reason");
+            ReasonGiven(reason);
             why ??= reason ?? "a read of the key did not settle";
         }
 
@@ -3545,6 +3546,22 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         return new UnlistedKeysRead(
             codes, packages, byName.Select(package => package.Name).ToHashSet(StringComparer.Ordinal),
             advertised, notAllSeen, keptOtherwise ? null : firstGivenUp);
+    }
+
+    /// <summary>
+    /// Fails a Debug build where a false answer of <see cref="AddCachedPackage"/> or
+    /// <see cref="AddRegistrySources"/> reached the log with no reason, so a return added to
+    /// either without one fails a test. A Release build compiles the call out, and the entry is
+    /// still written.
+    /// </summary>
+    [Conditional("DEBUG")]
+    private static void ReasonGiven(string? reason)
+    {
+#if DEBUG
+        if (reason is null)
+            throw new InvalidOperationException(
+                "A product key's read answered that it did not settle without saying why.");
+#endif
     }
 
     /// <summary>
@@ -3621,7 +3638,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///
     /// <paramref name="unsaid"/> is what the log says of a false answer: the first read that did
     /// not settle, or, for a key recording no cached package, that it was installed from the
-    /// Installer folder, followed by the first source read that did not settle where one did not.
+    /// Installer folder, followed, where a source read did not settle, by the first that did not.
     /// </summary>
     private bool AddRegistrySources(
         UnlistedProductKey key,
@@ -3645,17 +3662,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var allRead = RecordedInstallSource(properties, out var installSource);
         var keptOtherwise = !allRead;
         string? firstGivenUp = null;
-        string? firstUnsaid = allRead ? null
+        var formUnsaid = allRead ? null
             : properties.Presence is RegistryKeyPresence.Present or RegistryKeyPresence.Absent
                 ? "the key's InstallSource is in a form the check does not compare"
                 : "the key's InstallProperties key would not read";
 
-        string? firstListUnsaid = null;
+        string? firstUnsaid = null;
         void NotRead(string? root, string why)
         {
             allRead = false;
             firstUnsaid ??= why;
-            firstListUnsaid ??= why;
             if (root is null) keptOtherwise = true;
             else firstGivenUp ??= root;
         }
@@ -3710,7 +3726,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
                 unsaid = "the key records no cached package, no source list that read names its package, and the "
                     + "folder it was installed from is the Installer folder"
-                    + (firstListUnsaid is null ? string.Empty : "; also, " + firstListUnsaid);
+                    + (firstUnsaid is null ? string.Empty : "; also, " + firstUnsaid);
                 return false;
             }
 
@@ -3729,7 +3745,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                   + "Installer folder");
 
         givenUp = keptOtherwise ? null : firstGivenUp;
-        unsaid = firstUnsaid;
+        unsaid = formUnsaid ?? firstUnsaid;
         return allRead;
     }
 
