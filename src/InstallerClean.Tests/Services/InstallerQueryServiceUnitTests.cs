@@ -2187,6 +2187,9 @@ public class InstallerQueryServiceUnitTests
         Assert.False(row.IsRemovable);
         Assert.True(row.RemovableWithheld);
         Assert.True(row.WithheldScanWide);
+        Assert.True(row.OtherHoldNotRuledOut);
+        Assert.False(row.WithheldOnUnlistedKey);
+        Assert.Equal(2, row.PatchState);
         Assert.Equal(0, result.UnaccountedProductCount);
     }
 

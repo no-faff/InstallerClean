@@ -1335,8 +1335,8 @@ public enum WithholdingLeg
 ///
 /// THE GATE AND THE HOST THAT EXPLAINS IT READ THE SAME CALL. The scan asks whether
 /// anything fired; the command line asks which. Written as two expressions they agree
-/// until one of them changes, after which the gate can grow a fourth condition while
-/// the breakdown under it goes on naming three, every test still green and the output
+/// until one of them changes, after which the gate can grow a condition the breakdown
+/// under it does not name, every test still green and the output
 /// still looking like an answer. Here a leg added to the enum is a leg the gate acts
 /// on and a leg the host prints, and a leg added without a line is a failing test.
 /// </summary>

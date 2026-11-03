@@ -91,7 +91,7 @@ public class WithholdingLegsTests
     [Fact]
     public void The_fourth_leg_fires_for_a_read_of_the_records_that_failed_and_comes_last()
     {
-        var census = Census(recordedPath: true, unaskable: false) with { RegistryKeyReadFailures = 1 };
+        var census = Census(recordedPath: true, unaskable: false, unread: true);
 
         Assert.Equal(
             [WithholdingLeg.RecordedPathUnestablished, WithholdingLeg.RegistryRecordsUnread],
@@ -123,9 +123,9 @@ public class WithholdingLegsTests
     /// Every member of the census and of the identity tally, one at a time, asserting
     /// that the gate is exactly "some leg fired" for each.
     ///
-    /// THE EIGHT ROWS ABOVE CANNOT CATCH A CONDITION ADDED TO THE GATE THAT IS NOT A
-    /// LEG. They set the members the three legs read and leave the rest at zero, so a
-    /// gate that grew a fourth condition on any other member would withhold on machines
+    /// THE SIXTEEN ROWS ABOVE CANNOT CATCH A CONDITION ADDED TO THE GATE THAT IS NOT A
+    /// LEG. They set the members the four legs read and leave the rest at zero, so a
+    /// gate that grew a condition on any other member would withhold on machines
     /// the breakdown has nothing to say about, and every row would still pass. This is
     /// the test that closes that, and it needs no maintenance: the members are read off
     /// the types, so one added later is covered the day it lands.
