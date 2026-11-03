@@ -537,7 +537,9 @@ public class DeclaredProductCheckUnlistedKeyTests
         var written = new List<Exception>();
         var log = new PerItemFailureLog("Scan", "trail", written.Add);
         for (var i = 0; i < 20; i++)
-            log.Record(new InvalidOperationException("listed " + i), "the cached package is not a file that is there");
+            log.Record(
+                new InvalidOperationException("listed " + i),
+                DeclaredProductCheck.LinksCause + "the cached package is not a file that is there");
 
         pc.ScreeningOf([Installed(System, KeyCode, Cached)], [Package(First), Package(Second)], log.Record);
 

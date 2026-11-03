@@ -4244,7 +4244,7 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchUnestablished, outcomes[0]);
 
         var only = Assert.Single(recorded);
-        Assert.Equal("patch names no target product", only.Cause);
+        Assert.Equal(DeclaredProductCheck.PatchCause + "patch names no target product", only.Cause);
         Assert.Contains("patch names no target product", only.Ex.Message, StringComparison.Ordinal);
 
         // No path, for the reason the product half's test gives.
@@ -4620,7 +4620,7 @@ public class DeclaredProductCheckTests
         Assert.Equal(DeclaredProductOutcome.Unestablished, outcomes[0]);
 
         var only = Assert.Single(recorded);
-        Assert.Equal("no Property table", only.Cause);
+        Assert.Equal(DeclaredProductCheck.CandidateCause + "no Property table", only.Cause);
         Assert.Contains("no Property table", only.Ex.Message, StringComparison.Ordinal);
 
         // The path is not named, for the reason the reader's own contract gives: the
@@ -4948,7 +4948,39 @@ public class DeclaredProductCheckTests
 
         ScreenBesideTheSecondCopy(f, recordRefusal: (_, detail) => recorded.Add(detail), account: SomebodyElse);
 
-        Assert.Equal(new[] { cause }, recorded);
+        Assert.Equal(new[] { DeclaredProductCheck.LinksCause + cause }, recorded);
+    }
+
+    [Fact]
+    public void A_listed_installations_entry_is_written_past_the_budget_behind_a_candidates_in_the_same_words()
+    {
+        var f = ACopyBesideASecondCopy();
+        Break(f, CachedPackageFault.NoIdentity, OtherUserSid, MsiInstallContext.UserUnmanaged);
+        var unreadable = Enumerable.Range(0, 20)
+            .Select(i => Package($@"C:\Windows\Installer\unread{i}.msi"))
+            .ToArray();
+        foreach (var file in unreadable) f.Packages.YieldsNothing(file.FullPath, "the cached package would not read");
+        var written = new List<Exception>();
+        var log = new PerItemFailureLog("Scan", "trail", written.Add);
+
+        ScreenBesideTheSecondCopy(f, [.. unreadable, Package(Candidate)], log.Record, SomebodyElse);
+
+        Assert.Equal(21, written.Count);
+        Assert.Contains("every installation package is kept rather than offered", written[20].Message);
+    }
+
+    [Fact]
+    public void Each_step_of_the_check_logs_under_a_cause_of_its_own()
+    {
+        string[] causes =
+        [
+            DeclaredProductCheck.CandidateCause, DeclaredProductCheck.PatchCause,
+            DeclaredProductCheck.LinksCause, DeclaredProductCheck.UnlistedKeyCause,
+        ];
+
+        foreach (var cause in causes)
+            Assert.Single(causes, other => other.StartsWith(cause, StringComparison.Ordinal)
+                || cause.StartsWith(other, StringComparison.Ordinal));
     }
 
     [Theory]
@@ -5831,7 +5863,8 @@ public class DeclaredProductCheckTests
         Assert.Equal(
             new[]
             {
-                "the installation records no cached package and has no source list, and the folder it was "
+                DeclaredProductCheck.LinksCause
+                + "the installation records no cached package and has no source list, and the folder it was "
                 + "installed from could not be ruled out as the Installer folder",
             },
             recorded);
@@ -6158,7 +6191,7 @@ public class DeclaredProductCheckTests
         ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, TheOwner)
             .Screen([Package(Candidate)], f.Listed, [], default, (_, note) => recorded.Add(note), InInstallerFolder);
 
-        Assert.Equal(new[] { detail }, recorded);
+        Assert.Equal(new[] { DeclaredProductCheck.LinksCause + detail }, recorded);
     }
 
     // ---- An installation with no cached package, judged by its sources ----
@@ -6532,7 +6565,8 @@ public class DeclaredProductCheckTests
         Assert.Equal(
             new[]
             {
-                "the installation records no cached package, and the registry does not agree: it holds a cached "
+                DeclaredProductCheck.LinksCause
+                + "the installation records no cached package, and the registry does not agree: it holds a cached "
                 + "package for the installation, or a source list where Windows Installer answers that it has "
                 + "none, or a key would not read",
             },

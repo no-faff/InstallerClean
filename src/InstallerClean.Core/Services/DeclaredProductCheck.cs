@@ -210,7 +210,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                             "A cached package did not yield the product code it declares, so it is "
                             + "kept rather than offered. Reader detail: "
                             + (detail.Length == 0 ? "none given" : detail) + "."),
-                        detail);
+                        CandidateCause + detail);
 
                 outcomes[i] = DeclaredProductOutcome.Unestablished;
                 continue;
@@ -838,7 +838,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     "A program's cached package did not yield the product code it declares, and its own "
                     + "record did not show it to be an ordinary installation, so every installation package "
                     + "is kept rather than offered. Detail: " + unread + "."),
-                unread);
+                LinksCause + unread);
 
         return pass.Links = new InstallationLinks(
             byDeclaredCode,
@@ -3317,7 +3317,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                         "A cached patch did not yield the patch code and target products it "
                         + "declares, so it is kept rather than offered. Reader detail: "
                         + (detail.Length == 0 ? "none given" : detail) + "."),
-                    detail);
+                    PatchCause + detail);
 
             return DeclaredProductOutcome.DeclaredPatchUnestablished;
         }
@@ -3549,12 +3549,25 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// What the refusal log's cause for a product key's entry starts with. Three of the reasons are
-    /// worded as <see cref="LinksOf"/> words a listed installation's, and the log writes a cause it
-    /// has seen only while its budget lasts, so without this the key's entry would be counted
-    /// rather than written behind a listed installation's.
+    /// What each step's cause in the refusal log starts with, ahead of the detail it gives: a
+    /// candidate package the reader gave no identity for, a candidate patch the same, a listed
+    /// installation that keeps every installation package (<see cref="LinksOf"/>), and a product
+    /// key no installation accounts for that does (<see cref="ReadUnlistedKeys"/>).
+    ///
+    /// THE LOG WRITES A CAUSE IT HAS ALREADY SEEN ONLY WHILE ITS BUDGET LASTS, so two steps
+    /// giving the same detail under one cause would leave the second counted rather than written
+    /// once the budget is spent. The steps share wording, so each keeps a cause of its own.
     /// </summary>
-    internal const string UnlistedKeyCause = "unlisted-key: ";
+    internal const string CandidateCause = "declared-product/";
+
+    /// <inheritdoc cref="CandidateCause"/>
+    internal const string PatchCause = "declared-patch/";
+
+    /// <inheritdoc cref="CandidateCause"/>
+    internal const string LinksCause = "installation-links/";
+
+    /// <inheritdoc cref="CandidateCause"/>
+    internal const string UnlistedKeyCause = "unlisted-key/";
 
     /// <summary>
     /// Fails a Debug build where a false answer of <see cref="AddCachedPackage"/> or
