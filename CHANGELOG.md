@@ -2,6 +2,28 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.0] - Unreleased
+
+### Changed
+
+- The anonymous report is in a new format, version 11. It adds five counts: the entries in Windows Installer's registry records that no installation Windows Installer lists accounts for, with an InstallProperties key and without one, the files the check kept for entries of each kind, and the superseded files such an entry held back. Nothing naming a program, a file or an account is sent.
+- Where a product entry in Windows Installer's registry that no installation Windows Installer lists accounts for keeps every installation package, InstallerClean writes an entry to crash.log naming the reading that kept them, at most once in a scan and once in the check made before a Move or Delete.
+- The donate buttons say "Leave a tip", with no amount, on the card after a Move or Delete, under Done and in About, in every language, each in the word that language uses for tipping a creator. "Close without donating" is "Close without tipping", the tooltips under Done and in About say "Any tip is much appreciated", and the command line's last line after a Move or Delete says "If it helped, a tip is much appreciated" and prints the tip page's address.
+- The tip buttons open the tip page in the language InstallerClean is showing, and add the Country or region set in Windows to the address so that, where the page has one for that country, it can list the way of paying used there straight after Ko-fi. The command line prints the address without either. The privacy policy says what the address carries.
+- A comments pass covered everything that changed since 3.5.0: every comment added or changed was checked as a claim against the code, and so were the unchanged comments around changed code and the contract comments of everything whose behaviour changed. Each comment found claiming more than the code does now says what the code does.
+
+### Fixed
+
+- InstallerClean compares the product entries in Windows Installer's registry records with the installations Windows Installer lists, and holds back a superseded patch that an entry none of them accounts for still names, such as the entry of a program installed for its own account by SYSTEM. It offered such a patch where the patch was superseded on another program. Where such an entry's Patches listing will not read, every superseded patch is held back. A superseded patch such a listing names is reported by the missing-files warning where its file has gone. All of this applies in the scan and in the check made before a Move or Delete.
+- InstallerClean puts every installation package and spare patch it would offer to those same entries, in the scan and in the check made before a Move or Delete. It offered them without looking at those entries.
+  - An entry with an InstallProperties key keeps a package declaring its product code or the code its cached package declares, the package at one of its sources, and a file one of its package names opens from that file's own folder.
+  - An entry with an InstallProperties key keeps every installation package where the cached package it records is gone or does not say what it is, where its record of one cannot be read, where it records one and its sources will not read, or where it records none and was installed from the Installer folder, and no source list names its package or one of its source lists will not read or holds a value InstallerClean does not compare.
+  - An entry without an InstallProperties key keeps the package at a folder on its source list, where InstallerClean can compare that package by its file identity.
+  - Any entry keeps a spare patch its Patches listing names, and every spare patch where that listing will not read.
+  - An entry an uninstall left behind keeps files in the same way. The files kept count among those held back, so the finished screen of a scan that kept one does not show the all-clear.
+- Where a read of Windows Installer's product and patch records in the registry fails, InstallerClean offers nothing from the folder walk and no superseded patch, and the check made before a Move or Delete holds the same files. The command line says "Part of Windows Installer's records wouldn't read, so a file could belong to a program recorded there.", in every language, and the window counts the files among those held back. It carried on with the records that did read.
+- Once a scan, or the check made before a Move or Delete, has written 20 entries to crash.log about files it kept back, an entry from one step of the check of the program a file declares is written in full where an entry from another step carried the same words. It was counted in the closing entry instead.
+
 ## [3.5.0] - 2026-10-29
 
 ### Added
