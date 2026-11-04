@@ -1710,9 +1710,9 @@ Run InstallerClean again as administrator.</value></data>
   <!-- What a scan that offers nothing prints after the scanning line, ahead of the
        left-alone line (Summary.RegisteredStillUsed). It states what was found rather
        than what the tool intends to do about it, which is the question somebody
-       reading a scheduled task's log ran the scan to ask. It is not printed where a
-       line about files held back for their times, or about drives and shares the scan
-       stopped waiting for, is printed in its place. -->
+       reading a scheduled task's log ran the scan to ask. It is printed only where the
+       scan is all clear (ScanResult.IsAllClear), the rule the window's all-clear
+       follows. -->
   <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>No unneeded files identified.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names

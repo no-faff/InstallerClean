@@ -11,19 +11,16 @@ namespace InstallerClean.Tests.Helpers;
 /// What the command line says on a run with nothing to offer, driven through the real
 /// work method rather than through the strings.
 ///
-/// EVERY SUCH RUN ENDS ITS SUMMARY THE SAME WAY: the line saying nothing was found, then
-/// the line counting the files the scan left alone. The count is the window's, so the
-/// fixtures set up the three populations it takes in: registered files on the disk,
-/// registered files whose file has gone, and files the scan withheld.
+/// EVERY SUCH RUN PRINTS THE LINE COUNTING THE FILES THE SCAN LEFT ALONE. The count is the
+/// window's, so the fixtures set up the three populations it takes in: registered files on
+/// the disk, registered files whose file has gone, and files the scan withheld.
 ///
-/// WHAT KEPT A FILE BACK DOES NOT CHANGE WHAT IS PRINTED. The wholesale arm, the per-file
-/// arms and the arms that keep a file for a program Windows still has installed all give
-/// the same two lines, so one theory walks the split's members. The reasons live in the
-/// Application log's entries and in the opt-in report.
-///
-/// THE EXCEPTION IS A RUN THAT PRINTS ONE OF TWO LINES INSTEAD OF THE CLEAN ONE: the line
-/// about files held back for their times, and the line naming the drives and shares the
-/// scan stopped waiting for.
+/// THE LINE SAYING NOTHING WAS FOUND COMES AHEAD OF IT ONLY WHERE THE SCAN IS ALL CLEAR
+/// (ScanResult.IsAllClear), the window's rule for its all-clear: every file held back was
+/// kept for a program Windows still has installed or for its patch's registrations, and no
+/// drive or share given up kept a file. Two theories walk the split's members, one over
+/// the two arms that leave a scan all clear and one over the rest. No line names a cause:
+/// the reasons live in the Application log's entries and in the opt-in report.
 ///
 /// THE FIXTURES ARE WHAT THIS FILE IS. The branch below is taken only where the scan
 /// offers nothing, so a fixture with a file in its offer would make every assertion about
@@ -58,7 +55,7 @@ public class CliNothingOfferedTests
         var (_, stdout) = await Run(result);
 
         Assert.Equal(7, result.LeftAloneCount);
-        Assert.Equal(Lines(Strings.Cli_FoundNoOrphans, LeftAlone(7)), AfterScanningLine(stdout));
+        Assert.Equal(Lines(LeftAlone(7)), AfterScanningLine(stdout));
     }
 
     [Fact]
@@ -82,22 +79,45 @@ public class CliNothingOfferedTests
     }
 
     [Theory]
+    [InlineData("declared product installed")]
+    [InlineData("declared patch registered")]
+    public async Task Files_kept_for_an_installed_program_or_a_registered_patch_print_the_clean_line_and_the_count(
+        string arm)
+    {
+        // Two files held back by an arm that settles them, so the scan is all clear.
+        var result = Scan(registered: 10, withheld: 2, split: SplitFor(arm));
+
+        var (exit, stdout) = await Run(result);
+
+        Assert.True(result.IsAllClear);
+        Assert.Equal(CliExitCode.Ok, exit);
+        Assert.Equal(Lines(Strings.Cli_FoundNoOrphans, LeftAlone(12)), AfterScanningLine(stdout));
+    }
+
+    [Theory]
     [InlineData("wholesale")]
     [InlineData("identity")]
     [InlineData("declared product unestablished")]
     [InlineData("screen unanswered")]
     [InlineData("declared patch unestablished")]
     [InlineData("second copy unestablished")]
-    [InlineData("declared product installed")]
-    [InlineData("declared patch registered")]
     [InlineData("age unestablished")]
     [InlineData("containment refused")]
     [InlineData("containment unestablished")]
-    public async Task Whatever_kept_the_files_back_the_run_prints_the_clean_line_and_the_count(string arm)
+    public async Task Files_held_back_without_being_settled_print_the_count_with_no_clean_line(string arm)
     {
-        // Two files held back by one arm. The lines are the same for every arm, and
-        // nothing printed names a cause: the stdout is the scanning line and these two.
-        var split = arm switch
+        // Two files held back by an arm that does not settle them. Nothing printed names a
+        // cause: the stdout is the scanning line and the count.
+        var (exit, stdout) = await Run(Scan(
+            registered: 10, withheld: 2, split: SplitFor(arm),
+            census: arm == "wholesale" ? ProductNobodyCouldAsk : default));
+
+        Assert.Equal(CliExitCode.Ok, exit);
+        Assert.Equal(Lines(LeftAlone(12)), AfterScanningLine(stdout));
+    }
+
+    private static WithholdingSplit SplitFor(string arm) =>
+        arm switch
         {
             "wholesale" => new WithholdingSplit(WholesaleCount: 2),
             "identity" => new WithholdingSplit(IdentityUnestablishedCount: 2),
@@ -110,16 +130,8 @@ public class CliNothingOfferedTests
             "age unestablished" => new WithholdingSplit(AgeUnestablishedCount: 2),
             "containment refused" => new WithholdingSplit(ContainmentRefusedCount: 2),
             "containment unestablished" => new WithholdingSplit(ContainmentUnestablishedCount: 2),
-            _ => throw new ArgumentOutOfRangeException(nameof(arm), arm, "an arm this theory does not set up"),
+            _ => throw new ArgumentOutOfRangeException(nameof(arm), arm, "an arm these theories do not set up"),
         };
-
-        var (exit, stdout) = await Run(Scan(
-            registered: 10, withheld: 2, split: split,
-            census: arm == "wholesale" ? ProductNobodyCouldAsk : default));
-
-        Assert.Equal(CliExitCode.Ok, exit);
-        Assert.Equal(Lines(Strings.Cli_FoundNoOrphans, LeftAlone(12)), AfterScanningLine(stdout));
-    }
 
     [Theory]
     [InlineData(2, 0)]
@@ -152,7 +164,7 @@ public class CliNothingOfferedTests
     [InlineData(PendingRebootReason.PendingRenameInCache)]
     [InlineData(PendingRebootReason.RegistryCheckUnreadable)]
     [InlineData(PendingRebootReason.MsiExecuteMutexUnreadable)]
-    public async Task A_run_whose_walked_files_were_held_for_a_signal_prints_the_signal_s_line_after_the_count(
+    public async Task A_run_whose_walked_files_were_held_for_a_signal_prints_the_count_and_the_signal_s_line_with_no_clean_line(
         PendingRebootReason reason)
     {
         // Every walked file held because a signal was set just after the scan's clock: the
@@ -166,13 +178,14 @@ public class CliNothingOfferedTests
 
         Assert.Equal(CliExitCode.Ok, exit);
         Assert.Equal(
-            Lines(Strings.Cli_FoundNoOrphans, LeftAlone(6), ScanSignalReport.CommandLine(reason)),
+            Lines(LeftAlone(6), ScanSignalReport.CommandLine(reason)),
             AfterScanningLine(stdout));
+        Assert.False(result.IsAllClear);
         Assert.Equal(string.Empty, RecentChangeReport.Line(result));
     }
 
     [Fact]
-    public async Task A_run_whose_walked_files_were_held_for_the_clock_prints_the_clock_s_line_after_the_count()
+    public async Task A_run_whose_walked_files_were_held_for_the_clock_prints_the_count_and_the_clock_s_line_with_no_clean_line()
     {
         // The system clock went back while the scan read the files' times, so every walked
         // file its times passed was held for that. The clock's own line says why, with no
@@ -186,7 +199,7 @@ public class CliNothingOfferedTests
 
         Assert.Equal(CliExitCode.Ok, exit);
         Assert.Equal(
-            Lines(Strings.Cli_FoundNoOrphans, LeftAlone(6), Strings.Cli_ScanSignal_ClockSetBack),
+            Lines(LeftAlone(6), Strings.Cli_ScanSignal_ClockSetBack),
             AfterScanningLine(stdout));
         Assert.Equal(Strings.Cli_ScanSignal_ClockSetBack, ScanSignalReport.CommandLine(result));
     }
@@ -208,12 +221,13 @@ public class CliNothingOfferedTests
     }
 
     [Fact]
-    public async Task Superseded_patches_the_scan_held_back_add_no_line_of_their_own()
+    public async Task Superseded_patches_the_scan_held_back_add_no_line_of_their_own_and_take_the_clean_line_away()
     {
         // Distinct figures: one superseded patch held back for its products, two the
         // containment check refused and four it could not answer for. They are registered
-        // rows and so already in the count; what the run adds for them is the
-        // Application log's entry, which CliNoticeEntryTests reads.
+        // rows and so already in the count, and they keep the scan from being all clear.
+        // The run adds the Application log's entry for them, which CliNoticeEntryTests
+        // reads, and no line of its own.
         var result = Scan(registered: 9, withheld: 0, split: default) with
         {
             WithheldCount = 1,
@@ -225,7 +239,7 @@ public class CliNothingOfferedTests
 
         Assert.Equal(CliExitCode.Ok, exit);
         Assert.Equal(7, result.SupersededHeldBackCount);
-        Assert.Equal(Lines(Strings.Cli_FoundNoOrphans, LeftAlone(9)), AfterScanningLine(stdout));
+        Assert.Equal(Lines(LeftAlone(9)), AfterScanningLine(stdout));
     }
 
     // ---- fixtures ----

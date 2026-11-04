@@ -142,12 +142,12 @@ public class CliSourcesGivenUpTests
     }
 
     [Fact]
-    public async Task A_scan_with_a_withholding_to_report_prints_the_clean_line_the_count_and_then_the_line()
+    public async Task A_scan_with_a_withholding_to_report_prints_the_count_and_then_the_line()
     {
         // Two copies the scan could not tell apart are reported, one of them because the
         // share their packages are on did not answer, and a superseded file was held back
-        // too. The clean line comes first, then the count of files left alone, and the
-        // line naming the share next.
+        // too. The count of files left alone comes first, and the line naming the share
+        // next.
         var result = new ScanResult(
             Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
             WithheldCount: 1,

@@ -769,7 +769,8 @@ public record ScanResult(
     /// all-clear: nothing held back that <see cref="UnsettledHeldBackCount"/> counts, and
     /// no drive or share given up with a file kept because of it
     /// (<see cref="HasSourceRootsGivenUpKeepingFiles"/>). Every other such run gets the
-    /// screen saying nothing was offered.
+    /// screen saying nothing was offered. The command line prints its clean line on the
+    /// same rule.
     ///
     /// A FILE KEPT AT A DRIVE OR SHARE GIVEN UP NEED NOT BE IN THAT COUNT. One whose own
     /// program's packages could not all be read is kept as declaring a program Windows
@@ -782,8 +783,8 @@ public record ScanResult(
     /// Whether this scan has a line to give about recently changed files
     /// (<see cref="Helpers.RecentChangeReport.Line(ScanResult)"/>): it held back at least
     /// one file whose times are not before its clock, with Windows Installer's in-progress
-    /// signals clear when it read them. The command line prints its clean line only where
-    /// this is false, nothing was offered and no drive or share given up kept a file.
+    /// signals clear when it read them. Such a file is one <see cref="UnsettledHeldBackCount"/>
+    /// counts, so a scan with this line is never <see cref="IsAllClear"/>.
     /// </summary>
     public bool HasRecentChangeLine => WithheldBy.NotBeforeTheClockCount > 0;
 }
@@ -848,10 +849,10 @@ public enum WithholdingAccount
     /// different file. The command line writes no held-back entry for these files, as on
     /// a run that kept nothing back, and the files stay among those left alone; where any is
     /// of the second kind, it prints the line about those files
-    /// (<see cref="Helpers.RecentChangeReport"/>), which stands in place of its clean line
-    /// where nothing is offered. A file of the second kind is among those
+    /// (<see cref="Helpers.RecentChangeReport"/>). A file of the second kind is among those
     /// <see cref="ScanResult.UnsettledHeldBackCount"/> counts, so it keeps the all-clear off
-    /// the window's finished screen, which gives the line about those files.
+    /// the window's finished screen, which gives the line about those files, and the clean
+    /// line off the command line.
     /// </summary>
     KeptWithoutNotice,
 }

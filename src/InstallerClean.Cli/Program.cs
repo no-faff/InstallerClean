@@ -1170,17 +1170,18 @@ internal static class Program
             var size = DisplayHelpers.FormatSize(totalBytes);
             // Read once: the property builds its list afresh on every read.
             var sourcesGivenUp = scanResult.SourceRootsGivenUpKeepingFiles;
-            // A clean machine gets one line, not a count of zero and a size of
-            // zero followed by a second line saying the same thing: somebody
+            // A clean machine gets the clean line, not a count of zero and a size
+            // of zero followed by a second line saying the same thing: somebody
             // reading a scheduled task's log wants the state of the machine
             // rather than the tool's intention towards it.
             //
-            // THE CLEAN LINE IS PRINTED WHEREVER NOTHING IS OFFERED, EXCEPT WHERE ONE OF TWO
-            // LINES IS PRINTED INSTEAD: the line about files held back for their times, and
-            // the line naming the drives and shares the scan stopped waiting for. Where
-            // either is among the notices the clean line is not printed. Whether the first is
-            // printed is the scan's answer (HasRecentChangeLine), the same one
-            // ReportScanSignals spends.
+            // THE CLEAN LINE IS PRINTED WHERE NOTHING IS OFFERED AND THE SCAN IS ALL CLEAR
+            // (ScanResult.IsAllClear), the rule the window uses for its all-clear on the same
+            // run: nothing held back that ScanResult.UnsettledHeldBackCount counts, and no
+            // drive or share given up with a file kept because of it. A scan whose only holds
+            // are files kept for a program Windows still has installed or for their patch's
+            // registrations gets it. Every other scan that offers nothing prints the count of
+            // files left alone and its notices without it.
             //
             // THE HOST DOES NOT PARTITION ANYTHING TO GET HERE. Deciding it here would
             // mean reading a split the scan owns, and a host that infers one decision's
@@ -1275,20 +1276,18 @@ internal static class Program
 
             if (count > 0)
                 Console.WriteLine(FoundLine());
-            else if (sourcesGivenUp.Count == 0 && !scanResult.HasRecentChangeLine)
+            else if (scanResult.IsAllClear)
                 Console.WriteLine(Strings.Cli_FoundNoOrphans);
 
             notices.ForEach(Console.WriteLine);
 
             if (count == 0)
             {
-                // The audit line tells a machine the scan could not judge from a clean one.
-                // On stdout the clean line reports that nothing was identified, and is printed
-                // on both unless one of the two notices that replace it is printed. A monitoring
-                // tool watching the Application channel reads the split here. A machine with no
-                // withholding to report and no drive or share given up takes the clean entry,
-                // whether or not files were held back for their times: the line about them is
-                // on stdout alone.
+                // The audit line tells a machine the scan could not judge from a clean one, on
+                // its own rule, which is not stdout's: a machine with no withholding to report
+                // and no drive or share given up takes the clean entry, whether or not files
+                // were held back for their times, the line about them being on stdout alone.
+                // A monitoring tool watching the Application channel reads the split here.
                 //
                 // ONE EVENT CLASS FOR ALL OF THEM. The run did its job on each of these
                 // machines, so each entry belongs in the outcome band, and the notice
