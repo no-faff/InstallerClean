@@ -1049,7 +1049,8 @@ public sealed record MachineInfo(
 /// Candidates the age check kept back because the latest of their times is not before
 /// the scan's clock, Windows Installer's in-progress signals having read clear just after
 /// it: <c>ScanResult.WithheldBy.NotBeforeTheClockCount</c>. A time equal to the clock is
-/// among them. The window's finished screen counts them, and both hosts give them a line
+/// among them. The count that keeps the window's all-clear off
+/// (<c>ScanResult.UnsettledHeldBackCount</c>) takes them in, and both hosts give them a line
 /// of their own. They are among the files left alone.
 ///
 /// SERIALISED AS <c>withheldChangedSinceScanStartCount</c>. The member keeps the name of

@@ -948,7 +948,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // cost nothing: an absent file could never have been offered, the branch that
         // offers a superseded row being gated on its existence. Counting it would
         // overstate what the withholding costs, in the figure the opt-in report
-        // carries, the command line prints and the window's finished screen counts.
+        // carries, the command line's Application log entry carries and the count that
+        // keeps the window's all-clear off takes in.
         //
         // The flag itself is right in both cases and is not narrowed here. It records
         // a true fact about the RECORDS, established in the enumeration, and existence

@@ -783,7 +783,7 @@ public record ScanResult(
     /// (<see cref="Helpers.RecentChangeReport.Line(ScanResult)"/>): it held back at least
     /// one file whose times are not before its clock, with Windows Installer's in-progress
     /// signals clear when it read them. The command line prints its clean line only where
-    /// this is false and no drive or share was given up.
+    /// this is false, nothing was offered and no drive or share given up kept a file.
     /// </summary>
     public bool HasRecentChangeLine => WithheldBy.NotBeforeTheClockCount > 0;
 }
@@ -1205,8 +1205,8 @@ public enum WithholdingLeg
 /// THE GATE AND THE LIST OF WHICH LEGS FIRED READ THE SAME CALL. The scan asks whether
 /// anything fired through <see cref="Any"/>, which calls <see cref="Fired"/>. Written as
 /// two expressions they agree until one of them changes, after which the gate can grow a
-/// condition the list does not name. Here a leg added to the
-/// enum is a leg the gate acts on and a leg the list names.
+/// condition the list does not name. Here a leg added to the enum is a leg the gate acts
+/// on and a leg the list names.
 /// </summary>
 public static class WithholdingLegs
 {

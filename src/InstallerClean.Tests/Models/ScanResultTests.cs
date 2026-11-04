@@ -272,8 +272,8 @@ public class ScanResultTests
     [Fact]
     public void A_file_kept_for_its_patch_s_registrations_beside_one_the_scan_could_not_settle_reads_as_per_file()
     {
-        // The per-file sentence speaks of the file the scan could not settle, and its
-        // count and size leave the patch copy out.
+        // The Application log's per-file entry speaks of the file the scan could not
+        // settle, and its count leaves the patch copy out.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msp", 1024), File("b.msi", 2048)],
             WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 1, IdentityUnestablishedCount: 1));
@@ -341,7 +341,7 @@ public class ScanResultTests
     [Fact]
     public void A_patch_copy_the_scan_could_not_settle_is_counted_apart_from_one_kept_for_its_patch_s_registrations()
     {
-        // One of each. The sentence counts and sizes the first alone, and only the
+        // One of each. The Application log's per-file entry counts the first alone, and only the
         // first has a line.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msp", 1024), File("b.msp", 2048)],
@@ -354,8 +354,8 @@ public class ScanResultTests
     [Fact]
     public void A_file_kept_for_its_age_beside_one_the_scan_could_not_settle_reads_as_per_file()
     {
-        // The per-file sentence speaks of the file the scan could not settle, and its
-        // count and size leave the other out.
+        // The Application log's per-file entry speaks of the file the scan could not
+        // settle, and its count leaves the other out.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
             WithheldBy: new WithholdingSplit(NotBeforeTheClockCount: 1, DeclaredProductUnestablishedCount: 1),
@@ -404,7 +404,7 @@ public class ScanResultTests
     [Fact]
     public void A_file_whose_age_was_not_established_is_counted_apart_from_one_under_a_day_old()
     {
-        // One of each. The sentence counts and sizes the second alone.
+        // One of each. The Application log's per-file entry counts the second alone.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
             WithheldBy: new WithholdingSplit(NotBeforeTheClockCount: 1, AgeUnestablishedCount: 1),
@@ -417,8 +417,8 @@ public class ScanResultTests
     [Fact]
     public void A_file_kept_for_an_installed_program_beside_one_the_scan_could_not_settle_reads_as_per_file()
     {
-        // The per-file sentence speaks of the file the scan could not settle, and its
-        // count and size leave the other out.
+        // The Application log's per-file entry speaks of the file the scan could not
+        // settle, and its count leaves the other out.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
             WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, IdentityUnestablishedCount: 1));
