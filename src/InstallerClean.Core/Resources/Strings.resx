@@ -1848,8 +1848,8 @@ Run InstallerClean again as administrator.</value></data>
   <data name="Cli.EventLogSupersededHeldBack.Plural" xml:space="preserve"><value>{0} mode: InstallerClean could not be certain that {1} superseded files are no longer needed, so it has held them back.</value></data>
   <!-- The command line's line naming a drive that the scan, or the check made before a
        Move or Delete, stopped waiting for while files still had to be checked against
-       it. The scan's is printed after its own lines about the files it held back, and
-       where it offered nothing and has nothing else to report it is printed in place of
+       it. The scan's is printed among its notices, after the count of files left alone,
+       and a scan that gave up a drive with a file kept because of it prints no
        Cli.FoundNoOrphans. The check's is printed after the held-back line. The command
        line shows no wait, and the app stops waiting for a drive there when it does not
        answer or when its reads take too long, so "stopped waiting for" is true of each.

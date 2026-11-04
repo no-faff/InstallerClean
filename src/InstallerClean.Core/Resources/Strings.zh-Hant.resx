@@ -1710,9 +1710,9 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
   <!-- What a scan that offers nothing prints after the scanning line, ahead of the
        left-alone line (Summary.RegisteredStillUsed). It states what was found rather
        than what the tool intends to do about it, which is the question somebody
-       reading a scheduled task's log ran the scan to ask. It is not printed where a
-       line about files held back for their times, or about drives and shares the scan
-       stopped waiting for, is printed in its place. -->
+       reading a scheduled task's log ran the scan to ask. It is printed only where the
+       scan is all clear (ScanResult.IsAllClear), the rule the window's all-clear
+       follows. -->
   <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>沒有識別出不需要的檔案。</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
@@ -1722,9 +1722,9 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
        what the scan found in the folder, and a count of the registrations
        Windows holds is a different subject, and not one a reader of this log
        can act on. -->
-  <!-- The audit line for the outcome above, so a monitoring tool watching the
-       Application channel is not told a machine is clean when the scan could not
-       judge it.
+  <!-- The outcome entry for a scan that offered nothing because it held back the whole
+       walk-derived offer, so a monitoring tool watching the Application channel is not
+       told a machine is clean when the scan could not judge it.
 
        0 = mode arg, whichever of /s, /d and /m was run, as in the entry above:
        the no-files branch is common to all three. 1 = files held back,
@@ -1747,7 +1747,7 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
        surface needs. -->
   <!-- The per-file twin of the entry above, for the machine whose candidates were
        each judged and kept rather than emptied wholesale, so the Application channel
-       tells those two apart the way stdout does. It shares Event ID 1000 with its
+       tells those two apart. It shares Event ID 1000 with its
        sibling for the reason recorded above, and it takes the same three arguments in
        the same order. Machine-read and forced English at the emit site, as that entry
        is, so it takes no .Singular/.Plural pair and keeps the app as the subject:
@@ -1840,8 +1840,8 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
        sentence naming one of them is true of the files the others contribute. -->
   <!-- The command line's line naming a drive that the scan, or the check made before a
        Move or Delete, stopped waiting for while files still had to be checked against
-       it. The scan's is printed after its own lines about the files it held back, and
-       where it offered nothing and has nothing else to report it is printed in place of
+       it. The scan's is printed among its notices, after the count of files left alone,
+       and a scan that gave up a drive with a file kept because of it prints no
        Cli.FoundNoOrphans. The check's is printed after the held-back line. The command
        line shows no wait, and the app stops waiting for a drive there when it does not
        answer or when its reads take too long, so "stopped waiting for" is true of each.
