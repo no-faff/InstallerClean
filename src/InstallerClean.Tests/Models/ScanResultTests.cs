@@ -300,8 +300,8 @@ public class ScanResultTests
     [Fact]
     public void A_patch_copy_the_scan_could_not_settle_is_spoken_of_per_file()
     {
-        // The patch half's unsettled arm is not one of the silent arms. The per-file
-        // sentence counts and sizes its file.
+        // The patch half's unsettled arm is not one of the silent arms. The Application
+        // log's per-file entry counts its file.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msp", 1024)],
             WithheldBy: new WithholdingSplit(DeclaredPatchUnestablishedCount: 1));
@@ -315,7 +315,7 @@ public class ScanResultTests
     public void A_patch_copy_and_a_package_the_scan_could_not_settle_are_counted_together()
     {
         // Two members, not one shared: each half's unsettled arm is a different set of
-        // inabilities, and both are among the files the per-file sentence counts.
+        // inabilities, and both are among the files the Application log's per-file entry counts.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msp", 2048)],
             WithheldBy: new WithholdingSplit(
@@ -434,7 +434,7 @@ public class ScanResultTests
         // THE MUST-MISS FOR THE DECLARED-PRODUCT-INSTALLED ARM. One file counted under
         // it and one counted under nothing: no other arm fired, and the run still reads
         // per-file, because the rule is that this arm accounts for the whole list. The
-        // uncounted file is among those the per-file sentence counts.
+        // uncounted file is among those the Application log's per-file entry counts.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msi", 2048)],
             WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1));

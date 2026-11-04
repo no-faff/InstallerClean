@@ -1629,7 +1629,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // carries the two counts apart. The command line's held-back Application log
             // entry counts a file whose times were not established and leaves out a file
             // not before the clock, whose size is summed here for the line about recently
-            // changed files. The window's finished screen counts both.
+            // changed files. The count that keeps the window's all-clear off
+            // (ScanResult.UnsettledHeldBackCount) takes in both.
             withheld.Add(candidate);
             if (verdict == CachedFileAgeVerdict.NotBeforeTheClock)
                 withheldBy.NotBeforeTheClock(candidate.SizeBytes);

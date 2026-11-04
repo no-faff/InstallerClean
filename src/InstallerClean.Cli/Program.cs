@@ -2160,9 +2160,8 @@ internal static class Program
         // enumeration withheld every superseded patch because it could not check a
         // program entry in Windows Installer's records or match a cached patch file to a
         // program it asks about. It is the payload of Event ID 3000, a machine surface
-        // with an RMM filter downstream. Re-gating it changes which machines log it with
-        // every test still green, and a measurement that goes quiet reads exactly like
-        // nothing being wrong.
+        // with an RMM filter downstream. Re-gating it changes which machines log it, and a
+        // measurement that goes quiet reads exactly like nothing being wrong.
         //
         // THEY ARE NOT TWO VIEWS OF ONE QUANTITY. This counts entries or files, the
         // trigger for ONE of the several routes into the count above. A machine can meet

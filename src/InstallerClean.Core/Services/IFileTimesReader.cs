@@ -331,7 +331,8 @@ internal interface IPreciseWallClock
 /// THE TWO THAT KEEP IT ARE COUNTED APART. The opt-in report carries the two counts
 /// separately, and the command line's held-back Application log entry counts a file
 /// whose times were not established and leaves out a file not before the clock, which
-/// has a line of its own. The window's finished screen counts both among the files it held back.
+/// has a line of its own. The count that keeps the window's all-clear off
+/// (<see cref="Models.ScanResult.UnsettledHeldBackCount"/>) takes in both.
 /// </summary>
 public enum CachedFileAgeVerdict
 {

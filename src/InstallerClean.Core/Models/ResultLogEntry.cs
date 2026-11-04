@@ -1529,8 +1529,8 @@ public sealed record MachineInfo(
 /// was set when the scan read them just after its clock: <c>ScanResult.WithheldBy.ScanSignalCount</c>,
 /// an arm of the split of <see cref="WithheldCandidateCount"/>. Where a signal was set every
 /// candidate reaching the age check is counted here, so on one scan this and
-/// <see cref="WithheldNotBeforeTheClockCount"/> are never both above nought. Both hosts' held-back
-/// sentences count them, and both give the signal's reason in a line of its own.
+/// <see cref="WithheldNotBeforeTheClockCount"/> are never both above nought. Both hosts count
+/// them among the files left alone, and both give the signal's reason in a line of its own.
 ///
 /// NOT TO BE ADDED TO <see cref="WithheldNotBeforeTheClockCount"/>: that one is a finding about each
 /// file's times, and this one is a finding about the machine at one moment, made without reading any
