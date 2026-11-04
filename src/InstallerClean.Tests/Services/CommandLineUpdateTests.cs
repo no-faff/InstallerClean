@@ -41,7 +41,7 @@ public sealed class CommandLineUpdateTests : IDisposable
 
     private static string Prompt() =>
         string.Format(Strings.Cli_UpdatePrompt,
-            Strings.Cli_UpdateAnswerYes.ToLower(System.Globalization.CultureInfo.CurrentUICulture),
+            Strings.Cli_UpdateAnswerYes.ToUpper(System.Globalization.CultureInfo.CurrentUICulture),
             Strings.Cli_UpdateAnswerNo.ToLower(System.Globalization.CultureInfo.CurrentUICulture)) + " ";
 
     private static string ReleaseLink =>
@@ -147,17 +147,20 @@ public sealed class CommandLineUpdateTests : IDisposable
     }
 
     [Fact]
-    public void An_empty_answer_is_not_yes_and_the_question_is_asked_again()
+    public void Keys_typed_before_the_question_are_discarded_each_time_it_is_asked()
     {
+        // An answer that is neither yes nor no asks again, and each asking discards what was
+        // typed before it, ahead of printing it, so a key pressed during the update check
+        // answers nothing.
         var updater = new FakeUpdater();
-        _host.Answers.Enqueue(string.Empty);
+        _host.Answers.Enqueue("x");
         _host.Answers.Enqueue("n");
 
         var result = Run(updater, canAsk: true, command: "/d");
 
         Assert.Same(CommandLineUpdateResult.NothingTried, result);
         Assert.Equal([Available, Prompt(), Prompt()], _host.Output);
-        Assert.Equal(2, _host.Discards);
+        Assert.Equal([1, 2], _host.DiscardsAtEachQuestion);
         Assert.Equal(0, updater.Prepares);
     }
 
@@ -182,7 +185,7 @@ public sealed class CommandLineUpdateTests : IDisposable
     public void A_watched_yes_to_a_Move_or_Delete_lets_the_mutex_go_before_the_newer_version_scans(string command)
     {
         var updater = new FakeUpdater();
-        _host.Answers.Enqueue("y");
+        _host.Answers.Enqueue(string.Empty);
         _host.NewerVersionExitCode = 0;
 
         var result = Run(updater, canAsk: true, command: command, arguments: [command, @"D:\kept"]);
@@ -529,9 +532,16 @@ public sealed class CommandLineUpdateTests : IDisposable
         }
 
         // The question and the answer share a line on screen; recorded as an entry of its own.
-        public void Write(string text) => Output.Add(text);
+        public void Write(string text)
+        {
+            DiscardsAtEachQuestion.Add(Discards);
+            Output.Add(text);
+        }
 
         public int Discards { get; private set; }
+
+        /// <summary>How many discards had been made as each question was printed.</summary>
+        public List<int> DiscardsAtEachQuestion { get; } = [];
 
         public void DiscardTypedAhead() => Discards++;
 

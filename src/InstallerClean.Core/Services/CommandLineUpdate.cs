@@ -399,11 +399,11 @@ internal sealed class CommandLineUpdate
     private enum Answer { Yes, No, Cancelled, TimedOut }
 
     /// <summary>
-    /// Asks the question until it gets an answer. An answer starting with this language's
-    /// letter for yes or with Y is yes; one starting with its letter for no or with N is
-    /// no; anything else, an empty answer included, asks again. The read is handed the
-    /// token and ends as it is cancelled, by Ctrl+C or by the console being closed, and the
-    /// question then answers cancelled. The end of input is no, unless the token is cancelled while the
+    /// Asks the question until it gets an answer. Enter, or an answer starting with this
+    /// language's letter for yes or with Y, is yes; one starting with its letter for no or
+    /// with N is no; anything else asks again. The read is handed the token and ends as it
+    /// is cancelled, by Ctrl+C or by the console being closed, and the question then
+    /// answers cancelled. The end of input is no, unless the token is cancelled while the
     /// question waits on it, up to <see cref="ControlCBound"/> in a run, since Ctrl+C at the
     /// prompt can itself be read as the end of input. Nothing answered within the answer
     /// bound is <see cref="Answer.TimedOut"/>.

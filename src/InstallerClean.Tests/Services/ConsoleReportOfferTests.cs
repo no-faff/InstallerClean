@@ -23,6 +23,7 @@ public class ConsoleReportOfferTests
         5, "GB", ReportHost.CommandLine, AppCopyKind.CommandLineDownload);
 
     [Theory]
+    [InlineData("")]
     [InlineData("y")]
     [InlineData("Y")]
     [InlineData("  yes ")]
@@ -37,18 +38,6 @@ public class ConsoleReportOfferTests
         Assert.True(rig.Settings.State.HasSentResultLog);
         Assert.False(rig.Settings.State.ReportSendPending);
         Assert.Equal(Strings.Cli_ReportSent, rig.Console.Lines[^1]);
-    }
-
-    [Fact]
-    public void An_empty_answer_is_not_yes_and_the_question_is_asked_again()
-    {
-        var rig = new Rig("", "n");
-
-        var outcome = rig.Offer();
-
-        Assert.Equal(ReportOfferOutcome.Declined, outcome);
-        Assert.Equal(2, rig.Console.Writes.Count);
-        rig.Log.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -102,7 +91,7 @@ public class ConsoleReportOfferTests
         rig.Log.Received(1).WriteAsync(Entry, Arg.Any<CancellationToken>());
         var question = Assert.Single(rig.Console.Writes);
         Assert.Contains(ReportPath, question);
-        Assert.Contains("[" + Strings.Cli_UpdateAnswerYes.Trim().ToLower() + "/"
+        Assert.Contains("[" + Strings.Cli_UpdateAnswerYes.Trim().ToUpper() + "/"
             + Strings.Cli_UpdateAnswerNo.Trim().ToLower() + "/?]", question);
     }
 

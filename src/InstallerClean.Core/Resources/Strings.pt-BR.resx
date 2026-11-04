@@ -2114,8 +2114,8 @@ Execute o InstallerClean novamente como administrador.</value></data>
   <data name="Cli.DonateAsk" xml:space="preserve"><value>O InstallerClean é gratuito. Se ele ajudou, uma gorjeta é muito bem-vinda: {0}</value></data>
   <!-- The command line's update, printed before the scan where a newer version is out.
        The question follows UpdateNotice.Available, and is asked only where a person can see
-       it and answer it. 0 = the letter for yes and
-       1 = the letter for no, both in lower case, as neither is a default. Both
+       it and answer it. 0 = the letter for yes, shown
+       in capitals because Enter answers yes; 1 = the letter for no, in lower case. Both
        come from Cli.UpdateAnswerYes and Cli.UpdateAnswerNo, so the brackets always show
        the letters the reader takes. -->
   <data name="Cli.UpdatePrompt" xml:space="preserve"><value>Atualizar agora? É altamente recomendável usar a versão mais recente. [{0}/{1}]</value></data>
