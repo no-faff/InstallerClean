@@ -250,6 +250,35 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             pass.UnlistedHolds());
     }
 
+    /// <inheritdoc />
+    /// <remarks>
+    /// Each list is put to <see cref="ReadListAt"/>, as the screen's read of a key's sources puts
+    /// it (<see cref="AddRegistrySources"/>), on a pass of its own, so whether Windows follows a
+    /// link reached through a network path is asked by the same code once for the count.
+    /// </remarks>
+    public int CountKeysWithAListUnread(
+        IReadOnlyList<UnlistedProductKey> unlisted, CancellationToken cancellationToken = default)
+    {
+        var pass = new PassAnswers(_msi, [], cancellationToken, null);
+        var count = 0;
+        foreach (var key in unlisted)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (key.HasInstallProperties) continue;
+
+            foreach (var (sid, context) in SourceListPlaces(key.Account))
+            {
+                if (ReadListAt(key.Code, sid, context, pass, out _) is not (ListReading.NotRead or ListReading.NotCompared))
+                    continue;
+
+                count++;
+                break;
+            }
+        }
+
+        return count;
+    }
+
     /// <summary>
     /// What Windows holds for one declared product code, asked once per code per
     /// pass: the installations of that code, and every installation the caller listed
@@ -3813,16 +3842,17 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         foreach (var (sid, context) in SourceListPlaces(key.Account))
         {
-            if (!SourceListAt(key.Code, sid, context, out var listKey, out var values))
+            var reading = ReadListAt(key.Code, sid, context, pass, out var read);
+            if (reading == ListReading.NotRead)
             {
                 ListNotRead("a source list could not be read, its key not reading or its account's hive not loaded");
                 continue;
             }
 
-            if (values is null) continue;
+            if (reading == ListReading.NotThere) continue;
 
             listFound = true;
-            if (ReadSourceList(listKey, values, pass) is not { } sources)
+            if (reading == ListReading.NotCompared || read is not { } sources)
             {
                 ListNotRead("a source list holds a value in a form the check does not compare");
                 continue;
@@ -3929,6 +3959,38 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             namesAFileInInstallerFolder, packages, byName, out givenUp, out unsaid);
         packageNames.AddRange(byName.Select(package => package.Name));
         return allRead;
+    }
+
+    /// <summary>What reading one of a key's source lists from the registry gave (<see cref="ReadListAt"/>).</summary>
+    private enum ListReading
+    {
+        /// <summary>The list is not there, under a hive that is loaded.</summary>
+        NotThere,
+
+        /// <summary>The list read, in a form this check compares.</summary>
+        Read,
+
+        /// <summary>The list was not read: its key name cannot be made, its account's hive is not loaded, or its key will not read.</summary>
+        NotRead,
+
+        /// <summary>The list holds a value in a form this check does not compare.</summary>
+        NotCompared,
+    }
+
+    /// <summary>
+    /// A key's source list in one account and context, read from the registry alone
+    /// (<see cref="SourceListAt"/>, <see cref="ReadSourceList"/>), with
+    /// <paramref name="sources"/> what it names where it read. No package is read.
+    /// </summary>
+    private ListReading ReadListAt(
+        string code, string? sid, MsiInstallContext context, PassAnswers pass, out ListedSources? sources)
+    {
+        sources = null;
+        if (!SourceListAt(code, sid, context, out var listKey, out var values)) return ListReading.NotRead;
+        if (values is null) return ListReading.NotThere;
+
+        sources = ReadSourceList(listKey, values, pass);
+        return sources is null ? ListReading.NotCompared : ListReading.Read;
     }
 
     /// <summary>

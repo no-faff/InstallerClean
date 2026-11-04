@@ -158,7 +158,8 @@ public class ResultLogEntryTests
         FilesHeldForKeysWithInstallPropertiesCount: 0,
         FilesHeldForKeysWithoutInstallPropertiesCount: 0,
         SupersededHeldForUnlistedKeyCount: 0,
-        SecondCopyKeepOrdinarySourcesNotRuledOutCount: 0);
+        SecondCopyKeepOrdinarySourcesNotRuledOutCount: 0,
+        UnlistedKeysWithoutInstallPropertiesListUnreadCount: 0);
 
     private static MachineInfo SampleMachine() => new(
         ShortNameCreation: ShortNameCreationLabels.NoVolumes,
@@ -446,6 +447,8 @@ public class ResultLogEntryTests
                 // The fourth count of why the record did not settle an installation setting the
                 // hold: one whose record shows it ordinary, its sources not ruled out.
                 "secondCopyKeepOrdinarySourcesNotRuledOutCount",
+                // The keys without an InstallProperties key one of whose source lists did not read.
+                "unlistedKeysWithoutInstallPropertiesListUnreadCount",
             ],
             root.GetProperty("scan").EnumerateObject().Select(p => p.Name));
 
@@ -550,6 +553,7 @@ public class ResultLogEntryTests
         var withoutTheKeyCounts = json
             .Replace("unlistedKeysWithInstallPropertiesCount", "")
             .Replace("unlistedKeysWithoutInstallPropertiesCount", "")
+            .Replace("unlistedKeysWithoutInstallPropertiesListUnreadCount", "")
             .Replace("supersededHeldForUnlistedKeyCount", "");
         Assert.DoesNotContain("unlisted", withoutTheKeyCounts, StringComparison.OrdinalIgnoreCase);
     }
@@ -863,17 +867,21 @@ public class ResultLogEntryTests
             0,
             UnlistedKeysWithInstallProperties: 3,
             UnlistedKeysWithoutInstallProperties: 4,
-            UnlistedKeyHolds: new UnlistedKeyHolds(5, 6));
+            UnlistedKeyHolds: new UnlistedKeyHolds(5, 6),
+            UnlistedKeysWithoutInstallPropertiesListUnread: 2);
 
         var info = ScanInfo.From(scan, 10);
 
         Assert.Equal(
-            [3, 4, 5, 6, 1],
+            [3, 4, 5, 6, 1, 2],
             [
                 info.UnlistedKeysWithInstallPropertiesCount, info.UnlistedKeysWithoutInstallPropertiesCount,
                 info.FilesHeldForKeysWithInstallPropertiesCount, info.FilesHeldForKeysWithoutInstallPropertiesCount,
-                info.SupersededHeldForUnlistedKeyCount,
+                info.SupersededHeldForUnlistedKeyCount, info.UnlistedKeysWithoutInstallPropertiesListUnreadCount,
             ]);
+
+        using var doc = JsonDocument.Parse(JsonSerializer.Serialize(info, JsonOptions));
+        Assert.Equal(2, doc.RootElement.GetProperty("unlistedKeysWithoutInstallPropertiesListUnreadCount").GetInt32());
     }
 
     [Fact]

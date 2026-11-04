@@ -380,13 +380,14 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         // And the drives and shares the declared-product screen gives up, the waits it
         // makes, what it reads of each listed installation's cached package and the running
-        // account's own per-user source lists it reads, which the result built after the
-        // block below carries.
+        // account's own per-user source lists it reads, and the product keys whose source list
+        // did not read, which the result built after the block below carries.
         IReadOnlyList<SourceRootGivenUp> sourceRootsGivenUp = [];
         var sourceWaitCount = 0;
         var cachedPackageCensus = CachedPackageCensus.None;
         var ownPerUserSourceLists = OwnPerUserSourceLists.None;
         var unlistedKeyHolds = UnlistedKeyHolds.None;
+        var keysWithAListUnread = 0;
 
         // The closing entry is owed on every exit, not just the clean one: a
         // cancel and the correlation gate both leave through here, and the gate
@@ -686,6 +687,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
         (sourceRootsGivenUp, sourceWaitCount, cachedPackageCensus, ownPerUserSourceLists, unlistedKeyHolds) = WithholdCandidatesByWhatTheyDeclare(
             unclaimedByPath, withheld, withheldBy, cacheRoot, query.Installations, query.UnlistedProductKeys, cancellationToken,
             (ex, cause) => refusalLog.Record(ex, cause), progress);
+
+        // The screen reads no product key on a scan whose files were all held before its last
+        // step or that had none to screen, and can stop before the last key, so this is asked of
+        // every key without an InstallProperties key on its own. It reads the registry alone and
+        // decides nothing.
+        keysWithAListUnread =
+            _declaredProducts?.CountKeysWithAListUnread(query.UnlistedProductKeys, cancellationToken) ?? 0;
 
         // THE LAST DECISION ON THIS HALF, AND IT TAKES WHAT THE SCREEN LET THROUGH.
         // Run after the screen rather than before it, so the screen's own verdicts
@@ -1141,7 +1149,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             ownPerUserSourceLists,
             query.UnlistedProductKeys.Count(key => key.HasInstallProperties),
             query.UnlistedProductKeys.Count(key => !key.HasInstallProperties),
-            unlistedKeyHolds);
+            unlistedKeyHolds,
+            keysWithAListUnread);
     }
 
     /// <summary>

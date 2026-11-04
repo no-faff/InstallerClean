@@ -275,6 +275,22 @@ public interface IDeclaredProductCheck
         Action<SourceFolderWait?>? waitingOn = null,
         string? installerFolder = null,
         Func<string, bool?>? isTheInstallerFolder = null);
+
+    /// <summary>
+    /// How many of <paramref name="unlisted"/> have no <c>InstallProperties</c> key and a
+    /// source list that does not read: its account's hive not loaded, its key not reading, or a
+    /// value in a form the check does not compare. These are the lists for which
+    /// <see cref="Screen"/>, reaching such a key, keeps every installation package. Each key's
+    /// lists are read from the registry alone, whatever any screen read, and no package is
+    /// read, so nothing here waits on a drive or share. A check with no registry reader reads no
+    /// list, and counts every such key.
+    ///
+    /// IT COUNTS LISTS, NOT HOLDS. A key whose lists all read is not counted, though the screen
+    /// also keeps every installation package where the read of a package at a folder on one
+    /// does not settle, and where the check has no way to read the packages a list names.
+    /// </summary>
+    int CountKeysWithAListUnread(
+        IReadOnlyList<UnlistedProductKey> unlisted, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

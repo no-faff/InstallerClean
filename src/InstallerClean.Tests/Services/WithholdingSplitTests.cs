@@ -156,7 +156,8 @@ public class WithholdingSplitTests
 
         await Scan(walked: new[] { $@"{Folder}\a.msi" }, registered: Array.Empty<string>(), screen: screen, unlisted: [key]);
 
-        var handed = (IReadOnlyList<UnlistedProductKey>)screen.ReceivedCalls().Single().GetArguments()[2]!;
+        var handed = (IReadOnlyList<UnlistedProductKey>)screen.ReceivedCalls()
+            .Single(call => call.GetMethodInfo().Name == nameof(IDeclaredProductCheck.Screen)).GetArguments()[2]!;
         Assert.Equal([key], handed);
     }
 
@@ -190,6 +191,48 @@ public class WithholdingSplitTests
         Assert.Equal(1, result.UnlistedKeysWithInstallProperties);
         Assert.Equal(2, result.UnlistedKeysWithoutInstallProperties);
         Assert.Equal(new UnlistedKeyHolds(1, 1), result.UnlistedKeyHolds);
+    }
+
+    /// <summary>
+    /// <paramref name="screen"/>, answering that two of the keys it is asked about have a source
+    /// list that did not read.
+    /// </summary>
+    private static IDeclaredProductCheck CountingTwoListsUnread(IDeclaredProductCheck screen)
+    {
+        screen.CountKeysWithAListUnread(Arg.Any<IReadOnlyList<UnlistedProductKey>>(), Arg.Any<CancellationToken>())
+            .Returns(2);
+        return screen;
+    }
+
+    [Fact]
+    public async Task The_keys_whose_list_did_not_read_reach_the_result_asked_of_the_scans_keys()
+    {
+        var screen = CountingTwoListsUnread(
+            ScreenHoldingForKeys(DeclaredProductOutcome.Unestablished, DeclaredProductOutcome.Unestablished));
+
+        var result = await Scan(
+            walked: new[] { $@"{Folder}\a.msi", $@"{Folder}\b.msi" }, registered: Array.Empty<string>(),
+            screen: screen, unlisted: KeysOfBothKinds);
+
+        Assert.Equal(2, result.UnlistedKeysWithoutInstallPropertiesListUnread);
+        var asked = (IReadOnlyList<UnlistedProductKey>)screen.ReceivedCalls()
+            .Single(call => call.GetMethodInfo().Name == nameof(IDeclaredProductCheck.CountKeysWithAListUnread))
+            .GetArguments()[0]!;
+        Assert.Equal(KeysOfBothKinds, asked);
+    }
+
+    [Fact]
+    public async Task The_keys_whose_list_did_not_read_are_counted_on_a_scan_with_no_file_to_screen()
+    {
+        var screen = CountingTwoListsUnread(ScreenHoldingForKeys());
+
+        var result = await Scan(
+            walked: Array.Empty<string>(), registered: Array.Empty<string>(), screen: screen,
+            unlisted: KeysOfBothKinds);
+
+        Assert.DoesNotContain(
+            screen.ReceivedCalls(), call => call.GetMethodInfo().Name == nameof(IDeclaredProductCheck.Screen));
+        Assert.Equal(2, result.UnlistedKeysWithoutInstallPropertiesListUnread);
     }
 
     [Fact]

@@ -131,12 +131,15 @@ public class DeclaredProductCheckUnlistedKeyTests
 
         public DeclaredProductScreening ScreeningOf(
             IReadOnlyList<UnlistedProductKey> keys, OrphanedFile[] files, Action<Exception, string>? recordRefusal = null) =>
-            new DeclaredProductCheck(Msi, Packages, Files, Disk, Registry, null)
+            Check().Screen(files, [], keys, default, recordRefusal, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
+
+        public DeclaredProductCheck Check() =>
+            new(Msi, Packages, Files, Disk, Registry, null)
             {
                 DriveKindOf = DriveKindOf,
                 SourceFolderTimeLimit = SourceFolderTimeLimit,
                 NamesInFolderOf = path => [path[(path.LastIndexOf('\\') + 1)..]],
-            }.Screen(files, [], keys, default, recordRefusal, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
+            };
     }
 
     private const DeclaredProductOutcome LetThrough = DeclaredProductOutcome.DeclaredProductNotInstalled;
@@ -1514,5 +1517,113 @@ public class DeclaredProductCheckUnlistedKeyTests
         var key = new UnlistedProductKey(System, KeyCode, [PatchCode], [], true);
 
         Assert.Equal([DeclaredProductOutcome.DeclaredPatchRegistered], pc.Screen([key], Patch(Spare)));
+    }
+
+    // ---------------------------------------------------------------- the keys whose list did not read
+
+    [Theory]
+    [InlineData(RegistryKeyPresence.Absent)]
+    [InlineData(RegistryKeyPresence.Unreadable)]
+    public void A_key_with_no_InstallProperties_under_a_hive_not_loaded_is_counted(RegistryKeyPresence hive)
+    {
+        var pc = new Pc(User);
+        pc.Registry.HiveIs(User, hive);
+
+        Assert.Equal(1, pc.Check().CountKeysWithAListUnread([NoProperties(User)]));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_will_not_read_is_counted()
+    {
+        var pc = new Pc();
+        pc.Registry.Answers(HiveList(System, KeyCode), RegistryKeyPresence.Unreadable);
+
+        Assert.Equal(1, pc.Check().CountKeysWithAListUnread([NoProperties()]));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_holds_a_value_in_a_form_not_compared_is_counted()
+    {
+        var pc = new Pc();
+        pc.HasList(HiveList(System, KeyCode), SetupName, @"D:\%Folder%\");
+
+        Assert.Equal(1, pc.Check().CountKeysWithAListUnread([NoProperties()]));
+    }
+
+    [Fact]
+    public void A_list_with_a_media_package_path_is_counted_while_Windows_follows_links_reached_through_a_network_path()
+    {
+        var pc = new Pc();
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Registry.Holds(
+            HiveList(System, KeyCode) + @"\Media",
+            new RegistryValue("MediaPackage", RegistryValueKind.String, @"\sub\"));
+        pc.Registry.HoldsLinkSetting(ScriptedSourceListRegistry.LinkSettingsKey,
+            ScriptedSourceListRegistry.RemoteToLocal, new RegistryDwordRead(RegistryDwordState.Read, 1));
+
+        Assert.Equal(1, pc.Check().CountKeysWithAListUnread([NoProperties()]));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_list_reads_is_not_counted_and_no_package_is_read()
+    {
+        var pc = new Pc();
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Files.Opens(SetupPackage, 1);
+
+        Assert.Equal(0, pc.Check().CountKeysWithAListUnread([NoProperties()]));
+        Assert.Empty(pc.Files.Reads);
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_whose_package_does_not_settle_is_not_counted()
+    {
+        // The screen keeps every installation package for this key, and the count is of lists.
+        var pc = new Pc();
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Files.Answers(SetupPackage, FileIdentityRead.OpenRefused);
+
+        Assert.Equal(EveryFileKept, pc.Screen([NoProperties()], Package(First), Package(Second)));
+        Assert.Equal(0, pc.Check().CountKeysWithAListUnread([NoProperties()]));
+    }
+
+    [Fact]
+    public void A_key_with_no_InstallProperties_and_no_list_under_a_hive_that_is_loaded_is_not_counted()
+    {
+        Assert.Equal(0, new Pc().Check().CountKeysWithAListUnread([NoProperties()]));
+    }
+
+    [Fact]
+    public void A_key_with_InstallProperties_is_not_counted_and_its_lists_are_not_read()
+    {
+        var pc = new Pc();
+        pc.Registry.Answers(HiveList(System, KeyCode), RegistryKeyPresence.Unreadable);
+
+        Assert.Equal(0, pc.Check().CountKeysWithAListUnread([Installed()]));
+        Assert.Empty(pc.Registry.Reads);
+    }
+
+    [Fact]
+    public void Every_key_whose_list_did_not_read_is_counted_though_the_screen_stops_reading_at_the_first()
+    {
+        // Two programs advertised by one account, signed out. The screen keeps every file at the
+        // first key and reads no list of the second.
+        var pc = new Pc(User);
+        pc.Registry.HiveIs(User, RegistryKeyPresence.Absent);
+        pc.Registry.Answers(ManagedList(User, SecondKey), RegistryKeyPresence.Absent);
+        UnlistedProductKey[] keys = [NoProperties(User), NoProperties(User, SecondKey)];
+
+        Assert.Equal(EveryFileKept, pc.Screen(keys, Package(First), Package(Second)));
+        Assert.DoesNotContain(ManagedList(User, SecondKey), pc.Registry.Reads);
+        Assert.Equal(2, pc.Check().CountKeysWithAListUnread(keys));
+    }
+
+    [Fact]
+    public void A_check_with_no_registry_reader_counts_every_key_with_no_InstallProperties()
+    {
+        var pc = new Pc();
+        var check = new DeclaredProductCheck(pc.Msi, pc.Packages, pc.Files, pc.Disk, null, null);
+
+        Assert.Equal(2, check.CountKeysWithAListUnread([NoProperties(), Installed(), NoProperties(System, SecondKey)]));
     }
 }

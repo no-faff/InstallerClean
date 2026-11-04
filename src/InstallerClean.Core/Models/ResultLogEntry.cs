@@ -164,10 +164,13 @@ public sealed record ResultLogEntry(
     /// files a key held back (<see cref="ScanInfo.UnlistedKeysWithInstallPropertiesCount"/> to
     /// <see cref="ScanInfo.SupersededHeldForUnlistedKeyCount"/>).
     ///
-    /// SCHEMA 12 ADDS ONE KEY UNDER <c>scan</c> AND TAKES NONE AWAY: the installations setting the
+    /// SCHEMA 12 ADDS TWO KEYS UNDER <c>scan</c> AND TAKES NONE AWAY: the installations setting the
     /// hold whose record shows an ordinary installation, their sources not ruled out
     /// (<see cref="ScanInfo.SecondCopyKeepOrdinarySourcesNotRuledOutCount"/>), the fourth count of
-    /// why the record did not settle an installation. <c>scan.secondCopyReleasedOrdinaryCount</c>
+    /// why the record did not settle an installation; and the product keys without an
+    /// <c>InstallProperties</c> key one of whose source lists did not read
+    /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>), in that order.
+    /// <c>scan.secondCopyReleasedOrdinaryCount</c>
     /// NARROWS AT 12: from 12 it counts only an ordinary installation whose sources were all seen
     /// or left to be compared by name, and, for one recording no cached package, whose
     /// <c>InstallProperties</c> key records none as well, every package they name being compared
@@ -1643,6 +1646,19 @@ public sealed record MachineInfo(
 /// from <paramref name="SecondCopyKeepPathUnreadableCount"/>. Appended after the keys before it
 /// for the reason they were.
 /// </param>
+/// <param name="UnlistedKeysWithoutInstallPropertiesListUnreadCount">
+/// The keys counted in <paramref name="UnlistedKeysWithoutInstallPropertiesCount"/> one of whose
+/// source lists did not read: the account's hive not loaded, which is where a signed-out account's
+/// lists are, the key not reading, or a value in a form the check does not compare
+/// (<c>ScanResult.UnlistedKeysWithoutInstallPropertiesListUnread</c>). Asked of every such key from
+/// the registry alone, whatever the screen read. Keys, not files, and part of
+/// <paramref name="UnlistedKeysWithoutInstallPropertiesCount"/> and of no other count. IT
+/// COUNTS LISTS, NOT HOLDS: the screen keeps every installation package for each key counted here
+/// once it reaches it, and also for a key whose lists all read where the read of a package at a
+/// folder on one does not settle, which is not counted here. A check with no registry reader
+/// counts every such key, its lists not read.
+/// <paramref name="FilesHeldForKeysWithoutInstallPropertiesCount"/> counts the files such keys kept.
+/// </param>
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
@@ -1751,7 +1767,8 @@ public sealed record ScanInfo(
     int FilesHeldForKeysWithInstallPropertiesCount,
     int FilesHeldForKeysWithoutInstallPropertiesCount,
     int SupersededHeldForUnlistedKeyCount,
-    int SecondCopyKeepOrdinarySourcesNotRuledOutCount)
+    int SecondCopyKeepOrdinarySourcesNotRuledOutCount,
+    int UnlistedKeysWithoutInstallPropertiesListUnreadCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -1916,7 +1933,8 @@ public sealed record ScanInfo(
             scan.UnlistedKeyHolds.WithoutInstallProperties,
             scan.SupersededHeldForUnlistedKeyCount,
             // The fourth count of why the record did not settle an installation setting the hold.
-            cachedPackages.KeptOrdinarySourcesNotRuledOut);
+            cachedPackages.KeptOrdinarySourcesNotRuledOut,
+            scan.UnlistedKeysWithoutInstallPropertiesListUnread);
     }
 }
 
