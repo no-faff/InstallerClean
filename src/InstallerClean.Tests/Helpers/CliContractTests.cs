@@ -224,7 +224,7 @@ public class CliContractTests
     {
         Assert.Equal(3000, CliContract.EventIdFor(CliEventClass.ScanRecordsIncompleteNotice));
         Assert.Equal(3001, CliContract.EventIdFor(CliEventClass.ScanMissingFilesNotice));
-        Assert.Equal(3002, CliContract.EventIdFor(CliEventClass.ScanNothingOfferedNotice));
+        Assert.Equal(3002, CliContract.EventIdFor(CliEventClass.ScanWalkHeldBackNotice));
         Assert.Equal(3003, CliContract.EventIdFor(CliEventClass.ScanSupersededHeldBackNotice));
         Assert.Equal(3004, CliContract.EventIdFor(CliEventClass.SourcesGivenUpNotice));
         Assert.Equal(3005, CliContract.EventIdFor(CliEventClass.UpdatedNotice));
@@ -246,7 +246,7 @@ public class CliContractTests
 
         Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanRecordsIncompleteNotice), outcomes);
         Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanMissingFilesNotice), outcomes);
-        Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanNothingOfferedNotice), outcomes);
+        Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanWalkHeldBackNotice), outcomes);
         Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanSupersededHeldBackNotice), outcomes);
         Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.SourcesGivenUpNotice), outcomes);
         Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.UpdatedNotice), outcomes);
@@ -320,16 +320,16 @@ public class CliContractTests
     }
 
     [Fact]
-    public void EntryType_the_nothing_offered_notice_is_warning()
+    public void EntryType_the_walk_held_back_notice_is_warning()
     {
         // IT SITS ON THE OTHER SIDE OF THAT SAME SPLIT AND THE PAIR IS WHY THIS IS
-        // PINNED. Warning means THIS RUN fell short of its job, and this run offered
-        // nothing at all where it would otherwise have offered something. The
+        // PINNED. Warning means THIS RUN fell short of its job, and this run held back
+        // files the folder walk found that it would otherwise have offered. The
         // missing-files notice is a standing property of a machine and repeats
         // nightly for ever, which is what earns it Information; this one stops the
         // moment the condition does.
         Assert.Equal(EventLogEntryType.Warning,
-            CliContract.EntryTypeFor(CliEventClass.ScanNothingOfferedNotice));
+            CliContract.EntryTypeFor(CliEventClass.ScanWalkHeldBackNotice));
     }
 
     [Fact]

@@ -235,9 +235,10 @@ internal enum CliEventClass
     /// (<c>WithholdingAccount.WholeWalkOffer</c>).
     ///
     /// IT IS RAISED BESIDE AN OFFER TOO, so gating it on an empty offer would lose it on the
-    /// machine whose walk offer was held back while a superseded file was offered.
+    /// machine whose walk offer was held back while a superseded file was offered. The Event
+    /// ID is 3002 and is the wire contract; the member's name is this codebase's.
     /// </summary>
-    ScanNothingOfferedNotice,
+    ScanWalkHeldBackNotice,
 
     /// <summary>
     /// Notice: the scan held back superseded files it could not be certain are no
@@ -533,7 +534,7 @@ internal static class CliContract
         CliEventClass.HardError => 4000,
         CliEventClass.ScanRecordsIncompleteNotice => 3000,
         CliEventClass.ScanMissingFilesNotice => 3001,
-        CliEventClass.ScanNothingOfferedNotice => 3002,
+        CliEventClass.ScanWalkHeldBackNotice => 3002,
         CliEventClass.ScanSupersededHeldBackNotice => 3003,
         CliEventClass.SourcesGivenUpNotice => 3004,
         CliEventClass.UpdatedNotice => 3005,

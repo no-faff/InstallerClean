@@ -94,7 +94,7 @@ public class CliScanNoticeOrderTests
 
         Assert.True(console.Refused > 0, $"The console refused no write, so it never failed at {failsAt}.");
         Assert.Equal(CliExitCode.Error, run.ExitCode);
-        Assert.Contains(run.Entries, entry => entry.Class == CliEventClass.ScanNothingOfferedNotice);
+        Assert.Contains(run.Entries, entry => entry.Class == CliEventClass.ScanWalkHeldBackNotice);
         Assert.Contains(run.Entries, entry => entry.Class == CliEventClass.SourcesGivenUpNotice);
         Assert.Contains(run.Entries, entry => entry.Class == CliEventClass.ScanSupersededHeldBackNotice);
         Assert.Contains(run.Entries, entry => entry.Class == CliEventClass.ScanMissingFilesNotice);

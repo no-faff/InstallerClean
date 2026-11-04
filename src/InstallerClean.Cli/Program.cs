@@ -2108,7 +2108,7 @@ internal static class Program
             var perFile = scanResult.Withholding != WithholdingAccount.WholeWalkOffer;
             var heldBack = scanResult.UnestablishedWithheldCount;
 
-            MachineContract.WriteEventLog(CliEventClass.ScanNothingOfferedNotice,
+            MachineContract.WriteEventLog(CliEventClass.ScanWalkHeldBackNotice,
                 () => string.Format(
                     perFile
                         ? Strings.Cli_EventLogNothingOfferedPerFileNotice

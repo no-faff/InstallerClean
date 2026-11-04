@@ -70,7 +70,7 @@ public class CliNoticeEntryTests
             WithheldBy = new WithholdingSplit(DeclaredProductUnestablishedCount: 2),
         });
 
-        AssertNotice(entries, CliEventClass.ScanNothingOfferedNotice,
+        AssertNotice(entries, CliEventClass.ScanWalkHeldBackNotice,
             MachineContract.English(() => string.Format(Strings.Cli_EventLogNothingOfferedPerFileNotice,
                 Flag, 2, DisplayHelpers.PluraliseFile(2))));
     }
@@ -85,7 +85,7 @@ public class CliNoticeEntryTests
             Census = new EnumerationCensus(UnansweredProductCount: 1),
         });
 
-        AssertNotice(entries, CliEventClass.ScanNothingOfferedNotice,
+        AssertNotice(entries, CliEventClass.ScanWalkHeldBackNotice,
             MachineContract.English(() => string.Format(Strings.Cli_EventLogNothingOfferedNotice,
                 Flag, 2, DisplayHelpers.PluraliseFile(2))));
     }
