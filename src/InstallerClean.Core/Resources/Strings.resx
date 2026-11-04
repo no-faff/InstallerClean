@@ -1723,9 +1723,9 @@ Run InstallerClean again as administrator.</value></data>
        Windows holds is a different subject, and not one a reader of this log
        can act on. -->
   <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>{0} mode: no unneeded files identified.</value></data>
-  <!-- The outcome entry for a scan that offered nothing and held files back, so a
-       monitoring tool watching the Application channel is not told a machine is clean
-       when the scan could not judge it.
+  <!-- The outcome entry for a scan that offered nothing because it held back the whole
+       walk-derived offer, so a monitoring tool watching the Application channel is not
+       told a machine is clean when the scan could not judge it.
 
        0 = mode arg, whichever of /s, /d and /m was run, as in the entry above:
        the no-files branch is common to all three. 1 = files held back,

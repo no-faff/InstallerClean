@@ -1176,7 +1176,7 @@ internal static class Program
             // rather than the tool's intention towards it.
             //
             // THE CLEAN LINE IS PRINTED WHEREVER NOTHING IS OFFERED, EXCEPT WHERE ONE OF TWO
-            // LINES STANDS IN ITS PLACE. The line about files held back for their times
+            // LINES IS PRINTED INSTEAD. The line about files held back for their times
             // says those files were kept and when to scan again, and the line naming the
             // drives and shares the scan stopped waiting for says the files it left alone
             // were never established to be needed or unneeded. The clean line beside either
@@ -1194,7 +1194,7 @@ internal static class Program
             // THE FIRST NOTICE SAYS HOW MANY FILES WERE LEFT ALONE (ScanResult.LeftAloneCount),
             // the figure the window shows under its unneeded count. It follows the line saying
             // what the scan found or the clean line, and is the first line after the scanning
-            // one where neither is printed.
+            // one where neither is printed and on a /s that lists files.
             //
             // withheldCount is UnestablishedWithheldCount, which leaves out any file kept
             // because it declares an installed program, for its times
@@ -1214,8 +1214,8 @@ internal static class Program
                     DisplayHelpers.FormatCount(count), DisplayHelpers.PluraliseFile(count), size);
 
             // THE NOTICES' APPLICATION-LOG ENTRIES ARE WRITTEN HERE AND THEIR STDOUT LINES
-            // COME BACK TO BE PRINTED, after the line saying what the scan found, or after the
-            // scanning line where no such line is printed. A /s that lists files prints them
+            // COME BACK TO BE PRINTED, after the line saying what the scan found or the clean
+            // line, or after the scanning line where neither is printed. A /s that lists files prints them
             // ahead of the line counting the files instead, so the list sits straight under
             // that line, and a script reading the rows takes the indented lines after it to
             // the end of the output. What can follow the list is never indented: the unexpected-error
@@ -1287,7 +1287,7 @@ internal static class Program
             {
                 // The audit line tells a machine the scan could not judge from a clean one.
                 // On stdout the clean line reports that nothing was identified, and is printed
-                // on both unless one of the two lines above stands in its place. A monitoring
+                // on both unless one of the two notices that replace it is printed. A monitoring
                 // tool watching the Application channel reads the split here. A machine with no
                 // withholding to report and no drive or share given up takes the clean entry,
                 // whether or not files were held back for their times: the line about them is
