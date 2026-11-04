@@ -62,4 +62,34 @@ public sealed class ConsoleUpdateHostStartTests : IDisposable
         Assert.Equal(CliContract.NoUpdateSwitch, request.Command[3]);
         Assert.Equal(4, request.Command.Count);
     }
+
+    [Fact]
+    public void After_an_update_question_nobody_answered_the_newer_version_is_told_to_ask_nothing()
+    {
+        // This run's read of the console is still waiting, and would take the first line
+        // typed at the newer version's question.
+        var written = Directory.CreateDirectory(Path.Combine(_folder, "written")).FullName;
+        var replaces = Path.Combine(_folder, "app", "installerclean-cli.exe");
+        var host = new ConsoleUpdateHost("/d");
+        host.NobodyAnswered();
+
+        var answer = host.RunNewerVersion(
+            DetachedStandIn.Exe, [.. DetachedStandIn.Before(written, "exit"), "/d"], replaces,
+            "3.6.0", "3.7.0", () => throw new InvalidOperationException("It did not start."), CancellationToken.None);
+
+        Assert.Null(answer);
+        var passed = File.ReadAllLines(Path.Combine(written, "arguments.txt"));
+        Assert.Equal(ReplaceRead.Asked, HandOverContract.ReadReplaceRequest(passed, out var request));
+        Assert.Equal("/d", request!.Command[0]);
+        Assert.StartsWith(CliContract.CancelEventSwitch, request.Command[1], StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(CliContract.NoUpdateSwitch, request.Command[2]);
+        Assert.Equal(CliContract.NoQuestionsSwitch, request.Command[3]);
+        Assert.Equal(4, request.Command.Count);
+
+        // What the newer version makes of them, once the Ctrl+C event is taken out.
+        var invocation = CliContract.ParseArguments(CliContract.TakeCancelEvent([.. request.Command], out _));
+        Assert.Equal(CliCommand.Delete, invocation.Command);
+        Assert.True(invocation.SkipUpdate);
+        Assert.True(invocation.NoQuestions);
+    }
 }

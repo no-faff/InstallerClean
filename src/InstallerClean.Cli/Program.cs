@@ -315,7 +315,7 @@ internal static class Program
             return RefuseWithoutAdministratorRights(arg);
 
         using var cts = new CancellationTokenSource();
-        var updateHost = new ConsoleUpdateHost(arg);
+        var updateHost = NewUpdateHost(arg, invocation);
 
         // A Ctrl+C from here until the run returns cancels the run, before the update and the
         // mutex as well as during the work, and one that came before this line does so as it
@@ -373,7 +373,7 @@ internal static class Program
 
         // Made before the take, so nothing between the take and the try that releases the
         // mutex can throw.
-        var report = new RunReport(ConsoleCanAsk() && !updateHost.AsksNothingMore);
+        var report = new RunReport(MayAsk(ConsoleCanAsk(), updateHost));
         var take = TakeInstanceLock(arg, s_standsFor is not null, () => new InstanceLock(), update.RunningInstead, cts.Token,
             () => new StagedRunCover(InstanceLock.Name,
                 s_copyHeld ?? throw new InvalidOperationException("A run standing for a copy holds no handle on it.")));
@@ -619,7 +619,7 @@ internal static class Program
             if (!new SettingsService().Load().AutoUpdateCheck)
                 return UpdateConclusion.GoesOn;
 
-            var canAsk = ConsoleCanAsk();
+            var canAsk = MayAsk(ConsoleCanAsk(), host);
             var updater = new AppUpdater(
                 AppCopy.DetectRunningCommandLine(exePath, new RegistryReader()),
                 exePath,
@@ -746,6 +746,23 @@ internal static class Program
     /// nobody can answer takes the update without asking.
     /// </summary>
     internal static bool ConsoleCanAsk() => ConsoleIsWatched() && !Console.IsInputRedirected;
+
+    /// <summary>
+    /// Whether this run may put a question at the console: <paramref name="consoleCanAsk"/>
+    /// (<see cref="ConsoleCanAsk"/> in a run) and the run not told to ask nothing
+    /// (<see cref="ConsoleUpdateHost.AsksNothingMore"/>). The update question and the report
+    /// offer both read it, each at the moment it would be asked, so an update question nobody
+    /// answered leaves the report offer unasked.
+    /// </summary>
+    internal static bool MayAsk(bool consoleCanAsk, ConsoleUpdateHost host) =>
+        consoleCanAsk && !host.AsksNothingMore;
+
+    /// <summary>
+    /// The run's console host, asking nothing where <paramref name="invocation"/> carries
+    /// <see cref="CliContract.NoQuestionsSwitch"/>.
+    /// </summary>
+    internal static ConsoleUpdateHost NewUpdateHost(string arg, CliInvocation invocation) =>
+        new(arg, asksNothing: invocation.NoQuestions);
 
     /// <summary>
     /// The Event ID 3005 line: this run, at <paramref name="fromVersion"/>, found

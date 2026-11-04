@@ -69,11 +69,16 @@ internal enum CliCommand
 /// Whether <c>/noupdate</c> was given, which turns off the update check and the update
 /// for this run.
 /// </param>
+/// <param name="NoQuestions">
+/// Whether <c>/noquestions</c> was given, which turns off every question for this run
+/// (<see cref="CliContract.NoQuestionsSwitch"/>).
+/// </param>
 internal readonly record struct CliInvocation(
     CliCommand Command,
     string? OffendingArgument,
     string? MoveDestination,
-    bool SkipUpdate = false);
+    bool SkipUpdate = false,
+    bool NoQuestions = false);
 
 /// <summary>
 /// The CLI process exit codes, the contract RMM tooling and scheduled tasks
@@ -321,6 +326,21 @@ internal static class CliContract
     internal const string NoUpdateSwitch = "/noupdate";
 
     /// <summary>
+    /// The switch that turns off every question for one run, the update question and the
+    /// report offer, so the run asks nothing at the console and goes on as a run nobody can
+    /// answer does. It may come anywhere on the command line, in any case. A command line
+    /// whose update question went unanswered starts the newer version with it, beside
+    /// <see cref="NoUpdateSwitch"/>, because that run's read of the console is still waiting
+    /// and would take the line typed at the newer version's question. It is there for that
+    /// hand-over and is not in the help.
+    ///
+    /// DO NOT STOP ACCEPTING IT. A copy that passes it does so to every newer version it
+    /// ever updates to (<see cref="HandOverContract.ReadReplaceRequest"/>), and a version
+    /// refusing it is one that copy cannot update to after a question nobody answered.
+    /// </summary>
+    internal const string NoQuestionsSwitch = "/noquestions";
+
+    /// <summary>
     /// The switch through which the version that started this one passes, after the colon,
     /// the id of an event that version sets on Ctrl+C. Only a run updating itself passes
     /// it, so it is not in the help. It goes beside the switches
@@ -360,11 +380,12 @@ internal static class CliContract
 
     /// <summary>
     /// Resolves the argument vector to a <see cref="CliInvocation"/>.
-    /// <see cref="NoUpdateSwitch"/> is taken out first, wherever it stands, and what is
-    /// left is parsed: so <c>/m /noupdate</c> is a <c>/m</c> with no path, never a
-    /// <c>/m</c> to a folder of that name. The first token left decides the command,
-    /// lower-cased so the comparison is case-insensitive (PowerShell users frequently
-    /// type <c>/S</c>). The offending-argument and destination tokens are returned in
+    /// <see cref="NoUpdateSwitch"/> and <see cref="NoQuestionsSwitch"/> are taken out first,
+    /// wherever they stand, and what is left is parsed: so <c>/m /noupdate</c> is a
+    /// <c>/m</c> with no path, never a <c>/m</c> to a folder of that name. The first token
+    /// left decides the command, lower-cased so the comparison is case-insensitive
+    /// (PowerShell users frequently type <c>/S</c>). The offending-argument and destination
+    /// tokens are returned in
     /// their original case. A <see cref="CancelEventSwitch"/> or
     /// <see cref="HandOverContract.StartedEventSwitch"/> still here, carrying no event's
     /// id, is refused as an argument the command does not know, wherever it stands, so it
@@ -379,16 +400,31 @@ internal static class CliContract
                 || a.StartsWith(HandOverContract.ReplaceCopySwitch, StringComparison.OrdinalIgnoreCase)
                 || a.StartsWith(HandOverContract.AfterProcessSwitch, StringComparison.OrdinalIgnoreCase)) is { } stray)
             return new CliInvocation(CliCommand.UnknownArgument, stray, null);
-        var rest = args.Where(a => !a.Equals(NoUpdateSwitch, StringComparison.OrdinalIgnoreCase)).ToArray();
-        return ParseCommand(rest) with { SkipUpdate = rest.Length != args.Length };
+        var rest = args.Where(a => !IsRunSwitch(a)).ToArray();
+        return ParseCommand(rest) with
+        {
+            SkipUpdate = args.Any(a => Is(a, NoUpdateSwitch)),
+            NoQuestions = args.Any(a => Is(a, NoQuestionsSwitch)),
+        };
     }
 
     /// <summary>
-    /// The token naming the command: the first argument that is not
-    /// <see cref="NoUpdateSwitch"/>, as typed, or null where there is none.
+    /// The token naming the command: the first argument that is neither
+    /// <see cref="NoUpdateSwitch"/> nor <see cref="NoQuestionsSwitch"/>, as typed, or null
+    /// where there is none.
     /// </summary>
-    internal static string? CommandToken(string[] args) =>
-        args.FirstOrDefault(a => !a.Equals(NoUpdateSwitch, StringComparison.OrdinalIgnoreCase));
+    internal static string? CommandToken(string[] args) => args.FirstOrDefault(a => !IsRunSwitch(a));
+
+    /// <summary>
+    /// Whether <paramref name="arg"/> is <see cref="NoUpdateSwitch"/> or
+    /// <see cref="NoQuestionsSwitch"/>, in any case: a switch about the run, taken out before
+    /// the command and its path are read.
+    /// </summary>
+    private static bool IsRunSwitch(string arg) => Is(arg, NoUpdateSwitch) || Is(arg, NoQuestionsSwitch);
+
+    /// <summary>Whether <paramref name="arg"/> is <paramref name="runSwitch"/>, in any case.</summary>
+    private static bool Is(string arg, string runSwitch) =>
+        arg.Equals(runSwitch, StringComparison.OrdinalIgnoreCase);
 
     private static CliInvocation ParseCommand(string[] args)
     {

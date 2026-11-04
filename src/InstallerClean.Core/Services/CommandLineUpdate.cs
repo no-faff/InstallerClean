@@ -120,7 +120,10 @@ internal interface ICommandLineUpdateHost : IConsolePrompt
     /// <paramref name="arguments"/>, the switches asking it to run them standing for the copy
     /// at <paramref name="replaces"/> and then to take that copy's place
     /// (<see cref="Helpers.HandOverContract.ReplaceArguments"/>), the Ctrl+C event and
-    /// <see cref="Helpers.CliContract.NoUpdateSwitch"/>. Once it has set the started event,
+    /// <see cref="Helpers.CliContract.NoUpdateSwitch"/>, and
+    /// <see cref="Helpers.CliContract.NoQuestionsSwitch"/> where this run asks nothing more at
+    /// the console: the question went unanswered (<see cref="NobodyAnswered"/>), or this run
+    /// was itself given the switch. Once it has set the started event,
     /// calls <paramref name="onStarted"/>, notes in the Application log that this run, at
     /// <paramref name="fromVersion"/>, found <paramref name="toVersion"/> and is running
     /// <paramref name="arguments"/> with it,

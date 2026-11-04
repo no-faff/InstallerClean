@@ -11,7 +11,8 @@ namespace InstallerClean.Cli;
 /// The console, the single-instance mutex and the processes <see cref="CommandLineUpdate"/>
 /// works with, for one run.
 /// </summary>
-internal sealed class ConsoleUpdateHost(string arg, Func<InstanceLock>? newLock = null) : ICommandLineUpdateHost
+internal sealed class ConsoleUpdateHost(string arg, Func<InstanceLock>? newLock = null, bool asksNothing = false)
+    : ICommandLineUpdateHost
 {
     private readonly Func<InstanceLock> _newLock = newLock ?? (() => new InstanceLock());
     private InstanceLock? _instanceLock;
@@ -138,10 +139,13 @@ internal sealed class ConsoleUpdateHost(string arg, Func<InstanceLock>? newLock 
     }
 
     /// <summary>
-    /// Whether the update question went unanswered in this run, after which the run asks
-    /// nothing more at the console (<see cref="ICommandLineUpdateHost.NobodyAnswered"/>).
+    /// Whether this run asks nothing more at the console: its update question went
+    /// unanswered (<see cref="ICommandLineUpdateHost.NobodyAnswered"/>), or it was started
+    /// with <see cref="CliContract.NoQuestionsSwitch"/>, which a copy whose question went
+    /// unanswered passes to the newer version. Where it is set, <see cref="RunNewerVersion"/>
+    /// passes the switch on, as this run's read of the console may still be waiting.
     /// </summary>
-    public bool AsksNothingMore { get; private set; }
+    public bool AsksNothingMore { get; private set; } = asksNothing;
 
     public void NobodyAnswered() => AsksNothingMore = true;
 
@@ -203,6 +207,10 @@ internal sealed class ConsoleUpdateHost(string arg, Func<InstanceLock>? newLock 
         // The command, then the three switches asking the newer version to run it standing
         // for this copy and then take its place, each once, as HandOverContract.ReadReplaceRequest
         // reads them, then the Ctrl+C event and /noupdate, so it goes straight to the command.
+        // Where this run asks nothing more, /noquestions too: a read of this console left
+        // waiting by a question nobody answered takes the first line typed at it, so a line
+        // typed at the newer version's question would go to that read and the next to the
+        // question.
         List<string> passed =
         [
             .. arguments,
@@ -210,6 +218,7 @@ internal sealed class ConsoleUpdateHost(string arg, Func<InstanceLock>? newLock 
         ];
         if (cancelEvent is not null) passed.Add(CliContract.CancelEventArgument(cancelId));
         passed.Add(CliContract.NoUpdateSwitch);
+        if (AsksNothingMore) passed.Add(CliContract.NoQuestionsSwitch);
         Process? started;
         try
         {

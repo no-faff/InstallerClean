@@ -444,4 +444,49 @@ public class CliContractTests
         Assert.Null(CliContract.CommandToken(["/NOUPDATE"]));
         Assert.Null(CliContract.CommandToken([]));
     }
+
+    [Theory]
+    [InlineData(new[] { "/s", "/noupdate", "/noquestions" }, "ScanOnly", null)]
+    [InlineData(new[] { "/noquestions", "/s" }, "ScanOnly", null)]
+    [InlineData(new[] { "/d", "/noupdate", "/NoQuestions" }, "Delete", null)]
+    [InlineData(new[] { "/m", "/noquestions", "/noupdate" }, "Move", null)]
+    [InlineData(new[] { "/m", "D:\\Backup", "/noupdate", "/noquestions" }, "Move", "D:\\Backup")]
+    [InlineData(new[] { "/m", "/noquestions", "D:\\Backup" }, "Move", "D:\\Backup")]
+    public void ParseArguments_the_no_questions_switch_is_taken_out_wherever_it_stands(
+        string[] args, string command, string? destination)
+    {
+        // A newer version started after an update question nobody answered is given it beside
+        // /noupdate. Refusing it, or reading it as a Move's path, would leave such a copy
+        // unable to update to this version.
+        var invocation = CliContract.ParseArguments(args);
+
+        Assert.Equal(command, invocation.Command.ToString());
+        Assert.Equal(destination, invocation.MoveDestination);
+        Assert.True(invocation.NoQuestions);
+    }
+
+    [Fact]
+    public void ParseArguments_without_the_no_questions_switch_leaves_the_questions_on()
+    {
+        var invocation = CliContract.ParseArguments(["/d", "/noupdate"]);
+
+        Assert.True(invocation.SkipUpdate);
+        Assert.False(invocation.NoQuestions);
+    }
+
+    [Fact]
+    public void ParseArguments_the_no_questions_switch_does_not_turn_off_the_update()
+    {
+        var invocation = CliContract.ParseArguments(["/s", "/noquestions"]);
+
+        Assert.False(invocation.SkipUpdate);
+        Assert.True(invocation.NoQuestions);
+    }
+
+    [Fact]
+    public void CommandToken_passes_over_the_no_questions_switch()
+    {
+        Assert.Equal("/M", CliContract.CommandToken(["/noquestions", "/noupdate", "/M", "D:\\Backup"]));
+        Assert.Null(CliContract.CommandToken(["/NOQUESTIONS"]));
+    }
 }

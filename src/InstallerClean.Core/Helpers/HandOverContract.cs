@@ -154,7 +154,8 @@ internal static class HandOverContract
     /// Do not change what this reads. A copy from 3.5.0 on is to start the newer version it
     /// updates to with these three, and on the command line with the command as typed,
     /// <see cref="CliContract.CancelEventSwitch"/> and <see cref="CliContract.NoUpdateSwitch"/>
-    /// beside them, for every newer version it ever updates to. A later version reading them
+    /// beside them, and <see cref="CliContract.NoQuestionsSwitch"/> where the run asks nothing
+    /// more at the console, for every newer version it ever updates to. A later version reading them
     /// another way is one no such copy can update to.
     /// </para>
     /// <para>
