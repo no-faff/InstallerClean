@@ -704,7 +704,7 @@ public static class DeclaredProductOutcomes
     /// STATED AS "ANYTHING BUT THE FOUR THAT LET A FILE THROUGH" RATHER THAN BY
     /// NAMING THE WITHHOLDING MEMBERS, and that is the safety property rather than a
     /// style. Named positively, a member added later would silently not withhold: a
-    /// green build, a verdict the pass sets, and files going on being offered. Named
+    /// verdict the pass sets, and files going on being offered. Named
     /// this way an unconsidered member keeps the file, which is the direction a
     /// mistake here has to fail in.
     /// </summary>

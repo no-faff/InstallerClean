@@ -85,7 +85,7 @@ public static class FileIdentityReadOutcomes
     /// WRITTEN AS THE COMPLEMENT OF THE TWO SETTLED ANSWERS RATHER THAN AS A LIST
     /// OF THE FOUR, so a member added to the enum later withholds instead of
     /// silently passing. Naming the give-ups would leave the new member outside
-    /// every branch, with a green build and a file on the offer to show for it.
+    /// every branch, and its file on the offer.
     ///
     /// <c>FileIdentityReadTally.RefusedTotal</c> is the same membership counted,
     /// and it has to name its four because a count cannot be written as a

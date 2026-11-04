@@ -637,19 +637,13 @@ const STRIPPED = new Set([
   // coolvitto's PR, so nobody wrote a Japanese line for them and nobody should.
   'Cli.EventLogNothingOffered',
   'Cli.EventLogNothingOfferedNotice',
-  // Five more that arrived after the PR and sat in English inside a Japanese
-  // file, which is the second way a key earns its place here. Four never had a
-  // MAP entry at all; the fifth carried the English label verbatim.
+  // Five more machine Cli keys that postdate the PR, the second way.
   'Cli.EventLogNothingOfferedPerFile',
   'Cli.EventLogNothingOfferedPerFileNotice',
   'Cli.EventLogReason.RegistryCheckUnreadable',
   'Cli.EventLogReason.MsiExecuteMutexAccessRefused',
   'Cli.EventLogReason.PendingRenameUnresolved',
-  // And four that outlived their English, the first way. Two named Ctrl+C where
-  // the entry now names no cause for a cancel; one spelled
-  // the cache folder as a literal path where the entry names the folder; and the
-  // last opened by stating a cause, which that entry deliberately no longer does
-  // because the arm it reports carries several.
+  // And four whose English no longer says what the Japanese says, the first way.
   'Cli.EventLogCancelledNoWork',
   'Cli.EventLogCancelledPartial',
   'Cli.EventLogMoveDestinationInsideInstaller',

@@ -7,19 +7,17 @@ namespace InstallerClean.Tests.Services;
 /// pin: that the under-lease claims have to be supplied.
 /// </summary>
 /// <remarks>
-/// A TEST ABOUT A SHAPE RATHER THAN ABOUT BEHAVIOUR, and it is here because the
-/// defect it guards against is invisible to every other kind. While the argument
-/// was optional a caller could leave it out, the services turned an omitted one
-/// into <see cref="UnderLeaseClaims.None"/>, and an empty batch returns at the
-/// first line of the re-read. So the last check standing in front of a permanent
-/// delete passed without asking anything, and nothing anywhere said so: the
-/// files are deleted either way, and the only difference is whether a claim that
-/// moved while the caller's enumeration was running was ever looked for.
+/// A TEST ABOUT A SHAPE RATHER THAN ABOUT BEHAVIOUR, and it is here because what it
+/// guards is invisible to every other kind. Made optional, the argument could be left
+/// out at a call site, an omitted one would become <see cref="UnderLeaseClaims.None"/>,
+/// and an empty batch returns at the first line of the re-read, so the check in front
+/// of a permanent delete would never look for a claim that moved while the caller's
+/// enumeration was running.
 ///
-/// No behavioural test reaches that, because the omission happens at the call
-/// site and at compile time. What catches it now is the compiler. What keeps the
-/// compiler catching it is this test, because one <c>= null</c> put back here
-/// would restore the whole defect in a keystroke, with the suite still green.
+/// No behavioural test reaches that, because the omission happens at the call site and
+/// at compile time. The compiler catches it while the argument is required, and this
+/// test keeps it required: one <c>= null</c> added to the signature lets a call site
+/// leave it out.
 /// </remarks>
 public class UnderLeaseClaimsContractTests
 {

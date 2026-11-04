@@ -23,8 +23,7 @@
 // geregistreerde pakketten": indefinite singular before a het-word drops the
 // -e, and both counted nouns, pakket and product, are het-words), and the
 // counted CLI lines interpolate the file noun after "overbodig", which inflects
-// the same way. Hence the .One overrides below, and count the block rather than
-// this paragraph.
+// the same way. Hence the .One overrides below.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';

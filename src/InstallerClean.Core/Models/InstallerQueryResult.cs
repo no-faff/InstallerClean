@@ -601,8 +601,8 @@ public readonly record struct EnumerationCensus(
     /// (<see cref="UnparseableProductKeyNames"/>). THE ONE THING THE WITHHOLDING LEG OF THE
     /// SAME NAME FIRES ON, and it is here rather than in the service that acts on it for the reason
     /// <see cref="AnyRecordedPathUnestablished"/> is: a rule that named the members itself
-    /// would be one edit away from silently not acting on a member added later, with a
-    /// green build and a counter still reporting.
+    /// would be one edit away from silently not acting on a member added later, while a
+    /// counter still reports it.
     ///
     /// TWO MEMBERS, AND NOTHING MAY STATE ONE CAUSE OVER THEM. The first is a question
     /// Windows did not answer; the second was never a question, the key's name yielding

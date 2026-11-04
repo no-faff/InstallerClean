@@ -185,7 +185,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         //
         // A CASE PER MEMBER RATHER THAN ONE CASE OVER THE SUM, on the same reasoning
         // as the four above. A rule keyed on the members it happened to be written
-        // for lets the rest through with a green build and a counter still reporting.
+        // for lets the rest through while a counter still reports them.
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "one.msi"), new byte[] { 1 });
 
         var query = Substitute.For<IInstallerQueryService>();

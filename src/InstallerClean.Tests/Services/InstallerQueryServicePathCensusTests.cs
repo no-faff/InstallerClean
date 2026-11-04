@@ -189,8 +189,7 @@ public class InstallerQueryServicePathCensusTests
         // with it. The total is the population the walk-derived offer and every
         // superseded patch still carrying its removable verdict are withheld on, and a
         // stage that reaches a counter outside it is a cause the withholding silently
-        // does not act on: green build, counter reporting, withholding just not
-        // firing.
+        // does not act on: the counter reports it and the withholding does not fire.
         var seen = new Dictionary<string, InstallerQueryService.NormalisationStage>(StringComparer.Ordinal);
 
         foreach (var stage in Enum.GetValues<InstallerQueryService.NormalisationStage>())
