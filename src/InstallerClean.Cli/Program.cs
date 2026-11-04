@@ -1176,14 +1176,11 @@ internal static class Program
             // rather than the tool's intention towards it.
             //
             // THE CLEAN LINE IS PRINTED WHEREVER NOTHING IS OFFERED, EXCEPT WHERE ONE OF TWO
-            // LINES IS PRINTED INSTEAD. The line about files held back for their times
-            // says those files were kept and when to scan again, and the line naming the
-            // drives and shares the scan stopped waiting for says the files it left alone
-            // were never established to be needed or unneeded. The clean line beside either
-            // would claim more than the scan established, so where either is among the
-            // notices the clean line is not printed, as on the window's nothing-offered
-            // screen for the same run. Whether the first is printed is the scan's answer
-            // (HasRecentChangeLine), the same one ReportScanSignals spends.
+            // LINES IS PRINTED INSTEAD: the line about files held back for their times, and
+            // the line naming the drives and shares the scan stopped waiting for. Where
+            // either is among the notices the clean line is not printed. Whether the first is
+            // printed is the scan's answer (HasRecentChangeLine), the same one
+            // ReportScanSignals spends.
             //
             // THE HOST DOES NOT PARTITION ANYTHING TO GET HERE. Deciding it here would
             // mean reading a split the scan owns, and a host that infers one decision's
