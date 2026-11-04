@@ -24,10 +24,7 @@
 // -e, and both counted nouns, pakket and product, are het-words), and the
 // counted CLI lines interpolate the file noun after "overbodig", which inflects
 // the same way. Hence the .One overrides below, and count the block rather than
-// this paragraph. A held-back key carried one more for a pronoun (het at one file,
-// ze at many); that override was retired when the English lost its pronoun, and the
-// key itself went in the 3.0.0 round that replaced four held-back sentences with
-// one Completion.HeldBack pair.
+// this paragraph.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';

@@ -7,17 +7,13 @@ using InstallerClean.Services;
 namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
-/// The command line's half of the held-back reporting, which until this file
-/// existed no test could reach: the suite did not reference that host at all, so
-/// its folds, its stopped-batch byte arithmetic and its held-back stdout line
-/// were checkable only by hand.
+/// The command line's half of the held-back reporting: its folds, its stopped-batch byte
+/// arithmetic and its held-back stdout line.
 ///
-/// What makes them worth reaching rather than trusting to the window's own
-/// coverage is that the two hosts do NOT share this code. The sentences and the
-/// order they come in are Core's now, so the two cannot disagree about the words;
-/// everything around them is still written twice, which is exactly the shape that
-/// drifts. Three of the command line's paths were missing the fold while all three
-/// of the window's had it.
+/// They are tested here rather than left to the window's own coverage because the two
+/// hosts do NOT share this code. The sentences and the order they come in are Core's, so
+/// the two cannot disagree about the words; everything around them is written twice, once
+/// per host, so the command line's side is tested on its own here.
 /// </summary>
 public class CliHeldBackTests
 {
@@ -286,10 +282,10 @@ public class CliHeldBackTests
     [Theory]
     [InlineData(1, "/d mode: InstallerClean could not be certain that 1 superseded file is no longer needed, so it has held it back.")]
     [InlineData(5, "/d mode: InstallerClean could not be certain that 5 superseded files are no longer needed, so it has held them back.")]
-    public void The_superseded_notice_carries_the_count_the_console_line_prints(int held, string expected)
+    public void The_superseded_notice_carries_the_count_of_superseded_files_held_back(int held, string expected)
     {
-        // Event ID 3003, written on the condition the console's superseded line is
-        // printed on, with the same count, so a run nobody watches still records it.
+        // Event ID 3003, written wherever ScanResult.SupersededHeldBackCount is above nought
+        // and carrying that count, so a run nobody watches still records it.
         var line = MachineContract.English(() => string.Format(
             DisplayHelpers.Pluralise(held,
                 Strings.Cli_EventLogSupersededHeldBack_Singular,

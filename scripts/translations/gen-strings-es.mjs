@@ -9,12 +9,8 @@
 // Spanish past participles DO inflect for number (encontrado/encontrados,
 // eliminado/eliminados, movido/movidos), so the three CLI completion lines carry
 // .One overrides; the gerund progress lines (Moviendo/Eliminando) do not inflect
-// and need none. The four held-back sentences carried
-// .One overrides too, for the conservado/conservados participle, and went with the
-// sentences themselves when the 3.0.0 round replaced all four with one
-// Completion.HeldBack pair. The
-// three Completion.*CancelledSummary lines deliberately do NOT: their form is
-// picked by the total while the leading count varies, so they use the
+// and need none. The three Completion.*CancelledSummary lines deliberately do NOT:
+// their form is picked by the total while the leading count varies, so they use the
 // count-invariant "Cancelaste tras <infinitive>" frame that reads right at any count.
 //
 // MAP, OVERRIDES and ALSO_KEEP are derived byte-for-byte from the committed

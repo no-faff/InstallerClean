@@ -119,7 +119,7 @@ public class FileSystemScanServiceAgeCheckTests
         Assert.True(result.InstallerActivityAtScanBlocked);
 
         // Spoken of through the signal's reason, so the line about times does not count
-        // them and the held-back sentences do.
+        // them and the command line's held-back Application log entries do.
         Assert.False(result.HasRecentChangeLine);
         Assert.Equal(0, result.WithheldBy.NotBeforeTheClockCount);
         Assert.Equal(0, result.WithheldNotBeforeTheClockBytes);
@@ -176,7 +176,8 @@ public class FileSystemScanServiceAgeCheckTests
     public async Task A_file_kept_for_its_times_owes_no_notice()
     {
         // The treatment files kept for an installed program get: counted among the
-        // files left alone and left out of the held-back sentences.
+        // files left alone and left out of the command line's held-back Application log
+        // entries.
         // The line about recently changed files speaks for it instead.
         var times = new ScriptedFileTimes();
         times.Reads($@"{Folder}\new.msi", Late, Late, Late);
@@ -406,8 +407,8 @@ public class FileSystemScanServiceAgeCheckTests
         Assert.Equal(0, result.WithheldBy.ScanSignalCount);
         Assert.Equal(result.WithheldFiles!.Count, result.WithheldBy.Total);
 
-        // Counted by the held-back sentences: the clock's own line speaks for the files it
-        // kept.
+        // Counted by the command line's held-back Application log entries: the clock's own
+        // line speaks for the files it kept.
         Assert.Equal(3, result.UnestablishedWithheldCount);
         Assert.Equal(WithholdingAccount.PerFile, result.Withholding);
     }

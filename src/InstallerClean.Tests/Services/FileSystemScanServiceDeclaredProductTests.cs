@@ -268,8 +268,8 @@ public class FileSystemScanServiceDeclaredProductTests
         var kept = Assert.Single(result.WithheldFiles!);
         Assert.Equal($@"{Folder}\a.msi", kept.FullPath);
         Assert.Equal(1, result.WithheldBy.DeclaredProductInstalledCount);
-        // The held-back sentences leave this file out, so they are left nothing to
-        // count.
+        // The command line's held-back Application log entries leave this file out, so they
+        // are left nothing to count.
         Assert.Equal(0, result.UnestablishedWithheldCount);
         Assert.Equal(WithholdingAccount.KeptWithoutNotice, result.Withholding);
     }
@@ -411,7 +411,7 @@ public class FileSystemScanServiceDeclaredProductTests
         // and that registration records no cached copy. The screen cannot see which
         // copy the registration opens, so copy.msp could be it. It is treated the way
         // a file kept for an installed program is: counted in its own arm, and left
-        // out of the held-back sentences.
+        // out of the command line's held-back Application log entries.
         var (msi, identities, files) = APatchCopyBesideTheRecordedCopy();
         msi.RecordsPatchPackage(PatchQ, ProductA, null, MsiInstallContext.Machine, "");
 
@@ -471,7 +471,7 @@ public class FileSystemScanServiceDeclaredProductTests
         // The scan that offers copy.msp, with the machine-wide patch enumeration refusing
         // at its first row. The screen cannot find the registrations of patch Q, so
         // copy.msp is kept, counted in the patch half's unsettled arm, and among the
-        // files the held-back sentences speak of.
+        // files the command line's held-back Application log entries count.
         var (msi, identities, files) = APatchCopyBesideTheRecordedCopy();
         msi.RecordsPatchPackage(PatchQ, ProductA, null, MsiInstallContext.Machine, $@"{Folder}\cached.msp");
         msi.PatchEnumerationAnswersAt(0, MsiError.AccessDenied);

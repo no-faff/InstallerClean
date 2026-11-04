@@ -214,8 +214,8 @@ public class ScanResultTests
     public void Files_all_kept_for_their_times_have_nothing_to_report()
     {
         // Files whose times are not before the scan's clock take the same reading as those
-        // kept for an installed program, and leave the held-back sentences nothing to
-        // count: the line about recently changed files speaks for them.
+        // kept for an installed program, and leave the command line's held-back Application
+        // log entries nothing to count: the line about recently changed files speaks for them.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024), File("b.msp", 2048)],
             WithheldBy: new WithholdingSplit(NotBeforeTheClockCount: 2),
@@ -245,7 +245,7 @@ public class ScanResultTests
     {
         // A patch copy kept because Windows holds a registration of the patch it declares
         // takes the reading a file kept for an installed program takes, and leaves the
-        // held-back sentences nothing to count.
+        // command line's held-back Application log entries nothing to count.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msp", 1024), File("b.msp", 2048)],
             WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 2));
@@ -391,7 +391,7 @@ public class ScanResultTests
     public void A_file_whose_age_was_not_established_is_spoken_of_per_file()
     {
         // Kept by the age check with no age read. Not one of the silent arms, so it
-        // is among the files the held-back sentence counts.
+        // is among the files the command line's held-back Application log entry counts.
         var result = new ScanResult([], [], 0,
             WithheldFiles: [File("a.msi", 1024)],
             WithheldBy: new WithholdingSplit(AgeUnestablishedCount: 1));
@@ -743,8 +743,8 @@ public class ScanResultTests
         Assert.True(result.HasUnsettledHeldBack);
         Assert.False(result.IsAllClear);
 
-        // The command line's walk sentence is not about them, and its superseded line
-        // reads SupersededHeldBackCount.
+        // The command line's Application log entry for the folder walk is not about them,
+        // and its entry for superseded files reads SupersededHeldBackCount.
         Assert.Equal(WithholdingAccount.Nothing, result.Withholding);
         Assert.Equal(0, result.UnestablishedWithheldCount);
     }

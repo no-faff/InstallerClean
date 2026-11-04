@@ -1175,8 +1175,8 @@ internal static class Program
             // reading a scheduled task's log wants the state of the machine
             // rather than the tool's intention towards it.
             //
-            // THE CLEAN LINE IS PRINTED WHEREVER NOTHING IS OFFERED, WITH ONE EXCEPTION: a
-            // line that stands in its place. The line about files held back for their times
+            // THE CLEAN LINE IS PRINTED WHEREVER NOTHING IS OFFERED, EXCEPT WHERE ONE OF TWO
+            // LINES STANDS IN ITS PLACE. The line about files held back for their times
             // says those files were kept and when to scan again, and the line naming the
             // drives and shares the scan stopped waiting for says the files it left alone
             // were never established to be needed or unneeded. The clean line over either
@@ -1284,18 +1284,19 @@ internal static class Program
 
             if (count == 0)
             {
-                // The audit line follows the same split as stdout, so a monitoring
-                // tool watching the Application channel is not told a machine is
-                // clean when the scan could not judge it. The first machine takes the
-                // clean entry whether or not files were held back for their times: the
-                // line about them is on stdout alone.
+                // The audit line tells a machine the scan could not judge from a clean one.
+                // On stdout the clean line reports that nothing was identified, and is printed
+                // on both unless one of the two lines above stands in its place. A monitoring
+                // tool watching the Application channel reads the split here. A machine with no
+                // withholding to report and no drive or share given up takes the clean entry,
+                // whether or not files were held back for their times: the line about them is
+                // on stdout alone.
                 //
                 // ONE EVENT CLASS FOR ALL OF THEM. The run did its job on each of these
                 // machines, so each entry belongs in the outcome band, and the notice
                 // beside it in the 3000 band is what tells a machine the scan could not
-                // judge from a clean one by number. The message has to differ: the clean
-                // line over a machine the scan could not judge is the statement this
-                // branch exists to stop.
+                // judge from a clean one by number. The message differs too, so a filter
+                // reading the English tells them apart as well.
                 //
                 // A WITHHOLDING TO REPORT TAKES ITS OWN MESSAGE EVEN WHERE A DRIVE OR
                 // SHARE WAS GIVEN UP TOO: it counts the files held back, and the notice
@@ -2156,8 +2157,8 @@ internal static class Program
                     arg, supersededHeldBack));
         }
 
-        // THE NOTICE HAS ITS OWN CONDITION, SEPARATE FROM THE LINE ABOVE. The line is
-        // printed on the count of superseded files held back; this is written where the
+        // THE NOTICE HAS ITS OWN CONDITION, SEPARATE FROM THE ENTRY ABOVE. The entry is
+        // written on the count of superseded files held back; this is written where the
         // enumeration withheld every superseded patch because it could not check a
         // program entry in Windows Installer's records or match a cached patch file to a
         // program it asks about. It is the payload of Event ID 3000, a machine surface
@@ -2170,8 +2171,8 @@ internal static class Program
         // either condition without the other: this one with no superseded file to hold
         // back, or the count above with nothing this one counts.
         //
-        // The count does not appear in the human line and does appear here, for an RMM
-        // to hang a filter on. The program entries are the figure where there are any,
+        // The count is here, for an RMM to hang a filter on; stdout carries no line for this
+        // condition. The program entries are the figure where there are any,
         // and the patch files only where they are the whole reason; see
         // InstallerQueryResult.UnaccountedProductCount for the three kinds of entry and
         // EnumerationCensus.UnattributedPatchFileCount for the files.

@@ -1071,8 +1071,10 @@ public sealed record MachineInfo(
 /// registration of the patch each declares, and for at least one registration the screen
 /// could not show that the cached copy it records is a different file:
 /// <c>ScanResult.WithheldBy.DeclaredPatchRegisteredCount</c>.
-/// Neither host's held-back sentence counts them, as with
-/// <paramref name="WithheldDeclaredProductInstalledCount"/>.
+/// Neither the count that keeps the window's all-clear off
+/// (<c>ScanResult.UnsettledHeldBackCount</c>) nor the command line's held-back Application log
+/// entries count them, as neither counts the files
+/// <paramref name="WithheldDeclaredProductInstalledCount"/> counts.
 /// </param>
 /// <param name="WithheldDeclaredPatchUnestablishedCount">
 /// Patch copies the same screen kept back without settling them: the copy yielded no
@@ -1538,8 +1540,10 @@ public sealed record MachineInfo(
 /// Candidates the age check kept back because the system clock went back or lost time while
 /// the scan read their times, their own times having passed:
 /// <c>ScanResult.WithheldBy.ClockSetBackCount</c>, an arm of the split of
-/// <see cref="WithheldCandidateCount"/>. Both hosts' held-back sentences count them, and both say
-/// in a line of its own that the clock went back or lost time.
+/// <see cref="WithheldCandidateCount"/>. The count that keeps the window's all-clear off
+/// (<c>ScanResult.UnsettledHeldBackCount</c>) and the command line's held-back Application log
+/// entries count them, and each host says in a line of its own that the clock went back or
+/// lost time (<c>ScanSignalReport</c>).
 ///
 /// NOT TO BE ADDED TO <see cref="WithheldScanSignalCount"/>: that one is a finding about Windows
 /// Installer, and this one is a finding about the system clock. Appended last, as the split's arms

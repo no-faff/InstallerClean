@@ -621,8 +621,9 @@ public class MainViewModelTests : IDisposable
         Assert.Equal(string.Empty, vm.Completion.Summary);
     }
 
-    // THE FILES THAT KEEP THE ALL-CLEAR OFF THAT THE COMMAND LINE'S HELD-BACK SENTENCE
-    // DOES NOT COUNT: a file kept for its times and a superseded patch the scan held back.
+    // THE FILES THAT KEEP THE ALL-CLEAR OFF THAT THE COMMAND LINE'S APPLICATION LOG ENTRY
+    // FOR THE FOLDER WALK DOES NOT COUNT: a file kept for its times and a superseded patch
+    // the scan held back.
 
     [Fact]
     public async Task Files_kept_for_their_times_get_their_line_above_the_receipt_beside_another_hold()

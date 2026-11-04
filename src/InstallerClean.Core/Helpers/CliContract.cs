@@ -209,8 +209,11 @@ internal enum CliEventClass
     ScanMissingFilesNotice,
 
     /// <summary>
-    /// Notice: the scan could not establish which cached files belong to the
-    /// programs installed here, so it offered none of the files it walked.
+    /// Notice: the scan held back files the folder walk found, either all of them because it
+    /// could not establish which cached files belong to the programs installed here, or
+    /// particular files it could not establish are unneeded. Raised where
+    /// <c>ScanResult.HasWithholdingToReport</c> is true, whether or not anything else was
+    /// offered, and carrying <c>ScanResult.UnestablishedWithheldCount</c>.
     ///
     /// IT IS THE DISTINCTION THE OUTCOME BAND CANNOT CARRY. The run did its job
     /// and its outcome entry is <see cref="Ok"/> for that reason, so a machine
@@ -222,27 +225,31 @@ internal enum CliEventClass
     /// WARNING RATHER THAN INFORMATION, on the rule stated at
     /// <see cref="CliContract.EntryTypeFor"/>: Warning means THIS RUN fell short of
     /// its job. The sibling notice at 3000 is Warning because "that run's list
-    /// genuinely was short", and this run's list was empty for the same kind of
+    /// genuinely was short", and this run's list was short for the same kind of
     /// reason. It is not the missing-files case, which is a standing property of a
     /// machine and repeats nightly for ever.
     ///
-    /// IT NAMES NO CAUSE AND MAY NOT ACQUIRE ONE. Several different findings empty
-    /// a walk-derived offer this way; the message says what is true of all of them.
+    /// THE PER-FILE MESSAGE NAMES NO CAUSE AND MAY NOT ACQUIRE ONE: several different
+    /// findings hold particular files back, and it says what is true of all of them. The
+    /// wholesale message names the condition, which that reading alone earns
+    /// (<c>WithholdingAccount.WholeWalkOffer</c>).
+    ///
+    /// IT IS RAISED BESIDE AN OFFER TOO, so gating it on an empty offer would lose it on the
+    /// machine whose walk offer was held back while a superseded file was offered.
     /// </summary>
     ScanNothingOfferedNotice,
 
     /// <summary>
     /// Notice: the scan held back superseded files it could not be certain are no
     /// longer needed. Raised where <c>ScanResult.SupersededHeldBackCount</c> is above
-    /// nought, the condition the console's own superseded line is printed on, and
-    /// carrying the same count.
+    /// nought, and carrying that count.
     ///
     /// WARNING, on the rule at <see cref="CliContract.EntryTypeFor"/>: this run's offer
     /// was short of files it would otherwise have offered, which is the reason
     /// <see cref="ScanRecordsIncompleteNotice"/> is a warning too.
     ///
-    /// IT NAMES NO CAUSE, on the same terms as the console line: several separate
-    /// findings reach the count and no sentence naming one is true of the others.
+    /// IT NAMES NO CAUSE: several separate findings reach the count and no sentence
+    /// naming one is true of the others.
     /// </summary>
     ScanSupersededHeldBackNotice,
 
