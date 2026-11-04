@@ -534,8 +534,8 @@ public readonly record struct EnumerationCensus(
     ///
     /// IT IS A PROPERTY HERE SO THAT THE SUM EXISTS ONCE. The rule that reads it lives
     /// in another service, and a rule adding the parts itself would not act on a member
-    /// added to the split: the build stays green, the counter still reports, and the
-    /// withholding does not fire for the new cause.
+    /// added to the split: the counter still reports, and the withholding does not fire
+    /// for the new cause.
     ///
     /// A MIXED SET, SO NOTHING MAY STATE A CAUSE FOR IT. The four are four different
     /// facts about a machine and the only thing true of every member is that the
@@ -579,8 +579,8 @@ public readonly record struct EnumerationCensus(
     /// in either service that acts on it.
     ///
     /// A rule that named the populations itself would be one edit away from silently
-    /// not acting on a population added later: the build stays green, the new counter
-    /// still reports, and the withholding simply does not fire for the new cause.
+    /// not acting on a population added later: the new counter still reports, and the
+    /// withholding does not fire for the new cause.
     /// That is why the question is asked where the members are declared. Anything added
     /// to this record that means "a recorded path this scan could not settle" belongs
     /// in this expression in the same edit.

@@ -637,13 +637,14 @@ const STRIPPED = new Set([
   // coolvitto's PR, so nobody wrote a Japanese line for them and nobody should.
   'Cli.EventLogNothingOffered',
   'Cli.EventLogNothingOfferedNotice',
-  // Five more machine Cli keys that postdate the PR, the second way.
+  // Five more machine Cli keys that postdate the PR, by the header's rule.
   'Cli.EventLogNothingOfferedPerFile',
   'Cli.EventLogNothingOfferedPerFileNotice',
   'Cli.EventLogReason.RegistryCheckUnreadable',
   'Cli.EventLogReason.MsiExecuteMutexAccessRefused',
   'Cli.EventLogReason.PendingRenameUnresolved',
-  // And four whose English no longer says what the Japanese says, the first way.
+  // And four whose English no longer says what coolvitto's Japanese for it says, by
+  // the header's rule.
   'Cli.EventLogCancelledNoWork',
   'Cli.EventLogCancelledPartial',
   'Cli.EventLogMoveDestinationInsideInstaller',

@@ -703,10 +703,10 @@ public static class DeclaredProductOutcomes
     ///
     /// STATED AS "ANYTHING BUT THE FOUR THAT LET A FILE THROUGH" RATHER THAN BY
     /// NAMING THE WITHHOLDING MEMBERS, and that is the safety property rather than a
-    /// style. Named positively, a member added later would silently not withhold: a
-    /// verdict the pass sets, and files going on being offered. Named
-    /// this way an unconsidered member keeps the file, which is the direction a
-    /// mistake here has to fail in.
+    /// style. Named positively, a member added later would silently not withhold: the
+    /// pass would set it and the files it covers would go on being offered. Named this
+    /// way an unconsidered member keeps the file, which is the direction a mistake here
+    /// has to fail in.
     /// </summary>
     public static bool Withholds(this DeclaredProductOutcome outcome) =>
         outcome is not (DeclaredProductOutcome.DeclaredProductNotInstalled

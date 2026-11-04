@@ -611,8 +611,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // THE QUESTION IS ASKED OF THE CENSUS RATHER THAN ASSEMBLED HERE. Naming the
         // members one by one at this line is correct and is one edit away from not
         // being: a cause added to the split is then a cause this rule silently does
-        // not act on, a counter still reporting it and files still being offered. So the question is spelled once,
-        // where the members are.
+        // not act on, a counter still reporting it and files still being offered. So
+        // the question is spelled once, where the members are.
         //
         // THE LIST OF LEGS THAT FIRED IS THE SAME CALL (WithholdingLegs.Fired) rather than a
         // second reading of the census, which would be a copy of this rule able to answer

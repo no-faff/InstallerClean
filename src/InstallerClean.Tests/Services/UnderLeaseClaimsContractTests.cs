@@ -15,9 +15,9 @@ namespace InstallerClean.Tests.Services;
 /// enumeration was running.
 ///
 /// No behavioural test reaches that, because the omission happens at the call site and
-/// at compile time. The compiler catches it while the argument is required, and this
-/// test keeps it required: one <c>= null</c> added to the signature lets a call site
-/// leave it out.
+/// at compile time. The compiler catches it while the argument is required and not
+/// nullable, and this test holds it to both: one <c>= null</c> added to the signature
+/// lets a call site leave it out, and a nullable type lets one pass nothing.
 /// </remarks>
 public class UnderLeaseClaimsContractTests
 {
