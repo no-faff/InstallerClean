@@ -2,6 +2,20 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0] - Unreleased
+
+### Changed
+
+- After a scan, the command line prints the count the window shows, "N files left alone": the files programs still use and the files InstallerClean could not be certain about, together. It comes after the line saying what the scan found, or above that line where a scan lists files, so the list stays last. The command line no longer lists the files held back or the reasons; the opt-in report carries every reason, and the Application log entries for these runs are unchanged.
+- Where a scan offers nothing, the command line says "No unneeded files identified.", in every language, and the Application log entry for the run, which is always in English, ends "no unneeded files identified." A filter matching the old entry's whole text, "mode: no unneeded files.", needs the new one; one matching its start still matches.
+- A comments pass covered everything that changed since 3.6.0: every comment added or changed was checked as a claim against the code, and so were the unchanged comments around changed code and the contract comments of everything whose behaviour changed. Each comment found claiming more than the code does now says what the code does.
+
+### Fixed
+
+- A program set up (advertised) for one Windows account from a copy of its installer in the Installer folder could have that copy offered while the account was signed out, though the program still needed it. Where InstallerClean cannot read the list of places such a program was installed from, which includes when its account is signed out, it now keeps every installation package for it, as it already did for an installed program, both in the scan and in the check before a Move or Delete.
+- When the command line asks whether to update, or whether to send the anonymous report, keys pressed while the scan or the update check ran no longer answer the question, so an Enter pressed during a scan does not send a report or start an update before the question is on screen.
+- Where nobody answers the command line's update question within a minute and it updates, the newer version asks nothing at the console, the report offer included. An answer typed at the newer version's report offer could be read by the older version, which was still waiting, so a person who typed n and then pressed Enter could have the report sent.
+
 ## [3.6.0] - 2026-11-03
 
 ### Changed
