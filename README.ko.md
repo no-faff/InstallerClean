@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.6.0-blue" alt="GitHub 릴리스"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-125k-brightgreen" alt="총 다운로드 수"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-127k-brightgreen" alt="총 다운로드 수"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,10 +37,10 @@
 
 - **개요:** InstallerClean은 한 가지 일만 합니다. 소프트웨어를 설치하고 업데이트하는 동안 점점 차오르는 숨겨진 폴더 `C:\Windows\Installer`에서 불필요한 파일을 제거합니다. 빠른 검사를 마치면 그런 파일이 있는지 알려 주고, 궁금한 분께는 더 자세한 내용을 보여 주며, 그 파일을 다른 곳으로 옮기거나 삭제해 C: 드라이브 공간을 확보할 수 있게 합니다.
 - **이래서 오셨을지도 모릅니다:** [WinDirStat](https://github.com/windirstat/windirstat)나 WizTree, TreeSize를 써 보니 `C:\Windows\Installer`가 공간을 많이 차지하고 있는데, 그 안에 무엇이 들어 있는지는 알 수 없으셨을 겁니다. 그렇다면 InstallerClean이 바로 필요한 도구입니다. `9f05cba.msi`처럼 알 수 없는 이름의 파일 안에 무엇이 들어 있는지 알고 있어서, 어느 것을 안전하게 제거할 수 있는지 빠르게 알려 줍니다.
-- **얼마나 비워지나:** 위 그래프는 앱에서 보낸 선택적 보고서의 결과입니다(모두 감사합니다). 공간을 확보한 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 가운데, 확보된 공간의 중앙값은 <!-- reports-median-start -->1.7GB<!-- reports-median-end -->입니다. 아마 있는 줄도 몰랐을 파일들이 그냥 자리만 차지하고 있던 것입니다. *전체* 컴퓨터의 <!-- reports-over5gb-start -->21.9%<!-- reports-over5gb-end -->가 5GB 넘게 되찾았고, 수백 GB를 비운 분도 많습니다. 요컨대 MSI 기반 소프트웨어를 많이 설치할수록 불필요한 파일도 많아집니다. InstallerClean을 실행하는 순간 알게 됩니다.
+- **얼마나 비워지나:** 위 그래프는 앱에서 보낸 선택적 보고서의 결과입니다(모두 감사합니다). 공간을 확보한 <!-- reports-freedpct-start -->58%<!-- reports-freedpct-end --> 가운데, 확보된 공간의 중앙값은 <!-- reports-median-start -->1.7GB<!-- reports-median-end -->입니다. 아마 있는 줄도 몰랐을 파일들이 그냥 자리만 차지하고 있던 것입니다. *전체* 컴퓨터의 <!-- reports-over5gb-start -->21.8%<!-- reports-over5gb-end -->가 5GB 넘게 되찾았고, 수백 GB를 비운 분도 많습니다. 요컨대 MSI 기반 소프트웨어를 많이 설치할수록 불필요한 파일도 많아집니다. InstallerClean을 실행하는 순간 알게 됩니다.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>클릭해서 보기</kbd> 보고서가 전체 다운로드 125,718건을 정확히 반영한다면 그래프가 어떻게 보일지</summary>
+  <summary><kbd>클릭해서 보기</kbd> 보고서가 전체 다운로드 127,000건을 정확히 반영한다면 그래프가 어떻게 보일지</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ko-scaled-dark.svg" />
@@ -237,7 +237,7 @@ InstallerClean은 서명되어 있지 않습니다. 실행하기 전에 확인�
 - VirusTotal: 모든 빌드는 나가기 전에 검사하며, 릴리스 페이지에 파일별 엔진 전체 결과가 실려 있습니다.
 - 소스는 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)에 있습니다. 검사, 질의, 이동, 삭제, 설정, 재부팅 대기 확인 서비스는 `main`에 푸시할 때마다, 그리고 풀 리퀘스트마다 Windows에서 실행되는 자동화된 테스트 모음이 검증하며, 이 페이지 위쪽의 CI 배지가 그 결과를 알려 줍니다.
 - 릴리스 빌드는 결정적입니다. 같은 소스, 같은 SDK, 같은 게시 플래그는 같은 바이트를 냅니다. 그리고 모든 빌드 입력이 해당 태그의 소스와 일치하지 않으면 릴리스에 태그를 달 수 없습니다. 그래서 태그를 체크아웃해 직접 빌드한 뒤 공개된 해시와 비교해 보실 수 있습니다. 그러는 데 필요한 것은 각 릴리스의 노트에 있습니다. 빌드에 쓴 SDK 버전, 그리고 기본값이 아닌 플래그로 빌드한 파일이 있다면 그 게시 플래그입니다. Setup은 예외입니다. SDK가 아니라 Inno Setup이 컴파일하고 빌드 연도를 스스로 새겨 넣으므로, 해시를 재현하려면 같은 Inno 버전과 같은 연도까지 필요합니다.
-- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->125,000+<!-- downloads-end --> 회 내려받았습니다.
+- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->127,000+<!-- downloads-end --> 회 내려받았습니다.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 인증 100% 클린" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 검토한 뒤 스파이웨어와 애드웨어, 바이러스가 없음을 인증했습니다.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% 무료 수상, 스파이웨어와 애드웨어와 바이러스가 없음을 인증" width="190"></a>
 
