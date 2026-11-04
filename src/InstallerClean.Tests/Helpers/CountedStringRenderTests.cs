@@ -19,7 +19,7 @@ namespace InstallerClean.Tests.Helpers;
 /// render its noun where the size belongs, with the suite green and the gate
 /// clean.
 ///
-/// WHAT IT PINS. Cli.NothingOffered takes its counted noun through a slot, so the
+/// WHAT IT PINS. Completion.RecentChange takes its counted noun through a slot, so the
 /// noun follows the numeral standing in front of it. Russian and Ukrainian take the
 /// nominative singular after 21, 31 and 41, where a noun spelled into the value
 /// would read "21 файлов" for "21 файл" at every such count. Polish is here as the
@@ -44,7 +44,7 @@ public class CountedStringRenderTests
 
     [Theory]
     [MemberData(nameof(InflectingLanguages))]
-    public void The_nothing_offered_line_renders_with_its_size_and_a_noun_that_agrees(string cultureName)
+    public void The_recent_change_line_renders_with_its_size_and_a_noun_that_agrees(string cultureName)
     {
         var culture = CultureInfo.GetCultureInfo(cultureName);
         using var scope = new LocalisationScope(culture);
@@ -74,9 +74,9 @@ public class CountedStringRenderTests
                 Localisation.FormatCulture,
                 DisplayHelpers.Pluralise(
                     count,
-                    Strings.Cli_NothingOffered_Singular,
-                    Strings.Cli_NothingOffered_Plural,
-                    "Cli.NothingOffered"),
+                    Strings.Completion_RecentChange_Singular,
+                    Strings.Completion_RecentChange_Plural,
+                    "Completion.RecentChange"),
                 count,
                 noun,
                 size);

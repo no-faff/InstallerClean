@@ -124,10 +124,8 @@ public class FileSystemScanServiceAgeCheckTests
         Assert.Equal(0, result.WithheldBy.NotBeforeTheClockCount);
         Assert.Equal(0, result.WithheldNotBeforeTheClockBytes);
         Assert.Equal(2, result.UnestablishedWithheldCount);
-        Assert.Equal(200, result.UnestablishedWithheldBytes);
         Assert.Equal(WithholdingAccount.PerFile, result.Withholding);
         Assert.True(result.HasWithholdingToReport);
-        Assert.False(result.NamedConditionsCoverEveryHeldBackFile);
     }
 
     [Fact]
@@ -178,7 +176,7 @@ public class FileSystemScanServiceAgeCheckTests
     public async Task A_file_kept_for_its_times_owes_no_notice()
     {
         // The treatment files kept for an installed program get: counted among the
-        // files left alone, left out of the held-back sentences, and no reason line.
+        // files left alone and left out of the held-back sentences.
         // The line about recently changed files speaks for it instead.
         var times = new ScriptedFileTimes();
         times.Reads($@"{Folder}\new.msi", Late, Late, Late);
@@ -188,10 +186,8 @@ public class FileSystemScanServiceAgeCheckTests
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.WithheldFiles!);
         Assert.Equal(0, result.UnestablishedWithheldCount);
-        Assert.Equal(0, result.UnestablishedWithheldBytes);
         Assert.Equal(WithholdingAccount.KeptWithoutNotice, result.Withholding);
         Assert.False(result.HasWithholdingToReport);
-        Assert.Empty(result.WithheldBy.ArmsFired);
     }
 
     [Fact]
@@ -222,8 +218,7 @@ public class FileSystemScanServiceAgeCheckTests
     {
         // Kept like a file whose times are not before the clock, and counted apart from
         // one: its times were not established, so it is among the files the held-back
-        // sentence counts, and no reason line speaks for it, so the list under that sentence
-        // is not printed.
+        // sentence counts.
         var times = new ScriptedFileTimes();
         times.Reads($@"{Folder}\old.msi", Old, Old, Old);
         times.Answers($@"{Folder}\unvouched.msi", answer);
@@ -237,9 +232,7 @@ public class FileSystemScanServiceAgeCheckTests
         Assert.Equal(0, result.WithheldBy.NotBeforeTheClockCount);
         Assert.Equal(result.WithheldFiles!.Count, result.WithheldBy.Total);
         Assert.Equal(1, result.UnestablishedWithheldCount);
-        Assert.Equal(kept.SizeBytes, result.UnestablishedWithheldBytes);
         Assert.Equal(WithholdingAccount.PerFile, result.Withholding);
-        Assert.False(result.NamedConditionsCoverEveryHeldBackFile);
     }
 
     [Fact]
@@ -413,12 +406,10 @@ public class FileSystemScanServiceAgeCheckTests
         Assert.Equal(0, result.WithheldBy.ScanSignalCount);
         Assert.Equal(result.WithheldFiles!.Count, result.WithheldBy.Total);
 
-        // Counted by the held-back sentences, with no reason line under them: the clock's
-        // own line speaks for the files it kept.
+        // Counted by the held-back sentences: the clock's own line speaks for the files it
+        // kept.
         Assert.Equal(3, result.UnestablishedWithheldCount);
         Assert.Equal(WithholdingAccount.PerFile, result.Withholding);
-        Assert.False(result.NamedConditionsCoverEveryHeldBackFile);
-        Assert.Empty(result.WithheldBy.ArmsFired);
     }
 
     [Fact]

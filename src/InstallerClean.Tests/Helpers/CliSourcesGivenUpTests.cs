@@ -42,20 +42,24 @@ public class CliSourcesGivenUpTests
     // ---- the scan ----
 
     [Fact]
-    public async Task A_scan_with_nothing_else_to_report_prints_the_line_in_place_of_the_clean_one()
+    public async Task A_scan_with_nothing_else_to_report_prints_the_count_then_the_line_in_place_of_the_clean_one()
     {
         // THE MACHINE THIS EXISTS FOR. The only file held back was kept for a program
         // Windows still has installed, which the command line reports nothing about, but
         // it was kept because the drive its program's packages are on did not answer. So
         // nothing about this folder was established clean.
-        var run = await Run("/s", NothingOfferedKeptFor(Given("D:", 1)));
+        var result = NothingOfferedKeptFor(Given("D:", 1));
+
+        var run = await Run("/s", result);
 
         Assert.Equal(CliExitCode.Ok, run.ExitCode);
         Assert.DoesNotContain(Strings.Cli_FoundNoOrphans, run.Stdout, StringComparison.Ordinal);
-        // In the clean line's place: the first line after the scanning one.
+        // In the clean line's place: the count of files left alone, which the clean line
+        // would have been followed by, and under it the line naming the drive.
+        Assert.Equal(LeftAloneReport.Line(result.LeftAloneCount), Lines(run.Stdout)[1]);
         Assert.Equal(
             SourcesGivenUpReport.CommandLine([Given("D:", 1)]),
-            Lines(run.Stdout)[1]);
+            Lines(run.Stdout)[2]);
     }
 
     [Fact]
@@ -138,12 +142,12 @@ public class CliSourcesGivenUpTests
     }
 
     [Fact]
-    public async Task A_scan_with_a_withholding_to_report_keeps_its_own_lines_and_the_line_follows_them()
+    public async Task A_scan_with_a_withholding_to_report_prints_the_clean_line_the_count_and_then_the_line()
     {
         // Two copies the scan could not tell apart are reported, one of them because the
         // share their packages are on did not answer, and a superseded file was held back
-        // too. The held-back line and its reason come first, the line naming the share
-        // next, and the superseded line after it.
+        // too. The clean line comes first, then the count of files left alone, and the
+        // line naming the share next.
         var result = new ScanResult(
             Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
             WithheldCount: 1,
@@ -153,13 +157,10 @@ public class CliSourcesGivenUpTests
 
         var run = await Run("/s", result);
 
-        var heldBack = run.Stdout.IndexOf(Opening(Strings.Cli_NothingOfferedPerFile_Plural), StringComparison.Ordinal);
-        var reason = run.Stdout.IndexOf(Strings.Cli_WithheldReasons_SecondInstance, StringComparison.Ordinal);
-        var line = run.Stdout.IndexOf(SourcesGivenUpReport.CommandLine([Given(Share, 1)]), StringComparison.Ordinal);
-        // At one file the superseded line is its one-form, which carries no number.
-        var superseded = run.Stdout.IndexOf(Strings.Cli_SupersededHeldBack_Singular, StringComparison.Ordinal);
-        Assert.True(heldBack >= 0 && reason > heldBack && line > reason && superseded > line,
-            $"Out of order: held back at {heldBack}, reason at {reason}, line at {line}, superseded at {superseded}.\n{run.Stdout}");
+        // The line naming the share stands in the clean line's place.
+        var lines = Lines(run.Stdout);
+        Assert.Equal(LeftAloneReport.Line(result.LeftAloneCount), lines[1]);
+        Assert.Equal(SourcesGivenUpReport.CommandLine([Given(Share, 1)]), lines[2]);
         Assert.DoesNotContain(Strings.Cli_FoundNoOrphans, run.Stdout, StringComparison.Ordinal);
 
         // The outcome counts the files held back, as it does on any such machine, and the
@@ -320,7 +321,6 @@ public class CliSourcesGivenUpTests
                 .Select(i => new OrphanedFile($@"C:\Windows\Installer\kept-{i}.msi", 1024, false, false, false, "unclaimed"))
                 .ToArray(),
             WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: kept),
-            WithheldDeclaredProductInstalledBytes: kept * 1024L,
             SourceRootsGivenUp: roots);
     }
 

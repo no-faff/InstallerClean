@@ -761,8 +761,8 @@ Pour le remettre, il vous faut l'installateur de la version que vous avez déjà
        well.
 
        0 = files held back for their times, 1 = pluralised "file"/"files", 2 = their size.
-       THE ONE-FORM NAMES THE SIZE AND NOT THE NUMERAL, as Cli.NothingOfferedPerFile
-       does, so it spends 2 and leaves 0 and 1 unused. -->
+       THE ONE-FORM NAMES THE SIZE AND NOT THE NUMERAL, so it spends 2 and leaves 0
+       and 1 unused. -->
   <data name="Completion.RecentChange.Singular" xml:space="preserve"><value>Un fichier ({2}) a été retenu parce que Windows indique qu'il a été modifié après qu'InstallerClean a commencé l'analyse. Si un programme était en cours d'installation ou de mise à jour, relancez une analyse une fois qu'il a terminé et InstallerClean le vérifiera de nouveau.</value></data>
   <data name="Completion.RecentChange.Plural" xml:space="preserve"><value>{0} {1} ({2}) ont été retenus parce que Windows indique qu'ils ont été modifiés après qu'InstallerClean a commencé l'analyse. Si un programme était en cours d'installation ou de mise à jour, relancez une analyse une fois qu'il a terminé et InstallerClean les vérifiera de nouveau.</value></data>
   <!-- The line under the post-Move summary, in its two forms: the backup folder
@@ -1754,199 +1754,13 @@ Relancez InstallerClean en tant qu'administrateur.</value></data>
        a count of zero: that run prints another line instead, so this one does not
        have to read sensibly at "0 ... (0 B)". -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>{0} {1} inutiles à nettoyer ont été trouvés ({2}).</value></data>
-  <!-- The whole of what a clean machine prints after the scanning line. It states
-       what was found rather than what the tool intends to do about it, which is the
-       question somebody reading a scheduled task's log ran the scan to ask. -->
+  <!-- What a scan that offers nothing prints after the scanning line, ahead of the
+       left-alone line (Summary.RegisteredStillUsed). It states what was found rather
+       than what the tool intends to do about it, which is the question somebody
+       reading a scheduled task's log ran the scan to ask. It is not printed where a
+       line about files held back for their times, or about drives and shares the scan
+       stopped waiting for, is printed in its place. -->
   <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Aucun fichier inutile trouvé.</value></data>
-  <!-- The THIRD outcome, and the line above is why it has to exist: "Found no
-       unneeded files" is a statement about the folder, and on this machine the
-       scan never established one. Somebody reading a scheduled task's log would
-       otherwise be told a folder full of files nobody vouched for was clean.
-
-       0 = files held back, 1 = pluralised "file"/"files", 2 = their size.
-
-       IT NAMES NO CAUSE AND MUST NOT ACQUIRE ONE. Several different findings
-       empty an offer this way and they are different facts about a machine, so
-       any sentence naming one of them is false on the others. What is true of
-       every one of them is the opening clause: the app could not be certain which
-       cached files belong to which programs. It does not say that nothing is wrong
-       with the PC, which cannot be known: the conditions that reach this line include
-       a malformed registration, a drive that is not attached and a permission
-       refusal, so the line can be the one sign that something is. It carries no
-       apology. And it does not say the app held the files back rather than guess:
-       the app does not guess, so the phrase would raise a possibility that is not
-       there.
-
-       "Rather than offering them" claims only what the run established, so it says
-       what the scan declined to do rather than what it would have done instead.
-       Some of these files would have been kept back anyway by the per-file screen
-       this branch skips, so any wording promising they would have been offered
-       claims more than the run has. "Rather than listing them" would say something
-       else again: what the run refused was the offer, and on this host the
-       held-back files reach no list at all, the command line carrying their count
-       and not their names.
-
-       A PAIR AND NOT A FLAT KEY. A flat key here reads "held back 1 file (3.6 MB)
-       rather than offering them" at a count of one, which is what the two forms exist
-       to avoid. The one-form says "the one file" and names the size and not the
-       numeral, so it spends {2} and leaves {0} and {1} unused; all three are passed
-       on either branch so the two forms cannot disagree about which index is which.
-       SO THIS PAIR'S {N} SETS DIFFER, and that is deliberate rather than a dropped
-       placeholder. The arity check compares each key against its own satellite and
-       never against its sibling, so it is legal. A language that does want the
-       numeral in its one-form adds a satellite-only Cli.NothingOffered.One override,
-       whose arity is checked against the .Plural and may therefore carry {0}.
-
-       THE NOUN IS A SLOT AND NOT A WORD IN THE SENTENCE, because a noun spelled into
-       the value cannot follow the numeral standing in front of it. Russian and
-       Ukrainian take the nominative singular after 21, 31 and 41, where a value
-       carrying its own plural would read "21 файлов" for "21 файл", at every such
-       count, in both. The slot is filled by PluraliseFile, which answers that question
-       per language and per count.
-
-       WHERE A LANGUAGE PUTS THE SLOT IS ITS OWN, never the English. Japanese keeps its
-       classifier between the numeral and the noun, Chinese keeps its full-width
-       brackets, and Korean puts the noun BEFORE the numeral, so {1} precedes {0} there
-       and that is correct. In Turkish the slot has to stand where the nominative is
-       right, because Plural.File supplies the nominative alone: a construction ending
-       on "tamamını" governs the genitive, which the slot cannot give. Spelling the noun
-       into the value and leaving {1} out is not available either: every satellite
-       generator compares a value's placeholder set against the neutral's and fails on
-       a missing index.
-
-       ONE SENTENCE AND NO SECOND. It says what happened in full, so a sentence after
-       it, such as one saying this is not the same as finding nothing to clean up,
-       adds no fact: it has the app arguing against a conclusion the reader has not
-       reached. -->
-  <data name="Cli.NothingOffered.Singular" xml:space="preserve"><value>InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu le seul fichier ({2}) au lieu de le proposer.</value></data>
-  <data name="Cli.NothingOffered.Plural" xml:space="preserve"><value>InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu {0} {1} ({2}) au lieu de les proposer.</value></data>
-  <!-- The per-file form of the outcome above, for the machine whose offer came out
-       empty because every candidate was judged and kept back on its own, rather than
-       because a finding about the records emptied the whole walk at once. The pair
-       above names that finding, which is false of a file kept back on its own, so
-       this pair states only what holds of all of them: the app could not establish
-       that they are unneeded.
-
-       0 = files held back, 1 = pluralised "file"/"files", 2 = their size, exactly as
-       above, and both forms are passed all three so the two cannot disagree about
-       which index is which. The one-form says "one file" and names the size and not
-       the numeral, as the pair above does.
-
-       THE ENGLISH PLURAL MAKES THE COUNT THE SUBJECT OF "are unneeded". A language
-       whose verb or adjective agrees with the numeral, and so changes between 2, 5
-       and 21, or whose clause there wants a case Plural.File does not supply, makes
-       the count the object of the holding back instead, as its Cli.NothingOffered
-       does. Polish, Russian and Ukrainian are worded that way. Turkish makes the
-       count the head of a relative clause and the subject of a passive holding back,
-       which keeps it in the nominative Plural.File supplies. -->
-  <data name="Cli.NothingOfferedPerFile.Singular" xml:space="preserve"><value>InstallerClean n'a pas pu établir qu'un fichier est inutile, il l'a donc retenu ({2}) au lieu de le proposer.</value></data>
-  <data name="Cli.NothingOfferedPerFile.Plural" xml:space="preserve"><value>InstallerClean n'a pas pu établir que {0} {1} sont inutiles, il les a donc retenus ({2}) au lieu de les proposer.</value></data>
-  <!-- For the machine whose walk-derived half was withheld wholesale while a
-       superseded patch was still offered: that run takes the found-files branch, so
-       Cli.NothingOffered is not printed and this line is where stdout states the
-       withholding. It is the same sentence as Cli.NothingOffered, and the two move
-       together. The one-form names the size and not the numeral, so it spends {2} and
-       leaves {0} and {1} unused; both are passed on either branch so the two forms
-       cannot disagree about which index is which. -->
-  <data name="Cli.NothingListed.Singular" xml:space="preserve"><value>InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu le seul fichier ({2}) au lieu de le proposer.</value></data>
-  <data name="Cli.NothingListed.Plural" xml:space="preserve"><value>InstallerClean n'a pas pu déterminer avec certitude quels fichiers en cache appartiennent aux programmes installés ici, il a donc retenu {0} {1} ({2}) au lieu de les proposer.</value></data>
-  <!-- The per-file form of the pair above: a run that kept files back one at a time
-       while still offering something, so the sentence names no cause that could be
-       false of any file it counts.
-
-       It is the same sentence as Cli.NothingOfferedPerFile, and the two move together,
-       in every language. The one-form names the size and not the numeral, so it spends
-       {2} and leaves {0} and {1} unused; both are passed on either branch so the two
-       forms cannot disagree about which index is which. -->
-  <data name="Cli.NothingListedPerFile.Singular" xml:space="preserve"><value>InstallerClean n'a pas pu établir qu'un fichier est inutile, il l'a donc retenu ({2}) au lieu de le proposer.</value></data>
-  <data name="Cli.NothingListedPerFile.Plural" xml:space="preserve"><value>InstallerClean n'a pas pu établir que {0} {1} sont inutiles, il les a donc retenus ({2}) au lieu de les proposer.</value></data>
-  <!-- Introduces the conditions this run met. It prints under whichever of the
-       Cli.NothingOffered and Cli.NothingListed sentences that run chose, the
-       per-file forms included, so it has to read correctly under all four rather
-       than under one. It does not pick a phrase up from the line above, two of
-       those four saying "couldn't establish" instead; what is true of every
-       machine reaching this caption is that the scan could not be certain, which
-       is what the caption itself says.
-
-       The lines under it are Cli.WithheldReasons.*, one per condition met, and any
-       combination of them can print: they say which conditions the run met and are
-       not a partition of the files, so none of them carries a count and nothing
-       sums. -->
-  <data name="Cli.WithheldReasons.Header" xml:space="preserve"><value>Pourquoi la certitude n'était pas possible :</value></data>
-  <!-- The three wholesale legs, each printed only when its own leg is true, each
-       carrying two leading spaces like the Cli.Help.* block. They are findings about
-       the machine's records that withheld the walk-derived offer whole. The first, a
-       recorded path the scan could not settle, also withholds every superseded patch
-       still carrying its removable verdict. Those patches are counted by
-       Cli.SupersededHeldBack, which names no cause, and these lines print only where
-       files from the folder were held back, under the sentence counting them. The four
-       lines after them are the per-file arms and carry their own note; a run that
-       withheld both ways prints from both sets.
-
-       The nine path-resolution counts and the four identity-read outcomes sit
-       underneath legs one and two and are deliberately not printed: they travel in
-       the opt-in report, which reads them apart, and a reader of a console line can
-       do nothing different on one of them than on another.
-
-       No leg carries a count. Leg one's two groups can double-count one value, so
-       their sum is a count of refusals and not of paths; leg three's two members are
-       different findings and a single number states a cause over them; a count on
-       leg two alone would read as a total. The count and the size of what was held
-       back are on the line above. And no line says whether re-running helps, because
-       each leg holds members that differ on exactly that. -->
-  <data name="Cli.WithheldReasons.RecordedPath" xml:space="preserve"><value>  Un chemin de fichier issu des propres enregistrements de Windows Installer n'a pas pu être résolu, rien n'a donc pu lui être rapproché.</value></data>
-  <data name="Cli.WithheldReasons.FileIdentity" xml:space="preserve"><value>  Un fichier dont Windows garde un enregistrement n'a pas pu être identifié, il n'a donc pas pu être rapproché du contenu du dossier.</value></data>
-  <data name="Cli.WithheldReasons.SecondInstance" xml:space="preserve"><value>  Un programme est peut-être installé plusieurs fois sur ce PC, et les enregistrements ne peuvent pas dire à quelle copie appartient un fichier.</value></data>
-  <data name="Cli.WithheldReasons.RegistryRecordsUnread" xml:space="preserve"><value>  Une partie des enregistrements de Windows Installer n'a pas pu être lue, un fichier pourrait donc appartenir à un programme qui y est enregistré.</value></data>
-  <!-- The per-file arms that have a line. Each is a decision taken about one
-       candidate, where the lines above are findings about the machine's records that
-       withheld the walk-derived offer whole. They name different causes and have to
-       stay distinct: a rendering that blurs any two of them makes the app state a
-       cause it cannot support for the other's files.
-
-       Files kept by the declared-product-installed, declared-patch-registered,
-       not-before-the-clock, scan-signal, clock-set-back and age-unestablished arms have no
-       line here: WithholdingSplit.ArmsFired leaves those arms out.
-
-       The second-copy arm has no line here either. It prints
-       Cli.WithheldReasons.SecondInstance, above, which is true of its files too: a
-       program may be installed more than once and a file could not be compared with
-       every package it opens. The list prints each distinct line once, so the line
-       never appears twice.
-
-       CandidateIdentity is a file in the folder whose own identity would not read,
-       at the identity pass or at the check on the program or patch the file
-       declares, so it could not be matched against the files the records name.
-
-       DeclaredProductUnestablished is a disjunction and must stay one: either the file
-       would not say which program it belongs to, or Windows would not give a clear answer
-       about the program it named. Keeping only one half states a cause the app did not
-       establish for the files the other half holds. "A clear answer" covers both things
-       Windows can do there: give no answer at all, or give one that disagrees with its own
-       list of installed programs. A rendering saying Windows gave no answer is false of the
-       second.
-
-       ScreenUnanswered is the check answering about a different number of files than it
-       was handed, so no answer could be attached to any particular file.
-
-       DeclaredPatchUnestablished is the patch half's own line, and is a disjunction of
-       three that must stay one: a patch file would not say which patch it is, or would not
-       say which programs it is for, or Windows would not say in full which programs have
-       the patch it named. The first two are separate clauses because "would not say which
-       patch it is or which programs it is for" reads as the file saying neither, which is
-       false of a file whose patch code reads and whose program list does not. The third
-       says "in full" because Windows can already have named some programs holding the
-       patch when an answer about another is missing or cannot be used. It is not merged
-       with DeclaredProductUnestablished: a run can print both, and each speaks for its own
-       files.
-
-       None of them carries a count and none may acquire one: each is one fact about
-       one machine, and nothing may add it to another and call the result a cause. The
-       count and size of the files these lines explain are on the line above. -->
-  <data name="Cli.WithheldReasons.CandidateIdentity" xml:space="preserve"><value>  Un fichier du dossier n'a pas pu être identifié, il n'a donc pas pu être rapproché des enregistrements.</value></data>
-  <data name="Cli.WithheldReasons.DeclaredProductUnestablished" xml:space="preserve"><value>  Soit un fichier n'a pas indiqué à quel programme il appartient, soit Windows n'a pas donné de réponse claire au sujet de ce programme.</value></data>
-  <data name="Cli.WithheldReasons.ScreenUnanswered" xml:space="preserve"><value>  Une vérification des programmes auxquels appartiennent les fichiers a donné des réponses qui ne correspondaient pas aux fichiers qui lui avaient été transmis.</value></data>
-  <data name="Cli.WithheldReasons.DeclaredPatchUnestablished" xml:space="preserve"><value>  Soit un fichier de correctif n'a pas indiqué de quel correctif il s'agit, soit il n'a pas indiqué à quels programmes il est destiné, soit Windows n'a pas indiqué de façon complète quels programmes ont ce correctif.</value></data>
   <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
        is written from is common to all three, so a fixed mode word here names
        the wrong flag on two runs in three, and a filter for delete runs has to
@@ -1955,9 +1769,9 @@ Relancez InstallerClean en tant qu'administrateur.</value></data>
        what the scan found in the folder, and a count of the registrations
        Windows holds is a different subject, and not one a reader of this log
        can act on. -->
-  <!-- The audit line for the outcome above, so the Application channel splits the
-       same ways stdout does and a monitoring tool is not told a machine is clean
-       when the scan could not judge it.
+  <!-- The audit line for the outcome above, so a monitoring tool watching the
+       Application channel is not told a machine is clean when the scan could not
+       judge it.
 
        0 = mode arg, whichever of /s, /d and /m was run, as in the entry above:
        the no-files branch is common to all three. 1 = files held back,
@@ -2066,44 +1880,11 @@ Relancez InstallerClean en tant qu'administrateur.</value></data>
        holds it. -->
   <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>Windows a un enregistrement pour {0} fichier qui n'est pas dans {InstallerFolder} : {1}. Cela ne pose aucun problème au quotidien, mais une mise à jour ou une désinstallation de ce programme peut échouer. Pour remettre le fichier, il vous faut l'installateur de la version que vous avez déjà. Procurez-vous-le auprès de l'éditeur du programme et exécutez-le par-dessus votre copie actuelle. Une version plus récente ne fera pas l'affaire : elle devrait d'abord retirer celle que vous avez, et c'est justement l'étape qui a besoin de ce fichier. Désinstaller d'abord ne marchera pas non plus, pour la même raison. Cela devrait restaurer le fichier et laisser vos réglages intacts, mais Microsoft ne le garantit pas.</value></data>
   <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>Windows a des enregistrements pour {0} fichiers qui ne sont pas dans {InstallerFolder} : {1}. Cela ne pose aucun problème au quotidien, mais une mise à jour ou une désinstallation de ces programmes peut échouer. Pour remettre un fichier, il vous faut l'installateur de la version que vous avez déjà de ce programme. Procurez-vous-le auprès de l'éditeur du programme et exécutez-le par-dessus votre copie actuelle. Une version plus récente ne fera pas l'affaire : elle devrait d'abord retirer celle que vous avez, et c'est justement l'étape qui a besoin du fichier. Désinstaller d'abord ne marchera pas non plus, pour la même raison. Cela devrait restaurer le fichier et laisser vos réglages intacts, mais Microsoft ne le garantit pas.</value></data>
-  <!-- Superseded files this run held back. 0 = files held back. The one-form spends
-       no placeholder and names the file instead of the numeral, as the other one-forms
-       here do.
-
-       IT NAMES NO CAUSE, AND THE SUPERORDINATE HOLDS ON EVERY ROUTE INTO THE COUNT. The
-       count is ScanResult.SupersededHeldBackCount. Several separate findings set
-       RemovableWithheld: some are about one patch, and others are about the whole machine
-       and take every superseded patch at once. The containment check refusing the file,
-       or failing to answer for it, is a route in as well. So a sentence naming any one of
-       them is false of the files the others put in the count. What is true on every route
-       is that the app could not establish that the file is no longer needed, which is the
-       rule the whole app runs on, and establishing it takes every check, including the
-       one on where the file really is. Do not narrow it, do not name a mechanism and do
-       not add a cause in any language.
-
-       "SUPERSEDED" IS EARNED AND THE COUNT CANNOT HOLD AN OBSOLETED ROW. Every route to
-       RemovableWithheld guards on IsRemovable, and so does the containment check on a
-       superseded row; the only grant of IsRemovable is IsRemovablePatch, and that reads
-       a patch state of 2. An obsoleted patch is never offered, so it is never withheld
-       either.
-
-       IT IS GATED ON THE COUNT IT CARRIES, and never on a condition about the whole
-       machine. Each such condition is one of several routes into the count rather than
-       the count itself, and a machine can meet one with no superseded file to hold back,
-       so gating on it would tell somebody holding back no superseded file at all that one
-       was held back.
-
-       THIS SENTENCE AND THE NOTICE IN THE 3000 BAND ARE NOT ONE REPORT. This sentence
-       is for a person. The notice keeps its own condition and its own figure, on
-       program entries the scan could not check or cached patch files it could not match
-       to a program rather than on files held back, and the two counts are not the same
-       quantity: see Cli.EventLogScanWithheld and ReportScanSignals. -->
-  <data name="Cli.SupersededHeldBack.Singular" xml:space="preserve"><value>InstallerClean n'a pas pu déterminer avec certitude que le seul fichier remplacé n'est plus nécessaire, il l'a donc retenu.</value></data>
-  <data name="Cli.SupersededHeldBack.Plural" xml:space="preserve"><value>InstallerClean n'a pas pu déterminer avec certitude que {0} fichiers remplacés ne sont plus nécessaires, il les a donc retenus.</value></data>
-  <!-- 0 = mode arg, 1 = superseded files held back. Event ID 3003, written on the
-       condition Cli.SupersededHeldBack is printed on and carrying the same count, so a
+  <!-- 0 = mode arg, 1 = superseded files held back. Event ID 3003, written wherever
+       ScanResult.SupersededHeldBackCount is above nought and carrying that count, so a
        run whose console nobody reads still records that superseded files were held
-       back. It names no cause, for the reason that line names none. -->
+       back. It names no cause: several separate findings reach the count, and no
+       sentence naming one of them is true of the files the others contribute. -->
   <!-- The command line's line naming a drive that the scan, or the check made before a
        Move or Delete, stopped waiting for while files still had to be checked against
        it. The scan's is printed after its own lines about the files it held back, and
@@ -2165,7 +1946,7 @@ Relancez InstallerClean en tant qu'administrateur.</value></data>
        code, which need not be programs. InstallerQueryResult.UnaccountedProductCount
        sets them out.
 
-       Cli.SupersededHeldBack IS NOT THIS FIGURE IN OTHER WORDS: it counts files held
+       Cli.EventLogSupersededHeldBack IS NOT THIS FIGURE IN OTHER WORDS: it counts files held
        back, which is a different quantity reached by several routes, of which the
        condition here is one. The window does not show this figure. -->
   <!-- 0 = mode arg, 1 = cached patch files the scan could not match to any program it

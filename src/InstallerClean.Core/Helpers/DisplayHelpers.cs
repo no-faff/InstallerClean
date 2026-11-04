@@ -377,12 +377,9 @@ internal static class DisplayHelpers
         // number and agrees with nothing; it is simply false of twenty-one files and
         // false of none. Several of these carry a numeral in their PLURAL and none in
         // their singular, which is why the classification reads the one-form alone.
-        "Cli.NothingListed" or "Cli.NothingListedPerFile"
-            or "Cli.NothingOffered" or "Cli.NothingOfferedPerFile"
-            or "Confirm.DeletePermanently" or "Confirm.MoveDestination"
+        "Confirm.DeletePermanently" or "Confirm.MoveDestination"
             or "Error.AccessDenied" or "Error.FileInUse" or "Error.IOFailure"
             or "Error.UnknownError"
-            or "Cli.SupersededHeldBack"
             or "Completion.RecentChange"
             => CountQuestion.Cardinality,
 
@@ -402,13 +399,12 @@ internal static class DisplayHelpers
     /// their PLURAL and none in their singular, so their plural side is still a numeral
     /// governing a noun and still wants its paucal band.
     ///
-    /// A CARDINALITY KEY SHIPS PAUCAL OVERRIDES, SO THE BAND IS LOAD-BEARING RATHER
-    /// THAN THEORETICAL. Cli.SupersededHeldBack carries a .Few in Polish, Russian and
-    /// Ukrainian: its counted noun sits inside the sentence, so the numeral governs it
-    /// directly. Where a key's noun arrives through a slot Plural.File fills, the noun
-    /// agrees there instead and an override on the outer key would be
-    /// character-identical to its own .Plural, which is why Cli.NothingOffered carries
-    /// none. Collapsing everything that is not One into Other would put the
+    /// A CARDINALITY KEY WHOSE COUNTED NOUN SITS INSIDE THE SENTENCE SHIPS A .Few IN
+    /// POLISH, RUSSIAN AND UKRAINIAN, SO THE BAND IS LOAD-BEARING RATHER THAN
+    /// THEORETICAL: the numeral governs that noun directly. Where a key's noun arrives
+    /// through a slot Plural.File fills, the noun agrees there instead and an override on
+    /// the outer key would be character-identical to its own .Plural, so such a key
+    /// carries none. Collapsing everything that is not One into Other would put the
     /// five-and-up form on a count of three wherever the first case applies, and the band
     /// is pinned on the selector besides, by
     /// CountedStringTests.The_cardinality_selector_keeps_its_paucal_band.

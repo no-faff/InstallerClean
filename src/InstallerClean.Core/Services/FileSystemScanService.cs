@@ -1131,9 +1131,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // counts that no longer sum to it mean a thirteenth arm has been added and
             // is reported by none of them.
             withheldBy.Taken(),
-            withheldBy.DeclaredProductInstalledBytes,
             withheldBy.NotBeforeTheClockBytes,
-            withheldBy.DeclaredPatchRegisteredBytes,
             supersededContained.RefusedCount,
             supersededContained.UnestablishedCount,
             sourceRootsGivenUp,
@@ -1232,7 +1230,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
         private int _identityUnestablished;
         private int _wholesale;
         private int _declaredProductInstalled;
-        private long _declaredProductInstalledBytes;
         private int _declaredProductUnestablished;
         private int _screenUnanswered;
         private int _notBeforeTheClock;
@@ -1241,7 +1238,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
         private int _clockSetBack;
         private int _ageUnestablished;
         private int _declaredPatchRegistered;
-        private long _declaredPatchRegisteredBytes;
         private int _declaredPatchUnestablished;
         private int _secondCopyUnestablished;
         private readonly int[] _declaredProductInstalledBy =
@@ -1264,7 +1260,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         /// <summary>
         /// The size of the files counted under the not-before-the-clock arm, carried
-        /// beside the split for the reason <see cref="DeclaredProductInstalledBytes"/> is.
+        /// beside the split, which holds counts and nothing else, so the line about
+        /// recently changed files can give their size.
         /// </summary>
         internal long NotBeforeTheClockBytes => _notBeforeTheClockBytes;
 
@@ -1287,9 +1284,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         /// A CANDIDATE WHOSE OWN IDENTITY THE SCREEN COULD NOT READ, including one gone
         /// by the time the screen read it, is counted with the candidates the identity
         /// comparison could not identify. The comparison hands a gone candidate on
-        /// uncounted, so only the screen's share of this arm holds one. The command
-        /// line's line for the arm, that a file in the folder couldn't be identified, is
-        /// true of every file in it.
+        /// uncounted, so only the screen's share of this arm holds one.
         ///
         /// A FILE KEPT AS <see cref="DeclaredProductOutcome.DeclaredProductInstalled"/> IS
         /// COUNTED BY ITS CAUSE AS WELL, <paramref name="cause"/>, in the same arm, so the
@@ -1298,13 +1293,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         /// <see cref="DeclaredProductInstalledCause.None"/>, or with a value the enum does not
         /// declare, is counted in the arm and under no cause. Every other verdict takes no cause.
         /// </summary>
-        internal void Screened(DeclaredProductOutcome outcome, long sizeBytes, DeclaredProductInstalledCause cause)
+        internal void Screened(DeclaredProductOutcome outcome, DeclaredProductInstalledCause cause)
         {
             switch (outcome)
             {
                 case DeclaredProductOutcome.DeclaredProductInstalled:
                     _declaredProductInstalled++;
-                    _declaredProductInstalledBytes += sizeBytes;
                     if (cause != DeclaredProductInstalledCause.None && Enum.IsDefined(cause))
                         _declaredProductInstalledBy[(int)cause]++;
                     break;
@@ -1313,7 +1307,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     break;
                 case DeclaredProductOutcome.DeclaredPatchRegistered:
                     _declaredPatchRegistered++;
-                    _declaredPatchRegisteredBytes += sizeBytes;
                     break;
                 case DeclaredProductOutcome.DeclaredPatchUnestablished:
                     _declaredPatchUnestablished++;
@@ -1326,13 +1319,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     break;
             }
         }
-
-        /// <summary>
-        /// The size of the files counted under the declared-product-installed arm,
-        /// which the result carries beside the split so the held-back sentences can
-        /// give the size of the files they speak of and no others.
-        /// </summary>
-        internal long DeclaredProductInstalledBytes => _declaredProductInstalledBytes;
 
         /// <summary>
         /// The files counted under the declared-product-installed arm, by the cause each was
@@ -1365,12 +1351,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
             ByName: By(DeclaredProductInstalledCause.ByName));
 
         private int By(DeclaredProductInstalledCause cause) => _declaredProductInstalledBy[(int)cause];
-
-        /// <summary>
-        /// The size of the files counted under the declared-patch-registered arm,
-        /// carried beside the split for the reason <see cref="DeclaredProductInstalledBytes"/> is.
-        /// </summary>
-        internal long DeclaredPatchRegisteredBytes => _declaredPatchRegisteredBytes;
 
         /// <summary>
         /// The containment check's verdict on a file from the walk, counted through
@@ -1465,10 +1445,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// list that already holds files kept back for a different reason entirely,
     /// and the surfaces that read that list say only that the app left these
     /// alone, which is true of both. Any sentence naming a cause over the whole
-    /// list would be false of one half or the other. A cause is spoken per arm of
-    /// the split instead, as the command line's reason lines speak it, and the line
-    /// for an unestablished verdict is written as alternatives rather than as one
-    /// cause.
+    /// list would be false of one half or the other. A cause is carried per arm of
+    /// the split instead, as the opt-in report carries it.
     ///
     /// It returns every drive or share the screen gave up
     /// (<see cref="DeclaredProductScreening.RootsGivenUp"/>), and none where it handed the
@@ -1561,7 +1539,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             if (outcomes[i].Withholds())
             {
                 withheld.Add(candidates[i]);
-                withheldBy.Screened(outcomes[i], candidates[i].SizeBytes,
+                withheldBy.Screened(outcomes[i],
                     causes.Count == 0 ? DeclaredProductInstalledCause.None : causes[i]);
             }
             else survivors.Add(candidates[i]);
@@ -1649,10 +1627,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
             }
 
             // Counted by which of the two keeping verdicts it was. The opt-in report
-            // carries the two counts apart. The command line's held-back sentence counts
-            // a file whose times were not established and leaves out a file not before the
-            // clock, whose size is summed here so that the sentence's size can leave it out
-            // too. The window's finished screen counts both.
+            // carries the two counts apart. The command line's held-back Application log
+            // entry counts a file whose times were not established and leaves out a file
+            // not before the clock, whose size is summed here for the line about recently
+            // changed files. The window's finished screen counts both.
             withheld.Add(candidate);
             if (verdict == CachedFileAgeVerdict.NotBeforeTheClock)
                 withheldBy.NotBeforeTheClock(candidate.SizeBytes);

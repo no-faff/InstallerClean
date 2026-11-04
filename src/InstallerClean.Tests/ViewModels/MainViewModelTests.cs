@@ -438,8 +438,7 @@ public class MainViewModelTests : IDisposable
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
                 WithheldFiles: withheld,
-                WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 2),
-                WithheldDeclaredProductInstalledBytes: 3072));
+                WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 2)));
 
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -470,7 +469,6 @@ public class MainViewModelTests : IDisposable
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
                 WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 2),
-                WithheldDeclaredProductInstalledBytes: 3072,
                 SourceRootsGivenUp: [new("d:", SourceRootGiveUpRoute.StoppedWaiting, 2)]));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -513,7 +511,6 @@ public class MainViewModelTests : IDisposable
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
                 WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, SecondCopyUnestablishedCount: 1),
-                WithheldDeclaredProductInstalledBytes: 1024,
                 SourceRootsGivenUp: [new("D:", SourceRootGiveUpRoute.NoAnswer, 2)]));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -568,8 +565,7 @@ public class MainViewModelTests : IDisposable
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
                 WithheldFiles: withheld,
-                WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 2),
-                WithheldDeclaredPatchRegisteredBytes: 3072));
+                WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 2)));
 
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -593,8 +589,7 @@ public class MainViewModelTests : IDisposable
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
                 WithheldFiles: withheld,
-                WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 1, DeclaredPatchUnestablishedCount: 1),
-                WithheldDeclaredPatchRegisteredBytes: 1024));
+                WithheldBy: new WithholdingSplit(DeclaredPatchRegisteredCount: 1, DeclaredPatchUnestablishedCount: 1)));
 
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -618,8 +613,7 @@ public class MainViewModelTests : IDisposable
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0,
                 WithheldFiles: withheld,
-                WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, ScreenUnansweredCount: 1),
-                WithheldDeclaredProductInstalledBytes: 1024));
+                WithheldBy: new WithholdingSplit(DeclaredProductInstalledCount: 1, ScreenUnansweredCount: 1)));
 
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -674,7 +668,6 @@ public class MainViewModelTests : IDisposable
                 WithheldFiles: withheld,
                 WithheldBy: new WithholdingSplit(
                     DeclaredProductInstalledCount: 1, NotBeforeTheClockCount: 1, AgeUnestablishedCount: 1),
-                WithheldDeclaredProductInstalledBytes: 1024,
                 WithheldNotBeforeTheClockBytes: 2048));
 
         await vm.Scan.ScanWithProgressAsync(null);

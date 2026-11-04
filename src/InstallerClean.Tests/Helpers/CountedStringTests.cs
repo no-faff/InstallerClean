@@ -59,8 +59,6 @@ public class CountedStringTests
         "Cli.EventLogSourcesGivenUpCheckNotice",
         "Cli.FoundOrphans", "Cli.MissingFromDisk",
         "Cli.MovedFiles", "Cli.MovingFiles",
-        "Cli.NothingListed", "Cli.NothingListedPerFile",
-        "Cli.NothingOffered", "Cli.NothingOfferedPerFile",
         "Completion.FailedCount", "Completion.FailedCountDelete",
         "Completion.HeldBack",
         "Completion.MoveCancelledSummary", "Completion.MoveSummary",
@@ -72,7 +70,6 @@ public class CountedStringTests
         "Summary.MissingFromDisk.Unnamed",
         "Summary.OrphanedToCleanUp", "Summary.RegisteredStillUsed",
         "Summary.RegisteredWindow", "Summary.RegisteredWindow.Missing",
-        "Cli.SupersededHeldBack",
         "Completion.RecentChange",
     };
 
@@ -89,15 +86,12 @@ public class CountedStringTests
         "Cli.EventLogSourcesGivenUpCheckNotice",
         "Cli.FoundOrphans", "Cli.MissingFromDisk",
         "Cli.MovedFiles", "Cli.MovingFiles",
-        "Cli.NothingListed", "Cli.NothingListedPerFile",
-        "Cli.NothingOffered", "Cli.NothingOfferedPerFile",
         "Completion.HeldBack",
         "Completion.PermanentDeleteSummary",
         "Confirm.DeletePermanently", "Confirm.MoveDestination", "Error.FileInUse",
         "Summary.MissingFromDisk.OtherPrograms", "Summary.MissingFromDisk.Unnamed",
         "Summary.RegisteredStillUsed", "Summary.RegisteredWindow",
         "Summary.RegisteredWindow.Missing",
-        "Cli.SupersededHeldBack",
         "Completion.RecentChange",
     };
 
@@ -347,15 +341,14 @@ public class CountedStringTests
         // character-identical to its own .Plural, which is a copy waiting to drift, so
         // such an override does not exist to be asserted on.
         //
-        // SO THE BAND HAS A LIVE CONSUMER, AND THE PIN STILL BELONGS ON THE SELECTOR.
-        // Cli.SupersededHeldBack carries a .Few in these three languages, its counted
-        // noun sitting inside the sentence where the numeral governs it, so collapsing
-        // everything that is not One into Other would put the five-and-up form on a
-        // count of three. Pinning one of those renderings instead would hold only while
-        // that language kept that value and would say nothing about the arm itself. The
-        // prefix used below has no override of its own, which is what makes the null
-        // assertion mean something: the band is checked directly, with no translated
-        // value standing in for it.
+        // THE PIN BELONGS ON THE SELECTOR. A cardinality key whose counted noun sits
+        // inside the sentence carries a .Few in these three languages, the numeral
+        // governing that noun, so collapsing everything that is not One into Other would
+        // put the five-and-up form on a count of three. Pinning one such rendering
+        // instead would hold only while that language kept that value and would say
+        // nothing about the arm itself. The prefix used below has no override of its own,
+        // which is what makes the null assertion mean something: the band is checked
+        // directly, with no translated value standing in for it.
         //
         // Plural.File.Few is NOT what this guards. That prefix is Grammatical, so it
         // goes through CategoryFor and never through CardinalCategoryFor, and it would
@@ -363,7 +356,7 @@ public class CountedStringTests
         using var scope = new LocalisationScope(CultureInfo.GetCultureInfo(cultureName));
 
         var culture = CultureInfo.GetCultureInfo(cultureName);
-        const string Prefix = "Cli.NothingListed";
+        const string Prefix = "Completion.RecentChange";
         Assert.Equal(DisplayHelpers.CountQuestion.Cardinality, DisplayHelpers.QuestionFor(Prefix));
 
         // The override really is absent, so a later reader cannot mistake this for a

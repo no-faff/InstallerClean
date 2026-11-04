@@ -329,9 +329,9 @@ internal interface IPreciseWallClock
 /// <see cref="BeforeTheClock"/> lets the file through.
 ///
 /// THE TWO THAT KEEP IT ARE COUNTED APART. The opt-in report carries the two counts
-/// separately, and the command line's held-back sentence counts a file whose times were
-/// not established and leaves out a file not before the clock, which has a line of its
-/// own. The window's finished screen counts both among the files it held back.
+/// separately, and the command line's held-back Application log entry counts a file
+/// whose times were not established and leaves out a file not before the clock, which
+/// has a line of its own. The window's finished screen counts both among the files it held back.
 /// </summary>
 public enum CachedFileAgeVerdict
 {

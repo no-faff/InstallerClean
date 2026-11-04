@@ -590,7 +590,6 @@ const OVERRIDES = {
   'Cli.MovingFiles.One': `Идёт перемещение в {2}: {0} ненужный {1}...`,
   'Cli.MovedFiles.One': `Перемещён {0} ненужный {1}.`,
   'Completion.HeldBack.Few': `Задержано {0} файла. Сканирование сочло их ненужными. Итоговая проверка не смогла это подтвердить.`,
-  'Cli.SupersededHeldBack.Few': `InstallerClean не смог с уверенностью определить, что {0} замещённых файла больше не нужны, поэтому удержал их.`,
 };
 
 // The human-facing CLI keys (progress, argument/path errors, the pending-reboot
@@ -669,28 +668,13 @@ const CLI = {
   'Cli.ScanSignal.Other': `Когда началось сканирование, у Windows Installer что-то выполнялось или ожидало, поэтому InstallerClean удержал файлы в {InstallerFolder}, которые не названы в записях ни одной установленной программы, вместо того чтобы предложить их. Когда это разрешится, запустите команду снова.`,
   'Cli.ScanSignal.ClockSetBack': `Во время сканирования часы этого компьютера ушли назад или отстали, поэтому InstallerClean удержал файлы в {InstallerFolder}, которые не названы в записях ни одной установленной программы, вместо того чтобы предложить их. Запустите команду снова.`,
   'Cli.FoundNoOrphans': `Ненужных файлов не найдено.`,
-  'Cli.NothingOffered.Singular': `InstallerClean не смог с уверенностью определить, какие файлы в кэше принадлежат установленным здесь программам, поэтому удержал единственный файл ({2}), вместо того чтобы предложить его.`,
-  'Cli.NothingOffered.Plural': `InstallerClean не смог с уверенностью определить, какие файлы в кэше принадлежат установленным здесь программам, поэтому удержал {0} {1} ({2}), вместо того чтобы предложить их.`,
   // The per-file forms of the pair above.
-  'Cli.NothingOfferedPerFile.Singular': `InstallerClean не смог установить, что один файл не нужен, поэтому удержал его ({2}), вместо того чтобы предложить.`,
-  'Cli.NothingOfferedPerFile.Plural': `InstallerClean удержал {0} {1} ({2}), вместо того чтобы предложить их, потому что не смог установить, что они не нужны.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean больше не смог подтвердить папку резервных копий и остановился. Проверьте {0}, затем запустите команду снова.`,
   'Cli.Help.Summary': `Убирает .msi и .msp из кэша, не нужные ни одной установленной программе.`,
   'Cli.Help.Elevation': `Нужна командная строка администратора; без неё сканирования не будет.`,
   'Cli.InstallerLockUnavailable': `Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Cli.MoveInstallerLockUnavailable': `Ошибка: InstallerClean не смог взять блокировку Windows Installer, которая не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути. Ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
-  'Cli.SupersededHeldBack.Singular': `InstallerClean не смог с уверенностью определить, что единственный замещённый файл больше не нужен, поэтому удержал его.`,
-  'Cli.SupersededHeldBack.Plural': `InstallerClean не смог с уверенностью определить, что {0} замещённых файлов больше не нужны, поэтому удержал их.`,
-  'Cli.NothingListed.Singular': `InstallerClean не смог с уверенностью определить, какие файлы в кэше принадлежат установленным здесь программам, поэтому удержал единственный файл ({2}), вместо того чтобы предложить его.`,
-  'Cli.NothingListed.Plural': `InstallerClean не смог с уверенностью определить, какие файлы в кэше принадлежат установленным здесь программам, поэтому удержал {0} {1} ({2}), вместо того чтобы предложить их.`,
   // The per-file forms of the pair above.
-  'Cli.NothingListedPerFile.Singular': `InstallerClean не смог установить, что один файл не нужен, поэтому удержал его ({2}), вместо того чтобы предложить.`,
-  'Cli.NothingListedPerFile.Plural': `InstallerClean удержал {0} {1} ({2}), вместо того чтобы предложить их, потому что не смог установить, что они не нужны.`,
-  'Cli.WithheldReasons.Header': `Почему уверенности не было:`,
-  'Cli.WithheldReasons.RecordedPath': `  Путь к файлу из собственных записей Windows Installer не удалось разрешить, поэтому с ним ничего не удалось сопоставить.`,
-  'Cli.WithheldReasons.FileIdentity': `  Файл, о котором у Windows есть запись, не удалось опознать, поэтому его не удалось сопоставить с тем, что лежит в папке.`,
-  'Cli.WithheldReasons.SecondInstance': `  Программа может быть установлена на этом ПК более одного раза, а записи не могут сказать, какой копии принадлежит файл.`,
-  'Cli.WithheldReasons.RegistryRecordsUnread': `  Часть записей Windows Installer не удалось прочитать, поэтому файл может принадлежать программе, записанной там.`,
   // The four per-file arms. Each names a different cause and the four have to stay
   // four and distinct once translated:
   // DeclaredProductUnestablished is itself a disjunction, either the file would not
@@ -699,10 +683,6 @@ const CLI = {
   // establish for the files the other half holds. Windows falls short of a clear
   // answer two ways: it gives none, or it gives one that disagrees with its own list
   // of installed programs. Keep the two leading spaces on all four.
-  'Cli.WithheldReasons.CandidateIdentity': `  Файл в папке не удалось опознать, поэтому его не удалось сопоставить с записями.`,
-  'Cli.WithheldReasons.DeclaredProductUnestablished': `  Либо файл не указал, какой программе он принадлежит, либо Windows не дал ясного ответа об этой программе.`,
-  'Cli.WithheldReasons.ScreenUnanswered': `  Проверка того, каким программам принадлежат файлы, дала ответы, которые не совпали с переданными ей файлами.`,
-  'Cli.WithheldReasons.DeclaredPatchUnestablished': `  Либо файл исправления не указал, какое это исправление, либо не указал, для каких программ он предназначен, либо Windows не указал полностью, у каких программ есть это исправление.`,
   'Cli.PendingRebootBlocked.PendingRenameUnresolved': `Ошибка: файловая операция поставлена в очередь до следующей перезагрузки, и InstallerClean не может определить, какие файлы в ней названы, поэтому не может исключить {InstallerFolder}. Перезагрузите Windows перед очисткой.`,
   'Cli.MoveRestoreHint': `Убедитесь, что ваши программы по-прежнему обновляются и удаляются как обычно, а затем удалите {0}.`,
   'Cli.InstallerLockAccessRefused': `Ошибка: Windows отказал InstallerClean в праве проверить, занят ли Windows Installer, поэтому он не смог исключить, что файл понадобится в процессе. Ничего не было удалено.`,

@@ -1058,8 +1058,8 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="WithheldAgeUnestablishedCount">
 /// Candidates the age check kept back because their times were not established:
-/// <c>ScanResult.WithheldBy.AgeUnestablishedCount</c>. Both hosts' held-back sentences
-/// count them, and no reason line names them.
+/// <c>ScanResult.WithheldBy.AgeUnestablishedCount</c>. Both hosts count them among the
+/// files left alone.
 ///
 /// A DIFFERENT FINDING FROM THE ONE ABOVE AND THE TWO MUST NOT BE ADDED. Where that one
 /// counts files for their times, the scan read the times; this counts files whose times it
@@ -1079,8 +1079,7 @@ public sealed record MachineInfo(
 /// patch code and target products to ask about, or the registrations of the patch it
 /// declares could not all be found:
 /// <c>ScanResult.WithheldBy.DeclaredPatchUnestablishedCount</c>. Both
-/// hosts' held-back sentences count them, and the command line names them in a reason
-/// line of their own.
+/// hosts count them among the files left alone.
 ///
 /// NOT TO BE ADDED TO THE ONE ABOVE, for the reason given at the product half's pair.
 ///
@@ -1091,8 +1090,8 @@ public sealed record MachineInfo(
 /// <param name="WithheldContainmentRefusedCount">
 /// Files from the folder walk that the containment check refused, each being a reparse
 /// point or resolving somewhere other than directly in the folder:
-/// <c>ScanResult.WithheldBy.ContainmentRefusedCount</c>. Both hosts' held-back sentences
-/// count them, and no reason line names them.
+/// <c>ScanResult.WithheldBy.ContainmentRefusedCount</c>. Both hosts count them among the
+/// files left alone.
 ///
 /// APPENDED AFTER THE NINE ABOVE, with the three members after it, for the reason the
 /// four before it were.

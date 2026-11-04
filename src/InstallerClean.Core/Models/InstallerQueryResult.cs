@@ -56,8 +56,7 @@ namespace InstallerClean.Models;
 /// <see cref="Packages"/> is returned. The scan and the check made just before a Move or
 /// Delete decide from it, with the registration side's identity reads, whether the
 /// walk-derived offer is withheld wholesale (see <see cref="WithholdingLegs"/>). The
-/// scan carries it into its own result, where the opt-in report reads it and the
-/// command line names the withholding legs that fired.
+/// scan carries it into its own result, where the opt-in report reads it.
 /// Default on a result built by anything that does not enumerate, which reads as a
 /// census nobody took rather than as a machine where every term was zero; only a real
 /// enumeration's result should be read for these.

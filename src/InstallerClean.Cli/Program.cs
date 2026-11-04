@@ -1157,32 +1157,16 @@ internal static class Program
             // zero followed by a second line saying the same thing: somebody
             // reading a scheduled task's log wants the state of the machine
             // rather than the tool's intention towards it.
-            // THREE OUTCOMES WHERE NOTHING IS OFFERED, AND WHICH ONE IS THE SCAN
-            // RESULT'S ANSWER RATHER THAN THIS HOST'S. An empty offer has three
-            // meanings: the folder holds nothing this scan can offer, or holds only
-            // files it kept for a program Windows still has installed, for their times
-            // or for their patch's registrations; a rule about the machine's
-            // records emptied the walk-derived offer in one go; or the scan judged the
-            // files one at a time and could not clear them. "Found no unneeded files"
-            // is printed for the first machine only, and the two withholding
-            // sentences say different things that are each false of the other's
-            // machine. On all three, the lines ReportScanSignals returns follow, with the
-            // line about files held back for their times wherever the scan held any.
             //
-            // AND THE FIRST MACHINE GETS IT ONLY WHERE THAT LINE IS NOT PRINTED. The line
-            // says those files were held and when to scan again, and it stands in the clean
-            // line's place here as it does on the window's nothing-offered screen for the
-            // same run. Whether it is printed is the scan's answer (HasRecentChangeLine),
-            // the same one ReportScanSignals spends.
-            //
-            // AND THE FIRST MACHINE GETS IT ONLY WHERE THE SCAN STOPPED WAITING FOR NO
-            // DRIVE OR SHARE WHILE FILES STILL HAD TO BE CHECKED AGAINST IT. Where it did,
-            // the files it left alone are ones it never established to be needed or
-            // unneeded, so the clean line would be a claim about them the scan never made.
-            // Nothing is printed here for that machine: the line naming the drives and
-            // shares, which ReportScanSignals returns and the run prints next, stands in its
-            // place. Such a file can be kept for a program Windows still has installed,
-            // which is why the withholding reading alone does not answer this.
+            // THE CLEAN LINE IS PRINTED WHEREVER NOTHING IS OFFERED, WITH ONE EXCEPTION: a
+            // line that stands in its place. The line about files held back for their times
+            // says those files were kept and when to scan again, and the line naming the
+            // drives and shares the scan stopped waiting for says the files it left alone
+            // were never established to be needed or unneeded. The clean line over either
+            // would claim more than the scan established, so each is printed instead of it,
+            // as the window's nothing-offered screen does for the same run. Whether the
+            // first is printed is the scan's answer (HasRecentChangeLine), the same one
+            // ReportScanSignals spends.
             //
             // THE HOST DOES NOT PARTITION ANYTHING TO GET HERE. Deciding it here would
             // mean reading a split the scan owns, and a host that infers one decision's
@@ -1190,24 +1174,18 @@ internal static class Program
             // the moment any of them moves. The scan answers it where the withholding
             // happens; this branch spends the answer.
             //
-            // The count and the size are UnestablishedWithheldCount and
-            // UnestablishedWithheldBytes, which leave out any file kept because it
-            // declares an installed program, for its times (ScanResult.WithheldBy.NotBeforeTheClockCount)
-            // or as a copy of a patch Windows holds a registration of. Superseded files
-            // held back are printed in a line of their own.
+            // THE LINE AFTER IT, WHICHEVER OF THE TWO IS PRINTED, SAYS HOW MANY FILES WERE
+            // LEFT ALONE (ScanResult.LeftAloneCount), the figure the window shows under its
+            // unneeded count. ReportScanSignals returns it as the first of the notices.
+            //
+            // withheldCount is UnestablishedWithheldCount, which leaves out any file kept
+            // because it declares an installed program, for its times
+            // (ScanResult.WithheldBy.NotBeforeTheClockCount) or as a copy of a patch
+            // Windows holds a registration of. It is the figure the Application log's
+            // held-back entries carry.
             var withheldCount = scanResult.UnestablishedWithheldCount;
 
-            // The one-form names the size and not the numeral, so it spends {2} and
-            // leaves {0} and {1} unused; all three are passed on every branch so the
-            // forms cannot disagree about which index is which.
-            string HeldBackLine(string singular, string plural, string keyPrefix) =>
-                string.Format(
-                    DisplayHelpers.Pluralise(withheldCount, singular, plural, keyPrefix),
-                    DisplayHelpers.FormatCount(withheldCount),
-                    DisplayHelpers.PluraliseFile(withheldCount),
-                    DisplayHelpers.FormatSize(scanResult.UnestablishedWithheldBytes));
-
-            // The wholesale sentence names a cause, so it is spoken only for the
+            // The log's wholesale sentence names a cause, so it is written only for the
             // reading that earns it and the per-file one for every other reading the
             // scan says is worth reporting.
             var wholesale = scanResult.Withholding == WithholdingAccount.WholeWalkOffer;
@@ -1221,9 +1199,8 @@ internal static class Program
             // COME BACK TO BE PRINTED, after the line saying what the scan found, or after the
             // scanning line where no such line is printed. A /s that lists files prints them
             // ahead of the line counting the files instead, so the list sits straight under
-            // that line: the reasons a file was held back are indented like the rows, and a
-            // script reading the rows takes the indented lines after that line to the end of
-            // the output. What can follow the list is never indented: the unexpected-error
+            // that line, a script reading the rows taking the indented lines after that line
+            // to the end of the output. What can follow the list is never indented: the unexpected-error
             // line of a run whose output failed and the note saying the Application log
             // refused the run's summary, in either order, and a blank line wherever a failed
             // write lost a whole line (ConsoleGuard).
@@ -1283,14 +1260,6 @@ internal static class Program
 
             if (count > 0)
                 Console.WriteLine(FoundLine());
-            else if (scanResult.HasWithholdingToReport)
-                Console.WriteLine(wholesale
-                    ? HeldBackLine(
-                        Strings.Cli_NothingOffered_Singular,
-                        Strings.Cli_NothingOffered_Plural, "Cli.NothingOffered")
-                    : HeldBackLine(
-                        Strings.Cli_NothingOfferedPerFile_Singular,
-                        Strings.Cli_NothingOfferedPerFile_Plural, "Cli.NothingOfferedPerFile"));
             else if (sourcesGivenUp.Count == 0 && !scanResult.HasRecentChangeLine)
                 Console.WriteLine(Strings.Cli_FoundNoOrphans);
 
@@ -2048,7 +2017,7 @@ internal static class Program
 
     /// <summary>
     /// Reports the scan-level conditions that are facts about the machine rather
-    /// than about this run: an offer withheld and the conditions behind it, the
+    /// than about this run: how many files the scan left alone, an offer withheld, the
     /// drives and shares the scan stopped waiting for while files still had to be
     /// checked against them (<paramref name="sourcesGivenUp"/>, the scan's
     /// <see cref="ScanResult.SourceRootsGivenUpKeepingFiles"/> as the caller read
@@ -2081,12 +2050,18 @@ internal static class Program
     private static List<string> ReportScanSignals(
         string arg, ScanResult scanResult, IReadOnlyList<SourceRootGivenUp> sourcesGivenUp)
     {
-        var lines = new List<string>();
+        // HOW MANY FILES THE SCAN LEFT ALONE, ON EVERY SCAN AND AS THE FIRST NOTICE. It is
+        // the window's own count and phrase (ScanResult.LeftAloneCount through
+        // LeftAloneReport), so the two hosts say the same for one machine state, and it
+        // names no cause: what is true of every file it counts is that the app left it
+        // alone. It follows the line saying what the scan found, or the clean line, and
+        // comes ahead of the lines below, which say why particular files were kept. A /s
+        // that lists files prints the notices ahead of its count line, so this is the first
+        // line under the scanning one there.
+        var lines = new List<string> { LeftAloneReport.Line(scanResult.LeftAloneCount) };
 
         // FILES THE FOLDER WALK FOUND WERE HELD BACK, IN ONE GO OR ONE AT A TIME. An
-        // audit line for every machine that meets it, and on stdout a lead, a header and
-        // one line per condition the run met. The lead is the one part that is gated, on whether anything was offered
-        // beside the withheld half, and the comment at that line says what decides it.
+        // audit entry in the Application log for every machine that meets it.
         //
         // THIS BLOCK IS HERE RATHER THAN INSIDE THE EMPTY-OFFER BRANCH ABOVE THIS
         // METHOD, SO IT REACHES BOTH MACHINES. Written where the offer is empty, it
@@ -2107,14 +2082,11 @@ internal static class Program
         // its own further down.
         if (scanResult.HasWithholdingToReport)
         {
-            // WHICH OF THE TWO SENTENCES, ASKED ONCE AND SPENT BY BOTH THE AUDIT LINE
-            // AND THE LEAD BELOW, so the two cannot describe one machine two different
-            // ways. The wholesale one names a cause and is spoken only for the reading
-            // that earns it.
+            // WHICH OF THE TWO SENTENCES, ASKED ONCE. The wholesale one names a cause and
+            // is spoken only for the reading that earns it.
             //
-            // THE COUNT AND THE SIZE ARE UnestablishedWithheldCount AND
-            // UnestablishedWithheldBytes, the same figures the empty-offer line above
-            // this method prints.
+            // THE COUNT IS UnestablishedWithheldCount, the same figure the empty-offer
+            // summary entry carries.
             var perFile = scanResult.Withholding != WithholdingAccount.WholeWalkOffer;
             var heldBack = scanResult.UnestablishedWithheldCount;
 
@@ -2124,101 +2096,40 @@ internal static class Program
                         ? Strings.Cli_EventLogNothingOfferedPerFileNotice
                         : Strings.Cli_EventLogNothingOfferedNotice,
                     arg, heldBack, DisplayHelpers.PluraliseFile(heldBack)));
-
-            // THE LEAD, FOR THE MACHINE THAT OTHERWISE HEARS NOTHING. Where the offer
-            // is empty, the line the caller prints in place of the clean one already
-            // says this. Where something WAS offered beside the withheld half, the line
-            // counting what was found says nothing at all about the half that went;
-            // this line is where stdout states it on that machine.
-            if (scanResult.RemovableFiles.Count > 0)
-                lines.Add(string.Format(
-                    DisplayHelpers.Pluralise(heldBack,
-                        perFile
-                            ? Strings.Cli_NothingListedPerFile_Singular
-                            : Strings.Cli_NothingListed_Singular,
-                        perFile
-                            ? Strings.Cli_NothingListedPerFile_Plural
-                            : Strings.Cli_NothingListed_Plural,
-                        perFile ? "Cli.NothingListedPerFile" : "Cli.NothingListed"),
-                    DisplayHelpers.FormatCount(heldBack), DisplayHelpers.PluraliseFile(heldBack),
-                    DisplayHelpers.FormatSize(scanResult.UnestablishedWithheldBytes)));
-
-            // AND WHY, ONE LINE PER CONDITION THE RUN MET, FROM BOTH HALVES OF THE
-            // WITHHOLDING. The legs are read off the result, which calls the same
-            // expression the scan gated on; the arms are read off the split the scan
-            // filled as it withheld. So neither half can name a different set of
-            // conditions from the one that acted, and a run that withheld both ways
-            // gets both sets rather than whichever the surface happened to ask for.
-            // No line carries a count and none states a cause for any file: these are
-            // conditions, any combination of them can hold, and nothing sums.
-            //
-            // THE HEADING GOES WITH THE LINES OR NOT AT ALL. A caption reading "Why it
-            // couldn't be certain:" over nothing reads as output that failed rather
-            // than as a run with nothing to add, so it is printed from the list rather
-            // than beside it.
-            //
-            // AND THE LIST IS PRINTED ONLY WHERE IT ACCOUNTS FOR EVERY FILE THE LEAD
-            // COUNTS. A file the age check kept because its age was not established is
-            // in that count and has no line, so on a run holding one the lead stands on
-            // its own rather than over a list that states reasons for the other files
-            // alone.
-            //
-            // EACH DISTINCT LINE PRINTS ONCE. A leg and an arm can share a line, and a
-            // run meeting both would otherwise say the same thing twice.
-            var reasons = scanResult.WithholdingLegsFired.Select(leg => LineFor(leg))
-                .Concat(scanResult.WithheldBy.ArmsFired.Select(arm => LineFor(arm)))
-                .Distinct(StringComparer.Ordinal)
-                .ToList();
-
-            if (reasons.Count > 0 && scanResult.NamedConditionsCoverEveryHeldBackFile)
-            {
-                lines.Add(Strings.Cli_WithheldReasons_Header);
-                foreach (var line in reasons)
-                    lines.Add(line);
-            }
         }
 
         // WHY EVERY FILE THE FOLDER WALK FOUND WAS HELD BACK, WHERE THE SCAN FOUND ONE OF
         // WINDOWS INSTALLER'S IN-PROGRESS SIGNALS SET JUST AFTER ITS CLOCK, OR THE SYSTEM
         // CLOCK WENT BACK WHILE IT READ THE FILES' TIMES. On every mode and on stdout alone:
-        // the held-back lines above already count those files, and their notice is the
-        // Application log's record of them. This says which signal, in the terms the gate's
-        // own sentences use, or that the clock went back, and refuses nothing: where anything
-        // is offered, /d and /m read the gate again before acting and stop where it is set.
+        // the left-alone line above already counts those files, and the held-back entry is
+        // the Application log's record of them. This says which signal, in the terms the
+        // gate's own sentences use, or that the clock went back, and refuses nothing: where
+        // anything is offered, /d and /m read the gate again before acting and stop where it
+        // is set.
         var scanSignal = ScanSignalReport.CommandLine(scanResult);
         if (scanSignal.Length > 0) lines.Add(scanSignal);
 
         // THE DRIVES AND SHARES THE SCAN STOPPED WAITING FOR WHILE FILES STILL HAD TO BE
-        // CHECKED AGAINST THEM, on stdout and as Event ID 3004. After the held-back lines
-        // above, which also speak of files the scan left alone, and ahead of the
-        // superseded line, so where the scan has nothing else to report it is the first
-        // line after the scanning one, standing where the clean line would have been. The
-        // window draws its own line under its left-alone count and above its missing-files
-        // line, which is this order.
+        // CHECKED AGAINST THEM, on stdout and as Event ID 3004. After the left-alone line
+        // above, which also speaks of files the scan left alone, so where the scan has
+        // nothing else to report it is the first line after that one, standing where the
+        // clean line would have been. The window draws its own line under its left-alone
+        // count and above its missing-files line, which is this order.
         var givenUp = SourcesGivenUpReport.CommandLine(sourcesGivenUp);
         if (givenUp.Length > 0) lines.Add(givenUp);
         NoteSourcesGivenUp(arg, sourcesGivenUp, duringTheCheck: false);
 
-        // SUPERSEDED FILES HELD BACK, printed wherever the count this line carries is
-        // above zero. The count is SupersededHeldBackCount: the superseded files whose
-        // removable verdict was taken away and those the containment check refused or
-        // could not answer for. It names no
-        // cause, several separate findings reaching this count and no sentence naming one
-        // of them being true of the files the others contribute; the string's own remarks
-        // carry that and why "superseded" is earned.
-        //
-        // AND THE SAME FILES GO TO THE APPLICATION LOG, on the same condition, as Event ID
-        // 3003. A scheduled run throws the console away, so without it the log would say
-        // what was offered and never that superseded files were held back beside it.
+        // SUPERSEDED FILES HELD BACK, written to the Application log wherever the count
+        // is above zero, as Event ID 3003. The count is SupersededHeldBackCount: the
+        // superseded files whose removable verdict was taken away and those the
+        // containment check refused or could not answer for. It names no cause, several
+        // separate findings reaching this count and no sentence naming one of them being
+        // true of the files the others contribute. A scheduled run throws the console
+        // away, so without the entry the log would say what was offered and never that
+        // superseded files were held back beside it.
         var supersededHeldBack = scanResult.SupersededHeldBackCount;
         if (supersededHeldBack > 0)
         {
-            lines.Add(string.Format(
-                DisplayHelpers.Pluralise(supersededHeldBack,
-                    Strings.Cli_SupersededHeldBack_Singular,
-                    Strings.Cli_SupersededHeldBack_Plural,
-                    "Cli.SupersededHeldBack"),
-                DisplayHelpers.FormatCount(supersededHeldBack)));
             MachineContract.WriteEventLog(CliEventClass.ScanSupersededHeldBackNotice,
                 () => string.Format(
                     DisplayHelpers.Pluralise(supersededHeldBack,
@@ -2635,67 +2546,6 @@ internal static class Program
         NoteEventLogUnavailable();
         return ExitError;
     }
-
-    /// <summary>
-    /// The line printed for one leg of the wholesale withholding.
-    ///
-    /// Its own method rather than a switch inside the report, so
-    /// CliWithholdingReasonsTests can walk the enum against it: a leg added to
-    /// WithholdingLeg is a leg the gate acts on and the scan withholds for, and a leg
-    /// with no line here would leave a reader a heading with nothing under it.
-    ///
-    /// The fallback is the heading's own antecedent rather than a blank, because a
-    /// heading followed by nothing reads as output that failed rather than as a
-    /// condition nobody wrote up. It is unreachable while every leg is handled.
-    /// </summary>
-    internal static string LineFor(WithholdingLeg leg) => leg switch
-    {
-        WithholdingLeg.RecordedPathUnestablished => Strings.Cli_WithheldReasons_RecordedPath,
-        WithholdingLeg.FileIdentityUnestablished => Strings.Cli_WithheldReasons_FileIdentity,
-        WithholdingLeg.RegistryProductUnaskable => Strings.Cli_WithheldReasons_SecondInstance,
-        WithholdingLeg.RegistryRecordsUnread => Strings.Cli_WithheldReasons_RegistryRecordsUnread,
-        _ => Strings.Cli_WithheldReasons_Header,
-    };
-
-    /// <summary>
-    /// The line printed for one arm of the per-file withholding.
-    ///
-    /// Its own method for the same reason the one above it is, so
-    /// CliWithholdingReasonsTests can walk the enum against it: an arm added to
-    /// WithholdingSplit is an arm the scan counts files into, and an arm with no line
-    /// here is one whose files the list cannot account for, which keeps the list off
-    /// every run holding them.
-    ///
-    /// THE WHOLESALE ARM HAS NO MEMBER AND SO CANNOT REACH THIS. The leg lines
-    /// speak for it, and a line here as well would say the same thing twice about one
-    /// machine.
-    ///
-    /// NOR DO THE DECLARED-PRODUCT-INSTALLED, UNDER-A-DAY-OLD, DECLARED-PATCH-REGISTERED
-    /// AND AGE-UNESTABLISHED ARMS, so the command line prints no reason line for the
-    /// files they count. The first three are not in the held-back lead's count; the
-    /// fourth is, and a run holding one prints the lead with no list under it.
-    ///
-    /// THE SECOND-COPY ARM PRINTS THE LINE OF THE RegistryProductUnaskable LEG, which is true
-    /// of both: each is a program that may be installed more than once, whose packages
-    /// nothing could compare a file with. The list prints each distinct line once, so the
-    /// line never appears twice under the heading.
-    ///
-    /// The fallback is the heading's own antecedent rather than a blank, on the same
-    /// reasoning as above, and it is unreachable while every arm is handled.
-    /// </summary>
-    internal static string LineFor(WithholdingSplitArm arm) => arm switch
-    {
-        WithholdingSplitArm.IdentityUnestablished =>
-            Strings.Cli_WithheldReasons_CandidateIdentity,
-        WithholdingSplitArm.DeclaredProductUnestablished =>
-            Strings.Cli_WithheldReasons_DeclaredProductUnestablished,
-        WithholdingSplitArm.ScreenUnanswered =>
-            Strings.Cli_WithheldReasons_ScreenUnanswered,
-        WithholdingSplitArm.DeclaredPatchUnestablished =>
-            Strings.Cli_WithheldReasons_DeclaredPatchUnestablished,
-        WithholdingSplitArm.SecondCopyUnestablished => Strings.Cli_WithheldReasons_SecondInstance,
-        _ => Strings.Cli_WithheldReasons_Header,
-    };
 
     /// <summary>
     /// The sentence a blocked run prints, one per reason.

@@ -8,9 +8,9 @@ using NSubstitute;
 namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
-/// Where the command line prints the scan's notices: the files held back and why, the
-/// drives and shares given up, the superseded files held back, the files missing from the
-/// folder and the files held back for their times. A /s that lists files prints
+/// Where the command line prints the scan's notices: the count of files left alone, the
+/// drives and shares given up, the files missing from the folder and the files held back
+/// for their times. A /s that lists files prints
 /// them ahead of the line counting the files, so the list is the last thing printed; every
 /// other run prints them after the line saying what the scan found, or after the scanning
 /// line where no such line is printed. Driven through the real work method.
@@ -85,11 +85,12 @@ public class CliScanNoticeOrderTests
     public async Task A_scan_whose_output_fails_exits_1_on_one_error_entry_with_every_notice_written(
         string failsAt)
     {
+        var scan = EveryNotice();
         var console = new ConsoleFailingAt(failsAt == "the first row"
             ? Offer()[0].FileName
-            : Opening(Strings.Cli_NothingListedPerFile_Singular));
+            : LeftAloneReport.Line(scan.LeftAloneCount));
 
-        var run = await Run("/s", EveryNotice(), console);
+        var run = await Run("/s", scan, console);
 
         Assert.True(console.Refused > 0, $"The console refused no write, so it never failed at {failsAt}.");
         Assert.Equal(CliExitCode.Error, run.ExitCode);
@@ -250,16 +251,13 @@ public class CliScanNoticeOrderTests
 
     /// <summary>
     /// The opening of each notice <paramref name="scan"/> prints, in the order they are
-    /// printed: the sentence counting the files held back beside the offer, the heading
-    /// over its reasons, the drive given up, the superseded files, the missing files and
+    /// printed: the count of files left alone, the drive given up, the missing files and
     /// the files held back for their times.
     /// </summary>
     private static string[] NoticeOpenings(ScanResult scan) =>
     [
-        Opening(Strings.Cli_NothingListedPerFile_Singular),
-        Strings.Cli_WithheldReasons_Header,
+        LeftAloneReport.Line(scan.LeftAloneCount),
         SourcesGivenUpReport.CommandLine([DriveE]),
-        Strings.Cli_SupersededHeldBack_Singular,
         Opening(Strings.Cli_MissingFromDisk_Singular),
         RecentChangeReport.Line(scan),
     ];

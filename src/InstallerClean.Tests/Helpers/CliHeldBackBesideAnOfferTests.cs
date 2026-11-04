@@ -11,20 +11,16 @@ namespace InstallerClean.Tests.Helpers;
 /// What the command line says about files it did not act on, on a run that DID offer
 /// something, driven through the real work method rather than through the strings.
 ///
-/// WHAT EVERY FIXTURE HERE SETS UP, BECAUSE BOTH LINES ARE GATED ON IT. A scan whose
-/// offer is not empty, and something held back beside it: the scan's own withholding
-/// for the lead line, and a file dropped by the pre-act re-verify for the held-back
-/// tally. A run offered nothing takes neither branch and reports through the
-/// nothing-offered sentences instead.
-///
 /// TWO STAGES HOLD FILES BACK AND THEY ARE NOT ONE STAGE. The scan withholds before
 /// anything is offered, and the pre-act re-verify drops files out of a batch already
-/// offered. A run meets either without the other, they are reported by different
-/// lines, and each line is gated on something the other's fixture does not set.
+/// offered. A run meets either without the other, and they are reported by different
+/// lines: the scan's by the count of files left alone, which every scan prints, and the
+/// re-verify's by the held-back sentence a Move or Delete prints beside its summary.
 ///
-/// BOTH SENTENCES BELONG TO A RUN THAT ALSO PRINTED A CHEERFUL ONE. "Found 2 unneeded
-/// files" is true on each of these machines and says nothing about the files that went
-/// unmentioned, which is the whole reason the lines exist.
+/// THE COUNT SITS UNDER THE LINE SAYING WHAT WAS FOUND. "Found 2 unneeded files" is true
+/// on each of these machines and says nothing about the files that went unmentioned, so
+/// the line after it counts them. A /s that lists files prints the count ahead of that
+/// line instead, so the list sits straight under it.
 /// </summary>
 public class CliHeldBackBesideAnOfferTests
 {
@@ -33,145 +29,52 @@ public class CliHeldBackBesideAnOfferTests
     private const string HeldA = @"C:\Windows\Installer\held-a.msi";
     private const string HeldB = @"C:\Windows\Installer\held-b.msi";
 
-    [Fact]
-    public async Task A_scan_withholding_beside_a_live_offer_still_gets_its_own_lead_line()
+    private static readonly string MoveDestination =
+        Path.Combine(Path.GetTempPath(), "installerclean-cli-held-back-beside-an-offer-test");
+
+    [Theory]
+    [InlineData("/d")]
+    [InlineData("/m")]
+    public async Task A_delete_or_move_prints_the_count_straight_under_its_found_line(string arg)
     {
-        // THE MACHINE THE LEAD LINE EXISTS FOR. Its offer is not empty, so the run
-        // prints "Found 2 unneeded files" and that sentence is true of the folder it
-        // describes; the two files the scan kept back are not in it. This line is the
-        // run's only statement of them.
-        var (_, stdout) = await Run(Scan(
+        // Two offered, two withheld one at a time, and nine registered files on the disk:
+        // eleven files left alone. The clean line is not printed, there being an offer.
+        var (_, stdout) = await Run(arg, Scan(
             offer: 2, withheld: 2,
             split: new WithholdingSplit(DeclaredProductUnestablishedCount: 2)));
 
-        Assert.Contains(HeldBackLead(Strings.Cli_NothingListedPerFile_Plural, 2),
-            stdout, StringComparison.Ordinal);
-
-        // BESIDE THE OFFER RATHER THAN INSTEAD OF IT. The offer was real and was acted
-        // on, so its own line is still there and the held-back lead sits under it
-        // rather than in its place.
-        // Composed the way the run composes it. Cli.FoundOrphans is one flat
-        // sentence for every count, inflecting only through the satellite-only
-        // overrides, so the form has to be picked by the same rule rather than by
-        // reading the neutral value straight.
-        Assert.Contains(
-            string.Format(
-                DisplayHelpers.Pluralise(2, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
-                DisplayHelpers.FormatCount(2), DisplayHelpers.PluraliseFile(2),
-                DisplayHelpers.FormatSize(2048)),
-            stdout, StringComparison.Ordinal);
-
-        // The clean line is a statement about the folder and this folder has two files
-        // in it that nobody vouched for.
+        Assert.StartsWith(Lines(FoundLine(2, 2048), LeftAlone(11)), AfterScanningLine(stdout),
+            StringComparison.Ordinal);
         Assert.DoesNotContain(Strings.Cli_FoundNoOrphans, stdout, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task Files_kept_for_an_installed_program_beside_a_live_offer_get_no_lead_line()
+    public async Task A_scan_that_lists_files_prints_the_count_ahead_of_its_found_line_and_nothing_unindented_after()
     {
-        // Both held files were kept for a program Windows still has installed, so the
-        // run says what it says about its offer and nothing more.
-        var (_, stdout) = await Run(Scan(
-            offer: 2, withheld: 2,
-            split: new WithholdingSplit(DeclaredProductInstalledCount: 2),
-            positiveBytes: 2048));
-
-        // By each sentence's opening words rather than its formatted whole, so a lead
-        // printed with any count or size at all is caught.
-        foreach (var lead in new[]
-                 {
-                     Strings.Cli_NothingListedPerFile_Singular, Strings.Cli_NothingListedPerFile_Plural,
-                     Strings.Cli_NothingListed_Singular, Strings.Cli_NothingListed_Plural,
-                 })
-            Assert.DoesNotContain(Opening(lead), stdout, StringComparison.Ordinal);
-        Assert.DoesNotContain(Strings.Cli_WithheldReasons_Header, stdout, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task Patch_copies_kept_for_their_registrations_beside_a_live_offer_get_no_lead_line()
-    {
-        // Both held files are patch copies kept because Windows holds a registration of
-        // the patch they declare, so the run says what it says about its offer and
-        // nothing more.
-        var (_, stdout) = await Run(Scan(
-            offer: 2, withheld: 2,
-            split: new WithholdingSplit(DeclaredPatchRegisteredCount: 2),
-            patchBytes: 2048));
-
-        foreach (var lead in new[]
-                 {
-                     Strings.Cli_NothingListedPerFile_Singular, Strings.Cli_NothingListedPerFile_Plural,
-                     Strings.Cli_NothingListed_Singular, Strings.Cli_NothingListed_Plural,
-                 })
-            Assert.DoesNotContain(Opening(lead), stdout, StringComparison.Ordinal);
-        Assert.DoesNotContain(Strings.Cli_WithheldReasons_Header, stdout, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task Patch_copies_the_scan_could_not_settle_beside_a_live_offer_get_the_lead_line_and_their_reason()
-    {
-        // The patch half's unsettled arm is not silent. The lead counts both files and
-        // the reason under it is that arm's own, printed once under a heading printed
-        // once, so a reason falling back to the heading's text is caught.
-        var (_, stdout) = await Run(Scan(
-            offer: 2, withheld: 2,
-            split: new WithholdingSplit(DeclaredPatchUnestablishedCount: 2)));
-
-        Assert.Contains(HeldBackLead(Strings.Cli_NothingListedPerFile_Plural, 2),
-            stdout, StringComparison.Ordinal);
-        Assert.Equal(1, Occurrences(stdout, Strings.Cli_WithheldReasons_Header));
-        Assert.Equal(1, Occurrences(stdout, Program.LineFor(WithholdingSplitArm.DeclaredPatchUnestablished)));
-    }
-
-    [Fact]
-    public async Task A_lead_beside_a_live_offer_counts_only_the_files_the_scan_could_not_settle()
-    {
-        // One held file was kept for an installed program and one could not be settled:
-        // the lead speaks of the second, in its one-file form, and its size is that
-        // file's.
-        var (_, stdout) = await Run(Scan(
-            offer: 2, withheld: 2,
-            split: new WithholdingSplit(DeclaredProductInstalledCount: 1, ScreenUnansweredCount: 1),
-            positiveBytes: 1024));
-
-        Assert.Contains(HeldBackLead(Strings.Cli_NothingListedPerFile_Singular, 1),
-            stdout, StringComparison.Ordinal);
-        Assert.DoesNotContain(HeldBackLead(Strings.Cli_NothingListedPerFile_Plural, 2),
-            stdout, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task A_wholesale_withholding_beside_a_live_offer_gets_the_wholesale_lead()
-    {
-        // The same machine as above but for the condition that emptied the walk-derived
-        // half, with superseded patches offered beside it, so the pair is held apart here
-        // as it is where nothing was offered. One sentence for both would be false of one
-        // of them.
-        var (_, stdout) = await Run(Scan(
-            offer: 2, withheld: 2,
-            split: new WithholdingSplit(WholesaleCount: 2),
-            offerSuperseded: true));
-
-        Assert.Contains(HeldBackLead(Strings.Cli_NothingListed_Plural, 2),
-            stdout, StringComparison.Ordinal);
-        Assert.DoesNotContain(HeldBackLead(Strings.Cli_NothingListedPerFile_Plural, 2),
-            stdout, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task A_wholesale_withholding_beside_files_the_walk_found_gets_the_per_file_lead()
-    {
-        // The wholesale arm took the installation packages and the walk's patch files
-        // were offered. The wholesale lead would say the scan could not be certain which
-        // cached files belong to the programs, which the offered files show it could.
-        var (_, stdout) = await Run(Scan(
+        // The rows are indented and a script reading them takes the indented lines after
+        // the found line to the end of the output, so nothing may come between that line
+        // and the rows.
+        var (_, stdout) = await Run("/s", Scan(
             offer: 2, withheld: 2,
             split: new WithholdingSplit(WholesaleCount: 2)));
 
-        Assert.Contains(HeldBackLead(Strings.Cli_NothingListedPerFile_Plural, 2),
-            stdout, StringComparison.Ordinal);
-        Assert.DoesNotContain(HeldBackLead(Strings.Cli_NothingListed_Plural, 2),
-            stdout, StringComparison.Ordinal);
+        var after = AfterScanningLine(stdout);
+        Assert.StartsWith(Lines(LeftAlone(11), FoundLine(2, 2048)), after, StringComparison.Ordinal);
+
+        var rows = after[Lines(LeftAlone(11), FoundLine(2, 2048)).Length..]
+            .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        Assert.Equal(2, rows.Length);
+        Assert.All(rows, row => Assert.StartsWith("  ", row, StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [InlineData("/s")]
+    [InlineData("/d")]
+    public async Task A_scan_that_withheld_nothing_still_prints_the_count(string arg)
+    {
+        var (_, stdout) = await Run(arg, Scan(offer: 2, withheld: 0, split: default));
+
+        Assert.Contains(LeftAlone(9), stdout, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -181,7 +84,7 @@ public class CliHeldBackBesideAnOfferTests
         // what it dropped, and the held-back line is built from the tally beside them,
         // so a dropped file is the condition this fixture has to create: two offered,
         // one surviving, one dropped with a reason against it.
-        var (_, stdout) = await Run(
+        var (_, stdout) = await Run("/d",
             Scan(offer: 2, withheld: 0, split: default),
             reverify: new ReverifyResult(
                 new[] { OfferA },
@@ -199,7 +102,7 @@ public class CliHeldBackBesideAnOfferTests
         // the run prints one sentence for the batch. Taking the later tally instead of
         // adding it would report the second producer's files and lose the first's, so
         // this fixture is the one that has to put a count on both at once.
-        var (_, stdout) = await Run(
+        var (_, stdout) = await Run("/d",
             Scan(offer: 2, withheld: 0, split: default),
             reverify: new ReverifyResult(
                 new[] { OfferA },
@@ -223,36 +126,41 @@ public class CliHeldBackBesideAnOfferTests
                 Strings.Completion_HeldBack_Plural, "Completion.HeldBack"),
             DisplayHelpers.FormatCount(count));
 
-    // A sentence's words up to its first placeholder, which no count or size changes.
-    private static string Opening(string value) => value[..value.IndexOf('{')];
+    private static string LeftAlone(int count) => LeftAloneReport.Line(count);
 
-    private static string HeldBackLead(string value, int count) =>
-        string.Format(value, count, DisplayHelpers.PluraliseFile(count),
-            DisplayHelpers.FormatSize(count * 1024L));
+    // Composed the way the run composes it. Cli.FoundOrphans is one flat sentence for
+    // every count, inflecting only through the satellite-only overrides, so the form has
+    // to be picked by the same rule rather than by reading the neutral value straight.
+    private static string FoundLine(int count, long bytes) =>
+        string.Format(
+            DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
+            DisplayHelpers.FormatCount(count), DisplayHelpers.PluraliseFile(count),
+            DisplayHelpers.FormatSize(bytes));
 
-    // How many times a line appears in the output, compared ordinally and without
-    // overlap.
-    private static int Occurrences(string text, string value)
+    // The lines joined the way the console writes them, ending in a line break.
+    private static string Lines(params string[] lines) =>
+        string.Concat(lines.Select(line => line + Environment.NewLine));
+
+    // Everything after the scanning line, which names the folder and so differs by machine.
+    private static string AfterScanningLine(string stdout)
     {
-        var count = 0;
-        for (var at = text.IndexOf(value, StringComparison.Ordinal);
-             at >= 0;
-             at = text.IndexOf(value, at + value.Length, StringComparison.Ordinal))
-            count++;
-        return count;
+        var at = stdout.IndexOf(Environment.NewLine, StringComparison.Ordinal);
+        Assert.True(at >= 0, "the run printed no line at all");
+        return stdout[(at + Environment.NewLine.Length)..];
     }
 
-    // WHICH LEAD A RUN GETS IS DECIDED BY THE SPLIT AND THE OFFER, so those are the
-    // only things these fixtures vary for it: ScanResult.Withholding compares the
-    // withheld count against the split's wholesale count and its silent arms' counts,
-    // and asks whether anything the walk found is on the offer.
-    private static ScanResult Scan(int offer, int withheld, WithholdingSplit split, long positiveBytes = 0,
-        long patchBytes = 0, bool offerSuperseded = false) =>
-        new(Files(offer, OfferA, OfferB, offerSuperseded), Array.Empty<RegisteredPackage>(), 0,
+    // WHICH FILES THE COUNT TAKES IN IS DECIDED BY THE REGISTERED ROWS AND THE WITHHELD
+    // LIST, so those are the things these fixtures set: nine registered files on the
+    // disk, and the withheld files beside them.
+    private static ScanResult Scan(
+        int offer, int withheld, WithholdingSplit split, bool offerSuperseded = false) =>
+        new(Files(offer, OfferA, OfferB, offerSuperseded),
+            Enumerable.Range(0, 9)
+                .Select(i => new RegisteredPackage($@"C:\Windows\Installer\r{i}.msi", "Product", $"{{{i}}}"))
+                .ToArray(),
+            0,
             WithheldFiles: Files(withheld, HeldA, HeldB),
-            WithheldBy: split,
-            WithheldDeclaredProductInstalledBytes: positiveBytes,
-            WithheldDeclaredPatchRegisteredBytes: patchBytes);
+            WithheldBy: split);
 
     /// <param name="superseded">
     /// Registered superseded patches rather than files the walk found.
@@ -267,7 +175,7 @@ public class CliHeldBackBesideAnOfferTests
         };
 
     private static async Task<(int ExitCode, string Stdout)> Run(
-        ScanResult result, ReverifyResult? reverify = null, DeleteResult? delete = null)
+        string arg, ScanResult result, ReverifyResult? reverify = null, DeleteResult? delete = null)
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -291,16 +199,27 @@ public class CliHeldBackBesideAnOfferTests
             .Returns(delete ?? new DeleteResult(
                 result.RemovableFiles.Count, Array.Empty<FileOperationError>()));
 
-        var services = CliRunFixtures.Services(scan, reboot: reboot, reverifier: reverifier, delete: deleter);
+        var mover = Substitute.For<IMoveFilesService>();
+        mover.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(result.RemovableFiles.Count, Array.Empty<FileOperationError>()));
+
+        var services = CliRunFixtures.Services(
+            scan, reboot: reboot, reverifier: reverifier, delete: deleter, move: mover);
 
         var original = Console.Out;
         using var buffer = new StringWriter();
         try
         {
             Console.SetOut(buffer);
-            var exitCode = await Program.RunWorkAsync(
-                "/d", new CliInvocation(CliCommand.Delete, null, null),
-                CancellationToken.None, services);
+            var invocation = arg switch
+            {
+                "/m" => new CliInvocation(CliCommand.Move, null, MoveDestination),
+                "/s" => new CliInvocation(CliCommand.ScanOnly, null, null),
+                _ => new CliInvocation(CliCommand.Delete, null, null),
+            };
+            var exitCode = await Program.RunWorkAsync(arg, invocation, CancellationToken.None, services);
             return (exitCode, buffer.ToString());
         }
         finally

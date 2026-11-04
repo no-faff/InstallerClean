@@ -114,8 +114,8 @@ namespace InstallerClean.Models;
 /// are simply not offered, and they have their own count. The predicate settles it:
 /// nothing reaches the flag without having carried IsRemovable, and IsRemovablePatch
 /// requires state 2. THAT IS A USER-FACING CLAIM RATHER THAN AN INTERNAL ONE: the
-/// command line names the class in as many words (<c>Cli.SupersededHeldBack</c>), so
-/// this count and that noun have to agree.
+/// Application log entry for it names the class in as many words
+/// (<c>Cli.EventLogSupersededHeldBack</c>), so this count and that noun have to agree.
 ///
 /// AND A PRODUCT THAT COULD ROLL BACK ONTO THE FILE IS NOT IN IT EITHER. That
 /// condition is
@@ -149,10 +149,10 @@ namespace InstallerClean.Models;
 /// <param name="Census">
 /// What the enumeration behind this scan measured about itself and about the
 /// machine, carried straight through from
-/// <see cref="InstallerQueryResult.Census"/>. The opt-in report reads it, and the
-/// command line names the withholding legs that fired from it
-/// (<see cref="WithholdingLegsFired"/>). The withholdings it drives are decided on the
-/// enumeration's own copy, before this result is built.
+/// <see cref="InstallerQueryResult.Census"/>. The opt-in report reads it, and
+/// <see cref="WithholdingLegsFired"/> names the withholding legs that fired from it. The
+/// withholdings it drives are decided on the enumeration's own copy, before this result
+/// is built.
 /// </param>
 /// <param name="ShortNameCreation">
 /// The machine's 8dot3 short-name creation policy, one of
@@ -343,20 +343,10 @@ namespace InstallerClean.Models;
 /// other candidate was compared against the registrations by a read that answered,
 /// so that one is kept back and the rest stand.
 /// </param>
-/// <param name="WithheldDeclaredProductInstalledBytes">
-/// The size of the files <see cref="WithholdingSplit.DeclaredProductInstalledCount"/>
-/// counts, so that <see cref="UnestablishedWithheldBytes"/> can leave them out. Carried
-/// here rather than on the split, which holds counts and nothing else.
-/// </param>
 /// <param name="WithheldNotBeforeTheClockBytes">
 /// The size of the files <see cref="WithholdingSplit.NotBeforeTheClockCount"/> counts, so
-/// that <see cref="UnestablishedWithheldBytes"/> can leave them out and
-/// <see cref="Helpers.RecentChangeReport"/> can give their size, carried the same way.
-/// </param>
-/// <param name="WithheldDeclaredPatchRegisteredBytes">
-/// The size of the files <see cref="WithholdingSplit.DeclaredPatchRegisteredCount"/>
-/// counts, so that <see cref="UnestablishedWithheldBytes"/> can leave them out, carried
-/// the same way.
+/// that <see cref="Helpers.RecentChangeReport"/> can give their size. Carried here rather
+/// than on the split, which holds counts and nothing else.
 /// </param>
 /// <param name="SupersededContainmentRefusedCount">
 /// Superseded rows whose file is on disk, that carried a removable verdict to the offer,
@@ -464,9 +454,7 @@ public record ScanResult(
     FileIdentityReadTally RegistrationIdentityReads = default,
     FileIdentityReadTally CandidateIdentityReads = default,
     WithholdingSplit WithheldBy = default,
-    long WithheldDeclaredProductInstalledBytes = 0,
     long WithheldNotBeforeTheClockBytes = 0,
-    long WithheldDeclaredPatchRegisteredBytes = 0,
     int SupersededContainmentRefusedCount = 0,
     int SupersededContainmentUnestablishedCount = 0,
     IReadOnlyList<SourceRootGivenUp>? SourceRootsGivenUp = null,
@@ -535,6 +523,31 @@ public record ScanResult(
     /// <summary>Total bytes of the files this scan is offering for removal.</summary>
     public long RemovableTotalBytes => RemovableFiles.Sum(f => f.SizeBytes);
 
+    /// <summary>
+    /// How many files the scan left alone: every registered file that is on the disk, and
+    /// every file on <see cref="WithheldFiles"/>. It is the figure both hosts print as
+    /// "N files left alone", the window under its unneeded count and the command line
+    /// after its summary line, from this one expression, so the two cannot answer
+    /// differently for one machine state.
+    ///
+    /// THE WITHHELD FILES ARE COUNTED HERE BECAUSE THEY ARE IN NEITHER OTHER POPULATION.
+    /// A withheld file is neither offered nor a registered row, no registration naming
+    /// it, so without this term the offer and this count would between them leave every
+    /// withheld file out. The property is that the two take in every file a registration
+    /// names and every file on the scan's candidate list; anything added to this count
+    /// has to keep that.
+    ///
+    /// NO CAUSE TRAVELS WITH IT. What is true of every file counted is that the app left
+    /// it alone, and why any particular one was left is not something this count says.
+    ///
+    /// A REGISTRATION WHOSE FILE IS GONE IS NOT COUNTED. A file that is not in the folder
+    /// was not left alone, and there is nothing on the disk for a size beside it to
+    /// measure. <see cref="RegisteredTotalBytes"/> is summed under the same existence
+    /// test, so the count and the size describe one population.
+    /// </summary>
+    public int LeftAloneCount =>
+        RegisteredPackages.Count(p => !p.IsMissingFromDisk) + (WithheldFiles?.Count ?? 0);
+
     /// <summary>Total bytes of the files on <see cref="WithheldFiles"/>.</summary>
     public long WithheldTotalBytes =>
         WithheldFiles?.Sum(f => f.SizeBytes) ?? 0;
@@ -550,12 +563,11 @@ public record ScanResult(
     public bool InstallerActivityAtScanBlocked => InstallerActivityAtScan?.IsBlocked == true;
 
     /// <summary>
-    /// How many withheld files the command line's held-back sentences speak of: every
-    /// withheld file except those
+    /// How many withheld files the command line's held-back Application log entries
+    /// count: every withheld file except those
     /// <see cref="WithholdingSplit.DeclaredProductInstalledCount"/>,
     /// <see cref="WithholdingSplit.NotBeforeTheClockCount"/> and
     /// <see cref="WithholdingSplit.DeclaredPatchRegisteredCount"/> count.
-    /// <see cref="UnestablishedWithheldBytes"/> is their size.
     ///
     /// IT IS THE LIST LESS THOSE THREE, NOT A SUM OF THE OTHERS, so a withheld file no
     /// arm counted, or one counted by an arm added to <see cref="WithholdingSplit"/>
@@ -569,25 +581,11 @@ public record ScanResult(
             - WithheldBy.DeclaredPatchRegisteredCount);
 
     /// <summary>
-    /// The size of the files <see cref="UnestablishedWithheldCount"/> counts, on the same
-    /// reading: the whole withheld list's size less that of the files kept because they
-    /// declare a program Windows still has installed or an installed program opens them,
-    /// that of the files <see cref="WithholdingSplit.NotBeforeTheClockCount"/> counts, and that of the
-    /// patch copies kept because Windows holds a registration of the patch they declare.
-    /// </summary>
-    public long UnestablishedWithheldBytes =>
-        Math.Max(0, WithheldTotalBytes
-            - WithheldDeclaredProductInstalledBytes
-            - WithheldNotBeforeTheClockBytes
-            - WithheldDeclaredPatchRegisteredBytes);
-
-    /// <summary>
-    /// Which conditions kept the walk-derived offer back, for a host that explains the
-    /// withholding rather than merely reporting it.
+    /// Which conditions kept the walk-derived offer back.
     ///
     /// IT IS A SECOND CALLER OF THE GATE'S OWN EXPRESSION AND NOT A SECOND DERIVATION.
     /// The scan computes the gate from these same two values before it builds this
-    /// result, so what a host reads here cannot disagree with what the scan acted on.
+    /// result, so what is read here cannot disagree with what the scan acted on.
     /// The list is empty on any scan whose offer stood. It does not say whether the
     /// withholding took anything, because the gate also fires on a machine whose walk
     /// found nothing to withhold; <see cref="WithholdingSplit.WholesaleCount"/> counts
@@ -597,14 +595,14 @@ public record ScanResult(
         WithholdingLegs.Fired(Census, RegistrationIdentityReads);
 
     /// <summary>
-    /// What this run's withholding amounts to, for the command line deciding what to
-    /// tell somebody about it. The window's finished screen reads none of it: it chooses
-    /// between the all-clear and the screen saying nothing was offered through
-    /// <see cref="IsAllClear"/>.
+    /// What this run's withholding amounts to, for the command line deciding what its
+    /// held-back Application log entries say. The window's finished screen reads none of
+    /// it: it chooses between the all-clear and the screen saying nothing was offered
+    /// through <see cref="IsAllClear"/>.
     ///
-    /// THE COMMAND LINE MAKES TWO DECISIONS AND NOT ONE: whether to say anything about a
-    /// withholding at all, which <see cref="HasWithholdingToReport"/> answers, and
-    /// which of the two sentences the machine has earned. It says nothing for
+    /// THE COMMAND LINE MAKES TWO DECISIONS AND NOT ONE: whether to write a held-back
+    /// entry about a withholding at all, which <see cref="HasWithholdingToReport"/>
+    /// answers, and which of the two sentences the machine has earned. It writes none for
     /// <see cref="WithholdingAccount.Nothing"/> and
     /// <see cref="WithholdingAccount.KeptWithoutNotice"/> alike. Asking
     /// whether <see cref="WithheldFiles"/> is empty answers neither question, and nor
@@ -665,39 +663,14 @@ public record ScanResult(
     }
 
     /// <summary>
-    /// Whether the command line has a held-back sentence to print for this run's
-    /// withholding: false for <see cref="WithholdingAccount.Nothing"/> and
+    /// Whether the command line has a held-back Application log entry to write for this
+    /// run's withholding: false for <see cref="WithholdingAccount.Nothing"/> and
     /// <see cref="WithholdingAccount.KeptWithoutNotice"/>, true for every other
     /// reading. Written as the two readings with no such sentence excluded, so a reading
     /// added to the enum is reported rather than silenced.
     /// </summary>
     public bool HasWithholdingToReport =>
         Withholding is not (WithholdingAccount.Nothing or WithholdingAccount.KeptWithoutNotice);
-
-    /// <summary>
-    /// Whether the conditions the command line can name account for every file
-    /// <see cref="UnestablishedWithheldCount"/> counts: the wholesale arm, spoken for by
-    /// <see cref="WithholdingLegsFired"/>, and the arms
-    /// <see cref="WithholdingSplit.ArmsFired"/> can return.
-    ///
-    /// WHERE IT IS FALSE, A LIST OF REASONS UNDER THE HELD-BACK SENTENCE WOULD BE SHORT
-    /// OF THE FILES THAT SENTENCE COUNTS, so the command line prints the sentence on its
-    /// own. The scan-signal arm, the clock-set-back arm, the age-unestablished arm and the
-    /// two containment arms have no line in that list and are the arms that make it false; a file no arm
-    /// counted makes it false too.
-    ///
-    /// WRITTEN AS THE NAMED ARMS ADDING UP TO THE COUNT, so an arm added to
-    /// <see cref="WithholdingSplit"/> later without a reason line makes it false rather
-    /// than leaving a list that leaves its files out.
-    /// </summary>
-    public bool NamedConditionsCoverEveryHeldBackFile =>
-        WithheldBy.WholesaleCount
-        + WithheldBy.IdentityUnestablishedCount
-        + WithheldBy.DeclaredProductUnestablishedCount
-        + WithheldBy.ScreenUnansweredCount
-        + WithheldBy.DeclaredPatchUnestablishedCount
-        + WithheldBy.SecondCopyUnestablishedCount
-        == UnestablishedWithheldCount;
 
     /// <summary>
     /// How many files this scan held back without establishing that anything needs them:
@@ -719,9 +692,9 @@ public record ScanResult(
     /// no arm counted, or one counted by an arm added to <see cref="WithholdingSplit"/>
     /// later, is counted here.
     ///
-    /// THE COMMAND LINE DOES NOT READ IT. It speaks
-    /// <see cref="UnestablishedWithheldCount"/> and <see cref="SupersededHeldBackCount"/> in
-    /// separate sentences, and the first of those leaves out the files
+    /// THE COMMAND LINE DOES NOT READ IT. Its Application log entries count
+    /// <see cref="UnestablishedWithheldCount"/> and <see cref="SupersededHeldBackCount"/>
+    /// separately, and the first of those leaves out the files
     /// <see cref="WithholdingSplit.NotBeforeTheClockCount"/> counts.
     /// </summary>
     public int UnsettledHeldBackCount =>
@@ -733,7 +706,7 @@ public record ScanResult(
     /// <summary>
     /// How many superseded files this scan kept back from the offer: those
     /// <see cref="WithheldCount"/> counts, and those the containment check refused or could
-    /// not answer for. The command line's superseded line prints it, and
+    /// not answer for. The command line's Application log entry for them counts it, and
     /// <see cref="UnsettledHeldBackCount"/> takes it in, so a superseded file held back keeps
     /// the all-clear off the window's finished screen.
     ///
@@ -824,11 +797,11 @@ public record ScanResult(
 }
 
 /// <summary>
-/// What a scan's withholding amounts to, in the terms the command line has to speak it.
-/// The window's finished screen does not read it; it reads
+/// What a scan's withholding amounts to, in the terms the command line's Application log
+/// entries speak it. The window's finished screen does not read it; it reads
 /// <see cref="ScanResult.IsAllClear"/>.
 ///
-/// THE COMMAND LINE PRINTS NO HELD-BACK SENTENCE FOR <see cref="Nothing"/> AND
+/// THE COMMAND LINE WRITES NO HELD-BACK ENTRY FOR <see cref="Nothing"/> AND
 /// <see cref="KeptWithoutNotice"/> AND FOR NOTHING ELSE, through
 /// <see cref="ScanResult.HasWithholdingToReport"/>, and speaks the wholesale sentence for
 /// <see cref="WholeWalkOffer"/> and the per-file one for every other member. A member
@@ -843,7 +816,7 @@ public enum WithholdingAccount
 {
     /// <summary>
     /// This scan kept nothing back from the folder walk, so the command line's walk
-    /// sentence has nothing to count.
+    /// entry has nothing to count.
     /// </summary>
     Nothing,
 
@@ -861,7 +834,7 @@ public enum WithholdingAccount
     /// were unneeded. A run that kept files back both ways reads as this, the wholesale
     /// sentence being false of the half it did not cover.
     ///
-    /// THE COMMAND LINE'S SENTENCE COUNTS
+    /// THE COMMAND LINE'S ENTRY COUNTS
     /// <see cref="ScanResult.UnestablishedWithheldCount"/>, NOT THE WHOLE LIST, so a file
     /// any of those three counts is left out of it. A file the age check kept because its
     /// times were not established is in it, so is a file held because an in-progress
@@ -880,7 +853,7 @@ public enum WithholdingAccount
     /// Installer's in-progress signals clear just after it, which every later scan judges
     /// afresh. The third is a patch copy whose declared patch Windows holds a registration
     /// of, where at least one registration records no cached copy the check could show is a
-    /// different file. The command line prints no held-back sentence for these files, as on
+    /// different file. The command line writes no held-back entry for these files, as on
     /// a run that kept nothing back, and the files stay among those left alone; where any is
     /// of the second kind, it prints the line about those files
     /// (<see cref="Helpers.RecentChangeReport"/>), which stands in place of its clean line
@@ -1048,11 +1021,8 @@ public static class ShortNameCreationLabels
 /// <see cref="ScanResult.UnestablishedWithheldCount"/> and
 /// <see cref="ScanResult.Withholding"/>, and the first and last of those three by
 /// <see cref="ScanResult.UnsettledHeldBackCount"/> as well. The wholesale count is read
-/// by <see cref="ScanResult.Withholding"/> and
-/// <see cref="ScanResult.NamedConditionsCoverEveryHeldBackFile"/>. The scan-signal, the
-/// clock-set-back, the age-unestablished and the two containment counts are read by <see cref="Total"/>
-/// alone, and the remaining five by <see cref="ArmsFired"/> and
-/// <see cref="ScanResult.NamedConditionsCoverEveryHeldBackFile"/>.
+/// by <see cref="ScanResult.Withholding"/>. Every other count is read by
+/// <see cref="Total"/> alone.
 ///
 /// <see cref="Total"/> IS WHAT HOLDS THE PARTITION HONEST, and it is asserted against
 /// the list's own length rather than trusted. A partition is a partition until
@@ -1203,108 +1173,6 @@ public readonly record struct WithholdingSplit(
         + SecondCopyUnestablishedCount
         + ScanSignalCount
         + ClockSetBackCount;
-
-    /// <summary>
-    /// Which of the per-file decisions the scan could not settle kept anything back,
-    /// in declaration order, for the command line, which explains the withholding
-    /// rather than only reporting it.
-    ///
-    /// THE WHOLESALE ARM IS NOT AMONG THEM. <see cref="WholesaleCount"/> counts files
-    /// kept back on a condition about the machine's records, and
-    /// <see cref="ScanResult.WithholdingLegsFired"/> already names which of those
-    /// conditions held. A line built on the count would say less than the legs do and
-    /// would say it a second time.
-    ///
-    /// NOR ARE THE DECLARED-PRODUCT-INSTALLED, NOT-BEFORE-THE-CLOCK,
-    /// DECLARED-PATCH-REGISTERED, SCAN-SIGNAL, CLOCK-SET-BACK, AGE-UNESTABLISHED AND TWO
-    /// CONTAINMENT ARMS, so the command line's list of reasons names none of them. It says
-    /// nothing of the first three in its held-back sentences; the second has a line of its
-    /// own (<see cref="Helpers.RecentChangeReport"/>). The others are spoken of in its
-    /// per-file sentence, the scan-signal and clock-set-back arms' files with a line of their
-    /// own beside it (<see cref="Helpers.ScanSignalReport"/>), and
-    /// <see cref="ScanResult.NamedConditionsCoverEveryHeldBackFile"/> is what tells it
-    /// that such files are among those the sentence counts. The window's finished screen
-    /// names no reasons in its count, and counts the not-before-the-clock, scan-signal,
-    /// clock-set-back, age-unestablished and containment arms' files among those it says
-    /// were held back.
-    ///
-    /// A MEMBER MEANS ONE DECISION KEPT AT LEAST ONE FILE, AND NEVER A CAUSE FOR ANY
-    /// PARTICULAR ONE. Any combination of them can hold at once, so nothing sums over
-    /// this list: <see cref="Total"/> is the sum, and it answers how many rather than
-    /// why any single file is on the list.
-    /// </summary>
-    public IReadOnlyList<WithholdingSplitArm> ArmsFired
-    {
-        get
-        {
-            var fired = new List<WithholdingSplitArm>(5);
-
-            if (IdentityUnestablishedCount > 0)
-                fired.Add(WithholdingSplitArm.IdentityUnestablished);
-            if (DeclaredProductUnestablishedCount > 0)
-                fired.Add(WithholdingSplitArm.DeclaredProductUnestablished);
-            if (ScreenUnansweredCount > 0)
-                fired.Add(WithholdingSplitArm.ScreenUnanswered);
-            if (DeclaredPatchUnestablishedCount > 0)
-                fired.Add(WithholdingSplitArm.DeclaredPatchUnestablished);
-            if (SecondCopyUnestablishedCount > 0)
-                fired.Add(WithholdingSplitArm.SecondCopyUnestablished);
-
-            return fired;
-        }
-    }
-}
-
-/// <summary>
-/// The per-file withholding decisions the scan could not settle, one member per arm of
-/// <see cref="WithholdingSplit"/> that speaks for itself. The wholesale arm is spoken
-/// for by the legs, and the declared-product-installed, not-before-the-clock,
-/// declared-patch-registered, scan-signal, clock-set-back, age-unestablished and two
-/// containment arms have no line in that list, so none of them has a member.
-///
-/// ONE MEMBER PER ARM RATHER THAN ONE PER CAUSE. They are different inabilities, so
-/// nothing may add them together or write one sentence over them that names a cause.
-///
-/// THE ORDER IS THE ORDER THEY ARE REPORTED IN, and it is the order of the arms they
-/// name, so a reader holding a breakdown against <see cref="WithholdingSplit"/> meets
-/// them the same way in each.
-/// </summary>
-public enum WithholdingSplitArm
-{
-    /// <summary>A file in the folder would not identify itself.</summary>
-    IdentityUnestablished,
-
-    /// <summary>
-    /// A file would not say which product it belongs to, or Windows would not answer
-    /// about the product it named. Two inabilities under one arm, as the verdict they
-    /// come from keeps them.
-    /// </summary>
-    DeclaredProductUnestablished,
-
-    /// <summary>
-    /// The screen answered about a different number of files than it was handed, so
-    /// none of its answers could be read against a file.
-    /// </summary>
-    ScreenUnanswered,
-
-    /// <summary>
-    /// A patch copy would not say which patch it is, or would not say which products it
-    /// is for, or Windows would not fully answer which installations hold the patch it
-    /// named. Several inabilities under one arm, as the verdict they come from keeps
-    /// them.
-    /// </summary>
-    DeclaredPatchUnestablished,
-
-    /// <summary>
-    /// An installation the scan could not rule out as a second copy of a program opens
-    /// packages that could not all be seen, or an installation's cached package would not
-    /// say which program it belongs to, its own record did not show it to be an ordinary
-    /// installation, and it is not shown to have no package for Windows Installer to open,
-    /// or a product key no installation accounts for left a second copy not ruled out. Each
-    /// way a file could be a package such an installation opens. Several findings under one
-    /// arm, as the verdict they come from keeps them.
-    /// </summary>
-    SecondCopyUnestablished,
 }
 
 /// <summary>
@@ -1312,11 +1180,8 @@ public enum WithholdingSplitArm
 ///
 /// THEY ARE CONDITIONS THE RUN MET AND NOT A PARTITION OF ANY FILE SET. Any
 /// combination of them can hold at once and none of them counts anything, so nothing
-/// sums over these and no line built on one may state a cause for the files that were
-/// withheld.
-///
-/// THE ORDER IS THE ORDER THEY ARE REPORTED IN, so a reader meeting two of them meets
-/// them the same way twice.
+/// sums over these and no sentence built on one may state a cause for the files that
+/// were withheld.
 /// </summary>
 public enum WithholdingLeg
 {
@@ -1345,12 +1210,12 @@ public enum WithholdingLeg
 /// The one place the walk-offer withholding is decided, and the reason it is a type
 /// rather than an expression written twice.
 ///
-/// THE GATE AND THE HOST THAT EXPLAINS IT READ THE SAME CALL. The scan asks whether
-/// anything fired; the command line asks which. Written as two expressions they agree
-/// until one of them changes, after which the gate can grow a condition the breakdown
-/// under it does not name, every test still green and the output
-/// still looking like an answer. Here a leg added to the enum is a leg the gate acts
-/// on and a leg the host prints, and a leg added without a line is a failing test.
+/// THE GATE AND THE LIST OF WHICH LEGS FIRED READ THE SAME CALL. The scan asks whether
+/// anything fired; <see cref="ScanResult.WithholdingLegsFired"/> asks which. Written as
+/// two expressions they agree until one of them changes, after which the gate can grow a
+/// condition the list does not name, every test still green and the output still
+/// looking like an answer. Here a leg added to the enum is a leg the gate acts on and
+/// a leg the list names.
 /// </summary>
 public static class WithholdingLegs
 {

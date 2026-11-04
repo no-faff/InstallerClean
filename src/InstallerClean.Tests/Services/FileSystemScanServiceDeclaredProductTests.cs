@@ -268,12 +268,9 @@ public class FileSystemScanServiceDeclaredProductTests
         var kept = Assert.Single(result.WithheldFiles!);
         Assert.Equal($@"{Folder}\a.msi", kept.FullPath);
         Assert.Equal(1, result.WithheldBy.DeclaredProductInstalledCount);
-        // The file's size goes to the declared-product-installed arm's byte
-        // figure, so the held-back sentences, which leave this file out, are left
-        // nothing to count.
-        Assert.Equal(kept.SizeBytes, result.WithheldDeclaredProductInstalledBytes);
+        // The held-back sentences leave this file out, so they are left nothing to
+        // count.
         Assert.Equal(0, result.UnestablishedWithheldCount);
-        Assert.Equal(0, result.UnestablishedWithheldBytes);
         Assert.Equal(WithholdingAccount.KeptWithoutNotice, result.Withholding);
     }
 
@@ -413,8 +410,8 @@ public class FileSystemScanServiceDeclaredProductTests
         // copy.msp declares patch Q, which Windows holds registered against product A,
         // and that registration records no cached copy. The screen cannot see which
         // copy the registration opens, so copy.msp could be it. It is treated the way
-        // a file kept for an installed program is: counted in its own arm with its
-        // size, and left out of the held-back sentences.
+        // a file kept for an installed program is: counted in its own arm, and left
+        // out of the held-back sentences.
         var (msi, identities, files) = APatchCopyBesideTheRecordedCopy();
         msi.RecordsPatchPackage(PatchQ, ProductA, null, MsiInstallContext.Machine, "");
 
@@ -425,9 +422,7 @@ public class FileSystemScanServiceDeclaredProductTests
         Assert.Equal($@"{Folder}\copy.msp", kept.FullPath);
         Assert.Equal(1, result.WithheldBy.DeclaredPatchRegisteredCount);
         Assert.Equal(result.WithheldFiles!.Count, result.WithheldBy.Total);
-        Assert.Equal(kept.SizeBytes, result.WithheldDeclaredPatchRegisteredBytes);
         Assert.Equal(0, result.UnestablishedWithheldCount);
-        Assert.Equal(0, result.UnestablishedWithheldBytes);
         Assert.Equal(WithholdingAccount.KeptWithoutNotice, result.Withholding);
         Assert.False(result.HasWithholdingToReport);
     }
@@ -467,7 +462,6 @@ public class FileSystemScanServiceDeclaredProductTests
         Assert.Equal($@"{Folder}\copy.msp", offered.FullPath);
         Assert.Empty(result.WithheldFiles!);
         Assert.Equal(0, result.WithheldBy.DeclaredPatchRegisteredCount);
-        Assert.Equal(0, result.WithheldDeclaredPatchRegisteredBytes);
         Assert.Empty(msi.PatchSourceListWalks);
     }
 
@@ -476,9 +470,8 @@ public class FileSystemScanServiceDeclaredProductTests
     {
         // The scan that offers copy.msp, with the machine-wide patch enumeration refusing
         // at its first row. The screen cannot find the registrations of patch Q, so
-        // copy.msp is kept, counted in the patch half's unsettled arm with no byte
-        // figure of its own, and among the files the held-back sentences speak of,
-        // with a reason line of its own.
+        // copy.msp is kept, counted in the patch half's unsettled arm, and among the
+        // files the held-back sentences speak of.
         var (msi, identities, files) = APatchCopyBesideTheRecordedCopy();
         msi.RecordsPatchPackage(PatchQ, ProductA, null, MsiInstallContext.Machine, $@"{Folder}\cached.msp");
         msi.PatchEnumerationAnswersAt(0, MsiError.AccessDenied);
@@ -490,12 +483,8 @@ public class FileSystemScanServiceDeclaredProductTests
         Assert.Equal($@"{Folder}\copy.msp", kept.FullPath);
         Assert.Equal(1, result.WithheldBy.DeclaredPatchUnestablishedCount);
         Assert.Equal(result.WithheldFiles!.Count, result.WithheldBy.Total);
-        Assert.Equal(0, result.WithheldDeclaredPatchRegisteredBytes);
         Assert.Equal(1, result.UnestablishedWithheldCount);
-        Assert.Equal(kept.SizeBytes, result.UnestablishedWithheldBytes);
         Assert.Equal(WithholdingAccount.PerFile, result.Withholding);
-        Assert.Equal(new[] { WithholdingSplitArm.DeclaredPatchUnestablished }, result.WithheldBy.ArmsFired);
-        Assert.True(result.NamedConditionsCoverEveryHeldBackFile);
     }
 
     private const string PatchQ = "{33333333-3333-3333-3333-333333333333}";

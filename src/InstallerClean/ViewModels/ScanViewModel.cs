@@ -326,13 +326,7 @@ public partial class ScanViewModel : ObservableObject
     public void NotifyExternallyBlockedChanged() =>
         ScanCommand.NotifyCanExecuteChanged();
 
-    public string RegisteredSummaryText =>
-        string.Format(
-            DisplayHelpers.Pluralise(RegisteredFileCount,
-                Strings.Summary_RegisteredStillUsed_Singular,
-                Strings.Summary_RegisteredStillUsed_Plural,
-                "Summary.RegisteredStillUsed"),
-            DisplayHelpers.FormatCount(RegisteredFileCount));
+    public string RegisteredSummaryText => LeftAloneReport.Line(RegisteredFileCount);
 
     public string OrphanedSummaryText =>
         string.Format(
@@ -395,36 +389,17 @@ public partial class ScanViewModel : ObservableObject
             // probing first would miss it.
             var pendingRebootResult = await Task.Run(() => _rebootService.Check(), cancellationToken);
 
-            // THE LEFT-ALONE LINE COUNTS THE WITHHELD FILES TOO, so that it and the
-            // offer between them take in every file a registration names and every
-            // file on the scan's candidate list. THE PROPERTY IS THE ACCOUNTING, NOT
-            // THE NUMBER OF TERMS: a withheld file is in neither population
-            // otherwise, being neither offered nor a registered row, because no
-            // registration names it. The two lines would then leave every withheld
-            // file out, with the difference shown nowhere, which is exactly what this
-            // term exists to prevent. Anything added here later has to close it
-            // again.
+            // THE LEFT-ALONE COUNT IS THE RESULT'S OWN, which the command line prints from
+            // the same property (ScanResult.LeftAloneCount), and it includes the withheld
+            // files. The size beside it is summed over the same two populations: the
+            // registered files on the disk, whose total RegisteredTotalBytes sums under the
+            // same existence test the count uses, and the withheld files.
             //
-            // NO CAUSE TRAVELS WITH IT to this line, and none may be added. What the
-            // user sees is that the app left these alone, which is true of every file
-            // in both populations; why any particular one was left is not a sentence
-            // this line can carry.
-            //
-            // The Details window's own header counts the same two populations, off
-            // the same lists, because the two are one click apart and a reader
-            // comparing them must not find them disagreeing.
-            //
-            // A REGISTRATION WHOSE FILE IS GONE IS NOT ONE OF THESE. The line says files
-            // were left alone; a file that is not in the folder was not left alone, and
-            // there is nothing on the disk for the size beside it to measure.
-            // RegisteredTotalBytes is summed under the same existence test the scan
-            // settles the split on, so the count reads it the same way and the two
-            // describe one population. The Details window's footer works off the same
-            // set and says how many are missing, which is where that figure belongs:
-            // this line carries no cause and the missing rows are not on this screen.
+            // The Details window's own header counts the same two populations, off the
+            // same lists, because the two are one click apart and a reader comparing them
+            // must not find them disagreeing.
             var withheld = result.WithheldFiles ?? Array.Empty<OrphanedFile>();
-            var registeredCount =
-                result.RegisteredPackages.Count(p => !p.IsMissingFromDisk) + withheld.Count;
+            var registeredCount = result.LeftAloneCount;
             var registeredSize = DisplayHelpers.FormatSize(
                 result.RegisteredTotalBytes + withheld.Sum(f => f.SizeBytes));
             var orphanedCount = result.RemovableFiles.Count;
