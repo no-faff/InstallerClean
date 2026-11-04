@@ -504,7 +504,7 @@ const MAP = {
   'Cli.ScanSignal.LockUnreadableWindowsError': `Quando a análise começou, o InstallerClean não conseguiu verificar se o Windows Installer estava ocupado, porque o Windows deu um erro: {0} (erro {1}). Então ele reteve os arquivos de {InstallerFolder} que não são nomeados nos registros de nenhum programa instalado, em vez de oferecê-los. Reinicie o Windows e execute o comando de novo.`,
   'Cli.ScanSignal.Other': `O Windows Installer tinha algo em andamento ou pendente quando a análise começou, então o InstallerClean reteve os arquivos de {InstallerFolder} que não são nomeados nos registros de nenhum programa instalado, em vez de oferecê-los. Execute o comando de novo quando isso se resolver.`,
   'Cli.ScanSignal.ClockSetBack': `O relógio deste PC voltou atrás ou atrasou durante a análise, então o InstallerClean reteve os arquivos de {InstallerFolder} que não são nomeados nos registros de nenhum programa instalado, em vez de oferecê-los. Execute o comando de novo.`,
-  'Cli.FoundNoOrphans': `Nenhum arquivo desnecessário encontrado.`,
+  'Cli.FoundNoOrphans': `Nenhum arquivo desnecessário identificado.`,
   'Cli.DestinationChangedMidBatch': `O InstallerClean não pôde mais confirmar a pasta de backup, então parou. Verifique {0} e execute o comando de novo.`,
   'Cli.Help.Summary': `Remove arquivos .msi/.msp em cache que nenhum programa instalado precisa.`,
   'Cli.Help.Elevation': `Exige um prompt como administrador; sem ele, não faz a análise.`,
@@ -514,8 +514,6 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `O InstallerClean não conseguiu obter o bloqueio que o Windows Installer usa para impedir que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho, e nada foi movido. Tente de novo, e reinicie o Windows se continuar acontecendo.`,
   'Cli.InstallerLockUnavailable': `Erro: o InstallerClean não conseguiu obter o bloqueio do Windows Installer que impede que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho. Nada foi excluído. Tente de novo, e reinicie o Windows se continuar acontecendo.`,
   'Cli.MoveInstallerLockUnavailable': `Erro: o InstallerClean não conseguiu obter o bloqueio do Windows Installer que impede que dois programas alterem software instalado ao mesmo tempo, então não pôde descartar que um arquivo se tornasse necessário no meio do caminho. Nada foi movido. Tente de novo, e reinicie o Windows se continuar acontecendo.`,
-  'Completion.ReverifyIdentityClaimed': `{0} {1} mantidos no lugar, porque o Windows tem um registro do programa nomeado lá dentro.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} mantidos no lugar, porque o InstallerClean não encontrou nenhum programa nomeado lá dentro.`,
   'Error.ScanNoRegisteredFileInFolder': `O InstallerClean não conseguiu casar os registros do Windows Installer com o conteúdo de {InstallerFolder}. A pasta tem arquivos, mas nenhum registro aponta para nada lá dentro, então não foi possível mostrar que algum arquivo fosse desnecessário. Nada foi oferecido e nada foi removido.`,
   'Error.ScanInstallerFolderElsewhere': `O InstallerClean não pode analisar {InstallerFolder} neste PC. O Windows informa essa pasta como {0}, e o InstallerClean só analisa uma pasta Installer que o Windows informe em seu próprio caminho. Nada foi oferecido e nada foi removido.`,
   'Completion.NothingOffered': `Nada oferecido neste PC`,
@@ -671,13 +669,6 @@ const OVERRIDES = {
   'Cli.DeletedFiles.One': `Foi excluído permanentemente {0} {1} desnecessário.`,
   'Cli.MovingFiles.One': `Movendo {0} {1} desnecessário para {2}...`,
   'Cli.MovedFiles.One': `Foi movido {0} {1} desnecessário.`,
-  // Participle agreement only: "mantido" for a single file.
-  // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
-  // one of the two retired identity causes: no code reads it, so nothing passes
-  // the prefix to Pluralise and the override could never be selected.
-  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
-  // what says so. The base string itself stays translated, which is the point of
-  // keeping those two keys at all.
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

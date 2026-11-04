@@ -178,8 +178,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | 已將 {0} 個{1}移到：{2} |
 | {0} file held back. The scan said it was unneeded. The final check couldn't confirm that. | 已保留 {0} 個檔案。掃描認為它不需要，但最後的檢查無法確認這一點。 |
 | {0} files held back. The scan said these were unneeded. The final check couldn't confirm that. | 已保留 {0} 個檔案。掃描認為它們不需要，但最後的檢查無法確認這一點。 |
-| {0} {1} kept in place, because Windows has a record of the program named inside. | 有 {0} 個{1}留在原處，因為 Windows 有檔案內所標示程式的記錄。 |
-| {0} {1} kept in place, because InstallerClean couldn't find a program named inside. | 有 {0} 個{1}留在原處，因為 InstallerClean 在檔案內找不到程式名稱。 |
 | Moved {0} of {1} {2} to {3} before you cancelled. | 在您取消前，已將 {1} 個{2}中的 {0} 個移到 {3}。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久刪除 {1} 個{2}中的 {0} 個。 |
 | It's simple to undo. Move them back into {InstallerFolder} and everything will be back to how it was. | 要復原很簡單。把它們移回 {InstallerFolder}，一切就會恢復原狀。 |
@@ -499,28 +497,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: unexpected failure ({0}). The crash log could not be written. | 錯誤：未預期的失敗（{0}）。無法寫入當機記錄檔。 |
 | Scanning {InstallerFolder}... | 正在掃描 {InstallerFolder}... |
 | Found {0} unneeded {1} to clean up ({2}). | 找到 {0} 個可清理的不需要的{1}（{2}）。 |
-| Found no unneeded files. | 沒有找到不需要的檔案。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean 無法確定快取中的哪些檔案屬於這裡安裝的程式，因此沒有提供那 1 個檔案（{2}），而是把它保留了下來。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean 無法確定快取中的哪些檔案屬於這裡安裝的程式，因此沒有提供 {0} 個{1}（{2}），而是把它們保留了下來。 |
-| InstallerClean couldn't establish that one file is unneeded, so it has held it back ({2}) rather than offering it. | InstallerClean 無法證實 1 個檔案是不需要的，因此沒有提供它（{2}），而是把它保留了下來。 |
-| InstallerClean couldn't establish that {0} {1} are unneeded, so it has held them back ({2}) rather than offering them. | InstallerClean 無法證實 {0} 個{1}是不需要的，因此沒有提供它們（{2}），而是把它們保留了下來。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back the one file ({2}) rather than offering it. | InstallerClean 無法確定快取中的哪些檔案屬於這裡安裝的程式，因此沒有提供那 1 個檔案（{2}），而是把它保留了下來。 |
-| InstallerClean couldn't be certain which cached files belong to the programs installed here, so it has held back {0} {1} ({2}) rather than offering them. | InstallerClean 無法確定快取中的哪些檔案屬於這裡安裝的程式，因此沒有提供 {0} 個{1}（{2}），而是把它們保留了下來。 |
-| InstallerClean couldn't establish that one file is unneeded, so it has held it back ({2}) rather than offering it. | InstallerClean 無法證實 1 個檔案是不需要的，因此沒有提供它（{2}），而是把它保留了下來。 |
-| InstallerClean couldn't establish that {0} {1} are unneeded, so it has held them back ({2}) rather than offering them. | InstallerClean 無法證實 {0} 個{1}是不需要的，因此沒有提供它們（{2}），而是把它們保留了下來。 |
-| Why it couldn't be certain: | 無法確定的原因： |
-|   A file path in Windows Installer's own records wouldn't resolve, so nothing could be matched to it. |   Windows Installer 自己的記錄中有一個檔案路徑無法解析，因此沒有任何內容能與它對應。 |
-|   A file Windows has a record of couldn't be identified, so it couldn't be matched to what's in the folder. |   Windows 有記錄的某個檔案無法辨識，因此無法與資料夾中的內容對應。 |
-|   A program may be installed more than once on this PC, and the records can't say which copy a file belongs to. |   某個程式可能在這台電腦上安裝了不只一次，而記錄無法說明某個檔案屬於哪一份。 |
-|   Part of Windows Installer's records wouldn't read, so a file could belong to a program recorded there. |   Windows Installer 記錄的一部分無法讀取，因此某個檔案可能屬於記錄在其中的某個程式。 |
-|   A file in the folder couldn't be identified, so it couldn't be matched against the records. |   資料夾中的某個檔案無法辨識，因此無法與記錄對應。 |
-|   Either a file wouldn't say which program it belongs to, or Windows wouldn't give a clear answer about that program. |   可能是某個檔案沒有說明它屬於哪個程式，也可能是 Windows 對該程式沒有給出明確的答覆。 |
-|   A check on which programs the files belong to gave answers that didn't line up with the files it was handed. |   一項檢查這些檔案屬於哪些程式的作業，給出的答覆與交給它的檔案對不上。 |
-|   Either a patch file wouldn't say which patch it is, or it wouldn't say which programs it's for, or Windows wouldn't say in full which programs have that patch. |   可能是某個修補程式檔案沒有說明它是哪個修補程式，或沒有說明它適用於哪些程式，也可能是 Windows 沒有完整說明哪些程式套用了該修補程式。 |
+| No unneeded files identified. | 沒有識別出不需要的檔案。 |
 | Windows has a record for {0} file that is not in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. To put the file back, you need the installer for the version you already have. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs this file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows 記錄了 {0} 個不在 {InstallerFolder} 中的檔案：{1}。平常使用不會有問題，但該程式的更新或解除安裝可能會失敗。要把這個檔案放回去，您需要目前所用版本的安裝程式。請向該程式的開發者取得，然後直接執行它，覆蓋安裝現有的程式。較新的版本不行：新版本必須先移除您現有的版本，而需要這個檔案的正是這個步驟。先解除安裝也行不通，原因相同。這應該會復原這個檔案並保留您的設定，但 Microsoft 並不保證。 |
 | Windows has records for {0} files that are not in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. To put a file back, you need the installer for the version you already have of that program. Get it from the program's maker and run it over your existing copy. A newer version won't do: it has to remove the one you've got first, and that's the step that needs the file. Uninstalling first won't work either, for the same reason. This should restore the file and leave your settings alone, but Microsoft doesn't guarantee it. | Windows 記錄了 {0} 個不在 {InstallerFolder} 中的檔案：{1}。平常使用不會有問題，但這些程式的更新或解除安裝可能會失敗。要把某個檔案放回去，您需要該程式目前所用版本的安裝程式。請向該程式的開發者取得，然後直接執行它，覆蓋安裝現有的程式。較新的版本不行：新版本必須先移除您現有的版本，而需要該檔案的正是這個步驟。先解除安裝也行不通，原因相同。這應該會復原該檔案並保留您的設定，但 Microsoft 並不保證。 |
-| InstallerClean couldn't be certain that the one superseded file is no longer needed, so it has held it back. | InstallerClean 無法確定那一個已被取代的檔案已不再需要，因此保留了它。 |
-| InstallerClean couldn't be certain that {0} superseded files are no longer needed, so it has held them back. | InstallerClean 無法確定 {0} 個已被取代的檔案已不再需要，因此保留了它們。 |
 | InstallerClean stopped waiting for drive {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | InstallerClean 已不再等候磁碟機 {0}，並將仍需與它核對的檔案都原樣保留。等它恢復正常回應後，請再執行一次命令。 |
 | InstallerClean stopped waiting for {0} and left alone any file still to be checked against it. Once it's responding normally, run the command again. | InstallerClean 已不再等候 {0}，並將仍需與它核對的檔案都原樣保留。等它恢復正常回應後，請再執行一次命令。 |
 | InstallerClean stopped waiting for more than one drive or share ({0}) and left alone any file still to be checked against one of them. Once they're responding normally, run the command again. | InstallerClean 已不再等候多個磁碟機或共用資料夾（{0}），並將仍需與其中任何一個核對的檔案都原樣保留。等它們恢復正常回應後，請再執行一次命令。 |

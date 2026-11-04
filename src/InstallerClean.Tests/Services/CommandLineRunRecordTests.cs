@@ -53,6 +53,8 @@ public class CommandLineRunRecordTests
     [InlineData(@"Move mode (/m) aborted: destination C:\Windows\Installer\x is inside C:\Windows\Installer.")]
     [InlineData("/s mode: no unneeded files.")]
     [InlineData("/d mode: no unneeded files.")]
+    [InlineData("/s mode: no unneeded files identified.")]
+    [InlineData("/d mode: no unneeded files identified.")]
     [InlineData("/d mode: nothing could be offered. InstallerClean could not establish that any of the cached files it found are unneeded, so it has held back 12 files. No action taken.")]
     [InlineData("/d mode cancelled at the console before any work was done. No action taken.")]
     [InlineData("/d mode cancelled before any work was done. No action taken.")]

@@ -91,12 +91,6 @@ const OVERRIDES = {
   'Cli.DeletedFiles.One': `Se eliminó definitivamente {0} {1} innecesario.`,
   'Cli.MovingFiles.One': `Moviendo {0} {1} innecesario a {2}...`,
   'Cli.MovedFiles.One': `Se movió {0} {1} innecesario.`,
-  // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
-  // one of the two retired identity causes: no code reads it, so nothing passes
-  // the prefix to Pluralise and the override could never be selected.
-  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
-  // what says so. The base string itself stays translated, which is the point of
-  // keeping those two keys at all.
 };
 
 const MAP = {
@@ -436,7 +430,7 @@ const MAP = {
   'Cli.ScanSignal.LockUnreadableWindowsError': `Cuando empezó el análisis, InstallerClean no pudo comprobar si Windows Installer estaba ocupado, porque Windows dio un error: {0} (error {1}). Así que retuvo los archivos de {InstallerFolder} que no aparecen nombrados en los registros de ningún programa instalado, en lugar de ofrecerlos. Reinicia Windows y vuelve a ejecutar el comando.`,
   'Cli.ScanSignal.Other': `Windows Installer tenía algo en curso o pendiente cuando empezó el análisis, así que InstallerClean retuvo los archivos de {InstallerFolder} que no aparecen nombrados en los registros de ningún programa instalado, en lugar de ofrecerlos. Vuelve a ejecutar el comando cuando eso se haya resuelto.`,
   'Cli.ScanSignal.ClockSetBack': `El reloj de este equipo retrocedió o se atrasó mientras se ejecutaba el análisis, así que InstallerClean retuvo los archivos de {InstallerFolder} que no aparecen nombrados en los registros de ningún programa instalado, en lugar de ofrecerlos. Vuelve a ejecutar el comando.`,
-  'Cli.FoundNoOrphans': `No se encontraron archivos innecesarios.`,
+  'Cli.FoundNoOrphans': `No se identificaron archivos innecesarios.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean ya no pudo confirmar la carpeta de copia de seguridad, así que se detuvo. Comprueba {0} y vuelve a ejecutar el comando.`,
   'Cli.Help.Summary': `Quita archivos .msi/.msp en caché que ningún programa instalado necesita.`,
   'Cli.Help.Elevation': `Requiere símbolo del sistema como administrador; sin él no analiza.`,
@@ -446,8 +440,6 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean no pudo tomar el bloqueo que usa Windows Installer para impedir que dos programas cambien el software instalado a la vez, así que no pudo descartar que un archivo pasara a ser necesario a mitad de camino, y no se ha movido nada. Inténtalo de nuevo, y reinicia Windows si sigue ocurriendo.`,
   'Cli.InstallerLockUnavailable': `Error: InstallerClean no pudo tomar el bloqueo de Windows Installer que impide que dos programas cambien el software instalado a la vez, así que no pudo descartar que un archivo pasara a ser necesario a mitad de camino. No se ha eliminado nada. Inténtalo de nuevo, y reinicia Windows si sigue ocurriendo.`,
   'Cli.MoveInstallerLockUnavailable': `Error: InstallerClean no pudo tomar el bloqueo de Windows Installer que impide que dos programas cambien el software instalado a la vez, así que no pudo descartar que un archivo pasara a ser necesario a mitad de camino. No se ha movido nada. Inténtalo de nuevo, y reinicia Windows si sigue ocurriendo.`,
-  'Completion.ReverifyIdentityClaimed': `{0} {1} conservados en su sitio, porque Windows tiene un registro del programa que se nombra dentro.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} conservados en su sitio, porque InstallerClean no encontró ningún programa nombrado dentro.`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean no pudo hacer coincidir los registros de Windows Installer con el contenido de {InstallerFolder}. La carpeta tiene archivos, pero ni un solo registro señala nada de lo que hay ahí, así que no se pudo demostrar que ningún archivo fuera innecesario. No se ha ofrecido nada y no se ha quitado nada.`,
   'Error.ScanInstallerFolderElsewhere': `InstallerClean no puede analizar {InstallerFolder} en este PC. Windows sitúa esa carpeta en {0}, e InstallerClean solo analiza una carpeta Installer que Windows sitúe en su propia ruta. No se ha ofrecido nada y no se ha quitado nada.`,
   'Completion.NothingOffered': `No se ofreció nada en este PC`,

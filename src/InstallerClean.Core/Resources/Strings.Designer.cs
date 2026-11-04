@@ -373,8 +373,6 @@ public static class Strings
     public static string Completion_ReportPanel_ShortNames => Get("Completion.ReportPanel.ShortNames");
     public static string Completion_ReportPanel_Waits => Get("Completion.ReportPanel.Waits");
     public static string Completion_ReportPanel_Windows => Get("Completion.ReportPanel.Windows");
-    public static string Completion_ReverifyIdentityClaimed => Get("Completion.ReverifyIdentityClaimed");
-    public static string Completion_ReverifyIdentityUnreadable => Get("Completion.ReverifyIdentityUnreadable");
     public static string Completion_SendReport => Get("Completion.SendReport");
     public static string Confirm_DeletePermanently_Plural => Get("Confirm.DeletePermanently.Plural");
     public static string Confirm_DeletePermanently_Singular => Get("Confirm.DeletePermanently.Singular");

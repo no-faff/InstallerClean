@@ -331,8 +331,6 @@ const MAP = {
   'Completion.HeldBack.Plural': `{0} files held back. The scan said these were unneeded. The final check couldn't confirm that.`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.ReverifyIdentityClaimed': `{0} {1} kept in place, because Windows has a record of the program named inside.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} kept in place, because InstallerClean couldn't find a program named inside.`,
   'Completion.MoveCancelledSummary': `Moved {0} of {1} {2} to {3} before you cancelled.`,
   'Completion.PermanentDeleteCancelledSummary': `Permanently deleted {0} of {1} {2} before you cancelled.`,
 
@@ -519,7 +517,7 @@ const MAP = {
   'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
   'Cli.ScanningInstaller': `Scanning {InstallerFolder}...`,
   'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
-  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.FoundNoOrphans': `No unneeded files identified.`,
   'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
   'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)`,

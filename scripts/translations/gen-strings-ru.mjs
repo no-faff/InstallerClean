@@ -442,8 +442,6 @@ const MAP = {
   'Error.MoveInstallerLockUnavailableTitle': `Ничего не перемещено`,
   'Error.InstallerLockUnavailable': `InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не удалено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
   'Error.MoveInstallerLockUnavailable': `InstallerClean не смог взять блокировку, которой Windows Installer не даёт двум программам одновременно менять установленное ПО, поэтому не смог исключить, что файл понадобится на полпути, и ничего не перемещено. Попробуйте ещё раз, а если повторяется — перезагрузите Windows.`,
-  'Completion.ReverifyIdentityClaimed': `Оставлено на месте {0} {1}, потому что у Windows есть запись о программе, названной внутри.`,
-  'Completion.ReverifyIdentityUnreadable': `Оставлено на месте {0} {1}, потому что InstallerClean не нашёл внутри названия программы.`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean не смог сопоставить записи Windows Installer с содержимым {InstallerFolder}. В папке есть файлы, но ни одна запись не указывает ни на что внутри неё, поэтому ни про один файл не удалось показать, что он не нужен. Ничего не предложено и ничего не убрано.`,
   'Error.ScanInstallerFolderElsewhere': `InstallerClean не может просканировать {InstallerFolder} на этом ПК. Windows сообщает, что эта папка находится в {0}, а InstallerClean сканирует папку Installer, только если Windows указывает для неё её собственный путь. Ничего не предложено и ничего не убрано.`,
   'Completion.NothingOffered': `На этом ПК ничего не предложено`,
@@ -576,12 +574,6 @@ const OVERRIDES = {
   // the 5+ band, and the noun inflects through Plural.File, so a .Few form would
   // come out byte-identical to the base. An absent override falls back to the
   // base, which is the form wanted here.
-  // Completion.ReverifyIdentityUnreadable carries no .One override. Its base is
-  // one of the two retired identity causes: no code reads it, so nothing passes
-  // the prefix to Pluralise and an override could never be selected.
-  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
-  // what says so. The base string itself stays translated, which is the point of
-  // keeping those two keys at all.
   'Summary.MissingFromDisk.Unnamed.Few': `{0} файла, для которых в записях не названа программа`,
   'Summary.MissingFromDisk.OtherPrograms.Few': `ещё {0} программы`,
   'Cli.FoundOrphans.One': `Найден {0} ненужный {1} для очистки ({2}).`,
@@ -667,7 +659,7 @@ const CLI = {
   'Cli.ScanSignal.LockUnreadableWindowsError': `Когда началось сканирование, InstallerClean не смог проверить, занят ли Windows Installer, потому что Windows выдал ошибку: {0} (ошибка {1}). Поэтому он удержал файлы в {InstallerFolder}, которые не названы в записях ни одной установленной программы, вместо того чтобы предложить их. Перезагрузите Windows и запустите команду снова.`,
   'Cli.ScanSignal.Other': `Когда началось сканирование, у Windows Installer что-то выполнялось или ожидало, поэтому InstallerClean удержал файлы в {InstallerFolder}, которые не названы в записях ни одной установленной программы, вместо того чтобы предложить их. Когда это разрешится, запустите команду снова.`,
   'Cli.ScanSignal.ClockSetBack': `Во время сканирования часы этого компьютера ушли назад или отстали, поэтому InstallerClean удержал файлы в {InstallerFolder}, которые не названы в записях ни одной установленной программы, вместо того чтобы предложить их. Запустите команду снова.`,
-  'Cli.FoundNoOrphans': `Ненужных файлов не найдено.`,
+  'Cli.FoundNoOrphans': `Ненужных файлов не выявлено.`,
   // The per-file forms of the pair above.
   'Cli.DestinationChangedMidBatch': `InstallerClean больше не смог подтвердить папку резервных копий и остановился. Проверьте {0}, затем запустите команду снова.`,
   'Cli.Help.Summary': `Убирает .msi и .msp из кэша, не нужные ни одной установленной программе.`,

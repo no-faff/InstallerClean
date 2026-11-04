@@ -138,7 +138,7 @@ public class CliSourcesGivenUpTests
         Assert.Contains(Strings.Cli_FoundNoOrphans, run.Stdout, StringComparison.Ordinal);
         Assert.DoesNotContain(Opening(Strings.Cli_SourceGivenUp_Drive), run.Stdout, StringComparison.Ordinal);
         var entry = Assert.Single(run.Entries);
-        AssertEntry(entry, CliEventClass.Ok, "/s mode: no unneeded files.");
+        AssertEntry(entry, CliEventClass.Ok, "/s mode: no unneeded files identified.");
     }
 
     [Fact]

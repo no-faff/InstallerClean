@@ -86,13 +86,6 @@ const OVERRIDES = {
   'Cli.DeletedFiles.One': `Eliminato definitivamente {0} {1} non necessario.`,
   'Cli.MovingFiles.One': `Spostamento di {0} {1} non necessario in {2}...`,
   'Cli.MovedFiles.One': `Spostato {0} {1} non necessario.`,
-  // Participle and possessive agreement: "lasciato al suo posto" for one file.
-  // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
-  // one of the two retired identity causes: no code reads it, so nothing passes
-  // the prefix to Pluralise and the override could never be selected.
-  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
-  // what says so. The base string itself stays translated, which is the point of
-  // keeping those two keys at all.
 };
 
 const MAP = {
@@ -432,7 +425,7 @@ const MAP = {
   'Cli.ScanSignal.LockUnreadableWindowsError': `All'avvio della scansione, InstallerClean non è riuscito a controllare se Windows Installer era occupato, perché Windows ha restituito un errore: {0} (errore {1}). Perciò ha trattenuto i file in {InstallerFolder} non nominati nei record di alcun programma installato, invece di proporli. Riavvia Windows ed esegui di nuovo il comando.`,
   'Cli.ScanSignal.Other': `Windows Installer aveva qualcosa in corso o in attesa all'avvio della scansione, perciò InstallerClean ha trattenuto i file in {InstallerFolder} non nominati nei record di alcun programma installato, invece di proporli. Esegui di nuovo il comando quando si è risolto.`,
   'Cli.ScanSignal.ClockSetBack': `L'orologio di questo PC è tornato indietro o ha perso tempo durante la scansione, perciò InstallerClean ha trattenuto i file in {InstallerFolder} non nominati nei record di alcun programma installato, invece di proporli. Esegui di nuovo il comando.`,
-  'Cli.FoundNoOrphans': `Nessun file non necessario trovato.`,
+  'Cli.FoundNoOrphans': `Nessun file non necessario identificato.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean non è più riuscito a confermare la cartella di backup, quindi si è fermato. Controlla {0}, poi esegui di nuovo il comando.`,
   'Cli.Help.Summary': `Rimuove i file .msi/.msp in cache che nessun programma installato usa più.`,
   'Cli.Help.Elevation': `Richiede un prompt come amministratore; senza, non esegue la scansione.`,
@@ -442,8 +435,6 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean non è riuscito a prendere il blocco che Windows Installer usa per impedire a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada, e non è stato spostato nulla. Riprova, e riavvia Windows se continua a succedere.`,
   'Cli.InstallerLockUnavailable': `Errore: InstallerClean non è riuscito a prendere il blocco di Windows Installer che impedisce a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada. Non è stato eliminato nulla. Riprova, e riavvia Windows se continua a succedere.`,
   'Cli.MoveInstallerLockUnavailable': `Errore: InstallerClean non è riuscito a prendere il blocco di Windows Installer che impedisce a due programmi di modificare il software installato nello stesso momento, quindi non ha potuto escludere che un file diventasse necessario a metà strada. Non è stato spostato nulla. Riprova, e riavvia Windows se continua a succedere.`,
-  'Completion.ReverifyIdentityClaimed': `{0} {1} lasciati al loro posto, perché Windows ha un record del programma nominato all'interno.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} lasciati al loro posto, perché InstallerClean non ha trovato alcun programma nominato all'interno.`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean non è riuscito a far corrispondere i record di Windows Installer con il contenuto di {InstallerFolder}. La cartella contiene file, ma nemmeno un record indica qualcosa al suo interno, quindi non si è potuto dimostrare che qualche file fosse non necessario. Non è stato proposto nulla e non è stato rimosso nulla.`,
   'Error.ScanInstallerFolderElsewhere': `InstallerClean non può eseguire la scansione di {InstallerFolder} su questo PC. Windows indica questa cartella come {0}, e InstallerClean esegue la scansione solo di una cartella Installer che Windows indica nel suo stesso percorso. Non è stato proposto nulla e non è stato rimosso nulla.`,
   'Completion.NothingOffered': `Nulla proposto su questo PC`,

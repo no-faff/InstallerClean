@@ -89,14 +89,6 @@ const OVERRIDES = {
   'Cli.DeletedFiles.One': `{0} {1} inutile a été supprimé définitivement.`,
   'Cli.MovingFiles.One': `Déplacement de {0} {1} inutile vers {2}...`,
   'Cli.MovedFiles.One': `{0} {1} inutile a été déplacé.`,
-  // Participle agreement only: "laissé" for a single file. The reason clause
-  // is about the records, not the files, so it does not inflect.
-  // Completion.ReverifyIdentityUnreadable.One was added and removed again in the 3.0.0 round. Its base is
-  // one of the two retired identity causes: no code reads it, so nothing passes
-  // the prefix to Pluralise and the override could never be selected.
-  // CountedStringTests.Every_satellite_override_belongs_to_a_counted_prefix is
-  // what says so. The base string itself stays translated, which is the point of
-  // keeping those two keys at all.
 };
 
 const MAP = {
@@ -518,7 +510,7 @@ const MAP = {
   'Cli.ScanSignal.LockUnreadableWindowsError': `Au début de l'analyse, InstallerClean n'a pas pu vérifier si Windows Installer était occupé, car Windows a renvoyé une erreur : {0} (erreur {1}). Il a donc retenu les fichiers de {InstallerFolder} qu'aucun enregistrement de programme installé ne nomme, au lieu de les proposer. Redémarrez Windows et relancez la commande.`,
   'Cli.ScanSignal.Other': `Windows Installer avait quelque chose en cours ou en attente au début de l'analyse, donc InstallerClean a retenu les fichiers de {InstallerFolder} qu'aucun enregistrement de programme installé ne nomme, au lieu de les proposer. Relancez la commande une fois que c'est réglé.`,
   'Cli.ScanSignal.ClockSetBack': `L'horloge de ce PC a reculé ou pris du retard pendant l'analyse, donc InstallerClean a retenu les fichiers de {InstallerFolder} qu'aucun enregistrement de programme installé ne nomme, au lieu de les proposer. Relancez la commande.`,
-  'Cli.FoundNoOrphans': `Aucun fichier inutile trouvé.`,
+  'Cli.FoundNoOrphans': `Aucun fichier inutile identifié.`,
   'Cli.DestinationChangedMidBatch': `InstallerClean n'a plus pu confirmer le dossier de sauvegarde, il s'est donc arrêté. Vérifiez {0}, puis relancez la commande.`,
   'Cli.Help.Summary': `Retire les .msi et .msp en cache dont aucun programme installé n'a besoin.`,
   'Cli.Help.Elevation': `Exige une invite de commandes administrateur ; sinon, aucune analyse.`,
@@ -528,8 +520,6 @@ const MAP = {
   'Error.MoveInstallerLockUnavailable': `InstallerClean n'a pas pu prendre le verrou que Windows Installer utilise pour empêcher deux programmes de modifier les logiciels installés en même temps, il n'a donc pas pu exclure qu'un fichier devienne nécessaire en cours de route, et rien n'a été déplacé. Réessayez, et redémarrez Windows si cela persiste.`,
   'Cli.InstallerLockUnavailable': `Erreur : InstallerClean n'a pas pu prendre le verrou Windows Installer qui empêche deux programmes de modifier les logiciels installés en même temps, il n'a donc pas pu exclure qu'un fichier devienne nécessaire en cours de route. Rien n'a été supprimé. Réessayez, et redémarrez Windows si cela persiste.`,
   'Cli.MoveInstallerLockUnavailable': `Erreur : InstallerClean n'a pas pu prendre le verrou Windows Installer qui empêche deux programmes de modifier les logiciels installés en même temps, il n'a donc pas pu exclure qu'un fichier devienne nécessaire en cours de route. Rien n'a été déplacé. Réessayez, et redémarrez Windows si cela persiste.`,
-  'Completion.ReverifyIdentityClaimed': `{0} {1} laissés en place, parce que Windows a un enregistrement du programme nommé à l'intérieur.`,
-  'Completion.ReverifyIdentityUnreadable': `{0} {1} laissés en place, parce qu'InstallerClean n'a trouvé aucun programme nommé à l'intérieur.`,
   'Error.ScanNoRegisteredFileInFolder': `InstallerClean n'a pas pu faire correspondre les enregistrements de Windows Installer avec le contenu de {InstallerFolder}. Le dossier contient des fichiers, mais pas un seul enregistrement ne désigne quoi que ce soit dedans, donc aucun fichier n'a pu être montré comme inutile. Rien n'a été proposé et rien n'a été retiré.`,
   'Error.ScanInstallerFolderElsewhere': `InstallerClean ne peut pas analyser {InstallerFolder} sur ce PC. Windows indique que ce dossier se trouve à {0}, et InstallerClean n'analyse un dossier Installer que si Windows l'indique à son propre chemin. Rien n'a été proposé et rien n'a été retiré.`,
   'Completion.NothingOffered': `Rien n'a été proposé sur ce PC`,

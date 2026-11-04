@@ -49,18 +49,6 @@ const ALLOWLIST = new Set([
   // rather than the resx losing a string a later state might want back.
   'Status.MoveCancelled.Partial',
   'Status.DeleteCancelled.Partial',
-
-  // ---- Retired in 3.0.0 with the identity check, and RETIRED IS NOT DEAD ----
-  // THE TWO BELOW ARE IN EVERY SATELLITE, which is what makes keeping them
-  // worth something and is the same reason as the pair above: deleting the English
-  // would throw away every translation of the only wording this project has for
-  // the condition they describe.
-
-  // Two of the five held-back causes on the completion overlay, both produced only
-  // by the identity re-check at action time: a record existing under the code the
-  // FILE declares about itself, and a file that yielded no code to ask about.
-  'Completion.ReverifyIdentityClaimed',
-  'Completion.ReverifyIdentityUnreadable',
 ]);
 
 // A KEY THAT NAMES A CAUSE LEAVES THE RESX WITH ITS MECHANISM RATHER THAN JOINING
