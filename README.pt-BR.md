@@ -208,7 +208,7 @@ Dito tudo isso, o aplicativo recomenda que você mova os arquivos para uma pasta
 Três builds, escolha um:
 
 - **Portable** (`InstallerClean-portable.exe`): um arquivo só, com o runtime do .NET 10 dentro dele. Sem instalação, sem desinstalador: dois cliques e ele roda. Guarde o arquivo em algum lugar para a próxima vez, ou apague quando terminar.
-- **Setup** (`InstallerClean-3.6.0-setup.exe`): um instalador comum do Windows com o runtime do .NET 10 embutido. Adiciona um item no menu Iniciar e desinstala sem deixar resíduos. Fica guardadinho nos Programas, fácil de achar daqui a seis meses, ou de rodar com mais frequência do que isso se você instala e desinstala muito programa.
+- **Setup** (`InstallerClean-3.7.0-setup.exe`): um instalador comum do Windows com o runtime do .NET 10 embutido. Adiciona um item no menu Iniciar e desinstala sem deixar resíduos. Fica guardadinho nos Programas, fácil de achar daqui a seis meses, ou de rodar com mais frequência do que isso se você instala e desinstala muito programa.
 - **CLI** (`installerclean-cli.exe`): a versão de linha de comando sozinha, um arquivo só com o runtime dentro dele. Sem instalação, sem desinstalador. Largue num cliente, rode uma análise ou uma limpeza, apague. Feito para scripting, tarefas agendadas e implantação em massa, quando você quer as operações sem um aplicativo de desktop no cliente. Veja [Linha de comando](#linha-de-comando) para os argumentos e códigos de saída.
 
 A partir da 2.2.0, os nomes de arquivo do setup e da versão portátil trazem o número da versão, então uma cópia baixada sempre diz o que é; a CLI mantém o nome simples `installerclean-cli.exe`, para que tarefas agendadas e scripts que apontam para ela continuem funcionando entre atualizações.

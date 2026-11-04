@@ -208,7 +208,7 @@ Dat alles gezegd hebbende, moedigt de app je aan om de bestanden naar een back-u
 Drie varianten, kies er een:
 
 - **Portable** (`InstallerClean-portable.exe`): één bestand, met de .NET 10-runtime erin. Geen installatie, geen de-installatieprogramma: dubbelklikken en het draait. Bewaar het bestand ergens voor de volgende keer, of verwijder het als je klaar bent.
-- **Setup** (`InstallerClean-3.6.0-setup.exe`): een gewone Windows-installer met de .NET 10-runtime meegeleverd. Voegt een vermelding in het Startmenu toe en deïnstalleert netjes. Staat tussen je programma's, zodat je het over een half jaar zo terugvindt, of je het vaker draait als je veel software installeert en verwijdert.
+- **Setup** (`InstallerClean-3.7.0-setup.exe`): een gewone Windows-installer met de .NET 10-runtime meegeleverd. Voegt een vermelding in het Startmenu toe en deïnstalleert netjes. Staat tussen je programma's, zodat je het over een half jaar zo terugvindt, of je het vaker draait als je veel software installeert en verwijdert.
 - **CLI** (`installerclean-cli.exe`): de opdrachtregelversie op zichzelf, één bestand met de runtime erin. Geen installatie, geen de-installatieprogramma. Zet hem op een client, draai een scan of een opschoning, verwijder hem weer. Gemaakt voor scripts, geplande taken en massa-uitrol, waar je de bewerkingen wilt zonder desktopapp op de client. Zie [Opdrachtregel](#opdrachtregel) voor de argumenten en afsluitcodes.
 
 Sinds 2.2.0 dragen de bestandsnamen van de setup en de portable hun versienummer, zodat een gedownloade kopie altijd zegt wat hij is; de CLI houdt zijn kale naam `installerclean-cli.exe`, zodat geplande taken en scripts die ernaar wijzen over updates heen blijven werken.

@@ -208,7 +208,7 @@ Dù đã nói tất cả những điều đó, ứng dụng vẫn khuyến khíc
 Ba bản dựng, chọn một:
 
 - **Portable** (`InstallerClean-portable.exe`): một tệp duy nhất, có sẵn .NET 10 runtime bên trong. Không cần cài, không có trình gỡ: bấm đúp là chạy. Hãy cất tệp đó ở đâu đó cho lần sau, hoặc xóa đi khi bạn xong việc.
-- **Setup** (`InstallerClean-3.6.0-setup.exe`): một trình cài đặt Windows thông thường, đã đóng gói sẵn .NET 10 runtime. Thêm một mục vào menu Bắt Đầu và gỡ cài đặt gọn gàng. Được xếp vào danh sách chương trình để sáu tháng nữa bạn vẫn dễ tìm lại, hoặc để chạy thường xuyên hơn thế nếu bạn cài và gỡ nhiều phần mềm.
+- **Setup** (`InstallerClean-3.7.0-setup.exe`): một trình cài đặt Windows thông thường, đã đóng gói sẵn .NET 10 runtime. Thêm một mục vào menu Bắt Đầu và gỡ cài đặt gọn gàng. Được xếp vào danh sách chương trình để sáu tháng nữa bạn vẫn dễ tìm lại, hoặc để chạy thường xuyên hơn thế nếu bạn cài và gỡ nhiều phần mềm.
 - **CLI** (`installerclean-cli.exe`): riêng bản dòng lệnh, một tệp duy nhất có sẵn runtime bên trong. Không cần cài, không có trình gỡ. Thả nó lên một máy khách, chạy một lượt quét hay một lượt dọn, rồi xóa đi. Được làm cho việc viết script, các tác vụ theo lịch và triển khai hàng loạt, khi bạn muốn thực hiện các thao tác mà không cần một ứng dụng desktop trên máy khách. Xem [Dòng lệnh](#dòng-lệnh) để biết các tham số và mã thoát.
 
 Từ 2.2.0, tên tệp của bản cài đặt và bản portable có kèm số phiên bản, nên một bản đã tải về luôn cho biết nó là gì; bản CLI vẫn giữ tên đơn giản `installerclean-cli.exe` để các tác vụ theo lịch và script đang trỏ tới nó tiếp tục chạy qua các lần cập nhật.
