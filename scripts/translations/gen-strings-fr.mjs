@@ -17,13 +17,10 @@
 //     native-reviewed Italian and Windows-FR.
 //   - Plurals: fr = 0 and 1 singular (already in DisplayHelpers.CategoryFor). The
 //     satellite-only .One overrides live in the OVERRIDES block below, each because
-//     a post-nominal adjective or participle has to agree with the count. A held-back
-//     override lived there too and went with the four sentences the 3.0.0 round
-//     replaced with one Completion.HeldBack pair. The block is injected before
-//     </root> so a re-run reproduces the file exactly.
-//     COUNT THE BLOCK RATHER THAN THIS PARAGRAPH, which said two while the block
-//     held more. The cancelled-summary lines are the ones that genuinely take no
-//     .One: their leading participle precedes its object and does not inflect.
+//     a post-nominal adjective or participle has to agree with the count. The block
+//     is injected before </root> so a re-run reproduces the file exactly. The
+//     cancelled-summary lines are the ones that genuinely take no .One: their
+//     leading participle precedes its object and does not inflect.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';

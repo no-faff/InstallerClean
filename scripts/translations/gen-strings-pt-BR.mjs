@@ -655,14 +655,11 @@ const MAP = {
 // flat key itself) is in the neutral, and the value's {N} set matches the base's.
 // pt counts 0 and 1 as "one" (CategoryFor's fr/pt branch), so .One fires at 0 and 1.
 // The three Cli completion lines inflect the past participle at one. Progress
-// gerunds (Deleting/Moving) do not.
-// A held-back key took a singular .One for its mantido/mantidos participle and its
-// dele/deles pronoun, and went with the four sentences the 3.0.0 round replaced with
-// one Completion.HeldBack pair. The three
-// *CancelledSummary keys do NOT get an override: their form is selected on the total
-// ({1}) but any participle would have to agree with the acted-on count ({0}), a
-// different number, so they use a count-invariant "X cancelada apos <infinitive>
-// {0} de {1} {2}" that reads correctly at every count.
+// gerunds (Deleting/Moving) do not. The three *CancelledSummary keys do NOT get an
+// override: their form is selected on the total ({1}) but any participle would have
+// to agree with the acted-on count ({0}), a different number, so they use a
+// count-invariant "X cancelada apos <infinitive> {0} de {1} {2}" that reads correctly
+// at every count.
 const OVERRIDES = {
   'Cli.FoundOrphans.One': `Foi encontrado {0} {1} desnecessário para limpar ({2}).`,
   'Cli.DeletingFiles.One': `Excluindo {0} {1} desnecessário...`,
