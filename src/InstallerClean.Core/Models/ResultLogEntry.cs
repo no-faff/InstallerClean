@@ -164,6 +164,25 @@ public sealed record ResultLogEntry(
     /// files a key held back (<see cref="ScanInfo.UnlistedKeysWithInstallPropertiesCount"/> to
     /// <see cref="ScanInfo.SupersededHeldForUnlistedKeyCount"/>).
     ///
+    /// SCHEMA 12 ADDS ONE KEY UNDER <c>scan</c> AND TAKES NONE AWAY: the installations setting the
+    /// hold whose record shows an ordinary installation, their sources not ruled out
+    /// (<see cref="ScanInfo.SecondCopyKeepOrdinarySourcesNotRuledOutCount"/>), the fourth count of
+    /// why the record did not settle an installation. <c>scan.secondCopyReleasedOrdinaryCount</c>
+    /// NARROWS AT 12: from 12 it counts only an ordinary installation whose sources were all seen
+    /// or left to be compared by name, and, for one recording no cached package, whose
+    /// <c>InstallProperties</c> key records none as well, every package they name being compared
+    /// with every file the screen would let through. <c>scan.secondCopyKeepPathUnreadableCount</c> to
+    /// <c>scan.secondCopyKeepNoProductCodeCount</c>, <c>scan.secondCopyKeepPerMachineCount</c>,
+    /// <c>scan.secondCopyKeepNoneRecordedOtherAnswerCount</c> to
+    /// <c>scan.secondCopyKeepNoneRecordedSourcesNotRuledOutCount</c> AND
+    /// <c>scan.withheldSecondCopyUnestablishedCount</c> WIDEN AT 12 to the ordinary installations
+    /// whose sources could not be ruled out, and <c>scan.secondCopyUnseenByNameFileCount</c> AND
+    /// <c>scan.declaredInstalledIsAtAnotherInstallationsSourcesCount</c> to the files the sources
+    /// of the rest keep. <c>scan.declaredSourcesOwnPerUserReadCount</c> AND
+    /// <c>scan.declaredSourcesOwnPerUserKeptCount</c> WIDEN AT 12 to the running account's own
+    /// ordinary per-user-unmanaged installations whose cached package did not say what it declares,
+    /// whose lists are now read.
+    ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
     /// never loses data even if the allowlist has not caught up. THAT LENIENCE
@@ -172,7 +191,7 @@ public sealed record ResultLogEntry(
     /// <c>machine</c> arriving before the receiving end knows the name is a
     /// rejected report and a user told sending failed. The receiver ships first.
     /// </summary>
-    public const int CurrentSchemaVersion = 11;
+    public const int CurrentSchemaVersion = 12;
 
     // Each factory takes windowsRegion as IWindowsRegion.Read returned it when the
     // report box was put on the card, so the report carries that reading. The host is the
@@ -1184,8 +1203,8 @@ public sealed record MachineInfo(
 /// Candidates the declared-product screen kept back because an installation the scan
 /// could not rule out as a second copy of a program opens packages that could not all
 /// be seen, or because an installation's cached package did not say which product it
-/// declares, its own record did not show it to be an ordinary installation, and it is not
-/// shown to have no package for Windows Installer to open:
+/// declares and it is not shown to have no package for Windows Installer to open, nor shown by
+/// its sources to open only packages the screen saw:
 /// <c>ScanResult.WithheldBy.SecondCopyUnestablishedCount</c>. The last of the twelve
 /// counts that split <paramref name="WithheldCandidateCount"/>, appended after the
 /// members before it for the reason they were.
@@ -1253,18 +1272,19 @@ public sealed record MachineInfo(
 /// <param name="SecondCopyKeepPathUnreadableCount">
 /// Installations that set the hold counted in
 /// <paramref name="WithheldSecondCopyUnestablishedCount"/>: their cached package did not say
-/// which product it declares, their own record did not show an ordinary installation, and
-/// they are not shown to have no package for Windows Installer to open, nor, where they record
-/// none, in their <c>InstallProperties</c> key as well, to open only packages their sources name
-/// that the screen saw.
+/// which product it declares, and they are not shown to have no package for Windows Installer
+/// to open, nor, where their own record shows an ordinary installation or they record none, in
+/// their <c>InstallProperties</c> key as well, to open only packages their sources name that the
+/// screen saw.
 /// Counted where the screen reads them, before any file's verdict, so they are counted
 /// whether or not any file was then held back for them. This one counts those for which
 /// Windows gave no answer about the cached package's path: a read that failed, or an answer
 /// that it does not know the product in that account and context.
 ///
 /// THE FIVE KEYS FROM THIS ONE SAY WHAT EACH SUCH INSTALLATION'S CACHED PACKAGE GAVE, AND
-/// THE THREE AFTER THEM WHY ITS RECORD DID NOT SETTLE IT. Each installation is in one of
-/// each, so the five and the three add up to the same figure, which is not sent.
+/// THE THREE AFTER THEM, WITH <paramref name="SecondCopyKeepOrdinarySourcesNotRuledOutCount"/>,
+/// WHY ITS RECORD DID NOT SETTLE IT. Each installation is in one of each, so the five and the
+/// four add up to the same figure, which is not sent.
 /// </param>
 /// <param name="SecondCopyKeepNoneRecordedCount">
 /// The same installations, where the installation records no cached package, and its
@@ -1299,8 +1319,11 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="SecondCopyReleasedOrdinaryCount">
 /// Installations whose cached package did not say which product it declares and whose own
-/// record shows an ordinary installation, so they do not set the hold. One with no package
-/// for Windows Installer to open is counted in
+/// record shows an ordinary installation, which do not set the hold because every package
+/// their sources name was seen or left to be compared by name, and, for one recording no cached
+/// package, its <c>InstallProperties</c> key records none as well. Every installation package the
+/// screen would otherwise let through is compared with those packages instead. One with no
+/// package for Windows Installer to open is counted in
 /// <paramref name="SecondCopyReleasedOpensNoPackageCount"/> instead, and its record is not
 /// read.
 /// </param>
@@ -1356,9 +1379,9 @@ public sealed record MachineInfo(
 /// Files held back because a package compared by name (in a folder on the network, under a drive
 /// letter at which Windows reports no drive, on an optical or removable drive that answers that it
 /// is not ready or has no media in it, or looked for by the media search), which the sources of an
-/// installation not ruled out as a second copy name, or those of an installation recording no
-/// cached package whose record does not show an ordinary installation, and which the file could be
-/// by its name, could not be ruled out. Each is also counted in
+/// installation not ruled out as a second copy name, or those of an installation whose cached
+/// package did not say which product it declares that its sources released, and which the file
+/// could be by its name, could not be ruled out. Each is also counted in
 /// <paramref name="WithheldSecondCopyUnestablishedCount"/>.
 /// </param>
 /// <param name="SecondCopyReleasedOpensNoPackageCount">
@@ -1434,7 +1457,7 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="DeclaredInstalledIsAtAnotherInstallationsSourcesCount">
 /// Those that open as the package at a source of an installation not ruled out as a second copy, or
-/// of one recording no cached package that its sources released
+/// of one whose cached package did not say which product it declares that its sources released
 /// (<see cref="DeclaredProductInstalledCauses.IsAtAnotherInstallationsSources"/>).
 /// </param>
 /// <param name="DeclaredInstalledPathUnreadableCount">
@@ -1584,7 +1607,8 @@ public sealed record MachineInfo(
 /// </param>
 /// <param name="DeclaredSourcesOwnPerUserKeptCount">
 /// The same installations whose source lists the screen read and could not all see, so each kept
-/// the files its packages could be (<see cref="Services.OwnPerUserSourceLists.Kept"/>).
+/// the files its packages could be, or, where its cached package did not say what it declares,
+/// every installation package (<see cref="Services.OwnPerUserSourceLists.Kept"/>).
 /// </param>
 /// <param name="UnlistedKeysWithInstallPropertiesCount">
 /// The product keys no installation the scan listed accounts for that have an
@@ -1608,6 +1632,16 @@ public sealed record MachineInfo(
 /// <paramref name="SupersededScanWideWithheldCount"/>: a file withheld where a key's listing
 /// was not established is in both, and so is one a key's listing names on a scan whose read
 /// of the registry's records failed.
+/// </param>
+/// <param name="SecondCopyKeepOrdinarySourcesNotRuledOutCount">
+/// Installations setting the hold whose cached package did not say which product it declares,
+/// whose own record shows an ordinary installation, and whose sources could not be ruled out
+/// (<see cref="CachedPackageCensus.KeptOrdinarySourcesNotRuledOut"/>). The fourth count of why the
+/// record did not settle an installation, beside
+/// <paramref name="SecondCopyKeepAnotherAccountCount"/> to
+/// <paramref name="SecondCopyKeepInstanceTypeNotOrdinaryCount"/>, so the four add up to the five
+/// from <paramref name="SecondCopyKeepPathUnreadableCount"/>. Appended after the keys before it
+/// for the reason they were.
 /// </param>
 public sealed record ScanInfo(
     long DurationMs,
@@ -1716,7 +1750,8 @@ public sealed record ScanInfo(
     int UnlistedKeysWithoutInstallPropertiesCount,
     int FilesHeldForKeysWithInstallPropertiesCount,
     int FilesHeldForKeysWithoutInstallPropertiesCount,
-    int SupersededHeldForUnlistedKeyCount)
+    int SupersededHeldForUnlistedKeyCount,
+    int SecondCopyKeepOrdinarySourcesNotRuledOutCount)
 {
     public static ScanInfo From(ScanResult scan, long durationMs)
     {
@@ -1879,7 +1914,9 @@ public sealed record ScanInfo(
             scan.UnlistedKeysWithoutInstallProperties,
             scan.UnlistedKeyHolds.WithInstallProperties,
             scan.UnlistedKeyHolds.WithoutInstallProperties,
-            scan.SupersededHeldForUnlistedKeyCount);
+            scan.SupersededHeldForUnlistedKeyCount,
+            // The fourth count of why the record did not settle an installation setting the hold.
+            cachedPackages.KeptOrdinarySourcesNotRuledOut);
     }
 }
 

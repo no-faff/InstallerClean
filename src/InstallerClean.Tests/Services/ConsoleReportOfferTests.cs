@@ -16,7 +16,7 @@ public class ConsoleReportOfferTests
 {
     private const string ReportPath = @"C:\Users\someone\AppData\Local\InstallerClean\last-run.json";
     private const string ChartAddress = "https://github.com/no-faff/InstallerClean#reports-stats";
-    private const string Body = "{\"schemaVersion\":11}";
+    private const string Body = "{\"schemaVersion\":12}";
 
     private static readonly ResultLogEntry Entry = ResultLogEntry.ForScanOnly(
         new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), RegisteredTotalBytes: 0),

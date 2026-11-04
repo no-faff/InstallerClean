@@ -373,27 +373,34 @@ public class FileSystemScanServiceDeclaredProductTests
         // The scan hands the screen the installations its enumeration listed. One folder
         // is scanned twice, with Windows answering that neither product is installed:
         // where the enumeration listed nothing both files are offered, and where it
-        // listed product A the file declaring A is kept and the other is offered. The
-        // screen is built without its file readers, so it reads no cached package, and
-        // product A's own record is what shows it to be no second copy of product B.
+        // listed product A the file declaring A is kept and the other is offered. Product A's
+        // cached package declares product A, which shows it to be no second copy of product B.
+        const string CachedPackage = $@"{Folder}\cached.msi";
         var identities = new ScriptedPackageIdentities();
         identities.Declares($@"{Folder}\listed.msi", ProductA);
         identities.Declares($@"{Folder}\gone.msi", ProductB);
+        identities.Declares(CachedPackage, ProductA);
 
         var msi = new ScriptedMsiProducts();
         msi.NotInstalled(ProductA, MsiError.UnknownProduct);
         msi.NotInstalled(ProductB, MsiError.UnknownProduct);
-        msi.AnswersItsOwnRecord(ProductA, null, MsiInstallContext.Machine);
+        msi.RecordsPackage(ProductA, null, MsiInstallContext.Machine, CachedPackage);
+
+        var files = new ScriptedFileIdentities();
+        files.Opens($@"{Folder}\listed.msi", 1);
+        files.Opens($@"{Folder}\gone.msi", 2);
+        files.Opens(CachedPackage, 3);
 
         var walked = new[] { $@"{Folder}\listed.msi", $@"{Folder}\gone.msi" };
 
-        var unlisted = await Scan(walked, msi, identities);
+        var unlisted = await Scan(walked, msi, identities, fileIdentities: files, alsoOnDisk: [CachedPackage]);
 
         Assert.Equal(walked, unlisted.RemovableFiles.Select(f => f.FullPath));
         Assert.Empty(unlisted.WithheldFiles!);
 
         var listed = await Scan(walked, msi, identities,
-            installations: [new ListedInstallation(ProductA, null, (int)MsiInstallContext.Machine, SecondCopyNotRuledOut: false)]);
+            installations: [new ListedInstallation(ProductA, null, (int)MsiInstallContext.Machine, SecondCopyNotRuledOut: false)],
+            fileIdentities: files, alsoOnDisk: [CachedPackage]);
 
         var offered = Assert.Single(listed.RemovableFiles);
         Assert.Equal($@"{Folder}\gone.msi", offered.FullPath);
@@ -697,23 +704,30 @@ public class FileSystemScanServiceDeclaredProductTests
     /// <summary>
     /// One scan over <paramref name="walked"/>, with the REAL screen driven by the
     /// two scripted seams. Nothing here stubs the check itself: a fake screen
-    /// would pin the scan's wiring and leave the thing being wired untested.
+    /// would pin the scan's wiring and leave the thing being wired untested. Given
+    /// <paramref name="fileIdentities"/>, the screen has its file readers, the disk
+    /// holding <paramref name="alsoOnDisk"/> beside the walked files.
     /// </summary>
     private static Task<ScanResult> Scan(
         IEnumerable<string> walked,
         ScriptedMsiProducts msi,
         ScriptedPackageIdentities identities,
         IReadOnlyList<RegisteredPackage>? registered = null,
-        IReadOnlyList<ListedInstallation>? installations = null)
+        IReadOnlyList<ListedInstallation>? installations = null,
+        ScriptedFileIdentities? fileIdentities = null,
+        IReadOnlyList<string>? alsoOnDisk = null)
     {
         var files = walked.ToArray();
-        var fs = FolderHolding(files.Concat(
-            (registered ?? Array.Empty<RegisteredPackage>()).Select(p => p.LocalPackagePath)).ToArray());
+        var fs = FolderHolding(files
+            .Concat((registered ?? Array.Empty<RegisteredPackage>()).Select(p => p.LocalPackagePath))
+            .Concat(alsoOnDisk ?? []).ToArray());
 
         return new FileSystemScanService(
             QueryReturning(registered ?? Array.Empty<RegisteredPackage>(), installations), fs, null,
             files, null, null,
-            new DeclaredProductCheck(msi, identities))
+            fileIdentities is null
+                ? new DeclaredProductCheck(msi, identities)
+                : new DeclaredProductCheck(msi, identities, fileIdentities, fs, msi.Registry))
             .ScanAsync();
     }
 }

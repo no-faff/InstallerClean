@@ -7,23 +7,25 @@ namespace InstallerClean.Models;
 /// installations, and of files, and nothing naming either.
 ///
 /// THE FIRST CONDITION IS AN INSTALLATION THAT SETS THE HOLD: one whose cached package does
-/// not say which product it declares, whose own record does not show an ordinary
-/// installation, which is not shown to have no package for Windows Installer to open
-/// (<see cref="ReleasedOpensNoPackage"/>), and which, where it records no cached package, has
-/// an <c>InstallProperties</c> key that does not show it records none as well, or a source the
-/// check cannot rule out (<see cref="ReleasedBySources"/>). The check looks for the cached
-/// package of every installation the caller listed, once, the first time an installation
-/// package reaches that step, reads the record of each one whose cached package gave no product
-/// code, other than one with no package to open, and reads the <c>InstallProperties</c> key, and
-/// where that records none the sources, of each of those recording no cached package whose
-/// record does not show an ordinary installation.
+/// not say which product it declares, which is not shown to have no package for Windows
+/// Installer to open (<see cref="ReleasedOpensNoPackage"/>), and which is not shown by its
+/// sources to open only packages the check can see. Its sources are read where its own record
+/// shows an ordinary installation (<see cref="ReleasedOrdinary"/>), and where it records no
+/// cached package and its <c>InstallProperties</c> key shows it records none as well
+/// (<see cref="ReleasedBySources"/>). The check looks for the cached package of every
+/// installation the caller listed, once, the first time an installation package reaches that
+/// step, reads the record of each one whose cached package gave no product code, other than
+/// one with no package to open, and reads the sources of each of those whose record shows an
+/// ordinary installation, and the <c>InstallProperties</c> key, and where that records none
+/// the sources, of each of those recording no cached package.
 /// The count is taken there, before any file's verdict, so an installation is counted as
 /// setting the hold whether or not any installation package was then let through for it to
 /// hold back. Each such installation is counted once among the five members saying what its
-/// cached package gave, and once among the three saying why its record did not settle it, so
-/// the two groups add up to the same figure. One recording no cached package is also counted
-/// once among the three saying what kept it, from <see cref="KeptNoneRecordedOtherAnswer"/>,
-/// which add up to <see cref="KeptNoneRecorded"/>.
+/// cached package gave, and once among the four saying why its record did not settle it, from
+/// <see cref="KeptAnotherAccount"/> to <see cref="KeptInstanceTypeNotOrdinary"/> and
+/// <see cref="KeptOrdinarySourcesNotRuledOut"/>, so the two groups add up to the same figure.
+/// One recording no cached package is also counted once among the three saying what kept it,
+/// from <see cref="KeptNoneRecordedOtherAnswer"/>, which add up to <see cref="KeptNoneRecorded"/>.
 ///
 /// THE SECOND CONDITION IS READ ONLY WHERE NO INSTALLATION SETS THE HOLD: an installation the
 /// caller could not rule out as a second copy of a program whose packages cannot all be seen.
@@ -83,9 +85,12 @@ namespace InstallerClean.Models;
 /// <param name="KeptPerMachine">The installations setting the hold that are in the per-machine context.</param>
 /// <param name="ReleasedOrdinary">
 /// Installations whose cached package did not say what it declares and whose own record shows
-/// an ordinary installation, so they do not set the hold. One with no package for Windows
-/// Installer to open is counted in <see cref="ReleasedOpensNoPackage"/> instead, and its record
-/// is not read.
+/// an ordinary installation, which do not set the hold because every package their sources name
+/// was seen or left to be compared by name, and, for one recording no cached package, its
+/// <c>InstallProperties</c> key records none as well. Every installation package the answer about its own
+/// product lets through is compared with those packages instead. One with no package for
+/// Windows Installer to open is counted in <see cref="ReleasedOpensNoPackage"/> instead, and its
+/// record is not read.
 /// </param>
 /// <param name="UnruledChecked">
 /// The listed installations not ruled out as a second copy whose packages the pass looked for,
@@ -138,8 +143,8 @@ namespace InstallerClean.Models;
 /// <param name="UnseenByNameFiles">
 /// Files held back because a package compared by name, which the sources of an
 /// installation not ruled out as a second copy name, or of one counted in
-/// <see cref="ReleasedBySources"/>, and which the file could be by its name, could not be ruled
-/// out.
+/// <see cref="ReleasedBySources"/> or <see cref="ReleasedOrdinary"/>, and which the file could be
+/// by its name, could not be ruled out.
 /// </param>
 /// <param name="ReleasedOpensNoPackage">
 /// Installations which do not set the hold because Windows Installer has no package to open for
@@ -178,6 +183,16 @@ namespace InstallerClean.Models;
 /// records could not be ruled out as the Installer folder. The three members from
 /// <see cref="KeptNoneRecordedOtherAnswer"/> add up to <see cref="KeptNoneRecorded"/>.
 /// </param>
+/// <param name="KeptOrdinarySourcesNotRuledOut">
+/// Installations setting the hold whose own record shows an ordinary installation and whose
+/// sources could not be ruled out: a package name, source list or folder that would not read,
+/// was in a form the check does not compare or was held otherwise in the registry, a package at
+/// a source that could not be seen, a drive or share given up for the pass, and, for one
+/// recording no cached package, an <c>InstallProperties</c> key that does not show it records
+/// none as well or a folder it was installed from not ruled out as the Installer folder. The
+/// fourth count of why the record did not settle an installation, beside
+/// <see cref="KeptAnotherAccount"/> to <see cref="KeptInstanceTypeNotOrdinary"/>.
+/// </param>
 public sealed record CachedPackageCensus(
     int ListedChecked,
     int KeptPathUnreadable,
@@ -206,9 +221,10 @@ public sealed record CachedPackageCensus(
     int ReleasedBySources,
     int KeptNoneRecordedOtherAnswer,
     int KeptNoneRecordedRegistryDisagrees,
-    int KeptNoneRecordedSourcesNotRuledOut)
+    int KeptNoneRecordedSourcesNotRuledOut,
+    int KeptOrdinarySourcesNotRuledOut)
 {
     /// <summary>A pass that looked for no installation's packages.</summary>
     public static CachedPackageCensus None { get; } =
-        new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }

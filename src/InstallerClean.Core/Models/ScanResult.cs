@@ -1081,8 +1081,8 @@ public static class ShortNameCreationLabels
 /// Installation packages the screen kept back because an installation the scan could
 /// not rule out as a second copy of a program opens packages that could not all be
 /// seen, or because an installation's cached package did not say which product it
-/// declares, its own record did not show it to be an ordinary installation, and it is not
-/// shown to have no package for Windows Installer to open, or because a product key no
+/// declares and it is not shown to have no package for Windows Installer to open, nor shown
+/// by its sources to open only packages the screen saw, or because a product key no
 /// installation accounts for left a second copy not ruled out. See
 /// <see cref="Services.DeclaredProductOutcome.SecondCopyUnestablished"/>.
 ///

@@ -246,7 +246,8 @@ public class WithholdingSplitTests
         UnseenNotThere: 0, UnseenWouldNotIdentify: 0, UnseenWouldNotRead: 0, UnseenNoProductCode: 0,
         UnseenPerUserUnmanaged: 0, UnseenSourcesGivenUp: 0, UnseenSourceNotRuledOut: 0, UnseenPerMachine: 0,
         UnseenByNameFiles: 0, ReleasedOpensNoPackage: 0, ReleasedBySources: 0,
-        KeptNoneRecordedOtherAnswer: 0, KeptNoneRecordedRegistryDisagrees: 0, KeptNoneRecordedSourcesNotRuledOut: 0);
+        KeptNoneRecordedOtherAnswer: 0, KeptNoneRecordedRegistryDisagrees: 0, KeptNoneRecordedSourcesNotRuledOut: 0,
+        KeptOrdinarySourcesNotRuledOut: 0);
 
     [Fact]
     public async Task The_drives_and_shares_the_screen_gave_up_and_its_waits_travel_on_the_result_beside_the_split()
@@ -366,7 +367,8 @@ public class WithholdingSplitTests
         UnseenNotThere: 0, UnseenWouldNotIdentify: 0, UnseenWouldNotRead: 0, UnseenNoProductCode: 0,
         UnseenPerUserUnmanaged: 0, UnseenSourcesGivenUp: 0, UnseenSourceNotRuledOut: 1, UnseenPerMachine: 1,
         UnseenByNameFiles: 0, ReleasedOpensNoPackage: 0, ReleasedBySources: 0,
-        KeptNoneRecordedOtherAnswer: 0, KeptNoneRecordedRegistryDisagrees: 0, KeptNoneRecordedSourcesNotRuledOut: 0);
+        KeptNoneRecordedOtherAnswer: 0, KeptNoneRecordedRegistryDisagrees: 0, KeptNoneRecordedSourcesNotRuledOut: 0,
+        KeptOrdinarySourcesNotRuledOut: 0);
 
     [Fact]
     public async Task A_screen_that_answered_about_a_different_number_of_files_gives_up_nothing_the_result_carries_and_its_waits_still_travel()
