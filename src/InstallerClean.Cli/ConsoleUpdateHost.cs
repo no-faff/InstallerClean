@@ -143,7 +143,8 @@ internal sealed class ConsoleUpdateHost(string arg, Func<InstanceLock>? newLock 
     /// unanswered (<see cref="ICommandLineUpdateHost.NobodyAnswered"/>), or it was started
     /// with <see cref="CliContract.NoQuestionsSwitch"/>, which a copy whose question went
     /// unanswered passes to the newer version. Where it is set, <see cref="RunNewerVersion"/>
-    /// passes the switch on, as this run's read of the console may still be waiting.
+    /// passes the switch on, as a read of the console left by that question may still be
+    /// waiting.
     /// </summary>
     public bool AsksNothingMore { get; private set; } = asksNothing;
 
