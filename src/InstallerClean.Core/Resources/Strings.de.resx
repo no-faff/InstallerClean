@@ -1039,9 +1039,11 @@ Um sie zurückzuholen, brauchst du das Installationsprogramm genau der Version, 
        crosses the placeholder (Slavic case selection, Arabic dual,
        Japanese particle placement, etc). A translator rewrites both
        singular and plural keys per their language's rule. -->
-  <!-- Main-window count of the registered set. "Left alone" rather than "still
-       needed" because that set is three populations and only one of them makes
-       "needed" true; Summary.RegisteredWindow below carries the detail. -->
+  <!-- Main-window count of the registered set, and the line the command line prints
+       after its found line (LeftAloneReport), in the same words. "Left alone" rather
+       than "still needed" because that set is three populations and only one of them
+       makes "needed" true; Summary.RegisteredWindow below carries the detail. Rewording
+       it rewords what scheduled tasks capture from the command line. -->
   <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} Datei unangetastet</value></data>
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} Dateien unangetastet</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} nicht benötigte Datei zum Aufräumen</value></data>

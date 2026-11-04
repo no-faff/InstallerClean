@@ -615,9 +615,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // show for it but files still being offered. So the question is spelled once,
         // where the members are.
         //
-        // THE HOSTS READ THE SAME EXPRESSION OFF THE RESULT (ScanResult.WithholdingLegsFired)
-        // rather than a second reading of the census, which would be a copy of this rule
-        // able to answer differently from it after any edit to either.
+        // THE LIST OF LEGS THAT FIRED IS THE SAME CALL (WithholdingLegs.Fired) rather than a
+        // second reading of the census, which would be a copy of this rule able to answer
+        // differently from it after any edit to either.
         //
         // AND THE SIXTH, WHICH IS THE SAME ARGUMENT ABOUT THE OTHER HALF OF THE
         // COMPARISON. A recorded path can be settled and the file it names still not
@@ -658,12 +658,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // installation opens and keeps every installation package where those cannot
         // all be seen.
         //
-        // AND IT IS ONE CALL RATHER THAN A CONDITION PER LEG SPELLED OUT HERE. A host names
-        // which of these held, so the gate and that host read the same expression: a
-        // condition added to WithholdingLeg is one this line acts on and one that host
-        // prints. A condition written in beside this call instead, which would withhold
-        // an offer the breakdown has nothing to say about, is what
-        // FileSystemScanServiceWithholdingLegsTests holds this line against.
+        // AND IT IS ONE CALL RATHER THAN A CONDITION PER LEG SPELLED OUT HERE. The list of
+        // legs that fired and the gate read the same expression: a condition added to
+        // WithholdingLeg is one this line acts on and one the list names. A condition
+        // written in beside this call instead, which would withhold an offer no leg
+        // names, is what FileSystemScanServiceWithholdingLegsTests holds this line against.
         if (WithholdingLegs.Any(query.Census, registrationIdentityReads))
         {
             // Every candidate is already kept back on a fact about the machine, so the

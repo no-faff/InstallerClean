@@ -6,14 +6,14 @@ using NSubstitute;
 namespace InstallerClean.Tests.Services;
 
 /// <summary>
-/// The scan's own withholding gate, held to the list of legs a host prints under it.
+/// The scan's own withholding gate, held to the list of legs that fired.
 ///
 /// WHAT THIS CATCHES THAT NOTHING ELSE DOES. WithholdingLegsTests holds
 /// <c>WithholdingLegs.Any</c> to <c>WithholdingLegs.Fired</c>, which is a fact about
 /// that pair and says nothing whatever about the scan. The scan is free to stop
 /// calling either of them, or to write a condition of its own beside the call, and no
 /// test over the pair can see it. That is a machine whose offer is withheld and whose
-/// breakdown has nothing to say about why: a heading with nothing under it.
+/// list of legs names no condition that did it.
 ///
 /// So this drives the real scan, one per member of the census, and asserts that a
 /// wholesale withholding that took a file has a leg to explain it. The members are read
@@ -51,9 +51,9 @@ public class FileSystemScanServiceWithholdingLegsTests
 
         if (result.WithheldBy.WholesaleCount == 0) return;
 
-        Assert.True(result.WithholdingLegsFired.Count > 0,
+        Assert.True(Fired(result).Count > 0,
             $"the offer was withheld wholesale on a census whose only member is {member}, "
-            + "and no leg fired, so the breakdown would print a heading with nothing under it");
+            + "and no leg fired, so the gate acted on a condition no leg names");
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class FileSystemScanServiceWithholdingLegsTests
         var result = await Scan(default);
 
         Assert.Equal(0, result.WithheldBy.WholesaleCount);
-        Assert.Empty(result.WithholdingLegsFired);
+        Assert.Empty(Fired(result));
         Assert.Single(result.RemovableFiles);
     }
 
@@ -75,15 +75,19 @@ public class FileSystemScanServiceWithholdingLegsTests
     {
         // The other half, and the one that shows the theory can reach its assertion at
         // all: a census that does fire a leg withholds the offer, and the leg is on the
-        // list a host would print.
+        // list of legs that fired.
         var result = await Scan(new EnumerationCensus(UnansweredProductCount: 1));
 
         Assert.True(result.WithheldBy.WholesaleCount > 0);
         Assert.Equal(
             new[] { WithholdingLeg.RegistryProductUnaskable },
-            result.WithholdingLegsFired);
+            Fired(result));
         Assert.Empty(result.RemovableFiles);
     }
+
+    // The legs the gate names for what the result carries: the two values it was computed from.
+    private static IReadOnlyList<WithholdingLeg> Fired(ScanResult result) =>
+        WithholdingLegs.Fired(result.Census, result.RegistrationIdentityReads);
 
     private static EnumerationCensus CensusWithOnly(string member)
     {

@@ -149,8 +149,7 @@ namespace InstallerClean.Models;
 /// <param name="Census">
 /// What the enumeration behind this scan measured about itself and about the
 /// machine, carried straight through from
-/// <see cref="InstallerQueryResult.Census"/>. The opt-in report reads it, and
-/// <see cref="WithholdingLegsFired"/> names the withholding legs that fired from it. The
+/// <see cref="InstallerQueryResult.Census"/>. The opt-in report reads it. The
 /// withholdings it drives are decided on the enumeration's own copy, before this result
 /// is built.
 /// </param>
@@ -548,6 +547,13 @@ public record ScanResult(
     public int LeftAloneCount =>
         RegisteredPackages.Count(p => !p.IsMissingFromDisk) + (WithheldFiles?.Count ?? 0);
 
+    /// <summary>
+    /// The size of the files <see cref="LeftAloneCount"/> counts: the registered files on
+    /// the disk and the withheld files, summed under the same two tests as the count, so
+    /// the window's size beside its count describes one population.
+    /// </summary>
+    public long LeftAloneTotalBytes => RegisteredTotalBytes + WithheldTotalBytes;
+
     /// <summary>Total bytes of the files on <see cref="WithheldFiles"/>.</summary>
     public long WithheldTotalBytes =>
         WithheldFiles?.Sum(f => f.SizeBytes) ?? 0;
@@ -579,20 +585,6 @@ public record ScanResult(
             - WithheldBy.DeclaredProductInstalledCount
             - WithheldBy.NotBeforeTheClockCount
             - WithheldBy.DeclaredPatchRegisteredCount);
-
-    /// <summary>
-    /// Which conditions kept the walk-derived offer back.
-    ///
-    /// IT IS A SECOND CALLER OF THE GATE'S OWN EXPRESSION AND NOT A SECOND DERIVATION.
-    /// The scan computes the gate from these same two values before it builds this
-    /// result, so what is read here cannot disagree with what the scan acted on.
-    /// The list is empty on any scan whose offer stood. It does not say whether the
-    /// withholding took anything, because the gate also fires on a machine whose walk
-    /// found nothing to withhold; <see cref="WithholdingSplit.WholesaleCount"/> counts
-    /// what it took.
-    /// </summary>
-    public IReadOnlyList<WithholdingLeg> WithholdingLegsFired =>
-        WithholdingLegs.Fired(Census, RegistrationIdentityReads);
 
     /// <summary>
     /// What this run's withholding amounts to, for the command line deciding what its
@@ -1211,11 +1203,10 @@ public enum WithholdingLeg
 /// rather than an expression written twice.
 ///
 /// THE GATE AND THE LIST OF WHICH LEGS FIRED READ THE SAME CALL. The scan asks whether
-/// anything fired; <see cref="ScanResult.WithholdingLegsFired"/> asks which. Written as
+/// anything fired through <see cref="Any"/>, which calls <see cref="Fired"/>. Written as
 /// two expressions they agree until one of them changes, after which the gate can grow a
-/// condition the list does not name, every test still green and the output still
-/// looking like an answer. Here a leg added to the enum is a leg the gate acts on and
-/// a leg the list names.
+/// condition the list does not name, every test still green. Here a leg added to the
+/// enum is a leg the gate acts on and a leg the list names.
 /// </summary>
 public static class WithholdingLegs
 {

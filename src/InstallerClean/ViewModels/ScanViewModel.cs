@@ -389,19 +389,15 @@ public partial class ScanViewModel : ObservableObject
             // probing first would miss it.
             var pendingRebootResult = await Task.Run(() => _rebootService.Check(), cancellationToken);
 
-            // THE LEFT-ALONE COUNT IS THE RESULT'S OWN, which the command line prints from
-            // the same property (ScanResult.LeftAloneCount), and it includes the withheld
-            // files. The size beside it is summed over the same two populations: the
-            // registered files on the disk, whose total RegisteredTotalBytes sums under the
-            // same existence test the count uses, and the withheld files.
+            // THE LEFT-ALONE COUNT AND THE SIZE BESIDE IT ARE THE RESULT'S OWN
+            // (ScanResult.LeftAloneCount and LeftAloneTotalBytes), over the same two
+            // populations, and the command line prints the count from the same property.
             //
             // The Details window's own header counts the same two populations, off the
             // same lists, because the two are one click apart and a reader comparing them
             // must not find them disagreeing.
-            var withheld = result.WithheldFiles ?? Array.Empty<OrphanedFile>();
             var registeredCount = result.LeftAloneCount;
-            var registeredSize = DisplayHelpers.FormatSize(
-                result.RegisteredTotalBytes + withheld.Sum(f => f.SizeBytes));
+            var registeredSize = DisplayHelpers.FormatSize(result.LeftAloneTotalBytes);
             var orphanedCount = result.RemovableFiles.Count;
             var orphanedSize = DisplayHelpers.FormatSize(result.RemovableFiles.Sum(f => f.SizeBytes));
             // Built here with the rest of the display state rather than in the

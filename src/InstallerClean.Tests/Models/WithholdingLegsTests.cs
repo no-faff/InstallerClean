@@ -101,13 +101,12 @@ public class WithholdingLegsTests
 
     [Theory]
     [MemberData(nameof(Table))]
-    public void The_result_reads_the_same_legs_the_gate_was_given(
+    public void The_result_carries_the_same_legs_the_gate_was_given(
         bool recordedPath, bool identity, bool unaskable, bool unread, WithholdingLeg[] expected, bool expectedGate)
     {
-        // The host reads them off the result rather than off the two values, so the
-        // property is held to the same table. It calls the same static, which is what
-        // makes a disagreement impossible rather than merely unlikely; this is what
-        // says the wiring between them is right.
+        // The legs are asked of the census and the registration reads a result carries,
+        // the two values the scan's gate was computed from, so the table holds for them
+        // as it does for the values given directly.
         var result = new ScanResult(
             Array.Empty<OrphanedFile>(),
             Array.Empty<RegisteredPackage>(),
@@ -115,8 +114,10 @@ public class WithholdingLegsTests
             Census: Census(recordedPath, unaskable, unread),
             RegistrationIdentityReads: Reads(identity));
 
-        Assert.Equal(expected, result.WithholdingLegsFired);
-        Assert.Equal(expectedGate, result.WithholdingLegsFired.Count > 0);
+        var fired = WithholdingLegs.Fired(result.Census, result.RegistrationIdentityReads);
+
+        Assert.Equal(expected, fired);
+        Assert.Equal(expectedGate, fired.Count > 0);
     }
 
     /// <summary>
