@@ -1179,11 +1179,11 @@ internal static class Program
             // LINES STANDS IN ITS PLACE. The line about files held back for their times
             // says those files were kept and when to scan again, and the line naming the
             // drives and shares the scan stopped waiting for says the files it left alone
-            // were never established to be needed or unneeded. The clean line over either
-            // would claim more than the scan established, so each is printed instead of it,
-            // as the window's nothing-offered screen does for the same run. Whether the
-            // first is printed is the scan's answer (HasRecentChangeLine), the same one
-            // ReportScanSignals spends.
+            // were never established to be needed or unneeded. The clean line beside either
+            // would claim more than the scan established, so where either is among the
+            // notices the clean line is not printed, as on the window's nothing-offered
+            // screen for the same run. Whether the first is printed is the scan's answer
+            // (HasRecentChangeLine), the same one ReportScanSignals spends.
             //
             // THE HOST DOES NOT PARTITION ANYTHING TO GET HERE. Deciding it here would
             // mean reading a split the scan owns, and a host that infers one decision's
@@ -1191,9 +1191,10 @@ internal static class Program
             // the moment any of them moves. The scan answers it where the withholding
             // happens; this branch spends the answer.
             //
-            // THE LINE AFTER IT, WHICHEVER OF THE TWO IS PRINTED, SAYS HOW MANY FILES WERE
-            // LEFT ALONE (ScanResult.LeftAloneCount), the figure the window shows under its
-            // unneeded count. ReportScanSignals returns it as the first of the notices.
+            // THE FIRST NOTICE SAYS HOW MANY FILES WERE LEFT ALONE (ScanResult.LeftAloneCount),
+            // the figure the window shows under its unneeded count. It follows the line saying
+            // what the scan found or the clean line, and is the first line after the scanning
+            // one where neither is printed.
             //
             // withheldCount is UnestablishedWithheldCount, which leaves out any file kept
             // because it declares an installed program, for its times
@@ -1216,8 +1217,8 @@ internal static class Program
             // COME BACK TO BE PRINTED, after the line saying what the scan found, or after the
             // scanning line where no such line is printed. A /s that lists files prints them
             // ahead of the line counting the files instead, so the list sits straight under
-            // that line, a script reading the rows taking the indented lines after that line
-            // to the end of the output. What can follow the list is never indented: the unexpected-error
+            // that line, and a script reading the rows takes the indented lines after it to
+            // the end of the output. What can follow the list is never indented: the unexpected-error
             // line of a run whose output failed and the note saying the Application log
             // refused the run's summary, in either order, and a blank line wherever a failed
             // write lost a whole line (ConsoleGuard).
@@ -2129,10 +2130,10 @@ internal static class Program
 
         // THE DRIVES AND SHARES THE SCAN STOPPED WAITING FOR WHILE FILES STILL HAD TO BE
         // CHECKED AGAINST THEM, on stdout and as Event ID 3004. After the left-alone line
-        // above, which also speaks of files the scan left alone, so where the scan has
-        // nothing else to report it is the first line after that one, standing where the
-        // clean line would have been. The window draws its own line under its left-alone
-        // count and above its missing-files line, which is this order.
+        // above, which also speaks of files the scan left alone, and ahead of the line
+        // about registrations naming a file that is not there. The window draws its own
+        // line under its left-alone count and above its missing-files line, which is this
+        // order.
         var givenUp = SourcesGivenUpReport.CommandLine(sourcesGivenUp);
         if (givenUp.Length > 0) lines.Add(givenUp);
         NoteSourcesGivenUp(arg, sourcesGivenUp, duringTheCheck: false);

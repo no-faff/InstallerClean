@@ -21,10 +21,10 @@ namespace InstallerClean.Tests.Helpers;
 /// the same two lines, so one theory walks the split's members. The reasons live in the
 /// Application log's entries and in the opt-in report.
 ///
-/// THE ONE EXCEPTION IS A LINE THAT STANDS IN PLACE OF THE CLEAN ONE: the line about files
-/// held back for their times, and the line naming the drives and shares the scan stopped
-/// waiting for. Each says the files it speaks of were kept, so the clean line is not
-/// printed over it.
+/// THE EXCEPTION IS A RUN THAT PRINTS ONE OF TWO LINES INSTEAD OF THE CLEAN ONE: the line
+/// about files held back for their times, and the line naming the drives and shares the
+/// scan stopped waiting for. Each says the files it speaks of were kept, so the clean line
+/// is not printed beside it.
 ///
 /// THE FIXTURES ARE WHAT THIS FILE IS. The branch below is taken only where the scan
 /// offers nothing, so a fixture with a file in its offer would make every assertion about
@@ -129,8 +129,8 @@ public class CliNothingOfferedTests
         int forTheirTimes, int forAnInstalledProgram)
     {
         // Kept for their times with the signals clear, alone or beside a file kept for a
-        // program Windows still has installed: the line about recently changed files
-        // stands where the clean line would be, after the count.
+        // program Windows still has installed: the line about recently changed files is
+        // printed after the count, and the clean line is not.
         var result = Scan(
             registered: 4, withheld: 2,
             split: new WithholdingSplit(

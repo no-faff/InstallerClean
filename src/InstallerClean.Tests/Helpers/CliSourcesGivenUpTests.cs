@@ -54,8 +54,8 @@ public class CliSourcesGivenUpTests
 
         Assert.Equal(CliExitCode.Ok, run.ExitCode);
         Assert.DoesNotContain(Strings.Cli_FoundNoOrphans, run.Stdout, StringComparison.Ordinal);
-        // In the clean line's place: the count of files left alone, which the clean line
-        // would have been followed by, and under it the line naming the drive.
+        // No clean line: the count of files left alone comes straight after the scanning
+        // line, and under it the line naming the drive.
         Assert.Equal(LeftAloneReport.Line(result.LeftAloneCount), Lines(run.Stdout)[1]);
         Assert.Equal(
             SourcesGivenUpReport.CommandLine([Given("D:", 1)]),
@@ -157,7 +157,7 @@ public class CliSourcesGivenUpTests
 
         var run = await Run("/s", result);
 
-        // The line naming the share stands in the clean line's place.
+        // No clean line: the count of files left alone, then the line naming the share.
         var lines = Lines(run.Stdout);
         Assert.Equal(LeftAloneReport.Line(result.LeftAloneCount), lines[1]);
         Assert.Equal(SourcesGivenUpReport.CommandLine([Given(Share, 1)]), lines[2]);

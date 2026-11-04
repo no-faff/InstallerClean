@@ -1723,9 +1723,9 @@ Run InstallerClean again as administrator.</value></data>
        Windows holds is a different subject, and not one a reader of this log
        can act on. -->
   <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>{0} mode: no unneeded files identified.</value></data>
-  <!-- The audit line for the outcome above, so a monitoring tool watching the
-       Application channel is not told a machine is clean when the scan could not
-       judge it.
+  <!-- The outcome entry for a scan that offered nothing and held files back, so a
+       monitoring tool watching the Application channel is not told a machine is clean
+       when the scan could not judge it.
 
        0 = mode arg, whichever of /s, /d and /m was run, as in the entry above:
        the no-files branch is common to all three. 1 = files held back,
@@ -1749,7 +1749,7 @@ Run InstallerClean again as administrator.</value></data>
   <data name="Cli.EventLogNothingOffered" xml:space="preserve"><value>{0} mode: nothing could be offered. InstallerClean could not be certain which cached files belong to the programs installed here, so it has held back {1} {2}. No action taken.</value></data>
   <!-- The per-file twin of the entry above, for the machine whose candidates were
        each judged and kept rather than emptied wholesale, so the Application channel
-       tells those two apart the way stdout does. It shares Event ID 1000 with its
+       tells those two apart. It shares Event ID 1000 with its
        sibling for the reason recorded above, and it takes the same three arguments in
        the same order. Machine-read and forced English at the emit site, as that entry
        is, so it takes no .Singular/.Plural pair and keeps the app as the subject:
