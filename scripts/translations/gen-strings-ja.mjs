@@ -633,7 +633,7 @@ const STRIPPED = new Set([
   'Cli.EventLogMoveNotEnoughSpace',
   'Cli.EventLogMoveAborted',
   'Cli.EventLogInstallerLockUnavailable',
-  // By the rule in the paragraph above: both are machine Cli keys with no line in
+  // By the rule in the paragraph above: both are machine Cli keys that postdate
   // coolvitto's PR, so nobody wrote a Japanese line for them and nobody should.
   'Cli.EventLogNothingOffered',
   'Cli.EventLogNothingOfferedNotice',

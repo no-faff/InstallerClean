@@ -19,8 +19,8 @@
 //     satellite-only .One overrides live in the OVERRIDES block below, each because
 //     a post-nominal adjective or participle has to agree with the count. The block
 //     is injected before </root> so a re-run reproduces the file exactly. The
-//     cancelled-summary lines are the ones that genuinely take no .One: their
-//     leading participle precedes its object and does not inflect.
+//     cancelled-summary lines take no .One: their leading participle precedes its
+//     object and does not inflect.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';

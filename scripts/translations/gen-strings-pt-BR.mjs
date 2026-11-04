@@ -654,12 +654,12 @@ const MAP = {
 // check-resx-parity.mjs allows each because its base (the .Plural sibling, or the
 // flat key itself) is in the neutral, and the value's {N} set matches the base's.
 // pt counts 0 and 1 as "one" (CategoryFor's fr/pt branch), so .One fires at 0 and 1.
-// The three Cli completion lines inflect the past participle at one. Progress
-// gerunds (Deleting/Moving) do not. The three *CancelledSummary keys do NOT get an
-// override: their form is selected on the total ({1}) but any participle would have
-// to agree with the acted-on count ({0}), a different number, so they use a
-// count-invariant "X cancelada apos <infinitive> {0} de {1} {2}" that reads correctly
-// at every count.
+// The found, deleted and moved lines inflect the past participle at one, and every
+// Cli line here inflects the post-nominal adjective desnecessário, the progress lines
+// (Deleting/Moving) included. The *CancelledSummary keys do NOT get an override:
+// their form is selected on the total ({1}) but any participle would have to agree
+// with the acted-on count ({0}), a different number, so they use a count-invariant
+// "X cancelada após <infinitive> {0} de {1} {2}" that reads correctly at every count.
 const OVERRIDES = {
   'Cli.FoundOrphans.One': `Foi encontrado {0} {1} desnecessário para limpar ({2}).`,
   'Cli.DeletingFiles.One': `Excluindo {0} {1} desnecessário...`,
