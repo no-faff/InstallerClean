@@ -19,11 +19,19 @@ internal static class FolderPicker
 {
     /// <summary>
     /// The whole set of options the dialog runs with: it offers folders rather than files,
-    /// and the item it hands back is a file system item that exists.
-    /// FOS_DEFAULTNOMINIMODE is part of the set and Windows 7 and later do not act on it.
+    /// the item it hands back is a file system item that exists, and the process's working
+    /// directory stays where it is. FOS_DEFAULTNOMINIMODE is part of the set and Windows 7
+    /// and later do not act on it.
     /// </summary>
+    /// <remarks>
+    /// Do not take FOS_NOCHANGEDIR out: this process is elevated, and a program or file it
+    /// names without a full path is looked for in its working directory, so a folder the
+    /// user browsed to must not become it. Do not add FOS_ALLOWMULTISELECT either: the
+    /// answer is read with GetResult, which fails where more than one item was chosen.
+    /// </remarks>
     internal const uint Options =
         FileOpenDialogNative.FOS_PICKFOLDERS
+        | FileOpenDialogNative.FOS_NOCHANGEDIR
         | FileOpenDialogNative.FOS_FORCEFILESYSTEM
         | FileOpenDialogNative.FOS_PATHMUSTEXIST
         | FileOpenDialogNative.FOS_FILEMUSTEXIST

@@ -83,6 +83,9 @@ internal static class FileOpenDialogNative
     /// <summary>CLSCTX_INPROC_SERVER: the Common Item Dialog is an in-process server.</summary>
     internal const uint CLSCTX_INPROC_SERVER = 0x1;
 
+    /// <summary>FOS_NOCHANGEDIR: the dialog leaves the process's working directory as it is.</summary>
+    internal const uint FOS_NOCHANGEDIR = 0x00000008;
+
     /// <summary>FOS_PICKFOLDERS: the dialog chooses a folder rather than a file.</summary>
     internal const uint FOS_PICKFOLDERS = 0x00000020;
 
