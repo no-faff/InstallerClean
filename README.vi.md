@@ -40,7 +40,7 @@
 - **Giải phóng được bao nhiêu:** Biểu đồ ở trên cho thấy kết quả của các báo cáo tùy chọn gửi qua ứng dụng (cảm ơn mọi người). Trong số <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> đã giải phóng được dung lượng, trung vị giải phóng được là <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Đó là những tệp có lẽ bạn không hề biết là tồn tại, cứ nằm đó chiếm chỗ. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> trong *tất cả* các máy đã thu hồi hơn 5 GB, và nhiều người đã giải phóng hàng trăm GB. Nói chung, càng cài nhiều phần mềm dựa trên MSI thì càng có nhiều tệp không cần thiết. Ngay khi chạy InstallerClean, bạn sẽ biết.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Nhấp để xem</kbd> biểu đồ sẽ trông thế nào nếu các báo cáo phản ánh chính xác toàn bộ 129.618 lượt tải</summary>
+  <summary><kbd>Nhấp để xem</kbd> biểu đồ sẽ trông thế nào nếu các báo cáo phản ánh chính xác toàn bộ 129.750 lượt tải</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-vi-scaled-dark.svg" />

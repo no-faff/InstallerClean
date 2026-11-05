@@ -40,7 +40,7 @@
 - **どれくらい空くか：** 上のグラフは、アプリから送られた任意のレポートの結果です（みなさん、ありがとうございます）。レポートのうち容量を解放できたのは <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> で、その中央値は <!-- reports-median-start -->1.7 GB<!-- reports-median-end --> です。おそらく存在すら知らなかったファイルが、ただ場所を取っているのです。*すべて*のマシンのうち <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end --> が 5 GB を超える容量を取り戻し、数百 GB を解放した人もたくさんいます。要するに、MSI ベースのソフトを入れるほど、不要なファイルは増えます。InstallerClean を実行すれば、すぐにわかります。
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>クリックして表示</kbd> レポートが全 129,618 回のダウンロードを正確に映していたら、グラフはどう見えるか</summary>
+  <summary><kbd>クリックして表示</kbd> レポートが全 129,750 回のダウンロードを正確に映していたら、グラフはどう見えるか</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ja-scaled-dark.svg" />
