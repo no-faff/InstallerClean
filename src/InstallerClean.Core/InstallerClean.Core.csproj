@@ -4,8 +4,8 @@
     InstallerClean.Core: headless library shared by the WPF app
     (InstallerClean) and the console CLI (InstallerClean.Cli).
 
-    Targets net10.0 (not net10.0-windows): everything in here runs
-    without a WPF dispatcher, without HWND ownership, and without the
+    References no WPF assembly: everything in here runs without a WPF
+    dispatcher, without HWND ownership, and without the
     PresentationFramework / PresentationCore assemblies. Win32 P/Invoke
     is fine (msi.dll, kernel32, shell32) because those work in any
     process subsystem.
@@ -14,7 +14,7 @@
     in InstallerClean (the WPF project), not here.
   -->
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -39,13 +39,24 @@
          own IServiceCollection. The Core library itself doesn't pick
          a container implementation. -->
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
-    <!-- EventLog is only available on Windows but the source builds
-         for any platform. The platform analyser is satisfied by the
-         assembly-wide [SupportedOSPlatform("windows7.0")] attribute in
-         GlobalUsings.cs; EventLogWriter additionally wraps the call in
-         a try/catch so a non-Windows host (or a Windows host with the
-         service stopped) can't throw out of a logging call. -->
-    <PackageReference Include="System.Diagnostics.EventLog" Version="10.0.7" />
+    <!-- Span, Memory and ReadOnlySpan, which .NET Framework 4.8 does not
+         carry. -->
+    <PackageReference Include="System.Memory" Version="4.6.3" />
+    <!-- The JSON reader and writer for the report, the settings and
+         update.json. -->
+    <PackageReference Include="System.Text.Json" Version="10.0.7" />
+    <!-- TimeProvider, which .NET Framework 4.8 does not carry. -->
+    <PackageReference Include="Microsoft.Bcl.TimeProvider" Version="10.0.7" />
+    <!-- System.HashCode, for HashCode.Combine. -->
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- HttpClient and the types around it are in this framework assembly,
+         which a .NET Framework project references, and ImplicitUsings
+         imports, only when asked. -->
+    <Reference Include="System.Net.Http" />
+    <Using Include="System.Net.Http" />
   </ItemGroup>
 
   <!-- Localisation: the typed Strings accessor is hand-managed via

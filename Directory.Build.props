@@ -17,13 +17,15 @@
          wherever the exe is inspected. -->
     <Copyright>(c) No Faff</Copyright>
     <Deterministic>true</Deterministic>
-    <!-- Declaring the RID makes every restore compute the same graph,
-         so packages.lock.json holds one shape regardless of which
-         command wrote it. Without it the win-x64 sections exist only
-         after a "-r win-x64" publish restore, and every plain restore
-         (a build, an IDE design-time restore, on either OS) strips
-         them out again, so the lock files churned at every machine
-         change-over. -->
+    <!-- Every assembly is built for x64, so each copy runs as a 64-bit
+         process: it reads the 64-bit registry view and the real System32,
+         and every structure passed to Windows has its 64-bit layout. -->
+    <PlatformTarget>x64</PlatformTarget>
+    <!-- On Windows the SDK infers RuntimeIdentifier win-x64 for a .NET
+         Framework exe from PlatformTarget, and on Linux it infers none.
+         Declaring the RID here makes every restore on either OS compute
+         the same graph, so packages.lock.json holds one shape whichever
+         machine wrote it, and the locked restore passes on both. -->
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <!-- Source-built SDKs (the Fedora dotnet RPM) ship their own
          rebuilt copies of SDK packages in a library-packs folder and
@@ -35,14 +37,19 @@
     <DisableImplicitLibraryPacksFolder>true</DisableImplicitLibraryPacksFolder>
   </PropertyGroup>
   <ItemGroup>
-    <!-- The self-contained single-file publish injects this SDK task
-         package into its restore graph; referencing it explicitly puts
-         it in EVERY graph, so the lock files hold one shape for plain
-         builds and publishes alike (locked-mode restore compares the
-         reference SETS and fails on any difference). The version
-         tracks the pinned SDK band: when absent, the SDK injects its
-         own matching version, so this version moves in step with the SDK band. -->
-    <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.8" PrivateAssets="all" />
+    <!-- The .NET Framework 4.8 reference assemblies the compiler builds
+         against, from nuget.org. The SDK adds this package by itself only
+         where no 4.8 targeting pack is installed, which differs from one
+         Windows machine to the next and is always the case on Linux;
+         referenced here, it is in every restore graph and every build
+         compiles against the same assemblies. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <!-- A source generator, used at compile time only. It adds to each
+         assembly, as internal types, the attributes the C# compiler needs
+         for init accessors, required members, module initialisers and the
+         nullable-analysis annotations, which .NET Framework 4.8 does not
+         define. No PolySharp assembly ships. -->
+    <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
