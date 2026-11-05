@@ -10,12 +10,11 @@ namespace InstallerClean.Interop.Native;
 /// surface for that chain. Consumed by
 /// <see cref="Helpers.UnelevatedLauncher"/>.
 ///
-/// Source-generated <c>[LibraryImport]</c> with blittable signatures so
-/// it works under the assembly's <c>DisableRuntimeMarshalling</c>:
-/// <c>in Guid</c> and <c>out IntPtr</c> are pointers to blittable values
-/// and pass straight through with no marshalling.
+/// Every parameter is a number, a pointer or a pointer to a blittable
+/// value: <c>in Guid</c> and <c>out IntPtr</c> pass straight through with
+/// no conversion, so each declaration is the native signature exactly.
 /// </summary>
-internal static partial class ShellDispatchNative
+internal static class ShellDispatchNative
 {
     /// <summary>COINIT_APARTMENTTHREADED: the shell automation objects in this chain are STA.</summary>
     internal const uint COINIT_APARTMENTTHREADED = 0x2;
@@ -64,12 +63,12 @@ internal static partial class ShellDispatchNative
     /// error HRESULT. Both S_OK and S_FALSE increment the apartment's
     /// init count and require one matching <see cref="CoUninitialize"/>.
     /// </summary>
-    [LibraryImport("ole32.dll")]
-    internal static partial int CoInitializeEx(IntPtr pvReserved, uint dwCoInit);
+    [DllImport("ole32.dll", EntryPoint = "CoInitializeEx", ExactSpelling = true)]
+    internal static extern int CoInitializeEx(IntPtr pvReserved, uint dwCoInit);
 
     /// <summary>Balances one successful <see cref="CoInitializeEx"/> (S_OK or S_FALSE) on the same thread.</summary>
-    [LibraryImport("ole32.dll")]
-    internal static partial void CoUninitialize();
+    [DllImport("ole32.dll", EntryPoint = "CoUninitialize", ExactSpelling = true)]
+    internal static extern void CoUninitialize();
 
     /// <summary>
     /// Activates a coclass. <paramref name="ppv"/> comes back with a
@@ -77,8 +76,8 @@ internal static partial class ShellDispatchNative
     /// handing it to a ComWrappers wrapper, which takes its own
     /// reference.
     /// </summary>
-    [LibraryImport("ole32.dll")]
-    internal static partial int CoCreateInstance(
+    [DllImport("ole32.dll", EntryPoint = "CoCreateInstance", ExactSpelling = true)]
+    internal static extern int CoCreateInstance(
         in Guid rclsid, IntPtr pUnkOuter, uint dwClsContext, in Guid riid, out IntPtr ppv);
 }
 

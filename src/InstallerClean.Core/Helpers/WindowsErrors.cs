@@ -1,5 +1,7 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.InteropServices;
+using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Helpers;
 
@@ -40,7 +42,37 @@ internal static class WindowsErrors
     /// without the full stop Windows ends it with, so a sentence can carry it in the middle.
     /// It names no file and no account.
     /// </summary>
-    internal static string MessageFor(int code) => OneLine(Marshal.GetPInvokeErrorMessage(code));
+    internal static string MessageFor(int code) => OneLine(SystemMessage(code));
+
+    /// <summary>
+    /// The text Windows gives for <paramref name="code"/>, from the system's own message
+    /// table in the language Windows is shown in, with the white space and control
+    /// characters after it taken off and its full stop left on. Where Windows has no text
+    /// for the number it is <c>Unknown error (0x...)</c>, with the number in hexadecimal.
+    /// Inserts are left as written: the text is read with no arguments to put in them.
+    /// </summary>
+    internal static string SystemMessage(int code)
+    {
+        const uint flags = Kernel32.FORMAT_MESSAGE_ALLOCATE_BUFFER | Kernel32.FORMAT_MESSAGE_IGNORE_INSERTS
+            | Kernel32.FORMAT_MESSAGE_FROM_SYSTEM | Kernel32.FORMAT_MESSAGE_ARGUMENT_ARRAY;
+        var length = Kernel32.FormatMessage(
+            flags, IntPtr.Zero, unchecked((uint)code), 0, out var buffer, 0, IntPtr.Zero);
+        try
+        {
+            if (length > 0 && buffer != IntPtr.Zero)
+            {
+                var text = Marshal.PtrToStringUni(buffer, (int)length);
+                var end = text.Length;
+                while (end > 0 && text[end - 1] <= ' ') end--;
+                return text.Substring(0, end);
+            }
+        }
+        finally
+        {
+            if (buffer != IntPtr.Zero) Kernel32.LocalFree(buffer);
+        }
+        return "Unknown error (0x" + code.ToString("x", CultureInfo.InvariantCulture) + ")";
+    }
 
     /// <summary>
     /// <paramref name="message"/> as one line with its full stop taken off: every run of

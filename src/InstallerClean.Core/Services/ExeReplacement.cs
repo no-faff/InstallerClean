@@ -177,7 +177,7 @@ internal static class ExeReplacement
             Ntdll.SYNCHRONIZE | Kernel32.PROCESS_QUERY_LIMITED_INFORMATION, bInheritHandle: false, (uint)request.ProcessId);
         if (process.IsInvalid)
         {
-            var error = Marshal.GetLastPInvokeError();
+            var error = Marshal.GetLastWin32Error();
             process.Dispose();
             refused = Refusal($"The copy to be replaced, process {request.ProcessId}, could not be opened: error {error}.");
             return null;
@@ -613,7 +613,7 @@ internal static class ExeReplacement
 
     /// <summary>Gives <paramref name="existing"/> the second name <paramref name="link"/>, and answers 0, or the error Windows refused it with.</summary>
     private static int HardLink(string link, string existing) =>
-        Kernel32.CreateHardLink(link, existing, IntPtr.Zero) ? 0 : Marshal.GetLastPInvokeError();
+        Kernel32.CreateHardLink(link, existing, IntPtr.Zero) ? 0 : Marshal.GetLastWin32Error();
 
     /// <summary>
     /// Moves <paramref name="from"/> over <paramref name="to"/> in one step, written through
@@ -629,7 +629,7 @@ internal static class ExeReplacement
         {
             if (Kernel32.MoveFileEx(from, to, Kernel32.MOVEFILE_REPLACE_EXISTING | Kernel32.MOVEFILE_WRITE_THROUGH))
                 return RetryStep.Done;
-            last = Marshal.GetLastPInvokeError();
+            last = Marshal.GetLastWin32Error();
             return last is Kernel32.ERROR_ACCESS_DENIED or Kernel32.ERROR_SHARING_VIOLATION or Kernel32.ERROR_LOCK_VIOLATION
                 ? RetryStep.Again
                 : RetryStep.Stop;

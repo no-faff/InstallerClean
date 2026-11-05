@@ -243,7 +243,7 @@ internal static class NewerVersionProcess
             {
                 handle.DangerousAddRef(ref added);
                 accepted = Kernel32.TerminateProcess(handle.DangerousGetHandle(), NotStartedExitCode);
-                if (!accepted) terminateError = Marshal.GetLastPInvokeError();
+                if (!accepted) terminateError = Marshal.GetLastWin32Error();
             }
             finally
             {

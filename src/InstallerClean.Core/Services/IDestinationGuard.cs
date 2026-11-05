@@ -89,7 +89,7 @@ internal sealed class HandleDestinationGuard : IDestinationGuard
         {
             var attributes = Kernel32.SECURITY_ATTRIBUTES.With(IntPtr.Zero);
             if (Kernel32.CreateDirectory(folder, in attributes)) return FolderCreation.Made;
-            return Marshal.GetLastPInvokeError() == Kernel32.ERROR_ALREADY_EXISTS
+            return Marshal.GetLastWin32Error() == Kernel32.ERROR_ALREADY_EXISTS
                 ? FolderCreation.AlreadyThere
                 : FolderCreation.Failed;
         }

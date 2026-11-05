@@ -1,13 +1,11 @@
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
-/// P/Invoke surface for advapi32.dll, through the same source-generated
-/// <see cref="LibraryImportAttribute"/> stubs as <see cref="Kernel32"/>.
+/// P/Invoke surface for advapi32.dll, declared as <see cref="Kernel32"/>'s are.
 /// </summary>
-internal static partial class Advapi32
+internal static class Advapi32
 {
     private const string Library = "advapi32.dll";
 
@@ -16,10 +14,9 @@ internal static partial class Advapi32
     /// is allocated with LocalAlloc and the caller frees it with
     /// <see cref="Kernel32.LocalFree"/>.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "ConvertStringSecurityDescriptorToSecurityDescriptorW",
-                   SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "ConvertStringSecurityDescriptorToSecurityDescriptorW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool ConvertStringSecurityDescriptorToSecurityDescriptor(
+    public static extern bool ConvertStringSecurityDescriptorToSecurityDescriptor(
         string stringSecurityDescriptor,
         uint stringSdRevision,
         out IntPtr securityDescriptor,
@@ -39,8 +36,8 @@ internal static partial class Advapi32
     /// the handle already names, so a folder put in its place under the same name
     /// afterwards does not change what comes back.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetSecurityInfo")]
-    public static partial uint GetSecurityInfo(
+    [DllImport(Library, EntryPoint = "GetSecurityInfo", ExactSpelling = true)]
+    public static extern uint GetSecurityInfo(
         Microsoft.Win32.SafeHandles.SafeFileHandle handle,
         int ObjectType,
         uint SecurityInfo,
@@ -51,9 +48,9 @@ internal static partial class Advapi32
         out IntPtr ppSecurityDescriptor);
 
     /// <summary>Reads a descriptor's control flags, for the protected-list bit.</summary>
-    [LibraryImport(Library, EntryPoint = "GetSecurityDescriptorControl", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetSecurityDescriptorControl", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetSecurityDescriptorControl(
+    public static extern bool GetSecurityDescriptorControl(
         IntPtr pSecurityDescriptor,
         out ushort pControl,
         out uint lpdwRevision);
@@ -63,19 +60,18 @@ internal static partial class Advapi32
     /// a list, into the list's own memory. The entry is read before the descriptor it
     /// belongs to is freed.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetAce", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetAce", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetAce(IntPtr pAcl, uint dwAceIndex, out IntPtr pAce);
+    public static extern bool GetAce(IntPtr pAcl, uint dwAceIndex, out IntPtr pAce);
 
     /// <summary>
     /// Writes a SID as its canonical string form (S-1-...), into memory the caller
     /// frees with <see cref="Kernel32.LocalFree"/>. The string is a stable name for a
     /// SID, which is why two SIDs are compared through it here rather than byte by byte.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "ConvertSidToStringSidW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "ConvertSidToStringSidW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool ConvertSidToStringSid(IntPtr Sid, out IntPtr StringSid);
+    public static extern bool ConvertSidToStringSid(IntPtr Sid, out IntPtr StringSid);
 
     /// <summary>OWNER_SECURITY_INFORMATION: ask for the owner.</summary>
     public const uint OWNER_SECURITY_INFORMATION = 0x00000001;

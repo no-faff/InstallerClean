@@ -4,8 +4,7 @@ using Microsoft.Win32.SafeHandles;
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
-/// P/Invoke surface for ntdll.dll, through the same source-generated
-/// <see cref="LibraryImportAttribute"/> stubs as <see cref="Kernel32"/>, and loaded
+/// P/Invoke surface for ntdll.dll, declared as <see cref="Kernel32"/>'s are, and loaded
 /// from System32 by the resolver in <see cref="SystemLibraries"/> like every other
 /// library here.
 /// </summary>
@@ -19,7 +18,7 @@ namespace InstallerClean.Interop.Native;
 /// its own can then reach each child through that handle, and a folder put in the
 /// directory's place under its name afterwards is not on the path the kernel walks.
 /// </remarks>
-internal static partial class Ntdll
+internal static class Ntdll
 {
     private const string Library = "ntdll.dll";
 
@@ -29,8 +28,8 @@ internal static partial class Ntdll
     /// zero or above for success and negative for a failure the caller treats as "not
     /// opened".
     /// </summary>
-    [LibraryImport(Library, SetLastError = false)]
-    public static partial int NtCreateFile(
+    [DllImport(Library, EntryPoint = "NtCreateFile", ExactSpelling = true)]
+    public static extern int NtCreateFile(
         out IntPtr FileHandle,
         uint DesiredAccess,
         in OBJECT_ATTRIBUTES ObjectAttributes,
@@ -45,8 +44,8 @@ internal static partial class Ntdll
 
     /// <summary>The Win32 error a failing NTSTATUS maps to, so a handle open that an
     /// NTSTATUS refused is recorded with a cause the rest of the code reads.</summary>
-    [LibraryImport(Library, SetLastError = false)]
-    public static partial uint RtlNtStatusToDosError(int Status);
+    [DllImport(Library, EntryPoint = "RtlNtStatusToDosError", ExactSpelling = true)]
+    public static extern uint RtlNtStatusToDosError(int Status);
 
     /// <summary>
     /// A counted UTF-16 string, as ntdll takes names. <see cref="Buffer"/> points at

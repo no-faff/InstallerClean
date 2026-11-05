@@ -86,7 +86,7 @@ internal static unsafe class SystemLibraries
             }
             if (entry != exe) return false;
             if (setDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32 | LOAD_LIBRARY_SEARCH_USER_DIRS)) return true;
-            Record(new Win32Exception(Marshal.GetLastPInvokeError(),
+            Record(new Win32Exception(Marshal.GetLastWin32Error(),
                 "SetDefaultDllDirectories refused System32 as the process's library search."));
         }
         catch (Exception ex)

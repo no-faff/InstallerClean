@@ -187,7 +187,7 @@ internal static class SetupReplacement
         if (HandleWait.One(process, Kernel32.INFINITE, out error) != Kernel32.WAIT_OBJECT_0) return false;
         if (!Kernel32.GetExitCodeProcess(process, out var code))
         {
-            error = Marshal.GetLastPInvokeError();
+            error = Marshal.GetLastWin32Error();
             return false;
         }
         exitCode = (int)code;
@@ -282,7 +282,7 @@ internal static class SetupReplacement
         using var process = Kernel32.OpenProcess(
             Kernel32.PROCESS_QUERY_LIMITED_INFORMATION, bInheritHandle: false, (uint)processId);
         if (process.IsInvalid)
-            return Marshal.GetLastPInvokeError() == Kernel32.ERROR_INVALID_PARAMETER;
+            return Marshal.GetLastWin32Error() == Kernel32.ERROR_INVALID_PARAMETER;
 
         var length = (uint)buffer.Length;
         if (!Kernel32.QueryFullProcessImageName(process, 0, buffer, ref length)) return false;

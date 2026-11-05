@@ -1,17 +1,27 @@
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using Microsoft.Win32.SafeHandles;
 
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
-/// P/Invoke surface for kernel32.dll. Uses the source-generated
-/// <see cref="LibraryImportAttribute"/> stubs rather than DllImport so
-/// the marshalling code is emitted at compile time, free of runtime
-/// reflection and friendly to AOT.
+/// P/Invoke surface for kernel32.dll.
+///
+/// Every declaration names its entry point exactly, and every one whose entry point
+/// is a W function, or that passes a string or a char[], is CharSet.Unicode: a
+/// string then reaches the function as a pointer to UTF-16 characters and a char as
+/// two bytes, as a W function reads them. Under the default ANSI set each char
+/// would be converted to one byte, and the function would read the result as
+/// something else. A char[] buffer is passed as a pointer to its first element,
+/// and [Out] copies what the function wrote back into the array wherever the
+/// marshaller copies the array rather than pinning it.
+///
+/// Every struct passed here holds only integers, pointers and other such structs,
+/// so its layout in memory is the one Windows reads and writes, and the marshaller
+/// converts nothing in it. The marshaller would convert a bool field to a
+/// four-byte BOOL and, under the default ANSI set, a char field to one byte, so
+/// neither is declared.
 /// </summary>
-internal static partial class Kernel32
+internal static class Kernel32
 {
     private const string Library = "kernel32.dll";
 
@@ -23,9 +33,8 @@ internal static partial class Kernel32
     /// FILE_FLAG_BACKUP_SEMANTICS to open a directory handle at all, and
     /// FILE_APPEND_DATA granted without FILE_WRITE_DATA.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "CreateFileW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial SafeFileHandle CreateFile(
+    [DllImport(Library, EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern SafeFileHandle CreateFile(
         string lpFileName,
         uint dwDesiredAccess,
         uint dwShareMode,
@@ -43,10 +52,10 @@ internal static partial class Kernel32
     /// the size required, INCLUDING the null terminator. A retry therefore
     /// allocates exactly the returned count, not one more.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetFinalPathNameByHandleW", SetLastError = true)]
-    public static partial uint GetFinalPathNameByHandle(
+    [DllImport(Library, EntryPoint = "GetFinalPathNameByHandleW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern uint GetFinalPathNameByHandle(
         SafeFileHandle hFile,
-        [MarshalUsing(CountElementName = nameof(cchFilePath))] char[] lpszFilePath,
+        [Out] char[] lpszFilePath,
         uint cchFilePath,
         uint dwFlags);
 
@@ -55,10 +64,9 @@ internal static partial class Kernel32
     /// <paramref name="lpDirectoryName"/>. Handles local drives, UNC
     /// shares and mapped drives uniformly.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetDiskFreeSpaceExW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "GetDiskFreeSpaceExW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetDiskFreeSpaceEx(
+    public static extern bool GetDiskFreeSpaceEx(
         string lpDirectoryName,
         out ulong lpFreeBytesAvailableToCaller,
         out ulong lpTotalNumberOfBytes,
@@ -94,18 +102,16 @@ internal static partial class Kernel32
     /// <see cref="Helpers.StorageHelpers.IsRemotePath"/> is what keeps the
     /// shapes that can do it away from here.
     ///
-    /// <c>CountElementName</c> and not <c>ConstantElementCount</c>, which is the
-    /// opposite of the rule the <c>MsiEnum*</c> buffers follow and is right for
-    /// the same reason: those take no count parameter, so naming one injects a
-    /// phantom argument. This function takes <paramref name="cchBufferLength"/>
-    /// and must be told the size, exactly as GetFinalPathNameByHandle above is.
+    /// The buffer's size goes in <paramref name="cchBufferLength"/>, and the caller
+    /// passes the array's own length there, exactly as GetFinalPathNameByHandle
+    /// above is told its size. The <c>MsiEnum*</c> buffers are the opposite case,
+    /// taking no count parameter; both declarations match their native signatures.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetVolumePathNameW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "GetVolumePathNameW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetVolumePathName(
+    public static extern bool GetVolumePathName(
         string lpszFileName,
-        [MarshalUsing(CountElementName = nameof(cchBufferLength))] char[] lpszVolumePathName,
+        [Out] char[] lpszVolumePathName,
         uint cchBufferLength);
 
     /// <summary>
@@ -126,12 +132,11 @@ internal static partial class Kernel32
     /// small fails with ERROR_MORE_DATA and writes the required character count
     /// to <paramref name="lpcchReturnLength"/>, which includes both terminators.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetVolumePathNamesForVolumeNameW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "GetVolumePathNamesForVolumeNameW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetVolumePathNamesForVolumeName(
+    public static extern bool GetVolumePathNamesForVolumeName(
         string lpszVolumeName,
-        [MarshalUsing(CountElementName = nameof(cchBufferLength))] char[] lpszVolumePathNames,
+        [Out] char[] lpszVolumePathNames,
         uint cchBufferLength,
         out uint lpcchReturnLength);
 
@@ -148,10 +153,9 @@ internal static partial class Kernel32
     /// walks exactly the volumes, so a match cannot be a name that was never a
     /// volume to begin with.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "FindFirstVolumeW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial IntPtr FindFirstVolume(
-        [MarshalUsing(CountElementName = nameof(cchBufferLength))] char[] lpszVolumeName,
+    [DllImport(Library, EntryPoint = "FindFirstVolumeW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr FindFirstVolume(
+        [Out] char[] lpszVolumeName,
         uint cchBufferLength);
 
     /// <summary>
@@ -161,18 +165,17 @@ internal static partial class Kernel32
     /// other code for a real failure. The two are told apart by the code, never
     /// by the false.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "FindNextVolumeW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "FindNextVolumeW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool FindNextVolume(
+    public static extern bool FindNextVolume(
         IntPtr hFindVolume,
-        [MarshalUsing(CountElementName = nameof(cchBufferLength))] char[] lpszVolumeName,
+        [Out] char[] lpszVolumeName,
         uint cchBufferLength);
 
     /// <summary>Closes a volume enumeration opened by <see cref="FindFirstVolume"/>.</summary>
-    [LibraryImport(Library, EntryPoint = "FindVolumeClose", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "FindVolumeClose", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool FindVolumeClose(IntPtr hFindVolume);
+    public static extern bool FindVolumeClose(IntPtr hFindVolume);
 
     /// <summary>
     /// The NT object the given MS-DOS device name is a symbolic link to:
@@ -192,11 +195,10 @@ internal static partial class Kernel32
     /// not necessarily, so a caller reads the first entry rather than the whole
     /// buffer as a single string.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "QueryDosDeviceW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint QueryDosDevice(
+    [DllImport(Library, EntryPoint = "QueryDosDeviceW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern uint QueryDosDevice(
         string lpDeviceName,
-        [MarshalUsing(CountElementName = nameof(ucchMax))] char[] lpTargetPath,
+        [Out] char[] lpTargetPath,
         uint ucchMax);
 
     /// <summary>
@@ -208,14 +210,13 @@ internal static partial class Kernel32
     ///
     /// The entry holds the name and the short name the file system keeps for it.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "FindFirstFileW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial IntPtr FindFirstFile(string lpFileName, out WIN32_FIND_DATA lpFindFileData);
+    [DllImport(Library, EntryPoint = "FindFirstFileW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr FindFirstFile(string lpFileName, out WIN32_FIND_DATA lpFindFileData);
 
     /// <summary>Closes a search opened by <see cref="FindFirstFile"/>.</summary>
-    [LibraryImport(Library, EntryPoint = "FindClose", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "FindClose", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool FindClose(IntPtr hFindFile);
+    public static extern bool FindClose(IntPtr hFindFile);
 
     /// <summary>
     /// One folder entry as <see cref="FindFirstFile"/> writes it: the file's name in
@@ -223,12 +224,15 @@ internal static partial class Kernel32
     /// name, the short name in <see cref="cAlternateFileName"/>, which is empty
     /// otherwise. Each is null-terminated inside its buffer.
     ///
-    /// The two names are inline arrays of the sizes the API declares, 260 and 14
-    /// characters, which keeps the struct blittable under the assembly's disabled
-    /// runtime marshalling and byte-for-byte the WIN32_FIND_DATAW the API writes.
+    /// The two names are fixed buffers of the sizes the API declares, 260 and 14
+    /// UTF-16 code units, held as ushort. A fixed buffer's type takes the containing
+    /// struct's character set, ANSI unless the struct says otherwise, and the
+    /// marshaller converts a char field in an ANSI type to one byte; a ushort is
+    /// copied as it is. So the struct is byte-for-byte the WIN32_FIND_DATAW the API
+    /// writes, whatever character set anybody gives it.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct WIN32_FIND_DATA
+    public unsafe struct WIN32_FIND_DATA
     {
         public uint dwFileAttributes;
         public FILETIME ftCreationTime;
@@ -238,22 +242,14 @@ internal static partial class Kernel32
         public uint nFileSizeLow;
         public uint dwReserved0;
         public uint dwReserved1;
-        public FileNameBuffer cFileName;
-        public AlternateFileNameBuffer cAlternateFileName;
-    }
+        public fixed ushort cFileName[FileNameLength];
+        public fixed ushort cAlternateFileName[AlternateFileNameLength];
 
-    /// <summary>The 260 characters of <see cref="WIN32_FIND_DATA.cFileName"/>.</summary>
-    [InlineArray(260)]
-    public struct FileNameBuffer
-    {
-        private char _first;
-    }
+        /// <summary>The length of <see cref="cFileName"/>, MAX_PATH.</summary>
+        public const int FileNameLength = 260;
 
-    /// <summary>The 14 characters of <see cref="WIN32_FIND_DATA.cAlternateFileName"/>.</summary>
-    [InlineArray(14)]
-    public struct AlternateFileNameBuffer
-    {
-        private char _first;
+        /// <summary>The length of <see cref="cAlternateFileName"/>.</summary>
+        public const int AlternateFileNameLength = 14;
     }
 
     /// <summary>
@@ -261,15 +257,15 @@ internal static partial class Kernel32
     /// FILETIME in UTC. It moves only at a tick, so it stands behind the time
     /// <see cref="GetSystemTimePreciseAsFileTime"/> returns between ticks.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetSystemTimeAsFileTime")]
-    public static partial void GetSystemTimeAsFileTime(out long lpSystemTimeAsFileTime);
+    [DllImport(Library, EntryPoint = "GetSystemTimeAsFileTime", ExactSpelling = true)]
+    public static extern void GetSystemTimeAsFileTime(out long lpSystemTimeAsFileTime);
 
     /// <summary>
     /// The system time as a FILETIME in UTC, carried forward from the last tick of the
     /// system clock by the performance counter, so it moves between ticks.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetSystemTimePreciseAsFileTime")]
-    public static partial void GetSystemTimePreciseAsFileTime(out long lpSystemTimeAsFileTime);
+    [DllImport(Library, EntryPoint = "GetSystemTimePreciseAsFileTime", ExactSpelling = true)]
+    public static extern void GetSystemTimePreciseAsFileTime(out long lpSystemTimeAsFileTime);
 
     /// <summary>
     /// Whether the volume mounted at <paramref name="lpRootPathName"/> is fixed,
@@ -291,9 +287,8 @@ internal static partial class Kernel32
     /// (<see cref="DRIVE_UNKNOWN"/> or <see cref="DRIVE_NO_ROOT_DIR"/>) rather
     /// than a zero with a code behind it.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetDriveTypeW",
-                   StringMarshalling = StringMarshalling.Utf16)]
-    public static partial uint GetDriveType(string lpRootPathName);
+    [DllImport(Library, EntryPoint = "GetDriveTypeW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern uint GetDriveType(string lpRootPathName);
 
     /// <summary>
     /// Sets the error mode of the calling thread alone to <paramref name="dwNewMode"/>, with the
@@ -301,24 +296,24 @@ internal static partial class Kernel32
     /// Windows shows no critical-error box for a read the thread makes, such as one of a drive
     /// with no disc in it, and sends the error to the thread instead.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "SetThreadErrorMode", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "SetThreadErrorMode", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetThreadErrorMode(uint dwNewMode, out uint lpOldMode);
+    public static extern bool SetThreadErrorMode(uint dwNewMode, out uint lpOldMode);
 
     /// <summary>The error mode of the calling thread (<see cref="SetThreadErrorMode"/>).</summary>
-    [LibraryImport(Library, EntryPoint = "GetThreadErrorMode")]
-    public static partial uint GetThreadErrorMode();
+    [DllImport(Library, EntryPoint = "GetThreadErrorMode", ExactSpelling = true)]
+    public static extern uint GetThreadErrorMode();
 
     /// <summary>
     /// Sets the error mode of the process to <paramref name="uMode"/> and answers the mode it
     /// replaces. A thread's own mode (<see cref="SetThreadErrorMode"/>) is set apart from it.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "SetErrorMode")]
-    public static partial uint SetErrorMode(uint uMode);
+    [DllImport(Library, EntryPoint = "SetErrorMode", ExactSpelling = true)]
+    public static extern uint SetErrorMode(uint uMode);
 
     /// <summary>The error mode of the process (<see cref="SetErrorMode"/>).</summary>
-    [LibraryImport(Library, EntryPoint = "GetErrorMode")]
-    public static partial uint GetErrorMode();
+    [DllImport(Library, EntryPoint = "GetErrorMode", ExactSpelling = true)]
+    public static extern uint GetErrorMode();
 
     /// <summary>
     /// The error mode under which the system shows no critical-error box, for a thread
@@ -330,12 +325,24 @@ internal static partial class Kernel32
     /// Adds <paramref name="handlerRoutine"/> to the front of the process's list of console
     /// control handlers. Windows calls it on a thread of its own for each event, and the
     /// first routine to answer nonzero ends the list.
+    ///
+    /// The delegate reaches Windows as a pointer to a stub that calls it, and the stub
+    /// lives only as long as the delegate does. Windows keeps the pointer until the
+    /// handler is removed, so the caller keeps the delegate where the garbage collector
+    /// never frees it, for as long as it stays registered.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "SetConsoleCtrlHandler", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "SetConsoleCtrlHandler", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe partial bool SetConsoleCtrlHandler(
-        delegate* unmanaged<uint, int> handlerRoutine,
+    public static extern bool SetConsoleCtrlHandler(
+        HandlerRoutine handlerRoutine,
         [MarshalAs(UnmanagedType.Bool)] bool add);
+
+    /// <summary>
+    /// A console control handler: given the event, it answers nonzero where it took the
+    /// event and zero to pass it to the routine registered before it.
+    /// </summary>
+    [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+    public delegate int HandlerRoutine(uint dwCtrlType);
 
     // The console control events a handler routine is given.
     public const uint CTRL_C_EVENT = 0;
@@ -351,10 +358,9 @@ internal static partial class Kernel32
     /// where it did not, the last error (<see cref="ERROR_NOT_READY"/>,
     /// <see cref="ERROR_NO_MEDIA_IN_DRIVE"/>).
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetVolumeInformationW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "GetVolumeInformationW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetVolumeInformation(
+    public static extern bool GetVolumeInformation(
         string lpRootPathName,
         IntPtr lpVolumeNameBuffer,
         uint nVolumeNameSize,
@@ -369,9 +375,9 @@ internal static partial class Kernel32
     /// open handle. Used to detect whether a CreateFile-with-OPEN_REPARSE_POINT
     /// handle is pointing at a reparse point or a real file.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetFileInformationByHandle", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetFileInformationByHandle", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetFileInformationByHandle(
+    public static extern bool GetFileInformationByHandle(
         SafeFileHandle hFile,
         out BY_HANDLE_FILE_INFORMATION lpFileInformation);
 
@@ -403,9 +409,9 @@ internal static partial class Kernel32
     /// this call's 128-bit id is documented unique per volume on both NTFS and
     /// ReFS. A comparison that can collide would claim two files are one.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetFileInformationByHandleEx", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetFileInformationByHandleEx", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetFileInformationByHandleEx(
+    public static extern bool GetFileInformationByHandleEx(
         SafeFileHandle hFile,
         uint fileInformationClass,
         out FILE_ID_INFO lpFileInformation,
@@ -413,10 +419,9 @@ internal static partial class Kernel32
 
     /// <summary>
     /// The volume and the 128-bit file id that together name one file on one
-    /// machine. The id is declared as two ulongs rather than as a 16-byte array
-    /// because the assembly disables runtime marshalling, so the struct has to be
-    /// blittable; the layout is byte-for-byte the FILE_ID_128 the API writes, and
-    /// the halves are never interpreted, only compared.
+    /// machine. The id is declared as two ulongs rather than as a 16-byte array field,
+    /// which the marshaller would convert; two ulongs are byte-for-byte the FILE_ID_128
+    /// the API writes, and the halves are never interpreted, only compared.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct FILE_ID_INFO
@@ -440,9 +445,9 @@ internal static partial class Kernel32
     /// share flag, it also leaves the file free to be deleted. A rename that would
     /// replace the file is refused while the handle is open.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetFileInformationByHandleEx", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetFileInformationByHandleEx", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetFileBasicInfoByHandle(
+    public static extern bool GetFileBasicInfoByHandle(
         SafeFileHandle hFile,
         uint fileInformationClass,
         out FILE_BASIC_INFO lpFileInformation,
@@ -454,9 +459,9 @@ internal static partial class Kernel32
     /// a path. The handle needs <see cref="FILE_WRITE_ATTRIBUTES"/>. A field left zero
     /// is unchanged, so only <see cref="FILE_BASIC_INFO.FileAttributes"/> is set.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "SetFileInformationByHandle", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "SetFileInformationByHandle", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetFileBasicInfoByHandle(
+    public static extern bool SetFileBasicInfoByHandle(
         SafeFileHandle hFile,
         uint fileInformationClass,
         in FILE_BASIC_INFO lpFileInformation,
@@ -504,19 +509,19 @@ internal static partial class Kernel32
     /// path was spelled.
     ///
     /// The other outputs are optional and are passed as null pointers; only the
-    /// file-system name is asked for. <c>CountElementName</c> for the name buffer,
-    /// the function taking its size as a parameter.
+    /// file-system name is asked for. The name buffer's size goes in
+    /// <paramref name="nFileSystemNameSize"/>, the function taking it as a parameter.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetVolumeInformationByHandleW", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetVolumeInformationByHandleW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetVolumeInformationByHandle(
+    public static extern bool GetVolumeInformationByHandle(
         SafeFileHandle hFile,
         IntPtr lpVolumeNameBuffer,
         uint nVolumeNameSize,
         IntPtr lpVolumeSerialNumber,
         IntPtr lpMaximumComponentLength,
         IntPtr lpFileSystemFlags,
-        [MarshalUsing(CountElementName = nameof(nFileSystemNameSize))] char[] lpFileSystemNameBuffer,
+        [Out] char[] lpFileSystemNameBuffer,
         uint nFileSystemNameSize);
 
     /// <summary>
@@ -525,9 +530,9 @@ internal static partial class Kernel32
     /// same entry point, with the serial number the only output asked for and every other
     /// passed as a null pointer.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetVolumeInformationByHandleW", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetVolumeInformationByHandleW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetVolumeSerialNumberByHandle(
+    public static extern bool GetVolumeSerialNumberByHandle(
         SafeFileHandle hFile,
         IntPtr lpVolumeNameBuffer,
         uint nVolumeNameSize,
@@ -550,10 +555,9 @@ internal static partial class Kernel32
     /// descriptor is in place from the moment the directory exists, which is what a
     /// separate create and then set cannot give.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "CreateDirectoryW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "CreateDirectoryW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool CreateDirectory(
+    public static extern bool CreateDirectory(
         string lpPathName,
         in SECURITY_ATTRIBUTES lpSecurityAttributes);
 
@@ -583,8 +587,40 @@ internal static partial class Kernel32
     /// ConvertStringSecurityDescriptorToSecurityDescriptor does for the descriptor it
     /// returns.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "LocalFree")]
-    public static partial IntPtr LocalFree(IntPtr hMem);
+    [DllImport(Library, EntryPoint = "LocalFree", ExactSpelling = true)]
+    public static extern IntPtr LocalFree(IntPtr hMem);
+
+    /// <summary>
+    /// Sets the calling thread's last error to <paramref name="dwErrCode"/>. Declared with
+    /// SetLastError, so the runtime reads the code back as the call returns and
+    /// <see cref="Marshal.GetLastWin32Error"/> then answers it. That is how a method hands
+    /// its caller an error it read before making calls of its own.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "SetLastError", ExactSpelling = true, SetLastError = true)]
+    public static extern void SetLastError(uint dwErrCode);
+
+    /// <summary>
+    /// The text Windows gives for the error <paramref name="dwMessageId"/>, in the language
+    /// Windows is shown in, written into memory Windows allocates and the caller frees with
+    /// <see cref="LocalFree"/>. With <see cref="FORMAT_MESSAGE_ALLOCATE_BUFFER"/> the
+    /// buffer parameter receives the pointer to that memory, so it is declared as the
+    /// pointer's address. Returns the number of characters written, without the
+    /// terminating null, or 0 where Windows has no text for the number.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "FormatMessageW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern uint FormatMessage(
+        uint dwFlags,
+        IntPtr lpSource,
+        uint dwMessageId,
+        uint dwLanguageId,
+        out IntPtr lpBuffer,
+        uint nSize,
+        IntPtr Arguments);
+
+    public const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100;
+    public const uint FORMAT_MESSAGE_IGNORE_INSERTS  = 0x00000200;
+    public const uint FORMAT_MESSAGE_FROM_SYSTEM     = 0x00001000;
+    public const uint FORMAT_MESSAGE_ARGUMENT_ARRAY  = 0x00002000;
 
     /// <summary>
     /// Removes the file or directory an open handle names, through the handle rather
@@ -597,9 +633,9 @@ internal static partial class Kernel32
     /// FILE_FLAG_OPEN_REPARSE_POINT on a reparse point removes the reparse point
     /// itself, never what it points at.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "SetFileInformationByHandle", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "SetFileInformationByHandle", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetFileDispositionInfoEx(
+    public static extern bool SetFileDispositionInfoEx(
         SafeFileHandle hFile,
         uint fileInformationClass,
         in FILE_DISPOSITION_INFO_EX lpFileInformation,
@@ -610,9 +646,9 @@ internal static partial class Kernel32
     /// Windows build or file system that does not take <see cref="FileDispositionInfoEx"/>.
     /// It marks the name to go when the last handle closes.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "SetFileInformationByHandle", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "SetFileInformationByHandle", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetFileDispositionInfo(
+    public static extern bool SetFileDispositionInfo(
         SafeFileHandle hFile,
         uint fileInformationClass,
         in FILE_DISPOSITION_INFO lpFileInformation,
@@ -650,17 +686,17 @@ internal static partial class Kernel32
     /// <summary>
     /// The pseudo-handle standing for this process, which needs no closing.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetCurrentProcess")]
-    public static partial IntPtr GetCurrentProcess();
+    [DllImport(Library, EntryPoint = "GetCurrentProcess", ExactSpelling = true)]
+    public static extern IntPtr GetCurrentProcess();
 
     /// <summary>
     /// Ends the process <paramref name="hProcess"/> names at once, with
     /// <paramref name="uExitCode"/>. Given this process's own pseudo-handle it runs
     /// no more of its code: no finaliser, no exit handler and no DLL detach.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "TerminateProcess", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "TerminateProcess", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool TerminateProcess(IntPtr hProcess, uint uExitCode);
+    public static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
 
     /// <summary>
     /// Waits until one of <paramref name="lpHandles"/> is signalled or
@@ -670,8 +706,8 @@ internal static partial class Kernel32
     /// <see cref="WAIT_FAILED"/>. It never dispatches a window message or a COM call,
     /// so no window code runs on the waiting thread meanwhile.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "WaitForMultipleObjects", SetLastError = true)]
-    public static partial uint WaitForMultipleObjects(
+    [DllImport(Library, EntryPoint = "WaitForMultipleObjects", ExactSpelling = true, SetLastError = true)]
+    public static extern uint WaitForMultipleObjects(
         uint nCount, IntPtr[] lpHandles, [MarshalAs(UnmanagedType.Bool)] bool bWaitAll, uint dwMilliseconds);
 
     public const uint WAIT_OBJECT_0 = 0;
@@ -691,10 +727,9 @@ internal static partial class Kernel32
     /// the new name is replaced in the same step, so a reader of that name finds the old file
     /// or the new one and never neither; a link at the new name is replaced, not followed.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MoveFileExW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "MoveFileExW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool MoveFileEx(string lpExistingFileName, string lpNewFileName, uint dwFlags);
+    public static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, uint dwFlags);
 
     public const uint MOVEFILE_REPLACE_EXISTING = 0x1;
 
@@ -706,25 +741,24 @@ internal static partial class Kernel32
     /// <paramref name="lpFileName"/>, in a folder on the same volume. Fails where the volume
     /// has no hard links, as FAT and exFAT have none, and where a file has that name.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "CreateHardLinkW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "CreateHardLinkW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
+    public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
 
     /// <summary>
     /// Suspends the calling thread for <paramref name="dwMilliseconds"/>. Like
     /// <see cref="WaitForMultipleObjects"/>, it dispatches nothing meanwhile.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "Sleep")]
-    public static partial void Sleep(uint dwMilliseconds);
+    [DllImport(Library, EntryPoint = "Sleep", ExactSpelling = true)]
+    public static extern void Sleep(uint dwMilliseconds);
 
     /// <summary>
     /// Opens the process <paramref name="dwProcessId"/> names with
     /// <paramref name="dwDesiredAccess"/>. Answers an invalid handle where it cannot, with
     /// <see cref="ERROR_INVALID_PARAMETER"/> as the last error where no process has that id.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "OpenProcess", SetLastError = true)]
-    public static partial SafeProcessHandle OpenProcess(
+    [DllImport(Library, EntryPoint = "OpenProcess", ExactSpelling = true, SetLastError = true)]
+    public static extern SafeProcessHandle OpenProcess(
         uint dwDesiredAccess,
         [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle,
         uint dwProcessId);
@@ -735,9 +769,9 @@ internal static partial class Kernel32
     /// characters in, and the length written, without the terminating null, out. A buffer
     /// too small fails with ERROR_INSUFFICIENT_BUFFER.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "QueryFullProcessImageNameW", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "QueryFullProcessImageNameW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool QueryFullProcessImageName(
+    public static extern bool QueryFullProcessImageName(
         SafeProcessHandle hProcess,
         uint dwFlags,
         [Out] char[] lpExeName,
@@ -752,10 +786,9 @@ internal static partial class Kernel32
     /// <paramref name="lpVariables"/> is the block of variables the program starts with, and
     /// zero gives it the caller's own.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "CreateProcessW", SetLastError = true,
-                   StringMarshalling = StringMarshalling.Utf16)]
+    [DllImport(Library, EntryPoint = "CreateProcessW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool CreateProcess(
+    public static extern bool CreateProcess(
         string lpApplicationName,
         [In, Out] char[] lpCommandLine,
         IntPtr lpProcessAttributes,
@@ -818,9 +851,9 @@ internal static partial class Kernel32
     /// Reads the exit code of the process <paramref name="hProcess"/> stands for into
     /// <paramref name="lpExitCode"/>, which is <see cref="STILL_ACTIVE"/> while it runs.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetExitCodeProcess", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetExitCodeProcess", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetExitCodeProcess(SafeProcessHandle hProcess, out uint lpExitCode);
+    public static extern bool GetExitCodeProcess(SafeProcessHandle hProcess, out uint lpExitCode);
 
     /// <summary>What <see cref="GetExitCodeProcess"/> reads for a process still running.</summary>
     public const uint STILL_ACTIVE = 259;
@@ -832,16 +865,16 @@ internal static partial class Kernel32
     /// its full path with LOAD_WITH_ALTERED_SEARCH_PATH has its own imports looked for first
     /// in the folder it was loaded from.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "SetDefaultDllDirectories", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "SetDefaultDllDirectories", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetDefaultDllDirectories(uint directoryFlags);
+    public static extern bool SetDefaultDllDirectories(uint directoryFlags);
 
     /// <summary>
     /// The process's standard input, output or error handle, as <paramref name="nStdHandle"/>
     /// names it (<see cref="STD_INPUT_HANDLE"/>). Not to be closed: the process owns it.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetStdHandle", SetLastError = true)]
-    public static partial IntPtr GetStdHandle(int nStdHandle);
+    [DllImport(Library, EntryPoint = "GetStdHandle", ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr GetStdHandle(int nStdHandle);
 
     /// <summary>What <see cref="GetStdHandle"/> takes for standard input.</summary>
     public const int STD_INPUT_HANDLE = -10;
@@ -850,9 +883,9 @@ internal static partial class Kernel32
     /// Discards every input record waiting in a console's input buffer: key presses typed
     /// before a read starts. Fails on a handle that is not a console's input.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "FlushConsoleInputBuffer", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "FlushConsoleInputBuffer", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool FlushConsoleInputBuffer(IntPtr hConsoleInput);
+    public static extern bool FlushConsoleInputBuffer(IntPtr hConsoleInput);
 
     /// <summary>
     /// The least access <see cref="QueryFullProcessImageName"/> needs, asked for in place
@@ -913,12 +946,12 @@ internal static partial class Kernel32
     /// The count is in characters, the terminators included. A call with a null
     /// buffer and a count of zero answers the size needed.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetUserPreferredUILanguages", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetUserPreferredUILanguages", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetUserPreferredUILanguages(
+    public static extern bool GetUserPreferredUILanguages(
         uint dwFlags,
         out uint pulNumLanguages,
-        [MarshalUsing(CountElementName = nameof(pcchLanguagesBuffer))] char[]? pwszLanguagesBuffer,
+        [Out] char[]? pwszLanguagesBuffer,
         ref uint pcchLanguagesBuffer);
 
     // GetUserPreferredUILanguages flag: culture names rather than language ids.
@@ -932,9 +965,9 @@ internal static partial class Kernel32
     /// older Windows the entry point is missing and the call throws
     /// <see cref="EntryPointNotFoundException"/>.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetUserDefaultGeoName", SetLastError = true)]
-    public static partial int GetUserDefaultGeoName(
-        [MarshalUsing(CountElementName = nameof(geoNameCount))] char[] geoName,
+    [DllImport(Library, EntryPoint = "GetUserDefaultGeoName", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern int GetUserDefaultGeoName(
+        [Out] char[] geoName,
         int geoNameCount);
 
     // GetFinalPathNameByHandle flags. VOLUME_NAME_DOS names the volume by

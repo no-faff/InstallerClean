@@ -104,13 +104,13 @@ internal static class StorageHelpers
             disposition, flags, IntPtr.Zero);
         if (handle.IsInvalid)
         {
-            error = Marshal.GetLastPInvokeError();
+            error = Marshal.GetLastWin32Error();
             return null;
         }
 
         if (!Kernel32.GetFileInformationByHandle(handle, out var info))
         {
-            error = Marshal.GetLastPInvokeError();
+            error = Marshal.GetLastWin32Error();
             handle.Dispose();
             return null;
         }
@@ -446,10 +446,13 @@ internal static class StorageHelpers
             if (search == InvalidHandle) return null;
             Kernel32.FindClose(search);
 
-            ReadOnlySpan<char> nameBuffer = entry.cFileName;
-            ReadOnlySpan<char> shortNameBuffer = entry.cAlternateFileName;
-            var name = NullTerminated(nameBuffer);
-            var shortName = NullTerminated(shortNameBuffer);
+            string name, shortName;
+            unsafe
+            {
+                name = NullTerminated(entry.cFileName, Kernel32.WIN32_FIND_DATA.FileNameLength);
+                shortName = NullTerminated(
+                    entry.cAlternateFileName, Kernel32.WIN32_FIND_DATA.AlternateFileNameLength);
+            }
             if (name.Length == 0) return null;
 
             return shortName.Length == 0 ? [name] : [name, shortName];
@@ -459,10 +462,13 @@ internal static class StorageHelpers
             return null;
         }
 
-        static string NullTerminated(ReadOnlySpan<char> buffer)
+        // The UTF-16 code units of a buffer up to its first null, or the whole buffer
+        // where it holds none.
+        static unsafe string NullTerminated(ushort* buffer, int length)
         {
-            var end = buffer.IndexOf('\0');
-            return new string(end < 0 ? buffer : buffer[..end]);
+            var end = 0;
+            while (end < length && buffer[end] != 0) end++;
+            return new string((char*)buffer, 0, end);
         }
     }
 

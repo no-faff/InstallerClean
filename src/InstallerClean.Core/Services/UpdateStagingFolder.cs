@@ -99,14 +99,14 @@ public sealed class UpdateStagingFolder
 
         if (!Advapi32.ConvertStringSecurityDescriptorToSecurityDescriptor(
                 descriptorSddl, Advapi32.SDDL_REVISION_1, out var descriptor, IntPtr.Zero))
-            throw new Win32Exception(Marshal.GetLastPInvokeError());
+            throw new Win32Exception(Marshal.GetLastWin32Error());
         try
         {
             var handle = DirectoryGuard.CreateChildFolderHeld(rootHandle, leaf, descriptor, out var status)
                 ?? throw new Win32Exception((int)Ntdll.RtlNtStatusToDosError(status));
             if (DirectoryGuard.IdOf(handle) is not { } id)
             {
-                var error = Marshal.GetLastPInvokeError();
+                var error = Marshal.GetLastWin32Error();
                 handle.Dispose();
                 throw new Win32Exception(error);
             }

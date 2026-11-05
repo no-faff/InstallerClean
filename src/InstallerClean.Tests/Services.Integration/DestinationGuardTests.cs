@@ -339,7 +339,7 @@ public sealed class DestinationGuardTests : IDisposable
         using (var child = OpenTheCopyAsTheDiscardDoes(folder!, "payload.dll", out var attributes))
         {
             deleted = DirectoryGuard.DeleteClearingReadOnly(child, attributes);
-            cause = Marshal.GetLastPInvokeError();
+            cause = Marshal.GetLastWin32Error();
         }
 
         Assert.False(deleted);

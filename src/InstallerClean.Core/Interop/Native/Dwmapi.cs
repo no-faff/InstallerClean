@@ -6,7 +6,7 @@ namespace InstallerClean.Interop.Native;
 /// P/Invoke surface for dwmapi.dll. Used only to set the dark title-bar
 /// attribute on every window the app creates.
 /// </summary>
-internal static partial class Dwmapi
+internal static class Dwmapi
 {
     private const string Library = "dwmapi.dll";
 
@@ -18,8 +18,8 @@ internal static partial class Dwmapi
     /// call fails with E_INVALIDARG, which is swallowed, and the title
     /// bar stays light. Cosmetic only; everything else works there.
     /// </summary>
-    [LibraryImport(Library)]
-    public static partial int DwmSetWindowAttribute(
+    [DllImport(Library, EntryPoint = "DwmSetWindowAttribute", ExactSpelling = true)]
+    public static extern int DwmSetWindowAttribute(
         IntPtr hwnd,
         int attr,
         ref int value,

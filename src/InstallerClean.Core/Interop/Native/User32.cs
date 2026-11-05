@@ -9,7 +9,7 @@ namespace InstallerClean.Interop.Native;
 /// hand-off (foreground rights), and by <see cref="WindowStation"/> for the
 /// command line.
 /// </summary>
-internal static partial class User32
+internal static class User32
 {
     private const string Library = "user32.dll";
 
@@ -25,9 +25,9 @@ internal static partial class User32
     /// the first only through a named event, and the grant is consumed by the
     /// next foreground change either way.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "AllowSetForegroundWindow", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "AllowSetForegroundWindow", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool AllowSetForegroundWindow(uint dwProcessId);
+    public static extern bool AllowSetForegroundWindow(uint dwProcessId);
 
     /// <summary>ASFW_ANY: any process may take the foreground.</summary>
     public const uint ASFW_ANY = 0xFFFFFFFF;
@@ -40,11 +40,11 @@ internal static partial class User32
     /// window in another process: the call reads only the foreground
     /// HWND, never window text or a keystroke buffer.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetForegroundWindow")]
-    public static partial IntPtr GetForegroundWindow();
+    [DllImport(Library, EntryPoint = "GetForegroundWindow", ExactSpelling = true)]
+    public static extern IntPtr GetForegroundWindow();
 
-    [LibraryImport(Library, EntryPoint = "GetWindowThreadProcessId")]
-    public static partial uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+    [DllImport(Library, EntryPoint = "GetWindowThreadProcessId", ExactSpelling = true)]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
     /// <summary>
     /// Monitor with the largest intersection with the window.
@@ -52,8 +52,8 @@ internal static partial class User32
     /// monitor to the nearest one, so the return is never zero for a
     /// valid HWND.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "MonitorFromWindow")]
-    public static partial IntPtr MonitorFromWindow(IntPtr hWnd, uint dwFlags);
+    [DllImport(Library, EntryPoint = "MonitorFromWindow", ExactSpelling = true)]
+    public static extern IntPtr MonitorFromWindow(IntPtr hWnd, uint dwFlags);
 
     public const uint MONITOR_DEFAULTTONEAREST = 2;
 
@@ -63,9 +63,9 @@ internal static partial class User32
     /// versioned-struct contract; with it zero the call fails and
     /// reports nothing through last-error.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetMonitorInfoW")]
+    [DllImport(Library, EntryPoint = "GetMonitorInfoW", CharSet = CharSet.Unicode, ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+    public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
 
     [StructLayout(LayoutKind.Sequential)]
     public struct MONITORINFO
@@ -90,17 +90,17 @@ internal static partial class User32
     }
 
     /// <summary>The window station the process is attached to.</summary>
-    [LibraryImport(Library, EntryPoint = "GetProcessWindowStation")]
-    public static partial IntPtr GetProcessWindowStation();
+    [DllImport(Library, EntryPoint = "GetProcessWindowStation", ExactSpelling = true)]
+    public static extern IntPtr GetProcessWindowStation();
 
     /// <summary>
     /// Reads one kind of information about a window station or desktop object. Called
     /// with <see cref="UOI_FLAGS"/>, <paramref name="pvInfo"/> is a
     /// <see cref="USEROBJECTFLAGS"/> and <paramref name="nLength"/> its size.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "GetUserObjectInformationW", SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetUserObjectInformationW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool GetUserObjectInformation(
+    public static extern bool GetUserObjectInformation(
         IntPtr hObj, int nIndex, ref USEROBJECTFLAGS pvInfo, uint nLength, out uint lpnLengthNeeded);
 
     /// <summary>UOI_FLAGS: the object's <see cref="USEROBJECTFLAGS"/>.</summary>

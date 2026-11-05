@@ -9,10 +9,16 @@ namespace InstallerClean.Interop.Native;
 /// the event. An event it does not take goes on to the routines registered before it, the
 /// runtime's own for Ctrl+C and Ctrl+Break among them.
 /// </summary>
-internal static unsafe class ConsoleControl
+internal static class ConsoleControl
 {
     private static Func<uint, bool>? s_handler;
     private static int s_registered;
+
+    // The routine Windows calls. Windows holds a pointer to it from registration until
+    // the process ends, so it is kept in a static field, which the garbage collector never
+    // collects; a delegate made at the call and dropped after it would be freed while
+    // Windows still calls it.
+    private static readonly Kernel32.HandlerRoutine s_routine = Routine;
 
     /// <summary>
     /// Registers <paramref name="handler"/> for the life of the process. Answers false, with
@@ -25,8 +31,8 @@ internal static unsafe class ConsoleControl
         try
         {
             s_handler = handler;
-            if (Kernel32.SetConsoleCtrlHandler(&Routine, add: true)) return true;
-            CrashLog.TryWrite(new Win32Exception(Marshal.GetLastPInvokeError()));
+            if (Kernel32.SetConsoleCtrlHandler(s_routine, add: true)) return true;
+            CrashLog.TryWrite(new Win32Exception(Marshal.GetLastWin32Error()));
         }
         catch (Exception ex)
         {
@@ -36,7 +42,6 @@ internal static unsafe class ConsoleControl
     }
 
     // Called by Windows, where an exception would end the process, so nothing escapes it.
-    [UnmanagedCallersOnly]
     private static int Routine(uint ctrlType)
     {
         try

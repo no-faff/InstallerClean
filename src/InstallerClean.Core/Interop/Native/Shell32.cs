@@ -3,11 +3,10 @@ using System.Runtime.InteropServices;
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
-/// P/Invoke surface for shell32.dll, through the same source-generated
-/// <see cref="LibraryImportAttribute"/> stubs as <see cref="Kernel32"/>.
+/// P/Invoke surface for shell32.dll, declared as <see cref="Kernel32"/>'s are.
 /// Consumed by <see cref="Helpers.KnownFolders"/>.
 /// </summary>
-internal static partial class Shell32
+internal static class Shell32
 {
     private const string Library = "shell32.dll";
 
@@ -17,6 +16,6 @@ internal static partial class Shell32
     /// CoTaskMemAlloc and the caller frees it with <see cref="Ole32.CoTaskMemFree"/>
     /// whether the call succeeds or not.
     /// </summary>
-    [LibraryImport(Library, EntryPoint = "SHGetKnownFolderPath")]
-    public static partial int SHGetKnownFolderPath(in Guid rfid, uint dwFlags, IntPtr hToken, out IntPtr ppszPath);
+    [DllImport(Library, EntryPoint = "SHGetKnownFolderPath", ExactSpelling = true)]
+    public static extern int SHGetKnownFolderPath(in Guid rfid, uint dwFlags, IntPtr hToken, out IntPtr ppszPath);
 }

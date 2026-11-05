@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using InstallerClean.Helpers;
 
 namespace InstallerClean.Tests.Helpers;
@@ -54,8 +53,24 @@ public class WindowsErrorsTests
             sentence);
         Assert.False(WindowsErrors.MessageFor(NotEnoughMemory).EndsWith('.'));
         Assert.Equal(
-            Marshal.GetPInvokeErrorMessage(NotEnoughMemory).Trim().TrimEnd('.'),
+            new System.ComponentModel.Win32Exception(NotEnoughMemory).Message.Trim().TrimEnd('.'),
             WindowsErrors.MessageFor(NotEnoughMemory));
+    }
+
+    [Fact]
+    public void The_system_text_keeps_its_full_stop_and_loses_the_line_break_after_it()
+    {
+        var text = WindowsErrors.SystemMessage(NotEnoughMemory);
+
+        Assert.Equal(WindowsErrors.MessageFor(NotEnoughMemory) + ".", text);
+        Assert.Equal(text.TrimEnd(), text);
+    }
+
+    [Fact]
+    public void A_number_Windows_has_no_text_for_is_named_in_hexadecimal()
+    {
+        // The customer bit set: a number the system's message table never holds.
+        Assert.Equal("Unknown error (0x20000001)", WindowsErrors.SystemMessage(0x20000001));
     }
 
     [Fact]

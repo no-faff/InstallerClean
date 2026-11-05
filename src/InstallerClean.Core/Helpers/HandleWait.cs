@@ -99,7 +99,7 @@ internal static class HandleWait
                 raw[i] = handles[i].DangerousGetHandle();
             }
             var result = Kernel32.WaitForMultipleObjects((uint)raw.Length, raw, bWaitAll: false, milliseconds);
-            if (result == Kernel32.WAIT_FAILED) error = Marshal.GetLastPInvokeError();
+            if (result == Kernel32.WAIT_FAILED) error = Marshal.GetLastWin32Error();
             return result;
         }
         finally

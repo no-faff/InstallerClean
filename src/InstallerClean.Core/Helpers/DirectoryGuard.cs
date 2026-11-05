@@ -81,13 +81,13 @@ internal static class DirectoryGuard
             Kernel32.OPEN_EXISTING, Kernel32.FILE_FLAG_BACKUP_SEMANTICS, IntPtr.Zero);
         if (handle.IsInvalid)
         {
-            failureCode = Marshal.GetLastPInvokeError();
+            failureCode = Marshal.GetLastWin32Error();
             return null;
         }
 
         if (!Kernel32.GetFileInformationByHandle(handle, out var info))
         {
-            failureCode = Marshal.GetLastPInvokeError();
+            failureCode = Marshal.GetLastWin32Error();
             handle.Dispose();
             return null;
         }
@@ -495,7 +495,7 @@ internal static class DirectoryGuard
 
         if (!Kernel32.GetFileInformationByHandle(child, out var info))
         {
-            failureCode = Marshal.GetLastPInvokeError();
+            failureCode = Marshal.GetLastWin32Error();
             return false;
         }
 
@@ -509,7 +509,7 @@ internal static class DirectoryGuard
         if (DeleteByHandle(child, info.dwFileAttributes)) return true;
 
         // The cause the disposition call itself left.
-        failureCode = Marshal.GetLastPInvokeError();
+        failureCode = Marshal.GetLastWin32Error();
         return false;
     }
 
@@ -564,7 +564,7 @@ internal static class DirectoryGuard
         // answer is a refusal and stays one: the older form takes effect when the last
         // handle closes, so with another program holding the file open it would answer
         // success while the name is still there.
-        if (!PosixFormIsNotTaken(Marshal.GetLastPInvokeError())) return false;
+        if (!PosixFormIsNotTaken(Marshal.GetLastWin32Error())) return false;
 
         return fileAttributes is { } attributes
             ? DeleteClearingReadOnly(handle, attributes)
@@ -590,12 +590,12 @@ internal static class DirectoryGuard
         SetAttributesByHandle(handle, attributes & ~FILE_ATTRIBUTE_READONLY);
         if (DeleteByPlainForm(handle)) return true;
 
-        var error = Marshal.GetLastPInvokeError();
+        var error = Marshal.GetLastWin32Error();
         // The attributes as they are now, with read-only put back.
         var current = Kernel32.GetFileInformationByHandle(handle, out var info)
             ? info.dwFileAttributes : attributes & ~FILE_ATTRIBUTE_READONLY;
         SetAttributesByHandle(handle, (current & ~FILE_ATTRIBUTE_NORMAL) | FILE_ATTRIBUTE_READONLY);
-        Marshal.SetLastPInvokeError(error);
+        Kernel32.SetLastError(unchecked((uint)error));
         return false;
     }
 }

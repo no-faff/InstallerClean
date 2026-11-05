@@ -6,7 +6,7 @@ namespace InstallerClean.Interop;
 /// Production <see cref="IMsiApi"/>: a thin pass-through to the static
 /// <see cref="Msi"/> P/Invoke surface. It holds no state and adds no logic;
 /// the double-call buffer contract, the fixed GUID-buffer sizes and the
-/// [LibraryImport] marshalling all live on <see cref="Msi"/>. Its only reason
+/// marshalling declarations all live on <see cref="Msi"/>. Its only reason
 /// to exist is to give the verdict logic a mockable seam.
 /// </summary>
 internal sealed class MsiApi : IMsiApi

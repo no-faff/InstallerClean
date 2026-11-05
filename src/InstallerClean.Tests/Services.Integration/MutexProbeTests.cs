@@ -248,7 +248,7 @@ public class MutexProbeTests
     private static SafeWaitHandle CreateRefusingMutex(string name)
     {
         if (!ConvertStringSecurityDescriptorToSecurityDescriptorW("D:", SddlRevision1, out var descriptor, IntPtr.Zero))
-            throw new Win32Exception(Marshal.GetLastPInvokeError());
+            throw new Win32Exception(Marshal.GetLastWin32Error());
         try
         {
             var attributes = new SecurityAttributes
@@ -259,7 +259,7 @@ public class MutexProbeTests
             };
             var handle = CreateMutexW(ref attributes, initialOwner: false, name);
             if (handle.IsInvalid)
-                throw new Win32Exception(Marshal.GetLastPInvokeError());
+                throw new Win32Exception(Marshal.GetLastWin32Error());
             return handle;
         }
         finally

@@ -10,13 +10,3 @@ global using System.IO;
 // silences the platform-compatibility analyser at every callsite that
 // would otherwise warn.
 [assembly: System.Runtime.Versioning.SupportedOSPlatform("windows7.0")]
-
-// DisableRuntimeMarshalling switches off the runtime's reflection-based
-// interop marshaller for the whole assembly. Every interop struct under
-// Interop/Native/ is fully blittable for that reason: string fields are
-// IntPtr handles to caller-allocated unmanaged buffers (not managed
-// string fields the runtime would have to convert), arrays stay outside
-// the struct, and Win32 BOOL returns are marshalled explicitly via
-// [return: MarshalAs(UnmanagedType.Bool)] because Win32 BOOL is 32 bits
-// where C# bool is 8.
-[assembly: System.Runtime.CompilerServices.DisableRuntimeMarshalling]

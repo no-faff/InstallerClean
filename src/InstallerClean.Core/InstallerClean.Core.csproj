@@ -21,8 +21,9 @@
     <RootNamespace>InstallerClean</RootNamespace>
     <AssemblyName>InstallerClean.Core</AssemblyName>
     <NeutralLanguage>en-GB</NeutralLanguage>
-    <!-- AllowUnsafeBlocks lets the LibraryImport source generator emit
-         the pointer-handling stubs it needs. -->
+    <!-- AllowUnsafeBlocks is for the interop code, which reads memory
+         Windows hands back through pointers, passes text by address and
+         takes each struct's size with sizeof. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- Never packed, so this feeds no .nupkg. It is here so the licence
          reads the same in all three project files: the Apache 2.0 switch

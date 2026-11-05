@@ -98,7 +98,7 @@ internal static class DetachedProcess
             error = 0;
             return true;
         }
-        error = System.Runtime.InteropServices.Marshal.GetLastPInvokeError();
+        error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
         return false;
     }
 
