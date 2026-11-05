@@ -224,6 +224,28 @@ internal static class InstallerPathText
         AllowFolderBreaksInLogPath(KeepWhole(text));
 
     /// <summary>
+    /// Returns <paramref name="text"/> with every word joiner and zero-width space
+    /// taken out, for text leaving a selectable box on the clipboard or in a drag.
+    /// Those two characters are the only ones the treatments here add, and no string
+    /// the app ships carries either, so this gives back the text as it was before it
+    /// was drawn: a copied path is the path, and pastes into Run or Explorer as one.
+    /// <see cref="PlainCopy"/> applies it.
+    /// </summary>
+    public static string ForCopying(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text ?? string.Empty;
+        if (text.IndexOf(WordJoiner) < 0 && text.IndexOf(ZeroWidthSpace) < 0)
+            return text;
+
+        var plain = new StringBuilder(text.Length);
+        foreach (var c in text)
+            if (c != WordJoiner && c != ZeroWidthSpace)
+                plain.Append(c);
+        return plain.ToString();
+    }
+
+    /// <summary>
     /// Returns <paramref name="text"/> with a break opportunity after each backslash
     /// inside a path it names, and a word joiner between two backslashes, wherever in
     /// the line the path sits. The line saying what a scan is waiting for takes it,

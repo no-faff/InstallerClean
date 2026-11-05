@@ -48,6 +48,10 @@
              and Ctrl+C it. Consumers that genuinely shouldn't be in
              the tab order set IsTabStop="False" at the site. -->
         <Setter Property="IsTabStop" Value="True"/>
+        <!-- Text shown here can carry the word joiners and zero-width spaces
+             that hold a path together or let it wrap. What is copied, by
+             Ctrl+C, the menu below or a drag, is the text without them. -->
+        <Setter Property="a11y:PlainCopy.IsEnabled" Value="True"/>
         <Setter Property="ContextMenu">
             <Setter.Value>
                 <ContextMenu>
