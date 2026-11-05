@@ -158,7 +158,6 @@ public class ResultLogEntryTests
         FilesHeldForKeysWithInstallPropertiesCount: 0,
         FilesHeldForKeysWithoutInstallPropertiesCount: 0,
         SupersededHeldForUnlistedKeyCount: 0,
-        SecondCopyKeepOrdinarySourcesNotRuledOutCount: 0,
         UnlistedKeysWithoutInstallPropertiesListUnreadCount: 0);
 
     private static MachineInfo SampleMachine() => new(
@@ -366,8 +365,8 @@ public class ResultLogEntryTests
                 // The twelfth arm of the split of withheldCandidateCount: installation
                 // packages the screen kept beside an installation that may be a second
                 // copy of a program, either one whose packages it could not all see or one
-                // whose cached package does not say what it declares and which its sources do
-                // not show to open only packages the screen saw.
+                // whose cached package does not say what it declares and whose own record
+                // does not show an ordinary installation.
                 "withheldSecondCopyUnestablishedCount",
                 // The drives and shares the declared-product screen gave up and kept a file
                 // at, one count for each way it gives one up in the order the routes are
@@ -381,8 +380,7 @@ public class ResultLogEntryTests
                 // installation package it would otherwise let through. First, how many listed
                 // installations it looked at, the installations setting the hold by what their
                 // cached package gave and then by why their record did not settle it, those of
-                // them that are per-machine, and those whose record showed them ordinary and whose
-                // sources it saw.
+                // them that are per-machine, and those whose record showed them ordinary.
                 "secondCopyListedCheckedCount",
                 "secondCopyKeepPathUnreadableCount", "secondCopyKeepNoneRecordedCount",
                 "secondCopyKeepNotThereCount", "secondCopyKeepWouldNotReadCount",
@@ -444,9 +442,6 @@ public class ResultLogEntryTests
                 "unlistedKeysWithInstallPropertiesCount", "unlistedKeysWithoutInstallPropertiesCount",
                 "filesHeldForKeysWithInstallPropertiesCount", "filesHeldForKeysWithoutInstallPropertiesCount",
                 "supersededHeldForUnlistedKeyCount",
-                // The fourth count of why the record did not settle an installation setting the
-                // hold: one whose record shows it ordinary, its sources not ruled out.
-                "secondCopyKeepOrdinarySourcesNotRuledOutCount",
                 // The keys without an InstallProperties key one of whose source lists did not read.
                 "unlistedKeysWithoutInstallPropertiesListUnreadCount",
             ],
@@ -728,13 +723,12 @@ public class ResultLogEntryTests
                 UnseenNoProductCode: 17, UnseenPerUserUnmanaged: 18, UnseenSourcesGivenUp: 19,
                 UnseenSourceNotRuledOut: 20, UnseenPerMachine: 21, UnseenByNameFiles: 22,
                 ReleasedOpensNoPackage: 23, ReleasedBySources: 24, KeptNoneRecordedOtherAnswer: 25,
-                KeptNoneRecordedRegistryDisagrees: 26, KeptNoneRecordedSourcesNotRuledOut: 27,
-                KeptOrdinarySourcesNotRuledOut: 28));
+                KeptNoneRecordedRegistryDisagrees: 26, KeptNoneRecordedSourcesNotRuledOut: 27));
 
         var info = ScanInfo.From(scan, 10);
 
         Assert.Equal(
-            [64, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28],
+            [64, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
             [
                 info.SecondCopyListedCheckedCount, info.SecondCopyKeepPathUnreadableCount,
                 info.SecondCopyKeepNoneRecordedCount, info.SecondCopyKeepNotThereCount,
@@ -751,7 +745,6 @@ public class ResultLogEntryTests
                 info.SecondCopyReleasedOpensNoPackageCount, info.SecondCopyReleasedBySourcesCount,
                 info.SecondCopyKeepNoneRecordedOtherAnswerCount, info.SecondCopyKeepNoneRecordedRegistryDisagreesCount,
                 info.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount,
-                info.SecondCopyKeepOrdinarySourcesNotRuledOutCount,
             ]);
 
         using var doc = JsonDocument.Parse(JsonSerializer.Serialize(info, JsonOptions));
@@ -766,7 +759,6 @@ public class ResultLogEntryTests
         Assert.Equal(25, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedOtherAnswerCount").GetInt32());
         Assert.Equal(26, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedRegistryDisagreesCount").GetInt32());
         Assert.Equal(27, doc.RootElement.GetProperty("secondCopyKeepNoneRecordedSourcesNotRuledOutCount").GetInt32());
-        Assert.Equal(28, doc.RootElement.GetProperty("secondCopyKeepOrdinarySourcesNotRuledOutCount").GetInt32());
     }
 
     [Fact]
@@ -792,7 +784,6 @@ public class ResultLogEntryTests
                 info.SecondCopyReleasedOpensNoPackageCount, info.SecondCopyReleasedBySourcesCount,
                 info.SecondCopyKeepNoneRecordedOtherAnswerCount, info.SecondCopyKeepNoneRecordedRegistryDisagreesCount,
                 info.SecondCopyKeepNoneRecordedSourcesNotRuledOutCount,
-                info.SecondCopyKeepOrdinarySourcesNotRuledOutCount,
             ],
             count => Assert.Equal(0, count));
     }

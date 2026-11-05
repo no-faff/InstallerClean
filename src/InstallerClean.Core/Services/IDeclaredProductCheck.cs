@@ -135,15 +135,14 @@ namespace InstallerClean.Services;
 /// and an installation package is put to every installation whose cached package
 /// declares the code it declares, as well as to the installations of that code, each read
 /// by the code it is registered under. Where an installation's cached package does not
-/// say which product it declares, every installation package is kept unless it records no
-/// cached package and has no package to open at all, or it is judged by its sources: one
-/// whose own record, read by this process, shows an ordinary installation, and one that
-/// records no cached package and has a package to open. A per-user installation keeps that
-/// record under its owner's account, and it is read only where the owner is the account this
-/// process runs as. Where every package its sources name can be seen, and for one recording
-/// no cached package its <c>InstallProperties</c> key records none as well, every
-/// installation package is compared with those packages instead, as with the installations
-/// below.
+/// say which product it declares, every installation package is kept unless that
+/// installation's own record, read by this process, shows it to be an ordinary
+/// installation, or it records no cached package and has no package to open at all. A
+/// per-user installation keeps that record under its owner's account, and it is read only
+/// where the owner is the account this process runs as. One that records no cached package
+/// and has a package to open is judged by its sources, so where its <c>InstallProperties</c>
+/// key records none as well and every package they name can be seen, every installation
+/// package is compared with those packages instead, as with the installations below.
 ///
 /// AND AN INSTALLATION THE CALLER COULD NOT RULE OUT AS A SECOND COPY ANSWERS FOR EVERY
 /// FILE. Its cached package and its original package need not declare any code the check
@@ -159,9 +158,10 @@ namespace InstallerClean.Services;
 /// through is decided by the rest of the scan exactly as if this check had not
 /// run. For an installation package, a file it cannot read, a question it cannot
 /// put, an answer that contradicts the caller's enumeration, an installation whose
-/// cached package does not say which product it declares, unless it is shown to record no
-/// cached package and have no package to open at all, or is shown by its sources to open
-/// only packages that can all be seen, an installation not ruled
+/// cached package does not say which product it declares, unless its own record shows an
+/// ordinary installation or it is shown to record no cached package and either have no
+/// package to open at all or, its <c>InstallProperties</c> key recording none as well, have
+/// sources whose packages can all be seen, an installation not ruled
 /// out as a second copy whose packages cannot all be seen, a source that answers off the
 /// allowlist and a recorded package it cannot identify all keep the file. For a patch, a
 /// file it cannot read, a registration it cannot list or ask about, an answer about a
@@ -382,8 +382,7 @@ public sealed record UnlistedKeyHolds(int WithInstallProperties, int WithoutInst
 /// </param>
 /// <param name="Kept">
 /// The lists read that could not all be seen, so each kept the files its installation's
-/// packages could be, or, where its installation's cached package did not say what it
-/// declares, every installation package.
+/// packages could be.
 /// </param>
 public sealed record OwnPerUserSourceLists(int Read, int Kept)
 {
@@ -427,11 +426,12 @@ public enum DeclaredProductOutcome
     /// enumeration listed no installation of it, no product key no installation accounts for
     /// keeps the file, and no cached package the check read,
     /// of the installations it listed, declares it, every one whose cached package did
-    /// not read being shown to record no cached package and have no source list and no
-    /// <c>InstallProperties</c> key recording a cached package or a folder it was installed
-    /// from that could be the Installer folder, so that it opens none, or shown to open only
-    /// packages its sources name that the check saw, its own record showing an ordinary
-    /// installation or it recording none, in its <c>InstallProperties</c> key as well. Every installation
+    /// not read being shown by its own record to be an ordinary installation, or shown to
+    /// record no cached package and have no source list and no <c>InstallProperties</c> key
+    /// recording a cached package or a folder it was installed from that could be the
+    /// Installer folder, so that it opens none, or to record none, in its
+    /// <c>InstallProperties</c> key as well, and open only packages its sources name that the
+    /// check saw. Every installation
     /// the caller could not rule out as a second copy opens packages the check saw, and this
     /// file is shown to be a different file from all of those packages. The candidate goes
     /// on being decided by everything else.
@@ -671,10 +671,11 @@ public enum DeclaredProductOutcome
     /// The answer about the product this installation package declares would let it
     /// through, and either an installation the caller could not rule out as a second copy
     /// of a program opens packages the check could not all see, or an installation's
-    /// cached package does not say which product it declares and it is not shown to record
-    /// no cached package and have no source list and no <c>InstallProperties</c> key recording
-    /// a cached package or a folder it was installed from that could be the Installer folder,
-    /// nor shown to open only packages its sources name that the check saw.
+    /// cached package does not say which product it declares, its own record does not
+    /// show it to be an ordinary installation, and it is not shown to record no cached
+    /// package and either have no source list and no <c>InstallProperties</c> key recording a
+    /// cached package or a folder it was installed from that could be the Installer folder, or
+    /// have sources whose packages the check saw.
     /// Kept back.
     ///
     /// IT IS ABOUT ANOTHER INSTALLATION AND NOT ABOUT THIS FILE. Such an installation

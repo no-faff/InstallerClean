@@ -46,8 +46,8 @@ public enum DeclaredProductInstalledCause
 
     /// <summary>
     /// The file opens as the package at a folder an installation not ruled out as a second copy
-    /// has as a source, or one an installation whose cached package does not say which product it
-    /// declares, released by its sources, has.
+    /// has as a source, or one an installation recording no cached package, released by its
+    /// sources, has.
     /// </summary>
     IsAtAnotherInstallationsSources,
 
