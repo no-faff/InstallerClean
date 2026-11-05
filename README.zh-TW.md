@@ -37,10 +37,10 @@
 
 - **簡介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 裡不需要的檔案，這個隱藏資料夾會隨著您安裝和更新軟體而越塞越滿。快速掃描之後，它會告訴您有沒有這類檔案，想細看的人還能看到更多詳細資料，並讓您把它們移到別處，或者刪掉，替 C: 磁碟機騰出空間。
 - **您可能是為了這個而來：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 時，看到 `C:\Windows\Installer` 佔了一大堆空間，卻不知道裡面是什麼。這種情況下，InstallerClean 正是您需要的。像 `9f05cba.msi` 這種名字看起來毫無規則的檔案，它知道裡面是什麼，而且很快就會告訴您哪些可以安全清除。
-- **能騰出多少空間：** 上面的圖表來自透過應用程式傳送的選擇性報告（謝謝大家）。在釋放了空間的那 <!-- reports-freedpct-start -->58%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.7 GB<!-- reports-median-end -->。這些檔案您很可能根本不知道它們的存在，它們只是白白占著空間。在*所有*電腦中，有 <!-- reports-over5gb-start -->21.7%<!-- reports-over5gb-end --> 釋放了超過 5 GB，還有不少人釋放了數百 GB。基本上，安裝的 MSI 軟體越多，不需要的檔案就越多。一執行 InstallerClean，您就知道了。
+- **能騰出多少空間：** 上面的圖表來自透過應用程式傳送的選擇性報告（謝謝大家）。在釋放了空間的那 <!-- reports-freedpct-start -->58%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.7 GB<!-- reports-median-end -->。這些檔案您很可能根本不知道它們的存在，它們只是白白占著空間。在*所有*電腦中，有 <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end --> 釋放了超過 5 GB，還有不少人釋放了數百 GB。基本上，安裝的 MSI 軟體越多，不需要的檔案就越多。一執行 InstallerClean，您就知道了。
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>點擊查看</kbd> 如果報告能準確反映全部 128,308 次下載，圖表會是什麼樣</summary>
+  <summary><kbd>點擊查看</kbd> 如果報告能準確反映全部 128,504 次下載，圖表會是什麼樣</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-zh-TW-scaled-dark.svg" />
