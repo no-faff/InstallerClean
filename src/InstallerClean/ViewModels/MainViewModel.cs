@@ -399,7 +399,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // Block F5 / Re-scan while a Move/Delete (its pre-flight included),
             // a card or an update is up so a parallel scan can't race it.
             Scan.NotifyExternallyBlockedChanged();
-            // Update now waits for a scan or a Move or Delete to finish.
+            // Update now and the Details buttons wait for a scan or a Move or
+            // Delete to finish.
             Chrome.NotifyBusyChanged();
         }
 

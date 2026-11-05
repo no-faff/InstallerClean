@@ -792,10 +792,15 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     private bool CanCancelUpdate() => IsUpdating && !IsHandingOver;
 
     /// <summary>
-    /// Asks Update now's command to re-read whether it can run, which also depends on
-    /// whether a scan or a Move or Delete is in flight.
+    /// Asks Update now and the two Details commands to re-read whether they can run,
+    /// which also depends on whether a scan or a Move or Delete is in flight.
     /// </summary>
-    internal void NotifyBusyChanged() => UpdateNowCommand.NotifyCanExecuteChanged();
+    internal void NotifyBusyChanged()
+    {
+        UpdateNowCommand.NotifyCanExecuteChanged();
+        OpenOrphanedDetailsCommand.NotifyCanExecuteChanged();
+        OpenRegisteredDetailsCommand.NotifyCanExecuteChanged();
+    }
 
     /// <summary>
     /// Swap-then-dispose, matching CleanupViewModel.ScheduleMoveDestinationSave:
@@ -831,16 +836,21 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
             : Strings.UpdateCheck_Failed_Unknown_NoLog,
     };
 
-    private bool HasScanResult => _scan.LastScanResult is not null;
+    // A scan, or a Move or Delete with its pre-flight, replaces the result when it
+    // ends, and the overlay that disables the main window shows only once one has
+    // run for 200 ms. So both Details windows are out of use from the first line of
+    // either. A Details window reads the result once, as it opens, so one opened
+    // inside those 200 ms would go on showing the set, counts and sizes from
+    // before.
+    private bool CanOpenRegisteredDetails => _scan.LastScanResult is not null && !_isBusy();
 
     // The orphaned-files window lists what the scan found. With nothing found
     // there is nothing to list, and a live button onto an empty list is a dead
-    // end; the registered window, which after any scan the app will accept has
-    // content, keeps the plain has-a-result gate; the window itself no longer
-    // depends on that.
-    private bool HasOrphansToShow => HasScanResult && _scan.HasOrphans;
+    // end, so its gate also asks for files. The registered window has content
+    // after any scan the app accepts, and takes the gate above alone.
+    private bool CanOpenOrphanedDetails => CanOpenRegisteredDetails && _scan.HasOrphans;
 
-    [RelayCommand(CanExecute = nameof(HasOrphansToShow))]
+    [RelayCommand(CanExecute = nameof(CanOpenOrphanedDetails))]
     private void OpenOrphanedDetails()
     {
         if (_scan.LastScanResult is null) return;
@@ -852,7 +862,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
         _windowService.ShowOrphanedDetails(viewModel);
     }
 
-    [RelayCommand(CanExecute = nameof(HasScanResult))]
+    [RelayCommand(CanExecute = nameof(CanOpenRegisteredDetails))]
     private void OpenRegisteredDetails()
     {
         if (_scan.LastScanResult is null) return;
