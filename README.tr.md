@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="GitHub sürümü"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-128k-brightgreen" alt="Toplam indirme"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-129k-brightgreen" alt="Toplam indirme"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,10 +37,10 @@
 
 - **Ne yapar:** InstallerClean tek bir iş yapar: yazılım kurdukça ve güncelledikçe dolan gizli bir klasör olan `C:\Windows\Installer` içindeki gereksiz dosyaları kaldırır. Kısa bir taramanın ardından böyle dosyalarınız olup olmadığını size söyler, merak edenler için daha fazla ayrıntı gösterir ve C: sürücünüzde yer açmak için onları başka bir yere taşımanıza ya da silmenize olanak tanır.
 - **Buraya gelme nedeniniz belki de şu:** [WinDirStat](https://github.com/windirstat/windirstat), WizTree ya da TreeSize kullandınız, `C:\Windows\Installer`'ın çok yer kapladığını gördünüz ama içinde ne olduğunu bilmiyordunuz. Öyleyse InstallerClean tam da ihtiyacınız olan şey. `9f05cba.msi` gibi rastgele görünen adlara sahip o dosyaların içinde ne olduğunu bilir ve hangilerini güvenle kaldırabileceğinizi size hızlıca söyler.
-- **Ne kadar yer:** Yukarıdaki grafik, uygulamadan gönderilen isteğe bağlı raporların sonuçlarını gösteriyor (herkese teşekkürler). Yer açan raporların oranı <!-- reports-freedpct-start -->%58<!-- reports-freedpct-end -->; bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Bunlar, muhtemelen varlığından haberiniz bile olmayan, öylece yer kaplayan dosyalar. *Tüm* makinelerin <!-- reports-over5gb-start -->%21,6<!-- reports-over5gb-end --> kadarı 5 GB üzerinde yer kazandı, birçok kişi de yüzlerce GB açtı. Özetle, ne kadar çok MSI tabanlı yazılım kurarsanız o kadar çok gereksiz dosyanız olur. InstallerClean'i çalıştırdığınız anda öğrenirsiniz.
+- **Ne kadar yer:** Yukarıdaki grafik, uygulamadan gönderilen isteğe bağlı raporların sonuçlarını gösteriyor (herkese teşekkürler). Yer açan raporların oranı <!-- reports-freedpct-start -->%59<!-- reports-freedpct-end -->; bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Bunlar, muhtemelen varlığından haberiniz bile olmayan, öylece yer kaplayan dosyalar. *Tüm* makinelerin <!-- reports-over5gb-start -->%21,6<!-- reports-over5gb-end --> kadarı 5 GB üzerinde yer kazandı, birçok kişi de yüzlerce GB açtı. Özetle, ne kadar çok MSI tabanlı yazılım kurarsanız o kadar çok gereksiz dosyanız olur. InstallerClean'i çalıştırdığınız anda öğrenirsiniz.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Görmek için tıklayın</kbd>: raporlar 128.504 indirmenin tamamının birebir bir yansıması olsaydı grafik nasıl görünürdü</summary>
+  <summary><kbd>Görmek için tıklayın</kbd>: raporlar 129.618 indirmenin tamamının birebir bir yansıması olsaydı grafik nasıl görünürdü</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-tr-scaled-dark.svg" />
@@ -238,7 +238,7 @@ InstallerClean imzasızdır. Çalıştırmadan önce neleri denetleyebileceğini
 - VirusTotal: her yapı çıkmadan önce taranır ve sürüm sayfası her indirme için motor motor tam sonucu taşır.
 - Kaynak kod burada, [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) adresinde. Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmetleri, `main` dalına her gönderimde ve her çekme isteğinde Windows üzerinde çalışan otomatik bir test paketiyle kapsanır; bu sayfanın başındaki CI rozeti de sonucu bildirir.
 - Sürüm yapıları deterministiktir: aynı kaynak, aynı SDK ve aynı yayımlama bayrakları aynı baytları üretir; ayrıca her yapı girdisi o etiketteki kaynakla eşleşmedikçe bir sürüme etiket konulamaz. Yani etikete geçip kendiniz derleyebilir, karmaları yayımlananlarla karşılaştırabilirsiniz. Bunun için gerekenler her sürümün notlarındadır: hangi SDK sürümüyle derlendiği ve varsayılanlarla derlenmemiş indirmeler için yayımlama bayrakları. Kurulum bunun dışındadır: SDK ile değil Inno Setup ile derlenir ve yapım yılını kendi içine damgalar, dolayısıyla karmasını yeniden üretmek aynı Inno sürümünü ve aynı takvim yılını da gerektirir.
-- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->128.000+<!-- downloads-end --> indirme.
+- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->129.000+<!-- downloads-end --> indirme.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks tarafından %100 temiz olarak onaylandı" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) inceledi ve casus yazılım, reklam yazılımı ile virüs içermediğini onayladı.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia %100 ücretsiz ödülü; casus yazılım, reklam yazılımı ve virüs içermediği onaylı" width="190"></a>
 

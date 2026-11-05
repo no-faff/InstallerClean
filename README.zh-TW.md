@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="GitHub 版本"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-128k-brightgreen" alt="總下載次數"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-129k-brightgreen" alt="總下載次數"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,10 +37,10 @@
 
 - **簡介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 裡不需要的檔案，這個隱藏資料夾會隨著您安裝和更新軟體而越塞越滿。快速掃描之後，它會告訴您有沒有這類檔案，想細看的人還能看到更多詳細資料，並讓您把它們移到別處，或者刪掉，替 C: 磁碟機騰出空間。
 - **您可能是為了這個而來：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 時，看到 `C:\Windows\Installer` 佔了一大堆空間，卻不知道裡面是什麼。這種情況下，InstallerClean 正是您需要的。像 `9f05cba.msi` 這種名字看起來毫無規則的檔案，它知道裡面是什麼，而且很快就會告訴您哪些可以安全清除。
-- **能騰出多少空間：** 上面的圖表來自透過應用程式傳送的選擇性報告（謝謝大家）。在釋放了空間的那 <!-- reports-freedpct-start -->58%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.7 GB<!-- reports-median-end -->。這些檔案您很可能根本不知道它們的存在，它們只是白白占著空間。在*所有*電腦中，有 <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end --> 釋放了超過 5 GB，還有不少人釋放了數百 GB。基本上，安裝的 MSI 軟體越多，不需要的檔案就越多。一執行 InstallerClean，您就知道了。
+- **能騰出多少空間：** 上面的圖表來自透過應用程式傳送的選擇性報告（謝謝大家）。在釋放了空間的那 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 當中，釋放空間的中位數是 <!-- reports-median-start -->1.7 GB<!-- reports-median-end -->。這些檔案您很可能根本不知道它們的存在，它們只是白白占著空間。在*所有*電腦中，有 <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end --> 釋放了超過 5 GB，還有不少人釋放了數百 GB。基本上，安裝的 MSI 軟體越多，不需要的檔案就越多。一執行 InstallerClean，您就知道了。
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>點擊查看</kbd> 如果報告能準確反映全部 128,504 次下載，圖表會是什麼樣</summary>
+  <summary><kbd>點擊查看</kbd> 如果報告能準確反映全部 129,618 次下載，圖表會是什麼樣</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-zh-TW-scaled-dark.svg" />
@@ -237,7 +237,7 @@ InstallerClean 沒有簽章。在執行它之前，您可以檢查這些：
 - VirusTotal：每個版本在發出之前都會先掃描，發行頁面上附有每個下載檔案逐一引擎的完整結果。
 - 原始碼就在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)。掃描、查詢、移動、刪除、設定和待重新啟動這幾項服務都由一套自動化測試涵蓋，每次推送到 `main` 以及每個 pull request 都會在 Windows 上執行，本頁頂端的 CI 徽章會顯示結果。
 - 發行版本的建置是確定性的：相同的原始碼、相同的 SDK 和相同的發行參數會產生相同的位元組，而且除非每一項建置輸入都和該標籤的原始碼一致，否則一個版本無法加上標籤。所以您可以簽出標籤、自己建置一次，再把雜湊值和公布的比對。每個版本的發行說明都附有您需要的資訊：建置時用的 SDK 版本，以及任何不是用預設值建置的下載檔案所用的發行參數。安裝程式是例外：它是由 Inno Setup 而不是 SDK 編譯的，而且會把建置的年份寫進檔案本身，所以要重現它的雜湊值，還需要相同的 Inno 版本和相同的年份。
-- 在 GitHub、MajorGeeks 和 Softpedia 上累計 <!-- downloads-start -->128,000+<!-- downloads-end --> 次下載。
+- 在 GitHub、MajorGeeks 和 Softpedia 上累計 <!-- downloads-start -->129,000+<!-- downloads-end --> 次下載。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 會在虛擬機器中測試每一個送審的版本，只有通過他們的審查才會收錄。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認證 100% 乾淨" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 審查過它，並認證它不含間諜軟體、廣告軟體和病毒。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% 免費獎，認證不含間諜軟體、廣告軟體和病毒" width="190"></a>
 
