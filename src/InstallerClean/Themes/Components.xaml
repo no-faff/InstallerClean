@@ -1303,10 +1303,11 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <!-- Indeterminate with animations on: the stripe sweeps.
-                             The sweep runs while this trigger holds, and stops the
-                             moment the bar stops being indeterminate or "show
-                             animations" is switched off mid-run, because leaving
-                             the trigger clears IsRunning. -->
+                             The sweep runs while this trigger holds and the bar
+                             can be seen. It stops the moment the bar stops being
+                             indeterminate or "show animations" is switched off
+                             mid-run, because leaving the trigger clears IsRunning,
+                             and while a card holding the bar is collapsed. -->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsIndeterminate, RelativeSource={RelativeSource TemplatedParent}}" Value="True"/>

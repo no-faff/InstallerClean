@@ -16,10 +16,13 @@ namespace InstallerClean.Helpers;
 /// the width the bar is drawn at. A change in the track's width starts the run
 /// again from the left with the new ends.
 ///
-/// Clearing the property, or the stripe leaving the window, removes the
-/// animation and the size handler, so nothing keeps running or holds the bar
-/// once it has gone. A stripe that comes back with the property still set
-/// starts again.
+/// The run goes only while the stripe can be seen: loaded and visible, which an
+/// ancestor collapsed, such as the scanning card once a scan ends, makes it not.
+/// Clearing the property, the stripe leaving the window or the stripe stopping
+/// being visible removes the animation and the size handler, so nothing keeps
+/// the render loop running or holds the bar while it cannot be seen. Collapsing
+/// an ancestor raises no Unloaded, which is why visibility is followed as well. A
+/// stripe that is seen again with the property still set starts again.
 /// </summary>
 public static class IndeterminateSweep
 {
@@ -53,20 +56,35 @@ public static class IndeterminateSweep
         {
             stripe.Loaded += OnStripeLoaded;
             stripe.Unloaded += OnStripeUnloaded;
+            stripe.IsVisibleChanged += OnStripeIsVisibleChanged;
             // A stripe in a template that is applied before the window shows is
-            // not loaded yet, and its Loaded starts the run.
-            if (stripe.IsLoaded) Attach(stripe);
+            // not loaded yet, and its Loaded starts the run; one under a
+            // collapsed card starts when the card shows.
+            if (CanBeSeen(stripe)) Attach(stripe);
         }
         else
         {
             stripe.Loaded -= OnStripeLoaded;
             stripe.Unloaded -= OnStripeUnloaded;
+            stripe.IsVisibleChanged -= OnStripeIsVisibleChanged;
             Detach(stripe);
         }
     }
 
-    private static void OnStripeLoaded(object sender, RoutedEventArgs e) =>
-        Attach((FrameworkElement)sender);
+    private static bool CanBeSeen(FrameworkElement stripe) => stripe.IsLoaded && stripe.IsVisible;
+
+    private static void OnStripeLoaded(object sender, RoutedEventArgs e)
+    {
+        var stripe = (FrameworkElement)sender;
+        if (CanBeSeen(stripe)) Attach(stripe);
+    }
+
+    private static void OnStripeIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        var stripe = (FrameworkElement)sender;
+        if (CanBeSeen(stripe)) Attach(stripe);
+        else Detach(stripe);
+    }
 
     private static void OnStripeUnloaded(object sender, RoutedEventArgs e) =>
         Detach((FrameworkElement)sender);
