@@ -334,48 +334,21 @@ public sealed class SetupReplacementTests : IDisposable
 
         public static SuspendedProcess Start(string path)
         {
-            var startup = new StartupInfo { cb = Marshal.SizeOf<StartupInfo>() };
-            if (!CreateProcess(path, null, IntPtr.Zero, IntPtr.Zero, false, CreateSuspended,
-                    IntPtr.Zero, null, ref startup, out var started))
+            var startup = new Kernel32.STARTUPINFO { cb = (uint)Marshal.SizeOf<Kernel32.STARTUPINFO>() };
+            var commandLine = $"\"{path}\"\0".ToCharArray();
+            if (!Kernel32.CreateProcess(path, commandLine, IntPtr.Zero, IntPtr.Zero, bInheritHandles: false, CreateSuspended,
+                    IntPtr.Zero, Path.GetDirectoryName(path)!, in startup, out var started))
                 throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
             return new SuspendedProcess(started.hProcess, started.hThread);
         }
 
         public void Dispose()
         {
-            TerminateProcess(_process, 1);
+            Kernel32.TerminateProcess(_process, 1);
             WaitForSingleObject(_process, 10_000);
             CloseHandle(_thread);
             CloseHandle(_process);
         }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct StartupInfo
-        {
-            public int cb;
-            public string? lpReserved;
-            public string? lpDesktop;
-            public string? lpTitle;
-            public int dwX, dwY, dwXSize, dwYSize, dwXCountChars, dwYCountChars, dwFillAttribute, dwFlags;
-            public short wShowWindow, cbReserved2;
-            public IntPtr lpReserved2, hStdInput, hStdOutput, hStdError;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct ProcessInformation
-        {
-            public IntPtr hProcess, hThread;
-            public int dwProcessId, dwThreadId;
-        }
-
-        [DllImport("kernel32.dll", EntryPoint = "CreateProcessW", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern bool CreateProcess(
-            string lpApplicationName, string? lpCommandLine, IntPtr lpProcessAttributes, IntPtr lpThreadAttributes,
-            bool bInheritHandles, uint dwCreationFlags, IntPtr lpEnvironment, string? lpCurrentDirectory,
-            ref StartupInfo lpStartupInfo, out ProcessInformation lpProcessInformation);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);

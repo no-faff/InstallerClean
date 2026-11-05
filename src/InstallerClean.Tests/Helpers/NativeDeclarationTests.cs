@@ -72,7 +72,7 @@ public class NativeDeclarationTests
             .Select(d => Name(d.Method))
             .ToList();
 
-        Assert.Empty(widened);
+        Assert.True(widened.Count == 0, string.Join("; ", widened));
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class NativeDeclarationTests
             .Select(d => Name(d.Method))
             .ToList();
 
-        Assert.Empty(loose);
+        Assert.True(loose.Count == 0, string.Join("; ", loose));
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ public class NativeDeclarationTests
             .Select(d => $"{Name(d.Method)} ({d.Import.EntryPoint}, {d.Import.CharSet})")
             .ToList();
 
-        Assert.Empty(ansi);
+        Assert.True(ansi.Count == 0, string.Join("; ", ansi));
     }
 
     private static bool IsText(Type type)
@@ -126,7 +126,7 @@ public class NativeDeclarationTests
             }
         }
 
-        Assert.Empty(unstated);
+        Assert.True(unstated.Count == 0, string.Join("; ", unstated));
     }
 
     /// <summary>
@@ -147,7 +147,7 @@ public class NativeDeclarationTests
                 .Select(p => $"{Name(d.Method)} {p.Name} ({p.ParameterType.Name})"))
             .ToList();
 
-        Assert.Empty(wrong);
+        Assert.True(wrong.Count == 0, string.Join("; ", wrong));
     }
 
     /// <summary>A delegate Windows calls back is called with the Windows calling convention.</summary>
@@ -162,7 +162,7 @@ public class NativeDeclarationTests
                 .Select(p => $"{Name(d.Method)} {p.Name}"))
             .ToList();
 
-        Assert.Empty(undeclared);
+        Assert.True(undeclared.Count == 0, string.Join("; ", undeclared));
     }
 
     // Each struct's size on x64, from its declaration in the Windows SDK headers. A struct
@@ -212,13 +212,17 @@ public class NativeDeclarationTests
             Add(method.ReturnType);
         }
         foreach (var type in Core.GetTypes())
-            if (type.Namespace == typeof(Kernel32).Namespace) Add(type);
+            if (IsInteropStruct(type)) Add(type);
 
         while (pending.Count > 0)
             foreach (var field in pending.Dequeue().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                 Add(field.FieldType);
         return seen;
     }
+
+    /// <summary>A struct declared beside the declarations, in Core's interop namespace.</summary>
+    private static bool IsInteropStruct(Type type) =>
+        type.IsValueType && type.Assembly == Core && type.Namespace == typeof(Kernel32).Namespace;
 
     private static bool IsFixedBufferType(Type type) => type.IsDefined(typeof(CompilerGeneratedAttribute));
 
@@ -233,40 +237,63 @@ public class NativeDeclarationTests
     }
 
     /// <summary>
-    /// No struct holds a bool, a char or a reference. The marshaller converts each of those,
-    /// a char to one byte under the default ANSI set, so a struct holding one is a different
-    /// size or a different shape where Windows reads it than in memory. A pointer field is
-    /// copied as it is.
+    /// Every field of every struct is one the marshaller copies as it is: an integer, a
+    /// floating-point number, an IntPtr, a pointer, an enum, a GUID, or another struct
+    /// declared beside the declarations that the walk reached, whose own fields this
+    /// checks in turn. The marshaller converts the rest, so a struct holding one is a
+    /// different size or a different shape where Windows reads it than in memory: a bool
+    /// becomes a four-byte BOOL, a char one byte under the default ANSI set, a DateTime an
+    /// eight-byte OLE date, a decimal a DECIMAL, and a string or any other reference by
+    /// rules of its own.
     /// </summary>
     [Fact]
-    public void No_struct_holds_a_field_the_marshaller_converts()
+    public void Every_struct_field_is_one_the_marshaller_copies_as_it_is()
     {
-        var converted = Structs()
+        var structs = Structs();
+        var converted = structs
             .SelectMany(s => s.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(f => f.FieldType == typeof(bool) || f.FieldType == typeof(char)
-                    || (!f.FieldType.IsValueType && !f.FieldType.IsPointer))
-                .Select(f => $"{s.FullName}.{f.Name} ({f.FieldType.Name})"))
+                .Where(f => !IsCopiedAsItIs(f.FieldType, structs))
+                .Select(f => $"{s.FullName}.{f.Name} ({f.FieldType.FullName})"))
             .ToList();
 
-        Assert.Empty(converted);
+        Assert.True(converted.Count == 0, string.Join("; ", converted));
     }
+
+    private static bool IsCopiedAsItIs(Type type, IReadOnlyCollection<Type> checkedStructs) =>
+        type.IsPointer
+        || type.IsEnum
+        || (type.IsPrimitive && type != typeof(bool) && type != typeof(char))
+        || type == typeof(Guid)
+        || (IsInteropStruct(type) && checkedStructs.Contains(type));
 
     /// <summary>
     /// Each struct is the same size in memory as the marshaller makes it, so Windows reads
     /// and writes the bytes the code reads and writes, and a size the code passes Windows
-    /// from <c>Unsafe.SizeOf</c> or <c>sizeof</c> is the size Windows checks.
+    /// from <c>Unsafe.SizeOf</c> or <c>sizeof</c> is the size Windows checks. A struct the
+    /// marshaller gives no size, such as a DateTime, whose layout the runtime chooses, fails.
     /// </summary>
     [Fact]
     public void Every_struct_is_the_size_in_memory_that_the_marshaller_makes_it()
     {
         var sizeOf = typeof(Unsafe).GetMethod(nameof(Unsafe.SizeOf))!;
-        var differing = Structs()
-            .Select(s => (Struct: s, Memory: (int)sizeOf.MakeGenericMethod(s).Invoke(null, null)!, Marshalled: Marshal.SizeOf(s)))
-            .Where(s => s.Memory != s.Marshalled)
-            .Select(s => $"{s.Struct.FullName}: {s.Memory} in memory, {s.Marshalled} marshalled")
-            .ToList();
+        var differing = new List<string>();
+        foreach (var s in Structs())
+        {
+            int marshalled;
+            try
+            {
+                marshalled = Marshal.SizeOf(s);
+            }
+            catch (ArgumentException)
+            {
+                differing.Add($"{s.FullName}: the marshaller gives it no size");
+                continue;
+            }
+            var memory = (int)sizeOf.MakeGenericMethod(s).Invoke(null, null)!;
+            if (memory != marshalled) differing.Add($"{s.FullName}: {memory} in memory, {marshalled} marshalled");
+        }
 
-        Assert.Empty(differing);
+        Assert.True(differing.Count == 0, string.Join("; ", differing));
     }
 
     /// <summary>Each struct is the size its Windows SDK declaration gives on x64.</summary>
@@ -282,7 +309,7 @@ public class NativeDeclarationTests
             else if (Marshal.SizeOf(s) != size) wrong.Add($"{s.FullName}: {Marshal.SizeOf(s)}, the header gives {size}");
         }
 
-        Assert.Empty(wrong);
+        Assert.True(wrong.Count == 0, string.Join("; ", wrong));
     }
 
     /// <summary>Every enum a declaration passes is the four bytes of the DWORD or C enum it stands for.</summary>
@@ -297,6 +324,6 @@ public class NativeDeclarationTests
             .Distinct()
             .ToList();
 
-        Assert.Empty(wrong);
+        Assert.True(wrong.Count == 0, string.Join("; ", wrong));
     }
 }
