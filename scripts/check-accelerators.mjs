@@ -33,7 +33,7 @@
 //
 // Run from the repo root: node scripts/check-accelerators.mjs
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 
 const DIR = 'src/InstallerClean.Core/Resources';
 
@@ -302,7 +302,7 @@ for (const file of xamlFiles(XAML_ROOT)) {
   }
 }
 for (const [name, key] of KEYLESS_REQUIRED)
-  if (!keylessSites.some((s) => s.file.endsWith(`/${name}`) && s.key === key))
+  if (!keylessSites.some((s) => basename(s.file) === name && s.key === key))
     consumerProblems.push(`${name} does not show ${key} through {loc:TranslateWithoutAccessKey}, `
       + 'so its button carries the access key the main window\'s button does.');
 

@@ -393,6 +393,13 @@ const RAW_READ_ALLOWED = [
       + 'through Find or Get.',
   },
   {
+    file: 'src/InstallerClean.Tests/Helpers/InstallerPathTextCopyingTests.cs',
+    reason: 'Enumerates a whole resource set per culture to prove no shipped value '
+      + 'carries a word joiner or a zero-width space, which a copy then removes. A door '
+      + 'that answers one named key cannot list a set, and the values have to be the '
+      + 'raw ones the drawing transform starts from.',
+  },
+  {
     file: 'src/InstallerClean.Tests/Helpers/LocalisationOverrideTests.cs',
     reason: 'Reads one key at a named culture to prove an explicit language pick '
       + 'drives the typed accessor. The expectation has to come from the satellite '

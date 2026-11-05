@@ -50,10 +50,12 @@ public class AccessKeyTextTests
     {
         var culture = CultureInfo.GetCultureInfo(cultureName);
         var faults = new List<string>();
+        using var scope = new LocalisationScope(culture);
 
         foreach (var key in new[] { "Action.DeletePermanently", "Action.Move" })
         {
-            var label = Strings.ResourceManager.GetString(key, culture);
+            // Through Strings.Get, the door the confirmations' labels come through.
+            var label = Strings.Get(key);
             Assert.False(string.IsNullOrEmpty(label), $"{cultureName}: {key} did not resolve");
 
             // The label as shipped carries a key; a language without one would make
@@ -73,5 +75,12 @@ public class AccessKeyTextTests
         }
 
         Assert.True(faults.Count == 0, $"{cultureName}: {string.Join("; ", faults)}");
+    }
+
+    private sealed class LocalisationScope : IDisposable
+    {
+        public LocalisationScope(CultureInfo culture) => Localisation.Set(culture, culture);
+
+        public void Dispose() => Localisation.Reset();
     }
 }
