@@ -75,18 +75,6 @@ $ours = 'InstallerClean.Core', 'installerclean-cli', 'InstallerClean'
 # the members whenever that changes, so a new route is read against the reason before it passes.
 $entries = @(
   [pscustomobject]@{
-    Calls = @(, @('[InstallerClean.Core]InstallerClean.Helpers.UnelevatedLauncher::Wrap(IntPtr,System.Collections.Generic.List`1<Object>)',
-      'System.Runtime.InteropServices.ComWrappers::GetOrCreateObjectForComInstance(IntPtr,System.Runtime.InteropServices.CreateObjectFlags)'))
-    Reason = 'CoGetContextToken is reached only through ReferenceTrackerNativeObjectWrapper, which NativeObjectWrapper.Create makes only ' +
-      'under CreateObjectFlags.TrackerObject (ComWrappers.cs:567-580), and Wrap passes UniqueInstance (UnelevatedLauncher.cs). ' +
-      'The weak-reference callback the static constructor registers (:551-557, ComWeakRefToObject :1576-1593) creates through ' +
-      'GetOrCreateObjectFromWrapper (:751-768), which uses TrackerObject only for an instance registered with RegisterForTrackerSupport ' +
-      'or RegisterForMarshalling, and the app registers neither. The reference tracker host, whose callback also reaches ' +
-      'CoGetContextToken (ReferenceTrackerHost.cs:66), is registered only from that wrapper''s constructor ' +
-      '(TrackerObjectManager.cs:17-31, ReferenceTrackerHost.cs:17-19). Read at .NET v10.0.13.'
-    Reach = @{ 'System.Runtime.InteropServices.ComWrappers::GetOrCreateObjectForComInstance(IntPtr,System.Runtime.InteropServices.CreateObjectFlags)' = '29 members, a335253cebd44639' }
-  }
-  [pscustomobject]@{
     Calls = @(, @('[InstallerClean.Core]InstallerClean.Services.ProcessStartRetry::Start(System.Diagnostics.ProcessStartInfo,System.Func`2<System.Exception,Boolean>,System.Action`1<System.TimeSpan>)', 'System.Diagnostics.Process::Start(System.Diagnostics.ProcessStartInfo)'))
     Reason = 'StartWithCreateProcess reaches CoTaskMemAlloc only through SecureStringToGlobalAllocUnicode, called where ' +
       'ProcessStartInfo.UserName is not empty and Password is set (Process.Windows.cs:527, :552-553). UserName defaults to empty ' +

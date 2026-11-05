@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Helpers;
@@ -31,15 +29,6 @@ namespace InstallerClean.Helpers;
 /// </summary>
 internal static class UnelevatedLauncher
 {
-    // Bridges the raw COM pointers from CoCreateInstance and the chain's
-    // out-parameters into managed wrappers. UniqueInstance keeps each
-    // wrapper out of the cache so FinalRelease() releases it
-    // deterministically. The [GeneratedComInterface] marshallers use
-    // their own default ComWrappers instance, which is fine: every
-    // pointer here is wrapped exactly once and there is no cross-instance
-    // identity question.
-    private static readonly StrategyBasedComWrappers s_cw = new();
-
     /// <summary>
     /// Result of an <see cref="OpenUrl"/> attempt. <see cref="Launched"/>
     /// is true when the unelevated browser was launched; otherwise
@@ -82,7 +71,7 @@ internal static class UnelevatedLauncher
             // call synchronous for the caller.
             var sta = new Thread(() =>
             {
-                var co = ShellDispatchNative.CoInitializeEx(IntPtr.Zero, ShellDispatchNative.COINIT_APARTMENTTHREADED);
+                var co = Ole32.CoInitializeEx(IntPtr.Zero, ShellDispatchNative.COINIT_APARTMENTTHREADED);
                 try
                 {
                     launched = TryShellExecuteViaExplorer(safeUrl, out failureReason);
@@ -96,7 +85,7 @@ internal static class UnelevatedLauncher
                 {
                     // One CoUninitialize for the successful init (S_OK or
                     // S_FALSE, both >= 0); skip it if init failed.
-                    if (co >= 0) ShellDispatchNative.CoUninitialize();
+                    if (co >= 0) Ole32.CoUninitialize();
                 }
             });
             sta.SetApartmentState(ApartmentState.STA);
@@ -134,12 +123,14 @@ internal static class UnelevatedLauncher
     private static bool TryShellExecuteViaExplorer(string url, out string failureReason)
     {
         failureReason = string.Empty;
-        var wrappers = new List<object>(6);
+        // Every wrapper made here is released as this method returns, on every
+        // path and on this thread, before the caller's CoUninitialize.
+        using var com = new ComObjects();
         var bstrUrl = IntPtr.Zero;
         try
         {
             // 1. Connect to the running desktop shell's ShellWindows object.
-            var hr = ShellDispatchNative.CoCreateInstance(
+            var hr = Ole32.CoCreateInstance(
                 in ShellDispatchNative.CLSID_ShellWindows, IntPtr.Zero,
                 ShellDispatchNative.CLSCTX_LOCAL_SERVER,
                 in ShellDispatchNative.IID_IShellWindows, out var pShellWindows);
@@ -148,14 +139,15 @@ internal static class UnelevatedLauncher
                 failureReason = $"CoCreateInstance(ShellWindows) hr=0x{hr:X8}";
                 return false;
             }
-            var shellWindows = (IShellWindows)Wrap(pShellWindows, wrappers);
+            var shellWindows = (IShellWindows)com.Wrap(pShellWindows);
 
             // 2. FindWindowSW(SWC_DESKTOP) -> the desktop's IDispatch.
             //    Only S_OK (0) with a non-null dispatch is success;
             //    S_FALSE (1) means no desktop window.
-            var empty = default(VARIANT);
+            var location = default(VARIANT);
+            var locationRoot = default(VARIANT);
             hr = shellWindows.FindWindowSW(
-                in empty, in empty, ShellDispatchNative.SWC_DESKTOP,
+                ref location, ref locationRoot, ShellDispatchNative.SWC_DESKTOP,
                 out _, ShellDispatchNative.SWFO_NEEDDISPATCH, out var pDesktop);
             if (hr != 0 || pDesktop == IntPtr.Zero)
             {
@@ -164,18 +156,18 @@ internal static class UnelevatedLauncher
             }
             // The COM IServiceProvider (servprov.h), fully qualified to
             // distinguish it from System.IServiceProvider.
-            var serviceProvider = (InstallerClean.Interop.Native.IServiceProvider)Wrap(pDesktop, wrappers);
+            var serviceProvider = (InstallerClean.Interop.Native.IServiceProvider)com.Wrap(pDesktop);
 
             // 3. QueryService(SID_STopLevelBrowser) -> IShellBrowser.
-            hr = serviceProvider.QueryService(
-                in ShellDispatchNative.SID_STopLevelBrowser,
-                in ShellDispatchNative.IID_IShellBrowser, out var pBrowser);
+            var topLevelBrowser = ShellDispatchNative.SID_STopLevelBrowser;
+            var shellBrowserId = ShellDispatchNative.IID_IShellBrowser;
+            hr = serviceProvider.QueryService(ref topLevelBrowser, ref shellBrowserId, out var pBrowser);
             if (hr < 0 || pBrowser == IntPtr.Zero)
             {
                 failureReason = $"QueryService(STopLevelBrowser) hr=0x{hr:X8}";
                 return false;
             }
-            var browser = (IShellBrowser)Wrap(pBrowser, wrappers);
+            var browser = (IShellBrowser)com.Wrap(pBrowser);
 
             // 4. QueryActiveShellView -> IShellView.
             hr = browser.QueryActiveShellView(out var pView);
@@ -184,18 +176,17 @@ internal static class UnelevatedLauncher
                 failureReason = $"QueryActiveShellView hr=0x{hr:X8}";
                 return false;
             }
-            var view = (IShellView)Wrap(pView, wrappers);
+            var view = (IShellView)com.Wrap(pView);
 
             // 5. GetItemObject(SVGIO_BACKGROUND) -> the desktop folder view's IDispatch.
-            hr = view.GetItemObject(
-                ShellDispatchNative.SVGIO_BACKGROUND,
-                in ShellDispatchNative.IID_IDispatch, out var pBackground);
+            var dispatchId = ShellDispatchNative.IID_IDispatch;
+            hr = view.GetItemObject(ShellDispatchNative.SVGIO_BACKGROUND, ref dispatchId, out var pBackground);
             if (hr < 0 || pBackground == IntPtr.Zero)
             {
                 failureReason = $"GetItemObject(BACKGROUND) hr=0x{hr:X8}";
                 return false;
             }
-            var folderView = (IShellFolderViewDual)Wrap(pBackground, wrappers);
+            var folderView = (IShellFolderViewDual)com.Wrap(pBackground);
 
             // 6. get_Application -> the Shell.Application dispatch (IShellDispatch2).
             hr = folderView.get_Application(out var pApp);
@@ -204,7 +195,7 @@ internal static class UnelevatedLauncher
                 failureReason = $"get_Application hr=0x{hr:X8}";
                 return false;
             }
-            var shellDispatch = (IShellDispatch2)Wrap(pApp, wrappers);
+            var shellDispatch = (IShellDispatch2)com.Wrap(pApp);
 
             // 7. ShellExecute runs in Explorer's medium-integrity context.
             //    The four optional VARIANT arguments are VT_EMPTY (default),
@@ -222,27 +213,7 @@ internal static class UnelevatedLauncher
         finally
         {
             Bstrs.Free(bstrUrl);
-            // ComObject is not IDisposable; FinalRelease() releases the
-            // wrapper's own reference and works because each wrapper was
-            // created with UniqueInstance.
-            foreach (var rcw in wrappers)
-                if (rcw is ComObject co) co.FinalRelease();
         }
     }
 
-    // Wraps a raw COM pointer the caller owns one reference to.
-    // GetOrCreateObjectForComInstance QIs for IUnknown and so takes its
-    // own reference; the caller's reference is released here, and the
-    // wrapper's own reference is released by FinalRelease() in the
-    // caller's finally. The wrapper is returned as object so the call
-    // sites can cast to the generated interface (the cast triggers the QI
-    // through IDynamicInterfaceCastable); a ComObject-typed return would
-    // not compile that cast because ComObject is sealed.
-    private static object Wrap(IntPtr punk, List<object> wrappers)
-    {
-        var rcw = s_cw.GetOrCreateObjectForComInstance(punk, CreateObjectFlags.UniqueInstance);
-        Marshal.Release(punk);
-        wrappers.Add(rcw);
-        return rcw;
-    }
 }

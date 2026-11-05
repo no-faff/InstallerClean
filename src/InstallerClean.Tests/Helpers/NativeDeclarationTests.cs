@@ -190,11 +190,11 @@ public class NativeDeclarationTests
     };
 
     /// <summary>
-    /// Every struct a declaration passes, by value or by reference, and every struct
-    /// declared beside the declarations, with each struct inside one, a fixed buffer's
-    /// own type included.
+    /// Every struct a declaration or a COM interface method passes, by value or by
+    /// reference, and every struct declared beside the declarations, with each struct
+    /// inside one, a fixed buffer's own type included.
     /// </summary>
-    private static IReadOnlyCollection<Type> Structs()
+    internal static IReadOnlyCollection<Type> Structs()
     {
         var seen = new HashSet<Type>();
         var pending = new Queue<Type>();
@@ -206,7 +206,8 @@ public class NativeDeclarationTests
             if (seen.Add(t)) pending.Enqueue(t);
         }
 
-        foreach (var (method, _) in Declarations())
+        foreach (var method in Declarations().Select(d => d.Method)
+                     .Concat(ComInterfaceDeclarationTests.ComInterfaces().SelectMany(ComInterfaceDeclarationTests.SlotOrder)))
         {
             foreach (var parameter in method.GetParameters()) Add(parameter.ParameterType);
             Add(method.ReturnType);
@@ -259,7 +260,7 @@ public class NativeDeclarationTests
         Assert.True(converted.Count == 0, string.Join("; ", converted));
     }
 
-    private static bool IsCopiedAsItIs(Type type, IReadOnlyCollection<Type> checkedStructs) =>
+    internal static bool IsCopiedAsItIs(Type type, IReadOnlyCollection<Type> checkedStructs) =>
         type.IsPointer
         || type.IsEnum
         || (type.IsPrimitive && type != typeof(bool) && type != typeof(char))

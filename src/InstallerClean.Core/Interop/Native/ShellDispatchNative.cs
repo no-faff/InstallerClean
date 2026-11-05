@@ -3,16 +3,13 @@ using System.Runtime.InteropServices;
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
-/// Activation P/Invoke and constants for opening a URL through the
-/// already-running desktop shell. An elevated process that wants a URL
-/// opened at the user's normal integrity level hands the launch to
-/// Explorer rather than spawning the browser itself; this is the native
-/// surface for that chain. Consumed by
+/// Constants and GUIDs for opening a URL through the already-running
+/// desktop shell. An elevated process that wants a URL opened at the
+/// user's normal integrity level hands the launch to Explorer rather than
+/// spawning the browser itself; these are the values that chain passes.
+/// The COM activation calls are in <see cref="Ole32"/> and the interfaces
+/// in ShellDispatchInterfaces.cs. Consumed by
 /// <see cref="Helpers.UnelevatedLauncher"/>.
-///
-/// Every parameter is a number, a pointer or a pointer to a blittable
-/// value: <c>in Guid</c> and <c>out IntPtr</c> pass straight through with
-/// no conversion, so each declaration is the native signature exactly.
 /// </summary>
 internal static class ShellDispatchNative
 {
@@ -46,9 +43,9 @@ internal static class ShellDispatchNative
     // Only the GUIDs the chain passes as a riid argument are declared. The rest
     // of the interfaces it walks (IServiceProvider, IShellView,
     // IShellFolderViewDual, IShellDispatch2) are reached by casting a wrapped
-    // pointer, and ComWrappers takes their GUID from each interface's own [Guid]
-    // attribute, so a constant for them would be dead weight. This is not the
-    // vtable-slot rule next door in ShellDispatchInterfaces: an unused method
+    // pointer, and the cast asks the object for the GUID in each interface's own
+    // [Guid] attribute, so a constant for them would be dead weight. This is not
+    // the vtable-slot rule next door in ShellDispatchInterfaces: an unused method
     // there is load-bearing because slots are positional, and an unused GUID here
     // is not.
     internal static readonly Guid CLSID_ShellWindows       = new("9ba05972-f6a8-11cf-a442-00a0c90a8f39");
@@ -56,29 +53,6 @@ internal static class ShellDispatchNative
     internal static readonly Guid SID_STopLevelBrowser     = new("4c96be40-915c-11cf-99d3-00aa004ae837");
     internal static readonly Guid IID_IShellBrowser        = new("000214e2-0000-0000-c000-000000000046");
     internal static readonly Guid IID_IDispatch            = new("00020400-0000-0000-c000-000000000046");
-
-    /// <summary>
-    /// Initialises the calling thread's COM apartment. Returns S_OK
-    /// (first init), S_FALSE (already initialised on this thread) or an
-    /// error HRESULT. Both S_OK and S_FALSE increment the apartment's
-    /// init count and require one matching <see cref="CoUninitialize"/>.
-    /// </summary>
-    [DllImport("ole32.dll", EntryPoint = "CoInitializeEx", ExactSpelling = true)]
-    internal static extern int CoInitializeEx(IntPtr pvReserved, uint dwCoInit);
-
-    /// <summary>Balances one successful <see cref="CoInitializeEx"/> (S_OK or S_FALSE) on the same thread.</summary>
-    [DllImport("ole32.dll", EntryPoint = "CoUninitialize", ExactSpelling = true)]
-    internal static extern void CoUninitialize();
-
-    /// <summary>
-    /// Activates a coclass. <paramref name="ppv"/> comes back with a
-    /// reference owned by the caller; the caller releases it after
-    /// handing it to a ComWrappers wrapper, which takes its own
-    /// reference.
-    /// </summary>
-    [DllImport("ole32.dll", EntryPoint = "CoCreateInstance", ExactSpelling = true)]
-    internal static extern int CoCreateInstance(
-        in Guid rclsid, IntPtr pUnkOuter, uint dwClsContext, in Guid riid, out IntPtr ppv);
 }
 
 /// <summary>
