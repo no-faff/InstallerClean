@@ -26,7 +26,8 @@ public class ComInterfaceDeclarationTests
 
     /// <summary>
     /// The walk finds the interfaces it has to: the first and the last of the chain that
-    /// opens a link. A walk that found none would pass every test below.
+    /// opens a link, and the folder picker's dialog. A walk that found none would pass
+    /// every test below.
     /// </summary>
     [Fact]
     public void The_walk_finds_the_COM_interfaces()
@@ -35,6 +36,7 @@ public class ComInterfaceDeclarationTests
 
         Assert.Contains(typeof(IShellWindows), found);
         Assert.Contains(typeof(IShellDispatch2), found);
+        Assert.Contains(typeof(IFileDialog), found);
     }
 
     /// <summary>
@@ -152,6 +154,17 @@ public class ComInterfaceDeclarationTests
             "TileHorizontally(0)", "ShutdownWindows(0)", "Suspend(0)", "EjectPC(0)", "SetTime(0)",
             "TrayProperties(0)", "Help(0)", "FindFiles(0)", "FindComputer(0)", "RefreshMenu(0)",
             "ControlPanelItem(1)", "IsRestricted(3)", "ShellExecute(5)",
+        }),
+        [typeof(IFileDialog)] = ("42f85136-db7e-439c-85f1-e4075d135fc8", new[]
+        {
+            "Show(1)", "SetFileTypes(2)", "SetFileTypeIndex(1)", "GetFileTypeIndex(1)", "Advise(2)", "Unadvise(1)",
+            "SetOptions(1)", "GetOptions(1)", "SetDefaultFolder(1)", "SetFolder(1)", "GetFolder(1)",
+            "GetCurrentSelection(1)", "SetFileName(1)", "GetFileName(1)", "SetTitle(1)", "SetOkButtonLabel(1)",
+            "SetFileNameLabel(1)", "GetResult(1)",
+        }),
+        [typeof(IShellItem)] = ("43826d1e-e718-42ee-bc55-a1e261c37bfe", new[]
+        {
+            "BindToHandler(4)", "GetParent(1)", "GetDisplayName(2)",
         }),
     };
 

@@ -5,9 +5,9 @@ namespace InstallerClean.Interop.Native;
 /// <summary>
 /// P/Invoke surface for user32.dll. Consumed by the WPF host's
 /// WindowChromeExtensions (focus-visual suppression gate),
-/// DetailWindowSizing (work-area measurement) and App's single-instance
-/// hand-off (foreground rights), and by <see cref="WindowStation"/> for the
-/// command line.
+/// DetailWindowSizing (work-area measurement), App's single-instance
+/// hand-off (foreground rights) and the folder picker (its owner window), and
+/// by <see cref="WindowStation"/> for the command line.
 /// </summary>
 internal static class User32
 {
@@ -42,6 +42,14 @@ internal static class User32
     /// </summary>
     [DllImport(Library, EntryPoint = "GetForegroundWindow", ExactSpelling = true)]
     public static extern IntPtr GetForegroundWindow();
+
+    /// <summary>
+    /// HWND of the active window attached to the calling thread's message queue, or
+    /// zero if none is. The window app's folder picker opens owned by it, so the
+    /// picker is modal to whichever of the app's windows the user was in.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetActiveWindow", ExactSpelling = true)]
+    public static extern IntPtr GetActiveWindow();
 
     [DllImport(Library, EntryPoint = "GetWindowThreadProcessId", ExactSpelling = true)]
     public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);

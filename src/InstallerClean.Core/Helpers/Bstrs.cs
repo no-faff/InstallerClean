@@ -32,7 +32,7 @@ internal static unsafe class Bstrs
         if (bstr == IntPtr.Zero)
             throw new OutOfMemoryException();
 
-        s.CopyTo(new Span<char>((char*)bstr, s.Length));
+        s.AsSpan().CopyTo(new Span<char>((char*)bstr, s.Length));
         return bstr;
     }
 

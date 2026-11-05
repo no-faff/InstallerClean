@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Interop;
+using InstallerClean.Helpers;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Services;
@@ -28,10 +30,6 @@ public sealed class ConfirmationService : IConfirmationService
     public string? AskForMoveDestination(string? currentDestination = null)
     {
         if (Application.Current is null) return null;
-        var dialog = new Microsoft.Win32.OpenFolderDialog
-        {
-            Title = Strings.FilePicker_ChooseDestinationTitle,
-        };
 
         // Only ever an existing folder, and the check is wrapped because
         // Directory.Exists is the only cheap way to ask: the box holds
@@ -40,20 +38,25 @@ public sealed class ConfirmationService : IConfirmationService
         // A start folder the shell cannot resolve is worse than none,
         // so anything short of a confirmed directory falls back to the
         // shell default rather than being passed on.
+        string? startFolder = null;
         var start = currentDestination?.Trim();
         if (!string.IsNullOrEmpty(start))
         {
             try
             {
                 if (Directory.Exists(start))
-                    dialog.InitialDirectory = start;
+                    startFolder = start;
             }
             catch (Exception)
             {
-                // Unreadable, refused or malformed: no start folder, no dialog.
+                // Unreadable, refused or malformed: the dialog opens with no start folder.
             }
         }
 
-        return dialog.ShowDialog() == true ? dialog.FolderName : null;
+        // The main window owns the picker when none of the app's windows is active.
+        var main = Application.Current.MainWindow;
+        var fallbackOwner = main is null ? IntPtr.Zero : new WindowInteropHelper(main).Handle;
+
+        return FolderPicker.Pick(Strings.FilePicker_ChooseDestinationTitle, startFolder, fallbackOwner);
     }
 }
