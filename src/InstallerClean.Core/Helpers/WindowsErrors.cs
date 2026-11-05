@@ -80,7 +80,7 @@ internal static class WindowsErrors
     /// its text across lines, and a sentence carrying it is one line on both hosts.
     /// </summary>
     internal static string OneLine(string message) =>
-        string.Join(' ', message.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
+        string.Join(" ", message.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
             .TrimEnd('.', '。').TrimEnd();
 
     /// <summary>

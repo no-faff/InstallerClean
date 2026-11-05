@@ -56,6 +56,25 @@ public class NativeDeclarationTests
         Assert.Contains("Ntdll.NtCreateFile", names);
     }
 
+    /// <summary>
+    /// Core's imports search System32 alone for the libraries they name, and no declaration
+    /// widens its own search.
+    /// </summary>
+    [Fact]
+    public void Every_library_is_looked_for_in_System32_alone()
+    {
+        Assert.Equal(
+            DllImportSearchPath.System32,
+            Core.GetCustomAttribute<DefaultDllImportSearchPathsAttribute>()?.Paths);
+        var widened = Declarations()
+            .Where(d => d.Method.GetCustomAttribute<DefaultDllImportSearchPathsAttribute>() is { } own
+                && own.Paths != DllImportSearchPath.System32)
+            .Select(d => Name(d.Method))
+            .ToList();
+
+        Assert.Empty(widened);
+    }
+
     [Fact]
     public void Every_declaration_names_its_entry_point_exactly()
     {
@@ -112,18 +131,23 @@ public class NativeDeclarationTests
 
     /// <summary>
     /// A char[] is a buffer Windows writes into, and [Out] is what copies the writing back
-    /// wherever the marshaller copies the array rather than pinning it.
+    /// wherever the marshaller copies the array rather than pinning it. A text buffer is
+    /// passed in no other form: a StringBuilder or a char[] by reference has copy rules of
+    /// its own, and none is declared.
     /// </summary>
     [Fact]
-    public void Every_char_buffer_is_Out()
+    public void Every_char_buffer_is_an_Out_char_array()
     {
-        var inOnly = Declarations()
+        var wrong = Declarations()
             .SelectMany(d => d.Method.GetParameters()
-                .Where(p => p.ParameterType == typeof(char[]) && !p.IsOut)
-                .Select(p => $"{Name(d.Method)} {p.Name}"))
+                .Where(p => (p.ParameterType == typeof(char[]) && !p.IsOut)
+                    || p.ParameterType == typeof(StringBuilder)
+                    || (p.ParameterType.IsByRef && p.ParameterType.GetElementType() is { } e
+                        && (e == typeof(char[]) || e == typeof(StringBuilder))))
+                .Select(p => $"{Name(d.Method)} {p.Name} ({p.ParameterType.Name})"))
             .ToList();
 
-        Assert.Empty(inOnly);
+        Assert.Empty(wrong);
     }
 
     /// <summary>A delegate Windows calls back is called with the Windows calling convention.</summary>
@@ -211,14 +235,16 @@ public class NativeDeclarationTests
     /// <summary>
     /// No struct holds a bool, a char or a reference. The marshaller converts each of those,
     /// a char to one byte under the default ANSI set, so a struct holding one is a different
-    /// size or a different shape in Windows' hands than in memory.
+    /// size or a different shape where Windows reads it than in memory. A pointer field is
+    /// copied as it is.
     /// </summary>
     [Fact]
     public void No_struct_holds_a_field_the_marshaller_converts()
     {
         var converted = Structs()
             .SelectMany(s => s.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(f => f.FieldType == typeof(bool) || f.FieldType == typeof(char) || !f.FieldType.IsValueType)
+                .Where(f => f.FieldType == typeof(bool) || f.FieldType == typeof(char)
+                    || (!f.FieldType.IsValueType && !f.FieldType.IsPointer))
                 .Select(f => $"{s.FullName}.{f.Name} ({f.FieldType.Name})"))
             .ToList();
 

@@ -51,7 +51,7 @@ public class WindowsErrorsTests
         Assert.Equal(
             $"because: {WindowsErrors.MessageFor(NotEnoughMemory)} (error 8)",
             sentence);
-        Assert.False(WindowsErrors.MessageFor(NotEnoughMemory).EndsWith('.'));
+        Assert.False(WindowsErrors.MessageFor(NotEnoughMemory).EndsWith(".", StringComparison.Ordinal));
         Assert.Equal(
             new System.ComponentModel.Win32Exception(NotEnoughMemory).Message.Trim().TrimEnd('.'),
             WindowsErrors.MessageFor(NotEnoughMemory));
