@@ -133,10 +133,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// missing-file split both consult. The two counts beside it travel in the opt-in
     /// report through <c>EnumerationCensus</c> and <c>ResultLogEntry</c>.
     ///
-    /// DO NOT READ IT AS MACHINERY WAITING TO BE WIRED UP. The registry is the half of
-    /// this verdict that has no index and no early end to be blind to, which is the
-    /// whole reason it is read at all, and discounting it discards the one source that
-    /// cannot be silently truncated.
+    /// DO NOT READ IT AS MACHINERY WAITING TO BE WIRED UP. The registry half of this
+    /// verdict is read off each product's own <c>Patches</c> key, separately from
+    /// Windows Installer's enumeration of the product's patches, so a fault in that
+    /// enumeration does not reach it, which is the whole reason it is read at all.
+    /// Discounting it leaves the verdict resting on that enumeration alone.
     /// </param>
     /// <param name="ProductPatchKeys">
     /// Products whose <c>Patches</c> key opened. Against
@@ -358,16 +359,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
         /// existed. Only a listing that positively finished can exclude a path, and it
         /// excludes one only by naming neither the path's own patch codes nor the path.
         ///
-        /// WHY A LISTING MAY BE TRUSTED WHERE AN ENUMERATION MAY NOT, which is half of
-        /// the safety argument: <c>GetSubKeyNames</c> either returns every name under
-        /// the key or throws. There is no index and no early end, so a listing cannot
-        /// come back short while looking complete, which is the fault every other
-        /// source of a patch set has. See <see cref="ReadProductPatchSet"/>, where that
-        /// same property is the reason this source was chosen at all.
+        /// WHAT THE LISTING IS: the names <see cref="RegistryNames.SubKeysOf"/> reads off
+        /// the product's own <c>Patches</c> key, separately from Windows Installer's
+        /// enumeration of its patches. A key that fails to read throws, and
+        /// <see cref="ReadProductPatchSet"/>'s caller turns the throw into the null set
+        /// above.
         ///
-        /// AND THE OTHER HALF IS WHY THE PATH IS ASKED ABOUT TWICE. The codes naming a
-        /// path come from the claims, and a claim carries the path one registration
-        /// recorded for one patch code. A corrupt <c>LocalPackage</c> can aim a patch row
+        /// AND THE PATH IS ASKED ABOUT TWICE. The codes naming a path come from the
+        /// claims, and a claim carries the path one registration recorded for one
+        /// patch code. A corrupt <c>LocalPackage</c> can aim a patch row
         /// at a file that is not that patch's, so a product could hold the patch whose
         /// file this really is while the claims name the path under another code, and
         /// the codes alone would then exclude a product that can reach the file. The
@@ -3587,7 +3587,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
             if (udKey is not null)
             {
-                foreach (var sidName in udKey.GetSubKeyNames())
+                foreach (var sidName in RegistryNames.SubKeysOf(udKey))
                 {
                     ct.ThrowIfCancellationRequested();
                     var sidRead = ReadFallbackSid(udKey, sidName, claimed, productCodes, ct, failureLog);
@@ -3737,7 +3737,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
             if (productsKey is not null)
             {
-                foreach (var prodGuid in productsKey.GetSubKeyNames())
+                foreach (var prodGuid in RegistryNames.SubKeysOf(productsKey))
                 {
                     ct.ThrowIfCancellationRequested();
                     // Counted from the key list, before anything inside it is
@@ -3879,7 +3879,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
             if (patchesKey is not null)
             {
-                foreach (var patchGuid in patchesKey.GetSubKeyNames())
+                foreach (var patchGuid in RegistryNames.SubKeysOf(patchesKey))
                 {
                     ct.ThrowIfCancellationRequested();
 
@@ -3993,11 +3993,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// patches. Every source can only ADD a patch to the set, so unioning costs reads
     /// and can only ever withhold more.
     ///
-    /// THE REGISTRY IS WHAT MAKES THE SET TRUSTWORTHY AND THE API IS WHAT STOPS IT
-    /// RESTING ON ONE READING. The registry side is a key listing, so it has no index
-    /// and no early end to be blind to, which is the fault every enumeration of a
-    /// patch set shares. The API side is the same pairings the product loop already
-    /// read, so it costs nothing and it catches a patch the registry's own key does
+    /// THE REGISTRY AND THE API ARE TWO SEPARATE READINGS, SO THE SET DOES NOT REST ON
+    /// ONE. The registry side is the product's own <c>Patches</c> key, listed by
+    /// <see cref="RegistryNames.SubKeysOf"/> separately from Windows Installer's
+    /// enumeration, so a fault in that enumeration does not reach it. The API side is
+    /// the same pairings the product loop already read, so it costs nothing and it catches a patch the registry's own key does
     /// not list.
     ///
     /// AN ABSENT REGISTRY ENTRY IS AN INABILITY AND AN ABSENT API ENTRY IS NOT, which
@@ -4296,11 +4296,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <c>Products\&lt;packed product&gt;\Patches</c> and reduces it to a single
     /// verdict.
     ///
-    /// IT IS A LISTING AND NOT AN ENUMERATION, which is the reason this source is
-    /// worth having at all. There is no index and no <c>NoMoreItems</c>, so there is
-    /// no early-end case to be blind to: the fault every other source of a patch set
-    /// shares is that a truncated enumeration is indistinguishable from a complete
-    /// one, and a key listing cannot be truncated that way.
+    /// IT READS THE KEY ITSELF, separately from Windows Installer's enumeration of the
+    /// product's patches, which is the reason this source is worth having at all: a
+    /// fault in that enumeration does not reach it. The names come from
+    /// <see cref="RegistryNames.SubKeysOf"/>.
     ///
     /// NEVER <c>AllPatches</c>, AND THIS IS THE DECISION MOST LIKELY TO BE UNDONE BY
     /// SOMEBODY TIDYING UP. The same key carries an <c>AllPatches</c>
@@ -4401,14 +4400,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // quietly changes meaning is worse than one that is missing.
         patchKeys++;
 
-        // THE NAME LISTING IS WHAT EVERY COMPLETE ANSWER HERE COMES OFF, and the
-        // loop below is the part that may stop early. Both the code list and the
-        // registration count are taken from these names rather than out of that
-        // loop, which is what leaves them complete where it returns. A key listing
-        // cannot be truncated the way an enumeration can: GetSubKeyNames returns
-        // every name under the key or throws, and the caller's catch turns a throw
-        // into the null set above.
-        var patchNames = patchesKey.GetSubKeyNames();
+        // THE NAME LISTING IS WHAT EVERY ANSWER HERE COMES OFF, and the loop below is
+        // the part that may stop early. Both the code list and the registration count
+        // are taken from these names rather than out of that loop, so they hold every
+        // name the listing returned whether or not the loop returns early. A key that
+        // fails to list throws, and the caller's catch turns the throw into the null
+        // set above.
+        var patchNames = RegistryNames.SubKeysOf(patchesKey);
 
         // COUNTED OFF THE LISTING RATHER THAN INSIDE THE LOOP, so every registration
         // under the key reaches the figure. The loop returns on the first patch
@@ -4536,18 +4534,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// Nothing writing these keys is obliged to use REG_SZ.
     ///
-    /// AND TWO TYPES NEVER REACH THE CAST, which is why the presence test below is
-    /// not belt and braces over it. Microsoft documents that
-    /// <c>RegistryKey.GetValue</c> "does not support reading values of type
-    /// REG_NONE or REG_LINK. In both cases, the default value (null) is returned
-    /// instead of the actual value." So a value that is PRESENT in either of those
-    /// types arrives here as null and, read naively, is indistinguishable from a
+    /// AND ONE TYPE NEVER REACHES THE CAST, which is why the presence test below is
+    /// not belt and braces over it. <c>RegistryKey.GetValue</c> returns the default,
+    /// null, for a value of type REG_LINK, so a value that is PRESENT in that type
+    /// arrives here as null and, read naively, is indistinguishable from a
     /// registration that simply has no cached path. The claim is dropped, no
     /// failure is counted, and the fallback reports itself as having run cleanly
     /// and found nothing to say, which is the one state the degraded-sources gate
     /// exists to tell apart from a healthy machine. Asking the key which value
     /// names it holds is what separates the two, because the name list is typed
     /// nowhere and carries every value whatever its type.
+    ///
+    /// A REG_NONE value comes back as its bytes, though Microsoft's page for
+    /// <c>GetValue</c> says null, so it reaches the branch below that takes anything
+    /// present and not a string as a read that failed.
     ///
     /// AND IT EXPANDS A <c>REG_EXPAND_SZ</c> VALUE. .NET expands that type as part of
     /// the read, so a registration spelled <c>%SystemRoot%\Installer\...</c> and STORED
@@ -4584,7 +4584,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // have seen. The name comparison is case-insensitive because registry
         // value names are, so a key holding "localpackage" must not read as a key
         // holding nothing.
-        foreach (var name in key.GetValueNames())
+        foreach (var name in RegistryNames.ValuesOf(key))
         {
             if (string.Equals(name, valueName, StringComparison.OrdinalIgnoreCase))
                 return false;

@@ -3,3 +3,5 @@
 // Each line names one member in documentation-ID form and, after the ';', the
 // app's own replacement to call instead. A call to a listed member fails the
 // build with RS0030.
+M:Microsoft.Win32.RegistryKey.GetSubKeyNames;Use RegistryNames.SubKeysOf, which lists the key as .NET 10 does
+M:Microsoft.Win32.RegistryKey.GetValueNames;Use RegistryNames.ValuesOf, which lists the key as .NET 10 does

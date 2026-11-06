@@ -73,6 +73,61 @@ internal static class Advapi32
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool ConvertSidToStringSid(IntPtr Sid, out IntPtr StringSid);
 
+    /// <summary>
+    /// Reads how many subkeys and values an open key holds. Every other count, length
+    /// and time it can answer is passed as null and not read. Answers ERROR_SUCCESS or
+    /// a Win32 error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegQueryInfoKeyW", ExactSpelling = true)]
+    public static extern int RegQueryInfoKey(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        IntPtr lpClass,
+        IntPtr lpcchClass,
+        IntPtr lpReserved,
+        out uint lpcSubKeys,
+        IntPtr lpcbMaxSubKeyLen,
+        IntPtr lpcbMaxClassLen,
+        out uint lpcValues,
+        IntPtr lpcbMaxValueNameLen,
+        IntPtr lpcbMaxValueLen,
+        IntPtr lpcbSecurityDescriptor,
+        IntPtr lpftLastWriteTime);
+
+    /// <summary>
+    /// Writes the name of the subkey at <paramref name="dwIndex"/> into
+    /// <paramref name="lpName"/>, and its length in characters, without the terminator,
+    /// into <paramref name="lpcchName"/>, which goes in as the buffer's size. Answers
+    /// ERROR_SUCCESS, ERROR_NO_MORE_ITEMS past the last subkey, ERROR_MORE_DATA where the
+    /// name does not fit, or another Win32 error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegEnumKeyExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegEnumKeyEx(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        uint dwIndex,
+        [Out] char[] lpName,
+        ref uint lpcchName,
+        IntPtr lpReserved,
+        IntPtr lpClass,
+        IntPtr lpcchClass,
+        IntPtr lpftLastWriteTime);
+
+    /// <summary>
+    /// Writes the name of the value at <paramref name="dwIndex"/> into
+    /// <paramref name="lpValueName"/>, as <see cref="RegEnumKeyEx"/> writes a subkey's,
+    /// with the value's type and data passed as null and not read. Answers as
+    /// <see cref="RegEnumKeyEx"/> does.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegEnumValueW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegEnumValue(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        uint dwIndex,
+        [Out] char[] lpValueName,
+        ref uint lpcchValueName,
+        IntPtr lpReserved,
+        IntPtr lpType,
+        IntPtr lpData,
+        IntPtr lpcbData);
+
     /// <summary>OWNER_SECURITY_INFORMATION: ask for the owner.</summary>
     public const uint OWNER_SECURITY_INFORMATION = 0x00000001;
 

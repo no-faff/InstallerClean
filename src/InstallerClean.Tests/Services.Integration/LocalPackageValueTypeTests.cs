@@ -1,5 +1,8 @@
+using System.Runtime.InteropServices;
+using System.Text;
 using InstallerClean.Services;
 using Microsoft.Win32;
+using Microsoft.Win32.SafeHandles;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -10,11 +13,11 @@ namespace InstallerClean.Tests.Services.Integration;
 /// runs once per name, from <see cref="InstallerQueryService.CachedPackageValueNames"/>.
 ///
 /// AN INTEGRATION TEST BECAUSE THE SUBJECT IS THE FRAMEWORK'S OWN BEHAVIOUR, not
-/// this code's. <c>RegistryKey.GetValue</c> is documented as not supporting
-/// REG_NONE or REG_LINK, returning null for both "instead of the actual value", so
-/// a fake registry cannot exercise the case at all: a PRESENT value of either type
-/// arrives looking exactly like an absent one. Only a real key
-/// holding a real REG_NONE puts the framework in the loop.
+/// this code's. <c>RegistryKey.GetValue</c> is documented as returning null for a
+/// REG_NONE or a REG_LINK value "instead of the actual value", and returns a
+/// REG_NONE's bytes all the same, so a fake registry would test whichever answer it
+/// was written to give. Only a real key holding a real value of each type puts the
+/// framework in the loop.
 ///
 /// Writes are confined to a GUID-named key under HKCU and removed in a finally, so
 /// nothing needs elevation and nothing outlives the test. HKCU rather than HKLM for
@@ -109,16 +112,48 @@ public class LocalPackageValueTypeTests
     {
         // Registry value names are case-insensitive, so a key holding
         // "localpackage" holds a LocalPackage. A case-sensitive presence test
-        // would send this one down the absence path.
+        // would send this one down the absence path. The value is a REG_LINK,
+        // which GetValue hands back as null, so only the presence test sees it.
         WithTestKey(key =>
         {
-            key.SetValue(valueName.ToLowerInvariant(), Array.Empty<byte>(), RegistryValueKind.None);
+            SetLink(key, valueName.ToLowerInvariant());
 
             var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out _);
 
             Assert.False(read);
         });
     }
+
+    [Theory]
+    [MemberData(nameof(ValueNames))]
+    public void A_value_stored_as_REG_LINK_is_a_failed_read_and_not_an_absence(string valueName)
+    {
+        WithTestKey(key =>
+        {
+            SetLink(key, valueName);
+            Assert.Null(key.GetValue(valueName));
+
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+
+            Assert.False(read);
+            Assert.Null(path);
+        });
+    }
+
+    // RegistryKey.SetValue writes no REG_LINK, so the value goes in through Windows
+    // directly: a path as UTF-16 without a terminator, as a symbolic link's target is
+    // stored.
+    private static void SetLink(RegistryKey key, string valueName)
+    {
+        const int REG_LINK = 6;
+        var data = Encoding.Unicode.GetBytes(@"\Registry\Machine\Software");
+        var result = RegSetValueEx(key.Handle, valueName, 0, REG_LINK, data, data.Length);
+        Assert.Equal(0, result);
+    }
+
+    [DllImport("advapi32.dll", EntryPoint = "RegSetValueExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    private static extern int RegSetValueEx(
+        SafeRegistryHandle hKey, string lpValueName, int reserved, int dwType, byte[] lpData, int cbData);
 
     [Fact]
     public void Each_name_answers_for_its_own_value_and_not_the_other()
