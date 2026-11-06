@@ -39,7 +39,7 @@ public class RegistryNamesIntegrationTests
     }
 
     [Fact]
-    public void A_subkey_created_while_the_key_is_listed_is_in_the_listing()
+    public void A_subkey_created_past_the_listing_is_in_the_listing()
     {
         WithKey(key =>
         {
@@ -48,9 +48,86 @@ public class RegistryNamesIntegrationTests
 
             // Windows keeps a key's subkeys in name order, so one named to sort last is
             // at an index the listing has not yet reached.
-            var calls = new AddingAfterFirstName(RegistryNames.CallsOn(key.Handle), key, "zz-added");
+            var calls = new Writing(RegistryNames.CallsOn(key.Handle),
+                (listing, index) => { if (listing == 1 && index == 1) key.CreateSubKey("zz-added")!.Dispose(); });
 
             Assert.Equal(new[] { "a", "b", "zz-added" }, RegistryNames.SubKeys(calls));
+        });
+    }
+
+    [Fact]
+    public void A_subkey_created_ahead_of_the_listing_repeats_a_name_and_the_settled_names_are_given()
+    {
+        WithKey(key =>
+        {
+            key.CreateSubKey("b")!.Dispose();
+            key.CreateSubKey("c")!.Dispose();
+            Action<int, int> write = (listing, index) =>
+            {
+                if (listing == 1 && index == 1) key.CreateSubKey("a-added")!.Dispose();
+            };
+
+            // One listing alone: "b" is read again at index 1, and "a-added" not at all.
+            var once = RegistryNames.SubKeys(new Writing(RegistryNames.CallsOn(key.Handle), write));
+            Assert.Equal(new[] { "b", "b", "c" }, once);
+            key.DeleteSubKey("a-added");
+
+            Assert.Equal(new[] { "a-added", "b", "c" },
+                RegistryNames.SubKeysUnchanged(new Writing(RegistryNames.CallsOn(key.Handle), write)));
+        });
+    }
+
+    [Fact]
+    public void A_subkey_deleted_ahead_of_the_listing_skips_a_name_and_the_settled_names_are_given()
+    {
+        WithKey(key =>
+        {
+            foreach (var name in new[] { "a", "b", "c" }) key.CreateSubKey(name)!.Dispose();
+            Action<int, int> write = (listing, index) =>
+            {
+                if (listing == 1 && index == 2) key.DeleteSubKey("a");
+            };
+
+            // One listing alone: index 2 is past the end once "a" goes, so "c" is not read.
+            var once = RegistryNames.SubKeys(new Writing(RegistryNames.CallsOn(key.Handle), write));
+            Assert.Equal(new[] { "a", "b" }, once);
+            key.CreateSubKey("a")!.Dispose();
+
+            Assert.Equal(new[] { "b", "c" },
+                RegistryNames.SubKeysUnchanged(new Writing(RegistryNames.CallsOn(key.Handle), write)));
+        });
+    }
+
+    [Fact]
+    public void A_value_deleted_ahead_of_the_listing_gives_the_settled_names()
+    {
+        WithKey(key =>
+        {
+            foreach (var name in new[] { "a", "b", "c" }) key.SetValue(name, 1, RegistryValueKind.DWord);
+            Action<int, int> write = (listing, index) =>
+            {
+                if (listing == 1 && index == 2) key.DeleteValue("a");
+            };
+
+            // Windows does not document the order values are listed in after a delete, so
+            // the settled names are held against its own listing of the key afterwards.
+            var settled = RegistryNames.ValuesUnchanged(new Writing(RegistryNames.CallsOn(key.Handle), write));
+            Assert.Equal(key.GetValueNames(), settled);
+            Assert.Equal(new[] { "b", "c" }, settled.OrderBy(n => n, StringComparer.Ordinal));
+        });
+    }
+
+    [Fact]
+    public void A_key_written_during_every_listing_is_unread()
+    {
+        WithKey(key =>
+        {
+            key.CreateSubKey("m")!.Dispose();
+            key.CreateSubKey("n")!.Dispose();
+            var calls = new Writing(RegistryNames.CallsOn(key.Handle),
+                (listing, index) => { if (index == 1) key.CreateSubKey($"a{listing:D2}")!.Dispose(); });
+
+            Assert.Throws<IOException>(() => RegistryNames.SubKeysUnchanged(calls));
         });
     }
 
@@ -93,26 +170,30 @@ public class RegistryNamesIntegrationTests
         }
     }
 
-    // The real calls, with a subkey created on the key once its first name is read.
-    private sealed class AddingAfterFirstName(
-        RegistryNames.IKeyCalls inner, RegistryKey key, string added) : RegistryNames.IKeyCalls
+    // The real calls, with a write made before an enumeration call. The write is given
+    // which listing is under way, counted from 1 by the counts asked for, and the index
+    // about to be read.
+    private sealed class Writing(RegistryNames.IKeyCalls inner, Action<int, int> beforeEnum) : RegistryNames.IKeyCalls
     {
-        private bool _added;
+        private int _listing;
 
-        public int QueryCounts(out int subKeys, out int values) => inner.QueryCounts(out subKeys, out values);
+        public int QueryCounts(out int subKeys, out int values)
+        {
+            _listing++;
+            return inner.QueryCounts(out subKeys, out values);
+        }
 
         public int EnumKey(int index, char[] name, ref int nameLength)
         {
-            var result = inner.EnumKey(index, name, ref nameLength);
-            if (!_added)
-            {
-                key.CreateSubKey(added)!.Dispose();
-                _added = true;
-            }
-            return result;
+            beforeEnum(_listing, index);
+            return inner.EnumKey(index, name, ref nameLength);
         }
 
-        public int EnumValue(int index, char[] name, ref int nameLength) => inner.EnumValue(index, name, ref nameLength);
+        public int EnumValue(int index, char[] name, ref int nameLength)
+        {
+            beforeEnum(_listing, index);
+            return inner.EnumValue(index, name, ref nameLength);
+        }
 
         public void MarkHandleInvalid() => inner.MarkHandleInvalid();
     }

@@ -9,11 +9,11 @@ namespace InstallerClean.Helpers;
 /// <c>RegistryKey.GetSubKeyNames</c> and <c>GetValueNames</c> list them on .NET 10
 /// (dotnet/runtime v10.0.0, <c>RegistryKey.cs</c>), and called in their place.
 ///
-/// The listing asks for one index after another until Windows answers
-/// ERROR_NO_MORE_ITEMS. The count Windows gives first only sizes the array, which grows
-/// when the enumeration runs past it. .NET Framework's own members ask for exactly as
-/// many indexes as that first count and throw on ERROR_NO_MORE_ITEMS. A count of zero
-/// gives an empty listing without enumerating, as .NET 10's does.
+/// One listing asks for one index after another until Windows answers
+/// ERROR_NO_MORE_ITEMS. Within it, the count Windows gives first only sizes the array,
+/// which grows when the enumeration runs past it. .NET Framework's own members ask for
+/// exactly as many indexes as that first count and throw on ERROR_NO_MORE_ITEMS. A
+/// count of zero gives an empty listing without enumerating, as .NET 10's does.
 ///
 /// A failed call is thrown as .NET 10 throws it: access denied as
 /// <see cref="UnauthorizedAccessException"/>, a key that no longer exists as an
@@ -21,6 +21,19 @@ namespace InstallerClean.Helpers;
 /// <see cref="IOException"/> carrying the text Windows gives for the code and the bare
 /// code as its HResult. ERROR_INVALID_HANDLE also marks the key's handle invalid first,
 /// as .NET 10 does.
+///
+/// A LISTING THAT CHANGES WHILE IT IS READ IS TREATED AS UNREAD. Windows numbers a
+/// key's names by their place in the key, so a name added or removed ahead of the
+/// place a listing has reached moves every name after it: one name can then be read
+/// twice and another not at all, with no error from Windows. So <see cref="SubKeysOf"/>
+/// and <see cref="ValuesOf"/> read the key at least twice, and take the names only
+/// where two readings in a row agree: the same count from Windows, an earlier listing
+/// holding exactly that many names, the same names in the same order and no name
+/// twice. Where they do not, the key is read again after a short pause, up to
+/// <see cref="Readings"/> readings in all, since any agreeing pair is as good an answer
+/// as the first would have been; after that it throws an <see cref="IOException"/>
+/// naming the disagreement, which every caller takes as a key it could not read. A key
+/// nobody writes to gives the same names as one listing would, from two readings.
 ///
 /// IT TAKES AN OPENED SUBKEY, NEVER A HIVE'S BASE KEY, and refuses one with
 /// <see cref="ArgumentException"/>. .NET Framework's <c>RegistryKey.Handle</c> reopens a
@@ -48,13 +61,19 @@ internal static class RegistryNames
     private const int FirstValueNameBuffer = 128;
 
     /// <summary>Every subkey name under <paramref name="key"/>, in the order Windows gives them.</summary>
-    public static string[] SubKeysOf(RegistryKey key) => WithCalls(key, SubKeys);
+    public static string[] SubKeysOf(RegistryKey key) => WithCalls(key, calls => SubKeysUnchanged(calls));
 
     /// <summary>
     /// Every value name under <paramref name="key"/>, in the order Windows gives them, the default
     /// value's empty name among them when it is set.
     /// </summary>
-    public static string[] ValuesOf(RegistryKey key) => WithCalls(key, Values);
+    public static string[] ValuesOf(RegistryKey key) => WithCalls(key, calls => ValuesUnchanged(calls));
+
+    // How many readings are taken before a key whose readings keep disagreeing is
+    // reported as unread, and the pause before each reading after the second, which
+    // lets a run of writes to the key finish before it is read again.
+    private const int Readings = 4;
+    private static readonly TimeSpan[] PauseBefore = [TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(250)];
 
     /// <summary>
     /// The three Windows calls the listing makes, and the marking of the key's handle as
@@ -68,11 +87,60 @@ internal static class RegistryNames
         void MarkHandleInvalid();
     }
 
-    internal static string[] SubKeys(IKeyCalls calls)
+    /// <summary>One listing: the names, and the count Windows gave before it.</summary>
+    private readonly record struct Reading(string[] Names, int Count);
+
+    /// <summary>The subkey names, taken where two readings in a row agree.</summary>
+    internal static string[] SubKeysUnchanged(IKeyCalls calls, Action<TimeSpan>? pause = null) =>
+        Unchanged(calls, ReadSubKeys, pause ?? (wait => Thread.Sleep(wait)));
+
+    /// <summary>The value names, taken where two readings in a row agree.</summary>
+    internal static string[] ValuesUnchanged(IKeyCalls calls, Action<TimeSpan>? pause = null) =>
+        Unchanged(calls, ReadValues, pause ?? (wait => Thread.Sleep(wait)));
+
+    private static string[] Unchanged(IKeyCalls calls, Func<IKeyCalls, Reading> read, Action<TimeSpan> pause)
+    {
+        var earlier = read(calls);
+        for (var taken = 2; ; taken++)
+        {
+            var later = read(calls);
+            var disagreement = Disagreement(earlier, later);
+            if (disagreement is null) return earlier.Names;
+            if (taken == Readings)
+                throw new IOException(
+                    $"The registry key's names did not read the same way twice running in {Readings} readings: {disagreement}.");
+            pause(PauseBefore[taken - 2]);
+            earlier = later;
+        }
+    }
+
+    // The later reading's count is taken after the earlier listing ends. A name read
+    // twice is the same stored string both times, so names are compared exactly as
+    // Windows gives them.
+    private static string? Disagreement(Reading first, Reading second)
+    {
+        if (first.Count != second.Count)
+            return $"the count Windows gives went from {first.Count} to {second.Count}";
+        if (first.Names.Length != Math.Max(first.Count, 0))
+            return $"the first listing held {first.Names.Length} names against a count of {first.Count}";
+        if (!first.Names.SequenceEqual(second.Names, StringComparer.Ordinal))
+            return "the two listings differ";
+        if (first.Names.Distinct(StringComparer.Ordinal).Count() != first.Names.Length)
+            return "a name was read twice";
+        return null;
+    }
+
+    /// <summary>One listing of the subkey names, as .NET 10 lists them.</summary>
+    internal static string[] SubKeys(IKeyCalls calls) => ReadSubKeys(calls).Names;
+
+    /// <summary>One listing of the value names, as .NET 10 lists them.</summary>
+    internal static string[] Values(IKeyCalls calls) => ReadValues(calls).Names;
+
+    private static Reading ReadSubKeys(IKeyCalls calls)
     {
         var result = calls.QueryCounts(out var count, out _);
         if (result != ERROR_SUCCESS) Throw(calls, result);
-        if (count <= 0) return [];
+        if (count <= 0) return new Reading([], count);
 
         var names = new string[count];
         var buffer = new char[KeyNameBuffer];
@@ -89,14 +157,14 @@ internal static class RegistryNames
         }
 
         if (found < names.Length) Array.Resize(ref names, found);
-        return names;
+        return new Reading(names, count);
     }
 
-    internal static string[] Values(IKeyCalls calls)
+    private static Reading ReadValues(IKeyCalls calls)
     {
         var result = calls.QueryCounts(out _, out var count);
         if (result != ERROR_SUCCESS) Throw(calls, result);
-        if (count <= 0) return [];
+        if (count <= 0) return new Reading([], count);
 
         var names = new string[count];
         var buffer = new char[FirstValueNameBuffer];
@@ -124,7 +192,7 @@ internal static class RegistryNames
         }
 
         if (found < names.Length) Array.Resize(ref names, found);
-        return names;
+        return new Reading(names, count);
     }
 
     private static void Throw(IKeyCalls calls, int code)
