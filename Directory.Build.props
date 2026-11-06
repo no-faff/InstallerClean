@@ -51,6 +51,20 @@
          define. No PolySharp assembly ships. -->
     <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
   </ItemGroup>
+  <!-- A compile-time analyzer, no assembly of it ships. It refuses a call to
+       any member BannedSymbols.txt names, in the three projects that ship, so
+       a framework member the app replaces with its own code cannot be called
+       again by accident. The tests stay free to call the framework member,
+       which is how a test compares the replacement against it. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'InstallerClean.Tests'">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'InstallerClean.Tests'">
+    <!-- RS0030 is the analyzer's report of a banned call, a warning unless
+         raised here, and nothing else in the build fails on a warning. -->
+    <WarningsAsErrors>$(WarningsAsErrors);RS0030</WarningsAsErrors>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <DebugType>embedded</DebugType>

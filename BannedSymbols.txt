@@ -1,0 +1,5 @@
+// Framework members the shipped projects must not call, read by
+// Microsoft.CodeAnalysis.BannedApiAnalyzers (wired in Directory.Build.props).
+// Each line names one member in documentation-ID form and, after the ';', the
+// app's own replacement to call instead. A call to a listed member fails the
+// build with RS0030.
