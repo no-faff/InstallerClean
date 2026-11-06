@@ -689,6 +689,22 @@ internal static class Kernel32
     [DllImport(Library, EntryPoint = "GetCurrentProcess", ExactSpelling = true)]
     public static extern IntPtr GetCurrentProcess();
 
+    /// <summary>The id Windows gives this process.</summary>
+    [DllImport(Library, EntryPoint = "GetCurrentProcessId", ExactSpelling = true)]
+    public static extern uint GetCurrentProcessId();
+
+    /// <summary>
+    /// The full path of the file <paramref name="hModule"/> was loaded from, or of this
+    /// process's exe where it is <see cref="IntPtr.Zero"/>, written into
+    /// <paramref name="lpFilename"/>, whose length goes in <paramref name="nSize"/>.
+    /// Returns the number of characters written, without the terminating null. A path that
+    /// does not fit is cut to the buffer and the return is <paramref name="nSize"/>, so a
+    /// return equal to the buffer's length means the buffer was too small. Returns 0 on
+    /// failure, with the error left as the last error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetModuleFileNameW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern uint GetModuleFileName(IntPtr hModule, [Out] char[] lpFilename, uint nSize);
+
     /// <summary>
     /// Ends the process <paramref name="hProcess"/> names at once, with
     /// <paramref name="uExitCode"/>. Given this process's own pseudo-handle it runs
