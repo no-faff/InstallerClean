@@ -1838,6 +1838,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         if (listingNotEstablished || registryReadFailed)
         {
+            // The keys are copied first: the loop sets claimed[path], and on .NET Framework a
+            // dictionary written to while it is enumerated throws at the next step.
             foreach (var path in claimed.Keys.ToList())
             {
                 var removable = claimed[path].IsRemovable;
