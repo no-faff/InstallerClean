@@ -22,7 +22,10 @@
 // for updates) and cost real accelerators to fix something that cannot fire.
 //
 // A window carrying one access key cannot clash, so the message and two details
-// windows are not listed.
+// windows are not listed, and nor are the two confirmations: their Delete
+// permanently and Move buttons show the label through
+// {loc:TranslateWithoutAccessKey}, which leaves Cancel the only key on each. The
+// pass after the consumers pass holds that.
 //
 // It also fails when a string carrying an access key is shown by XAML that does
 // not turn the marker into one: a TextBlock's Text, say, draws the underscore and
@@ -30,7 +33,7 @@
 //
 // Run from the repo root: node scripts/check-accelerators.mjs
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 
 const DIR = 'src/InstallerClean.Core/Resources';
 
@@ -81,8 +84,6 @@ const SETS = {
 
   'About': ['About.AutoUpdateCheck', 'Action.Licence', 'Action.LeaveStarOnGitHub',
     'Action.LeaveATip', 'Action.Close'],
-  'ConfirmDelete': ['Action.Cancel', 'Action.DeletePermanently'],
-  'ConfirmMove': ['Action.Cancel', 'Action.Move'],
 };
 
 // One string, two buttons on the same window (the unneeded and still-needed
@@ -270,6 +271,41 @@ for (const file of xamlFiles(XAML_ROOT)) {
     }
   }
 }
+// THE KEYLESS PASS. {loc:TranslateWithoutAccessKey KEY} shows a label with its
+// access key taken out, so the consumers pass above, which reads the bare
+// {loc:Translate KEY} form, does not see these sites. Each is printed, and each
+// must be a Button's Content, the one consumer that takes it: anywhere else the
+// key is not there to take out. The two confirmations must each have theirs, or
+// the window keeps a second key the sets above no longer list.
+const KEYLESS_REQUIRED = [
+  ['ConfirmDeleteWindow.xaml', 'Action.DeletePermanently'],
+  ['ConfirmMoveWindow.xaml', 'Action.Move'],
+];
+const keylessSites = [];
+for (const file of xamlFiles(XAML_ROOT)) {
+  const text = blankComments(readFileSync(file, 'utf8'));
+  for (const tag of text.matchAll(/<([\w:.]+)\b([^<>]*?)\/?>/g)) {
+    const [, element, attributes] = tag;
+    const line = text.slice(0, tag.index).split('\n').length;
+    for (const attr of attributes.matchAll(/([\w:.]+)="([^"]*)"/g)) {
+      for (const use of attr[2].matchAll(/\{loc:TranslateWithoutAccessKey ([\w.]+)\}/g)) {
+        const site = `${file}:${line}`;
+        keylessSites.push({ file, key: use[1] });
+        console.log(`keyless ${site} ${element}.${attr[1]} ${use[1]}`);
+        if (!neutral.has(use[1]))
+          consumerProblems.push(`${site} shows ${use[1]} without its access key, and Strings.resx does not hold that key.`);
+        else if (`${element}.${attr[1]}` !== 'Button.Content')
+          consumerProblems.push(`${site} shows ${use[1]} without its access key in ${element}.${attr[1]}, `
+            + 'which is not a Button\'s Content.');
+      }
+    }
+  }
+}
+for (const [name, key] of KEYLESS_REQUIRED)
+  if (!keylessSites.some((s) => basename(s.file) === name && s.key === key))
+    consumerProblems.push(`${name} does not show ${key} through {loc:TranslateWithoutAccessKey}, `
+      + 'so its button carries the access key the main window\'s button does.');
+
 // The control on the pass itself: a reader that matched nothing would report clean.
 if (sitesChecked === 0) {
   console.error('CONSUMERS PASS FAILED: no XAML site showing a string with an access key was found.');

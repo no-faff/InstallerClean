@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="GitHub Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-129k-brightgreen" alt="Total downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-130k-brightgreen" alt="Total downloads"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,10 +37,10 @@
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder that fills up as you install and update software. After a quick scan it tells you whether you have any, shows more detail for the curious, and lets you move them somewhere else or delete them to free up space on your C: drive.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. In that case, InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely remove.
-- **How much space:** The chart above shows the results of the optional reports sent in via the app (thanks, everyone). Of the <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> that freed space, the median reclaimed is <!-- reports-median-start -->1.7 GB<!-- reports-median-end -->. That's files you probably didn't know existed just sitting there taking up space. <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end --> of *all* machines reclaimed more than 5 GB, with many people freeing hundreds of GB. Essentially the more MSI-based software you install, the more unneeded files you'll have. As soon as you run InstallerClean, you'll find out.
+- **How much space:** The chart above shows the results of the optional reports sent in via the app (thanks, everyone). Of the <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> that freed space, the median reclaimed is <!-- reports-median-start -->1.7 GB<!-- reports-median-end -->. That's files you probably didn't know existed just sitting there taking up space. <!-- reports-over5gb-start -->21.7%<!-- reports-over5gb-end --> of *all* machines reclaimed more than 5 GB, with many people freeing hundreds of GB. Essentially the more MSI-based software you install, the more unneeded files you'll have. As soon as you run InstallerClean, you'll find out.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Click to see</kbd> how the chart would look if the reports were an exact picture of all 129,618 downloads</summary>
+  <summary><kbd>Click to see</kbd> how the chart would look if the reports were an exact picture of all 130,450 downloads</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-scaled-dark.svg" />
@@ -237,7 +237,7 @@ InstallerClean is unsigned. Here's what you can check before you run it:
 - VirusTotal: every build is scanned before it goes out, and the release page carries the full per-engine result for each download.
 - Source is here at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on Windows on every push to `main` and on every pull request, and the CI badge at the top of this page reports the result.
 - Release builds are deterministic: the same source, the same SDK and the same publish flags produce the same bytes, and a release can't be tagged unless every build input matches the source at that tag. So you can check out the tag, build it yourself and compare hashes with the published ones. Each release's notes carry what you need for that: the SDK version it was built with, and the publish flags for any download that wasn't built with the defaults. The setup is the exception: it's compiled by Inno Setup rather than by the SDK and stamps the build year into itself, so reproducing its hash needs the same Inno version and the same calendar year as well.
-- <!-- downloads-start -->129,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
+- <!-- downloads-start -->130,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) test each submission in a virtual machine and list it only if it passes their review.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks certified 100% clean" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) reviewed it and certified it free of spyware, adware and viruses.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 100% free award, certified no spyware, no adware and no viruses" width="190"></a>
 

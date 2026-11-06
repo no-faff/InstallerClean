@@ -178,13 +178,15 @@
   <!-- The label on both delete surfaces: the main window's button and the
        confirmation dialog's. It says "permanently" because Delete here does
        not mean what Delete means elsewhere in Windows, and the label is the
-       only place that difference can be carried. -->
+       only place that difference can be carried. The dialog shows it without
+       its access key, so the letter that opens the dialog cannot press it. -->
   <data name="Action.DeletePermanently" xml:space="preserve"><value>_Excluir permanentemente</value></data>
-  <!-- Alt+D safe here because the Delete button under the overlay is
-       disabled while Completion.IsComplete is true (IsMainContentInteractive
-       binds the body region to false); the mnemonic only resolves to
-       this Done button. IsDefault=True keeps Enter as the primary
-       keyboard shortcut. -->
+  <!-- D reaches only this Done button, pressed bare or with Alt: WPF fires
+       an access key on the bare letter wherever the focused control takes no
+       typing, and the Delete button under the overlay is disabled while
+       Completion.IsComplete is true (IsMainContentInteractive binds the body
+       region to false). IsDefault=True keeps Enter as the primary keyboard
+       shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Concluído</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Detalhes</value></data>
   <!-- The label on the large tip button on the completion card after a Move or
@@ -208,6 +210,9 @@
   <data name="Action.LeaveATip" xml:space="preserve"><value>Deixar uma _gorjeta</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>_Deixe uma estrela no GitHub</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Licença Apache 2.0</value></data>
+  <!-- The label on both Move surfaces: the main window's button and the
+       confirmation dialog's. The dialog shows it without its access key, so the
+       letter that opens the dialog cannot press it. -->
   <data name="Action.Move" xml:space="preserve"><value>_Mover</value></data>
   <!-- "rather than" and not "instead of": "instead of" takes the -ing form,
        so "instead of delete" is ungrammatical and only read as English

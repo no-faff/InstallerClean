@@ -1137,6 +1137,58 @@ public class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task The_Details_buttons_are_out_of_use_from_the_first_instant_of_a_scan()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        await vm.Scan.ScanWithProgressAsync(null);
+        Assert.True(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+        Assert.True(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
+
+        // A button asks CanExecute again only when its command raises
+        // CanExecuteChanged, so the last answer recorded is the one it shows.
+        var orphanedAnswers = new List<bool>();
+        var registeredAnswers = new List<bool>();
+        vm.Chrome.OpenOrphanedDetailsCommand.CanExecuteChanged += (_, _) =>
+            orphanedAnswers.Add(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+        vm.Chrome.OpenRegisteredDetailsCommand.CanExecuteChanged += (_, _) =>
+            registeredAnswers.Add(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
+
+        var release = new ManualResetEventSlim();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Task.Run(() =>
+            {
+                release.Wait();
+                return ScanResultWithOrphans(3);
+            }));
+
+        var scan = vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        // Inside the 200 ms before the overlay disables the window, the previous
+        // result is still there to open. A window opened from it now would keep
+        // that set after this scan replaces it.
+        Assert.False(vm.Scan.IsScanning);
+        Assert.True(vm.Scan.IsScanInFlight);
+        Assert.NotNull(vm.Scan.LastScanResult);
+        Assert.False(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+        Assert.False(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
+        Assert.NotEmpty(orphanedAnswers);
+        Assert.False(orphanedAnswers[^1]);
+        Assert.NotEmpty(registeredAnswers);
+        Assert.False(registeredAnswers[^1]);
+
+        release.Set();
+        await scan;
+
+        Assert.False(vm.Scan.IsScanInFlight);
+        Assert.True(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+        Assert.True(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
+        Assert.True(orphanedAnswers[^1]);
+        Assert.True(registeredAnswers[^1]);
+    }
+
+    [Fact]
     public async Task The_post_operation_refresh_blocks_a_parallel_scan()
     {
         var vm = CreateViewModel();

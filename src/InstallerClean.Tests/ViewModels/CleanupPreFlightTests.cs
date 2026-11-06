@@ -457,6 +457,32 @@ public class CleanupPreFlightTests : IDisposable
     }
 
     [Fact]
+    public async Task The_Details_buttons_are_out_of_use_while_a_pre_flight_runs()
+    {
+        var releaseProbe = new ManualResetEventSlim();
+        _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+        Assert.True(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+        Assert.True(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
+
+        var move = vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // Inside the 200 ms before the operating overlay would appear, with the
+        // main window still taking clicks. The Move ends by replacing the result,
+        // so a Details window opened now would show the set from before it.
+        Assert.True(vm.Cleanup.IsOperationInFlight);
+        Assert.False(vm.Cleanup.IsOperating);
+        Assert.False(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+        Assert.False(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
+
+        releaseProbe.Set();
+        await move;
+    }
+
+    [Fact]
     public async Task A_language_switch_is_refused_while_a_move_pre_flight_is_in_flight()
     {
         var releaseProbe = new ManualResetEventSlim();

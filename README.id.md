@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="Rilis GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-129k-brightgreen" alt="Total unduhan"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-130k-brightgreen" alt="Total unduhan"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -37,10 +37,10 @@
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang terus terisi saat Anda memasang dan memperbarui perangkat lunak. Setelah pemindaian singkat, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda memindahkannya ke tempat lain atau menghapusnya untuk mengosongkan ruang di drive C: Anda.
 - **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. Kalau begitu, InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman untuk dihapus.
-- **Berapa banyak ruang:** Diagram di atas menunjukkan hasil laporan opsional yang dikirim lewat aplikasi (terima kasih, semuanya). Dari <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> yang mengosongkan ruang, median yang dikosongkan adalah <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Itu file yang mungkin tidak Anda ketahui keberadaannya dan hanya memakan ruang. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> dari *semua* mesin mengosongkan lebih dari 5 GB, dan banyak orang mengosongkan ratusan GB. Pada dasarnya, makin banyak perangkat lunak berbasis MSI yang Anda pasang, makin banyak file tidak diperlukan yang Anda miliki. Begitu menjalankan InstallerClean, Anda akan tahu.
+- **Berapa banyak ruang:** Diagram di atas menunjukkan hasil laporan opsional yang dikirim lewat aplikasi (terima kasih, semuanya). Dari <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> yang mengosongkan ruang, median yang dikosongkan adalah <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Itu file yang mungkin tidak Anda ketahui keberadaannya dan hanya memakan ruang. <!-- reports-over5gb-start -->21,7%<!-- reports-over5gb-end --> dari *semua* mesin mengosongkan lebih dari 5 GB, dan banyak orang mengosongkan ratusan GB. Pada dasarnya, makin banyak perangkat lunak berbasis MSI yang Anda pasang, makin banyak file tidak diperlukan yang Anda miliki. Begitu menjalankan InstallerClean, Anda akan tahu.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Klik untuk melihat</kbd> seperti apa diagramnya jika laporan itu gambaran persis dari semua 129.618 unduhan</summary>
+  <summary><kbd>Klik untuk melihat</kbd> seperti apa diagramnya jika laporan itu gambaran persis dari semua 130.450 unduhan</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-id-scaled-dark.svg" />
@@ -237,7 +237,7 @@ InstallerClean tidak ditandatangani. Berikut yang bisa Anda periksa sebelum menj
 - VirusTotal: setiap build dipindai sebelum dirilis, dan halaman rilis memuat hasil lengkap per mesin pemindai untuk tiap unduhan.
 - Kode sumbernya ada di sini, di [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Layanan pindai, kueri, pindah, hapus, pengaturan dan mulai-ulang-tertunda dicakup oleh rangkaian pengujian otomatis yang berjalan di Windows pada setiap push ke `main` dan pada setiap pull request, dan lencana CI di bagian atas halaman ini melaporkan hasilnya.
 - Build rilis bersifat deterministik: kode sumber yang sama, SDK yang sama dan flag publish yang sama menghasilkan byte yang sama, dan sebuah rilis tidak bisa diberi tag kecuali setiap masukan build cocok dengan kode sumber pada tag tersebut. Jadi Anda bisa checkout tag itu, membangunnya sendiri, lalu membandingkan hash-nya dengan yang dipublikasikan. Catatan tiap rilis memuat apa yang Anda perlukan untuk itu: versi SDK yang dipakai membangunnya, dan flag publish untuk unduhan mana pun yang tidak dibangun dengan flag bawaan. Setup adalah pengecualiannya: ia dikompilasi oleh Inno Setup dan bukan oleh SDK, dan menanamkan tahun pembuatan ke dalam dirinya sendiri, jadi mereproduksi hash-nya juga memerlukan versi Inno yang sama dan tahun kalender yang sama.
-- <!-- downloads-start -->129.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks dan Softpedia.
+- <!-- downloads-start -->130.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya kalau lolos tinjauan mereka.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Disertifikasi MajorGeeks 100% bersih" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) meninjaunya dan menyatakannya bebas spyware, adware dan virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Penghargaan Softpedia 100% gratis, disertifikasi tanpa spyware, tanpa adware dan tanpa virus" width="190"></a>
 
