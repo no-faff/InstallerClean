@@ -5,7 +5,7 @@ namespace InstallerClean.Helpers;
 /// <summary>
 /// BSTRs, made and freed the way <see cref="System.Runtime.InteropServices.Marshal.StringToBSTR"/>
 /// and <see cref="System.Runtime.InteropServices.Marshal.FreeBSTR"/> make and free them on
-/// Windows, through this assembly's own oleaut32 import, which its resolver loads from System32.
+/// Windows, through this assembly's own oleaut32 import, which loads from System32.
 /// </summary>
 /// <remarks>
 /// A null string gives a null pointer, and an empty one a BSTR of no characters. The

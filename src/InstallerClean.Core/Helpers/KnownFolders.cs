@@ -8,7 +8,7 @@ namespace InstallerClean.Helpers;
 /// <c>%LOCALAPPDATA%</c>, <c>%ProgramData%</c> and the two Program Files folders.
 /// Each answer is the one <see cref="Environment.GetFolderPath(Environment.SpecialFolder)"/>
 /// gives for the same folder, asked through this assembly's own shell32 import, which
-/// its resolver loads from System32.
+/// loads from System32.
 /// </summary>
 /// <remarks>
 /// The call is the one .NET makes: SHGetKnownFolderPath for the same known-folder GUID,

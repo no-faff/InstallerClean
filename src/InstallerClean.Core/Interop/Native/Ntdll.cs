@@ -5,8 +5,7 @@ namespace InstallerClean.Interop.Native;
 
 /// <summary>
 /// P/Invoke surface for ntdll.dll, declared as <see cref="Kernel32"/>'s are, and loaded
-/// from System32 by the resolver in <see cref="SystemLibraries"/> like every other
-/// library here.
+/// from System32 like every other library here.
 /// </summary>
 /// <remarks>
 /// Declared because the Win32 CreateFile cannot open a child by a name resolved

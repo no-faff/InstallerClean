@@ -9,8 +9,7 @@ namespace InstallerClean.Interop.Native;
 /// </summary>
 /// <remarks>
 /// A BSTR is made and freed here rather than with <see cref="Marshal.StringToBSTR"/> and
-/// <see cref="Marshal.FreeBSTR"/>, which call oleaut32 through .NET's own imports, and
-/// those imports search for oleaut32 without going through this assembly's resolver.
+/// <see cref="Marshal.FreeBSTR"/>, through this assembly's own import of oleaut32.
 /// </remarks>
 internal static class OleAut32
 {

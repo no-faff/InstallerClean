@@ -1,46 +1,29 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Tests.Helpers.Integration;
 
 /// <summary>
-/// Core's libraries come from System32 by their full path. Windows only: the libraries
+/// The libraries Core's imports load are the copies in System32. Windows only: the libraries
 /// are part of Windows.
 /// </summary>
 public class SystemLibrariesTests
 {
-    [Fact]
-    public void Core_has_its_resolver_in_place_before_its_first_import()
+    public static TheoryData<string, Action> CoreImports => new()
     {
-        // A call into Core runs its module initialiser, if nothing has yet. A second
-        // resolver for an assembly is then refused where one is set already.
-        SystemLibraries.Resolve("kernel32.dll", typeof(SystemLibraries).Assembly, null);
-        Assert.Throws<InvalidOperationException>(() =>
-            NativeLibrary.SetDllImportResolver(typeof(SystemLibraries).Assembly, (_, _, _) => IntPtr.Zero));
-    }
-
-    [Fact]
-    public void Core_sets_its_resolver_as_it_is_loaded()
-    {
-        var setUp = typeof(SystemLibraries).GetMethod(nameof(SystemLibraries.LoadFromSystem32),
-            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-
-        Assert.NotNull(setUp);
-        Assert.NotNull(setUp.GetCustomAttributes(typeof(System.Runtime.CompilerServices.ModuleInitializerAttribute), false)
-            .SingleOrDefault());
-    }
+        { "msi.dll", () => Msi.MsiCloseHandle(0) },
+        { "ole32.dll", () => Ole32.CoTaskMemFree(IntPtr.Zero) },
+        { "oleaut32.dll", () => OleAut32.SysFreeString(IntPtr.Zero) },
+        { "shell32.dll", () => KnownFolders.GetPath(Environment.SpecialFolder.CommonApplicationData) },
+    };
 
     [Theory]
-    [InlineData("msi.dll")]
-    [InlineData("shell32.dll")]
-    [InlineData("ole32.dll")]
-    [InlineData("oleaut32.dll")]
-    public void A_library_is_loaded_from_System32(string name)
+    [MemberData(nameof(CoreImports))]
+    public void A_library_Core_imports_is_loaded_from_System32(string name, Action call)
     {
-        var handle = SystemLibraries.Resolve(name, typeof(SystemLibraries).Assembly, null);
+        call();
 
-        Assert.NotEqual(IntPtr.Zero, handle);
         var system32 = Environment.GetFolderPath(Environment.SpecialFolder.System);
         var loaded = Process.GetCurrentProcess().Modules.Cast<ProcessModule>()
             .Where(m => string.Equals(Path.GetFileName(m.FileName), name, StringComparison.OrdinalIgnoreCase))
@@ -49,32 +32,5 @@ public class SystemLibrariesTests
         Assert.NotEmpty(loaded);
         Assert.All(loaded, path =>
             Assert.Equal(system32, Path.GetDirectoryName(path), StringComparer.OrdinalIgnoreCase));
-    }
-
-    [Fact]
-    public void A_library_System32_does_not_hold_fails_rather_than_being_searched_for()
-    {
-        Assert.Throws<DllNotFoundException>(() =>
-            SystemLibraries.Resolve("installerclean-no-such-library.dll", typeof(SystemLibraries).Assembly, null));
-    }
-
-    // An API set name loads the library that implements it, which is the module checked.
-    [Theory]
-    [InlineData("uxtheme.dll")]
-    [InlineData("api-ms-win-core-winrt-l1-1-0.dll")]
-    public void A_Windows_library_a_framework_assembly_imports_is_loaded_from_System32(string name)
-    {
-        var handle = FrameworkLibraries.Resolve(name, typeof(Uri).Assembly, null);
-
-        Assert.NotEqual(IntPtr.Zero, handle);
-        var system32 = Environment.GetFolderPath(Environment.SpecialFolder.System);
-        var module = Process.GetCurrentProcess().Modules.Cast<ProcessModule>().Single(m => m.BaseAddress == handle);
-        Assert.Equal(system32, Path.GetDirectoryName(module.FileName), StringComparer.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public void A_library_the_app_carries_is_left_to_the_runtime_by_the_real_resolver()
-    {
-        Assert.Equal(IntPtr.Zero, FrameworkLibraries.Resolve("wpfgfx_cor3.dll", typeof(Uri).Assembly, null));
     }
 }

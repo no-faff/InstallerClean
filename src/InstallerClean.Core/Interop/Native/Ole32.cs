@@ -11,8 +11,7 @@ namespace InstallerClean.Interop.Native;
 /// <remarks>
 /// Memory a Windows call hands back for the caller to free is freed here rather than
 /// with <see cref="Marshal.FreeCoTaskMem"/>, and a new GUID is made here rather than
-/// with <see cref="Guid.NewGuid"/>. Both of those call ole32 through .NET's own imports,
-/// and those imports search for ole32 without going through this assembly's resolver.
+/// with <see cref="Guid.NewGuid"/>, through this assembly's own import of ole32.
 /// </remarks>
 internal static class Ole32
 {

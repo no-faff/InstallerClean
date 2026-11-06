@@ -4,7 +4,7 @@ namespace InstallerClean.Helpers;
 
 /// <summary>
 /// New GUIDs, made by the call <see cref="Guid.NewGuid"/> makes on Windows, CoCreateGuid,
-/// asked through this assembly's own ole32 import, which its resolver loads from System32.
+/// asked through this assembly's own ole32 import, which loads from System32.
 /// </summary>
 /// <remarks>
 /// Where CoCreateGuid returns anything but zero, an <see cref="Exception"/> carrying its
