@@ -39,19 +39,25 @@ public class RegistryNamesIntegrationTests
     }
 
     [Fact]
-    public void A_subkey_created_past_the_listing_is_in_the_listing()
+    public void A_listing_runs_past_the_count_Windows_gave_first()
     {
         WithKey(key =>
         {
             key.CreateSubKey("a")!.Dispose();
             key.CreateSubKey("b")!.Dispose();
 
-            // Windows keeps a key's subkeys in name order, so one named to sort last is
-            // at an index the listing has not yet reached.
+            // The count is two when the listing starts, and a third subkey is created before
+            // index 2 is asked for. Whatever index Windows gives the new subkey, index 2 then
+            // names a subkey of the key, so the listing reads three names past a count of two.
+            // The registry lists subkeys in name order, an order Microsoft does not document,
+            // which puts "zz-added" at index 2 itself.
             var calls = new Writing(RegistryNames.CallsOn(key.Handle),
-                (listing, index) => { if (listing == 1 && index == 1) key.CreateSubKey("zz-added")!.Dispose(); });
+                (listing, index) => { if (listing == 1 && index == 2) key.CreateSubKey("zz-added")!.Dispose(); });
 
-            Assert.Equal(new[] { "a", "b", "zz-added" }, RegistryNames.SubKeys(calls));
+            var listed = RegistryNames.SubKeys(calls);
+            Assert.Equal(3, listed.Length);
+            Assert.All(listed, name => Assert.Contains(name, key.GetSubKeyNames()));
+            Assert.Equal(new[] { "a", "b", "zz-added" }, listed.OrderBy(n => n, StringComparer.Ordinal));
         });
     }
 
@@ -67,13 +73,18 @@ public class RegistryNamesIntegrationTests
                 if (listing == 1 && index == 1) key.CreateSubKey("a-added")!.Dispose();
             };
 
-            // One listing alone: "b" is read again at index 1, and "a-added" not at all.
+            // One listing alone: the registry lists subkeys in name order, an order Microsoft
+            // does not document, so "a-added" takes index 0 and moves "b" to index 1, where it
+            // is read again, and "a-added" is not read at all.
             var once = RegistryNames.SubKeys(new Writing(RegistryNames.CallsOn(key.Handle), write));
             Assert.Equal(new[] { "b", "b", "c" }, once);
             key.DeleteSubKey("a-added");
 
-            Assert.Equal(new[] { "a-added", "b", "c" },
-                RegistryNames.SubKeysUnchanged(new Writing(RegistryNames.CallsOn(key.Handle), write)));
+            // The settled names are the framework's own listing of the unchanged key afterwards,
+            // and the names the key holds.
+            var settled = RegistryNames.SubKeysUnchanged(new Writing(RegistryNames.CallsOn(key.Handle), write), _ => { });
+            Assert.Equal(key.GetSubKeyNames(), settled);
+            Assert.Equal(new[] { "a-added", "b", "c" }, settled.OrderBy(n => n, StringComparer.Ordinal));
         });
     }
 
@@ -88,13 +99,18 @@ public class RegistryNamesIntegrationTests
                 if (listing == 1 && index == 2) key.DeleteSubKey("a");
             };
 
-            // One listing alone: index 2 is past the end once "a" goes, so "c" is not read.
+            // One listing alone: the registry lists subkeys in name order, an order Microsoft
+            // does not document, so "a" and "b" are read at indexes 0 and 1, index 2 is past the
+            // end once "a" goes, and "c" is not read.
             var once = RegistryNames.SubKeys(new Writing(RegistryNames.CallsOn(key.Handle), write));
             Assert.Equal(new[] { "a", "b" }, once);
             key.CreateSubKey("a")!.Dispose();
 
-            Assert.Equal(new[] { "b", "c" },
-                RegistryNames.SubKeysUnchanged(new Writing(RegistryNames.CallsOn(key.Handle), write)));
+            // The settled names are the framework's own listing of the unchanged key afterwards,
+            // and the names the key holds.
+            var settled = RegistryNames.SubKeysUnchanged(new Writing(RegistryNames.CallsOn(key.Handle), write), _ => { });
+            Assert.Equal(key.GetSubKeyNames(), settled);
+            Assert.Equal(new[] { "b", "c" }, settled.OrderBy(n => n, StringComparer.Ordinal));
         });
     }
 
