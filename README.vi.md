@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v3.7.0-blue" alt="Bản phát hành GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-130k-brightgreen" alt="Tổng lượt tải"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-131k-brightgreen" alt="Tổng lượt tải"></a>
 </p>
 
 <a id="reports-stats"></a>
@@ -40,7 +40,7 @@
 - **Giải phóng được bao nhiêu:** Biểu đồ ở trên cho thấy kết quả của các báo cáo tùy chọn gửi qua ứng dụng (cảm ơn mọi người). Trong số <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> đã giải phóng được dung lượng, trung vị giải phóng được là <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Đó là những tệp có lẽ bạn không hề biết là tồn tại, cứ nằm đó chiếm chỗ. <!-- reports-over5gb-start -->21,6%<!-- reports-over5gb-end --> trong *tất cả* các máy đã thu hồi hơn 5 GB, và nhiều người đã giải phóng hàng trăm GB. Nói chung, càng cài nhiều phần mềm dựa trên MSI thì càng có nhiều tệp không cần thiết. Ngay khi chạy InstallerClean, bạn sẽ biết.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Nhấp để xem</kbd> biểu đồ sẽ trông thế nào nếu các báo cáo phản ánh chính xác toàn bộ 130.963 lượt tải</summary>
+  <summary><kbd>Nhấp để xem</kbd> biểu đồ sẽ trông thế nào nếu các báo cáo phản ánh chính xác toàn bộ 131.037 lượt tải</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-vi-scaled-dark.svg" />
@@ -237,7 +237,7 @@ InstallerClean không được ký số. Đây là những thứ bạn có thể
 - VirusTotal: mỗi bản dựng đều được quét trước khi phát hành, và trang phát hành mang kết quả đầy đủ theo từng công cụ cho mỗi bản tải về.
 - Mã nguồn nằm ở đây, tại [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean). Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra khởi động lại đang chờ đều được một bộ kiểm thử tự động bao phủ, và bộ kiểm thử đó chạy trên Windows ở mỗi lần đẩy lên `main` và ở mỗi pull request, còn huy hiệu CI ở đầu trang này cho biết kết quả.
 - Các bản dựng phát hành có tính tất định: cùng một mã nguồn, cùng một SDK và cùng những cờ publish sẽ cho ra đúng những byte như nhau, và một bản phát hành không thể được gắn tag trừ khi mọi đầu vào của bản dựng khớp với mã nguồn tại tag đó. Vậy nên bạn có thể checkout tag đó, tự dựng lấy rồi đối chiếu mã băm với mã băm đã công bố. Ghi chú của mỗi bản phát hành mang đủ những gì bạn cần cho việc đó: phiên bản SDK mà nó được dựng bằng, và các cờ publish của bất kỳ bản tải nào không dựng bằng giá trị mặc định. Bản setup là ngoại lệ: nó do Inno Setup biên dịch chứ không phải SDK, và nó tự đóng dấu năm dựng vào bên trong, nên muốn tái tạo mã băm của nó thì cần cả đúng phiên bản Inno lẫn đúng năm dương lịch.
-- <!-- downloads-start -->130.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
+- <!-- downloads-start -->131.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Được MajorGeeks chứng nhận 100% sạch" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) đã đánh giá nó và chứng nhận nó không có phần mềm gián điệp, phần mềm quảng cáo và virus.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Giải thưởng 100% miễn phí của Softpedia, chứng nhận không phần mềm gián điệp, không phần mềm quảng cáo và không virus" width="190"></a>
 
