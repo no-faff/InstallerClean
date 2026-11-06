@@ -203,7 +203,7 @@ internal static class MoveSpaceCheck
             var probe = Path.GetFullPath(destination);
             while (!Directory.Exists(probe))
             {
-                var parent = Path.GetDirectoryName(probe);
+                var parent = PathText.GetDirectoryName(probe);
                 // Null at a path root, and equal to itself if GetDirectoryName
                 // ever stops making progress: either way no ancestor is left.
                 if (string.IsNullOrEmpty(parent) || parent == probe) return null;

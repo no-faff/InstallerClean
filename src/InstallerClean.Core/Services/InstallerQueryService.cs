@@ -4608,13 +4608,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Whether a claimed path's leaf name has more than eight characters before
     /// its extension, so the name itself cannot be an 8dot3 short name.
     ///
-    /// The separator search is explicit rather than <c>Path.GetFileName</c>
-    /// because this file's own paths are Windows-spelled whatever the host is,
-    /// and the framework helper reads a backslash as an ordinary character
-    /// anywhere but Windows: the whole path would come back as the leaf, every
-    /// row would count, and the number would look like a finding. Nothing here
-    /// runs off Windows in production and the counter is not worth a
-    /// platform-shaped answer in a test either.
+    /// The leaf is the text after the last separator of either kind, or the whole path
+    /// where it has none. Do not replace the search with <see cref="PathText.GetFileName"/>:
+    /// that reads <c>C:longname.msi</c>'s leaf after the drive, so the count changes for
+    /// such a path.
     ///
     /// Eight is the short name's own limit, so this counts the names that cannot
     /// be one and says nothing about whether the volume has generated one

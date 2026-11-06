@@ -69,8 +69,8 @@ internal static class SetupReplacement
         var version = seams.Version ?? ThisVersion();
         var thisExe = seams.ThisExe ?? Environment.ProcessPath
             ?? throw new InvalidOperationException("This process has no path, so the setup beside it cannot be found.");
-        var setupPath = Path.Combine(Path.GetDirectoryName(thisExe)!, AppCopy.DownloadFileName(AppCopyKind.Setup, version)!);
-        var copyFolder = Path.GetDirectoryName(request.ExePath)!;
+        var setupPath = PathText.Combine(PathText.GetDirectoryName(thisExe)!, AppCopy.DownloadFileName(AppCopyKind.Setup, version)!);
+        var copyFolder = PathText.GetDirectoryName(request.ExePath)!;
 
         using var oldCopy = (seams.OpenCopy ?? ExeReplacement.OpenCopy)(request, out var refused);
         if (oldCopy is null) return Fail(SetupReplaceOutcome.NotHandedOver, refused!);
@@ -104,7 +104,7 @@ internal static class SetupReplacement
 
             using var started = (seams.Start ?? DetachedProcess.Start)(
                 setupPath, CommandLineUpdate.SetupArguments.Split(' ', StringSplitOptions.RemoveEmptyEntries),
-                Path.GetDirectoryName(setupPath)!);
+                PathText.GetDirectoryName(setupPath)!);
             // The setup has its own handle on its file once it runs, so this one goes.
             setup.Dispose();
             setup = null;
@@ -161,8 +161,8 @@ internal static class SetupReplacement
                 if (!instance.TryTake(left > TimeSpan.Zero ? left : TimeSpan.Zero)) return false;
                 try
                 {
-                    busy = AnotherProcessMayRunFrom(Path.Combine(folder, AppCopy.CommandLineFileName))
-                        || AnotherProcessMayRunFrom(Path.Combine(folder, WindowFileName));
+                    busy = AnotherProcessMayRunFrom(PathText.Combine(folder, AppCopy.CommandLineFileName))
+                        || AnotherProcessMayRunFrom(PathText.Combine(folder, WindowFileName));
                 }
                 finally
                 {
@@ -242,7 +242,7 @@ internal static class SetupReplacement
         Process[] named;
         try
         {
-            named = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(exePath));
+            named = Process.GetProcessesByName(PathText.GetFileNameWithoutExtension(exePath));
         }
         catch (Exception ex)
         {

@@ -425,7 +425,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
             // Re-checked rather than trusted from the walk: the walk filters on
             // the same test, but an override file list does not go through it.
-            var ext = _fs.Path.GetExtension(filePath);
+            var ext = PathText.GetExtension(filePath);
             if (!IsCacheExtension(ext))
                 continue;
 
@@ -1697,7 +1697,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
-        var parent = Path.GetDirectoryName(
+        var parent = PathText.GetDirectoryName(
             path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
         return parent is not null && SpellsTheSameFolder(parent, folder);
     }

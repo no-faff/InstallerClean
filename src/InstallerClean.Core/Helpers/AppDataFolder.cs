@@ -95,7 +95,7 @@ internal static class AppDataFolder
     /// </remarks>
     internal static Settled Settle(string localAppData)
     {
-        var current = Path.Combine(localAppData, FolderName);
+        var current = PathText.Combine(localAppData, FolderName);
 
         // No profile folder to answer from, which KnownFolders reports as an empty
         // string. The relative path is returned as the callers would build it, and
@@ -103,8 +103,8 @@ internal static class AppDataFolder
         if (string.IsNullOrEmpty(localAppData))
             return new Settled(current, null);
 
-        var parent = Path.Combine(localAppData, EarlierParentName);
-        var earlier = Path.Combine(parent, FolderName);
+        var parent = PathText.Combine(localAppData, EarlierParentName);
+        var earlier = PathText.Combine(parent, FolderName);
         var failures = new List<Exception>();
 
         try
@@ -189,7 +189,7 @@ internal static class AppDataFolder
     {
         foreach (var entry in Directory.EnumerateFileSystemEntries(earlier))
         {
-            var name = Path.GetFileName(entry);
+            var name = PathText.GetFileName(entry);
             if (StorageHelpers.CheckReparsePoint(entry, out var error) != StorageHelpers.ReparseCheck.No)
             {
                 if (error is not null) failures.Add(error);
@@ -198,7 +198,7 @@ internal static class AppDataFolder
             if (Directory.Exists(entry))
                 continue;
 
-            var target = Path.Combine(current, name);
+            var target = PathText.Combine(current, name);
             try
             {
                 File.Move(entry, target, overwrite: false);

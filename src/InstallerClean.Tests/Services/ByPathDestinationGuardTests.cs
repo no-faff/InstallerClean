@@ -26,7 +26,7 @@ public class ByPathDestinationGuardTests
     public ByPathDestinationGuardTests()
     {
         // MockFileSystem's Path is a working implementation; a bare substitute returns an
-        // empty string from Combine and GetRandomFileName.
+        // empty string from GetRandomFileName.
         _fileSystem.Path.Returns(new MockFileSystem().Path);
         _fileSystem.Directory.Returns(_directory);
         _fileSystem.File.Returns(_file);

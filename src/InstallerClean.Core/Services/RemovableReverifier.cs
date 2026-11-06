@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 
 namespace InstallerClean.Services;
@@ -517,7 +518,7 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
     /// <summary>Whether a walk-derived path is a patch file, by its extension as the scan tells it.</summary>
     private static bool IsPatchFile(string path) =>
-        Path.GetExtension(path).Equals(".msp", StringComparison.OrdinalIgnoreCase);
+        PathText.GetExtension(path).Equals(".msp", StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc />
     /// <remarks>

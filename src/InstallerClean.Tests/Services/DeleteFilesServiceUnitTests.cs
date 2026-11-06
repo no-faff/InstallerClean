@@ -190,7 +190,6 @@ public class DeleteFilesServiceUnitTests
     private static IFileSystem FileSystemReporting(string source, Exception? deleteThrows = null)
     {
         var fs = Substitute.For<IFileSystem>();
-        fs.Path.Returns(new MockFileSystem().Path);
         fs.Directory.Returns(Substitute.For<IDirectory>());
         var file = Substitute.For<IFile>();
         fs.File.Returns(file);

@@ -283,8 +283,8 @@ public class RegisteredFilesViewModelTests
         // literal "1285c2.msi", and that is not the assertion going soft. What is
         // under test is the composition: four parts, comma-separated, opening with
         // the product cell. Spelling the base name out here would also pin
-        // Path.GetFileName's answer, which is a different subject and one that
-        // depends on the platform's path separator.
+        // PathText.GetFileName's answer, which is a different subject, tested in
+        // PathTextTests.
         //
         // THE OBVIOUS OBJECTION IS THAT PART OF THE SUBJECT APPEARS ON BOTH SIDES, SO
         // THIS COULD NOT FAIL. IT WAS CHECKED RATHER THAN ARGUED. Composing the line

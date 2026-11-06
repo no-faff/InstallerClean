@@ -63,7 +63,7 @@ public class CleanupPreFlightTests : IDisposable
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>(), Arg.Any<IProgress<ScanProgressUpdate>?>())
             .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
         // MockFileSystem's Path is a working implementation; a bare substitute
-        // returns an empty string from Combine and GetRandomFileName.
+        // returns an empty string from GetFullPath and GetRandomFileName.
         _fileSystem.Path.Returns(new MockFileSystem().Path);
         _fileSystem.Directory.Returns(_directory);
         _fileSystem.File.Returns(_file);

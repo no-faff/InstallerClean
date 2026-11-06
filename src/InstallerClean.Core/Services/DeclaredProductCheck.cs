@@ -2238,11 +2238,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     }
 
     /// <summary>
-    /// <paramref name="name"/> in <paramref name="folder"/>, joined with a backslash by hand
-    /// rather than with <c>Path.Combine</c>, whose separator is the host's.
+    /// <paramref name="name"/> in <paramref name="folder"/>, joined with one backslash.
     /// </summary>
     private static string PathOfPackage(string folder, string name) =>
-        folder.EndsWith('\\') ? folder + name : folder + '\\' + name;
+        folder.EndsWith("\\", StringComparison.Ordinal) ? folder + name : folder + '\\' + name;
 
     /// <summary>
     /// Whether <paramref name="packageName"/> holds a '\', a '/', a ':', a '%' or a null, each of

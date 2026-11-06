@@ -35,7 +35,7 @@ public sealed class SettingsService : ISettingsService
     // the update-check opt-out on the dispatcher.
     private readonly object _ioGate = new();
 
-    public SettingsService() : this(Path.Combine(AppDataFolder.Location, "settings.json")) { }
+    public SettingsService() : this(PathText.Combine(AppDataFolder.Location, "settings.json")) { }
 
     internal SettingsService(string settingsFile)
     {
@@ -140,7 +140,7 @@ public sealed class SettingsService : ISettingsService
         var tempFile = _settingsFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
-            var folder = Path.GetDirectoryName(_settingsFile);
+            var folder = PathText.GetDirectoryName(_settingsFile);
             if (!string.IsNullOrEmpty(folder))
                 Directory.CreateDirectory(folder);
 

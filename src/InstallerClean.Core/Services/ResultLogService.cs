@@ -48,7 +48,7 @@ public sealed class ResultLogService : IResultLogService
         MaxResponseContentBufferSize = 4 * 1024,
     };
 
-    public ResultLogService() : this(Path.Combine(AppDataFolder.Location, "last-run.json")) { }
+    public ResultLogService() : this(PathText.Combine(AppDataFolder.Location, "last-run.json")) { }
 
     /// <summary>
     /// Test seam, mirroring <see cref="SettingsService"/>'s next door: points
@@ -82,9 +82,10 @@ public sealed class ResultLogService : IResultLogService
         var tempFile = _logFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
-            // GetDirectoryName is null only for a root path, which the
-            // default never is and a test sandbox never should be.
-            var folder = Path.GetDirectoryName(_logFile);
+            // GetDirectoryName is null for a root, an empty path and one of spaces
+            // alone, and empty for a bare file name, which CreateDirectory refuses.
+            // The default path is none of those, and a test sandbox never should be.
+            var folder = PathText.GetDirectoryName(_logFile);
             if (folder is not null) Directory.CreateDirectory(folder);
 
             var json = JsonSerializer.Serialize(entry, JsonOptions);

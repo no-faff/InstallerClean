@@ -1070,7 +1070,7 @@ public partial class CompletionViewModel : ObservableObject
             // font the app draws in is, so the hyphen is what separates a
             // filename from the sentence above it.
             foreach (var err in bucket)
-                sb.Append("- ").Append(Path.GetFileName(err.FilePath)).AppendLine();
+                sb.Append("- ").Append(PathText.GetFileName(err.FilePath)).AppendLine();
         }
         return sb.ToString().TrimEnd();
     }

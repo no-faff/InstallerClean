@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 
@@ -84,7 +85,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // Reject relative destinations: Path.GetFullPath would otherwise
             // resolve them against the process CWD, and the CLI host's CWD
             // is whatever the caller invoked it from.
-            if (!Path.IsPathFullyQualified(destinationFolder))
+            if (!PathText.IsPathFullyQualified(destinationFolder))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
 
@@ -339,7 +340,7 @@ public sealed class MoveFilesService : IMoveFilesService
                     // the try the throw leaves the loop altogether, and the files
                     // already moved are never reported, the result and the failure
                     // log's closing entry both being built past the loop.
-                    progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
+                    progress?.Report(new OperationProgress(i + 1, total, PathText.GetFileName(sourcePath)));
                     // Asked again after the report, which can block on the console: a cancel
                     // that came meanwhile leaves this file alone. The catch-all below lets the
                     // batch's own cancellation through (BatchStop.EndsBatch).
@@ -510,8 +511,8 @@ public sealed class MoveFilesService : IMoveFilesService
                     // out-of-bounds or unresolvable path the guard established it to
                     // be. A refusal has to name the reason it was refused for, and
                     // the guard's reason outranks this one wherever both apply.
-                    var fileName = _fs.Path.GetFileName(sourcePath);
-                    var destPath = _fs.Path.Combine(destinationFolder, fileName);
+                    var fileName = PathText.GetFileName(sourcePath);
+                    var destPath = PathText.Combine(destinationFolder, fileName);
                     if (_fs.File.Exists(destPath))
                     {
                         errors.Add(new DestinationCollision(sourcePath, fileName));
@@ -547,7 +548,7 @@ public sealed class MoveFilesService : IMoveFilesService
                 // DirectoryNotFoundException.
                 catch (FileNotFoundException) when (
                     !_fs.File.Exists(sourcePath)
-                    && !_fs.File.Exists(_fs.Path.Combine(destinationFolder, _fs.Path.GetFileName(sourcePath))))
+                    && !_fs.File.Exists(PathText.Combine(destinationFolder, PathText.GetFileName(sourcePath))))
                 {
                     errors.Add(new MissingSourceFile(sourcePath));
                 }

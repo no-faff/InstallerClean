@@ -261,7 +261,7 @@ public sealed class AppUpdater : IAppUpdater
         try
         {
             return AppCopy.ReadScoopUpdate(
-                Path.GetDirectoryName(_exePath) ?? string.Empty,
+                PathText.GetDirectoryName(_exePath) ?? string.Empty,
                 ScoopVariable,
                 ReadScoopConfig,
                 KnownFolders.GetPath(Environment.SpecialFolder.CommonApplicationData));
@@ -611,7 +611,7 @@ public sealed class AppUpdater : IAppUpdater
                 foreach (var file in _holds) file.Dispose();
                 _holds.Clear();
                 lock (HeldForTheProcess) HeldForTheProcess.Remove(folder.Handle);
-                folder.TryRemove(_staged.Select(Path.GetFileName)!);
+                folder.TryRemove(_staged.Select(PathText.GetFileName)!);
             }
         }
     }
@@ -632,7 +632,7 @@ public sealed class AppUpdater : IAppUpdater
         CancellationToken cancellationToken)
     {
         var fractions = progress is null ? null : new Fractions(progress);
-        var path = Path.Combine(staging.FolderPath, AppCopy.DownloadFileName(kind, version)!);
+        var path = PathText.Combine(staging.FolderPath, AppCopy.DownloadFileName(kind, version)!);
         var address = AppCopy.DownloadAddress(kind, version)!;
         staging.AddStaged(path);
 #if DEBUG
@@ -777,7 +777,7 @@ public sealed class AppUpdater : IAppUpdater
     {
         try
         {
-            if (!Path.IsPathFullyQualified(path)) throw new IOException($"The local file {path} is not a full path.");
+            if (!PathText.IsPathFullyQualified(path)) throw new IOException($"The local file {path} is not a full path.");
             var bytes = File.ReadAllBytes(path);
             if (bytes.Length > UpdateManifest.MaxBytes) throw new IOException($"The local file {path} is over the cap.");
             return bytes;
@@ -812,7 +812,7 @@ public sealed class AppUpdater : IAppUpdater
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if (!Path.IsPathFullyQualified(path))
+            if (!PathText.IsPathFullyQualified(path))
                 throw new HttpRequestException($"The local file {path} is not a full path.");
             FileStream file;
             try
@@ -827,7 +827,7 @@ public sealed class AppUpdater : IAppUpdater
             {
                 try
                 {
-                    if (!Path.IsPathFullyQualified(gate)) throw new IOException($"The gate {gate} is not a full path.");
+                    if (!PathText.IsPathFullyQualified(gate)) throw new IOException($"The gate {gate} is not a full path.");
                     File.Delete(gate);
                     File.Delete(gate + GateReachedSuffix);
                 }

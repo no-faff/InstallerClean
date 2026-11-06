@@ -802,7 +802,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // Same three checks in the same order as the CLI's
         // ResolveAndValidateMoveDestination; MoveFilesService keeps its own copy
         // at the service boundary for callers that never come through here.
-        if (!Path.IsPathFullyQualified(dest))
+        if (!PathText.IsPathFullyQualified(dest))
         {
             _dialogService.ShowWarning(
                 string.Format(Strings.Error_DestinationNotFullyQualified, dest),

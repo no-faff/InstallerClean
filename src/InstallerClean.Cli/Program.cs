@@ -465,7 +465,7 @@ internal static class Program
         if (!report.CanAsk || token.IsCancellationRequested) return;
         var offer = new ConsoleReportOffer(
             console, resultLog, settings,
-            Path.Combine(AppDataFolder.Location, "last-run.json"),
+            PathText.Combine(AppDataFolder.Location, "last-run.json"),
             ReadmeLinks.For("reports-stats", Localisation.UiCulture),
             () => CancelKey.Process.Closing,
             CommandLineUpdate.ControlCBound,
@@ -1555,7 +1555,7 @@ internal static class Program
                     Console.WriteLine(MachineContract.English(
                         () => $"{result.Errors.Count} {Strings.Plural_Error_Plural}:"));
                     foreach (var err in result.Errors)
-                        Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
+                        Console.WriteLine($"  {PathText.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
 
                 // The service returns its partial result on a mid-batch cancel
@@ -1727,7 +1727,7 @@ internal static class Program
                 Console.WriteLine(MachineContract.English(
                     () => $"{moveResult.Errors.Count} {Strings.Plural_Error_Plural}:"));
                 foreach (var err in moveResult.Errors)
-                    Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
+                    Console.WriteLine($"  {PathText.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
             }
             // AFTER THE ERROR BLOCK RATHER THAN BETWEEN IT AND THE SUMMARY, so a
             // script scraping the "\d+ errors:" shape finds that block straight under
@@ -2389,7 +2389,7 @@ internal static class Program
             Console.WriteLine(MachineContract.English(
                 () => $"{partial.Errors.Count} {Strings.Plural_Error_Plural}:"));
             foreach (var err in partial.Errors)
-                Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
+                Console.WriteLine($"  {PathText.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
         }
         // The command line's wording of the guard's sentence rather than
         // ex.Message, which is the window's: that one closes on Re-scan, a button
@@ -2806,7 +2806,7 @@ internal static class Program
         // Reject relative destinations: Path.GetFullPath would otherwise
         // resolve them against the process CWD, and the CLI host's CWD is
         // whatever the caller invoked it from.
-        if (!Path.IsPathFullyQualified(dest))
+        if (!PathText.IsPathFullyQualified(dest))
         {
             Console.WriteLine(string.Format(Strings.Cli_MoveDestinationRelative, dest));
             MachineContract.WriteEventLog(CliEventClass.HardError,

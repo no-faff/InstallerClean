@@ -69,7 +69,7 @@ public record OrphanedFile(
     bool IsObsoleted,
     string Reason)
 {
-    public string FileName => Path.GetFileName(FullPath);
+    public string FileName => PathText.GetFileName(FullPath);
     public string SizeDisplay => DisplayHelpers.FormatSize(SizeBytes);
 
     /// <summary>

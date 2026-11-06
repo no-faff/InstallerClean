@@ -38,11 +38,11 @@ public class MoveSpaceCheckMountPointTests(ITestOutputHelper output)
     private const long FreeSpaceTolerance = 1024 * 1024;
 
     private static string MountFolder =>
-        Path.TrimEndingDirectorySeparator(Path.GetFullPath(
+        PathText.TrimEndingDirectorySeparator(Path.GetFullPath(
             Environment.GetEnvironmentVariable(MountedVolumeFactAttribute.FolderVariable)!));
 
     private static string BesideFolder =>
-        Path.TrimEndingDirectorySeparator(Path.GetFullPath(
+        PathText.TrimEndingDirectorySeparator(Path.GetFullPath(
             Environment.GetEnvironmentVariable(MountedVolumeFactAttribute.BesideVariable)!));
 
     private static long MountedFreeBytes =>

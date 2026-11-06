@@ -150,7 +150,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
             var patches = items
                 .Where(p => p.LocalPackagePath.EndsWith(".msp", StringComparison.OrdinalIgnoreCase))
                 .Select(p => new PatchRow(
-                    Path.GetFileName(p.LocalPackagePath),
+                    PathText.GetFileName(p.LocalPackagePath),
                     p.LocalPackagePath,
                     DisplayHelpers.FormatSize(p.FileSizeBytes),
                     IsMissing: p.IsMissingFromDisk))
@@ -165,7 +165,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
             {
                 products.Add(new ProductRow(
                     productName,
-                    Path.GetFileName(msi.LocalPackagePath),
+                    PathText.GetFileName(msi.LocalPackagePath),
                     msi.LocalPackagePath,
                     DisplayHelpers.FormatSize(msi.FileSizeBytes),
                     msi.FileSizeBytes,
@@ -186,7 +186,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                 {
                     products.Add(new ProductRow(
                         productName,
-                        Path.GetFileName(extra.LocalPackagePath),
+                        PathText.GetFileName(extra.LocalPackagePath),
                         extra.LocalPackagePath,
                         DisplayHelpers.FormatSize(extra.FileSizeBytes),
                         extra.FileSizeBytes,
@@ -256,7 +256,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         {
             products.Add(new ProductRow(
                 ProductName: string.Empty,
-                Path.GetFileName(file.FullPath),
+                PathText.GetFileName(file.FullPath),
                 file.FullPath,
                 DisplayHelpers.FormatSize(file.SizeBytes),
                 file.SizeBytes,

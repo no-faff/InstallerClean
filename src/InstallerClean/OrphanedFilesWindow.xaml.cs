@@ -128,7 +128,7 @@ public partial class OrphanedFilesWindow : Window
     /// Any OTHER IComparer, which is what CustomSort takes, falls to the plain
     /// ArrayList.Sort branch with no cache at all. So replacing this with a typed
     /// comparer would trade one read per row for two reads per comparison, and
-    /// FileName is a Path.GetFileName over the full path, which the comparer
+    /// FileName is a PathText.GetFileName over the full path, which the comparer
     /// would then run on every comparison rather than once per row.
     ///
     /// What is left after that is culture-aware collation, which costs the same

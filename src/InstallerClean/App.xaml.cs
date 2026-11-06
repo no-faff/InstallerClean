@@ -941,7 +941,7 @@ public partial class App : Application
         var info = new ProcessStartInfo(fileToStart, arguments)
         {
             UseShellExecute = false,
-            WorkingDirectory = Path.GetDirectoryName(fileToStart) ?? string.Empty,
+            WorkingDirectory = PathText.GetDirectoryName(fileToStart) ?? string.Empty,
         };
 
         try

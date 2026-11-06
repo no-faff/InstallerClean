@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using InstallerClean.Helpers;
 
 namespace InstallerClean.Services;
 
@@ -23,7 +24,7 @@ internal static class CreatedFolders
         string folder;
         try
         {
-            folder = fileSystem.Path.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(destination));
+            folder = PathText.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(destination));
         }
         catch
         {
@@ -32,7 +33,7 @@ internal static class CreatedFolders
         }
         while (!string.IsNullOrEmpty(folder) && !fileSystem.Directory.Exists(folder))
         {
-            var parent = fileSystem.Path.GetDirectoryName(folder);
+            var parent = PathText.GetDirectoryName(folder);
             if (string.IsNullOrEmpty(parent)) break;
             missing.Add(folder);
             folder = parent;
@@ -107,7 +108,7 @@ internal static class CreatedFolders
         try
         {
             if (folders.Count == 0) return;
-            var existingAncestor = fileSystem.Path.GetDirectoryName(folders[^1]);
+            var existingAncestor = PathText.GetDirectoryName(folders[^1]);
             if (string.IsNullOrEmpty(existingAncestor)) return;
 
             foreach (var folder in folders)

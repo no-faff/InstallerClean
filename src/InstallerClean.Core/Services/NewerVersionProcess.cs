@@ -68,7 +68,7 @@ internal static class NewerVersionProcess
             var info = new ProcessStartInfo(file)
             {
                 UseShellExecute = false,
-                WorkingDirectory = Path.GetDirectoryName(file) ?? string.Empty,
+                WorkingDirectory = PathText.GetDirectoryName(file) ?? string.Empty,
             };
             foreach (var argument in argumentsFor(id)) info.ArgumentList.Add(argument);
             Process newer;

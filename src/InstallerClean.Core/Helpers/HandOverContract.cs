@@ -191,7 +191,7 @@ internal static class HandOverContract
                 command.Add(arg);
             if (twice) return ReplaceRead.Refused;
         }
-        if (exePath is null || !Path.IsPathFullyQualified(exePath)
+        if (exePath is null || !PathText.IsPathFullyQualified(exePath)
             || !int.TryParse(processId, System.Globalization.NumberStyles.None,
                 System.Globalization.CultureInfo.InvariantCulture, out var id) || id <= 0
             || !Guid.TryParseExact(startedEvent, "N", out _))

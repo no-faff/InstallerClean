@@ -122,7 +122,7 @@ internal static unsafe class SystemLibraries
         var loadLibraryEx = s_loadLibraryEx;
         if (loadLibraryEx == null)
         {
-            var kernel32 = Path.Combine(Environment.SystemDirectory, "kernel32.dll");
+            var kernel32 = PathText.Combine(Environment.SystemDirectory, "kernel32.dll");
             if (!NativeLibrary.TryLoad(kernel32, out var module)
                 || !NativeLibrary.TryGetExport(module, "LoadLibraryExW", out var export))
                 throw new DllNotFoundException($"{libraryName} could not be loaded: kernel32's LoadLibraryExW is not there.");

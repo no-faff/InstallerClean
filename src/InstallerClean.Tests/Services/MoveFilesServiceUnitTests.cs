@@ -507,7 +507,7 @@ public class MoveFilesServiceUnitTests
     {
         var fs = Substitute.For<IFileSystem>();
         // MockFileSystem's Path is a working implementation; a bare substitute
-        // returns an empty string from Combine and GetRandomFileName.
+        // returns an empty string from GetFullPath and GetRandomFileName.
         fs.Path.Returns(new MockFileSystem().Path);
         // The service creates the destination folder through IFileSystem.Directory
         // before the loop. A bare IFileSystem substitute returns null there, so the

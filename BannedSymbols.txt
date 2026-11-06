@@ -5,3 +5,21 @@
 // build with RS0030.
 M:Microsoft.Win32.RegistryKey.GetSubKeyNames;Use RegistryNames.SubKeysOf, which lists the key as .NET 10 does
 M:Microsoft.Win32.RegistryKey.GetValueNames;Use RegistryNames.ValuesOf, which lists the key as .NET 10 does
+M:System.IO.Path.Combine(System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does
+M:System.IO.Path.Combine(System.String,System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does
+M:System.IO.Path.Combine(System.String,System.String,System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does
+M:System.IO.Path.Combine(System.String[]);Use PathText.Combine, which joins the parts as .NET 10 does
+M:System.IO.Path.GetDirectoryName(System.String);Use PathText.GetDirectoryName, which reads the path as .NET 10 does
+M:System.IO.Path.GetExtension(System.String);Use PathText.GetExtension, which reads the path as .NET 10 does
+M:System.IO.Path.GetFileName(System.String);Use PathText.GetFileName, which reads the path as .NET 10 does
+M:System.IO.Path.GetFileNameWithoutExtension(System.String);Use PathText.GetFileNameWithoutExtension, which reads the path as .NET 10 does
+M:System.IO.Path.IsPathRooted(System.String);Use PathText.IsPathRooted, which reads the path as .NET 10 does
+M:System.IO.Abstractions.IPath.Combine(System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does
+M:System.IO.Abstractions.IPath.Combine(System.String,System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does
+M:System.IO.Abstractions.IPath.Combine(System.String,System.String,System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does
+M:System.IO.Abstractions.IPath.Combine(System.String[]);Use PathText.Combine, which joins the parts as .NET 10 does
+M:System.IO.Abstractions.IPath.GetDirectoryName(System.String);Use PathText.GetDirectoryName, which reads the path as .NET 10 does
+M:System.IO.Abstractions.IPath.GetExtension(System.String);Use PathText.GetExtension, which reads the path as .NET 10 does
+M:System.IO.Abstractions.IPath.GetFileName(System.String);Use PathText.GetFileName, which reads the path as .NET 10 does
+M:System.IO.Abstractions.IPath.GetFileNameWithoutExtension(System.String);Use PathText.GetFileNameWithoutExtension, which reads the path as .NET 10 does
+M:System.IO.Abstractions.IPath.IsPathRooted(System.String);Use PathText.IsPathRooted, which reads the path as .NET 10 does

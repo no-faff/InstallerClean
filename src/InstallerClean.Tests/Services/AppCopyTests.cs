@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using NSubstitute;
+using InstallerClean.Helpers;
 using InstallerClean.Services;
 
 namespace InstallerClean.Tests.Services;
@@ -242,7 +243,7 @@ public class AppCopyTests
         var record = AppCopy.ReadSetupRecord(registry);
 
         Assert.Equal(SetupRecordState.Folder, record.State);
-        Assert.Equal(Path.TrimEndingDirectorySeparator(Path.GetFullPath(ProgramFilesFolder + @"\")), record.Folder);
+        Assert.Equal(PathText.TrimEndingDirectorySeparator(Path.GetFullPath(ProgramFilesFolder + @"\")), record.Folder);
     }
 
     [Fact]

@@ -572,7 +572,7 @@ internal static class ExeReplacement
             if (File.Exists(path)) DeletePlainFile(path);
             using var input = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var handle = StorageHelpers.OpenAtomic(path, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateNew)
-                ?? throw new IOException($"The file ending {Path.GetExtension(path)} could not be created.");
+                ?? throw new IOException($"The file ending {PathText.GetExtension(path)} could not be created.");
             created = true;
             using var output = new FileStream(handle, FileAccess.Write, bufferSize: 0);
             input.CopyTo(output);
@@ -684,7 +684,7 @@ internal static class ExeReplacement
             var info = new ProcessStartInfo(exePath)
             {
                 UseShellExecute = false,
-                WorkingDirectory = Path.GetDirectoryName(exePath) ?? string.Empty,
+                WorkingDirectory = PathText.GetDirectoryName(exePath) ?? string.Empty,
             };
             info.ArgumentList.Add(HandOverContract.UpdateFailedSwitch);
             ProcessStartRetry.Start(info, _ => true, interval => Thread.Sleep(interval)).Dispose();
@@ -751,14 +751,14 @@ internal static class ExeReplacement
     /// </summary>
     internal static List<string>? SetupDoneCopies(string exePath)
     {
-        var folder = Path.GetDirectoryName(exePath)!;
-        var stem = Path.GetFileName(exePath) + SetupDoneSuffix;
+        var folder = PathText.GetDirectoryName(exePath)!;
+        var stem = PathText.GetFileName(exePath) + SetupDoneSuffix;
         var found = new List<string>();
         try
         {
             foreach (var path in Directory.EnumerateFiles(folder, stem + "*"))
             {
-                var rest = Path.GetFileName(path)[stem.Length..];
+                var rest = PathText.GetFileName(path)[stem.Length..];
                 if (rest.Length == 0 || (rest.Length > 1 && rest[0] == '-' && rest[1..].All(char.IsAsciiDigit)))
                     found.Add(path);
             }
@@ -781,7 +781,7 @@ internal static class ExeReplacement
     {
         if (!TryDelete(path, out var error))
             CrashLog.TryWrite(new IOException(
-                $"The name ending {Path.GetExtension(path)} beside the exe could not be deleted, with error {error}, and is left there."));
+                $"The name ending {PathText.GetExtension(path)} beside the exe could not be deleted, with error {error}, and is left there."));
     }
 
     /// <summary>
@@ -794,7 +794,7 @@ internal static class ExeReplacement
     /// </summary>
     private static bool TryDelete(string path, out int error)
     {
-        if (DirectoryGuard.TryDiscardChildCopy(Path.GetDirectoryName(path)!, Path.GetFileName(path), out error))
+        if (DirectoryGuard.TryDiscardChildCopy(PathText.GetDirectoryName(path)!, PathText.GetFileName(path), out error))
         {
             error = 0;
             return true;
@@ -814,7 +814,7 @@ internal static class ExeReplacement
         {
             Kernel32.ERROR_REPARSE_POINT_ENCOUNTERED => new NotAPlainFileException(path, "a reparse point"),
             Kernel32.ERROR_DIRECTORY_NOT_SUPPORTED => new NotAPlainFileException(path, "a folder"),
-            _ => new IOException($"The file ending {Path.GetExtension(path)} could not be deleted: error {error}."),
+            _ => new IOException($"The file ending {PathText.GetExtension(path)} could not be deleted: error {error}."),
         };
     }
 
@@ -823,7 +823,7 @@ internal static class ExeReplacement
     /// folder, or a reparse point, which it never follows.
     /// </summary>
     private sealed class NotAPlainFileException(string path, string found)
-        : IOException($"The name ending {Path.GetExtension(path)} is {found}, not a plain file.");
+        : IOException($"The name ending {PathText.GetExtension(path)} is {found}, not a plain file.");
 }
 
 /// <summary>How a replace (<see cref="ExeReplacement.Run(ReplaceRequest, bool)"/>) ended.</summary>

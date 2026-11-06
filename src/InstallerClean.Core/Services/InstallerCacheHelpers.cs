@@ -76,7 +76,7 @@ internal enum PathResolution
 internal static class InstallerCacheHelpers
 {
     internal static readonly string InstallerFolder =
-        Path.Combine(KnownFolders.GetPath(Environment.SpecialFolder.Windows), "Installer");
+        PathText.Combine(KnownFolders.GetPath(Environment.SpecialFolder.Windows), "Installer");
 
     /// <summary>
     /// True if <paramref name="path"/> resolves to <c>C:\Windows\Installer</c>
@@ -154,7 +154,7 @@ internal static class InstallerCacheHelpers
         var input = resolvedInput
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-        var parent = Path.GetDirectoryName(input);
+        var parent = PathText.GetDirectoryName(input);
         return parent is not null
             && parent.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 .Equals(root.Resolved, StringComparison.OrdinalIgnoreCase);
@@ -212,7 +212,7 @@ internal static class InstallerCacheHelpers
 
         // The parent as ResolvesDirectlyInInstallerFolder takes it. A path with no
         // parent is a volume or a share root, which is no file in any folder.
-        var folder = Path.GetDirectoryName(
+        var folder = PathText.GetDirectoryName(
             resolved.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
         if (string.IsNullOrEmpty(folder)) return false;
 
@@ -240,7 +240,7 @@ internal static class InstallerCacheHelpers
 
         // One trailing separator comes off, and none comes off a volume or share root: "C:\"
         // without it is "C:", which names the current folder on that drive rather than its root.
-        var input = Path.TrimEndingDirectorySeparator(resolved);
+        var input = PathText.TrimEndingDirectorySeparator(resolved);
         if (input.Equals(root.Resolved, StringComparison.OrdinalIgnoreCase)) return true;
 
         return OpensAsTheRoot(input, root, identities);
@@ -414,7 +414,7 @@ internal static class InstallerCacheHelpers
         var probe = normalised;
         while (probe.Length > 0 && !Directory.Exists(probe) && !File.Exists(probe))
         {
-            var parent = Path.GetDirectoryName(probe);
+            var parent = PathText.GetDirectoryName(probe);
             if (string.IsNullOrEmpty(parent) || parent == probe)
                 return PathResolution.NoExistingAncestor;
             probe = parent;
@@ -449,13 +449,13 @@ internal static class InstallerCacheHelpers
             var final = StripLongPathPrefix(new string(buffer, 0, (int)length));
 
             // Reattach the not-yet-created suffix to the resolved root.
-            // Path.Combine handles the separator boundary; probe = "C:\"
+            // PathText.Combine handles the separator boundary; probe = "C:\"
             // gives a suffix without a leading separator, others with.
             if (probe.Length < normalised.Length)
             {
                 var suffix = normalised.Substring(probe.Length)
                     .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                final = Path.Combine(final, suffix);
+                final = PathText.Combine(final, suffix);
             }
 
             resolved = final;
@@ -513,7 +513,7 @@ internal static class InstallerCacheHelpers
 
     /// <summary>
     /// True where the span opens with a drive letter and a colon. Deliberately
-    /// narrower than <see cref="Path.IsPathRooted(string)"/>, which counts a bare
+    /// narrower than <see cref="PathText.IsPathRooted(string)"/>, which counts a bare
     /// leading separator as rooted: <c>\Windows\Installer\9f05cba.msi</c> is
     /// rooted on whichever drive the process happens to be running from, and an
     /// answer that moves with the process is the one thing the caller above is

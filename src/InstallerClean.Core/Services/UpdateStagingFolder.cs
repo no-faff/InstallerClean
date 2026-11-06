@@ -51,7 +51,7 @@ public sealed class UpdateStagingFolder
         _root = root;
         _leaf = leaf;
         _id = id;
-        FullPath = Path.Combine(root, leaf);
+        FullPath = PathText.Combine(root, leaf);
         Handle = handle;
     }
 
@@ -199,7 +199,7 @@ public sealed class UpdateStagingFolder
             var allGone = true;
             foreach (var folder in Directory.EnumerateDirectories(root, NamePrefix + "*"))
             {
-                var leaf = Path.GetFileName(folder);
+                var leaf = PathText.GetFileName(folder);
                 try
                 {
                     if (!IsOurName(leaf)) continue;
@@ -222,7 +222,7 @@ public sealed class UpdateStagingFolder
                     var cleared = true;
                     foreach (var file in Directory.EnumerateFiles(folder, "InstallerClean-*.exe"))
                     {
-                        if (!DirectoryGuard.TryRemoveChildFile(folderHandle, Path.GetFileName(file)))
+                        if (!DirectoryGuard.TryRemoveChildFile(folderHandle, PathText.GetFileName(file)))
                             cleared = false;
                     }
 

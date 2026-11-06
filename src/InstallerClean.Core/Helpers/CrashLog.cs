@@ -88,7 +88,7 @@ public static class CrashLog
         {
             try
             {
-                return Path.Combine(LogFolder, FileName);
+                return PathText.Combine(LogFolder, FileName);
             }
             catch (Exception)
             {
@@ -109,7 +109,7 @@ public static class CrashLog
         try
         {
             var folder = LogFolder;
-            path = Path.Combine(folder, FileName);
+            path = PathText.Combine(folder, FileName);
             Directory.CreateDirectory(folder);
             RotateIfNeeded(path, path + ArchiveSuffix);
 

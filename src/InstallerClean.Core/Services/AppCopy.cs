@@ -1,3 +1,5 @@
+using InstallerClean.Helpers;
+
 namespace InstallerClean.Services;
 
 /// <summary>
@@ -95,7 +97,7 @@ public readonly record struct SetupRecord
     /// </summary>
     public static SetupRecord At(string? installLocation) =>
         !string.IsNullOrWhiteSpace(installLocation)
-        && Path.IsPathFullyQualified(installLocation)
+        && PathText.IsPathFullyQualified(installLocation)
         && AppCopy.Normalise(installLocation) is { } folder
             ? new SetupRecord(SetupRecordState.Folder, folder)
             : CannotTell;
@@ -221,7 +223,7 @@ public static class AppCopy
 #endif
         return DecideCommandLine(
             IsSingleFileBuild(),
-            Path.GetDirectoryName(exePath) ?? string.Empty,
+            PathText.GetDirectoryName(exePath) ?? string.Empty,
             ReadSetupRecord(registry));
     }
 
@@ -243,7 +245,7 @@ public static class AppCopy
         return Decide(
             IsSingleFileBuild(),
             isSelfContained,
-            Path.GetDirectoryName(exePath) ?? string.Empty,
+            PathText.GetDirectoryName(exePath) ?? string.Empty,
             ReadSetupRecord(registry),
             File.Exists);
     }
@@ -343,13 +345,13 @@ public static class AppCopy
         string commonApplicationData)
     {
         if (Normalise(exeFolder) is not { } versionFolder) return null;
-        var nameFolder = Path.GetDirectoryName(versionFolder);
-        var appsFolder = nameFolder is null ? null : Path.GetDirectoryName(nameFolder);
-        var root = appsFolder is null ? null : Path.GetDirectoryName(appsFolder);
+        var nameFolder = PathText.GetDirectoryName(versionFolder);
+        var appsFolder = nameFolder is null ? null : PathText.GetDirectoryName(nameFolder);
+        var root = appsFolder is null ? null : PathText.GetDirectoryName(appsFolder);
         if (nameFolder is null || appsFolder is null || root is null) return null;
-        if (!string.Equals(Path.GetFileName(appsFolder), "apps", StringComparison.OrdinalIgnoreCase)) return null;
+        if (!string.Equals(PathText.GetFileName(appsFolder), "apps", StringComparison.OrdinalIgnoreCase)) return null;
 
-        var name = Path.GetFileName(nameFolder);
+        var name = PathText.GetFileName(nameFolder);
         if (!ScoopAppName.IsMatch(name)) return null;
 
         var isGlobal = ResolveScoopGlobalRoot(variable, readConfig, commonApplicationData) is { } globalRoot
@@ -384,13 +386,13 @@ public static class AppCopy
             {
                 var profile = variable("USERPROFILE");
                 if (string.IsNullOrEmpty(profile)) return null;
-                configHome = Path.Combine(profile, ".config");
+                configHome = PathText.Combine(profile, ".config");
             }
 
             string? text;
             try
             {
-                text = readConfig(Path.Combine(configHome, "scoop", "config.json"));
+                text = readConfig(PathText.Combine(configHome, "scoop", "config.json"));
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
             {
@@ -417,10 +419,10 @@ public static class AppCopy
                 }
             }
 
-            if (string.IsNullOrEmpty(chosen)) chosen = Path.Combine(commonApplicationData, "scoop");
+            if (string.IsNullOrEmpty(chosen)) chosen = PathText.Combine(commonApplicationData, "scoop");
         }
 
-        return Path.IsPathFullyQualified(chosen) ? Normalise(chosen) : null;
+        return PathText.IsPathFullyQualified(chosen) ? Normalise(chosen) : null;
     }
 
     /// <summary>
@@ -467,7 +469,7 @@ public static class AppCopy
     {
         try
         {
-            return Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
+            return PathText.TrimEndingDirectorySeparator(Path.GetFullPath(path));
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
         {
@@ -483,7 +485,7 @@ public static class AppCopy
     /// </summary>
     private static bool IsScoopFolder(string folder, Func<string, bool> fileExists)
     {
-        bool Has(string name) => fileExists(Path.Combine(folder, name));
+        bool Has(string name) => fileExists(PathText.Combine(folder, name));
         return (Has("scoop-manifest.json") || Has("manifest.json"))
             && (Has("scoop-install.json") || Has("install.json"));
     }
