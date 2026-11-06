@@ -15,6 +15,9 @@
   -->
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
+    <!-- C# 14's extension members are how Compatibility/ gives .NET Framework the .NET 10
+         members the code calls, static ones such as char.IsAsciiDigit included. Every project
+         that calls them needs 14 too. -->
     <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
