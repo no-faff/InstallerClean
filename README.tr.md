@@ -40,7 +40,7 @@
 - **Ne kadar yer:** Yukarıdaki grafik, uygulamadan gönderilen isteğe bağlı raporların sonuçlarını gösteriyor (herkese teşekkürler). Yer açan raporların oranı <!-- reports-freedpct-start -->%59<!-- reports-freedpct-end -->; bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Bunlar, muhtemelen varlığından haberiniz bile olmayan, öylece yer kaplayan dosyalar. *Tüm* makinelerin <!-- reports-over5gb-start -->%21,7<!-- reports-over5gb-end --> kadarı 5 GB üzerinde yer kazandı, birçok kişi de yüzlerce GB açtı. Özetle, ne kadar çok MSI tabanlı yazılım kurarsanız o kadar çok gereksiz dosyanız olur. InstallerClean'i çalıştırdığınız anda öğrenirsiniz.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Görmek için tıklayın</kbd>: raporlar 130.450 indirmenin tamamının birebir bir yansıması olsaydı grafik nasıl görünürdü</summary>
+  <summary><kbd>Görmek için tıklayın</kbd>: raporlar 130.679 indirmenin tamamının birebir bir yansıması olsaydı grafik nasıl görünürdü</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-tr-scaled-dark.svg" />

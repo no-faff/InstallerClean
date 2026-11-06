@@ -40,7 +40,7 @@
 - **Hoeveel ruimte:** De grafiek hierboven toont de uitkomsten van de optionele rapporten die via de app zijn verstuurd (bedankt allemaal). Van de <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> die ruimte heeft vrijgemaakt, is de mediaan van wat er vrijkwam <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Dat zijn bestanden waarvan je waarschijnlijk niet wist dat ze bestonden en die alleen maar ruimte innemen. <!-- reports-over5gb-start -->21,7%<!-- reports-over5gb-end --> van *alle* machines haalde er meer dan 5 GB uit, en veel mensen maakten honderden GB vrij. Kort gezegd: hoe meer MSI-software je installeert, hoe meer overbodige bestanden je krijgt. Zodra je InstallerClean draait, weet je het.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Klik om te zien</kbd> hoe de grafiek eruit zou zien als de rapporten een exact beeld gaven van alle 130.450 downloads</summary>
+  <summary><kbd>Klik om te zien</kbd> hoe de grafiek eruit zou zien als de rapporten een exact beeld gaven van alle 130.679 downloads</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-nl-scaled-dark.svg" />

@@ -42,7 +42,7 @@
 - **كم من المساحة:** يعرض الرسم البياني أعلاه نتائج التقارير الاختيارية المُرسَلة عبر التطبيق (شكراً للجميع). ومن بين الـ <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> التي حرَّرت مساحة، بلغ الوسيط المُحرَّر <!-- reports-median-start -->1.7 GB<!-- reports-median-end -->. إنها ملفات ربما لم تكن تعرف بوجودها، وهي قابعة هناك تشغل المساحة فحسب. واستعاد <!-- reports-over5gb-start -->21.7%<!-- reports-over5gb-end --> من *كل* الأجهزة أكثر من 5 GB، وحرَّر كثيرون مئات الجيجابايت. باختصار، كلما ثبّتَّ برامج أكثر قائمة على MSI، زادت الملفات غير الضرورية لديك. وستعرف ذلك فور تشغيل InstallerClean.
   <!-- reports-scaled-start -->
   <details dir="rtl">
-  <summary><kbd>انقر لترى</kbd> كيف سيبدو الرسم البياني لو كانت التقارير صورة دقيقة لكل التنزيلات (وعددها 130,450)</summary>
+  <summary><kbd>انقر لترى</kbd> كيف سيبدو الرسم البياني لو كانت التقارير صورة دقيقة لكل التنزيلات (وعددها 130,679)</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ar-scaled-dark.svg" />

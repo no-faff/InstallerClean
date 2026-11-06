@@ -40,7 +40,7 @@
 - **Quanto spazio:** Il grafico qui sopra mostra i risultati dei rapporti facoltativi inviati dall'app (grazie a tutti). Del <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> che ha liberato spazio, la mediana liberata è di <!-- reports-median-start -->1,7 GB<!-- reports-median-end -->. Sono file di cui probabilmente non conoscevi l'esistenza e che stanno lì a occupare spazio. Il <!-- reports-over5gb-start -->21,7%<!-- reports-over5gb-end --> di *tutti* i computer ha recuperato più di 5 GB, e molte persone hanno liberato centinaia di GB. In sostanza, più software basato su MSI installi, più file non necessari avrai. Appena esegui InstallerClean, lo scoprirai.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>Clicca per vedere</kbd> come sarebbe il grafico se i rapporti fossero un'immagine esatta di tutti i 130.450 download</summary>
+  <summary><kbd>Clicca per vedere</kbd> come sarebbe il grafico se i rapporti fossero un'immagine esatta di tutti i 130.679 download</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-it-scaled-dark.svg" />
