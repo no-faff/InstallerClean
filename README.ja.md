@@ -37,10 +37,10 @@
 
 - **概要：** InstallerClean がすることは 1 つだけです。ソフトウェアをインストールしたり更新したりするたびに膨らんでいく隠しフォルダー `C:\Windows\Installer` から、不要なファイルを取り除きます。ほぼ一瞬で終わるスキャンのあと、不要なファイルがあるかどうかを知らせ、詳しく知りたい人にはさらに詳細を示し、それらを別の場所へ移動するか削除して C: ドライブの空き容量を増やせるようにします。
 - **こんな覚えはありませんか：** [WinDirStat](https://github.com/windirstat/windirstat)、WizTree、TreeSize などを使っていて、`C:\Windows\Installer` が大量の容量を占めているのに気づいたものの、中に何が入っているのか分からなかった。InstallerClean は、まさにそんなあなたのためのツールです。`9f05cba.msi` のような一見ランダムな名前のファイルの中身を把握していて、どれなら安全に取り除けるのかをすぐに教えてくれます。
-- **どれくらい空くか：** 上のグラフは、アプリから送られた任意のレポートの結果です（みなさん、ありがとうございます）。レポートのうち容量を解放できたのは <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> で、その中央値は <!-- reports-median-start -->1.7 GB<!-- reports-median-end --> です。おそらく存在すら知らなかったファイルが、ただ場所を取っているのです。*すべて*のマシンのうち <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end --> が 5 GB を超える容量を取り戻し、数百 GB を解放した人もたくさんいます。要するに、MSI ベースのソフトを入れるほど、不要なファイルは増えます。InstallerClean を実行すれば、すぐにわかります。
+- **どれくらい空くか：** 上のグラフは、アプリから送られた任意のレポートの結果です（みなさん、ありがとうございます）。レポートのうち容量を解放できたのは <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> で、その中央値は <!-- reports-median-start -->1.7 GB<!-- reports-median-end --> です。おそらく存在すら知らなかったファイルが、ただ場所を取っているのです。*すべて*のマシンのうち <!-- reports-over5gb-start -->21.7%<!-- reports-over5gb-end --> が 5 GB を超える容量を取り戻し、数百 GB を解放した人もたくさんいます。要するに、MSI ベースのソフトを入れるほど、不要なファイルは増えます。InstallerClean を実行すれば、すぐにわかります。
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>クリックして表示</kbd> レポートが全 130,004 回のダウンロードを正確に映していたら、グラフはどう見えるか</summary>
+  <summary><kbd>クリックして表示</kbd> レポートが全 130,450 回のダウンロードを正確に映していたら、グラフはどう見えるか</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ja-scaled-dark.svg" />

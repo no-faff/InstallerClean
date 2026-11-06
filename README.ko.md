@@ -37,10 +37,10 @@
 
 - **개요:** InstallerClean은 한 가지 일만 합니다. 소프트웨어를 설치하고 업데이트하는 동안 점점 차오르는 숨겨진 폴더 `C:\Windows\Installer`에서 불필요한 파일을 제거합니다. 빠른 검사를 마치면 그런 파일이 있는지 알려 주고, 궁금한 분께는 더 자세한 내용을 보여 주며, 그 파일을 다른 곳으로 옮기거나 삭제해 C: 드라이브 공간을 확보할 수 있게 합니다.
 - **이래서 오셨을지도 모릅니다:** [WinDirStat](https://github.com/windirstat/windirstat)나 WizTree, TreeSize를 써 보니 `C:\Windows\Installer`가 공간을 많이 차지하고 있는데, 그 안에 무엇이 들어 있는지는 알 수 없으셨을 겁니다. 그렇다면 InstallerClean이 바로 필요한 도구입니다. `9f05cba.msi`처럼 알 수 없는 이름의 파일 안에 무엇이 들어 있는지 알고 있어서, 어느 것을 안전하게 제거할 수 있는지 빠르게 알려 줍니다.
-- **얼마나 비워지나:** 위 그래프는 앱에서 보낸 선택적 보고서의 결과입니다(모두 감사합니다). 공간을 확보한 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 가운데, 확보된 공간의 중앙값은 <!-- reports-median-start -->1.7GB<!-- reports-median-end -->입니다. 아마 있는 줄도 몰랐을 파일들이 그냥 자리만 차지하고 있던 것입니다. *전체* 컴퓨터의 <!-- reports-over5gb-start -->21.6%<!-- reports-over5gb-end -->가 5GB 넘게 되찾았고, 수백 GB를 비운 분도 많습니다. 요컨대 MSI 기반 소프트웨어를 많이 설치할수록 불필요한 파일도 많아집니다. InstallerClean을 실행하는 순간 알게 됩니다.
+- **얼마나 비워지나:** 위 그래프는 앱에서 보낸 선택적 보고서의 결과입니다(모두 감사합니다). 공간을 확보한 <!-- reports-freedpct-start -->59%<!-- reports-freedpct-end --> 가운데, 확보된 공간의 중앙값은 <!-- reports-median-start -->1.7GB<!-- reports-median-end -->입니다. 아마 있는 줄도 몰랐을 파일들이 그냥 자리만 차지하고 있던 것입니다. *전체* 컴퓨터의 <!-- reports-over5gb-start -->21.7%<!-- reports-over5gb-end -->가 5GB 넘게 되찾았고, 수백 GB를 비운 분도 많습니다. 요컨대 MSI 기반 소프트웨어를 많이 설치할수록 불필요한 파일도 많아집니다. InstallerClean을 실행하는 순간 알게 됩니다.
   <!-- reports-scaled-start -->
   <details>
-  <summary><kbd>클릭해서 보기</kbd> 보고서가 전체 다운로드 130,004건을 정확히 반영한다면 그래프가 어떻게 보일지</summary>
+  <summary><kbd>클릭해서 보기</kbd> 보고서가 전체 다운로드 130,450건을 정확히 반영한다면 그래프가 어떻게 보일지</summary>
   <p align="center">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ko-scaled-dark.svg" />
