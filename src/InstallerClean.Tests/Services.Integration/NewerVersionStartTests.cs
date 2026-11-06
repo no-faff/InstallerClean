@@ -115,7 +115,7 @@ public sealed class NewerVersionStartTests : IDisposable
         var answer = NewerVersionProcess.AwaitStart(newer, started, bound, cancel: null, out var waitError);
 
         Assert.Equal(NewerVersionStart.Ended, answer);
-        Assert.True(clock.Elapsed < bound / 2, $"The wait took {clock.Elapsed}.");
+        Assert.True(clock.Elapsed < Durations.Times(bound, 0.5), $"The wait took {clock.Elapsed}.");
         Assert.Contains("exit code 7", NewerVersionProcess.NotStartedFailure(answer, waitError, newer, bound).Message);
         Assert.True(NewerVersionProcess.EndNewerVersion(newer));
     }

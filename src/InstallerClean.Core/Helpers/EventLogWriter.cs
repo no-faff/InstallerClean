@@ -62,7 +62,7 @@ internal static class EventLogWriter
     {
         var registeredAt = Interlocked.Read(ref _registeredAt);
         if (registeredAt == 0) return TimeSpan.Zero;
-        var left = RegistrationSettleBound - Stopwatch.GetElapsedTime(registeredAt);
+        var left = RegistrationSettleBound - Durations.Since(registeredAt);
         return left > TimeSpan.Zero ? left : TimeSpan.Zero;
     }
 

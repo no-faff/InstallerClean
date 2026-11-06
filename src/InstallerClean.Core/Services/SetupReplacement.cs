@@ -154,7 +154,7 @@ internal static class SetupReplacement
         var started = System.Diagnostics.Stopwatch.GetTimestamp();
         while (true)
         {
-            var left = bound - System.Diagnostics.Stopwatch.GetElapsedTime(started);
+            var left = bound - Durations.Since(started);
             bool busy;
             using (var instance = new InstanceLock())
             {
@@ -170,7 +170,7 @@ internal static class SetupReplacement
                 }
             }
             if (!busy) return true;
-            left = bound - System.Diagnostics.Stopwatch.GetElapsedTime(started);
+            left = bound - Durations.Since(started);
             if (left <= TimeSpan.Zero) return false;
             Thread.Sleep(RetryInterval < left ? RetryInterval : left);
         }
@@ -212,7 +212,7 @@ internal static class SetupReplacement
                 return FileVersionResource.ReadIfThere(path) is { } carried && FileVersionResource.IsRelease(carried, version);
             }
             catch (IOException ex) when (WindowsErrors.Of(ex) is Kernel32.ERROR_SHARING_VIOLATION or Kernel32.ERROR_LOCK_VIOLATION
-                && System.Diagnostics.Stopwatch.GetElapsedTime(started) < ReadHoldWait)
+                && Durations.Since(started) < ReadHoldWait)
             {
                 Thread.Sleep(100);
             }

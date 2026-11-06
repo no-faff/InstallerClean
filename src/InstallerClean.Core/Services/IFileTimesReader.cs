@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 namespace InstallerClean.Services;
 
 /// <summary>
@@ -179,7 +180,7 @@ public static class CachedFileAge
     /// <see cref="SlowRateAllowance"/> of any pass longer than forty milliseconds, which is
     /// twice this limit divided by the allowance.
     /// </summary>
-    public static readonly TimeSpan NarrowReading = TimeSpan.FromMicroseconds(20);
+    public static readonly TimeSpan NarrowReading = TimeSpan.FromTicks(200);
 
     /// <summary>
     /// How many times <see cref="ReadWallClock"/> takes a reading before it keeps the
@@ -198,8 +199,8 @@ public static class CachedFileAge
     /// behind the time that passed by however long ago that tick was, at each reading. The
     /// precise time moves between ticks with the monotonic clock, so the two keep pace
     /// wherever the system clock is not stepped or slewed. A clock that is not a
-    /// <see cref="IPreciseWallClock"/> answers with its own time, which for
-    /// <see cref="TimeProvider.System"/> is the precise time.
+    /// <see cref="IPreciseWallClock"/> answers with its own time; both hosts give the scan
+    /// and the check before a Move or Delete <see cref="FileStampClock"/>.
     ///
     /// UP TO <see cref="WallClockTries"/> READINGS, keeping the first no wider than
     /// <see cref="NarrowReading"/>, or else the narrowest. Every gap between the wall clock
@@ -258,7 +259,7 @@ public static class CachedFileAge
     {
         var elapsed = clock.GetElapsedTime(atStart.TimestampBefore, atEnd.TimestampAfter);
         var wallAdvance = atEnd.Wall - atStart.Wall;
-        var allowed = elapsed * SlowRateAllowance;
+        var allowed = Durations.Times(elapsed, SlowRateAllowance);
         if (allowed > FallBehindLimit) allowed = FallBehindLimit;
         return elapsed - wallAdvance > allowed;
     }

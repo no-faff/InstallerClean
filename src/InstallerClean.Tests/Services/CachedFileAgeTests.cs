@@ -218,6 +218,19 @@ public class CachedFileAgeTests
         Assert.Equal(wentBack, ClockWentBack(clock));
     }
 
+    // Forty milliseconds: a thousandth of it is four hundred ticks, a fraction of a
+    // millisecond, which the allowance keeps.
+    [Theory]
+    [InlineData(400, false)]
+    [InlineData(401, true)]
+    public void In_a_short_pass_the_allowance_is_kept_to_the_tick(long behindTicks, bool wentBack)
+    {
+        var elapsed = TimeSpan.FromMilliseconds(40);
+        var clock = new SteppingClock(Clock, elapsed - TimeSpan.FromTicks(behindTicks), elapsed);
+
+        Assert.Equal(wentBack, ClockWentBack(clock));
+    }
+
     [Fact]
     public void The_allowance_is_a_thousandth_of_the_time_that_passed()
     {
@@ -304,7 +317,7 @@ public class CachedFileAgeTests
     [Fact]
     public void A_reading_is_kept_at_once_where_it_took_no_longer_than_twenty_microseconds()
     {
-        Assert.Equal(TimeSpan.FromMicroseconds(20), CachedFileAge.NarrowReading);
+        Assert.Equal(200, CachedFileAge.NarrowReading.Ticks);
         Assert.Equal(16, CachedFileAge.WallClockTries);
     }
 

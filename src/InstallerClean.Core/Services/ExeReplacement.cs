@@ -466,10 +466,11 @@ internal static class ExeReplacement
         {
             var step = attempt();
             if (step != RetryStep.Again) return step == RetryStep.Done;
-            var left = bound - Stopwatch.GetElapsedTime(started);
+            var left = bound - Durations.Since(started);
             if (left <= TimeSpan.Zero) return false;
             Thread.Sleep(interval < left ? interval : left);
-            interval = interval * 2 < LongestRetryInterval ? interval * 2 : LongestRetryInterval;
+            var doubled = Durations.Times(interval, 2);
+            interval = doubled < LongestRetryInterval ? doubled : LongestRetryInterval;
         }
     }
 

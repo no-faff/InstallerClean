@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Text.RegularExpressions;
+using InstallerClean.Helpers;
 using InstallerClean.Interop;
 using InstallerClean.Models;
 using InstallerClean.Services;
@@ -8553,7 +8554,7 @@ public class DeclaredProductCheckTests
                 });
 
         Assert.NotNull(sinceBStarted);
-        Assert.True(sinceBStarted.Elapsed < threshold / 2, $"B's read went on for {sinceBStarted.Elapsed} after it started");
+        Assert.True(sinceBStarted.Elapsed < Durations.Times(threshold, 0.5), $"B's read went on for {sinceBStarted.Elapsed} after it started");
         Assert.Equal(
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
             screening.Outcomes);
