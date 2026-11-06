@@ -1828,6 +1828,8 @@ public class InstallerQueryServiceUnitTests
                 ? null
                 : new PackageIdentity(string.Empty, isPatch, Array.Empty<string>());
         }
+
+        public string? PackageCodeOf(string filePath) => null;
     }
 
     /// <summary>
@@ -1963,6 +1965,8 @@ public class InstallerQueryServiceUnitTests
             return new PackageIdentity(string.Empty, isPatch,
                 filePath.EndsWith(leaf, StringComparison.OrdinalIgnoreCase) ? targets : Array.Empty<string>());
         }
+
+        public string? PackageCodeOf(string filePath) => null;
     }
 
     [Fact]

@@ -710,6 +710,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             refusal = PackageReadRefusal.WouldNotRead;
             return new Models.PackageIdentity(string.Empty, isPatch, Array.Empty<string>());
         }
+
+        public string? PackageCodeOf(string filePath) => null;
     }
 
     /// <inheritdoc />

@@ -153,19 +153,6 @@ public interface IFileIdentityReader
     FileIdentityRead ReadOutcome(string path, out FileIdentity identity);
 
     /// <summary>
-    /// <see cref="ReadOutcome"/> with its answer narrowed to the one question a
-    /// caller that only wants to compare files is asking. Defined off the outcome
-    /// and sealed, so the two cannot drift apart and no implementation has to be
-    /// trusted to keep them in step.
-    ///
-    /// The scan takes the outcome form instead, because it counts what it was
-    /// told as well as acting on it, and a second read to recover the reason
-    /// would be a second handle on the same file.
-    /// </summary>
-    sealed bool TryRead(string path, out FileIdentity identity) =>
-        ReadOutcome(path, out identity) == FileIdentityRead.Read;
-
-    /// <summary>
     /// <see cref="ReadOutcome"/>, and where the file opens and gives no id
     /// (<see cref="FileIdentityRead.IdentityUnavailable"/>), the volume it is on in
     /// <paramref name="volume"/>, named off the handle that read opened, as <see cref="VolumeOf"/>

@@ -370,5 +370,7 @@ public class ScanProgressAgainstTheScanTests
             refusal = PackageReadRefusal.WouldNotRead;
             return null;
         }
+
+        public string? PackageCodeOf(string filePath) => null;
     }
 }

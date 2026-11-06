@@ -891,6 +891,8 @@ public class FileSystemScanServiceTests
                 Path.GetFileName(f).Equals(leaf, StringComparison.OrdinalIgnoreCase));
             return onDisk ? new PackageIdentity(string.Empty, isPatch, Array.Empty<string>()) : null;
         }
+
+        public string? PackageCodeOf(string filePath) => null;
     }
 
     private static void PutOnDisk(MockFileSystem fs, string path)

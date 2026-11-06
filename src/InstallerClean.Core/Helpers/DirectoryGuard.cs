@@ -41,15 +41,15 @@ internal static class DirectoryGuard
     /// </summary>
     internal readonly struct FolderExpectation
     {
-        internal FolderExpectation(IReadOnlySet<string> ownerSids, IReadOnlySet<string> daclSids, bool requireProtected)
+        internal FolderExpectation(HashSet<string> ownerSids, HashSet<string> daclSids, bool requireProtected)
         {
             OwnerSids = ownerSids;
             DaclSids = daclSids;
             RequireProtected = requireProtected;
         }
 
-        internal IReadOnlySet<string> OwnerSids { get; }
-        internal IReadOnlySet<string> DaclSids { get; }
+        internal HashSet<string> OwnerSids { get; }
+        internal HashSet<string> DaclSids { get; }
         internal bool RequireProtected { get; }
 
         /// <summary>A real folder: owned by SYSTEM or Administrators, granting only those two, sealed.</summary>
@@ -134,7 +134,7 @@ internal static class DirectoryGuard
         }
     }
 
-    private static unsafe bool EveryAceSidIsExpected(IntPtr dacl, IReadOnlySet<string> allowed)
+    private static unsafe bool EveryAceSidIsExpected(IntPtr dacl, HashSet<string> allowed)
     {
         // The ACL header carries its entry count in its third field; each entry begins
         // with a four-byte header, then a four-byte mask, then the SID. An entry whose

@@ -57,13 +57,6 @@ public interface IPackageIdentityReader
     PackageIdentity? Read(string filePath, bool isPatch, out string detail, out PackageReadRefusal refusal);
 
     /// <summary>
-    /// <see cref="Read(string, bool, out string, out PackageReadRefusal)"/>, for a caller
-    /// that does not count the refusals.
-    /// </summary>
-    PackageIdentity? Read(string filePath, bool isPatch, out string detail) =>
-        Read(filePath, isPatch, out detail, out _);
-
-    /// <summary>
     /// The package code of the installation package at <paramref name="filePath"/>: the
     /// Revision Number of its summary information, in the braced upper-case form a product
     /// code is read in. Windows Installer records, for each installation, the package code
@@ -72,7 +65,19 @@ public interface IPackageIdentityReader
     /// one braced GUID, and from a reader that does not read package codes; a caller
     /// comparing package codes keeps the file then.
     /// </summary>
-    string? PackageCodeOf(string filePath) => null;
+    string? PackageCodeOf(string filePath);
+}
+
+/// <summary>Reads made through <see cref="IPackageIdentityReader"/>'s own members.</summary>
+public static class PackageIdentityReaderExtensions
+{
+    /// <summary>
+    /// <see cref="IPackageIdentityReader.Read(string, bool, out string, out PackageReadRefusal)"/>,
+    /// for a caller that does not count the refusals.
+    /// </summary>
+    public static PackageIdentity? Read(
+        this IPackageIdentityReader reader, string filePath, bool isPatch, out string detail) =>
+        reader.Read(filePath, isPatch, out detail, out _);
 }
 
 /// <summary>

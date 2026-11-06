@@ -254,8 +254,6 @@ public static class AppCopy
     /// Whether the running build is a single-file bundle. Inside one, an assembly has
     /// no file of its own, and its Location is empty; every build from source has one.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("SingleFile", "IL3000",
-        Justification = "The empty Location inside a bundle is the answer being asked for.")]
     private static bool IsSingleFileBuild() =>
         string.IsNullOrEmpty(typeof(AppCopy).Assembly.Location);
 

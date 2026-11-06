@@ -114,7 +114,7 @@ public class ResultLogServiceTests : IDisposable
         // One byte past the cap, so the test pins the boundary rather than
         // some arbitrary large size.
         await File.WriteAllBytesAsync(
-            _logFile, Encoding.UTF8.GetBytes(new string('x', (int)IResultLogService.MaxLogBytes + 1)));
+            _logFile, Encoding.UTF8.GetBytes(new string('x', (int)ResultLogService.MaxLogBytes + 1)));
         var svc = new ResultLogService(_logFile);
 
         // Refused rather than truncated: the body is posted to an endpoint, so
@@ -127,7 +127,7 @@ public class ResultLogServiceTests : IDisposable
     {
         Directory.CreateDirectory(_folder);
         await File.WriteAllBytesAsync(
-            _logFile, Encoding.UTF8.GetBytes(new string('x', (int)IResultLogService.MaxLogBytes)));
+            _logFile, Encoding.UTF8.GetBytes(new string('x', (int)ResultLogService.MaxLogBytes)));
         var svc = new ResultLogService(_logFile);
 
         var body = await svc.ReadLastLogAsync();
@@ -135,7 +135,7 @@ public class ResultLogServiceTests : IDisposable
         // The cap is a maximum, not an exclusive bound; a test only on the
         // over-cap side would pass with an off-by-one in either direction.
         Assert.NotNull(body);
-        Assert.Equal((int)IResultLogService.MaxLogBytes, body.Length);
+        Assert.Equal((int)ResultLogService.MaxLogBytes, body.Length);
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class ResultLogServiceTests : IDisposable
         // rather than piping it through ReadLastLogAsync would otherwise carry
         // an unbounded payload to the endpoint. Returning before the request is
         // built is what makes this runnable with no network at all.
-        var outcome = await svc.SendAsync(new string('x', (int)IResultLogService.MaxLogBytes + 1));
+        var outcome = await svc.SendAsync(new string('x', (int)ResultLogService.MaxLogBytes + 1));
 
         Assert.Equal(ResultLogSendOutcome.Unknown, outcome);
     }

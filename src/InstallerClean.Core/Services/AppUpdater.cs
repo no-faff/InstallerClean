@@ -32,8 +32,8 @@ public interface IAppUpdater
     /// (<see cref="UpdateManifest"/>) and answers why this copy does not install it, or
     /// null where it may. The read of the release's file is given up after
     /// <paramref name="within"/>: null, <see cref="Timeout.InfiniteTimeSpan"/> or a time
-    /// longer than a timer can be set for is no limit (<see cref="IsNoLimit"/>), and less
-    /// than a millisecond fetches nothing and fails as a read that could not be made. A
+    /// longer than a timer can be set for is no limit (<see cref="AppUpdater.IsNoLimit"/>),
+    /// and less than a millisecond fetches nothing and fails as a read that could not be made. A
     /// file already kept for the version is answered from without a read, whatever the
     /// limit, and the rest of the check runs to its answer. Throws
     /// <see cref="UpdateFailedException"/> at the Download stage where the release's file
@@ -43,15 +43,6 @@ public interface IAppUpdater
     /// is cancelled at any point before the answer is returned.
     /// </summary>
     Task<UpdateRefusal?> CheckRequirementsAsync(string version, TimeSpan? within, CancellationToken cancellationToken);
-
-    /// <summary>The longest time <see cref="CancellationTokenSource.CancelAfter(TimeSpan)"/> takes.</summary>
-    private static readonly TimeSpan MaxTimerLimit = TimeSpan.FromMilliseconds(uint.MaxValue - 1);
-
-    /// <summary>
-    /// Whether a time limit given to <see cref="CheckRequirementsAsync"/> is no limit:
-    /// <see cref="Timeout.InfiniteTimeSpan"/>, or longer than a timer can be set for.
-    /// </summary>
-    public static bool IsNoLimit(TimeSpan within) => within == Timeout.InfiniteTimeSpan || within > MaxTimerLimit;
 
     /// <summary>
     /// Downloads <paramref name="version"/> as the same kind of copy, where its release
@@ -162,6 +153,19 @@ public sealed class PreparedUpdate
 /// </summary>
 public sealed class AppUpdater : IAppUpdater
 {
+    /// <summary>
+    /// The longest time in whole milliseconds that
+    /// <see cref="CancellationTokenSource.CancelAfter(TimeSpan)"/> takes,
+    /// <see cref="int.MaxValue"/>. It throws from one millisecond more.
+    /// </summary>
+    private static readonly TimeSpan MaxTimerLimit = TimeSpan.FromTicks(int.MaxValue * TimeSpan.TicksPerMillisecond);
+
+    /// <summary>
+    /// Whether a time limit given to <see cref="IAppUpdater.CheckRequirementsAsync"/> is no
+    /// limit: <see cref="Timeout.InfiniteTimeSpan"/>, or longer than a timer can be set for.
+    /// </summary>
+    public static bool IsNoLimit(TimeSpan within) => within == Timeout.InfiniteTimeSpan || within > MaxTimerLimit;
+
     /// <summary>
     /// What the window starts the newer setup with. /SILENT shows Setup's progress and
     /// asks nothing, /SP- leaves out the page asking whether to install, and /NORESTART
@@ -377,7 +381,7 @@ public sealed class AppUpdater : IAppUpdater
     /// </summary>
     private async Task<byte[]?> ReadWithinAsync(string version, TimeSpan? within, CancellationToken cancellationToken)
     {
-        if (within is not { } limit || IAppUpdater.IsNoLimit(limit))
+        if (within is not { } limit || IsNoLimit(limit))
             return await _downloader.ReadAsync(UpdateManifest.Address(version), UpdateManifest.MaxBytes, cancellationToken)
                 .ConfigureAwait(false);
         // Less than a millisecond is a timer set to fire at once, so it fetches nothing. A
@@ -861,7 +865,7 @@ public sealed class AppUpdater : IAppUpdater
         public override long Length => throw new NotSupportedException();
         public override long Position { get => _passed; set => throw new NotSupportedException(); }
 
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (!_open && _passed >= _gateAt)
             {
@@ -871,14 +875,11 @@ public sealed class AppUpdater : IAppUpdater
                     await Task.Delay(100, cancellationToken).ConfigureAwait(false);
                 _open = true;
             }
-            var room = _open ? buffer.Length : (int)Math.Min(buffer.Length, _gateAt - _passed);
-            var read = await inner.ReadAsync(buffer[..room], cancellationToken).ConfigureAwait(false);
+            var room = _open ? count : (int)Math.Min(count, _gateAt - _passed);
+            var read = await inner.ReadAsync(buffer, offset, room, cancellationToken).ConfigureAwait(false);
             _passed += read;
             return read;
         }
-
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) =>
-            ReadAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
 
         // A wait at the gate ends only on a token, which a read with none cannot give it.
         public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();

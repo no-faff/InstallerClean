@@ -17,6 +17,14 @@ namespace InstallerClean.Services;
 /// </summary>
 public sealed class ResultLogService : IResultLogService
 {
+    /// <summary>
+    /// Maximum size of <c>last-run.json</c> the service will read or
+    /// POST. The writer caps the JSON at this size by construction
+    /// (the schema's natural size is well under it); a file larger
+    /// than this came from outside the process and is rejected.
+    /// </summary>
+    public const long MaxLogBytes = 64 * 1024;
+
     private const string EndpointUrl = "https://nofaff.netlify.app/api/result-log";
 
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
@@ -128,7 +136,7 @@ public sealed class ResultLogService : IResultLogService
         // Defence in depth: a caller that builds the body in-memory
         // (rather than piping through ReadLastLogAsync, which enforces
         // MaxLogBytes on read) would otherwise bypass the byte cap.
-        if (Encoding.UTF8.GetByteCount(body) > IResultLogService.MaxLogBytes)
+        if (Encoding.UTF8.GetByteCount(body) > MaxLogBytes)
             return ResultLogSendOutcome.Unknown;
 
         try
@@ -199,13 +207,13 @@ public sealed class ResultLogService : IResultLogService
                 _logFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
             if (handle is null) return null;
             using var fs = new FileStream(handle, FileAccess.Read);
-            if (fs.Length > IResultLogService.MaxLogBytes)
+            if (fs.Length > MaxLogBytes)
             {
                 // Oversize is not a normal outcome (writer caps at the
                 // schema's natural size); record it so a report that never
                 // went has a breadcrumb to follow.
                 CrashLog.TryWrite(new InvalidDataException(
-                    $"last-run.json exceeds the {IResultLogService.MaxLogBytes}-byte cap and was not read."));
+                    $"last-run.json exceeds the {MaxLogBytes}-byte cap and was not read."));
                 return null;
             }
             using var reader = new StreamReader(fs, Encoding.UTF8);

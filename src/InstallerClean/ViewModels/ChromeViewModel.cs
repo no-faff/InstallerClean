@@ -484,7 +484,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
                 // bound unless that is no limit.
                 var remaining = _automaticCheckWindow - sinceStart.Elapsed;
                 var left = remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
-                var within = IAppUpdater.IsNoLimit(_requirementsBound) || left < _requirementsBound
+                var within = AppUpdater.IsNoLimit(_requirementsBound) || left < _requirementsBound
                     ? left
                     : _requirementsBound;
                 var requirements = await RequirementsAsync(available.LatestVersion, within, token);
