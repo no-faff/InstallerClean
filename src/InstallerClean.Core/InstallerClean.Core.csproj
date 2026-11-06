@@ -15,7 +15,7 @@
   -->
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <LangVersion>12</LangVersion>
+    <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>InstallerClean</RootNamespace>
