@@ -120,10 +120,9 @@ jobs:
         if: success() || failure()
         run: node scripts/check-setup-held-copies.mjs
 
-      # Core's extension members are called from the window, the command line and the
-      # tests, and the .NET 10 SDK's compiler binds one from another assembly only where
-      # it is public.
-      - name: Check every extension member in Core is public
+      # Members of C# 14 extension blocks are called across the app's assemblies, and the
+      # .NET 10 SDK's compiler binds one from another assembly only where it is public.
+      - name: Check every member of an extension block is public
         if: success() || failure()
         run: node scripts/check-extension-member-access.mjs
 
