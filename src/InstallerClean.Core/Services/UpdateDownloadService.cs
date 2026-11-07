@@ -284,7 +284,13 @@ public sealed class UpdateDownloadService
 
     private static bool IsRedirect(HttpStatusCode status) => status is
         HttpStatusCode.MovedPermanently or HttpStatusCode.Found or HttpStatusCode.SeeOther
-        or HttpStatusCode.TemporaryRedirect or HttpStatusCode.PermanentRedirect;
+        or HttpStatusCode.TemporaryRedirect or PermanentRedirect;
+
+    /// <summary>
+    /// 308 Permanent Redirect, which .NET Framework's <see cref="HttpStatusCode"/> has no name
+    /// for.
+    /// </summary>
+    private const HttpStatusCode PermanentRedirect = (HttpStatusCode)308;
 
     private static UpdateFailedException Download(string message) =>
         new(UpdateFailureStage.Download, message);

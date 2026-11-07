@@ -4,8 +4,9 @@ namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
 /// Guids hands back the GUID Windows made where CoCreateGuid returns zero, and throws an
-/// <see cref="Exception"/> carrying the HRESULT for any other answer, as
-/// <see cref="Guid.NewGuid"/> does. A stand-in plays Windows, so these run on any host.
+/// <see cref="Exception"/> carrying the HRESULT for any other answer, as .NET 10's
+/// Guid.NewGuid does: a plain Exception, with .NET 10's English message. A stand-in plays
+/// Windows, so these run on any host.
 /// </summary>
 public class GuidsTests
 {
@@ -32,5 +33,7 @@ public class GuidsTests
         var thrown = Assert.Throws<Exception>(() => Guids.NewGuid((out Guid g) => { g = Guid.Empty; return hr; }));
 
         Assert.Equal(hr, thrown.HResult);
+        Assert.Equal("Exception of type 'System.Exception' was thrown.", thrown.Message);
+        Assert.Null(thrown.InnerException);
     }
 }

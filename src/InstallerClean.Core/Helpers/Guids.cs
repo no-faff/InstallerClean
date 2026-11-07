@@ -8,7 +8,10 @@ namespace InstallerClean.Helpers;
 /// </summary>
 /// <remarks>
 /// Where CoCreateGuid returns anything but zero, an <see cref="Exception"/> carrying its
-/// HRESULT is thrown, which is what <see cref="Guid.NewGuid"/> throws for the same answer.
+/// HRESULT is thrown, which is what .NET 10's Guid.NewGuid throws for the same answer: a
+/// plain Exception, never a type derived from it, with .NET 10's English message. .NET
+/// Framework's Guid.NewGuid throws the exception Marshal.ThrowExceptionForHR maps the
+/// HRESULT to instead.
 /// </remarks>
 internal static class Guids
 {
@@ -23,7 +26,22 @@ internal static class Guids
     {
         var hr = create(out var guid);
         if (hr != 0)
-            throw new Exception { HResult = hr };
+            throw CarryingHResult(hr);
         return guid;
+    }
+
+    /// <summary>
+    /// A plain <see cref="Exception"/> whose HResult is <paramref name="hr"/>. .NET Framework
+    /// gives HResult a protected setter, which code outside a derived class reaches only by
+    /// reflection. The message is given, because .NET Framework's default text for an
+    /// Exception follows an installed language pack and .NET 10's is English.
+    /// </summary>
+    private static Exception CarryingHResult(int hr)
+    {
+        var exception = new Exception("Exception of type 'System.Exception' was thrown.");
+        typeof(Exception).GetProperty(nameof(Exception.HResult))!
+            .GetSetMethod(nonPublic: true)!
+            .Invoke(exception, [hr]);
+        return exception;
     }
 }
