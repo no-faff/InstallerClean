@@ -9,8 +9,8 @@ namespace System.Threading.Tasks;
 /// <remarks>
 /// The creation options go to .NET Framework's promise task, which accepts AttachedToParent and
 /// RunContinuationsAsynchronously, the set .NET 10 accepts, and throws ArgumentOutOfRangeException
-/// for any other. With RunContinuationsAsynchronously, a continuation never runs on the thread that
-/// completes the task. Every Try member that loses a race waits until the task has completed
+/// for any other. With RunContinuationsAsynchronously, a continuation is queued and never runs inside
+/// the call that completes the task. Every Try member that loses a race waits until the task has completed
 /// before returning false, and every Set member throws InvalidOperationException where its Try
 /// member returns false.
 /// </remarks>

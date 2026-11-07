@@ -101,8 +101,13 @@ internal static class FrameworkConfigureAwait
                     return;
                 }
 
-                if (!task.IsCompleted)
-                    ((IAsyncResult)task).AsyncWaitHandle.WaitOne();
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException)
+                {
+                }
                 _ = task.Exception;
             }
         }

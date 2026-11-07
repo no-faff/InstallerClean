@@ -32,6 +32,24 @@ public class FrameworkTasksTests
     }
 
     [Fact]
+    public async Task ForceYielding_with_the_captured_context_posts_the_continuation_to_it()
+    {
+        var context = new RecordingContext();
+        var posts = await Task.Run(async () =>
+        {
+            SynchronizationContext.SetSynchronizationContext(context);
+            await ResumeOnCapturedContext().ConfigureAwait(false);
+            return context.Posts;
+        });
+
+        Assert.Equal(1, posts);
+    }
+
+    private static async Task ResumeOnCapturedContext() =>
+        await Task.CompletedTask.ConfigureAwait(
+            ConfigureAwaitOptions.ForceYielding | ConfigureAwaitOptions.ContinueOnCapturedContext);
+
+    [Fact]
     public void ForceYielding_reports_a_completed_task_incomplete()
     {
         Assert.False(Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding).GetAwaiter().IsCompleted);
@@ -131,7 +149,7 @@ public class FrameworkTasksTests
         {
             Assert.True(entered.Wait(Bound));
 
-            var unregistering = Task.Run(registration.Unregister);
+            var unregistering = Task.Run(() => registration.Unregister());
 
             Assert.True(unregistering.Wait(TimeSpan.FromSeconds(2)), "Unregister waited for the running callback");
             Assert.False(unregistering.Result);

@@ -11,18 +11,20 @@ namespace System.Threading;
 /// run or is running, or the registration is empty, it returns false at once and never waits
 /// for a running callback, which Dispose does. .NET Framework performs exactly that removal in
 /// its internal TryDeregister, the first step of its own Dispose, and this calls it by name.
-/// The member is looked up at each call, so a .NET Framework without it fails that call alone,
-/// with MissingMethodException.
+/// The member is looked up at the first call and kept, never in a static initialiser, so a .NET
+/// Framework without it fails each call with MissingMethodException and nothing else.
 /// </remarks>
 internal static class FrameworkCancellationTokenRegistration
 {
     internal const string TryDeregisterName = "TryDeregister";
 
+    private static MethodInfo? s_tryDeregister;
+
     extension(CancellationTokenRegistration registration)
     {
         internal bool Unregister()
         {
-            var tryDeregister = FindTryDeregister()
+            var tryDeregister = s_tryDeregister ??= FindTryDeregister()
                 ?? throw new MissingMethodException(nameof(CancellationTokenRegistration), TryDeregisterName);
             return (bool)tryDeregister.Invoke(registration, null)!;
         }
