@@ -36,12 +36,12 @@ public class FrameworkSwitchesTests
     [Fact]
     public void The_window_s_module_initializer_sets_the_switches()
     {
-        var initializer = typeof(InstallerClean.LibrarySearch).GetMethod(
+        var initializer = typeof(InstallerClean.ProcessDefaults).GetMethod(
             "SetBeforeMain", BindingFlags.Static | BindingFlags.NonPublic)!;
         var pin = typeof(InstallerClean.FrameworkSwitches).GetMethod(
             nameof(InstallerClean.FrameworkSwitches.Pin), BindingFlags.Static | BindingFlags.NonPublic)!;
 
-        // By name: on .NET Framework each assembly carries its own copy of the attribute.
+        // By name: on .NET Framework the attribute is PolySharp's, matched whichever copy a build takes.
         Assert.Contains(
             initializer.GetCustomAttributes(),
             a => a.GetType().FullName == "System.Runtime.CompilerServices.ModuleInitializerAttribute");
@@ -68,7 +68,7 @@ public class FrameworkSwitchesTests
     }
 
     [Theory]
-    [InlineData(typeof(InstallerClean.LibrarySearch))]
+    [InlineData(typeof(InstallerClean.ProcessDefaults))]
     [InlineData(typeof(InstallerClean.Cli.LibrarySearch))]
     public void Each_exe_targets_net_framework_4_8(Type inExe)
     {

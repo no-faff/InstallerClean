@@ -804,8 +804,8 @@ jobs:
           $builds = @(
             [pscustomobject]@{ Label = 'command line'; Exe = 'publish/cli/installerclean-cli.exe'; Source = 'src/InstallerClean.Cli/LibrarySearch.cs'; Arguments = @('/s', '/noupdate'); Wait = 60; MustLoad = @('msi.dll'); Marker = 'replace leftovers' },
             [pscustomobject]@{ Label = 'command line, checking for updates'; Exe = 'publish/cli/installerclean-cli.exe'; Source = 'src/InstallerClean.Cli/LibrarySearch.cs'; Arguments = @('/s'); Wait = 60; MustLoad = @('msi.dll', 'winhttp.dll'); UpdateCheck = $true; Marker = 'replace leftovers' },
-            [pscustomobject]@{ Label = 'portable'; Exe = 'publish/self-contained/InstallerClean.exe'; Source = 'src/InstallerClean/LibrarySearch.cs'; Arguments = @(); Wait = 20; MustLoad = @('dwmapi.dll', 'wpfgfx_cor3.dll'); Marker = 'app folder' },
-            [pscustomobject]@{ Label = 'slim'; Exe = 'publish/framework-dependent/InstallerClean.exe'; Source = 'src/InstallerClean/LibrarySearch.cs'; Arguments = @(); Wait = 20; MustLoad = @('dwmapi.dll', 'wpfgfx_cor3.dll'); Marker = 'module initializer' }
+            [pscustomobject]@{ Label = 'portable'; Exe = 'publish/self-contained/InstallerClean.exe'; Source = 'src/InstallerClean/ProcessDefaults.cs'; Arguments = @(); Wait = 20; MustLoad = @('dwmapi.dll', 'wpfgfx_cor3.dll'); Marker = 'app folder' },
+            [pscustomobject]@{ Label = 'slim'; Exe = 'publish/framework-dependent/InstallerClean.exe'; Source = 'src/InstallerClean/ProcessDefaults.cs'; Arguments = @(); Wait = 20; MustLoad = @('dwmapi.dll', 'wpfgfx_cor3.dll'); Marker = 'module initializer' }
           )
           # Each of the command line, the portable and the slim started in replace mode
           # (Invoke-Replace in native-libraries.ps1), once putting itself in place and once
@@ -841,7 +841,7 @@ jobs:
 
       # Each exe loads, before its Main, every assembly its self-contained build carries that
       # imports a Windows library, so each has its resolver before any thread of the app's
-      # can use it. The list is LibrarySearch.ImportingAssemblies in each exe's project, and
+      # can use it. The list is ImportingAssemblies in each exe's project, and
       # this step recomputes it from the exe's self-contained bundle and the runtime packs it
       # was built from: the assemblies the exe references, directly or through others, that
       # the bundle carries and that import a library not on FrameworkLibraries.OwnLibraries,
@@ -871,7 +871,7 @@ jobs:
           $wpfReads = 'System.Drawing.Common', 'System.Private.Xml', 'System.Private.Xml.Linq', 'System.Data.Common', 'System.Linq.Expressions'
           $exes = @(
             [pscustomobject]@{ Label = 'window'; Bundle = 'publish/self-contained/InstallerClean.exe'; Assembly = 'src/InstallerClean/bin/Release/net10.0-windows/win-x64/InstallerClean.dll'
-              Source = 'src/InstallerClean/LibrarySearch.cs'; LeftToTheirLoad = @('System.Drawing.Common'); ByName = @('UIAutomationClient', 'UIAutomationClientSideProviders') }
+              Source = 'src/InstallerClean/ProcessDefaults.cs'; LeftToTheirLoad = @('System.Drawing.Common'); ByName = @('UIAutomationClient', 'UIAutomationClientSideProviders') }
             [pscustomobject]@{ Label = 'command line'; Bundle = 'publish/cli/installerclean-cli.exe'; Assembly = 'src/InstallerClean.Cli/bin/Release/net10.0/win-x64/installerclean-cli.dll'
               Source = 'src/InstallerClean.Cli/LibrarySearch.cs'; LeftToTheirLoad = @()
               ByName = @('Microsoft.VisualBasic.Core', 'System.Formats.Tar', 'System.IO.Pipes', 'System.Net.HttpListener', 'System.Net.Ping', 'System.Text.Encoding.CodePages', 'System.Transactions.Local') }

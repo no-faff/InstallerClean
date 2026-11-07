@@ -526,8 +526,8 @@ function Get-BaseName([string]$name) { ($name -replace '\.dll$', '').ToLowerInva
 $crashLogFolders = 'InstallerClean', 'NoFaff\InstallerClean'
 
 # The assemblies the window loads before its Main only where the runtime lists them
-# as trusted platform assemblies, read from its LibrarySearch.ImportingAssembliesWhereInstalled.
-function Get-WhereInstalled { Read-SourceList 'src/InstallerClean/LibrarySearch.cs' 'ImportingAssembliesWhereInstalled' }
+# as trusted platform assemblies, read from its ProcessDefaults.ImportingAssembliesWhereInstalled.
+function Get-WhereInstalled { Read-SourceList 'src/InstallerClean/ProcessDefaults.cs' 'ImportingAssembliesWhereInstalled' }
 
 # Whether a file carries .NET metadata, and every module its methods import from,
 # by the name the import spells.
@@ -1981,7 +1981,7 @@ function Test-ReplaceControls {
 
   Write-Host "== Control: the first act of a replace's own code"
   $target = 'C:\Control\target\InstallerClean.exe'
-  $run = [pscustomobject]@{ Label = 'replace control'; Build = [pscustomobject]@{ Source = 'src/InstallerClean/LibrarySearch.cs' }; Folder = 'C:\Control\staging'; Exe = 'InstallerClean.exe'; Target = $target }
+  $run = [pscustomobject]@{ Label = 'replace control'; Build = [pscustomobject]@{ Source = 'src/InstallerClean/ProcessDefaults.cs' }; Folder = 'C:\Control\staging'; Exe = 'InstallerClean.exe'; Target = $target }
   $rows = @(
     [pscustomobject]@{ Operation = 'CreateFile'; Path = 'C:\Control\staging\InstallerClean.exe'; Detail = '' },
     [pscustomobject]@{ Operation = 'QueryOpen'; Path = 'C:\Control\target\other.txt'; Detail = '' },

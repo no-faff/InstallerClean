@@ -53,11 +53,11 @@ public class SystemLibrariesSearchTests
     }
 
     [Theory]
-    [InlineData(typeof(InstallerClean.LibrarySearch))]
+    [InlineData(typeof(InstallerClean.ProcessDefaults))]
     [InlineData(typeof(InstallerClean.Cli.LibrarySearch))]
-    public void Each_exe_sets_the_search_as_it_is_loaded(Type librarySearch)
+    public void Each_exe_sets_the_search_as_it_is_loaded(Type initializer)
     {
-        var setUp = librarySearch.GetMethod("SetBeforeMain", BindingFlags.Static | BindingFlags.NonPublic);
+        var setUp = initializer.GetMethod("SetBeforeMain", BindingFlags.Static | BindingFlags.NonPublic);
 
         Assert.NotNull(setUp);
         Assert.NotNull(setUp.GetCustomAttribute<ModuleInitializerAttribute>());
