@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Windows.Threading;
 
@@ -110,7 +111,7 @@ public class FrameworkSwitchesTests
     {
         public bool[] Read(bool pin)
         {
-            if (pin) InstallerClean.FrameworkSwitches.Pin();
+            if (pin) PinWindowSwitches();
             return
             [
                 Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48CompatibleAccessibilityFeatures"),
@@ -127,7 +128,7 @@ public class FrameworkSwitchesTests
         /// </summary>
         public string? DispatcherError()
         {
-            InstallerClean.FrameworkSwitches.Pin();
+            PinWindowSwitches();
 
             string? raised = null;
             var thread = new Thread(() =>
@@ -149,6 +150,13 @@ public class FrameworkSwitchesTests
                 return "the dispatcher did not stop";
             return raised;
         }
+
+        // On .NET Framework, compiling a method whose body names the window's code loads the
+        // window's assembly and runs its module initializer, which sets the switches, whether or
+        // not that line runs. Read names only this method, so a read without the window's
+        // switches stays without them.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void PinWindowSwitches() => InstallerClean.FrameworkSwitches.Pin();
 
         private static bool Switch(Assembly assembly, string typeName, string property)
         {
