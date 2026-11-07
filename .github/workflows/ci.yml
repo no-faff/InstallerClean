@@ -120,6 +120,13 @@ jobs:
         if: success() || failure()
         run: node scripts/check-setup-held-copies.mjs
 
+      # Core's extension members are called from the window, the command line and the
+      # tests, and the .NET 10 SDK's compiler binds one from another assembly only where
+      # it is public.
+      - name: Check every extension member in Core is public
+        if: success() || failure()
+        run: node scripts/check-extension-member-access.mjs
+
       # Two guards read built files, so neither can be picked up with the
       # check-*.mjs glob that runs before the build. Each is invoked by name
       # instead, the artefact guard in both workflows and the native-imports

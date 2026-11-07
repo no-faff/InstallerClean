@@ -9,6 +9,6 @@ internal static class FrameworkOperatingSystem
     extension(OperatingSystem)
     {
         /// <summary>True: this process runs on Windows.</summary>
-        internal static bool IsWindows() => true;
+        public static bool IsWindows() => true;
     }
 }

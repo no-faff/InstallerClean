@@ -49,7 +49,7 @@ internal static class FrameworkConfigureAwait
     extension(Task task)
     {
         /// <summary>An awaitable for <paramref name="options"/>; any other bit throws ArgumentOutOfRangeException.</summary>
-        internal OptionsTaskAwaitable ConfigureAwait(ConfigureAwaitOptions options)
+        public OptionsTaskAwaitable ConfigureAwait(ConfigureAwaitOptions options)
         {
             if ((options & ~AllOptions) != 0)
                 throw new ArgumentOutOfRangeException(nameof(options));
@@ -63,7 +63,7 @@ internal static class FrameworkConfigureAwait
         /// An awaitable for <paramref name="options"/> that gives the task's result.
         /// SuppressThrowing throws ArgumentOutOfRangeException, as on .NET 10.
         /// </summary>
-        internal OptionsTaskAwaitable<TResult> ConfigureAwait(ConfigureAwaitOptions options)
+        public OptionsTaskAwaitable<TResult> ConfigureAwait(ConfigureAwaitOptions options)
         {
             if ((options & ~(ConfigureAwaitOptions.ContinueOnCapturedContext | ConfigureAwaitOptions.ForceYielding)) != 0)
             {

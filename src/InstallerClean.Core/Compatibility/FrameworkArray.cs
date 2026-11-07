@@ -12,7 +12,7 @@ internal static class FrameworkArray
         /// Sets every element of <paramref name="array"/> to its type's default, whatever its
         /// rank and lower bounds.
         /// </summary>
-        internal static void Clear(Array array)
+        public static void Clear(Array array)
         {
             if (array is null) throw new ArgumentNullException(nameof(array));
 
@@ -24,7 +24,7 @@ internal static class FrameworkArray
         /// element is assigned in turn, so an array of a derived type refuses a value it
         /// cannot hold with ArrayTypeMismatchException.
         /// </summary>
-        internal static void Fill<T>(T[] array, T value)
+        public static void Fill<T>(T[] array, T value)
         {
             if (array is null) throw new ArgumentNullException(nameof(array));
 

@@ -22,7 +22,7 @@ internal static class FrameworkCancellationTokenRegistration
 
     extension(CancellationTokenRegistration registration)
     {
-        internal bool Unregister()
+        public bool Unregister()
         {
             var tryDeregister = s_tryDeregister ??= FindTryDeregister()
                 ?? throw new MissingMethodException(nameof(CancellationTokenRegistration), TryDeregisterName);

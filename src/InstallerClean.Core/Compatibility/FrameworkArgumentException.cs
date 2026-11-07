@@ -17,7 +17,7 @@ internal static class FrameworkArgumentException
         /// null and an <see cref="ArgumentException"/> where it is empty, each naming
         /// <paramref name="paramName"/>, the expression the caller passed.
         /// </summary>
-        internal static void ThrowIfNullOrEmpty(
+        public static void ThrowIfNullOrEmpty(
             [NotNull] string? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
         {
             if (argument is null) throw new ArgumentNullException(paramName);

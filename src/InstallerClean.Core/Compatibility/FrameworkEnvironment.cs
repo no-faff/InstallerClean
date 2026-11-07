@@ -18,7 +18,7 @@ internal static class FrameworkEnvironment
     extension(Environment)
     {
         /// <summary>The id Windows gives this process, read once and kept.</summary>
-        internal static int ProcessId
+        public static int ProcessId
         {
             get
             {
@@ -34,7 +34,7 @@ internal static class FrameworkEnvironment
         /// from, read once and kept for the life of the process, so every read gives the same
         /// path. Null where there is no path, never empty.
         /// </summary>
-        internal static string? ProcessPath
+        public static string? ProcessPath
         {
             get
             {

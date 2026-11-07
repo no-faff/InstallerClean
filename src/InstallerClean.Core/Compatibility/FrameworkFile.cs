@@ -33,7 +33,7 @@ internal static class FrameworkFile
         /// an existing destination is an <see cref="IOException"/> whose HResult carries 183
         /// on the same volume or 80 on another, and a source in use one carrying 32 or 33.
         /// </remarks>
-        internal static void Move(string sourceFileName, string destFileName, bool overwrite)
+        public static void Move(string sourceFileName, string destFileName, bool overwrite)
         {
             ArgumentException.ThrowIfNullOrEmpty(sourceFileName);
             ArgumentException.ThrowIfNullOrEmpty(destFileName);

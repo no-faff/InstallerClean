@@ -20,7 +20,7 @@ internal static class FrameworkArgumentOutOfRangeException
         /// Throws where <paramref name="value"/> is less than <paramref name="other"/>; a
         /// value equal to it passes.
         /// </summary>
-        internal static void ThrowIfLessThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        public static void ThrowIfLessThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string? paramName = null)
             where T : IComparable<T>
         {
             if (value.CompareTo(other) < 0)
@@ -32,7 +32,7 @@ internal static class FrameworkArgumentOutOfRangeException
         /// Throws where <paramref name="value"/> is greater than <paramref name="other"/>; a
         /// value equal to it passes.
         /// </summary>
-        internal static void ThrowIfGreaterThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        public static void ThrowIfGreaterThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string? paramName = null)
             where T : IComparable<T>
         {
             if (value.CompareTo(other) > 0)

@@ -14,10 +14,10 @@ internal static class FrameworkStringExtensions
     extension(string text)
     {
         /// <summary>Whether the text is not empty and its first character is <paramref name="value"/>.</summary>
-        internal bool StartsWith(char value) => text.Length != 0 && text[0] == value;
+        public bool StartsWith(char value) => text.Length != 0 && text[0] == value;
 
         /// <summary>Whether the text is not empty and its last character is <paramref name="value"/>.</summary>
-        internal bool EndsWith(char value) => text.Length != 0 && text[text.Length - 1] == value;
+        public bool EndsWith(char value) => text.Length != 0 && text[text.Length - 1] == value;
 
         /// <summary>
         /// Whether the character <paramref name="value"/> occurs in the text, compared ordinally.
@@ -25,7 +25,7 @@ internal static class FrameworkStringExtensions
         /// answers the same for a string but throws ArgumentNullException rather than
         /// NullReferenceException where the text is null.
         /// </summary>
-        internal bool Contains(char value)
+        public bool Contains(char value)
         {
             if (text is null) throw new NullReferenceException();
 
@@ -38,7 +38,7 @@ internal static class FrameworkStringExtensions
         /// in every text.
         /// </summary>
         /// <exception cref="NotSupportedException">A culture comparison, which has no .NET Framework port.</exception>
-        internal bool Contains(string value, StringComparison comparisonType)
+        public bool Contains(string value, StringComparison comparisonType)
         {
             if (text is null) throw new NullReferenceException();
             if (value is null) throw new ArgumentNullException(nameof(value));
@@ -54,7 +54,7 @@ internal static class FrameworkStringExtensions
         /// back where nothing matched.
         /// </summary>
         /// <exception cref="NotSupportedException">A culture comparison, which has no .NET Framework port.</exception>
-        internal string Replace(string oldValue, string? newValue, StringComparison comparisonType)
+        public string Replace(string oldValue, string? newValue, StringComparison comparisonType)
         {
             if (text is null) throw new NullReferenceException();
             var ignoreCase = IgnoresCase(comparisonType);
@@ -77,7 +77,7 @@ internal static class FrameworkStringExtensions
         }
 
         /// <summary>The text split at each <paramref name="separator"/>, as the overload taking a count does with no limit on it.</summary>
-        internal string[] Split(char separator, StringSplitOptions options) =>
+        public string[] Split(char separator, StringSplitOptions options) =>
             SplitAt(text, separator.ToString(), int.MaxValue, options);
 
         /// <summary>
@@ -87,7 +87,7 @@ internal static class FrameworkStringExtensions
         /// TrimEntries (value 2, which .NET Framework's enum does not name) trims white space from
         /// each.
         /// </summary>
-        internal string[] Split(char separator, int count, StringSplitOptions options = StringSplitOptions.None) =>
+        public string[] Split(char separator, int count, StringSplitOptions options = StringSplitOptions.None) =>
             SplitAt(text, separator.ToString(), count, options);
 
         /// <summary>
@@ -95,11 +95,11 @@ internal static class FrameworkStringExtensions
         /// without overlap by ordinal comparison. A null or empty separator splits nothing: the
         /// text is the one part.
         /// </summary>
-        internal string[] Split(string? separator, StringSplitOptions options = StringSplitOptions.None) =>
+        public string[] Split(string? separator, StringSplitOptions options = StringSplitOptions.None) =>
             SplitAt(text, separator ?? string.Empty, int.MaxValue, options);
 
         /// <summary>The text split at each occurrence of <paramref name="separator"/> into at most <paramref name="count"/> parts.</summary>
-        internal string[] Split(string? separator, int count, StringSplitOptions options = StringSplitOptions.None) =>
+        public string[] Split(string? separator, int count, StringSplitOptions options = StringSplitOptions.None) =>
             SplitAt(text, separator ?? string.Empty, count, options);
     }
 
@@ -109,11 +109,11 @@ internal static class FrameworkStringExtensions
         /// Each of <paramref name="values"/> as text, joined with <paramref name="separator"/>
         /// between them. A null value, or one whose text is null, joins as nothing.
         /// </summary>
-        internal static string Join<T>(char separator, IEnumerable<T> values) =>
+        public static string Join<T>(char separator, IEnumerable<T> values) =>
             string.Join(separator.ToString(), values);
 
         /// <summary>The characters of <paramref name="str0"/> followed by those of <paramref name="str1"/>.</summary>
-        internal static string Concat(ReadOnlySpan<char> str0, ReadOnlySpan<char> str1)
+        public static string Concat(ReadOnlySpan<char> str0, ReadOnlySpan<char> str1)
         {
             var length = checked(str0.Length + str1.Length);
             if (length == 0) return string.Empty;

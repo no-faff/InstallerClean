@@ -14,14 +14,14 @@ internal static class FrameworkEnum
         /// name and so including any value declared twice, in order of the value read as an
         /// unsigned number.
         /// </summary>
-        internal static TEnum[] GetValues<TEnum>() where TEnum : struct, Enum =>
+        public static TEnum[] GetValues<TEnum>() where TEnum : struct, Enum =>
             (TEnum[])Enum.GetValues(typeof(TEnum));
 
         /// <summary>
         /// Whether <paramref name="value"/> is a value <typeparamref name="TEnum"/> declares.
         /// A combination of flags is defined only where a name declares that combination.
         /// </summary>
-        internal static bool IsDefined<TEnum>(TEnum value) where TEnum : struct, Enum =>
+        public static bool IsDefined<TEnum>(TEnum value) where TEnum : struct, Enum =>
             Enum.IsDefined(typeof(TEnum), value);
     }
 }
