@@ -41,7 +41,7 @@ public sealed class NewerVersionStartTests : IDisposable
     private Process Start(string file, params string[] arguments)
     {
         var info = new ProcessStartInfo(file) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in arguments) info.ArgumentList.Add(argument);
+        info.Arguments = CommandLineArguments.Join(arguments);
         var process = Process.Start(info)!;
         _started.Add(process);
         return process;

@@ -112,46 +112,7 @@ internal static class DetachedProcess
     {
         var line = new StringBuilder().Append('"').Append(file).Append('"');
         foreach (var argument in arguments)
-        {
-            line.Append(' ');
-            AppendArgument(line, argument);
-        }
+            CommandLineArguments.Append(line, argument);
         return line.Append('\0').ToString().ToCharArray();
-    }
-
-    /// <summary>
-    /// Appends <paramref name="argument"/> as one argument. Inside quotes, a run of
-    /// backslashes is doubled where a quote or the closing quote follows it, and a quote is
-    /// written as a backslash and the quote; any other backslash stands for itself.
-    /// </summary>
-    private static void AppendArgument(StringBuilder line, string argument)
-    {
-        if (argument.Length > 0 && !argument.Any(c => char.IsWhiteSpace(c) || c == '"'))
-        {
-            line.Append(argument);
-            return;
-        }
-        line.Append('"');
-        var i = 0;
-        while (i < argument.Length)
-        {
-            var backslashes = 0;
-            while (i < argument.Length && argument[i] == '\\')
-            {
-                backslashes++;
-                i++;
-            }
-            if (i == argument.Length)
-            {
-                line.Append('\\', backslashes * 2);
-                break;
-            }
-            if (argument[i] == '"')
-                line.Append('\\', backslashes * 2 + 1).Append('"');
-            else
-                line.Append('\\', backslashes).Append(argument[i]);
-            i++;
-        }
-        line.Append('"');
     }
 }

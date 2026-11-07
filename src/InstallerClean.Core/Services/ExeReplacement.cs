@@ -685,8 +685,8 @@ internal static class ExeReplacement
             {
                 UseShellExecute = false,
                 WorkingDirectory = PathText.GetDirectoryName(exePath) ?? string.Empty,
+                Arguments = CommandLineArguments.Join([HandOverContract.UpdateFailedSwitch]),
             };
-            info.ArgumentList.Add(HandOverContract.UpdateFailedSwitch);
             ProcessStartRetry.Start(info, _ => true, interval => Thread.Sleep(interval)).Dispose();
         }
         catch (Exception ex)

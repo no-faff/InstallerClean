@@ -63,8 +63,7 @@ public sealed class ExeReplacementTests : IDisposable
         Directory.CreateDirectory(Path.GetDirectoryName(Exe)!);
         File.Copy(PowerShell, Exe);
         var info = new ProcessStartInfo(Exe) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in new[] { "-NoProfile", "-NonInteractive", "-Command", "Start-Sleep -Seconds 300" })
-            info.ArgumentList.Add(argument);
+        info.Arguments = CommandLineArguments.Join(new[] { "-NoProfile", "-NonInteractive", "-Command", "Start-Sleep -Seconds 300" });
         var process = Process.Start(info)!;
         _started.Add(process);
         return process;

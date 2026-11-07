@@ -5,6 +5,7 @@ using NSubstitute;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 using InstallerClean.Services;
+using InstallerClean.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -672,8 +673,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-        foreach (var arg in new[] { "/d", "/c", "mklink", "/J", link, target })
-            start.ArgumentList.Add(arg);
+        start.Arguments = CommandLineArguments.Join(new[] { "/d", "/c", "mklink", "/J", link, target });
 
         using var cmd = Process.Start(start)
             ?? throw new InvalidOperationException("cmd.exe did not start.");

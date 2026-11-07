@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using InstallerClean.Helpers;
 
 namespace InstallerClean.Tests.Helpers;
 
@@ -117,8 +118,7 @@ internal static class OtherConsole
             StandardOutputEncoding = System.Text.Encoding.UTF8,
         };
         var (script, library) = Files.Value;
-        foreach (var argument in new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script, mode, processId.ToString(), library })
-            info.ArgumentList.Add(argument);
+        info.Arguments = CommandLineArguments.Join(new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script, mode, processId.ToString(), library });
         using var helper = Process.Start(info)!;
         var output = helper.StandardOutput.ReadToEndAsync();
         var error = helper.StandardError.ReadToEndAsync();

@@ -82,14 +82,13 @@ internal static class DetachedStandIn
             RedirectStandardOutput = true,
             RedirectStandardError = true,
         };
-        foreach (var argument in new[]
+        info.Arguments = CommandLineArguments.Join(new[]
         {
             // -Command takes the rest of the line as the command, so the paths go inside it,
             // each in single quotes with any quote in it doubled.
             "-NoProfile", "-NonInteractive", "-Command",
             $"$ErrorActionPreference = 'Stop'; Add-Type -OutputType ConsoleApplication -OutputAssembly {Quoted(exe)} -TypeDefinition ([IO.File]::ReadAllText({Quoted(source)}))",
-        })
-            info.ArgumentList.Add(argument);
+        });
         using var compiler = Process.Start(info)!;
         var output = compiler.StandardOutput.ReadToEndAsync();
         var error = compiler.StandardError.ReadToEndAsync();

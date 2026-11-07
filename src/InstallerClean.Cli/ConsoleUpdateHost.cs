@@ -387,8 +387,11 @@ internal sealed class ConsoleUpdateHost(string arg, Func<InstanceLock>? newLock 
     private static Process? Start(
         string file, IReadOnlyList<string> arguments, CancellationToken token)
     {
-        var info = new ProcessStartInfo(file) { UseShellExecute = false };
-        foreach (var argument in arguments) info.ArgumentList.Add(argument);
+        var info = new ProcessStartInfo(file)
+        {
+            UseShellExecute = false,
+            Arguments = CommandLineArguments.Join(arguments),
+        };
 
         token.ThrowIfCancellationRequested();
         try

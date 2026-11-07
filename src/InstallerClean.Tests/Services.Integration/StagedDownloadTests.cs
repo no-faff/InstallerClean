@@ -369,8 +369,7 @@ public sealed class StagedDownloadTests : IDisposable
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-        foreach (var arg in new[] { "/d", "/c", "mklink", "/J", linkedRoot, _stagingRoot })
-            start.ArgumentList.Add(arg);
+        start.Arguments = CommandLineArguments.Join(new[] { "/d", "/c", "mklink", "/J", linkedRoot, _stagingRoot });
         using (var mklink = Process.Start(start)!)
         {
             var output = mklink.StandardOutput.ReadToEnd() + mklink.StandardError.ReadToEnd();
@@ -421,7 +420,7 @@ public sealed class StagedDownloadTests : IDisposable
         // The stand-in's "exit" ends with 1 once it has written its files.
         var attached = Directory.CreateDirectory(Path.Combine(folder, "attached")).FullName;
         var info = new ProcessStartInfo(exe) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in DetachedStandIn.Before(attached, "exit")) info.ArgumentList.Add(argument);
+        info.Arguments = CommandLineArguments.Join(DetachedStandIn.Before(attached, "exit"));
         using (var process = Process.Start(info)!)
         {
             try
