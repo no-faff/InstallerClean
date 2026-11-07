@@ -7,11 +7,11 @@ namespace InstallerClean;
 /// <remarks>
 /// WPF reads these once, when they are first asked for, so they are set from the module
 /// initializer, ahead of App and the first Dispatcher. .NET Framework checks the accessibility
-/// switches as a chain when the first Dispatcher is created: once one of
+/// switches when the first Dispatcher is created: once one of
 /// <c>Switch.UseLegacyAccessibilityFeatures</c> and its .2 to .5 is true every later one must be,
 /// and OptOutOfGridColumnResizeUsingKeyboard may be false only where .4 is false, or the window
-/// gets a NotSupportedException. So the three are set false together; setting only one of them
-/// breaks the window at start.
+/// gets a NotSupportedException. So the column resize is set false only with .4; setting it
+/// alone, or .5 alone, breaks the window at start.
 /// </remarks>
 internal static class FrameworkSwitches
 {
@@ -24,8 +24,8 @@ internal static class FrameworkSwitches
 
     internal static void Pin()
     {
-        // .4 and .5 change nothing of their own; they are false so the column resize below
-        // passes the accessibility check.
+        // In WPF .4 and .5 are read only by the accessibility check. .4 is false so the column
+        // resize below passes it; .5 is false as well, .NET 10 having neither.
         AppContext.SetSwitch(LegacyAccessibility4, false);
         AppContext.SetSwitch(LegacyAccessibility5, false);
         // Alt+Left and Alt+Right resize a GridView column from its header.
