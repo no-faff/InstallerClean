@@ -150,4 +150,55 @@ public class PathTextTests
     {
         Assert.Equal(expected, PathText.TrimEndingDirectorySeparator(path));
     }
+
+    [Theory]
+    [InlineData(@"C:\a\b", @"C:\")]
+    [InlineData(@"C:/a", @"C:\")]
+    [InlineData(@"C:a", @"C:")]
+    [InlineData(@"\a", @"\")]
+    [InlineData(@"\\server\share\a", @"\\server\share")]
+    [InlineData(@"\\?\C:\a", @"\\?\C:\")]
+    [InlineData(@"a\b", "")]
+    public void The_root_is_read_off_the_front_of_the_path(string path, string expected)
+    {
+        Assert.Equal(expected, PathText.GetPathRoot(path));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void A_path_with_no_text_has_no_root(string? path)
+    {
+        Assert.Null(PathText.GetPathRoot(path));
+    }
+
+    [Theory]
+    [InlineData(@"C:\a", @"C:\a")]
+    [InlineData(@"C:\a ", @"\\?\C:\a ")]
+    [InlineData(@"C:\a.", @"\\?\C:\a.")]
+    [InlineData(@"\\server\share\a.", @"\\?\UNC\server\share\a.")]
+    [InlineData(@"\\?\C:\a.", @"\\?\C:\a.")]
+    [InlineData(@"\\.\C:\a.", @"\\.\C:\a.")]
+    [InlineData(@"a.", @"a.")]
+    [InlineData(@"C:a.", @"C:a.")]
+    [InlineData(@"//server/share/a.", @"\\?\//server/share/a.")]
+    public void A_path_ending_in_a_space_or_a_period_takes_the_prefix_unless_relative_or_a_device_path(
+        string path, string expected)
+    {
+        Assert.Equal(expected, PathText.EnsureExtendedPrefixIfNeeded(path));
+    }
+
+    [Fact]
+    public void A_path_takes_the_prefix_from_260_characters()
+    {
+        var below = @"C:\" + new string('a', 256);
+        var at = below + "a";
+        Assert.Equal(259, below.Length);
+
+        Assert.Same(below, PathText.EnsureExtendedPrefixIfNeeded(below));
+        Assert.Equal(@"\\?\" + at, PathText.EnsureExtendedPrefixIfNeeded(at));
+        Assert.Equal(@"\\?\UNC\server\" + new string('s', 260),
+            PathText.EnsureExtendedPrefixIfNeeded(@"\\server\" + new string('s', 260)));
+    }
 }

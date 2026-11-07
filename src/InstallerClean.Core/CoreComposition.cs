@@ -32,8 +32,11 @@ public static class CoreComposition
     /// </remarks>
     public static IServiceCollection AddInstallerCleanCore(this IServiceCollection services)
     {
-        // Stateless infrastructure.
-        services.AddSingleton<IFileSystem, FileSystem>();
+        // Stateless infrastructure. The app's own file system, whose File.Move moves as
+        // .NET 10's does. BannedSymbols.txt does not see a type argument, so naming
+        // System.IO.Abstractions' FileSystem here compiles: CompositionRootTests holds
+        // this registration instead.
+        services.AddSingleton<IFileSystem, AppFileSystem>();
         services.AddSingleton<IRegistryReader, RegistryReader>();
         services.AddSingleton<IMutexProbe, MutexProbe>();
         // Answers where a volume is mounted, for the pending-reboot gate alone. A

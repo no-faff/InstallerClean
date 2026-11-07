@@ -522,16 +522,17 @@ internal static class StorageHelpers
     /// junction or symlink. Move and Delete refuse a source in
     /// C:\Windows\Installer that has been replaced with one.
     ///
-    /// A move can read straight through a link. .NET calls MoveFileEx with
-    /// MOVEFILE_COPY_ALLOWED (dotnet/runtime, Interop.MoveFileEx.cs), Win32
-    /// documents that flag as simulating a cross-volume move with CopyFile plus
-    /// DeleteFile, and CopyFile documents that "if the source file is a symbolic
-    /// link, the actual file copied is the target of the symbolic link". So a
-    /// link planted in the cache and pointing anywhere this elevated process can
-    /// read copies THAT file's contents into a folder the user picked, which is
-    /// an arbitrary read wearing the shape of a relocation. Whether a same-volume
-    /// rename would follow the link is documented neither way and does not need
-    /// to be: the flag is always set, so the copy path is always available.
+    /// A move can read straight through a link. The move calls MoveFileEx with
+    /// MOVEFILE_COPY_ALLOWED, as .NET 10's File.Move does (dotnet/runtime,
+    /// Interop.MoveFileEx.cs), Win32 documents that flag as simulating a
+    /// cross-volume move with CopyFile plus DeleteFile, and CopyFile documents that
+    /// "if the source file is a symbolic link, the actual file copied is the target
+    /// of the symbolic link". So a link planted in the cache and pointing anywhere
+    /// this elevated process can read copies THAT file's contents into a folder the
+    /// user picked, which is an arbitrary read wearing the shape of a relocation.
+    /// Whether a same-volume rename would follow the link is documented neither way
+    /// and does not need to be: the flag is always set, so the copy path is always
+    /// available.
     ///
     /// Delete has no equivalent, DeleteFile being documented to remove the link
     /// and not the target, and refuses on the plainer ground that a link is not

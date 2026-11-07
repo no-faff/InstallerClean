@@ -170,6 +170,7 @@ public class NativeDeclarationTests
     private static readonly Dictionary<Type, int> HeaderSize = new()
     {
         [typeof(Kernel32.WIN32_FIND_DATA)] = 592,
+        [typeof(Kernel32.WIN32_FILE_ATTRIBUTE_DATA)] = 36,
         [typeof(Kernel32.FILETIME)] = 8,
         [typeof(Kernel32.BY_HANDLE_FILE_INFORMATION)] = 52,
         [typeof(Kernel32.FILE_ID_INFO)] = 24,

@@ -125,7 +125,7 @@ internal static class AppDataFolder
             {
                 try
                 {
-                    Directory.Move(earlier, current);
+                    FrameworkDirectory.Move(earlier, current);
                     RemoveIfEmpty(parent);
                     return Answer(current, failures);
                 }

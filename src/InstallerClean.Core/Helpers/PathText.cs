@@ -32,6 +32,7 @@ internal static class PathText
     private const int DevicePrefixLength = 4;
     private const int UncPrefixLength = 2;
     private const int UncExtendedPrefixLength = 8;
+    private const int MaxShortPath = 260;
 
     /// <summary>
     /// The folder part of <paramref name="path"/>, each run of separators in it made one
@@ -130,6 +131,45 @@ internal static class PathText
         !string.IsNullOrEmpty(path) && IsDirectorySeparator(path[path.Length - 1]) && GetRootLength(path) != path.Length
             ? path.Substring(0, path.Length - 1)
             : path;
+
+    /// <summary>
+    /// The root of <paramref name="path"/>, as <see cref="GetRootLength"/> measures it, with
+    /// each run of separators in it made one backslash except at its start: empty where the
+    /// path has no root, and null where the path is null, empty or spaces alone.
+    /// </summary>
+    internal static string? GetPathRoot(string? path)
+    {
+        if (path is null || IsEffectivelyEmpty(path))
+            return null;
+
+        var rootLength = GetRootLength(path);
+        return NormalizeDirectorySeparators(rootLength == path.Length ? path : path.Substring(0, rootLength));
+    }
+
+    /// <summary>
+    /// <paramref name="path"/> with <c>\\?\</c> in front, or <c>\\?\UNC\</c> in place of the
+    /// <c>\\</c> of a share, where it is 260 characters or longer or ends in a space or a
+    /// period, so Windows takes it as it is: without the prefix Windows refuses the longer
+    /// path where the long-path policy is off, and takes the space or period off the end.
+    /// A path that is relative or already a device path is returned as it is, as is every
+    /// other path.
+    /// </summary>
+    internal static string EnsureExtendedPrefixIfNeeded(string path)
+    {
+        if (path.Length < MaxShortPath && !EndsWithPeriodOrSpace(path))
+            return path;
+
+        if (IsPartiallyQualified(path) || IsDevice(path))
+            return path;
+
+        if (path.StartsWith(@"\\", StringComparison.OrdinalIgnoreCase))
+            return path.Insert(2, @"?\UNC\");
+
+        return @"\\?\" + path;
+
+        static bool EndsWithPeriodOrSpace(string path) =>
+            path.Length > 0 && path[path.Length - 1] is ' ' or '.';
+    }
 
     /// <summary>
     /// <paramref name="path2"/> joined to <paramref name="path1"/> with one backslash between

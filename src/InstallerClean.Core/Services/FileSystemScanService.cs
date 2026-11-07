@@ -65,11 +65,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, new FileSystem(), null, overrideFiles, null, null, null) { }
+        : this(queryService, new AppFileSystem(), null, overrideFiles, null, null, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
-        : this(queryService, new FileSystem(), null, overrideFiles, installerFolderOverride, null, null) { }
+        : this(queryService, new AppFileSystem(), null, overrideFiles, installerFolderOverride, null, null) { }
 
     /// <summary>
     /// Test constructor. Injects an <see cref="IFileSystem"/> so the

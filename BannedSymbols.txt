@@ -36,3 +36,12 @@ M:System.MemoryExtensions.Contains(System.ReadOnlySpan{System.Char},System.ReadO
 M:System.MemoryExtensions.IndexOf(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.StringComparison);Not ported: port .NET 10's search before calling it, as on .NET Framework this hands every comparison but Ordinal to string.IndexOf, which searches ASCII text by culture rules even for OrdinalIgnoreCase
 M:System.MemoryExtensions.SequenceEqual``1(System.ReadOnlySpan{``0},System.ReadOnlySpan{``0});Call Enumerable.SequenceEqual: on .NET Framework this calls Equals on each element of the first sequence, so a null element throws where .NET 10 compares it
 M:System.MemoryExtensions.SequenceEqual``1(System.Span{``0},System.ReadOnlySpan{``0});Call Enumerable.SequenceEqual: on .NET Framework this calls Equals on each element of the first sequence, so a null element throws where .NET 10 compares it
+M:System.IO.File.Move(System.String,System.String);Use File.Move(source, destination, overwrite: false), which moves the file as .NET 10 does
+M:System.IO.Directory.Move(System.String,System.String);Use FrameworkDirectory.Move, which moves the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.Move(System.String,System.String);Use FrameworkDirectory.Move, which moves the folder as .NET 10 does
+M:System.IO.FileInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the file otherwise
+M:System.IO.DirectoryInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the folder otherwise
+M:System.IO.Abstractions.IFileInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the file otherwise
+M:System.IO.Abstractions.IDirectoryInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the folder otherwise
+T:System.IO.Abstractions.FileSystem;Use AppFileSystem, whose File moves a file as .NET 10 does
+M:System.IO.Abstractions.FileWrapper.#ctor(System.IO.Abstractions.IFileSystem);Use AppFileSystem, whose File moves a file as .NET 10 does

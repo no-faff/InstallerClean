@@ -238,6 +238,55 @@ internal static class Kernel32
     [DllImport(Library, EntryPoint = "FindFirstFileW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     public static extern IntPtr FindFirstFile(string lpFileName, out WIN32_FIND_DATA lpFindFileData);
 
+    /// <summary>
+    /// <see cref="FindFirstFile"/> with the level of detail and the kind of search given:
+    /// <see cref="FindExInfoBasic"/> leaves the short name out of the entry, and
+    /// <see cref="FindExSearchNameMatch"/> matches by name alone. Returns
+    /// INVALID_HANDLE_VALUE on failure; the handle must be closed with
+    /// <see cref="FindClose"/>.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "FindFirstFileExW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr FindFirstFileEx(
+        string lpFileName,
+        uint fInfoLevelId,
+        out WIN32_FIND_DATA lpFindFileData,
+        uint fSearchOp,
+        IntPtr lpSearchFilter,
+        uint dwAdditionalFlags);
+
+    /// <summary>The entry is written without its short name (FINDEX_INFO_LEVELS).</summary>
+    public const uint FindExInfoBasic = 1;
+
+    /// <summary>The search matches entries by name alone (FINDEX_SEARCH_OPS).</summary>
+    public const uint FindExSearchNameMatch = 0;
+
+    /// <summary>
+    /// The attributes, times and size of the file or folder <paramref name="lpFileName"/>
+    /// names, written into <paramref name="lpFileInformation"/>. For a link these are the
+    /// link's own, not its target's.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetFileAttributesExW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetFileAttributesEx(
+        string lpFileName,
+        uint fInfoLevelId,
+        out WIN32_FILE_ATTRIBUTE_DATA lpFileInformation);
+
+    /// <summary>The level <see cref="GetFileAttributesEx"/> answers with a WIN32_FILE_ATTRIBUTE_DATA (GET_FILEEX_INFO_LEVELS).</summary>
+    public const uint GetFileExInfoStandard = 0;
+
+    /// <summary>A file's or folder's attributes, times and size as <see cref="GetFileAttributesEx"/> writes them.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WIN32_FILE_ATTRIBUTE_DATA
+    {
+        public uint dwFileAttributes;
+        public FILETIME ftCreationTime;
+        public FILETIME ftLastAccessTime;
+        public FILETIME ftLastWriteTime;
+        public uint nFileSizeHigh;
+        public uint nFileSizeLow;
+    }
+
     /// <summary>Closes a search opened by <see cref="FindFirstFile"/>.</summary>
     [DllImport(Library, EntryPoint = "FindClose", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -764,15 +813,22 @@ internal static class Kernel32
 
     /// <summary>
     /// Renames <paramref name="lpExistingFileName"/> to <paramref name="lpNewFileName"/> as
-    /// <paramref name="dwFlags"/> says. With <see cref="MOVEFILE_REPLACE_EXISTING"/> a file at
-    /// the new name is replaced in the same step, so a reader of that name finds the old file
-    /// or the new one and never neither; a link at the new name is replaced, not followed.
+    /// <paramref name="dwFlags"/> says. On one volume, with <see cref="MOVEFILE_REPLACE_EXISTING"/>
+    /// a file at the new name is replaced in the same step, so a reader of that name finds the
+    /// old file or the new one and never neither, and a link at the new name is replaced, not
+    /// followed.
     /// </summary>
     [DllImport(Library, EntryPoint = "MoveFileExW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, uint dwFlags);
 
     public const uint MOVEFILE_REPLACE_EXISTING = 0x1;
+
+    /// <summary>
+    /// A move to another volume is made by copying the file and then deleting the source,
+    /// which a rename cannot do.
+    /// </summary>
+    public const uint MOVEFILE_COPY_ALLOWED = 0x2;
 
     /// <summary>The move returns only once it is written to the disk.</summary>
     public const uint MOVEFILE_WRITE_THROUGH = 0x8;

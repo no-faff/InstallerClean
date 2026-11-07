@@ -519,13 +519,12 @@ public sealed class MoveFilesService : IMoveFilesService
                         continue;
                     }
 
-                    // Not File.Move with overwrite=true, which would follow a
-                    // reparse point planted at destPath in the window this check
-                    // leaves open. The non-overwriting form refuses an existing
-                    // target, so the race ends in a per-file error rather than in a
-                    // move that follows a link out to somewhere sensitive. The check
-                    // above is what makes the ordinary collision a stated refusal
-                    // rather than that error; it is not what makes the move safe.
+                    // The non-overwriting form, so a file or a link that appears at
+                    // destPath in the window this check leaves open stays as it is
+                    // and the move ends in a per-file error; overwrite=true would
+                    // write over whatever is there. The check above is what makes
+                    // the ordinary collision a stated refusal rather than that
+                    // error; it is not what makes the move safe.
                     // The host's question is the last thing before the act, after every
                     // check on the file.
                     if (mayAct is not null && !mayAct(sourcePath)) throw new BatchStoppedException();
@@ -660,16 +659,16 @@ public sealed class MoveFilesService : IMoveFilesService
     /// moved, and returns null when the file really has gone or the error to
     /// file when it has not.
     ///
-    /// A move that returns without throwing is not proof the source is gone.
-    /// .NET calls MoveFileEx with MOVEFILE_COPY_ALLOWED (dotnet/runtime,
-    /// Interop.MoveFileEx.cs), and Win32 documents that flag as simulating a
-    /// cross-volume move with CopyFile plus DeleteFile, then says outright: "If
-    /// the file is successfully copied to a different volume and the original
-    /// file is unable to be deleted, the function succeeds leaving the source
-    /// file intact." A read-only source is exactly that case, DeleteFile being
-    /// documented to fail with ERROR_ACCESS_DENIED on one, and a file another
-    /// program holds open without FILE_SHARE_DELETE is a second. Same-drive
-    /// moves never reach this state: a rename either happens or throws.
+    /// A move that returns without throwing is not proof the source is gone. The
+    /// move calls MoveFileEx with MOVEFILE_COPY_ALLOWED, as .NET 10's File.Move
+    /// does (dotnet/runtime, Interop.MoveFileEx.cs), and Win32 documents that flag
+    /// as simulating a cross-volume move with CopyFile plus DeleteFile, then says
+    /// outright: "If the file is successfully copied to a different volume and the
+    /// original file is unable to be deleted, the function succeeds leaving the
+    /// source file intact." A read-only source is exactly that case, DeleteFile
+    /// being documented to fail with ERROR_ACCESS_DENIED on one, and a file another
+    /// program holds open without FILE_SHARE_DELETE is a second. Same-drive moves
+    /// never reach this state: a rename either happens or throws.
     ///
     /// Checked after the fact rather than pre-empted, because pre-clearing the
     /// attribute would mutate sources that never needed it and would need a
