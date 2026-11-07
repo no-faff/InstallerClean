@@ -551,7 +551,7 @@ internal static class ExeReplacement
         if (reader.ReadOutcome(image, out var imageIdentity) == FileIdentityRead.Read
             && reader.ReadOutcome(exePath, out var exeIdentity) == FileIdentityRead.Read)
             return imageIdentity == exeIdentity;
-        return string.Equals(Path.GetFullPath(image), Path.GetFullPath(exePath), StringComparison.OrdinalIgnoreCase);
+        return string.Equals(FullPaths.GetFullPath(image), FullPaths.GetFullPath(exePath), StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

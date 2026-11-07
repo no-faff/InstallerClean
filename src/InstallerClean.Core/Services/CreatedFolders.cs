@@ -24,7 +24,7 @@ internal static class CreatedFolders
         string folder;
         try
         {
-            folder = PathText.TrimEndingDirectorySeparator(fileSystem.Path.GetFullPath(destination));
+            folder = PathText.TrimEndingDirectorySeparator(FullPaths.GetFullPath(destination));
         }
         catch
         {

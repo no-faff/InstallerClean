@@ -115,7 +115,7 @@ internal sealed class HandleDestinationGuard : IDestinationGuard
     {
         if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(existingAncestor)) return false;
 
-        var relative = Path.GetRelativePath(existingAncestor, folder);
+        var relative = FullPaths.GetRelativePath(existingAncestor, folder);
         if (PathText.IsPathRooted(relative)) return false;
         var names = relative.Split(
             [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],

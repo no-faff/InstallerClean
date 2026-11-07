@@ -138,7 +138,7 @@ internal static class MoveSpaceCheck
             if (cacheVolume is null) return null;
 
             var destinationVolume =
-                StorageHelpers.GetVolumeMountPoint(Path.GetFullPath(destination));
+                StorageHelpers.GetVolumeMountPoint(FullPaths.GetFullPath(destination));
             if (destinationVolume is null) return null;
 
             return string.Equals(destinationVolume, cacheVolume, StringComparison.OrdinalIgnoreCase);
@@ -200,7 +200,7 @@ internal static class MoveSpaceCheck
         if (string.IsNullOrWhiteSpace(destination)) return null;
         try
         {
-            var probe = Path.GetFullPath(destination);
+            var probe = FullPaths.GetFullPath(destination);
             while (!Directory.Exists(probe))
             {
                 var parent = PathText.GetDirectoryName(probe);

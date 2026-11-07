@@ -44,6 +44,31 @@ internal static class Kernel32
         IntPtr hTemplateFile);
 
     /// <summary>
+    /// The full path of <paramref name="lpFileName"/>, resolved against the current folder
+    /// and drive and with Win32's own trimming done, written into
+    /// <paramref name="lpBuffer"/>. The return value counts characters as
+    /// GetFinalPathNameByHandle's does: the length written, without the null terminator, or
+    /// the size needed, with it, when the buffer is too small; 0 on failure.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetFullPathNameW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern uint GetFullPathName(
+        string lpFileName,
+        uint nBufferLength,
+        [Out] char[] lpBuffer,
+        IntPtr lpFilePart);
+
+    /// <summary>
+    /// <paramref name="lpszShortPath"/> with every short (8.3) name in it replaced by the
+    /// long name, written into <paramref name="lpszLongPath"/>. The path must exist, and its
+    /// return value counts characters as <see cref="GetFullPathName"/>'s does.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetLongPathNameW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern uint GetLongPathName(
+        string lpszShortPath,
+        [Out] char[] lpszLongPath,
+        uint cchBuffer);
+
+    /// <summary>
     /// Resolves a file handle to its final canonical path, expanding
     /// junctions and symlinks. The output buffer is sized in characters.
     /// The return value counts characters, but on the two outcomes it

@@ -792,7 +792,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         var dest = MoveDestination.Trim();
 
         // Relative destinations are refused before anything resolves or creates
-        // them. Every gate below goes through Path.GetFullPath, which expands a
+        // them. Every gate below goes through FullPaths.GetFullPath, which expands a
         // bare "backup" against the process CWD, so the pre-flight would create
         // that folder and write its probe file somewhere the user never named,
         // elevated, and only then would MoveFilesService refuse the batch, after

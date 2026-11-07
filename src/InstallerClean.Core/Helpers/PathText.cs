@@ -286,7 +286,7 @@ internal static class PathText
     // The length of the root: \\server\share and \\?\UNC\server\share up to, not including,
     // the separator after the share; a device path such as \\?\C:\ up to and including the
     // separator after its first component; \ alone; C: and C:\; otherwise none.
-    private static int GetRootLength(string path)
+    internal static int GetRootLength(string path)
     {
         var pathLength = path.Length;
         var i = 0;
@@ -345,7 +345,7 @@ internal static class PathText
 
     // \\?\ and \\.\ with either separator in place of each backslash, and \??\ with
     // backslashes alone.
-    private static bool IsDevice(string path) =>
+    internal static bool IsDevice(string path) =>
         IsExtended(path)
         || (path.Length >= DevicePrefixLength
             && IsDirectorySeparator(path[0])
@@ -362,19 +362,19 @@ internal static class PathText
         && path[6] == 'C';
 
     // \\?\ and \??\, backslashes only.
-    private static bool IsExtended(string path) =>
+    internal static bool IsExtended(string path) =>
         path.Length >= DevicePrefixLength
         && path[0] == '\\'
         && (path[1] == '\\' || path[1] == '?')
         && path[2] == '?'
         && path[3] == '\\';
 
-    private static bool IsDirectorySeparator(char c) => c == DirectorySeparatorChar || c == AltDirectorySeparatorChar;
+    internal static bool IsDirectorySeparator(char c) => c == DirectorySeparatorChar || c == AltDirectorySeparatorChar;
 
     private static bool IsValidDriveChar(char value) => (uint)((value | 0x20) - 'a') <= (uint)('z' - 'a');
 
     // Empty, or spaces alone. A tab or any other white space is text.
-    private static bool IsEffectivelyEmpty(string path)
+    internal static bool IsEffectivelyEmpty(string path)
     {
         foreach (var c in path)
         {

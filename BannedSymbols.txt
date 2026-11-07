@@ -23,6 +23,8 @@ M:System.IO.Abstractions.IPath.GetExtension(System.String);Use PathText.GetExten
 M:System.IO.Abstractions.IPath.GetFileName(System.String);Use PathText.GetFileName, which reads the path as .NET 10 does
 M:System.IO.Abstractions.IPath.GetFileNameWithoutExtension(System.String);Use PathText.GetFileNameWithoutExtension, which reads the path as .NET 10 does
 M:System.IO.Abstractions.IPath.IsPathRooted(System.String);Use PathText.IsPathRooted, which reads the path as .NET 10 does
+M:System.IO.Path.GetFullPath(System.String);Use FullPaths.GetFullPath, which resolves the path as .NET 10 does
+M:System.IO.Abstractions.IPath.GetFullPath(System.String);Use FullPaths.GetFullPath, which resolves the path as .NET 10 does
 M:System.IO.Path.GetPathRoot(System.String);Not ported to PathText: port it from .NET 10 before calling it, as .NET Framework reads the path otherwise
 M:System.IO.Path.HasExtension(System.String);Not ported to PathText: port it from .NET 10 before calling it, as .NET Framework reads the path otherwise
 M:System.IO.Path.ChangeExtension(System.String,System.String);Not ported to PathText: port it from .NET 10 before calling it, as .NET Framework reads the path otherwise

@@ -441,7 +441,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         /// </summary>
         PrefixStrip,
 
-        /// <summary>The closing <see cref="Path.GetFullPath(string)"/> alone.</summary>
+        /// <summary>The closing <see cref="FullPaths.GetFullPath(string)"/> alone.</summary>
         FullPath,
     }
 
@@ -518,7 +518,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         /// <summary>Values refused while taking a prefix off or preparing the resolver ask.</summary>
         internal int NormalisationRefusedAtPrefixStrip;
 
-        /// <summary>Values <see cref="Path.GetFullPath(string)"/> refused.</summary>
+        /// <summary>Values <see cref="FullPaths.GetFullPath(string)"/> refused.</summary>
         internal int NormalisationRefusedAtFullPath;
 
         /// <summary>
@@ -3229,7 +3229,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // the time this value is used for anything. What it produces is the best
             // spelling available for a claim nothing is going to act on.
             stage = NormalisationStage.FullPath;
-            return Path.GetFullPath(stripped);
+            return FullPaths.GetFullPath(stripped);
         }
         catch
         {
@@ -4766,7 +4766,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Puts a surviving prefix into the spelling Win32 accepts. Both forms reach
     /// this from a registered value and both name the same object, but only the
-    /// <c>\\?\</c> one survives <see cref="Path.GetFullPath(string)"/> intact:
+    /// <c>\\?\</c> one survives <see cref="FullPaths.GetFullPath(string)"/> intact:
     /// the other's leading separator is read as rooted on the running process's
     /// drive, so the resolver would answer about a path that depends on where the
     /// process was started from. A path with no prefix left is returned as it

@@ -82,7 +82,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // the operating overlay already up and its Cancel button
             // unpressable.
 
-            // Reject relative destinations: Path.GetFullPath would otherwise
+            // Reject relative destinations: FullPaths.GetFullPath would otherwise
             // resolve them against the process CWD, and the CLI host's CWD
             // is whatever the caller invoked it from.
             if (!PathText.IsPathFullyQualified(destinationFolder))

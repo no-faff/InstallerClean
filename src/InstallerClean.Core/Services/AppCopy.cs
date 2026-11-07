@@ -467,7 +467,7 @@ public static class AppCopy
     {
         try
         {
-            return PathText.TrimEndingDirectorySeparator(Path.GetFullPath(path));
+            return PathText.TrimEndingDirectorySeparator(FullPaths.GetFullPath(path));
         }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
         {

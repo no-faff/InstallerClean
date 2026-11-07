@@ -13,7 +13,10 @@ namespace InstallerClean.Tests.Services;
 public class CreatedFoldersTests
 {
     private readonly MockFileSystem _fs = new();
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-created");
+
+    // A full path with no short name in it: Windows resolves it as text and nothing on the
+    // disk is looked at, so the folders exist only in the mock.
+    private readonly string _root = @"C:\ic-created";
     private readonly IDestinationGuard _guard;
 
     public CreatedFoldersTests()
@@ -73,12 +76,7 @@ public class CreatedFoldersTests
     [Fact]
     public void A_destination_that_cannot_be_spelled_as_a_full_path_lists_nothing()
     {
-        var fileSystem = Substitute.For<IFileSystem>();
-        var path = Substitute.For<IPath>();
-        path.GetFullPath(Arg.Any<string>()).Returns(_ => throw new PathTooLongException());
-        fileSystem.Path.Returns(path);
-
-        Assert.Empty(CreatedFolders.MissingOnPath(fileSystem, Folder("a")));
+        Assert.Empty(CreatedFolders.MissingOnPath(_fs, Folder("a") + "\0"));
     }
 
     [Fact]
@@ -86,7 +84,6 @@ public class CreatedFoldersTests
     {
         var nothingThere = Substitute.For<IFileSystem>();
         var directory = Substitute.For<IDirectory>();
-        nothingThere.Path.Returns(_fs.Path);
         nothingThere.Directory.Returns(directory);
         var destination = Folder("a");
 

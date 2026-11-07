@@ -289,7 +289,7 @@ public sealed class PendingRebootService : IPendingRebootService
     /// the UNC form. A UNC path is compared like any other and simply never matches,
     /// %SystemRoot%\Installer being local on any machine that can boot.
     ///
-    /// ANYTHING NOT FULLY QUALIFIED IS UNPLACEABLE RATHER THAN SKIPPED. Path.GetFullPath
+    /// ANYTHING NOT FULLY QUALIFIED IS UNPLACEABLE RATHER THAN SKIPPED. FullPaths.GetFullPath
     /// completes a value that is not rooted from the process's working directory, so
     /// reading one would answer about wherever the app was started from rather than
     /// about the entry. A bare "\Windows\Installer\9f05cba.msi" is the cache path
@@ -434,7 +434,7 @@ public sealed class PendingRebootService : IPendingRebootService
     {
         try
         {
-            resolved = Path.GetFullPath(path);
+            resolved = FullPaths.GetFullPath(path);
             return true;
         }
         catch (Exception ex) when (ex is ArgumentException

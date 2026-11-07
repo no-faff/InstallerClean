@@ -76,7 +76,7 @@ public static class MoveDestinationClassifier
 
         try
         {
-            var volume = StorageHelpers.GetVolumeMountPoint(Path.GetFullPath(dest));
+            var volume = StorageHelpers.GetVolumeMountPoint(FullPaths.GetFullPath(dest));
             if (volume is null) return MoveDestinationKinds.Unknown;
 
             return StorageHelpers.GetDriveKind(volume) switch

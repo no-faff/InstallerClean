@@ -42,7 +42,7 @@ internal enum PathResolution
     Resolved,
 
     /// <summary>
-    /// <see cref="Path.GetFullPath(string)"/> refused the string outright: one of
+    /// <see cref="FullPaths.GetFullPath(string)"/> refused the string outright: one of
     /// nothing but spaces, an embedded null, or a length past the API's limit. The
     /// value names nothing that can be looked for and cannot be improved.
     /// </summary>
@@ -336,7 +336,7 @@ internal static class InstallerCacheHelpers
     /// Expands symlinks, NTFS junctions and subst-mapped drives to the
     /// real on-disk path. Required so a destination check cannot be
     /// bypassed by picking a junction that points inside
-    /// C:\Windows\Installer. Falls back to Path.GetFullPath if the
+    /// C:\Windows\Installer. Falls back to FullPaths.GetFullPath if the
     /// kernel32 resolution call fails.
     /// </summary>
     internal static string ResolveFinalPath(string path)
@@ -380,7 +380,7 @@ internal static class InstallerCacheHelpers
     /// by absence or by a permission, so a count over all five together says
     /// nothing anybody could act on.
     ///
-    /// IT DOES NOT THROW. A path <see cref="Path.GetFullPath(string)"/> refuses
+    /// IT DOES NOT THROW. A path <see cref="FullPaths.GetFullPath(string)"/> refuses
     /// answers <see cref="PathResolution.NotAPath"/>, the walk up to an existing
     /// ancestor asks <see cref="File.Exists(string)"/> and
     /// <see cref="Directory.Exists(string)"/>, which answer false rather than throw,
@@ -404,7 +404,7 @@ internal static class InstallerCacheHelpers
         string path, out string resolved, IFinalPathKernel kernel)
     {
         string normalised;
-        try { normalised = Path.GetFullPath(path); }
+        try { normalised = FullPaths.GetFullPath(path); }
         catch { resolved = path; return PathResolution.NotAPath; }
 
         resolved = normalised;
@@ -483,12 +483,12 @@ internal static class InstallerCacheHelpers
     ///
     /// A bare prefix comes off ONLY where a drive letter and colon follow, and
     /// the UNC form only where <c>UNC\</c> does. Those are the two remainders
-    /// that are still rooted. Taking it off blind turned
-    /// <c>\\?\Volume{...}\Windows\Installer\9f05cba.msi</c> into a path with no
-    /// root at all, which <see cref="Path.GetFullPath(string)"/> then resolved
-    /// against the process working directory: one registration, and the GUI and
-    /// the command line answered differently for it. Left whole, a volume-GUID
-    /// path is still a path Win32 accepts, so it names its file, answers true to
+    /// that are still rooted. A volume-GUID path keeps its prefix: without it,
+    /// <c>\\?\Volume{...}\Windows\Installer\9f05cba.msi</c> has no root at all,
+    /// <see cref="FullPaths.GetFullPath(string)"/> would resolve it against the process
+    /// working directory, and the window and the command line would answer differently
+    /// for one registration. Left whole, a volume-GUID path is still a path Win32
+    /// accepts, so it names its file, answers true to
     /// <c>File.Exists</c>, and reads the same from either host. It does not match
     /// the folder walk's spelling, and no lexical rule can make it: a caller
     /// wanting the walk's spelling asks the filesystem, which is what

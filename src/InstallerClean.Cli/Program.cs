@@ -2803,7 +2803,7 @@ internal static class Program
         // is assigned once above and only read after, so the two stay equal.
         var resolved = dest;
 
-        // Reject relative destinations: Path.GetFullPath would otherwise
+        // Reject relative destinations: FullPaths.GetFullPath would otherwise
         // resolve them against the process CWD, and the CLI host's CWD is
         // whatever the caller invoked it from.
         if (!PathText.IsPathFullyQualified(dest))
