@@ -22,8 +22,8 @@ namespace InstallerClean.Cli;
 /// crash.log's rotation on copies of it.
 ///
 /// A FAILED WRITE CAN STOP PART-WAY THROUGH A LINE. The console's writer sends a line longer
-/// than its buffer, or a string builder, out in pieces, so the pieces ahead of the failure
-/// are out and the rest of the write, its line break included, is not. So after a failure
+/// than its buffer out in pieces, so the pieces ahead of the failure are out and the rest of
+/// the write, its line break included, is not. So after a failure
 /// the guard puts a line break ahead of the next write, tried as part of that write: the
 /// next text out starts a line of its own, and where the failure lost a whole line a blank
 /// line stands in its place. Where the line break is refused too, the write it leads is not
@@ -65,13 +65,11 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
     public override void WriteLine(string? value) => Guard(value, static (w, v) => w.WriteLine(v));
 
     // TextWriter writes each of the overloads below as more than one write: a line as its
-    // text and then a line break, a string builder a chunk at a time. Each is overridden so
-    // it reaches the console's writer as one call, inside one guard, and a failure part-way
-    // through it ends that write: no later chunk goes out after the line break the failure
-    // leaves owing, and no second line break follows. WriteLine of a span is not overridden:
-    // TextWriter writes it through WriteLine of part of a character array, which is.
-
-    public override void Write(StringBuilder? value) => Guard(value, static (w, v) => w.Write(v));
+    // text and then a line break. Each is overridden so it reaches the console's writer as
+    // one call, inside one guard, and a failure part-way through it ends that write: no
+    // second line break follows the one the failure leaves owing. A string builder reaches
+    // TextWriter's Write and WriteLine of an object, which write its text as one string
+    // through the string overrides above.
 
     public override void WriteLine(char value) => Guard(value, static (w, v) => w.WriteLine(v));
 
@@ -95,8 +93,6 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
     public override void WriteLine(double value) => Guard(value, static (w, v) => w.WriteLine(v));
 
     public override void WriteLine(decimal value) => Guard(value, static (w, v) => w.WriteLine(v));
-
-    public override void WriteLine(StringBuilder? value) => Guard(value, static (w, v) => w.WriteLine(v));
 
     public override void Flush()
     {
