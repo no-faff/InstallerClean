@@ -78,8 +78,8 @@
                 <!-- Cancel is the default, as on the Confirm Delete dialog:
                      a reflexive Enter dismisses, never commits. Move carries no
                      access key, so it is reached only by the pointer or by Tab
-                     then Space, and the letter that opened this dialog does
-                     nothing here. The help text describes the dialog's choice
+                     then Space or Enter, and the letter that opened this dialog
+                     does nothing here. The help text describes the dialog's choice
                      from the first focus, as on Confirm Delete. -->
                 <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" IsDefault="True"

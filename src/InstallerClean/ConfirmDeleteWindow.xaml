@@ -59,8 +59,8 @@
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                 <!-- Cancel is the default, so a reflexive Enter does not
                      delete. Delete permanently carries no access key, so it is
-                     reached only by the pointer or by Tab then Space, and the
-                     letter that opened this dialog does nothing here. The help
+                     reached only by the pointer or by Tab then Space or Enter,
+                     and the letter that opened this dialog does nothing here. The help
                      text describes the dialog's choice: Cancel is the first
                      focus, and help text is only spoken for the focused
                      element (a window-level description is never read
