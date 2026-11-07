@@ -75,8 +75,9 @@
             </ScrollViewer>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <!-- Cancel is the default, as on the Confirm Delete dialog:
-                     a reflexive Enter dismisses, never commits. Move carries no
+                <!-- Cancel is the default and takes the focus when the dialog
+                     opens, as on the Confirm Delete dialog, so an Enter pressed
+                     straight away dismisses it. Move carries no
                      access key, so it is reached only by the pointer or by Tab
                      then Space or Enter, and the letter that opened this dialog
                      does nothing here. The help text describes the dialog's choice
