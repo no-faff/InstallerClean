@@ -15,8 +15,6 @@ namespace InstallerClean.Tests.Helpers;
 /// </summary>
 public class FrameworkSwitchesTests
 {
-    private const string NetFramework48 = ".NETFramework,Version=v4.8";
-
     [Fact]
     public void A_4_8_target_reads_all_four_as_net_framework_sets_them_until_the_window_sets_them()
     {
@@ -40,7 +38,7 @@ public class FrameworkSwitchesTests
     [InlineData(typeof(InstallerClean.Cli.LibrarySearch))]
     public void Each_exe_targets_net_framework_4_8(Type inExe)
     {
-        Assert.Equal(NetFramework48, inExe.Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName);
+        Assert.Equal(FrameworkSwitch.NetFramework48, inExe.Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName);
     }
 
     private static T InDomain<TProbe, T>(Func<TProbe, T> run) where TProbe : MarshalByRefObject
@@ -48,7 +46,7 @@ public class FrameworkSwitchesTests
         var setup = new AppDomainSetup
         {
             ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
-            TargetFrameworkName = NetFramework48,
+            TargetFrameworkName = FrameworkSwitch.NetFramework48,
             // The configuration file of the domain running the tests, for its binding redirects;
             // it sets no switch.
             ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
@@ -145,18 +143,10 @@ public class FrameworkSwitchesTests
     {
         internal static bool[] Read() =>
         [
-            Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48CompatibleAccessibilityFeatures"),
-            Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48aCompatibleAccessibilityFeatures"),
-            Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "OptOutOfGridColumnResizeUsingKeyboard"),
-            Switch(typeof(System.Windows.FrameworkElement).Assembly, "MS.Internal.FrameworkAppContextSwitches", "SelectorUpdatesSelectionPropertiesWhenDisconnected"),
+            FrameworkSwitch.Read(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48CompatibleAccessibilityFeatures"),
+            FrameworkSwitch.Read(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48aCompatibleAccessibilityFeatures"),
+            FrameworkSwitch.Read(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "OptOutOfGridColumnResizeUsingKeyboard"),
+            FrameworkSwitch.Read(typeof(System.Windows.FrameworkElement).Assembly, "MS.Internal.FrameworkAppContextSwitches", "SelectorUpdatesSelectionPropertiesWhenDisconnected"),
         ];
-
-        private static bool Switch(Assembly assembly, string typeName, string property)
-        {
-            var type = assembly.GetType(typeName, throwOnError: true)!;
-            var member = type.GetProperty(property, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                ?? throw new MissingMemberException(typeName, property);
-            return (bool)member.GetValue(null)!;
-        }
     }
 }
