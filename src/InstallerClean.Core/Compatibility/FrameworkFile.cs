@@ -53,6 +53,36 @@ internal static class FrameworkFile
     internal static FileAttributes GetAttributes(string path) =>
         FrameworkFileSystem.GetAttributes(FullPaths.GetFullPath(path));
 
+    /// <summary>
+    /// Deletes the file at <paramref name="path"/>, as .NET 10's <c>File.Delete</c> does
+    /// (<c>File.cs</c>, <c>FileSystem.Windows.cs</c>): nothing there is not an error, a
+    /// read-only file or a folder is an <see cref="UnauthorizedAccessException"/>, and any other
+    /// refusal is the exception <see cref="Win32Marshal"/> gives for its error, naming the full
+    /// path.
+    /// </summary>
+    internal static void Delete(string path)
+    {
+        if (path is null) throw new ArgumentNullException(nameof(path));
+        FrameworkFileSystem.DeleteFile(FullPaths.GetFullPath(path));
+    }
+
+    /// <summary>
+    /// Sets the attributes of the file or folder at <paramref name="path"/>, as .NET 10's
+    /// <c>File.SetAttributes</c> does.
+    /// </summary>
+    internal static void SetAttributes(string path, FileAttributes fileAttributes) =>
+        FrameworkFileSystem.SetAttributes(FullPaths.GetFullPath(path), fileAttributes);
+
+    /// <summary>
+    /// The size in bytes of the file at <paramref name="path"/>, as .NET 10's
+    /// <c>new FileInfo(path).Length</c> reads it (<c>FileInfo.cs</c>,
+    /// <c>FileSystemInfo.Windows.cs</c>): nothing there, or a folder, is a
+    /// <see cref="FileNotFoundException"/> naming the full path, and any other refusal the
+    /// exception <see cref="Win32Marshal"/> gives for its error.
+    /// </summary>
+    internal static long GetLength(string path) =>
+        FrameworkFileSystem.GetLength(FullPaths.GetFullPath(path));
+
     extension(File)
     {
         /// <summary>

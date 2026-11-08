@@ -11,8 +11,10 @@ namespace InstallerClean.Services;
 /// <summary>
 /// The app's <see cref="IFileSystem"/>: System.IO.Abstractions' own, except that its
 /// <see cref="File"/> and <see cref="Directory"/> answer whether a file or a folder is there,
-/// read a file's attributes and move a file as .NET 10 does (<see cref="FrameworkFileWrapper"/>,
-/// <see cref="FrameworkDirectoryWrapper"/>).
+/// read and set a file's attributes, and move and delete a file as .NET 10 does
+/// (<see cref="FrameworkFileWrapper"/>, <see cref="FrameworkDirectoryWrapper"/>), and its
+/// <see cref="FileInfo"/> reads a file's attributes and size as .NET 10's FileInfo does
+/// (<see cref="FrameworkFileInfoFactory"/>).
 /// </summary>
 internal sealed class AppFileSystem : FileSystem
 {
@@ -20,6 +22,7 @@ internal sealed class AppFileSystem : FileSystem
     {
         File = new FrameworkFileWrapper(this);
         Directory = new FrameworkDirectoryWrapper(this);
+        FileInfo = new FrameworkFileInfoFactory(this);
     }
 
     /// <inheritdoc />
@@ -27,12 +30,16 @@ internal sealed class AppFileSystem : FileSystem
 
     /// <inheritdoc />
     public override IDirectory Directory { get; }
+
+    /// <inheritdoc />
+    public override IFileInfoFactory FileInfo { get; }
 }
 
 /// <summary>
 /// System.IO.Abstractions' <see cref="FileWrapper"/>, whose every member calls
-/// <c>System.IO.File</c>, except these, which do as .NET 10's own: <see cref="Exists"/> and
-/// <see cref="GetAttributes(string)"/> (<see cref="FrameworkFile"/>), and
+/// <c>System.IO.File</c>, except these, which do as .NET 10's own: <see cref="Exists"/>,
+/// <see cref="GetAttributes(string)"/>, <see cref="SetAttributes"/> and <see cref="Delete"/>
+/// (<see cref="FrameworkFile"/>), and
 /// <see cref="Move(string, string)"/>, MoveFileExW with MOVEFILE_COPY_ALLOWED and
 /// <c>\\?\</c> in front of a path of 260 characters or more.
 /// </summary>
@@ -43,6 +50,13 @@ internal sealed class FrameworkFileWrapper(IFileSystem fileSystem) : FileWrapper
 
     /// <inheritdoc />
     public override FileAttributes GetAttributes(string path) => FrameworkFile.GetAttributes(path);
+
+    /// <inheritdoc />
+    public override void SetAttributes(string path, FileAttributes fileAttributes) =>
+        FrameworkFile.SetAttributes(path, fileAttributes);
+
+    /// <inheritdoc />
+    public override void Delete(string path) => FrameworkFile.Delete(path);
 
     /// <inheritdoc />
     public override void Move(string sourceFileName, string destFileName) =>

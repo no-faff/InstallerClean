@@ -220,7 +220,7 @@ internal static class AppDataFolder
                 if (name.Equals(CrashLog.FileName, StringComparison.OrdinalIgnoreCase))
                     AppendEarlierLog(entry, target, failures);
                 else
-                    File.Delete(entry);
+                    FrameworkFile.Delete(entry);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
@@ -287,7 +287,7 @@ internal static class AppDataFolder
             fs.Write(payload, 0, payload.Length);
         }
 
-        File.Delete(claimed);
+        FrameworkFile.Delete(claimed);
     }
 
     /// <summary>

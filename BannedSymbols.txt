@@ -50,6 +50,37 @@ M:System.IO.Abstractions.IDirectory.Move(System.String,System.String);Use Framew
 M:System.IO.FileInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the file otherwise
 M:System.IO.DirectoryInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the folder otherwise
 M:System.IO.Abstractions.IFileInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the file otherwise
+M:System.IO.File.Delete(System.String);Use FrameworkFile.Delete, which deletes the file as .NET 10 does
+M:System.IO.File.SetAttributes(System.String,System.IO.FileAttributes);Use FrameworkFile.SetAttributes, which sets them as .NET 10 does
+M:System.IO.FileInfo.#ctor(System.String);Use FrameworkFile.GetLength, or the file system's FileInfo, which read the file as .NET 10 does
+M:System.IO.Abstractions.FileInfoWrapper.#ctor(System.IO.Abstractions.IFileSystem,System.IO.FileInfo);Use AppFileSystem, whose FileInfo reads the file as .NET 10 does
+M:System.IO.Abstractions.IFileInfoFactory.Wrap(System.IO.FileInfo);Use New, as a FileInfo holds a path .NET Framework has already normalised
+P:System.IO.Abstractions.IFileInfo.Directory;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+P:System.IO.Abstractions.IFileInfo.IsReadOnly;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.AppendText;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.CopyTo(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.CopyTo(System.String,System.Boolean);Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.Create;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.CreateText;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.Decrypt;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.Encrypt;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.Open(System.IO.FileMode);Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.Open(System.IO.FileMode,System.IO.FileAccess);Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.Open(System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare);Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.OpenRead;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.OpenText;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.OpenWrite;Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.Replace(System.String,System.String);Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+M:System.IO.Abstractions.IFileInfo.Replace(System.String,System.String,System.Boolean);Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise
+P:System.IO.Abstractions.IFileSystemInfo.CreationTime;Not ported: port .NET 10's member before calling it, as .NET Framework reads or changes the file or folder otherwise
+P:System.IO.Abstractions.IFileSystemInfo.CreationTimeUtc;Not ported: port .NET 10's member before calling it, as .NET Framework reads or changes the file or folder otherwise
+P:System.IO.Abstractions.IFileSystemInfo.LastAccessTime;Not ported: port .NET 10's member before calling it, as .NET Framework reads or changes the file or folder otherwise
+P:System.IO.Abstractions.IFileSystemInfo.LastAccessTimeUtc;Not ported: port .NET 10's member before calling it, as .NET Framework reads or changes the file or folder otherwise
+P:System.IO.Abstractions.IFileSystemInfo.LastWriteTime;Not ported: port .NET 10's member before calling it, as .NET Framework reads or changes the file or folder otherwise
+P:System.IO.Abstractions.IFileSystemInfo.LastWriteTimeUtc;Not ported: port .NET 10's member before calling it, as .NET Framework reads or changes the file or folder otherwise
+M:System.IO.Abstractions.IFileSystemInfo.Delete;Not ported: port .NET 10's member before calling it, as .NET Framework reads or changes the file or folder otherwise
+T:System.IO.Abstractions.FileAclExtensions;Not ported: these read the file through the file system's FileInfo, which has no access-control members
+T:System.IO.Abstractions.FileInfoAclExtensions;Not ported: the app's FileInfo has no access-control members
 M:System.IO.Abstractions.IDirectoryInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the folder otherwise
 T:System.IO.Abstractions.FileSystem;Use AppFileSystem, whose File moves a file as .NET 10 does
 M:System.IO.Abstractions.FileWrapper.#ctor(System.IO.Abstractions.IFileSystem);Use AppFileSystem, whose File moves a file as .NET 10 does

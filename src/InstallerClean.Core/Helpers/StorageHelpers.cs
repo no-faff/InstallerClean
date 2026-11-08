@@ -163,7 +163,7 @@ internal static class StorageHelpers
         try
         {
             if (FrameworkFile.Exists(path))
-                File.Delete(path);
+                FrameworkFile.Delete(path);
         }
         catch
         {

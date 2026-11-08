@@ -497,7 +497,7 @@ internal static class ExeReplacement
         failure = null;
         try
         {
-            File.SetAttributes(path, attributes);
+            FrameworkFile.SetAttributes(path, attributes);
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)

@@ -257,7 +257,7 @@ public sealed class AppUpdater : IAppUpdater
         // taken off before the read.
         var fullPath = FullPaths.GetFullPath(path);
         if (!FrameworkFileSystem.FileExists(fullPath)) return null;
-        if (new FileInfo(fullPath).Length > MaxScoopConfigBytes) throw new IOException("The settings file is larger than is read.");
+        if (FrameworkFileSystem.GetLength(fullPath) > MaxScoopConfigBytes) throw new IOException("The settings file is larger than is read.");
         return File.ReadAllText(path);
     }
 
@@ -834,8 +834,8 @@ public sealed class AppUpdater : IAppUpdater
                 try
                 {
                     if (!PathText.IsPathFullyQualified(gate)) throw new IOException($"The gate {gate} is not a full path.");
-                    File.Delete(gate);
-                    File.Delete(gate + GateReachedSuffix);
+                    FrameworkFile.Delete(gate);
+                    FrameworkFile.Delete(gate + GateReachedSuffix);
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                 {

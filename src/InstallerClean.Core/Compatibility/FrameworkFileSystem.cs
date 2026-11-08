@@ -61,8 +61,77 @@ internal static class FrameworkFileSystem
     }
 
     /// <summary>
+    /// The size of the file at <paramref name="fullPath"/>, read once as .NET 10's FileInfo
+    /// reads it. Nothing there, or a folder, is a <see cref="FileNotFoundException"/> naming
+    /// <paramref name="fullPath"/>; any other refusal is the exception
+    /// <see cref="Win32Marshal"/> gives for its error.
+    /// </summary>
+    internal static long GetLength(string fullPath)
+    {
+        var errorCode = FillAttributeInfo(fullPath, out var data, returnErrorOnNotFound: false);
+        if (errorCode != ERROR_SUCCESS)
+            throw Win32Marshal.GetExceptionForWin32Error(errorCode, fullPath);
+        return LengthOf(fullPath, data);
+    }
+
+    /// <summary>
+    /// The size <paramref name="data"/> holds for the file at <paramref name="fullPath"/>, read
+    /// with <c>returnErrorOnNotFound</c> false. A folder, or nothing there, which reads as
+    /// every attribute bit set, the folder bit among them, is a
+    /// <see cref="FileNotFoundException"/> naming <paramref name="fullPath"/>.
+    /// </summary>
+    internal static long LengthOf(string fullPath, in Kernel32.WIN32_FILE_ATTRIBUTE_DATA data)
+    {
+        if ((data.dwFileAttributes & Kernel32.FILE_ATTRIBUTE_DIRECTORY) != 0)
+            throw Win32Marshal.GetExceptionForWin32Error(ERROR_FILE_NOT_FOUND, fullPath);
+
+        return ((long)data.nFileSizeHigh << 32) | (data.nFileSizeLow & 0xFFFFFFFFL);
+    }
+
+    /// <summary>
+    /// Deletes the file at <paramref name="fullPath"/>. Nothing there is not an error; any
+    /// other refusal from Windows is the exception <see cref="Win32Marshal"/> gives for its
+    /// error, naming <paramref name="fullPath"/>.
+    /// </summary>
+    internal static void DeleteFile(string fullPath)
+    {
+        if (Kernel32.DeleteFile(PathText.EnsureExtendedPrefixIfNeeded(fullPath)))
+            return;
+
+        var errorCode = Marshal.GetLastWin32Error();
+        if (errorCode == ERROR_FILE_NOT_FOUND)
+            return;
+        throw Win32Marshal.GetExceptionForWin32Error(errorCode, fullPath);
+    }
+
+    /// <summary>
+    /// Sets the attributes of what <paramref name="fullPath"/> names. Attributes Windows will
+    /// not set are an <see cref="ArgumentException"/>; any other refusal is the exception
+    /// <see cref="Win32Marshal"/> gives for its error, naming <paramref name="fullPath"/>.
+    /// </summary>
+    internal static void SetAttributes(string fullPath, FileAttributes attributes)
+    {
+        if (Kernel32.SetFileAttributes(PathText.EnsureExtendedPrefixIfNeeded(fullPath), (uint)attributes))
+            return;
+
+        var errorCode = Marshal.GetLastWin32Error();
+        if (errorCode == ERROR_INVALID_PARAMETER)
+            throw new ArgumentException("Invalid File or Directory attributes value.", nameof(attributes));
+        throw Win32Marshal.GetExceptionForWin32Error(errorCode, fullPath);
+    }
+
+    /// <summary>
     /// The attributes, times and size of what <paramref name="path"/> names, with 0 as the
     /// answer, or the Windows error number that stopped the read.
+    /// </summary>
+    internal static int FillAttributeInfo(string path, out Kernel32.WIN32_FILE_ATTRIBUTE_DATA data) =>
+        FillAttributeInfo(path, out data, returnErrorOnNotFound: true);
+
+    /// <summary>
+    /// As <see cref="FillAttributeInfo(string, out Kernel32.WIN32_FILE_ATTRIBUTE_DATA)"/>,
+    /// except that where <paramref name="returnErrorOnNotFound"/> is false, nothing being at
+    /// the path, or a drive that is not ready, answers 0 with every attribute bit set, which is
+    /// how .NET 10's FileInfo and DirectoryInfo hold a path with nothing there.
     /// </summary>
     /// <remarks>
     /// One separator at the end is taken off first, as neither call reads a path ending in
@@ -77,7 +146,8 @@ internal static class FrameworkFileSystem
     /// nothing can be reached at the path is asked again through FindFirstFileEx, and its
     /// answer, attributes or error, is the one returned.
     /// </remarks>
-    internal static int FillAttributeInfo(string path, out Kernel32.WIN32_FILE_ATTRIBUTE_DATA data)
+    internal static int FillAttributeInfo(
+        string path, out Kernel32.WIN32_FILE_ATTRIBUTE_DATA data, bool returnErrorOnNotFound)
     {
         var errorCode = ERROR_SUCCESS;
 
@@ -125,6 +195,13 @@ internal static class FrameworkFileSystem
         finally
         {
             if (promptOff) Kernel32.SetThreadErrorMode(oldMode, out _);
+        }
+
+        if (errorCode != ERROR_SUCCESS && !returnErrorOnNotFound
+            && errorCode is ERROR_FILE_NOT_FOUND or ERROR_PATH_NOT_FOUND or ERROR_NOT_READY)
+        {
+            data.dwFileAttributes = InvalidFileAttributes;
+            return ERROR_SUCCESS;
         }
 
         return errorCode;

@@ -272,6 +272,22 @@ internal static class Kernel32
         uint fInfoLevelId,
         out WIN32_FILE_ATTRIBUTE_DATA lpFileInformation);
 
+    /// <summary>
+    /// Deletes the file <paramref name="lpFileName"/> names. For a link this is the link
+    /// itself, never its target.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "DeleteFileW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool DeleteFile(string lpFileName);
+
+    /// <summary>
+    /// Sets the attributes of the file or folder <paramref name="lpFileName"/> names to
+    /// <paramref name="dwFileAttributes"/>.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "SetFileAttributesW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetFileAttributes(string lpFileName, uint dwFileAttributes);
+
     /// <summary>The level <see cref="GetFileAttributesEx"/> answers with a WIN32_FILE_ATTRIBUTE_DATA (GET_FILEEX_INFO_LEVELS).</summary>
     public const uint GetFileExInfoStandard = 0;
 
