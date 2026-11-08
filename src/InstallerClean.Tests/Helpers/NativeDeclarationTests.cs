@@ -192,6 +192,27 @@ public class NativeDeclarationTests
     };
 
     /// <summary>
+    /// The folder listing reads each entry of NtQueryDirectoryFile's buffer at the offsets
+    /// the Windows headers give FILE_FULL_DIR_INFORMATION on x64: the offset of the next entry
+    /// at byte 0, the creation, last access and last write times at 8, 16 and 24, the size at
+    /// 40, the attributes at 56, the name's length at 60 and the name itself at 68. The struct holds
+    /// nothing the marshaller converts, so its offsets are the offsets in memory too. A name
+    /// or size read from any other offset is another part of the entry.
+    /// </summary>
+    [Fact]
+    public void The_folder_listing_entry_is_laid_out_as_NtQueryDirectoryFile_writes_it()
+    {
+        Assert.Equal(0, (int)Marshal.OffsetOf<Ntdll.FILE_FULL_DIR_INFORMATION>(nameof(Ntdll.FILE_FULL_DIR_INFORMATION.NextEntryOffset)));
+        Assert.Equal(8, (int)Marshal.OffsetOf<Ntdll.FILE_FULL_DIR_INFORMATION>(nameof(Ntdll.FILE_FULL_DIR_INFORMATION.CreationTime)));
+        Assert.Equal(16, (int)Marshal.OffsetOf<Ntdll.FILE_FULL_DIR_INFORMATION>(nameof(Ntdll.FILE_FULL_DIR_INFORMATION.LastAccessTime)));
+        Assert.Equal(24, (int)Marshal.OffsetOf<Ntdll.FILE_FULL_DIR_INFORMATION>(nameof(Ntdll.FILE_FULL_DIR_INFORMATION.LastWriteTime)));
+        Assert.Equal(40, (int)Marshal.OffsetOf<Ntdll.FILE_FULL_DIR_INFORMATION>(nameof(Ntdll.FILE_FULL_DIR_INFORMATION.EndOfFile)));
+        Assert.Equal(56, (int)Marshal.OffsetOf<Ntdll.FILE_FULL_DIR_INFORMATION>(nameof(Ntdll.FILE_FULL_DIR_INFORMATION.FileAttributes)));
+        Assert.Equal(60, (int)Marshal.OffsetOf<Ntdll.FILE_FULL_DIR_INFORMATION>(nameof(Ntdll.FILE_FULL_DIR_INFORMATION.FileNameLength)));
+        Assert.Equal(68, (int)Marshal.OffsetOf<Ntdll.FILE_FULL_DIR_INFORMATION>(nameof(Ntdll.FILE_FULL_DIR_INFORMATION.FileName)));
+    }
+
+    /// <summary>
     /// Every struct a declaration or a COM interface method passes, by value or by
     /// reference, and every struct declared beside the declarations, with each struct
     /// inside one, a fixed buffer's own type included.

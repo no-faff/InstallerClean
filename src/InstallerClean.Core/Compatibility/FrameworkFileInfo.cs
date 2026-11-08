@@ -32,83 +32,42 @@ internal sealed class FrameworkFileInfoFactory(IFileSystem fileSystem) : IFileIn
 /// </summary>
 /// <remarks>
 /// The path is made a full path when the object is made, so a null, empty or malformed path
-/// throws there. The file is not read until a member asks for its attributes or its size,
+/// throws there. One made by a folder listing holds what the listing read. Any other file is
+/// not read until a member asks for its attributes or its size,
 /// and the answer is kept until <see cref="Refresh"/>. Nothing at the path is not an error
 /// until then: <see cref="Attributes"/> reads every bit set, and <see cref="Length"/> throws
 /// a <see cref="FileNotFoundException"/>. Members the app does not read are not ported and
 /// throw <see cref="NotSupportedException"/>; BannedSymbols.txt refuses a call to any of
 /// them, and to the access-control extensions that would read through one.
 /// </remarks>
-internal sealed class FrameworkFileInfo : IFileInfo
+internal sealed class FrameworkFileInfo : FrameworkFileSystemInfo, IFileInfo
 {
-    private const int NotRead = -1;
-
-    private readonly string _originalPath;
-    private readonly string _fullPath;
     private string? _name;
-    private Kernel32.WIN32_FILE_ATTRIBUTE_DATA _data;
-    private int _dataInitialized = NotRead;
 
     internal FrameworkFileInfo(IFileSystem fileSystem, string fileName)
+        : base(fileSystem, fileName ?? throw new ArgumentNullException(nameof(fileName)), FullPaths.GetFullPath(fileName))
     {
-        if (fileName is null) throw new ArgumentNullException(nameof(fileName));
-        FileSystem = fileSystem;
-        _originalPath = fileName;
-        _fullPath = FullPaths.GetFullPath(fileName);
     }
 
-    /// <inheritdoc />
-    public IFileSystem FileSystem { get; }
-
-    /// <inheritdoc />
-    public string FullName => _fullPath;
+    /// <summary>
+    /// A file a folder listing found, as .NET 10's <c>FileSystemInfo.Create</c> makes it: the
+    /// name is the listing's, and the attributes, times and size are the listing's.
+    /// </summary>
+    internal FrameworkFileInfo(
+        IFileSystem fileSystem,
+        string fullPath,
+        string fileName,
+        in Kernel32.WIN32_FILE_ATTRIBUTE_DATA data)
+        : base(fileSystem, fullPath, data)
+    {
+        _name = fileName;
+    }
 
     /// <inheritdoc />
     public string Name => _name ??= PathText.GetFileName(_originalPath);
 
-    /// <summary>
-    /// The full path's extension, from its last period, or empty where the last part of the
-    /// path has none.
-    /// </summary>
-    public string Extension
-    {
-        get
-        {
-            var length = _fullPath.Length;
-            for (var i = length; --i >= 0;)
-            {
-                var ch = _fullPath[i];
-                if (ch == '.')
-                    return _fullPath.Substring(i, length - i);
-                if (PathText.IsDirectorySeparator(ch) || ch == Path.VolumeSeparatorChar)
-                    break;
-            }
-            return string.Empty;
-        }
-    }
-
     /// <inheritdoc />
     public string? DirectoryName => PathText.GetDirectoryName(_fullPath);
-
-    /// <summary>
-    /// The attributes, read on the first ask. Nothing at the path reads as every bit set; any
-    /// other refusal from Windows is the exception <see cref="Win32Marshal"/> gives for its
-    /// error, naming the full path. Setting them sets them on the file, and the next ask
-    /// reads them again.
-    /// </summary>
-    public FileAttributes Attributes
-    {
-        get
-        {
-            EnsureDataInitialized();
-            return (FileAttributes)_data.dwFileAttributes;
-        }
-        set
-        {
-            FrameworkFileSystem.SetAttributes(_fullPath, value);
-            _dataInitialized = NotRead;
-        }
-    }
 
     /// <summary>
     /// The size in bytes. A folder, or nothing at the path, is a
@@ -122,12 +81,6 @@ internal sealed class FrameworkFileInfo : IFileInfo
             return FrameworkFileSystem.LengthOf(_fullPath, _data);
         }
     }
-
-    /// <summary>Reads the attributes and size again.</summary>
-    public void Refresh() => RefreshCore();
-
-    /// <summary>The path as it was given.</summary>
-    public override string ToString() => _originalPath;
 
     // Not ported. Each is refused in shipped code by BannedSymbols.txt.
     public bool Exists => throw NotPorted();
@@ -156,21 +109,6 @@ internal sealed class FrameworkFileInfo : IFileInfo
     public FileSystemStream OpenWrite() => throw NotPorted();
     public IFileInfo Replace(string destinationFileName, string? destinationBackupFileName) => throw NotPorted();
     public IFileInfo Replace(string destinationFileName, string? destinationBackupFileName, bool ignoreMetadataErrors) => throw NotPorted();
-
-    private void EnsureDataInitialized()
-    {
-        if (_dataInitialized == NotRead)
-        {
-            _data = default;
-            RefreshCore();
-        }
-
-        if (_dataInitialized != 0)
-            throw Win32Marshal.GetExceptionForWin32Error(_dataInitialized, _fullPath);
-    }
-
-    private void RefreshCore() =>
-        _dataInitialized = FrameworkFileSystem.FillAttributeInfo(_fullPath, out _data, returnErrorOnNotFound: false);
 
     private static NotSupportedException NotPorted() =>
         new("Not ported: port .NET 10's member before calling it, as .NET Framework reads the file otherwise.");

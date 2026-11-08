@@ -110,9 +110,11 @@ internal static class FrameworkDirectory
     /// <summary>
     /// The folder and pattern as .NET 10's <c>FileSystemEnumerableFactory.NormalizeInputs</c>
     /// leaves them for Win32 matching: a folder at the front of the pattern moves onto the
-    /// folder, and the rest of the pattern is put into the form the matcher reads.
+    /// folder, and the rest of the pattern is put into the form the matcher reads. False
+    /// where a folder moved onto <paramref name="directory"/>, which then has to be resolved
+    /// again; true otherwise.
     /// </summary>
-    private static void NormalizeInputs(ref string directory, ref string expression)
+    internal static bool NormalizeInputs(ref string directory, ref string expression)
     {
         if (PathText.IsPathRooted(expression))
             throw new ArgumentException("Second path fragment must not be a drive or UNC name.", nameof(expression));
@@ -121,19 +123,24 @@ internal static class FrameworkDirectory
         if (directory.IndexOf('\0') >= 0)
             throw new ArgumentException("Null character in path.", directory);
 
+        var directoryUnchanged = true;
+
         var directoryName = PathText.GetDirectoryNameAsWritten(expression);
         if (directoryName.Length != 0)
         {
             directory = PathText.Join(directory, directoryName);
             expression = expression.Substring(directoryName.Length + 1);
+            directoryUnchanged = false;
         }
 
-        if (expression == "*")
-            return;
+        if (expression != "*")
+        {
+            expression = string.IsNullOrEmpty(expression) || expression == "." || expression == "*.*"
+                ? "*"
+                : FrameworkFileSystemName.TranslateWin32Expression(expression);
+        }
 
-        expression = string.IsNullOrEmpty(expression) || expression == "." || expression == "*.*"
-            ? "*"
-            : FrameworkFileSystemName.TranslateWin32Expression(expression);
+        return directoryUnchanged;
     }
 
     /// <summary>

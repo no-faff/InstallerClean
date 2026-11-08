@@ -236,9 +236,10 @@ Helpers/FullPaths.cs, Helpers/Win32Marshal.cs, Helpers/RegistryNames.cs,
 Helpers/CommandLineArguments.cs, Helpers/Durations.cs, and in Compatibility/,
 FrameworkFile.cs, FrameworkFileInfo.cs, FrameworkFileSystem.cs,
 FrameworkFileSystemEnumerable.cs, FrameworkFileSystemName.cs,
-FrameworkDirectory.cs, FrameworkStreamExtensions.cs,
-FrameworkStringExtensions.cs, FrameworkCollectionExtensions.cs,
-FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
+FrameworkFileSystemInfo.cs, FrameworkDirectory.cs, FrameworkDirectoryInfo.cs,
+FrameworkStreamExtensions.cs, FrameworkStringExtensions.cs,
+FrameworkCollectionExtensions.cs, FrameworkEnumerable.cs,
+FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
 ConfigureAwaitOptions.cs and TaskCompletionSource.cs.
 

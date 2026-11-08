@@ -14,7 +14,8 @@ namespace InstallerClean.Services;
 /// read and set a file's attributes, and move and delete a file as .NET 10 does
 /// (<see cref="FrameworkFileWrapper"/>, <see cref="FrameworkDirectoryWrapper"/>), and its
 /// <see cref="FileInfo"/> reads a file's attributes and size as .NET 10's FileInfo does
-/// (<see cref="FrameworkFileInfoFactory"/>).
+/// (<see cref="FrameworkFileInfoFactory"/>), and its <see cref="DirectoryInfo"/> lists a
+/// folder's files as .NET 10's DirectoryInfo does (<see cref="FrameworkDirectoryInfoFactory"/>).
 /// </summary>
 internal sealed class AppFileSystem : FileSystem
 {
@@ -23,6 +24,7 @@ internal sealed class AppFileSystem : FileSystem
         File = new FrameworkFileWrapper(this);
         Directory = new FrameworkDirectoryWrapper(this);
         FileInfo = new FrameworkFileInfoFactory(this);
+        DirectoryInfo = new FrameworkDirectoryInfoFactory(this);
     }
 
     /// <inheritdoc />
@@ -33,6 +35,9 @@ internal sealed class AppFileSystem : FileSystem
 
     /// <inheritdoc />
     public override IFileInfoFactory FileInfo { get; }
+
+    /// <inheritdoc />
+    public override IDirectoryInfoFactory DirectoryInfo { get; }
 }
 
 /// <summary>

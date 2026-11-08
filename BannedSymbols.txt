@@ -120,3 +120,46 @@ M:System.IO.Abstractions.IFileStreamFactory.New(System.String,System.IO.FileMode
 M:System.IO.Abstractions.IFileStreamFactory.New(System.String,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare,System.Int32,System.IO.FileOptions);.NET Framework refuses a buffer size of 0, which .NET 10 reads as no buffer: use StorageHelpers.UnbufferedWriter over a handle, or an overload without a buffer size
 M:System.IO.Abstractions.IFileStreamFactory.New(Microsoft.Win32.SafeHandles.SafeFileHandle,System.IO.FileAccess,System.Int32);.NET Framework refuses a buffer size of 0, which .NET 10 reads as no buffer: use StorageHelpers.UnbufferedWriter over a handle, or an overload without a buffer size
 M:System.IO.Abstractions.IFileStreamFactory.New(Microsoft.Win32.SafeHandles.SafeFileHandle,System.IO.FileAccess,System.Int32,System.Boolean);.NET Framework refuses a buffer size of 0, which .NET 10 reads as no buffer: use StorageHelpers.UnbufferedWriter over a handle, or an overload without a buffer size
+M:System.IO.DirectoryInfo.#ctor(System.String);Use the file system's DirectoryInfo, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.DirectoryInfoWrapper.#ctor(System.IO.Abstractions.IFileSystem,System.IO.DirectoryInfo);Use AppFileSystem, whose DirectoryInfo lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectoryInfoFactory.Wrap(System.IO.DirectoryInfo);Use New, as a DirectoryInfo holds a path .NET Framework has already normalised
+M:System.IO.Abstractions.IDirectoryInfo.Create;Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.CreateSubdirectory(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.Delete(System.Boolean);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.EnumerateDirectories;Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.EnumerateDirectories(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.EnumerateDirectories(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.EnumerateFileSystemInfos;Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.EnumerateFileSystemInfos(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.EnumerateFileSystemInfos(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetDirectories;Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetDirectories(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetDirectories(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetFiles;Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetFiles(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetFiles(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetFileSystemInfos;Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetFileSystemInfos(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+M:System.IO.Abstractions.IDirectoryInfo.GetFileSystemInfos(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+P:System.IO.Abstractions.IDirectoryInfo.Parent;Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+P:System.IO.Abstractions.IDirectoryInfo.Root;Not ported: port .NET 10's member before calling it, as .NET Framework reads the folder otherwise
+T:System.IO.Abstractions.DirectoryAclExtensions;Not ported: these read the folder through the file system's DirectoryInfo, which has no access-control members
+T:System.IO.Abstractions.DirectoryInfoAclExtensions;Not ported: the app's DirectoryInfo has no access-control members
+M:System.IO.Abstractions.IDirectory.EnumerateFiles(System.String);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.EnumerateFiles(System.String,System.String);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.EnumerateFiles(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.EnumerateDirectories(System.String);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.EnumerateDirectories(System.String,System.String);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.EnumerateDirectories(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.EnumerateFileSystemEntries(System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.EnumerateFileSystemEntries(System.String,System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.EnumerateFileSystemEntries(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetFiles(System.String);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetFiles(System.String,System.String);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetFiles(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetDirectories(System.String);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetDirectories(System.String,System.String);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetDirectories(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetFileSystemEntries(System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetFileSystemEntries(System.String,System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
+M:System.IO.Abstractions.IDirectory.GetFileSystemEntries(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does

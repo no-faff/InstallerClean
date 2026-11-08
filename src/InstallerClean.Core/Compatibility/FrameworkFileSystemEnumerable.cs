@@ -8,21 +8,40 @@ namespace System.IO;
 
 /// <summary>
 /// One entry of a folder listing, as .NET 10's <c>FileSystemEntry</c> gives it on Windows:
-/// the name and attributes the listing read, and the folder as the caller gave it.
+/// the name, attributes, times and size the listing read, the folder as a full path, and the
+/// folder as the caller gave it.
 /// </summary>
 internal readonly struct FrameworkFileSystemEntry(
     string originalRootDirectory,
+    string directory,
     string fileName,
-    FileAttributes attributes)
+    Kernel32.WIN32_FILE_ATTRIBUTE_DATA data)
 {
     /// <summary>The folder as the caller gave it.</summary>
     internal string OriginalRootDirectory { get; } = originalRootDirectory;
 
+    /// <summary>
+    /// The folder as a full path, with no separator at the end unless it is a root.
+    /// </summary>
+    internal string Directory { get; } = directory;
+
     internal string FileName { get; } = fileName;
 
-    internal FileAttributes Attributes { get; } = attributes;
+    /// <summary>
+    /// The attributes, times and size the listing read, laid out as .NET 10's
+    /// <c>FileSystemInfo.Init</c> copies them.
+    /// </summary>
+    internal Kernel32.WIN32_FILE_ATTRIBUTE_DATA Data { get; } = data;
+
+    internal FileAttributes Attributes => (FileAttributes)Data.dwFileAttributes;
 
     internal bool IsDirectory => (Attributes & FileAttributes.Directory) != 0;
+
+    /// <summary>
+    /// The entry's name joined to the folder's full path, as .NET 10's <c>ToFullPath</c>
+    /// gives it and its FileInfo and DirectoryInfo listings name each entry.
+    /// </summary>
+    internal string ToFullPath() => PathText.Join(Directory, FileName);
 
     /// <summary>
     /// The entry's name joined to the folder as the caller gave it, as .NET 10's Directory
@@ -56,16 +75,26 @@ internal sealed class FrameworkFileSystemEnumerable<T> : IEnumerable<T>
     private readonly string _directory;
     private readonly Func<FrameworkFileSystemEntry, T> _transform;
     private readonly Func<FrameworkFileSystemEntry, bool> _include;
+    private readonly bool _isNormalized;
     private Enumerator? _first;
 
+    /// <param name="directory">The folder to list.</param>
+    /// <param name="transform">What each entry becomes.</param>
+    /// <param name="include">Which entries are listed.</param>
+    /// <param name="isNormalized">
+    /// Whether <paramref name="directory"/> is already a full path, as .NET 10's
+    /// <c>FileSystemEnumerator</c> takes it: where it is, the folder is not resolved again.
+    /// </param>
     internal FrameworkFileSystemEnumerable(
         string directory,
         Func<FrameworkFileSystemEntry, T> transform,
-        Func<FrameworkFileSystemEntry, bool> include)
+        Func<FrameworkFileSystemEntry, bool> include,
+        bool isNormalized = false)
     {
         _directory = directory ?? throw new ArgumentNullException(nameof(directory));
         _transform = transform;
         _include = include;
+        _isNormalized = isNormalized;
         _first = new Enumerator(this);
     }
 
@@ -96,7 +125,8 @@ internal sealed class FrameworkFileSystemEnumerable<T> : IEnumerable<T>
         {
             _owner = owner;
             _originalRootDirectory = owner._directory;
-            _rootDirectory = PathText.TrimEndingDirectorySeparator(FullPaths.GetFullPath(owner._directory));
+            _rootDirectory = PathText.TrimEndingDirectorySeparator(
+                owner._isNormalized ? owner._directory : FullPaths.GetFullPath(owner._directory));
 
             _directoryHandle = OpenDirectory(_rootDirectory);
 
@@ -167,11 +197,21 @@ internal sealed class FrameworkFileSystemEnumerable<T> : IEnumerable<T>
             }
         }
 
+        // The data is copied as .NET 10's FileSystemInfo.Init copies it.
         private FrameworkFileSystemEntry ToEntry(Ntdll.FILE_FULL_DIR_INFORMATION* info) =>
             new(
                 _originalRootDirectory,
+                _rootDirectory,
                 new string((char*)&info->FileName, 0, (int)(info->FileNameLength / sizeof(char))),
-                (FileAttributes)info->FileAttributes);
+                new Kernel32.WIN32_FILE_ATTRIBUTE_DATA
+                {
+                    dwFileAttributes = info->FileAttributes,
+                    ftCreationTime = *(Kernel32.FILETIME*)&info->CreationTime,
+                    ftLastAccessTime = *(Kernel32.FILETIME*)&info->LastAccessTime,
+                    ftLastWriteTime = *(Kernel32.FILETIME*)&info->LastWriteTime,
+                    nFileSizeHigh = (uint)(info->EndOfFile >> 32),
+                    nFileSizeLow = (uint)info->EndOfFile,
+                });
 
         private void FindNextEntry()
         {
