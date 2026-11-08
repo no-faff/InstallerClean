@@ -316,7 +316,7 @@ internal static class Program
         if (!AdministratorRights.Held())
             return RefuseWithoutAdministratorRights(arg);
 
-        using var cts = new CancellationTokenSource();
+        using var cts = new RunCancellation();
         var updateHost = NewUpdateHost(arg, invocation);
 
         // A Ctrl+C from here until the run returns cancels the run, before the update and the
