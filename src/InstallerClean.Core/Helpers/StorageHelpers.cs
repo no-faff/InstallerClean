@@ -115,7 +115,7 @@ internal static class StorageHelpers
         uint flags = Kernel32.FILE_FLAG_OPEN_REPARSE_POINT | moreFlags;
 
         var handle = Kernel32.CreateFile(
-            path, desiredAccess, share, IntPtr.Zero,
+            FullPaths.ForWindowsCall(path), desiredAccess, share, IntPtr.Zero,
             disposition, flags, IntPtr.Zero);
         if (handle.IsInvalid)
         {
@@ -375,7 +375,7 @@ internal static class StorageHelpers
     {
         using var noBox = WithNoCriticalErrorBox();
         var handle = Kernel32.CreateFile(
-            path,
+            FullPaths.ForWindowsCall(path),
             0,
             Kernel32.FILE_SHARE_ALL,
             IntPtr.Zero,
@@ -457,7 +457,7 @@ internal static class StorageHelpers
 
         try
         {
-            var search = Kernel32.FindFirstFile(path, out var entry);
+            var search = Kernel32.FindFirstFile(FullPaths.ForWindowsCall(path), out var entry);
             if (search == InvalidHandle) return null;
             Kernel32.FindClose(search);
 
@@ -502,7 +502,7 @@ internal static class StorageHelpers
 
         try
         {
-            if (!Kernel32.GetDiskFreeSpaceEx(path, out var free, out _, out _))
+            if (!Kernel32.GetDiskFreeSpaceEx(FullPaths.ForWindowsCall(path), out var free, out _, out _))
                 return null;
             return (long)free;
         }

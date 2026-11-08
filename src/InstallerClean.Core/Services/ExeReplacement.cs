@@ -614,7 +614,7 @@ internal static class ExeReplacement
 
     /// <summary>Gives <paramref name="existing"/> the second name <paramref name="link"/>, and answers 0, or the error Windows refused it with.</summary>
     private static int HardLink(string link, string existing) =>
-        Kernel32.CreateHardLink(link, existing, IntPtr.Zero) ? 0 : Marshal.GetLastWin32Error();
+        Kernel32.CreateHardLink(FullPaths.ForWindowsCall(link), FullPaths.ForWindowsCall(existing), IntPtr.Zero) ? 0 : Marshal.GetLastWin32Error();
 
     /// <summary>
     /// Moves <paramref name="from"/> over <paramref name="to"/> in one step, written through
@@ -626,9 +626,11 @@ internal static class ExeReplacement
     private static bool TryMoveOver(string from, string to, TimeSpan bound, out int error)
     {
         var last = 0;
+        var source = FullPaths.ForWindowsCall(from);
+        var target = FullPaths.ForWindowsCall(to);
         var moved = Retry(bound, () =>
         {
-            if (Kernel32.MoveFileEx(from, to, Kernel32.MOVEFILE_REPLACE_EXISTING | Kernel32.MOVEFILE_WRITE_THROUGH))
+            if (Kernel32.MoveFileEx(source, target, Kernel32.MOVEFILE_REPLACE_EXISTING | Kernel32.MOVEFILE_WRITE_THROUGH))
                 return RetryStep.Done;
             last = Marshal.GetLastWin32Error();
             return last is Kernel32.ERROR_ACCESS_DENIED or Kernel32.ERROR_SHARING_VIOLATION or Kernel32.ERROR_LOCK_VIOLATION

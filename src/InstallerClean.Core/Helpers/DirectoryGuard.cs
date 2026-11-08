@@ -77,7 +77,7 @@ internal static class DirectoryGuard
         if (string.IsNullOrEmpty(path)) return null;
 
         var handle = Kernel32.CreateFile(
-            path, Kernel32.GENERIC_READ, Kernel32.FILE_SHARE_ALL, IntPtr.Zero,
+            FullPaths.ForWindowsCall(path), Kernel32.GENERIC_READ, Kernel32.FILE_SHARE_ALL, IntPtr.Zero,
             Kernel32.OPEN_EXISTING, Kernel32.FILE_FLAG_BACKUP_SEMANTICS, IntPtr.Zero);
         if (handle.IsInvalid)
         {

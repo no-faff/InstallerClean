@@ -36,6 +36,47 @@ internal static class FullPaths
     private static char[]? t_firstBuffer;
 
     /// <summary>
+    /// The string to hand one of the app's own Windows calls for <paramref name="path"/>.
+    /// Where both <paramref name="path"/> and its full path are under 260 characters, that is
+    /// <paramref name="path"/> exactly as given, so Windows reads it as it always has. Otherwise
+    /// it is the full path, with <c>\\?\</c> in front where it is 260 characters or longer, so
+    /// Windows takes it whether or not the long-path policy is on. Where the full path cannot be
+    /// had, it is <paramref name="path"/> as given, so Windows answers as it did before.
+    /// </summary>
+    /// <remarks>
+    /// The full path is measured as Windows itself builds it, with any short (8.3) name left
+    /// as it is: expanding one would read the disk for every call, and Windows never expands one.
+    ///
+    /// A path under 260 that ends in a space or a period goes to Windows as given, which takes
+    /// the space or period off, as it did for these calls before. The ports in Compatibility
+    /// put <c>\\?\</c> in front of such a path instead, as .NET 10 does for its own calls; these
+    /// are the app's own calls, not ports.
+    ///
+    /// The result goes to Windows only. A caller keeps its own string for anything it logs,
+    /// shows or compares.
+    /// </remarks>
+    internal static string ForWindowsCall(string path)
+    {
+        if (path is null || PathText.IsEffectivelyEmpty(path) || path.IndexOf('\0') >= 0 || PathText.IsExtended(path))
+            return path!;
+
+        string fullPath;
+        try
+        {
+            fullPath = Normalize(path, expandShortNames: false);
+        }
+        catch
+        {
+            return path;
+        }
+
+        if (path.Length < MaxShortPath && fullPath.Length < MaxShortPath)
+            return path;
+
+        return fullPath.Length >= MaxShortPath ? PathText.EnsureExtendedPrefix(fullPath) : fullPath;
+    }
+
+    /// <summary>
     /// The full path of <paramref name="path"/>. A path beginning <c>\\?\</c> or <c>\??\</c>
     /// is returned as it is. Null is an <see cref="ArgumentNullException"/>; an empty path,
     /// one of spaces alone, or one holding a null character is an
@@ -135,9 +176,9 @@ internal static class FullPaths
         return builder.ToString();
     }
 
-    // GetFullPathNameW's answer, then the short names in it expanded where it holds a '~'.
-    // The string given is returned where the answer is the same text.
-    private static string Normalize(string path)
+    // GetFullPathNameW's answer, then, where expandShortNames is set, the short names in it
+    // expanded where it holds a '~'. The string given is returned where the answer is the same text.
+    private static string Normalize(string path, bool expandShortNames = true)
     {
         var buffer = t_firstBuffer ??= new char[MaxShortPath];
         uint result;
@@ -153,7 +194,7 @@ internal static class FullPaths
         }
 
         var length = (int)result;
-        if (Array.IndexOf(buffer, '~', 0, length) >= 0)
+        if (expandShortNames && Array.IndexOf(buffer, '~', 0, length) >= 0)
             return TryExpandShortFileName(buffer, length, path);
 
         return SameText(buffer, 0, length, path) ? path : new string(buffer, 0, length);

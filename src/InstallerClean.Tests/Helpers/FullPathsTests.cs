@@ -137,4 +137,78 @@ public class FullPathsTests
         Assert.Equal(name, thrown.ParamName);
         Assert.StartsWith("The path is empty.", thrown.Message);
     }
+
+    [Theory]
+    [InlineData(@"C:\Windows\Installer\1a2b3c.msi")]
+    [InlineData(@"relative\name.msi")]
+    [InlineData(@"C:\Windows\Installer\name.msi.")]
+    [InlineData(@"C:\Windows\Installer\name.msi ")]
+    [InlineData(@"C:\Windows\..\Windows\Installer\name.msi")]
+    public void Under_260_a_Windows_call_is_handed_the_callers_own_string(string path)
+    {
+        Assert.Same(path, FullPaths.ForWindowsCall(path));
+    }
+
+    [Fact]
+    public void At_260_or_more_a_Windows_call_is_handed_the_full_path_with_the_prefix()
+    {
+        var path = @"C:\" + new string('a', 296) + @"\x.msi";
+
+        Assert.Equal(@"\\?\" + path, FullPaths.ForWindowsCall(path));
+    }
+
+    [Fact]
+    public void A_long_path_with_dot_dot_is_resolved_before_the_prefix_goes_on()
+    {
+        var folder = @"C:\" + new string('a', 296);
+
+        Assert.Equal(@"\\?\" + folder + @"\x.msi", FullPaths.ForWindowsCall(folder + @"\b\..\x.msi"));
+    }
+
+    [Fact]
+    public void A_long_path_whose_full_path_is_short_is_handed_over_as_its_full_path()
+    {
+        var path = @"C:\" + new string('a', 290) + @"\..\Windows\Installer\x.msi";
+
+        Assert.Equal(@"C:\Windows\Installer\x.msi", FullPaths.ForWindowsCall(path));
+    }
+
+    [Fact]
+    public void A_short_name_is_not_expanded_for_a_Windows_call()
+    {
+        var path = @"C:\" + new string('a', 250) + @"\PROGRA~1\x.msi";
+
+        Assert.Equal(@"\\?\" + path, FullPaths.ForWindowsCall(path));
+    }
+
+    [Fact]
+    public void A_long_share_path_is_handed_over_with_the_UNC_prefix()
+    {
+        var path = @"\\server\share\" + new string('s', 280);
+
+        Assert.Equal(@"\\?\UNC\server\share\" + new string('s', 280), FullPaths.ForWindowsCall(path));
+    }
+
+    [Fact]
+    public void A_long_path_already_prefixed_is_handed_over_as_given()
+    {
+        var path = @"\\?\C:\" + new string('a', 300);
+
+        Assert.Same(path, FullPaths.ForWindowsCall(path));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("C:\\a\0b")]
+    public void A_path_with_no_full_path_is_handed_over_as_given(string path)
+    {
+        Assert.Same(path, FullPaths.ForWindowsCall(path));
+    }
+
+    [Fact]
+    public void Null_is_handed_over_as_null()
+    {
+        Assert.Null(FullPaths.ForWindowsCall(null!));
+    }
 }
