@@ -7,9 +7,9 @@ namespace InstallerClean.Tests.Helpers;
 /// Every member outside the app's own assemblies that a method can reach: each call, callvirt,
 /// newobj, ldftn and ldvirtftn is followed into the app's own code, together with the type
 /// initializer of every type of the app's whose method or field is reached, down to the first
-/// member of another assembly on each path. An abstract or interface method of the app's own is
-/// not followed but answered as <see cref="Unfollowed"/>, so a path through one cannot pass
-/// unread.
+/// member of another assembly on each path. A method of the app's own that has no body, or is
+/// called through a virtual that an override could replace, is not followed but answered as
+/// <see cref="Unfollowed"/>, so a path through one cannot pass unread.
 /// </summary>
 internal sealed class InitializerReach
 {
@@ -23,14 +23,15 @@ internal sealed class InitializerReach
     /// <summary>Members of other assemblies reached, each with the app method that names it.</summary>
     public List<(MemberInfo Member, MethodBase From)> Outside { get; } = [];
 
-    /// <summary>Methods of the app's own that have no body to read.</summary>
+    /// <summary>Methods of the app's own the walk could not read through.</summary>
     public List<MethodBase> Unfollowed { get; } = [];
 
     /// <summary>The app's own methods read, the starting one included.</summary>
     public IReadOnlyCollection<MethodBase> Own => _visited;
 
     public static bool IsOwn(Type? type) =>
-        type?.Assembly.GetName().Name?.StartsWith("InstallerClean", StringComparison.Ordinal) == true;
+        // The command line's assembly is installerclean-cli, in lower case.
+        type?.Assembly.GetName().Name?.StartsWith("InstallerClean", StringComparison.OrdinalIgnoreCase) == true;
 
     public static InitializerReach From(MethodBase start)
     {
@@ -39,8 +40,15 @@ internal sealed class InitializerReach
         return reach;
     }
 
-    private void Visit(MethodBase method)
+    private void Visit(MethodBase method, bool dispatched = false)
     {
+        // A call through a virtual of the app's own may land in any override, which a walk of
+        // the declared method alone would not read.
+        if (dispatched && method.IsVirtual && !method.IsFinal && !(method.DeclaringType?.IsSealed ?? false))
+        {
+            Unfollowed.Add(method);
+            return;
+        }
         if (!_visited.Add(method)) return;
         if (method.DeclaringType?.TypeInitializer is { } cctor) Visit(cctor);
 
@@ -67,7 +75,7 @@ internal sealed class InitializerReach
                 case OperandType.InlineMethod:
                     var token = BitConverter.ToInt32(il, i);
                     var called = method.Module.ResolveMethod(token, typeArgs, methodArgs)!;
-                    if (IsOwn(called.DeclaringType)) Visit(called);
+                    if (IsOwn(called.DeclaringType)) Visit(called, dispatched: op == OpCodes.Callvirt || op == OpCodes.Ldvirtftn);
                     else Outside.Add((called, method));
                     break;
                 case OperandType.InlineField:
@@ -79,6 +87,7 @@ internal sealed class InitializerReach
                 case OperandType.InlineTok:
                     var member = method.Module.ResolveMember(BitConverter.ToInt32(il, i), typeArgs, methodArgs)!;
                     if (member is MethodBase m) { if (IsOwn(m.DeclaringType)) Visit(m); else Outside.Add((m, method)); }
+                    else if (member is FieldInfo f) { if (!IsOwn(f.DeclaringType)) Outside.Add((f, method)); else if (f.DeclaringType!.TypeInitializer is { } tokenCctor) Visit(tokenCctor); }
                     else if (member is Type ty && !IsOwn(ty)) Outside.Add((ty, method));
                     else if (member is Type own && own.TypeInitializer is { } typeCctor) Visit(typeCctor);
                     break;
@@ -97,21 +106,31 @@ internal sealed class InitializerReach
     }
 
     /// <summary>
-    /// Whether <paramref name="member"/> fills in the runtime's AppContext defaults where it is the
-    /// first such call in the process: AppContext itself, any assembly's LocalAppContext or
-    /// AppContext switch class, System.IO, Assembly.Location and FileIOPermission.
+    /// Whether <paramref name="member"/>, a member of another assembly, is known not to reach
+    /// AppContext. The list is of what a module initializer here may call: interop handles and
+    /// errors, IntPtr, Nullable, delegates, List, Monitor, exception constructors and the type
+    /// and module handles. Anything else is answered false, so a new call fails the check until
+    /// it is read and added. A name-based ban would pass a framework member that reads
+    /// AppContext inside itself, as Assembly.Location does through its path permission.
     /// </summary>
-    public static bool FillsInAppContextDefaults(MemberInfo member)
+    public static bool KnownNotToReachAppContext(MemberInfo member)
     {
         var type = member as Type ?? member.DeclaringType;
         if (type is null) return false;
-        var name = type.Name;
-        var ns = type.Namespace ?? string.Empty;
-        return type.FullName == "System.AppContext"
-            || name == "LocalAppContext"
-            || name.EndsWith("AppContextSwitches", StringComparison.Ordinal)
-            || ns == "System.IO" || ns.StartsWith("System.IO.", StringComparison.Ordinal)
-            || (member.Name is "get_Location" or "get_CodeBase" or "get_EscapedCodeBase" && typeof(Assembly).IsAssignableFrom(type))
-            || type.FullName == "System.Security.Permissions.FileIOPermission";
+        if (type.IsGenericType) type = type.GetGenericTypeDefinition();
+        var name = type.FullName ?? string.Empty;
+        if (name is "System.Object" or "System.IntPtr" or "System.Nullable`1"
+            or "System.Action`1" or "System.Func`2" or "System.Collections.Generic.List`1"
+            or "System.Threading.Monitor")
+            return true;
+        if (name == "System.Runtime.InteropServices.Marshal")
+            return member.Name is "GetHINSTANCE" or "GetLastWin32Error";
+        if (name == "System.Type")
+            return member.Name is "GetTypeFromHandle" or "get_Assembly";
+        if (name == "System.Reflection.Assembly")
+            return member.Name == "get_ManifestModule";
+        if (member is ConstructorInfo && typeof(Exception).IsAssignableFrom(type))
+            return true;
+        return member is Type t && (t.IsValueType || t == typeof(object));
     }
 }

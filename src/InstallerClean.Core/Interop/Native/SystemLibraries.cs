@@ -104,12 +104,9 @@ internal static class SystemLibraries
     /// </summary>
     internal static void WriteWhatTheInitializerKept()
     {
-        Exception[] kept;
-        lock (Kept)
-        {
-            kept = [.. Kept];
-            Kept.Clear();
-        }
+        // The module initializer and Main run on the one thread that starts the process.
+        var kept = Kept.ToArray();
+        Kept.Clear();
         foreach (var ex in kept)
         {
             try
@@ -123,8 +120,5 @@ internal static class SystemLibraries
         }
     }
 
-    private static void Keep(Exception ex)
-    {
-        lock (Kept) Kept.Add(ex);
-    }
+    private static void Keep(Exception ex) => Kept.Add(ex);
 }

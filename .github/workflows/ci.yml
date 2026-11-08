@@ -270,9 +270,11 @@ jobs:
       # initializer writes to the crash log goes through System.IO there, which fixes the
       # runtime's compatibility defaults at .NET Framework 4.0 for the whole process. The
       # initializer keeps what it has to report and the exe writes it once Main runs, so a
-      # start leaves no entry about the library search. The window is closed once its first
+      # start leaves no entry about the library search. This shows the search was not skipped
+      # with a reason and not refused; whether it was set in a started exe is read on Windows
+      # by hand, Windows having no call that reports it. The window is closed once its first
       # window is up; the first-run mark is set first so its scan carries no report.
-      - name: Check each exe starts with its library search set and nothing written for it
+      - name: Check each exe starts with nothing in the crash log about its library search
         if: success() || failure()
         shell: pwsh
         run: |
@@ -281,7 +283,7 @@ jobs:
           $log = Join-Path $env:LOCALAPPDATA 'InstallerClean\crash.log'
           function Entries {
             if (-not (Test-Path $log)) { return @() }
-            @(Get-Content $log | Where-Object { $_ -match 'library search|SetDefaultDllDirectories' })
+            @(Get-Content $log | Where-Object { $_ -match 'library search|SetDefaultDllDirectories|SystemLibraries' })
           }
           $before = (Entries).Count
           $failed = $false
@@ -295,6 +297,8 @@ jobs:
           $window = 'src/InstallerClean/bin/Debug/net48/InstallerClean.exe'
           if (-not (Test-Path $window)) { throw "There is no $window to start." }
           $p = Start-Process -FilePath $window -PassThru
+          # Held so the exit code can be read if the window ends by itself.
+          $null = $p.Handle
           $deadline = (Get-Date).AddSeconds(30)
           while ((Get-Date) -lt $deadline -and -not $p.HasExited) {
             $p.Refresh()

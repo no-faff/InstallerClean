@@ -5,8 +5,11 @@ namespace InstallerClean;
 /// what .NET 10 does, each set to .NET 10's behaviour before the window's first code runs.
 /// </summary>
 /// <remarks>
-/// WPF reads these once, when they are first asked for, so they are set from the module
-/// initializer, ahead of App and the first Dispatcher. .NET Framework checks the accessibility
+/// WPF reads these once, when they are first asked for, so they are set from App's type
+/// initializer, ahead of Application's constructor and the first Dispatcher it makes. Not from
+/// the module initializer: the first AppContext call in the process fixes the runtime's own
+/// defaults for the target the domain knows at that moment, and inside the module initializer
+/// it knows none. .NET Framework checks the accessibility
 /// switches when the first Dispatcher is created: once one of
 /// <c>Switch.UseLegacyAccessibilityFeatures</c> and its .2 to .5 is true every later one must be,
 /// and OptOutOfGridColumnResizeUsingKeyboard may be false only where .4 is false, or the window

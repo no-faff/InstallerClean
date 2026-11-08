@@ -7,8 +7,8 @@ namespace InstallerClean.Tests.Helpers;
 /// defaults. On .NET Framework the domain does not know its target framework while the
 /// initializer runs, so the first such call there would fix the process's compatibility
 /// defaults at those of .NET Framework 4.0 (legacy path handling, a 260-character limit).
-/// Every member of another assembly the initializer reaches is read, through the app's own code
-/// to any depth.
+/// Every member of another assembly the initializer reaches, through the app's own code to any
+/// depth, must be on a short list known not to reach AppContext.
 /// </summary>
 public class InitializerReachTests
 {
@@ -29,7 +29,7 @@ public class InitializerReachTests
         Assert.Empty(reach.Unfollowed);
         Assert.NotEmpty(reach.Outside);
         Assert.Empty(reach.Outside
-            .Where(r => InitializerReach.FillsInAppContextDefaults(r.Member))
+            .Where(r => !InitializerReach.KnownNotToReachAppContext(r.Member))
             .Select(r => $"{r.Member.DeclaringType}.{r.Member.Name} from {r.From.DeclaringType}.{r.From.Name}"));
     }
 
@@ -41,7 +41,7 @@ public class InitializerReachTests
         var reach = InitializerReach.From(
             typeof(InstallerClean.Helpers.CrashLog).GetMethod(nameof(InstallerClean.Helpers.CrashLog.TryWrite))!);
 
-        Assert.Contains(reach.Outside, r => InitializerReach.FillsInAppContextDefaults(r.Member));
+        Assert.Contains(reach.Outside, r => !InitializerReach.KnownNotToReachAppContext(r.Member));
     }
 
     [Fact]
