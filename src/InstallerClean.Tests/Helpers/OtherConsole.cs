@@ -97,7 +97,7 @@ internal static class OtherConsole
         var folder = Directory.CreateTempSubdirectory("ic-other-console-").FullName;
         var script = Path.Combine(folder, "OtherConsole.ps1");
         File.WriteAllText(script, Script);
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => { try { Directory.Delete(folder, recursive: true); } catch { } };
+        DomainEnd.DeleteFolder(folder);
         return (script, Path.Combine(folder, "OtherConsole.dll"));
     });
 

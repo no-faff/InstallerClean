@@ -73,7 +73,7 @@ internal static class DetachedStandIn
         var source = Path.Combine(folder, "StandIn.cs");
         var exe = Path.Combine(folder, "stand-in.exe");
         File.WriteAllText(source, Source);
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => { try { Directory.Delete(folder, recursive: true); } catch { } };
+        DomainEnd.DeleteFolder(folder);
 
         var info = new ProcessStartInfo(PowerShell)
         {
