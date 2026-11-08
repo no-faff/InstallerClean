@@ -404,8 +404,7 @@ public class DeclaredProductCheckUnlistedKeyTests
             }
         }
 
-        Assert.Contains("InstallPropertiesOf", reached);
-        Assert.Contains("ValuesOf", reached);
+        Assert.Equal(["InstallPropertiesOf", "ValuesOf"], reached.Where(m => m != "(not the check)").ToArray());
     }
 
     [Fact]
