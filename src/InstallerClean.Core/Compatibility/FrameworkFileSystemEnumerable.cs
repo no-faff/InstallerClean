@@ -68,14 +68,13 @@ internal readonly struct FrameworkFileSystemEntry(
 /// and any other refusal the exception <see cref="Win32Marshal"/> gives for its error, each
 /// naming the folder. A refusal while the entries are read is thrown the same way from
 /// <see cref="IEnumerator.MoveNext"/>. The first enumeration uses that first handle; each
-/// later one opens the folder again.
+/// later one resolves the folder to a full path and opens it again.
 /// </remarks>
 internal sealed class FrameworkFileSystemEnumerable<T> : IEnumerable<T>
 {
     private readonly string _directory;
     private readonly Func<FrameworkFileSystemEntry, T> _transform;
     private readonly Func<FrameworkFileSystemEntry, bool> _include;
-    private readonly bool _isNormalized;
     private Enumerator? _first;
 
     /// <param name="directory">The folder to list.</param>
@@ -83,7 +82,8 @@ internal sealed class FrameworkFileSystemEnumerable<T> : IEnumerable<T>
     /// <param name="include">Which entries are listed.</param>
     /// <param name="isNormalized">
     /// Whether <paramref name="directory"/> is already a full path, as .NET 10's
-    /// <c>FileSystemEnumerator</c> takes it: where it is, the folder is not resolved again.
+    /// <c>FileSystemEnumerable</c> takes it: where it is, the first enumeration does not
+    /// resolve the folder again. Each later enumeration resolves it, as .NET 10's does.
     /// </param>
     internal FrameworkFileSystemEnumerable(
         string directory,
@@ -94,12 +94,11 @@ internal sealed class FrameworkFileSystemEnumerable<T> : IEnumerable<T>
         _directory = directory ?? throw new ArgumentNullException(nameof(directory));
         _transform = transform;
         _include = include;
-        _isNormalized = isNormalized;
-        _first = new Enumerator(this);
+        _first = new Enumerator(this, isNormalized);
     }
 
     public IEnumerator<T> GetEnumerator() =>
-        Interlocked.Exchange(ref _first, null) ?? new Enumerator(this);
+        Interlocked.Exchange(ref _first, null) ?? new Enumerator(this, isNormalized: false);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -121,12 +120,12 @@ internal sealed class FrameworkFileSystemEnumerable<T> : IEnumerable<T>
         private bool _lastEntryFound;
         private T _current = default!;
 
-        internal Enumerator(FrameworkFileSystemEnumerable<T> owner)
+        internal Enumerator(FrameworkFileSystemEnumerable<T> owner, bool isNormalized)
         {
             _owner = owner;
             _originalRootDirectory = owner._directory;
             _rootDirectory = PathText.TrimEndingDirectorySeparator(
-                owner._isNormalized ? owner._directory : FullPaths.GetFullPath(owner._directory));
+                isNormalized ? owner._directory : FullPaths.GetFullPath(owner._directory));
 
             _directoryHandle = OpenDirectory(_rootDirectory);
 
