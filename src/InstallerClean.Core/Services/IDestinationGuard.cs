@@ -177,8 +177,9 @@ internal sealed class ByPathDestinationGuard(IFileSystem fileSystem) : IDestinat
         refusal = WriteProbeRefusal.None;
         var probe = PathText.Combine(folder, _fs.Path.GetRandomFileName());
         // BannedSymbols.txt refuses WriteAllBytes and ReadAllBytes, which reach .NET
-        // Framework's own File. This guard runs only over the substituted filesystem of a
-        // test, so the two are allowed here and nowhere else.
+        // Framework's own File. They are allowed here alone: the app's composition
+        // registers HandleDestinationGuard, which the wiring test holds, so this guard
+        // writes only through the filesystem a test substitutes.
 #pragma warning disable RS0030
         try
         {

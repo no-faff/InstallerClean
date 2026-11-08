@@ -1953,7 +1953,6 @@ InstallerClean을 관리자 권한으로 다시 실행하세요.</value></data>
        destination folder is created, so the cache is untouched. -->
   <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>오류: {0}에 공간이 부족합니다. 이 파일들을 옮기려면 {1}이(가) 필요한데 {2}만 남아 있습니다. 아무것도 이동하지 않았습니다.</value></data>
   <!-- 0 = mode, 1 = destination -->
-  <!-- 0 = mode, 1 = destination as the run was given it. Application event log, machine-read: MachineContract forces en-GB at the emit site. -->
   <!-- 0 = mode, 1 = destination, 2 = size free there, 3 = size the move needs -->
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches

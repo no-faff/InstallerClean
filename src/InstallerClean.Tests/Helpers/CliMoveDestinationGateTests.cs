@@ -242,6 +242,34 @@ public class CliMoveDestinationGateTests
     }
 
     [Fact]
+    public async Task Every_file_the_scan_offered_is_measured_not_only_those_the_re_check_keeps()
+    {
+        // 247 characters, a separator and "1a2b3c4d.msp" make 260; with "a.msi", the one
+        // file the re-check keeps, they make 253. The window measures the scan's list
+        // before its own re-check, so the command line refuses the same Move.
+        var destination = UnderTempOf(247);
+        const string LongNamed = @"C:\Windows\Installer\1a2b3c4d.msp";
+        var (services, _, move) = Fixture(
+            new[]
+            {
+                new OrphanedFile(File1, 100, IsPatch: false, IsRemovablePatch: false,
+                    IsObsoleted: false, Reason: "unclaimed"),
+                new OrphanedFile(LongNamed, 200, IsPatch: true, IsRemovablePatch: true,
+                    IsObsoleted: false, Reason: "superseded"),
+            },
+            survivors: new[] { File1 },
+            survivingClaims: new[] { SurvivingA });
+
+        var (exitCode, stdout) = await RunMove(destination, services);
+
+        Assert.Equal(CliExitCode.Error, exitCode);
+        Assert.Contains(string.Format(Strings.Error_PathTooLong, destination), stdout);
+        await move.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public void The_too_long_event_log_line_names_the_mode_and_the_destination()
     {
         var destination = UnderTempOf(258);
@@ -297,18 +325,29 @@ public class CliMoveDestinationGateTests
     /// move service reports them moved, so a run that gets past the destination
     /// gates completes.
     /// </summary>
-    private static (IServiceProvider Services, IFileSystemScanService Scan, IMoveFilesService Move) Fixture()
+    private static (IServiceProvider Services, IFileSystemScanService Scan, IMoveFilesService Move) Fixture() =>
+        Fixture(
+            new[]
+            {
+                new OrphanedFile(File1, 100, IsPatch: false, IsRemovablePatch: false,
+                    IsObsoleted: false, Reason: "unclaimed"),
+                new OrphanedFile(File2, 200, IsPatch: true, IsRemovablePatch: true,
+                    IsObsoleted: false, Reason: "superseded"),
+            },
+            survivors: new[] { File1, File2 },
+            survivingClaims: new[] { SurvivingA, SurvivingB });
+
+    /// <summary>
+    /// As <see cref="Fixture()"/>, with the files the scan offers, the ones the re-verify
+    /// keeps, and the claims naming those.
+    /// </summary>
+    private static (IServiceProvider Services, IFileSystemScanService Scan, IMoveFilesService Move) Fixture(
+        OrphanedFile[] offered, string[] survivors, PatchClaim[] survivingClaims)
     {
         var scan = Substitute.For<IFileSystemScanService>();
         scan.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
-                new[]
-                {
-                    new OrphanedFile(File1, 100, IsPatch: false, IsRemovablePatch: false,
-                        IsObsoleted: false, Reason: "unclaimed"),
-                    new OrphanedFile(File2, 200, IsPatch: true, IsRemovablePatch: true,
-                        IsObsoleted: false, Reason: "superseded"),
-                },
+                offered,
                 Array.Empty<RegisteredPackage>(),
                 RegisteredTotalBytes: 0));
 
@@ -318,9 +357,9 @@ public class CliMoveDestinationGateTests
         var reverifier = Substitute.For<IRemovableReverifier>();
         reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(new ReverifyResult(
-                new[] { File1, File2 },
-                Array.Empty<string>(),
-                SurvivingPatchClaims: new[] { SurvivingA, SurvivingB },
+                survivors,
+                offered.Select(f => f.FullPath).Except(survivors).ToArray(),
+                SurvivingPatchClaims: survivingClaims,
                 SiblingPatchClaims: Array.Empty<PatchClaim>()));
 
         var move = Substitute.For<IMoveFilesService>();

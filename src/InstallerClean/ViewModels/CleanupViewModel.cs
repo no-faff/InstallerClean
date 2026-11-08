@@ -846,8 +846,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         var probeTask = Task.Run(() =>
         {
             // A destination where a moved file's path would reach MAX_PATH is refused
-            // first, before anything reads or creates it. The batch measured is the
-            // scan's, which holds every file the Move can be handed.
+            // first, before anything reads or creates it. The batch measured is every
+            // file the scan offered, as the command line measures it, which holds every
+            // file the Move can be handed.
             if (MoveDestinationLength.TooLong(dest, batchPaths))
                 return DestinationPreFlight.Rejected(pathTooLong: true);
 

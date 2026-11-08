@@ -52,6 +52,9 @@ internal static class MoveDestinationLength
             }
         }
 
+        // A bare drive, as \\?\C: leaves it, takes the separator the Move writes after it.
+        if (folder.Length == 2 && folder[1] == ':') folder += @"\";
+
         return PathText.Combine(folder, longest ?? "x").Length >= Limit;
     }
 

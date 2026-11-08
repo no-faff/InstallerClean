@@ -1607,12 +1607,14 @@ internal static class Program
 
             // The /m destination was resolved and validated before the scan
             // (see ResolveAndValidateMoveDestination); moveDest is non-empty,
-            // fully qualified and outside the Installer and system folders.
+            // fully qualified, long enough to hold a file of one character, and
+            // outside the Installer and system folders.
             var moveService = services.GetRequiredService<IMoveFilesService>();
 
-            // The files the scan left to move, measured against the destination before the
-            // free-space check reads it.
-            if (MoveDestinationLength.TooLong(moveDest, filePaths))
+            // Every file the scan offered, measured against the destination before the
+            // free-space check reads it: the window measures the same list, before its own
+            // re-check, so the two refuse the same Moves.
+            if (MoveDestinationLength.TooLong(moveDest, scanResult.RemovableFiles.Select(f => f.FullPath)))
                 return MoveDestinationTooLong(arg, moveDest);
 
             // Room at the destination, decided by the Core rule the window
@@ -1621,7 +1623,6 @@ internal static class Program
             // destination validation because only the surviving set's size says
             // how much room is needed, and asked before the folder is created so a
             // refusal leaves nothing behind.
-
             if (MoveSpaceCheck.RefusalFreeSpace(moveDest, totalBytes) is long freeAtDestination)
             {
                 Console.WriteLine(string.Format(Strings.Cli_MoveNotEnoughSpace,
