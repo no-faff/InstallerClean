@@ -5,8 +5,9 @@ namespace InstallerClean.Helpers;
 
 /// <summary>
 /// The exception .NET 10 raises for a Windows error number, built as .NET 10's own
-/// Win32Marshal builds it: the same type, message and HResult for each number, so a caller
-/// that tells one failure from another by its type or its HResult reads it the same on
+/// Win32Marshal builds it (dotnet/runtime v10.0.0, <c>Win32Marshal.cs</c>): the same type,
+/// message and HResult for each number, so a caller that tells one failure from another
+/// by its type or its HResult reads it the same on
 /// .NET Framework 4.8.
 /// </summary>
 internal static class Win32Marshal

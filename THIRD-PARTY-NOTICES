@@ -8,17 +8,16 @@ downloads. Which of them a download carries depends on which download it is, and
 the difference matters:
 
   InstallerClean-<version>-setup.exe     Poppins, Montserrat, the Phosphor
-                                         icon, the two Material Icons
-                                         and the Inno Setup translation
-                                         files
+                                         icon, the two Material Icons, the
+                                         Inno Setup translation files and
+                                         the code from the .NET runtime
   InstallerClean-portable.exe            Poppins, Montserrat, the Phosphor
-                                         icon and the two Material Icons
-  InstallerClean-slim.exe                Poppins, Montserrat, the Phosphor
-                                         icon and the two Material Icons
-  installerclean-cli.exe                 none of them, and nothing on this
-                                         page applies to it: it is built
-                                         from InstallerClean.Core alone,
-                                         which carries no font, no icon and
+                                         icon, the two Material Icons and
+                                         the code from the .NET runtime
+  installerclean-cli.exe                 the code from the .NET runtime
+                                         alone: it is built from
+                                         InstallerClean.Core, which carries
+                                         that code and no font, no icon and
                                          no wizard
 
 The setup installs this file beside LICENSE.txt. The portable and the
@@ -216,6 +215,58 @@ They are src/action/favorite/materialicons/24px.svg and
 src/navigation/check/materialicons/24px.svg in that repository, which
 publishes them under the Apache License, Version 2.0, the licence
 InstallerClean itself is under. Its full text is in LICENSE.
+
+-------------------------------------------------------------------------------
+.NET runtime
+-------------------------------------------------------------------------------
+
+Parts of the .NET runtime's class library, as it is at the v10.0.0 tag, are
+ported to .NET Framework 4.8 and compiled into InstallerClean.Core, which every
+download carries. They are how a path is read, joined and made full; how a file
+or folder is found, read, moved, deleted and listed, and a folder made; how a
+search pattern is matched; how a Windows error becomes an exception; how a
+registry key is listed; how a command line is quoted for a new process; the
+dictionary, sequence, string, stream, ASCII, Math, environment and timing members
+.NET Framework 4.8 lacks; and the text of the messages its exceptions carry.
+
+  https://github.com/dotnet/runtime
+
+They are in these files in src/InstallerClean.Core/: Helpers/PathText.cs,
+Helpers/FullPaths.cs, Helpers/Win32Marshal.cs, Helpers/RegistryNames.cs,
+Helpers/CommandLineArguments.cs, Helpers/Durations.cs, and in Compatibility/,
+FrameworkFile.cs, FrameworkFileInfo.cs, FrameworkFileSystem.cs,
+FrameworkFileSystemEnumerable.cs, FrameworkFileSystemName.cs,
+FrameworkDirectory.cs, FrameworkStreamExtensions.cs,
+FrameworkStringExtensions.cs, FrameworkCollectionExtensions.cs,
+FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
+FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
+ConfigureAwaitOptions.cs and TaskCompletionSource.cs.
+
+Its licence, LICENSE.TXT in that repository at that tag:
+
+  The MIT License (MIT)
+
+  Copyright (c) .NET Foundation and Contributors
+
+  All rights reserved.
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
 
 -------------------------------------------------------------------------------
 Inno Setup translation files

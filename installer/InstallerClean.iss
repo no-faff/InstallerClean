@@ -183,7 +183,8 @@ Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ign
 Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
 ; Same argument, for what is redistributed rather than what is licensed: the GUI
 ; embeds the fonts and icons THIRD-PARTY-NOTICES names, each under its own
-; licence, and this setup compiles in the wizard translations carried under
+; licence, InstallerClean.Core carries the code it names from the .NET runtime,
+; and this setup compiles in the wizard translations carried under
 ; installer\Languages. The DestName trick is the LICENSE one and is needed for
 ; the same reason.
 Source: "..\THIRD-PARTY-NOTICES"; DestDir: "{app}"; DestName: "THIRD-PARTY-NOTICES.txt"; Flags: ignoreversion
