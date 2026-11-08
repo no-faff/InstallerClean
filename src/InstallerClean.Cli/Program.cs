@@ -1610,12 +1610,18 @@ internal static class Program
             // fully qualified and outside the Installer and system folders.
             var moveService = services.GetRequiredService<IMoveFilesService>();
 
+            // The files the scan left to move, measured against the destination before the
+            // free-space check reads it.
+            if (MoveDestinationLength.TooLong(moveDest, filePaths))
+                return MoveDestinationTooLong(arg, moveDest);
+
             // Room at the destination, decided by the Core rule the window
             // applies, which refused a Move it had no room for while this ran it
             // and filled the volume. Asked here rather than in the pre-scan
             // destination validation because only the surviving set's size says
             // how much room is needed, and asked before the folder is created so a
             // refusal leaves nothing behind.
+
             if (MoveSpaceCheck.RefusalFreeSpace(moveDest, totalBytes) is long freeAtDestination)
             {
                 Console.WriteLine(string.Format(Strings.Cli_MoveNotEnoughSpace,
@@ -2777,7 +2783,9 @@ internal static class Program
     /// <summary>
     /// Resolves the /m destination (the command-line path, or the path saved
     /// in %LOCALAPPDATA% when none was given) and runs the fully-qualified,
-    /// not-inside-Installer and not-inside-System-folder gates. Returns null
+    /// length, not-inside-Installer and not-inside-System-folder gates. No file is
+    /// known yet, so the length gate here refuses a destination too long to hold
+    /// any file, and the files the scan finds are measured after it. Returns null
     /// when the destination is valid, setting <paramref name="dest"/>; or the
     /// exit code to return when it is not, after printing the stdout reason
     /// and writing the EventLog entry. Both sources have the same trust
@@ -2816,6 +2824,12 @@ internal static class Program
             return ExitError;
         }
 
+        // Before the scan no file is known, so this refuses a destination too long to hold
+        // any file. The files the scan finds are measured again after it, before anything
+        // reads the destination.
+        if (MoveDestinationLength.TooLong(dest))
+            return MoveDestinationTooLong(arg, resolved);
+
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
         {
             Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
@@ -2833,6 +2847,18 @@ internal static class Program
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Refuses a <c>/m</c> whose destination would put a moved file at a path of
+    /// MAX_PATH or more, naming the destination on stdout and in the Application log.
+    /// </summary>
+    private static int MoveDestinationTooLong(string arg, string destination)
+    {
+        Console.WriteLine(string.Format(Strings.Error_PathTooLong, destination));
+        MachineContract.WriteEventLog(CliEventClass.HardError,
+            () => string.Format(Strings.Cli_EventLogMoveDestinationTooLong, arg, destination));
+        return ExitError;
     }
 
     /// <summary>

@@ -149,6 +149,36 @@ public sealed class DestinationGuardTests : IDisposable
         Assert.False(Directory.Exists(parent));
     }
 
+    [Theory]
+    [InlineData(248)]
+    [InlineData(259)]
+    public void A_folder_of_248_characters_or_more_is_made(int length)
+    {
+        // Each is one folder below the root, so its parent is there.
+        var folder = _root + @"\" + new string('g', length - _root.Length - 1);
+        try
+        {
+            Assert.Equal(FolderCreation.Made, _guard.TryCreateFolder(folder));
+
+            Assert.True(Directory.Exists(@"\\?\" + folder));
+        }
+        finally
+        {
+            try { Directory.Delete(@"\\?\" + folder); } catch { }
+        }
+    }
+
+    [Fact]
+    public void A_folder_is_made_under_its_name_with_a_no_break_space_after_it()
+    {
+        var plain = Path.Combine(_root, "n");
+
+        Assert.Equal(FolderCreation.Made, _guard.TryCreateFolder(plain + "\u00A0"));
+
+        Assert.True(Directory.Exists(@"\\?\" + plain + "\u00A0"));
+        Assert.False(Directory.Exists(@"\\?\" + plain));
+    }
+
     [Fact]
     public void A_chain_of_created_folders_is_removed_from_the_leaf_up()
     {

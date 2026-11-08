@@ -83,12 +83,19 @@ public enum FolderCreation
 /// </summary>
 internal sealed class HandleDestinationGuard : IDestinationGuard
 {
+    /// <summary>
+    /// Makes the one folder through CreateDirectoryW, given its full path with <c>\\?\</c> in
+    /// front whatever its length, as .NET 10's own CreateDirectory gives it: without the
+    /// prefix, CreateDirectoryW's documented limit is 248 characters. A folder whose full path
+    /// cannot be made is <see cref="FolderCreation.Failed"/>.
+    /// </summary>
     public FolderCreation TryCreateFolder(string folder)
     {
         try
         {
             var attributes = Kernel32.SECURITY_ATTRIBUTES.With(IntPtr.Zero);
-            if (Kernel32.CreateDirectory(folder, in attributes)) return FolderCreation.Made;
+            var path = PathText.EnsureExtendedPrefix(FullPaths.GetFullPath(folder));
+            if (Kernel32.CreateDirectory(path, in attributes)) return FolderCreation.Made;
             return Marshal.GetLastWin32Error() == Kernel32.ERROR_ALREADY_EXISTS
                 ? FolderCreation.AlreadyThere
                 : FolderCreation.Failed;
@@ -169,6 +176,10 @@ internal sealed class ByPathDestinationGuard(IFileSystem fileSystem) : IDestinat
         failureCode = 0;
         refusal = WriteProbeRefusal.None;
         var probe = PathText.Combine(folder, _fs.Path.GetRandomFileName());
+        // BannedSymbols.txt refuses WriteAllBytes and ReadAllBytes, which reach .NET
+        // Framework's own File. This guard runs only over the substituted filesystem of a
+        // test, so the two are allowed here and nowhere else.
+#pragma warning disable RS0030
         try
         {
             _fs.File.WriteAllBytes(probe, Array.Empty<byte>());
@@ -186,6 +197,7 @@ internal sealed class ByPathDestinationGuard(IFileSystem fileSystem) : IDestinat
             _fs.File.ReadAllBytes(probe);
             return true;
         }
+#pragma warning restore RS0030
         catch (Exception ex)
         {
             failureCode = Win32CodeOf(ex);

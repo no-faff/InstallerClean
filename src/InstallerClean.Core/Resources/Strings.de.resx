@@ -1953,6 +1953,7 @@ Führe InstallerClean erneut als Administrator aus.</value></data>
        destination folder is created, so the cache is untouched. -->
   <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Fehler: nicht genügend Speicherplatz unter {0}. Das Verschieben dieser Dateien braucht {1}, frei sind {2}. Es wurde nichts verschoben.</value></data>
   <!-- 0 = mode, 1 = destination -->
+  <!-- 0 = mode, 1 = destination as the run was given it. Application event log, machine-read: MachineContract forces en-GB at the emit site. -->
   <!-- 0 = mode, 1 = destination, 2 = size free there, 3 = size the move needs -->
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches

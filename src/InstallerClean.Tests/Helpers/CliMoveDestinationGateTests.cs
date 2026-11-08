@@ -190,7 +190,80 @@ public class CliMoveDestinationGateTests
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
+    [Fact]
+    public async Task A_destination_too_long_to_hold_any_file_is_refused_before_the_scan()
+    {
+        // 258 characters, a separator and a one-character name make 260.
+        var destination = UnderTempOf(258);
+        var (services, scan, move) = Fixture();
+
+        var (exitCode, stdout) = await RunMove(destination, services);
+
+        Assert.Equal(CliExitCode.Error, exitCode);
+        Assert.Contains(string.Format(Strings.Error_PathTooLong, destination), stdout);
+        await scan.DidNotReceive().ScanAsync(
+            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
+        await move.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_destination_where_a_found_file_would_reach_260_characters_is_refused_after_the_scan()
+    {
+        // 254 characters, a separator and "a.msi" make 260.
+        var destination = UnderTempOf(254);
+        var (services, scan, move) = Fixture();
+
+        var (exitCode, stdout) = await RunMove(destination, services);
+
+        Assert.Equal(CliExitCode.Error, exitCode);
+        Assert.Contains(string.Format(Strings.Error_PathTooLong, destination), stdout);
+        await scan.Received(1).ScanAsync(
+            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
+        await move.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_destination_where_every_found_file_stays_under_260_characters_is_moved_into()
+    {
+        // 253 characters, a separator and "a.msi" make 259.
+        var destination = UnderTempOf(253);
+        var (services, _, move) = Fixture();
+
+        var (exitCode, _) = await RunMove(destination, services);
+
+        Assert.Equal(CliExitCode.Ok, exitCode);
+        await move.Received(1).MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), destination, Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public void The_too_long_event_log_line_names_the_mode_and_the_destination()
+    {
+        var destination = UnderTempOf(258);
+
+        var line = MachineContract.English(
+            () => string.Format(Strings.Cli_EventLogMoveDestinationTooLong, "/m", destination));
+
+        Assert.StartsWith("/m mode aborted:", line, StringComparison.Ordinal);
+        Assert.Contains(destination, line, StringComparison.Ordinal);
+    }
+
     // ---- fixtures ----
+
+    /// <summary>
+    /// A folder under temp whose full path is <paramref name="length"/> characters, made of
+    /// one letter so nothing in it is a short name to expand. Nothing is created.
+    /// </summary>
+    private static string UnderTempOf(int length)
+    {
+        var temp = PathText.TrimEndingDirectorySeparator(FullPaths.GetFullPath(Path.GetTempPath()));
+        return temp + @"\" + new string('d', length - temp.Length - 1);
+    }
 
     /// <summary>
     /// Runs <c>/m</c> against <paramref name="destination"/> with stdout redirected,

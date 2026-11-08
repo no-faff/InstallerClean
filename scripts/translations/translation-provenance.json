@@ -8659,6 +8659,9 @@
       "vi": "41fb5d6735ab3543",
       "zh-Hans": "41fb5d6735ab3543",
       "zh-Hant": "41fb5d6735ab3543"
+    },
+    "Cli.EventLogMoveDestinationTooLong": {
+      "ja": "505457e2e53b7c48"
     }
   }
 }

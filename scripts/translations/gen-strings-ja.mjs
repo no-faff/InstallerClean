@@ -346,6 +346,7 @@ const MAP = {
   'Cli.MoveDestinationRelative': `エラー：移動先は完全修飾パスである必要があります。指定されたもの：{0}`,
   'Cli.MoveDestinationInSystemFolder': `エラー：移動先 {0} は Windows のシステムフォルダー配下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramFiles(x86)%、%ProgramData% の外にあるパスを選んでください。`,
   'Cli.EventLogMoveDestinationRelative': `{0}モードは中止されました：移動先 {1} は完全修飾パスではありません。`,
+  'Cli.EventLogMoveDestinationTooLong': `{0}モードは中止されました：移動先 {1} が長すぎます。移動したファイルのパスが 260 文字に達します。`,
   'Cli.EventLogMoveDestinationInSystemFolder': `{0}モードは中止されました：移動先 {1} は Windows システムフォルダー内に解決されます。`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `エラー：現在、Windows Update やバックグラウンドでインストール中のプログラムなど、何かが Windows Installer を使用しています。その間 /m と /d はブロックされます。終わってからもう一度お試しください。`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `エラー：このコンピューターには、中断されたままの以前の Windows Installer トランザクションがあります。{InstallerFolder} をクリーンアップする前に、そのインストールを再開するかロールバックしてください(または Windows を再起動してください)。`,

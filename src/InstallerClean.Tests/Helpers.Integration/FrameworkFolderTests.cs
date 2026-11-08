@@ -1,3 +1,5 @@
+using InstallerClean.Services;
+
 namespace InstallerClean.Tests.Helpers.Integration;
 
 /// <summary>
@@ -71,6 +73,78 @@ public sealed class FrameworkFolderTests : IDisposable
 
         Assert.True(FolderIsThere(plain + "\u00A0"));
         Assert.False(FolderIsThere(plain));
+    }
+
+    [Fact]
+    public void The_app_file_system_makes_a_folder_and_hands_back_its_own_folder_info()
+    {
+        var fileSystem = new AppFileSystem();
+        var folder = Path.Combine(_root, "made", "here");
+
+        var made = fileSystem.Directory.CreateDirectory(folder);
+
+        Assert.True(FolderIsThere(folder));
+        Assert.IsType<FrameworkDirectoryInfo>(made);
+        Assert.Equal(folder, made.FullName);
+    }
+
+    [Fact]
+    public void The_app_file_system_makes_a_folder_under_its_name_with_a_no_break_space_after_it()
+    {
+        var plain = Path.Combine(_root, "m");
+
+        new AppFileSystem().Directory.CreateDirectory(plain + "\u00A0");
+
+        Assert.True(FolderIsThere(plain + "\u00A0"));
+        Assert.False(FolderIsThere(plain));
+    }
+
+    [Fact]
+    public void The_app_file_system_makes_a_folder_of_259_characters()
+    {
+        var folder = PathOfLength(259);
+
+        new AppFileSystem().Directory.CreateDirectory(folder);
+
+        Assert.True(FolderIsThere(folder));
+    }
+
+    [Theory]
+    [InlineData("a*b")]
+    [InlineData("a?b")]
+    public void The_app_file_system_refuses_a_wildcard_in_a_folder_name_with_an_IOException(string name)
+    {
+        // .NET Framework's own CreateDirectory throws ArgumentException for these.
+        var ex = Record.Exception(() => new AppFileSystem().Directory.CreateDirectory(Path.Combine(_root, name)));
+
+        Assert.IsType<IOException>(ex);
+    }
+
+    [Fact]
+    public void The_app_file_system_refuses_a_colon_after_the_drive_with_an_IOException()
+    {
+        // .NET Framework's own CreateDirectory throws NotSupportedException for this.
+        var ex = Record.Exception(() => new AppFileSystem().Directory.CreateDirectory(_root + @"\a:b"));
+
+        Assert.IsType<IOException>(ex);
+    }
+
+    [Fact]
+    public void The_app_file_system_removes_an_empty_folder_and_leaves_one_holding_anything()
+    {
+        var fileSystem = new AppFileSystem();
+        var empty = Path.Combine(_root, "empty");
+        var full = Path.Combine(_root, "full");
+        FrameworkDirectory.CreateDirectory(empty);
+        FrameworkDirectory.CreateDirectory(full);
+        File.WriteAllText(Path.Combine(full, "x"), "x");
+
+        fileSystem.Directory.Delete(empty);
+        var ex = Record.Exception(() => fileSystem.Directory.Delete(full));
+
+        Assert.False(FolderIsThere(empty));
+        Assert.IsType<IOException>(ex);
+        Assert.True(FolderIsThere(full));
     }
 
     [Fact]

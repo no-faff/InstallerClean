@@ -411,6 +411,68 @@ public class CleanupPreFlightTests : IDisposable
     }
 
     [Fact]
+    public async Task A_destination_where_a_found_file_would_reach_260_characters_is_refused_before_anything_reads_it()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        // 254 characters, a separator and "a.msi" make 260.
+        var destination = @"D:\" + new string('d', 254 - 3);
+        vm.Cleanup.MoveDestination = destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
+            InstallerClean.Resources.Strings.Error_InvalidDestinationTitle);
+        // Not asked whether a folder is there, made, written or removed.
+        Assert.Empty(_directory.ReceivedCalls());
+        Assert.Empty(_file.ReceivedCalls());
+        _confirmationService.DidNotReceive().ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_destination_too_long_is_refused_before_where_it_leads_is_read()
+    {
+        // Inside the installer cache as well, so the message says which check answered first.
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        var destination = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer", new string('d', 260));
+        vm.Cleanup.MoveDestination = destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
+            InstallerClean.Resources.Strings.Error_InvalidDestinationTitle);
+        _dialogService.DidNotReceive().ShowWarning(
+            InstallerClean.Resources.Strings.Error_DestinationInsideInstaller, Arg.Any<string>());
+        _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task A_destination_where_every_found_file_stays_under_260_characters_goes_on_to_be_made()
+    {
+        // 253 characters, a separator and "a.msi" make 259.
+        var destination = @"D:\" + new string('d', 253 - 3);
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(false);
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.DidNotReceive().ShowWarning(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination), Arg.Any<string>());
+        _directory.Received(1).CreateDirectory(destination);
+    }
+
+    [Fact]
     public async Task A_refused_pre_flight_leaves_the_commands_usable()
     {
         var vm = CreateViewModel();

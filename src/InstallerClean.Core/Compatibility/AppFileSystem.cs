@@ -11,7 +11,8 @@ namespace InstallerClean.Services;
 /// <summary>
 /// The app's <see cref="IFileSystem"/>: System.IO.Abstractions' own, except that its
 /// <see cref="File"/> and <see cref="Directory"/> answer whether a file or a folder is there,
-/// read and set a file's attributes, and move and delete a file as .NET 10 does
+/// read and set a file's attributes, move and delete a file, and make and remove a folder as
+/// .NET 10 does
 /// (<see cref="FrameworkFileWrapper"/>, <see cref="FrameworkDirectoryWrapper"/>), and its
 /// <see cref="FileInfo"/> reads a file's attributes and size as .NET 10's FileInfo does
 /// (<see cref="FrameworkFileInfoFactory"/>), and its <see cref="DirectoryInfo"/> lists a
@@ -70,13 +71,28 @@ internal sealed class FrameworkFileWrapper(IFileSystem fileSystem) : FileWrapper
 
 /// <summary>
 /// System.IO.Abstractions' <see cref="DirectoryWrapper"/>, whose every member calls
-/// <c>System.IO.Directory</c>, except <see cref="Exists"/>, which answers as .NET 10's
-/// <c>Directory.Exists</c> does (<see cref="FrameworkDirectory"/>).
+/// <c>System.IO.Directory</c>, except these, which do as .NET 10's own
+/// (<see cref="FrameworkDirectory"/>): <see cref="Exists"/>,
+/// <see cref="CreateDirectory(string)"/> and <see cref="Delete(string)"/>.
 /// </summary>
 internal sealed class FrameworkDirectoryWrapper(IFileSystem fileSystem) : DirectoryWrapper(fileSystem)
 {
     /// <inheritdoc />
     public override bool Exists(string? path) => FrameworkDirectory.Exists(path);
+
+    /// <summary>
+    /// Creates the folder and every folder above it that is not there, and returns the
+    /// folder's <see cref="FrameworkDirectoryInfo"/>, as .NET 10's
+    /// <c>Directory.CreateDirectory</c> returns its DirectoryInfo.
+    /// </summary>
+    public override IDirectoryInfo CreateDirectory(string path)
+    {
+        FrameworkDirectory.CreateDirectory(path);
+        return new FrameworkDirectoryInfo(FileSystem, path);
+    }
+
+    /// <summary>Removes the empty folder, as .NET 10's <c>Directory.Delete(string)</c> does.</summary>
+    public override void Delete(string path) => FrameworkDirectory.Delete(path);
 }
 
 #pragma warning restore RS0030

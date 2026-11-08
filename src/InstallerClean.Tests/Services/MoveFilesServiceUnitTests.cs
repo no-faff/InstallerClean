@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using NSubstitute;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
@@ -851,6 +852,46 @@ public class MoveFilesServiceUnitTests
             string.Format(InstallerClean.Resources.Strings.Error_DestinationInSystemFolder, InsideSystemFolder),
             ex.Message);
         Assert.False(fs.Directory.Exists(InsideSystemFolder));
+        Assert.True(fs.File.Exists(source));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_refuses_a_destination_where_a_moved_file_would_reach_260_characters()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        // 254 characters, a separator and "a.msi" make 260.
+        var destination = @"D:\" + new string('d', 254 - 3);
+
+        var svc = new MoveFilesService(fs);
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            svc.MoveFilesAsync(new[] { source }, destination, UnderLeaseClaims.None));
+
+        Assert.Equal(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
+            ex.Message);
+        Assert.False(fs.Directory.Exists(destination));
+        Assert.True(fs.File.Exists(source));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_refuses_a_destination_too_long_before_reading_where_it_leads()
+    {
+        // Inside the installer cache as well, so the refusal the message names is the
+        // check that answered first.
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        var destination = PathText.Combine(InsideInstallerCache, new string('d', 260));
+
+        var svc = new MoveFilesService(fs);
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            svc.MoveFilesAsync(new[] { source }, destination, UnderLeaseClaims.None));
+
+        Assert.Equal(
+            string.Format(InstallerClean.Resources.Strings.Error_PathTooLong, destination),
+            ex.Message);
         Assert.True(fs.File.Exists(source));
     }
 

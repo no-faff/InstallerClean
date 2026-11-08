@@ -189,6 +189,7 @@ public static class Strings
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
     public static string Cli_EventLogMoveDestinationInSystemFolder => Get("Cli.EventLogMoveDestinationInSystemFolder");
     public static string Cli_EventLogMoveDestinationRelative => Get("Cli.EventLogMoveDestinationRelative");
+    public static string Cli_EventLogMoveDestinationTooLong => Get("Cli.EventLogMoveDestinationTooLong");
     public static string Cli_EventLogMoveNoDestination => Get("Cli.EventLogMoveNoDestination");
     public static string Cli_EventLogMoveNotEnoughSpace => Get("Cli.EventLogMoveNotEnoughSpace");
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");

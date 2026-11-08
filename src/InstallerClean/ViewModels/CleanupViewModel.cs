@@ -799,9 +799,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // the confirmation dialog. The CWD is wherever the process happened to be
         // started from and nothing in the app constrains it, so the two
         // out-of-bounds gates below catching such a path is luck, not a gate.
-        // Same three checks in the same order as the CLI's
-        // ResolveAndValidateMoveDestination; MoveFilesService keeps its own copy
-        // at the service boundary for callers that never come through here.
+        // The same checks in the same order as the CLI's
+        // ResolveAndValidateMoveDestination, with the length check first in the
+        // pass below, where the scan's files are known; MoveFilesService keeps
+        // its own copy at the service boundary for callers that never come
+        // through here.
         if (!PathText.IsPathFullyQualified(dest))
         {
             _dialogService.ShowWarning(
@@ -840,8 +842,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // created. The write happens before the first await, and the await is
         // the barrier, so the read after it sees it.
         var createdFolders = new List<string>();
+        var batchPaths = preOpScan.RemovableFiles.Select(f => f.FullPath).ToList();
         var probeTask = Task.Run(() =>
         {
+            // A destination where a moved file's path would reach MAX_PATH is refused
+            // first, before anything reads or creates it. The batch measured is the
+            // scan's, which holds every file the Move can be handed.
+            if (MoveDestinationLength.TooLong(dest, batchPaths))
+                return DestinationPreFlight.Rejected(pathTooLong: true);
+
             // Never let files move back inside C:\Windows\Installer.
             // ResolveFinalPath inside IsInstallerFolderOrChild expands
             // junctions so a reparse-point destination cannot smuggle the
@@ -965,6 +974,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         IsOperating = false;
         OperationProgress = string.Empty;
+
+        if (preFlight.PathTooLong)
+        {
+            EndOperation();
+            _dialogService.ShowWarning(
+                string.Format(Strings.Error_PathTooLong, dest),
+                Strings.Error_InvalidDestinationTitle);
+            return;
+        }
 
         if (preFlight.InsideInstallerCache)
         {
@@ -1996,9 +2014,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <summary>
     /// What one off-thread pass over a Move destination found: whether it is
     /// out of bounds, and, when it is not, what kind of volume it sits on and
-    /// how much room is left there. <see cref="Kind"/> and
-    /// <see cref="AvailableFreeSpace"/> are only meaningful when neither
-    /// rejection flag is set, because the pass returns at the first gate that
+    /// how much room is left there. <see cref="PathTooLong"/> is set where the
+    /// Move would write a path of MAX_PATH or more. <see cref="Kind"/> and
+    /// <see cref="AvailableFreeSpace"/> are only meaningful when no
+    /// rejection is set, because the pass returns at the first gate that
     /// refuses and never touches the destination after that.
     ///
     /// Whether the pass created the destination folder is deliberately NOT on
@@ -2010,11 +2029,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         bool InsideInstallerCache,
         bool InsideSystemFolder,
         string Kind,
-        long? AvailableFreeSpace)
+        long? AvailableFreeSpace,
+        bool PathTooLong = false)
     {
         public static DestinationPreFlight Rejected(
-            bool insideInstallerCache = false, bool insideSystemFolder = false) =>
-            new(insideInstallerCache, insideSystemFolder, MoveDestinationKinds.Unknown, null);
+            bool insideInstallerCache = false, bool insideSystemFolder = false,
+            bool pathTooLong = false) =>
+            new(insideInstallerCache, insideSystemFolder, MoveDestinationKinds.Unknown, null, pathTooLong);
     }
 
     /// <summary>

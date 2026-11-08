@@ -1953,6 +1953,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        destination folder is created, so the cache is untouched. -->
   <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>错误：{0} 上的空间不足。移动这些文件需要 {1}，而可用空间为 {2}。没有移动任何内容。</value></data>
   <!-- 0 = mode, 1 = destination -->
+  <!-- 0 = mode, 1 = destination as the run was given it. Application event log, machine-read: MachineContract forces en-GB at the emit site. -->
   <!-- 0 = mode, 1 = destination, 2 = size free there, 3 = size the move needs -->
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches

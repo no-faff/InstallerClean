@@ -74,7 +74,7 @@ public sealed class MoveFilesService : IMoveFilesService
     {
         return Task.Run(() =>
         {
-            // The three destination gates are inside the worker, not on the
+            // The destination gates are inside the worker, not on the
             // caller's thread, which for the GUI is the dispatcher: two of them
             // resolve a user-chosen path through CreateFile and
             // GetFinalPathNameByHandle, twice over, and a mapped drive or a UNC
@@ -88,6 +88,15 @@ public sealed class MoveFilesService : IMoveFilesService
             if (!PathText.IsPathFullyQualified(destinationFolder))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
+
+            // A destination where a moved file's path would reach MAX_PATH is refused before
+            // any check below reads the destination, so a refusal touches nothing. The batch
+            // measured is the one handed in, the files the re-read under the lease leaves
+            // being among them.
+            var batch = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
+            if (MoveDestinationLength.TooLong(destinationFolder, batch))
+                throw new LocalisedInvalidOperationException(
+                    string.Format(Strings.Error_PathTooLong, destinationFolder));
 
             // Destination must not resolve inside C:\Windows\Installer;
             // ResolveFinalPath expands junctions so a reparse-point
@@ -214,7 +223,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // acquire and the release may await.
             var recheck = _reverifier.RecheckUnderLease(underLeaseClaims);
             var heldBack = recheck.HeldBack;
-            var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
+            var pathList = batch;
             if (heldBack.Count > 0)
             {
                 var reclaimed = new HashSet<string>(heldBack, StringComparer.OrdinalIgnoreCase);
