@@ -83,7 +83,8 @@ public class FrameworkSwitchesTests
         {
             ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
             TargetFrameworkName = NetFramework48,
-            // The test host's own file, for its binding redirects; it sets no switch.
+            // The configuration file of the domain running the tests, for its binding redirects;
+            // it sets no switch.
             ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
         };
         var domain = AppDomain.CreateDomain("switches", null, setup);
@@ -116,11 +117,17 @@ public class FrameworkSwitchesTests
     {
         public bool[] Read()
         {
+            RefuseTheWindow();
             var values = SwitchValues.Read();
+            RefuseTheWindow();
+            return values;
+        }
+
+        private static void RefuseTheWindow()
+        {
             if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "InstallerClean"))
                 throw new InvalidOperationException(
                     "The window's assembly is loaded in the domain read for .NET Framework's own switches.");
-            return values;
         }
     }
 
