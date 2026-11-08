@@ -225,7 +225,7 @@ public sealed class UpdateRequirementsCheckTests
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Requests++;
-            if (delay is { } wait) await Task.Delay(wait, cancellationToken);
+            if (delay is { } wait) await FrameworkTask.Delay(wait, cancellationToken);
             cancelAsItAnswers?.Cancel();
             var bytes = System.Text.Encoding.UTF8.GetBytes(body ?? string.Empty);
             return new HttpResponseMessage(status)
@@ -243,7 +243,7 @@ public sealed class UpdateRequirementsCheckTests
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            await FrameworkTask.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             throw new InvalidOperationException("A delay without end ended.");
         }
     }

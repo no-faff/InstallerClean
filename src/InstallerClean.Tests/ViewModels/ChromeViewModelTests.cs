@@ -617,7 +617,7 @@ public class ChromeViewModelTests
 
     private static async Task<UpdateCheckResult> NeverAnswersAsync(CancellationToken token)
     {
-        await Task.Delay(Timeout.Infinite, token);
+        await FrameworkTask.Delay(Timeout.Infinite, token);
         throw new InvalidOperationException("unreachable");
     }
 

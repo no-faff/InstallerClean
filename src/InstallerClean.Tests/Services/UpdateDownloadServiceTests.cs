@@ -575,7 +575,7 @@ public sealed class UpdateDownloadServiceTests : IDisposable
             }
             try
             {
-                await Task.Delay(Timeout.Infinite, cancellationToken);
+                await FrameworkTask.Delay(Timeout.Infinite, cancellationToken);
             }
             catch (OperationCanceledException ex) when (breaksOffOnCancel)
             {

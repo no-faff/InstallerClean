@@ -488,7 +488,7 @@ public class FrameworkStreamsTests
                 var body = Encoding.ASCII.GetBytes("MZab".PadRight(sent, 'c').Substring(0, sent));
                 await connection.WriteAsync(body, 0, body.Length);
                 await connection.FlushAsync();
-                await Task.Delay(Timeout.Infinite, _stop.Token);
+                await FrameworkTask.Delay(Timeout.Infinite, _stop.Token);
             }
             catch (Exception ex) when (ex is OperationCanceledException or IOException or ObjectDisposedException or SocketException)
             {
