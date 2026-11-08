@@ -187,7 +187,7 @@ internal static class AppDataFolder
 
     private static void Merge(string earlier, string current, List<Exception> failures)
     {
-        foreach (var entry in Directory.EnumerateFileSystemEntries(earlier))
+        foreach (var entry in FrameworkDirectory.EnumerateFileSystemEntries(earlier))
         {
             var name = PathText.GetFileName(entry);
             if (StorageHelpers.CheckReparsePoint(entry, out var error) != StorageHelpers.ReparseCheck.No)
@@ -320,8 +320,8 @@ internal static class AppDataFolder
         {
             if (StorageHelpers.CheckReparsePoint(folder, out _) != StorageHelpers.ReparseCheck.No)
                 return;
-            if (FrameworkDirectory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
-                Directory.Delete(folder, recursive: false);
+            if (FrameworkDirectory.Exists(folder) && !FrameworkDirectory.EnumerateFileSystemEntries(folder).Any())
+                FrameworkDirectory.Delete(folder);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

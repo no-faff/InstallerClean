@@ -50,6 +50,20 @@ internal static class PathText
     }
 
     /// <summary>
+    /// The folder part of <paramref name="path"/> as it is written, separators and all, as
+    /// .NET 10's <c>Path.GetDirectoryName(ReadOnlySpan&lt;char&gt;)</c> gives it: empty where
+    /// the path is empty, all spaces or a root alone.
+    /// </summary>
+    internal static string GetDirectoryNameAsWritten(string path)
+    {
+        if (IsEffectivelyEmpty(path))
+            return "";
+
+        var end = GetDirectoryNameOffset(path);
+        return end >= 0 ? path.Substring(0, end) : "";
+    }
+
+    /// <summary>
     /// The extension of <paramref name="path"/>, its period included: empty where the last
     /// part has no period or ends in one, and null where the path is null.
     /// </summary>
@@ -159,6 +173,19 @@ internal static class PathText
         if (path.Length < MaxShortPath && !EndsWithPeriodOrSpace(path))
             return path;
 
+        return EnsureExtendedPrefix(path);
+
+        static bool EndsWithPeriodOrSpace(string path) =>
+            path.Length > 0 && path[path.Length - 1] is ' ' or '.';
+    }
+
+    /// <summary>
+    /// <paramref name="path"/> with <c>\\?\</c> in front, or <c>\\?\UNC\</c> in place of the
+    /// <c>\\</c> of a share, whatever its length. A path that is relative or already a device
+    /// path is returned as it is.
+    /// </summary>
+    internal static string EnsureExtendedPrefix(string path)
+    {
         if (IsPartiallyQualified(path) || IsDevice(path))
             return path;
 
@@ -166,9 +193,19 @@ internal static class PathText
             return path.Insert(2, @"?\UNC\");
 
         return @"\\?\" + path;
+    }
 
-        static bool EndsWithPeriodOrSpace(string path) =>
-            path.Length > 0 && path[path.Length - 1] is ' ' or '.';
+    /// <summary>
+    /// <paramref name="path2"/> joined to <paramref name="path1"/> as .NET 10's
+    /// <c>Path.Join</c> joins two parts: an empty part is left out, and one backslash goes
+    /// between them where neither has a separator at the join. Nothing in either part is read
+    /// as a root.
+    /// </summary>
+    internal static string Join(string path1, string path2)
+    {
+        if (path1.Length == 0) return path2;
+        if (path2.Length == 0) return path1;
+        return NeedsSeparator(path1, path2) ? path1 + DirectorySeparatorChar + path2 : path1 + path2;
     }
 
     /// <summary>

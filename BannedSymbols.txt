@@ -39,6 +39,28 @@ M:System.MemoryExtensions.SequenceEqual``1(System.Span{``0},System.ReadOnlySpan{
 M:System.IO.File.Exists(System.String);Use FrameworkFile.Exists, which answers as .NET 10 does
 M:System.IO.File.GetAttributes(System.String);Use FrameworkFile.GetAttributes, which reads them as .NET 10 does
 M:System.IO.Directory.Exists(System.String);Use FrameworkDirectory.Exists, which answers as .NET 10 does
+M:System.IO.Directory.CreateDirectory(System.String);Use FrameworkDirectory.CreateDirectory, which makes the folders as .NET 10 does
+M:System.IO.Directory.CreateDirectory(System.String,System.Security.AccessControl.DirectorySecurity);Use FrameworkDirectory.CreateDirectory, which makes the folders as .NET 10 does
+M:System.IO.Directory.Delete(System.String);Use FrameworkDirectory.Delete, which removes an empty folder as .NET 10 does; a recursive delete is not ported
+M:System.IO.Directory.Delete(System.String,System.Boolean);Use FrameworkDirectory.Delete, which removes an empty folder as .NET 10 does; a recursive delete is not ported
+M:System.IO.Directory.EnumerateFiles(System.String);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.EnumerateFiles(System.String,System.String);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.EnumerateFiles(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.EnumerateDirectories(System.String);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.EnumerateDirectories(System.String,System.String);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.EnumerateDirectories(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.EnumerateFileSystemEntries(System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.EnumerateFileSystemEntries(System.String,System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.EnumerateFileSystemEntries(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does; a listing of subfolders is not ported
+M:System.IO.Directory.GetFiles(System.String);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Directory.GetFiles(System.String,System.String);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Directory.GetFiles(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFiles, which lists the folder as .NET 10 does
+M:System.IO.Directory.GetDirectories(System.String);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Directory.GetDirectories(System.String,System.String);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Directory.GetDirectories(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateDirectories, which lists the folder as .NET 10 does
+M:System.IO.Directory.GetFileSystemEntries(System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
+M:System.IO.Directory.GetFileSystemEntries(System.String,System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
+M:System.IO.Directory.GetFileSystemEntries(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
 P:System.IO.FileInfo.Exists;Use FrameworkFile.Exists, which answers as .NET 10 does
 P:System.IO.DirectoryInfo.Exists;Use FrameworkDirectory.Exists, which answers as .NET 10 does
 P:System.IO.FileSystemInfo.Exists;Use FrameworkFile.Exists or FrameworkDirectory.Exists, which answer as .NET 10 does

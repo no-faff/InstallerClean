@@ -288,6 +288,14 @@ internal static class Kernel32
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetFileAttributes(string lpFileName, uint dwFileAttributes);
 
+    /// <summary>
+    /// Removes the empty folder <paramref name="lpPathName"/> names. For a link to a folder
+    /// this is the link itself, never its target.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RemoveDirectoryW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool RemoveDirectory(string lpPathName);
+
     /// <summary>The level <see cref="GetFileAttributesEx"/> answers with a WIN32_FILE_ATTRIBUTE_DATA (GET_FILEEX_INFO_LEVELS).</summary>
     public const uint GetFileExInfoStandard = 0;
 
@@ -1036,6 +1044,9 @@ internal static class Kernel32
     public const uint FILE_SHARE_READ        = 0x00000001;
     public const uint FILE_SHARE_WRITE       = 0x00000002;
     public const uint FILE_SHARE_ALL         = 0x00000007;
+
+    /// <summary>The right to list a folder's entries.</summary>
+    public const uint FILE_LIST_DIRECTORY           = 0x00000001;
 
     public const uint FILE_FLAG_BACKUP_SEMANTICS    = 0x02000000;
     public const uint FILE_FLAG_OPEN_REPARSE_POINT  = 0x00200000;

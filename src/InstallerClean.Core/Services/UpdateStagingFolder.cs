@@ -197,7 +197,7 @@ public sealed class UpdateStagingFolder
             if (rootHandle is null) return false;
 
             var allGone = true;
-            foreach (var folder in Directory.EnumerateDirectories(root, NamePrefix + "*"))
+            foreach (var folder in FrameworkDirectory.EnumerateDirectories(root, NamePrefix + "*"))
             {
                 var leaf = PathText.GetFileName(folder);
                 try
@@ -220,7 +220,7 @@ public sealed class UpdateStagingFolder
                         continue;
 
                     var cleared = true;
-                    foreach (var file in Directory.EnumerateFiles(folder, "InstallerClean-*.exe"))
+                    foreach (var file in FrameworkDirectory.EnumerateFiles(folder, "InstallerClean-*.exe"))
                     {
                         if (!DirectoryGuard.TryRemoveChildFile(folderHandle, PathText.GetFileName(file)))
                             cleared = false;

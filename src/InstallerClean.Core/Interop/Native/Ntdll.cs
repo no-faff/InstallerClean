@@ -41,6 +41,56 @@ internal static class Ntdll
         IntPtr EaBuffer,
         uint EaLength);
 
+    /// <summary>
+    /// Fills <paramref name="FileInformation"/> with the next entries of the folder
+    /// <paramref name="FileHandle"/> lists, as records of the kind
+    /// <paramref name="FileInformationClass"/> names, each pointing at the next. The return
+    /// value is an NTSTATUS: <see cref="STATUS_NO_MORE_FILES"/> once the listing is done.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "NtQueryDirectoryFile", ExactSpelling = true)]
+    public static extern int NtQueryDirectoryFile(
+        SafeFileHandle FileHandle,
+        IntPtr Event,
+        IntPtr ApcRoutine,
+        IntPtr ApcContext,
+        out IO_STATUS_BLOCK IoStatusBlock,
+        IntPtr FileInformation,
+        uint Length,
+        int FileInformationClass,
+        byte ReturnSingleEntry,
+        IntPtr FileName,
+        byte RestartScan);
+
+    /// <summary>The record kind of <see cref="FILE_FULL_DIR_INFORMATION"/> (FILE_INFORMATION_CLASS).</summary>
+    public const int FileFullDirectoryInformation = 2;
+
+    public const int STATUS_SUCCESS = 0;
+    public const int STATUS_NO_MORE_FILES = unchecked((int)0x80000006);
+    public const int STATUS_FILE_NOT_FOUND = unchecked((int)0xC000000F);
+
+    /// <summary>
+    /// One entry of a folder listing as <see cref="NtQueryDirectoryFile"/> writes it: the
+    /// times are FILETIMEs, the name is <see cref="FileNameLength"/> bytes of UTF-16 starting
+    /// at <see cref="FileName"/>, and the next record is <see cref="NextEntryOffset"/> bytes
+    /// on, or none where it is 0.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILE_FULL_DIR_INFORMATION
+    {
+        public uint NextEntryOffset;
+        public uint FileIndex;
+        public long CreationTime;
+        public long LastAccessTime;
+        public long LastWriteTime;
+        public long ChangeTime;
+        public long EndOfFile;
+        public long AllocationSize;
+        public uint FileAttributes;
+        public uint FileNameLength;
+        public uint EaSize;
+        public ushort FileName;
+    }
+
     /// <summary>The Win32 error a failing NTSTATUS maps to, so a handle open that an
     /// NTSTATUS refused is recorded with a cause the rest of the code reads.</summary>
     [DllImport(Library, EntryPoint = "RtlNtStatusToDosError", ExactSpelling = true)]

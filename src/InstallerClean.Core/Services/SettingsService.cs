@@ -141,8 +141,8 @@ public sealed class SettingsService : ISettingsService
         try
         {
             var folder = PathText.GetDirectoryName(_settingsFile);
-            if (!string.IsNullOrEmpty(folder))
-                Directory.CreateDirectory(folder);
+            if (folder is { Length: > 0 })
+                FrameworkDirectory.CreateDirectory(folder);
 
             // OpenAtomic + MoveFileEx(MOVEFILE_REPLACE_EXISTING) gives a
             // race-free save: atomic open at the temp file (refuses

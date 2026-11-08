@@ -16,6 +16,7 @@ internal static class FrameworkFileSystem
     private const int ERROR_SUCCESS = 0;
     private const int ERROR_FILE_NOT_FOUND = 2;
     private const int ERROR_PATH_NOT_FOUND = 3;
+    private const int ERROR_ACCESS_DENIED = 5;
     private const int ERROR_INVALID_HANDLE = 6;
     private const int ERROR_NOT_READY = 21;
     private const int ERROR_BAD_NETPATH = 53;
@@ -42,10 +43,19 @@ internal static class FrameworkFileSystem
     /// Whether <paramref name="fullPath"/> names a folder: something answers there, and it is
     /// a folder. A link to a folder counts as a folder, read by its own attributes.
     /// </summary>
-    internal static bool DirectoryExists(string fullPath) =>
-        FillAttributeInfo(fullPath, out var data) == ERROR_SUCCESS
-        && data.dwFileAttributes != InvalidFileAttributes
-        && (data.dwFileAttributes & Kernel32.FILE_ATTRIBUTE_DIRECTORY) != 0;
+    internal static bool DirectoryExists(string fullPath) => DirectoryExists(fullPath, out _);
+
+    /// <summary>
+    /// As <see cref="DirectoryExists(string)"/>, with the Windows error that stopped the
+    /// read, or 0, in <paramref name="lastError"/>.
+    /// </summary>
+    internal static bool DirectoryExists(string fullPath, out int lastError)
+    {
+        lastError = FillAttributeInfo(fullPath, out var data);
+        return lastError == ERROR_SUCCESS
+            && data.dwFileAttributes != InvalidFileAttributes
+            && (data.dwFileAttributes & Kernel32.FILE_ATTRIBUTE_DIRECTORY) != 0;
+    }
 
     /// <summary>
     /// The attributes of what <paramref name="fullPath"/> names. A refusal from Windows,
@@ -86,6 +96,118 @@ internal static class FrameworkFileSystem
             throw Win32Marshal.GetExceptionForWin32Error(ERROR_FILE_NOT_FOUND, fullPath);
 
         return ((long)data.nFileSizeHigh << 32) | (data.nFileSizeLow & 0xFFFFFFFFL);
+    }
+
+    /// <summary>
+    /// Creates the folder at <paramref name="fullPath"/> and every folder above it that is
+    /// not there, as .NET 10's <c>FileSystem.CreateDirectory</c> does
+    /// (<c>FileSystem.DirectoryCreation.Windows.cs</c>, <c>Interop.CreateDirectory.cs</c>).
+    /// </summary>
+    /// <remarks>
+    /// A folder already there is not an error, whatever the folders above it allow. The
+    /// missing folders are found from the bottom up and made from the top down, each with
+    /// <c>\\?\</c> in front whatever its length, so Windows' limit of 248 characters for a new
+    /// folder does not apply. Where one is refused, the rest are still tried, and the first
+    /// refusal is thrown as the exception <see cref="Win32Marshal"/> gives for its error,
+    /// naming the full path. A file in a folder's place, or a folder there that cannot be
+    /// read, is thrown naming that folder. A root that is not there is a
+    /// <see cref="DirectoryNotFoundException"/> naming the root.
+    /// </remarks>
+    internal static void CreateDirectory(string fullPath)
+    {
+        if (DirectoryExists(fullPath))
+            return;
+
+        var stackDir = new List<string>();
+
+        var somepathexists = false;
+        var length = fullPath.Length;
+
+        // A separator at the end would otherwise make the same folder twice.
+        if (length >= 2 && PathText.IsDirectorySeparator(fullPath[length - 1]))
+            length--;
+
+        var lengthRoot = PathText.GetRootLength(fullPath);
+        if (length > lengthRoot)
+        {
+            var i = length - 1;
+            while (i >= lengthRoot && !somepathexists)
+            {
+                var dir = fullPath.Substring(0, i + 1);
+
+                if (!DirectoryExists(dir))
+                    stackDir.Add(dir);
+                else
+                    somepathexists = true;
+
+                while (i > lengthRoot && !PathText.IsDirectorySeparator(fullPath[i]))
+                    i--;
+                i--;
+            }
+        }
+
+        var count = stackDir.Count;
+        var r = true;
+        var firstError = 0;
+        var errorString = fullPath;
+
+        var attributes = Kernel32.SECURITY_ATTRIBUTES.With(IntPtr.Zero);
+        while (stackDir.Count > 0)
+        {
+            var name = stackDir[stackDir.Count - 1];
+            stackDir.RemoveAt(stackDir.Count - 1);
+
+            r = Kernel32.CreateDirectory(PathText.EnsureExtendedPrefix(name), in attributes);
+            if (!r && firstError == 0)
+            {
+                var currentError = Marshal.GetLastWin32Error();
+
+                // Already there is not a failure unless what is there is a file, or a folder
+                // that cannot be read.
+                if (currentError != Kernel32.ERROR_ALREADY_EXISTS)
+                {
+                    firstError = currentError;
+                }
+                else if (FileExists(name)
+                         || (!DirectoryExists(name, out currentError) && currentError == ERROR_ACCESS_DENIED))
+                {
+                    firstError = currentError;
+                    errorString = name;
+                }
+            }
+        }
+
+        // Nothing was missing and nothing was found: the root itself is not there.
+        if (count == 0 && !somepathexists)
+        {
+            var root = PathText.GetPathRoot(fullPath);
+            if (!DirectoryExists(root!))
+                throw Win32Marshal.GetExceptionForWin32Error(ERROR_PATH_NOT_FOUND, root);
+            return;
+        }
+
+        if (!r && firstError != 0)
+            throw Win32Marshal.GetExceptionForWin32Error(firstError, errorString);
+    }
+
+    /// <summary>
+    /// Removes the empty folder at <paramref name="fullPath"/>, as .NET 10's
+    /// <c>FileSystem.RemoveDirectory</c> does with <c>recursive</c> false. Nothing there is a
+    /// <see cref="DirectoryNotFoundException"/>, access denied an <see cref="IOException"/>
+    /// carrying no Windows error number, and any other refusal the exception
+    /// <see cref="Win32Marshal"/> gives for its error, each naming <paramref name="fullPath"/>.
+    /// </summary>
+    internal static void RemoveDirectory(string fullPath)
+    {
+        if (Kernel32.RemoveDirectory(PathText.EnsureExtendedPrefixIfNeeded(fullPath)))
+            return;
+
+        var errorCode = Marshal.GetLastWin32Error();
+        if (errorCode == ERROR_FILE_NOT_FOUND)
+            errorCode = ERROR_PATH_NOT_FOUND;
+        if (errorCode == ERROR_ACCESS_DENIED)
+            throw new IOException($"Access to the path '{fullPath}' is denied.");
+        throw Win32Marshal.GetExceptionForWin32Error(errorCode, fullPath);
     }
 
     /// <summary>

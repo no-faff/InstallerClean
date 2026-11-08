@@ -48,6 +48,95 @@ internal static class FrameworkDirectory
     }
 
     /// <summary>
+    /// Creates the folder at <paramref name="path"/> and every folder above it that is not
+    /// there, as .NET 10's <c>Directory.CreateDirectory</c> does; a folder already there is
+    /// not an error. A null path is an <see cref="ArgumentNullException"/> and an empty one an
+    /// <see cref="ArgumentException"/>. Each folder goes to Windows with <c>\\?\</c> in front
+    /// whatever its length.
+    /// </summary>
+    internal static void CreateDirectory(string path)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(path);
+        FrameworkFileSystem.CreateDirectory(FullPaths.GetFullPath(path));
+    }
+
+    /// <summary>
+    /// Removes the empty folder at <paramref name="path"/>, as .NET 10's
+    /// <c>Directory.Delete(string)</c> does: a folder with anything in it stays, and is an
+    /// <see cref="IOException"/>.
+    /// </summary>
+    internal static void Delete(string path) =>
+        FrameworkFileSystem.RemoveDirectory(FullPaths.GetFullPath(path));
+
+    /// <summary>
+    /// The full paths of the files directly in the folder at <paramref name="path"/> whose
+    /// names match <paramref name="searchPattern"/>, each spelled from
+    /// <paramref name="path"/> as given, as .NET 10's <c>Directory.EnumerateFiles</c> lists
+    /// them (<see cref="FrameworkFileSystemEnumerable{T}"/>). The pattern is matched against
+    /// each entry's own name only.
+    /// </summary>
+    internal static IEnumerable<string> EnumerateFiles(string path, string searchPattern) =>
+        EnumeratePaths(path, searchPattern, files: true, directories: false);
+
+    /// <summary>
+    /// The full paths of the folders directly in the folder at <paramref name="path"/> whose
+    /// names match <paramref name="searchPattern"/>, as .NET 10's
+    /// <c>Directory.EnumerateDirectories</c> lists them.
+    /// </summary>
+    internal static IEnumerable<string> EnumerateDirectories(string path, string searchPattern) =>
+        EnumeratePaths(path, searchPattern, files: false, directories: true);
+
+    /// <summary>
+    /// The full paths of everything directly in the folder at <paramref name="path"/>, as
+    /// .NET 10's <c>Directory.EnumerateFileSystemEntries</c> lists them.
+    /// </summary>
+    internal static IEnumerable<string> EnumerateFileSystemEntries(string path) =>
+        EnumeratePaths(path, "*", files: true, directories: true);
+
+    private static IEnumerable<string> EnumeratePaths(string path, string searchPattern, bool files, bool directories)
+    {
+        if (path is null) throw new ArgumentNullException(nameof(path));
+        if (searchPattern is null) throw new ArgumentNullException(nameof(searchPattern));
+
+        NormalizeInputs(ref path, ref searchPattern);
+
+        return new FrameworkFileSystemEnumerable<string>(
+            path,
+            entry => entry.ToSpecifiedFullPath(),
+            entry => (entry.IsDirectory ? directories : files)
+                && FrameworkFileSystemName.MatchesWin32Expression(searchPattern.AsSpan(), entry.FileName.AsSpan(), ignoreCase: true));
+    }
+
+    /// <summary>
+    /// The folder and pattern as .NET 10's <c>FileSystemEnumerableFactory.NormalizeInputs</c>
+    /// leaves them for Win32 matching: a folder at the front of the pattern moves onto the
+    /// folder, and the rest of the pattern is put into the form the matcher reads.
+    /// </summary>
+    private static void NormalizeInputs(ref string directory, ref string expression)
+    {
+        if (PathText.IsPathRooted(expression))
+            throw new ArgumentException("Second path fragment must not be a drive or UNC name.", nameof(expression));
+        if (expression.IndexOf('\0') >= 0)
+            throw new ArgumentException("Null character in path.", expression);
+        if (directory.IndexOf('\0') >= 0)
+            throw new ArgumentException("Null character in path.", directory);
+
+        var directoryName = PathText.GetDirectoryNameAsWritten(expression);
+        if (directoryName.Length != 0)
+        {
+            directory = PathText.Join(directory, directoryName);
+            expression = expression.Substring(directoryName.Length + 1);
+        }
+
+        if (expression == "*")
+            return;
+
+        expression = string.IsNullOrEmpty(expression) || expression == "." || expression == "*.*"
+            ? "*"
+            : FrameworkFileSystemName.TranslateWin32Expression(expression);
+    }
+
+    /// <summary>
     /// Moves the folder at <paramref name="sourceDirName"/>, with everything in it, to
     /// <paramref name="destDirName"/> on the same volume. A rename that changes only the case
     /// of the folder's name is made.

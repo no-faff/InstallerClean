@@ -183,6 +183,7 @@ public class NativeDeclarationTests
         [typeof(Ntdll.UNICODE_STRING)] = 16,
         [typeof(Ntdll.OBJECT_ATTRIBUTES)] = 48,
         [typeof(Ntdll.IO_STATUS_BLOCK)] = 16,
+        [typeof(Ntdll.FILE_FULL_DIR_INFORMATION)] = 72,
         [typeof(User32.MONITORINFO)] = 40,
         [typeof(User32.RECT)] = 16,
         [typeof(User32.USEROBJECTFLAGS)] = 12,

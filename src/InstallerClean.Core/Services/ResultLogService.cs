@@ -94,7 +94,7 @@ public sealed class ResultLogService : IResultLogService
             // alone, and empty for a bare file name, which CreateDirectory refuses.
             // The default path is none of those, and a test sandbox never should be.
             var folder = PathText.GetDirectoryName(_logFile);
-            if (folder is not null) Directory.CreateDirectory(folder);
+            if (folder is not null) FrameworkDirectory.CreateDirectory(folder);
 
             var json = JsonSerializer.Serialize(entry, JsonOptions);
 

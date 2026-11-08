@@ -110,7 +110,7 @@ public static class CrashLog
         {
             var folder = LogFolder;
             path = PathText.Combine(folder, FileName);
-            Directory.CreateDirectory(folder);
+            FrameworkDirectory.CreateDirectory(folder);
             RotateIfNeeded(path, path + ArchiveSuffix);
 
             // Append-only handle, so the write lands at the end of the file as

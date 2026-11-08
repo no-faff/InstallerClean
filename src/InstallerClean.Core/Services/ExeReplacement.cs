@@ -756,7 +756,7 @@ internal static class ExeReplacement
         var found = new List<string>();
         try
         {
-            foreach (var path in Directory.EnumerateFiles(folder, stem + "*"))
+            foreach (var path in FrameworkDirectory.EnumerateFiles(folder, stem + "*"))
             {
                 var rest = PathText.GetFileName(path)[stem.Length..];
                 if (rest.Length == 0 || (rest.Length > 1 && rest[0] == '-' && rest[1..].All(char.IsAsciiDigit)))
