@@ -2558,7 +2558,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // not told.
         Task[] answerOrStop = [answered.Task, stopped];
         bool EndsWithin(TimeSpan timeout) =>
-            Task.WaitAny(answerOrStop, WholeMilliseconds(timeout), pass.CancellationToken) >= 0;
+            FrameworkTask.WaitAny(answerOrStop, WholeMilliseconds(timeout), pass.CancellationToken) >= 0;
 
         var notice = SourceFolderWaitThreshold < SourceFolderTimeLimit ? SourceFolderWaitThreshold : SourceFolderTimeLimit;
         var ended = EndsWithin(notice);
@@ -2594,7 +2594,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
     /// <summary>
     /// <paramref name="timeout"/> in whole milliseconds, the unit
-    /// <see cref="Task.WaitAny(Task[], int, CancellationToken)"/> takes, held between nought and
+    /// <see cref="FrameworkTask.WaitAny(Task[], int, CancellationToken)"/> takes, held between nought and
     /// the longest wait that can be given.
     /// </summary>
     private static int WholeMilliseconds(TimeSpan timeout) => (int)Math.Clamp(timeout.TotalMilliseconds, 0, int.MaxValue);
@@ -4674,7 +4674,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
         // Made to run its continuations asynchronously, so code that continues from a stop runs
         // on the thread pool and not on the caller's thread, which completes it. The pass waits
-        // on it with Task.WaitAny, which the runtime wakes from the caller's thread all the same.
+        // on it with FrameworkTask.WaitAny, on the task's wait handle, which the caller's thread
+        // sets as it completes the task.
         private TaskCompletionSource<string> StopOf(string root) =>
             _stops.GetOrAdd(root, _ => new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously));
 

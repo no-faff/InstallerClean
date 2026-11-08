@@ -241,7 +241,7 @@ FrameworkFileStream.cs, FrameworkStreamExtensions.cs,
 FrameworkStringExtensions.cs, FrameworkCollectionExtensions.cs,
 FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
-ConfigureAwaitOptions.cs and TaskCompletionSource.cs.
+ConfigureAwaitOptions.cs, TaskCompletionSource.cs and FrameworkTask.cs.
 
 Its licence, LICENSE.TXT in that repository at that tag:
 
