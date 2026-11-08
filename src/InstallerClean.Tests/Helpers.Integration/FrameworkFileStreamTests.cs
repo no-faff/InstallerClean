@@ -56,7 +56,10 @@ public sealed class FrameworkFileStreamTests : IDisposable
     [Fact]
     public void A_bar_in_a_name_is_asked_of_Windows_and_refused_as_an_IOException()
     {
-        var ex = Record.Exception(() => FrameworkFileStream.OpenRead(Path.Combine(_root, "a|b")));
+        // Joined by hand: .NET Framework's Path.Combine refuses a | itself, with an ArgumentException.
+        var path = _root + @"\a|b";
+
+        var ex = Record.Exception(() => FrameworkFileStream.OpenRead(path));
 
         Assert.IsType<IOException>(ex);
     }
