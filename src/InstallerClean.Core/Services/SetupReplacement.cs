@@ -78,7 +78,7 @@ internal static class SetupReplacement
         FileStream? setup;
         try
         {
-            setup = new FileStream(setupPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            setup = FrameworkFileStream.Open(setupPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

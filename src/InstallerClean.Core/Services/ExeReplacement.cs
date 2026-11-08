@@ -570,7 +570,7 @@ internal static class ExeReplacement
         {
             if (source is null) throw new IOException("This process has no path to copy.");
             if (FrameworkFile.Exists(path)) DeletePlainFile(path);
-            using var input = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var input = FrameworkFileStream.Open(source, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var handle = StorageHelpers.OpenAtomic(path, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateNew)
                 ?? throw new IOException($"The file ending {PathText.GetExtension(path)} could not be created.");
             created = true;

@@ -58,7 +58,7 @@ internal static class FileVersionResource
         FileStream file;
         try
         {
-            file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            file = FrameworkFileStream.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         }
         catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
         {

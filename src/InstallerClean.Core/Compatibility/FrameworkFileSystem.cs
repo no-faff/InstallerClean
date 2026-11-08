@@ -34,8 +34,14 @@ internal static class FrameworkFileSystem
     /// Whether <paramref name="fullPath"/> names a file: something answers there, and it is
     /// not a folder. A link to a file counts as a file, read by its own attributes.
     /// </summary>
-    internal static bool FileExists(string fullPath) =>
-        FillAttributeInfo(fullPath, out var data) == ERROR_SUCCESS
+    internal static bool FileExists(string fullPath) => FileExists(fullPath, out _);
+
+    /// <summary>
+    /// As <see cref="FileExists(string)"/>, with the attributes, times and size the one read
+    /// gave in <paramref name="data"/>.
+    /// </summary>
+    internal static bool FileExists(string fullPath, out Kernel32.WIN32_FILE_ATTRIBUTE_DATA data) =>
+        FillAttributeInfo(fullPath, out data) == ERROR_SUCCESS
         && data.dwFileAttributes != InvalidFileAttributes
         && (data.dwFileAttributes & Kernel32.FILE_ATTRIBUTE_DIRECTORY) == 0;
 

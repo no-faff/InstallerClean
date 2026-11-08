@@ -253,12 +253,12 @@ public sealed class AppUpdater : IAppUpdater
 
     private static string? ReadScoopConfig(string path)
     {
-        // As .NET 10's FileInfo.Exists answers: the full path, with a separator at the end
-        // taken off before the read.
+        // One read of the file's attributes and size, as .NET 10's FileInfo makes it: the
+        // full path, with a separator at the end taken off.
         var fullPath = FullPaths.GetFullPath(path);
-        if (!FrameworkFileSystem.FileExists(fullPath)) return null;
-        if (FrameworkFileSystem.GetLength(fullPath) > MaxScoopConfigBytes) throw new IOException("The settings file is larger than is read.");
-        return File.ReadAllText(path);
+        if (!FrameworkFileSystem.FileExists(fullPath, out var data)) return null;
+        if (FrameworkFileSystem.LengthOf(fullPath, data) > MaxScoopConfigBytes) throw new IOException("The settings file is larger than is read.");
+        return FrameworkFileStream.ReadAllText(fullPath);
     }
 
     private ScoopUpdate? ReadScoopUpdate()
@@ -784,7 +784,7 @@ public sealed class AppUpdater : IAppUpdater
         try
         {
             if (!PathText.IsPathFullyQualified(path)) throw new IOException($"The local file {path} is not a full path.");
-            var bytes = File.ReadAllBytes(path);
+            var bytes = FrameworkFileStream.ReadAllBytes(path);
             if (bytes.Length > UpdateManifest.MaxBytes) throw new IOException($"The local file {path} is over the cap.");
             return bytes;
         }
@@ -823,7 +823,7 @@ public sealed class AppUpdater : IAppUpdater
             FileStream file;
             try
             {
-                file = File.OpenRead(path);
+                file = FrameworkFileStream.OpenRead(path);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {

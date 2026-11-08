@@ -228,3 +228,141 @@ M:System.IO.Abstractions.IFile.WriteAllText(System.String,System.String);Not por
 M:System.IO.Abstractions.IFile.WriteAllText(System.String,System.String,System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
 M:System.IO.File.Copy(System.String,System.String);Not ported: port .NET 10's copy before calling it, as .NET Framework's own runs in its place
 M:System.IO.File.Copy(System.String,System.String,System.Boolean);Not ported: port .NET 10's copy before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.OpenRead(System.String);Use FrameworkFileStream.OpenRead, which opens the file as .NET 10 does
+M:System.IO.File.ReadAllBytes(System.String);Use FrameworkFileStream.ReadAllBytes, which reads the file as .NET 10 does
+M:System.IO.File.ReadAllText(System.String);Use FrameworkFileStream.ReadAllText, which reads the file as .NET 10 does
+M:System.IO.FileStream.#ctor(System.String,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare);Use FrameworkFileStream.Open, which opens the file as .NET 10 does
+M:System.IO.Directory.GetAccessControl(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetAccessControl(System.String,System.Security.AccessControl.AccessControlSections);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetCreationTime(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetCreationTimeUtc(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetCurrentDirectory;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetDirectoryRoot(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetLastAccessTime(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetLastAccessTimeUtc(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetLastWriteTime(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetLastWriteTimeUtc(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetLogicalDrives;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.GetParent(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.SetAccessControl(System.String,System.Security.AccessControl.DirectorySecurity);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.SetCreationTime(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.SetCreationTimeUtc(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.SetCurrentDirectory(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.SetLastAccessTime(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.SetLastAccessTimeUtc(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.SetLastWriteTime(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.Directory.SetLastWriteTimeUtc(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.Create;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.Create(System.Security.AccessControl.DirectorySecurity);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.CreateSubdirectory(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.CreateSubdirectory(System.String,System.Security.AccessControl.DirectorySecurity);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.Delete;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.Delete(System.Boolean);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateDirectories;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateDirectories(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateDirectories(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateFileSystemInfos;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateFileSystemInfos(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateFileSystemInfos(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateFiles;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateFiles(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.EnumerateFiles(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetAccessControl;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetAccessControl(System.Security.AccessControl.AccessControlSections);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetDirectories;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetDirectories(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetDirectories(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetFileSystemInfos;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetFileSystemInfos(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetFileSystemInfos(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetFiles;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetFiles(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.GetFiles(System.String,System.IO.SearchOption);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.SetAccessControl(System.Security.AccessControl.DirectorySecurity);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.DirectoryInfo.ToString;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.AppendAllLines(System.String,System.Collections.Generic.IEnumerable{System.String});Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.AppendAllLines(System.String,System.Collections.Generic.IEnumerable{System.String},System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.AppendAllText(System.String,System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.AppendAllText(System.String,System.String,System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.AppendText(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Create(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Create(System.String,System.Int32,System.IO.FileOptions,System.Security.AccessControl.FileSecurity);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.CreateText(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Decrypt(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Encrypt(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.GetAccessControl(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.GetAccessControl(System.String,System.Security.AccessControl.AccessControlSections);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.GetCreationTime(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.GetCreationTimeUtc(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.GetLastAccessTime(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.GetLastAccessTimeUtc(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.GetLastWriteTime(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.GetLastWriteTimeUtc(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Open(System.String,System.IO.FileMode);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Open(System.String,System.IO.FileMode,System.IO.FileAccess);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Open(System.String,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.OpenText(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.OpenWrite(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.ReadAllLines(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.ReadAllLines(System.String,System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.ReadAllText(System.String,System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.ReadLines(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.ReadLines(System.String,System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Replace(System.String,System.String,System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.Replace(System.String,System.String,System.String,System.Boolean);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.SetAccessControl(System.String,System.Security.AccessControl.FileSecurity);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.SetCreationTime(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.SetCreationTimeUtc(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.SetLastAccessTime(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.SetLastAccessTimeUtc(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.SetLastWriteTime(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.SetLastWriteTimeUtc(System.String,System.DateTime);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.WriteAllBytes(System.String,System.Byte[]);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.WriteAllLines(System.String,System.Collections.Generic.IEnumerable{System.String});Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.WriteAllLines(System.String,System.Collections.Generic.IEnumerable{System.String},System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.WriteAllLines(System.String,System.String[]);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.WriteAllLines(System.String,System.String[],System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.WriteAllText(System.String,System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.File.WriteAllText(System.String,System.String,System.Text.Encoding);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.AppendText;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.CopyTo(System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.CopyTo(System.String,System.Boolean);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Create;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.CreateText;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Decrypt;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Delete;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Encrypt;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.GetAccessControl;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.GetAccessControl(System.Security.AccessControl.AccessControlSections);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Open(System.IO.FileMode);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Open(System.IO.FileMode,System.IO.FileAccess);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Open(System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.OpenRead;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.OpenText;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.OpenWrite;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Replace(System.String,System.String);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.Replace(System.String,System.String,System.Boolean);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.SetAccessControl(System.Security.AccessControl.FileSecurity);Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileInfo.ToString;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.IO.FileStream.#ctor(System.String,System.IO.FileMode);Read through FrameworkFileStream.Open, which opens the file as .NET 10 does, and write through StorageHelpers.OpenAtomic
+M:System.IO.FileStream.#ctor(System.String,System.IO.FileMode,System.IO.FileAccess);Read through FrameworkFileStream.Open, which opens the file as .NET 10 does, and write through StorageHelpers.OpenAtomic
+M:System.IO.FileStream.#ctor(System.String,System.IO.FileMode,System.Security.AccessControl.FileSystemRights,System.IO.FileShare,System.Int32,System.IO.FileOptions);Read through FrameworkFileStream.Open, which opens the file as .NET 10 does, and write through StorageHelpers.OpenAtomic
+M:System.IO.FileStream.#ctor(System.String,System.IO.FileMode,System.Security.AccessControl.FileSystemRights,System.IO.FileShare,System.Int32,System.IO.FileOptions,System.Security.AccessControl.FileSecurity);Read through FrameworkFileStream.Open, which opens the file as .NET 10 does, and write through StorageHelpers.OpenAtomic
+M:System.IO.StreamReader.#ctor(System.String);Use a StreamReader over FrameworkFileStream.Open, which opens the file as .NET 10 does
+M:System.IO.StreamReader.#ctor(System.String,System.Boolean);Use a StreamReader over FrameworkFileStream.Open, which opens the file as .NET 10 does
+M:System.IO.StreamReader.#ctor(System.String,System.Text.Encoding);Use a StreamReader over FrameworkFileStream.Open, which opens the file as .NET 10 does
+M:System.IO.StreamReader.#ctor(System.String,System.Text.Encoding,System.Boolean);Use a StreamReader over FrameworkFileStream.Open, which opens the file as .NET 10 does
+M:System.IO.StreamReader.#ctor(System.String,System.Text.Encoding,System.Boolean,System.Int32);Use a StreamReader over FrameworkFileStream.Open, which opens the file as .NET 10 does
+M:System.IO.StreamWriter.#ctor(System.String);Read through FrameworkFileStream.Open, which opens the file as .NET 10 does, and write through StorageHelpers.OpenAtomic
+M:System.IO.StreamWriter.#ctor(System.String,System.Boolean);Read through FrameworkFileStream.Open, which opens the file as .NET 10 does, and write through StorageHelpers.OpenAtomic
+M:System.IO.StreamWriter.#ctor(System.String,System.Boolean,System.Text.Encoding);Read through FrameworkFileStream.Open, which opens the file as .NET 10 does, and write through StorageHelpers.OpenAtomic
+M:System.IO.StreamWriter.#ctor(System.String,System.Boolean,System.Text.Encoding,System.Int32);Read through FrameworkFileStream.Open, which opens the file as .NET 10 does, and write through StorageHelpers.OpenAtomic
+P:System.IO.DirectoryInfo.FullName;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+P:System.IO.DirectoryInfo.Name;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+P:System.IO.DirectoryInfo.Parent;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+P:System.IO.DirectoryInfo.Root;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+P:System.IO.FileInfo.Directory;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+P:System.IO.FileInfo.DirectoryName;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+P:System.IO.FileInfo.IsReadOnly;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+P:System.IO.FileInfo.Length;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+P:System.IO.FileInfo.Name;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
