@@ -18,15 +18,12 @@ public sealed class FrameworkFolderTests : IDisposable
     private const int ERROR_ALREADY_EXISTS = 183;
     private const int ERROR_DIR_NOT_EMPTY = 145;
 
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-folders-" + Guid.NewGuid().ToString("N"));
+    private readonly string _root = TestTemp.NewFolder("ic-folders-");
 
-    public FrameworkFolderTests() => Directory.CreateDirectory(_root);
 
     public void Dispose()
     {
-        try { Directory.Delete(@"\\?\" + _root, recursive: true); }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
+        TestTemp.Delete(_root);
     }
 
     private static bool FolderIsThere(string path) => Directory.Exists(@"\\?\" + path);

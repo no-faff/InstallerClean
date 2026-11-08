@@ -20,7 +20,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class StagedDownloadTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-staged-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-staged-");
     private readonly string _stagingRoot;
     private readonly string _exe;
     private readonly List<PreparedUpdate> _prepared = [];
@@ -48,7 +48,7 @@ public sealed class StagedDownloadTests : IDisposable
                 }
                 catch { }
             }
-            try { Directory.Delete(_root, recursive: true); } catch { }
+            TestTemp.Delete(_root);
         }
         finally
         {

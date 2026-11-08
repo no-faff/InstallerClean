@@ -1,12 +1,13 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
 /// The production <see cref="FileTimesReader"/> against the real filesystem, in the
-/// temp folder, which on the machines the suite runs on is a local NTFS volume.
+/// test run's temp folder, which on the machines the suite runs on is a local NTFS volume.
 ///
 /// THE LAST TWO TESTS HOLD THE AGE CHECK'S FOOTING AS WELL AS THE READER. The check
 /// dates a file by the latest of its creation, last-write and change times, so a copy
@@ -41,7 +42,7 @@ public class FileTimesReaderTests
     [Fact]
     public void A_path_with_nothing_at_it_names_nothing()
     {
-        var path = Path.Combine(Path.GetTempPath(), "ic-times-absent-" + Guid.NewGuid() + ".msi");
+        var path = TestTemp.NewFilePath("ic-times-absent-", ".msi");
 
         Assert.Equal(FileTimesRead.NamesNothing, new FileTimesReader().ReadOutcome(path, out _));
     }
@@ -49,7 +50,7 @@ public class FileTimesReaderTests
     [Fact]
     public void A_directory_is_not_a_plain_file()
     {
-        var path = Path.Combine(Path.GetTempPath(), "ic-times-dir-" + Guid.NewGuid());
+        var path = TestTemp.NewFilePath("ic-times-dir-");
         Directory.CreateDirectory(path);
         try
         {
@@ -137,7 +138,7 @@ public class FileTimesReaderTests
 
     private static string NewFile()
     {
-        var path = Path.Combine(Path.GetTempPath(), "ic-times-" + Guid.NewGuid() + ".msi");
+        var path = TestTemp.NewFilePath("ic-times-", ".msi");
         File.WriteAllBytes(path, new byte[16]);
         return path;
     }

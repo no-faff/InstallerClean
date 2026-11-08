@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -15,7 +16,7 @@ public sealed class ProcessStartRetryTests : IDisposable
     public void Dispose() => _crashLog.Dispose();
 
     private static ProcessStartInfo Missing() =>
-        new(Path.Combine(Path.GetTempPath(), $"InstallerClean-missing-{Guid.NewGuid():N}.exe"))
+        new(TestTemp.NewFilePath("InstallerClean-missing-", ".exe"))
         {
             UseShellExecute = false,
         };

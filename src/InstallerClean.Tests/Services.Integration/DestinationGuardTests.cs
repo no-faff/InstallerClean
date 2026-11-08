@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -18,12 +19,12 @@ public sealed class DestinationGuardTests : IDisposable
 {
     private const int ErrorAccessDenied = 5;
 
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-dest-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-dest-");
     private readonly IDestinationGuard _guard = new HandleDestinationGuard();
 
     public void Dispose()
     {
-        try { Directory.Delete(_root, recursive: true); } catch { }
+        TestTemp.Delete(_root);
     }
 
     [Fact]

@@ -1,12 +1,13 @@
 using System.Text;
 using InstallerClean.Models;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
 /// The write-and-read half of <see cref="ResultLogService"/>, driven against a
-/// %TEMP% sandbox through the internal path-taking constructor. That seam is
+/// sandbox in the test run's temp folder through the internal path-taking constructor. That seam is
 /// what makes the byte cap, the atomic write and the temp-file cleanup testable
 /// at all: with the paths fixed to %LOCALAPPDATA%, exercising them would mean
 /// writing over the real last-run.json in whichever profile ran the suite.
@@ -25,14 +26,13 @@ public class ResultLogServiceTests : IDisposable
     {
         // Its own folder per test class run, because WriteAsync creates the
         // parent and the temp files are siblings of the log.
-        _folder = Path.Combine(Path.GetTempPath(), $"ic-resultlog-{Guid.NewGuid()}");
+        _folder = Path.Combine(TestTemp.Run, $"ic-resultlog-{Guid.NewGuid():N}");
         _logFile = Path.Combine(_folder, "last-run.json");
     }
 
     public void Dispose()
     {
-        if (Directory.Exists(_folder))
-            Directory.Delete(_folder, recursive: true);
+        TestTemp.Delete(_folder);
     }
 
     private static ResultLogEntry SampleEntry() =>

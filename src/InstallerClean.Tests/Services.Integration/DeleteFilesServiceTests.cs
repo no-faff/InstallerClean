@@ -8,7 +8,7 @@ namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
 /// Real-filesystem integration tests: the service deletes throwaway files
-/// under %TEMP% through a real <c>FileSystem</c>, so the parts a
+/// in the test run's temp folder through a real <c>FileSystem</c>, so the parts a
 /// MockFileSystem cannot reach are exercised. Those are the two safety gates,
 /// which read the real filesystem whatever is injected: the reparse-point
 /// refusal needs a real symlink, and the containment guard needs a real path
@@ -20,15 +20,11 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public class DeleteFilesServiceTests : IDisposable
 {
-    private readonly string _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    private readonly string _tempDir = TestTemp.NewFolder("ic-delete-");
 
-    public DeleteFilesServiceTests()
-    {
-        Directory.CreateDirectory(_tempDir);
-    }
 
     // The source-containment guard requires sources to resolve inside the cache
-    // root; point that root at the %TEMP% sandbox so the real files these tests
+    // root; point that root at the test run's sandbox folder so the real files these tests
     // delete are not refused as out-of-bounds, without touching the real cache.
     private DeleteFilesService NewService() =>
         new(new System.IO.Abstractions.FileSystem(), NullMutexProbe.Instance, _tempDir);
@@ -309,7 +305,6 @@ public class DeleteFilesServiceTests : IDisposable
 
     public void Dispose()
     {
-        if (Directory.Exists(_tempDir))
-            Directory.Delete(_tempDir, recursive: true);
+        TestTemp.Delete(_tempDir);
     }
 }

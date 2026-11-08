@@ -12,14 +12,13 @@ public class AppDataFolderTests : IDisposable
 {
     private const string Header = "# crash.log header, first line\n# second line\n\n";
 
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-appdata-" + Guid.NewGuid().ToString("N"));
+    private readonly string _root = TestTemp.NewFolder("ic-appdata-");
     private readonly string _parent;
     private readonly string _earlier;
     private readonly string _current;
 
     public AppDataFolderTests()
     {
-        Directory.CreateDirectory(_root);
         _parent = Path.Combine(_root, "NoFaff");
         _earlier = Path.Combine(_parent, "InstallerClean");
         _current = Path.Combine(_root, "InstallerClean");
@@ -37,7 +36,7 @@ public class AppDataFolderTests : IDisposable
             }
             catch (Exception) { }
         }
-        TestCrashLog.TryDelete(_root);
+        TestTemp.Delete(_root);
     }
 
     private static void Write(string folder, string name, string text)

@@ -17,7 +17,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class StagedRunTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-staged-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-staged-");
     private readonly List<Process> _owned = [];
     private readonly IDisposable _crashLog = TestCrashLog.OwnFolder();
 
@@ -56,7 +56,7 @@ public sealed class StagedRunTests : IDisposable
                 try { if (!process.HasExited) { process.Kill(); process.WaitForExit(10_000); } } catch { }
                 process.Dispose();
             }
-            TestCrashLog.TryDelete(_root);
+            TestTemp.Delete(_root);
         }
         finally
         {

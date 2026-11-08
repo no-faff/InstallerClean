@@ -15,13 +15,12 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// </remarks>
 public sealed class FrameworkFileDeleteAndLengthTests : IDisposable
 {
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-delete-length-" + Guid.NewGuid().ToString("N"));
+    private readonly string _root = TestTemp.NewFolder("ic-delete-length-");
     private readonly string _file;
     private readonly string _spaced;
 
     public FrameworkFileDeleteAndLengthTests()
     {
-        Directory.CreateDirectory(_root);
         _file = Path.Combine(_root, "x.txt");
         File.WriteAllText(_file, "xyz");
         _spaced = _file + "\u00A0";
@@ -29,14 +28,7 @@ public sealed class FrameworkFileDeleteAndLengthTests : IDisposable
 
     public void Dispose()
     {
-        try
-        {
-            foreach (var entry in Directory.EnumerateFiles(@"\\?\" + _root, "*", SearchOption.AllDirectories))
-                File.SetAttributes(entry, FileAttributes.Normal);
-            Directory.Delete(@"\\?\" + _root, recursive: true);
-        }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
+        TestTemp.Delete(_root);
     }
 
     private string LongFolder()

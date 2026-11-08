@@ -6,6 +6,7 @@ using InstallerClean.Models;
 using InstallerClean.Resources;
 using InstallerClean.Services;
 using InstallerClean.Helpers;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -16,7 +17,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     // another path. Where the host keeps its temporary folder is then no part of any
     // test here.
     private readonly string _fakeInstallerDir = Path.Combine(
-        InstallerCacheHelpers.ResolveFinalPath(Path.GetTempPath()), "ic-tests-" + Guid.NewGuid());
+        InstallerCacheHelpers.ResolveFinalPath(TestTemp.Run), "ic-tests-" + Guid.NewGuid());
 
     public FileSystemScanServiceIntegrationTests()
     {
@@ -680,7 +681,6 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
 
     public void Dispose()
     {
-        try { if (Directory.Exists(_fakeInstallerDir)) Directory.Delete(_fakeInstallerDir, recursive: true); }
-        catch { }
+        TestTemp.Delete(_fakeInstallerDir);
     }
 }

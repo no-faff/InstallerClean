@@ -18,7 +18,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class ExeReplacementTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-replace-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-replace-");
     private readonly List<Process> _started = [];
     private readonly List<IDisposable> _held = [];
     private readonly IDisposable _crashLog = TestCrashLog.OwnFolder();
@@ -38,13 +38,7 @@ public sealed class ExeReplacementTests : IDisposable
                 try { if (!process.HasExited) process.Kill(); process.WaitForExit(); } catch { }
                 process.Dispose();
             }
-            try
-            {
-                foreach (var file in Directory.EnumerateFiles(_root, "*", SearchOption.AllDirectories))
-                    File.SetAttributes(file, FileAttributes.Normal);
-                Directory.Delete(_root, recursive: true);
-            }
-            catch { }
+            TestTemp.Delete(_root);
         }
         finally
         {

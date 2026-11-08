@@ -18,7 +18,7 @@ namespace InstallerClean.Tests.EndToEnd;
 /// </summary>
 public sealed class ConsoleCloseTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-close-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-close-");
     private Process? _run;
     private Process? _host;
 
@@ -62,7 +62,7 @@ public sealed class ConsoleCloseTests : IDisposable
         foreach (var name in Switches) Environment.SetEnvironmentVariable(name, null);
         OtherConsole.End(_run);
         OtherConsole.End(_host);
-        try { Directory.Delete(_root, recursive: true); } catch { }
+        TestTemp.Delete(_root);
     }
 
     [OwnConsoleWindowFact]

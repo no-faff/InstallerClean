@@ -16,15 +16,12 @@ public sealed class FrameworkFileStreamTests : IDisposable
 {
     private const int SharingViolation = unchecked((int)0x80070020);
 
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-open-" + Guid.NewGuid().ToString("N"));
+    private readonly string _root = TestTemp.NewFolder("ic-open-");
 
-    public FrameworkFileStreamTests() => Directory.CreateDirectory(_root);
 
     public void Dispose()
     {
-        try { Directory.Delete(@"\\?\" + _root, recursive: true); }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
+        TestTemp.Delete(_root);
     }
 
     private static void Write(string path, byte[] bytes) => File.WriteAllBytes(@"\\?\" + path, bytes);

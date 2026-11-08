@@ -1,5 +1,6 @@
 using InstallerClean.Models;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -9,7 +10,7 @@ public class SettingsServiceTests : IDisposable
 
     public SettingsServiceTests()
     {
-        _tempFile = Path.Combine(Path.GetTempPath(), $"settings-test-{Guid.NewGuid()}.json");
+        _tempFile = TestTemp.NewFilePath("settings-test-", ".json");
     }
 
     public void Dispose()
@@ -65,7 +66,7 @@ public class SettingsServiceTests : IDisposable
 
         Assert.False(saved);
         Assert.Empty(Directory.GetFiles(
-            Path.GetTempPath(), Path.GetFileName(_tempFile) + ".*.tmp"));
+            TestTemp.Run, Path.GetFileName(_tempFile) + ".*.tmp"));
     }
 
     [Fact]

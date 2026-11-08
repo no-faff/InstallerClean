@@ -22,7 +22,4 @@ internal static class DomainEnd
         AppDomain.CurrentDomain.DomainUnload += Run;
         AppDomain.CurrentDomain.ProcessExit += Run;
     }
-
-    /// <summary>Deletes <paramref name="folder"/> and everything in it as the domain ends.</summary>
-    internal static void DeleteFolder(string folder) => Then(() => Directory.Delete(folder, recursive: true));
 }

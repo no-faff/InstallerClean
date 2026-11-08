@@ -1,6 +1,7 @@
 using InstallerClean.Helpers;
 using InstallerClean.Services;
 using Microsoft.Win32.SafeHandles;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services;
 
@@ -12,7 +13,7 @@ namespace InstallerClean.Tests.Services;
 /// </summary>
 /// <remarks>
 /// The walk up to the ancestor is real. The path names a file not yet created, in a
-/// folder made under the temp folder, and is spelled with a "." segment, so the walk
+/// folder made under the test run's folder, and is spelled with a "." segment, so the walk
 /// opens that folder and <see cref="Path.GetFullPath(string)"/> spells the path
 /// differently from the way it was passed in. Every failure hands back that
 /// GetFullPath spelling; a path given with \\?\, \\.\ or \??\ in front of a drive or
@@ -20,20 +21,18 @@ namespace InstallerClean.Tests.Services;
 /// </remarks>
 public sealed class InstallerCacheHelpersKernelAnswerTests : IDisposable
 {
-    private readonly string _folder =
-        Path.Combine(Path.GetTempPath(), "installerclean-kernel-answer-" + Guid.NewGuid().ToString("N"));
+    private readonly string _folder = TestTemp.NewFolder("installerclean-kernel-answer-");
 
     private readonly string _path;
 
     public InstallerCacheHelpersKernelAnswerTests()
     {
-        Directory.CreateDirectory(_folder);
         _path = Path.Combine(_folder, ".", "not-yet-created.msi");
     }
 
     public void Dispose()
     {
-        try { Directory.Delete(_folder, recursive: true); } catch { }
+        TestTemp.Delete(_folder);
     }
 
     [Fact]

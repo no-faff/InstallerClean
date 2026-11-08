@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services;
 
@@ -17,13 +18,13 @@ public sealed class UpdateDownloadServiceTests : IDisposable
     private static readonly Uri AssetAddress =
         new("https://release-assets.githubusercontent.com/some/asset");
 
-    private readonly string _folder = Directory.CreateTempSubdirectory("ic-download-").FullName;
+    private readonly string _folder = TestTemp.NewFolder("ic-download-");
 
     private string Destination => Path.Combine(_folder, "download.exe");
 
     public void Dispose()
     {
-        try { Directory.Delete(_folder, recursive: true); } catch { }
+        TestTemp.Delete(_folder);
     }
 
     /// <summary>Answers each request from a table keyed by its address, and records the addresses.</summary>

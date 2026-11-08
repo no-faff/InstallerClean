@@ -111,12 +111,6 @@ namespace System.IO
 
     internal static class TestFrameworkDirectory
     {
-        private const int ErrorAlreadyExists = 183;
-
-        [DllImport("kernel32.dll", EntryPoint = "CreateDirectoryW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool CreateDirectoryW(string lpPathName, IntPtr lpSecurityAttributes);
-
         extension(Directory)
         {
             public static FileSystemInfo CreateSymbolicLink(string path, string pathToTarget)
@@ -125,25 +119,7 @@ namespace System.IO
                 TestFrameworkFile.MakeLink(path, pathToTarget, isDirectory: true);
                 return new DirectoryInfo(fullPath);
             }
-
-            /// <summary>
-            /// A new, empty folder in the temporary folder, named <paramref name="prefix"/> and
-            /// eight random characters, made as .NET 10 makes one: a name already taken is never
-            /// reused, and another is tried.
-            /// </summary>
-            public static DirectoryInfo CreateTempSubdirectory(string? prefix = null)
-            {
-                var tempPath = Path.GetTempPath();
-                while (true)
-                {
-                    var path = tempPath + prefix + Path.GetRandomFileName().Replace(".", "").Substring(0, 8);
-                    if (CreateDirectoryW(path, IntPtr.Zero)) return new DirectoryInfo(path);
-                    var error = Marshal.GetLastWin32Error();
-                    if (error != ErrorAlreadyExists) throw TestFrameworkFile.ExceptionFor(error, path);
-                }
-            }
         }
-
     }
 }
 

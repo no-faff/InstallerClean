@@ -17,21 +17,13 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// </remarks>
 public sealed class FrameworkDirectoryInfoTests : IDisposable
 {
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-folder-info-" + Guid.NewGuid().ToString("N"));
+    private readonly string _root = TestTemp.NewFolder("ic-folder-info-");
     private readonly IFileSystem _fs = new AppFileSystem();
 
-    public FrameworkDirectoryInfoTests() => Directory.CreateDirectory(_root);
 
     public void Dispose()
     {
-        try
-        {
-            foreach (var file in Directory.EnumerateFiles(@"\\?\" + _root, "*", SearchOption.AllDirectories))
-                File.SetAttributes(file, FileAttributes.Normal);
-            Directory.Delete(@"\\?\" + _root, recursive: true);
-        }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
+        TestTemp.Delete(_root);
     }
 
     private IEnumerable<IFileInfo> Walk(string folder) =>

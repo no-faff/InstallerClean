@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using InstallerClean.Interop;
 using InstallerClean.Interop.Native;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -21,11 +22,10 @@ public sealed class PackageIdentityReaderDatabaseTests : IDisposable
     /// <summary>The real reader, asked through the interface, as the declared-product check asks it.</summary>
     private static readonly IPackageIdentityReader Reader = new PackageIdentityReader();
 
-    private readonly string _folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    private readonly string _folder = TestTemp.NewFolder("ic-package-identity-");
 
-    public PackageIdentityReaderDatabaseTests() => Directory.CreateDirectory(_folder);
 
-    public void Dispose() => Directory.Delete(_folder, recursive: true);
+    public void Dispose() => TestTemp.Delete(_folder);
 
     [Fact]
     public void A_package_declaring_a_well_formed_ProductCode_reads_as_that_code()

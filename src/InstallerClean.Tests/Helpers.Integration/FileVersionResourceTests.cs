@@ -14,13 +14,12 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// </summary>
 public sealed class FileVersionResourceTests : IDisposable
 {
-    private readonly string _folder = Path.Combine(Path.GetTempPath(), $"ic-fileversion-{Guid.NewGuid():N}");
+    private readonly string _folder = TestTemp.NewFolder("ic-fileversion-");
 
-    public FileVersionResourceTests() => Directory.CreateDirectory(_folder);
 
     public void Dispose()
     {
-        try { Directory.Delete(_folder, recursive: true); } catch (IOException) { }
+        TestTemp.Delete(_folder);
     }
 
     private string CopyOf(string path, string name)

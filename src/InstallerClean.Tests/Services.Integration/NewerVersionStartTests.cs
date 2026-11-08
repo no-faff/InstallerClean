@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using InstallerClean.Helpers;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -14,7 +15,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class NewerVersionStartTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-start-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-start-");
     private readonly List<Process> _started = [];
     private readonly IDisposable _crashLog = TestCrashLog.OwnFolder();
 
@@ -24,10 +25,18 @@ public sealed class NewerVersionStartTests : IDisposable
         {
             foreach (var process in _started)
             {
-                try { if (!process.HasExited) process.Kill(); } catch { }
+                try
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                        process.WaitForExit(10_000);
+                    }
+                }
+                catch { }
                 process.Dispose();
             }
-            try { Directory.Delete(_root, recursive: true); } catch { }
+            TestTemp.Delete(_root);
         }
         finally
         {

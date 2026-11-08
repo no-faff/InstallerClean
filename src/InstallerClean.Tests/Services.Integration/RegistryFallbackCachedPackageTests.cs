@@ -1,6 +1,7 @@
 using InstallerClean.Models;
 using InstallerClean.Services;
 using Microsoft.Win32;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -330,16 +331,16 @@ public class RegistryFallbackCachedPackageTests
     private static void WithSubtree(Action<Fixture> body)
     {
         var keyPath = $@"Software\InstallerCleanTests\{Guid.NewGuid():N}";
-        var folder = Path.Combine(Path.GetTempPath(), $"ictest-{Guid.NewGuid():N}");
+        var folder = TestTemp.NewFolder("ictest-");
         try
         {
-            Directory.CreateDirectory(folder);
             using var userData = Registry.CurrentUser.CreateSubKey(keyPath, writable: true);
             Assert.NotNull(userData);
             using var account = userData.CreateSubKey(Sid, writable: true);
             Assert.NotNull(account);
             body(new Fixture(userData, account, new TempFiles(folder)));
         }
+        catch (Exception) when (TestTemp.KeepOnFailure(folder)) { }
         finally
         {
             try { Registry.CurrentUser.DeleteSubKeyTree(keyPath, throwOnMissingSubKey: false); }
@@ -356,8 +357,7 @@ public class RegistryFallbackCachedPackageTests
             }
             catch (Exception) { /* as above */ }
 
-            try { Directory.Delete(folder, recursive: true); }
-            catch (Exception) { /* as above */ }
+            TestTemp.Delete(folder);
         }
     }
 }

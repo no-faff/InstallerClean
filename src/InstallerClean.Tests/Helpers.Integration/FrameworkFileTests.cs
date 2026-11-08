@@ -14,18 +14,12 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// </remarks>
 public sealed class FrameworkFileTests : IDisposable
 {
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-move-" + Guid.NewGuid().ToString("N"));
+    private readonly string _root = TestTemp.NewFolder("ic-move-");
 
-    public FrameworkFileTests()
-    {
-        Directory.CreateDirectory(_root);
-    }
 
     public void Dispose()
     {
-        try { Directory.Delete(@"\\?\" + _root, recursive: true); }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
+        TestTemp.Delete(_root);
     }
 
     private string Write(string name, string text)

@@ -15,7 +15,7 @@ namespace InstallerClean.Tests.Helpers.Integration;
 /// </remarks>
 public sealed class LongPathWindowsCallTests : IDisposable
 {
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-long-" + Guid.NewGuid().ToString("N"));
+    private readonly string _root = TestTemp.NewFolder("ic-long-");
     private readonly string _folder;
     private readonly string _file;
 
@@ -31,9 +31,7 @@ public sealed class LongPathWindowsCallTests : IDisposable
 
     public void Dispose()
     {
-        try { Directory.Delete(@"\\?\" + _root, recursive: true); }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
+        TestTemp.Delete(_root);
     }
 
     [Fact]

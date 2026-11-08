@@ -3,6 +3,7 @@ using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Services;
 using Microsoft.Win32.SafeHandles;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
@@ -15,7 +16,7 @@ namespace InstallerClean.Tests.Services.Integration;
 /// </summary>
 public sealed class SetupReplacementTests : IDisposable
 {
-    private readonly string _root = Directory.CreateTempSubdirectory("ic-setup-replace-").FullName;
+    private readonly string _root = TestTemp.NewFolder("ic-setup-replace-");
     private readonly IDisposable _crashLog = TestCrashLog.OwnFolder();
     private readonly string _staging;
     private readonly string _version;
@@ -41,7 +42,7 @@ public sealed class SetupReplacementTests : IDisposable
         try
         {
             _started.Dispose();
-            TestCrashLog.TryDelete(_root);
+            TestTemp.Delete(_root);
         }
         finally
         {

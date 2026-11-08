@@ -94,10 +94,9 @@ internal static class OtherConsole
     /// </summary>
     private static readonly Lazy<(string Script, string Library)> Files = new(() =>
     {
-        var folder = Directory.CreateTempSubdirectory("ic-other-console-").FullName;
+        var folder = TestTemp.NewFolder("ic-other-console-");
         var script = Path.Combine(folder, "OtherConsole.ps1");
         File.WriteAllText(script, Script);
-        DomainEnd.DeleteFolder(folder);
         return (script, Path.Combine(folder, "OtherConsole.dll"));
     });
 

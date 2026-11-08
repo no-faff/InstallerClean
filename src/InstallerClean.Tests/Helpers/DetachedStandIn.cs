@@ -69,11 +69,10 @@ internal static class DetachedStandIn
 
     private static readonly Lazy<string> Compiled = new(() =>
     {
-        var folder = Directory.CreateTempSubdirectory("ic-detached-stand-in-").FullName;
+        var folder = TestTemp.NewFolder("ic-detached-stand-in-");
         var source = Path.Combine(folder, "StandIn.cs");
         var exe = Path.Combine(folder, "stand-in.exe");
         File.WriteAllText(source, Source);
-        DomainEnd.DeleteFolder(folder);
 
         var info = new ProcessStartInfo(PowerShell)
         {

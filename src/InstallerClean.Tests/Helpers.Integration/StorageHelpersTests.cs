@@ -23,7 +23,7 @@ public class StorageHelpersTests
     {
         const int writers = 8;
         const int linesEach = 25;
-        var file = Path.Combine(Path.GetTempPath(), $"ic-append-{Guid.NewGuid():N}.log");
+        var file = TestTemp.NewFilePath("ic-append-", ".log");
         // Long enough that a lost write is a lost line rather than a few
         // scrambled characters, and that the writers genuinely overlap.
         var filler = new string('x', 300);
@@ -56,7 +56,7 @@ public class StorageHelpersTests
     [Fact]
     public void OpenAtomicAppend_creates_the_file_and_keeps_what_is_already_there()
     {
-        var file = Path.Combine(Path.GetTempPath(), $"ic-append-{Guid.NewGuid():N}.log");
+        var file = TestTemp.NewFilePath("ic-append-", ".log");
 
         try
         {
@@ -99,8 +99,7 @@ public class StorageHelpersTests
     public void GetNamesInFolder_reads_a_files_name_and_short_name_from_its_folder_entry()
     {
         const string Name = "InstallerClean folder entry test.msi";
-        var folder = Path.Combine(Path.GetTempPath(), $"ic-names-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(folder);
+        var folder = TestTemp.NewFolder("ic-names-");
         var file = Path.Combine(folder, Name);
         File.WriteAllBytes(file, []);
 
@@ -114,9 +113,10 @@ public class StorageHelpersTests
             Assert.Equal(expected, StorageHelpers.GetNamesInFolder(Path.Combine(folder, shortName)));
             Assert.Null(StorageHelpers.GetNamesInFolder(Path.Combine(folder, "not there.msi")));
         }
+        catch (Exception) when (TestTemp.KeepOnFailure(folder)) { }
         finally
         {
-            Directory.Delete(folder, recursive: true);
+            TestTemp.Delete(folder);
         }
     }
 

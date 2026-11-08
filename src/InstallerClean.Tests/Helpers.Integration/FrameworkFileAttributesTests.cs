@@ -17,21 +17,18 @@ public sealed class FrameworkFileAttributesTests : IDisposable
 {
     private const int ERROR_INVALID_NAME = 123;
 
-    private readonly string _root = Path.Combine(Path.GetTempPath(), "ic-attributes-" + Guid.NewGuid().ToString("N"));
+    private readonly string _root = TestTemp.NewFolder("ic-attributes-");
     private readonly string _file;
 
     public FrameworkFileAttributesTests()
     {
-        Directory.CreateDirectory(_root);
         _file = Path.Combine(_root, "x.txt");
         File.WriteAllText(_file, "x");
     }
 
     public void Dispose()
     {
-        try { Directory.Delete(@"\\?\" + _root, recursive: true); }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
+        TestTemp.Delete(_root);
     }
 
     [Fact]

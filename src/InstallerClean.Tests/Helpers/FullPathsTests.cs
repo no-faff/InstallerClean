@@ -69,8 +69,7 @@ public class FullPathsTests
     [ShortNamesFact]
     public void A_short_name_in_a_folder_that_is_there_is_expanded()
     {
-        var folder = Path.Combine(Path.GetTempPath(), "ic full paths " + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(folder);
+        var folder = TestTemp.NewFolder("ic full paths ");
         try
         {
             var shortPath = ShortNamesFactAttribute.GetShortPath(folder);
@@ -89,8 +88,7 @@ public class FullPathsTests
     [ShortNamesFact]
     public void A_short_name_above_a_part_that_is_not_there_is_expanded_and_the_rest_kept()
     {
-        var folder = Path.Combine(Path.GetTempPath(), "ic full paths " + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(folder);
+        var folder = TestTemp.NewFolder("ic full paths ");
         try
         {
             var shortPath = ShortNamesFactAttribute.GetShortPath(folder);
