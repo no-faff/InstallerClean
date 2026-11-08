@@ -41,8 +41,8 @@ internal static class TestCulture
 /// temp folder, never to the log of the PC running the suite. The folder is set before any
 /// test runs, so a test reaching the log by a path nobody planned for is covered too. Each
 /// AppDomain's folder is deleted as the domain is unloaded or the process exits, whichever it
-/// sees first, along with the shared InstallerClean.Tests folder above it where no other
-/// folder is left in it. A test that changes the folder for its run, through
+/// sees first, along with the shared InstallerClean.Tests folder above it where nothing else
+/// is left in it. A test that changes the folder for its run, through
 /// <see cref="OwnFolder"/> or by hand as CrashLogTests does, puts this one back.
 /// </summary>
 internal static class TestCrashLog
