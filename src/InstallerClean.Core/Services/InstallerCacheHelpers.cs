@@ -336,8 +336,9 @@ internal static class InstallerCacheHelpers
     /// Expands symlinks, NTFS junctions and subst-mapped drives to the
     /// real on-disk path. Required so a destination check cannot be
     /// bypassed by picking a junction that points inside
-    /// C:\Windows\Installer. Falls back to FullPaths.GetFullPath if the
-    /// kernel32 resolution call fails.
+    /// C:\Windows\Installer. Where the kernel32 resolution fails, answers the path made
+    /// full, without a \\.\, \\?\ or \??\ in front of a drive or share, and the path as
+    /// given where it cannot be made full.
     /// </summary>
     internal static string ResolveFinalPath(string path)
     {
@@ -402,6 +403,20 @@ internal static class InstallerCacheHelpers
     /// </summary>
     internal static PathResolution ResolveFinalPathOutcome(
         string path, out string resolved, IFinalPathKernel kernel)
+    {
+        var outcome = ResolveCore(path, out resolved, kernel);
+
+        // A failure hands back the path made full, and every gate compares it with the
+        // cache folder and the system folders as text. GetFullPath leaves a \\?\ or \??\
+        // path as given, so its prefix comes off here and nothing else in it changes: the
+        // text compared is the text the Move goes on to use.
+        if (outcome != PathResolution.Resolved && outcome != PathResolution.NotAPath)
+            resolved = ComparedSpelling(resolved);
+
+        return outcome;
+    }
+
+    private static PathResolution ResolveCore(string path, out string resolved, IFinalPathKernel kernel)
     {
         string normalised;
         try { normalised = FullPaths.GetFullPath(path); }
@@ -470,6 +485,28 @@ internal static class InstallerCacheHelpers
         {
             ArrayPool<char>.Shared.Return(buffer);
         }
+    }
+
+    /// <summary>
+    /// <paramref name="fullPath"/> without the <c>\\.\</c>, <c>\\?\</c> or <c>\??\</c> in
+    /// front of it, where a drive letter, a colon and a backslash follow it, or
+    /// <c>UNC\</c> in any case, which becomes the <c>\\</c> of a share. Any other path
+    /// comes back as given.
+    /// </summary>
+    private static string ComparedSpelling(string fullPath)
+    {
+        if (!fullPath.StartsWith(@"\\?\", StringComparison.Ordinal)
+            && !fullPath.StartsWith(@"\\.\", StringComparison.Ordinal)
+            && !fullPath.StartsWith(@"\??\", StringComparison.Ordinal))
+            return fullPath;
+
+        var rest = fullPath.AsSpan(4);
+        if (rest.StartsWith(@"UNC\".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            return @"\\" + fullPath.Substring(8);
+
+        return rest.Length >= 3 && HasDriveRoot(rest) && rest[2] == '\\'
+            ? fullPath.Substring(4)
+            : fullPath;
     }
 
     /// <summary>
