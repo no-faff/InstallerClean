@@ -118,7 +118,7 @@ public sealed class FrameworkDirectoryInfoTests : IDisposable
         File.WriteAllText(Path.Combine(_root, longName), "x");
         File.WriteAllText(Path.Combine(_root, "S.MSI"), "x");
 
-        Assert.Equal([longName, "S.MSI"],
+        Assert.Equal(["S.MSI", longName],
             Walk(_root).Select(f => f.Name).OrderBy(n => n, StringComparer.Ordinal));
     }
 

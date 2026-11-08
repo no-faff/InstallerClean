@@ -166,7 +166,7 @@ public sealed class FrameworkFolderTests : IDisposable
         File.WriteAllText(Path.Combine(_root, "bar.exe"), "x");
         File.WriteAllText(Path.Combine(_root, "InstallerClean-1.exe"), "x");
 
-        Assert.Equal(["bar.exe", "InstallerClean-1.exe"],
+        Assert.Equal(["InstallerClean-1.exe", "bar.exe"],
             FrameworkDirectory.EnumerateFiles(_root, "*.exe").Select(Path.GetFileName).OrderBy(n => n, StringComparer.Ordinal));
         Assert.Equal(["InstallerClean-1.exe"],
             FrameworkDirectory.EnumerateFiles(_root, "installerclean-*.EXE").Select(Path.GetFileName));
