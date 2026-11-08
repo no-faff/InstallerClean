@@ -50,7 +50,8 @@ internal static class TestTemp
     /// still refused after a few tries a tenth of a second apart, as a file another process is
     /// closing can be, throws an IOException naming the folder with the last refusal inside it,
     /// so the test whose clean-up it is fails. A folder <see cref="KeepOnFailure"/> marked is
-    /// left for the run's end instead.
+    /// left for the run's end instead, and a folder <see cref="LeaveForRunEnd"/> marked is
+    /// left by every delete, of it or of a folder holding it, while everything round it goes.
     /// </summary>
     internal static void Delete(string folder) => Delete(folder, attempts: 5);
 
@@ -63,17 +64,42 @@ internal static class TestTemp
     /// </summary>
     internal static bool KeepOnFailure(string folder)
     {
-        lock (Kept) Kept.Add(Path.GetFullPath(folder));
+        Mark(Kept, folder);
         return false;
     }
 
+    /// <summary>
+    /// Leaves <paramref name="folder"/> in place for the rest of the run, for the next run's
+    /// sweep: every <see cref="Delete"/> of it, or of a folder holding it, deletes everything
+    /// else and leaves it. For a test whose subject is a file held open for the rest of the run,
+    /// named by the folder that file is in.
+    /// </summary>
+    internal static void LeaveForRunEnd(string folder) => Mark(Left, folder);
+
     private static readonly HashSet<string> Kept = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly HashSet<string> Left = new(StringComparer.OrdinalIgnoreCase);
+
+    private static void Mark(HashSet<string> marks, string folder)
+    {
+        lock (marks) marks.Add(Path.GetFullPath(folder).TrimEnd('\\'));
+    }
 
     private static void Delete(string folder, int attempts)
     {
+        var full = Path.GetFullPath(folder).TrimEnd('\\');
         lock (Kept)
         {
-            if (Kept.Remove(Path.GetFullPath(folder))) return;
+            if (Kept.Remove(full)) return;
+        }
+        string[] leftHere;
+        lock (Left)
+            leftHere = Left.Where(l => l.Equals(full, StringComparison.OrdinalIgnoreCase)
+                || l.StartsWith(full + "\\", StringComparison.OrdinalIgnoreCase)
+                || full.StartsWith(l + "\\", StringComparison.OrdinalIgnoreCase)).ToArray();
+        if (leftHere.Length > 0)
+        {
+            DeleteAround(full, leftHere);
+            return;
         }
         var target = folder.StartsWith(@"\\", StringComparison.Ordinal) ? folder : @"\\?\" + Path.GetFullPath(folder);
         Exception? last = null;
@@ -176,6 +202,29 @@ internal static class TestTemp
             try { Directory.Delete(Path.GetDirectoryName(Runs)!); } catch (IOException) { }
         });
         return folder;
+    }
+
+    // Deletes everything in folder but the folders in left and the folders on the way to them,
+    // each child through Delete, so a refusal there fails as any other does.
+    private static void DeleteAround(string folder, string[] left)
+    {
+        if (left.Any(l => folder.Equals(l, StringComparison.OrdinalIgnoreCase)
+                || folder.StartsWith(l + "\\", StringComparison.OrdinalIgnoreCase)))
+            return;
+        if (!Directory.Exists(folder)) return;
+        foreach (var entry in new DirectoryInfo(folder).EnumerateFileSystemInfos())
+        {
+            var path = entry.FullName.TrimEnd('\\');
+            var onTheWay = left.Any(l => l.StartsWith(path + "\\", StringComparison.OrdinalIgnoreCase)
+                || l.Equals(path, StringComparison.OrdinalIgnoreCase));
+            if (onTheWay) DeleteAround(path, left);
+            else if ((entry.Attributes & FileAttributes.Directory) != 0) Delete(path, attempts: 5);
+            else
+            {
+                entry.Attributes &= ~FileAttributes.ReadOnly;
+                entry.Delete();
+            }
+        }
     }
 
     // A link is never followed: tests make links to folders outside the run's, and what is in

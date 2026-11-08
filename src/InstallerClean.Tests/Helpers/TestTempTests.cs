@@ -82,6 +82,23 @@ public sealed class TestTempTests : IDisposable
     }
 
     [Fact]
+    public void A_delete_round_a_folder_left_for_the_run_end_takes_everything_else()
+    {
+        var root = TestTemp.NewFolder("ic-left-");
+        var left = Directory.CreateDirectory(Path.Combine(root, "staging", "held")).FullName;
+        File.WriteAllText(Path.Combine(left, "kept.txt"), "x");
+        var sibling = Directory.CreateDirectory(Path.Combine(root, "staging", "other")).FullName;
+        File.WriteAllText(Path.Combine(root, "loose.txt"), "x");
+        TestTemp.LeaveForRunEnd(left);
+
+        TestTemp.Delete(root);
+
+        Assert.True(File.Exists(Path.Combine(left, "kept.txt")), "The folder left for the run's end went.");
+        Assert.False(Directory.Exists(sibling), "A folder beside it was left.");
+        Assert.False(File.Exists(Path.Combine(root, "loose.txt")), "A file above it was left.");
+    }
+
+    [Fact]
     public void A_delete_of_a_folder_that_is_not_there_does_nothing() =>
         TestTemp.Delete(Path.Combine(_runs, "never-made"));
 }

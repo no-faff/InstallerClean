@@ -236,8 +236,10 @@ public sealed class StagedDownloadTests : IDisposable
     public async Task The_holds_last_once_nothing_references_the_prepared_update(bool stagedRun)
     {
         var network = new ByName(new() { [AppCopy.CommandLineFileName] = Release(2) });
-        // Undo is never called, so the file stays held for the rest of the test run.
+        // Undo is never called, so the file stays held for the rest of the test run, and the
+        // folder it is in is left for the next run to delete.
         var path = await PrepareAndDrop(Updater(AppCopyKind.CommandLineDownload, network), stagedRun);
+        TestTemp.LeaveForRunEnd(Path.GetDirectoryName(path)!);
 
         GC.Collect();
         GC.WaitForPendingFinalizers();

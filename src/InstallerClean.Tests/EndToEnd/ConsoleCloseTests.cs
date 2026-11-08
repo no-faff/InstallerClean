@@ -24,26 +24,29 @@ public sealed class ConsoleCloseTests : IDisposable
 
     /// <summary>
     /// The command line in its own project's build of this configuration, which the test build
-    /// builds first: src/InstallerClean.Cli/bin/&lt;configuration&gt;/net10.0 under the folder holding
-    /// the solution, the configuration being the one the tests were built in. A copy beside the
-    /// tests would run without the libraries the command line carries itself,
-    /// System.Diagnostics.EventLog among them, the test project taking those from the Windows
-    /// desktop framework the command line does not use. Answers why where there is none.
+    /// builds first, run as that project builds it rather than as a copy among the tests' own
+    /// files: the folder under src/InstallerClean.Cli/bin that matches the tests' own folder
+    /// under their project's bin (configuration, framework and, on Windows, runtime), under the
+    /// folder holding the solution. Answers why where there is none.
     /// </summary>
     private static string? CommandLineBuild(out string why)
     {
-        // The tests run from bin/<configuration>/<framework>/ under their own project.
-        var configuration = new DirectoryInfo(AppContext.BaseDirectory).Parent?.Name;
-        for (var folder = new DirectoryInfo(AppContext.BaseDirectory); folder is not null; folder = folder.Parent)
+        // The tests run from bin/<configuration>/<framework>/[<runtime>/] under their own project.
+        var below = new List<string>();
+        var testFolder = new DirectoryInfo(AppContext.BaseDirectory.TrimEnd('\\'));
+        for (; testFolder is not null && !testFolder.Name.Equals("bin", StringComparison.OrdinalIgnoreCase); testFolder = testFolder.Parent)
+            below.Insert(0, testFolder.Name);
+        if (testFolder is null)
+        {
+            why = $"the tests in {AppContext.BaseDirectory} are not under a folder named bin";
+            return null;
+        }
+        for (var folder = testFolder; folder is not null; folder = folder.Parent)
         {
             if (!File.Exists(Path.Combine(folder.FullName, "src", "InstallerClean.sln"))) continue;
-            var cli = Path.Combine(folder.FullName, "src", "InstallerClean.Cli", "bin", configuration ?? "", "net10.0", "installerclean-cli.exe");
+            var cli = Path.Combine(
+                [folder.FullName, "src", "InstallerClean.Cli", "bin", .. below, "installerclean-cli.exe"]);
             if (!File.Exists(cli)) { why = $"there is no {cli}"; return null; }
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(cli)!, "System.Diagnostics.EventLog.dll")))
-            {
-                why = $"{cli} has no System.Diagnostics.EventLog.dll beside it";
-                return null;
-            }
             why = "";
             return cli;
         }
