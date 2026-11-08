@@ -32,7 +32,9 @@ namespace InstallerClean.Helpers;
 /// twice. Where they do not, the key is read again after a short pause, up to
 /// <see cref="Readings"/> readings in all, since any agreeing pair is as good an answer
 /// as the first would have been; after that it throws an <see cref="IOException"/>
-/// naming the disagreement, which every caller takes as a key it could not read. A key
+/// naming the disagreement, which every caller takes as a key it could not read. A cancel
+/// of the caller's token during a pause, or before the last reading's disagreement is
+/// thrown, is thrown as OperationCanceledException, never as a key it could not read. A key
 /// nobody writes to gives the same names as one listing would, from two readings.
 ///
 /// IT TAKES AN OPENED SUBKEY, NEVER A HIVE'S BASE KEY, and refuses one with
@@ -60,14 +62,49 @@ internal static class RegistryNames
     // does not fit, as the pool's next bucket up does.
     private const int FirstValueNameBuffer = 128;
 
-    /// <summary>Every subkey name under <paramref name="key"/>, in the order Windows gives them.</summary>
-    public static string[] SubKeysOf(RegistryKey key) => WithCalls(key, calls => SubKeysUnchanged(calls));
+    /// <summary>
+    /// Every subkey name under <paramref name="key"/>, in the order Windows gives them. A cancel of
+    /// <paramref name="cancellationToken"/> ends a pause between readings with
+    /// OperationCanceledException.
+    /// </summary>
+    public static string[] SubKeysOf(RegistryKey key, CancellationToken cancellationToken) =>
+        WithCalls(key, calls => SubKeysUnchanged(calls, cancellationToken: cancellationToken));
 
     /// <summary>
     /// Every value name under <paramref name="key"/>, in the order Windows gives them, the default
-    /// value's empty name among them when it is set.
+    /// value's empty name among them when it is set. A cancel of
+    /// <paramref name="cancellationToken"/> ends a pause between readings with
+    /// OperationCanceledException.
     /// </summary>
-    public static string[] ValuesOf(RegistryKey key) => WithCalls(key, calls => ValuesUnchanged(calls));
+    public static string[] ValuesOf(RegistryKey key, CancellationToken cancellationToken) =>
+        WithCalls(key, calls => ValuesUnchanged(calls, cancellationToken: cancellationToken));
+
+    /// <summary>
+    /// The pause between readings: the wait ends early where <paramref name="cancellationToken"/>
+    /// cancels, and a cancel before or during it throws OperationCanceledException. A token whose
+    /// source is disposed before or during the pause can no longer cancel, and the pause then
+    /// sleeps its whole time, as a pause without a token does.
+    /// </summary>
+    internal static Action<TimeSpan> Pause(CancellationToken cancellationToken) => wait =>
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!cancellationToken.CanBeCanceled)
+        {
+            Thread.Sleep(wait);
+            return;
+        }
+
+        try
+        {
+            cancellationToken.WaitHandle.WaitOne(wait);
+        }
+        catch (ObjectDisposedException)
+        {
+            Thread.Sleep(wait);
+            return;
+        }
+        cancellationToken.ThrowIfCancellationRequested();
+    };
 
     // How many readings are taken before a key whose readings keep disagreeing is
     // reported as unread, and the pause before each reading after the second, which
@@ -91,14 +128,17 @@ internal static class RegistryNames
     private readonly record struct Reading(string[] Names, int Count);
 
     /// <summary>The subkey names, taken where two readings in a row agree.</summary>
-    internal static string[] SubKeysUnchanged(IKeyCalls calls, Action<TimeSpan>? pause = null) =>
-        Unchanged(calls, ReadSubKeys, pause ?? (wait => Thread.Sleep(wait)));
+    internal static string[] SubKeysUnchanged(
+        IKeyCalls calls, Action<TimeSpan>? pause = null, CancellationToken cancellationToken = default) =>
+        Unchanged(calls, ReadSubKeys, pause ?? Pause(cancellationToken), cancellationToken);
 
     /// <summary>The value names, taken where two readings in a row agree.</summary>
-    internal static string[] ValuesUnchanged(IKeyCalls calls, Action<TimeSpan>? pause = null) =>
-        Unchanged(calls, ReadValues, pause ?? (wait => Thread.Sleep(wait)));
+    internal static string[] ValuesUnchanged(
+        IKeyCalls calls, Action<TimeSpan>? pause = null, CancellationToken cancellationToken = default) =>
+        Unchanged(calls, ReadValues, pause ?? Pause(cancellationToken), cancellationToken);
 
-    private static string[] Unchanged(IKeyCalls calls, Func<IKeyCalls, Reading> read, Action<TimeSpan> pause)
+    private static string[] Unchanged(
+        IKeyCalls calls, Func<IKeyCalls, Reading> read, Action<TimeSpan> pause, CancellationToken cancellationToken)
     {
         var earlier = read(calls);
         for (var taken = 2; ; taken++)
@@ -107,8 +147,13 @@ internal static class RegistryNames
             var disagreement = Disagreement(earlier, later);
             if (disagreement is null) return earlier.Names;
             if (taken == Readings)
+            {
+                // A cancel that came during the last reading ends the listing as a cancel,
+                // never as a key that could not be read.
+                cancellationToken.ThrowIfCancellationRequested();
                 throw new IOException(
                     $"The registry key's names did not read the same way twice running in {Readings} readings: {disagreement}.");
+            }
             pause(PauseBefore[taken - 2]);
             earlier = later;
         }

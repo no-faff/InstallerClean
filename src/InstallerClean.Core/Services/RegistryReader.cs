@@ -88,10 +88,11 @@ internal sealed class RegistryReader : IRegistryReader
         catch (ObjectDisposedException) { return new RegistryDwordRead(RegistryDwordState.Unreadable); }
     }
 
-    public RegistryKeyValues LocalMachineValues(string keyPath) => ValuesOf(RegistryHive.LocalMachine, keyPath);
+    public RegistryKeyValues LocalMachineValues(string keyPath, CancellationToken cancellationToken) =>
+        ValuesOf(RegistryHive.LocalMachine, keyPath, cancellationToken);
 
-    public RegistryKeyValues UserValues(string sid, string keyPath) =>
-        ValuesOf(RegistryHive.Users, sid + @"\" + keyPath);
+    public RegistryKeyValues UserValues(string sid, string keyPath, CancellationToken cancellationToken) =>
+        ValuesOf(RegistryHive.Users, sid + @"\" + keyPath, cancellationToken);
 
     public RegistryKeyPresence UserHivePresence(string sid)
     {
@@ -107,7 +108,7 @@ internal sealed class RegistryReader : IRegistryReader
         catch (ObjectDisposedException) { return RegistryKeyPresence.Unreadable; }
     }
 
-    private static RegistryKeyValues ValuesOf(RegistryHive root, string keyPath)
+    private static RegistryKeyValues ValuesOf(RegistryHive root, string keyPath, CancellationToken cancellationToken)
     {
         try
         {
@@ -120,7 +121,7 @@ internal sealed class RegistryReader : IRegistryReader
             // its text. DoNotExpandEnvironmentNames gives a REG_EXPAND_SZ as the text it
             // holds; a REG_SZ and a REG_EXPAND_SZ come back as strings and every other
             // type as something else, which is reported as no text rather than converted.
-            var names = RegistryNames.ValuesOf(key);
+            var names = RegistryNames.ValuesOf(key, cancellationToken);
             var values = new RegistryValue[names.Length];
             for (var i = 0; i < names.Length; i++)
                 values[i] = new RegistryValue(

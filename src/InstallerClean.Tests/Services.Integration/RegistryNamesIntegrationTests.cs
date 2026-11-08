@@ -21,10 +21,10 @@ public class RegistryNamesIntegrationTests
             key.SetValue("one", 1, RegistryValueKind.DWord);
             key.SetValue("two", new byte[0], RegistryValueKind.None);
 
-            Assert.Equal(key.GetSubKeyNames(), RegistryNames.SubKeysOf(key));
-            Assert.Equal(key.GetValueNames(), RegistryNames.ValuesOf(key));
-            Assert.Equal(3, RegistryNames.SubKeysOf(key).Length);
-            Assert.Contains("", RegistryNames.ValuesOf(key));
+            Assert.Equal(key.GetSubKeyNames(), RegistryNames.SubKeysOf(key, CancellationToken.None));
+            Assert.Equal(key.GetValueNames(), RegistryNames.ValuesOf(key, CancellationToken.None));
+            Assert.Equal(3, RegistryNames.SubKeysOf(key, CancellationToken.None).Length);
+            Assert.Contains("", RegistryNames.ValuesOf(key, CancellationToken.None));
         });
     }
 
@@ -33,8 +33,8 @@ public class RegistryNamesIntegrationTests
     {
         WithKey(key =>
         {
-            Assert.Empty(RegistryNames.SubKeysOf(key));
-            Assert.Empty(RegistryNames.ValuesOf(key));
+            Assert.Empty(RegistryNames.SubKeysOf(key, CancellationToken.None));
+            Assert.Empty(RegistryNames.ValuesOf(key, CancellationToken.None));
         });
     }
 
@@ -152,8 +152,8 @@ public class RegistryNamesIntegrationTests
     {
         using var hive = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
 
-        Assert.Throws<ArgumentException>(() => RegistryNames.SubKeysOf(hive));
-        Assert.Throws<ArgumentException>(() => RegistryNames.ValuesOf(hive));
+        Assert.Throws<ArgumentException>(() => RegistryNames.SubKeysOf(hive, CancellationToken.None));
+        Assert.Throws<ArgumentException>(() => RegistryNames.ValuesOf(hive, CancellationToken.None));
         using var software = hive.OpenSubKey("Software");
         Assert.NotNull(software);
     }
@@ -167,8 +167,8 @@ public class RegistryNamesIntegrationTests
             var copy = Registry.CurrentUser.OpenSubKey(parentPath)!;
             copy.Dispose();
 
-            Assert.Throws<ObjectDisposedException>(() => RegistryNames.SubKeysOf(copy));
-            Assert.Throws<ObjectDisposedException>(() => RegistryNames.ValuesOf(copy));
+            Assert.Throws<ObjectDisposedException>(() => RegistryNames.SubKeysOf(copy, CancellationToken.None));
+            Assert.Throws<ObjectDisposedException>(() => RegistryNames.ValuesOf(copy, CancellationToken.None));
         });
     }
 

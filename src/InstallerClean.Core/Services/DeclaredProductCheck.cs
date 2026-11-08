@@ -1041,8 +1041,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             || SourceListKeyPath(code, sid, context) is not { } listKey)
             return new NoPackageReading(NoPackageAnswer.RegistryDisagrees, answered);
 
-        var key = registry.LocalMachineValues(properties);
-        if (!RecordsNoCachedPackage(key) || ValuesOf(registry, listKey).Presence != RegistryKeyPresence.Absent)
+        var key = registry.LocalMachineValues(properties, pass.CancellationToken);
+        if (!RecordsNoCachedPackage(key) || ValuesOf(registry, listKey, pass.CancellationToken).Presence != RegistryKeyPresence.Absent)
             return new NoPackageReading(NoPackageAnswer.RegistryDisagrees, answered);
 
         if (key.Presence == RegistryKeyPresence.Absent)
@@ -1121,10 +1121,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="AddSourcePackages"/> asks it before it reads the sources of an installation whose
     /// cached package reads as none.
     /// </summary>
-    private bool RegistryRecordsNoCachedPackage(string code, string? sid, MsiInstallContext context) =>
+    private bool RegistryRecordsNoCachedPackage(
+        string code, string? sid, MsiInstallContext context, CancellationToken cancellationToken) =>
         _registry is not null
         && InstallPropertiesKeyPath(code, sid, context) is { } path
-        && RecordsNoCachedPackage(_registry.LocalMachineValues(path));
+        && RecordsNoCachedPackage(_registry.LocalMachineValues(path, cancellationToken));
 
     /// <summary>
     /// Whether an installation's <c>InstallProperties</c> key, <paramref name="key"/>, records no
@@ -1762,7 +1763,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                     return null;
                 }
 
-                if (RecordedPackageCode(registeredCode, sid, context) is not { } packageCode)
+                if (RecordedPackageCode(registeredCode, sid, context, pass.CancellationToken) is not { } packageCode)
                 {
                     cause = DeclaredProductInstalledCause.MissingPackageCodeUnread;
                     return null;
@@ -1867,7 +1868,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (_fileIdentities.ReadOutcome(path, out _) != FileIdentityRead.NamesNothing) return false;
 
         if (InstallPropertiesKeyPath(code, sid, context) is not { } keyPath) return false;
-        var key = _registry.LocalMachineValues(keyPath);
+        var key = _registry.LocalMachineValues(keyPath, pass.CancellationToken);
         if (key.Presence != RegistryKeyPresence.Present || key.Values is null) return false;
 
         var held = 0;
@@ -1898,7 +1899,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// account's (<see cref="ReadsItsOwnRecord"/>), and for a check built without its registry
     /// reader.
     /// </summary>
-    private string? RecordedPackageCode(string code, string? sid, MsiInstallContext context)
+    private string? RecordedPackageCode(string code, string? sid, MsiInstallContext context, CancellationToken cancellationToken)
     {
         if (_registry is null || !ReadsItsOwnRecord(sid, context)
             || ProductKeyPath(code, sid, context) is not { } productKey)
@@ -1908,7 +1909,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (read.Unreadable || PackageIdentityReader.Canonicalise(read.Value.TrimEnd('\0')) is not { } answered)
             return null;
 
-        var key = ValuesOf(_registry, productKey);
+        var key = ValuesOf(_registry, productKey, cancellationToken);
         if (key.Presence != RegistryKeyPresence.Present || key.Values is null) return null;
 
         // The key holds the value under the name the API reads it by.
@@ -2069,7 +2070,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // or one that will not read, keeps the copy, and no source of it is read. This comes
         // before the per-user-unmanaged refusal below, so such an installation is counted by
         // what its key holds whatever its context and account.
-        if (noneRecorded && !RegistryRecordsNoCachedPackage(code, sid, context))
+        if (noneRecorded && !RegistryRecordsNoCachedPackage(code, sid, context, pass.CancellationToken))
             return Refuse(SourceRefusal.CachedPackageNotRuledOut, out refusal);
 
         // ANOTHER ACCOUNT'S PER-USER-UNMANAGED SOURCE LIST IS NOT READ, AND THE COPY IS KEPT.
@@ -2148,7 +2149,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (SourceListKeyPath(code, sid, context) is not { } listKey)
             return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
-        var sourceList = ValuesOf(registry, listKey);
+        var sourceList = ValuesOf(registry, listKey, pass.CancellationToken);
         if (sourceList.Presence != RegistryKeyPresence.Present || sourceList.Values is null)
             return Refuse(KeyRefusal(sourceList), out refusal);
 
@@ -2158,13 +2159,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (!HoldsThePackageName(sourceList.Values, packageName))
             return Refuse(SourceRefusal.RegistryDiffers, out refusal);
 
-        var net = ValuesOf(registry, listKey.Below("Net"));
+        var net = ValuesOf(registry, listKey.Below("Net"), pass.CancellationToken);
         if (!IsTheList(net, sources)) return Refuse(KeyRefusal(net), out refusal);
 
-        var urlKey = ValuesOf(registry, listKey.Below("URL"));
+        var urlKey = ValuesOf(registry, listKey.Below("URL"), pass.CancellationToken);
         if (!IsTheList(urlKey, urls)) return Refuse(KeyRefusal(urlKey), out refusal);
 
-        var media = ValuesOf(registry, listKey.Below("Media"));
+        var media = ValuesOf(registry, listKey.Below("Media"), pass.CancellationToken);
         var mediaPath = MediaPackagePathOf(code, sid, context, media, out refusal);
         if (mediaPath is null) return false;
 
@@ -2180,7 +2181,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var usedLast = SourceUsedLastOf(code, sid, context, sourceList.Values, out refusal);
         if (usedLast is null) return false;
 
-        var installSource = InstallSourceOf(registry, code, sid, context, out refusal);
+        var installSource = InstallSourceOf(registry, code, sid, context, pass.CancellationToken, out refusal);
         if (installSource is null) return false;
 
         // The source used last and the InstallSource join the folders compared, each
@@ -3071,12 +3072,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="SourceRefusal.None"/> for every other answer.
     /// </summary>
     private string? InstallSourceOf(
-        IRegistryReader registry, string code, string? sid, MsiInstallContext context, out SourceRefusal refusal)
+        IRegistryReader registry, string code, string? sid, MsiInstallContext context,
+        CancellationToken cancellationToken, out SourceRefusal refusal)
     {
         var path = InstallPropertiesKeyPath(code, sid, context);
         if (path is null) return Refused(SourceRefusal.WouldNotRead, out refusal);
 
-        return InstallSourceIn(registry.LocalMachineValues(path), code, sid, context, out refusal);
+        return InstallSourceIn(registry.LocalMachineValues(path, cancellationToken), code, sid, context, out refusal);
     }
 
     /// <summary>
@@ -3281,10 +3283,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Every value of <paramref name="key"/>, read through <paramref name="registry"/> from HKLM
     /// or from its account's hive as it says.
     /// </summary>
-    private static RegistryKeyValues ValuesOf(IRegistryReader registry, KeyAt key) =>
+    private static RegistryKeyValues ValuesOf(IRegistryReader registry, KeyAt key, CancellationToken cancellationToken) =>
         key.Account is null
-            ? registry.LocalMachineValues(key.Path)
-            : registry.UserValues(key.Account, key.Path);
+            ? registry.LocalMachineValues(key.Path, cancellationToken)
+            : registry.UserValues(key.Account, key.Path, cancellationToken);
 
     /// <summary>
     /// The HKLM path this check reads a product installation's <c>InstallProperties</c>
@@ -3582,7 +3584,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             codes.Add(PackageIdentityReader.Canonicalise(key.Code) ?? key.Code);
 
             // A key gone since the walk reads as absent, and a path the walk read still counts.
-            var properties = InstallPropertiesOf(key);
+            var properties = InstallPropertiesOf(key, pass.CancellationToken);
             var recordsNone = key.CachedPackages.Count == 0 && RecordsNoCachedPackage(properties);
 
             var cachedSaid = key.CachedPackages.Count > 0 || recordsNone;
@@ -3952,7 +3954,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         string code, string? sid, MsiInstallContext context, PassAnswers pass, out ListedSources? sources)
     {
         sources = null;
-        if (!SourceListAt(code, sid, context, out var listKey, out var values)) return ListReading.NotRead;
+        if (!SourceListAt(code, sid, context, pass.CancellationToken, out var listKey, out var values)) return ListReading.NotRead;
         if (values is null) return ListReading.NotThere;
 
         sources = ReadSourceList(listKey, values, pass);
@@ -3965,7 +3967,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// that cannot be made, an account whose hive is not loaded, and a key that will not read.
     /// </summary>
     private bool SourceListAt(
-        string code, string? sid, MsiInstallContext context,
+        string code, string? sid, MsiInstallContext context, CancellationToken cancellationToken,
         out KeyAt listKey, out IReadOnlyList<RegistryValue>? values)
     {
         listKey = default;
@@ -3976,7 +3978,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (path.Account is { } account && _registry.UserHivePresence(account) != RegistryKeyPresence.Present)
             return false;
 
-        var list = ValuesOf(_registry, path);
+        var list = ValuesOf(_registry, path, cancellationToken);
         if (list.Presence == RegistryKeyPresence.Absent) return true;
         if (list.Presence != RegistryKeyPresence.Present || list.Values is null) return false;
 
@@ -3990,11 +3992,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="RegistryKeyPresence.Unreadable"/> where a check has no registry reader or the
     /// key's path cannot be made.
     /// </summary>
-    private RegistryKeyValues InstallPropertiesOf(UnlistedProductKey key)
+    private RegistryKeyValues InstallPropertiesOf(UnlistedProductKey key, CancellationToken cancellationToken)
     {
         var (sid, context) = SourceListPlaces(key.Account)[0];
         return _registry is not null && InstallPropertiesKeyPath(key.Code, sid, context) is { } path
-            ? _registry.LocalMachineValues(path)
+            ? _registry.LocalMachineValues(path, cancellationToken)
             : default;
     }
 
@@ -4072,7 +4074,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             || !IsAFileName(packageName))
             return null;
 
-        var net = ValuesOf(_registry!, listKey.Below("Net"));
+        var net = ValuesOf(_registry!, listKey.Below("Net"), pass.CancellationToken);
         var folders = new List<string>();
         if (net.Presence != RegistryKeyPresence.Absent)
         {
@@ -4086,7 +4088,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             }
         }
 
-        var urls = ValuesOf(_registry!, listKey.Below("URL"));
+        var urls = ValuesOf(_registry!, listKey.Below("URL"), pass.CancellationToken);
         if (urls.Presence != RegistryKeyPresence.Absent)
         {
             if (urls.Presence != RegistryKeyPresence.Present || urls.Values is null) return null;
@@ -4096,7 +4098,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         var mediaSearch = false;
-        var media = ValuesOf(_registry!, listKey.Below("Media"));
+        var media = ValuesOf(_registry!, listKey.Below("Media"), pass.CancellationToken);
         if (media.Presence != RegistryKeyPresence.Absent)
         {
             if (media.Presence != RegistryKeyPresence.Present || media.Values is null) return null;

@@ -36,7 +36,7 @@ public class AppCopyTests
     private static IRegistryReader Registry(RegistryKeyValues read)
     {
         var registry = Substitute.For<IRegistryReader>();
-        registry.LocalMachineValues(AppCopy.SetupUninstallKeyPath).Returns(read);
+        registry.LocalMachineValues(AppCopy.SetupUninstallKeyPath, Arg.Any<CancellationToken>()).Returns(read);
         return registry;
     }
 

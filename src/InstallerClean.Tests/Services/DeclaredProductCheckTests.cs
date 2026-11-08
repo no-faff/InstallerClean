@@ -10543,7 +10543,7 @@ internal sealed class ScriptedSourceListRegistry : IRegistryReader
     public void Answers(string keyPath, RegistryKeyPresence presence) =>
         _keys[keyPath] = new RegistryKeyValues(presence);
 
-    public RegistryKeyValues LocalMachineValues(string keyPath)
+    public RegistryKeyValues LocalMachineValues(string keyPath, CancellationToken cancellationToken)
     {
         Reads.Add(keyPath);
         return _keys.TryGetValue(keyPath, out var scripted) ? scripted : _msi.MirroredKey(keyPath);
@@ -10553,7 +10553,8 @@ internal sealed class ScriptedSourceListRegistry : IRegistryReader
     /// A key in an account's own hive, spelled from <c>HKEY_USERS</c> (<see cref="InHive"/>) in
     /// <see cref="Reads"/>, in a scripted key's path and in the path mirrored.
     /// </summary>
-    public RegistryKeyValues UserValues(string sid, string keyPath) => LocalMachineValues(InHive(sid, keyPath));
+    public RegistryKeyValues UserValues(string sid, string keyPath, CancellationToken cancellationToken) =>
+        LocalMachineValues(InHive(sid, keyPath), cancellationToken);
 
     /// <summary>The spelling of <paramref name="keyPath"/> in the hive of <paramref name="sid"/>.</summary>
     public static string InHive(string sid, string keyPath) => $@"HKEY_USERS\{sid}\{keyPath}";

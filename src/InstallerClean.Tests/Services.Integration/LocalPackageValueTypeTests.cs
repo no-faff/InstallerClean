@@ -48,7 +48,7 @@ public class LocalPackageValueTypeTests
         {
             key.SetValue(valueName, Array.Empty<byte>(), RegistryValueKind.None);
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.False(read);
             Assert.Null(path);
@@ -67,7 +67,7 @@ public class LocalPackageValueTypeTests
         {
             key.SetValue("SomethingElse", "x", RegistryValueKind.String);
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.True(read);
             Assert.Null(path);
@@ -82,7 +82,7 @@ public class LocalPackageValueTypeTests
         {
             key.SetValue(valueName, @"C:\Windows\Installer\9f05cba.msi", RegistryValueKind.String);
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.True(read);
             Assert.Equal(@"C:\Windows\Installer\9f05cba.msi", path);
@@ -99,7 +99,7 @@ public class LocalPackageValueTypeTests
         {
             key.SetValue(valueName, 42, RegistryValueKind.DWord);
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.False(read);
             Assert.Null(path);
@@ -118,7 +118,7 @@ public class LocalPackageValueTypeTests
         {
             SetLink(key, valueName.ToLowerInvariant());
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out _);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out _, CancellationToken.None);
 
             Assert.False(read);
         });
@@ -133,7 +133,7 @@ public class LocalPackageValueTypeTests
             SetLink(key, valueName);
             Assert.Null(key.GetValue(valueName));
 
-            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path);
+            var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 
             Assert.False(read);
             Assert.Null(path);
@@ -167,9 +167,9 @@ public class LocalPackageValueTypeTests
             key.SetValue("LocalPackage", Array.Empty<byte>(), RegistryValueKind.None);
             key.SetValue("ManagedLocalPackage", @"C:\Windows\Installer\1a2b3c.msi", RegistryValueKind.String);
 
-            Assert.False(InstallerQueryService.TryReadLocalPackage(key, "LocalPackage", out var local));
+            Assert.False(InstallerQueryService.TryReadLocalPackage(key, "LocalPackage", out var local, CancellationToken.None));
             Assert.Null(local);
-            Assert.True(InstallerQueryService.TryReadLocalPackage(key, "ManagedLocalPackage", out var managed));
+            Assert.True(InstallerQueryService.TryReadLocalPackage(key, "ManagedLocalPackage", out var managed, CancellationToken.None));
             Assert.Equal(@"C:\Windows\Installer\1a2b3c.msi", managed);
         });
     }
@@ -178,7 +178,7 @@ public class LocalPackageValueTypeTests
     [MemberData(nameof(ValueNames))]
     public void A_null_key_is_an_absence(string valueName)
     {
-        var read = InstallerQueryService.TryReadLocalPackage(null, valueName, out var path);
+        var read = InstallerQueryService.TryReadLocalPackage(null, valueName, out var path, CancellationToken.None);
 
         Assert.True(read);
         Assert.Null(path);

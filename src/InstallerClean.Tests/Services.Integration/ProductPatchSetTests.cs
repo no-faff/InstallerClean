@@ -363,7 +363,7 @@ public class ProductPatchSetTests
         var keys = 0;
         var registrations = 0;
         var set = InstallerQueryService.ReadProductPatchSet(
-            products, Product, ref keys, ref registrations, out var codes, out _);
+            products, Product, ref keys, ref registrations, out var codes, out _, CancellationToken.None);
         return (set, keys, registrations, codes);
     }
 
@@ -372,7 +372,7 @@ public class ProductPatchSetTests
         var keys = 0;
         var registrations = 0;
         InstallerQueryService.ReadProductPatchSet(
-            products, Product, ref keys, ref registrations, out _, out var present);
+            products, Product, ref keys, ref registrations, out _, out var present, CancellationToken.None);
         return present;
     }
 

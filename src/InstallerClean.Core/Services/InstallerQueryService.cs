@@ -3591,7 +3591,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
             if (udKey is not null)
             {
-                foreach (var sidName in RegistryNames.SubKeysOf(udKey))
+                foreach (var sidName in RegistryNames.SubKeysOf(udKey, ct))
                 {
                     ct.ThrowIfCancellationRequested();
                     var sidRead = ReadFallbackSid(udKey, sidName, claimed, productCodes, ct, failureLog);
@@ -3741,7 +3741,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
             if (productsKey is not null)
             {
-                foreach (var prodGuid in RegistryNames.SubKeysOf(productsKey))
+                foreach (var prodGuid in RegistryNames.SubKeysOf(productsKey, ct))
                 {
                     ct.ThrowIfCancellationRequested();
                     // Counted from the key list, before anything inside it is
@@ -3789,7 +3789,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         {
                             var set = ReadProductPatchSet(productsKey, prodGuid,
                                 ref productPatchKeys, ref productPatchRegistrations,
-                                out var heldCodes, out var patchesKeyPresent);
+                                out var heldCodes, out var patchesKeyPresent, ct);
                             entryCodes = heldCodes;
                             patchSets[unpacked] = patchSets.TryGetValue(unpacked, out var existing)
                                 ? Worse(existing, set)
@@ -3832,7 +3832,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         var unclaimedFileHere = false;
                         foreach (var valueName in CachedPackageValueNames)
                         {
-                            if (!TryReadLocalPackage(ipKey, valueName, out var localPkg))
+                            if (!TryReadLocalPackage(ipKey, valueName, out var localPkg, ct))
                             {
                                 failures++;
                                 // The only way this returns false is a value that was
@@ -3883,7 +3883,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
             if (patchesKey is not null)
             {
-                foreach (var patchGuid in RegistryNames.SubKeysOf(patchesKey))
+                foreach (var patchGuid in RegistryNames.SubKeysOf(patchesKey, ct))
                 {
                     ct.ThrowIfCancellationRequested();
 
@@ -3921,7 +3921,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         var unclaimedFileHere = false;
                         foreach (var valueName in CachedPackageValueNames)
                         {
-                            if (!TryReadLocalPackage(patchKey, valueName, out var localPkg))
+                            if (!TryReadLocalPackage(patchKey, valueName, out var localPkg, ct))
                             {
                                 failures++;
                                 nonStringValues++;
@@ -4355,7 +4355,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         ref int patchKeys,
         ref int patchRegistrations,
         out IReadOnlyCollection<string>? patchCodes,
-        out bool patchesKeyPresent)
+        out bool patchesKeyPresent,
+        CancellationToken cancellationToken)
     {
         // NOT ESTABLISHED UNTIL IT IS, and this line rather than a failure path is
         // where that is decided: a path added below that forgets to set it leaves the
@@ -4410,7 +4411,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // name the listing returned whether or not the loop returns early. A key that
         // fails to list throws, and the caller's catch turns the throw into the null
         // set above.
-        var patchNames = RegistryNames.SubKeysOf(patchesKey);
+        var patchNames = RegistryNames.SubKeysOf(patchesKey, cancellationToken);
 
         // COUNTED OFF THE LISTING RATHER THAN INSIDE THE LOOP, so every registration
         // under the key reaches the figure. The loop returns on the first patch
@@ -4560,7 +4561,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// so both storage types reach the claim as the path they name.
     /// </summary>
     internal static bool TryReadLocalPackage(
-        Microsoft.Win32.RegistryKey? key, string valueName, out string? path)
+        Microsoft.Win32.RegistryKey? key, string valueName, out string? path,
+        CancellationToken cancellationToken)
     {
         path = null;
 
@@ -4588,7 +4590,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // have seen. The name comparison is case-insensitive because registry
         // value names are, so a key holding "localpackage" must not read as a key
         // holding nothing.
-        foreach (var name in RegistryNames.ValuesOf(key))
+        foreach (var name in RegistryNames.ValuesOf(key, cancellationToken))
         {
             if (string.Equals(name, valueName, StringComparison.OrdinalIgnoreCase))
                 return false;

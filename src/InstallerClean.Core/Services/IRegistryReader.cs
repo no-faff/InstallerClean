@@ -41,9 +41,11 @@ public interface IRegistryReader
     /// Every value of one key: its name, its registry type, and its text where it
     /// holds a string, read without expanding environment variables. Three-state for
     /// the reason <see cref="LocalMachineKeyPresence"/> is: a key that is not there is
-    /// an answer, and a key nobody could read is the absence of one.
+    /// an answer, and a key nobody could read is the absence of one. A cancel of
+    /// <paramref name="cancellationToken"/> while the key's names are read again throws
+    /// OperationCanceledException.
     /// </summary>
-    RegistryKeyValues LocalMachineValues(string keyPath);
+    RegistryKeyValues LocalMachineValues(string keyPath, CancellationToken cancellationToken);
 
     /// <summary>
     /// Every value of one key in the hive of the account <paramref name="sid"/>, at
@@ -51,7 +53,7 @@ public interface IRegistryReader
     /// <see cref="LocalMachineValues"/> reads one. An account whose hive is not loaded there reads
     /// as a key that is not there.
     /// </summary>
-    RegistryKeyValues UserValues(string sid, string keyPath);
+    RegistryKeyValues UserValues(string sid, string keyPath, CancellationToken cancellationToken);
 
     /// <summary>
     /// Whether the hive of the account <paramref name="sid"/> is loaded at

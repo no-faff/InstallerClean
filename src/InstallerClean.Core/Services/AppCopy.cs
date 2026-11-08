@@ -300,7 +300,7 @@ public static class AppCopy
     /// </summary>
     public static SetupRecord ReadSetupRecord(IRegistryReader registry)
     {
-        var read = registry.LocalMachineValues(SetupUninstallKeyPath);
+        var read = registry.LocalMachineValues(SetupUninstallKeyPath, CancellationToken.None);
         if (read.Presence == RegistryKeyPresence.Absent) return SetupRecord.None;
         if (read.Presence != RegistryKeyPresence.Present || read.Values is null) return SetupRecord.CannotTell;
         foreach (var value in read.Values)

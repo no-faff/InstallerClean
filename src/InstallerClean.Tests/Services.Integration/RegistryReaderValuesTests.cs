@@ -12,7 +12,7 @@ public class RegistryReaderValuesTests
     [Fact]
     public void A_key_s_values_are_read_with_their_types_and_the_strings_with_their_text()
     {
-        var read = new RegistryReader().LocalMachineValues(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+        var read = new RegistryReader().LocalMachineValues(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", CancellationToken.None);
 
         Assert.Equal(RegistryKeyPresence.Present, read.Presence);
         Assert.NotNull(read.Values);
@@ -29,7 +29,7 @@ public class RegistryReaderValuesTests
     {
         // windir is a REG_EXPAND_SZ holding a variable, which a default read expands.
         var read = new RegistryReader().LocalMachineValues(
-            @"SYSTEM\CurrentControlSet\Control\Session Manager\Environment");
+            @"SYSTEM\CurrentControlSet\Control\Session Manager\Environment", CancellationToken.None);
 
         Assert.Equal(RegistryKeyPresence.Present, read.Presence);
         var windir = Assert.Single(read.Values!, v => v.Name == "windir");
@@ -41,7 +41,7 @@ public class RegistryReaderValuesTests
     public void A_key_s_default_value_is_read_under_the_empty_name()
     {
         // The .exe key's default value names the file type an executable is.
-        var read = new RegistryReader().LocalMachineValues(@"SOFTWARE\Classes\.exe");
+        var read = new RegistryReader().LocalMachineValues(@"SOFTWARE\Classes\.exe", CancellationToken.None);
 
         Assert.Equal(RegistryKeyPresence.Present, read.Presence);
         var defaultValue = Assert.Single(read.Values!, v => v.Name.Length == 0);
@@ -52,7 +52,7 @@ public class RegistryReaderValuesTests
     [Fact]
     public void A_key_that_is_not_there_reads_as_absent_with_no_values()
     {
-        var read = new RegistryReader().LocalMachineValues(@"SOFTWARE\InstallerClean-test-" + Guid.NewGuid().ToString("N"));
+        var read = new RegistryReader().LocalMachineValues(@"SOFTWARE\InstallerClean-test-" + Guid.NewGuid().ToString("N"), CancellationToken.None);
 
         Assert.Equal(RegistryKeyPresence.Absent, read.Presence);
         Assert.Null(read.Values);

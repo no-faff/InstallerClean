@@ -354,6 +354,74 @@ public class RegistryNamesTests
         Assert.Empty(pauses);
     }
 
+    [Fact]
+    public void A_cancel_during_the_pause_ends_the_listing()
+    {
+        using var cts = new CancellationTokenSource(20);
+        var key = new ScriptedKey((2, new[] { "A", "B" }), (3, new[] { "A", "B" }));
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+
+        Assert.ThrowsAny<OperationCanceledException>(
+            () => RegistryNames.SubKeysUnchanged(key, cancellationToken: cts.Token));
+        Assert.True(clock.ElapsedMilliseconds < 200, $"ended after {clock.ElapsedMilliseconds} ms");
+    }
+
+    [Fact]
+    public void A_token_cancelled_before_the_pause_ends_it_without_waiting()
+    {
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+
+        Assert.ThrowsAny<OperationCanceledException>(() => RegistryNames.Pause(cts.Token)(TimeSpan.FromSeconds(5)));
+        Assert.True(clock.ElapsedMilliseconds < 2_500, $"ended after {clock.ElapsedMilliseconds} ms");
+    }
+
+    [Fact]
+    public void A_cancel_during_the_last_reading_is_thrown_as_a_cancel()
+    {
+        using var cts = new CancellationTokenSource();
+        var key = new ScriptedKey((2, new[] { "A", "B" }), (3, new[] { "A", "B" }));
+        var pauses = 0;
+
+        // The second pause comes before the last reading; the cancel lands after it.
+        Assert.ThrowsAny<OperationCanceledException>(() => RegistryNames.SubKeysUnchanged(
+            key, _ => { if (++pauses == 2) cts.Cancel(); }, cts.Token));
+    }
+
+    [Fact]
+    public void A_key_that_reads_the_same_twice_answers_whatever_the_token()
+    {
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        Assert.Equal(new[] { "A" },
+            RegistryNames.SubKeysUnchanged(new StandInKey { SubKeys = { "A" } }, cancellationToken: cts.Token));
+    }
+
+    [Fact]
+    public void A_token_whose_source_is_disposed_pauses_the_whole_time()
+    {
+        var cts = new CancellationTokenSource();
+        var token = cts.Token;
+        cts.Dispose();
+        var key = new ScriptedKey((2, new[] { "A", "B" }), (3, new[] { "A", "B" }));
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+
+        Assert.Throws<IOException>(() => RegistryNames.SubKeysUnchanged(key, cancellationToken: token));
+        Assert.True(clock.ElapsedMilliseconds >= 280, $"ended after {clock.ElapsedMilliseconds} ms");
+    }
+
+    [Fact]
+    public void A_token_that_cannot_cancel_pauses_the_whole_time()
+    {
+        var key = new ScriptedKey((2, new[] { "A", "B" }), (3, new[] { "A", "B" }));
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+
+        Assert.Throws<IOException>(() => RegistryNames.SubKeysUnchanged(key));
+        Assert.True(clock.ElapsedMilliseconds >= 280, $"ended after {clock.ElapsedMilliseconds} ms");
+    }
+
     private static void AssertUnread(ScriptedKey key, string disagreement)
     {
         foreach (var subKeys in new[] { true, false })
