@@ -168,7 +168,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
 #if DEBUG
             if (Environment.GetEnvironmentVariable(SlowCheckVariable) is { Length: > 0 })
             {
-                await Task.Delay(RequestTimeout, cancellationToken).ConfigureAwait(false);
+                await FrameworkTask.Delay(RequestTimeout, cancellationToken).ConfigureAwait(false);
                 return new CheckFailed(UpdateCheckFailureReason.Timeout);
             }
             if (Environment.GetEnvironmentVariable(PretendLatestVariable) is { Length: > 0 } pretendedTag)

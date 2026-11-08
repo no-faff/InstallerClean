@@ -563,7 +563,7 @@ public sealed class AppUpdater : IAppUpdater
                         "The downloaded file could not be opened to hold it.",
                         new System.ComponentModel.Win32Exception(error));
             }
-            await Task.Delay(250, cancellationToken).ConfigureAwait(false);
+            await FrameworkTask.Delay(250, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -874,7 +874,7 @@ public sealed class AppUpdater : IAppUpdater
                 using (StorageHelpers.OpenAtomic(gate + GateReachedSuffix, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateAlways)
                     ?? throw new IOException($"The file {gate}{GateReachedSuffix} could not be written.")) { }
                 while (!FrameworkFile.Exists(gate))
-                    await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+                    await FrameworkTask.Delay(100, cancellationToken).ConfigureAwait(false);
                 _open = true;
             }
             var room = _open ? count : (int)Math.Min(count, _gateAt - _passed);

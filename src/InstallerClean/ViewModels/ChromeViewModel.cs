@@ -558,7 +558,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
         try
         {
-            await Task.Delay(_checkCooldown, token);
+            await FrameworkTask.Delay(_checkCooldown, token);
         }
         catch (OperationCanceledException)
         {
@@ -775,7 +775,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
         try
         {
-            await Task.Delay(_scoopUpdateCopiedFor, token);
+            await FrameworkTask.Delay(_scoopUpdateCopiedFor, token);
         }
         catch (OperationCanceledException)
         {

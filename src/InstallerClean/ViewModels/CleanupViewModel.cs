@@ -480,7 +480,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         try
         {
-            await Task.Delay(MoveDestinationSaveDelay, token);
+            await FrameworkTask.Delay(MoveDestinationSaveDelay, token);
         }
         catch (OperationCanceledException)
         {
@@ -548,7 +548,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         try
         {
-            await Task.Delay(MoveDestinationSaveDelay, token);
+            await FrameworkTask.Delay(MoveDestinationSaveDelay, token);
         }
         catch (OperationCanceledException)
         {

@@ -3,13 +3,18 @@ using System.Collections.Generic;
 namespace System.Threading.Tasks;
 
 /// <summary>
-/// Task.WaitAny as .NET 10 times it. On .NET Framework 4.8 the runtime's own WaitAny is woken
-/// by a completion action, and a task made with RunContinuationsAsynchronously queues every
-/// completion action to the thread pool, so its wake waits for a free pool thread. .NET 10
-/// runs that wake on the completing thread.
+/// Task.WaitAny, and Task.Delay with a token, as .NET 10 times them. On .NET Framework 4.8 the
+/// runtime's own WaitAny is woken by a completion action, and a task made with
+/// RunContinuationsAsynchronously queues every completion action to the thread pool, so its wake
+/// waits for a free pool thread; .NET 10 runs that wake on the completing thread. A Task.Delay
+/// that a cancel ends runs its continuations inside the cancel on .NET Framework 4.8, where
+/// .NET 10 queues them.
 /// </summary>
 internal static class FrameworkTask
 {
+    // WaitHandle.WaitAny's limit.
+    private const int MaxHandles = 64;
+
     /// <summary>
     /// Waits for any of <paramref name="tasks"/> to complete, as .NET 10's
     /// Task.WaitAny(Task[], int, CancellationToken) does: the index of a completed task, or -1
@@ -24,9 +29,6 @@ internal static class FrameworkTask
     /// <paramref name="cancellationToken"/> before the call, or one seen when the wait wakes,
     /// throws OperationCanceledException, a task completing at the same moment included.
     /// </remarks>
-    // WaitHandle.WaitAny's limit.
-    private const int MaxHandles = 64;
-
     public static int WaitAny(Task[] tasks, int millisecondsTimeout, CancellationToken cancellationToken)
     {
         if (tasks is null) throw new ArgumentNullException(nameof(tasks));
@@ -81,5 +83,91 @@ internal static class FrameworkTask
         if (woken == WaitHandle.WaitTimeout) return -1;
         if (woken >= first.Count) throw new OperationCanceledException(cancellationToken);
         return first[woken];
+    }
+
+    /// <summary>
+    /// A task that completes after <paramref name="millisecondsDelay"/>, or as cancelled with
+    /// <paramref name="cancellationToken"/> where the token cancels first, as .NET 10's
+    /// Task.Delay(int, CancellationToken) does. -1 waits until the cancel.
+    /// </summary>
+    /// <remarks>
+    /// The cancel completes the task inside the call that cancels, and every continuation is
+    /// queued, never run inside that call, as on .NET 10. A delay ending by its time queues its
+    /// continuations too, where .NET 10 runs them on the timer's thread.
+    /// </remarks>
+    public static Task Delay(int millisecondsDelay, CancellationToken cancellationToken)
+    {
+        if (millisecondsDelay < -1) throw new ArgumentOutOfRangeException(nameof(millisecondsDelay));
+        return DelayCore((uint)millisecondsDelay, cancellationToken);
+    }
+
+    /// <summary>
+    /// <see cref="Delay(int, CancellationToken)"/> for a <see cref="TimeSpan"/>, taken in whole
+    /// milliseconds from -1 to <see cref="uint.MaxValue"/> less one, as .NET 10 takes it.
+    /// </summary>
+    public static Task Delay(TimeSpan delay, CancellationToken cancellationToken)
+    {
+        var milliseconds = (long)delay.TotalMilliseconds;
+        if (milliseconds < -1 || milliseconds > uint.MaxValue - 1)
+            throw new ArgumentOutOfRangeException(nameof(delay));
+        return DelayCore((uint)milliseconds, cancellationToken);
+    }
+
+    private static Task DelayCore(uint millisecondsDelay, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested) return Task.FromCanceled(cancellationToken);
+        if (millisecondsDelay == 0) return Task.CompletedTask;
+
+        return new DelayPromise(millisecondsDelay, cancellationToken).Task;
+    }
+
+    /// <summary>
+    /// One delay: a timer that completes it, and a registration on the token that cancels it.
+    /// Whichever comes first disposes both.
+    /// </summary>
+    private sealed class DelayPromise
+    {
+        private readonly TaskCompletionSource<bool> _source =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly CancellationToken _token;
+        private readonly Timer? _timer;
+        private readonly CancellationTokenRegistration _registration;
+
+        public DelayPromise(uint millisecondsDelay, CancellationToken cancellationToken)
+        {
+            _token = cancellationToken;
+            // Neither the timer nor the registration carries the caller's execution context, as
+            // .NET 10's do not.
+            using (ExecutionContext.SuppressFlow())
+            {
+                if (millisecondsDelay != uint.MaxValue)
+                    _timer = new Timer(static state => ((DelayPromise)state!).Complete(), this,
+                        (long)millisecondsDelay, Timeout.Infinite);
+
+                if (cancellationToken.CanBeCanceled)
+                    _registration = cancellationToken.Register(
+                        static state => ((DelayPromise)state!).Cancel(), this);
+            }
+
+            if (_source.Task.IsCompleted) Cleanup();
+        }
+
+        public Task Task => _source.Task;
+
+        private void Complete()
+        {
+            if (_source.TrySetResult(true)) Cleanup();
+        }
+
+        private void Cancel()
+        {
+            if (_source.TrySetCanceled(_token)) Cleanup();
+        }
+
+        private void Cleanup()
+        {
+            _timer?.Dispose();
+            _registration.Dispose();
+        }
     }
 }

@@ -61,6 +61,8 @@ M:System.IO.Directory.GetDirectories(System.String,System.String,System.IO.Searc
 M:System.IO.Directory.GetFileSystemEntries(System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
 M:System.IO.Directory.GetFileSystemEntries(System.String,System.String);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
 M:System.IO.Directory.GetFileSystemEntries(System.String,System.String,System.IO.SearchOption);Use FrameworkDirectory.EnumerateFileSystemEntries, which lists the folder as .NET 10 does
+M:System.Threading.Tasks.Task.Delay(System.Int32,System.Threading.CancellationToken);Delay through FrameworkTask.Delay, which queues the continuations of a cancelled delay as .NET 10 does
+M:System.Threading.Tasks.Task.Delay(System.TimeSpan,System.Threading.CancellationToken);Delay through FrameworkTask.Delay, which queues the continuations of a cancelled delay as .NET 10 does
 M:System.Threading.Tasks.Task.WaitAny(System.Threading.Tasks.Task[]);Wait through FrameworkTask.WaitAny, which .NET Framework wakes on the completing thread as .NET 10 does
 M:System.Threading.Tasks.Task.WaitAny(System.Threading.Tasks.Task[],System.Int32);Wait through FrameworkTask.WaitAny, which .NET Framework wakes on the completing thread as .NET 10 does
 M:System.Threading.Tasks.Task.WaitAny(System.Threading.Tasks.Task[],System.TimeSpan);Wait through FrameworkTask.WaitAny, which .NET Framework wakes on the completing thread as .NET 10 does

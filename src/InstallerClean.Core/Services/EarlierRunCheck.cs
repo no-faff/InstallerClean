@@ -74,7 +74,7 @@ internal sealed class EarlierRunCheck : IEarlierRunCheck
     {
         _ = ShowsAnEarlierRunAsync();
         using var stopWaiting = new CancellationTokenSource();
-        var finished = await Task.WhenAny(_settled.Task, Task.Delay(bound, stopWaiting.Token)).ConfigureAwait(false);
+        var finished = await Task.WhenAny(_settled.Task, FrameworkTask.Delay(bound, stopWaiting.Token)).ConfigureAwait(false);
         if (finished == _settled.Task)
         {
             stopWaiting.Cancel();

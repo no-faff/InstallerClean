@@ -692,7 +692,7 @@ public partial class ScanViewModel : ObservableObject
             var progress = new ThrottledScanProgress(
                 new Progress<ScanProgressUpdate>(ApplyProgressUpdate));
             var scanTask = RunScanCoreAsync(progress, cts.Token);
-            if (await Task.WhenAny(scanTask, Task.Delay(200, cts.Token)) != scanTask)
+            if (await Task.WhenAny(scanTask, FrameworkTask.Delay(200, cts.Token)) != scanTask)
                 IsScanning = true;
             await scanTask;
 

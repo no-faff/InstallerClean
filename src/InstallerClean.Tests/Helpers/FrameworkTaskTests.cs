@@ -8,7 +8,8 @@ namespace InstallerClean.Tests.Helpers;
 /// <see cref="FrameworkTask.WaitAny"/> answers as .NET 10's Task.WaitAny(Task[], int,
 /// CancellationToken) does, and wakes when a task made with RunContinuationsAsynchronously
 /// completes even while every thread-pool thread is busy, which .NET Framework's own WaitAny
-/// does not.
+/// does not. <see cref="FrameworkTask.Delay(int, CancellationToken)"/> answers as .NET 10's
+/// Task.Delay with a token does, and a cancel that ends it queues its continuations.
 /// </summary>
 [Collection(nameof(ThreadPoolCollection))]
 public class FrameworkTaskTests
@@ -110,6 +111,82 @@ public class FrameworkTaskTests
             () => FrameworkTask.WaitAny([Task.CompletedTask], -2, CancellationToken.None));
         Assert.Throws<ArgumentException>(
             () => FrameworkTask.WaitAny([Task.CompletedTask, null!], 0, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task A_cancelled_delay_does_not_run_its_continuation_inside_the_cancel()
+    {
+        using var cts = new CancellationTokenSource();
+        var delay = FrameworkTask.Delay(Timeout.Infinite, cts.Token);
+        var cancelling = Environment.CurrentManagedThreadId;
+        var ranInside = false;
+        var continuation = delay.ContinueWith(
+            _ => ranInside = Environment.CurrentManagedThreadId == cancelling,
+            CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+
+        cts.Cancel();
+        var seenAtCancel = Volatile.Read(ref ranInside);
+
+        Assert.True(delay.IsCanceled);
+        Assert.False(seenAtCancel);
+        await continuation;
+    }
+
+    [Fact]
+    public async Task A_cancelled_delay_carries_the_token()
+    {
+        using var cts = new CancellationTokenSource(50);
+
+        var thrown = await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => FrameworkTask.Delay(TimeSpan.FromSeconds(30), cts.Token));
+        Assert.Equal(cts.Token, thrown.CancellationToken);
+    }
+
+    [Fact]
+    public void A_delay_with_a_token_already_cancelled_is_cancelled_at_once()
+    {
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        Assert.True(FrameworkTask.Delay(100, cts.Token).IsCanceled);
+        Assert.True(FrameworkTask.Delay(0, cts.Token).IsCanceled);
+    }
+
+    [Fact]
+    public void A_zero_delay_has_completed_when_it_returns()
+    {
+        using var cts = new CancellationTokenSource();
+
+        Assert.Equal(TaskStatus.RanToCompletion, FrameworkTask.Delay(0, cts.Token).Status);
+        Assert.Equal(TaskStatus.RanToCompletion, FrameworkTask.Delay(TimeSpan.Zero, cts.Token).Status);
+    }
+
+    [Fact]
+    public async Task A_delay_ends_after_its_time()
+    {
+        using var cts = new CancellationTokenSource();
+        var clock = Stopwatch.StartNew();
+
+        await FrameworkTask.Delay(TimeSpan.FromMilliseconds(100), cts.Token);
+
+        // The timer may fire up to one system clock tick early, as a stopwatch measures it.
+        Assert.True(clock.ElapsedMilliseconds >= 80, $"ended after {clock.ElapsedMilliseconds} ms");
+    }
+
+    [Fact]
+    public void A_delay_out_of_range_throws_as_on_dotnet_10()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => { _ = FrameworkTask.Delay(-2, CancellationToken.None); });
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => { _ = FrameworkTask.Delay(TimeSpan.FromMilliseconds(-2), CancellationToken.None); });
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => { _ = FrameworkTask.Delay(TimeSpan.FromMilliseconds(uint.MaxValue), CancellationToken.None); });
+
+        using var cts = new CancellationTokenSource();
+        var endless = FrameworkTask.Delay(TimeSpan.FromMilliseconds(-1), cts.Token);
+        Assert.Equal(TaskStatus.WaitingForActivation, endless.Status);
+        cts.Cancel();
+        Assert.True(endless.IsCanceled);
     }
 
     /// <summary>
