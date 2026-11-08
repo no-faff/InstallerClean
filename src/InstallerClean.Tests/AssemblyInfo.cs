@@ -95,7 +95,9 @@ internal static class TestCrashLog
         CrashLog.FolderForTests = folder;
         Helpers.DomainEnd.Then(() =>
         {
-            TryDelete(folder);
+            // Deleted here rather than through TryDelete, so a refused delete reaches DomainEnd's
+            // trace. A domain that never wrote the log has no folder.
+            if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true);
             // Not recursive, so a folder another run or domain is still using stays, and the
             // refusal that keeps it is expected.
             try { Directory.Delete(Shared); } catch (IOException) { }
@@ -151,6 +153,8 @@ internal static class TestCrashLog
     /// </summary>
     internal static void TryDelete(string folder)
     {
-        try { Directory.Delete(folder, recursive: true); } catch (Exception) { }
+        try { Directory.Delete(folder, recursive: true); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 }
