@@ -201,7 +201,7 @@ internal static class MoveSpaceCheck
         try
         {
             var probe = FullPaths.GetFullPath(destination);
-            while (!Directory.Exists(probe))
+            while (!FrameworkDirectory.Exists(probe))
             {
                 var parent = PathText.GetDirectoryName(probe);
                 // Null at a path root, and equal to itself if GetDirectoryName

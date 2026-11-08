@@ -87,7 +87,7 @@ public sealed class UpdateStagingFolder
     /// </summary>
     internal static UpdateStagingFolder Create(string root, string descriptorSddl)
     {
-        if (!Directory.Exists(root))
+        if (!FrameworkDirectory.Exists(root))
             throw new IOException("The folder to create the update's folder in does not exist.");
 
         var leaf = NamePrefix + Guids.NewGuid().ToString("N");
@@ -191,7 +191,7 @@ public sealed class UpdateStagingFolder
     {
         try
         {
-            if (!Directory.Exists(root)) return true;
+            if (!FrameworkDirectory.Exists(root)) return true;
 
             using var rootHandle = DirectoryGuard.OpenDirectoryFollow(root, out _);
             if (rootHandle is null) return false;

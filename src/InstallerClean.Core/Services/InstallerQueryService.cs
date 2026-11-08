@@ -3853,7 +3853,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                                 // registry records.
                                 if (MergeClaim(claimed, new RegisteredPackage(path, "", ""),
                                         ClaimSource.RegistryFallback)
-                                    && File.Exists(path))
+                                    && FrameworkFile.Exists(path))
                                     unclaimedFileHere = true;
                             }
                         }
@@ -3945,7 +3945,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                                 packageRecords.Add(new RegistryPackageRecord(path, IsPatch: true, patchCode, sidName));
                                 if (MergeClaim(claimed, new RegisteredPackage(path, "", ""),
                                         ClaimSource.RegistryFallback)
-                                    && File.Exists(path))
+                                    && FrameworkFile.Exists(path))
                                     unclaimedFileHere = true;
                             }
                         }

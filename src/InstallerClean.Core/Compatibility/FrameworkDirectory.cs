@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
@@ -5,12 +6,13 @@ using InstallerClean.Interop.Native;
 namespace System.IO;
 
 /// <summary>
-/// <c>Directory.Move</c> as .NET 10 moves a folder on Windows (dotnet/runtime v10.0.0,
-/// <c>Directory.cs</c>, <c>FileSystem.cs</c>, <c>FileSystem.Windows.cs</c> and
-/// <c>Interop.MoveFileEx.cs</c>), called in place of .NET Framework's.
+/// <c>Directory.Exists</c> and <c>Directory.Move</c> as .NET 10 answers whether a folder
+/// is there and moves one on Windows (dotnet/runtime v10.0.0, <c>Directory.cs</c>,
+/// <c>FileSystem.cs</c>, <c>FileSystem.Windows.cs</c> and <c>Interop.MoveFileEx.cs</c>),
+/// called in place of .NET Framework's.
 /// </summary>
 /// <remarks>
-/// .NET Framework's own passes the paths to MoveFileW as the caller gave them, so a path of
+/// .NET Framework's own Move passes the paths to MoveFileW as the caller gave them, so a path of
 /// 260 characters or more fails where the long-path policy is off, refuses a rename that
 /// changes only the case of the name, and names neither path when the destination exists.
 /// </remarks>
@@ -20,6 +22,30 @@ internal static class FrameworkDirectory
     private const int ERROR_PATH_NOT_FOUND = 3;
     private const int ERROR_ACCESS_DENIED = 5;
     private const int ERROR_ALREADY_EXISTS = 183;
+
+    /// <summary>
+    /// Whether <paramref name="path"/> names a folder, as .NET 10's <c>Directory.Exists</c>
+    /// answers it (<c>Directory.cs</c>): false for a null or empty path, for a file, and for
+    /// any path that cannot be read; a path that is not rooted is read from the working
+    /// directory.
+    /// </summary>
+    internal static bool Exists([NotNullWhen(true)] string? path)
+    {
+        try
+        {
+            if (path == null)
+                return false;
+            if (path.Length == 0)
+                return false;
+
+            return FrameworkFileSystem.DirectoryExists(FullPaths.GetFullPath(path));
+        }
+        catch (ArgumentException) { }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+
+        return false;
+    }
 
     /// <summary>
     /// Moves the folder at <paramref name="sourceDirName"/>, with everything in it, to

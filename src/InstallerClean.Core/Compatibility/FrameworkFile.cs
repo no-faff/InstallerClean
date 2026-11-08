@@ -1,15 +1,58 @@
+using System.Diagnostics.CodeAnalysis;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 
 namespace System.IO;
 
 /// <summary>
-/// <c>File.Move(string, string, bool)</c>, which .NET Framework 4.8 does not have, as .NET 10
-/// moves a file on Windows (dotnet/runtime v10.0.0, <c>File.cs</c>,
-/// <c>FileSystem.Windows.cs</c> and <c>Interop.MoveFileEx.cs</c>).
+/// <c>File.Exists</c> and <c>File.GetAttributes</c>, called in place of .NET Framework's,
+/// and <c>File.Move(string, string, bool)</c>, which .NET Framework 4.8 does not have, as
+/// .NET 10 answers and moves a file on Windows (dotnet/runtime v10.0.0, <c>File.cs</c>,
+/// <c>FileSystem.Attributes.Windows.cs</c>, <c>FileSystem.Windows.cs</c> and
+/// <c>Interop.MoveFileEx.cs</c>).
 /// </summary>
 internal static class FrameworkFile
 {
+    /// <summary>
+    /// Whether <paramref name="path"/> names a file, as .NET 10's <c>File.Exists</c> answers it
+    /// (<c>File.cs</c>): false for a null or empty path, for one whose full path ends in a
+    /// separator, for a folder, and for any path that cannot be read; a path that is not
+    /// rooted is read from the working directory.
+    /// </summary>
+    internal static bool Exists([NotNullWhen(true)] string? path)
+    {
+        try
+        {
+            if (path == null)
+                return false;
+            if (path.Length == 0)
+                return false;
+
+            path = FullPaths.GetFullPath(path);
+
+            // A separator at the end would be taken off by the read below, which could then
+            // answer for a file of that name.
+            if (path.Length > 0 && PathText.IsDirectorySeparator(path[path.Length - 1]))
+                return false;
+
+            return FrameworkFileSystem.FileExists(path);
+        }
+        catch (ArgumentException) { }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+
+        return false;
+    }
+
+    /// <summary>
+    /// The attributes of the file or folder at <paramref name="path"/>, as .NET 10's
+    /// <c>File.GetAttributes</c> reads them: the full path is read, and a refusal from
+    /// Windows, nothing being there included, is the exception <see cref="Win32Marshal"/>
+    /// gives for its error, naming the full path.
+    /// </summary>
+    internal static FileAttributes GetAttributes(string path) =>
+        FrameworkFileSystem.GetAttributes(FullPaths.GetFullPath(path));
+
     extension(File)
     {
         /// <summary>

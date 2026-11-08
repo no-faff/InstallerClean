@@ -162,7 +162,7 @@ internal static class StorageHelpers
     {
         try
         {
-            if (File.Exists(path))
+            if (FrameworkFile.Exists(path))
                 File.Delete(path);
         }
         catch
@@ -575,7 +575,7 @@ internal static class StorageHelpers
         error = null;
         try
         {
-            var attrs = File.GetAttributes(path);
+            var attrs = FrameworkFile.GetAttributes(path);
             return (attrs & FileAttributes.ReparsePoint) != 0 ? ReparseCheck.Yes : ReparseCheck.No;
         }
         catch (FileNotFoundException)

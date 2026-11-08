@@ -44,7 +44,7 @@ public sealed class ConfirmationService : IConfirmationService
         {
             try
             {
-                if (Directory.Exists(start))
+                if (FrameworkDirectory.Exists(start))
                     startFolder = start;
             }
             catch (Exception)

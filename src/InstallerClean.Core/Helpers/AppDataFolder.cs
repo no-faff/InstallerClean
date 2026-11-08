@@ -110,9 +110,9 @@ internal static class AppDataFolder
         try
         {
             if (!IsPlainFolder(parent, failures))
-                return Answer(Directory.Exists(earlier) ? earlier : current, failures);
+                return Answer(FrameworkDirectory.Exists(earlier) ? earlier : current, failures);
 
-            if (!Directory.Exists(earlier))
+            if (!FrameworkDirectory.Exists(earlier))
             {
                 RemoveIfEmpty(parent);
                 return Answer(current, failures);
@@ -121,7 +121,7 @@ internal static class AppDataFolder
             if (!IsPlainFolder(earlier, failures) || !IsPlainFolder(current, failures))
                 return Answer(earlier, failures);
 
-            if (!Directory.Exists(current))
+            if (!FrameworkDirectory.Exists(current))
             {
                 try
                 {
@@ -135,9 +135,9 @@ internal static class AppDataFolder
                     // in between. Where neither happened the rename was refused, by a
                     // file held open inside the folder for one, and every file is still
                     // where it was.
-                    if (!Directory.Exists(earlier))
+                    if (!FrameworkDirectory.Exists(earlier))
                         return Answer(current, failures);
-                    if (!Directory.Exists(current))
+                    if (!FrameworkDirectory.Exists(current))
                     {
                         failures.Add(ex);
                         return Answer(earlier, failures);
@@ -157,7 +157,7 @@ internal static class AppDataFolder
             // Whatever this was, the answer is the folder the files are in now.
             failures.Add(ex);
             string folder;
-            try { folder = Directory.Exists(current) || !Directory.Exists(earlier) ? current : earlier; }
+            try { folder = FrameworkDirectory.Exists(current) || !FrameworkDirectory.Exists(earlier) ? current : earlier; }
             catch { folder = earlier; }
             return Answer(folder, failures);
         }
@@ -195,7 +195,7 @@ internal static class AppDataFolder
                 if (error is not null) failures.Add(error);
                 continue;
             }
-            if (Directory.Exists(entry))
+            if (FrameworkDirectory.Exists(entry))
                 continue;
 
             var target = PathText.Combine(current, name);
@@ -208,9 +208,9 @@ internal static class AppDataFolder
             {
                 // A file of this name already in the new folder is the clash handled
                 // below; anything else leaves this one where it is for the next start.
-                if (!File.Exists(target))
+                if (!FrameworkFile.Exists(target))
                 {
-                    if (File.Exists(entry)) failures.Add(ex);
+                    if (FrameworkFile.Exists(entry)) failures.Add(ex);
                     continue;
                 }
             }
@@ -247,7 +247,7 @@ internal static class AppDataFolder
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             // Another process claimed it, or it went; either way it is not this one's.
-            if (File.Exists(earlierLog)) failures.Add(ex);
+            if (FrameworkFile.Exists(earlierLog)) failures.Add(ex);
             return;
         }
 
@@ -320,7 +320,7 @@ internal static class AppDataFolder
         {
             if (StorageHelpers.CheckReparsePoint(folder, out _) != StorageHelpers.ReparseCheck.No)
                 return;
-            if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
+            if (FrameworkDirectory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
                 Directory.Delete(folder, recursive: false);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)

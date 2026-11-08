@@ -382,8 +382,8 @@ internal static class InstallerCacheHelpers
     ///
     /// IT DOES NOT THROW. A path <see cref="FullPaths.GetFullPath(string)"/> refuses
     /// answers <see cref="PathResolution.NotAPath"/>, the walk up to an existing
-    /// ancestor asks <see cref="File.Exists(string)"/> and
-    /// <see cref="Directory.Exists(string)"/>, which answer false rather than throw,
+    /// ancestor asks <see cref="FrameworkFile.Exists(string)"/> and
+    /// <see cref="FrameworkDirectory.Exists(string)"/>, which answer false rather than throw,
     /// and anything thrown from the open onwards answers
     /// <see cref="PathResolution.Faulted"/>. Keep it that way:
     /// <c>InstallerQueryService.NormaliseLocalPackagePath</c> counts a throw from this
@@ -412,7 +412,7 @@ internal static class InstallerCacheHelpers
         // GetFinalPathNameByHandle needs an existing target; walk up
         // until an ancestor exists and open that.
         var probe = normalised;
-        while (probe.Length > 0 && !Directory.Exists(probe) && !File.Exists(probe))
+        while (probe.Length > 0 && !FrameworkDirectory.Exists(probe) && !FrameworkFile.Exists(probe))
         {
             var parent = PathText.GetDirectoryName(probe);
             if (string.IsNullOrEmpty(parent) || parent == probe)
@@ -489,7 +489,7 @@ internal static class InstallerCacheHelpers
     /// working directory, and the window and the command line would answer differently
     /// for one registration. Left whole, a volume-GUID path is still a path Win32
     /// accepts, so it names its file, answers true to
-    /// <c>File.Exists</c>, and reads the same from either host. It does not match
+    /// <c>FrameworkFile.Exists</c>, and reads the same from either host. It does not match
     /// the folder walk's spelling, and no lexical rule can make it: a caller
     /// wanting the walk's spelling asks the filesystem, which is what
     /// <c>InstallerQueryService.NormaliseLocalPackagePath</c> does with the

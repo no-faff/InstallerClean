@@ -247,7 +247,7 @@ public static class AppCopy
             isSelfContained,
             PathText.GetDirectoryName(exePath) ?? string.Empty,
             ReadSetupRecord(registry),
-            File.Exists);
+            FrameworkFile.Exists);
     }
 
     /// <summary>

@@ -127,7 +127,7 @@ public sealed class SettingsService : ISettingsService
     /// having no better answer than the cautious one.
     /// </summary>
     private static bool RefusedRatherThanAbsent(string path) =>
-        File.Exists(path)
+        FrameworkFile.Exists(path)
         && StorageHelpers.CheckReparsePoint(path, out _) != StorageHelpers.ReparseCheck.Yes;
 
     /// <summary>Persists settings via write-temp-then-rename. Returns true on

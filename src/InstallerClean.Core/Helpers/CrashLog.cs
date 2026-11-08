@@ -175,7 +175,7 @@ public static class CrashLog
     {
         try
         {
-            if (!File.Exists(logFile)) return;
+            if (!FrameworkFile.Exists(logFile)) return;
             if (new FileInfo(logFile).Length < MaxBytes) return;
             // File.Move with overwrite uses MOVEFILE_REPLACE_EXISTING,
             // which replaces a symlink rather than following it.

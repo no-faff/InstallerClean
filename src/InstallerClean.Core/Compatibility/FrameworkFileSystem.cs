@@ -5,8 +5,9 @@ using InstallerClean.Interop.Native;
 namespace System.IO;
 
 /// <summary>
-/// Whether a file is at a full path, read as .NET 10 reads it before <c>File.Move</c> on
-/// Windows (dotnet/runtime v10.0.0, <c>FileSystem.Attributes.Windows.cs</c>,
+/// Whether a file or a folder is at a full path, and its attributes, read as .NET 10 reads
+/// them on Windows (dotnet/runtime v10.0.0, <c>FileSystem.Attributes.Windows.cs</c>,
+/// <c>FileSystem.Windows.cs</c>,
 /// <c>Interop.GetFileAttributesEx.cs</c>, <c>Interop.FindFirstFileEx.cs</c> and
 /// <c>DisableMediaInsertionPrompt.cs</c>).
 /// </summary>
@@ -36,6 +37,28 @@ internal static class FrameworkFileSystem
         FillAttributeInfo(fullPath, out var data) == ERROR_SUCCESS
         && data.dwFileAttributes != InvalidFileAttributes
         && (data.dwFileAttributes & Kernel32.FILE_ATTRIBUTE_DIRECTORY) == 0;
+
+    /// <summary>
+    /// Whether <paramref name="fullPath"/> names a folder: something answers there, and it is
+    /// a folder. A link to a folder counts as a folder, read by its own attributes.
+    /// </summary>
+    internal static bool DirectoryExists(string fullPath) =>
+        FillAttributeInfo(fullPath, out var data) == ERROR_SUCCESS
+        && data.dwFileAttributes != InvalidFileAttributes
+        && (data.dwFileAttributes & Kernel32.FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+    /// <summary>
+    /// The attributes of what <paramref name="fullPath"/> names. A refusal from Windows,
+    /// nothing being there included, is the exception <see cref="Win32Marshal"/> gives for its
+    /// error, naming <paramref name="fullPath"/>.
+    /// </summary>
+    internal static FileAttributes GetAttributes(string fullPath)
+    {
+        var errorCode = FillAttributeInfo(fullPath, out var data);
+        if (errorCode != ERROR_SUCCESS)
+            throw Win32Marshal.GetExceptionForWin32Error(errorCode, fullPath);
+        return (FileAttributes)data.dwFileAttributes;
+    }
 
     /// <summary>
     /// The attributes, times and size of what <paramref name="path"/> names, with 0 as the

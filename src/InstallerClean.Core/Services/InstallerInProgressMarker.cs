@@ -42,7 +42,7 @@ internal sealed class InstallerInProgressMarker : IInstallerInProgressMarker
         // is left to propagate.
         try
         {
-            File.GetAttributes(_path);
+            FrameworkFile.GetAttributes(_path);
             return InstallerInProgressMarkerReading.Present;
         }
         catch (FileNotFoundException)

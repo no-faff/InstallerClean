@@ -194,11 +194,11 @@ public sealed class ResultLogService : IResultLogService
     /// File.Exists, which answers false rather than throwing where the folder cannot be
     /// read. Called from the window's start check on a thread-pool thread.
     /// </summary>
-    public bool LastLogExists() => File.Exists(_logFile);
+    public bool LastLogExists() => FrameworkFile.Exists(_logFile);
 
     private async Task<string?> ReadLastLogCoreAsync(CancellationToken cancellationToken)
     {
-        if (!File.Exists(_logFile))
+        if (!FrameworkFile.Exists(_logFile))
             return null;
 
         try

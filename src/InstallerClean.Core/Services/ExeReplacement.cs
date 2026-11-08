@@ -480,7 +480,7 @@ internal static class ExeReplacement
         failure = null;
         try
         {
-            attributes = File.GetAttributes(path);
+            attributes = FrameworkFile.GetAttributes(path);
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -569,7 +569,7 @@ internal static class ExeReplacement
         try
         {
             if (source is null) throw new IOException("This process has no path to copy.");
-            if (File.Exists(path)) DeletePlainFile(path);
+            if (FrameworkFile.Exists(path)) DeletePlainFile(path);
             using var input = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             using var handle = StorageHelpers.OpenAtomic(path, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateNew)
                 ?? throw new IOException($"The file ending {PathText.GetExtension(path)} could not be created.");
@@ -601,7 +601,7 @@ internal static class ExeReplacement
         linkError = 0;
         try
         {
-            if (File.Exists(backup)) DeletePlainFile(backup);
+            if (FrameworkFile.Exists(backup)) DeletePlainFile(backup);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -715,14 +715,14 @@ internal static class ExeReplacement
     {
         try
         {
-            if (!File.Exists(exePath)) return false;
+            if (!FrameworkFile.Exists(exePath)) return false;
             var replacing = exePath + ReplacingSuffix;
             var backup = exePath + BackupSuffix;
             // A folder that cannot be listed answers that something may be left, with
             // nothing written to crash.log, since the window asks again many times at
             // every start.
             var setupDone = SetupDoneCopies(exePath);
-            var replaceLeft = File.Exists(replacing) || File.Exists(backup) || File.Exists(exePath + LockSuffix);
+            var replaceLeft = FrameworkFile.Exists(replacing) || FrameworkFile.Exists(backup) || FrameworkFile.Exists(exePath + LockSuffix);
             if (!replaceLeft && setupDone is not { Count: > 0 }) return setupDone is not null;
             using var held = TryHold(exePath, TimeSpan.Zero, out _);
             if (held is null) return false;

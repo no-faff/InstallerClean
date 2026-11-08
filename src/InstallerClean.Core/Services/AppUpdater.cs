@@ -253,9 +253,11 @@ public sealed class AppUpdater : IAppUpdater
 
     private static string? ReadScoopConfig(string path)
     {
-        var file = new FileInfo(path);
-        if (!file.Exists) return null;
-        if (file.Length > MaxScoopConfigBytes) throw new IOException("The settings file is larger than is read.");
+        // As .NET 10's FileInfo.Exists answers: the full path, with a separator at the end
+        // taken off before the read.
+        var fullPath = FullPaths.GetFullPath(path);
+        if (!FrameworkFileSystem.FileExists(fullPath)) return null;
+        if (new FileInfo(fullPath).Length > MaxScoopConfigBytes) throw new IOException("The settings file is larger than is read.");
         return File.ReadAllText(path);
     }
 
@@ -871,7 +873,7 @@ public sealed class AppUpdater : IAppUpdater
             {
                 using (StorageHelpers.OpenAtomic(gate + GateReachedSuffix, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateAlways)
                     ?? throw new IOException($"The file {gate}{GateReachedSuffix} could not be written.")) { }
-                while (!File.Exists(gate))
+                while (!FrameworkFile.Exists(gate))
                     await Task.Delay(100, cancellationToken).ConfigureAwait(false);
                 _open = true;
             }
