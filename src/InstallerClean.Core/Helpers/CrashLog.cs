@@ -130,11 +130,11 @@ public static class CrashLog
             using var handle = StorageHelpers.OpenAtomicAppend(path);
             if (handle is null) return (path, false);
 
-            // bufferSize 0: no buffering layer, so the single Write below is a
-            // single write to the file. A StreamWriter over a buffered stream
-            // flushes in chunks, and a second writer appending between two of
-            // this entry's chunks would split it down the middle.
-            using var fs = new FileStream(handle, FileAccess.Write, bufferSize: 0);
+            // No buffering layer (StorageHelpers.UnbufferedWriter), so the single
+            // Write below is a single write to the file. A StreamWriter over a
+            // buffered stream flushes in chunks, and a second writer appending
+            // between two of this entry's chunks would split it down the middle.
+            using var fs = StorageHelpers.UnbufferedWriter(handle);
 
             // The first write to a fresh log file prepends a privacy
             // header. Under elevation, framework exception messages can

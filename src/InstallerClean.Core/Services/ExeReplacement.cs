@@ -574,7 +574,7 @@ internal static class ExeReplacement
             using var handle = StorageHelpers.OpenAtomic(path, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateNew)
                 ?? throw new IOException($"The file ending {PathText.GetExtension(path)} could not be created.");
             created = true;
-            using var output = new FileStream(handle, FileAccess.Write, bufferSize: 0);
+            using var output = StorageHelpers.UnbufferedWriter(handle);
             input.CopyTo(output);
             output.Flush(flushToDisk: true);
             return true;

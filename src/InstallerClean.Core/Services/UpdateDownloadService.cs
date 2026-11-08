@@ -86,7 +86,7 @@ public sealed class UpdateDownloadService
                     destinationPath, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateAlways)
                 ?? throw new UpdateFailedException(UpdateFailureStage.Install,
                     "The file the download is saved to could not be created.");
-            using var file = new FileStream(handle, FileAccess.Write, bufferSize: 0);
+            using var file = StorageHelpers.UnbufferedWriter(handle);
 
             stall.CancelAfter(_stallTimeout);
             using var body = await response.Content.ReadAsStreamAsync(stall.Token).ConfigureAwait(false);

@@ -36,7 +36,7 @@ public class StorageHelpersTests
                 {
                     using var handle = StorageHelpers.OpenAtomicAppend(file);
                     Assert.NotNull(handle);
-                    using var fs = new FileStream(handle, FileAccess.Write, bufferSize: 0);
+                    using var fs = new FileStream(handle, FileAccess.Write, bufferSize: 1);
                     fs.Seek(0, SeekOrigin.End);
                     var bytes = Encoding.UTF8.GetBytes($"{w}:{i}:{filler}\n");
                     fs.Write(bytes, 0, bytes.Length);
@@ -63,7 +63,7 @@ public class StorageHelpersTests
             using (var first = StorageHelpers.OpenAtomicAppend(file))
             {
                 Assert.NotNull(first);
-                using var fs = new FileStream(first, FileAccess.Write, bufferSize: 0);
+                using var fs = new FileStream(first, FileAccess.Write, bufferSize: 1);
                 // Length is readable on an append-only handle: it is what
                 // CrashLog uses to decide whether the file is fresh.
                 Assert.Equal(0, fs.Length);
@@ -74,7 +74,7 @@ public class StorageHelpersTests
             using (var second = StorageHelpers.OpenAtomicAppend(file))
             {
                 Assert.NotNull(second);
-                using var fs = new FileStream(second, FileAccess.Write, bufferSize: 0);
+                using var fs = new FileStream(second, FileAccess.Write, bufferSize: 1);
                 Assert.Equal(4, fs.Length);
                 var bytes = Encoding.UTF8.GetBytes("two\n");
                 fs.Write(bytes, 0, bytes.Length);

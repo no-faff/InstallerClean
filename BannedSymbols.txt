@@ -45,3 +45,5 @@ M:System.IO.Abstractions.IFileInfo.MoveTo(System.String);Not ported: port .NET 1
 M:System.IO.Abstractions.IDirectoryInfo.MoveTo(System.String);Not ported: port .NET 10's move before calling it, as .NET Framework moves the folder otherwise
 T:System.IO.Abstractions.FileSystem;Use AppFileSystem, whose File moves a file as .NET 10 does
 M:System.IO.Abstractions.FileWrapper.#ctor(System.IO.Abstractions.IFileSystem);Use AppFileSystem, whose File moves a file as .NET 10 does
+M:System.IO.FileStream.#ctor(Microsoft.Win32.SafeHandles.SafeFileHandle,System.IO.FileAccess,System.Int32);Use StorageHelpers.UnbufferedWriter, or the constructor without a buffer size: .NET Framework refuses a buffer size of 0 over a handle
+M:System.IO.FileStream.#ctor(Microsoft.Win32.SafeHandles.SafeFileHandle,System.IO.FileAccess,System.Int32,System.Boolean);Use StorageHelpers.UnbufferedWriter, or the constructor without a buffer size: .NET Framework refuses a buffer size of 0 over a handle

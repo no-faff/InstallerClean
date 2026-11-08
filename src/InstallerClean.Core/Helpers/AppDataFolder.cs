@@ -277,7 +277,7 @@ internal static class AppDataFolder
                 failures.Add(new IOException("The kept crash log could not be opened to add the earlier one's entries."));
                 return;
             }
-            using var fs = new FileStream(write, FileAccess.Write, bufferSize: 0);
+            using var fs = StorageHelpers.UnbufferedWriter(write);
 
             // An empty kept log takes the earlier one whole, header and mark included,
             // as its own first write would have.

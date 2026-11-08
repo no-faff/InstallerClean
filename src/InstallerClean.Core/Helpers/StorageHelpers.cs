@@ -62,6 +62,20 @@ internal static class StorageHelpers
             Kernel32.OPEN_ALWAYS);
 
     /// <summary>
+    /// A stream that writes to <paramref name="handle"/> with no buffer of its own, so each
+    /// Write is one write to the file. .NET 10 reads a buffer size of 0 or 1 as no buffer;
+    /// .NET Framework refuses 0 and with 1 passes every Write of one byte or more straight
+    /// to the file. A WriteByte would sit in that one-byte buffer, and on an append-only
+    /// handle .NET Framework can then refuse the next write because the handle's position
+    /// has moved, so callers write whole arrays. BannedSymbols.txt refuses the FileStream
+    /// constructors that take a handle and a buffer size everywhere else.
+    /// </summary>
+#pragma warning disable RS0030
+    internal static FileStream UnbufferedWriter(SafeFileHandle handle) =>
+        new(handle, FileAccess.Write, bufferSize: 1);
+#pragma warning restore RS0030
+
+    /// <summary>
     /// Creates <paramref name="path"/> as a new file, with the same reparse-point refusal as
     /// <see cref="OpenAtomic"/>, shared with nothing, and deleted by Windows as the handle
     /// closes, however the process holding it ends. Returns null on any failure, a file
