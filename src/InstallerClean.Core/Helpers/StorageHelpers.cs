@@ -67,8 +67,9 @@ internal static class StorageHelpers
     /// .NET Framework refuses 0 and with 1 passes every Write of one byte or more straight
     /// to the file. A WriteByte would sit in that one-byte buffer, and on an append-only
     /// handle .NET Framework can then refuse the next write because the handle's position
-    /// has moved, so callers write whole arrays. BannedSymbols.txt refuses the FileStream
-    /// constructors that take a handle and a buffer size everywhere else.
+    /// has moved, so callers write whole arrays. BannedSymbols.txt refuses, in the projects
+    /// that ship, the FileStream constructors and File.Create overloads that take a buffer
+    /// size, so this is the one stream over a handle made with one.
     /// </summary>
 #pragma warning disable RS0030
     internal static FileStream UnbufferedWriter(SafeFileHandle handle) =>
