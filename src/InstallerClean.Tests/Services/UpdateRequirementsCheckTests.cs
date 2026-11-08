@@ -251,9 +251,9 @@ public sealed class UpdateRequirementsCheckTests
     /// <summary>A body that cancels <paramref name="cts"/> when a read finds nothing left.</summary>
     private sealed class CancelsAtEnd(byte[] bytes, CancellationTokenSource cts) : MemoryStream(bytes)
     {
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            var read = await base.ReadAsync(buffer, cancellationToken);
+            var read = await base.ReadAsync(buffer, offset, count, cancellationToken);
             if (read == 0) cts.Cancel();
             return read;
         }

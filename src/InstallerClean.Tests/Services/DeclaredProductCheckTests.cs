@@ -7871,7 +7871,7 @@ public class DeclaredProductCheckTests
         var outcomes = ScreenEvery(CheckOnTheClock(f, files, clock), copies);
 
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome));
-        Assert.Equal(sourcePackages[..Reads], files.Started);
+        Assert.Equal(sourcePackages.Slice(..Reads), files.Started);
     }
 
     [Theory]
@@ -7890,7 +7890,7 @@ public class DeclaredProductCheckTests
         var outcomes = ScreenEvery(CheckOnTheClock(f, files, clock), copies);
 
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome));
-        Assert.Equal(sourcePackages[..Reads], files.Started);
+        Assert.Equal(sourcePackages.Slice(..Reads), files.Started);
     }
 
     [Theory]
@@ -7923,7 +7923,7 @@ public class DeclaredProductCheckTests
 
         ScreenEvery(CheckOnTheClock(f, files, clock), copies);
 
-        Assert.Equal(sourcePackages[..21].Concat(sourcePackages[24..]), files.Started);
+        Assert.Equal(sourcePackages.Slice(..21).Concat(sourcePackages.Slice(24..)), files.Started);
     }
 
     [Fact]
@@ -7935,9 +7935,9 @@ public class DeclaredProductCheckTests
         var check = CheckOnTheClock(f, files, clock);
 
         ScreenEvery(check, copies);
-        Assert.Equal(sourcePackages[..21], files.Started);
+        Assert.Equal(sourcePackages.Slice(..21), files.Started);
 
-        ScreenEvery(check, copies[21..]);
+        ScreenEvery(check, copies.Slice(21..));
 
         Assert.Equal(sourcePackages, files.Started);
     }
@@ -7967,7 +7967,7 @@ public class DeclaredProductCheckTests
 
         var outcomes = ScreenEvery(CheckOnTheClock(f, files, clock), copies);
 
-        Assert.Equal(sourcePackages[..Reads], files.Started);
+        Assert.Equal(sourcePackages.Slice(..Reads), files.Started);
         Assert.All(outcomes.Take(Reads),
             outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome));
         Assert.All(outcomes.Skip(Reads), outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome));
@@ -7988,7 +7988,7 @@ public class DeclaredProductCheckTests
 
         var outcomes = ScreenEvery(CheckOnTheClock(f, files, clock), copies);
 
-        Assert.Equal(sourcePackages[..Reads], files.Started);
+        Assert.Equal(sourcePackages.Slice(..Reads), files.Started);
         Assert.All(outcomes.Skip(Reads), outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome));
     }
 
@@ -8005,11 +8005,11 @@ public class DeclaredProductCheckTests
         var (f, files, clock, copies, sourcePackages) = ProgramsWhosePackagesAnswer(
             [.. Enumerable.Repeat(folder, Programs)], FileIdentityRead.NamesNothing, TimeSpan.FromSeconds(4));
         using var _ = files;
-        foreach (var package in sourcePackages[..Refused]) f.Files.Answers(package, FileIdentityRead.OpenRefused);
+        foreach (var package in sourcePackages.Slice(..Refused)) f.Files.Answers(package, FileIdentityRead.OpenRefused);
 
         var outcomes = ScreenEvery(CheckOnTheClock(f, files, clock), copies);
 
-        Assert.Equal(sourcePackages[..Reads], files.Started);
+        Assert.Equal(sourcePackages.Slice(..Reads), files.Started);
         Assert.All(outcomes.Take(Refused), outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductInstalled, outcome));
         Assert.All(outcomes.Take(Reads).Skip(Refused),
             outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome));
@@ -8039,7 +8039,7 @@ public class DeclaredProductCheckTests
 
         ScreenEvery(check, copies);
 
-        Assert.Equal(sourcePackages[..Reads], files.Started);
+        Assert.Equal(sourcePackages.Slice(..Reads), files.Started);
     }
 
     [Fact]
@@ -8053,7 +8053,7 @@ public class DeclaredProductCheckTests
 
         ScreenEvery(CheckOnTheClock(f, files, clock), copies);
 
-        Assert.Equal(sourcePackages[..13].Concat(sourcePackages[16..]), files.Started);
+        Assert.Equal(sourcePackages.Slice(..13).Concat(sourcePackages.Slice(16..)), files.Started);
     }
 
     [Fact]
@@ -8065,9 +8065,9 @@ public class DeclaredProductCheckTests
         var check = CheckOnTheClock(f, files, clock);
 
         ScreenEvery(check, copies);
-        Assert.Equal(sourcePackages[..13], files.Started);
+        Assert.Equal(sourcePackages.Slice(..13), files.Started);
 
-        var outcomes = ScreenEvery(check, copies[13..]);
+        var outcomes = ScreenEvery(check, copies.Slice(13..));
 
         Assert.Equal(sourcePackages, files.Started);
         Assert.All(outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome));

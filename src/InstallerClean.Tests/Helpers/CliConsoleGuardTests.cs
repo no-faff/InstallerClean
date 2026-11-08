@@ -81,7 +81,7 @@ public class CliConsoleGuardTests
     [InlineData("a character")]
     [InlineData("a character array")]
     [InlineData("part of a character array")]
-    [InlineData("a span of characters")]
+    [InlineData("a string builder")]
     [InlineData("a bool")]
     [InlineData("an int")]
     [InlineData("a uint")]
@@ -103,7 +103,7 @@ public class CliConsoleGuardTests
                 case "a character": guard.WriteLine('2'); break;
                 case "a character array": guard.WriteLine(['2']); break;
                 case "part of a character array": guard.WriteLine(['1', '2', '3'], 1, 1); break;
-                case "a span of characters": guard.WriteLine("2".AsSpan()); break;
+                case "a string builder": guard.WriteLine(new StringBuilder("2")); break;
                 case "a bool": guard.WriteLine(true); break;
                 case "an int": guard.WriteLine(2); break;
                 case "a uint": guard.WriteLine(2u); break;
@@ -124,13 +124,11 @@ public class CliConsoleGuardTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void A_string_builder_that_fails_part_way_ends_where_it_stopped_and_writes_nothing_more_of_itself(
-        bool asALine)
+    public void A_string_builder_goes_out_as_one_write_and_a_failure_in_it_writes_none_of_it(bool asALine)
     {
-        // Three chunks, written a chunk at a time as the console's writer writes them: the
-        // first goes out and the second is refused.
+        // TextWriter writes a string builder as the one string its ToString gives, so a
+        // failure anywhere in the text refuses all of it, however many chunks it holds.
         var builder = new StringBuilder(4).Append("abcd").Append("2xyz").Append("efgh");
-        Assert.Equal(3, CountChunks(builder));
         var console = new ConsoleFailingAt("2");
         var guard = new ConsoleGuard(console);
 
@@ -143,27 +141,6 @@ public class CliConsoleGuardTests
         });
 
         Assert.Null(thrown);
-        Assert.Equal(1, console.Refused);
-        Assert.Equal("first" + NewLine + "abcd" + NewLine + "third" + NewLine, console.ToString());
-    }
-
-    private static int CountChunks(StringBuilder builder)
-    {
-        var chunks = 0;
-        foreach (var _ in builder.GetChunks()) chunks++;
-        return chunks;
-    }
-
-    [Fact]
-    public void A_span_written_after_a_failed_write_starts_a_line_of_its_own()
-    {
-        var console = new ConsoleFailingAt("second");
-        var guard = new ConsoleGuard(console);
-
-        guard.WriteLine("first");
-        guard.WriteLine("second");
-        guard.WriteLine("third".AsSpan());
-
         Assert.Equal(1, console.Refused);
         Assert.Equal("first" + NewLine + NewLine + "third" + NewLine, console.ToString());
     }
@@ -213,7 +190,6 @@ public class CliConsoleGuardTests
     [InlineData("a character")]
     [InlineData("a line break")]
     [InlineData("characters from an array")]
-    [InlineData("a span of characters")]
     [InlineData("a string builder")]
     public void A_console_failing_at_an_empty_text_refuses_every_write(string write)
     {
@@ -225,7 +201,6 @@ public class CliConsoleGuardTests
             {
                 case "a character": console.Write('x'); break;
                 case "a line break": console.WriteLine(); break;
-                case "a span of characters": console.Write("xy".AsSpan()); break;
                 case "a string builder": console.Write(new StringBuilder("xy")); break;
                 default: console.Write(['x', 'y'], 0, 2); break;
             }
@@ -619,8 +594,6 @@ internal sealed class DiskRefusingWrites(params int[] refused) : MemoryStream
 {
     public int Writes { get; private set; }
 
-    public override void Write(ReadOnlySpan<byte> buffer) => Write(buffer.ToArray(), 0, buffer.Length);
-
     public override void Write(byte[] buffer, int offset, int count)
     {
         if (refused.Contains(++Writes))
@@ -633,16 +606,13 @@ internal sealed class DiskRefusingWrites(params int[] refused) : MemoryStream
 /// A console that takes every write until one carrying <c>text</c>, and throws on that one,
 /// as a write to a redirected standard output on a full disk does. An empty
 /// <c>text</c> refuses every write it is given: a string, a character, characters from an
-/// array, a span, each chunk of a string builder and a line break alike. <see cref="Refused"/>
-/// counts the writes it threw on.
+/// array, a string builder and a line break alike. <see cref="Refused"/> counts the writes
+/// it threw on.
 /// </summary>
 /// <remarks>
-/// StringWriter writes a span and a string builder straight to its own buffer, so those
-/// overloads are refused here as well as the ones every other write comes down to. A
-/// string builder is written a chunk at a time, as the console's writer writes one, and
-/// each chunk is matched on its own: the chunks ahead of the one refused are out, text split
-/// across two chunks is not refused, and a null builder writes nothing and so is not
-/// refused either.
+/// On .NET Framework, TextWriter has no span or string builder Write: a string builder
+/// reaches Write of an object, which writes its text as one string, so every write comes
+/// down to the overloads refused here. A null builder writes nothing and so is not refused.
 /// </remarks>
 internal sealed class ConsoleFailingAt(string text) : StringWriter
 {
@@ -655,31 +625,6 @@ internal sealed class ConsoleFailingAt(string text) : StringWriter
     {
         Refuse(value ?? string.Empty);
         base.Write(value);
-    }
-
-    public override void Write(ReadOnlySpan<char> buffer)
-    {
-        Refuse(new string(buffer));
-        base.Write(buffer);
-    }
-
-    public override void Write(StringBuilder? value)
-    {
-        if (value is null) return;
-        foreach (var chunk in value.GetChunks())
-            Write(chunk.Span);
-    }
-
-    public override void WriteLine(ReadOnlySpan<char> buffer)
-    {
-        Write(buffer);
-        base.WriteLine();
-    }
-
-    public override void WriteLine(StringBuilder? value)
-    {
-        Write(value);
-        base.WriteLine();
     }
 
     public override void Write(char value)

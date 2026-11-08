@@ -118,7 +118,7 @@ public sealed class FileVersionResourceTests : IDisposable
     {
         var whole = File.ReadAllBytes(Path.Combine(Environment.SystemDirectory, "kernel32.dll"));
         var cut = Path.Combine(_folder, "cut.dll");
-        File.WriteAllBytes(cut, whole[..4096]);
+        File.WriteAllBytes(cut, whole.Slice(..4096));
 
         Assert.Null(FileVersionResource.Read(cut));
     }

@@ -63,7 +63,7 @@ public class ChromeViewModelTests
 
     private void CheckAnswers(params UpdateCheckResult[] results) =>
         _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
-            .Returns(results[0], results[1..]);
+            .Returns(results[0], results.Slice(1..));
 
     [Fact]
     public async Task Automatic_check_opens_no_socket_when_the_setting_is_off()

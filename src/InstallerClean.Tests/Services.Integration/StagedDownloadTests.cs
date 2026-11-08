@@ -121,7 +121,7 @@ public sealed class StagedDownloadTests : IDisposable
 
         Assert.True(seen.Count >= 2);
         Assert.Equal(new UpdateProgress(null, Checking: true), seen[^1]);
-        Assert.All(seen[..^1], step => Assert.False(step.Checking));
+        Assert.All(seen.GetRange(0, seen.Count - 1), step => Assert.False(step.Checking));
         Assert.Equal(1d, seen[^2].Fraction);
     }
 

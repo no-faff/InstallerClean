@@ -305,7 +305,7 @@ public sealed class PackageIdentityReaderDatabaseTests : IDisposable
     }
 
     /// <summary>MSIDBOPEN_CREATE in msiquery.h, passed as the pointer value it is declared as.</summary>
-    private static readonly IntPtr CreateMode = 3;
+    private static readonly IntPtr CreateMode = (IntPtr)3;
 
     /// <summary>How many properties the summary stream may be given; more than the two written.</summary>
     private const uint SummaryUpdateCount = 20;

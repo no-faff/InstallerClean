@@ -78,7 +78,7 @@ public class ConsoleReportOfferTests
         rig.Log.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
         Assert.False(rig.Settings.State.ReportSendPending);
         Assert.False(rig.Settings.State.HasSentResultLog);
-        Assert.Equal([string.Empty, Strings.Cli_ReportNoAnswer, Strings.Cli_ReportNotSent], rig.Console.Lines[^3..]);
+        Assert.Equal([string.Empty, Strings.Cli_ReportNoAnswer, Strings.Cli_ReportNotSent], rig.Console.Lines.GetRange(rig.Console.Lines.Count - 3, 3));
     }
 
     [Fact]

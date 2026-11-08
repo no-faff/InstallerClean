@@ -20,7 +20,7 @@ public class PerItemFailureLogTests
     /// An IOException with a chosen HRESULT, which is half the cause identity
     /// the budget de-duplicates on (the type is the other half).
     /// </summary>
-    private static IOException Io(int hresult) => new("boom") { HResult = hresult };
+    private static IOException Io(int hresult) => new("boom", hresult);
 
     [Fact]
     public void Logs_every_failure_in_full_while_within_the_budget()

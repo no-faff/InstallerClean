@@ -594,7 +594,7 @@ public class MoveFilesServiceUnitTests
     {
         var source = $@"{SourceDir}\locked.msi";
         var fs = FileSystemThatFailsMove(source,
-            new IOException("held open") { HResult = unchecked((int)hresult) });
+            new IOException("held open", unchecked((int)hresult)));
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
@@ -612,7 +612,7 @@ public class MoveFilesServiceUnitTests
         var source = $@"{SourceDir}\a.msi";
         // ERROR_DISK_FULL: real, and nothing to do with the file being held.
         var fs = FileSystemThatFailsMove(source,
-            new IOException("disk full") { HResult = unchecked((int)0x80070070) });
+            new IOException("disk full", unchecked((int)0x80070070)));
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
@@ -716,7 +716,7 @@ public class MoveFilesServiceUnitTests
         fs.AddFile(source, new MockFileData("payload"));
         fs.AddDirectory(DestDir);
         fs.DeleteFailures[source] =
-            new IOException("held open") { HResult = unchecked((int)0x80070020) };
+            new IOException("held open", unchecked((int)0x80070020));
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);
@@ -761,7 +761,7 @@ public class MoveFilesServiceUnitTests
         fs.AddFile(source, new MockFileData("payload") { Attributes = FileAttributes.ReadOnly });
         fs.AddDirectory(DestDir);
         fs.DeleteFailures[source] =
-            new IOException("held open") { HResult = unchecked((int)0x80070020) };
+            new IOException("held open", unchecked((int)0x80070020));
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir, UnderLeaseClaims.None);

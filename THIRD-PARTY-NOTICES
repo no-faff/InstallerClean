@@ -241,7 +241,8 @@ FrameworkFileStream.cs, FrameworkStreamExtensions.cs,
 FrameworkStringExtensions.cs, FrameworkCollectionExtensions.cs,
 FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
-ConfigureAwaitOptions.cs, TaskCompletionSource.cs and FrameworkTask.cs.
+ConfigureAwaitOptions.cs, TaskCompletionSource.cs and FrameworkTask.cs; and,
+for the tests, src/InstallerClean.Tests/Compatibility/TestFramework.cs.
 
 Its licence, LICENSE.TXT in that repository at that tag:
 

@@ -562,12 +562,14 @@ public sealed class UpdateDownloadServiceTests : IDisposable
     {
         private bool _sent;
 
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (!_sent)
             {
                 _sent = true;
-                first.CopyTo(buffer);
+                if (count < first.Length)
+                    throw new ArgumentException("The read is smaller than the bytes held.", nameof(count));
+                Array.Copy(first, 0, buffer, offset, first.Length);
                 return first.Length;
             }
             try
@@ -580,9 +582,6 @@ public sealed class UpdateDownloadServiceTests : IDisposable
             }
             return 0;
         }
-
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) =>
-            ReadAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
 
         public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
         public override bool CanRead => true;

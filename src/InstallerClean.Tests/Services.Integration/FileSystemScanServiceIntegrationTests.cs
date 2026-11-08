@@ -494,9 +494,10 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     {
         // The walk is one pass over the folder filtered on the extension rather
         // than a "*.msi" pass concatenated with a "*.msp" one. This is the
-        // equivalence the single pass rests on, asserted against the real matcher rather than
-        // argued: the names below are the ones where a pattern and an extension
-        // test could plausibly disagree.
+        // equivalence the single pass rests on, asserted against .NET 10's pattern
+        // matcher (FrameworkDirectory's port of it) rather than argued: the names
+        // below are the ones where a pattern and an extension test could plausibly
+        // disagree.
         var names = new[]
         {
             "a.msi", "b.msp", "UPPER.MSI", "MiXeD.MsP", ".msi",
@@ -505,14 +506,8 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         for (int i = 0; i < names.Length; i++)
             File.WriteAllBytes(Path.Combine(_fakeInstallerDir, names[i]), new byte[i + 1]);
 
-        var options = new EnumerationOptions
-        {
-            RecurseSubdirectories = false,
-            AttributesToSkip = FileAttributes.ReparsePoint,
-            IgnoreInaccessible = true,
-        };
-        var byPattern = Directory.EnumerateFiles(_fakeInstallerDir, "*.msi", options)
-            .Concat(Directory.EnumerateFiles(_fakeInstallerDir, "*.msp", options))
+        var byPattern = FrameworkDirectory.EnumerateFiles(_fakeInstallerDir, "*.msi")
+            .Concat(FrameworkDirectory.EnumerateFiles(_fakeInstallerDir, "*.msp"))
             .OrderBy(p => p, StringComparer.Ordinal)
             .ToList();
 

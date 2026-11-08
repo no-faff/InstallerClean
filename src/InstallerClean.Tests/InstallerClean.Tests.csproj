@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>14</LangVersion>
+    <!-- FrameworkStreamsTests reads through memory that is not over a managed
+         array, which only a pointer can make. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -55,6 +58,19 @@
          ImplicitUsings imports it, only when asked. -->
     <Reference Include="System.Net.Http" />
     <Using Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The WPF assemblies, for the tests of the window's view models,
+         converters and controls. On .NET Framework they are framework
+         assemblies referenced by name; UseWPF is left off so the XAML
+         below stays plain embedded bytes. -->
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
   </ItemGroup>
 
   <ItemGroup>

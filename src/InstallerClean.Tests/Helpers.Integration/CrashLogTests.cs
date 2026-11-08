@@ -47,10 +47,12 @@ public class CrashLogTests
         Directory.CreateDirectory(folder);
         var file = Path.Combine(folder, "crash.log");
         File.WriteAllText(file, "held");
-        if (OperatingSystem.IsWindows())
-            File.SetAttributes(file, FileAttributes.ReadOnly);
-        else
+#if NET
+        if (!OperatingSystem.IsWindows())
             File.SetUnixFileMode(folder, UnixFileMode.UserRead | UnixFileMode.UserExecute);
+        else
+#endif
+            File.SetAttributes(file, FileAttributes.ReadOnly);
         try
         {
             Assert.Null(Record.Exception(() => TestCrashLog.TryDelete(folder)));
@@ -58,15 +60,16 @@ public class CrashLogTests
         }
         finally
         {
-            if (OperatingSystem.IsWindows())
+#if NET
+            if (!OperatingSystem.IsWindows())
             {
-                if (File.Exists(file)) File.SetAttributes(file, FileAttributes.Normal);
+                if (Directory.Exists(folder))
+                    File.SetUnixFileMode(folder,
+                        UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
             }
-            else if (Directory.Exists(folder))
-            {
-                File.SetUnixFileMode(folder,
-                    UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
-            }
+            else
+#endif
+            if (File.Exists(file)) File.SetAttributes(file, FileAttributes.Normal);
             TestCrashLog.TryDelete(folder);
         }
     }
