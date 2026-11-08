@@ -20,19 +20,19 @@ public class FrameworkSwitchesTests
     [Fact]
     public void A_4_8_target_reads_all_four_as_net_framework_sets_them_until_the_window_sets_them()
     {
-        Assert.Equal(new[] { true, true, true, true }, InDomain<DefaultsProbe, bool[]>(probe => probe.Read()));
+        Assert.Equal(new[] { true, true, true, true }, InDomain((DefaultsProbe probe) => probe.Read()));
     }
 
     [Fact]
     public void The_window_s_switches_are_set_as_net_10_has_them()
     {
-        Assert.Equal(new[] { false, false, false, false }, InDomain<WindowProbe, bool[]>(probe => probe.Read()));
+        Assert.Equal(new[] { false, false, false, false }, InDomain((WindowProbe probe) => probe.Read()));
     }
 
     [Fact]
     public void A_dispatcher_starts_without_an_error_once_the_window_s_switches_are_set()
     {
-        Assert.Null(InDomain<WindowProbe, string?>(probe => probe.DispatcherError()));
+        Assert.Null(InDomain((WindowProbe probe) => probe.DispatcherError()));
     }
 
     [Fact]
@@ -114,10 +114,22 @@ public class FrameworkSwitchesTests
     /// </summary>
     public sealed class DefaultsProbe : MarshalByRefObject
     {
-        public bool[] Read() => SwitchValues.Read();
+        public bool[] Read()
+        {
+            var values = SwitchValues.Read();
+            if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "InstallerClean"))
+                throw new InvalidOperationException(
+                    "The window's assembly is loaded in the domain read for .NET Framework's own switches.");
+            return values;
+        }
     }
 
-    /// <summary>Sets the window's switches inside the test's own AppDomain, then reads or runs.</summary>
+    /// <summary>
+    /// Sets the window's switches inside the test's own AppDomain, then reads or runs. Naming
+    /// Pin loads the window's assembly, whose initializer sets them first, so these tests show
+    /// the switches the window sets, by either route; the test of the initializer's IL shows the
+    /// route.
+    /// </summary>
     public sealed class WindowProbe : MarshalByRefObject
     {
         public bool[] Read()
