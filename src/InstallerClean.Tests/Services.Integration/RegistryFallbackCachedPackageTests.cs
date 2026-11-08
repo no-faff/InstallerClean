@@ -114,6 +114,32 @@ public class RegistryFallbackCachedPackageTests
         });
     }
 
+    [Theory]
+    [InlineData("a product")]
+    [InlineData("a patch")]
+    public void A_scan_cancelled_during_the_read_stops_it_as_a_cancel_and_logs_no_failure(string recorded)
+    {
+        // A cancel inside the try round each loop of the walk, the products loop and the
+        // patches loop, leaves the read as the cancel, never as a failure counted or written to
+        // the failure log. The entry is what takes the walk into its loop.
+        WithSubtree(f =>
+        {
+            var package = f.Files.Create(recorded == "a product" ? "msi" : "msp");
+            using (var values = recorded == "a product" ? ProductValues(f) : PatchValues(f))
+                values.SetValue("LocalPackage", package, RegistryValueKind.String);
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+            var logged = new List<Exception>();
+
+            Assert.ThrowsAny<OperationCanceledException>(() => InstallerQueryService.ReadFallbackSid(
+                f.UserData, Sid, new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase),
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase), cts.Token,
+                new PerItemFailureLog("Registry fallback", "Test run.", logged.Add)));
+
+            Assert.Empty(logged);
+        });
+    }
+
     [Fact]
     public void A_product_recording_both_values_claims_both_and_counts_once()
     {

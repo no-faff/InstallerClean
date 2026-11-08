@@ -350,6 +350,70 @@ public class DeclaredProductCheckTests
         Assert.Equal(3, identities.Reads.Count);
     }
 
+    /// <summary>
+    /// Every fixture below with a copy beside an installation, screened once to list the
+    /// key reads it makes and then once per read with the scan cancelled at that read.
+    /// Nothing in the check turns an exception from a key read into anything, so a cancel
+    /// there must leave the screen as that same exception: no verdict comes back, and nothing
+    /// reaches the refusal record or the crash log on the way out. The reads come from the five
+    /// methods that read a key's values for an installation the API lists; the one for a key
+    /// it does not list, InstallPropertiesOf, is DeclaredProductCheckUnlistedKeyTests'.
+    /// </summary>
+    [Fact]
+    public void A_scan_cancelled_at_any_registry_read_stops_as_a_cancel_and_records_nothing()
+    {
+        var scenarios = new (string Name, Func<(ScriptedPackageIdentities, ScriptedMsiProducts, ScriptedFileIdentities, MockFileSystem)> Make, IRunningAccount? Account)[]
+        {
+            ("beside the recorded package", ACopyBesideTheRecordedPackage, null),
+            ("beside a recorded package naming nothing", ACopyBesideARecordedPackageThatNamesNothing, null),
+            ("beside a per-user installation", ACopyBesideAPerUserUnmanagedInstallation, new Account(UserSid)),
+            ("installed from drive E, by its list", () => ACopyInstalledFromDriveE("list", SetupName), null),
+            ("installed from drive E, by its install source", () => ACopyInstalledFromDriveE("install source", SetupName), null),
+            ("installed from drive E, by the source used last", () => ACopyInstalledFromDriveE("used last", SetupName), null),
+            ("with a media source used last", () => ACopyWithAMediaSourceUsedLast(OtherFolder), null),
+            ("with the source used last", () => ACopyWithTheSourceUsedLast(OtherFolder), null),
+            ("a patch beside the recorded copy", APatchCopyBesideTheRecordedCopy, null),
+        };
+        var reached = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var (name, make, account) in scenarios)
+        {
+            var dry = make();
+            dry.Item2.Registry.TracksCallers();
+            ScreenWith(dry, account, CancellationToken.None, (_, _) => { });
+            Assert.True(dry.Item2.Registry.Reads.Count > 0, $"{name}: the screen read no key.");
+            reached.UnionWith(dry.Item2.Registry.Callers);
+
+            for (var read = 0; read < dry.Item2.Registry.Reads.Count; read++)
+            {
+                var f = make();
+                using var cts = new CancellationTokenSource();
+                f.Item2.Registry.CancelsAtRead(read, cts);
+                var refusals = new List<string>();
+                using var crashLog = TestCrashLog.OwnFolder();
+
+                var thrown = Record.Exception(() =>
+                    ScreenWith(f, account, cts.Token, (_, what) => refusals.Add(what)));
+
+                var at = $"{name}, read {read} ({f.Item2.Registry.Reads[read]} by {f.Item2.Registry.Callers[read]})";
+                Assert.True(thrown is not null && ReferenceEquals(thrown, f.Item2.Registry.Thrown),
+                    $"{at}: not the read's own cancel: {thrown?.ToString() ?? "nothing thrown"}");
+                Assert.True(refusals.Count == 0, $"{at}: refusals recorded: {string.Join(", ", refusals)}");
+                Assert.True(TestCrashLog.Text().Length == 0, $"{at}: the crash log was written: {TestCrashLog.Text()}");
+            }
+        }
+
+        Assert.Equal(
+            ["AsksAndFindsNoPackage", "InstallSourceOf", "NamesNothing", "RegistryRecordsNoCachedPackage", "ValuesOf"],
+            reached.Where(m => m != "(not the check)").ToArray());
+    }
+
+    private static void ScreenWith(
+        (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi, ScriptedFileIdentities Files, MockFileSystem Disk) f,
+        IRunningAccount? account, CancellationToken token, Action<Exception, string> recordRefusal) =>
+        _ = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, account)
+            .Screen([Package(Candidate)], [], [], token, recordRefusal, InInstallerFolder).Outcomes;
+
     [Fact]
     public void A_cancelled_scan_stops_the_pass()
     {
@@ -10546,7 +10610,61 @@ internal sealed class ScriptedSourceListRegistry : IRegistryReader
     public RegistryKeyValues LocalMachineValues(string keyPath, CancellationToken cancellationToken)
     {
         Reads.Add(keyPath);
+        if (_tracksCallers) Callers.Add(CheckMethodReading());
+        if (Reads.Count - 1 == _cancelAt)
+        {
+            // As RegistryNames' pause answers a cancel: through the token the read was given.
+            _cancel!.Cancel();
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            catch (OperationCanceledException ex)
+            {
+                Thrown = ex;
+                throw;
+            }
+            throw new InvalidOperationException($"The read of {keyPath} was not given the scan's token.");
+        }
         return _keys.TryGetValue(keyPath, out var scripted) ? scripted : _msi.MirroredKey(keyPath);
+    }
+
+    private int _cancelAt = -1;
+    private CancellationTokenSource? _cancel;
+    private bool _tracksCallers;
+
+    /// <summary>
+    /// The read numbered <paramref name="read"/>, counted from nought in <see cref="Reads"/>,
+    /// cancels <paramref name="source"/> and then throws as a key read the cancel ends does,
+    /// keeping what it threw in <see cref="Thrown"/>. Callers are tracked from here on.
+    /// </summary>
+    public void CancelsAtRead(int read, CancellationTokenSource source)
+    {
+        (_cancelAt, _cancel) = (read, source);
+        TracksCallers();
+    }
+
+    /// <summary>The exception the read <see cref="CancelsAtRead"/> names threw, once it has.</summary>
+    public OperationCanceledException? Thrown { get; private set; }
+
+    /// <summary>Records the reading method of every read from here on, in <see cref="Callers"/>.</summary>
+    public void TracksCallers() => _tracksCallers = true;
+
+    /// <summary>
+    /// For each read in <see cref="Reads"/> made while callers are tracked, the name of the
+    /// DeclaredProductCheck method that made it.
+    /// </summary>
+    public List<string> Callers { get; } = new();
+
+    private static string CheckMethodReading()
+    {
+        foreach (var frame in new System.Diagnostics.StackTrace().GetFrames() ?? [])
+        {
+            var method = frame.GetMethod();
+            for (var type = method?.DeclaringType; type is not null; type = type.DeclaringType)
+                if (type == typeof(DeclaredProductCheck)) return method!.Name;
+        }
+        return "(not the check)";
     }
 
     /// <summary>

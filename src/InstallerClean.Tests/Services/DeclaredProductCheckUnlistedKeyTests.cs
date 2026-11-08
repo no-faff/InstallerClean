@@ -130,8 +130,9 @@ public class DeclaredProductCheckUnlistedKeyTests
             ScreeningOf(keys, files).Outcomes.ToArray();
 
         public DeclaredProductScreening ScreeningOf(
-            IReadOnlyList<UnlistedProductKey> keys, OrphanedFile[] files, Action<Exception, string>? recordRefusal = null) =>
-            Check().Screen(files, [], keys, default, recordRefusal, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
+            IReadOnlyList<UnlistedProductKey> keys, OrphanedFile[] files, Action<Exception, string>? recordRefusal = null,
+            CancellationToken cancellationToken = default) =>
+            Check().Screen(files, [], keys, cancellationToken, recordRefusal, InInstallerFolder, isTheInstallerFolder: IsTheInstallerFolder);
 
         public DeclaredProductCheck Check() =>
             new(Msi, Packages, Files, Disk, Registry, null)
@@ -356,6 +357,55 @@ public class DeclaredProductCheckUnlistedKeyTests
             (_, detail) => recorded.Add(ReasonIn(detail)));
 
         Assert.Equal(["the cached package declares no product code"], recorded);
+    }
+
+    /// <summary>
+    /// A key's reads, each listed once and then made the read a cancel ends: the screen stops
+    /// as that same exception, with nothing in the refusal record or the crash log, at every
+    /// one of them, the key's InstallProperties and source list reads among them.
+    /// </summary>
+    [Fact]
+    public void A_scan_cancelled_at_any_of_a_keys_registry_reads_stops_as_a_cancel_and_records_nothing()
+    {
+        var scenarios = new (string Name, Action<Pc> Script)[]
+        {
+            ("with nothing recorded", _ => { }),
+            ("installed from a folder", pc => pc.InstalledFrom(Setup)),
+            ("with a source list", pc => pc.HasList(MachineList(KeyCode), SetupName, Setup)),
+        };
+        var reached = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var (name, script) in scenarios)
+        {
+            var dry = new Pc();
+            script(dry);
+            dry.Registry.TracksCallers();
+            _ = dry.ScreeningOf([Installed()], [Package(First), Package(Second)], (_, _) => { });
+            Assert.True(dry.Registry.Reads.Count > 0, $"{name}: the screen read no key.");
+            reached.UnionWith(dry.Registry.Callers);
+
+            for (var read = 0; read < dry.Registry.Reads.Count; read++)
+            {
+                var pc = new Pc();
+                script(pc);
+                using var cts = new CancellationTokenSource();
+                pc.Registry.CancelsAtRead(read, cts);
+                var refusals = new List<string>();
+                using var crashLog = TestCrashLog.OwnFolder();
+
+                var thrown = Record.Exception(() => pc.ScreeningOf(
+                    [Installed()], [Package(First), Package(Second)], (_, what) => refusals.Add(what), cts.Token));
+
+                var at = $"{name}, read {read} ({pc.Registry.Reads[read]} by {pc.Registry.Callers[read]})";
+                Assert.True(thrown is not null && ReferenceEquals(thrown, pc.Registry.Thrown),
+                    $"{at}: not the read's own cancel: {thrown?.ToString() ?? "nothing thrown"}");
+                Assert.True(refusals.Count == 0, $"{at}: refusals recorded: {string.Join(", ", refusals)}");
+                Assert.True(TestCrashLog.Text().Length == 0, $"{at}: the crash log was written: {TestCrashLog.Text()}");
+            }
+        }
+
+        Assert.Contains("InstallPropertiesOf", reached);
+        Assert.Contains("ValuesOf", reached);
     }
 
     [Fact]
