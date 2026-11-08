@@ -41,8 +41,9 @@ internal static class TestCulture
 /// temp folder, never to the log of the PC running the suite. The folder is set before any
 /// test runs, so a test reaching the log by a path nobody planned for is covered too. Each
 /// AppDomain's folder is deleted as that domain ends (<see cref="Helpers.DomainEnd"/>), along
-/// with the shared InstallerClean.Tests folder above it where nothing else is left in it. A test that changes the folder for its run, through
-/// <see cref="OwnFolder"/> or by hand as CrashLogTests does, puts this one back.
+/// with the shared InstallerClean.Tests folder above it where nothing else is left in it. A
+/// test that changes the folder for its run, through <see cref="OwnFolder"/> or by hand as
+/// CrashLogTests does, puts this one back.
 /// </summary>
 internal static class TestCrashLog
 {
@@ -95,8 +96,9 @@ internal static class TestCrashLog
         Helpers.DomainEnd.Then(() =>
         {
             TryDelete(folder);
-            // Not recursive, so a folder another run or domain is still using stays.
-            Directory.Delete(Shared);
+            // Not recursive, so a folder another run or domain is still using stays, and the
+            // refusal that keeps it is expected.
+            try { Directory.Delete(Shared); } catch (IOException) { }
         });
     }
 

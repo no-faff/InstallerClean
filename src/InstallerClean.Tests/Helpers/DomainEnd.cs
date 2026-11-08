@@ -15,12 +15,14 @@ internal static class DomainEnd
         void Run(object? sender, EventArgs e)
         {
             if (Interlocked.Exchange(ref done, 1) != 0) return;
-            try { cleanUp(); } catch (Exception) { }
+            // A clean-up that fails leaves its folder in the temp folder; the reason goes to the
+            // trace output rather than out of the domain's unload.
+            try { cleanUp(); } catch (Exception ex) { System.Diagnostics.Trace.WriteLine($"DomainEnd: {ex}"); }
         }
         AppDomain.CurrentDomain.DomainUnload += Run;
         AppDomain.CurrentDomain.ProcessExit += Run;
     }
 
     /// <summary>Deletes <paramref name="folder"/> and everything in it as the domain ends.</summary>
-    internal static void DeleteFolder(string folder) => Then(() => Directory.Delete(folder, recursive: true));
+    internal static void DeleteFolder(string folder) => Then(() => TestCrashLog.TryDelete(folder));
 }
