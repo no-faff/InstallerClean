@@ -40,8 +40,9 @@ internal static class TestCulture
 /// Every test that writes the crash log writes it to a folder of this run's own under the
 /// temp folder, never to the log of the PC running the suite. The folder is set before any
 /// test runs, so a test reaching the log by a path nobody planned for is covered too, and
-/// it is deleted when the test process exits, along with the shared InstallerClean.Tests
-/// folder above it where no other run's folder is left in it. A test that changes the
+/// it is deleted when the test process exits, or the AppDomain it was set in is unloaded,
+/// along with the shared InstallerClean.Tests folder above it where no other run's folder is
+/// left in it. A test that changes the
 /// folder for its run, through <see cref="OwnFolder"/> or by hand as CrashLogTests does,
 /// puts this one back.
 /// </summary>
@@ -93,12 +94,16 @@ internal static class TestCrashLog
     {
         var folder = NewFolder();
         CrashLog.FolderForTests = folder;
-        AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+        void Remove(object? sender, EventArgs e)
         {
             TryDelete(folder);
             // Not recursive, so a folder another run is still using stays.
             try { Directory.Delete(Shared); } catch (Exception) { }
-        };
+        }
+        // ProcessExit for the test process's own domain; DomainUnload for a domain a test
+        // makes and unloads, which never sees ProcessExit.
+        AppDomain.CurrentDomain.ProcessExit += Remove;
+        AppDomain.CurrentDomain.DomainUnload += Remove;
     }
 
     /// <summary>

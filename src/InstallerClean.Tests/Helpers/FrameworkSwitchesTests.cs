@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Windows.Threading;
 
@@ -9,7 +8,9 @@ namespace InstallerClean.Tests.Helpers;
 /// The AppContext switches the window pins, read as .NET Framework reads them in a domain
 /// targeting 4.8: each test runs in an AppDomain of its own, since a switch is read once per
 /// domain and this test process loads the window's assembly, whose initializer pins them here
-/// too. That an exe's own domain reports 4.8 to WPF rests on the exe's TargetFramework
+/// too. The read without the window's switches goes through a probe that names none of the
+/// window's code, since loading the window's assembly into a domain runs its initializer
+/// there. That an exe's own domain reports 4.8 to WPF rests on the exe's TargetFramework
 /// attribute, checked here, and is read in the started window on Windows.
 /// </summary>
 public class FrameworkSwitchesTests
@@ -19,19 +20,19 @@ public class FrameworkSwitchesTests
     [Fact]
     public void A_4_8_target_reads_all_four_as_net_framework_sets_them_until_the_window_sets_them()
     {
-        Assert.Equal(new[] { true, true, true, true }, InDomain(probe => probe.Read(pin: false)));
+        Assert.Equal(new[] { true, true, true, true }, InDomain<DefaultsProbe, bool[]>(probe => probe.Read()));
     }
 
     [Fact]
     public void The_window_s_switches_are_set_as_net_10_has_them()
     {
-        Assert.Equal(new[] { false, false, false, false }, InDomain(probe => probe.Read(pin: true)));
+        Assert.Equal(new[] { false, false, false, false }, InDomain<WindowProbe, bool[]>(probe => probe.Read()));
     }
 
     [Fact]
     public void A_dispatcher_starts_without_an_error_once_the_window_s_switches_are_set()
     {
-        Assert.Null(InDomain(probe => probe.DispatcherError()));
+        Assert.Null(InDomain<WindowProbe, string?>(probe => probe.DispatcherError()));
     }
 
     [Fact]
@@ -76,7 +77,7 @@ public class FrameworkSwitchesTests
         Assert.Equal(NetFramework48, inExe.Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName);
     }
 
-    private static T InDomain<T>(Func<Probe, T> run)
+    private static T InDomain<TProbe, T>(Func<TProbe, T> run) where TProbe : MarshalByRefObject
     {
         var setup = new AppDomainSetup
         {
@@ -88,8 +89,8 @@ public class FrameworkSwitchesTests
         var domain = AppDomain.CreateDomain("switches", null, setup);
         try
         {
-            var probe = (Probe)domain.CreateInstanceAndUnwrap(
-                typeof(Probe).Assembly.FullName!, typeof(Probe).FullName!);
+            var probe = (TProbe)domain.CreateInstanceAndUnwrap(
+                typeof(TProbe).Assembly.FullName!, typeof(TProbe).FullName!);
             return run(probe);
         }
         finally
@@ -106,19 +107,23 @@ public class FrameworkSwitchesTests
         }
     }
 
-    /// <summary>Runs inside the test's own AppDomain and reads through WPF's own properties.</summary>
-    public sealed class Probe : MarshalByRefObject
+    /// <summary>
+    /// Runs inside the test's own AppDomain and reads the four switches through WPF's own
+    /// properties. Nothing here names the window's code, so the window's assembly is never
+    /// loaded into the domain.
+    /// </summary>
+    public sealed class DefaultsProbe : MarshalByRefObject
     {
-        public bool[] Read(bool pin)
+        public bool[] Read() => SwitchValues.Read();
+    }
+
+    /// <summary>Sets the window's switches inside the test's own AppDomain, then reads or runs.</summary>
+    public sealed class WindowProbe : MarshalByRefObject
+    {
+        public bool[] Read()
         {
-            if (pin) PinWindowSwitches();
-            return
-            [
-                Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48CompatibleAccessibilityFeatures"),
-                Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48aCompatibleAccessibilityFeatures"),
-                Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "OptOutOfGridColumnResizeUsingKeyboard"),
-                Switch(typeof(System.Windows.FrameworkElement).Assembly, "MS.Internal.FrameworkAppContextSwitches", "SelectorUpdatesSelectionPropertiesWhenDisconnected"),
-            ];
+            InstallerClean.FrameworkSwitches.Pin();
+            return SwitchValues.Read();
         }
 
         /// <summary>
@@ -128,7 +133,7 @@ public class FrameworkSwitchesTests
         /// </summary>
         public string? DispatcherError()
         {
-            PinWindowSwitches();
+            InstallerClean.FrameworkSwitches.Pin();
 
             string? raised = null;
             var thread = new Thread(() =>
@@ -151,12 +156,18 @@ public class FrameworkSwitchesTests
             return raised;
         }
 
-        // On .NET Framework, compiling a method whose body names the window's code loads the
-        // window's assembly and runs its module initializer, which sets the switches, whether or
-        // not that line runs. Read names only this method, so a read without the window's
-        // switches stays without them.
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void PinWindowSwitches() => InstallerClean.FrameworkSwitches.Pin();
+    }
+
+    /// <summary>The four switches, in the order the tests expect, through WPF's own properties.</summary>
+    private static class SwitchValues
+    {
+        internal static bool[] Read() =>
+        [
+            Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48CompatibleAccessibilityFeatures"),
+            Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "UseNetFx48aCompatibleAccessibilityFeatures"),
+            Switch(typeof(Dispatcher).Assembly, "System.Windows.AccessibilitySwitches", "OptOutOfGridColumnResizeUsingKeyboard"),
+            Switch(typeof(System.Windows.FrameworkElement).Assembly, "MS.Internal.FrameworkAppContextSwitches", "SelectorUpdatesSelectionPropertiesWhenDisconnected"),
+        ];
 
         private static bool Switch(Assembly assembly, string typeName, string property)
         {
