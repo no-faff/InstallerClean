@@ -27,6 +27,19 @@ namespace InstallerClean;
 /// </summary>
 public partial class App : Application
 {
+    /// <summary>
+    /// Runs as Main does, before Application's constructor: writes what the module initializer
+    /// kept for the crash log, then pins the AppContext switches. Application's constructor
+    /// creates the Dispatcher, which is WPF's first read of the accessibility switches, and by
+    /// this point the domain knows it targets .NET Framework 4.8, so the runtime's own defaults
+    /// are those of 4.8.
+    /// </summary>
+    static App()
+    {
+        SystemLibraries.WriteWhatTheInitializerKept();
+        FrameworkSwitches.Pin();
+    }
+
     private static InstanceLock? _instanceLock;
     // Set where an update that did not hand over could not take the mutex back.
     private static bool _instanceLockLost;

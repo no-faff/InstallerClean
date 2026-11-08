@@ -265,6 +265,59 @@ jobs:
         if: success() || failure()
         run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -p:RestoreLockedMode=true
 
+      # Each exe started for real, as the test host cannot be: on .NET Framework its module
+      # initializer runs before the domain knows its target framework, and anything the
+      # initializer writes to the crash log goes through System.IO there, which fixes the
+      # runtime's compatibility defaults at .NET Framework 4.0 for the whole process. The
+      # initializer keeps what it has to report and the exe writes it once Main runs, so a
+      # start leaves no entry about the library search. The window is closed once its first
+      # window is up; the first-run mark is set first so its scan carries no report.
+      - name: Check each exe starts with its library search set and nothing written for it
+        if: success() || failure()
+        shell: pwsh
+        run: |
+          New-Item -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Force | Out-Null
+          New-ItemProperty -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Name FirstRunRecorded -PropertyType DWord -Value 1 -Force | Out-Null
+          $log = Join-Path $env:LOCALAPPDATA 'InstallerClean\crash.log'
+          function Entries {
+            if (-not (Test-Path $log)) { return @() }
+            @(Get-Content $log | Where-Object { $_ -match 'library search|SetDefaultDllDirectories' })
+          }
+          $before = (Entries).Count
+          $failed = $false
+
+          $cli = 'src/InstallerClean.Cli/bin/Debug/net48/installerclean-cli.exe'
+          if (-not (Test-Path $cli)) { throw "There is no $cli to start." }
+          $out = & $cli --version 2>&1
+          "installerclean-cli --version exited $LASTEXITCODE and printed: $out"
+          if ($LASTEXITCODE -ne 0) { $failed = $true }
+
+          $window = 'src/InstallerClean/bin/Debug/net48/InstallerClean.exe'
+          if (-not (Test-Path $window)) { throw "There is no $window to start." }
+          $p = Start-Process -FilePath $window -PassThru
+          $deadline = (Get-Date).AddSeconds(30)
+          while ((Get-Date) -lt $deadline -and -not $p.HasExited) {
+            $p.Refresh()
+            if ($p.MainWindowHandle -ne [IntPtr]::Zero) { break }
+            Start-Sleep -Milliseconds 250
+          }
+          if ($p.HasExited) {
+            "The window exited by itself with $($p.ExitCode) before any window was up."
+            $failed = $true
+          } elseif ($p.MainWindowHandle -eq [IntPtr]::Zero) {
+            "The window showed no window within 30 seconds."
+            $failed = $true
+          } else {
+            "The window is up: $($p.MainWindowTitle)"
+          }
+          if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null }
+
+          $new = @(Entries | Select-Object -Skip $before)
+          foreach ($line in $new) { "crash.log: $line" }
+          if ($new.Count -gt 0) { $failed = $true }
+          if ($failed) { throw "An exe did not start cleanly, or wrote to the crash log about its library search." }
+          "Both exes started, and neither wrote anything about its library search."
+
       # The tests set en-GB for themselves, culture and UI culture alike
       # (src/InstallerClean.Tests/AssemblyInfo.cs). This prints the runner's own
       # culture and UI culture, the two that setting takes the place of.

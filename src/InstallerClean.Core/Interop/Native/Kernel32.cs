@@ -780,6 +780,14 @@ internal static class Kernel32
     public static extern uint GetModuleFileName(IntPtr hModule, [Out] char[] lpFilename, uint nSize);
 
     /// <summary>
+    /// The handle of the module named <paramref name="lpModuleName"/> where it is loaded, or of
+    /// this process's exe where it is <see cref="IntPtr.Zero"/>, which is the base address the
+    /// exe's image is mapped at. Returns <see cref="IntPtr.Zero"/> on failure.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetModuleHandleW", ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr GetModuleHandle(IntPtr lpModuleName);
+
+    /// <summary>
     /// Ends the process <paramref name="hProcess"/> names at once, with
     /// <paramref name="uExitCode"/>. Given this process's own pseudo-handle it runs
     /// no more of its code: no finaliser, no exit handler and no DLL detach.

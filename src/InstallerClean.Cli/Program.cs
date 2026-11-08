@@ -32,6 +32,8 @@ internal static class Program
 
     public static int Main(string[] args)
     {
+        InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
+
         // A newer version a copy downloaded, started to put itself at that copy's path once
         // the copy has ended, does that and nothing else, printing nothing: it runs with no
         // console of its own. Exit code 0 where the newer version is in place, 1 otherwise,

@@ -7,11 +7,11 @@ namespace InstallerClean.Tests.Helpers;
 /// <summary>
 /// The AppContext switches the window pins, read as .NET Framework reads them in a domain
 /// targeting 4.8: each test runs in an AppDomain of its own, since a switch is read once per
-/// domain and this test process loads the window's assembly, whose initializer pins them here
-/// too. The read without the window's switches goes through a probe that names none of the
-/// window's code, since loading the window's assembly into a domain runs its initializer
-/// there. That an exe's own domain reports 4.8 to WPF rests on the exe's TargetFramework
-/// attribute, checked here, and is read in the started window on Windows.
+/// domain. The read without the window's switches goes through a probe that names none of the
+/// window's code, so the domain holds none of it. That an exe's own domain reports 4.8 to WPF
+/// rests on the exe's TargetFramework attribute, checked here, and is read in the started
+/// window on Windows. Where the window pins them, App's type initializer, is checked in
+/// InitializerReachTests.
 /// </summary>
 public class FrameworkSwitchesTests
 {
@@ -33,40 +33,6 @@ public class FrameworkSwitchesTests
     public void A_dispatcher_starts_without_an_error_once_the_window_s_switches_are_set()
     {
         Assert.Null(InDomain((WindowProbe probe) => probe.DispatcherError()));
-    }
-
-    [Fact]
-    public void The_window_s_module_initializer_sets_the_switches()
-    {
-        var initializer = typeof(InstallerClean.ProcessDefaults).GetMethod(
-            "SetBeforeMain", BindingFlags.Static | BindingFlags.NonPublic)!;
-        var pin = typeof(InstallerClean.FrameworkSwitches).GetMethod(
-            nameof(InstallerClean.FrameworkSwitches.Pin), BindingFlags.Static | BindingFlags.NonPublic)!;
-
-        // By name: on .NET Framework the attribute is PolySharp's, matched whichever copy a build takes.
-        Assert.Contains(
-            initializer.GetCustomAttributes(),
-            a => a.GetType().FullName == "System.Runtime.CompilerServices.ModuleInitializerAttribute");
-        Assert.Contains(pin, CallsIn(initializer));
-    }
-
-    // The methods a method body calls with the call opcode (0x28 and a metadata token).
-    private static IEnumerable<MethodBase> CallsIn(MethodInfo method)
-    {
-        var il = method.GetMethodBody()!.GetILAsByteArray()!;
-        for (var i = 0; i + 4 < il.Length; i++)
-        {
-            if (il[i] != 0x28) continue;
-            MethodBase? called = null;
-            try
-            {
-                called = method.Module.ResolveMethod(BitConverter.ToInt32(il, i + 1));
-            }
-            catch (ArgumentException)
-            {
-            }
-            if (called is not null) yield return called;
-        }
     }
 
     [Theory]
@@ -132,10 +98,7 @@ public class FrameworkSwitchesTests
     }
 
     /// <summary>
-    /// Sets the window's switches inside the test's own AppDomain, then reads or runs. Naming
-    /// Pin loads the window's assembly, whose initializer sets them first, so these tests show
-    /// the switches the window sets, by either route; the test of the initializer's IL shows the
-    /// route.
+    /// Sets the window's switches inside the test's own AppDomain, then reads or runs.
     /// </summary>
     public sealed class WindowProbe : MarshalByRefObject
     {

@@ -6,50 +6,78 @@ namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
 /// The process's library search: System32 and the folders added with AddDllDirectory or
-/// SetDllDirectory, set before each exe's Main, only in the process that exe was started for, and never an
-/// exception out of a module initializer.
+/// SetDllDirectory, set before each exe's Main, only in the process started from that exe, and
+/// never an exception out of a module initializer.
 /// </summary>
 public class SystemLibrariesSearchTests
 {
     private const uint System32AndAddedFolders = 0x00000800 | 0x00000400;
 
-    private static readonly Assembly Exe = typeof(InstallerClean.Cli.LibrarySearch).Assembly;
 
     [Fact]
     public void The_exes_own_process_searches_System32_and_added_folders()
     {
         var calls = new List<uint>();
+        var kept = new List<Exception>();
 
-        var set = SystemLibraries.SearchSystem32For(Exe, Exe, flags => { calls.Add(flags); return true; });
+        var set = SystemLibraries.SearchSystem32For(true, flags => { calls.Add(flags); return true; }, kept.Add);
 
         Assert.True(set);
         Assert.Equal(new[] { System32AndAddedFolders }, calls);
+        Assert.Empty(kept);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void A_process_started_for_another_assembly_or_none_keeps_its_own_search(bool entryKnown)
+    [Fact]
+    public void A_process_that_loaded_the_exe_without_being_started_from_it_keeps_its_own_search_and_says_nothing()
     {
         var calls = new List<uint>();
-        var entry = entryKnown ? typeof(SystemLibrariesSearchTests).Assembly : null;
+        var kept = new List<Exception>();
 
-        var set = SystemLibraries.SearchSystem32For(Exe, entry, flags => { calls.Add(flags); return true; });
+        var set = SystemLibraries.SearchSystem32For(false, flags => { calls.Add(flags); return true; }, kept.Add);
 
         Assert.False(set);
         Assert.Empty(calls);
+        Assert.Empty(kept);
     }
 
     [Fact]
-    public void A_refused_search_does_not_throw()
+    public void A_process_that_cannot_be_told_keeps_its_own_search_and_records_why()
     {
-        Assert.False(SystemLibraries.SearchSystem32For(Exe, Exe, _ => false));
+        var calls = new List<uint>();
+        var kept = new List<Exception>();
+
+        var set = SystemLibraries.SearchSystem32For(null, flags => { calls.Add(flags); return true; }, kept.Add);
+
+        Assert.False(set);
+        Assert.Empty(calls);
+        Assert.Contains("could not be told", Assert.Single(kept).Message);
     }
 
     [Fact]
-    public void A_call_that_throws_does_not_throw_out()
+    public void A_refused_search_is_recorded_and_does_not_throw()
     {
-        Assert.False(SystemLibraries.SearchSystem32For(Exe, Exe, _ => throw new DllNotFoundException("kernel32.dll")));
+        var kept = new List<Exception>();
+
+        Assert.False(SystemLibraries.SearchSystem32For(true, _ => false, kept.Add));
+        Assert.IsType<System.ComponentModel.Win32Exception>(Assert.Single(kept));
+    }
+
+    [Fact]
+    public void A_call_that_throws_is_recorded_and_does_not_throw_out()
+    {
+        var kept = new List<Exception>();
+
+        Assert.False(SystemLibraries.SearchSystem32For(true, _ => throw new DllNotFoundException("kernel32.dll"), kept.Add));
+        Assert.IsType<DllNotFoundException>(Assert.Single(kept));
+    }
+
+    [Theory]
+    [InlineData(typeof(InstallerClean.ProcessDefaults))]
+    [InlineData(typeof(InstallerClean.Cli.LibrarySearch))]
+    public void Neither_exe_is_this_test_process_s_own_image(Type inExe)
+    {
+        // The test host loads both exes as references; its own image is the host's.
+        Assert.False(SystemLibraries.IsProcessImage(inExe.Assembly));
     }
 
     [Theory]
