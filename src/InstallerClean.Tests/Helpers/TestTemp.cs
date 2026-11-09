@@ -70,7 +70,7 @@ internal static class TestTemp
 
     /// <summary>
     /// Leaves <paramref name="folder"/> in place for the rest of the run, for the next run's
-    /// sweep: every <see cref="Delete"/> of it, or of a folder holding it, deletes everything
+    /// sweep: every <see cref="Delete(string)"/> of it, or of a folder holding it, deletes everything
     /// else and leaves it. For a test whose subject is a file held open for the rest of the run,
     /// named by the folder that file is in.
     /// </summary>

@@ -48,7 +48,7 @@ internal static class NewerVersionProcess
     /// Starts <paramref name="file"/> with the arguments <paramref name="argumentsFor"/> gives
     /// for a new started event's id, working in the folder the file is in, and waits up to
     /// <paramref name="bound"/> for it to set that event. One that does not is ended and
-    /// waited for (<see cref="EndNewerVersion(SafeProcessHandle)"/>). Answers
+    /// waited for (<c>EndNewerVersion(SafeProcessHandle)</c>). Answers
     /// <see cref="NewerVersionAnswer.Started"/>; <see cref="NewerVersionAnswer.NotStarted"/>
     /// where it could not be started, did not set the event and has been ended, or no event
     /// could be made to see it by; or <see cref="NewerVersionAnswer.StillRunning"/> where it
@@ -121,7 +121,7 @@ internal static class NewerVersionProcess
 
     /// <summary>
     /// Waits up to <paramref name="bound"/> for <paramref name="newer"/> to set
-    /// <paramref name="started"/>, and ends one that does not (<see cref="EndNewerVersion(SafeProcessHandle)"/>),
+    /// <paramref name="started"/>, and ends one that does not (<c>EndNewerVersion(SafeProcessHandle)</c>),
     /// writing why to crash.log. Answers <see cref="NewerVersionAnswer.Started"/>,
     /// <see cref="NewerVersionAnswer.NotStarted"/> or <see cref="NewerVersionAnswer.StillRunning"/>,
     /// with <paramref name="endedByItself"/> set where it ended before it set the event.
@@ -148,7 +148,7 @@ internal static class NewerVersionProcess
     /// where the wait was not. A look Windows refuses after the bound or
     /// <paramref name="cancel"/> is written to crash.log and the answer stands; after a
     /// refused wait it is not, the refusal being the answer already. Nothing else is
-    /// written: the caller writes <see cref="NotStartedFailure(NewerVersionStart, int, SafeProcessHandle, TimeSpan)"/>. The wait dispatches
+    /// written: the caller writes <c>NotStartedFailure(NewerVersionStart, int, SafeProcessHandle, TimeSpan)</c>. The wait dispatches
     /// nothing, so on a window's thread no window code runs during it. Never throws.
     /// </summary>
     internal static NewerVersionStart AwaitStart(
@@ -186,13 +186,13 @@ internal static class NewerVersionProcess
         }
     }
 
-    /// <summary>Where <see cref="AwaitStart(SafeProcessHandle, WaitHandle, TimeSpan, WaitHandle?, out int)"/> puts the started event in the handles it waits on.</summary>
+    /// <summary>Where <c>AwaitStart(SafeProcessHandle, WaitHandle, TimeSpan, WaitHandle?, out int)</c> puts the started event in the handles it waits on.</summary>
     private const int StartedIndex = 0;
 
-    /// <summary>Where <see cref="AwaitStart(SafeProcessHandle, WaitHandle, TimeSpan, WaitHandle?, out int)"/> puts the newer version's process.</summary>
+    /// <summary>Where <c>AwaitStart(SafeProcessHandle, WaitHandle, TimeSpan, WaitHandle?, out int)</c> puts the newer version's process.</summary>
     private const int EndedIndex = 1;
 
-    /// <summary>Where <see cref="AwaitStart(SafeProcessHandle, WaitHandle, TimeSpan, WaitHandle?, out int)"/> puts the Ctrl+C handle, where there is one.</summary>
+    /// <summary>Where <c>AwaitStart(SafeProcessHandle, WaitHandle, TimeSpan, WaitHandle?, out int)</c> puts the Ctrl+C handle, where there is one.</summary>
     private const int CancelIndex = 2;
 
     /// <summary>
@@ -265,10 +265,10 @@ internal static class NewerVersionProcess
         }
     }
 
-    /// <summary>How long <see cref="EndNewerVersion(SafeProcessHandle)"/> waits for the newer version to have ended.</summary>
+    /// <summary>How long <c>EndNewerVersion(SafeProcessHandle)</c> waits for the newer version to have ended.</summary>
     private static readonly TimeSpan EndBound = TimeSpan.FromSeconds(5);
 
-    /// <summary>The exit code <see cref="EndNewerVersion(SafeProcessHandle)"/> ends the newer version with.</summary>
+    /// <summary>The exit code <c>EndNewerVersion(SafeProcessHandle)</c> ends the newer version with.</summary>
     private const uint NotStartedExitCode = 1;
 
     /// <summary>
@@ -323,7 +323,7 @@ internal static class NewerVersionProcess
     }
 }
 
-/// <summary>What came first while a copy waited for the newer version it started (<see cref="NewerVersionProcess.AwaitStart(SafeProcessHandle, WaitHandle, TimeSpan, WaitHandle?, out int)"/>).</summary>
+/// <summary>What came first while a copy waited for the newer version it started (<c>AwaitStart(SafeProcessHandle, WaitHandle, TimeSpan, WaitHandle?, out int)</c>).</summary>
 internal enum NewerVersionStart
 {
     /// <summary>The newer version set the event: its own code is running.</summary>

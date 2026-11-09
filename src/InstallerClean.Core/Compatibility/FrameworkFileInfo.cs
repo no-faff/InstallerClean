@@ -33,9 +33,10 @@ internal sealed class FrameworkFileInfoFactory(IFileSystem fileSystem) : IFileIn
 /// <remarks>
 /// The path is made a full path when the object is made, so a null, empty or malformed path
 /// throws there. One made by a folder listing holds what the listing read. Any other file is
-/// not read until a member asks for its attributes or its size,
-/// and the answer is kept until <see cref="Refresh"/>. Nothing at the path is not an error
-/// until then: <see cref="Attributes"/> reads every bit set, and <see cref="Length"/> throws
+/// not read until a member asks for its attributes or its size, and the answer is kept until
+/// <see cref="FrameworkFileSystemInfo.Refresh"/>. Nothing at the path is not an error until
+/// then: <see cref="FrameworkFileSystemInfo.Attributes"/> reads every bit set, and
+/// <see cref="Length"/> throws
 /// a <see cref="FileNotFoundException"/>. Members the app does not read are not ported and
 /// throw <see cref="NotSupportedException"/>; BannedSymbols.txt refuses a call to any of
 /// them, and to the access-control extensions that would read through one.
