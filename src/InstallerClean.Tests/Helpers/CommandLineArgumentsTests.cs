@@ -6,8 +6,8 @@ namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
 /// <see cref="CommandLineArguments"/> writes a list of arguments as .NET 10 writes
-/// <c>ProcessStartInfo.ArgumentList</c>, and Windows' own reader of a command line,
-/// CommandLineToArgvW, gives each argument back as it was given.
+/// <c>ProcessStartInfo.ArgumentList</c>, and CommandLineToArgvW, the reader Windows
+/// provides, gives each argument back as it was given.
 /// </summary>
 public class CommandLineArgumentsTests
 {

@@ -31,13 +31,15 @@ public sealed class ConfirmationService : IConfirmationService
     {
         if (Application.Current is null) return null;
 
-        // Only ever an existing folder, and the check is wrapped because
-        // Directory.Exists is the only cheap way to ask: the box holds
-        // free text, so it can be a half-typed path, a relative name, a
-        // drive that is not there or a UNC share that no longer answers.
-        // A start folder the shell cannot resolve is worse than none,
-        // so anything short of a confirmed directory falls back to the
-        // shell default rather than being passed on.
+        // Only ever an existing folder. The box holds free text, so it can be a
+        // half-typed path, a relative name, a drive that is not there or a UNC
+        // share that no longer answers. A start folder the shell cannot resolve is
+        // worse than none, so anything short of a confirmed folder falls back to the
+        // shell default rather than being passed on. FrameworkDirectory.Exists answers
+        // false for a path that cannot be read, is refused or is malformed, and the
+        // catch takes what it lets through, such as the OperationCanceledException an
+        // aborted operation (error 995) maps to: the dialog then opens with no start
+        // folder.
         string? startFolder = null;
         var start = currentDestination?.Trim();
         if (!string.IsNullOrEmpty(start))
@@ -49,7 +51,6 @@ public sealed class ConfirmationService : IConfirmationService
             }
             catch (Exception)
             {
-                // Unreadable, refused or malformed: the dialog opens with no start folder.
             }
         }
 

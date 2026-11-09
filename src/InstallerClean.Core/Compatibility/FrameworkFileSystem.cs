@@ -112,10 +112,10 @@ internal static class FrameworkFileSystem
     /// <remarks>
     /// A folder already there is not an error, whatever the folders above it allow. The
     /// missing folders are found from the bottom up and made from the top down, each with
-    /// <c>\\?\</c> in front whatever its length, so Windows' limit of 248 characters for a new
-    /// folder does not apply. Where one is refused, the rest are still tried, and the first
-    /// refusal is thrown as the exception <see cref="Win32Marshal"/> gives for its error,
-    /// naming the full path. A file in a folder's place, or a folder there that cannot be
+    /// <c>\\?\</c> in front whatever its length, so the limit of 248 characters Windows
+    /// sets for a new folder does not apply. Where one is refused, the rest are still tried,
+    /// and the first refusal is thrown as the exception <see cref="Win32Marshal"/> gives for
+    /// its error, naming the full path. A file in a folder's place, or a folder there that cannot be
     /// read, is thrown naming that folder. A root that is not there is a
     /// <see cref="DirectoryNotFoundException"/> naming the root.
     /// </remarks>

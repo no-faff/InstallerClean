@@ -9,7 +9,7 @@ namespace InstallerClean.Helpers;
 /// Windows (dotnet/runtime v10.0.0, <c>Path.Windows.cs</c>, <c>Path.cs</c> and
 /// <c>PathHelper.Windows.cs</c>), called in their place.
 ///
-/// The full path is Windows' own answer: GetFullPathNameW resolves the path against the
+/// The full path is the answer Windows gives: GetFullPathNameW resolves the path against the
 /// current folder and drive and does Win32's trimming, and GetLongPathNameW then expands any
 /// short (8.3) name in it. Nothing else is checked or trimmed. .NET Framework's own
 /// GetFullPath does more: it trims white space and U+00A0 off the end, throws for
