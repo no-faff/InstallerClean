@@ -4233,10 +4233,23 @@ public class MainViewModelTests : IDisposable
         var vm = FirstRunAllClear();
         _resultLogService.WriteAsync(Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(false));
+        // The card's write runs behind the scan rather than inside it, so the box is
+        // waited for, from being put up to being taken away, rather than the scan.
+        var boxUp = new TaskCompletionSource();
+        var boxGone = new TaskCompletionSource();
+        vm.Completion.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName != nameof(CompletionViewModel.OffersReport)) return;
+            if (vm.Completion.OffersReport) boxUp.TrySetResult();
+            else if (boxUp.Task.IsCompleted) boxGone.TrySetResult();
+        };
+
         await vm.Scan.ScanCommand.ExecuteAsync(null);
+        await boxGone.Task.WaitAsync(TimeSpan.FromSeconds(10));
 
         Assert.True(vm.Completion.IsComplete);
         Assert.False(vm.Completion.OffersReport);
+        await _resultLogService.Received(1).WriteAsync(Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
         // The write was attempted, so this was the PC's first run.
         _firstRunMark.Received(1).TryClaim();
 
