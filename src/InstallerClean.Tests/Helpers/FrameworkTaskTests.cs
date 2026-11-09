@@ -191,11 +191,12 @@ public class FrameworkTaskTests
     }
 
     /// <summary>
-    /// Holds every worker thread the pool may start until disposed: the pool's maximum is set
-    /// to its minimum, or to one more than the threads already busy where more are (the
-    /// maximum cannot go below them, nor below the minimum), and a work item blocks on a gate
-    /// in every thread left free, the test's own thread among the busy ones where it is a
-    /// pool thread.
+    /// Holds every worker thread the pool may start until disposed. The pool's maximum is set
+    /// to the lowest the pool takes that still leaves a thread free, and a work item blocks on
+    /// a gate in every thread left free, the test's own thread among the busy ones where it is
+    /// a pool thread. A thread counts against the maximum while it is alive, idle or working,
+    /// and SetMaxThreads takes a maximum below the threads alive, so the free count read after
+    /// each cap is what settles it.
     /// </summary>
     private sealed class BusyPool : IDisposable
     {
@@ -208,21 +209,24 @@ public class FrameworkTaskTests
             ThreadPool.GetMaxThreads(out _oldWorkers, out _oldPorts);
             ThreadPool.GetMinThreads(out var minWorkers, out _);
 
-            // Work items still running from earlier tests are given up to ten seconds to end, so
-            // the cap can be the minimum. Where they do not, the cap goes one above them, read
-            // again until the pool takes it, since the pool can start a thread between the read
-            // and the cap.
+            // Work items still running from earlier tests are given up to ten seconds to end,
+            // so the cap can stay near the minimum.
             var waited = Stopwatch.StartNew();
-            var capped = false;
-            while (!capped)
+            while (waited.ElapsedMilliseconds < 10_000)
             {
                 ThreadPool.GetAvailableThreads(out var freeNow, out _);
-                var busy = _oldWorkers - freeNow;
-                if (busy < minWorkers || waited.ElapsedMilliseconds > 10_000)
-                    capped = ThreadPool.SetMaxThreads(Math.Max(minWorkers, busy + 1), _oldPorts);
-                if (!capped) Thread.Sleep(50);
+                if (_oldWorkers - freeNow < minWorkers) break;
+                Thread.Sleep(50);
             }
-            ThreadPool.GetAvailableThreads(out var free, out _);
+
+            // From the minimum up, one at a time, to the first cap leaving a thread free.
+            var free = 0;
+            for (var cap = minWorkers; cap <= _oldWorkers; cap++)
+            {
+                if (!ThreadPool.SetMaxThreads(cap, _oldPorts)) continue;
+                ThreadPool.GetAvailableThreads(out free, out _);
+                if (free > 0) break;
+            }
             if (free <= 0)
             {
                 Dispose();
