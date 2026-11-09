@@ -81,8 +81,23 @@ public static class WindowsDisplayLanguage
         while (!culture.IsNeutralCulture && culture.Parent.Name.Length > 0)
             culture = culture.Parent;
 
-        return IsLanguageAndScript(culture.Name) ? culture.Name : Unrecognised;
+        var neutral = ScriptNameOf(culture.Name);
+        return IsLanguageAndScript(neutral) ? neutral : Unrecognised;
     }
+
+    /// <summary>
+    /// The script-tagged name for the two older Chinese neutral cultures, zh-CHS and
+    /// zh-CHT, whether handed in as the name or reached as a parent. On .NET Framework
+    /// zh-CN and zh-SG have zh-CHS as their parent, and zh-TW, zh-HK and zh-MO have
+    /// zh-CHT. Each older name stands for the same language and script as zh-Hans or
+    /// zh-Hant. Any other name is returned as given.
+    /// </summary>
+    private static string ScriptNameOf(string name) => name switch
+    {
+        "zh-CHS" => "zh-Hans",
+        "zh-CHT" => "zh-Hant",
+        _ => name,
+    };
 
     /// <summary>
     /// Two or three lower-case ASCII letters, optionally followed by a hyphen and a
