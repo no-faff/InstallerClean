@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using InstallerClean.Compatibility;
 using InstallerClean.Helpers;
 
 namespace InstallerClean.Services;
@@ -30,7 +31,7 @@ internal static class ProcessStartRetry
         {
             try
             {
-                return Process.Start(info)
+                return FrameworkProcess.Start(info)
                     ?? throw new InvalidOperationException("Windows started no process for the file.");
             }
             catch (Exception ex) when (attempt < Attempts && retries(ex))
