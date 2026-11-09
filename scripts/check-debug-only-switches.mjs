@@ -29,9 +29,10 @@
 // RegistryValueOptions.None, the option that expands the %NAME% in a registry value. A
 // write (SetEnvironmentVariable, _putenv) counts as a read and is printed as a write.
 // NAMES_NO_VARIABLE lists, by exact text, what holds the word and names no environment
-// variable, such as Environment.NewLine. Anything else holding the word is a read, a
-// message in a string that says "environment" among them, until NAMES_NO_VARIABLE or
-// ALLOWED names it. An entry in NAMES_NO_VARIABLE that nothing in the shipped projects
+// variable, such as Environment.NewLine; extension(Environment), the header of a C# 14
+// extension block on the class, is a name the run gives that header. Anything else
+// holding the word is a read, a message in a string that says "environment" among
+// them, until NAMES_NO_VARIABLE or ALLOWED names it. An entry in NAMES_NO_VARIABLE that nothing in the shipped projects
 // holds stops the run. In Environment.GetEnvironmentVariable the read is the member, so
 // the line holds one. One outside the branch fails unless ALLOWED names it by file and
 // line text; each entry admits one read and stops the run where it finds none. The
@@ -138,15 +139,19 @@ const ALLOWED = [
 ];
 
 // What holds the word and names no environment variable, by its text with the spaces
-// taken out. Environment.X is the class System.Environment and its member.
+// taken out. Environment.X is the class System.Environment and its member; a bare name
+// is an identifier holding the word; extension(Environment) is the name given to an
+// extension block's header on the class.
 const NAMES_NO_VARIABLE = new Map([
+  ['Environment.CurrentDirectory', 'the current folder'],
   ['Environment.CurrentManagedThreadId', 'the managed thread'],
   ['Environment.NewLine', 'the line ending'],
   ['Environment.OSVersion', 'the version of Windows'],
   ['Environment.ProcessId', 'the process'],
   ['Environment.ProcessPath', 'the executable'],
   ['Environment.SpecialFolder', 'the known folders'],
-  ['Environment.SystemDirectory', 'the system folder'],
+  ['FrameworkEnvironment', 'the class giving .NET Framework the ProcessId and ProcessPath members'],
+  ['extension(Environment)', 'the block adding those members to the class Environment'],
   ['DoNotExpandEnvironmentNames', 'the registry option that leaves a %NAME% as written'],
 ]);
 
@@ -243,7 +248,10 @@ for (const { file, code, comments, lineAt, inside } of shipped) {
   for (const m of code.matchAll(READ)) {
     let name = m[0].replace(/\s+/g, '');
     // The class itself, written bare or as System.Environment, takes its member's name.
-    // Where the member names the environment too, it is the match that counts.
+    // Where the member names the environment too, it is the match that counts. The class
+    // with no member, as the whole parameter of an extension block's header, which is
+    // followed by the block's brace, is extension(Environment); a call passing something
+    // called Environment is followed by no brace and stays a read.
     if (m[0] === 'Environment') {
       const before = code.slice(Math.max(0, m.index - 80), m.index);
       const member = /^\s*\.\s*(\w+)/.exec(code.slice(m.index + m[0].length));
@@ -252,6 +260,9 @@ for (const { file, code, comments, lineAt, inside } of shipped) {
       if (qualified && member) {
         if (/environ/i.test(member[1])) continue;
         name = `Environment.${member[1]}`;
+      } else if (/(?:^|[^\w.])extension\s*\(\s*$/.test(before)
+        && /^\s*\)\s*\{/.test(code.slice(m.index + m[0].length))) {
+        name = 'extension(Environment)';
       }
     }
     const line = lineAt(m.index);
