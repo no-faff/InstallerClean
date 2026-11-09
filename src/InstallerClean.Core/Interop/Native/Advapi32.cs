@@ -78,7 +78,7 @@ internal static class Advapi32
     /// and time it can answer is passed as null and not read. Answers ERROR_SUCCESS or
     /// a Win32 error.
     /// </summary>
-    [DllImport(Library, EntryPoint = "RegQueryInfoKeyW", ExactSpelling = true)]
+    [DllImport(Library, EntryPoint = "RegQueryInfoKeyW", CharSet = CharSet.Unicode, ExactSpelling = true)]
     public static extern int RegQueryInfoKey(
         Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
         IntPtr lpClass,

@@ -808,7 +808,7 @@ internal static class Kernel32
     /// this process's exe where it is <see cref="IntPtr.Zero"/>, which is the base address the
     /// exe's image is mapped at. Returns <see cref="IntPtr.Zero"/> on failure.
     /// </summary>
-    [DllImport(Library, EntryPoint = "GetModuleHandleW", ExactSpelling = true, SetLastError = true)]
+    [DllImport(Library, EntryPoint = "GetModuleHandleW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     public static extern IntPtr GetModuleHandle(IntPtr lpModuleName);
 
     /// <summary>
