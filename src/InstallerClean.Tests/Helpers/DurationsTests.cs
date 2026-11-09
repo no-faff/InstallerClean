@@ -3,9 +3,10 @@ using InstallerClean.Helpers;
 namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
-/// <see cref="Durations"/> computes as .NET 10's <c>TimeSpan</c> multiplication and
-/// <c>Stopwatch.GetElapsedTime</c> do: in ticks, a product to the nearest tick with a tie
-/// going to the even one, and an elapsed time truncated to a whole tick.
+/// <see cref="Durations"/> computes as .NET 10's <c>TimeSpan</c> multiplication,
+/// <c>TimeSpan.FromSeconds(double)</c> and <c>Stopwatch.GetElapsedTime</c> do: in ticks, a
+/// product to the nearest tick with a tie going to the even one, and a number of seconds
+/// and an elapsed time truncated to a whole tick.
 /// </summary>
 public class DurationsTests
 {
@@ -126,5 +127,52 @@ public class DurationsTests
 
         Assert.True(first >= TimeSpan.Zero);
         Assert.True(second >= first);
+    }
+
+    [Theory]
+    // Under a millisecond, which .NET Framework's FromSeconds rounds to a whole one.
+    [InlineData(0.0004, 4_000)]
+    [InlineData(-0.0004, -4_000)]
+    [InlineData(0.0005, 5_000)]
+    // The stripe's crossing of a 240-wide track: 320 / 286 seconds.
+    [InlineData(320.0 / 286, 11_188_811)]
+    [InlineData(0, 0)]
+    public void Seconds_are_truncated_to_a_whole_tick(double seconds, long expected)
+    {
+        Assert.Equal(expected, Durations.FromSeconds(seconds).Ticks);
+    }
+
+    [Fact]
+    public void A_NaN_number_of_seconds_is_refused()
+    {
+        Assert.Null(Assert.Throws<ArgumentException>(() => Durations.FromSeconds(double.NaN)).ParamName);
+        Assert.Null(Assert.Throws<ArgumentException>(() => Durations.FromMilliseconds(double.NaN)).ParamName);
+    }
+
+    [Theory]
+    [InlineData(1e12)]
+    [InlineData(-1e12)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(double.NegativeInfinity)]
+    public void Seconds_past_what_a_TimeSpan_holds_are_an_overflow(double seconds)
+    {
+        Assert.Throws<OverflowException>(() => Durations.FromSeconds(seconds));
+    }
+
+    [Fact]
+    public void Seconds_at_the_ends_of_a_TimeSpan_give_its_largest_and_smallest()
+    {
+        Assert.Equal(TimeSpan.MaxValue, Durations.FromSeconds(922337203685.4775807));
+        Assert.Equal(TimeSpan.MinValue, Durations.FromSeconds(-922337203685.4775808));
+    }
+
+    [Theory]
+    // Under a millisecond, which .NET Framework's FromMilliseconds rounds to a whole one.
+    [InlineData(0.5, 5_000)]
+    [InlineData(-0.5, -5_000)]
+    [InlineData(1.5, 15_000)]
+    public void Milliseconds_are_truncated_to_a_whole_tick(double milliseconds, long expected)
+    {
+        Assert.Equal(expected, Durations.FromMilliseconds(milliseconds).Ticks);
     }
 }

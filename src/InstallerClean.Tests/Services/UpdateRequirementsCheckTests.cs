@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using System.Net;
 using InstallerClean.Services;
 using NSubstitute;
@@ -138,7 +139,7 @@ public sealed class UpdateRequirementsCheckTests
         var updater = Updater(network);
 
         var failed = await Assert.ThrowsAsync<UpdateFailedException>(() => updater.CheckRequirementsAsync(
-            "9.9.9", TimeSpan.FromMilliseconds(milliseconds), CancellationToken.None));
+            "9.9.9", Durations.FromMilliseconds(milliseconds), CancellationToken.None));
 
         Assert.Equal(UpdateFailureStage.Download, failed.Stage);
         Assert.Equal(0, network.Requests);

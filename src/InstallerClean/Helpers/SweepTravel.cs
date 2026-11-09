@@ -25,6 +25,6 @@ internal static class SweepTravel
     {
         var from = -stripeWidth;
         var to = trackWidth;
-        return (from, to, TimeSpan.FromSeconds((to - from) / PixelsPerSecond));
+        return (from, to, Durations.FromSeconds((to - from) / PixelsPerSecond));
     }
 }

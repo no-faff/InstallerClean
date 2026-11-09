@@ -3,12 +3,13 @@ using System.Diagnostics;
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Two pieces of time arithmetic .NET 10 provides and .NET Framework does not, computed as
-/// .NET 10 computes them (dotnet/runtime v10.0.0): a duration times a number, from
-/// <c>TimeSpan.cs</c>'s <c>operator *</c>, and the time since a <see cref="Stopwatch"/>
-/// timestamp, from <c>Stopwatch.cs</c>'s <c>GetElapsedTime</c>.
+/// Time arithmetic .NET 10 provides and .NET Framework does not, computed as .NET 10
+/// computes it (dotnet/runtime v10.0.0): a duration times a number, from
+/// <c>TimeSpan.cs</c>'s <c>operator *</c>; a number of seconds as a duration, from its
+/// <c>FromSeconds(double)</c> and <c>FromMilliseconds(double)</c>; and the time since a <see cref="Stopwatch"/> timestamp,
+/// from <c>Stopwatch.cs</c>'s <c>GetElapsedTime</c>.
 ///
-/// Both work in ticks, never through milliseconds: .NET Framework's
+/// All of it works in ticks, never through milliseconds: .NET Framework's
 /// <c>TimeSpan.FromMilliseconds(double)</c> and <c>FromSeconds(double)</c> round their
 /// argument to a whole millisecond, so a product of 400 ticks taken that way is zero.
 /// </summary>
@@ -28,6 +29,37 @@ internal static class Durations
         if (ticks > TimeSpan.MaxValue.Ticks || ticks < TimeSpan.MinValue.Ticks || double.IsNaN(ticks))
             throw new OverflowException("TimeSpan overflowed because the duration is too long.");
         if (ticks == TimeSpan.MaxValue.Ticks)
+            return TimeSpan.MaxValue;
+        return new TimeSpan((long)ticks);
+    }
+
+    /// <summary>
+    /// <paramref name="seconds"/> as a duration, truncated to a whole tick, as .NET 10's
+    /// <c>TimeSpan.FromSeconds(double)</c> answers.
+    /// </summary>
+    public static TimeSpan FromSeconds(double seconds) => Interval(seconds, TimeSpan.TicksPerSecond);
+
+    /// <summary>
+    /// <paramref name="milliseconds"/> as a duration, truncated to a whole tick, as .NET
+    /// 10's <c>TimeSpan.FromMilliseconds(double)</c> answers.
+    /// </summary>
+    public static TimeSpan FromMilliseconds(double milliseconds) => Interval(milliseconds, TimeSpan.TicksPerMillisecond);
+
+    /// <summary>
+    /// <paramref name="value"/> units of <paramref name="scale"/> ticks each, from
+    /// <c>TimeSpan.cs</c>'s <c>Interval</c> and <c>IntervalFromDoubleTicks</c>. A NaN is
+    /// an <see cref="ArgumentException"/> naming no parameter, and a duration outside
+    /// what a <see cref="TimeSpan"/> holds an <see cref="OverflowException"/>.
+    /// </summary>
+    private static TimeSpan Interval(double value, double scale)
+    {
+        if (double.IsNaN(value))
+            throw new ArgumentException("TimeSpan does not accept floating point Not-a-Number values.");
+
+        var ticks = value * scale;
+        if (ticks > long.MaxValue || ticks < long.MinValue || double.IsNaN(ticks))
+            throw new OverflowException("TimeSpan overflowed because the duration is too long.");
+        if (ticks == long.MaxValue)
             return TimeSpan.MaxValue;
         return new TimeSpan((long)ticks);
     }
