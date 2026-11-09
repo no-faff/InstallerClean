@@ -370,8 +370,8 @@ public class DeclaredProductCheckTests
             ("installed from drive E, by its list", () => ACopyInstalledFromDriveE("list", SetupName), null),
             ("installed from drive E, by its install source", () => ACopyInstalledFromDriveE("install source", SetupName), null),
             ("installed from drive E, by the source used last", () => ACopyInstalledFromDriveE("used last", SetupName), null),
-            ("with a media source used last", () => ACopyWithAMediaSourceUsedLast(OtherFolder), null),
-            ("with the source used last", () => ACopyWithTheSourceUsedLast(OtherFolder), null),
+            ("with a media source used last", () => WithAnotherFileUsedLast(ACopyWithAMediaSourceUsedLast(OtherFolder)), null),
+            ("with the source used last", () => WithAnotherFileUsedLast(ACopyWithTheSourceUsedLast(OtherFolder)), null),
             ("a patch beside the recorded copy", APatchCopyBesideTheRecordedCopy, null),
         };
         var reached = new SortedSet<string>(StringComparer.Ordinal);
@@ -406,6 +406,17 @@ public class DeclaredProductCheckTests
         Assert.Equal(
             ["AsksAndFindsNoPackage", "InstallSourceOf", "NamesNothing", "RegistryRecordsNoCachedPackage", "ValuesOf"],
             reached.Where(m => m != "(not the check)").ToArray());
+    }
+
+    /// <summary>
+    /// <paramref name="f"/> with the package in the folder used last, OtherPackage, opening as
+    /// a file other than the copy, so the copy is let through.
+    /// </summary>
+    private static (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi, ScriptedFileIdentities Files, MockFileSystem Disk) WithAnotherFileUsedLast(
+        (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi, ScriptedFileIdentities Files, MockFileSystem Disk) f)
+    {
+        f.Files.Opens(OtherPackage, 9);
+        return f;
     }
 
     private static void ScreenWith(
@@ -2454,8 +2465,7 @@ public class DeclaredProductCheckTests
     [Fact]
     public void A_copy_is_let_through_when_the_package_in_the_folder_used_last_is_another_file()
     {
-        var f = ACopyWithTheSourceUsedLast(OtherFolder);
-        f.Files.Opens(OtherPackage, 9);
+        var f = WithAnotherFileUsedLast(ACopyWithTheSourceUsedLast(OtherFolder));
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
         Assert.Contains(OtherPackage, f.Files.Reads);
@@ -2782,8 +2792,7 @@ public class DeclaredProductCheckTests
     [Fact]
     public void A_copy_is_let_through_when_the_package_in_a_media_folder_used_last_is_another_file()
     {
-        var f = ACopyWithAMediaSourceUsedLast(OtherFolder);
-        f.Files.Opens(OtherPackage, 9);
+        var f = WithAnotherFileUsedLast(ACopyWithAMediaSourceUsedLast(OtherFolder));
 
         Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, ScreenTheCopy(f));
         Assert.Contains(OtherPackage, f.Files.Reads);

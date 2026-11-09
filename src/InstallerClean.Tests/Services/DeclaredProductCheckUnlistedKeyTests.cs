@@ -371,7 +371,12 @@ public class DeclaredProductCheckUnlistedKeyTests
         {
             ("with nothing recorded", _ => { }),
             ("installed from a folder", pc => pc.InstalledFrom(Setup)),
-            ("with a source list", pc => pc.HasList(MachineList(KeyCode), SetupName, Setup)),
+            ("with a source list", pc =>
+            {
+                pc.HasList(MachineList(KeyCode), SetupName, Setup);
+                pc.Files.Answers(SetupPackage, FileIdentityRead.NamesNothing);
+                pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
+            }),
         };
         var reached = new SortedSet<string>(StringComparer.Ordinal);
 
