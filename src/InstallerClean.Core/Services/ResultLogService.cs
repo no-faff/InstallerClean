@@ -91,10 +91,10 @@ public sealed class ResultLogService : IResultLogService
         try
         {
             // GetDirectoryName is null for a root, an empty path and one of spaces
-            // alone, and empty for a bare file name, which CreateDirectory refuses.
-            // The default path is none of those, and a test sandbox never should be.
+            // alone, and empty for a bare file name, which names the current folder:
+            // there is no folder to make for any of them.
             var folder = PathText.GetDirectoryName(_logFile);
-            if (folder is not null) FrameworkDirectory.CreateDirectory(folder);
+            if (folder is { Length: > 0 }) FrameworkDirectory.CreateDirectory(folder);
 
             var json = JsonSerializer.Serialize(entry, JsonOptions);
 
