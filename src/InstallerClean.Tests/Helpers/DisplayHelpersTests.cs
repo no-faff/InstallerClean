@@ -49,14 +49,16 @@ public class DisplayHelpersTests
     [Theory]
     [InlineData(1_280, "1.2 KB")]
     [InlineData(1_792, "1.8 KB")]
+    [InlineData(1_310_720, "1.2 MB")]
+    [InlineData(1_835_008, "1.8 MB")]
     [InlineData(1_207_959_552, "1.12 GB")]
     [InlineData(1_744_830_464, "1.62 GB")]
     public void FormatSize_rounds_a_figure_exactly_halfway_to_the_even_digit(long bytes, string expected)
     {
         // A whole number of bytes over a power of two can land exactly halfway
-        // between two printed values: 1,280 bytes is 1.25 KB. The rounding is the
-        // one .NET applies when it formats a double, so the machine form, which
-        // formats a double, prints the same digits for the same size.
+        // between two printed values: 1,280 bytes is 1.25 KB. Both forms round it
+        // to the even digit, so the window and the Application-channel entry print
+        // the same digits for a size both give in the same unit.
         using var scope = new LocalisationScope(British, British);
         Assert.Equal(expected, DisplayHelpers.FormatSize(bytes));
         Assert.Equal(expected, DisplayHelpers.FormatSizeForMachine(bytes));
