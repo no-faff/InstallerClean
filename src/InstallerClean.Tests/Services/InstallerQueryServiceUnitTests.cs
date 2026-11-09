@@ -1,3 +1,4 @@
+using System.Globalization;
 using InstallerClean.Helpers;
 using InstallerClean.Interop;
 using InstallerClean.Models;
@@ -1209,6 +1210,20 @@ public class InstallerQueryServiceUnitTests
     // history this evicts.
 
     /// <summary>
+    /// Product <paramref name="i"/>'s code, of the form {p007}, and its cached package,
+    /// p007.msi. Both are built by concatenation. On .NET Framework an interpolated
+    /// string becomes a string.Format call, and its parser reads a "}}" after a
+    /// format specifier as an escaped brace belonging to the specifier: in
+    /// $"{{p{i:D3}}}" the specifier becomes "D3}", a custom format with no digit
+    /// placeholder, which prints "D3}" whatever i is.
+    /// </summary>
+    private static (string Code, string Package) Product(int i)
+    {
+        var digits = i.ToString("D3", CultureInfo.InvariantCulture);
+        return ("{p" + digits + "}", @"C:\Windows\Installer\p" + digits + ".msi");
+    }
+
+    /// <summary>
     /// 200 products whose patch enumeration refuses at every index. Each one
     /// abandons after the tolerance and each abandonment is worth recording, but
     /// they are 200 restatements of one condition.
@@ -1220,10 +1235,13 @@ public class InstallerQueryServiceUnitTests
         var msi = new FakeMsiApi();
         for (int i = 0; i < 200; i++)
         {
-            msi.AddProduct($"{{p{i:D3}}}");
-            msi.SetProductProperty($"{{p{i:D3}}}", "LocalPackage", $@"C:\Windows\Installer\p{i:D3}.msi");
-            msi.PatchEnumResult[$"{{p{i:D3}}}"] = InvalidParameter;
+            var (code, package) = Product(i);
+            msi.AddProduct(code);
+            msi.SetProductProperty(code, "LocalPackage", package);
+            msi.PatchEnumResult[code] = InvalidParameter;
         }
+
+        Assert.Equal(200, msi.Products.Select(p => p.Code).Distinct().Count());
 
         var result = await new InstallerQueryService(msi, NoFallback, written.Add)
             .GetRegisteredPackagesAsync();
@@ -1257,9 +1275,9 @@ public class InstallerQueryServiceUnitTests
         var msi = new FakeMsiApi();
         for (int i = 0; i < 200; i++)
         {
-            var code = $"{{p{i:D3}}}";
+            var (code, package) = Product(i);
             msi.AddProduct(code);
-            msi.SetProductProperty(code, "LocalPackage", $@"C:\Windows\Installer\p{i:D3}.msi");
+            msi.SetProductProperty(code, "LocalPackage", package);
 
             if (i == 150)
                 // Rows the API returns as success carrying an empty GUID: the
