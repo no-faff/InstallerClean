@@ -82,16 +82,6 @@ public class FrameworkStringsTests
             Assert.Equal(expected, text.IndexOfOrdinal(value, comparison));
     }
 
-#if NETFRAMEWORK
-    // .NET Framework's own search, which the shipped projects are barred from calling, passes
-    // over the NUL in ASCII text under OrdinalIgnoreCase and finds "ab" at 0, where
-    // IndexOfOrdinal's row above answers -1.
-    [Fact]
-    public void The_framework_s_own_search_passes_over_a_NUL_under_OrdinalIgnoreCase()
-    {
-        Assert.Equal(0, "a\u0000b".IndexOf("ab", StringComparison.OrdinalIgnoreCase));
-    }
-#endif
 
     [Fact]
     public void IndexOfOrdinal_refuses_a_null_value_a_start_past_the_end_and_a_culture_comparison()

@@ -357,30 +357,31 @@ public class DeclaredProductCheckTests
     /// there must leave the screen as that same exception: no verdict comes back, and nothing
     /// reaches the refusal record or the crash log on the way out. The reads come from the five
     /// methods that read a key's values for an installation the API lists; the one for a key
-    /// it does not list, InstallPropertiesOf, is DeclaredProductCheckUnlistedKeyTests'.
+    /// it does not list, InstallPropertiesOf, is DeclaredProductCheckUnlistedKeyTests'. A patch
+    /// copy is decided through Windows Installer's own answers and reads no key, as the patch
+    /// tests further down assert, so none is screened here.
     /// </summary>
     [Fact]
     public void A_scan_cancelled_at_any_registry_read_stops_as_a_cancel_and_records_nothing()
     {
-        var scenarios = new (string Name, Func<(ScriptedPackageIdentities, ScriptedMsiProducts, ScriptedFileIdentities, MockFileSystem)> Make, IRunningAccount? Account, bool IsPatch)[]
+        var scenarios = new (string Name, Func<(ScriptedPackageIdentities, ScriptedMsiProducts, ScriptedFileIdentities, MockFileSystem)> Make, IRunningAccount? Account)[]
         {
-            ("beside the recorded package", ACopyBesideTheRecordedPackage, null, false),
-            ("beside a recorded package naming nothing", ACopyBesideARecordedPackageThatNamesNothing, null, false),
-            ("beside a per-user installation", ACopyBesideAPerUserUnmanagedInstallation, new Account(UserSid), false),
-            ("installed from drive E, by its list", () => ACopyInstalledFromDriveE("list", SetupName), null, false),
-            ("installed from drive E, by its install source", () => ACopyInstalledFromDriveE("install source", SetupName), null, false),
-            ("installed from drive E, by the source used last", () => ACopyInstalledFromDriveE("used last", SetupName), null, false),
-            ("with a media source used last", () => WithAnotherFileUsedLast(ACopyWithAMediaSourceUsedLast(OtherFolder)), null, false),
-            ("with the source used last", () => WithAnotherFileUsedLast(ACopyWithTheSourceUsedLast(OtherFolder)), null, false),
-            ("a patch beside the recorded copy", APatchCopyBesideTheRecordedCopy, null, true),
+            ("beside the recorded package", ACopyBesideTheRecordedPackage, null),
+            ("beside a recorded package naming nothing", ACopyBesideARecordedPackageThatNamesNothing, null),
+            ("beside a per-user installation", ACopyBesideAPerUserUnmanagedInstallation, new Account(UserSid)),
+            ("installed from drive E, by its list", () => ACopyInstalledFromDriveE("list", SetupName), null),
+            ("installed from drive E, by its install source", () => ACopyInstalledFromDriveE("install source", SetupName), null),
+            ("installed from drive E, by the source used last", () => ACopyInstalledFromDriveE("used last", SetupName), null),
+            ("with a media source used last", () => WithAnotherFileUsedLast(ACopyWithAMediaSourceUsedLast(OtherFolder)), null),
+            ("with the source used last", () => WithAnotherFileUsedLast(ACopyWithTheSourceUsedLast(OtherFolder)), null),
         };
         var reached = new SortedSet<string>(StringComparer.Ordinal);
 
-        foreach (var (name, make, account, isPatch) in scenarios)
+        foreach (var (name, make, account) in scenarios)
         {
             var dry = make();
             dry.Item2.Registry.TracksCallers();
-            ScreenWith(dry, account, isPatch, CancellationToken.None, (_, _) => { });
+            ScreenWith(dry, account, CancellationToken.None, (_, _) => { });
             Assert.True(dry.Item2.Registry.Reads.Count > 0, $"{name}: the screen read no key.");
             reached.UnionWith(dry.Item2.Registry.Callers);
 
@@ -393,7 +394,7 @@ public class DeclaredProductCheckTests
                 using var crashLog = TestCrashLog.OwnFolder();
 
                 var thrown = Record.Exception(() =>
-                    ScreenWith(f, account, isPatch, cts.Token, (_, what) => refusals.Add(what)));
+                    ScreenWith(f, account, cts.Token, (_, what) => refusals.Add(what)));
 
                 var at = $"{name}, read {read} ({f.Item2.Registry.Reads[read]} by {f.Item2.Registry.Callers[read]})";
                 Assert.True(thrown is not null && ReferenceEquals(thrown, f.Item2.Registry.Thrown),
@@ -421,9 +422,9 @@ public class DeclaredProductCheckTests
 
     private static void ScreenWith(
         (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi, ScriptedFileIdentities Files, MockFileSystem Disk) f,
-        IRunningAccount? account, bool isPatch, CancellationToken token, Action<Exception, string> recordRefusal) =>
+        IRunningAccount? account, CancellationToken token, Action<Exception, string> recordRefusal) =>
         _ = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry, account)
-            .Screen([isPatch ? Patch(PatchCopy) : Package(Candidate)], [], [], token, recordRefusal, InInstallerFolder).Outcomes;
+            .Screen([Package(Candidate)], [], [], token, recordRefusal, InInstallerFolder).Outcomes;
 
     [Fact]
     public void A_cancelled_scan_stops_the_pass()
