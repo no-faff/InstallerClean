@@ -538,6 +538,7 @@ const MAP = {
   'Automation.UpdateNotice.DownloadNetFramework48': `Скачать .NET Framework 4.8 с сайта Microsoft`,
   'UpdateNotice.CheckingDownload': `Проверка скачанного файла...`,
   'Startup.PlantedConfigRefusal': `InstallerClean не запустится, потому что рядом с ним находится файл с именем {0}, а InstallerClean не поставляется с таким файлом. Удалите этот файл, а затем снова запустите InstallerClean.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова откройте InstallerClean.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -715,6 +716,7 @@ const CLI = {
   'Cli.CoverLostNoWorkMove': `Остановлено до перемещения каких-либо файлов: InstallerClean больше не мог быть уверен, что никакой другой InstallerClean не выполняет действий. Запустите ту же команду ещё раз. Код выхода 75 (временное состояние).`,
   'Cli.UpdateNoAnswer': `Ответа нет уже минуту, поэтому InstallerClean обновляется без вопросов, как при запуске, когда отвечать некому.`,
   'Cli.ReportNoAnswer': `Ответа нет уже минуту.`,
+  'Cli.NeedsNetFramework48': `Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова запустите InstallerClean.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

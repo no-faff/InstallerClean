@@ -708,6 +708,8 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `Stopped before moving any file: InstallerClean could no longer be sure that no other InstallerClean was acting. Run the same command again. Exit 75 (transient).`,
   'Cli.UpdateNoAnswer': `No answer after a minute, so InstallerClean updates without asking, as it does when nobody is there to answer.`,
   'Cli.ReportNoAnswer': `No answer after a minute.`,
+  'Startup.NeedsNetFramework48': `InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again.`,
+  'Cli.NeedsNetFramework48': `InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then run InstallerClean again.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

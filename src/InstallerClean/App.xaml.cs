@@ -210,6 +210,16 @@ public partial class App : Application
         LanguageFonts.Initialise((System.Windows.Media.FontFamily)Resources["Type.FontFamily"]);
         Resources["Type.FontFamily"] = LanguageFonts.For(SupportedLanguages.Active(Localisation.UiCulture));
 
+        // On a PC without .NET Framework 4.8 the window says what to install, in a plain
+        // message box, and closes, before anything scans. The portable carries no config
+        // naming the runtime, so .NET Framework starts it on any 4.x.
+        if (NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: false) is { } needsNetFramework48)
+        {
+            MessageBox.Show(needsNetFramework48, Strings.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            EndFailedStart(splash: null);
+            return;
+        }
+
         // A .exe.config beside the copy that says more than the build's own is a file
         // somebody else wrote, which on .NET Framework the runtime reads. A config beside
         // the setup's copy is not refused. Refused here, in the language the user chose and

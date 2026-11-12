@@ -8680,6 +8680,42 @@
       "vi": "7f585a29ff4b0eb0",
       "zh-Hans": "7f585a29ff4b0eb0",
       "zh-Hant": "7f585a29ff4b0eb0"
+    },
+    "Startup.NeedsNetFramework48": {
+      "de": "7a6025b5303f72ce",
+      "es": "7a6025b5303f72ce",
+      "fr": "7a6025b5303f72ce",
+      "id": "7a6025b5303f72ce",
+      "it": "7a6025b5303f72ce",
+      "ja": "7a6025b5303f72ce",
+      "ko": "7a6025b5303f72ce",
+      "nl": "7a6025b5303f72ce",
+      "pl": "7a6025b5303f72ce",
+      "pt-BR": "7a6025b5303f72ce",
+      "ru": "7a6025b5303f72ce",
+      "tr": "7a6025b5303f72ce",
+      "uk": "7a6025b5303f72ce",
+      "vi": "7a6025b5303f72ce",
+      "zh-Hans": "7a6025b5303f72ce",
+      "zh-Hant": "7a6025b5303f72ce"
+    },
+    "Cli.NeedsNetFramework48": {
+      "de": "20e495fc484a99c5",
+      "es": "20e495fc484a99c5",
+      "fr": "20e495fc484a99c5",
+      "id": "20e495fc484a99c5",
+      "it": "20e495fc484a99c5",
+      "ja": "20e495fc484a99c5",
+      "ko": "20e495fc484a99c5",
+      "nl": "20e495fc484a99c5",
+      "pl": "20e495fc484a99c5",
+      "pt-BR": "20e495fc484a99c5",
+      "ru": "20e495fc484a99c5",
+      "tr": "20e495fc484a99c5",
+      "uk": "20e495fc484a99c5",
+      "vi": "20e495fc484a99c5",
+      "zh-Hans": "20e495fc484a99c5",
+      "zh-Hant": "20e495fc484a99c5"
     }
   }
 }

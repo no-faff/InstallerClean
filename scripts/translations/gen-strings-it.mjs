@@ -570,6 +570,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `Nessuna risposta dopo un minuto, quindi InstallerClean si aggiorna senza chiedere, come quando non c'è nessuno a rispondere.`,
   'Cli.ReportNoAnswer': `Nessuna risposta dopo un minuto.`,
   'Startup.PlantedConfigRefusal': `InstallerClean non si avvia perché accanto ad esso c'è un file chiamato {0}, e InstallerClean non ne include nessuno. Elimina quel file, poi apri di nuovo InstallerClean.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean richiede .NET Framework 4.8. Installalo dal sito di Microsoft, riavvia il PC, poi apri di nuovo InstallerClean.`,
+  'Cli.NeedsNetFramework48': `InstallerClean richiede .NET Framework 4.8. Installalo dal sito di Microsoft, riavvia il PC, poi esegui di nuovo InstallerClean.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

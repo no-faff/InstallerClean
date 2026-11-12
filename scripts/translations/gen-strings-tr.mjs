@@ -570,6 +570,8 @@ Ayrıntılar şuraya yazıldı:
   'Cli.UpdateNoAnswer': `Bir dakika içinde yanıt gelmedi, bu yüzden InstallerClean, yanıtlayacak kimse olmadığında yaptığı gibi sormadan güncelleniyor.`,
   'Cli.ReportNoAnswer': `Bir dakika içinde yanıt gelmedi.`,
   'Startup.PlantedConfigRefusal': `InstallerClean başlamıyor çünkü yanında {0} adlı bir dosya var ve InstallerClean böyle bir dosyayla gelmez. Bu dosyayı silin, ardından InstallerClean'i yeniden çalıştırın.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean için .NET Framework 4.8 gerekiyor. Microsoft'tan yükleyin, bilgisayarı yeniden başlatın, ardından InstallerClean'i yeniden açın.`,
+  'Cli.NeedsNetFramework48': `InstallerClean için .NET Framework 4.8 gerekiyor. Microsoft'tan yükleyin, bilgisayarı yeniden başlatın, ardından InstallerClean'i yeniden çalıştırın.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

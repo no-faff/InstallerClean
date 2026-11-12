@@ -652,6 +652,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `Pas de réponse après une minute, donc InstallerClean se met à jour sans demander, comme lorsque personne n'est là pour répondre.`,
   'Cli.ReportNoAnswer': `Pas de réponse après une minute.`,
   'Startup.PlantedConfigRefusal': `InstallerClean ne démarrera pas car un fichier nommé {0} se trouve à côté du programme, et InstallerClean n'en fournit aucun. Supprimez ce fichier, puis rouvrez InstallerClean.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean nécessite .NET Framework 4.8. Installez-le depuis le site de Microsoft, redémarrez le PC, puis rouvrez InstallerClean.`,
+  'Cli.NeedsNetFramework48': `InstallerClean nécessite .NET Framework 4.8. Installez-le depuis le site de Microsoft, redémarrez le PC, puis exécutez à nouveau InstallerClean.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

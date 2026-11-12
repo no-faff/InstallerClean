@@ -624,6 +624,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `Na een minuut geen antwoord, dus InstallerClean werkt bij zonder te vragen, zoals wanneer er niemand is om te antwoorden.`,
   'Cli.ReportNoAnswer': `Na een minuut geen antwoord.`,
   'Startup.PlantedConfigRefusal': `InstallerClean start niet omdat er naast het programma een bestand met de naam {0} staat, en InstallerClean wordt niet met zo'n bestand geleverd. Verwijder dat bestand en open InstallerClean daarna opnieuw.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean heeft .NET Framework 4.8 nodig. Installeer het van Microsoft, herstart de pc en open InstallerClean daarna opnieuw.`,
+  'Cli.NeedsNetFramework48': `InstallerClean heeft .NET Framework 4.8 nodig. Installeer het van Microsoft, herstart de pc en voer InstallerClean daarna opnieuw uit.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

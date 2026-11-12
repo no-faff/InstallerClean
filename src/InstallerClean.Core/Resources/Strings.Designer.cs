@@ -287,6 +287,7 @@ public static class Strings
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_MutexLostDelete => Get("Cli.MutexLostDelete");
     public static string Cli_MutexLostMove => Get("Cli.MutexLostMove");
+    public static string Cli_NeedsNetFramework48 => Get("Cli.NeedsNetFramework48");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
     public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
@@ -495,6 +496,7 @@ public static class Strings
     public static string Startup_ErrorTitle => Get("Startup.ErrorTitle");
     public static string Startup_FailedToStart => Get("Startup.FailedToStart");
     public static string Startup_FailedToStart_NoLog => Get("Startup.FailedToStart.NoLog");
+    public static string Startup_NeedsNetFramework48 => Get("Startup.NeedsNetFramework48");
     public static string Startup_PlantedConfigRefusal => Get("Startup.PlantedConfigRefusal");
     public static string Startup_UnhandledBody => Get("Startup.UnhandledBody");
     public static string Startup_UnhandledBody_NoLog => Get("Startup.UnhandledBody.NoLog");

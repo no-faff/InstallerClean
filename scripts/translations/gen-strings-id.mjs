@@ -669,6 +669,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `Tidak ada jawaban setelah satu menit, jadi InstallerClean memperbarui tanpa bertanya, seperti saat tidak ada orang yang dapat menjawab.`,
   'Cli.ReportNoAnswer': `Tidak ada jawaban setelah satu menit.`,
   'Startup.PlantedConfigRefusal': `InstallerClean tidak akan dimulai karena ada file bernama {0} di sebelahnya, dan InstallerClean tidak menyertakan file seperti itu. Hapus file itu, lalu buka InstallerClean lagi.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean memerlukan .NET Framework 4.8. Pasang dari Microsoft, mulai ulang PC, lalu buka InstallerClean lagi.`,
+  'Cli.NeedsNetFramework48': `InstallerClean memerlukan .NET Framework 4.8. Pasang dari Microsoft, mulai ulang PC, lalu jalankan InstallerClean lagi.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

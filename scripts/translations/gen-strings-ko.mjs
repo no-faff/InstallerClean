@@ -645,6 +645,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `1분 동안 응답이 없어, 응답할 사람이 없을 때처럼 InstallerClean이 묻지 않고 업데이트합니다.`,
   'Cli.ReportNoAnswer': `1분 동안 응답이 없었습니다.`,
   'Startup.PlantedConfigRefusal': `InstallerClean 옆에 {0} 파일이 있는데 InstallerClean에는 그런 파일이 포함되어 있지 않아서 시작할 수 없습니다. 그 파일을 삭제한 다음 InstallerClean을 다시 실행하세요.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean에는 .NET Framework 4.8이 필요합니다. Microsoft에서 설치하고 PC를 다시 시작한 다음 InstallerClean을 다시 여세요.`,
+  'Cli.NeedsNetFramework48': `InstallerClean에는 .NET Framework 4.8이 필요합니다. Microsoft에서 설치하고 PC를 다시 시작한 다음 InstallerClean을 다시 실행하세요.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

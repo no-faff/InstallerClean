@@ -570,6 +570,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `1 分たっても応答がないため、応答できる人がいない場合と同じく、確認なしで InstallerClean を更新します。`,
   'Cli.ReportNoAnswer': `1 分たっても応答がありませんでした。`,
   'Startup.PlantedConfigRefusal': `InstallerClean の隣に {0} というファイルがあり、InstallerClean にはそのようなファイルが付属していないため、起動できません。そのファイルを削除してから、InstallerClean をもう一度起動してください。\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean には .NET Framework 4.8 が必要です。Microsoft からインストールして PC を再起動し、InstallerClean をもう一度開いてください。`,
+  'Cli.NeedsNetFramework48': `InstallerClean には .NET Framework 4.8 が必要です。Microsoft からインストールして PC を再起動し、InstallerClean をもう一度実行してください。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

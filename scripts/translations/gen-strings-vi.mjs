@@ -644,6 +644,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `Không có câu trả lời sau một phút, nên InstallerClean cập nhật mà không hỏi, như khi không có ai ở đó để trả lời.`,
   'Cli.ReportNoAnswer': `Không có câu trả lời sau một phút.`,
   'Startup.PlantedConfigRefusal': `InstallerClean không khởi động được vì có một tệp tên {0} nằm cạnh nó, mà InstallerClean không đi kèm tệp nào như vậy. Hãy xóa tệp đó, rồi chạy lại InstallerClean.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean cần .NET Framework 4.8. Hãy cài đặt nó từ Microsoft, khởi động lại PC, rồi mở lại InstallerClean.`,
+  'Cli.NeedsNetFramework48': `InstallerClean cần .NET Framework 4.8. Hãy cài đặt nó từ Microsoft, khởi động lại PC, rồi chạy lại InstallerClean.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

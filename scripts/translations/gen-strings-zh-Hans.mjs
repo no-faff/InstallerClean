@@ -549,6 +549,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `一分钟内没有回答，因此 InstallerClean 会像无人可回答时一样，不询问直接更新。`,
   'Cli.ReportNoAnswer': `一分钟内没有回答。`,
   'Startup.PlantedConfigRefusal': `InstallerClean 无法启动，因为它旁边有一个名为 {0} 的文件，而 InstallerClean 本身并不附带这样的文件。请删除该文件，然后再次运行 InstallerClean。\n\n{1}`,
+  'Startup.NeedsNetFramework48': `InstallerClean 需要 .NET Framework 4.8。请从 Microsoft 安装它，重启电脑，然后再次打开 InstallerClean。`,
+  'Cli.NeedsNetFramework48': `InstallerClean 需要 .NET Framework 4.8。请从 Microsoft 安装它，重启电脑，然后再次运行 InstallerClean。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

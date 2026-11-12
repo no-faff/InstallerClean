@@ -649,6 +649,8 @@ const MAP = {
   'Cli.UpdateNoAnswer': `Sem resposta após um minuto, então o InstallerClean se atualiza sem perguntar, como quando não há ninguém para responder.`,
   'Cli.ReportNoAnswer': `Sem resposta após um minuto.`,
   'Startup.PlantedConfigRefusal': `O InstallerClean não vai iniciar porque há um arquivo chamado {0} ao lado dele, e o InstallerClean não vem com nenhum. Exclua esse arquivo e abra o InstallerClean novamente.\n\n{1}`,
+  'Startup.NeedsNetFramework48': `O InstallerClean precisa do .NET Framework 4.8. Instale-o pelo site da Microsoft, reinicie o PC e depois abra o InstallerClean de novo.`,
+  'Cli.NeedsNetFramework48': `O InstallerClean precisa do .NET Framework 4.8. Instale-o pelo site da Microsoft, reinicie o PC e depois execute o InstallerClean de novo.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.
