@@ -51,9 +51,9 @@ public class RegistryDataTests
         {
             // "ab" and an odd trailing byte: the last code unit takes a zero byte.
             RawRegistryValue.Write(key, "odd", RawRegistryValue.REG_SZ, new byte[] { (byte)'a', 0, (byte)'b', 0, (byte)'c' });
-            // a, an empty entry, b, then the list's two terminators.
+            // a and its null, an empty entry's null, b and its null, then the list's own.
             RawRegistryValue.Write(key, "list", RawRegistryValue.REG_MULTI_SZ,
-                new byte[] { (byte)'a', 0, 0, 0, (byte)'b', 0, 0, 0, 0, 0 });
+                new byte[] { (byte)'a', 0, 0, 0, 0, 0, (byte)'b', 0, 0, 0, 0, 0 });
 
             Assert.Equal("abc", RegistryData.ValueOf(key, "odd"));
             Assert.Equal(new[] { "a", "", "b" }, (string[])RegistryData.ValueOf(key, "list")!);

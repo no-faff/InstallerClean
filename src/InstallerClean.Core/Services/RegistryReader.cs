@@ -119,7 +119,7 @@ internal sealed class RegistryReader : IRegistryReader
 
             // The default value is listed under the empty name when it is set, so a
             // caller sees it as a value like any other. Each value's type is read beside
-            // its text. DoNotExpandEnvironmentNames gives a REG_EXPAND_SZ as the text it
+            // its text. Not expanding gives a REG_EXPAND_SZ as the text it
             // holds; a REG_SZ and a REG_EXPAND_SZ come back as strings and every other
             // type as something else, which is reported as no text rather than converted.
             var names = RegistryNames.ValuesOf(key, cancellationToken);
