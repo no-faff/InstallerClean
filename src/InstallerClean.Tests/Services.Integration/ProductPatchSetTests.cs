@@ -1,5 +1,6 @@
 using InstallerClean.Models;
 using InstallerClean.Services;
+using InstallerClean.Tests.Helpers;
 using Microsoft.Win32;
 
 namespace InstallerClean.Tests.Services.Integration;
@@ -348,6 +349,26 @@ public class ProductPatchSetTests
         Assert.Equal(
             new[] { (ProductPatchSet.AllNonRemovable, ProductPatchSet.AllNonRemovable) },
             permitting);
+    }
+
+    // An Uninstallable value of the wrong length is not a clean zero, and a REG_QWORD of
+    // four bytes is read as the number it holds, as .NET 10 reads both.
+    [Theory]
+    [InlineData(RawRegistryValue.REG_DWORD, 0, ProductPatchSet.Unestablished)]
+    [InlineData(RawRegistryValue.REG_DWORD, 2, ProductPatchSet.Unestablished)]
+    [InlineData(RawRegistryValue.REG_QWORD, 4, ProductPatchSet.AllNonRemovable)]
+    public void An_uninstallable_value_is_a_number_only_at_its_full_length(int type, int length, ProductPatchSet expected)
+    {
+        WithProductsKey(products =>
+        {
+            using var patch = products.CreateSubKey($@"{Product}\Patches\p1", writable: true)!;
+            RawRegistryValue.Write(patch, "Uninstallable", type, new byte[length]);
+            patch.SetValue("State", 2, RegistryValueKind.DWord);
+
+            var (set, _, _, _) = Read(products);
+
+            Assert.Equal(expected, set);
+        });
     }
 
     private static void Patch(RegistryKey products, string name, int uninstallable)

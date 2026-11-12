@@ -182,13 +182,13 @@ public class MutexProbeTests
     [Fact]
     public void Sample_is_not_held_for_a_name_that_exists_but_nobody_holds()
     {
-        // The case the acquire-rather-than-check design exists for, and the one
+        // The case reading ownership rather than existence is for, and the one
         // the name-does-not-exist test above cannot reach. A named mutex exists
         // for as long as any process holds a handle to it, owned or not, so an
         // existence test would answer "installer busy" whenever something merely
         // had the object open. An unowned handle held open is precisely that
-        // state: the object exists, so TryOpenExisting succeeds, and the
-        // zero-wait acquire is what tells the two apart.
+        // state: the object exists, so TryOpenExisting succeeds, and the read of
+        // its state is what tells the two apart.
         using var existsUnheld = new Mutex(initiallyOwned: false, _name);
 
         Assert.Equal(MutexSample.NotHeld, new MutexProbe().Sample(_name).State);
@@ -199,6 +199,75 @@ public class MutexProbeTests
     {
         WithNameHeldElsewhere(_name,
             () => Assert.Equal(MutexSample.Held, new MutexProbe().Sample(_name).State));
+    }
+
+    [Fact]
+    public void Sample_is_not_held_for_an_abandoned_mutex_and_does_not_take_it()
+    {
+        // This handle keeps the object there after the holder ends.
+        using var mine = new Mutex(initiallyOwned: false, _name);
+        var holder = new Thread(() =>
+        {
+            var mutex = new Mutex(initiallyOwned: false, _name);
+            mutex.WaitOne(0);
+            // No release, no dispose: the thread ends holding it.
+        })
+        { IsBackground = true };
+        holder.Start();
+        Assert.True(holder.Join(TimeSpan.FromSeconds(30)));
+
+        Assert.Equal(MutexSample.NotHeld, new MutexProbe().Sample(_name).State);
+
+        // The next wait is still the one told the mutex was abandoned. A sample that
+        // had taken the mutex and released it would have been told instead, and this
+        // wait would return true.
+        Assert.Throws<AbandonedMutexException>(() => mine.WaitOne(0));
+        mine.ReleaseMutex();
+    }
+
+    [Fact]
+    public void Sample_is_not_held_for_a_mutex_the_sampling_thread_owns()
+    {
+        // Held means another thread owns it. The thread asking is not another thread.
+        using var mine = new Mutex(initiallyOwned: false, _name);
+        Assert.True(mine.WaitOne(0));
+        try
+        {
+            Assert.Equal(MutexSample.NotHeld, new MutexProbe().Sample(_name).State);
+        }
+        finally
+        {
+            mine.ReleaseMutex();
+        }
+    }
+
+    [Fact]
+    public void Sample_leaves_a_free_mutex_free_for_a_thread_that_asks_at_once()
+    {
+        // Many samples from one thread while another takes and releases the mutex with a
+        // zero wait. No take fails: no sample ever owns the mutex.
+        using var mine = new Mutex(initiallyOwned: false, _name);
+        using var stop = new ManualResetEventSlim();
+        var sampler = new Thread(() =>
+        {
+            var probe = new MutexProbe();
+            while (!stop.IsSet) probe.Sample(_name);
+        })
+        { IsBackground = true };
+        sampler.Start();
+        try
+        {
+            for (var take = 0; take < 20_000; take++)
+            {
+                Assert.True(mine.WaitOne(0), $"take {take} found the mutex owned");
+                mine.ReleaseMutex();
+            }
+        }
+        finally
+        {
+            stop.Set();
+            Assert.True(sampler.Join(TimeSpan.FromSeconds(30)));
+        }
     }
 
     [Fact]

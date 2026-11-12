@@ -124,9 +124,19 @@ const ALLOWED = [
     what: 'ExpandRecordedPath, expanding a path Windows Installer recorded',
   },
   {
-    file: 'src/InstallerClean.Core/Services/InstallerQueryService.cs',
-    text: 'var raw = key.GetValue(valueName, null, Microsoft.Win32.RegistryValueOptions.None);',
-    what: 'TryReadLocalPackage, expanding the LocalPackage path Windows Installer recorded',
+    file: 'src/InstallerClean.Core/Helpers/RegistryData.cs',
+    text: 'while ((length = Kernel32.ExpandEnvironmentStrings(text, buffer, (uint)buffer.Length)) > buffer.Length)',
+    what: 'RegistryData.Expanded, expanding a REG_EXPAND_SZ value such as the LocalPackage path Windows Installer recorded',
+  },
+  {
+    file: 'src/InstallerClean.Core/Interop/Native/Kernel32.cs',
+    text: '[DllImport(Library, EntryPoint = "ExpandEnvironmentStringsW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]',
+    what: 'the entry point of the expansion RegistryData.Expanded calls',
+  },
+  {
+    file: 'src/InstallerClean.Core/Interop/Native/Kernel32.cs',
+    text: 'public static extern uint ExpandEnvironmentStrings(string lpSrc, [Out] char[] lpDst, uint nSize);',
+    what: 'the declaration of the expansion RegistryData.Expanded calls',
   },
   {
     file: 'src/InstallerClean.Core/Services/AppUpdater.cs',
@@ -154,7 +164,6 @@ const NAMES_NO_VARIABLE = new Map([
   ['Environment.SpecialFolder', 'the known folders'],
   ['FrameworkEnvironment', 'the class giving .NET Framework the ProcessId and ProcessPath members'],
   ['extension(Environment)', 'the block adding those members to the class Environment'],
-  ['DoNotExpandEnvironmentNames', 'the registry option that leaves a %NAME% as written'],
 ]);
 
 const READ = new RegExp([

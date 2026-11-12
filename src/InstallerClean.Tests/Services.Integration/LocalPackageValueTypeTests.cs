@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text;
+using InstallerClean.Helpers;
 using InstallerClean.Services;
 using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
@@ -12,12 +13,11 @@ namespace InstallerClean.Tests.Services.Integration;
 /// <c>ManagedLocalPackage</c> for a per-user managed installation. Every test here
 /// runs once per name, from <see cref="InstallerQueryService.CachedPackageValueNames"/>.
 ///
-/// AN INTEGRATION TEST BECAUSE THE SUBJECT IS THE FRAMEWORK'S OWN BEHAVIOUR, not
-/// this code's. <c>RegistryKey.GetValue</c> is documented as returning null for a
-/// REG_NONE or a REG_LINK value "instead of the actual value", and returns a
-/// REG_NONE's bytes all the same, so a fake registry would test whichever answer it
-/// was written to give. Only a real key holding a real value of each type puts the
-/// framework in the loop.
+/// AN INTEGRATION TEST BECAUSE THE SUBJECT IS WHAT A REAL VALUE READS AS.
+/// <see cref="RegistryData.ValueOf"/> answers null for a REG_LINK value and a
+/// REG_NONE's bytes for a REG_NONE, as .NET 10's <c>RegistryKey.GetValue</c> does, so
+/// a fake registry would test whichever answer it was written to give. Only a real
+/// key holding a real value of each type puts the reading Windows gives in the loop.
 ///
 /// Writes are confined to a GUID-named key under HKCU and removed in a finally, so
 /// nothing needs elevation and nothing outlives the test. HKCU rather than HKLM for
@@ -131,7 +131,7 @@ public class LocalPackageValueTypeTests
         WithTestKey(key =>
         {
             SetLink(key, valueName);
-            Assert.Null(key.GetValue(valueName));
+            Assert.Null(RegistryData.ValueOf(key, valueName));
 
             var read = InstallerQueryService.TryReadLocalPackage(key, valueName, out var path, CancellationToken.None);
 

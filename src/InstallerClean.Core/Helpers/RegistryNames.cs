@@ -256,15 +256,31 @@ internal static class RegistryNames
         }
     }
 
+    /// <summary>
+    /// Stands in for the calls of every listing made on the thread that sets it, handed the
+    /// key and the calls on its handle, so a test can make one real key's listing disagree
+    /// with itself. Null everywhere else. Nothing in the app sets it.
+    /// </summary>
+    [ThreadStatic]
+    internal static Func<RegistryKey, IKeyCalls, IKeyCalls>? CallsForTests;
+
     private static string[] WithCalls(RegistryKey key, Func<IKeyCalls, string[]> list)
     {
-        // A key opened under another carries its parent's path in its Name; a hive's base
-        // key is named by the hive alone. For an opened subkey, Handle is the key's own
-        // handle, which the key closes.
-        if (key.Name.IndexOf('\\') < 0)
-            throw new ArgumentException("Only a key opened under a hive is listed here, never a hive's base key.", nameof(key));
+        var calls = CallsOn(SubkeyHandle(key));
+        return list(CallsForTests?.Invoke(key, calls) ?? calls);
+    }
 
-        return list(CallsOn(key.Handle));
+    /// <summary>
+    /// The handle of <paramref name="key"/>, a key opened under a hive, which the key
+    /// closes. A hive's base key is refused with <see cref="ArgumentException"/>, for the
+    /// reason in this class's summary: a key opened under another carries its parent's
+    /// path in its Name, and a base key is named by the hive alone.
+    /// </summary>
+    internal static SafeRegistryHandle SubkeyHandle(RegistryKey key)
+    {
+        if (key.Name.IndexOf('\\') < 0)
+            throw new ArgumentException("Only a key opened under a hive is read here, never a hive's base key.", nameof(key));
+        return key.Handle;
     }
 
     /// <summary>The calls made on <paramref name="handle"/> itself.</summary>

@@ -68,7 +68,7 @@ internal sealed class FirstRunMark : IFirstRunMark
 
             // Not expanded and not converted: whatever is stored under the name, of
             // any type, is enough to answer.
-            var value = key.GetValue(ValueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames);
+            var value = RegistryData.ValueOf(key, ValueName, doNotExpand: true);
             return value is null ? FirstRunMarkState.NotSet : FirstRunMarkState.Set;
         }
         catch (SecurityException) { return FirstRunMarkState.Unreadable; }
@@ -127,12 +127,12 @@ internal sealed class FirstRunMark : IFirstRunMark
                 return false;
             }
             var wrote = false;
-            if (key.GetValue(ValueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames) is null)
+            if (RegistryData.ValueOf(key, ValueName, doNotExpand: true) is null)
             {
                 key.SetValue(ValueName, 1, RegistryValueKind.DWord);
                 wrote = true;
             }
-            if (key.GetValue(ValueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames) is null)
+            if (RegistryData.ValueOf(key, ValueName, doNotExpand: true) is null)
                 return false;
             if (wrote && createdUnderLock) _setHere = true;
             return true;

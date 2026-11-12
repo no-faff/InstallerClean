@@ -42,7 +42,7 @@ internal sealed class RegistryReader : IRegistryReader
             // leaves the caller with no answer at all and comes out of the catches.
             if (key is null) return new RegistryMultiStringRead(RegistryMultiStringState.Absent);
 
-            var raw = key.GetValue(valueName);
+            var raw = RegistryData.ValueOf(key, valueName);
             if (raw is null) return new RegistryMultiStringRead(RegistryMultiStringState.Absent);
 
             // A REG_MULTI_SZ comes back as string[]. Anything else is a value
@@ -67,15 +67,16 @@ internal sealed class RegistryReader : IRegistryReader
             using var key = hive.OpenSubKey(keyPath);
             if (key is null) return new RegistryDwordRead(RegistryDwordState.Absent);
 
-            // DoNotExpandEnvironmentNames is inert on a REG_DWORD and is passed
+            // Not expanding is inert on a REG_DWORD and is asked for
             // so that a value stored as REG_EXPAND_SZ answers as the string it
             // is rather than as whatever the expansion produces, which would be
             // one more shape to tell apart from a number for no gain.
-            var raw = key.GetValue(valueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames);
+            var raw = RegistryData.ValueOf(key, valueName, doNotExpand: true);
             if (raw is null) return new RegistryDwordRead(RegistryDwordState.Absent);
 
-            // A REG_DWORD comes back as int; REG_QWORD comes back as long and is
-            // not what this asks for. Neither is silently coerced: the caller is
+            // Four bytes of number come back as int, eight as long, which is not
+            // what this asks for, and any other length as bytes (RegistryData).
+            // Nothing is silently coerced: the caller is
             // measuring how machines are configured, and a coercion would hide
             // exactly the configuration worth hearing about.
             return raw is int value
@@ -118,7 +119,7 @@ internal sealed class RegistryReader : IRegistryReader
 
             // The default value is listed under the empty name when it is set, so a
             // caller sees it as a value like any other. Each value's type is read beside
-            // its text. DoNotExpandEnvironmentNames gives a REG_EXPAND_SZ as the text it
+            // its text. Not expanding gives a REG_EXPAND_SZ as the text it
             // holds; a REG_SZ and a REG_EXPAND_SZ come back as strings and every other
             // type as something else, which is reported as no text rather than converted.
             var names = RegistryNames.ValuesOf(key, cancellationToken);
@@ -127,7 +128,7 @@ internal sealed class RegistryReader : IRegistryReader
                 values[i] = new RegistryValue(
                     names[i],
                     key.GetValueKind(names[i]),
-                    key.GetValue(names[i], null, RegistryValueOptions.DoNotExpandEnvironmentNames) as string);
+                    RegistryData.ValueOf(key, names[i], doNotExpand: true) as string);
 
             return new RegistryKeyValues(RegistryKeyPresence.Present, values);
         }
