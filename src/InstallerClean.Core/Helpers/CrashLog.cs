@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using InstallerClean.Resources;
 
@@ -155,7 +156,11 @@ public static class CrashLog
             // of the file.
             fs.Seek(0, SeekOrigin.End);
 
-            var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
+            // The invariant culture keeps the stamp in one shape on every machine: in the
+            // user's culture the pattern's ':' is the culture's time separator, '.' in
+            // Danish as ICU gives it, and the year is the culture's calendar's.
+            var stamp = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture);
+            var entry = $"---- {stamp} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
             // The BOM goes in with the header, on a fresh file only: written
             // again on an append it would sit in the log body as a stray
             // U+FEFF.

@@ -200,29 +200,102 @@ internal static class Program
     /// <see cref="RestoreOutputEncoding"/>, or null when nothing was changed.
     /// </summary>
     /// <remarks>
-    /// Failure is swallowed, and that asymmetry with the rest of the pre-flight is
-    /// the point: the setter calls SetConsoleOutputCP, which fails when the process
-    /// has no console at all (a DETACHED_PROCESS launcher, a session-0 service
-    /// wrapper), and the BCL surfaces that as an IOException. What is lost is
-    /// cosmetic, correct glyphs in non-ASCII stdout nobody is reading on a headless
-    /// run; what letting it escape would cost is the whole run, every run, with the
+    /// <para>
+    /// The setter calls SetConsoleOutputCP, which fails when the process has no
+    /// console at all (a DETACHED_PROCESS launcher, a session-0 service wrapper),
+    /// with ERROR_INVALID_HANDLE or ERROR_INVALID_ACCESS. .NET Framework's setter
+    /// throws that as an IOException carrying the error's HRESULT and leaves the
+    /// console's writers in the ANSI code page, so where the process has no console
+    /// the run puts UTF-8 writers over stdout and stderr itself
+    /// (<see cref="UseUtf8WritersWithoutAConsole"/>): output redirected to a file
+    /// by such a launcher is UTF-8 either way. Nothing was changed on a console, so
+    /// null comes back.
+    /// </para>
+    /// <para>
+    /// Any other failure is swallowed, and that asymmetry with the rest of the
+    /// pre-flight is the point: what is lost is correct glyphs in non-ASCII stdout,
+    /// and what letting it escape would cost is the whole run, every run, with the
     /// cache never cleaned.
+    /// </para>
     /// </remarks>
-    private static Encoding? TrySetUtf8Output()
+    private static Encoding? TrySetUtf8Output() =>
+        TrySetUtf8Output(
+            static () => Console.OutputEncoding,
+            static encoding => Console.OutputEncoding = encoding,
+            UseUtf8WritersWithoutAConsole);
+
+    /// <summary>
+    /// <see cref="TrySetUtf8Output()"/> with the console's code page read and set through
+    /// <paramref name="read"/> and <paramref name="set"/>, and <paramref name="noConsole"/>
+    /// run where the set fails because the process has no console.
+    /// </summary>
+    internal static Encoding? TrySetUtf8Output(Func<Encoding> read, Action<Encoding> set, Action noConsole)
     {
+        Encoding previous;
         try
         {
-            var previous = Console.OutputEncoding;
-            Console.OutputEncoding = Encoding.UTF8;
-            return previous;
+            previous = read();
         }
         catch (Exception)
         {
-            // Either the read or the write failed, so nothing was changed and
-            // there is nothing to give back. Carry on in the inherited code page.
+            // Nothing was changed, so there is nothing to give back. Carry on in the
+            // inherited code page.
+            return null;
+        }
+        try
+        {
+            set(Encoding.UTF8);
+            return previous;
+        }
+        catch (IOException ex) when (HasNoConsole(ex))
+        {
+            try
+            {
+                noConsole();
+            }
+            catch (Exception)
+            {
+                // The console's own writers stay, in the inherited code page.
+            }
+            return null;
+        }
+        catch (Exception)
+        {
             return null;
         }
     }
+
+    /// <summary>
+    /// Whether <paramref name="failure"/> is the console's answer to setting its code page
+    /// in a process with no console: ERROR_INVALID_HANDLE (6) or ERROR_INVALID_ACCESS (12),
+    /// as the HRESULT .NET Framework gives the IOException it throws for them. They are the
+    /// two errors .NET 10's setter ignores, writing UTF-8 anyway.
+    /// </summary>
+    internal static bool HasNoConsole(IOException failure) =>
+        failure.HResult is unchecked((int)0x80070006) or unchecked((int)0x8007000C);
+
+    /// <summary>
+    /// Puts a UTF-8 writer over standard output and standard error, each made as .NET 10
+    /// makes the console's writer for an encoding it has been set to: no byte-order mark, a
+    /// 256-character buffer flushed on every write, the stream left open, one write at a
+    /// time. Where the process has no standard handle for one, the runtime gives an empty
+    /// stream and that writer takes nothing, as the console's own would.
+    /// </summary>
+    private static void UseUtf8WritersWithoutAConsole()
+    {
+        Console.SetOut(Utf8ConsoleWriter(Console.OpenStandardOutput()));
+        Console.SetError(Utf8ConsoleWriter(Console.OpenStandardError()));
+    }
+
+    /// <summary>The writer <see cref="UseUtf8WritersWithoutAConsole"/> puts over one of the standard streams.</summary>
+    internal static TextWriter Utf8ConsoleWriter(Stream stream) =>
+        stream == Stream.Null
+            ? TextWriter.Null
+            : TextWriter.Synchronized(
+                new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), 256, leaveOpen: true)
+                {
+                    AutoFlush = true,
+                });
 
     /// <summary>
     /// Puts the console output code page back the way this process found it.
