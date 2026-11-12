@@ -169,7 +169,7 @@ internal sealed class CommandLineUpdate
     /// How long the check may take where a person is waiting on the console. Where nobody
     /// is, the check's own <see cref="UpdateCheckService.RequestTimeout"/> bounds it.
     /// </summary>
-    internal static readonly TimeSpan WatchedCheckBound = TimeSpan.FromSeconds(3);
+    internal static readonly TimeSpan WatchedCheckBound = Durations.FromSeconds(3);
 
     /// <summary>
     /// How long the run waits for Ctrl+C's cancellation once something Ctrl+C can end has
@@ -179,7 +179,7 @@ internal sealed class CommandLineUpdate
     /// control-handler thread, which can run after either has ended, so the run waits up
     /// to this long for it and reads that Ctrl+C as its own.
     /// </summary>
-    internal static readonly TimeSpan ControlCBound = TimeSpan.FromMilliseconds(500);
+    internal static readonly TimeSpan ControlCBound = Durations.FromMilliseconds(500);
 
     /// <summary>
     /// The exit code of a console process Windows ended for Ctrl+C because it had no

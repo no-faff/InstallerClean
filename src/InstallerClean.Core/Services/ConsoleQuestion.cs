@@ -1,6 +1,7 @@
 using System.Globalization;
 using InstallerClean.Resources;
 
+using InstallerClean.Helpers;
 namespace InstallerClean.Services;
 
 /// <summary>How a question put to the console was answered.</summary>
@@ -34,7 +35,7 @@ internal static class ConsoleQuestion
     /// nobody is there to answer it, and the run waits this long before going on as an
     /// unanswered run does. The lines saying so name the time as a minute.
     /// </summary>
-    internal static readonly TimeSpan AnswerBound = TimeSpan.FromMinutes(1);
+    internal static readonly TimeSpan AnswerBound = Durations.FromMinutes(1);
 
     /// <summary>
     /// Discards what was typed before the question appears, prints the question and reads

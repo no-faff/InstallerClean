@@ -33,7 +33,7 @@ internal static class HandOverContract
     /// time it runs, and an antivirus looks at a program it has not seen before. A bound
     /// a healthy start can reach fails the update on every attempt on that PC.
     /// </summary>
-    internal static readonly TimeSpan StartBound = TimeSpan.FromSeconds(60);
+    internal static readonly TimeSpan StartBound = Durations.FromSeconds(60);
 
     /// <summary>
     /// The name of the event <paramref name="id"/> stands for, in the session's own

@@ -488,8 +488,8 @@ public partial class App : Application
             // over the time the window has left, what remains of the minimum plus
             // the close, rather than over the bar's own step, so the last of the
             // fill arrives as the window goes instead of being cut off by it.
-            var splashFloor = TimeSpan.FromMilliseconds(800);
-            var splashClose = TimeSpan.FromMilliseconds(200);
+            var splashFloor = Durations.FromMilliseconds(800);
+            var splashClose = Durations.FromMilliseconds(200);
 
             // Throttled, because the scan's ticker fires once per installed
             // program and many times while the files are counted, so its rate
@@ -637,7 +637,7 @@ public partial class App : Application
     /// closing and holding it, and Windows hands the mutex to the waiting thread as that copy
     /// lets go of it.
     /// </summary>
-    private static readonly TimeSpan InstanceLockWait = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan InstanceLockWait = Durations.FromSeconds(15);
 
     /// <summary>
     /// Ends a start that failed, with exit code 1, and closes <paramref name="splash"/>
@@ -918,7 +918,7 @@ public partial class App : Application
     /// release needs inside the check's own timeout (ChromeViewModel's
     /// AutomaticCheckWindow), so a find is shown within this wait.
     /// </summary>
-    private static readonly TimeSpan UpdateCheckGrace = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan UpdateCheckGrace = Durations.FromSeconds(1);
 
     /// <summary>
     /// Hands over to the newer version <paramref name="prepared"/> holds and closes the

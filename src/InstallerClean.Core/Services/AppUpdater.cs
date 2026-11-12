@@ -388,7 +388,7 @@ public sealed class AppUpdater : IAppUpdater
                 .ConfigureAwait(false);
         // Less than a millisecond is a timer set to fire at once, so it fetches nothing. A
         // cancel is still answered as the cancel.
-        if (limit < TimeSpan.FromMilliseconds(1))
+        if (limit < Durations.FromMilliseconds(1))
         {
             cancellationToken.ThrowIfCancellationRequested();
             throw new UpdateFailedException(UpdateFailureStage.Download,
@@ -526,7 +526,7 @@ public sealed class AppUpdater : IAppUpdater
     /// How long the hold on a download is tried for while another process has it open. An
     /// antivirus can take several seconds over a program it has just seen written.
     /// </summary>
-    internal static readonly TimeSpan HoldRetryBound = TimeSpan.FromSeconds(30);
+    internal static readonly TimeSpan HoldRetryBound = Durations.FromSeconds(30);
 
     /// <summary>
     /// Opens <paramref name="path"/> to hold it (<see cref="Helpers.StorageHelpers.OpenHeldToRead"/>).

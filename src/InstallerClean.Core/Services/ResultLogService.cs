@@ -27,7 +27,7 @@ public sealed class ResultLogService : IResultLogService
 
     private const string EndpointUrl = "https://nofaff.netlify.app/api/result-log";
 
-    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
+    private static readonly TimeSpan RequestTimeout = Durations.FromSeconds(8);
 
     private readonly string _logFile;
 

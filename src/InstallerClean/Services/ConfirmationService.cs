@@ -32,7 +32,7 @@ public sealed class ConfirmationService : IConfirmationService
     /// opens with no start folder. A network share that does not answer holds the check
     /// for as long as Windows tries it, far longer than this.
     /// </summary>
-    internal static readonly TimeSpan StartFolderBound = TimeSpan.FromSeconds(2);
+    internal static readonly TimeSpan StartFolderBound = Durations.FromSeconds(2);
 
     public async Task<string?> AskForMoveDestinationAsync(string? currentDestination = null, Func<bool>? stillWanted = null)
     {

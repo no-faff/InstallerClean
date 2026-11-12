@@ -68,7 +68,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// value plus a small margin instead of hardcoding 700 ms (which
     /// drifts silently if the constant is ever tuned).
     /// </remarks>
-    internal static readonly TimeSpan MoveDestinationSaveDelay = TimeSpan.FromMilliseconds(400);
+    internal static readonly TimeSpan MoveDestinationSaveDelay = Durations.FromMilliseconds(400);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]

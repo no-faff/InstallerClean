@@ -24,7 +24,7 @@ public sealed class UpdateDownloadService
     /// <summary>Several times the size of any download the project publishes.</summary>
     internal const long MaxBytes = 512L * 1024 * 1024;
 
-    private static readonly TimeSpan DefaultStallTimeout = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan DefaultStallTimeout = Durations.FromSeconds(30);
 
     private const int MaxRedirects = 10;
 

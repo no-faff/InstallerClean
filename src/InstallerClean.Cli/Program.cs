@@ -425,7 +425,7 @@ internal static class Program
     }
 
     /// <summary>How long the PC's first-run check is waited for before a report is carried, as the window waits.</summary>
-    private static readonly TimeSpan ReportCheckBound = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan ReportCheckBound = Durations.FromSeconds(3);
 
     /// <summary>
     /// The kind of copy this command-line tool is, as the report names it

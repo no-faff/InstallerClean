@@ -194,14 +194,14 @@ public partial class CompletionViewModel : ObservableObject
     /// before it is revealed. Where the bound passes first the check answers that
     /// the PC has had its first run, and sets the mark.
     /// </summary>
-    internal static readonly TimeSpan ReportCheckBound = TimeSpan.FromSeconds(3);
+    internal static readonly TimeSpan ReportCheckBound = Durations.FromSeconds(3);
 
     /// <summary>
     /// How long closing the app waits for the report's send and its settings saves
     /// before it lets the process go. A report cut off here is still waiting
     /// (<see cref="AppSettings.ReportSendPending"/>) and goes from a later start.
     /// </summary>
-    internal static readonly TimeSpan ExitWaitBound = TimeSpan.FromSeconds(2);
+    internal static readonly TimeSpan ExitWaitBound = Durations.FromSeconds(2);
 
     private readonly IResultLogService _resultLogService;
     private readonly ISettingsService _settingsService;
@@ -295,7 +295,7 @@ public partial class CompletionViewModel : ObservableObject
             Strings.Completion_NothingToCleanUpReceipt,
             DisplayHelpers.FormatCount(scannedFileCount),
             DisplayHelpers.PluraliseFile(scannedFileCount),
-            DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
+            DisplayHelpers.FormatElapsedLong(Durations.FromMilliseconds(scanDurationMs)));
         Errors = string.Empty;
         Skipped = string.Empty;
         ScanStartLine = string.Empty;
@@ -364,7 +364,7 @@ public partial class CompletionViewModel : ObservableObject
             Strings.Completion_NothingToCleanUpReceipt,
             DisplayHelpers.FormatCount(scannedFileCount),
             DisplayHelpers.PluraliseFile(scannedFileCount),
-            DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
+            DisplayHelpers.FormatElapsedLong(Durations.FromMilliseconds(scanDurationMs)));
         Errors = string.Empty;
         Skipped = string.Empty;
         ScanStartLine = string.Empty;

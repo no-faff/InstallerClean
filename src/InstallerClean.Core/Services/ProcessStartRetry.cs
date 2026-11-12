@@ -15,7 +15,7 @@ internal static class ProcessStartRetry
     public const int Attempts = 4;
 
     /// <summary>The wait between one failed try and the next.</summary>
-    public static readonly TimeSpan Interval = TimeSpan.FromMilliseconds(500);
+    public static readonly TimeSpan Interval = Durations.FromMilliseconds(500);
 
     /// <summary>
     /// Starts <paramref name="info"/> and answers the process. A throw that

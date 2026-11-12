@@ -63,24 +63,24 @@ internal static class ExeReplacement
     /// How long the copy is waited for before crash.log says the replace is still waiting
     /// for it to close. The wait goes on after that.
     /// </summary>
-    internal static readonly TimeSpan OldCopyNotice = TimeSpan.FromSeconds(60);
+    internal static readonly TimeSpan OldCopyNotice = Durations.FromSeconds(60);
 
     /// <summary>
     /// How long a move refused because the file is held is tried again. An antivirus can
     /// hold a program it has just seen written or ended while it looks at it, and a file
     /// held that way answers a move with a sharing violation, a lock violation or access denied.
     /// </summary>
-    internal static readonly TimeSpan MoveRetryBound = TimeSpan.FromSeconds(30);
+    internal static readonly TimeSpan MoveRetryBound = Durations.FromSeconds(30);
 
     /// <summary>
     /// How long a replace tries again to hold the file named with <see cref="LockSuffix"/>
     /// where it cannot. <see cref="TryRemoveLeftovers(string)"/> holds that file for as long as its
     /// deletes take, and a replace starting meanwhile takes it once they are done.
     /// </summary>
-    internal static readonly TimeSpan HoldRetryBound = TimeSpan.FromSeconds(2);
+    internal static readonly TimeSpan HoldRetryBound = Durations.FromSeconds(2);
 
-    private static readonly TimeSpan FirstRetryInterval = TimeSpan.FromMilliseconds(100);
-    private static readonly TimeSpan LongestRetryInterval = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan FirstRetryInterval = Durations.FromMilliseconds(100);
+    private static readonly TimeSpan LongestRetryInterval = Durations.FromSeconds(2);
 
     /// <summary>The longest path Windows gives for a process's image, in characters.</summary>
     private const int MaxImagePathLength = 32768;

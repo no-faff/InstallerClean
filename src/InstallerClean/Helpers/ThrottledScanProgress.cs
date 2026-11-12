@@ -26,7 +26,7 @@ internal sealed class ThrottledScanProgress : IProgress<ScanProgressUpdate>
     /// updates a second, short enough that the bar's own easing, which is longer
     /// than this, runs into the next update and reads as one continuous motion.
     /// </summary>
-    public static readonly TimeSpan DefaultInterval = TimeSpan.FromMilliseconds(100);
+    public static readonly TimeSpan DefaultInterval = Durations.FromMilliseconds(100);
 
     private readonly IProgress<ScanProgressUpdate> _inner;
     private readonly long _intervalTicks;

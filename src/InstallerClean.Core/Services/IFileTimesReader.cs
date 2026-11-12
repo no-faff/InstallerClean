@@ -141,7 +141,7 @@ public static class CachedFileAge
     /// <see cref="CachedFileAgeVerdict.Unestablished"/>. Both keep the file; this decides
     /// only which count it is in.
     /// </summary>
-    public static readonly TimeSpan AheadLimit = TimeSpan.FromDays(1);
+    public static readonly TimeSpan AheadLimit = Durations.FromDays(1);
 
     /// <summary>
     /// How far the wall clock may run slow against the monotonic one, as a share of the
@@ -171,7 +171,7 @@ public static class CachedFileAge
     /// a clock slewed slow does. A larger limit lets a larger step back through in a long
     /// pass; a smaller one holds files in long passes where the clock only drifted.
     /// </summary>
-    public static readonly TimeSpan FallBehindLimit = TimeSpan.FromMilliseconds(100);
+    public static readonly TimeSpan FallBehindLimit = Durations.FromMilliseconds(100);
 
     /// <summary>
     /// How long a wall-clock reading may take, from the monotonic timestamp before it to the

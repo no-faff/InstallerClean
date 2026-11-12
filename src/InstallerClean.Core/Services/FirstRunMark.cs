@@ -26,7 +26,7 @@ internal sealed class FirstRunMark : IFirstRunMark
     /// How long <see cref="TryClaim"/> waits for the lock before it answers false, and how
     /// long <see cref="Set"/> waits before it writes the mark without the lock.
     /// </summary>
-    internal static readonly TimeSpan ClaimLockWait = TimeSpan.FromSeconds(2);
+    internal static readonly TimeSpan ClaimLockWait = Durations.FromSeconds(2);
 
     private readonly RegistryHive _hive;
     private readonly string _keyPath;

@@ -100,7 +100,7 @@ internal static class UnelevatedLauncher
             // keep the process alive, and if it completes late the
             // browser simply opens after the fallback dialog, which is
             // harmless.
-            if (!sta.Join(TimeSpan.FromSeconds(10)))
+            if (!sta.Join(Durations.FromSeconds(10)))
             {
                 CrashLog.TryWrite(new TimeoutException(
                     "UnelevatedLauncher shell dispatch chain did not return within 10 seconds"));

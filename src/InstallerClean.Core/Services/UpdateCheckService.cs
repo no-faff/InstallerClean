@@ -66,7 +66,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// scan found until the check made as the app starts has answered, so this bounds
     /// that wait too.
     /// </summary>
-    public static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
+    public static readonly TimeSpan RequestTimeout = Durations.FromSeconds(8);
 
     /// <summary>
     /// What the check asks for: GitHub answers it with a redirect to the newest

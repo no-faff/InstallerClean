@@ -38,7 +38,7 @@ internal sealed class CancelKey
     /// How long a close or shutdown event holds the process: a second inside the five
     /// seconds Windows allows a console close by default.
     /// </summary>
-    internal static readonly TimeSpan CloseHold = TimeSpan.FromSeconds(4);
+    internal static readonly TimeSpan CloseHold = Durations.FromSeconds(4);
 
     public CancelKey() : this(OpenEvent, Thread.Sleep) { }
 

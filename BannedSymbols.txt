@@ -373,3 +373,8 @@ P:System.IO.FileInfo.DirectoryName;Not ported: port .NET 10's member before call
 P:System.IO.FileInfo.IsReadOnly;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
 P:System.IO.FileInfo.Length;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
 P:System.IO.FileInfo.Name;Not ported: port .NET 10's member before calling it, as .NET Framework's own runs in its place
+M:System.TimeSpan.FromMilliseconds(System.Double);Durations.FromMilliseconds, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
+M:System.TimeSpan.FromSeconds(System.Double);Durations.FromSeconds, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
+M:System.TimeSpan.FromMinutes(System.Double);Durations.FromMinutes, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
+M:System.TimeSpan.FromHours(System.Double);Durations.FromMinutes, sixty to the hour, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
+M:System.TimeSpan.FromDays(System.Double);Durations.FromDays, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond

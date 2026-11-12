@@ -266,7 +266,7 @@ internal static class NewerVersionProcess
     }
 
     /// <summary>How long <c>EndNewerVersion(SafeProcessHandle)</c> waits for the newer version to have ended.</summary>
-    private static readonly TimeSpan EndBound = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan EndBound = Durations.FromSeconds(5);
 
     /// <summary>The exit code <c>EndNewerVersion(SafeProcessHandle)</c> ends the newer version with.</summary>
     private const uint NotStartedExitCode = 1;

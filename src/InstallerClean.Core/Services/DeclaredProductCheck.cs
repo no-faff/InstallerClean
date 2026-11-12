@@ -2810,7 +2810,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// depends on it kept in the pass it is slow in. Lengthen it and a root that does not
     /// answer at all costs each pass that much longer.
     /// </summary>
-    internal TimeSpan SourceFolderTimeLimit { get; init; } = TimeSpan.FromSeconds(30);
+    internal TimeSpan SourceFolderTimeLimit { get; init; } = Durations.FromSeconds(30);
 
     /// <summary>
     /// How long a source folder's package read can take to answer false before its root is
@@ -2820,7 +2820,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <see cref="SourceFolderFailedWaitBudget"/>. Lower it and a root that is only slow to
     /// answer that one package will not open is given up with every package under it.
     /// </summary>
-    internal TimeSpan SourceFolderSlowFailure { get; init; } = TimeSpan.FromSeconds(5);
+    internal TimeSpan SourceFolderSlowFailure { get; init; } = Durations.FromSeconds(5);
 
     /// <summary>
     /// How long, in one pass, the package reads under one root that each answered false can
@@ -2833,7 +2833,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// costs each pass that much longer, up to <see cref="SourceFolderReadBudget"/>, which
     /// counts these reads too.
     /// </summary>
-    internal TimeSpan SourceFolderFailedWaitBudget { get; init; } = TimeSpan.FromMinutes(1);
+    internal TimeSpan SourceFolderFailedWaitBudget { get; init; } = Durations.FromMinutes(1);
 
     /// <summary>
     /// How long, in one pass, all the reads under one root can add up to before the root is
@@ -2844,7 +2844,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// of the copies that depend on it are kept; raise it and such a root holds each pass that
     /// much longer.
     /// </summary>
-    internal TimeSpan SourceFolderReadBudget { get; init; } = TimeSpan.FromMinutes(5);
+    internal TimeSpan SourceFolderReadBudget { get; init; } = Durations.FromMinutes(5);
 
     /// <summary>
     /// How long a read under a root can take before it is a wait, and the pass's caller is
@@ -2853,7 +2853,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// whatever this is. Raise it and a read waits that much longer before the caller is
     /// told; lower it and a read that is only not instant flashes a line on screen.
     /// </summary>
-    internal TimeSpan SourceFolderWaitThreshold { get; init; } = TimeSpan.FromSeconds(1);
+    internal TimeSpan SourceFolderWaitThreshold { get; init; } = Durations.FromSeconds(1);
 
     /// <summary>
     /// The clock <see cref="AnswersWithin"/> times each read on. Every read adds the time it

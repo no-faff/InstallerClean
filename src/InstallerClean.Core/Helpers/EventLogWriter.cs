@@ -71,8 +71,8 @@ internal static class EventLogWriter
     /// often. Windows can refuse a write under a source registered moments before, with
     /// InvalidOperationException, until its own list of sources has caught up.
     /// </summary>
-    internal static readonly TimeSpan RegistrationSettleBound = TimeSpan.FromSeconds(5);
-    internal static readonly TimeSpan RegistrationSettleInterval = TimeSpan.FromMilliseconds(250);
+    internal static readonly TimeSpan RegistrationSettleBound = Durations.FromSeconds(5);
+    internal static readonly TimeSpan RegistrationSettleInterval = Durations.FromMilliseconds(250);
 
     /// <summary>
     /// Runs <paramref name="write"/>. A write that throws InvalidOperationException is

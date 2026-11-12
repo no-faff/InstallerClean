@@ -1450,7 +1450,7 @@ public partial class MainWindow : Window
         ReportPanel.BeginAnimation(OpacityProperty, WobbleSteps(0, 1, 1, 1));
     }
 
-    private static readonly TimeSpan WobbleLength = TimeSpan.FromSeconds(0.5);
+    private static readonly TimeSpan WobbleLength = Durations.FromSeconds(0.5);
 
     // CSS's "ease" timing function, which a CSS animation applies to each step between
     // keyframes.

@@ -175,4 +175,22 @@ public class DurationsTests
     {
         Assert.Equal(expected, Durations.FromMilliseconds(milliseconds).Ticks);
     }
+
+    [Theory]
+    // A thousandth of a minute is 60 ms, a millionth 600 ticks.
+    [InlineData(0.000001, 600)]
+    [InlineData(1, 600_000_000)]
+    [InlineData(-0.5, -300_000_000)]
+    public void Minutes_are_truncated_to_a_whole_tick(double minutes, long expected)
+    {
+        Assert.Equal(expected, Durations.FromMinutes(minutes).Ticks);
+    }
+
+    [Theory]
+    [InlineData(1, 864_000_000_000)]
+    [InlineData(0.00000001, 8_640)]
+    public void Days_are_truncated_to_a_whole_tick(double days, long expected)
+    {
+        Assert.Equal(expected, Durations.FromDays(days).Ticks);
+    }
 }

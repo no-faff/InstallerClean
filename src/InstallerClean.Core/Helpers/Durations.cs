@@ -6,7 +6,7 @@ namespace InstallerClean.Helpers;
 /// Time arithmetic .NET 10 provides and .NET Framework does not, computed as .NET 10
 /// computes it (dotnet/runtime v10.0.0): a duration times a number, from
 /// <c>TimeSpan.cs</c>'s <c>operator *</c>; a number of seconds as a duration, from its
-/// <c>FromSeconds(double)</c> and <c>FromMilliseconds(double)</c>; and the time since a <see cref="Stopwatch"/> timestamp,
+/// <c>FromMilliseconds</c>, <c>FromSeconds</c>, <c>FromMinutes</c> and <c>FromDays</c> taking a double; and the time since a <see cref="Stopwatch"/> timestamp,
 /// from <c>Stopwatch.cs</c>'s <c>GetElapsedTime</c>.
 ///
 /// All of it works in ticks, never through milliseconds: .NET Framework's
@@ -44,6 +44,18 @@ internal static class Durations
     /// 10's <c>TimeSpan.FromMilliseconds(double)</c> answers.
     /// </summary>
     public static TimeSpan FromMilliseconds(double milliseconds) => Interval(milliseconds, TimeSpan.TicksPerMillisecond);
+
+    /// <summary>
+    /// <paramref name="minutes"/> as a duration, truncated to a whole tick, as .NET 10's
+    /// <c>TimeSpan.FromMinutes(double)</c> answers.
+    /// </summary>
+    public static TimeSpan FromMinutes(double minutes) => Interval(minutes, TimeSpan.TicksPerMinute);
+
+    /// <summary>
+    /// <paramref name="days"/> as a duration, truncated to a whole tick, as .NET 10's
+    /// <c>TimeSpan.FromDays(double)</c> answers.
+    /// </summary>
+    public static TimeSpan FromDays(double days) => Interval(days, TimeSpan.TicksPerDay);
 
     /// <summary>
     /// <paramref name="value"/> units of <paramref name="scale"/> ticks each, from

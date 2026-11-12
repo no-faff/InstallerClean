@@ -110,7 +110,7 @@ internal static class RegistryNames
     // reported as unread, and the pause before each reading after the second, which
     // lets a run of writes to the key finish before it is read again.
     private const int Readings = 4;
-    private static readonly TimeSpan[] PauseBefore = [TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(250)];
+    private static readonly TimeSpan[] PauseBefore = [Durations.FromMilliseconds(50), Durations.FromMilliseconds(250)];
 
     /// <summary>
     /// The three Windows calls the listing makes, and the marking of the key's handle as

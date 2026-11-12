@@ -26,15 +26,15 @@ internal static class SetupReplacement
     /// once nothing does. Where InstallerClean is still in use after this, nothing is run,
     /// and the next run that finds the newer version tries again.
     /// </summary>
-    internal static readonly TimeSpan InUseBound = TimeSpan.FromSeconds(60);
+    internal static readonly TimeSpan InUseBound = Durations.FromSeconds(60);
 
     /// <summary>How long a look at the copy at the path waits out a program holding it, once the setup has written it.</summary>
-    internal static readonly TimeSpan ReadHoldWait = TimeSpan.FromSeconds(15);
+    internal static readonly TimeSpan ReadHoldWait = Durations.FromSeconds(15);
 
     /// <summary>The window's file name in the setup's folder, as installer/InstallerClean.iss installs it.</summary>
     internal const string WindowFileName = "InstallerClean.exe";
 
-    private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan RetryInterval = Durations.FromSeconds(1);
 
     /// <summary>
     /// Carries out <paramref name="request"/> on the setup's copy and answers how it ended,
