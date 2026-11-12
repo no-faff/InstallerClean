@@ -1966,7 +1966,8 @@ jobs:
             New-Item -ItemType Directory -Force -Path $folder | Out-Null
             $manifestFile = Join-Path $env:RUNNER_TEMP "start-check-$label-update.json"
             Set-Content -LiteralPath $manifestFile -Value $manifest -Encoding utf8NoBOM -NoNewline
-            Copy-Item -LiteralPath $oldExe -Destination $folder
+            # The old copy is a plain build, so its assemblies and its config go with it.
+            Copy-Item -Path (Join-Path (Split-Path -Parent $oldExe) '*') -Destination $folder -Recurse
             $exe = Join-Path $folder 'installerclean-cli.exe'
             foreach ($left in $leftNames) { if (Test-Path -LiteralPath "$exe$left") { throw "$exe$left is there before the run." } }
             $logLength = CrashLogLength
