@@ -2330,10 +2330,18 @@ jobs:
       - name: Publish the old copy, the 9.9.9 command line and the stand-in
         shell: pwsh
         run: |
-          dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Debug -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o publish/old
-          if ($LASTEXITCODE -ne 0) { throw "The old copy did not publish." }
-          dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:Version=9.9.9 --nologo -o publish/newer
-          if ($LASTEXITCODE -ne 0) { throw "The 9.9.9 command line did not publish." }
+          # The old copy is this commit's command line, built on net48 with its Debug
+          # switches, which answer its update check without a request to the network.
+          # .NET Framework has no single-file publish and a Debug build is not merged
+          # (the merge is Release only), so the old copy is a plain build: the exe with
+          # its assemblies beside it, which is the copy the update replaces at its path.
+          # Framework seat 34's job 12 builds this from the v3.5.0 tag instead; here it
+          # is the current source, so the start handshake and its timing run every push.
+          dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Debug -p:RestoreLockedMode=true --nologo -o publish/old
+          if ($LASTEXITCODE -ne 0) { throw "The old copy did not build." }
+          # The newer version is the merged 9.9.9 command line, one file as it ships.
+          dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:OneFileDir=publish/newer -p:Version=9.9.9 --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The 9.9.9 command line did not merge." }
 
           $standIn = Join-Path $env:RUNNER_TEMP 'stand-in'
           New-Item -ItemType Directory -Force -Path $standIn | Out-Null

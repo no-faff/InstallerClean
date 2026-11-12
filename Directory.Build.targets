@@ -51,22 +51,26 @@
        write the output.
 
        Do not merge a Debug build: it compiles the Debug-only switches in. -->
+  <!-- OneFileDir is relative to the repository root (this file's folder), not to
+       the project, so a build that passes -p:OneFileDir=publish/newer writes there
+       and not under src/. An absolute OneFileDir is taken as given. -->
   <PropertyGroup Condition="'$(OneFile)' == 'true' And '$(OneFileDir)' == ''">
-    <OneFileDir Condition="'$(MSBuildProjectName)' == 'InstallerClean'">$(MSBuildThisFileDirectory)publish/window/</OneFileDir>
-    <OneFileDir Condition="'$(MSBuildProjectName)' == 'InstallerClean.Cli'">$(MSBuildThisFileDirectory)publish/cli/</OneFileDir>
+    <OneFileDir Condition="'$(MSBuildProjectName)' == 'InstallerClean'">publish/window/</OneFileDir>
+    <OneFileDir Condition="'$(MSBuildProjectName)' == 'InstallerClean.Cli'">publish/cli/</OneFileDir>
   </PropertyGroup>
 
   <Target Name="MergeToOneFile" AfterTargets="Build"
           Condition="'$(OneFile)' == 'true' And ('$(MSBuildProjectName)' == 'InstallerClean' Or '$(MSBuildProjectName)' == 'InstallerClean.Cli')"
           Inputs="$(TargetPath);@(ReferenceCopyLocalPaths)"
-          Outputs="$([MSBuild]::EnsureTrailingSlash('$(OneFileDir)'))$(TargetFileName)">
+          Outputs="$([MSBuild]::EnsureTrailingSlash($([System.IO.Path]::GetFullPath('$(OneFileDir)', '$(MSBuildThisFileDirectory)'))))$(TargetFileName)">
     <ItemGroup>
       <_OneFileInput Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll'" />
       <_OneFileInCultureFolder Include="@(_OneFileInput)" Condition="'%(_OneFileInput.DestinationSubDirectory)' != ''" />
       <_OneFileLibFolder Include="$(TargetFrameworkDirectory)" />
     </ItemGroup>
     <PropertyGroup>
-      <_OneFileOut>$([MSBuild]::EnsureTrailingSlash('$(OneFileDir)'))$(TargetFileName)</_OneFileOut>
+      <_OneFileOutDir>$([System.IO.Path]::GetFullPath('$(OneFileDir)', '$(MSBuildThisFileDirectory)'))</_OneFileOutDir>
+      <_OneFileOut>$([MSBuild]::EnsureTrailingSlash('$(_OneFileOutDir)'))$(TargetFileName)</_OneFileOut>
       <_OneFileRsp>$(IntermediateOutputPath)onefile.rsp</_OneFileRsp>
     </PropertyGroup>
     <Error Condition="'$(Configuration)' != 'Release'"
@@ -86,7 +90,7 @@
       <_OneFileArg Include="$(TargetPath)" />
       <_OneFileArg Include="@(_OneFileInput->'%(FullPath)')" />
     </ItemGroup>
-    <MakeDir Directories="$(OneFileDir)" />
+    <MakeDir Directories="$(_OneFileOutDir)" />
     <Delete Files="$(_OneFileOut)" />
     <WriteLinesToFile File="$(_OneFileRsp)" Lines="@(_OneFileArg)" Overwrite="true" />
     <Exec Command="dotnet &quot;$(ILRepack)&quot; &quot;@$(_OneFileRsp)&quot;" />
