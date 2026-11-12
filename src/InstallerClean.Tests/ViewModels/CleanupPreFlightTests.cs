@@ -256,6 +256,7 @@ public class CleanupPreFlightTests : IDisposable
     {
         var probeEntered = new ManualResetEventSlim();
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ =>
         {
             probeEntered.Set();
@@ -290,6 +291,7 @@ public class CleanupPreFlightTests : IDisposable
         Assert.False(vm.Cleanup.IsCancellationRequested);
 
         var releaseMove = new ManualResetEventSlim();
+        using var releaseMoveOnExit = new SetOnExit(releaseMove);
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
@@ -316,6 +318,7 @@ public class CleanupPreFlightTests : IDisposable
         // move must not proceed, and the user must not be asked to confirm one.
         var probeFinishing = new ManualResetEventSlim();
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _file.When(f => f.Delete(Arg.Any<string>())).Do(_ =>
         {
             probeFinishing.Set();
@@ -495,6 +498,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task Move_and_Delete_are_blocked_while_a_pre_flight_runs()
     {
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
 
         var vm = CreateViewModel();
@@ -522,6 +526,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task The_Details_buttons_are_out_of_use_while_a_pre_flight_runs()
     {
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
 
         var vm = CreateViewModel();
@@ -548,6 +553,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task A_language_switch_is_refused_while_a_move_pre_flight_is_in_flight()
     {
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
 
         var vm = CreateViewModel();
@@ -1513,8 +1519,10 @@ public class CleanupPreFlightTests : IDisposable
     {
         var probeEntered = new ManualResetEventSlim();
         var releaseProbe = new ManualResetEventSlim();
+        using var releaseProbeOnExit = new SetOnExit(releaseProbe);
         var removalEntered = new ManualResetEventSlim();
         var releaseRemoval = new ManualResetEventSlim();
+        using var releaseRemovalOnExit = new SetOnExit(releaseRemoval);
         var removalFinished = 0;
         _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ =>
         {

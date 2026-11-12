@@ -81,8 +81,9 @@
          of a token against the surfaces it is drawn on, the order of two
          control-template triggers, where the wrong order is valid XAML that
          simply looks wrong on screen, the main window's overlay cards
-         against the width of their window, and the dialogs' cards, whose
-         widths code-behind sets. Embedded as plain bytes, not
+         against the width of their window, the dialogs' cards, whose
+         widths code-behind sets, and the focus ring every focusable element
+         names. Embedded as plain bytes, not
          compiled: this project has no UseWPF, so no Page processing
          applies. -->
     <EmbeddedResource Include="..\InstallerClean\Themes\Primitives.xaml" LogicalName="ThemeXaml.Primitives.xaml" />
@@ -97,6 +98,7 @@
     <EmbeddedResource Include="..\InstallerClean\ReportWindow.xaml" LogicalName="ThemeXaml.ReportWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\AboutWindow.xaml" LogicalName="ThemeXaml.AboutWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\Controls\ScoopCommandBox.xaml" LogicalName="ThemeXaml.ScoopCommandBox.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\SplashWindow.xaml" LogicalName="ThemeXaml.SplashWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>

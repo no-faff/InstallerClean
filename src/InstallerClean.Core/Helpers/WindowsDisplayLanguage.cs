@@ -29,7 +29,7 @@ public static class WindowsDisplayLanguage
     /// The first of the user's preferred display languages, or null where Windows gave
     /// none or the call is not there to make.
     /// </summary>
-    private static string? Read()
+    internal static string? Read()
     {
         try
         {

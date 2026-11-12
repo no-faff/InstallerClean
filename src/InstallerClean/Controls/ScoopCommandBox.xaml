@@ -75,7 +75,6 @@
                          Foreground="{StaticResource Text.Heading}"
                          FontFamily="Consolas, Cascadia Mono, Lucida Console"
                          FontSize="{DynamicResource Type.Body}"
-                         FocusVisualStyle="{StaticResource FlatTextBoxFocusVisual}"
                          AutomationProperties.Name="{loc:Translate Automation.UpdateNotice.ScoopCommand}"/>
             </Border>
             <Border Style="{StaticResource CopyFrame}">

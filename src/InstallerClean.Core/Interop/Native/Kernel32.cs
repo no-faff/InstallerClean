@@ -876,7 +876,7 @@ internal static class Kernel32
     /// <paramref name="lpLCData"/> and returns the characters written with the NUL, or 0.
     /// </summary>
     [DllImport(Library, EntryPoint = "GetLocaleInfoEx", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-    public static extern int GetLocaleInfoEx(string lpLocaleName, uint LCType, [Out] char[] lpLCData, int cchData);
+    public static extern int GetLocaleInfoEx(string? lpLocaleName, uint LCType, [Out] char[] lpLCData, int cchData);
 
     /// <summary>LOCALE_SLOCALIZEDDISPLAYNAME: the locale's full name in the display language Windows is set to.</summary>
     public const uint LOCALE_SLOCALIZEDDISPLAYNAME = 0x00000002;
@@ -884,13 +884,20 @@ internal static class Kernel32
     /// <summary>LOCALE_SLOCALIZEDLANGUAGENAME: the locale's language alone, in the display language Windows is set to.</summary>
     public const uint LOCALE_SLOCALIZEDLANGUAGENAME = 0x0000006F;
 
-    /// <summary>The language identifier of the user's own display language.</summary>
-    [DllImport(Library, EntryPoint = "GetUserDefaultUILanguage", ExactSpelling = true)]
-    public static extern ushort GetUserDefaultUILanguage();
+    /// <summary>LOCALE_SNATIVELANGUAGENAME: the locale's language alone, in that language.</summary>
+    public const uint LOCALE_SNATIVELANGUAGENAME = 0x00000004;
 
-    /// <summary>The user's default locale, the one the regional format set in Windows names, written NUL-terminated.</summary>
-    [DllImport(Library, EntryPoint = "GetUserDefaultLocaleName", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-    public static extern int GetUserDefaultLocaleName([Out] char[] lpLocaleName, int cchLocaleName);
+    /// <summary>LOCALE_SNAME: the locale's name, such as <c>en-GB</c>.</summary>
+    public const uint LOCALE_SNAME = 0x0000005C;
+
+    /// <summary>
+    /// LOCALE_NAME_USER_DEFAULT, a null locale name: the user's default locale, the one
+    /// the regional format set in Windows names.
+    /// </summary>
+    public const string? LOCALE_NAME_USER_DEFAULT = null;
+
+    /// <summary>LOCALE_NAME_SYSTEM_DEFAULT: the system's default locale.</summary>
+    public const string LOCALE_NAME_SYSTEM_DEFAULT = "!x-sys-default-locale";
 
     /// <summary>
     /// Ends the process <paramref name="hProcess"/> names at once, with

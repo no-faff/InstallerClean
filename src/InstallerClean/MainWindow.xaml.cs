@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.Text;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -12,6 +13,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using InstallerClean.Compatibility;
 using InstallerClean.Helpers;
+using InstallerClean.Interop.Native;
 using InstallerClean.Resources;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
@@ -1249,14 +1251,19 @@ public partial class MainWindow : Window
             // to keep in step.
             var spokenName = FrameworkCultureDisplayName.Of(new CultureInfo(culture), Localisation.UiCulture);
             AutomationProperties.SetName(item,
-                // Skip the suffix where it would repeat the endonym: exact for a
-                // language listed in its own UI ("日本語"), prefix for one whose
-                // display name only adds a region ("English (United Kingdom)").
-                // Case-insensitively, because several languages lowercase their
-                // own name where the endonym capitalises it, and "Français,
-                // français" is the same word twice. Ordinally, so the answer does not
-                // turn on the thread's culture or on the runtime.
-                spokenName.StartsWith(endonym, StringComparison.OrdinalIgnoreCase)
+                // Skip the suffix where ICU gave no name, and where it would repeat
+                // the endonym: exact for a language listed in its own UI ("日本語"),
+                // prefix for one whose display name only adds a region ("English
+                // (United Kingdom)"). Case-insensitively, because several languages
+                // lowercase their own name where the endonym capitalises it, and
+                // "Français, français" is the same word twice. Ordinally, so the
+                // answer does not turn on the thread's culture or on the runtime,
+                // with both names composed first, so an accented letter written as
+                // one character in one and as a letter and a mark in the other
+                // still matches.
+                spokenName.Length == 0
+                || spokenName.Normalize(NormalizationForm.FormC)
+                    .StartsWith(endonym.Normalize(NormalizationForm.FormC), StringComparison.OrdinalIgnoreCase)
                     ? endonym
                     // A separator, not brackets: pt-BR's display name carries its
                     // own parenthetical, and nesting them reads badly aloud. It comes
@@ -1310,9 +1317,8 @@ public partial class MainWindow : Window
     // is required before comparing the command code.
     private static IntPtr SuppressMaximize(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        const int WM_SYSCOMMAND = 0x0112;
         const int SC_MAXIMIZE = 0xF030;
-        if (msg == WM_SYSCOMMAND && (wParam.ToInt32() & 0xFFF0) == SC_MAXIMIZE)
+        if (msg == User32.WM_SYSCOMMAND && (wParam.ToInt32() & 0xFFF0) == SC_MAXIMIZE)
             handled = true;
         return IntPtr.Zero;
     }

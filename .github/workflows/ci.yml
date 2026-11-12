@@ -272,11 +272,21 @@ jobs:
       # initializer keeps what it has to report and the exe writes it once Main runs, so a
       # start leaves no entry about the library search. This shows the search was not skipped
       # with a reason and not refused; whether it was set in a started exe is read on Windows
-      # by hand, Windows having no call that reports it. The window is closed once its first
-      # window is up; the first-run mark is set first so its scan carries no report.
+      # by hand, Windows having no call that reports it. The first-run mark is set first so
+      # the window's scan carries no report.
+      #
+      # The window opens its main window only once its startup scan has finished, behind a
+      # splash that WPF gives a hidden owner (ShowInTaskbar is off), so Process.MainWindowHandle,
+      # which takes only a visible window with no owner, finds nothing until the main window.
+      # The step prints, for 3.7.0's release and for this build, how long a command-line scan
+      # takes on this runner, and how long each window takes to show its first window and its
+      # main window, so the time a user waits for the window reads beside the scan's own cost
+      # and beside 3.7.0's. It fails where the main window is not up within 120 s.
       - name: Check each exe starts with nothing in the crash log about its library search
         if: success() || failure()
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           New-Item -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Force | Out-Null
           New-ItemProperty -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Name FirstRunRecorded -PropertyType DWord -Value 1 -Force | Out-Null
@@ -285,36 +295,92 @@ jobs:
             if (-not (Test-Path $log)) { return @() }
             @(Get-Content $log | Where-Object { $_ -match 'library search|SetDefaultDllDirectories|SystemLibraries' })
           }
-          $before = (Entries).Count
           $failed = $false
+
+          Add-Type -TypeDefinition @'
+          using System;
+          using System.Runtime.InteropServices;
+          public static class StartCheckWindows
+          {
+              private delegate bool EnumProc(IntPtr hwnd, IntPtr lParam);
+              [DllImport("user32.dll")] private static extern bool EnumWindows(EnumProc proc, IntPtr lParam);
+              [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
+              [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr hwnd);
+              // Whether the process has any visible top-level window, owned or not.
+              public static bool AnyVisible(int processId)
+              {
+                  var found = false;
+                  EnumWindows((hwnd, _) =>
+                  {
+                      GetWindowThreadProcessId(hwnd, out var pid);
+                      if (pid == (uint)processId && IsWindowVisible(hwnd)) { found = true; return false; }
+                      return true;
+                  }, IntPtr.Zero);
+                  return found;
+              }
+          }
+          '@
+
+          # A command-line scan, /s /noupdate, timed from start to exit.
+          function Time-Scan([string]$label, [string]$exe) {
+            $clock = [Diagnostics.Stopwatch]::StartNew()
+            $p = Start-Process -FilePath $exe -ArgumentList '/s', '/noupdate' -NoNewWindow -PassThru `
+              -RedirectStandardOutput (Join-Path $env:RUNNER_TEMP "$label-scan-out.txt") `
+              -RedirectStandardError (Join-Path $env:RUNNER_TEMP "$label-scan-err.txt")
+            $null = $p.Handle
+            if (-not $p.WaitForExit(120000)) {
+              Stop-Process -Id $p.Id -Force; $p.WaitForExit()
+              "${label}: the command-line scan was still running after 120 s."
+              return
+            }
+            "${label}: the command-line scan ended with $($p.ExitCode) after $([math]::Round($clock.Elapsed.TotalSeconds, 1)) s."
+          }
+
+          # The window started, timed to its first visible window and to its main window,
+          # then closed. Returns whether the main window came up.
+          function Time-Window([string]$label, [string]$exe) {
+            $clock = [Diagnostics.Stopwatch]::StartNew()
+            $p = Start-Process -FilePath $exe -PassThru
+            # Held so the exit code can be read if the window ends by itself.
+            $null = $p.Handle
+            $first = $null
+            while ($clock.Elapsed.TotalSeconds -lt 120 -and -not $p.HasExited) {
+              if ($null -eq $first -and [StartCheckWindows]::AnyVisible($p.Id)) { $first = $clock.Elapsed.TotalSeconds }
+              $p.Refresh()
+              if ($p.MainWindowHandle -ne [IntPtr]::Zero) { break }
+              Start-Sleep -Milliseconds 100
+            }
+            $firstText = if ($null -ne $first) { "$([math]::Round($first, 1)) s" } else { 'never' }
+            $up = $false
+            if ($p.HasExited) {
+              Write-Host "${label}: the window exited by itself with $($p.ExitCode) before its main window was up (first window: $firstText)."
+            } elseif ($p.MainWindowHandle -eq [IntPtr]::Zero) {
+              Write-Host "${label}: no main window within 120 s (first window: $firstText)."
+            } else {
+              Write-Host "${label}: first window $firstText, main window $([math]::Round($clock.Elapsed.TotalSeconds, 1)) s after the start: $($p.MainWindowTitle)"
+              $up = $true
+            }
+            if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null }
+            return $up
+          }
 
           $cli = 'src/InstallerClean.Cli/bin/Debug/net48/installerclean-cli.exe'
           if (-not (Test-Path $cli)) { throw "There is no $cli to start." }
+          $window = 'src/InstallerClean/bin/Debug/net48/InstallerClean.exe'
+          if (-not (Test-Path $window)) { throw "There is no $window to start." }
+
+          $released = Join-Path $env:RUNNER_TEMP 'release-3.7.0'
+          gh release download v3.7.0 --repo $env:GITHUB_REPOSITORY --pattern installerclean-cli.exe --pattern InstallerClean-portable.exe --dir $released
+          if ($LASTEXITCODE -ne 0) { throw "3.7.0's release did not download." }
+          Time-Scan '3.7.0' (Join-Path $released 'installerclean-cli.exe')
+          Time-Scan 'this build' $cli
+          $null = Time-Window '3.7.0' (Join-Path $released 'InstallerClean-portable.exe')
+
+          $before = (Entries).Count
           $out = & $cli --version 2>&1
           "installerclean-cli --version exited $LASTEXITCODE and printed: $out"
           if ($LASTEXITCODE -ne 0) { $failed = $true }
-
-          $window = 'src/InstallerClean/bin/Debug/net48/InstallerClean.exe'
-          if (-not (Test-Path $window)) { throw "There is no $window to start." }
-          $p = Start-Process -FilePath $window -PassThru
-          # Held so the exit code can be read if the window ends by itself.
-          $null = $p.Handle
-          $deadline = (Get-Date).AddSeconds(30)
-          while ((Get-Date) -lt $deadline -and -not $p.HasExited) {
-            $p.Refresh()
-            if ($p.MainWindowHandle -ne [IntPtr]::Zero) { break }
-            Start-Sleep -Milliseconds 250
-          }
-          if ($p.HasExited) {
-            "The window exited by itself with $($p.ExitCode) before any window was up."
-            $failed = $true
-          } elseif ($p.MainWindowHandle -eq [IntPtr]::Zero) {
-            "The window showed no window within 30 seconds."
-            $failed = $true
-          } else {
-            "The window is up: $($p.MainWindowTitle)"
-          }
-          if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null }
+          if (-not (Time-Window 'this build' $window)) { $failed = $true }
 
           $new = @(Entries | Select-Object -Skip $before)
           foreach ($line in $new) { "crash.log: $line" }

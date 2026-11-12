@@ -1108,6 +1108,7 @@ public class MainViewModelTests : IDisposable
         Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
 
         var release = new ManualResetEventSlim();
+        using var releaseOnExit = new SetOnExit(release);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(_ => Task.Run(() =>
             {
@@ -1156,6 +1157,7 @@ public class MainViewModelTests : IDisposable
             registeredAnswers.Add(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
 
         var release = new ManualResetEventSlim();
+        using var releaseOnExit = new SetOnExit(release);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(_ => Task.Run(() =>
             {
@@ -1193,6 +1195,7 @@ public class MainViewModelTests : IDisposable
     {
         var vm = CreateViewModel();
         var release = new ManualResetEventSlim();
+        using var releaseOnExit = new SetOnExit(release);
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(_ => Task.Run(() =>
             {

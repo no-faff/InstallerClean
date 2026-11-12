@@ -39,6 +39,7 @@
          showing values worth copying (file paths, version strings,
          hashes). -->
     <Style x:Key="SelectableText" TargetType="TextBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
         <Setter Property="IsReadOnly" Value="True"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Background" Value="Transparent"/>
@@ -132,10 +133,12 @@
 
     <!-- Focus ring for flat, rectangular controls: the checkbox row
          further down (whose focusable extent is the box plus its
-         label, a rectangle), the in-body links (SubtleLink) and the
-         scrolling regions (BodyScrollRegion), each of which names it.
-         A focusable element whose style names no FocusVisualStyle gets
-         the Windows theme's ring rather than this one. The pill visuals above sit
+         label, a rectangle), the selectable text boxes, the lists, the
+         in-body links (SubtleLink) and the scrolling regions
+         (BodyScrollRegion), each of which names it. A focusable element
+         whose style names no FocusVisualStyle gets the Windows theme's
+         ring rather than this one, so every focusable element's style
+         names one of these visuals. The pill visuals above sit
          around rounded controls and paint a 16 to 22 px rounded ring,
          which outside a sharp-cornered edge traces a shape the control
          does not have. This one uses a 2px corner radius so the ring
@@ -148,6 +151,24 @@
                             BorderThickness="{StaticResource BorderThickness.Focus}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
+                            SnapsToDevicePixels="True"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The same ring drawn inside the element's edge, for the rows of a
+         list, the items of a menu and the column headers. Each of those
+         sits in a scrolling viewport that clips what is drawn beyond it, so
+         a ring outside the edge would lose its top on the first row and its
+         bottom on the last. -->
+    <Style x:Key="InsetFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border CornerRadius="{StaticResource Radius.Tight}"
+                            BorderThickness="{StaticResource BorderThickness.Focus}"
+                            BorderBrush="{DynamicResource Text.Body}"
                             SnapsToDevicePixels="True"/>
                 </ControlTemplate>
             </Setter.Value>
@@ -696,7 +717,17 @@
          the list shuffles under the selection as it moves. -->
 
 
+    <!-- A list takes the focus itself where it has no rows to give it to. -->
+    <Style TargetType="ListView">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
+    </Style>
+
+    <Style TargetType="ListBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
+    </Style>
+
     <Style TargetType="ListViewItem">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <!-- Stretch, not the Left default: GridViewRowPresenter arranges each
              cell's content at its own desired width and packs it to the left
@@ -739,9 +770,9 @@
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
                         </MultiTrigger>
                         <!-- Declared last so it wins over the selection rule
-                             above. A row wearing the 2px ring does not also want
-                             a rule immediately inside it, two boundaries doing
-                             one job. The condition is FocusRing.IsShowing rather
+                             above. A row wearing the 2px ring, drawn just inside
+                             its edge, does not also want the rule under it, two
+                             boundaries doing one job. The condition is FocusRing.IsShowing rather
                              than IsKeyboardFocused because those are not the
                              same state: a clicked row has keyboard focus and no
                              ring, and keying on focus would leave it with
@@ -761,6 +792,7 @@
     </Style>
 
     <Style TargetType="ListBoxItem">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -824,6 +856,7 @@
          which also keeps the ▲/▼ glyph appended to the visible header text out
          of speech. -->
     <Style TargetType="GridViewColumnHeader">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Caption}"/>
         <Setter Property="IsTabStop" Value="True"/>
@@ -1380,6 +1413,7 @@
     </Style>
 
     <Style TargetType="MenuItem">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusVisual}"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Body}"/>
         <Setter Property="Padding" Value="12,6"/>

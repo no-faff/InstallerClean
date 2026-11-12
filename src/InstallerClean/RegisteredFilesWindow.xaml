@@ -267,7 +267,7 @@
                                 </Style>
                             </ListBox.ItemContainerStyle>
                             <ListBox.Style>
-                                <Style TargetType="ListBox">
+                                <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding HasPatches}" Value="True">
