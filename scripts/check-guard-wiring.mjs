@@ -11,9 +11,8 @@
 // rather than a habit.
 //
 // verify-shipped-artefacts.mjs is run by both workflows. check-native-imports.ps1
-// reads the four bundles build-and-test publishes and is run by ci.yml alone: the
-// release builds the same projects with the same SDK, and its compression inputs
-// change how a bundle stores an assembly, not the assembly.
+// reads the two merged exes build-and-test builds and is run by ci.yml alone: the
+// release builds the same projects with the same SDK and merges them the same way.
 //
 // THE INVOCATION HAS TO OPEN THE COMMAND, after the indent and an optional
 // "run:". A line carrying the name anywhere else is text about the guard rather

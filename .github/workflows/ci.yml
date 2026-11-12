@@ -523,14 +523,16 @@ jobs:
           if ($code -ne 0) { throw "The line-number probe exited $code." }
           "An embedded portable PDB gives a 4.8 stack trace its line numbers."
 
-      # Reads the merged exes and fails where our code
-      # can reach a Windows library by a search no resolver of ours answers: a call
-      # into framework code that ends at one of CoreLib's ole32 or oleaut32 imports,
-      # a P/Invoke outside InstallerClean.Interop.Native, an unlisted NativeLibrary
-      # call, a package added or importing a new library, or a reference to
-      # System.Net.Quic. The script says what each check reads and builds the planted
-      # assembly every check must catch.
-      - name: Check what the builds' code can reach in Windows libraries
+      # Reads each merged exe's own metadata and fails where the exe can load a library from
+      # anywhere but System32 or .NET Framework's own folders: an assembly without the System32
+      # library search, a P/Invoke outside InstallerClean.Interop.Native or naming a library
+      # not on the list, an import or a call that loads a library by name or sets where one is
+      # searched for and is not listed, a call that loads an assembly from a file or a name, a
+      # reference to an assembly .NET Framework does not carry, or a module initializer whose
+      # first call does not reach the call that sets the process's library search. The script
+      # builds an assembly with each of those faults, which it has to report, and one without,
+      # which it has to leave alone.
+      - name: Check what the merged exes can load
         if: success() || failure()
         shell: pwsh
         run: ./scripts/check-native-imports.ps1
