@@ -15,4 +15,60 @@
   <PropertyGroup Condition="'$(SelfContained)' != 'true'">
     <AppHostDotNetSearch>Global</AppHostDotNetSearch>
   </PropertyGroup>
+
+  <!-- ONE FILE PER COPY. .NET Framework has no single-file publish, so a build
+       given -p:OneFile=true merges each exe with every assembly it references
+       that is not part of .NET Framework: InstallerClean.Core and the packages.
+       The merged exe is written to publish/window or publish/cli at the root of
+       the repository, or to the folder OneFileDir names, and is the whole copy:
+       it loads no assembly from the folder it is run from.
+
+       The exe the project built is the first input, so the merged file is that
+       exe with the other assemblies' types added. It keeps the exe's own
+       manifest, icon, version resource and assembly attributes, the
+       TargetFrameworkAttribute among them, which is where .NET Framework reads
+       the version an exe was built for; and it is the image Windows starts, as
+       SystemLibraries.IsProcessImage requires. The symbols of every input are
+       merged into the PDB embedded in the output.
+
+       ILRepack runs on the dotnet host on every OS, so one engine does the merge
+       wherever the build runs. /lib names the reference assemblies the build
+       compiled against, which is where the tool resolves .NET Framework's own
+       types. /skipconfig leaves the unmerged build's .exe.config behind: its
+       binding redirects name assemblies that are now inside the exe.
+       /noRepackRes leaves out the tool's list of what it merged.
+
+       Do not merge a Debug build: it compiles the Debug-only switches in. -->
+  <PropertyGroup Condition="'$(OneFile)' == 'true' And '$(OneFileDir)' == ''">
+    <OneFileDir Condition="'$(MSBuildProjectName)' == 'InstallerClean'">$(MSBuildThisFileDirectory)publish/window/</OneFileDir>
+    <OneFileDir Condition="'$(MSBuildProjectName)' == 'InstallerClean.Cli'">$(MSBuildThisFileDirectory)publish/cli/</OneFileDir>
+  </PropertyGroup>
+
+  <Target Name="MergeToOneFile" AfterTargets="Build"
+          Condition="'$(OneFile)' == 'true' And ('$(MSBuildProjectName)' == 'InstallerClean' Or '$(MSBuildProjectName)' == 'InstallerClean.Cli')">
+    <ItemGroup>
+      <_OneFileInput Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll'" />
+      <_OneFileInCultureFolder Include="@(_OneFileInput)" Condition="'%(_OneFileInput.DestinationSubDirectory)' != ''" />
+      <_OneFileLibFolder Include="$(TargetFrameworkDirectory)" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_OneFileOut>$([MSBuild]::EnsureTrailingSlash('$(OneFileDir)'))$(TargetFileName)</_OneFileOut>
+    </PropertyGroup>
+    <Error Condition="'$(Configuration)' != 'Release'"
+           Text="OneFile merges a Release build only; this build's configuration is $(Configuration)." />
+    <Error Condition="'$(ILRepack)' == '' Or !Exists('$(ILRepack)')"
+           Text="The ILRepack package is not restored, so there is nothing to merge with (ILRepack property: '$(ILRepack)')." />
+    <Error Condition="'@(_OneFileInput)' == ''"
+           Text="The build lists no referenced assembly to merge into $(TargetFileName)." />
+    <Error Condition="'@(_OneFileInCultureFolder)' != ''"
+           Text="A referenced assembly is built into a folder of its own and would be left out of the one file: @(_OneFileInCultureFolder)" />
+    <Error Condition="'@(_OneFileLibFolder)' == ''"
+           Text="The build names no reference-assembly folder for the merge to resolve .NET Framework's types from." />
+    <MakeDir Directories="$(OneFileDir)" />
+    <Delete Files="$(_OneFileOut)" />
+    <Exec Command="dotnet &quot;$(ILRepack)&quot; /skipconfig /noRepackRes &quot;/out:$(_OneFileOut)&quot; @(_OneFileLibFolder->'&quot;/lib:%(FullPath)&quot;', ' ') &quot;$(TargetPath)&quot; @(_OneFileInput->'&quot;%(FullPath)&quot;', ' ')" />
+    <Error Condition="!Exists('$(_OneFileOut)')" Text="The merge wrote no $(_OneFileOut)." />
+    <Message Importance="high" Text="$(TargetFileName) and @(_OneFileInput->Count()) assemblies -> $(_OneFileOut)" />
+  </Target>
+
 </Project>

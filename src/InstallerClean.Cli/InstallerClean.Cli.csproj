@@ -12,9 +12,6 @@
     <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- R2R off, matching InstallerClean.csproj. Same AV-signal-
-         stability rationale documented there. -->
-    <PublishReadyToRun>false</PublishReadyToRun>
     <RootNamespace>InstallerClean.Cli</RootNamespace>
     <AssemblyName>installerclean-cli</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>

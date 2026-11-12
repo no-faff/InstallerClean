@@ -14,6 +14,12 @@
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
+      "ILRepack": {
+        "type": "Direct",
+        "requested": "[2.0.48, )",
+        "resolved": "2.0.48",
+        "contentHash": "+FT+Jdn+6R2UmnNVxumqh8aaGDbOUZ/erinWsGMqEk7MJR+r6hyu6cwH2NRhw1S+rVX/EAWv34eFxPijzAq/Pg=="
+      },
       "Microsoft.CodeAnalysis.BannedApiAnalyzers": {
         "type": "Direct",
         "requested": "[5.6.0, )",

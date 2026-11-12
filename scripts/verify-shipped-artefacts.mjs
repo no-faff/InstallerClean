@@ -1,18 +1,19 @@
 #!/usr/bin/env node
-// Fails (exit 1) when a built artefact is missing a satellite assembly for a
-// language the source tree provides, when it does not ask for administrator, or
-// when it is older than the sources it was built from. Reads the built files
-// themselves rather than the tree they came from, which is the only place these
-// three can be answered.
+// Fails (exit 1) when a built artefact is missing the strings of a language the
+// source tree provides, when it does not ask for administrator, or when it is
+// older than the sources it was built from. Reads the built files themselves
+// rather than the tree they came from, which is the only place these three can
+// be answered.
 //
 // WHAT A GREEN LINE HERE SAYS ABOUT A LANGUAGE, AND WHAT IT DOES NOT. It says
-// the satellite reached the artefact. Whether that satellite holds every key the
-// neutral holds is a question about the source, and check-resx-parity.mjs
-// answers it there, in the guard glob, on every push. A satellite short of a key
-// still compiles and still ships, so the culture named below is a statement
-// about a file arriving rather than about a screen being translated.
+// the language's resource reached the artefact. Whether that resource holds
+// every key the neutral holds is a question about the source, and
+// check-resx-parity.mjs answers it there, in the guard glob, on every push. A
+// language short of a key still compiles and still ships, so the culture named
+// below is a statement about a resource arriving rather than about a screen
+// being translated.
 //
-// WHY A BUILT FILE AND NOT THE SOURCE. A satellite that never reaches the
+// WHY A BUILT FILE AND NOT THE SOURCE. A language that never reaches the
 // artefact costs nothing at build time and nothing at startup: resource lookup
 // falls back to the neutral, so the window opens in English on a machine set to
 // that language and says nothing about it. The source resx is present and
@@ -20,32 +21,33 @@
 //
 // WHY IT IS NOT A check-*.mjs. The release workflow runs that glob before it
 // builds anything, which is the right place for a guard over sources and the
-// wrong one for a guard over outputs. This is invoked by name after the publish
-// steps in both workflows instead, and check-guard-wiring.mjs is what holds
+// wrong one for a guard over outputs. This is invoked by name after the merged
+// builds in both workflows instead, and check-guard-wiring.mjs is what holds
 // those invocations in place.
 //
 // AN ABSENT ARTEFACT IS A FAILURE AND NEVER A PASS. A guard that skips when it
-// finds nothing to read reports the same clean line over a publish that never
+// finds nothing to read reports the same clean line over a build that never
 // happened, which is the shape it exists to catch.
 //
 // Usage, from the repo root:
 //   node scripts/verify-shipped-artefacts.mjs [artefact-dir ...]
-// With no arguments it reads the three directories a release publishes.
+// With no arguments it reads the two directories a build with OneFile writes.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { blankXmlComments } from './xml-source.mjs';
 
 const RESOURCE_DIR = 'src/InstallerClean.Core/Resources';
 
-// The satellite assembly is named for the project the resx lives in, which is
-// Core rather than either host. Anchoring on the host name finds nothing in a
-// correct artefact and reads as an app with no translations at all.
-const SATELLITE = 'InstallerClean.Core.resources.dll';
+// Every language is a resource inside the exe, named for the namespace the resx
+// files are compiled under: the neutral strings as <base>.resources and each
+// other language as <base>.<culture>.resources. The names are the ones
+// InstallerClean.Core.csproj gives them and EmbeddedCultureResources reads.
+const RESOURCE_BASE = 'InstallerClean.Resources.Strings';
+const RESOURCE_EXTENSION = '.resources';
 
 const REQUIRED_LEVEL = 'requireAdministrator';
 
 const DEFAULT_ARTEFACTS = [
-  'publish/self-contained',
-  'publish/framework-dependent',
+  'publish/window',
   'publish/cli',
 ];
 
@@ -54,15 +56,14 @@ const fail = (lines) => {
   for (const line of lines) console.error(`  ${line}`);
   console.error('\nFix: rebuild the artefact from a clean tree, then run this again.');
   console.error('Clear obj/ and bin/ first. Removing a source file does not remove its');
-  console.error('output: the previous copy is still there to be bundled and the build');
+  console.error('output: the previous copy is still there to be merged and the build');
   console.error('stays green, so a rebuild over stale intermediates can carry a language');
-  console.error('the tree no longer has. Note that --no-incremental is a dotnet build');
-  console.error('switch and dotnet publish rejects it.');
+  console.error('the tree no longer has.');
   process.exit(1);
 };
 
-// Every language with a satellite resx. The neutral ships inside the main
-// assembly and has no satellite of its own, so it is not in this set.
+// Every language with a satellite resx. The neutral is not in this set: its
+// resource carries no culture in its name and is looked for by itself.
 const sourceCultures = () => {
   let names;
   try {
@@ -91,14 +92,14 @@ const newestSourceMtime = () => {
   return newest;
 };
 
-// The single executable a publish directory holds. A single-file publish leaves
-// one, so anything else means the directory is not what this expects.
+// The single executable an artefact directory holds. The merge writes one file,
+// so anything else means the directory is not what this expects.
 const executableIn = (dir) => {
   let entries;
   try {
     entries = readdirSync(dir);
   } catch {
-    return { error: `${dir}: not present, so nothing was published there` };
+    return { error: `${dir}: not present, so nothing was built there` };
   }
   const exes = entries.filter((n) => n.toLowerCase().endsWith('.exe'));
   if (exes.length === 0) return { error: `${dir}: no .exe` };
@@ -106,26 +107,25 @@ const executableIn = (dir) => {
   return { path: `${dir}/${exes[0]}` };
 };
 
-// Bundled entry names are stored as plain text, so latin1 gives one JavaScript
-// character per byte and leaves the names intact for matching. The culture is
-// read from the entry's own path rather than looked for one language at a time,
-// so an unexpected one is as visible as a missing one.
-const culturesIn = (bytes) => {
-  const text = bytes.toString('latin1');
-  const re = new RegExp(`([A-Za-z][A-Za-z-]{1,9})/${SATELLITE.replace(/\./g, '\\.')}`, 'g');
+// An assembly's metadata stores each resource's name as plain text ended by a
+// zero byte, so latin1 gives one JavaScript character per byte and leaves the
+// names intact for matching. The culture is read from the resource's own name
+// rather than looked for one language at a time, so an unexpected one is as
+// visible as a missing one. The zero byte on each side keeps a longer name that
+// merely contains one of these from counting; it is looked at and not consumed,
+// since two names stored one after the other share the byte between them.
+const escaped = (s) => s.replace(/\./g, '\\.');
+const culturesIn = (text) => {
+  const re = new RegExp(`(?<=\\0)${escaped(RESOURCE_BASE)}\\.([A-Za-z][A-Za-z-]{1,9})${escaped(RESOURCE_EXTENSION)}(?=\\0)`, 'g');
   return [...new Set([...text.matchAll(re)].map((m) => m[1]))].sort();
 };
+const holdsNeutral = (text) => text.includes(`\0${RESOURCE_BASE}${RESOURCE_EXTENSION}\0`);
 
-// THE MANIFEST WINDOWS HONOURS IS A PE RESOURCE, AND A SINGLE-FILE ARTEFACT
-// HOLDS OTHERS THAT IT DOES NOT. The apphost carries the app's own manifest in
-// its resource directory, and a single-file publish appends a bundle after that
-// image. Assemblies inside the bundle can carry manifests of their own asking
-// for a different level, and those are payload bytes the loader never consults.
-// Scanning the file for the first thing shaped like a manifest cannot tell the
-// two apart, so the level is read out of the resource directory instead, which
-// is the same place the loader reads it from. Compression decides how many of
-// the payload copies are legible as text and decides nothing about which
-// manifest starts the process.
+// THE MANIFEST WINDOWS HONOURS IS A PE RESOURCE. Text shaped like a manifest can
+// sit elsewhere in an exe, in a string or a resource of a merged assembly, and
+// the loader never consults it. Scanning the file for the first thing shaped
+// like a manifest cannot tell the two apart, so the level is read out of the
+// resource directory instead, which is the same place the loader reads it from.
 const RT_MANIFEST = 24;
 
 // The resource id Windows reserves for an executable's own manifest. A library
@@ -273,12 +273,16 @@ for (const dir of artefacts) {
 
   const bytes = readFileSync(exe.path);
 
-  const cultures = culturesIn(bytes);
+  const text = bytes.toString('latin1');
+  const cultures = culturesIn(text);
   const missing = expected.filter((c) => !cultures.includes(c));
   const extra = cultures.filter((c) => !expected.includes(c));
 
+  if (!holdsNeutral(text)) {
+    problems.push(`${exe.path}: no ${RESOURCE_BASE}${RESOURCE_EXTENSION}, the neutral strings`);
+  }
   if (cultures.length === 0) {
-    problems.push(`${exe.path}: no ${SATELLITE} entries at all`);
+    problems.push(`${exe.path}: no ${RESOURCE_BASE}.<culture>${RESOURCE_EXTENSION} resource at all`);
   } else {
     if (missing.length) problems.push(`${exe.path}: missing ${missing.join(', ')}`);
     if (extra.length) problems.push(`${exe.path}: carries ${extra.join(', ')}, which no source resx provides`);
@@ -308,7 +312,7 @@ for (const dir of artefacts) {
     }
   }
 
-  report.push(`${exe.path}: level="${level}", satellites for ${cultures.join(' ')}`);
+  report.push(`${exe.path}: level="${level}", the neutral strings and ${cultures.join(' ')}`);
 }
 
 if (problems.length) fail(problems);
