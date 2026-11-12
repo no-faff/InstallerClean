@@ -1102,6 +1102,7 @@ jobs:
             "  $($p.Label):"
             foreach ($plant in $p.Plants) { "    $($plant.Place) $($plant.Path): $($plant.Why), $($plant.Kind), $($plant.Source)" }
             foreach ($plant in $p.ReplacePlants) { "    for the replace it starts, $($plant.Place) $($plant.Path): $($plant.Why), $($plant.Kind), $($plant.Source)" }
+            foreach ($plant in $p.TargetPlants) { "    in the folder the exe is put into, $($plant.Place) $($plant.Path): $($plant.Why), $($plant.Kind), $($plant.Source)" }
           }
           ConvertTo-Json -InputObject @($planned) -Depth 5 | Set-Content (Join-Path $env:RUNNER_TEMP 'plants.json')
 
