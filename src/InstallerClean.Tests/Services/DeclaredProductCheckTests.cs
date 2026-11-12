@@ -1957,6 +1957,92 @@ public class DeclaredProductCheckTests
         AssertKeptFor(DeclaredProductInstalledCause.SourcesWouldNotRead, f);
     }
 
+    /// <summary>
+    /// Screens the one copy with a pause that records its waits, and answers what the copy
+    /// came out as, the waits, and how many times the product's source lists were walked.
+    /// </summary>
+    private static ((DeclaredProductOutcome Outcome, DeclaredProductInstalledCause Cause) Verdict,
+        List<TimeSpan> Pauses, int Walks) ScreenTheCopyCountingWalks(
+        (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+            ScriptedFileIdentities Files, MockFileSystem Disk) f)
+    {
+        var pauses = new List<TimeSpan>();
+        var screening = new DeclaredProductCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+        {
+            DriveKindOf = FixedDrive,
+            NamesInFolderOf = NameOnly,
+            WalkPause = pauses.Add,
+        }.Screen(new[] { Package(Candidate) }, [], [], default, null, InInstallerFolder);
+
+        return ((screening.Outcomes[0], screening.InstalledCauses[0]), pauses, f.Msi.SourceListWalks.Count);
+    }
+
+    [Theory]
+    [InlineData(0u, 1, false)]
+    [InlineData(1u, 1, false)]
+    [InlineData(1u, 2, false)]
+    [InlineData(0u, 1, true)]
+    [InlineData(0u, 2, true)]
+    public void A_source_entry_that_will_not_read_on_one_walk_and_reads_on_a_later_one_leaves_the_copy_as_a_clean_list_does(
+        uint index, int calls, bool url)
+    {
+        // The same list twice, the second with an error that passes planted on one entry.
+        // The control beside this is the test above: the same error staying keeps the copy
+        // because its sources would not read.
+        var clean = ACopyBesideTheRecordedPackage();
+        clean.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, SetupName, SetupFolder, MediaFolder);
+        var planted = ACopyBesideTheRecordedPackage();
+        planted.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, SetupName, SetupFolder, MediaFolder);
+        clean.Files.Answers(MediaFolder + SetupName, FileIdentityRead.NamesNothing);
+        planted.Files.Answers(MediaFolder + SetupName, FileIdentityRead.NamesNothing);
+        planted.Msi.SourceListEntryAnswersOnce(ProductA, null, MsiInstallContext.Machine, index,
+            MsiError.BadConfiguration, calls, url);
+
+        var cleanScreen = ScreenTheCopyCountingWalks(clean);
+        var plantedScreen = ScreenTheCopyCountingWalks(planted);
+
+        Assert.Equal(cleanScreen.Verdict, plantedScreen.Verdict);
+        Assert.NotEqual(DeclaredProductInstalledCause.SourcesWouldNotRead, plantedScreen.Verdict.Cause);
+        Assert.Empty(cleanScreen.Pauses);
+        Assert.Equal(calls, plantedScreen.Pauses.Count);
+
+        // The planted list, network or URL, was walked once more for each error.
+        Assert.Equal(cleanScreen.Walks + (url ? 0 : calls), plantedScreen.Walks);
+        Assert.Equal(clean.Msi.UrlSourceListWalks + (url ? calls : 0), planted.Msi.UrlSourceListWalks);
+    }
+
+    [Fact]
+    public void A_source_entry_that_never_reads_keeps_the_copy_after_three_walks()
+    {
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.RecordsSources(ProductA, null, MsiInstallContext.Machine, SetupName, SetupFolder, MediaFolder);
+        f.Msi.SourceListEntryAnswers(ProductA, null, MsiInstallContext.Machine, 1, MsiError.BadConfiguration);
+
+        var screen = ScreenTheCopyCountingWalks(f);
+
+        Assert.Equal(
+            (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcesWouldNotRead),
+            screen.Verdict);
+        Assert.Equal(WalkRestarts.Attempts, screen.Walks);
+        Assert.Equal(new[] { TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(250) }, screen.Pauses);
+    }
+
+    [Fact]
+    public void A_source_list_that_never_ends_keeps_the_copy_after_one_walk()
+    {
+        // Every entry read, so there is no error for a second walk to get past.
+        var f = ACopyBesideTheRecordedPackage();
+        f.Msi.SourceListNeverEnds(ProductA, null, MsiInstallContext.Machine);
+
+        var screen = ScreenTheCopyCountingWalks(f);
+
+        Assert.Equal(
+            (DeclaredProductOutcome.DeclaredProductInstalled, DeclaredProductInstalledCause.SourcesWouldNotRead),
+            screen.Verdict);
+        Assert.Equal(1, screen.Walks);
+        Assert.Empty(screen.Pauses);
+    }
+
     [Fact]
     public void A_copy_is_kept_when_a_source_entry_is_longer_than_any_path()
     {
@@ -2917,6 +3003,37 @@ public class DeclaredProductCheckTests
             new[] { DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, DeclaredProductOutcome.DeclaredProductInstalled },
             screening.Outcomes);
         Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.ByName }, screening.InstalledCauses);
+    }
+
+    [Theory]
+    [InlineData(1, 2)]
+    [InlineData(2, 3)]
+    public void A_media_disk_answer_that_is_an_error_once_and_then_the_end_of_the_list_keeps_no_copy_by_its_name(
+        int errors, int asks)
+    {
+        // The list holds no media source. The control beside this is the theory above: the
+        // same error staying keeps the copy the package could be by its name.
+        var f = TwoCopiesBesideAMediaPackagePath(string.Empty);
+        f.Msi.MediaDisksAnswerOnce(ProductA, null, MsiInstallContext.Machine, MsiError.BadConfiguration, errors);
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
+
+        Assert.All(screening.Outcomes, outcome => Assert.Equal(DeclaredProductOutcome.DeclaredProductCachedAsAnotherFile, outcome));
+        Assert.Equal(asks, f.Msi.MediaDiskAsks);
+    }
+
+    [Fact]
+    public void A_media_disk_answer_that_stays_an_error_is_asked_for_three_times()
+    {
+        var f = TwoCopiesBesideAMediaPackagePath(string.Empty);
+        f.Msi.MediaDisksAnswer(ProductA, null, MsiInstallContext.Machine, MsiError.AccessDenied);
+
+        var screening = ScriptedCheck(f.Msi, f.Packages, f.Files, f.Disk, f.Msi.Registry)
+            .Screen([Package(Candidate), Package(SecondCandidate)], [], [], default, null, InInstallerFolder);
+
+        Assert.Equal(new[] { DeclaredProductInstalledCause.None, DeclaredProductInstalledCause.ByName }, screening.InstalledCauses);
+        Assert.Equal(WalkRestarts.Attempts, f.Msi.MediaDiskAsks);
     }
 
     [Fact]
@@ -9756,6 +9873,22 @@ internal sealed class ScriptedMsiProducts : IMsiApi
             FailingError = error,
         };
 
+    private readonly Dictionary<(string Kind, string ProductCode, string? Sid, MsiInstallContext Context, uint Index), (uint Error, int Calls)>
+        _passingSourceErrors = new();
+
+    /// <summary>
+    /// An error that passes: the next <paramref name="calls"/> calls for this index of the
+    /// installation's network source list, or of its URL list where <paramref name="url"/>
+    /// is true, answer <paramref name="error"/>, and every call after them answers as the
+    /// list is scripted.
+    /// </summary>
+    public void SourceListEntryAnswersOnce(string productCode, string? sid, MsiInstallContext context,
+        uint index, uint error, int calls = 1, bool url = false) =>
+        _passingSourceErrors[(url ? "product URL" : "product", productCode, sid, context, index)] = (error, calls);
+
+    /// <summary>How many times any product's URL source list was asked for its first entry.</summary>
+    public int UrlSourceListWalks { get; private set; }
+
     /// <summary>A source list whose every index answers with another folder, and which never ends.</summary>
     public void SourceListNeverEnds(string productCode, string? sid, MsiInstallContext context) =>
         _sources[(productCode, sid, context)] = new SourceList(new[] { @"D:\Somewhere\" }, Endless: true);
@@ -9948,6 +10081,19 @@ internal sealed class ScriptedMsiProducts : IMsiApi
     public void MediaDisksAnswer(string code, string? sid, MsiInstallContext context, uint error) =>
         _mediaDisks[(code, sid, context)] = error;
 
+    private readonly Dictionary<(string Code, string? Sid, MsiInstallContext Context), (uint Error, int Calls)>
+        _passingMediaDiskErrors = new();
+
+    /// <summary>
+    /// An error that passes: the next <paramref name="calls"/> asks for the product's first
+    /// media disk answer <paramref name="error"/>, and every ask after them answers as scripted.
+    /// </summary>
+    public void MediaDisksAnswerOnce(string code, string? sid, MsiInstallContext context, uint error, int calls = 1) =>
+        _passingMediaDiskErrors[(code, sid, context)] = (error, calls);
+
+    /// <summary>How many times the first media disk of any product was asked for.</summary>
+    public int MediaDiskAsks { get; private set; }
+
     /// <summary>Whether the product's source list holds a media source, as <see cref="HoldsMediaDisk"/> says.</summary>
     private bool HasAMediaDisk(string code, string? sid, MsiInstallContext context) =>
         _mediaDisks.TryGetValue((code, sid, context), out var answer)
@@ -9968,6 +10114,14 @@ internal sealed class ScriptedMsiProducts : IMsiApi
         if (options != MsiSourceListOptions.Product)
             throw new InvalidOperationException(
                 $"the declared-product check reads a product's media disks, and was asked with options {options}");
+
+        MediaDiskAsks++;
+        if (_passingMediaDiskErrors.TryGetValue((productCodeOrPatchCode, userSid, context), out var passing)
+            && passing.Calls > 0)
+        {
+            _passingMediaDiskErrors[(productCodeOrPatchCode, userSid, context)] = (passing.Error, passing.Calls - 1);
+            return passing.Error;
+        }
 
         if (_mediaDisks.TryGetValue((productCodeOrPatchCode, userSid, context), out var scripted)
             && scripted != MsiError.Success)
@@ -10262,6 +10416,14 @@ internal sealed class ScriptedMsiProducts : IMsiApi
         else if (index != _sourcePosition)
         {
             return InvalidParameter;
+        }
+
+        if (index == 0 && source is not null && kind == "product URL") UrlSourceListWalks++;
+        if (_passingSourceErrors.TryGetValue((kind, productCodeOrPatchCode, userSid, context, index), out var passing)
+            && passing.Calls > 0)
+        {
+            _passingSourceErrors[(kind, productCodeOrPatchCode, userSid, context, index)] = (passing.Error, passing.Calls - 1);
+            return passing.Error;
         }
 
         if (scripted.Error != MsiError.Success) return scripted.Error;
