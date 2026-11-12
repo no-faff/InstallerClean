@@ -49,11 +49,12 @@ internal static class FrameworkStringExtensions
         /// <summary>
         /// The first index at or after <paramref name="startIndex"/> where <paramref name="value"/>
         /// occurs in the text under an ordinal comparison, with case folded for
-        /// <see cref="StringComparison.OrdinalIgnoreCase"/>, or -1: what .NET 10's
-        /// <c>IndexOf(string, int, StringComparison)</c> answers for those two comparisons. An
-        /// empty value is found at <paramref name="startIndex"/>. string.IndexOf with a
-        /// comparison is banned in the shipped projects and this is called in its place, as
-        /// .NET Framework's searches ASCII text by culture rules under OrdinalIgnoreCase.
+        /// <see cref="StringComparison.OrdinalIgnoreCase"/>, or -1, with .NET 10's
+        /// <c>IndexOf(string, int, StringComparison)</c> checks of its arguments. An empty value
+        /// is found at <paramref name="startIndex"/>. string.IndexOf with a comparison is banned
+        /// in the shipped projects and this is called in its place, as .NET Framework's searches
+        /// ASCII text by culture rules under OrdinalIgnoreCase, which pass over a NUL and other
+        /// control characters as if they were not there.
         /// </summary>
         /// <exception cref="NotSupportedException">A culture comparison, which has no .NET Framework port.</exception>
         public int IndexOfOrdinal(string value, int startIndex, StringComparison comparisonType)
@@ -68,7 +69,7 @@ internal static class FrameworkStringExtensions
 
         /// <summary><see cref="IndexOfOrdinal(string, int, StringComparison)"/> from the start of the text.</summary>
         public int IndexOfOrdinal(string value, StringComparison comparisonType) =>
-            IndexOfOrdinal(text, value, 0, comparisonType);
+            text.IndexOfOrdinal(value, 0, comparisonType);
 
         /// <summary>
         /// The text with every occurrence of <paramref name="oldValue"/>, found left to right
