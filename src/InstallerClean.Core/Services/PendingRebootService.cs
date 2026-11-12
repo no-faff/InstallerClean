@@ -116,9 +116,9 @@ public sealed class PendingRebootService : IPendingRebootService
         if (installerInProgress is not RegistryKeyPresence.Absent)
             return PendingRebootResult.Block(PendingRebootReason.RegistryCheckUnreadable);
 
-        // Windows Installer's in-progress file. Windows Installer writes it a moment
-        // after an installation has taken the mutex above, which is read first and
-        // covers that moment, and across a transaction of several packages the file
+        // Windows Installer's in-progress file. Windows Installer writes it some time
+        // after an installation has taken the mutex above, after its working copy is
+        // already in the folder. The mutex is read first and covers that time, and across a transaction of several packages the file
         // stays until the transaction has finished, the stretches between packages
         // included, when the mutex is free. The two cover an installation together.
         // Absent is the only reading that carries on, on the rule the key above
