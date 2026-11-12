@@ -82,7 +82,6 @@ public class FrameworkStringsTests
             Assert.Equal(expected, text.IndexOfOrdinal(value, comparison));
     }
 
-
     [Fact]
     public void IndexOfOrdinal_refuses_a_null_value_a_start_past_the_end_and_a_culture_comparison()
     {

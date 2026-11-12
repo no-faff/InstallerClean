@@ -53,7 +53,7 @@ internal static class FrameworkStringExtensions
         /// <c>IndexOf(string, int, StringComparison)</c> checks of its arguments. An empty value
         /// is found at <paramref name="startIndex"/>. string.IndexOf with a comparison is banned
         /// in the shipped projects and this is called in its place, as .NET Framework's searches
-        /// ASCII text by culture rules under OrdinalIgnoreCase.
+        /// ASCII text by the invariant culture's rules under OrdinalIgnoreCase.
         /// </summary>
         /// <exception cref="NotSupportedException">A culture comparison, which has no .NET Framework port.</exception>
         public int IndexOfOrdinal(string value, int startIndex, StringComparison comparisonType)
@@ -186,8 +186,8 @@ internal static class FrameworkStringExtensions
     /// characters are compared as they are. With it, each window is compared by System.Memory's
     /// span Equals under OrdinalIgnoreCase, which folds a to z itself and passes the rest, from
     /// the first character outside ASCII, to string.Compare under OrdinalIgnoreCase. Neither path
-    /// goes through string.IndexOf, which on .NET Framework searches ASCII text by culture rules
-    /// under OrdinalIgnoreCase.
+    /// goes through string.IndexOf, which on .NET Framework searches ASCII text by the invariant
+    /// culture's rules under OrdinalIgnoreCase.
     /// </summary>
     private static int OrdinalIndexOf(string text, string value, int startIndex, bool ignoreCase)
     {
