@@ -44,8 +44,8 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     private static readonly TimeSpan[] PauseBefore = [Durations.FromMilliseconds(50), Durations.FromMilliseconds(250)];
 
     /// <summary>
-    /// The longest the walks sharing one of these pause, in all, for the lists walked once
-    /// for each program or patch (<see cref="KeyedWalk"/>).
+    /// The longest the walks sharing one of these pause, in all, for the lists walked for
+    /// one program or patch at a time (<see cref="KeyedWalk"/>).
     /// </summary>
     internal static readonly TimeSpan KeyedPauseLimit = Durations.FromSeconds(2);
 
@@ -59,7 +59,8 @@ internal sealed class WalkRestarts(Action<TimeSpan> pause)
     internal T Walk<T>(Func<T> walk, Func<T, bool> stands) => Run(walk, stands, keyed: false);
 
     /// <summary>
-    /// A list the scan walks once for each program or patch. Where Windows Installer
+    /// A list the scan walks for one program or patch at a time, or one ask about one.
+    /// Where Windows Installer
     /// refuses such a list for one program it can refuse it for every program recorded
     /// under the same account, so these walks share <see cref="KeyedPauseLimit"/>: a
     /// restart whose pause would take them past it is made at once, without the pause.
