@@ -2127,10 +2127,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         if (SpellsMoreThanAName(packageName))
             return Refuse(SourceRefusal.FormPackageName, out refusal);
 
-        var sources = SourcesOf(code, sid, context, MsiSourceListOptions.Network);
+        var sources = SourcesOf(code, sid, context, MsiSourceListOptions.Network, pass);
         if (sources is null) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
-        var urls = SourcesOf(code, sid, context, MsiSourceListOptions.Url);
+        var urls = SourcesOf(code, sid, context, MsiSourceListOptions.Url, pass);
         if (urls is null) return Refuse(SourceRefusal.WouldNotRead, out refusal);
 
         // A web address on the list is not compared, and any other URL keeps the copy.
@@ -2175,7 +2175,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // keeps every copy while Windows follows a symbolic link reached through a network path.
         if (mediaPath.Length > 0 && RemoteLinksCanBeFollowed(registry, pass))
             return Refuse(SourceRefusal.FormMedia, out refusal);
-        if (mediaPath.Length > 0 || !HasNoMediaSource(code, sid, context, media))
+        if (mediaPath.Length > 0 || !HasNoMediaSource(code, sid, context, media, pass))
             byName.Add(new PackageByName(null, packageName));
 
         var usedLast = SourceUsedLastOf(code, sid, context, sourceList.Values, out refusal);
@@ -2877,6 +2877,28 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// <paramref name="sourceType"/> says, in the order Windows lists them, or null where
     /// the list did not read to its end.
     ///
+    /// A WALK THAT AN ERROR STOPS IS MADE AGAIN FROM THE FIRST INDEX
+    /// (<see cref="WalkRestarts.KeyedWalk"/>), and the first walk that reaches the end is
+    /// the list. Null, which keeps the file, is the answer only where none of them does.
+    /// A list that no walk read is walked once each time the pass asks for it again.
+    /// </summary>
+    private IReadOnlyList<string>? SourcesOf(
+        string code, string? sid, MsiInstallContext context, uint sourceType, PassAnswers pass)
+    {
+        var list = (code, sid, context, sourceType);
+        if (pass.SourceListsNoWalkRead.Contains(list)) return WalkSources(code, sid, context, sourceType).Sources;
+
+        var walk = pass.Restarts.KeyedWalk(
+            () => WalkSources(code, sid, context, sourceType), walked => !walked.StoppedAtAnError);
+        if (walk.StoppedAtAnError) pass.SourceListsNoWalkRead.Add(list);
+        return walk.Sources;
+    }
+
+    /// <summary>
+    /// One walk of a source list from index 0, for <see cref="SourcesOf"/>: the entries, or
+    /// null where the walk did not read the list to its end. <c>StoppedAtAnError</c> is true
+    /// where an error return ended the walk.
+    ///
     /// ONE CALL PER ENTRY, WITH THE BUFFER. Windows keeps the position of the walk
     /// between calls. A call at index 0 starts the walk again, a call at the position
     /// is answered, and a call at any other index answers ERROR_INVALID_PARAMETER. A
@@ -2886,13 +2908,17 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// Microsoft requires every call of one walk to come from the same thread, and this
     /// loop makes them all with nothing awaited between them.
     ///
-    /// ONLY <see cref="MsiError.NoMoreItems"/> ENDS THE LIST. Every other return keeps
-    /// the file, <see cref="MsiError.MoreData"/> from an entry longer than the buffer
-    /// among them, and so does a list that runs past <see cref="MaxSourceIndex"/>
-    /// without ending, since what lies beyond it is unread. The index moves on only
-    /// after a success, so no entry is passed over.
+    /// ONLY <see cref="MsiError.NoMoreItems"/> ENDS THE LIST. Every other return ends the
+    /// walk with the list unread, and so does a list that runs past
+    /// <see cref="MaxSourceIndex"/> without ending, since what lies beyond it is unread.
+    /// The index moves on only after a success, so no entry is passed over.
+    ///
+    /// <see cref="MsiError.MoreData"/> from an entry longer than the buffer, an entry that
+    /// reads as empty and a list that runs past <see cref="MaxSourceIndex"/> are not
+    /// errors a second walk gets past: the entry is the same on every walk.
     /// </summary>
-    private IReadOnlyList<string>? SourcesOf(string code, string? sid, MsiInstallContext context, uint sourceType)
+    private (IReadOnlyList<string>? Sources, bool StoppedAtAnError) WalkSources(
+        string code, string? sid, MsiInstallContext context, uint sourceType)
     {
         var options = MsiSourceListOptions.Product | sourceType;
         var sources = new List<string>();
@@ -2906,15 +2932,16 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
 
             uint length = (uint)buffer.Length;
             var error = _msi.EnumSources(code, sid, context, options, index, buffer, ref length);
-            if (error == MsiError.NoMoreItems) return sources;
-            if (error != MsiError.Success) return null;
+            if (error == MsiError.NoMoreItems) return (sources, false);
+            if (error == MsiError.MoreData) return (null, false);
+            if (error != MsiError.Success) return (null, true);
 
             var source = new string(buffer, 0, (int)Math.Min(length, (uint)buffer.Length)).TrimEnd('\0');
-            if (source.Length == 0) return null;
+            if (source.Length == 0) return (null, false);
             sources.Add(source);
         }
 
-        return null;
+        return (null, false);
     }
 
     /// <summary>
@@ -2965,8 +2992,11 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// two disagreeing, is false, and the list keeps every candidate the package could be by
     /// its name (<see cref="AddSourcePackages"/>). A key that will not read does not reach
     /// here, its media package path having already kept the file (<see cref="MediaPackagePathOf"/>).
+    /// An answer that is neither a disk nor the end of the list is asked for again
+    /// (<see cref="WalkRestarts.KeyedWalk"/>), and the first that is one of those is taken.
     /// </summary>
-    private bool HasNoMediaSource(string code, string? sid, MsiInstallContext context, RegistryKeyValues media)
+    private bool HasNoMediaSource(
+        string code, string? sid, MsiInstallContext context, RegistryKeyValues media, PassAnswers pass)
     {
         if (media.Presence != RegistryKeyPresence.Absent)
         {
@@ -2975,7 +3005,9 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
                 if (value.Name.Length > 0 && value.Name.All(char.IsAsciiDigit)) return false;
         }
 
-        return _msi.EnumMediaDisks(code, sid, context, MsiSourceListOptions.Product, 0, out _) == MsiError.NoMoreItems;
+        return pass.Restarts.KeyedWalk(
+            () => _msi.EnumMediaDisks(code, sid, context, MsiSourceListOptions.Product, 0, out _),
+            answer => answer is MsiError.NoMoreItems or MsiError.Success) == MsiError.NoMoreItems;
     }
 
     /// <summary>
@@ -4623,9 +4655,6 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         private Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? _holders;
         private bool _holdersRead;
 
-        // The restarts the pass shares between the installations of a product code and
-        // the machine-wide patch list.
-        private readonly WalkRestarts _restarts;
 
         internal PassAnswers(
             IMsiApi msi,
@@ -4635,7 +4664,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             Action<TimeSpan>? walkPause)
         {
             _msi = msi;
-            _restarts = WalkRestarts.For(cancellationToken, walkPause);
+            Restarts = WalkRestarts.For(cancellationToken, walkPause);
             _listed = InstallerQueryService.InstallationsByCode(
                 installations.Select(i => (i.ProductCode, i.UserSid, (MsiInstallContext)i.Context)));
             Installations = installations;
@@ -4644,6 +4673,15 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         }
 
         internal CancellationToken CancellationToken { get; }
+
+        /// <summary>The restarts the pass shares among the Windows Installer lists it walks.</summary>
+        internal WalkRestarts Restarts { get; }
+
+        /// <summary>
+        /// The source lists an error stopped every walk of, so the pass walks each once where
+        /// it asks for it again (<see cref="SourcesOf"/>).
+        /// </summary>
+        internal HashSet<(string Code, string? Sid, MsiInstallContext Context, uint SourceType)> SourceListsNoWalkRead { get; } = [];
 
         /// <summary>
         /// Told each wait a read makes, naming the root it is under, and null when that wait
@@ -4969,7 +5007,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             if (!_instances.TryGetValue(productCode, out var resolved))
             {
-                resolved = InstallerQueryService.ResolveProductInstances(_msi, productCode, _restarts);
+                resolved = InstallerQueryService.ResolveProductInstances(_msi, productCode, Restarts);
                 if (!resolved.Unaskable
                     && !InstallerQueryService.HoldsEveryListedInstallation(_listed, productCode, resolved.Instances))
                     resolved = (Array.Empty<(string?, MsiInstallContext)>(), true);
@@ -4991,7 +5029,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             {
                 if (!_holdersRead)
                 {
-                    _holders = InstallerQueryService.EnumeratePatchHoldersAcrossAllProducts(_msi, _restarts, CancellationToken);
+                    _holders = InstallerQueryService.EnumeratePatchHoldersAcrossAllProducts(_msi, Restarts, CancellationToken);
                     _holdersRead = true;
                 }
 

@@ -34,56 +34,6 @@
         <Setter Property="FontFamily" Value="{DynamicResource Type.FontFamily}"/>
     </Style>
 
-    <!-- Selectable text. A read-only TextBox styled to look like a
-         TextBlock but with user-selectable contents. Useful for
-         showing values worth copying (file paths, version strings,
-         hashes). -->
-    <Style x:Key="SelectableText" TargetType="TextBox">
-        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
-        <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="FontFamily" Value="{DynamicResource Type.FontFamily}"/>
-        <!-- IsTabStop=True so keyboard-only users can Tab onto a value
-             and Ctrl+C it. Consumers that genuinely shouldn't be in
-             the tab order set IsTabStop="False" at the site. -->
-        <Setter Property="IsTabStop" Value="True"/>
-        <Setter Property="ContextMenu">
-            <Setter.Value>
-                <ContextMenu>
-                    <MenuItem Header="{loc:Translate Action.Copy}" Command="ApplicationCommands.Copy"/>
-                </ContextMenu>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- A value row in the detail panels' metadata grids (Orphaned and
-         Registered): SelectableText's copyable, borderless look, in the
-         heading colour at body size, and wrapping so a long value (a signing
-         certificate, a long product field) breaks onto the next line rather
-         than clipping. The wrap lives here, not on each of the value boxes, so
-         a metadata row cannot be added without it. -->
-    <Style x:Key="MetadataValueText" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
-        <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
-        <Setter Property="TextWrapping" Value="Wrap"/>
-    </Style>
-
-    <!-- Cards. Rounded surface containers. Card has standard inner
-         padding; CardNoPad lets the consumer control its own padding
-         (used for lists that paint their own row spacing). -->
-    <Style x:Key="Card" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
-        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
-        <Setter Property="Padding" Value="{StaticResource Gap.Lg}"/>
-    </Style>
-
-    <Style x:Key="CardNoPad" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
-        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
-    </Style>
-
     <!-- Focus visuals. Three sizes match the three pill heights
          (40 / 30 / 28). The default focus visual at the bottom of
          this file applies to anything else that takes focus
@@ -173,6 +123,56 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- Selectable text. A read-only TextBox styled to look like a
+         TextBlock but with user-selectable contents. Useful for
+         showing values worth copying (file paths, version strings,
+         hashes). -->
+    <Style x:Key="SelectableText" TargetType="TextBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="FontFamily" Value="{DynamicResource Type.FontFamily}"/>
+        <!-- IsTabStop=True so keyboard-only users can Tab onto a value
+             and Ctrl+C it. Consumers that genuinely shouldn't be in
+             the tab order set IsTabStop="False" at the site. -->
+        <Setter Property="IsTabStop" Value="True"/>
+        <Setter Property="ContextMenu">
+            <Setter.Value>
+                <ContextMenu>
+                    <MenuItem Header="{loc:Translate Action.Copy}" Command="ApplicationCommands.Copy"/>
+                </ContextMenu>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A value row in the detail panels' metadata grids (Orphaned and
+         Registered): SelectableText's copyable, borderless look, in the
+         heading colour at body size, and wrapping so a long value (a signing
+         certificate, a long product field) breaks onto the next line rather
+         than clipping. The wrap lives here, not on each of the value boxes, so
+         a metadata row cannot be added without it. -->
+    <Style x:Key="MetadataValueText" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <!-- Cards. Rounded surface containers. Card has standard inner
+         padding; CardNoPad lets the consumer control its own padding
+         (used for lists that paint their own row spacing). -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
+        <Setter Property="Padding" Value="{StaticResource Gap.Lg}"/>
+    </Style>
+
+    <Style x:Key="CardNoPad" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
     </Style>
 
     <!-- Pill buttons. Four flavours share one visual language (40px
