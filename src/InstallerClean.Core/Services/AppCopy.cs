@@ -454,7 +454,7 @@ public static class AppCopy
     /// and stripped of trailing separators, then compared without regard to case, as
     /// Windows compares names. Inno Setup writes InstallLocation with a trailing backslash.
     /// </summary>
-    private static bool IsSetupFolder(string exeFolder, SetupRecord setup) =>
+    internal static bool IsSetupFolder(string exeFolder, SetupRecord setup) =>
         setup is { State: SetupRecordState.Folder, Folder: { } folder }
         && Normalise(exeFolder) is { } exe
         && string.Equals(exe, folder, StringComparison.OrdinalIgnoreCase);

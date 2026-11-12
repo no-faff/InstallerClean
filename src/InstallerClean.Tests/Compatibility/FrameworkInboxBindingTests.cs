@@ -44,11 +44,14 @@ public class FrameworkInboxBindingTests
     [Fact]
     public void System_ValueTuple_binds_to_the_runtime_copy_and_a_tuple_reads()
     {
-        var reference = typeof(ValueTuple<int, int>).Assembly.GetName();
+        // A tuple expression is where the code uses ValueTuple, so reading one proves the
+        // reference to System.ValueTuple 4.0.5.0 bound without a load failure. On .NET
+        // Framework 4.8 the type itself is forwarded into mscorlib, so its hosting assembly
+        // is not asserted here; the LoadedVersions theory below names what loaded.
         (int first, int second) pair = (1, 2);
+        var sum = pair.first + pair.second;
 
-        Assert.Equal(3, pair.first + pair.second);
-        Assert.Equal("System.ValueTuple", reference.Name);
+        Assert.Equal(3, sum);
     }
 
     /// <summary>
