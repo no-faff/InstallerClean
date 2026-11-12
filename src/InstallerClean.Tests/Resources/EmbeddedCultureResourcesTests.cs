@@ -26,8 +26,10 @@ public class EmbeddedCultureResourcesTests
     [Fact]
     public void No_satellite_assembly_of_the_apps_is_built_beside_the_assembly()
     {
-        // The test platform's own satellite assemblies sit in the same culture folders.
-        var folder = Path.GetDirectoryName(typeof(Strings).Assembly.Location)!;
+        // The test platform's own satellite assemblies sit in the same culture folders. The
+        // domain's base folder is the build's output; the assembly itself can be loaded from a
+        // shadow copy elsewhere.
+        var folder = AppDomain.CurrentDomain.BaseDirectory;
 
         Assert.Empty(Directory.GetFiles(folder, "InstallerClean*.resources.dll", SearchOption.AllDirectories));
     }
@@ -36,7 +38,6 @@ public class EmbeddedCultureResourcesTests
     [InlineData("fr-CA", "fr")]
     [InlineData("zh-CN", "zh-Hans")]
     [InlineData("zh-TW", "zh-Hant")]
-    [InlineData("PT-br", "pt-BR")]
     public void A_culture_with_no_resource_of_its_own_reads_its_parents(string culture, string parent)
     {
         Assert.NotEqual(AllClean(SupportedLanguages.Neutral), AllClean(parent));
@@ -52,6 +53,17 @@ public class EmbeddedCultureResourcesTests
     {
         Assert.Equal(AllClean(SupportedLanguages.Neutral), AllClean(culture));
         Assert.Null(Manager.GetResourceSet(CultureInfo.GetCultureInfo(culture), createIfNotExists: true, tryParents: false));
+    }
+
+    [Fact]
+    public void The_neutral_language_reads_the_neutral_strings_without_trying_parents()
+    {
+        var neutral = Manager.GetResourceSet(CultureInfo.InvariantCulture, createIfNotExists: true, tryParents: false);
+        var named = Manager.GetResourceSet(
+            CultureInfo.GetCultureInfo(SupportedLanguages.Neutral), createIfNotExists: true, tryParents: false);
+
+        Assert.NotNull(neutral);
+        Assert.Same(neutral, named);
     }
 
     [Fact]

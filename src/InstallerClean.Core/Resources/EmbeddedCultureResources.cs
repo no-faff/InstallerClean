@@ -8,16 +8,18 @@ namespace InstallerClean.Resources;
 /// A <see cref="ResourceManager"/> that reads every language from the assembly it is given.
 /// The neutral strings are the resource named <c>&lt;baseName&gt;.resources</c>, and each
 /// other language is the resource named <c>&lt;baseName&gt;.&lt;culture&gt;.resources</c>
-/// beside it in the same assembly. No satellite assembly is looked for, so no folder named
-/// for a culture beside the exe is read.
+/// beside it in the same assembly. This manager looks for no satellite assembly, so it reads
+/// no folder named for a culture beside the exe.
 /// </summary>
 /// <remarks>
 /// The fallback is the one a satellite layout gives. A culture with no resource of its own
 /// takes its parent's, and so on up to the neutral strings; a key a language's resource does
 /// not hold is answered by the next resource up the same chain, which
 /// <see cref="ResourceManager.GetString(string, CultureInfo)"/> walks by asking
-/// <see cref="InternalGetResourceSet"/> for each culture in turn. A culture's name is matched
-/// to its resource without regard to case, as a folder name on Windows is.
+/// <see cref="InternalGetResourceSet"/> for each culture in turn. The culture the assembly's
+/// <see cref="NeutralResourcesLanguageAttribute"/> names reads the neutral strings, as the
+/// invariant culture does. A culture's name is matched to its resource without regard to
+/// case, as a folder name on Windows is.
 /// </remarks>
 internal sealed class EmbeddedCultureResources : ResourceManager
 {
@@ -25,8 +27,9 @@ internal sealed class EmbeddedCultureResources : ResourceManager
 
     private readonly Assembly _assembly;
     private readonly string _neutralName;
+    private readonly string _neutralCulture;
     private readonly Dictionary<string, string> _nameByCulture = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, ResourceSet> _sets = new(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<string, ResourceSet> _sets = new(StringComparer.OrdinalIgnoreCase);
     private readonly object _gate = new();
 
     internal EmbeddedCultureResources(string baseName, Assembly assembly)
@@ -34,6 +37,7 @@ internal sealed class EmbeddedCultureResources : ResourceManager
     {
         _assembly = assembly;
         _neutralName = baseName + Extension;
+        _neutralCulture = GetNeutralResourcesLanguage(assembly).Name;
         var prefix = baseName + ".";
         foreach (var name in assembly.GetManifestResourceNames())
         {
@@ -61,7 +65,8 @@ internal sealed class EmbeddedCultureResources : ResourceManager
     {
         for (var current = culture; ; current = current.Parent)
         {
-            var neutral = current.Equals(CultureInfo.InvariantCulture);
+            var neutral = current.Equals(CultureInfo.InvariantCulture)
+                || string.Equals(current.Name, _neutralCulture, StringComparison.OrdinalIgnoreCase);
             if (neutral || _nameByCulture.ContainsKey(current.Name))
             {
                 return SetFor(neutral ? string.Empty : current.Name, createIfNotExists);
@@ -70,15 +75,20 @@ internal sealed class EmbeddedCultureResources : ResourceManager
         }
     }
 
-    /// <summary>Closes every resource read so far; a later read opens it again.</summary>
+    /// <summary>
+    /// Closes every resource read so far; a later read opens it again. The sets are taken out
+    /// of use before any of them is closed, as the base class does with its own.
+    /// </summary>
     public override void ReleaseAllResources()
     {
+        Dictionary<string, ResourceSet> released;
         lock (_gate)
         {
-            foreach (var set in _sets.Values) set.Close();
-            _sets.Clear();
+            released = _sets;
+            _sets = new Dictionary<string, ResourceSet>(StringComparer.OrdinalIgnoreCase);
         }
         base.ReleaseAllResources();
+        foreach (var set in released.Values) set.Close();
     }
 
     private ResourceSet? SetFor(string culture, bool createIfNotExists)
