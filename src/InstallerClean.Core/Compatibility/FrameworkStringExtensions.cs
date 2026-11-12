@@ -47,6 +47,30 @@ internal static class FrameworkStringExtensions
         }
 
         /// <summary>
+        /// The first index at or after <paramref name="startIndex"/> where <paramref name="value"/>
+        /// occurs in the text under an ordinal comparison, with case folded for
+        /// <see cref="StringComparison.OrdinalIgnoreCase"/>, or -1: what .NET 10's
+        /// <c>IndexOf(string, int, StringComparison)</c> answers for those two comparisons. An
+        /// empty value is found at <paramref name="startIndex"/>. string.IndexOf with a
+        /// comparison is banned in the shipped projects and this is called in its place, as
+        /// .NET Framework's searches ASCII text by culture rules under OrdinalIgnoreCase.
+        /// </summary>
+        /// <exception cref="NotSupportedException">A culture comparison, which has no .NET Framework port.</exception>
+        public int IndexOfOrdinal(string value, int startIndex, StringComparison comparisonType)
+        {
+            if (text is null) throw new NullReferenceException();
+            if (value is null) throw new ArgumentNullException(nameof(value));
+            if ((uint)startIndex > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), "Index was out of range. Must be non-negative and less than or equal to the size of the collection.");
+
+            return OrdinalIndexOf(text, value, startIndex, IgnoresCase(comparisonType));
+        }
+
+        /// <summary><see cref="IndexOfOrdinal(string, int, StringComparison)"/> from the start of the text.</summary>
+        public int IndexOfOrdinal(string value, StringComparison comparisonType) =>
+            IndexOfOrdinal(text, value, 0, comparisonType);
+
+        /// <summary>
         /// The text with every occurrence of <paramref name="oldValue"/>, found left to right
         /// without overlap under an ordinal comparison (case folded for
         /// <see cref="StringComparison.OrdinalIgnoreCase"/>), replaced by

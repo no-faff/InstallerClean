@@ -207,7 +207,7 @@ internal sealed class FileTimesReader : IFileTimesReader
         if (!finalPath.StartsWith(VolumeGuidPrefix, StringComparison.OrdinalIgnoreCase))
             return null;
 
-        var close = finalPath.IndexOf("}\\", VolumeGuidPrefix.Length, StringComparison.Ordinal);
+        var close = finalPath.IndexOfOrdinal("}\\", VolumeGuidPrefix.Length, StringComparison.Ordinal);
         return close < 0 ? null : finalPath.Substring(0, close + 2);
     }
 

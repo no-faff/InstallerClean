@@ -64,6 +64,35 @@ public class FrameworkStringsTests
         Assert.Equal(expected, text.Contains(value, comparison));
     }
 
+    [Theory]
+    [InlineData("a<installer>b", "<installer>", 0, StringComparison.Ordinal, 1)]
+    [InlineData("a<INSTALLER>b", "<installer>", 0, StringComparison.Ordinal, -1)]
+    [InlineData("a<INSTALLER>b", "<installer>", 0, StringComparison.OrdinalIgnoreCase, 1)]
+    [InlineData(@"C:\Windows\Installer and c:\windows\installer", @"C:\WINDOWS\INSTALLER", 1, StringComparison.OrdinalIgnoreCase, 25)]
+    [InlineData("a\u0000b", "ab", 0, StringComparison.OrdinalIgnoreCase, -1)]
+    [InlineData("a\u00ADb", "ab", 0, StringComparison.OrdinalIgnoreCase, -1)]
+    [InlineData("abc", "", 2, StringComparison.OrdinalIgnoreCase, 2)]
+    [InlineData("abc", "", 3, StringComparison.Ordinal, 3)]
+    [InlineData("ab", "abc", 0, StringComparison.OrdinalIgnoreCase, -1)]
+    public void IndexOfOrdinal_finds_the_first_ordinal_match_folding_case_only_when_asked(
+        string text, string value, int startIndex, StringComparison comparison, int expected)
+    {
+        Assert.Equal(expected, text.IndexOfOrdinal(value, startIndex, comparison));
+        if (startIndex == 0)
+            Assert.Equal(expected, text.IndexOfOrdinal(value, comparison));
+    }
+
+    [Fact]
+    public void IndexOfOrdinal_refuses_a_null_value_a_start_past_the_end_and_a_culture_comparison()
+    {
+        var text = "abc";
+
+        Assert.Throws<ArgumentNullException>(() => text.IndexOfOrdinal(null!, StringComparison.Ordinal));
+        Assert.Throws<ArgumentOutOfRangeException>(() => text.IndexOfOrdinal("a", 4, StringComparison.Ordinal));
+        Assert.Throws<ArgumentOutOfRangeException>(() => text.IndexOfOrdinal("a", -1, StringComparison.Ordinal));
+        Assert.Throws<NotSupportedException>(() => text.IndexOfOrdinal("a", StringComparison.CurrentCultureIgnoreCase));
+    }
+
     [Fact]
     public void Contains_refuses_a_null_value_and_an_unknown_comparison()
     {

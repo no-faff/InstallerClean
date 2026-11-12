@@ -136,7 +136,7 @@ internal static class InstallerPathText
         if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(path))
             return text ?? string.Empty;
 
-        int at = text.IndexOf(path, StringComparison.OrdinalIgnoreCase);
+        int at = text.IndexOfOrdinal(path, StringComparison.OrdinalIgnoreCase);
         if (at < 0)
             return text;
 
@@ -171,7 +171,7 @@ internal static class InstallerPathText
         if (string.IsNullOrEmpty(text))
             return text ?? string.Empty;
 
-        int at = text.IndexOf(InstallerFolder, StringComparison.OrdinalIgnoreCase);
+        int at = text.IndexOfOrdinal(InstallerFolder, StringComparison.OrdinalIgnoreCase);
         if (at < 0)
             return text;
 
@@ -182,7 +182,7 @@ internal static class InstallerPathText
             joined.Append(text, copiedTo, at - copiedTo);
             AppendBound(joined, text.AsSpan(at, InstallerFolder.Length));
             copiedTo = at + InstallerFolder.Length;
-            at = text.IndexOf(InstallerFolder, copiedTo, StringComparison.OrdinalIgnoreCase);
+            at = text.IndexOfOrdinal(InstallerFolder, copiedTo, StringComparison.OrdinalIgnoreCase);
         }
 
         joined.Append(text, copiedTo, text.Length - copiedTo);

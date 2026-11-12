@@ -378,3 +378,6 @@ M:System.TimeSpan.FromSeconds(System.Double);Durations.FromSeconds, which keeps 
 M:System.TimeSpan.FromMinutes(System.Double);Durations.FromMinutes, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
 M:System.TimeSpan.FromHours(System.Double);Durations.FromMinutes, sixty to the hour, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
 M:System.TimeSpan.FromDays(System.Double);Durations.FromDays, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
+M:System.String.IndexOf(System.String,System.StringComparison);Call IndexOfOrdinal (FrameworkStringExtensions), which searches as .NET 10 does where .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
+M:System.String.IndexOf(System.String,System.Int32,System.StringComparison);Call IndexOfOrdinal (FrameworkStringExtensions), which searches as .NET 10 does where .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
+M:System.String.IndexOf(System.String,System.Int32,System.Int32,System.StringComparison);Call IndexOfOrdinal (FrameworkStringExtensions), which searches as .NET 10 does where .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
