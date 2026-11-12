@@ -196,10 +196,33 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
     }
 
-    [ObservableProperty] private int _operationCurrentFile;
-    [ObservableProperty] private int _operationTotalFiles;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OperationProgressPercentShown))]
+    private int _operationCurrentFile;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OperationProgressPercentShown))]
+    private int _operationTotalFiles;
+
     [ObservableProperty] private string _operationCurrentFileName = string.Empty;
     [ObservableProperty] private double _operationProgressPercent;
+
+    /// <summary>
+    /// The whole percentage the label beside the bar shows, from the two counts the
+    /// line beside it shows: see <see cref="ShownPercent"/>.
+    /// </summary>
+    public int OperationProgressPercentShown => ShownPercent(OperationCurrentFile, OperationTotalFiles);
+
+    /// <summary>
+    /// <paramref name="done"/> of <paramref name="total"/> files as a whole percentage, to
+    /// the nearest, a tie going to the even one, worked out on the two counts: one file of
+    /// eight reads 12%, three 38%, and 23 of 40, exactly 57.5%, reads 58%. Taken as a double
+    /// first, the share for 23 of 40 is 57.49999999999999, and .NET Framework's F0 takes a
+    /// tie away from zero, so the label prints this whole number rather than formatting the
+    /// bar's double.
+    /// </summary>
+    internal static int ShownPercent(int done, int total) =>
+        total > 0 ? (int)DisplayHelpers.WholeUnits(done * 100L, total) : 0;
 
     /// <summary>
     /// What a screen reader speaks for <see cref="OperationProgress"/>: the heading itself,
@@ -2351,13 +2374,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// volume the cached files came off being genuinely emptier once they are on
     /// it; only an unreadable destination declines to say either way.
     ///
-    /// THAT VOLUME IS THE SYSTEM DRIVE ON AN ORDINARY MACHINE AND IS NOT NAMED
-    /// AS ONE HERE. The files come off whatever volume holds
-    /// <c>C:\Windows\Installer</c>, and Windows lets a volume be mounted there.
-    /// Nothing in the mapping below turns on which volume it is, so naming one
-    /// bought nothing and was wrong on the machine where the two differ. The
-    /// mapping itself is unchanged: what a same-volume move's bytes count as is
-    /// settled and is not in question here.
+    /// The files come off whatever volume holds <c>C:\Windows\Installer</c>. That
+    /// is the system drive on an ordinary machine, and Windows lets another volume
+    /// be mounted there; nothing in the mapping below turns on which volume it is.
     /// </summary>
     internal static MoveSpaceOutcome ClassifySpaceOutcome(string destinationKind) => destinationKind switch
     {

@@ -30,4 +30,34 @@ public class CleanupViewModelLogicTests
     [InlineData("a kind nothing has ever emitted", MoveSpaceOutcome.Unclassified)]
     public void ClassifySpaceOutcome_maps_every_destination_kind(string kind, MoveSpaceOutcome expected) =>
         Assert.Equal(expected, CleanupViewModel.ClassifySpaceOutcome(kind));
+
+    [Theory]
+    // Files done of files in the batch, and the percentage the label shows: the exact
+    // share to the nearest whole number, a tie to the even one.
+    [InlineData(1, 8, 12)]
+    [InlineData(3, 8, 38)]
+    [InlineData(5, 8, 62)]
+    [InlineData(7, 8, 88)]
+    [InlineData(1, 200, 0)]
+    [InlineData(3, 200, 2)]
+    [InlineData(29, 200, 14)]
+    [InlineData(11, 40, 28)]
+    [InlineData(23, 40, 58)]
+    [InlineData(1, 3, 33)]
+    [InlineData(2, 3, 67)]
+    [InlineData(8, 8, 100)]
+    [InlineData(0, 0, 0)]
+    public void The_progress_label_rounds_a_halfway_percentage_to_the_even_number(int done, int total, int expected)
+    {
+        Assert.Equal(expected, CleanupViewModel.ShownPercent(done, total));
+    }
+
+#if NETFRAMEWORK
+    // .NET Framework's own F0, which the label does not use, takes 12.5 up to 13.
+    [Fact]
+    public void The_framework_s_own_F0_rounds_a_halfway_percentage_up()
+    {
+        Assert.Equal("13", 12.5.ToString("F0", System.Globalization.CultureInfo.InvariantCulture));
+    }
+#endif
 }

@@ -1001,7 +1001,7 @@
                         <DockPanel Margin="0,0,0,2"
                                    Visibility="{Binding Cleanup.ShowOperationProgressDetail, Converter={StaticResource BoolToVis}}">
                             <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}">
-                                <Run Text="{Binding Cleanup.OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
+                                <Run Text="{Binding Cleanup.OperationProgressPercentShown, Mode=OneWay, StringFormat='{}{0}%'}"/>
                             </TextBlock>
                             <Grid>
                                 <!-- Visible count: updates once per file and is
