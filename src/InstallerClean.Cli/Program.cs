@@ -34,10 +34,10 @@ internal static class Program
     {
         InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
 
-        // The command line ships no .exe.config, so one beside it is a file it did not
-        // create, which on .NET Framework the runtime would read. Refuse before anything
-        // else runs, printing the message and ending; the setup's copy ships its own
-        // config and is not refused. Read here, never in a module initializer.
+        // A .exe.config beside the command line that says more than the build's own is a
+        // file somebody else wrote, which on .NET Framework the runtime would read. Refuse
+        // before anything else runs, printing the message and ending; a config beside the
+        // setup's copy is not refused. Read here, never in a module initializer.
         if (PlantedConfig.RefusalMessage(Environment.ProcessPath, new RegistryReader()) is { } plantedConfig)
         {
             Console.Error.WriteLine(plantedConfig);

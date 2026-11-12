@@ -472,6 +472,7 @@ const MAP = {
   'Startup.UnhandledBody': `An unexpected error occurred and InstallerClean needs to close.\n\n{0}\n\nDetails written to:\n{1}`,
   'Startup.UnhandledBody.NoLog': `An unexpected error occurred and InstallerClean needs to close.\n\n{0}\n\nThe crash log could not be written.`,
   'Startup.ErrorTitle': `Startup error`,
+  'Startup.PlantedConfigRefusal': `InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.\n\n{1}`,
   'Startup.FailedToStart': `Failed to start ({0}). Details written to:\n{1}`,
   'Startup.FailedToStart.NoLog': `Failed to start ({0}). The crash log could not be written.`,
 

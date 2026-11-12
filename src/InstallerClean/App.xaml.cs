@@ -210,11 +210,11 @@ public partial class App : Application
         LanguageFonts.Initialise((System.Windows.Media.FontFamily)Resources["Type.FontFamily"]);
         Resources["Type.FontFamily"] = LanguageFonts.For(SupportedLanguages.Active(Localisation.UiCulture));
 
-        // A .exe.config beside a copy that ships none is a file the copy did not create,
-        // which on .NET Framework the runtime reads. The portable and command line ship no
-        // config; the setup's copy ships its own and is not refused. Refused here, in the
-        // language the user chose and before anything scans, and read here rather than in a
-        // module initializer, which reaches System.IO and the registry.
+        // A .exe.config beside the copy that says more than the build's own is a file
+        // somebody else wrote, which on .NET Framework the runtime reads. A config beside
+        // the setup's copy is not refused. Refused here, in the language the user chose and
+        // before anything scans, and read here rather than in a module initializer, which
+        // reaches System.IO and the registry.
         if (PlantedConfig.RefusalMessage(Environment.ProcessPath, new RegistryReader()) is { } plantedConfig)
         {
             MessageDialog.Show(plantedConfig, Strings.Startup_ErrorTitle, MessageKind.Error);
