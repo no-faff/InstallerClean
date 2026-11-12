@@ -28,6 +28,10 @@
 ; The published binaries and the setup output all sit under ..\publish;
 ; defined once here so the [Files] sources and OutputDir cannot drift apart.
 #define PublishDir "..\publish"
+; The registry key and the Release value .NET Framework 4.8 writes. [Code] reads them
+; as UpdateManifest.HasNetFramework48 does, and the two change together.
+#define NetFrameworkKey "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"
+#define NetFramework48Release "528040"
 ; The single-instance mutex, named by AppMutex and by the wait in [Code]. It matches
 ; InstanceLock.Name in src/InstallerClean.Core/Services/InstanceLock.cs, and
 ; scripts/check-instance-lock-name.mjs holds the two together.
@@ -173,8 +177,8 @@ SignedUninstallerDir={#UninstallerSignatureDir}
 Source: "{#PublishDir}\window\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; The merged exe's .exe.config carries the supportedRuntime line that names .NET
 ; Framework 4.8. The setup's copy in Program Files ships it; the portable and
-; command-line downloads ship no config, so a config beside either of them is a
-; file they did not create. A drive-by download cannot write this folder.
+; command-line downloads are the exe alone. A drive-by download cannot write this
+; folder.
 Source: "{#PublishDir}\window\InstallerClean.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 ; CLI is a .NET console exe published from src/InstallerClean.Cli;
 ; ships alongside the GUI so PowerShell and cmd block on the process
@@ -250,17 +254,37 @@ begin
   Result := HasSwitch('/UPDATEFROMCLI');
 end;
 
+// Whether this PC has .NET Framework 4.8: the Release value it writes, at least
+// {#NetFramework48Release}. The app reads the same value (UpdateManifest.HasNetFramework48).
+function HasNetFramework48: Boolean;
+var
+  Release: Cardinal;
+begin
+  Result := RegQueryDWordValue(HKLM, '{#NetFrameworkKey}', 'Release', Release)
+    and (Release >= {#NetFramework48Release});
+end;
+
 // Started by an update, Setup waits for every copy of the app to close before it
 // checks AppMutex, for up to 30 seconds: the copy that starts Setup, or the one it
 // stands for, may still be closing, and its handle to the mutex stays open until it
 // closes it as it exits. Setup calls InitializeSetup before its own AppMutex check,
 // which then asks for InstallerClean to be closed where the mutex is still open, and
 // fails the setup with nothing written where /SUPPRESSMSGBOXES answers that box.
+//
+// Before that, on a PC without .NET Framework 4.8, Setup says what to install and
+// stops with nothing written: the copies it installs run on 4.8, which their configs
+// name. Silent, the message goes to Setup's log alone.
 function InitializeSetup: Boolean;
 var
   Waited: Integer;
 begin
-  Result := True;
+  Result := HasNetFramework48;
+  if not Result then
+  begin
+    Log('.NET Framework 4.8 is not installed: no Release value of at least {#NetFramework48Release} under HKLM\{#NetFrameworkKey}.');
+    SuppressibleMsgBox(CustomMessage('NeedsNetFramework48'), mbCriticalError, MB_OK, IDOK);
+    Exit;
+  end;
   if not (UpdatingFromApp or UpdatingFromCommandLine) then Exit;
   Waited := 0;
   while CheckForMutexes('{#AppMutexName}') and (Waited < 30000) do

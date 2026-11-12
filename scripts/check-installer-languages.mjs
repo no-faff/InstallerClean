@@ -58,7 +58,7 @@ const REQUIRED_MESSAGE_KEYS = [
   'FinishedHeadingLabel', 'FinishedLabel', 'ClickFinish',
   'SetupAppRunningError', 'UninstallAppRunningError',
 ];
-const REQUIRED_CUSTOM_KEYS = ['UninstallApp', 'LaunchApp'];
+const REQUIRED_CUSTOM_KEYS = ['UninstallApp', 'LaunchApp', 'NeedsNetFramework48'];
 
 const errors = [];
 
