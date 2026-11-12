@@ -12,8 +12,9 @@ namespace InstallerClean.Tests.Services.Integration;
 /// at all: with the paths fixed to %LOCALAPPDATA%, exercising them would mean
 /// writing over the real last-run.json in whichever profile ran the suite.
 ///
-/// SendAsync's network path is deliberately not covered: it posts to a live No
-/// Faff endpoint. Its two pre-network guards (an empty body, and a body over
+/// SendAsync's network path is not covered here: it posts to a live No Faff
+/// endpoint. The request it sends is, on a loopback server, in
+/// <see cref="ResultLogRequestTests"/>. Its two pre-network guards (an empty body, and a body over
 /// the byte cap) are covered below, which is possible precisely because both
 /// return before the request is built.
 /// </summary>
