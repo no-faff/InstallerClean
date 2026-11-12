@@ -33,7 +33,8 @@ namespace InstallerClean.Cli;
 /// Setting <see cref="Console.OutputEncoding"/> replaces a writer the console made for
 /// itself and keeps one installed through <see cref="Console.SetOut"/>, so with the code
 /// page set first this guard wraps a writer that already writes UTF-8, and putting the
-/// code page back at the end leaves it in place.
+/// code page back at the end leaves it in place. In a process with no console, Main puts a
+/// UTF-8 writer over stdout itself before the guard wraps it.
 /// </summary>
 internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
 {
