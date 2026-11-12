@@ -69,7 +69,7 @@ public class FrameworkCollationTests
 
         Assert.Equal(
             Math.Sign(culture.CompareInfo.Compare("a_b", "a)b", CompareOptions.None)),
-            Math.Sign(FrameworkCollation.Compare("a_b", "a)b", culture, CompareOptions.None, icu: null)));
+            Math.Sign(FrameworkCollation.For(culture, CompareOptions.None, icu: null)("a_b", "a)b")));
     }
 
     [Theory]

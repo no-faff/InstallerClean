@@ -134,8 +134,8 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         //
         // This order decides which row the window opens on (see the selection at
         // the end of the constructor), not which order it displays: the window
-        // applies its own culture-aware SortDescription at Loaded, so that the
-        // sort arrow it paints describes an order the list is actually in. The
+        // sorts the view itself at Loaded, collating in its own language, so that
+        // the sort arrow it paints describes an order the list is actually in. The
         // two need not agree and a change here does not move the display.
         var products = new List<ProductRow>();
         foreach (var group in groups

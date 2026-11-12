@@ -24,7 +24,7 @@ namespace InstallerClean.Helpers;
 internal sealed class CollatedSort<T> : IComparer where T : class
 {
     private readonly (Func<T, object?> Read, bool Descending)[] _keys;
-    private readonly CultureInfo _culture;
+    private readonly Func<string?, string?, int> _collate;
     private readonly Dictionary<T, object?[]> _read = new(ByReference.Instance);
 
     /// <param name="culture">
@@ -34,7 +34,7 @@ internal sealed class CollatedSort<T> : IComparer where T : class
     /// <param name="keys">Each key's value for a row, and its direction, first key first.</param>
     public CollatedSort(CultureInfo? culture, params (Func<T, object?> Read, ListSortDirection Direction)[] keys)
     {
-        _culture = culture ?? CultureInfo.InvariantCulture;
+        _collate = FrameworkCollation.For(culture ?? CultureInfo.InvariantCulture, CompareOptions.None);
         _keys = Array.ConvertAll(keys, k => (k.Read, k.Direction == ListSortDirection.Descending));
     }
 
@@ -58,7 +58,7 @@ internal sealed class CollatedSort<T> : IComparer where T : class
         if (a is null) return -1;
         if (b is null) return 1;
         if (a is string sa && b is string sb)
-            return FrameworkCollation.Compare(sa, sb, _culture, CompareOptions.None);
+            return _collate(sa, sb);
         if (a is IComparable ia) return ia.CompareTo(b);
         if (b is IComparable ib) return -ib.CompareTo(a);
         throw new ArgumentException("At least one object must implement IComparable.");

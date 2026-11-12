@@ -34,26 +34,36 @@ internal static unsafe class FrameworkCollation
     /// </summary>
     /// <exception cref="ArgumentException">Options other than None and IgnoreCase.</exception>
     public static int Compare(string? first, string? second, CultureInfo culture, CompareOptions options) =>
-        Compare(first, second, culture, options, Loaded.Value);
+        For(culture, options, Loaded.Value)(first, second);
 
-    internal static int Compare(string? first, string? second, CultureInfo culture, CompareOptions options, Icu? icu)
+    /// <summary>
+    /// <see cref="Compare(string, string, CultureInfo, CompareOptions)"/> with the culture's
+    /// collator found once, for a sort that compares many times in one culture.
+    /// </summary>
+    /// <exception cref="ArgumentException">Options other than None and IgnoreCase.</exception>
+    public static Func<string?, string?, int> For(CultureInfo culture, CompareOptions options) =>
+        For(culture, options, Loaded.Value);
+
+    internal static Func<string?, string?, int> For(CultureInfo culture, CompareOptions options, Icu? icu)
     {
         if (options is not (CompareOptions.None or CompareOptions.IgnoreCase))
             throw new ArgumentException($"CompareOptions.{options} is not ported to .NET Framework: only None and IgnoreCase sort as .NET 10 does.", nameof(options));
 
-        if (first is null) return second is null ? 0 : -1;
-        if (second is null) return 1;
-        if (ReferenceEquals(first, second)) return 0;
+        var collator = icu?.Collator(culture.Name, options);
+        return (first, second) =>
+        {
+            if (first is null) return second is null ? 0 : -1;
+            if (second is null) return 1;
+            if (ReferenceEquals(first, second)) return 0;
+            if (collator is { } c) return icu!.Compare(c, first, second);
 
-        if (icu?.Collator(culture.Name, options) is { } collator)
-            return icu.Compare(collator, first, second);
-
-        // NLS, as .NET 10 compares where Windows has no ICU: CompareStringEx with the
-        // culture's sort and NORM_LINGUISTIC_CASING, adding NORM_IGNORECASE for IgnoreCase,
-        // which is what .NET Framework's CompareInfo calls too.
+            // NLS, as .NET 10 compares where Windows has no ICU: CompareStringEx with the
+            // culture's sort and NORM_LINGUISTIC_CASING, adding NORM_IGNORECASE for
+            // IgnoreCase, which is what .NET Framework's CompareInfo calls too.
 #pragma warning disable RS0030
-        return culture.CompareInfo.Compare(first, second, options);
+            return culture.CompareInfo.Compare(first, second, options);
 #pragma warning restore RS0030
+        };
     }
 
     /// <summary>
@@ -174,6 +184,7 @@ internal static unsafe class FrameworkCollation
     internal sealed class Icu
     {
         private readonly delegate* unmanaged[Cdecl]<byte*, byte*, int, int*, int> _canonicalize;
+        private readonly delegate* unmanaged[Cdecl]<byte*, byte*, int, int*, int> _getLanguage;
         private readonly delegate* unmanaged[Cdecl]<byte*, int*, IntPtr> _open;
         private readonly delegate* unmanaged[Cdecl]<char*, int, int, int, void*, int*, IntPtr> _openRules;
         private readonly delegate* unmanaged[Cdecl]<IntPtr, int*, char*> _getRules;
@@ -181,9 +192,10 @@ internal static unsafe class FrameworkCollation
         private readonly delegate* unmanaged[Cdecl]<IntPtr, char*, int, char*, int, int> _strcoll;
         private readonly ConcurrentDictionary<(string Culture, CompareOptions Options), IntPtr> _collators = new();
 
-        private Icu(IntPtr canonicalize, IntPtr open, IntPtr openRules, IntPtr getRules, IntPtr setAttribute, IntPtr strcoll)
+        private Icu(IntPtr canonicalize, IntPtr getLanguage, IntPtr open, IntPtr openRules, IntPtr getRules, IntPtr setAttribute, IntPtr strcoll)
         {
             _canonicalize = (delegate* unmanaged[Cdecl]<byte*, byte*, int, int*, int>)canonicalize;
+            _getLanguage = (delegate* unmanaged[Cdecl]<byte*, byte*, int, int*, int>)getLanguage;
             _open = (delegate* unmanaged[Cdecl]<byte*, int*, IntPtr>)open;
             _openRules = (delegate* unmanaged[Cdecl]<char*, int, int, int, void*, int*, IntPtr>)openRules;
             _getRules = (delegate* unmanaged[Cdecl]<IntPtr, int*, char*>)getRules;
@@ -195,15 +207,16 @@ internal static unsafe class FrameworkCollation
         internal static Icu? Load(WindowsIcu icu)
         {
             var canonicalize = WindowsIcu.Export(icu.Common, "uloc_canonicalize");
+            var getLanguage = WindowsIcu.Export(icu.Common, "uloc_getLanguage");
             var open = WindowsIcu.Export(icu.Internationalisation, "ucol_open");
             var openRules = WindowsIcu.Export(icu.Internationalisation, "ucol_openRules");
             var getRules = WindowsIcu.Export(icu.Internationalisation, "ucol_getRules");
             var setAttribute = WindowsIcu.Export(icu.Internationalisation, "ucol_setAttribute");
             var strcoll = WindowsIcu.Export(icu.Internationalisation, "ucol_strcoll");
-            return canonicalize == IntPtr.Zero || open == IntPtr.Zero || openRules == IntPtr.Zero
+            return canonicalize == IntPtr.Zero || getLanguage == IntPtr.Zero || open == IntPtr.Zero || openRules == IntPtr.Zero
                 || getRules == IntPtr.Zero || setAttribute == IntPtr.Zero || strcoll == IntPtr.Zero
                 ? null
-                : new Icu(canonicalize, open, openRules, getRules, setAttribute, strcoll);
+                : new Icu(canonicalize, getLanguage, open, openRules, getRules, setAttribute, strcoll);
         }
 
         /// <summary>
@@ -212,7 +225,8 @@ internal static unsafe class FrameworkCollation
         /// </summary>
         public IntPtr? Collator(string cultureName, CompareOptions options)
         {
-            var collator = _collators.GetOrAdd((cultureName, options), key => Open(key.Culture, key.Options));
+            if (!_collators.TryGetValue((cultureName, options), out var collator))
+                collator = _collators.GetOrAdd((cultureName, options), Open(cultureName, options));
             return collator == IntPtr.Zero ? null : collator;
         }
 
@@ -257,24 +271,30 @@ internal static unsafe class FrameworkCollation
             return *status > 0 ? IntPtr.Zero : ignoringCase;
         }
 
-        // GetLocale with canonicalising, from pal_locale.c: a character outside ASCII, or a
-        // '/', is refused, and ICU canonicalises the rest.
+        // GetLocale with canonicalising, from pal_locale.c: the name's first 156 characters,
+        // a character outside ASCII, or a '/', refused, canonicalised by ICU, and refused
+        // where its language part does not fit ICU's language capacity.
         private string? Canonicalise(string name)
         {
             const int Capacity = 157;
-            if (name.Length >= Capacity) return null;
+            const int LanguageCapacity = 12;
+            const int BufferOverflowError = 15;
+            const int StringNotTerminatedWarning = -124;
             var source = stackalloc byte[Capacity];
             var result = stackalloc byte[Capacity];
-            for (var i = 0; i < name.Length; i++)
+            var language = stackalloc byte[LanguageCapacity];
+            for (var i = 0; i < Capacity - 1 && i < name.Length; i++)
             {
                 if (name[i] > 0x7F || name[i] == '/') return null;
                 source[i] = (byte)name[i];
             }
-            source[name.Length] = 0;
 
             var status = 0;
             var length = _canonicalize(source, result, Capacity, &status);
-            return status > 0 || length >= Capacity ? null : new string((sbyte*)result, 0, length);
+            if (status > 0) return null;
+            _getLanguage(source, language, LanguageCapacity, &status);
+            if (status > 0 || status == StringNotTerminatedWarning || status == BufferOverflowError) return null;
+            return new string((sbyte*)result, 0, Math.Min(length, Capacity - 1));
         }
     }
 }

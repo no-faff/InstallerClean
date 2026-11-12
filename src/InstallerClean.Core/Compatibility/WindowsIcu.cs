@@ -51,7 +51,8 @@ internal sealed class WindowsIcu
 
     /// <summary>
     /// The address of <paramref name="name"/> in <paramref name="library"/>, or zero where
-    /// it is not exported. Windows' ICU exports its functions under their plain names.
+    /// it is not exported. The ICU Windows ships exports its functions under their plain
+    /// names, which are the names .NET 10 asks it for.
     /// </summary>
     public static IntPtr Export(IntPtr library, string name) =>
         Kernel32.GetProcAddress(library, System.Text.Encoding.ASCII.GetBytes(name + "\0"));
