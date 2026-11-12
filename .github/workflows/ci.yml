@@ -477,11 +477,22 @@ jobs:
             # value string sits in the exe's metadata. The merged package assemblies
             # (net462, netstandard) are dropped, so ".NETFramework,Version=v4.8" is that
             # attribute and nothing else. A one-byte-per-char read finds it without loading
-            # the assembly, which PowerShell 7 cannot do for a .NET Framework exe.
+            # the assembly, which PowerShell 7 cannot do for a .NET Framework exe. The
+            # read cannot tell that attribute from another UTF-8 copy of the same bytes (an
+            # embedded resource, a merged assembly's own attribute that kept v4.8); it
+            # holds today because no such copy exists and a C# string literal is UTF-16.
             $metadata = [System.Text.Encoding]::Latin1.GetString([System.IO.File]::ReadAllBytes($full))
             $carries48 = $metadata.Contains('.NETFramework,Version=v4.8')
             "$exe is $($name.Version), carries the 4.8 target-framework attribute: $carries48"
             if (-not $carries48) { "  the merge dropped the 4.8 target-framework attribute"; $failed = $true }
+            # Environment.OSVersion reports Windows 10 or 11 only while the exe's manifest
+            # carries the Windows 10 supportedOS entry; without it the report would say plain
+            # "Windows". The merge keeps the primary exe's manifest, so this GUID (the Windows
+            # 10 supportedOS Id in both app.manifest files) is in the exe's bytes, read the
+            # same way and with the same limit as the attribute above.
+            $win10Manifest = $metadata.Contains('8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a')
+            "$exe carries the Windows 10 supportedOS manifest entry: $win10Manifest"
+            if (-not $win10Manifest) { "  the merge dropped the Windows 10 supportedOS manifest entry"; $failed = $true }
           }
           # The command line is the one that starts without a window. A clean start
           # leaves no library-search line in the crash log.
