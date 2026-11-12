@@ -44,7 +44,7 @@ BEGIN {
     print "[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"InstallerClean.ResxGen\", \"1.0.0.0\")]"
     print "public static class Strings"
     print "{"
-    print "    private static readonly ResourceManager Manager ="
+    print "    private static readonly EmbeddedCultureResources Manager ="
     print "        new(\"InstallerClean.Resources.Strings\", typeof(Strings).Assembly);"
     print ""
     print "    /// <summary>"

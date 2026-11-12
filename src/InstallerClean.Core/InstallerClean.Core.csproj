@@ -67,16 +67,24 @@
        scripts/regenerate-strings-designer.sh; Strings.resx is the
        neutral resx for the assembly's NeutralLanguage (en-GB). A satellite
        resx sits beside it for every other language in
-       SupportedLanguages.CultureNames (Strings.<culture>.resx), so the
-       build emits a satellite assembly per culture and .NET resource
-       fallback serves the neutral resx only for a culture with no
-       satellite. Each satellite is generated from its
-       gen-strings-<code>.mjs MAP; only the resx is committed. A new UI
-       language lands as a new Strings.<culture>.resx generated the same
-       way (Arabic is README-only and has no resx). -->
+       SupportedLanguages.CultureNames (Strings.<culture>.resx). Each one
+       is compiled into this assembly as the resource
+       InstallerClean.Resources.Strings.<culture>.resources, beside the
+       neutral one, and no satellite assembly is built: WithCulture false
+       is what keeps the build from taking the culture in the file name as
+       a request for one. EmbeddedCultureResources reads them, and serves
+       the neutral resx only for a culture with no resource of its own.
+       Each satellite resx is generated from its gen-strings-<code>.mjs
+       MAP; only the resx is committed. A new UI language lands as a new
+       Strings.<culture>.resx generated the same way (Arabic is
+       README-only and has no resx). -->
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <ManifestResourceName>InstallerClean.Resources.Strings</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Strings.*.resx">
+      <WithCulture>false</WithCulture>
+      <ManifestResourceName>InstallerClean.Resources.%(Filename)</ManifestResourceName>
     </EmbeddedResource>
   </ItemGroup>
 

@@ -24,7 +24,7 @@ using InstallerClean.Helpers;
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("InstallerClean.ResxGen", "1.0.0.0")]
 public static class Strings
 {
-    private static readonly ResourceManager Manager =
+    private static readonly EmbeddedCultureResources Manager =
         new("InstallerClean.Resources.Strings", typeof(Strings).Assembly);
 
     /// <summary>
