@@ -6,11 +6,12 @@ namespace InstallerClean.Tests.Compatibility;
 /// The tests' own File.CreateSymbolicLink and Directory.CreateSymbolicLink make a link
 /// on a GitHub Actions Windows runner, which runs as an administrator. Every test that
 /// takes a link it cannot make as a host that makes none, and passes, rests on these
-/// two making one where the suite runs on CI.
+/// two making one where the suite runs on CI. A runner without the rights fails here
+/// rather than skipping it.
 /// </summary>
 public class TestFrameworkLinkTests
 {
-    [CiWindowsRunnerFact("Needs the rights to make a symbolic link")]
+    [CiWindowsRunnerFact("Needs the rights to make a symbolic link", evenWithoutAdministrator: true)]
     public void A_link_to_a_file_and_a_link_to_a_folder_are_made_and_read_through()
     {
         var folder = TestTemp.NewFolder("ic-links-");

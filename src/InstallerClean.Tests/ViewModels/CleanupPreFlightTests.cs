@@ -1453,6 +1453,7 @@ public class CleanupPreFlightTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(null, null);
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(), Arg.Any<UnderLeaseClaims>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -1648,6 +1649,8 @@ public class CleanupPreFlightTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
+        // The picker was asked as a Move with no destination asks it, so the close came from inside it.
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(null, null);
         _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
         AssertNoFolderRemoved();
         _confirmationService.DidNotReceive().ConfirmMove(

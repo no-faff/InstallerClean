@@ -17,13 +17,19 @@ public sealed class CiWindowsRunnerFactAttribute : FactAttribute
     public CiWindowsRunnerFactAttribute() => Skip = SkipReason();
 
     /// <param name="because">What the test needs or leaves, which the skip message names.</param>
-    public CiWindowsRunnerFactAttribute(string because) => Skip = SkipReason(because);
+    /// <param name="evenWithoutAdministrator">
+    /// Runs on a GitHub Actions Windows runner whatever its rights, for a test whose point
+    /// is that the runner has them: it then fails where they are missing, rather than
+    /// being skipped.
+    /// </param>
+    public CiWindowsRunnerFactAttribute(string because, bool evenWithoutAdministrator = false) =>
+        Skip = SkipReason(because, evenWithoutAdministrator);
 
     /// <summary>Null on a GitHub Actions Windows runner; otherwise why a test that runs only there is skipped.</summary>
-    internal static string? SkipReason(string because = ApplicationLog) =>
+    internal static string? SkipReason(string because = ApplicationLog, bool evenWithoutAdministrator = false) =>
         !OperatingSystem.IsWindows()
         || Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
-        || !AdministratorRights.Held()
+        || (!evenWithoutAdministrator && !AdministratorRights.Held())
             ? because + ", so it runs only on a GitHub Actions Windows runner."
             : null;
 }
