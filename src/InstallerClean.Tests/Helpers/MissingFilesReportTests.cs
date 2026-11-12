@@ -69,6 +69,21 @@ public class MissingFilesReportTests
     }
 
     [Fact]
+    public void Programs_that_have_lost_the_same_number_order_as_NET_10_collates_their_names()
+    {
+        // In the user's culture through the ICU Windows ships, ignoring case: '_' sorts
+        // ahead of ')' there, where NLS puts ')' first.
+        var products = MissingFilesReport.Products(new[]
+        {
+            Missing(@"C:\Windows\Installer\a.msi", "Contoso (x64)"),
+            Missing(@"C:\Windows\Installer\b.msi", "contoso (x64_arm64)"),
+        });
+
+        Assert.Equal(new[] { "contoso (x64_arm64)", "Contoso (x64)" },
+            products.Select(p => p.ProductName).ToArray());
+    }
+
+    [Fact]
     public void Two_programs_that_have_lost_the_same_number_order_alphabetically()
     {
         // So two scans of one machine agree. Without a tiebreaker the order falls

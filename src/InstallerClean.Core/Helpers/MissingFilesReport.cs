@@ -1,3 +1,5 @@
+using System.Globalization;
+using InstallerClean.Compatibility;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 
@@ -189,7 +191,7 @@ internal static class MissingFilesReport
 
         named.Sort((a, b) => b.FileCount != a.FileCount
             ? b.FileCount.CompareTo(a.FileCount)
-            : string.Compare(a.ProductName, b.ProductName, StringComparison.CurrentCultureIgnoreCase));
+            : FrameworkCollation.Compare(a.ProductName, b.ProductName, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase));
 
         if (unnamed > 0) named.Add(new AffectedProduct(string.Empty, unnamed));
         return named;
