@@ -654,8 +654,12 @@
                                  text), so binding Padding to this ScrollViewer's
                                  Margin too would apply it twice and push the
                                  typed text and caret a whole Padding.Left right
-                                 of the placeholder. -->
+                                 of the placeholder. Not focusable, as in the
+                                 stock template: the box takes the focus, and
+                                 the ScrollViewer inside it is no stop of its
+                                 own. -->
                             <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
                                           VerticalAlignment="Center"/>
                             <!-- Placeholder text comes from the box's Tag. Its
                                  Margin is the box Padding, the single inset
