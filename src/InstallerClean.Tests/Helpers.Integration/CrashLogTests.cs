@@ -38,6 +38,35 @@ public class CrashLogTests
     }
 
     [Fact]
+    public void An_entry_is_stamped_in_one_shape_whatever_the_culture()
+    {
+        // A culture whose time separator is '.' and whose calendar is not the Gregorian one,
+        // as the user's culture can be: Danish under ICU, Thai with its Buddhist calendar.
+        var culture = (CultureInfo)CultureInfo.GetCultureInfo("th-TH").Clone();
+        culture.DateTimeFormat.Calendar = new ThaiBuddhistCalendar();
+        culture.DateTimeFormat.TimeSeparator = ".";
+        var folder = Path.Combine(Path.GetTempPath(), "InstallerClean.Tests", Guid.NewGuid().ToString("N"));
+        var suite = CrashLog.FolderForTests;
+        var before = CultureInfo.CurrentCulture;
+        CrashLog.FolderForTests = folder;
+        CultureInfo.CurrentCulture = culture;
+        try
+        {
+            var (path, written) = CrashLog.TryWrite(new InvalidOperationException("stamp"));
+
+            Assert.True(written);
+            var stamp = File.ReadAllLines(path).Single(line => line.StartsWith("---- ", StringComparison.Ordinal));
+            Assert.Matches(@"^---- 20\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d:\d\d ----$", stamp);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = before;
+            CrashLog.FolderForTests = suite;
+            TestCrashLog.TryDelete(folder);
+        }
+    }
+
+    [Fact]
     public void A_folder_whose_delete_is_refused_is_left_without_a_throw()
     {
         // A read-only file makes the delete throw UnauthorizedAccessException on Windows, as a

@@ -61,7 +61,10 @@ public sealed class ResultLogService : IResultLogService
     private static readonly string UserAgent =
         $"InstallerClean/{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0"}";
 
-    private static readonly HttpClient HttpClient = new()
+    /// <summary>The report client's handler, carrying the proxy .NET 10 takes by default (<see cref="ProxyFromVariables"/>).</summary>
+    internal static HttpClientHandler CreateHandler() => ProxyFromVariables.Carrying(new HttpClientHandler());
+
+    private static readonly HttpClient HttpClient = new(CreateHandler())
     {
         Timeout = RequestTimeout,
         // Bounds the eager buffering only: MaxResponseContentBufferSize

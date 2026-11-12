@@ -141,34 +141,23 @@ internal static unsafe class FrameworkCultureDisplayName
         public delegate* unmanaged[Cdecl]<byte*, byte*, char*, int, int*, int> DisplayLanguage { get; }
 
         /// <summary>
-        /// The ICU Windows ships, found as .NET 10 finds it: icu.dll in System32, which
-        /// Windows 10 version 1903 and later carry, or icuuc.dll with icuin.dll beside it.
-        /// Null where neither is there or a function is missing, which is where .NET 10
-        /// uses NLS.
+        /// The functions from the ICU this process uses (<see cref="WindowsIcu.Loaded"/>),
+        /// or null where it uses NLS or a function is missing, which the lookup answers
+        /// through NLS.
         /// </summary>
-        internal static Icu? Load()
-        {
-            var common = Kernel32.LoadLibraryEx("icu.dll", IntPtr.Zero, Kernel32.LOAD_LIBRARY_SEARCH_SYSTEM32);
-            if (common == IntPtr.Zero)
-            {
-                common = Kernel32.LoadLibraryEx("icuuc.dll", IntPtr.Zero, Kernel32.LOAD_LIBRARY_SEARCH_SYSTEM32);
-                if (common == IntPtr.Zero
-                    || Kernel32.LoadLibraryEx("icuin.dll", IntPtr.Zero, Kernel32.LOAD_LIBRARY_SEARCH_SYSTEM32) == IntPtr.Zero)
-                    return null;
-            }
+        internal static Icu? Load() => WindowsIcu.Loaded is { } icu ? Load(icu.Common) : null;
 
-            var getName = Export(common, "uloc_getName");
-            var getLanguage = Export(common, "uloc_getLanguage");
-            var getDisplayName = Export(common, "uloc_getDisplayName");
-            var getDisplayLanguage = Export(common, "uloc_getDisplayLanguage");
+        private static Icu? Load(IntPtr common)
+        {
+            var getName = WindowsIcu.Export(common, "uloc_getName");
+            var getLanguage = WindowsIcu.Export(common, "uloc_getLanguage");
+            var getDisplayName = WindowsIcu.Export(common, "uloc_getDisplayName");
+            var getDisplayLanguage = WindowsIcu.Export(common, "uloc_getDisplayLanguage");
             return getName == IntPtr.Zero || getLanguage == IntPtr.Zero
                 || getDisplayName == IntPtr.Zero || getDisplayLanguage == IntPtr.Zero
                 ? null
                 : new Icu(getName, getLanguage, getDisplayName, getDisplayLanguage);
         }
-
-        private static IntPtr Export(IntPtr library, string name) =>
-            Kernel32.GetProcAddress(library, System.Text.Encoding.ASCII.GetBytes(name + "\0"));
 
         /// <summary>
         /// What <paramref name="lookup"/> gives for <paramref name="localeName"/> in

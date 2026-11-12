@@ -29,11 +29,17 @@ namespace InstallerClean.Cli;
 /// line stands in its place. Where the line break is refused too, the write it leads is not
 /// made, since its text would join the cut line, and the next write tries again.
 ///
+/// A write to a pipe whose reader has gone, refused with ERROR_NO_DATA, ERROR_BROKEN_PIPE or
+/// ERROR_PIPE_NOT_CONNECTED, is no failure: its text is lost as the reader's going loses
+/// it, and nothing is recorded. .NET Framework's console stream ends such a write itself
+/// for the first two and throws for the third, so the guard takes the third here.
+///
 /// <see cref="Program"/>'s Main installs it once, after it sets the code page.
 /// Setting <see cref="Console.OutputEncoding"/> replaces a writer the console made for
 /// itself and keeps one installed through <see cref="Console.SetOut"/>, so with the code
 /// page set first this guard wraps a writer that already writes UTF-8, and putting the
-/// code page back at the end leaves it in place.
+/// code page back at the end leaves it in place. In a process with no console, Main puts a
+/// UTF-8 writer over stdout itself before the guard wraps it.
 /// </summary>
 internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
 {
@@ -100,6 +106,9 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
         {
             inner.Flush();
         }
+        catch (IOException ex) when (ex.HResult == PipeNotConnected)
+        {
+        }
         catch (Exception ex)
         {
             Record(ex);
@@ -121,11 +130,22 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
             }
             write(inner, value);
         }
+        catch (IOException ex) when (ex.HResult == PipeNotConnected)
+        {
+            // The pipe's reader has gone, so this text and every later write's is lost
+            // whatever is done, and no line is left cut for a reader to see.
+        }
         catch (Exception ex)
         {
             Record(ex);
         }
     }
+
+    /// <summary>
+    /// ERROR_PIPE_NOT_CONNECTED (233) as the HRESULT of the IOException .NET Framework's
+    /// console stream throws for it.
+    /// </summary>
+    internal const int PipeNotConnected = unchecked((int)0x800700E9);
 
     private void Record(Exception ex)
     {

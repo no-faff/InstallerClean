@@ -45,33 +45,6 @@
     <NeutralLanguage>en-GB</NeutralLanguage>
   </PropertyGroup>
 
-  <!-- A Release build runs no start-up hook: neither an assembly DOTNET_STARTUP_HOOKS
-       names nor one applied over the diagnostics channel is loaded before Main. A Debug
-       build keeps .NET's default. -->
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <StartupHookSupport>false</StartupHookSupport>
-  </PropertyGroup>
-
-  <!-- HttpClient's DiagnosticsHandler is left out of every handler chain, so a request
-       reaches System.Diagnostics.Activity only where a tool outside the app listens to
-       HttpClient's telemetry, metrics or activities. Activity's static constructor calls
-       Guid.NewGuid, and .NET binds that call's ole32 import with a search that starts in
-       the folder its own assemblies load from, which in a self-contained build is the
-       exe's own folder.
-       With no Activity listener in the process the handler adds nothing to a request. -->
-  <PropertyGroup>
-    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
-  </PropertyGroup>
-
-  <!-- HttpClient never opens an HTTP/3 connection. One would load msquic.dll by its full
-       path, which in a self-contained build is a path in the exe's own folder, and no
-       resolver of the app's is asked about that load. With the switch in the runtimeconfig
-       the connection pool never reaches System.Net.Quic, whatever version a request asks
-       for, and the environment variable that turns HTTP/3 on is not read. -->
-  <PropertyGroup>
-    <Http3Support>false</Http3Support>
-  </PropertyGroup>
-
   <!-- WPF-only dependencies. Headless services, models, helpers,
        interop and the localisation resx live in InstallerClean.Core
        and flow in via the project reference below. -->

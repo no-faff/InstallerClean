@@ -32,7 +32,7 @@ public sealed class UpdateDownloadService
     private readonly TimeSpan _stallTimeout;
 
     public UpdateDownloadService()
-        : this(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false }, null) { }
+        : this(UpdateCheckService.CreateShippingHandler(), null) { }
 
     /// <summary>
     /// Test seam: a handler stands in for the network, and a shorter stall timeout

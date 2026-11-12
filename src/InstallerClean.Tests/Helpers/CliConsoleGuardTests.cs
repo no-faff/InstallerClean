@@ -186,6 +186,32 @@ public class CliConsoleGuardTests
         Assert.Equal(1, TestCrashLog.Text().Split(ConsoleFailingAt.Message).Length - 1);
     }
 
+    [Fact]
+    public void A_write_to_a_pipe_whose_reader_has_gone_is_no_failure_and_nothing_is_recorded()
+    {
+        // The console's writer over a pipe that takes the first line and then refuses every
+        // write with ERROR_PIPE_NOT_CONNECTED, as .NET Framework's console stream throws it.
+        using var _ = TestCrashLog.OwnFolder();
+        var pipe = new PipeReaderGoneAfter(1);
+        var console = TextWriter.Synchronized(
+            new StreamWriter(pipe, new UTF8Encoding(false), 256, leaveOpen: true) { AutoFlush = true });
+        var guard = new ConsoleGuard(console);
+
+        var thrown = Record.Exception(() =>
+        {
+            guard.WriteLine("first");
+            guard.WriteLine(new string('a', 300));
+            guard.Write('x');
+            guard.Flush();
+        });
+
+        Assert.Null(thrown);
+        Assert.False(guard.Failed);
+        Assert.True(pipe.Writes > 2, "The writes after the reader went never reached the pipe.");
+        Assert.Equal("first" + NewLine, Encoding.UTF8.GetString(pipe.ToArray()));
+        Assert.Equal("", TestCrashLog.Text());
+    }
+
     [Theory]
     [InlineData("a character")]
     [InlineData("a line break")]
@@ -598,6 +624,23 @@ internal sealed class DiskRefusingWrites(params int[] refused) : MemoryStream
     {
         if (refused.Contains(++Writes))
             throw new IOException(ConsoleFailingAt.Message);
+        base.Write(buffer, offset, count);
+    }
+}
+
+/// <summary>
+/// A pipe that takes the first <c>taken</c> writes and refuses every later one as .NET
+/// Framework's console stream refuses a write to a pipe with no reader: an IOException
+/// carrying ERROR_PIPE_NOT_CONNECTED's HRESULT.
+/// </summary>
+internal sealed class PipeReaderGoneAfter(int taken) : MemoryStream
+{
+    public int Writes { get; private set; }
+
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        if (++Writes > taken)
+            throw new IOException("No process is on the other end of the pipe.", unchecked((int)0x800700E9));
         base.Write(buffer, offset, count);
     }
 }

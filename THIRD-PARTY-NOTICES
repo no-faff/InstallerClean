@@ -227,8 +227,9 @@ path is read, joined and made full; how a file or folder is found, read, moved,
 deleted and listed, and a folder made; how a search pattern is matched; how a
 Windows error becomes an exception; how a registry key is listed; how a command
 line is quoted for a new process, and the exception a refused start carries;
+how a proxy is taken from the variables that name one;
 how the machine's architecture is read; how a culture is named in the language
-of the window; the dictionary, sequence, string, stream, ASCII, Math,
+of the window; how names are sorted in a culture, through the ICU Windows ships; the dictionary, sequence, string, stream, ASCII, Math,
 environment and timing members .NET Framework 4.8 lacks; and the text of the
 messages its exceptions carry.
 
@@ -236,7 +237,7 @@ messages its exceptions carry.
 
 They are in these files in src/InstallerClean.Core/: Helpers/PathText.cs,
 Helpers/FullPaths.cs, Helpers/Win32Marshal.cs, Helpers/RegistryNames.cs,
-Helpers/RegistryData.cs,
+Helpers/RegistryData.cs, Helpers/ProxyFromVariables.cs,
 Helpers/CommandLineArguments.cs, Helpers/Durations.cs, and in Compatibility/,
 FrameworkFile.cs, FrameworkFileInfo.cs, FrameworkFileSystem.cs,
 FrameworkFileSystemEnumerable.cs, FrameworkFileSystemName.cs,
@@ -246,8 +247,10 @@ FrameworkStringExtensions.cs, FrameworkCollectionExtensions.cs,
 FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
 ConfigureAwaitOptions.cs, TaskCompletionSource.cs, FrameworkTask.cs,
-FrameworkProcess.cs, FrameworkRuntimeInformation.cs and
-FrameworkCultureDisplayName.cs; and,
+FrameworkProcess.cs, FrameworkRuntimeInformation.cs,
+FrameworkCultureDisplayName.cs, WindowsIcu.cs and FrameworkCollation.cs;
+in src/InstallerClean/Helpers/CollatedSort.cs, which also follows the list
+sort of WPF (https://github.com/dotnet/wpf, MIT, the same copyright); and,
 for the tests, src/InstallerClean.Tests/Compatibility/TestFramework.cs.
 
 Its licence, LICENSE.TXT in that repository at that tag:
