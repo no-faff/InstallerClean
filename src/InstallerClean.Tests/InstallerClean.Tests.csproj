@@ -95,6 +95,8 @@
     <EmbeddedResource Include="..\InstallerClean\ConfirmMoveWindow.xaml" LogicalName="ThemeXaml.ConfirmMoveWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\MessageWindow.xaml" LogicalName="ThemeXaml.MessageWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\ReportWindow.xaml" LogicalName="ThemeXaml.ReportWindow.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\AboutWindow.xaml" LogicalName="ThemeXaml.AboutWindow.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\Controls\ScoopCommandBox.xaml" LogicalName="ThemeXaml.ScoopCommandBox.xaml" />
   </ItemGroup>
 
   <ItemGroup>

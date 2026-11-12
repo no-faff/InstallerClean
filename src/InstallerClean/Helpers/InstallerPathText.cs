@@ -224,25 +224,73 @@ internal static class InstallerPathText
         AllowFolderBreaksInLogPath(KeepWhole(text));
 
     /// <summary>
-    /// Returns <paramref name="text"/> with every word joiner and zero-width space
-    /// taken out, for text leaving a selectable box on the clipboard or in a drag.
-    /// Those two characters are the only ones the treatments here add, and no string
-    /// the app ships carries either, so this gives back the text as it was before it
-    /// was drawn: a copied path is the path, and pastes into Run or Explorer as one.
-    /// <see cref="PlainCopy"/> applies it.
+    /// The text a copy of <paramref name="length"/> characters from
+    /// <paramref name="start"/> in <paramref name="drawn"/> carries, where
+    /// <paramref name="drawn"/> is <paramref name="untreated"/> after the treatments
+    /// here: the selected characters without the word joiners and zero-width spaces the
+    /// treatments added, and with every one <paramref name="untreated"/> holds itself,
+    /// as a folder's name may. A copied path is the path, and pastes into Run or
+    /// Explorer as one. <see cref="PlainCopy"/> applies it.
+    ///
+    /// The treatments only add those two characters, so <paramref name="untreated"/> is
+    /// <paramref name="drawn"/> with some of them taken out, and each character of
+    /// <paramref name="drawn"/> is matched to the next one of <paramref name="untreated"/>
+    /// it equals. Where an added character and the text's own are the same character side
+    /// by side, the added one comes first: each treatment puts its character straight after
+    /// a backslash or a colon, or between a letter of the cache folder's path and the
+    /// backslash after it, so in a run of one of them the text's own are the last of the run.
+    ///
+    /// Null where <paramref name="drawn"/> is not <paramref name="untreated"/> with only
+    /// those two characters added, or the range lies outside it.
     /// </summary>
-    public static string ForCopying(string? text)
+    public static string? ForCopying(string drawn, string untreated, int start, int length)
     {
-        if (string.IsNullOrEmpty(text))
-            return text ?? string.Empty;
+        if (start < 0 || length < 0 || start > drawn.Length - length)
+            return null;
+
+        var plain = new StringBuilder(length);
+        var next = 0;
+        for (var i = 0; i < drawn.Length; i++)
+        {
+            var c = drawn[i];
+            var fromText = next < untreated.Length && untreated[next] == c
+                && (!IsAdded(c) || RunLength(drawn, i) <= RunLength(untreated, next));
+            if (fromText)
+                next++;
+            else if (!IsAdded(c))
+                return null;
+
+            if (fromText && i >= start && i < start + length)
+                plain.Append(c);
+        }
+
+        return next == untreated.Length ? plain.ToString() : null;
+    }
+
+    /// <summary>
+    /// <paramref name="text"/> with every word joiner and zero-width space taken out, for a
+    /// copy whose untreated text does not map onto what the box shows.
+    /// </summary>
+    public static string WithoutAddedCharacters(string text)
+    {
         if (text.IndexOf(WordJoiner) < 0 && text.IndexOf(ZeroWidthSpace) < 0)
             return text;
 
         var plain = new StringBuilder(text.Length);
         foreach (var c in text)
-            if (c != WordJoiner && c != ZeroWidthSpace)
+            if (!IsAdded(c))
                 plain.Append(c);
         return plain.ToString();
+    }
+
+    private static bool IsAdded(char c) => c is WordJoiner or ZeroWidthSpace;
+
+    // How many times the character at at repeats from there on.
+    private static int RunLength(string text, int at)
+    {
+        var end = at;
+        while (end < text.Length && text[end] == text[at]) end++;
+        return end - at;
     }
 
     /// <summary>

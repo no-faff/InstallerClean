@@ -1,50 +1,61 @@
 using System.Windows;
+using System.Windows.Controls;
 
 namespace InstallerClean.Helpers;
 
 /// <summary>
 /// Gives a selectable box's copied text back without the invisible characters
-/// <see cref="InstallerPathText"/> adds for line breaking. Set <c>IsEnabled</c> on
-/// a TextBox and its Copy, by Ctrl+C, by the context menu or by a drag, carries
-/// <see cref="InstallerPathText.ForCopying"/> of each piece of text it would have
-/// carried. The <c>SelectableText</c> style sets it, so every box built on that
-/// style copies plain text whatever it is given to show.
+/// <see cref="InstallerPathText"/> adds for line breaking. Set <c>Untreated</c> on a
+/// TextBox to the text before it was treated, and give the box the treated text to
+/// show: its Copy, by Ctrl+C, by the context menu or by a drag, then carries
+/// <see cref="InstallerPathText.ForCopying"/> of the selection. A word joiner or a
+/// zero-width space that was in the untreated text, as one can be in a folder's name,
+/// is copied with the rest. A box showing text no treatment has touched sets nothing,
+/// and copies what it shows.
 /// </summary>
 public static class PlainCopy
 {
-    public static readonly DependencyProperty IsEnabledProperty =
+    public static readonly DependencyProperty UntreatedProperty =
         DependencyProperty.RegisterAttached(
-            "IsEnabled", typeof(bool), typeof(PlainCopy),
-            new PropertyMetadata(false, OnIsEnabledChanged));
+            "Untreated", typeof(string), typeof(PlainCopy),
+            new PropertyMetadata(null, OnUntreatedChanged));
 
-    public static bool GetIsEnabled(DependencyObject element) =>
-        (bool)element.GetValue(IsEnabledProperty);
+    public static string? GetUntreated(DependencyObject element) =>
+        (string?)element.GetValue(UntreatedProperty);
 
-    public static void SetIsEnabled(DependencyObject element, bool value) =>
-        element.SetValue(IsEnabledProperty, value);
+    public static void SetUntreated(DependencyObject element, string? value) =>
+        element.SetValue(UntreatedProperty, value);
 
-    private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnUntreatedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is not UIElement element) return;
 
         DataObject.RemoveCopyingHandler(element, OnCopying);
-        if ((bool)e.NewValue)
+        if (e.NewValue is not null)
             DataObject.AddCopyingHandler(element, OnCopying);
     }
 
     // The box puts the selection on the data object in each text format before it
     // raises Copying, and the data object replaces a format's data when it is set
-    // again, so rewriting every format that holds a string is the whole of it. Each
-    // is set back with conversion allowed, as the box sets it, so a reader asking
-    // for another text format is still given one.
+    // again, so rewriting every format that holds the selection is the whole of it.
+    // Each is set back with conversion allowed, as the box sets it, so a reader asking
+    // for another text format is still given one. A format holding anything other than
+    // the box's selection is left as it is. Where the box's text is not its untreated text
+    // with only those two characters added, the copy is the selection with every one of
+    // them taken out.
     private static void OnCopying(object sender, DataObjectCopyingEventArgs e)
     {
+        if (sender is not TextBox box || GetUntreated(box) is not { } untreated) return;
+
+        var selected = box.SelectedText;
+        var plain = InstallerPathText.ForCopying(box.Text, untreated, box.SelectionStart, box.SelectionLength)
+            ?? InstallerPathText.WithoutAddedCharacters(selected);
         var data = e.DataObject;
         foreach (var format in data.GetFormats(autoConvert: false))
         {
-            if (data.GetData(format, autoConvert: false) is not string text) continue;
-            var plain = InstallerPathText.ForCopying(text);
-            if (!ReferenceEquals(plain, text))
+            if (data.GetData(format, autoConvert: false) is string text
+                && string.Equals(text, selected, StringComparison.Ordinal)
+                && !string.Equals(text, plain, StringComparison.Ordinal))
                 data.SetData(format, plain, autoConvert: true);
         }
     }

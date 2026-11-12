@@ -24,7 +24,9 @@ public partial class MessageWindow : Window
         // places the message goes this is the one that gets laid out, so it is the
         // one with a line break to protect; the announced title takes the message
         // as it came. The same split TranslateExtension makes for an automation
-        // property.
+        // property. The box is also given the message as it came, so a copy out of
+        // it carries the message's own characters and none of the treatment's.
+        PlainCopy.SetUntreated(MessageText, message);
         MessageText.Text = InstallerPathText.ForDrawing(message);
         if (kind != MessageKind.Information)
             WarningIcon.Visibility = Visibility.Visible;
