@@ -54,7 +54,7 @@ $libraries = 'advapi32.dll', 'dwmapi.dll', 'kernel32.dll', 'msi.dll', 'ntdll.dll
 # each with the members that may call it. SetDefaultDllDirectories is taken by address.
 $loaders = [ordered]@{
   'SetDefaultDllDirectories' = @($searchCall)
-  'LoadLibraryExW' = @('InstallerClean.Compatibility.FrameworkCultureDisplayName+Icu::Load()')
+  'LoadLibraryExW' = @('InstallerClean.Compatibility.WindowsIcu::Load()')
 }
 $loaderPattern = '^(LoadLibrary|LoadPackagedLibrary|LdrLoadDll|SetDllDirectory|AddDllDirectory|RemoveDllDirectory|SetDefaultDllDirectories)'
 
