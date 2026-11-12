@@ -256,8 +256,19 @@ internal static class RegistryNames
         }
     }
 
-    private static string[] WithCalls(RegistryKey key, Func<IKeyCalls, string[]> list) =>
-        list(CallsOn(SubkeyHandle(key)));
+    /// <summary>
+    /// Stands in for the calls of every listing made on the thread that sets it, handed the
+    /// key and the calls on its handle, so a test can make one real key's listing disagree
+    /// with itself. Null everywhere else. Nothing in the app sets it.
+    /// </summary>
+    [ThreadStatic]
+    internal static Func<RegistryKey, IKeyCalls, IKeyCalls>? CallsForTests;
+
+    private static string[] WithCalls(RegistryKey key, Func<IKeyCalls, string[]> list)
+    {
+        var calls = CallsOn(SubkeyHandle(key));
+        return list(CallsForTests?.Invoke(key, calls) ?? calls);
+    }
 
     /// <summary>
     /// The handle of <paramref name="key"/>, a key opened under a hive, which the key
