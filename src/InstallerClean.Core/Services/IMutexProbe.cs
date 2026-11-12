@@ -4,7 +4,8 @@ namespace InstallerClean.Services;
 public interface IMutexProbe
 {
     /// <summary>
-    /// Samples the named mutex with a zero wait. Never creates it.
+    /// Samples the named mutex: reads whether a thread owns it, without waiting on it,
+    /// so the sample never owns the mutex. Never creates it.
     /// <see cref="MutexSample.Held"/> when it exists and another thread owns it.
     /// <see cref="MutexSample.AccessRefused"/> when it exists and its security
     /// refuses this process the rights to open it, so whether anything owns it was
@@ -67,7 +68,7 @@ public readonly record struct MutexSampling(MutexSample State, int? WindowsError
 }
 
 /// <summary>
-/// What a zero-wait sample of a named mutex found. The three answers that stop a
+/// What a sample of a named mutex found. The three answers that stop a
 /// caller are kept apart because they are different facts about the machine: one
 /// says another thread owns the mutex, one says this process was not allowed to
 /// look, and one says the look failed.
@@ -85,7 +86,7 @@ public enum MutexSample
     /// </summary>
     NotHeld,
 
-    /// <summary>The mutex was opened and a zero wait failed to take it, so another thread owns it.</summary>
+    /// <summary>The mutex was opened and its state read as owned by another thread.</summary>
     Held,
 
     /// <summary>
@@ -96,8 +97,7 @@ public enum MutexSample
 
     /// <summary>
     /// The probe failed some other non-fatal way, so whether anything owns the mutex
-    /// was not established. A failure after a zero wait took the mutex lands here
-    /// too, which is the cautious side of a sample that did not finish.
+    /// was not established. A read of the state that Windows refuses lands here too.
     /// </summary>
     Unestablished,
 }

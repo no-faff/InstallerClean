@@ -45,6 +45,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private readonly IPackageIdentityReader _identityReader;
 
     /// <summary>
+    /// The wait before a Windows Installer list is walked again
+    /// (<see cref="WalkRestarts"/>). Null waits on the scan's own token, so a cancel ends
+    /// the wait; a test hands in one that records the wait.
+    /// </summary>
+    internal Action<TimeSpan>? WalkPause { get; init; }
+
+    /// <summary>
     /// Reads the registry fallback into <paramref name="claimed"/> and reports
     /// what it saw on the way.
     ///
@@ -741,7 +748,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // place all of them exist at once.
         var patchClaims = new List<PatchClaim>();
 
-        var (products, unreadableRows) = EnumerateProducts(ct);
+        // The restarts this scan shares among every list it walks.
+        var restarts = WalkRestarts.For(ct, WalkPause);
+
+        var (products, unreadableRows) = EnumerateProducts(restarts, ct);
 
         // Installed products this scan could not read in full. A skipped patch
         // row, or a LocalPackage value that could not be read, is one product
@@ -941,7 +951,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     ClaimSource.InstallerApi);
             }
 
-            var (patches, patchesIncomplete) = EnumeratePatches(productCode, userSid, context, ct, abandonedLog);
+            var (patches, patchesIncomplete) = EnumeratePatches(productCode, userSid, context, restarts, ct, abandonedLog);
             if (patchesIncomplete) recordsShort = true;
 
             foreach (var (patchCode, patchUserSid, patchContext) in patches)
@@ -1073,7 +1083,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (claimed.Count == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
 
-        var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, ct);
+        var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, restarts, ct);
 
         // THE SAME QUESTION, PUT TO THE PRODUCTS THE ENUMERATION LOST. A product it
         // lost is recovered by name above, through ResolveProductInstances, which asks
@@ -1113,7 +1123,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var heldByName = new List<PatchClaim>();
         ConfirmRemovableAgainstEveryProduct(claimed, patchClaims, products, missed.Recovered,
             fallback.Reach, fallback.ProductPatchSets, apiPatchSets, ct, unreadPatchFileLog,
-            heldByName);
+            heldByName, restarts);
 
         // After the confirmation pass, so a row an installation it asked holds stays that
         // installation's claim, and a key's listing takes the verdict only from rows still removable.
@@ -1464,7 +1474,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts, patchClaims.AsReadOnly(),
             census, listed,
             pairingsHeldByName,
-            PairingsOfHoldersWithNoClaims(pairingsHeldByName, patchClaims, ct, abandonedLog),
+            PairingsOfHoldersWithNoClaims(pairingsHeldByName, patchClaims, restarts, ct, abandonedLog),
             UnlistedProductKeysOf(unlistedEntries, fallback.PackageRecords));
         }
         finally
@@ -1523,6 +1533,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private IReadOnlyList<PatchClaim> PairingsOfHoldersWithNoClaims(
         IReadOnlyList<PatchClaim> heldByName,
         List<PatchClaim> patchClaims,
+        WalkRestarts restarts,
         CancellationToken ct,
         PerItemFailureLog failureLog)
     {
@@ -1539,7 +1550,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             try
             {
                 (patches, _) = EnumeratePatches(held.ProductCode, held.UserSid,
-                    (MsiInstallContext)held.Context, ct, failureLog);
+                    (MsiInstallContext)held.Context, restarts, ct, failureLog);
             }
             catch (Exception ex) when (ex is LocalisedAccessException or LocalisedInvalidOperationException)
             {
@@ -1913,6 +1924,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private MissedProducts LocateProductsTheEnumerationMissed(
         List<(string ProductCode, string? UserSid, MsiInstallContext Context)> products,
         IReadOnlyCollection<string>? registryCodes,
+        WalkRestarts restarts,
         CancellationToken ct)
     {
         var recovered = new List<(string, string?, MsiInstallContext)>();
@@ -1931,7 +1943,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             ct.ThrowIfCancellationRequested();
 
-            var resolved = ResolveProductInstances(_msi, code);
+            var resolved = ResolveProductInstances(_msi, code, restarts);
             if (!enumerated.TryGetValue(code, out var listed))
             {
                 if (resolved.Unaskable) { unresolved++; continue; }
@@ -2093,8 +2105,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IReadOnlyDictionary<string, ProductPatchSet> apiPatchSets,
         CancellationToken ct,
         PerItemFailureLog? unreadPatchFileLog = null,
-        ICollection<PatchClaim>? heldByName = null)
+        ICollection<PatchClaim>? heldByName = null,
+        WalkRestarts? restarts = null)
     {
+        // Null from a test that calls this pass directly; the scan hands in its own.
+        restarts ??= WalkRestarts.For(ct, WalkPause);
+
+        // One answer per product code for the whole pass, so a code several patch files
+        // declare is walked once.
+        var instancesByCode = new Dictionary<string, (IReadOnlyList<(string? Sid, MsiInstallContext Context)> Instances, bool Unaskable)>(
+            StringComparer.OrdinalIgnoreCase);
+
         // EVERY patch code naming a still-removable path, not one per path. The
         // merged row carries no patch code, so the codes come from the claims,
         // and a path can legitimately be named by more than one of them: the
@@ -2136,7 +2157,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // run to a clean end, and that withholds rather than reading as nothing
         // to report: the API returns no rows both where it refuses and where it
         // finds nothing, and the null is what tells the two apart.
-        var holders = EnumeratePatchHoldersAcrossAllProducts(_msi, ct);
+        var holders = EnumeratePatchHoldersAcrossAllProducts(_msi, restarts, ct);
 
         // ONE STATE READ PER PAIRING, SHARED BY BOTH PASSES BELOW. The judging pass asks
         // every listed installation about the codes naming each still-removable path, and
@@ -2316,7 +2337,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // withheld on the flag below, and reading the rest is what makes one
                 // cached answer serve both consumers rather than depending on which
                 // of them asked first.
-                var resolved = ResolveProductInstances(_msi, target);
+                if (!instancesByCode.TryGetValue(target, out var resolved))
+                    instancesByCode[target] = resolved = ResolveProductInstances(_msi, target, restarts);
                 if (resolved.Unaskable || !HoldsEveryListedInstallation(listed, target, resolved.Instances))
                 {
                     unaskable = true;
@@ -2559,6 +2581,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// this pass exists to close, so nothing here distinguishes a refusal from an
     /// empty machine.
     ///
+    /// A WALK THAT STOPS AT A ROW IT CANNOT READ IS MADE AGAIN FROM THE FIRST INDEX
+    /// (<see cref="WalkRestarts"/>), and the first that reaches the end of the list is
+    /// the answer. Null is the answer only where none of them does.
+    ///
     /// STATIC AND SHARED RATHER THAN COPIED, for the reason
     /// <see cref="ResolveProductInstances"/> is: <see cref="DeclaredProductCheck"/>
     /// finds the registrations of a patch a cached copy declares through the same
@@ -2568,7 +2594,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// registrations past that point.
     /// </summary>
     internal static Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>?
-        EnumeratePatchHoldersAcrossAllProducts(IMsiApi msi, CancellationToken ct)
+        EnumeratePatchHoldersAcrossAllProducts(IMsiApi msi, WalkRestarts restarts, CancellationToken ct) =>
+        restarts.Walk(() => WalkPatchHolders(msi, ct), walked => !walked.StoppedAtARow).Holders;
+
+    /// <summary>
+    /// One walk of the machine-wide patch list from index 0, for
+    /// <see cref="EnumeratePatchHoldersAcrossAllProducts"/>: the map, or null where the
+    /// walk did not run to the end of the list. <c>StoppedAtARow</c> is true where a row
+    /// that did not read ended it, and false where it spent the index budget.
+    /// </summary>
+    private static (Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? Holders,
+        bool StoppedAtARow) WalkPatchHolders(IMsiApi msi, CancellationToken ct)
     {
         var holders = new Dictionary<string, List<(string, string?, MsiInstallContext)>>(
             StringComparer.OrdinalIgnoreCase);
@@ -2620,13 +2656,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     targetUserSidLength: ref sidLength);
             }
 
-            if (error == MsiError.NoMoreItems) return holders;
+            if (error == MsiError.NoMoreItems) return (holders, false);
 
             // Every documented failure return lands here: access denied, corrupt
             // configuration, an invalid parameter, an unknown product. None of
             // them is an answer, and a set short by an unknown amount is a veto
             // that does not fire.
-            if (error != MsiError.Success) return null;
+            if (error != MsiError.Success) return (null, true);
 
             var code = BufferToString(patchCode);
             var target = BufferToString(targetProductCode);
@@ -2635,7 +2671,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // A success that named nothing. It cannot be used and it cannot
                 // be shown to be harmless, so it is treated as the row that was
                 // missed rather than skipped.
-                return null;
+                return (null, true);
             }
 
             var safeSidLength = (int)Math.Min(sidLength, (uint)sidBuffer.Length);
@@ -2650,7 +2686,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         // Ran out of budget rather than reaching the end, so the map is short for
         // the same reason a refusal makes it short.
-        return null;
+        return (null, false);
     }
 
     /// <summary>
@@ -2799,6 +2835,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// true of both. The index budget ends the same way and for the same reason:
     /// the enumeration ran out of it rather than reporting an end, so what is past
     /// it is unread.
+    ///
+    /// A WALK THAT STOPS AT A ROW IT CANNOT READ IS MADE AGAIN FROM THE FIRST INDEX
+    /// (<see cref="WalkRestarts.KeyedWalk"/>), and the first walk that reads every row to
+    /// the end is the answer. The code is unaskable only where none of them does.
     /// </remarks>
     /// <remarks>
     /// THE ANSWER IS AN ADMINISTRATOR'S. The question is put with the Everyone SID across
@@ -2825,7 +2865,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// answered.
     /// </remarks>
     internal static (IReadOnlyList<(string? Sid, MsiInstallContext Context)> Instances, bool Unaskable)
-        ResolveProductInstances(IMsiApi msi, string productCode)
+        ResolveProductInstances(IMsiApi msi, string productCode, WalkRestarts restarts)
+    {
+        var walk = restarts.KeyedWalk(() => WalkProductInstances(msi, productCode), walked => !walked.StoppedAtARow);
+        return (walk.Instances, walk.Unaskable);
+    }
+
+    /// <summary>
+    /// One walk of a product code's installations from index 0, for
+    /// <see cref="ResolveProductInstances"/>. <c>StoppedAtARow</c> is true where a row
+    /// that did not read ended it, and false where it reached the end of the rows or
+    /// spent the index budget.
+    /// </summary>
+    private static (IReadOnlyList<(string? Sid, MsiInstallContext Context)> Instances, bool Unaskable,
+        bool StoppedAtARow) WalkProductInstances(IMsiApi msi, string productCode)
     {
         var installedCode = new char[Msi.GuidBufferLength];
         var instances = new List<(string? Sid, MsiInstallContext Context)>();
@@ -2871,8 +2924,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // the machine saying it does not hold the code at all. The two are one
             // return because they are one fact: there is no row here. What separates
             // them is whether anything was collected before it.
-            if (IsProductNotInstalled(error)) return (instances, false);
-            if (error != MsiError.Success) return (Array.Empty<(string?, MsiInstallContext)>(), true);
+            if (IsProductNotInstalled(error)) return (instances, false, false);
+            if (error != MsiError.Success) return (Array.Empty<(string?, MsiInstallContext)>(), true, true);
 
             var safeSidLength = (int)Math.Min(sidLength, (uint)sidBuffer.Length);
             var sid = (context != MsiInstallContext.Machine && safeSidLength > 0)
@@ -2881,7 +2934,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             instances.Add((sid, context));
         }
 
-        return (Array.Empty<(string?, MsiInstallContext)>(), true);
+        return (Array.Empty<(string?, MsiInstallContext)>(), true, false);
     }
 
     /// <summary>
@@ -4453,7 +4506,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // A positive zero is the only clean answer. Absent, wrong-typed and
             // anything non-zero all fail the product, and only the last of the three
             // is a finding rather than an inability.
-            if (patchKey.GetValue("Uninstallable") is not int uninstallable)
+            if (RegistryData.ValueOf(patchKey, "Uninstallable") is not int uninstallable)
             {
                 unestablished = true;
                 continue;
@@ -4569,12 +4622,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Absent by structure: not a failed read.
         if (key is null) return true;
 
-        // RegistryValueOptions.None is the option that selects expansion, and it is
-        // passed explicitly rather than left to the default so a reader can see the
-        // expansion, which pairs with NormaliseLocalPackagePath. GetValue(name)
-        // delegates to this same overload with this same option, so dropping the
-        // argument changes what the call says and not what it does.
-        var raw = key.GetValue(valueName, null, Microsoft.Win32.RegistryValueOptions.None);
+        // doNotExpand is passed as false rather than left to the default so a reader
+        // can see that a REG_EXPAND_SZ is expanded here, which pairs with
+        // NormaliseLocalPackagePath.
+        var raw = RegistryData.ValueOf(key, valueName, doNotExpand: false);
         if (raw is string value)
         {
             path = value;
@@ -4784,13 +4835,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Enumerates the products Windows Installer lists across all contexts, or refuses the scan.
     /// The walk reads rows until Windows reports the end of the list, and a row it
-    /// cannot read stops it, the scan then refusing with <c>Error.MsiNonSuccess</c>.
+    /// cannot read stops it. A walk such a row stops is made again from the first
+    /// index (<see cref="WalkRestarts"/>), and the first that reaches the end is the
+    /// list. Where none does, the scan refuses as the first walk ended: with
+    /// <c>Error.MsiNonSuccess</c> for a row that did not read.
     /// <c>UnreadableRows</c> counts the rows the walk passed without reading, so it is
     /// zero on every walk that returns. It seeds <c>unreadableProducts</c> and the
     /// census carries it as <see cref="EnumerationCensus.SkippedProductRows"/>.
     /// </summary>
     private (List<(string ProductCode, string? UserSid, MsiInstallContext Context)> Products, int UnreadableRows)
-        EnumerateProducts(CancellationToken ct)
+        EnumerateProducts(WalkRestarts restarts, CancellationToken ct)
+    {
+        var walk = restarts.Walk(() => WalkProducts(ct), walked => !walked.StoppedAtARow);
+        if (walk.Refusal is not null) throw walk.Refusal;
+
+        return (walk.Products, walk.UnreadableRows);
+    }
+
+    /// <summary>
+    /// One walk of the product list from index 0, for <see cref="EnumerateProducts"/>.
+    /// <c>Refusal</c> is null where the walk ran to the end of the list, and otherwise
+    /// the exception the scan refuses with where no walk does. <c>StoppedAtARow</c> is
+    /// true where a row that did not read ended the walk, and false where it reached the
+    /// end or spent the index budget.
+    /// </summary>
+    private (List<(string ProductCode, string? UserSid, MsiInstallContext Context)> Products, int UnreadableRows,
+        Exception? Refusal, bool StoppedAtARow) WalkProducts(CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
         var productCode = new char[Msi.GuidBufferLength];
@@ -4801,7 +4871,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // THE INDEX ADVANCES ONLY PAST A ROW THAT READ, which is what
         // MsiEnumProductsEx documents: "The index should be incremented, only if
         // the previous call has returned ERROR_SUCCESS." A row that does not read
-        // ends the walk, and the check after the loop refuses the scan on it.
+        // ends the walk, and the check after the loop makes it the walk's refusal.
         //
         // Do not turn that stop into a skip. The API documents its output buffers
         // for ERROR_SUCCESS and ERROR_MORE_DATA only, so a row that did not read
@@ -4883,7 +4953,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
 
             if (error == MsiError.AccessDenied)
-                throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
+                return (results, unreadableRows, new LocalisedAccessException(Strings.Error_MsiAccessDenied), true);
 
             lastError = error;
 
@@ -4930,9 +5000,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // reached the end either, and would otherwise be refused under the message
         // for a list that never ended.
         if (unreadableRows > 0)
-            throw new LocalisedInvalidOperationException(
+            return (results, unreadableRows, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiNonSuccess, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)));
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count))), true);
 
         // Hitting the index cap is not a clean end: the enumeration ran out of
         // budget rather than reporting NoMoreItems, so everything past the cap
@@ -4945,11 +5015,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // the error code is the last row's, which is Success whenever the list
         // simply never terminated.
         if (!reachedEnd)
-            throw new LocalisedInvalidOperationException(
+            return (results, unreadableRows, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiEnumerationNeverEnded, MaxProductIndex, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)));
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count))), false);
 
-        return (results, unreadableRows);
+        return (results, unreadableRows, null, false);
     }
 
     /// <summary>
@@ -4983,10 +5053,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// with the rest of the removable class. So where every index of a per-user
     /// installation refuses identically, the scan
     /// declines to assert a patch list Windows will not hand over, rather than
-    /// losing the whole scan over it. The AccessDenied and never-ended-cap throws
+    /// losing the whole scan over it. The AccessDenied and never-ended-cap refusals
     /// below are a machine-level breakdown, and the product loop lets them refuse
     /// the scan. <see cref="PairingsOfHoldersWithNoClaims"/> catches them, the
     /// offer resting on what the judging pass has already read.
+    ///
+    /// A WALK THAT MEETS A ROW IT CANNOT READ IS MADE AGAIN FROM THE FIRST INDEX
+    /// (<see cref="WalkRestarts.KeyedWalk"/>), whether it skipped the row, was abandoned
+    /// or was refused access, and the first walk that reads every row to the end is the
+    /// product's patch list. Where none does, the first walk stands: its rows and
+    /// <c>Incomplete</c>, its breadcrumb, or its refusal.
     /// </summary>
     /// <param name="failureLog">
     /// The run's budget for the abandonment breadcrumb, which is one entry per
@@ -4998,8 +5074,36 @@ public sealed class InstallerQueryService : IInstallerQueryService
         string productCode,
         string? userSid,
         MsiInstallContext context,
+        WalkRestarts restarts,
         CancellationToken ct,
         PerItemFailureLog failureLog)
+    {
+        var walk = restarts.KeyedWalk(
+            () => WalkPatches(productCode, userSid, context, ct),
+            walked => !walked.MetAnUnreadRow);
+
+        if (walk.Abandoned is { } abandoned)
+            LogPatchEnumerationAbandoned(productCode, context, userSid, abandoned.Error, abandoned.Index,
+                failureLog, abandoned.Cause);
+        if (walk.Refusal is not null) throw walk.Refusal;
+
+        return (walk.Patches, walk.Incomplete);
+    }
+
+    /// <summary>
+    /// One walk of a product's patch list from index 0, for <see cref="EnumeratePatches"/>.
+    /// <c>Abandoned</c> carries what the breadcrumb records where a run of unreadable rows
+    /// ended the walk, and <c>Refusal</c> the exception the walk ends the scan with.
+    /// <c>MetAnUnreadRow</c> is true where a row did not read, and false where every row
+    /// read to the end or the walk spent the index budget.
+    /// </summary>
+    private (List<(string PatchCode, string? UserSid, MsiInstallContext Context)> Patches, bool Incomplete,
+        (uint Error, uint Index, string Cause)? Abandoned, Exception? Refusal, bool MetAnUnreadRow)
+        WalkPatches(
+        string productCode,
+        string? userSid,
+        MsiInstallContext context,
+        CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
         var patchCode = new char[Msi.GuidBufferLength];
@@ -5052,7 +5156,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // returns Incomplete, where a break would return with the flag
                 // still false. The scan command's catch routes this to a dialog
                 // and to crash.log.
-                throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
+                return (results, incomplete, null, new LocalisedAccessException(Strings.Error_MsiAccessDenied), true);
 
             lastError = error;
 
@@ -5074,11 +5178,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // and the non-success arm for why one product's loss is not the
                     // scan's).
                     if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
-                    {
-                        LogPatchEnumerationAbandoned(productCode, context, userSid, error, index,
-                            failureLog, cause: "empty-guid-run");
-                        return (results, incomplete);
-                    }
+                        return (results, incomplete, (error, index, "empty-guid-run"), null, true);
                     continue;
                 }
 
@@ -5117,14 +5217,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // installation's own account naming every patch this list returned,
                 // the removable class is withheld scan-wide. Declining to name a patch
                 // list Windows refuses to return beats guessing at one. A whole-machine
-                // breakdown throws instead: see the AccessDenied arm above and the
+                // breakdown refuses the scan instead: see the AccessDenied arm above and the
                 // never-ended cap below.
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
-                {
-                    LogPatchEnumerationAbandoned(productCode, context, userSid, error, index,
-                        failureLog, cause: "unreadable-row-run");
-                    return (results, incomplete);
-                }
+                    return (results, incomplete, (error, index, "unreadable-row-run"), null, true);
             }
         }
 
@@ -5132,11 +5228,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // enumeration, not a clean end. Fail loudly rather than truncate, and
         // keep its own message for the reason given there.
         if (!reachedEnd)
-            throw new LocalisedInvalidOperationException(
+            return (results, incomplete, null, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, MaxPatchIndex, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluralisePatch(results.Count)));
+                    results.Count, Helpers.DisplayHelpers.PluralisePatch(results.Count))), false);
 
-        return (results, incomplete);
+        return (results, incomplete, null, null, incomplete);
     }
 
     /// <summary>

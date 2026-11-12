@@ -4278,8 +4278,9 @@ public class DeclaredProductCheckTests
     public void A_patch_enumeration_that_fails_keeps_every_patch_copy_on_the_pass()
     {
         // Two copies declaring different patches for different products. The enumeration
-        // is walked once for the pass, and its failure keeps both, each without the keyed
-        // question being put. A package in the same pass is screened on its own terms.
+        // is made once for the pass, in as many walks as a list that does not read is
+        // given, and its failure keeps both, each without the keyed question being put. A
+        // package in the same pass is screened on its own terms.
         const string OtherPatchCopy = @"C:\Windows\Installer\r.msp";
         const string ThePackage = @"C:\Windows\Installer\a.msi";
         var packages = new ScriptedPackageIdentities();
@@ -4300,7 +4301,7 @@ public class DeclaredProductCheckTests
             DeclaredProductOutcome.DeclaredProductNotInstalled,
             DeclaredProductOutcome.DeclaredPatchUnestablished,
         }, outcomes);
-        Assert.Equal(1, msi.PatchEnumerations);
+        Assert.Equal(WalkRestarts.Attempts, msi.PatchEnumerations);
         Assert.Empty(msi.PatchStateReads);
     }
 

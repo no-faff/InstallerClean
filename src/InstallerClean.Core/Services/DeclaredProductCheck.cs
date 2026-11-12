@@ -159,7 +159,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         // by both halves, for the same reason and with the same lifetime, and the
         // installations the caller's enumeration listed, which every answer about a
         // product is held against.
-        var pass = new PassAnswers(_msi, installations, cancellationToken, waitingOn)
+        var pass = new PassAnswers(_msi, installations, cancellationToken, waitingOn, WalkPause)
         {
             InstallerFolderVolume = new Lazy<VolumeName?>(
                 () => installerFolder is null || _fileIdentities is null
@@ -257,7 +257,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     public int CountKeysWithAListUnread(
         IReadOnlyList<UnlistedProductKey> unlisted, CancellationToken cancellationToken = default)
     {
-        var pass = new PassAnswers(_msi, [], cancellationToken, null);
+        var pass = new PassAnswers(_msi, [], cancellationToken, null, WalkPause);
         var count = 0;
         foreach (var key in unlisted)
         {
@@ -2866,6 +2866,13 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     internal TimeProvider Clock { get; init; } = TimeProvider.System;
 
     /// <summary>
+    /// The wait before a Windows Installer list is walked again
+    /// (<see cref="WalkRestarts"/>). Null waits on the pass's own token, so a cancel ends
+    /// the wait; a test hands in one that records the wait.
+    /// </summary>
+    internal Action<TimeSpan>? WalkPause { get; init; }
+
+    /// <summary>
     /// The entries on one installation's source list, network or URL as
     /// <paramref name="sourceType"/> says, in the order Windows lists them, or null where
     /// the list did not read to its end.
@@ -4172,7 +4179,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// one the caller's enumeration listed, and an installation that would not answer
     /// the keyed read each leave registrations unfound, and the answer is
     /// <see cref="DeclaredProductOutcome.DeclaredPatchUnestablished"/>. The enumeration
-    /// is walked once per pass, so where it fails, every patch copy the pass asks about
+    /// is made once per pass, so where it fails, every patch copy the pass asks about
     /// is kept.
     /// </summary>
     private DeclarationAnswer AskAboutPatch(string code, IReadOnlyList<string> targets, PassAnswers pass)
@@ -4616,13 +4623,19 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         private Dictionary<string, List<(string ProductCode, string? Sid, MsiInstallContext Context)>>? _holders;
         private bool _holdersRead;
 
+        // The restarts the pass shares between the installations of a product code and
+        // the machine-wide patch list.
+        private readonly WalkRestarts _restarts;
+
         internal PassAnswers(
             IMsiApi msi,
             IReadOnlyList<ListedInstallation> installations,
             CancellationToken cancellationToken,
-            Action<SourceFolderWait?>? waitingOn)
+            Action<SourceFolderWait?>? waitingOn,
+            Action<TimeSpan>? walkPause)
         {
             _msi = msi;
+            _restarts = WalkRestarts.For(cancellationToken, walkPause);
             _listed = InstallerQueryService.InstallationsByCode(
                 installations.Select(i => (i.ProductCode, i.UserSid, (MsiInstallContext)i.Context)));
             Installations = installations;
@@ -4956,7 +4969,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         {
             if (!_instances.TryGetValue(productCode, out var resolved))
             {
-                resolved = InstallerQueryService.ResolveProductInstances(_msi, productCode);
+                resolved = InstallerQueryService.ResolveProductInstances(_msi, productCode, _restarts);
                 if (!resolved.Unaskable
                     && !InstallerQueryService.HoldsEveryListedInstallation(_listed, productCode, resolved.Instances))
                     resolved = (Array.Empty<(string?, MsiInstallContext)>(), true);
@@ -4978,7 +4991,7 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             {
                 if (!_holdersRead)
                 {
-                    _holders = InstallerQueryService.EnumeratePatchHoldersAcrossAllProducts(_msi, CancellationToken);
+                    _holders = InstallerQueryService.EnumeratePatchHoldersAcrossAllProducts(_msi, _restarts, CancellationToken);
                     _holdersRead = true;
                 }
 
