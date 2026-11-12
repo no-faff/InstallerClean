@@ -1743,11 +1743,13 @@ jobs:
   # staging folder under %ProgramData% and starts it there, in the same console, to run the
   # command standing for the copy at the path. It waits up to a minute for the newer
   # version to say its own code is running before it hands the run over, and the newer
-  # version then puts itself at the path once both have ended. This job runs that in a
-  # single-file build, offline, against three newer files.
+  # version then puts itself at the path once both have ended. This job runs that
+  # offline, against three newer files.
   #
-  # The old copy is the command line published as a single file from this commit with
-  # the Debug configuration, so it reads INSTALLERCLEAN_DEBUG_PRETEND_LATEST, which has
+  # The old copy is a plain build of the command line from this commit with the Debug
+  # configuration, so it reads INSTALLERCLEAN_DEBUG_PRETEND_COPY, set to cli, which has it
+  # take itself for the command line's own download where a plain build would otherwise
+  # be one from source, INSTALLERCLEAN_DEBUG_PRETEND_LATEST, which has
   # its update check answer that v9.9.9 is the newest release without asking GitHub, and
   # INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD, which has its download fetch the named file in
   # place of the release's, and INSTALLERCLEAN_DEBUG_LOCAL_MANIFEST, which has it read the
@@ -2019,6 +2021,7 @@ jobs:
             $argumentsFile = Join-Path $env:RUNNER_TEMP "start-check-$label-arguments.txt"
             Remove-Item -LiteralPath $argumentsFile -ErrorAction SilentlyContinue
             $run = Run $exe @('/s') @{
+              INSTALLERCLEAN_DEBUG_PRETEND_COPY = 'cli'
               INSTALLERCLEAN_DEBUG_PRETEND_LATEST = "v$latest"
               INSTALLERCLEAN_DEBUG_LOCAL_DOWNLOAD = $newerFile
               INSTALLERCLEAN_DEBUG_LOCAL_MANIFEST = $manifestFile
