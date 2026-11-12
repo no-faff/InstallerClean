@@ -478,6 +478,51 @@ jobs:
           if ($failed) { throw "A merged exe is not v4.8, did not start, or wrote to the crash log about its library search." }
           "Both merged exes carry 4.8, and the command line started clean."
 
+      # .NET Framework reads a portable PDB beside an assembly for the file and line
+      # in a stack trace. Whether it reads an EMBEDDED portable PDB, which is what a
+      # Release build carries (Directory.Build.props, DebugType embedded) and so what
+      # the merged exe carries, is the question crash.log's file and line numbers rest
+      # on. This builds a net48 console with an embedded portable PDB outside the repo
+      # tree, makes it throw across a frame, and fails unless the caught exception's
+      # text carries ":line".
+      - name: Check an embedded portable PDB gives a stack trace its line numbers
+        if: success() || failure()
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'linecheck'
+          New-Item -ItemType Directory -Force -Path $dir | Out-Null
+          @'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net48</TargetFramework>
+              <DebugType>embedded</DebugType>
+              <Deterministic>true</Deterministic>
+            </PropertyGroup>
+          </Project>
+          '@ | Set-Content (Join-Path $dir 'LineCheck.csproj')
+          @'
+          using System;
+          static class P {
+            static void Deep() => throw new InvalidOperationException("line check");
+            static int Main() {
+              try { Deep(); } catch (Exception ex) {
+                Console.WriteLine(ex.ToString());
+                return ex.ToString().Contains(":line ") ? 0 : 3;
+              }
+              return 2;
+            }
+          }
+          '@ | Set-Content (Join-Path $dir 'Program.cs')
+          dotnet build (Join-Path $dir 'LineCheck.csproj') -c Release --nologo -o (Join-Path $dir 'out') | Out-Host
+          if ($LASTEXITCODE -ne 0) { throw "The line-number probe did not build." }
+          $out = & (Join-Path $dir 'out/LineCheck.exe') 2>&1 | ForEach-Object { "$_" }
+          $code = $LASTEXITCODE
+          $out | ForEach-Object { Write-Host $_ }
+          if ($code -eq 3) { throw "A 4.8 stack trace from an embedded portable PDB carries no :line, so crash.log would lose its file and line numbers." }
+          if ($code -ne 0) { throw "The line-number probe exited $code." }
+          "An embedded portable PDB gives a 4.8 stack trace its line numbers."
+
       # Reads the merged exes and fails where our code
       # can reach a Windows library by a search no resolver of ours answers: a call
       # into framework code that ends at one of CoreLib's ole32 or oleaut32 imports,
