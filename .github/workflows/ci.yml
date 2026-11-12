@@ -526,6 +526,42 @@ jobs:
           if ((Get-Content -Raw $fromSource) -notmatch '<bindingRedirect ') { throw "$fromSource holds no binding redirect, so it plants nothing a merged exe refuses." }
           $failed = $false
 
+          Add-Type -TypeDefinition @'
+          using System;
+          using System.Collections.Generic;
+          using System.Runtime.InteropServices;
+          using System.Text;
+          public static class PlantedConfigWindows
+          {
+              private delegate bool EnumProc(IntPtr hwnd, IntPtr lParam);
+              [DllImport("user32.dll")] private static extern bool EnumWindows(EnumProc proc, IntPtr lParam);
+              [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
+              [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr hwnd);
+              [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowText(IntPtr hwnd, StringBuilder text, int length);
+              [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetWindowTextLength(IntPtr hwnd);
+              [DllImport("user32.dll")] private static extern bool PostMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
+              // The visible top-level windows of the process, owned or not, each with its title.
+              public static List<KeyValuePair<IntPtr, string>> Visible(int processId)
+              {
+                  var found = new List<KeyValuePair<IntPtr, string>>();
+                  EnumWindows((hwnd, _) =>
+                  {
+                      GetWindowThreadProcessId(hwnd, out var pid);
+                      if (pid == (uint)processId && IsWindowVisible(hwnd))
+                      {
+                          var text = new StringBuilder(GetWindowTextLength(hwnd) + 1);
+                          GetWindowText(hwnd, text, text.Capacity);
+                          found.Add(new KeyValuePair<IntPtr, string>(hwnd, text.ToString()));
+                      }
+                      return true;
+                  }, IntPtr.Zero);
+                  return found;
+              }
+              // Asks the window to close, as its close button does.
+              public static void Close(IntPtr hwnd) => PostMessage(hwnd, 0x0010, IntPtr.Zero, IntPtr.Zero);
+          }
+          '@
+
           # The folder for one case: the exe copied in and, unless $config is null, that
           # text written beside it under the exe's name with .config after it.
           function Place([string]$exe, [string]$case, $config) {
@@ -572,26 +608,34 @@ jobs:
               }
 
               # The window. Its main window is titled InstallerClean; the refusal's title is
-              # its caption, "Startup error", then the message. The splash has a hidden
-              # owner, so Process.MainWindowHandle never names it.
+              # its caption, "Startup error", then the message. The refusal and the splash
+              # show no taskbar button, so WPF gives each a hidden owner and
+              # Process.MainWindowHandle names the main window alone. Every visible window
+              # of the process is read as well, for the refusal and for the splash, which
+              # carries the main window's title and shows that the start went past the check.
               $clock = [Diagnostics.Stopwatch]::StartNew()
               $p = Start-Process -FilePath $copy -PassThru
               $null = $p.Handle
-              $title = ''
+              $main = $false; $past = $false; $refusal = $null
               while ($clock.Elapsed.TotalSeconds -lt 120 -and -not $p.HasExited) {
                 $p.Refresh()
-                if ($p.MainWindowHandle -ne [IntPtr]::Zero -and $p.MainWindowTitle) { $title = $p.MainWindowTitle; break }
+                if ($p.MainWindowHandle -ne [IntPtr]::Zero -and $p.MainWindowTitle -eq 'InstallerClean') { $main = $true; $past = $true }
+                foreach ($w in [PlantedConfigWindows]::Visible($p.Id)) {
+                  if ($w.Value -like 'Startup error*') { $refusal = $w }
+                  elseif ($w.Value -eq 'InstallerClean') { $past = $true }
+                }
+                if ($main -or $refusal) { break }
                 Start-Sleep -Milliseconds 200
               }
-              "${label}: after $([math]::Round($clock.Elapsed.TotalSeconds, 1)) s its window reads: $title"
-              $mainUp = $title -eq 'InstallerClean'
-              $refused = $title -like "Startup error*won't start because there is a file called $name.config beside it*"
+              $seen = if ($refusal) { $refusal.Value } elseif ($main) { 'the main window' } elseif ($past) { 'the splash' } else { 'no window' }
+              "${label}: after $([math]::Round($clock.Elapsed.TotalSeconds, 1)) s it shows: $seen"
+              $refused = $refusal -and $refusal.Value -like "Startup error*won't start because there is a file called $name.config beside it*"
               if ($starts) {
-                if (-not $mainUp) { "  ${label}: expected the main window."; $failed = $true }
+                if (-not $main -or $refusal) { "  ${label}: expected the main window and no refusal."; $failed = $true }
                 if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null }
               } else {
-                if (-not $refused) { "  ${label}: expected the refusal naming $name.config."; $failed = $true }
-                if (-not $p.HasExited) { $null = $p.CloseMainWindow() }
+                if (-not $refused -or $past) { "  ${label}: expected the refusal naming $name.config, and neither the splash nor the main window."; $failed = $true }
+                if ($refusal -and -not $p.HasExited) { [PlantedConfigWindows]::Close($refusal.Key) }
                 if (-not $p.WaitForExit(30000)) { "  ${label}: still running 30 s after the refusal was closed."; Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null; $failed = $true }
                 elseif ($p.ExitCode -ne 1) { "  ${label}: exited $($p.ExitCode) once the refusal was closed, not 1."; $failed = $true }
                 else { "  ${label}: exited 1 once the refusal was closed." }
