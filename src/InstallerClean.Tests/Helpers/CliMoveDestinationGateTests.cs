@@ -275,7 +275,7 @@ public class CliMoveDestinationGateTests
         var destination = UnderTempOf(258);
 
         var line = MachineContract.English(
-            () => string.Format(Strings.Cli_EventLogMoveDestinationTooLong, "/m", destination));
+            () => Program.MoveDestinationTooLongEventLogLine("/m", destination));
 
         Assert.StartsWith("/m mode aborted:", line, StringComparison.Ordinal);
         Assert.Contains(destination, line, StringComparison.Ordinal);

@@ -2858,9 +2858,18 @@ internal static class Program
     {
         Console.WriteLine(string.Format(Strings.Error_PathTooLong, destination));
         MachineContract.WriteEventLog(CliEventClass.HardError,
-            () => string.Format(Strings.Cli_EventLogMoveDestinationTooLong, arg, destination));
+            () => MoveDestinationTooLongEventLogLine(arg, destination));
         return ExitError;
     }
+
+    /// <summary>
+    /// The Application-channel line for a <c>/m</c> whose destination is too long to
+    /// hold a moved file. Its own method so the wording can be read back without
+    /// driving a run, and built outside the en-GB scope, as
+    /// <see cref="MoveDestinationInsideInstallerEventLogLine"/> is.
+    /// </summary>
+    internal static string MoveDestinationTooLongEventLogLine(string arg, string destination) =>
+        string.Format(Strings.Cli_EventLogMoveDestinationTooLong, arg, destination);
 
     /// <summary>
     /// The Application-channel line for a <c>/m</c> whose destination resolves
