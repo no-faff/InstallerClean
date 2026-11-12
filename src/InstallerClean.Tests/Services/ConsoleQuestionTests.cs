@@ -1,5 +1,4 @@
 using InstallerClean.Services;
-using NSubstitute;
 
 namespace InstallerClean.Tests.Services;
 
@@ -12,10 +11,8 @@ public class ConsoleQuestionTests
 {
     private static ConsoleAnswer Answering(string typed)
     {
-        var console = Substitute.For<IConsolePrompt>();
-        console.ReadLine(Arg.Any<CancellationToken>()).Returns(typed);
         return ConsoleQuestion.Ask(
-            console, (yes, no) => $"[{yes}/{no}]", CancellationToken.None,
+            new Typing(typed), (yes, no) => $"[{yes}/{no}]", CancellationToken.None,
             TimeSpan.Zero, TimeSpan.FromMinutes(1), out _);
     }
 
@@ -30,5 +27,17 @@ public class ConsoleQuestionTests
     public void An_answer_is_read_by_its_first_letter_as_NET_10_matches_it(string typed, string expected)
     {
         Assert.Equal(expected, Answering(typed).ToString());
+    }
+
+    /// <summary>A console where <c>typed</c> is the one line read.</summary>
+    private sealed class Typing(string typed) : IConsolePrompt
+    {
+        public void WriteLine(string line) { }
+
+        public void Write(string text) { }
+
+        public void DiscardTypedAhead() { }
+
+        public string? ReadLine(CancellationToken token) => typed;
     }
 }

@@ -124,14 +124,66 @@ public class FrameworkCollationTests
         Assert.Equal(starts, FrameworkCollation.StartsWithIgnoringCase(answer, letter, CultureInfo.GetCultureInfo(culture)));
     }
 
+    /// <summary>
+    /// Answers that start, or do not start, with a letter as .NET 10 matches them, each
+    /// with .NET 10's answer: marks after the letter, characters ICU ignores ahead of it,
+    /// other forms of the letter, and punctuation ahead of it.
+    /// </summary>
+    private static readonly (string Culture, string Answer, string Letter, bool Starts)[] Candidates =
+    [
+        ("en-GB", "\u006F\u0308\u006B", "o", false),
+        ("en-GB", "\u0079\u0301\u0065\u0073", "y", false),
+        ("en-GB", "\u0001\u0079", "y", true),
+        ("en-GB", "\u0000\u0079", "y", true),
+        ("en-GB", "\u000D\u000A\u0079", "y", false),
+        ("en-GB", "\u200B\u0079", "y", true),
+        ("en-GB", "\u200D\u0079", "y", true),
+        ("en-GB", "\uFEFF\u0079", "y", true),
+        ("en-GB", "\u0079\u200D", "y", true),
+        ("en-GB", "\u2010\u0079", "y", false),
+        ("en-GB", "y", "\u0079\u0308", false),
+        ("en-GB", "\uFF39", "y", false),
+        ("en-GB", "\u24E8", "y", true),
+        ("en-GB", "\u00FD\u0065", "y", false),
+        ("en-GB", "Yes", "\uFF59", false),
+        ("fr-FR", "\u006F\u0308\u0075\u0069", "o", false),
+        ("fr-FR", "\u200B\u006F", "o", true),
+        ("de-DE", "\u006A\u0308\u0061", "j", false),
+        ("ru-RU", "\u0435\u0308", "\u0415", false),
+        ("ru-RU", "\u0451", "\u0415", false),
+        ("de-DE", "\u00E4", "a", false),
+        ("sv-SE", "\u00E4", "a", false),
+        ("da-DK", "aa", "a", false),
+        ("en-GB", "--y", "y", false),
+        ("en-GB", "-yes", "y", false),
+        ("en-GB", "'yes", "y", false),
+    ];
+
     [Fact]
-    public void NLS_takes_a_hyphen_ahead_of_the_letter_as_starting_with_it_where_NET_10_does_not()
+    public void Each_candidate_answer_starts_with_its_letter_as_NET_10_matches_it()
     {
-        // The difference the port exists for: .NET Framework's own IsPrefix passes over the
-        // hyphen, so "-yes" would answer yes to the update question.
-        Assert.True(CultureInfo.GetCultureInfo("en-GB").CompareInfo.IsPrefix("-yes", "y", CompareOptions.IgnoreCase));
-        Assert.False(FrameworkCollation.StartsWithIgnoringCase("-yes", "y", CultureInfo.GetCultureInfo("en-GB")));
+        foreach (var (culture, answer, letter, starts) in Candidates)
+            Assert.True(
+                starts == FrameworkCollation.StartsWithIgnoringCase(answer, letter, CultureInfo.GetCultureInfo(culture)),
+                $"{culture} {Hex(answer)} against {Hex(letter)}: .NET 10 answers {starts}.");
     }
+
+    [Fact]
+    public void NLS_answers_at_least_one_candidate_otherwise_than_NET_10()
+    {
+        // The difference the port exists for: .NET Framework's own IsPrefix matches through
+        // NLS. Every candidate it answers, and how, is printed where none differs.
+        var nls = Candidates.Select(c => (c, Answer: CultureInfo.GetCultureInfo(c.Culture).CompareInfo
+            .IsPrefix(c.Answer, c.Letter, CompareOptions.IgnoreCase))).ToArray();
+
+        Assert.True(
+            nls.Any(n => n.Answer != n.c.Starts),
+            "NLS answered every candidate as .NET 10 does: "
+                + string.Join("; ", nls.Select(n => $"{n.c.Culture} {Hex(n.c.Answer)}/{Hex(n.c.Letter)} {n.Answer}")));
+    }
+
+    private static string Hex(string text) =>
+        string.Join(" ", text.Select(c => ((int)c).ToString("X4", CultureInfo.InvariantCulture)));
 
     [Theory]
     [InlineData("yes", "Y", true)]
