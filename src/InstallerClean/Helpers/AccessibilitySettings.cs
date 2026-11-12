@@ -119,7 +119,7 @@ public sealed class AccessibilitySettings : INotifyPropertyChanged
         try
         {
             using var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Accessibility");
-            if (key?.GetValue("TextScaleFactor") is int percent && percent > 0)
+            if (key is not null && RegistryData.ValueOf(key, "TextScaleFactor") is int percent && percent > 0)
                 return percent / 100.0;
         }
         catch (Exception)

@@ -4453,7 +4453,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // A positive zero is the only clean answer. Absent, wrong-typed and
             // anything non-zero all fail the product, and only the last of the three
             // is a finding rather than an inability.
-            if (patchKey.GetValue("Uninstallable") is not int uninstallable)
+            if (RegistryData.ValueOf(patchKey, "Uninstallable") is not int uninstallable)
             {
                 unestablished = true;
                 continue;
@@ -4569,12 +4569,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // Absent by structure: not a failed read.
         if (key is null) return true;
 
-        // RegistryValueOptions.None is the option that selects expansion, and it is
-        // passed explicitly rather than left to the default so a reader can see the
-        // expansion, which pairs with NormaliseLocalPackagePath. GetValue(name)
-        // delegates to this same overload with this same option, so dropping the
-        // argument changes what the call says and not what it does.
-        var raw = key.GetValue(valueName, null, Microsoft.Win32.RegistryValueOptions.None);
+        // doNotExpand is passed as false rather than left to the default so a reader
+        // can see that a REG_EXPAND_SZ is expanded here, which pairs with
+        // NormaliseLocalPackagePath.
+        var raw = RegistryData.ValueOf(key, valueName, doNotExpand: false);
         if (raw is string value)
         {
             path = value;
