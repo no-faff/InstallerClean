@@ -120,8 +120,9 @@ public sealed class ProcessStartRetryTests : IDisposable
         var info = new ProcessStartInfo(file) { UseShellExecute = false };
         var thrown = Assert.Throws<Win32Exception>(() => ProcessStartRetry.Start(info, _ => false, _ => { }));
 
-        // ERROR_BAD_EXE_FORMAT.
-        Assert.Equal(193, thrown.NativeErrorCode);
+        // ERROR_BAD_EXE_FORMAT or ERROR_EXE_MACHINE_TYPE_MISMATCH, as Windows reads the file;
+        // .NET 10 gives both the one text.
+        Assert.Contains(thrown.NativeErrorCode, new[] { 193, 216 });
         Assert.EndsWith(
             "'. The specified executable is not a valid application for this OS platform.",
             thrown.Message,
