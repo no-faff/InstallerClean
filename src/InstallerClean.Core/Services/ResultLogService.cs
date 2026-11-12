@@ -38,6 +38,9 @@ public sealed class ResultLogService : IResultLogService
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
     };
 
+    /// <summary>The report as last-run.json holds it.</summary>
+    internal static string Serialize(ResultLogEntry entry) => JsonSerializer.Serialize(entry, JsonOptions);
+
     private static readonly string UserAgent =
         $"InstallerClean/{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0"}";
 
@@ -96,7 +99,7 @@ public sealed class ResultLogService : IResultLogService
             var folder = PathText.GetDirectoryName(_logFile);
             if (folder is { Length: > 0 }) FrameworkDirectory.CreateDirectory(folder);
 
-            var json = JsonSerializer.Serialize(entry, JsonOptions);
+            var json = Serialize(entry);
 
             // OpenAtomic + MoveFileEx(REPLACE_EXISTING) keeps the swap
             // race-free: the temp open refuses a symlink, and the
