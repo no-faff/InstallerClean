@@ -41,14 +41,6 @@ on:
           - release-signing
           - test-signing
         default: release-signing
-      gui_compression:
-        description: 'Compress the single-file GUI builds'
-        type: boolean
-        default: true
-      cli_compression:
-        description: 'Compress the single-file command-line build'
-        type: boolean
-        default: true
 
 # actions: read is what lets SignPath's connector fetch the uploaded artifact
 # through the workflow token. contents: read is the default and is kept explicit
@@ -150,31 +142,24 @@ jobs:
       - name: Test
         run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true
 
-      # The three publishes below are the shapes that ship, flags and all. They
-      # are the release script's own, and CI smoke-publishes the same shapes on
-      # every push; if any of the three lines drift apart, the README's promise
-      # that a reader can rebuild a tag and compare hashes stops being true.
+      # The two merges below are the shapes that ship. They are the release
+      # script's own, and CI builds the same shapes on every push; if the lines
+      # drift apart, the README's promise that a reader can rebuild a tag and
+      # compare hashes stops being true, which rests on ILRepack being
+      # reproducible across runs.
       #
-      # Compression is on by default because it roughly halves a download whose
-      # whole audience is wary of what they are running. It is an input rather
-      # than a constant for one reason: where a scan flags the compressed build
-      # and the uncompressed build of the same source comes back clean, the
-      # uncompressed shape ships that release. It does not carry forward.
-      - name: Publish the command-line tool
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=${{ inputs.cli_compression }} --nologo -o publish/cli
+      # .NET Framework has no single-file publish, so each copy is one exe the
+      # OneFile merge makes (Directory.Build.targets): a Release build with every
+      # assembly it references folded in by ILRepack. There is one window exe; the
+      # portable and the slim download are that same file under two names, so no
+      # separate slim build. The merge has no compression knob, and a plain net48
+      # exe is not the self-extracting shape a scan might flag, so the compression
+      # inputs are gone.
+      - name: Merge the command-line tool into one file
+        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
 
-      - name: Publish the portable GUI
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=${{ inputs.gui_compression }} --nologo -o publish/self-contained
-
-      # PublishSelfContained=false is the property that actually disables the
-      # "PublishSingleFile implies SelfContained" rule; --self-contained false
-      # sets a different one and .NET 10 no longer takes it, which packs the
-      # whole WPF runtime into a build meant to be a small launcher.
-      # SelfContained is written into the app (InstallerClean.csproj), false here
-      # and true on the portable, and the app reads it to know which of the two it
-      # is when it updates itself.
-      - name: Publish the slim GUI
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true --nologo -o publish/framework-dependent
+      - name: Merge the window into one file
+        run: dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
 
       # THE GUARDS ABOVE READ SOURCES AND THIS ONE READS WHAT WAS JUST BUILT, so
       # it runs here rather than in the glob, which is why it is invoked by name.
@@ -195,13 +180,16 @@ jobs:
 
       # THE FIRST SIGNING ROUND. The three exes go up under distinct names
       # because two of them are called InstallerClean.exe, and they come back
-      # into the folders the compile step reads from.
+      # into the folders the compile step reads from. The portable and the slim
+      # are the same merged window exe under two names, staged and signed both,
+      # so 3.5.0+ copies updating from either download get a signed exe; two
+      # signatures of the same bytes differ only by timestamp.
       - name: Stage the executables for signing
         run: |
           New-Item -ItemType Directory -Force -Path signing/executables | Out-Null
-          Copy-Item publish/self-contained/InstallerClean.exe      signing/executables/InstallerClean-portable.exe
-          Copy-Item publish/framework-dependent/InstallerClean.exe signing/executables/InstallerClean-slim.exe
-          Copy-Item publish/cli/installerclean-cli.exe             signing/executables/installerclean-cli.exe
+          Copy-Item publish/window/InstallerClean.exe  signing/executables/InstallerClean-portable.exe
+          Copy-Item publish/window/InstallerClean.exe  signing/executables/InstallerClean-slim.exe
+          Copy-Item publish/cli/installerclean-cli.exe signing/executables/installerclean-cli.exe
 
       # THE UNINSTALLER GOES UP IN THE SAME ROUND. Defining
       # UninstallerSignatureDir tells the script to embed a signed uninstaller,
@@ -297,10 +285,9 @@ jobs:
           }
           $unsigned = @(Get-ChildItem signing/uninstaller -Filter 'uninst-*.e32')
           if ($unsigned.Count -ne 1) { throw "Expected one uninst-*.e32 in signing/uninstaller and found $($unsigned.Count)." }
-          Copy-Item signing/signed-executables/InstallerClean-portable.exe    publish/self-contained/InstallerClean.exe      -Force
-          Copy-Item signing/signed-executables/InstallerClean-slim.exe        publish/framework-dependent/InstallerClean.exe -Force
-          Copy-Item signing/signed-executables/installerclean-cli.exe         publish/cli/installerclean-cli.exe             -Force
-          Copy-Item signing/signed-executables/InstallerClean-uninstaller.exe $unsigned[0].FullName                          -Force
+          Copy-Item signing/signed-executables/InstallerClean-portable.exe    publish/window/InstallerClean.exe  -Force
+          Copy-Item signing/signed-executables/installerclean-cli.exe         publish/cli/installerclean-cli.exe -Force
+          Copy-Item signing/signed-executables/InstallerClean-uninstaller.exe $unsigned[0].FullName              -Force
 
       - name: Compile the installer around the signed executables and uninstaller
         run: |
@@ -377,9 +364,11 @@ jobs:
           $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
                      Where-Object { $_ } | Select-Object -First 1
           Copy-Item "signing/signed-setup/InstallerClean-$version-setup.exe" "publish/InstallerClean-$version-setup.exe" -Force
-          Copy-Item publish/self-contained/InstallerClean.exe      publish/InstallerClean-portable.exe
-          Copy-Item publish/framework-dependent/InstallerClean.exe publish/InstallerClean-slim.exe
-          Copy-Item publish/cli/installerclean-cli.exe             publish/installerclean-cli.exe
+          # Portable is the signed window exe; slim is the same exe signed under
+          # its own name (still in the signing folder); cli is the signed cli.
+          Copy-Item publish/window/InstallerClean.exe                  publish/InstallerClean-portable.exe
+          Copy-Item signing/signed-executables/InstallerClean-slim.exe publish/InstallerClean-slim.exe
+          Copy-Item publish/cli/installerclean-cli.exe                 publish/installerclean-cli.exe
           # The same question asked of what will actually be published, after
           # the copies rather than before them, so a mis-copy is caught here as
           # well as a missing signature.
@@ -436,8 +425,8 @@ jobs:
                      Where-Object { $_ } | Select-Object -First 1
           $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
                   Select-Object -First 1 -ExpandProperty FullName
-          $guiShape = 'self-contained, single-file, ' + $(if ('${{ inputs.gui_compression }}' -eq 'true') { 'compression on' } else { 'compression off' })
-          $cliShape = 'self-contained, single-file, ' + $(if ('${{ inputs.cli_compression }}' -eq 'true') { 'compression on' } else { 'compression off' })
+          $guiShape = 'net48, one file (ILRepack)'
+          $cliShape = 'net48, one file (ILRepack)'
           $artefacts = [ordered]@{
             setup    = "InstallerClean-$version-setup.exe"
             portable = 'InstallerClean-portable.exe'
@@ -450,7 +439,7 @@ jobs:
             "dotnet_sdk=$((& dotnet --version).Trim())",
             "publish_portable=$guiShape",
             "publish_cli=$cliShape",
-            "publish_slim=framework-dependent, single-file",
+            "publish_slim=net48, one file (ILRepack), the portable exe under the slim name",
             "signing_policy=${{ inputs.signing_policy }}",
             "build_run=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           )
