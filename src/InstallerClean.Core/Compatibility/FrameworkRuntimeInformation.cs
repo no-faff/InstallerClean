@@ -23,8 +23,6 @@ internal static class FrameworkRuntimeInformation
     private const ushort ProcessorArchitectureAmd64 = 9;
     private const ushort ProcessorArchitectureArm64 = 12;
 
-    private static readonly byte[] IsWow64Process2Name = Encoding.ASCII.GetBytes("IsWow64Process2\0");
-
     private static int s_osArchPlusOne;
 
     /// <summary>The architecture of the machine this process runs on, read once and kept.</summary>
@@ -69,7 +67,8 @@ internal static class FrameworkRuntimeInformation
     internal static bool HasIsWow64Process2()
     {
         var kernel32 = Kernel32.GetModuleHandle("kernel32.dll");
-        return kernel32 != IntPtr.Zero && Kernel32.GetProcAddress(kernel32, IsWow64Process2Name) != IntPtr.Zero;
+        return kernel32 != IntPtr.Zero
+            && Kernel32.GetProcAddress(kernel32, Encoding.ASCII.GetBytes("IsWow64Process2\0")) != IntPtr.Zero;
     }
 
     private static bool NativeMachineOfThisProcess(out ushort nativeMachine) =>

@@ -44,7 +44,7 @@ public class FrameworkRuntimeInformationTests
     {
         var architecture = FrameworkRuntimeInformation.Read(
             (out ushort nativeMachine) => { nativeMachine = 0xAA64; return true; },
-            () => 9);
+            NotAsked);
 
         Assert.Equal(Architecture.Arm64, architecture);
     }
@@ -54,7 +54,7 @@ public class FrameworkRuntimeInformationTests
     {
         var architecture = FrameworkRuntimeInformation.Read(
             (out ushort nativeMachine) => { nativeMachine = 0xAA64; return false; },
-            () => 12);
+            NotAsked);
 
         Assert.Equal(RuntimeInformation.ProcessArchitecture, architecture);
     }
@@ -65,6 +65,9 @@ public class FrameworkRuntimeInformationTests
         Assert.Equal(Architecture.Arm64, FrameworkRuntimeInformation.Read(null, () => 12));
         Assert.Equal(Architecture.X64, FrameworkRuntimeInformation.Read(null, () => 9));
     }
+
+    // Where IsWow64Process2 answers, GetNativeSystemInfo is never asked.
+    private static ushort NotAsked() => throw new InvalidOperationException("GetNativeSystemInfo was asked although IsWow64Process2 answered.");
 
     // CI's runners are Windows 10 version 1511 or later, whose kernel32 exports it.
     [Fact]
