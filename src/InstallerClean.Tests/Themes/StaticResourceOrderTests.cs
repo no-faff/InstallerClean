@@ -38,10 +38,34 @@ public class StaticResourceOrderTests
         Assert.True(late.Count == 0, "Named before it is defined:\n" + string.Join("\n", late));
     }
 
+    // Every page the app compiles is read here: its built pages are listed from the app's
+    // own resources, so a window added to the app and not embedded for these tests fails.
+    [Fact]
+    public void Every_page_the_app_builds_is_read()
+    {
+        var resources = typeof(App).Assembly.GetManifestResourceNames()
+            .Single(n => n.EndsWith(".g.resources", StringComparison.Ordinal));
+        using var stream = typeof(App).Assembly.GetManifestResourceStream(resources)!;
+        using var reader = new System.Resources.ResourceReader(stream);
+        var built = reader.Cast<System.Collections.DictionaryEntry>()
+            .Select(e => (string)e.Key)
+            .Where(k => k.EndsWith(".baml", StringComparison.Ordinal))
+            .Select(k => Path.GetFileNameWithoutExtension(k))
+            .Where(n => n != "app")
+            .OrderBy(n => n, StringComparer.Ordinal)
+            .ToArray();
+        var read = ThemeFiles.Concat(Windows)
+            .Select(n => Path.GetFileNameWithoutExtension(n).ToLowerInvariant())
+            .OrderBy(n => n, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.NotEmpty(built);
+        Assert.Equal(built, read);
+    }
+
     [Fact]
     public void Every_window_key_is_defined_above_the_first_StaticResource_naming_it()
     {
-        Assert.True(Windows.Length >= 10, string.Join(", ", Windows));
 
         var themeKeys = new HashSet<string>(StringComparer.Ordinal);
         foreach (var file in ThemeFiles)
@@ -82,12 +106,22 @@ public class StaticResourceOrderTests
             + "<Style x:Key=\"Early\"><Setter Property=\"FocusVisualStyle\" Value=\"{StaticResource Late}\"/></Style>"
             + "<Style x:Key=\"Late\"/>"
             + "<Style x:Key=\"After\" BasedOn=\"{StaticResource Early}\"/>"
+            + "<Style x:Key=\"Based\" BasedOn=\"{StaticResource Base}\"/>"
+            + "<Style x:Key=\"Base\"/>"
+            + "<Style x:Key=\"Scoped\"><Style.Resources><Style x:Key=\"Inner\"/></Style.Resources>"
+            + "<Setter Property=\"Tag\" Value=\"{StaticResource Inner}\"/></Style>"
+            + "<Style x:Key=\"Outside\" BasedOn=\"{StaticResource Inner}\"/>"
             + "</ResourceDictionary>");
         var known = KeysIn(root);
 
         var late = Walk(root, "test.xaml", new HashSet<string>(StringComparer.Ordinal), known);
 
-        Assert.Equal(new[] { "test.xaml: Late, in Setter" }, late);
+        Assert.Equal(new[]
+        {
+            "test.xaml: Late, in Setter",
+            "test.xaml: Base, in Style",
+            "test.xaml: Inner, in Style",
+        }, late);
     }
 
     [Theory]
@@ -106,31 +140,47 @@ public class StaticResourceOrderTests
     }
 
     /// <summary>
-    /// Walks <paramref name="element"/> in document order. Each StaticResource on an
-    /// element is checked against the keys whose elements have already closed, and an
-    /// element's own key joins them as it closes. A name found nowhere in
-    /// <paramref name="known"/> that is a typed key belongs to the Windows theme and is
-    /// skipped; any other name found nowhere is reported as well.
+    /// Walks <paramref name="root"/> in document order. Each StaticResource on an element
+    /// is checked against the keys whose elements have already closed in the element's own
+    /// scope or one around it, and a key joins the scope of the nearest element around it
+    /// that is not a property element, so a key in a <c>Style.Resources</c> or a
+    /// <c>ListView.Resources</c> is seen inside that style or list only. The root's own keys
+    /// join <paramref name="available"/>, which the next file of a theme reads. A name
+    /// found nowhere in <paramref name="known"/> that is a typed key belongs to the Windows
+    /// theme and is skipped; any other name found nowhere is reported as well.
     /// </summary>
-    private static List<string> Walk(XElement element, string file, HashSet<string> available, HashSet<string> known)
+    private static List<string> Walk(XElement root, string file, HashSet<string> available, HashSet<string> known)
     {
         var late = new List<string>();
-        foreach (var reference in element.Attributes().SelectMany(a => References(a.Value)))
-        {
-            if (available.Contains(reference))
-                continue;
-            if (!known.Contains(reference) && reference.StartsWith("{x:Type ", StringComparison.Ordinal))
-                continue;
-            late.Add($"{file}: {reference}, in {element.Name.LocalName}");
-        }
-
-        foreach (var child in element.Elements())
-            late.AddRange(Walk(child, file, available, known));
-
-        var key = KeyOf(element);
-        if (key is not null)
-            available.Add(key);
+        var scopes = new List<HashSet<string>> { available };
+        Visit(root, isRoot: true);
         return late;
+
+        void Visit(XElement element, bool isRoot)
+        {
+            foreach (var reference in element.Attributes().SelectMany(a => References(a.Value)))
+            {
+                if (scopes.Any(scope => scope.Contains(reference)))
+                    continue;
+                if (!known.Contains(reference) && reference.StartsWith("{x:Type ", StringComparison.Ordinal))
+                    continue;
+                late.Add($"{file}: {reference}, in {element.Name.LocalName}");
+            }
+
+            // A property element (Style.Resources, Setter.Value) opens no scope of its own:
+            // what it holds belongs to the element it sets. The root's scope is the one handed in.
+            var opensScope = !isRoot && element.Name.LocalName.IndexOf('.') < 0;
+            if (opensScope)
+                scopes.Add(new HashSet<string>(StringComparer.Ordinal));
+            foreach (var child in element.Elements())
+                Visit(child, isRoot: false);
+            if (opensScope)
+                scopes.RemoveAt(scopes.Count - 1);
+
+            var key = KeyOf(element);
+            if (key is not null)
+                scopes[scopes.Count - 1].Add(key);
+        }
     }
 
     private static HashSet<string> KeysIn(XElement root)

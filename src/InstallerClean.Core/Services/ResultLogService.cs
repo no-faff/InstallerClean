@@ -148,6 +148,25 @@ public sealed class ResultLogService : IResultLogService
         }
     }
 
+    /// <summary>
+    /// The POST carrying <paramref name="body"/> to <paramref name="url"/>: the app's user
+    /// agent, the body as UTF-8 JSON, and no <c>Expect: 100-continue</c>, so the body goes
+    /// with the headers as .NET 10 sends it. .NET Framework's handler asks the server's
+    /// leave before a body unless the request says otherwise, and holds the body until the
+    /// server answers or its wait runs out. It takes the request's word as the setting of
+    /// the service point for the endpoint's host, or for the proxy in front of it, which
+    /// every later request through that point shares; the app sends no other body.
+    /// </summary>
+    internal static HttpRequestMessage Request(string body, string url)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, url);
+        request.Headers.UserAgent.ParseAdd(UserAgent);
+        request.Headers.ExpectContinue = false;
+        request.Content = new StringContent(body, Encoding.UTF8);
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        return request;
+    }
+
     public async Task<ResultLogSendOutcome> SendAsync(string body, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(body))
@@ -161,10 +180,7 @@ public sealed class ResultLogService : IResultLogService
 
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, EndpointUrl);
-            request.Headers.UserAgent.ParseAdd(UserAgent);
-            request.Content = new StringContent(body, Encoding.UTF8);
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            using var request = Request(body, EndpointUrl);
 
             // ResponseHeadersRead returns as soon as the status line and
             // headers are in. Only IsSuccessStatusCode is read and Content
