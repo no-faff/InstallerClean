@@ -18,8 +18,14 @@ namespace InstallerClean.Helpers;
 /// before an <c>@</c> are the proxy's credentials, <c>:</c> alone being the account's own.
 /// A NO_PROXY entry starting with a full stop matches that domain and every host under it,
 /// and any other entry matches its host exactly, in any case. The variables are read
-/// once, the first time a handler asks. An https or SOCKS proxy is read as not set (see
-/// <see cref="HttpOnly"/>).
+/// once, the first time a handler asks.
+///
+/// An https or SOCKS proxy is read as not set (see <see cref="HttpOnly"/>), which is where
+/// this differs from .NET 10: the next variable stands in for it, so an https or SOCKS
+/// HTTPS_PROXY lets ALL_PROXY be read for an https address, where .NET 10 reads ALL_PROXY
+/// only for a variable that is not set. Where no variable names a usable proxy at all, the
+/// handler keeps .NET Framework's own default; where one does for the other scheme only,
+/// an address of this scheme goes direct, as .NET 10 sends one whose variables name none.
 ///
 /// A handler is given a proxy only where the variables name one. Left without one,
 /// .NET Framework takes its own default, which follows a proxy script or WPAD through the
@@ -35,7 +41,15 @@ internal sealed class ProxyFromVariables : IWebProxy
     /// The proxy the variables name, or null where none does, so the handler keeps
     /// .NET Framework's own default.
     /// </summary>
-    public static IWebProxy? Default => FromProcess.Value;
+    public static IWebProxy? Default => ForTests ?? FromProcess.Value;
+
+    /// <summary>
+    /// The proxy a test has every handler built on its own thread take in place of the one
+    /// the variables name, so a handler another thread builds meanwhile is not given it.
+    /// Null everywhere else. Nothing in the app sets it.
+    /// </summary>
+    [ThreadStatic]
+    internal static IWebProxy? ForTests;
 
     /// <summary>
     /// <paramref name="handler"/> with <see cref="Default"/> as its proxy where the
@@ -93,7 +107,7 @@ internal sealed class ProxyFromVariables : IWebProxy
     /// <paramref name="proxy"/> where it is an http proxy, and null for an https or SOCKS
     /// one, which .NET 10 speaks to and .NET Framework refuses with NotSupportedException
     /// before the request leaves. A value naming one is read as not set, so the next
-    /// variable, or .NET Framework's own default, is taken in its place.
+    /// variable stands in for it (the class summary says what follows where none does).
     /// </summary>
     private static Uri? HttpOnly(Uri? proxy) =>
         proxy is not null && string.Equals(proxy.Scheme, "http", StringComparison.OrdinalIgnoreCase) ? proxy : null;
@@ -232,8 +246,9 @@ internal sealed class ProxyFromVariables : IWebProxy
 
             return uri;
         }
-        catch (Exception ex) when (ex is UriFormatException or ArgumentException)
+        catch (Exception)
         {
+            // As in .NET 10, any value the builder refuses names no proxy.
             return null;
         }
     }

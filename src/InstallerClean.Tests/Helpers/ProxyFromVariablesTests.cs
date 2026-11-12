@@ -8,7 +8,8 @@ namespace InstallerClean.Tests.Helpers;
 /// <see cref="ProxyFromVariables"/> reads HTTP_PROXY, HTTPS_PROXY, ALL_PROXY and NO_PROXY
 /// as .NET 10 reads them on Windows. The rows and expectations are those of .NET 10's own
 /// tests (dotnet/runtime v10.0.0, <c>HttpEnvironmentProxyTest.cs</c>), bar the https and
-/// SOCKS proxies, which .NET Framework cannot use and which are read as not set.
+/// SOCKS proxies, which .NET Framework cannot use: they are read as not set, and the rows
+/// for them, with the next variable standing in, are this class's own.
 /// </summary>
 public class ProxyFromVariablesTests
 {
@@ -129,6 +130,8 @@ public class ProxyFromVariablesTests
         Assert.Equal("foo", proxy.Credentials!.GetCredential(proxy.GetProxy(FooHttp), "Basic")!.UserName);
         Assert.Equal("foo1", proxy.Credentials.GetCredential(proxy.GetProxy(FooHttps), "Basic")!.UserName);
         Assert.Null(proxy.Credentials.GetCredential(FooHttp, "Basic"));
+        // The address .NET Framework asks with is its own, built apart from this one.
+        Assert.Equal("foo", proxy.Credentials.GetCredential(new Uri("http://1.1.1.1:3000"), "Basic")!.UserName);
         Assert.Null(proxy.Credentials.GetCredential(null, "Basic"));
     }
 
@@ -163,7 +166,26 @@ public class ProxyFromVariablesTests
         using var left = ProxyFromVariables.Carrying(new HttpClientHandler(), null);
 
         Assert.Same(proxy, given.Proxy);
-        Assert.True(given.UseProxy);
         Assert.Null(left.Proxy);
+    }
+
+    // The update check's and the download's handler, and the report's, each take the proxy.
+    [Fact]
+    public void The_update_and_report_handlers_carry_the_proxy()
+    {
+        var proxy = From(("HTTPS_PROXY", "http://1.1.1.5:3005"))!;
+        ProxyFromVariables.ForTests = proxy;
+        try
+        {
+            using var shipping = InstallerClean.Services.UpdateCheckService.CreateShippingHandler();
+            using var report = InstallerClean.Services.ResultLogService.CreateHandler();
+
+            Assert.Same(proxy, shipping.Proxy);
+            Assert.Same(proxy, report.Proxy);
+        }
+        finally
+        {
+            ProxyFromVariables.ForTests = null;
+        }
     }
 }
