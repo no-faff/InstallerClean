@@ -472,11 +472,16 @@ jobs:
             $full = (Resolve-Path $exe).Path
             "sha256 $exe = $((Get-FileHash -Algorithm SHA256 $full).Hash)"
             $name = [System.Reflection.AssemblyName]::GetAssemblyName($full)
-            $target = [System.Reflection.Assembly]::ReflectionOnlyLoadFrom($full).GetCustomAttributesData() |
-              Where-Object { $_.AttributeType.Name -eq 'TargetFrameworkAttribute' } |
-              ForEach-Object { $_.ConstructorArguments[0].Value }
-            "$exe is $($name.Version), target framework $target"
-            if ($target -notmatch 'v4\.8') { "  NOT v4.8"; $failed = $true }
+            # ILRepack keeps only the primary assembly's custom attributes, so the one
+            # TargetFrameworkAttribute left is the window's or the command line's, and its
+            # value string sits in the exe's metadata. The merged package assemblies
+            # (net462, netstandard) are dropped, so ".NETFramework,Version=v4.8" is that
+            # attribute and nothing else. A one-byte-per-char read finds it without loading
+            # the assembly, which PowerShell 7 cannot do for a .NET Framework exe.
+            $metadata = [System.Text.Encoding]::Latin1.GetString([System.IO.File]::ReadAllBytes($full))
+            $carries48 = $metadata.Contains('.NETFramework,Version=v4.8')
+            "$exe is $($name.Version), carries the 4.8 target-framework attribute: $carries48"
+            if (-not $carries48) { "  the merge dropped the 4.8 target-framework attribute"; $failed = $true }
           }
           # The command line is the one that starts without a window. A clean start
           # leaves no library-search line in the crash log.
