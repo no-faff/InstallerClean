@@ -187,6 +187,27 @@ public class MoveFilesServiceUnitTests
         Assert.All(reports, r => Assert.Equal(3, r.TotalFiles));
     }
 
+    // The window's progress label counts the file a report names as still in hand.
+    [Fact]
+    public async Task MoveFilesAsync_reports_each_file_before_moving_it()
+    {
+        var fs = new MockFileSystem();
+        var sources = new[] { "a.msi", "b.msi", "c.msi" }
+            .Select(n => $@"{SourceDir}\{n}").ToArray();
+        foreach (var s in sources) fs.AddFile(s, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+
+        var stillThere = new List<bool>();
+        var progress = new Helpers.SyncProgress<OperationProgress>(p =>
+            stillThere.Add(fs.File.Exists(sources[p.CurrentFile - 1])));
+
+        var svc = new MoveFilesService(fs);
+        await svc.MoveFilesAsync(sources, DestDir, UnderLeaseClaims.None, progress);
+
+        Assert.Equal(new[] { true, true, true }, stillThere);
+        Assert.All(sources, s => Assert.False(fs.File.Exists(s)));
+    }
+
     [Fact]
     public async Task MoveFilesAsync_progress_handler_that_throws_costs_one_file_and_not_the_batch()
     {

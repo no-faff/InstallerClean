@@ -91,6 +91,22 @@ public class DeleteFilesServiceUnitTests
         Assert.All(reports, r => Assert.Equal(3, r.TotalFiles));
     }
 
+    // The window's progress label counts the file a report names as still in hand.
+    [Fact]
+    public async Task Reports_each_file_before_deleting_it()
+    {
+        var fs = new MockFileSystem();
+        var files = new[] { "a.msi", "b.msi", "c.msi" }.Select(n => AddFile(fs, n)).ToArray();
+        var stillThere = new List<bool>();
+        var progress = new SyncProgress<OperationProgress>(p => stillThere.Add(fs.File.Exists(files[p.CurrentFile - 1])));
+        var svc = new DeleteFilesService(fs);
+
+        await svc.DeleteFilesAsync(files, UnderLeaseClaims.None, progress: progress);
+
+        Assert.Equal(new[] { true, true, true }, stillThere);
+        Assert.All(files, f => Assert.False(fs.File.Exists(f)));
+    }
+
     [Fact]
     public async Task A_progress_handler_that_throws_costs_one_file_and_not_the_batch()
     {

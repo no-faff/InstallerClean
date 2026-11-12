@@ -52,6 +52,31 @@ public class CleanupViewModelLogicTests
         Assert.Equal(expected, CleanupViewModel.ShownPercent(done, total));
     }
 
+    [Theory]
+    // 199 of 200 is exactly 99.5, which rounds to the even 100; 1,999 of 2,000 is 99.95.
+    [InlineData(199, 200, 99)]
+    [InlineData(1_999, 2_000, 99)]
+    [InlineData(200, 200, 100)]
+    [InlineData(2_000, 2_000, 100)]
+    public void The_progress_label_reads_100_only_once_the_last_file_is_done(int done, int total, int expected)
+    {
+        Assert.Equal(expected, CleanupViewModel.ShownPercent(done, total));
+    }
+
+    // The count a report names is the file in hand (MoveFilesServiceUnitTests and
+    // DeleteFilesServiceUnitTests pin that each file is reported before it is acted on),
+    // so the report naming the last file shows the files before it as done.
+    [Theory]
+    [InlineData(1, 1, 0)]
+    [InlineData(1, 200, 0)]
+    [InlineData(2, 200, 0)]
+    [InlineData(200, 200, 99)]
+    [InlineData(101, 200, 50)]
+    public void The_progress_label_counts_the_file_in_hand_as_not_done(int current, int total, int expected)
+    {
+        Assert.Equal(expected, CleanupViewModel.ShownPercent(CleanupViewModel.FilesDone(current), total));
+    }
+
 #if NETFRAMEWORK
     // .NET Framework's own F0, which the label does not use, takes 12.5 up to 13.
     [Fact]

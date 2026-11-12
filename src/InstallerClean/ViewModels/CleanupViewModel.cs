@@ -208,10 +208,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [ObservableProperty] private double _operationProgressPercent;
 
     /// <summary>
-    /// The whole percentage the label beside the bar shows, from the two counts the
-    /// line beside it shows: see <see cref="ShownPercent"/>.
+    /// The whole percentage the label beside the bar shows, of the files done: see
+    /// <see cref="ShownPercent"/> and <see cref="FilesDone"/>.
     /// </summary>
-    public int OperationProgressPercentShown => ShownPercent(OperationCurrentFile, OperationTotalFiles);
+    public int OperationProgressPercentShown => ShownPercent(FilesDone(OperationCurrentFile), OperationTotalFiles);
+
+    /// <summary>
+    /// The files a batch has finished, from the count its progress names. The move and
+    /// delete services report a file's count as they start on it, so the file the count
+    /// names, the one the line under the bar shows, is still in hand.
+    /// </summary>
+    internal static int FilesDone(int currentFile) => currentFile > 0 ? currentFile - 1 : 0;
 
     /// <summary>
     /// <paramref name="done"/> of <paramref name="total"/> files as a whole percentage, to
@@ -220,9 +227,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// first, the share for 23 of 40 is 57.49999999999999, and .NET Framework's F0 takes a
     /// tie away from zero, so the label prints this whole number rather than formatting the
     /// bar's double.
+    ///
+    /// 100% is the last file done. A share that rounds to 100 with a file still to go,
+    /// as 199 of 200 does, reads 99%.
     /// </summary>
-    internal static int ShownPercent(int done, int total) =>
-        total > 0 ? (int)DisplayHelpers.WholeUnits(done * 100L, total) : 0;
+    internal static int ShownPercent(int done, int total)
+    {
+        if (total <= 0) return 0;
+        var percent = (int)DisplayHelpers.WholeUnits(done * 100L, total);
+        return percent >= 100 && done < total ? 99 : percent;
+    }
 
     /// <summary>
     /// What a screen reader speaks for <see cref="OperationProgress"/>: the heading itself,
@@ -2352,7 +2366,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         OperationTotalFiles = p.TotalFiles;
         OperationCurrentFileName = p.CurrentFileName;
         OperationProgressPercent = p.TotalFiles > 0
-            ? (double)p.CurrentFile / p.TotalFiles * 100
+            ? (double)FilesDone(p.CurrentFile) / p.TotalFiles * 100
             : 0;
         // Heading stays at the original "Moving N files..." / "Deleting
         // N files..." action verb for the operation's duration; the
