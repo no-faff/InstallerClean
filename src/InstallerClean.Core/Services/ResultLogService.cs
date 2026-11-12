@@ -153,7 +153,9 @@ public sealed class ResultLogService : IResultLogService
     /// agent, the body as UTF-8 JSON, and no <c>Expect: 100-continue</c>, so the body goes
     /// with the headers as .NET 10 sends it. .NET Framework's handler asks the server's
     /// leave before a body unless the request says otherwise, and holds the body until the
-    /// server answers or its wait runs out.
+    /// server answers or its wait runs out. It takes the request's word as the setting of
+    /// the service point for the endpoint's host, or for the proxy in front of it, which
+    /// every later request through that point shares; the app sends no other body.
     /// </summary>
     internal static HttpRequestMessage Request(string body, string url)
     {
