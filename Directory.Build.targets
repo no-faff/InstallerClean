@@ -1,21 +1,4 @@
 <Project>
-  <!-- An exe published without its own .NET, the slim among them, has written into it
-       that it finds .NET only at the location .NET's installer registers, or in .NET's
-       default install folder where none is registered. Neither the folder the exe is run
-       from nor a folder named by DOTNET_ROOT or DOTNET_ROOT_X64 is searched, so a
-       hostfxr.dll saved beside a downloaded copy, or in a folder the environment names,
-       is not loaded. A self-contained publish that is not single file keeps its own
-       hostfxr.dll beside its exe and needs that folder searched, so a publish with
-       SelfContained true keeps the default search. This file is read after the publish
-       profile and after the SDK has set SelfContained from PublishSelfContained and the
-       other publish settings; set in a project file, the condition would be read before
-       both and could put the setting on a self-contained publish. The SDK rebuilds the
-       exe a publish writes into obj only when the assembly or the apphost changes, so a
-       change to the value reaches a local publish after the obj folder is cleaned. -->
-  <PropertyGroup Condition="'$(SelfContained)' != 'true'">
-    <AppHostDotNetSearch>Global</AppHostDotNetSearch>
-  </PropertyGroup>
-
   <!-- ONE FILE PER COPY. .NET Framework has no single-file publish, so a build
        given -p:OneFile=true merges each exe with every assembly it references
        that is not part of .NET Framework: InstallerClean.Core and the packages.

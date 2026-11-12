@@ -791,106 +791,61 @@ jobs:
         run: dotnet restore src/InstallerClean.sln -p:EnableWindowsTargeting=true -p:RestoreLockedMode=true
 
 
-  # Where each shipped build loads the Windows libraries it uses from. The app runs
-  # elevated, and a portable or slim copy is often run from a Downloads folder, so a
-  # library it would load from its own folder is one a file dropped there would
-  # replace. Each build is published with release.yml's flags and run in two passes,
-  # with Process Monitor recording every file the build's process opens or probes. The
+  # Where each shipped exe loads the Windows libraries it uses from. The app runs
+  # elevated, and a portable copy is often run from a Downloads folder, so a library
+  # it would load from its own folder is one a file dropped there would replace. The two
+  # exes are the merged builds release.yml makes: the window, which is also the portable
+  # and the slim download under their own names, and the command line. Each is run in two
+  # passes with Process Monitor recording every file its process opens or probes. The
   # command line runs twice in each pass: once to scan with /noupdate, and once to scan
   # after checking for updates, which reaches its network code.
   #
-  # The first pass runs each build from an empty folder of its own and notes every
-  # .dll it looked for there, and every one it looked for under %TEMP%\.net, where a
-  # single-file build extracts itself. The second pass runs each build again with a
-  # file of each of those names planted at the path that was looked at: one the build
-  # loaded under that name in the first pass, else System32's, else, where no file on
-  # the runner carries the name, a small System32 library under it. The job fails where
-  # a build loaded, mapped or read a planted file, where no look found a planted file in
-  # place, and where one had changed by the time the build ended.
+  # The first pass runs each exe from an empty folder of its own and notes every .dll it
+  # looked for there and every library it loaded from Windows' own folders, System32,
+  # WinSxS and the .NET Framework's. The second pass runs each exe again with a file of
+  # each of those names planted beside it: for a look, the file the exe loaded under
+  # that name in the first pass, else System32's, else, where no file on the runner
+  # carries the name, a small System32 library under it; for a load, the copy it loaded.
+  # An exe that searches System32 alone never looks beside itself for the second kind, so
+  # that planting is the proof that it does not take them from there. The job fails where
+  # an exe loaded, mapped or read a planted file, where no look found a planted file put
+  # for a look, and where one had changed by the time the exe ended.
   #
-  # Some Windows libraries the .NET runtime inside the command line and the portable looks
-  # for in their own folders, before System32, on behalf of System.Private.CoreLib's
-  # imports or of WPF's own start-up, which no resolver or setting the app makes can send
-  # elsewhere. Those looks are listed in the first pass's step by exe, the runs that make
-  # them, the folder, the library and the assembly that asks for it, and nothing is
-  # planted for a listed look that passes the first pass's check. Any other look, in any
-  # run, is planted as any other. The first pass prints each listed look with the row of
-  # its first look in each run, reads the assembly from the runtime pack the exe's bundle
-  # names, and fails where a listed library is not spelled as that assembly asks for it,
-  # where no run of the exe looked for it, and, for one listed as looked for before the
-  # build's own code runs, where its first look in a run came after the first act of that
-  # code the job can see, or no act was seen.
-  #
-  # In either pass the job also fails where a build loaded a library from its own
-  # folder, and in the second where it loaded one under %TEMP%\.net that its bundle did
-  # not extract in the first. The files planted under %TEMP%\.net are removed as the
-  # first act of the step that traces each build's start. A hostfxr.dll or hostpolicy.dll
-  # planted beside a build runs on its own, since the apphost reads those before the
-  # runtime starts and taking one can stop the build starting at all.
-  #
-  # Every look is printed with its full path, its place among the process's rows, and
-  # whether it came after the first act of the build's own code that Process Monitor
-  # can see. Each build names that act: in the slim, its module initializer loading the
-  # first assembly on its list from the installed runtime's folder; in the command line,
-  # Main's look for the names a replace leaves beside the exe; in the portable, its look
-  # for the app's folder under %LOCALAPPDATA%. The first pass fails where a build shows
-  # another first, or none, and where a build started with nothing planted writes to its
-  # crash log.
+  # In either pass the job also fails where an exe loaded a library from its own folder or
+  # its working folder, or from anywhere outside Windows' own folders, Program Files and the
+  # folder Windows Defender keeps under %ProgramData%. A look the exe makes is printed with
+  # its full path, its place among the process's rows, and whether it came after the first
+  # act of the exe's own code that Process Monitor can see. Each exe names that act: in the
+  # command line, Main's look for the names a replace leaves beside the exe; in the window,
+  # its look for the app's folder under %LOCALAPPDATA%. The first pass fails where an exe
+  # shows another first, or none, and where an exe started with nothing planted writes to
+  # its crash log.
   #
   # It refuses to pass on a run that saw nothing: Process Monitor has to have started
-  # and recorded each build's process, the command line has to have loaded msi.dll
-  # for its scan, and each window has to have loaded dwmapi.dll and WPF's
-  # wpfgfx_cor3.dll, which it does only once it creates a window, so a window that
-  # could not open on the runner fails the job. A run with an apphost library planted
-  # alone is the exception and is judged without its must-loads. The command line's run
-  # that checks for updates has to have loaded winhttp.dll and had an answer from
-  # github.com, and fails where the Application log shows it updated itself or found a
-  # newer release it did not install.
+  # and recorded each exe's process, the command line has to have loaded msi.dll for its
+  # scan, and the window has to have loaded dwmapi.dll and WPF's own graphics library,
+  # which it does only once it creates a window, so a window that could not open on the
+  # runner fails the job. The command line's run that checks for updates has to have had
+  # an answer from github.com, and fails where the Application log shows it updated itself
+  # or found a newer release it did not install.
   #
-  # Every Windows library a .NET or WPF assembly imports is loaded from System32 by the
-  # resolver in FrameworkLibraries.cs, which hands the libraries on its OwnLibraries
-  # list back to the runtime. The job fails where the portable's bundle extracts a
-  # library that list does not name, where a framework assembly in a folder the slim's
-  # runtime searches imports a native library there that the list does not name, and
-  # where the list names one those folders do not carry. The window loads before its
-  # Main the Windows Forms assemblies the installed desktop runtime adds, where the host
-  # lists them as trusted platform assemblies, so the job fails where the slim's host
-  # trace does not list them, where the portable's lists one of them or an assembly its
-  # bundle carries, and where the slim does not load them before the first act seen of
-  # its code in Main or later.
+  # Then each exe is started with the switch a copy updating itself passes the newer
+  # version, and the job fails where the exe does not say within 60 s that its own code is
+  # running.
   #
-  # The slim's exe finds .NET only where .NET is installed, so the job fails where the
-  # first pass sees the slim look for hostfxr.dll or hostpolicy.dll in its own folder.
-  # After both passes each build is started once more with the .NET host's trace on,
-  # with a hostfxr.dll planted beside the slim and a decoy .NET install named by
-  # DOTNET_ROOT. The job fails where that trace shows the slim's exe searching for .NET
-  # anywhere but the registered or default install, or loading a hostfxr.dll from
-  # anywhere else, and where a slim published to search only the DOTNET_ROOT variables
-  # does not carry that search or does not load the decoy's. It prints the folders each
-  # build's runtime searches for native libraries.
+  # A window started on a fresh account offers to send a report. Before any exe runs, the
+  # PC-wide first-run mark is set, so the offer is never made, and the report receiver's
+  # host is pointed nowhere in the hosts file. The job fails where either window left a
+  # report behind.
   #
-  # Then each build is started with the switch a copy updating itself passes the
-  # newer version, and the job fails where the build does not say within 60 s that its
-  # own code is running.
+  # Last, the setup is compiled from the exes the job built and run from a folder of its
+  # own under both passes, as a download is run. The setup, the setup.tmp it starts and
+  # anything that starts are judged on the images they load from their own folders, and the
+  # setup on the files planted beside it.
   #
-  # Then each build is started with a start-up hook named by DOTNET_STARTUP_HOOKS,
-  # and so is each published again with start-up hooks allowed. The job fails where a
-  # shipped build runs the hook, where an allowing build does not, and where any build
-  # does not say within 60 s that its own code is running.
-  #
-  # A window started on a fresh account offers to send a report. Before any build
-  # runs, the PC-wide first-run mark is set, so the offer is never made, and the
-  # report receiver's host is pointed nowhere in the hosts file. The job fails where
-  # either window left a report behind.
-  #
-  # Last, the setup is compiled from the builds the job published and run from a
-  # folder of its own under both passes, as a download is run. The setup, the
-  # setup.tmp it starts and anything that starts are judged on the images they load
-  # from their own folders, and the setup on the files planted beside it.
-  #
-  # Each pass's Process Monitor rows for every process named as one of the builds'
-  # exes and for the setup's processes, each host trace and the app's crash logs are
-  # kept with the run for seven days, whether or not the job passed.
+  # Each pass's Process Monitor rows for every process named as one of the exes and for the
+  # setup's processes and the app's crash logs are kept with the run for seven days,
+  # whether or not the job passed.
   native-libraries:
     name: Native libraries (Windows)
     runs-on: windows-2025
@@ -904,14 +859,12 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Publish the three builds as release.yml does
+      - name: Build the two exes as release.yml does
         run: |
-          dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o publish/cli
-          if ($LASTEXITCODE -ne 0) { throw "The command line did not publish." }
-          dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true --nologo -o publish/self-contained
-          if ($LASTEXITCODE -ne 0) { throw "The portable did not publish." }
-          dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true --nologo -o publish/framework-dependent
-          if ($LASTEXITCODE -ne 0) { throw "The slim did not publish." }
+          dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The command line did not build." }
+          dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
+          if ($LASTEXITCODE -ne 0) { throw "The window did not build." }
 
       # FirstRunRecorded under HKLM\SOFTWARE\NoFaff\InstallerClean is the mark a
       # window reads to decide this PC has run InstallerClean before, and with it set
@@ -983,23 +936,21 @@ jobs:
 
           Set-Content -Path (Join-Path $env:RUNNER_TEMP 'native.ps1') -Value @'
           $builds = @(
-            [pscustomobject]@{ Label = 'command line'; Exe = 'publish/cli/installerclean-cli.exe'; Source = 'src/InstallerClean.Cli/LibrarySearch.cs'; Arguments = @('/s', '/noupdate'); Wait = 60; MustLoad = @('msi.dll'); Marker = 'replace leftovers' },
-            [pscustomobject]@{ Label = 'command line, checking for updates'; Exe = 'publish/cli/installerclean-cli.exe'; Source = 'src/InstallerClean.Cli/LibrarySearch.cs'; Arguments = @('/s'); Wait = 60; MustLoad = @('msi.dll', 'winhttp.dll'); UpdateCheck = $true; Marker = 'replace leftovers' },
-            [pscustomobject]@{ Label = 'portable'; Exe = 'publish/self-contained/InstallerClean.exe'; Source = 'src/InstallerClean/ProcessDefaults.cs'; Arguments = @(); Wait = 20; MustLoad = @('dwmapi.dll', 'wpfgfx_cor3.dll'); Marker = 'app folder' },
-            [pscustomobject]@{ Label = 'slim'; Exe = 'publish/framework-dependent/InstallerClean.exe'; Source = 'src/InstallerClean/ProcessDefaults.cs'; Arguments = @(); Wait = 20; MustLoad = @('dwmapi.dll', 'wpfgfx_cor3.dll'); Marker = 'module initializer' }
+            [pscustomobject]@{ Label = 'command line'; Exe = 'publish/cli/installerclean-cli.exe'; Arguments = @('/s', '/noupdate'); Wait = 60; MustLoad = @('msi.dll'); Marker = 'replace leftovers' },
+            [pscustomobject]@{ Label = 'command line, checking for updates'; Exe = 'publish/cli/installerclean-cli.exe'; Arguments = @('/s'); Wait = 60; MustLoad = @('msi.dll', 'schannel.dll'); UpdateCheck = $true; Marker = 'replace leftovers' },
+            [pscustomobject]@{ Label = 'window'; Exe = 'publish/window/InstallerClean.exe'; Arguments = @(); Wait = 20; MustLoad = @('dwmapi.dll', 'wpfgfx_v0400.dll'); Marker = 'app folder' }
           )
-          # Each of the command line, the portable and the slim started in replace mode
+          # Each of the command line and the window started in replace mode
           # (Invoke-Replace in native-libraries.ps1), once putting itself in place and once
-          # with nothing left at the path, given Wait seconds to end. A window build that
-          # puts itself in place starts the copy at the path, which the first pass judges as
-          # the build it now is. A replace returns before the window or the scan starts, so it names
+          # with nothing left at the path, given Wait seconds to end. A window that puts itself
+          # in place starts the copy at the path, which the first pass judges as the
+          # window it now is. A replace returns before the window or the scan starts, so it names
           # nothing it must load; its first act seen is judged instead.
-          $builds += foreach ($base in @($builds | Where-Object Label -in 'command line', 'portable', 'slim')) {
+          $builds += foreach ($base in @($builds | Where-Object Label -in 'command line', 'window')) {
             foreach ($mode in 'replaced', 'nothing') {
               [pscustomobject]@{
                 Label = "$($base.Label), $(if ($mode -eq 'replaced') { 'putting itself in place' } else { 'with nothing left at the path' })"
-                Exe = $base.Exe; Source = $base.Source; Wait = 120
-                Marker = $(if ($base.Label -eq 'slim') { 'module initializer' } else { 'replaced copy' })
+                Exe = $base.Exe; Wait = 120; Marker = 'replaced copy'
                 Replace = $mode; StartsAtPath = ($base.Label -ne 'command line'); AtPath = $base
               }
             }
@@ -1013,219 +964,37 @@ jobs:
           $cli = $builds | Where-Object Label -eq 'command line'
           $builds += [pscustomobject]@{
             Label = 'command line, running /s from staging in a working folder of its own'
-            Exe = $cli.Exe; Source = $cli.Source; Wait = 120; Marker = 'replaced copy'
+            Exe = $cli.Exe; Wait = 120; Marker = 'replaced copy'
             Replace = 'command'; StartsAtPath = $false; AtPath = $cli
           }
 
           . (Join-Path $env:GITHUB_WORKSPACE 'scripts/native-libraries.ps1')
           '@
 
-      # Each exe loads, before its Main, every assembly its self-contained build carries that
-      # imports a Windows library, so each has its resolver before any thread of the app's
-      # can use it. The list is ImportingAssemblies in each exe's project, and
-      # this step recomputes it from the exe's self-contained bundle and the runtime packs it
-      # was built from: the assemblies the exe references, directly or through others, that
-      # the bundle carries and that import a library not on FrameworkLibraries.OwnLibraries,
-      # less those left for their own load to register, plus those the app loads by name.
-      # It fails on any difference, naming it. The slim runs the window's exe on the
-      # installed desktop runtime, which also carries Windows Forms assemblies the portable
-      # leaves out. The window loads those of them that import a Windows library from a
-      # second list, ImportingAssembliesWhereInstalled, which this step recomputes as what
-      # the runtime packs reach beyond what the bundle carries, and fails on any difference
-      # there too. The command line has no second list, so its packs must reach no assembly
-      # beyond its bundle that imports a Windows library.
-      #
-      # Left for their own load to register: System.Drawing.Common, whose being loaded WPF
-      # reads (WindowsBase's MS.Internal.AssemblyHelper) to decide how it handles
-      # System.Drawing types; and the ribbon and Windows Forms hosting assemblies, which
-      # add their types to the XAML namespace the window's markup uses. WPF reads four more
-      # assemblies the same way, and the step fails where one of them comes to import a
-      # Windows library, so whether to load it is decided rather than inherited. It also
-      # fails where an assembly on a list declares types into that XAML namespace, other
-      # than WPF's own three, which every window loads before its markup is read.
-      - name: Check each exe's list of assemblies it loads first
-        shell: pwsh
-        run: |
-          . (Join-Path $env:RUNNER_TEMP 'native.ps1')
-          $cache = Get-NuGetCache
-          $presentation = 'http://schemas.microsoft.com/winfx/2006/xaml/presentation'
-          $wpfReads = 'System.Drawing.Common', 'System.Private.Xml', 'System.Private.Xml.Linq', 'System.Data.Common', 'System.Linq.Expressions'
-          $exes = @(
-            [pscustomobject]@{ Label = 'window'; Bundle = 'publish/self-contained/InstallerClean.exe'; Assembly = 'src/InstallerClean/bin/Release/net10.0-windows/win-x64/InstallerClean.dll'
-              Source = 'src/InstallerClean/ProcessDefaults.cs'; LeftToTheirLoad = @('System.Drawing.Common'); ByName = @('UIAutomationClient', 'UIAutomationClientSideProviders') }
-            [pscustomobject]@{ Label = 'command line'; Bundle = 'publish/cli/installerclean-cli.exe'; Assembly = 'src/InstallerClean.Cli/bin/Release/net10.0/win-x64/installerclean-cli.dll'
-              Source = 'src/InstallerClean.Cli/LibrarySearch.cs'; LeftToTheirLoad = @()
-              ByName = @('Microsoft.VisualBasic.Core', 'System.Formats.Tar', 'System.IO.Pipes', 'System.Net.HttpListener', 'System.Net.Ping', 'System.Text.Encoding.CodePages', 'System.Transactions.Local') }
-          )
-          $own = @(Get-OwnLibraries)
-
-          # The XAML namespaces an assembly declares its types into.
-          function Read-XmlnsDefinitions([string]$path) {
-            $stream = [IO.File]::OpenRead($path)
-            try {
-              $md = [System.Reflection.Metadata.PEReaderExtensions]::GetMetadataReader([System.Reflection.PortableExecutable.PEReader]::new($stream))
-              foreach ($handle in $md.GetAssemblyDefinition().GetCustomAttributes()) {
-                $attribute = $md.GetCustomAttribute($handle)
-                $type = switch ($attribute.Constructor.Kind) {
-                  'MemberReference' {
-                    $parent = $md.GetMemberReference([System.Reflection.Metadata.MemberReferenceHandle]$attribute.Constructor).Parent
-                    if ($parent.Kind -eq 'TypeReference') { $md.GetString($md.GetTypeReference([System.Reflection.Metadata.TypeReferenceHandle]$parent).Name) }
-                  }
-                  'MethodDefinition' {
-                    $md.GetString($md.GetTypeDefinition($md.GetMethodDefinition([System.Reflection.Metadata.MethodDefinitionHandle]$attribute.Constructor).GetDeclaringType()).Name)
-                  }
-                }
-                if ($type -eq 'XmlnsDefinitionAttribute') {
-                  $blob = $md.GetBlobReader($attribute.Value)
-                  $null = $blob.ReadUInt16()
-                  $blob.ReadSerializedString()
-                }
-              }
-            }
-            finally { $stream.Dispose() }
-          }
-
-          # Every assembly reached from $root through the references of those $index holds and,
-          # where $carried is given, the bundle carries, with those of them that import a
-          # library not on OwnLibraries, and the names reached that could not be followed.
-          function Get-Reached($index, [string]$root, $carried) {
-            $seen = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-            $pending = [System.Collections.Generic.Queue[string]]::new()
-            $pending.Enqueue($root)
-            $importing = [System.Collections.Generic.SortedSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-            $absent = [System.Collections.Generic.List[string]]::new()
-            while ($pending.Count) {
-              $name = $pending.Dequeue()
-              if (-not $seen.Add($name)) { continue }
-              if (-not $index.ContainsKey($name) -or ($null -ne $carried -and -not $carried.Contains($name))) { $absent.Add($name); continue }
-              $stream = [IO.File]::OpenRead($index[$name])
-              try {
-                $md = [System.Reflection.Metadata.PEReaderExtensions]::GetMetadataReader([System.Reflection.PortableExecutable.PEReader]::new($stream))
-                foreach ($handle in $md.AssemblyReferences) { $pending.Enqueue($md.GetString($md.GetAssemblyReference($handle).Name)) }
-              }
-              finally { $stream.Dispose() }
-              if ($name -in $root, 'System.Private.CoreLib', 'InstallerClean.Core') { continue }
-              $windows = @((Read-Imports $index[$name]).Imports | Where-Object { (Get-BaseName $_) -notin $own })
-              if ($windows) { $null = $importing.Add($name) }
-            }
-            [pscustomobject]@{ Seen = $seen; Importing = $importing; Absent = $absent }
-          }
-
-          foreach ($exe in $exes) {
-            "== $($exe.Label)"
-            if (-not (Test-Path -LiteralPath $exe.Assembly)) { throw "$($exe.Assembly) is not there to read the $($exe.Label)'s references from." }
-            $folders = foreach ($pack in @(Read-RuntimePacks $exe.Bundle)) {
-              $folder = Join-Path $cache "$($pack.Name.ToLowerInvariant()).runtime.win-x64/$($pack.Version)/runtimes/win-x64/lib/net10.0"
-              if (-not (Test-Path -LiteralPath $folder)) { throw "NuGet's cache does not hold $folder, the $($pack.Name) runtime pack the $($exe.Label) was built from." }
-              Write-Host "  built from the $($pack.Name) runtime pack $($pack.Version)"
-              $folder
-            }
-            $folders = @($folders) + (Split-Path $exe.Assembly)
-            $carried = Read-BundleAssemblies $exe.Bundle
-            Write-Host "  the bundle carries $($carried.Count) assemblies"
-            # Where two packs carry an assembly of one name, as the .NET pack carries small
-            # stand-ins for WindowsBase and Microsoft.VisualBasic, the build takes the one of
-            # higher version, and so does this.
-            $index = @{}
-            $versions = @{}
-            foreach ($folder in $folders) {
-              foreach ($file in (Get-ChildItem -LiteralPath $folder -Filter '*.dll' -File)) {
-                $version = try { [Reflection.AssemblyName]::GetAssemblyName($file.FullName).Version } catch [BadImageFormatException] { continue }
-                if (-not $index.ContainsKey($file.BaseName) -or $version -gt $versions[$file.BaseName]) {
-                  $index[$file.BaseName] = $file.FullName
-                  $versions[$file.BaseName] = $version
-                }
-              }
-            }
-
-            # What the exe references, walked twice: through the assemblies its bundle
-            # carries, for the list loaded in every build, and through everything its runtime
-            # packs carry, which is what the installed runtime offers the slim.
-            $root = [IO.Path]::GetFileNameWithoutExtension($exe.Assembly)
-            $index[$root] = (Resolve-Path -LiteralPath $exe.Assembly).Path
-            $bundled = Get-Reached $index $root $carried
-            $installed = Get-Reached $index $root $null
-            if ($bundled.Importing.Count -eq 0) { throw "No assembly the $($exe.Label) references imports a Windows library, so the walk read nothing." }
-            $seen = $bundled.Seen
-            $importing = $bundled.Importing
-            "  references $($seen.Count) assemblies; the build carries none of: $($bundled.Absent -join ', ')"
-            "  on the installed runtime, references $($installed.Seen.Count) assemblies; the packs carry none of: $($installed.Absent -join ', ')"
-
-            # Where the exe has a list of assemblies it loads where installed, a name it leaves
-            # for their own load may be one only the installed runtime carries; otherwise it is
-            # one its bundle carries.
-            $reached = if (@(Read-SourceList $exe.Source 'ImportingAssembliesWhereInstalled' -optional).Count) { $installed.Importing } else { $importing }
-            foreach ($name in $exe.LeftToTheirLoad) {
-              if (-not $reached.Contains($name)) { Fail "The $($exe.Label) leaves $name for its own load to register, and no assembly it references that imports a Windows library is called that." }
-            }
-            foreach ($name in $wpfReads) {
-              if ($installed.Importing.Contains($name) -and $name -notin $exe.LeftToTheirLoad) {
-                Fail "$name, whose being loaded WPF reads, now imports a Windows library and is referenced by the $($exe.Label): decide whether it is loaded first or left for its own load to register."
-              }
-            }
-            $byName = [System.Collections.Generic.List[string]]::new()
-            foreach ($name in $exe.ByName) {
-              if ($seen.Contains($name)) { Fail "The $($exe.Label) names $name as loaded by name, and it is among the assemblies it references." }
-              elseif (-not $index.ContainsKey($name)) { Fail "The $($exe.Label) names $name as loaded by name, and its runtime packs do not carry it." }
-              elseif (-not $carried.Contains($name)) { Fail "The $($exe.Label) names $name as loaded by name, and its bundle does not carry it." }
-              elseif (-not @((Read-Imports $index[$name]).Imports | Where-Object { (Get-BaseName $_) -notin $own })) { Fail "The $($exe.Label) names $name as loaded by name, and it imports no Windows library." }
-              else { $byName.Add($name) }
-            }
-
-            $lists = @(
-              [pscustomobject]@{
-                Name = 'ImportingAssemblies'; Required = $true
-                Expected = @($importing | Where-Object { $_ -notin $exe.LeftToTheirLoad }) + @($byName)
-                Missing = 'which imports a Windows library'
-              }
-              [pscustomobject]@{
-                Name = 'ImportingAssembliesWhereInstalled'; Required = $false
-                Expected = @($installed.Importing | Where-Object { -not $importing.Contains($_) -and $_ -notin $exe.LeftToTheirLoad })
-                Missing = 'which imports a Windows library and which the installed runtime carries and its bundle does not'
-              }
-            )
-            $allListed = [System.Collections.Generic.List[string]]::new()
-            foreach ($list in $lists) {
-              $expected = [System.Collections.Generic.SortedSet[string]]::new([string[]]$list.Expected, [StringComparer]::OrdinalIgnoreCase)
-              $listed = [System.Collections.Generic.SortedSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-              foreach ($name in @(Read-SourceList $exe.Source $list.Name -optional:(-not $list.Required))) { $null = $listed.Add($name) }
-              "  $($list.Name): $($listed.Count) listed, $($expected.Count) computed"
-              foreach ($name in $expected) { if (-not $listed.Contains($name)) { Fail "The $($exe.Label) can load $name, $($list.Missing), and $($exe.Source) does not list it in $($list.Name)." } }
-              foreach ($name in $listed) { if (-not $expected.Contains($name)) { Fail "$($exe.Source) lists $name in $($list.Name), and it is not an assembly the $($exe.Label) can load $($list.Missing)." } }
-              $allListed.AddRange([string[]]@($listed))
-            }
-            foreach ($name in $allListed) {
-              if ($name -in 'PresentationCore', 'PresentationFramework', 'WindowsBase' -or -not $index.ContainsKey($name)) { continue }
-              if (@(Read-XmlnsDefinitions $index[$name]) -contains $presentation) {
-                Fail "$($exe.Source) lists $name, which declares types into the XAML namespace the window's markup uses, so loading it first changes how that markup is read."
-              }
-            }
-          }
-
-          Exit-IfFailed
-
       # First the plants are worked out over records made up for the purpose, and the job
-      # fails unless each look for a file to load beside a build or in a working folder of
-      # its own is planted for, each for data is not, a load of a planted file fails, and a
-      # look recorded under a short name is read in full or fails (Test-ImageNameControls,
+      # fails unless each look for a file to load beside an exe or in a working folder of
+      # its own is planted for, each for data is not, each library loaded from Windows' own
+      # folders is planted for under its name, a library from anywhere else is not, a load of a
+      # planted file fails, a run that loads each library from System32 passes, and a look
+      # recorded under a short name is read in full or fails (Test-ImageNameControls,
       # Test-WorkingFolderControls and Test-ShortNameControls in native-libraries.ps1). The
-      # checks on how a build in replace mode ended are run the same way over ends made up
+      # checks on how an exe in replace mode ended are run the same way over ends made up
       # with a fault planted in each, and must fail at each (Test-ReplaceControls), and so
-      # are the check on the slim's loads before its Main (Test-WhereInstalledControls) and
-      # the reading of each run's rows, and of the replace a run starts, from the lifetime
-      # of its own process (Test-LifetimeControls).
+      # are the check on where an image may be loaded from (Test-ImageFolderControls) and the
+      # reading of each run's rows, and of the replace a run starts, from the lifetime of its
+      # own process (Test-LifetimeControls).
       #
-      # Each build is also started in replace mode, as a newer version an update downloaded
+      # Each exe is also started in replace mode, as a newer version an update downloaded
       # is started to put itself at the old copy's path (Invoke-Replace): from a staging
       # folder under %ProgramData% made as the app makes one, against a stand-in old copy
       # it has to wait for, once putting itself in place and once with nothing left at the
       # path. What it looks for and loads there is judged like every other start, in both
       # passes. The job fails where it does not set the started event, ends with the wrong
-      # exit code, leaves anything but the build at the path or anything beside it, leaves
+      # exit code, leaves anything but the exe at the path or anything beside it, leaves
       # the exe without the access list a file made in that folder carries, writes the
       # Application-log entry saying the update was not installed where it put itself in
-      # place, or does not write it where nothing was left. A window build that puts itself
-      # in place starts the copy at the path, which the first pass judges as that build
+      # place, or does not write it where nothing was left. A window that puts itself
+      # in place starts the copy at the path, which the first pass judges as that window
       # started from its own folder; the second pass ends it once the replace has ended.
       - name: First pass, with nothing planted
         shell: pwsh
@@ -1236,17 +1005,8 @@ jobs:
           Test-ShortNameControls
           Test-LifetimeControls
           Test-ReplaceControls
-          Test-WhereInstalledControls
+          Test-ImageFolderControls
           "  interactive: $([Environment]::UserInteractive); session $((Get-Process -Id $PID).SessionId)"
-          $runtimes = dotnet --list-runtimes
-          $runtimes
-          if (-not ($runtimes | Where-Object { $_ -match '^Microsoft\.WindowsDesktop\.App 10\.' })) {
-            throw "No .NET 10 Desktop Runtime is installed, so the slim cannot start."
-          }
-
-          $notPlanted = @(Select-NotPlanted @(Get-NotPlanted) $builds)
-
-          $listedSeen = @{}
 
           Start-Record 'first'
           $runs = foreach ($build in $builds) {
@@ -1267,31 +1027,18 @@ jobs:
           foreach ($run in $runs) {
             $read = Read-Run $run $byProcess
             if (-not $read) { continue }
-            # The build a run starts, which for a start in replace mode is the build it is a
-            # newer version of, and which the copy a replace started at the path already is.
-            $base = if ($run.Build.AtPath) { $run.Build.AtPath.Label } else { $run.Build.Label }
             if (-not $run.Build.Replace) { Test-MustLoad $run $read.Loads }
             if ($run.Build.UpdateCheck) { Test-UpdateCheck $run $byProcess }
-            # A build whose first act seen is not the kind it names is judged against a later
+            # An exe whose first act seen is not the kind it names is judged against a later
             # row than its own code's start, so it fails rather than passing on that row.
             if (-not $read.Marker) { Fail "$($run.Label) showed no act of its own code." }
             elseif ($read.Marker.Kind -ne $run.Build.Marker) { Fail "$($run.Label)'s first act of its own code seen is the $($read.Marker.Kind) at row $($read.Marker.Index), where it should be the $($run.Build.Marker)." }
-            # A build in replace mode whose first act seen is its module initializer's shows
-            # the replaced copy as the first act of its code in Main or later.
-            if ($run.Build.Replace -and $read.MainMarker.Kind -ne 'replaced copy') {
-              Fail "$($run.Label)'s first act of its code in Main or later is $(if ($read.MainMarker) { "the $($read.MainMarker.Kind) at row $($read.MainMarker.Index)" } else { 'not seen' }), where it should be the replaced copy."
-            }
-            # The slim runs on the installed desktop runtime, which lists these as trusted
-            # platform assemblies, so its module initializer loads each before its Main: before
-            # the first act seen of its code in Main or later.
-            # So do the slim's starts in replace mode, and the copy one starts at the path.
-            if ($base -eq 'slim') { Test-WhereInstalledLoads $run $read }
-            # Each exe writes to the crash log whatever fails as it starts, such as an
-            # assembly on its list that will not load, so a build started with nothing
-            # planted writes nothing there. The app also writes to it to add an earlier
-            # folder's log to its own, which on a runner that never held an earlier version
-            # is as wrong as an entry. A replace that finds nothing left at the path writes
-            # why, which is printed.
+            Test-ImageFolders $run $read
+            # Each exe writes to the crash log whatever fails as it starts, so an exe started
+            # with nothing planted writes nothing there. The app also writes to it to add an
+            # earlier folder's log to its own, which on a runner that never held an earlier
+            # version is as wrong as an entry. A replace that finds nothing left at the path
+            # writes why, which is printed.
             $crashLogPattern = '\\AppData\\Local\\(' + (($crashLogFolders | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')\\crash\.log$'
             $rows = $byProcess[(Get-RunKey $run)]
             $writes = @(for ($i = 0; $i -lt $rows.Count; $i++) {
@@ -1299,95 +1046,44 @@ jobs:
             })
             if ($writes -and $run.Build.Replace -eq 'nothing') { "  made $($writes.Count) WriteFile rows to its crash log, the first at row $($writes[0]), as a replace with nothing left at the path does" }
             elseif ($writes) { Fail "$($run.Label) made $($writes.Count) WriteFile rows to its crash log with nothing planted, the first at row $($writes[0]): $($rows[$writes[0] - 1].Path)." }
-            foreach ($name in $plantedAlone) {
-              $beside = @($read.Libraries | Where-Object { $_.Place -eq 'own' -and $_.Operation -ne 'Load Image' -and $_.Relative -eq $name })
-              "  looked for $name beside itself: $(if ($beside) { "yes, from row $($beside[0].Index)" } else { 'no' })"
-              if ($beside -and $base -eq 'slim') {
-                $who = if ($name -eq 'hostfxr.dll') { "so its exe searches that folder for .NET" } else { "where hostfxr.dll looked for it" }
-                Fail "$($run.Label) looked for $name in the folder it was run from, row $($beside[0].Index), $who."
-              }
-            }
             foreach ($load in ($read.Loads | Where-Object Place -in 'own', 'working')) {
               $where = if ($load.Place -eq 'own') { 'its own folder' } else { 'its working folder' }
               Fail "$($run.Label) loaded $($load.Path) from $where, row $($load.Index), $(Get-When $load $read.Marker)."
             }
 
-            # What the bundle extracted is every file in the folders its libraries were
-            # loaded from under %TEMP%\.net. Those folders stay after the run, and the
-            # second pass starts from them again. A start of the same bundle extracts to the
-            # same folder, so the portable's own run and the copy a replace starts at the
-            # path each check it, and a replace of the portable, which ends before the
-            # window starts, is not required to load from it.
-            $extractionFolders = @($read.Loads | Where-Object Place -eq 'extraction' | ForEach-Object { Split-Path $_.Path } | Sort-Object -Unique)
-            if ($base -eq 'portable' -and -not $run.Build.Replace -and -not $extractionFolders) {
-              Fail "$($run.Label) loaded nothing from its extraction folder, so that folder went unchecked."
-            }
-            $bundleFiles = @(foreach ($folder in $extractionFolders) { Get-ChildItem -LiteralPath $folder -File | ForEach-Object FullName })
-            # A library the bundle extracts is one a framework assembly may import, and the
-            # resolver hands only those in OwnLibraries back to the runtime.
-            $own = @(Get-OwnLibraries)
-            foreach ($file in $bundleFiles) {
-              if ((Get-BaseName (Split-Path $file -Leaf)) -notin $own) {
-                Fail "$($run.Label)'s bundle extracted $file, which FrameworkLibraries.OwnLibraries does not name, so an import of it is sent to System32."
+            # The copy a replace started at the path is the exe started from its own
+            # folder, which the exe's own runs plant for.
+            if ($run.StartedCopy) { continue }
+            $plants = @(Get-RunPlants $run $read)
+            # What an exe must load is among what is planted for it as a load, or the planting
+            # would prove nothing about it.
+            if (-not $run.Build.Replace) {
+              foreach ($name in @($run.Build.MustLoad)) {
+                if (-not @($plants | Where-Object { $_.Why -eq 'loaded' -and $_.Place -eq 'beside' -and $_.Path -eq $name })) { Fail "$($run.Label) loaded $name, which is not among the libraries planted for it as loaded from Windows' own folders." }
               }
             }
-
-            # The copy a replace started at the path is the build started from its own
-            # folder, which the build's own runs plant for.
-            if ($run.StartedCopy) { continue }
-            $plants = @(Get-RunPlants $run $read $notPlanted $listedSeen $extractionFolders)
-
-            $alone = @($plants | Where-Object { $_.Place -in 'beside', 'working' -and (Split-Path $_.Path -Leaf) -in $plantedAlone })
             # The replace a run starts is started again by that run in the second pass, so
             # its plants go with the run's, in the same staging folder, and are judged
             # against the replace.
             if ($run.StartedReplace) {
-              $parent = @($planned | Where-Object { $_.BuildLabel -eq $run.Build.Label -and -not $_.JudgeOnLoadAlone })
+              $parent = @($planned | Where-Object { $_.BuildLabel -eq $run.Build.Label })
               if ($parent.Count -ne 1) { Fail "$($run.Label) has $($parent.Count) runs planned to start it, where it has one." }
-              else { $parent[0].ReplacePlants = @($plants | Where-Object { $_ -notin $alone }) }
+              else { $parent[0].ReplacePlants = $plants }
             }
             else {
-              $planned.Add([pscustomobject]@{
-                Label = $run.Label; BuildLabel = $run.Label; JudgeOnLoadAlone = $false; BundleFiles = $bundleFiles
-                Plants = @($plants | Where-Object { $_ -notin $alone }); ReplacePlants = @()
-              })
-            }
-            # A plant alone for the replace goes with a run of its own of the build that starts
-            # it, labelled as that run, which the replace's label then follows. One the run
-            # plants alone too is beside the run as well, which takes it first, so that run's own
-            # plant alone is the one judged.
-            if ($run.StartedReplace) {
-              $runAlone = @($planned | Where-Object { $_.BuildLabel -eq $run.Build.Label -and $_.JudgeOnLoadAlone } | ForEach-Object { $_.Plants } |
-                ForEach-Object { "$($_.Place)|$($_.Path)" })
-              foreach ($plant in @($alone | Where-Object { "$($_.Place)|$($_.Path)" -in $runAlone })) {
-                "  not planted alone for $($run.Label): $($plant.Path), which $($run.Build.Label) is planted alone with"
-              }
-              $alone = @($alone | Where-Object { "$($_.Place)|$($_.Path)" -notin $runAlone })
-            }
-            # The place is in the label, so a name looked for both beside the exe and in its
-            # working folder gives two runs with folders of their own.
-            foreach ($plant in $alone) {
-              $where = if ($plant.Place -eq 'working') { ' in its working folder' } else { '' }
-              $aloneLabel = if ($run.StartedReplace) { "$($run.Build.Label) with $(Split-Path $plant.Path -Leaf) alone$where for its replace" }
-                else { "$($run.Label) with $(Split-Path $plant.Path -Leaf) alone$where" }
-              $planned.Add([pscustomobject]@{
-                Label = $aloneLabel; BuildLabel = $run.Build.Label; JudgeOnLoadAlone = $true
-                BundleFiles = $bundleFiles; Plants = @(if (-not $run.StartedReplace) { $plant }); ReplacePlants = @(if ($run.StartedReplace) { $plant })
-              })
+              $planned.Add([pscustomobject]@{ Label = $run.Label; BuildLabel = $run.Label; Plants = $plants; ReplacePlants = @() })
             }
           }
-
-          Test-ListedSeen $notPlanted $listedSeen
 
           "== Planted for the second pass"
           foreach ($p in $planned) {
             "  $($p.Label):"
-            foreach ($plant in $p.Plants) { "    $($plant.Place) $($plant.Path): $($plant.Kind), $($plant.Source)" }
-            foreach ($plant in $p.ReplacePlants) { "    for the replace it starts, $($plant.Place) $($plant.Path): $($plant.Kind), $($plant.Source)" }
+            foreach ($plant in $p.Plants) { "    $($plant.Place) $($plant.Path): $($plant.Why), $($plant.Kind), $($plant.Source)" }
+            foreach ($plant in $p.ReplacePlants) { "    for the replace it starts, $($plant.Place) $($plant.Path): $($plant.Why), $($plant.Kind), $($plant.Source)" }
           }
           ConvertTo-Json -InputObject @($planned) -Depth 5 | Set-Content (Join-Path $env:RUNNER_TEMP 'plants.json')
 
-          # The builds write to the same crash logs in both passes, so a copy of each taken
+          # The exes write to the same crash logs in both passes, so a copy of each taken
           # now holds the first pass's entries alone. They go into the artifact.
           foreach ($folder in $crashLogFolders) {
             $crashLog = Join-Path $env:LOCALAPPDATA "$folder\crash.log"
@@ -1401,9 +1097,9 @@ jobs:
 
           Exit-IfFailed
 
-      # A planted file is judged by whether the build loaded it, and a plant counts only
-      # where a look found it in place and it was unchanged when the build ended, so a
-      # plant that was missed, removed or rewritten cannot pass.
+      # A planted file is judged by whether the exe loaded it, and a plant put for a look
+      # counts only where a look found it in place and it was unchanged when the exe ended,
+      # so a plant that was missed, removed or rewritten cannot pass.
       - name: Second pass, with the genuine files planted
         if: ${{ !cancelled() && env.PROCMON != '' }}
         shell: pwsh
@@ -1418,9 +1114,7 @@ jobs:
             $build = $builds | Where-Object Label -eq $p.BuildLabel
             if ($build.Replace) {
               # The copy a replace started at the path is ended at once and not judged here.
-              foreach ($run in @(Invoke-Replace $build $p.Label 'second' $p.Plants -LoadAlone:$p.JudgeOnLoadAlone -replacePlants $p.ReplacePlants)) {
-                $run | Add-Member -NotePropertyMembers @{ BundleFiles = @($p.BundleFiles | Where-Object { $_ }); JudgeOnLoadAlone = $p.JudgeOnLoadAlone } -PassThru
-              }
+              Invoke-Replace $build $p.Label 'second' $p.Plants -replacePlants $p.ReplacePlants
               continue
             }
             $folder = Get-RunFolder 'second' $p.Label
@@ -1432,7 +1126,7 @@ jobs:
             $ended = Get-Date
             [pscustomobject]@{
               Label = $p.Label; Build = $build; Folder = $folder; Exe = (Split-Path $build.Exe -Leaf); Id = $id; Started = $started; Ended = $ended
-              Placed = $placed; BundleFiles = @($p.BundleFiles | Where-Object { $_ }); JudgeOnLoadAlone = $p.JudgeOnLoadAlone
+              Placed = $placed
             }
           }
           $read = Read-RecordWithReplaces (Stop-Record 'second') $runs
@@ -1443,197 +1137,9 @@ jobs:
             $read = Read-Run $run $byProcess
             if (-not $read) { continue }
             Test-PlantedRun $run $read
-
-            if ($run.JudgeOnLoadAlone) {
-              $mustLoad = if ($run.Build.MustLoad) { ", so $($run.Label) is not expected to load $($run.Build.MustLoad -join ' or ')" } else { '' }
-              "  judged on what it loads alone: a build that takes a planted apphost library cannot start$mustLoad. DOTNET_ROOT is $env:DOTNET_ROOT."
-            }
-            else {
-              if (-not $run.Build.Replace) { Test-MustLoad $run $read.Loads }
-              if ($run.Build.UpdateCheck) { Test-UpdateCheck $run $byProcess }
-            }
-          }
-
-          Exit-IfFailed
-
-      # Each build is started once more with the .NET host's trace on, outside both
-      # records so the trace's variables change nothing either pass saw. A genuine
-      # hostfxr.dll is planted beside the slim, and DOTNET_ROOT and DOTNET_ROOT_X64 name a
-      # decoy .NET install holding a copy of it under host\fxr. The slim's exe carries the
-      # places its host searches for .NET, which the trace prints as a number made of
-      # these: 1 the exe's own folder, 2 a folder relative to it, 4 the folder the
-      # DOTNET_ROOT variables name, and 8 the location .NET's installer registers, or
-      # .NET's default install folder where none is registered. 0 is the default search,
-      # which includes the exe's folder. The job fails where the slim's number is missing
-      # or anything but 8, and where its trace does not name the hostfxr.dll it loaded or
-      # names one outside .NET's install. The slim is also published to search only the
-      # DOTNET_ROOT variables, from a copy of the commit of its own, and the job fails
-      # where that build does not load the decoy's hostfxr.dll, which is what shows the
-      # decoy is one the host takes. That build cannot find the desktop runtime under the
-      # decoy and does not start, and its trace is all that is read. The job also fails
-      # where that build's search location options are missing or anything but 4, the value
-      # for the DOTNET_ROOT variables alone. For every build whose runtime starts it prints
-      # the folders the runtime searches for native libraries; the command line is started
-      # for its version, so its host and runtime start and it scans nothing.
-      - name: Trace how each build's host starts
-        if: ${{ !cancelled() && env.PROCMON != '' }}
-        shell: pwsh
-        run: |
-          . (Join-Path $env:RUNNER_TEMP 'native.ps1')
-          # The second pass leaves its plants in place, and a start of the same bundle extracts
-          # to the same folder under %TEMP%\.net, so the files planted there are removed first.
-          $plantsFile = Join-Path $env:RUNNER_TEMP 'plants.json'
-          if (Test-Path $plantsFile) {
-            foreach ($p in @(Get-Content -Raw $plantsFile | ConvertFrom-Json)) {
-              foreach ($plant in @(@($p.Plants) + @($p.ReplacePlants) | Where-Object { $_ -and $_.Place -eq 'extraction' -and (Test-Path -LiteralPath $_.Path) })) {
-                Remove-Item -LiteralPath $plant.Path -Force -ErrorAction SilentlyContinue
-                if (Test-Path -LiteralPath $plant.Path) { Fail "The planted $($plant.Path) could not be removed before the trace." }
-                else { "  removed the planted $($plant.Path)" }
-              }
-            }
-          }
-          # The host reads the registered location from the registry's 32-bit view.
-          $key = [Microsoft.Win32.RegistryKey]::OpenBaseKey('LocalMachine', 'Registry32').OpenSubKey('SOFTWARE\dotnet\Setup\InstalledVersions\x64')
-          $registered = if ($key) { $key.GetValue('InstallLocation') }
-          "  DOTNET_ROOT was '$env:DOTNET_ROOT', DOTNET_ROOT_X64 '$env:DOTNET_ROOT_X64'; the registered x64 install is '$registered'"
-          $installed = if ($registered) { $registered } else { Join-Path $env:ProgramFiles 'dotnet' }
-          # The newest host, by version: host\fxr holds one folder per installed version.
-          $genuineFxr = @(Get-ChildItem -Path (Join-Path $installed 'host\fxr\*\hostfxr.dll') -ErrorAction SilentlyContinue |
-            Sort-Object { $v = $null; if ([version]::TryParse(($_.Directory.Name -replace '-.*$'), [ref]$v)) { $v } else { [version]'0.0' } } |
-            Select-Object -Last 1)
-          if (-not $genuineFxr.Count) { throw "No hostfxr.dll under $installed to plant beside the slim." }
-
-          # Published before the DOTNET_ROOT variables are set, so the publish runs as every
-          # other does, and from a copy of the commit, so nothing a publish above left under
-          # obj reaches it.
-          $tree = Join-Path $env:RUNNER_TEMP 'dotnet-root-control'
-          git archive --format=zip -o "$tree.zip" HEAD
-          if ($LASTEXITCODE -ne 0) { throw "git archive failed for the slim that searches DOTNET_ROOT." }
-          Expand-Archive -Path "$tree.zip" -DestinationPath $tree -Force
-          dotnet publish (Join-Path $tree 'src/InstallerClean/InstallerClean.csproj') -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true -p:AppHostDotNetSearch=EnvironmentVariable --nologo -o "$tree-publish"
-          if ($LASTEXITCODE -ne 0) { throw "The slim that searches DOTNET_ROOT did not publish." }
-
-          # The host takes the highest version folder under host\fxr, so the decoy's is named
-          # as the genuine one is.
-          $decoy = Join-Path $env:RUNNER_TEMP 'decoy-dotnet-root'
-          $decoyFxr = Join-Path $decoy ('host\fxr\' + $genuineFxr[0].Directory.Name)
-          New-Item -ItemType Directory -Force -Path $decoyFxr | Out-Null
-          Copy-Item -LiteralPath $genuineFxr[0].FullName -Destination $decoyFxr
-          $decoyFxr = $decoyFxr.TrimEnd('\') + '\'
-          $env:DOTNET_ROOT = $decoy
-          $env:DOTNET_ROOT_X64 = $decoy
-          "  DOTNET_ROOT and DOTNET_ROOT_X64 name $decoy, which holds a copy of $($genuineFxr[0].FullName)"
-          $env:DOTNET_HOST_TRACE = '1'
-          # The trace lines printed for every build the step starts.
-          $shown = '\.NET root search location options|registry value in|Found registered install location|as runtime location|Resolved fxr|Property NATIVE_DLL_SEARCH_DIRECTORIES'
-          foreach ($build in $builds) {
-            # The trace shows how a build's host starts, which a second run of the same exe
-            # repeats.
-            if ($build.UpdateCheck -or $build.Replace) { continue }
-            $folder = Get-RunFolder 'trace' $build.Label
-            New-Item -ItemType Directory -Force -Path $folder | Out-Null
-            Copy-Item $build.Exe $folder
-            if ($build.Label -eq 'slim') {
-              Copy-Item -LiteralPath $genuineFxr[0].FullName -Destination $folder
-              "  planted $($genuineFxr[0].FullName) beside the slim"
-            }
-            $trace = "$folder.txt"
-            $env:DOTNET_HOST_TRACEFILE = $trace
-            # The command line's host and runtime start for --version, which then ends the run.
-            $start = $build | Select-Object *
-            if ($build.Label -eq 'command line') { $start.Arguments = @('--version') }
-            $null = Invoke-Build $start $build.Label $folder
-            if (-not (Test-Path $trace)) { Fail "$($build.Label) wrote no host trace."; continue }
-            $lines = @(Get-Content $trace)
-            Write-Host "== $($build.Label): $($lines.Count) trace lines"
-            $lines | Where-Object { $_ -match $shown } | ForEach-Object { Write-Host "  $_" }
-
-            # The window loads the assemblies on its ImportingAssembliesWhereInstalled list only
-            # where the host lists them as trusted platform assemblies: the slim's host lists
-            # every assembly of the installed runtime, and the portable's lists none of them
-            # and none its bundle carries.
-            if ($build.Label -in 'slim', 'portable') {
-              if (-not @($lines | Where-Object { $_ -match 'Property TRUSTED_PLATFORM_ASSEMBLIES = ' }).Count) { Fail "The $($build.Label)'s trace has no TRUSTED_PLATFORM_ASSEMBLIES line." }
-              $trusted = @($lines | ForEach-Object { if ($_ -match 'Property TRUSTED_PLATFORM_ASSEMBLIES = (.*)$') { $Matches[1] -split ';' } } | Where-Object { $_ })
-              "  the $($build.Label)'s trusted platform assemblies: $($trusted.Count)"
-              foreach ($name in @(Get-WhereInstalled)) {
-                $named = [bool]@($trusted | Where-Object { ($_ -split '\\')[-1] -eq "$name.dll" }).Count
-                "  they name $name`: $(if ($named) { 'yes' } else { 'no' })"
-                if ($build.Label -eq 'slim' -and -not $named) { Fail "The slim's trusted platform assemblies do not name $name, so the slim does not load it before its Main." }
-                if ($build.Label -eq 'portable' -and $named) { Fail "The portable's trusted platform assemblies name $name, so its module initializer loads $name by name before its Main." }
-              }
-              if ($build.Label -eq 'portable') {
-                $bundled = Read-BundleAssemblies $build.Exe
-                $listedBundled = @($trusted | Where-Object { $_.EndsWith('.dll', 'OrdinalIgnoreCase') -and $bundled.Contains((($_ -split '\\')[-1] -replace '\.dll$', '')) })
-                "  of the $($bundled.Count) assemblies the portable's bundle carries, its trusted platform assemblies name $($listedBundled.Count)"
-                if ($listedBundled) { Fail "The portable's trusted platform assemblies name $($listedBundled[0]), which its bundle carries." }
-              }
-            }
-            if ($build.Label -eq 'slim') {
-              $options = @($lines | ForEach-Object { if ($_ -match '\.NET root search location options: (\d+)') { [int]$Matches[1] } })
-              if (-not $options.Count) { Fail "The slim's trace has no .NET root search location options line." }
-              elseif ($options[0] -ne 8) { Fail "The slim's host searches for .NET beyond the registered or default install: search location options $($options[0])." }
-              $fxr = @($lines | ForEach-Object { if ($_ -match 'Resolved fxr \[(.+)\]') { $Matches[1] } })
-              $installedFxr = $installed.TrimEnd('\') + '\host\fxr\'
-              if (-not $fxr.Count) { Fail "The slim's trace does not name the hostfxr.dll it loaded." }
-              foreach ($path in $fxr) {
-                if ($path.StartsWith($installedFxr, 'OrdinalIgnoreCase')) { "  the slim loaded $path, under $installedFxr" }
-                else { Fail "The slim loaded $path, which is not under $installedFxr, with a hostfxr.dll planted in $folder and DOTNET_ROOT naming $decoy." }
-              }
-
-              # The native libraries in the folders the slim's runtime searches are the ones
-              # a framework assembly there can import from beside it. Each one imported must
-              # be in FrameworkLibraries.OwnLibraries, or the resolver sends it to System32,
-              # and each one OwnLibraries names must be there.
-              $searched = @($lines | ForEach-Object { if ($_ -match 'Property NATIVE_DLL_SEARCH_DIRECTORIES = (.*)$') { $Matches[1] -split ';' } } |
-                Where-Object { $_ } | Sort-Object -Unique)
-              $natives = @{}
-              $imported = @{}
-              foreach ($file in @(if ($searched) { Get-ChildItem -LiteralPath $searched -Filter '*.dll' -File })) {
-                $read = Read-Imports $file.FullName
-                if (-not $read.Managed) { $natives[(Get-BaseName $file.Name)] = $file.FullName }
-                elseif ($file.BaseName -ne 'System.Private.CoreLib') {
-                  foreach ($name in $read.Imports) { $imported[(Get-BaseName $name)] = $file.Name }
-                }
-              }
-              $own = @(Get-OwnLibraries)
-              if (-not $natives.Count -or -not $imported.Count) {
-                Fail "The slim's runtime folders ($($searched -join ', ')) gave no native library or no import to compare with FrameworkLibraries.OwnLibraries."
-              }
-              else {
-                "  native libraries in the slim's runtime folders: $(($natives.Keys | Sort-Object) -join ', ')"
-                foreach ($name in ($natives.Keys | Where-Object { $imported.ContainsKey($_) } | Sort-Object)) {
-                  if ($name -in $own) { "  $name, imported by $($imported[$name]), is in OwnLibraries" }
-                  else { Fail "$($natives[$name]) is imported by $($imported[$name]) and FrameworkLibraries.OwnLibraries does not name it, so the resolver sends it to System32." }
-                }
-                foreach ($name in $own) {
-                  if (-not $natives.ContainsKey($name)) { Fail "FrameworkLibraries.OwnLibraries names $name, which no folder the slim's runtime searches carries." }
-                }
-              }
-            }
-          }
-
-          $control = [pscustomobject]@{ Label = 'slim searching DOTNET_ROOT'; Exe = (Join-Path "$tree-publish" 'InstallerClean.exe'); Arguments = @(); Wait = 20 }
-          $folder = Get-RunFolder 'trace' $control.Label
-          New-Item -ItemType Directory -Force -Path $folder | Out-Null
-          Copy-Item $control.Exe $folder
-          $trace = "$folder.txt"
-          $env:DOTNET_HOST_TRACEFILE = $trace
-          # Without this the host shows a dialog saying the desktop runtime is missing.
-          $env:DOTNET_DISABLE_GUI_ERRORS = '1'
-          $null = Invoke-Build $control $control.Label $folder
-          Remove-Item Env:DOTNET_DISABLE_GUI_ERRORS
-          if (-not (Test-Path $trace)) { Fail "The $($control.Label) wrote no host trace, so the decoy is not shown to be one the host takes." }
-          else {
-            $lines = @(Get-Content $trace)
-            Write-Host "== $($control.Label): $($lines.Count) trace lines"
-            $lines | Where-Object { $_ -match $shown } | ForEach-Object { Write-Host "  $_" }
-            $options = @($lines | ForEach-Object { if ($_ -match '\.NET root search location options: (\d+)') { [int]$Matches[1] } })
-            if (-not $options.Count) { Fail "The $($control.Label)'s trace has no .NET root search location options line." }
-            elseif ($options[0] -ne 4) { Fail "The $($control.Label) was not published to search the DOTNET_ROOT variables alone: search location options $($options[0])." }
-            $fxr = @($lines | ForEach-Object { if ($_ -match 'Resolved fxr \[(.+)\]') { $Matches[1] } })
-            if (@($fxr | Where-Object { $_.StartsWith($decoyFxr, 'OrdinalIgnoreCase') }).Count) { "  the $($control.Label) loaded $($fxr -join ', '), the decoy's" }
-            else { Fail "The $($control.Label) loaded $(if ($fxr.Count) { $fxr -join ', ' } else { 'no hostfxr.dll its trace names' }), not the decoy's under $decoyFxr, so the decoy is not shown to be one the host takes." }
+            Test-ImageFolders $run $read
+            if (-not $run.Build.Replace) { Test-MustLoad $run $read.Loads }
+            if ($run.Build.UpdateCheck) { Test-UpdateCheck $run $byProcess }
           }
 
           Exit-IfFailed
@@ -1660,8 +1166,7 @@ jobs:
           $failed = @()
           $builds = @(
             @{ Label = 'command line'; Exe = 'publish/cli/installerclean-cli.exe'; Arguments = @('--version') },
-            @{ Label = 'portable'; Exe = 'publish/self-contained/InstallerClean.exe'; Arguments = @() },
-            @{ Label = 'slim'; Exe = 'publish/framework-dependent/InstallerClean.exe'; Arguments = @() }
+            @{ Label = 'window'; Exe = 'publish/window/InstallerClean.exe'; Arguments = @() }
           )
           foreach ($build in $builds) {
             $folder = Join-Path $env:RUNNER_TEMP ('started-' + ($build.Label -replace ' ', '-'))
@@ -1711,188 +1216,6 @@ jobs:
           }
           $failed | ForEach-Object { Write-Host "::error::$_" }
           if ($failed.Count) { exit 1 }
-
-      # A start-up hook is an assembly .NET loads and runs before the app's own code,
-      # named by DOTNET_STARTUP_HOOKS. A small one is built here that writes its process's
-      # ID and path to the file another variable names. Each build is started from a
-      # folder of its own with both variables set on its process alone, and so is each
-      # build published again with start-up hooks allowed, from a copy of the commit of
-      # its own. Every build is started with /startedevent:<id> and waited for until it
-      # sets the event, the command line for its version, so it scans nothing. The step
-      # fails where a shipped build's start wrote any hook line, from its own process or
-      # one it started, whether or not the build then set the event; where any build does
-      # not set the event within 60 s; and where an allowing build's own process had not
-      # run the hook by the time it set the event. Each allowing build's hook line is
-      # printed. The builds are started with CreateProcess, which a window build asking
-      # for administrator rights refuses with error 740 where the step is not elevated.
-      - name: Check no build runs a start-up hook
-        if: ${{ !cancelled() }}
-        shell: pwsh
-        run: |
-          . (Join-Path $env:GITHUB_WORKSPACE 'scripts/native-libraries.ps1')
-          $failed = @()
-
-          $hookDir = Join-Path $env:RUNNER_TEMP 'startup-hook'
-          New-Item -ItemType Directory -Force -Path $hookDir | Out-Null
-          Set-Content -Path (Join-Path $hookDir 'StartupHook.csproj') -Value @'
-          <Project Sdk="Microsoft.NET.Sdk">
-            <PropertyGroup>
-              <TargetFramework>net10.0</TargetFramework>
-            </PropertyGroup>
-          </Project>
-          '@
-          Set-Content -Path (Join-Path $hookDir 'StartupHook.cs') -Value @'
-          internal class StartupHook
-          {
-              public static void Initialize()
-              {
-                  var marker = System.Environment.GetEnvironmentVariable("STARTUP_HOOK_MARKER");
-                  if (!string.IsNullOrEmpty(marker))
-                      System.IO.File.AppendAllText(marker,
-                          $"{System.Environment.ProcessId} {System.Environment.ProcessPath}{System.Environment.NewLine}");
-              }
-          }
-          '@
-          dotnet build (Join-Path $hookDir 'StartupHook.csproj') -c Release --nologo -o (Join-Path $hookDir 'out')
-          if ($LASTEXITCODE -ne 0) { throw "The start-up hook did not build." }
-          $hook = Join-Path $hookDir 'out\StartupHook.dll'
-          if (-not (Test-Path $hook)) { throw "The start-up hook build wrote no $hook." }
-
-          function Publish-Allowing([string]$name, [string]$project, [string[]]$options) {
-            $tree = Join-Path $env:RUNNER_TEMP "hooks-allowed-$name"
-            git archive --format=zip -o "$tree.zip" HEAD
-            if ($LASTEXITCODE -ne 0) { throw "git archive failed for the $name with start-up hooks allowed." }
-            Expand-Archive -Path "$tree.zip" -DestinationPath $tree -Force
-            # Printed rather than returned, so the function answers with the folder alone.
-            dotnet publish (Join-Path $tree $project) -c Release -r win-x64 -p:RestoreLockedMode=true @options -p:StartupHookSupport=true --nologo -o "$tree-publish" | Out-Host
-            if ($LASTEXITCODE -ne 0) { throw "The $name with start-up hooks allowed did not publish." }
-            "$tree-publish"
-          }
-          $selfContained = '--self-contained', 'true', '-p:PublishSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true', '-p:EnableCompressionInSingleFile=true'
-          $cli = Publish-Allowing 'command-line' 'src/InstallerClean.Cli/InstallerClean.Cli.csproj' $selfContained
-          $portable = Publish-Allowing 'portable' 'src/InstallerClean/InstallerClean.csproj' $selfContained
-          $slim = Publish-Allowing 'slim' 'src/InstallerClean/InstallerClean.csproj' @('-p:PublishSelfContained=false', '-p:SelfContained=false', '-p:PublishSingleFile=true')
-
-          $builds = @(
-            [pscustomobject]@{ Label = 'command line'; Exe = 'publish/cli/installerclean-cli.exe'; Allowing = $false },
-            [pscustomobject]@{ Label = 'portable'; Exe = 'publish/self-contained/InstallerClean.exe'; Allowing = $false },
-            [pscustomobject]@{ Label = 'slim'; Exe = 'publish/framework-dependent/InstallerClean.exe'; Allowing = $false },
-            [pscustomobject]@{ Label = 'command line with hooks allowed'; Exe = (Join-Path $cli 'installerclean-cli.exe'); Allowing = $true },
-            [pscustomobject]@{ Label = 'portable with hooks allowed'; Exe = (Join-Path $portable 'InstallerClean.exe'); Allowing = $true },
-            [pscustomobject]@{ Label = 'slim with hooks allowed'; Exe = (Join-Path $slim 'InstallerClean.exe'); Allowing = $true }
-          )
-          # One at a time, each ended and waited for before the next starts, since the
-          # windows share the single-instance mutex.
-          foreach ($build in $builds) {
-            $folder = Join-Path $env:RUNNER_TEMP ('hook-' + ($build.Label -replace '[^A-Za-z0-9]+', '-'))
-            New-Item -ItemType Directory -Force -Path $folder | Out-Null
-            Copy-Item $build.Exe $folder
-            $exe = Join-Path $folder (Split-Path $build.Exe -Leaf)
-            $marker = Join-Path $folder 'hook-ran.txt'
-            Remove-Item -LiteralPath $marker -Force -ErrorAction SilentlyContinue
-            $signal = New-StartedEvent
-            $started = $signal.Handle
-            $info = [System.Diagnostics.ProcessStartInfo]::new($exe)
-            $info.UseShellExecute = $false
-            $info.WorkingDirectory = $folder
-            if ($exe.EndsWith('installerclean-cli.exe', 'OrdinalIgnoreCase')) { $info.ArgumentList.Add('--version') }
-            $info.ArgumentList.Add($signal.Argument)
-            $info.Environment['DOTNET_STARTUP_HOOKS'] = $hook
-            $info.Environment['STARTUP_HOOK_MARKER'] = $marker
-            Write-Host "== $($build.Label)"
-            try {
-              $p = [System.Diagnostics.Process]::Start($info)
-            }
-            catch {
-              $cause = if ($_.Exception.InnerException) { $_.Exception.InnerException } else { $_.Exception }
-              $why = if ($cause.NativeErrorCode -eq 740) { ', which asks for administrator rights the step does not have' } else { '' }
-              $code = if ($cause.NativeErrorCode) { " (error $($cause.NativeErrorCode))" } else { '' }
-              $failed += "$($build.Label) could not be started: $($cause.Message.TrimEnd('.'))$code$why."
-              $started.Dispose()
-              continue
-            }
-            $clock = [System.Diagnostics.Stopwatch]::StartNew()
-            $set = $started.WaitOne([TimeSpan]::FromSeconds(60))
-            $clock.Stop()
-            $ranBySignal = Test-Path -LiteralPath $marker
-            if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
-            $p.WaitForExit()
-            $started.Dispose()
-            $lines = @(if (Test-Path -LiteralPath $marker) { Get-Content -LiteralPath $marker })
-            $own = @($lines | Where-Object { $_ -like "$($p.Id) *" })
-            # Every line counts against a shipped build, its own process's or a process it
-            # started; an allowing build is credited with its own process's line only.
-            if (-not $build.Allowing -and $lines.Count) { $failed += "$($build.Label) ran the start-up hook DOTNET_STARTUP_HOOKS names: $($lines -join '; ')"; continue }
-            if (-not $set) {
-              $failed += if ($build.Allowing) { "$($build.Label) did not set the event within 60 s, so whether the hook ran by then is not judged." }
-                         else { "$($build.Label) did not set the event within 60 s; no hook ran in it before it was ended." }
-              continue
-            }
-            $after = "$([math]::Round($clock.Elapsed.TotalSeconds, 1)) s"
-            if ($build.Allowing) {
-              if (-not $own.Count) { $failed += "$($build.Label) ran no hook, so a shipped build running none shows nothing." }
-              elseif (-not $ranBySignal) { $failed += "$($build.Label) ran the hook only after it set the event." }
-              else { "  $($build.Label) set the event after $after, and the hook ran in it: $($own -join '; ')" }
-            }
-            else { "  $($build.Label) set the event after $after, and no hook ran in it" }
-          }
-          $failed | ForEach-Object { Write-Host "::error::$_" }
-          if ($failed.Count) { exit 1 }
-
-      # Each single-file bundle carries its runtimeconfig.json, stored uncompressed, at the
-      # offset and size its manifest's header gives. The three shipped builds must have
-      # System.Net.SocketsHttpHandler.Http3Support and System.Net.Http.EnableActivityPropagation
-      # set to false, and System.StartupHookProvider.IsSupported set to false; the three builds
-      # the start-up hook step publishes with hooks allowed must have the last set to true.
-      # Each bundle's offset and size are printed with the values read. A bundle with no
-      # runtimeconfig, one that does not parse, or one missing any of the keys fails the step.
-      - name: Check each build's runtimeconfig for HTTP/3, HTTP activities and start-up hooks
-        if: ${{ !cancelled() }}
-        shell: pwsh
-        run: |
-          . (Join-Path $env:RUNNER_TEMP 'native.ps1')
-          $http3 = 'System.Net.SocketsHttpHandler.Http3Support'
-          $activity = 'System.Net.Http.EnableActivityPropagation'
-          $hooks = 'System.StartupHookProvider.IsSupported'
-          $allowed = Join-Path $env:RUNNER_TEMP 'hooks-allowed'
-          $bundles = @(
-            [pscustomobject]@{ Label = 'command line'; Exe = 'publish/cli/installerclean-cli.exe'; Expected = [ordered]@{ $http3 = $false; $activity = $false; $hooks = $false } },
-            [pscustomobject]@{ Label = 'portable'; Exe = 'publish/self-contained/InstallerClean.exe'; Expected = [ordered]@{ $http3 = $false; $activity = $false; $hooks = $false } },
-            [pscustomobject]@{ Label = 'slim'; Exe = 'publish/framework-dependent/InstallerClean.exe'; Expected = [ordered]@{ $http3 = $false; $activity = $false; $hooks = $false } },
-            [pscustomobject]@{ Label = 'command line with hooks allowed'; Exe = "$allowed-command-line-publish/installerclean-cli.exe"; Expected = [ordered]@{ $hooks = $true } },
-            [pscustomobject]@{ Label = 'portable with hooks allowed'; Exe = "$allowed-portable-publish/InstallerClean.exe"; Expected = [ordered]@{ $hooks = $true } },
-            [pscustomobject]@{ Label = 'slim with hooks allowed'; Exe = "$allowed-slim-publish/InstallerClean.exe"; Expected = [ordered]@{ $hooks = $true } }
-          )
-          foreach ($bundle in $bundles) {
-            Write-Host "== $($bundle.Label)"
-            try {
-              if (-not (Test-Path -LiteralPath $bundle.Exe)) {
-                $from = if ($bundle.Exe.StartsWith($allowed)) { ', which the start-up hook step publishes' } else { '' }
-                throw "$($bundle.Exe) does not exist$from."
-              }
-              $header = Read-BundleHeader $bundle.Exe
-              $header.Reader.Dispose()
-              if ($header.ConfigSize -le 0 -or $header.ConfigOffset -le 0 -or $header.ConfigOffset + $header.ConfigSize -gt $header.Data.Length) {
-                throw "the bundle carries no runtimeconfig.json (offset $($header.ConfigOffset), size $($header.ConfigSize))."
-              }
-              Write-Host "  runtimeconfig.json at offset $($header.ConfigOffset), $($header.ConfigSize) bytes"
-              $config = [Text.Encoding]::UTF8.GetString($header.Data, $header.ConfigOffset, $header.ConfigSize) | ConvertFrom-Json -AsHashtable
-              $properties = $config.runtimeOptions.configProperties
-              if ($properties -isnot [System.Collections.IDictionary]) { throw "its runtimeconfig.json has no runtimeOptions.configProperties." }
-            }
-            catch {
-              Fail "$($bundle.Label): $($_.Exception.Message)"
-              continue
-            }
-            foreach ($key in $bundle.Expected.Keys) {
-              $want = $bundle.Expected[$key]
-              if (-not $properties.Contains($key)) { Fail "$($bundle.Label): its runtimeconfig.json does not set $key."; continue }
-              $value = $properties[$key]
-              Write-Host "  $key = $(ConvertTo-Json -Compress -InputObject $value)"
-              if ($value -isnot [bool] -or $value -ne $want) { Fail "$($bundle.Label): $key is $(ConvertTo-Json -Compress -InputObject $value), where it should be $($want.ToString().ToLowerInvariant())." }
-            }
-          }
-          Exit-IfFailed
 
       - name: Check no window left a report
         if: ${{ !cancelled() }}
@@ -1991,7 +1314,7 @@ jobs:
             if ($p.ExitCode -ne 0) { Fail "The setup, $pass pass, exited with $($p.ExitCode)." }
 
             $run = [pscustomobject]@{ Label = "setup, $pass pass"; Build = [pscustomobject]@{ Exe = $setup }; Folder = $folder
-              Exe = Split-Path $exe -Leaf; Id = $p.Id; Placed = $placed; BundleFiles = @(); TempFolders = @() }
+              Exe = Split-Path $exe -Leaf; Id = $p.Id; Placed = $placed; TempFolders = @() }
             $kept = [System.Collections.Generic.List[string]]::new()
             $kept.Add("$($run.Id)`t$($run.Exe)")
             $byProcess = Read-Record $csv @($run)
@@ -2014,33 +1337,34 @@ jobs:
           $first = Invoke-Setup 'first' @()
           $plants = @()
           if ($first.Read) {
-            $plants = @(Get-RunPlants $first.Run $first.Read @() @{} @())
+            # Inno Setup's own loader is the setup's, so only the files it looked for beside itself
+            # are planted for it.
+            $plants = @(Get-RunPlants $first.Run $first.Read | Where-Object Why -eq 'looked')
             "== Planted for the setup's second pass"
             if (-not $plants) { '  none' }
-            foreach ($plant in $plants) { "  $($plant.Place) $($plant.Path): $($plant.Kind), $($plant.Source)" }
+            foreach ($plant in $plants) { "  $($plant.Place) $($plant.Path): $($plant.Why), $($plant.Kind), $($plant.Source)" }
           }
           $null = Invoke-Setup 'second' $plants
           Exit-IfFailed
 
       # A Process Monitor record holds every process on the runner, so only the rows of
       # the setup's processes, each by its process ID and name, and of every process
-      # named as one of the builds' exes or as a download is staged are kept, in the
+      # named as one of the exes or as a download is staged are kept, in the
       # record's order, each column as recorded. The log's row N for a process is its Nth
       # row in the file with that PID; its row N of the record is the record's own Nth row,
       # which this file does not number. Detail is emptied on a row that starts or creates
-      # a process and must stay so, since the artifact is public. The host traces are kept
-      # whole, and so is each crash log the app keeps as the job leaves it, beside the first
-      # pass's copy of it: crash.log from the app's folder, nofaff-crash.log from the NoFaff
-      # one. A run that ended before a record was saved keeps what there is, and this step
+      # a process and must stay so, since the artifact is public. Each crash log the app keeps
+      # is kept whole as the job leaves it, beside the first pass's copy of it: crash.log from
+      # the app's folder, nofaff-crash.log from the NoFaff one. A run that ended before a record was saved keeps what there is, and this step
       # judges nothing. The artifact's name carries the run attempt, so a job run again
       # uploads under a name of its own.
-      - name: Keep the Process Monitor rows and the host traces
+      - name: Keep the Process Monitor rows
         if: ${{ always() }}
         shell: pwsh
         run: |
           $kept = Join-Path $env:RUNNER_TEMP 'kept'
           New-Item -ItemType Directory -Force -Path $kept | Out-Null
-          $exes = 'installerclean-cli.exe', 'InstallerClean.exe', 'InstallerClean-portable.exe', 'InstallerClean-slim.exe'
+          $exes = 'installerclean-cli.exe', 'InstallerClean.exe', 'InstallerClean-portable.exe'
           foreach ($name in 'first', 'second') {
             $csv = Join-Path $env:RUNNER_TEMP "procmon\$name.csv"
             if (-not (Test-Path $csv)) { "  no $csv"; continue }
@@ -2064,10 +1388,6 @@ jobs:
             $rows | Export-Csv -Path (Join-Path $kept "$name.csv") -NoTypeInformation -UseQuotes Always
             "  kept $($rows.Count) rows of $csv, for the processes $(@($names.Keys) -join ', ')"
           }
-          foreach ($trace in @(Get-ChildItem -Path (Join-Path $env:RUNNER_TEMP 'trace-*.txt') -ErrorAction SilentlyContinue)) {
-            Copy-Item -LiteralPath $trace.FullName -Destination $kept
-            "  kept $($trace.FullName)"
-          }
           $native = Join-Path $env:RUNNER_TEMP 'native.ps1'
           if (Test-Path $native) { . $native } else { "  no $native, so the crash logs' folders are not known"; $crashLogFolders = @() }
           foreach ($folder in $crashLogFolders) {
@@ -2077,7 +1397,7 @@ jobs:
             elseif ($folder -eq 'InstallerClean') { "  no $crashLog" }
           }
 
-      - name: Upload the Process Monitor rows and the host traces
+      - name: Upload the Process Monitor rows
         if: ${{ always() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
