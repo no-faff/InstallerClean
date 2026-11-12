@@ -1425,7 +1425,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task Move_with_no_destination_asks_for_one_and_moves_there()
     {
         var chosen = Path.Combine(Path.GetTempPath(), "ic-test-picked");
-        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>()).Returns(chosen);
+        _confirmationService.AskForMoveDestinationAsync(null, null).Returns(chosen);
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1434,7 +1434,7 @@ public class CleanupPreFlightTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>());
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(null, null);
         await _moveService.Received(1).MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), chosen, Arg.Any<UnderLeaseClaims>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -1446,7 +1446,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task Backing_out_of_the_destination_browser_moves_nothing()
     {
         // Null is the cancelled answer.
-        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>()).Returns((string?)null);
+        _confirmationService.AskForMoveDestinationAsync(null, null).Returns((string?)null);
 
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);
@@ -1639,7 +1639,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task A_close_while_the_destination_browser_is_up_starts_no_Move()
     {
         var vm = CreateViewModel();
-        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>()).Returns(_ =>
+        _confirmationService.AskForMoveDestinationAsync(null, null).Returns(_ =>
         {
             vm.Cleanup.RequestClose();
             return _destination;
