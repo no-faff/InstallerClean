@@ -506,6 +506,101 @@ jobs:
           if ($failed) { throw "A merged exe is not v4.8, did not start, or wrote to the crash log about its library search." }
           "Both merged exes carry 4.8, and the command line started clean."
 
+      # A config beside a merged exe is accepted only where its text is the one the merge
+      # writes (PlantedConfig). Each merged exe is copied into a folder of its own, where no
+      # setup is recorded, and started four ways: alone, beside the config the merge wrote,
+      # beside that config with a system.diagnostics section added, and beside the config
+      # the window's build from source writes, whose binding redirects a merged exe does not
+      # take. The first two start: the command line's scan exits 0 having printed it, and
+      # the window's main window comes up. The other two refuse: the command line exits 1
+      # having printed the refusal and no scan, and the window shows the refusal, whose
+      # title carries the message, and exits 1 once it is closed, its main window never up.
+      - name: Check a config beside a merged exe that the merge did not write refuses its start
+        if: success() || failure()
+        shell: pwsh
+        run: |
+          New-Item -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Force | Out-Null
+          New-ItemProperty -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Name FirstRunRecorded -PropertyType DWord -Value 1 -Force | Out-Null
+          $fromSource = 'src/InstallerClean/bin/Release/net48/InstallerClean.exe.config'
+          if (-not (Test-Path $fromSource)) { throw "There is no $fromSource to plant." }
+          if ((Get-Content -Raw $fromSource) -notmatch '<bindingRedirect ') { throw "$fromSource holds no binding redirect, so it plants nothing a merged exe refuses." }
+          $failed = $false
+
+          # The folder for one case: the exe copied in and, unless $config is null, that
+          # text written beside it under the exe's name with .config after it.
+          function Place([string]$exe, [string]$case, $config) {
+            $dir = Join-Path $env:RUNNER_TEMP "planted-config/$(Split-Path -Leaf $exe)-$case"
+            New-Item -ItemType Directory -Force -Path $dir | Out-Null
+            Copy-Item $exe $dir
+            $copy = Join-Path $dir (Split-Path -Leaf $exe)
+            if ($null -ne $config) { [IO.File]::WriteAllText("$copy.config", $config) }
+            return $copy
+          }
+
+          foreach ($exe in 'publish/window/InstallerClean.exe', 'publish/cli/installerclean-cli.exe') {
+            $own = [IO.File]::ReadAllText("$exe.config")
+            if ($own -notmatch '</configuration>') { throw "$exe.config is not a config." }
+            $cases = [ordered]@{
+              'alone'           = @{ Config = $null; Starts = $true }
+              'own-config'      = @{ Config = $own; Starts = $true }
+              'added-section'   = @{ Config = $own.Replace('</configuration>', '<system.diagnostics><trace autoflush="true" /></system.diagnostics></configuration>'); Starts = $false }
+              'redirects'       = @{ Config = [IO.File]::ReadAllText($fromSource); Starts = $false }
+            }
+            $name = Split-Path -Leaf $exe
+            foreach ($case in $cases.Keys) {
+              $copy = Place $exe $case $cases[$case].Config
+              $starts = $cases[$case].Starts
+              $label = "$name, $case"
+
+              if ($name -eq 'installerclean-cli.exe') {
+                $outFile = Join-Path $env:RUNNER_TEMP "planted-$case-out.txt"
+                $errFile = Join-Path $env:RUNNER_TEMP "planted-$case-err.txt"
+                $p = Start-Process -FilePath $copy -ArgumentList '/s', '/noupdate' -NoNewWindow -PassThru `
+                  -RedirectStandardOutput $outFile -RedirectStandardError $errFile
+                $null = $p.Handle
+                if (-not $p.WaitForExit(120000)) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(); "${label}: still running after 120 s."; $failed = $true; continue }
+                $out = Get-Content -Raw $outFile
+                $err = Get-Content -Raw $errFile
+                "${label}: exited $($p.ExitCode); stdout $($out.Length) chars; stderr: $err"
+                $refused = $err -like "*won't start because there is a file called $name.config beside it*"
+                if ($starts) {
+                  if ($p.ExitCode -ne 0 -or $refused -or [string]::IsNullOrWhiteSpace($out)) { "  ${label}: expected a scan that exits 0 and no refusal."; $failed = $true }
+                } else {
+                  if ($p.ExitCode -ne 1 -or -not $refused -or -not [string]::IsNullOrEmpty($out)) { "  ${label}: expected exit 1, the refusal naming $name.config, and no scan output."; $failed = $true }
+                }
+                continue
+              }
+
+              # The window. Its main window is titled InstallerClean; the refusal's title is
+              # its caption, "Startup error", then the message. The splash has a hidden
+              # owner, so Process.MainWindowHandle never names it.
+              $clock = [Diagnostics.Stopwatch]::StartNew()
+              $p = Start-Process -FilePath $copy -PassThru
+              $null = $p.Handle
+              $title = ''
+              while ($clock.Elapsed.TotalSeconds -lt 120 -and -not $p.HasExited) {
+                $p.Refresh()
+                if ($p.MainWindowHandle -ne [IntPtr]::Zero -and $p.MainWindowTitle) { $title = $p.MainWindowTitle; break }
+                Start-Sleep -Milliseconds 200
+              }
+              "${label}: after $([math]::Round($clock.Elapsed.TotalSeconds, 1)) s its window reads: $title"
+              $mainUp = $title -eq 'InstallerClean'
+              $refused = $title -like "Startup error*won't start because there is a file called $name.config beside it*"
+              if ($starts) {
+                if (-not $mainUp) { "  ${label}: expected the main window."; $failed = $true }
+                if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null }
+              } else {
+                if (-not $refused) { "  ${label}: expected the refusal naming $name.config."; $failed = $true }
+                if (-not $p.HasExited) { $null = $p.CloseMainWindow() }
+                if (-not $p.WaitForExit(30000)) { "  ${label}: still running 30 s after the refusal was closed."; Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null; $failed = $true }
+                elseif ($p.ExitCode -ne 1) { "  ${label}: exited $($p.ExitCode) once the refusal was closed, not 1."; $failed = $true }
+                else { "  ${label}: exited 1 once the refusal was closed." }
+              }
+            }
+          }
+          if ($failed) { throw "A merged exe started beside a config the merge did not write, or refused one it did." }
+          "Each merged exe starts alone and beside the config the merge wrote, and refuses beside any other."
+
       # .NET Framework reads a portable PDB beside an assembly for the file and line
       # in a stack trace. Whether it reads an EMBEDDED portable PDB, which is what a
       # Release build carries (Directory.Build.props, DebugType embedded) and so what
