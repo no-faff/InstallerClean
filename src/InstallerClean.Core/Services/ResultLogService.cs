@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
 
@@ -36,7 +37,23 @@ public sealed class ResultLogService : IResultLogService
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { InDeclarationOrder } },
     };
+
+    /// <summary>
+    /// Writes each object's properties in the order its type declares them, which is the
+    /// order .NET 10 writes them in. The serialiser otherwise takes its order from
+    /// Type.GetProperties, which returns properties in no particular order, and on .NET
+    /// Framework the order it gives can differ from one process to the next.
+    /// </summary>
+    private static void InDeclarationOrder(JsonTypeInfo info)
+    {
+        if (info.Kind != JsonTypeInfoKind.Object) return;
+        var declared = info.Properties
+            .OrderBy(p => (p.AttributeProvider as MemberInfo)?.MetadataToken ?? int.MaxValue)
+            .ToList();
+        for (var i = 0; i < declared.Count; i++) declared[i].Order = i;
+    }
 
     /// <summary>The report as last-run.json holds it.</summary>
     internal static string Serialize(ResultLogEntry entry) => JsonSerializer.Serialize(entry, JsonOptions);
