@@ -122,6 +122,61 @@ public class DisplayHelpersTests
     }
 
     [Theory]
+    // Ticks, and the status line's time. A time whose milliseconds round to a thousand
+    // reads in seconds. On the halfway rows .NET 10 prints the same, and .NET
+    // Framework's F0 and F1 give 13ms for 125,000 ticks, 1.3s for 12,500,000 and 1.5s
+    // for 14,500,000.
+    [InlineData(0, "0ms")]
+    [InlineData(125_000, "12ms")]
+    [InlineData(135_000, "14ms")]
+    [InlineData(9_994_000, "999ms")]
+    [InlineData(9_995_000, "1.0s")]
+    [InlineData(9_999_999, "1.0s")]
+    [InlineData(10_000_000, "1.0s")]
+    [InlineData(12_500_000, "1.2s")]
+    [InlineData(13_500_000, "1.4s")]
+    [InlineData(14_500_000, "1.4s")]
+    [InlineData(25_000_000, "2.5s")]
+    [InlineData(610_500_000, "61.0s")]
+    public void The_scan_time_rounds_a_halfway_figure_to_the_even_digit(long ticks, string expected)
+    {
+        using var scope = new LocalisationScope(British, British);
+        Assert.Equal(expected, DisplayHelpers.FormatElapsed(new TimeSpan(ticks)));
+    }
+
+    // 1.15 s is a true tie, and the even tenth is 1.2. .NET 10 prints 1.1s, from the
+    // double nearest 1.15, which lies just under it.
+    [Fact]
+    public void A_halfway_tenth_of_a_second_goes_to_the_even_digit_on_the_exact_tick_count()
+    {
+        using var scope = new LocalisationScope(British, British);
+        Assert.Equal("1.2s", DisplayHelpers.FormatElapsed(new TimeSpan(11_500_000)));
+        Assert.Equal("1.2 seconds", DisplayHelpers.FormatElapsedLong(new TimeSpan(11_500_000)));
+    }
+
+    [Theory]
+    [InlineData(9_999_999, "less than a second")]
+    [InlineData(10_000_000, "1.0 seconds")]
+    [InlineData(12_500_000, "1.2 seconds")]
+    public void The_long_scan_time_rounds_as_the_short_one_does(long ticks, string expected)
+    {
+        using var scope = new LocalisationScope(British, British);
+        Assert.Equal(expected, DisplayHelpers.FormatElapsedLong(new TimeSpan(ticks)));
+    }
+
+    [Theory]
+    [InlineData(25, 10, 2)]
+    [InlineData(35, 10, 4)]
+    [InlineData(-25, 10, -2)]
+    [InlineData(-35, 10, -4)]
+    [InlineData(-26, 10, -3)]
+    [InlineData(24, 10, 2)]
+    public void WholeUnits_rounds_to_the_nearest_unit_a_tie_to_the_even_one(long ticks, long unit, long expected)
+    {
+        Assert.Equal(expected, DisplayHelpers.WholeUnits(ticks, unit));
+    }
+
+    [Theory]
     [InlineData(0, "files")]
     [InlineData(1, "file")]
     [InlineData(2, "files")]

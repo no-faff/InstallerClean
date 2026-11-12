@@ -241,10 +241,19 @@ internal static class DisplayHelpers
         return null;
     }
 
-    internal static string FormatElapsed(TimeSpan elapsed) =>
-        elapsed.TotalSeconds < 1
-            ? string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_Ms, elapsed.TotalMilliseconds)
-            : string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_S, elapsed.TotalSeconds);
+    /// <summary>
+    /// A scan's time for the status line: in whole milliseconds where that figure is under
+    /// a thousand, otherwise in seconds to one decimal place, each rounded as
+    /// <see cref="WholeUnits"/> rounds. The unit is chosen on the rounded figure, so 999.6
+    /// ms reads 1.0s.
+    /// </summary>
+    internal static string FormatElapsed(TimeSpan elapsed)
+    {
+        var milliseconds = WholeUnits(elapsed.Ticks, TimeSpan.TicksPerMillisecond);
+        return milliseconds < 1000
+            ? string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_Ms, milliseconds)
+            : string.Format(Localisation.FormatCulture, Strings.Display_Elapsed_S, SecondsToATenth(elapsed));
+    }
 
     /// <summary>
     /// Natural-language elapsed time for body copy. Renders sub-second
@@ -254,9 +263,33 @@ internal static class DisplayHelpers
     /// the right call for the short-form metadata pills.
     /// </summary>
     internal static string FormatElapsedLong(TimeSpan elapsed) =>
-        elapsed.TotalSeconds < 1
+        elapsed.Ticks < TimeSpan.TicksPerSecond
             ? Strings.Display_ElapsedLong_LessThanASecond
-            : string.Format(Localisation.FormatCulture, Strings.Display_ElapsedLong_Seconds, elapsed.TotalSeconds);
+            : string.Format(Localisation.FormatCulture, Strings.Display_ElapsedLong_Seconds, SecondsToATenth(elapsed));
+
+    /// <summary>
+    /// <paramref name="elapsed"/> in seconds to the nearest tenth, as a decimal, which the
+    /// resx value's F1 prints digit for digit.
+    /// </summary>
+    private static decimal SecondsToATenth(TimeSpan elapsed) =>
+        WholeUnits(elapsed.Ticks, TimeSpan.TicksPerSecond / 10) / 10m;
+
+    /// <summary>
+    /// <paramref name="ticks"/> as a whole number of units <paramref name="unit"/> ticks
+    /// long, to the nearest, a tie going to the even one. Worked out on the tick count
+    /// itself, the answer is the same on both runtimes. F0 and F1 on a double from
+    /// TotalMilliseconds or TotalSeconds round it differently on each: .NET Framework
+    /// rounds the double's fifteen-digit form with a tie away from zero, giving 13ms for
+    /// 12.5 ms where .NET 10 gives 12ms.
+    /// </summary>
+    internal static long WholeUnits(long ticks, long unit)
+    {
+        var whole = ticks / unit;
+        var twiceTheRest = Math.Abs(ticks % unit) * 2;
+        if (twiceTheRest > unit || (twiceTheRest == unit && whole % 2 != 0))
+            whole += ticks < 0 ? -1 : 1;
+        return whole;
+    }
 
     internal enum PluralCategory { One, Few, Many, Other }
 
