@@ -142,6 +142,11 @@ const ALLOWED = [
     what: 'ScoopVariable, answering the variables Scoop itself reads to find its global root',
   },
   {
+    file: 'src/InstallerClean.Core/Helpers/ProxyFromVariables.cs',
+    text: 'private static string? Variable(string name) => Environment.GetEnvironmentVariable(name);',
+    what: 'ProxyFromVariables.Variable, reading HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, NO_PROXY and GATEWAY_INTERFACE as .NET 10 reads them for its default proxy',
+  },
+  {
     file: 'src/InstallerClean.Core/Helpers/KnownFolders.cs',
     text: 'GetPath(folder, Shell32.SHGetKnownFolderPath, Ole32.CoTaskMemFree, Environment.GetEnvironmentVariable);',
     what: 'KnownFolders.GetPath, the variable .NET falls back to where Windows does not answer for a known folder',

@@ -61,7 +61,8 @@ public sealed class ResultLogService : IResultLogService
     private static readonly string UserAgent =
         $"InstallerClean/{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0"}";
 
-    private static readonly HttpClient HttpClient = new()
+    // The handler carries the proxy .NET 10 takes by default (ProxyFromVariables).
+    private static readonly HttpClient HttpClient = new(ProxyFromVariables.Carrying(new HttpClientHandler()))
     {
         Timeout = RequestTimeout,
         // Bounds the eager buffering only: MaxResponseContentBufferSize

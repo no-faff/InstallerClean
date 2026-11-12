@@ -104,10 +104,11 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// because the elevated process has no use for the session cookie
     /// github.com offers, and declining it is cheaper than holding it.
     /// Internal so a test can pin both, neither being reachable through the
-    /// handler seam the rest of the tests use.
+    /// handler seam the rest of the tests use. It carries the proxy .NET 10 takes
+    /// by default (<see cref="ProxyFromVariables"/>).
     /// </summary>
     internal static HttpClientHandler CreateShippingHandler() =>
-        new() { AllowAutoRedirect = false, UseCookies = false };
+        ProxyFromVariables.Carrying(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
 
     private static readonly HttpClient SharedClient = CreateClient(CreateShippingHandler());
 
