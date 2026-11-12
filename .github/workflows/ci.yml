@@ -645,6 +645,63 @@ jobs:
           if ($failed) { throw "A merged exe started beside a config the merge did not write, or refused one it did." }
           "Each merged exe starts alone and beside the config the merge wrote, and refuses beside any other."
 
+      # How long the merged window takes to show its main window, beside 3.7.0's released
+      # portable, on this runner: each started six times, the two alternating, after one
+      # start of each that is not counted, so both read the Installer folder from the same
+      # warm cache. Each time runs from the start to the main window, which comes up once the
+      # startup scan has finished. The step prints every time and each copy's median and
+      # fails only where a copy does not start.
+      - name: Time the merged window's start beside 3.7.0's portable
+        if: success() || failure()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          New-Item -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Force | Out-Null
+          New-ItemProperty -Path 'HKLM:\SOFTWARE\NoFaff\InstallerClean' -Name FirstRunRecorded -PropertyType DWord -Value 1 -Force | Out-Null
+          $released = Join-Path $env:RUNNER_TEMP 'start-time-3.7.0'
+          gh release download v3.7.0 --repo $env:GITHUB_REPOSITORY --pattern InstallerClean-portable.exe --dir $released --clobber
+          if ($LASTEXITCODE -ne 0) { throw "3.7.0's portable did not download." }
+          $copies = [ordered]@{
+            '3.7.0 portable' = (Join-Path $released 'InstallerClean-portable.exe')
+            'this merged window' = (Resolve-Path 'publish/window/InstallerClean.exe').Path
+          }
+
+          # Seconds from the start to the main window, or null where it is not up in 120 s.
+          function Time-Start([string]$exe) {
+            $clock = [Diagnostics.Stopwatch]::StartNew()
+            $p = Start-Process -FilePath $exe -PassThru
+            $null = $p.Handle
+            $up = $null
+            while ($clock.Elapsed.TotalSeconds -lt 120 -and -not $p.HasExited) {
+              $p.Refresh()
+              if ($p.MainWindowHandle -ne [IntPtr]::Zero -and $p.MainWindowTitle -eq 'InstallerClean') { $up = $clock.Elapsed.TotalSeconds; break }
+              Start-Sleep -Milliseconds 50
+            }
+            if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null }
+            return $up
+          }
+
+          $times = @{}
+          foreach ($label in $copies.Keys) { $times[$label] = New-Object System.Collections.Generic.List[double] }
+          $failed = $false
+          foreach ($label in $copies.Keys) { $null = Time-Start $copies[$label] }
+          foreach ($round in 1..6) {
+            foreach ($label in $copies.Keys) {
+              $t = Time-Start $copies[$label]
+              if ($null -eq $t) { "${label}, start $round`: no main window within 120 s."; $failed = $true; continue }
+              $times[$label].Add($t)
+              "${label}, start $round`: main window after $([math]::Round($t, 2)) s"
+            }
+          }
+          foreach ($label in $copies.Keys) {
+            $sorted = @($times[$label] | Sort-Object)
+            if ($sorted.Count -eq 0) { continue }
+            $median = if ($sorted.Count % 2) { $sorted[[int][math]::Floor($sorted.Count / 2)] } else { ($sorted[$sorted.Count / 2 - 1] + $sorted[$sorted.Count / 2]) / 2 }
+            "${label}: median $([math]::Round($median, 2)) s over $($sorted.Count) starts ($(($sorted | ForEach-Object { [math]::Round($_, 2) }) -join ', '))"
+          }
+          if ($failed) { throw "A copy's main window did not come up." }
+
       # .NET Framework reads a portable PDB beside an assembly for the file and line
       # in a stack trace. Whether it reads an EMBEDDED portable PDB, which is what a
       # Release build carries (Directory.Build.props, DebugType embedded) and so what
