@@ -22,14 +22,15 @@ namespace InstallerClean.Helpers;
 /// data there reads as the int 0.
 ///
 /// A REG_SZ or REG_EXPAND_SZ is its text without one terminating null, expanded for a
-/// REG_EXPAND_SZ unless <c>doNotExpand</c> is set, and a REG_MULTI_SZ is its strings,
+/// REG_EXPAND_SZ, as .NET 10 expands it, unless <c>doNotExpand</c> is set, and a REG_MULTI_SZ is its strings,
 /// split at each null. REG_NONE, REG_BINARY and REG_DWORD_BIG_ENDIAN are their bytes, and
 /// any other type answers null. Text is the data's UTF-16 code units as they are, an
 /// unpaired surrogate included. An odd byte length takes one zero byte on the end, as on
 /// .NET 10.
 ///
 /// IT TAKES AN OPENED SUBKEY, NEVER A HIVE'S BASE KEY, and refuses one with
-/// <see cref="ArgumentException"/>, for the reason <see cref="RegistryNames"/> gives. A
+/// <see cref="ArgumentException"/>, for the reason <see cref="RegistryNames"/> gives
+/// (<see cref="RegistryNames.SubkeyHandle"/>). A
 /// disposed key throws <see cref="ObjectDisposedException"/>, as on .NET 10.
 /// </summary>
 internal static class RegistryData
@@ -56,10 +57,7 @@ internal static class RegistryData
     /// </summary>
     public static object? ValueOf(RegistryKey key, string? name, bool doNotExpand = false)
     {
-        if (key.Name.IndexOf('\\') < 0)
-            throw new ArgumentException("Only a key opened under a hive is read here, never a hive's base key.", nameof(key));
-
-        var handle = key.Handle;
+        var handle = RegistryNames.SubkeyHandle(key);
         return Decode(buffer =>
         {
             var length = buffer.Length;
@@ -126,6 +124,8 @@ internal static class RegistryData
     private static object Text(byte[] buffer, int length, int type, bool doNotExpand)
     {
         // An odd length takes one zero byte on the end, so the last code unit is whole.
+        if (length == int.MaxValue)
+            throw new IOException("Registry values larger than 2 GB are not supported.");
         var byteLength = length % 2 == 1 ? length + 1 : length;
         var chars = new char[byteLength / 2];
         Buffer.BlockCopy(buffer, 0, chars, 0, length);
@@ -158,6 +158,30 @@ internal static class RegistryData
 
         var textLength = chars[chars.Length - 1] == '\0' ? chars.Length - 1 : chars.Length;
         var text = new string(chars, 0, textLength);
-        return type == REG_EXPAND_SZ && !doNotExpand ? Environment.ExpandEnvironmentVariables(text) : text;
+        return type == REG_EXPAND_SZ && !doNotExpand ? Expanded(text) : text;
+    }
+
+    /// <summary>
+    /// <paramref name="text"/> with its environment variables expanded as .NET 10's
+    /// Environment.ExpandEnvironmentVariables expands them (<c>Environment.Windows.cs</c>):
+    /// one ExpandEnvironmentStrings call over the whole text, into a buffer grown to the
+    /// length it asks for, and the error Windows gives where it answers 0. .NET
+    /// Framework's own asks once for each %-delimited piece before the whole.
+    /// </summary>
+    private static string Expanded(string text)
+    {
+        if (text.Length == 0)
+            return text;
+
+        var buffer = new char[128];
+        uint length;
+        while ((length = Kernel32.ExpandEnvironmentStrings(text, buffer, (uint)buffer.Length)) > buffer.Length)
+            buffer = new char[length];
+
+        if (length == 0)
+            throw Win32Marshal.GetExceptionForLastWin32Error();
+
+        // The length counts the terminating null.
+        return new string(buffer, 0, (int)length - 1);
     }
 }

@@ -5,7 +5,7 @@ using InstallerClean.Interop.Native;
 namespace InstallerClean.Compatibility;
 
 /// <summary>
-/// <see cref="CultureInfo.DisplayName"/> as .NET 10 gives it on Windows (dotnet/runtime
+/// <c>CultureInfo.DisplayName</c> as .NET 10 gives it on Windows (dotnet/runtime
 /// v10.0.0: <c>CultureData.cs</c>'s <c>DisplayName</c> and <c>LocalizedLanguageName</c>,
 /// <c>CultureData.Icu.cs</c>, <c>CultureData.Nls.cs</c>, and in
 /// <c>src/native/libs/System.Globalization.Native</c>, <c>pal_icushim.c</c>'s

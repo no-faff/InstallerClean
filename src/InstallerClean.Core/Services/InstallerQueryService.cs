@@ -4593,8 +4593,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Nothing writing these keys is obliged to use REG_SZ.
     ///
     /// AND ONE TYPE NEVER REACHES THE CAST, which is why the presence test below is
-    /// not belt and braces over it. <c>RegistryKey.GetValue</c> returns the default,
-    /// null, for a value of type REG_LINK, so a value that is PRESENT in that type
+    /// not belt and braces over it. <see cref="RegistryData.ValueOf"/> answers null for
+    /// a value of type REG_LINK, as .NET 10's <c>RegistryKey.GetValue</c> does, so a value that is PRESENT in that type
     /// arrives here as null and, read naively, is indistinguishable from a
     /// registration that simply has no cached path. The claim is dropped, no
     /// failure is counted, and the fallback reports itself as having run cleanly
@@ -4603,12 +4603,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// names it holds is what separates the two, because the name list is typed
     /// nowhere and carries every value whatever its type.
     ///
-    /// A REG_NONE value comes back as its bytes, though Microsoft's page for
-    /// <c>GetValue</c> says null, so it reaches the branch below that takes anything
-    /// present and not a string as a read that failed.
+    /// A REG_NONE value comes back as its bytes, so it reaches the branch below that
+    /// takes anything present and not a string as a read that failed.
     ///
-    /// AND IT EXPANDS A <c>REG_EXPAND_SZ</c> VALUE. .NET expands that type as part of
-    /// the read, so a registration spelled <c>%SystemRoot%\Installer\...</c> and STORED
+    /// AND IT EXPANDS A <c>REG_EXPAND_SZ</c> VALUE. The read expands that type, so a registration spelled <c>%SystemRoot%\Installer\...</c> and STORED
     /// expandable comes back as a usable path here. The same text stored as a plain
     /// <c>REG_SZ</c> is expanded by <c>NormaliseLocalPackagePath</c>, on the main path,
     /// so both storage types reach the claim as the path they name.
