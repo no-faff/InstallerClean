@@ -1,4 +1,5 @@
 using System.Globalization;
+using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Compatibility;
@@ -49,68 +50,75 @@ internal static unsafe class FrameworkCultureDisplayName
             name;
 
         var displayName = icu is null
-            ? NlsDisplayName(culture, uiCultureName)
+            ? NlsDisplayName(culture, CultureInfo.DefaultThreadCurrentUICulture?.Name, UserDefaultCultureName())
             : icu.Name(icu.DisplayName, lookedUp, uiCultureName);
         if (displayName.Length == 0 && culture.IsNeutralCulture)
         {
             displayName = icu is null
-                ? NlsLanguageName(culture, uiCultureName)
+                ? NlsLanguageName(culture, uiCultureName, UserDefaultUiCultureName())
                 : icu.Name(icu.DisplayLanguage, lookedUp, uiCultureName);
         }
         return displayName;
     }
 
     /// <summary>
-    /// .NET 10's answer where Windows has no ICU (<c>NlsGetLanguageDisplayName</c>): the
-    /// culture's own name where the app has set a default UI culture other than the user's
-    /// regional format, and otherwise the localised display name NLS gives.
+    /// .NET 10's answer where Windows has no ICU (<c>CultureData.Nls.cs</c>'s
+    /// <c>NlsGetLanguageDisplayName</c>): the culture's own name where the app has set a
+    /// default UI culture other than the user's regional format, and otherwise the
+    /// localised display name NLS gives. The two names are the default UI culture's, or
+    /// null where none is set, and the regional format's as a culture name.
     /// </summary>
-    internal static string NlsDisplayName(CultureInfo culture, string uiCultureName)
-    {
-        var defaultUi = CultureInfo.DefaultThreadCurrentUICulture;
-        if (defaultUi is not null && UserDefaultLocaleName() is { } user && !defaultUi.Name.Equals(user))
-            return culture.NativeName;
-
-        return NlsValue(culture.Name, Kernel32.LOCALE_SLOCALIZEDDISPLAYNAME);
-    }
+    internal static string NlsDisplayName(CultureInfo culture, string? defaultUiCultureName, string userDefaultCultureName) =>
+        defaultUiCultureName is not null && !defaultUiCultureName.Equals(userDefaultCultureName)
+            ? culture.NativeName
+            : NlsValue(culture.Name, Kernel32.LOCALE_SLOCALIZEDDISPLAYNAME);
 
     /// <summary>
     /// .NET 10's <c>LocalizedLanguageName</c> where Windows has no ICU: NLS's localised
-    /// language name where the display language Windows is set to is the UI culture, and the
-    /// language's own name otherwise.
+    /// language name where the display language Windows is set to is the UI culture, and
+    /// the language's own name (<c>NativeLanguageName</c>) otherwise.
     /// </summary>
-    private static string NlsLanguageName(CultureInfo culture, string uiCultureName) =>
-        UserDefaultUiCultureName() == uiCultureName
+    internal static string NlsLanguageName(CultureInfo culture, string uiCultureName, string userDefaultUiCultureName) =>
+        userDefaultUiCultureName == uiCultureName
             ? NlsValue(culture.Name, Kernel32.LOCALE_SLOCALIZEDLANGUAGENAME)
-            : culture.NativeName;
+            : NlsValue(culture.Name, Kernel32.LOCALE_SNATIVELANGUAGENAME);
 
-    // The user's own display language, as .NET 10's UserDefaultUICulture reads it. A
-    // language Windows names by a number no culture has gives no name.
-    private static string? UserDefaultUiCultureName()
+    // The user's own display language as .NET 10's UserDefaultUICulture reads it: the
+    // first of the preferred display languages, or the regional format where Windows
+    // gives none.
+    private static string UserDefaultUiCultureName() =>
+        WindowsDisplayLanguage.Read() is { } language ? CultureName(language) : UserDefaultCultureName();
+
+    // The regional format as .NET 10's GetUserDefaultCulture reads it: the user's
+    // default locale, or the system's where the user has none.
+    private static string UserDefaultCultureName() =>
+        UserDefaultLocaleName() is { } locale ? CultureName(locale) : string.Empty;
+
+    // A culture's name as .NET 10's GetCultureByName gives it: the invariant culture's,
+    // which is empty, for a name no culture has.
+    private static string CultureName(string name)
     {
         try
         {
-            return CultureInfo.GetCultureInfo(Kernel32.GetUserDefaultUILanguage()).Name;
+            return new CultureInfo(name).Name;
         }
-        catch (CultureNotFoundException)
+        catch (ArgumentException)
         {
-            return null;
+            return string.Empty;
         }
     }
 
-    private static string NlsValue(string localeName, uint type)
+    private static string NlsValue(string? localeName, uint type)
     {
         var buffer = new char[530];
         var written = Kernel32.GetLocaleInfoEx(localeName, type, buffer, buffer.Length);
         return written > 0 ? new string(buffer, 0, written - 1) : string.Empty;
     }
 
-    private static string? UserDefaultLocaleName()
-    {
-        var buffer = new char[85];
-        var written = Kernel32.GetUserDefaultLocaleName(buffer, buffer.Length);
-        return written > 0 ? new string(buffer, 0, written - 1) : null;
-    }
+    private static string? UserDefaultLocaleName() =>
+        NlsValue(Kernel32.LOCALE_NAME_USER_DEFAULT, Kernel32.LOCALE_SNAME) is { Length: > 0 } user ? user
+        : NlsValue(Kernel32.LOCALE_NAME_SYSTEM_DEFAULT, Kernel32.LOCALE_SNAME) is { Length: > 0 } system ? system
+        : null;
 
     /// <summary>The ICU functions the lookup calls, from the icu.dll Windows ships.</summary>
     internal sealed class Icu

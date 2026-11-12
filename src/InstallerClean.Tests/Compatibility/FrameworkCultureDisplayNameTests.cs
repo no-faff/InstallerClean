@@ -87,14 +87,30 @@ public class FrameworkCultureDisplayNameTests
             FrameworkCultureDisplayName.Of(new CultureInfo("ru"), "qaa", FrameworkCultureDisplayName.Icu.Load()));
     }
 
-    // Where Windows has no ICU and the default UI culture is not the regional format, as
-    // here (the test assembly pins en-GB, and CI's runners are set to en-US), .NET 10
-    // names a culture by its own name.
-    [Fact]
-    public void Without_ICU_a_default_UI_culture_other_than_the_regional_format_gives_the_own_name()
+    // Where Windows has no ICU and the app has set a default UI culture other than the
+    // regional format, .NET 10 names a culture by its own name; with none set, or with
+    // the regional format's own, by the name NLS gives in the display language Windows
+    // is set to. The NLS names below are English, the display language of CI's runners.
+    [Theory]
+    [InlineData("fr", "en-GB", "\u0440\u0443\u0441\u0441\u043A\u0438\u0439")]
+    [InlineData("en-GB", "en-GB", "Russian")]
+    [InlineData(null, "en-GB", "Russian")]
+    [InlineData("fr", "", "\u0440\u0443\u0441\u0441\u043A\u0438\u0439")]
+    public void Without_ICU_a_culture_is_named_by_NLS_or_by_its_own_name(string? defaultUiCulture, string regionalFormat, string expected)
     {
-        Assert.Equal(new CultureInfo("ru").NativeName,
-            FrameworkCultureDisplayName.NlsDisplayName(new CultureInfo("ru"), "fr"));
+        Assert.Equal(expected,
+            FrameworkCultureDisplayName.NlsDisplayName(new CultureInfo("ru"), defaultUiCulture, regionalFormat));
+    }
+
+    // Where Windows has no ICU, a neutral culture's language is named by NLS where the
+    // display language Windows is set to is the UI culture, and by its own name otherwise.
+    [Theory]
+    [InlineData("en-US", "en-US", "Russian")]
+    [InlineData("fr", "en-US", "\u0440\u0443\u0441\u0441\u043A\u0438\u0439")]
+    public void Without_ICU_a_language_is_named_by_NLS_or_by_its_own_name(string uiCulture, string windowsDisplayLanguage, string expected)
+    {
+        Assert.Equal(expected,
+            FrameworkCultureDisplayName.NlsLanguageName(new CultureInfo("ru"), uiCulture, windowsDisplayLanguage));
     }
 
     [Fact]
