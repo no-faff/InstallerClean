@@ -9,8 +9,9 @@ namespace InstallerClean.Services;
 /// <remarks>
 /// The portable and command-line downloads ship no config naming the runtime, so .NET
 /// Framework starts them on whatever 4.x the PC has. Each reads the Release value .NET
-/// Framework 4.8 writes (<see cref="UpdateManifest.HasNetFramework48"/>) as the first thing
-/// its start does, and below 4.8 says what to install and ends. The setup's copy has its
+/// Framework 4.8 writes (<see cref="UpdateManifest.HasNetFramework48"/>) at its start: the
+/// command line before it reads its arguments, the window once the language is applied and
+/// before anything scans. Below 4.8 each says what to install and ends. The setup's copy has its
 /// config, which names 4.8, and the setup refuses to install where 4.8 is missing.
 /// </remarks>
 internal static class NetFrameworkCheck
@@ -31,15 +32,10 @@ internal static class NetFrameworkCheck
             return Strings.Cli_NeedsNetFramework48 + Environment.NewLine
                 + string.Format(Strings.Cli_UpdateDownloadLink, Strings.UpdateNotice_DownloadNetFramework48, url);
 
-        // The link line in the language's own punctuation, broken where the address goes,
-        // so the address stands on its own line.
-        var name = string.Format(Strings.Cli_UpdateDownloadLink, Strings.UpdateNotice_DownloadNetFramework48, AddressMark);
-        name = name.Substring(0, name.IndexOfOrdinal(AddressMark, StringComparison.Ordinal)).TrimEnd();
+        // The link line in the language's own punctuation with no address in it, which then
+        // stands on its own line. Every language's link line ends with the address.
+        var name = string.Format(Strings.Cli_UpdateDownloadLink, Strings.UpdateNotice_DownloadNetFramework48, "").TrimEnd();
         return Strings.Startup_NeedsNetFramework48 + Environment.NewLine + Environment.NewLine
             + name + Environment.NewLine + url;
     }
-
-    // Stands in for the address in the link line until the line is cut there. No string the
-    // app shows holds it.
-    private const string AddressMark = "\u0001";
 }

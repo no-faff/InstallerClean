@@ -273,7 +273,7 @@ end;
 //
 // Before that, on a PC without .NET Framework 4.8, Setup says what to install and
 // stops with nothing written: the copies it installs run on 4.8, which their configs
-// name. Silent, the message goes to Setup's log alone.
+// name. With /SUPPRESSMSGBOXES no box is shown, and with /LOG the log says why it stopped.
 function InitializeSetup: Boolean;
 var
   Waited: Integer;

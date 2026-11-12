@@ -35,7 +35,7 @@ internal static class Program
         InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
 
         // On a PC without .NET Framework 4.8 the command line says what to install and
-        // ends, before anything else runs. The download carries no config naming the
+        // ends, before it reads its arguments. The download carries no config naming the
         // runtime, so .NET Framework starts it on any 4.x.
         if (NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: true) is { } needsNetFramework48)
         {
