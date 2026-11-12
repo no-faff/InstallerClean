@@ -4,6 +4,12 @@ using InstallerClean.Services;
 namespace InstallerClean.Tests.Services;
 
 /// <summary>
+/// The four lists the scan walks, for <see cref="FakeMsiApi.PassingError"/> and
+/// <see cref="FakeMsiApi.WalksStarted"/>. Public so a theory can take one as a parameter.
+/// </summary>
+public enum MsiWalk { Products, RouteA, Patches, Instances }
+
+/// <summary>
 /// Scriptable fake over <see cref="IMsiApi"/>. Reproduces the double-call
 /// buffer contract of msi.dll: a sizing call with a null buffer returns the
 /// char count (excluding the terminator) and MoreData; the second call
@@ -129,6 +135,39 @@ internal sealed class FakeMsiApi : IMsiApi
 
     private readonly HashSet<uint> _sidRetried = new();
 
+    private readonly Dictionary<(MsiWalk Walk, string? ProductCode, uint Index), (uint Error, int Calls)> _passing = new();
+    private readonly Dictionary<(MsiWalk Walk, string? ProductCode), int> _walksStarted = new();
+
+    /// <summary>
+    /// An error that passes: the next <paramref name="calls"/> calls for this row of the
+    /// list answer <paramref name="error"/>, and every call after them answers as the
+    /// fixture scripts the row. <paramref name="productCode"/> is null for the two
+    /// machine-wide walks.
+    /// </summary>
+    public void PassingError(MsiWalk walk, string? productCode, uint index, uint error, int calls = 1) =>
+        _passing[(walk, productCode, index)] = (error, calls);
+
+    /// <summary>
+    /// How many times a list was asked for its first row: once for each walk of it, and
+    /// once more where a first row is asked again with a larger SID buffer.
+    /// <paramref name="productCode"/> is null for the two machine-wide walks.
+    /// </summary>
+    public int WalksStarted(MsiWalk walk, string? productCode = null) =>
+        _walksStarted.TryGetValue((walk, productCode), out var started) ? started : 0;
+
+    private bool PassingErrorAt(MsiWalk walk, string? productCode, uint index, out uint error)
+    {
+        if (index == 0)
+            _walksStarted[(walk, productCode)] = WalksStarted(walk, productCode) + 1;
+
+        error = Success;
+        if (!_passing.TryGetValue((walk, productCode, index), out var passing) || passing.Calls <= 0) return false;
+
+        _passing[(walk, productCode, index)] = (passing.Error, passing.Calls - 1);
+        error = passing.Error;
+        return true;
+    }
+
     private static readonly List<(string? Sid, MsiInstallContext Context)> OneMachineInstance =
         new() { (null, MsiInstallContext.Machine) };
 
@@ -185,6 +224,7 @@ internal sealed class FakeMsiApi : IMsiApi
         // returns may be read as absence.
         if (productCode is not null)
         {
+            if (PassingErrorAt(MsiWalk.Instances, productCode, index, out var passingInstance)) return passingInstance;
             if (KeyedRowResult.TryGetValue((productCode, index), out var forcedRow)) return forcedRow;
             if (NotInstalled.Contains(productCode)) return MsiError.UnknownProduct;
 
@@ -204,6 +244,7 @@ internal sealed class FakeMsiApi : IMsiApi
             return Success;
         }
 
+        if (PassingErrorAt(MsiWalk.Products, null, index, out var passingProduct)) return passingProduct;
         if (NeverEndProducts)
         {
             WriteCode(installedProductCode, "{FFFFFFFF-0000-0000-0000-000000000000}");
@@ -244,6 +285,7 @@ internal sealed class FakeMsiApi : IMsiApi
         // answers NoMoreItems at once: a route A that succeeds and names nothing.
         if (productCode is null)
         {
+            if (PassingErrorAt(MsiWalk.RouteA, null, index, out var passingHolder)) return passingHolder;
             if (RouteAResult is { } forcedRouteA) return forcedRouteA;
             if (index >= RouteAHolders.Count) return NoMoreItems;
             var (heldCode, heldTarget) = RouteAHolders[(int)index];
@@ -255,6 +297,7 @@ internal sealed class FakeMsiApi : IMsiApi
         // context, which is what every row below answers.
         targetProductContext = context;
         if (productCode is not null && index == 0) PatchEnumerationsStarted.Add(productCode);
+        if (PassingErrorAt(MsiWalk.Patches, productCode, index, out var passingPatch)) return passingPatch;
         if (productCode is not null && productCode == NeverEndPatchesFor)
         {
             WriteCode(patchCode, "{FFFFFFFF-0000-0000-0000-000000000001}");

@@ -37,6 +37,17 @@ internal static class TestCulture
 }
 
 /// <summary>
+/// No test waits out the pause before a Windows Installer list is walked again
+/// (<see cref="WalkRestarts"/>): for the whole run the pause returns at once. A test
+/// that reads the pauses hands the scan a pause of its own.
+/// </summary>
+internal static class TestWalkPause
+{
+    [ModuleInitializer]
+    internal static void Skip() => WalkRestarts.PauseForTests = _ => { };
+}
+
+/// <summary>
 /// Every test that writes the crash log writes it to a folder of this run's own under the
 /// temp folder, never to the log of the PC running the suite. The folder is set before any
 /// test runs, so a test reaching the log by a path nobody planned for is covered too. Each
