@@ -787,6 +787,36 @@ internal static class Kernel32
     [DllImport(Library, EntryPoint = "GetCurrentProcess", ExactSpelling = true)]
     public static extern IntPtr GetCurrentProcess();
 
+    /// <summary>
+    /// Whether <paramref name="hProcess"/> runs under emulation, giving the machine type it
+    /// runs as and the machine's own. Windows 10 version 1511 and later; earlier, the entry
+    /// point is not there.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "IsWow64Process2", ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool IsWow64Process2(IntPtr hProcess, out ushort pProcessMachine, out ushort pNativeMachine);
+
+    /// <summary>What GetNativeSystemInfo writes; only the architecture is read.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SYSTEM_INFO
+    {
+        public ushort wProcessorArchitecture;
+        public ushort wReserved;
+        public uint dwPageSize;
+        public IntPtr lpMinimumApplicationAddress;
+        public IntPtr lpMaximumApplicationAddress;
+        public UIntPtr dwActiveProcessorMask;
+        public uint dwNumberOfProcessors;
+        public uint dwProcessorType;
+        public uint dwAllocationGranularity;
+        public ushort wProcessorLevel;
+        public ushort wProcessorRevision;
+    }
+
+    /// <summary>The machine's own processor architecture, whatever the process runs as.</summary>
+    [DllImport(Library, EntryPoint = "GetNativeSystemInfo", ExactSpelling = true)]
+    public static extern void GetNativeSystemInfo(out SYSTEM_INFO lpSystemInfo);
+
     /// <summary>The id Windows gives this process.</summary>
     [DllImport(Library, EntryPoint = "GetCurrentProcessId", ExactSpelling = true)]
     public static extern uint GetCurrentProcessId();

@@ -1,3 +1,4 @@
+using InstallerClean.Compatibility;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -255,7 +256,7 @@ public sealed record ResultLogEntry(
             > 0 => "Windows",
             _ => "Unknown",
         };
-        return $"{family} ({RuntimeInformation.OSArchitecture})";
+        return $"{family} ({FrameworkRuntimeInformation.OSArchitecture})";
     }
 }
 

@@ -226,7 +226,7 @@ download carries. They are how a path is read, joined and made full; how a file
 or folder is found, read, moved, deleted and listed, and a folder made; how a
 search pattern is matched; how a Windows error becomes an exception; how a
 registry key is listed; how a command line is quoted for a new process, and the
-exception a refused start carries; the dictionary, sequence, string, stream,
+exception a refused start carries; how the machine's architecture is read; the dictionary, sequence, string, stream,
 ASCII, Math, environment and timing members .NET Framework 4.8 lacks; and the
 text of the messages its exceptions carry.
 
@@ -242,8 +242,8 @@ FrameworkFileStream.cs, FrameworkStreamExtensions.cs,
 FrameworkStringExtensions.cs, FrameworkCollectionExtensions.cs,
 FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
-ConfigureAwaitOptions.cs, TaskCompletionSource.cs, FrameworkTask.cs and
-FrameworkProcess.cs; and,
+ConfigureAwaitOptions.cs, TaskCompletionSource.cs, FrameworkTask.cs,
+FrameworkProcess.cs and FrameworkRuntimeInformation.cs; and,
 for the tests, src/InstallerClean.Tests/Compatibility/TestFramework.cs.
 
 Its licence, LICENSE.TXT in that repository at that tag:
