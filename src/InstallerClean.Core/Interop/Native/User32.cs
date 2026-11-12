@@ -4,7 +4,7 @@ namespace InstallerClean.Interop.Native;
 
 /// <summary>
 /// P/Invoke surface for user32.dll. Consumed by the WPF host's
-/// WindowChromeExtensions (focus-visual suppression gate),
+/// WindowChromeExtensions (focus-visual suppression gate, the system menu),
 /// DetailWindowSizing (work-area measurement), App's single-instance
 /// hand-off (foreground rights) and the folder picker (its owner window), and
 /// by <see cref="WindowStation"/> for the command line.
@@ -53,6 +53,43 @@ internal static class User32
 
     [DllImport(Library, EntryPoint = "GetWindowThreadProcessId", ExactSpelling = true)]
     public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+    /// <summary>Whether <paramref name="hWnd"/> names a window that exists.</summary>
+    [DllImport(Library, EntryPoint = "IsWindow", ExactSpelling = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool IsWindow(IntPtr hWnd);
+
+    /// <summary>
+    /// The window's system menu, the one Alt+Space opens. With <paramref name="bRevert"/>
+    /// false the window's own copy, which is what Windows shows.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetSystemMenu", ExactSpelling = true)]
+    public static extern IntPtr GetSystemMenu(IntPtr hWnd, [MarshalAs(UnmanagedType.Bool)] bool bRevert);
+
+    /// <summary>
+    /// Shows <paramref name="hmenu"/> at the screen point in physical pixels and waits for
+    /// the user. With TPM_RETURNCMD it returns the chosen item's command, or 0 where
+    /// nothing was chosen, and sends the window nothing itself.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "TrackPopupMenuEx", ExactSpelling = true, SetLastError = true)]
+    public static extern uint TrackPopupMenuEx(IntPtr hmenu, uint uFlags, int x, int y, IntPtr hwnd, IntPtr lptpm);
+
+    /// <summary>TPM_RETURNCMD: the chosen command comes back as the return value.</summary>
+    public const uint TPM_RETURNCMD = 0x0100;
+
+    /// <summary>TPM_LEFTBUTTON: the left mouse button chooses an item.</summary>
+    public const uint TPM_LEFTBUTTON = 0x0000;
+
+    /// <summary>TPM_RIGHTBUTTON: either mouse button chooses an item.</summary>
+    public const uint TPM_RIGHTBUTTON = 0x0002;
+
+    /// <summary>Puts a message on the window's queue and returns without waiting for it.</summary>
+    [DllImport(Library, EntryPoint = "PostMessageW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>WM_SYSCOMMAND: a command from the window's system menu.</summary>
+    public const uint WM_SYSCOMMAND = 0x0112;
 
     /// <summary>
     /// Monitor with the largest intersection with the window.

@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Helpers;
@@ -18,14 +20,39 @@ internal static class WindowChromeExtensions
         {
             if (e.Key == Key.System && e.SystemKey == Key.Space)
             {
-                SystemCommands.ShowSystemMenu(
-                    window,
-                    new Point(window.Left, window.Top));
+                ShowSystemMenu(window, new Point(window.Left, window.Top));
                 e.Handled = true;
             }
         };
         window.PreviewKeyDown += handler;
         window.Closed += (_, _) => window.PreviewKeyDown -= handler;
+    }
+
+    /// <summary>
+    /// What the system menu is shown with: the chosen command returned, and either mouse
+    /// button choosing an item.
+    /// </summary>
+    internal const uint SystemMenuFlags = User32.TPM_LEFTBUTTON | User32.TPM_RIGHTBUTTON | User32.TPM_RETURNCMD;
+
+    /// <summary>
+    /// Shows the window's system menu with its top left at <paramref name="screenLocation"/>,
+    /// in device-independent pixels, and sends the window the command chosen, as .NET 10's
+    /// SystemCommands.ShowSystemMenu does (dotnet/wpf v10.0.0, <c>SystemCommands.cs</c>).
+    /// SystemCommands.ShowSystemMenu on .NET Framework passes TPM_RETURNCMD alone, with which
+    /// only the left mouse button chooses an item, and is banned in the shipped projects.
+    /// </summary>
+    internal static void ShowSystemMenu(Window window, Point screenLocation)
+    {
+        var dpi = VisualTreeHelper.GetDpi(window);
+        var hwnd = new WindowInteropHelper(window).Handle;
+        if (hwnd == IntPtr.Zero || !User32.IsWindow(hwnd))
+            return;
+
+        var menu = User32.GetSystemMenu(hwnd, false);
+        var command = User32.TrackPopupMenuEx(menu, SystemMenuFlags,
+            (int)(screenLocation.X * dpi.DpiScaleX), (int)(screenLocation.Y * dpi.DpiScaleY), hwnd, IntPtr.Zero);
+        if (command != 0)
+            User32.PostMessage(hwnd, User32.WM_SYSCOMMAND, new IntPtr(command), IntPtr.Zero);
     }
 
     /// <summary>
