@@ -376,9 +376,12 @@ P:System.IO.FileInfo.Name;Not ported: port .NET 10's member before calling it, a
 M:System.TimeSpan.FromMilliseconds(System.Double);Durations.FromMilliseconds, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
 M:System.TimeSpan.FromSeconds(System.Double);Durations.FromSeconds, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
 M:System.TimeSpan.FromMinutes(System.Double);Durations.FromMinutes, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
-M:System.TimeSpan.FromHours(System.Double);Durations.FromMinutes, sixty to the hour, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
+M:System.TimeSpan.FromHours(System.Double);Durations.FromHours, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
 M:System.TimeSpan.FromDays(System.Double);Durations.FromDays, which keeps the ticks as .NET 10 does where .NET Framework rounds to a whole millisecond
-M:System.String.IndexOf(System.String,System.StringComparison);Call IndexOfOrdinal (FrameworkStringExtensions), which searches as .NET 10 does where .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
-M:System.String.IndexOf(System.String,System.Int32,System.StringComparison);Call IndexOfOrdinal (FrameworkStringExtensions), which searches as .NET 10 does where .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
-M:System.String.IndexOf(System.String,System.Int32,System.Int32,System.StringComparison);Call IndexOfOrdinal (FrameworkStringExtensions), which searches as .NET 10 does where .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
+M:System.String.IndexOf(System.String,System.StringComparison);Call IndexOfOrdinal (FrameworkStringExtensions), an ordinal search, where .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
+M:System.String.IndexOf(System.String,System.Int32,System.StringComparison);Call IndexOfOrdinal (FrameworkStringExtensions), an ordinal search, where .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
+M:System.String.IndexOf(System.String,System.Int32,System.Int32,System.StringComparison);IndexOfOrdinal takes no count: port .NET 10's search with one before calling it, as .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
+M:System.String.LastIndexOf(System.String,System.StringComparison);Not ported: port .NET 10's search before calling it, as .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
+M:System.String.LastIndexOf(System.String,System.Int32,System.StringComparison);Not ported: port .NET 10's search before calling it, as .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
+M:System.String.LastIndexOf(System.String,System.Int32,System.Int32,System.StringComparison);Not ported: port .NET 10's search before calling it, as .NET Framework searches ASCII text by culture rules under OrdinalIgnoreCase
 P:System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;FrameworkRuntimeInformation.OSArchitecture, which asks IsWow64Process2 for the machine's own architecture as .NET 10 does

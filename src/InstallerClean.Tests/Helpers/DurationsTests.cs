@@ -187,6 +187,16 @@ public class DurationsTests
     }
 
     [Theory]
+    // A hundred-millionth of an hour is 360 ticks, and a billionth over an hour 36 ticks over.
+    [InlineData(0.00000001, 360)]
+    [InlineData(1.000000001, 36_000_000_036)]
+    [InlineData(-0.25, -9_000_000_000)]
+    public void Hours_are_truncated_to_a_whole_tick(double hours, long expected)
+    {
+        Assert.Equal(expected, Durations.FromHours(hours).Ticks);
+    }
+
+    [Theory]
     [InlineData(1, 864_000_000_000)]
     [InlineData(0.00000001, 8_640)]
     public void Days_are_truncated_to_a_whole_tick(double days, long expected)

@@ -5,13 +5,15 @@ namespace InstallerClean.Helpers;
 /// <summary>
 /// Time arithmetic .NET 10 provides and .NET Framework does not, computed as .NET 10
 /// computes it (dotnet/runtime v10.0.0): a duration times a number, from
-/// <c>TimeSpan.cs</c>'s <c>operator *</c>; a number of seconds as a duration, from its
-/// <c>FromMilliseconds</c>, <c>FromSeconds</c>, <c>FromMinutes</c> and <c>FromDays</c> taking a double; and the time since a <see cref="Stopwatch"/> timestamp,
-/// from <c>Stopwatch.cs</c>'s <c>GetElapsedTime</c>.
+/// <c>TimeSpan.cs</c>'s <c>operator *</c>; a number of milliseconds, seconds, minutes,
+/// hours or days as a duration, from its <c>FromMilliseconds</c>, <c>FromSeconds</c>,
+/// <c>FromMinutes</c>, <c>FromHours</c> and <c>FromDays</c> taking a double; and the time
+/// since a <see cref="Stopwatch"/> timestamp, from <c>Stopwatch.cs</c>'s
+/// <c>GetElapsedTime</c>.
 ///
-/// All of it works in ticks, never through milliseconds: .NET Framework's
-/// <c>TimeSpan.FromMilliseconds(double)</c> and <c>FromSeconds(double)</c> round their
-/// argument to a whole millisecond, so a product of 400 ticks taken that way is zero.
+/// All of it works in ticks, never through milliseconds: each of .NET Framework's
+/// <c>TimeSpan.From*(double)</c> members rounds its duration to a whole millisecond, so a
+/// product of 400 ticks taken that way is zero.
 /// </summary>
 internal static class Durations
 {
@@ -50,6 +52,12 @@ internal static class Durations
     /// <c>TimeSpan.FromMinutes(double)</c> answers.
     /// </summary>
     public static TimeSpan FromMinutes(double minutes) => Interval(minutes, TimeSpan.TicksPerMinute);
+
+    /// <summary>
+    /// <paramref name="hours"/> as a duration, truncated to a whole tick, as .NET 10's
+    /// <c>TimeSpan.FromHours(double)</c> answers.
+    /// </summary>
+    public static TimeSpan FromHours(double hours) => Interval(hours, TimeSpan.TicksPerHour);
 
     /// <summary>
     /// <paramref name="days"/> as a duration, truncated to a whole tick, as .NET 10's
