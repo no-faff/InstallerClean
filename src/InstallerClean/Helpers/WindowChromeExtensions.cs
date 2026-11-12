@@ -13,6 +13,12 @@ internal static class WindowChromeExtensions
     /// custom <see cref="System.Windows.Shell.WindowChrome"/>. WPF's chrome
     /// swallows the shortcut by default, which removes a standard
     /// accessibility affordance (keyboard move / resize / close).
+    ///
+    /// A right click on the title bar opens the same menu, through
+    /// <see cref="ShowSystemMenu"/> as well. The chrome opens it there itself, from its
+    /// own WM_NCRBUTTONUP handler, with .NET Framework's flags; a hook added once the
+    /// window has its handle runs ahead of the chrome's, which is added as the handle is
+    /// made, and takes the message.
     /// </summary>
     public static void EnableAltSpaceSystemMenu(this Window window)
     {
@@ -26,6 +32,33 @@ internal static class WindowChromeExtensions
         };
         window.PreviewKeyDown += handler;
         window.Closed += (_, _) => window.PreviewKeyDown -= handler;
+
+        HwndSourceHook titleBarRightClick = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
+            OnTitleBarRightClick(window, hwnd, msg, wParam, lParam, ref handled);
+        if (PresentationSource.FromVisual(window) is HwndSource source)
+            source.AddHook(titleBarRightClick);
+        else
+            window.SourceInitialized += (_, _) =>
+                (PresentationSource.FromVisual(window) as HwndSource)?.AddHook(titleBarRightClick);
+    }
+
+    /// <summary>
+    /// A right click released on the title bar of a window with custom chrome: the system
+    /// menu at the pointer, as the chrome shows it on .NET 10 (dotnet/wpf v10.0.0,
+    /// <c>WindowChromeWorker.cs</c>, <c>_HandleNCRButtonUp</c>). The message then goes
+    /// to DefWindowProc, which on .NET 10 it reaches after the chrome's handler, and is
+    /// marked handled so the chrome does not open the menu a second time.
+    /// </summary>
+    private static IntPtr OnTitleBarRightClick(Window window, IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg != User32.WM_NCRBUTTONUP || wParam.ToInt64() != User32.HTCAPTION
+            || System.Windows.Shell.WindowChrome.GetWindowChrome(window) is null)
+            return IntPtr.Zero;
+
+        var packed = lParam.ToInt64();
+        ShowSystemMenuAt(window, new Point((short)(packed & 0xFFFF), (short)((packed >> 16) & 0xFFFF)));
+        handled = true;
+        return User32.DefWindowProc(hwnd, (uint)msg, wParam, lParam);
     }
 
     /// <summary>
@@ -44,13 +77,22 @@ internal static class WindowChromeExtensions
     internal static void ShowSystemMenu(Window window, Point screenLocation)
     {
         var dpi = VisualTreeHelper.GetDpi(window);
+        ShowSystemMenuAt(window, new Point(screenLocation.X * dpi.DpiScaleX, screenLocation.Y * dpi.DpiScaleY));
+    }
+
+    /// <summary>
+    /// The system menu at <paramref name="physicalScreenLocation"/>, in physical pixels,
+    /// from .NET 10's SystemCommands.ShowSystemMenuPhysicalCoordinates.
+    /// </summary>
+    private static void ShowSystemMenuAt(Window window, Point physicalScreenLocation)
+    {
         var hwnd = new WindowInteropHelper(window).Handle;
         if (hwnd == IntPtr.Zero || !User32.IsWindow(hwnd))
             return;
 
         var menu = User32.GetSystemMenu(hwnd, false);
         var command = User32.TrackPopupMenuEx(menu, SystemMenuFlags,
-            (int)(screenLocation.X * dpi.DpiScaleX), (int)(screenLocation.Y * dpi.DpiScaleY), hwnd, IntPtr.Zero);
+            (int)physicalScreenLocation.X, (int)physicalScreenLocation.Y, hwnd, IntPtr.Zero);
         if (command != 0)
             User32.PostMessage(hwnd, User32.WM_SYSCOMMAND, new IntPtr(command), IntPtr.Zero);
     }

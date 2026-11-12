@@ -91,6 +91,16 @@ internal static class User32
     /// <summary>WM_SYSCOMMAND: a command from the window's system menu.</summary>
     public const uint WM_SYSCOMMAND = 0x0112;
 
+    /// <summary>WM_NCRBUTTONUP: the right mouse button released outside the client area.</summary>
+    public const int WM_NCRBUTTONUP = 0x00A5;
+
+    /// <summary>HTCAPTION: the hit-test answer for the title bar.</summary>
+    public const int HTCAPTION = 2;
+
+    /// <summary>The default handling Windows gives a message the window has not handled.</summary>
+    [DllImport(Library, EntryPoint = "DefWindowProcW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern IntPtr DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
     /// <summary>
     /// Monitor with the largest intersection with the window.
     /// MONITOR_DEFAULTTONEAREST maps a window that intersects no
