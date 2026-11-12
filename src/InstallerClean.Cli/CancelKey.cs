@@ -139,8 +139,9 @@ internal sealed class CancelKey
 
     /// <summary>
     /// What Ctrl+C does: keeps the process running and cancels <see cref="Pressed"/>,
-    /// running the answer registered on it. It runs on the console's control-handler
-    /// thread, where a throw is unhandled, so it never throws.
+    /// running the answer registered on it. The runtime runs it on a thread-pool thread
+    /// while the console's control-handler thread waits for it, and a throw there is
+    /// unhandled, so it never throws.
     /// </summary>
     internal void Take(object? sender, ConsoleCancelEventArgs cancelArgs)
     {
