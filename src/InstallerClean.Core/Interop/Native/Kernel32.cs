@@ -878,6 +878,15 @@ internal static class Kernel32
     [DllImport(Library, EntryPoint = "GetLocaleInfoEx", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     public static extern int GetLocaleInfoEx(string? lpLocaleName, uint LCType, [Out] char[] lpLCData, int cchData);
 
+    /// <summary>
+    /// Writes <paramref name="lpSrc"/> with its environment variables expanded into
+    /// <paramref name="lpDst"/>, and answers the length in characters, the terminating
+    /// null counted, that the expanded text needs, which is more than
+    /// <paramref name="nSize"/> where it did not fit, or 0 on failure.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "ExpandEnvironmentStringsW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern uint ExpandEnvironmentStrings(string lpSrc, [Out] char[] lpDst, uint nSize);
+
     /// <summary>LOCALE_SLOCALIZEDDISPLAYNAME: the locale's full name in the display language Windows is set to.</summary>
     public const uint LOCALE_SLOCALIZEDDISPLAYNAME = 0x00000002;
 

@@ -5,7 +5,7 @@ using InstallerClean.Interop.Native;
 namespace InstallerClean.Compatibility;
 
 /// <summary>
-/// <see cref="RuntimeInformation.OSArchitecture"/> as .NET 10 answers it on Windows, from
+/// <c>RuntimeInformation.OSArchitecture</c> as .NET 10 answers it on Windows, from
 /// <c>RuntimeInformation.Windows.cs</c> (dotnet/runtime v10.0.0): where kernel32 exports
 /// IsWow64Process2, the machine's own architecture as it gives it, or the process's
 /// architecture where it fails; where kernel32 does not, the architecture GetNativeSystemInfo

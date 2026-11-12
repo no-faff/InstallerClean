@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Xml.Linq;
 
 namespace InstallerClean.Tests.Themes;
@@ -14,18 +15,40 @@ public class FocusVisualStyleTests
     // The types the app's XAML uses that take keyboard focus unless told not to.
     private static readonly HashSet<string> FocusableTypes = new(StringComparer.Ordinal)
     {
-        "Button", "ToggleButton", "DisclosureButton", "CheckBox", "TextBox",
+        "Button", "ToggleButton", "RepeatButton", "DisclosureButton", "CheckBox", "TextBox",
         "ListView", "ListBox", "ListViewItem", "ListBoxItem", "GridViewColumnHeader",
-        "MenuItem", "Hyperlink", "ScrollViewer",
+        "MenuItem", "Hyperlink", "ScrollViewer", "ItemsControl",
     };
 
-    private static readonly string[] Documents =
+    // The types the app's XAML uses that never take keyboard focus: panels, shapes,
+    // text, resources and templates, and the controls WPF makes unfocusable (ProgressBar,
+    // Thumb, ToolTip, UserControl) or that pass the focus to their items (ContextMenu).
+    // A type in neither list fails the test until it is put in one.
+    private static readonly HashSet<string> UnfocusableTypes = new(StringComparer.Ordinal)
     {
-        "Components.xaml", "MainWindow.xaml", "AboutWindow.xaml", "ConfirmDeleteWindow.xaml",
-        "ConfirmMoveWindow.xaml", "MessageWindow.xaml", "ReportWindow.xaml",
-        "OrphanedFilesWindow.xaml", "RegisteredFilesWindow.xaml", "SplashWindow.xaml",
-        "ScoopCommandBox.xaml",
+        "AccessText", "AnyPathTextConverter", "BooleanToVisibilityConverter", "Border",
+        "BulletDecorator", "ColumnDefinition", "Condition", "ContentPresenter", "ContextMenu",
+        "ControlTemplate", "DataTemplate", "DataTrigger", "DecorativeBorder", "DecorativeImage",
+        "DockPanel", "Ellipse", "Grid", "GridView", "GridViewColumn", "GridViewRowPresenter",
+        "InstallerPathTextConverter", "KeyBinding", "MultiDataTrigger", "MultiTrigger", "Path",
+        "ProgressBar", "ResourceDictionary", "RowDefinition", "Run", "ScoopCommandBox", "Setter",
+        "SolidColorBrush", "StackPanel", "Style", "TextBlock", "Thumb", "ToolTip", "Track",
+        "TranslateTransform", "Trigger", "UnreadText", "UserControl", "Viewbox", "Window",
+        "WindowChrome", "WrapPanel",
     };
+
+    // Every XAML file the test project embeds for these tests, bar the two that hold
+    // only colours and sizes. A window is read here once the csproj embeds it.
+    private static readonly string[] Documents = Assembly.GetExecutingAssembly()
+        .GetManifestResourceNames()
+        .Where(n => n.StartsWith("ThemeXaml.", StringComparison.Ordinal)
+            && n.EndsWith(".xaml", StringComparison.Ordinal)
+            && n != "ThemeXaml.Primitives.xaml" && n != "ThemeXaml.Tokens.xaml")
+        .Select(n => n.Substring("ThemeXaml.".Length))
+        .OrderBy(n => n, StringComparer.Ordinal)
+        .ToArray();
+
+    private static readonly Dictionary<string, XDocument> Parsed = new(StringComparer.Ordinal);
 
     [Theory]
     [InlineData("SubtleLink", "FlatTextBoxFocusVisual")]
@@ -43,6 +66,22 @@ public class FocusVisualStyleTests
 
         Assert.NotNull(style);
         Assert.Equal("{StaticResource " + visual + "}", FocusVisualSetter(style!));
+    }
+
+    [Fact]
+    public void Every_window_is_read_and_every_element_type_is_classified()
+    {
+        Assert.Contains("Components.xaml", Documents);
+        Assert.True(Documents.Length >= 11, string.Join(", ", Documents));
+
+        var unclassified = Documents
+            .SelectMany(name => Load(name).Descendants()
+                .Select(e => e.Name.LocalName)
+                .Where(type => type.IndexOf('.') < 0 && !FocusableTypes.Contains(type) && !UnfocusableTypes.Contains(type))
+                .Select(type => $"{name}: {type}"))
+            .Distinct()
+            .ToList();
+        Assert.True(unclassified.Count == 0, string.Join(", ", unclassified));
     }
 
     // Every style for a focusable type, in the theme and in each window, names a focus
@@ -129,9 +168,31 @@ public class FocusVisualStyleTests
         if (local is not null)
             return NamesAFocusVisual(local, document);
 
-        var implicitStyle = StyleIn(document, "{x:Type " + element.Name.LocalName + "}")
-            ?? StyleIn(Components(), "{x:Type " + element.Name.LocalName + "}");
+        var implicitStyle = ImplicitStyleFor(element);
         return implicitStyle is not null && NamesAFocusVisual(implicitStyle, document);
+    }
+
+    // The implicit style WPF gives the element: from the resources of its nearest
+    // ancestor that declares one for its type, and otherwise from the theme's.
+    private static XElement? ImplicitStyleFor(XElement element)
+    {
+        var type = element.Name.LocalName;
+        foreach (var ancestor in element.Ancestors())
+        {
+            var resources = ancestor.Element(ancestor.Name + ".Resources");
+            if (resources is null)
+                continue;
+            var declared = resources.Elements(ThemeXaml.Presentation + "Style")
+                .Concat(resources.Elements(ThemeXaml.Presentation + "ResourceDictionary")
+                    .Elements(ThemeXaml.Presentation + "Style"))
+                .FirstOrDefault(s => s.Attribute(ThemeXaml.Xaml + "Key") is null
+                    && TypeName((string?)s.Attribute("TargetType")) == type);
+            if (declared is not null)
+                return declared;
+        }
+        return Components().Root!.Elements(ThemeXaml.Presentation + "Style")
+            .FirstOrDefault(s => s.Attribute(ThemeXaml.Xaml + "Key") is null
+                && TypeName((string?)s.Attribute("TargetType")) == type);
     }
 
     private static bool NamesAFocusVisual(XElement style, XDocument document)
@@ -184,7 +245,15 @@ public class FocusVisualStyleTests
         return colon < 0 ? name : name.Substring(colon + 1);
     }
 
-    private static XDocument Components() => ThemeXaml.Load("ThemeXaml.Components.xaml");
+    private static XDocument Components() => Load("Components.xaml");
 
-    private static XDocument Load(string name) => ThemeXaml.Load("ThemeXaml." + name);
+    private static XDocument Load(string name)
+    {
+        lock (Parsed)
+        {
+            if (!Parsed.TryGetValue(name, out var document))
+                Parsed[name] = document = ThemeXaml.Load("ThemeXaml." + name);
+            return document;
+        }
+    }
 }

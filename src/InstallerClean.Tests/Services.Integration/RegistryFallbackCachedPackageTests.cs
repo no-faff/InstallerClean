@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 using Microsoft.Win32;
@@ -115,29 +116,81 @@ public class RegistryFallbackCachedPackageTests
     }
 
     [Theory]
-    [InlineData("a product")]
-    [InlineData("a patch")]
-    public void A_scan_cancelled_during_the_read_stops_it_as_a_cancel_and_logs_no_failure(string recorded)
+    [InlineData("the product's patch list")]
+    [InlineData("the product's entry")]
+    [InlineData("a patch's entry")]
+    public void A_scan_cancelled_during_the_read_stops_it_as_a_cancel_and_logs_no_failure(string listing)
     {
-        // A cancel inside the try round each loop of the walk, the products loop and the
-        // patches loop, leaves the read as the cancel, never as a failure counted or written to
-        // the failure log. The entry is what takes the walk into its loop.
+        // A cancel that arrives while a listing inside one of the walk's own tries pauses
+        // between two readings that disagree leaves the read as the cancel, never as a
+        // failure counted or written to the failure log. Each row's listing is the one
+        // read inside that try: the product's Patches key, its InstallProperties and the
+        // patch's own key. The token is cancelled from inside that listing, after the
+        // walk's loop has checked it, so the try's own catch is what meets the cancel.
         WithSubtree(f =>
         {
-            var package = f.Files.Create(recorded == "a product" ? "msi" : "msp");
-            using (var values = recorded == "a product" ? ProductValues(f) : PatchValues(f))
-                values.SetValue("LocalPackage", package, RegistryValueKind.String);
+            using (var values = listing == "a patch's entry" ? PatchValues(f) : ProductValues(f))
+                values.SetValue("LocalPackage", f.Files.Create(listing == "a patch's entry" ? "msp" : "msi"),
+                    RegistryValueKind.String);
+            f.Account.CreateSubKey($@"Products\{PackedProduct}\Patches\{PackedPatch}", writable: true)!.Dispose();
+            var keyEnd = listing switch
+            {
+                "the product's patch list" => $@"\{Sid}\Products\{PackedProduct}\Patches",
+                "the product's entry" => $@"\{Sid}\Products\{PackedProduct}\InstallProperties",
+                _ => $@"\{Sid}\Patches\{PackedPatch}",
+            };
             using var cts = new CancellationTokenSource();
-            cts.Cancel();
+            var disagreed = 0;
             var logged = new List<Exception>();
 
-            Assert.ThrowsAny<OperationCanceledException>(() => InstallerQueryService.ReadFallbackSid(
-                f.UserData, Sid, new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase),
-                new HashSet<string>(StringComparer.OrdinalIgnoreCase), cts.Token,
-                new PerItemFailureLog("Registry fallback", "Test run.", logged.Add)));
+            RegistryNames.CallsForTests = (key, calls) =>
+            {
+                if (!key.Name.EndsWith(keyEnd, StringComparison.OrdinalIgnoreCase))
+                    return calls;
+                disagreed++;
+                return new DisagreeingCalls(calls, cts);
+            };
+            try
+            {
+                Assert.ThrowsAny<OperationCanceledException>(() => InstallerQueryService.ReadFallbackSid(
+                    f.UserData, Sid, new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase),
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase), cts.Token,
+                    new PerItemFailureLog("Registry fallback", "Test run.", logged.Add)));
+            }
+            finally
+            {
+                RegistryNames.CallsForTests = null;
+            }
 
+            Assert.Equal(1, disagreed);
             Assert.Empty(logged);
         });
+    }
+
+    /// <summary>
+    /// A key's real calls with a count one higher at every reading, so no two readings
+    /// agree, and the token cancelled at the first.
+    /// </summary>
+    private sealed class DisagreeingCalls(RegistryNames.IKeyCalls calls, CancellationTokenSource cts)
+        : RegistryNames.IKeyCalls
+    {
+        private int _readings;
+
+        public int QueryCounts(out int subKeys, out int values)
+        {
+            cts.Cancel();
+            var result = calls.QueryCounts(out subKeys, out values);
+            _readings++;
+            subKeys += _readings;
+            values += _readings;
+            return result;
+        }
+
+        public int EnumKey(int index, char[] name, ref int nameLength) => calls.EnumKey(index, name, ref nameLength);
+
+        public int EnumValue(int index, char[] name, ref int nameLength) => calls.EnumValue(index, name, ref nameLength);
+
+        public void MarkHandleInvalid() => calls.MarkHandleInvalid();
     }
 
     [Fact]

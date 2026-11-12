@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.Interop;
 using InstallerClean.Services;
 
@@ -27,6 +28,9 @@ public class InstallerQueryServiceProductInstanceTests
     private const string UserSid = "S-1-5-21-1111111111-2222222222-3333333333-1001";
     private const string OtherSid = "S-1-5-21-1111111111-2222222222-3333333333-1002";
 
+    /// <summary>The restarts a walk is handed, with a pause that does not wait.</summary>
+    private static WalkRestarts NoPause() => new(_ => { });
+
     [Fact]
     public void Every_instance_of_one_code_comes_back_with_its_own_account_and_context()
     {
@@ -36,7 +40,7 @@ public class InstallerQueryServiceProductInstanceTests
             (UserSid, MsiInstallContext.UserUnmanaged),
             (OtherSid, MsiInstallContext.UserManaged));
 
-        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA);
+        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA, NoPause());
 
         Assert.False(resolved.Unaskable);
         Assert.Equal(
@@ -58,7 +62,7 @@ public class InstallerQueryServiceProductInstanceTests
         var msi = new ScriptedMsiProducts();
         msi.Installed(ProductA);
 
-        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA);
+        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA, NoPause());
 
         Assert.False(resolved.Unaskable);
         Assert.Equal(new[] { ((string?)null, MsiInstallContext.Machine) }, resolved.Instances);
@@ -76,7 +80,7 @@ public class InstallerQueryServiceProductInstanceTests
         var msi = new ScriptedMsiProducts();
         msi.NotInstalled(ProductA, absence);
 
-        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA);
+        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA, NoPause());
 
         Assert.False(resolved.Unaskable);
         Assert.Empty(resolved.Instances);
@@ -93,7 +97,7 @@ public class InstallerQueryServiceProductInstanceTests
         msi.Installed(ProductA, (null, MsiInstallContext.Machine), (UserSid, MsiInstallContext.UserUnmanaged));
         msi.AnswersAtRow(ProductA, index: 1, MsiError.AccessDenied);
 
-        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA);
+        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA, NoPause());
 
         Assert.True(resolved.Unaskable);
         Assert.Empty(resolved.Instances);
@@ -105,7 +109,7 @@ public class InstallerQueryServiceProductInstanceTests
         var msi = new ScriptedMsiProducts();
         msi.Answers(ProductA, MsiError.AccessDenied);
 
-        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA);
+        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA, NoPause());
 
         Assert.True(resolved.Unaskable);
         Assert.Empty(resolved.Instances);
@@ -133,7 +137,7 @@ public class InstallerQueryServiceProductInstanceTests
         msi.Installed(ProductA,
             Enumerable.Repeat(((string?)null, MsiInstallContext.Machine), 10_000).ToArray());
 
-        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA);
+        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA, NoPause());
 
         Assert.True(resolved.Unaskable);
         Assert.Empty(resolved.Instances);
@@ -149,7 +153,7 @@ public class InstallerQueryServiceProductInstanceTests
         var msi = new ScriptedMsiProducts();
         msi.Installed(ProductA, (null, MsiInstallContext.Machine), (UserSid, MsiInstallContext.UserUnmanaged));
 
-        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA);
+        var resolved = InstallerQueryService.ResolveProductInstances(msi, ProductA, NoPause());
 
         Assert.Equal(2, resolved.Instances.Count);
         Assert.Equal(new[] { ProductA }, msi.Asked);

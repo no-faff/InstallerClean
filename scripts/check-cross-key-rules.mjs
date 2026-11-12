@@ -407,6 +407,13 @@ const RAW_READ_ALLOWED = [
       + 'assert against is read through Strings.Get.',
   },
   {
+    file: 'src/InstallerClean.Tests/Helpers/AccessKeyTextTests.cs',
+    reason: 'Reads each confirmation label from one culture\'s own resource set, with '
+      + 'tryParents false, to show the label the door gives is that language\'s own '
+      + 'and not the English it would fall back to. No door answers without the '
+      + 'fallback. The label it asserts against is read through Strings.Get.',
+  },
+  {
     file: 'src/InstallerClean.Tests/Helpers/LinkPhraseCompositionTests.cs',
     reason: 'Enumerates the neutral resource set to derive which sentences carry a '
       + 'link phrase from the English punctuation, the way linkKeys below is built. A '

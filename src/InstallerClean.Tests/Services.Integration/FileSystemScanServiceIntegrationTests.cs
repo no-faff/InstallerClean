@@ -498,7 +498,9 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         // equivalence the single pass rests on, asserted against .NET 10's pattern
         // matcher (FrameworkDirectory's port of it) rather than argued: the names
         // below are the ones where a pattern and an extension test could plausibly
-        // disagree.
+        // disagree. The port and the walk list through the same enumerator, so the
+        // names both must find are also written out: a fault in that enumerator
+        // drops a name from both sides alike.
         var names = new[]
         {
             "a.msi", "b.msp", "UPPER.MSI", "MiXeD.MsP", ".msi",
@@ -523,6 +525,9 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
             .ToList();
 
         Assert.Equal(byPattern, walked);
+        Assert.Equal(
+            new[] { ".msi", "MiXeD.MsP", "UPPER.MSI", "a.msi", "b.msp" },
+            walked.Select(Path.GetFileName).OrderBy(n => n, StringComparer.Ordinal).ToArray());
 
         // And the size on each row is the file's own, now that it is carried
         // through from the directory entry instead of being read again.

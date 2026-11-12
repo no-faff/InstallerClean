@@ -276,12 +276,16 @@ jobs:
       # the window's scan carries no report.
       #
       # The window opens its main window only once its startup scan has finished, behind a
-      # splash that WPF gives a hidden owner (ShowInTaskbar is off), so Process.MainWindowHandle,
-      # which takes only a visible window with no owner, finds nothing until the main window.
-      # The step prints, for 3.7.0's release and for this build, how long a command-line scan
-      # takes on this runner, and how long each window takes to show its first window and its
-      # main window, so the time a user waits for the window reads beside the scan's own cost
-      # and beside 3.7.0's. It fails where the main window is not up within 120 s.
+      # splash that WPF gives a hidden owner (ShowInTaskbar is off, in 3.7.0 as here), so
+      # Process.MainWindowHandle, which takes only a visible window with no owner, finds
+      # nothing until the main window. The step prints, for 3.7.0's release and for this
+      # build, how long a command-line scan takes on this runner, and how long each window
+      # takes to show its first window and its main window, so the time a user waits for the
+      # window reads beside the scan's own cost and beside 3.7.0's. A scan by this build runs
+      # first and is not timed, so every timed run reads the Installer folder from the same
+      # warm cache. The step fails where this build's main window is not up within 120 s, or
+      # comes up more than half as late again as 3.7.0's and more than 5 s after it. Where
+      # 3.7.0's release does not download, the comparison is left out and said so.
       - name: Check each exe starts with nothing in the crash log about its library search
         if: success() || failure()
         shell: pwsh
@@ -337,7 +341,8 @@ jobs:
           }
 
           # The window started, timed to its first visible window and to its main window,
-          # then closed. Returns whether the main window came up.
+          # then closed. Returns the seconds to the main window, or null where it did not
+          # come up.
           function Time-Window([string]$label, [string]$exe) {
             $clock = [Diagnostics.Stopwatch]::StartNew()
             $p = Start-Process -FilePath $exe -PassThru
@@ -351,14 +356,14 @@ jobs:
               Start-Sleep -Milliseconds 100
             }
             $firstText = if ($null -ne $first) { "$([math]::Round($first, 1)) s" } else { 'never' }
-            $up = $false
+            $up = $null
             if ($p.HasExited) {
               Write-Host "${label}: the window exited by itself with $($p.ExitCode) before its main window was up (first window: $firstText)."
             } elseif ($p.MainWindowHandle -eq [IntPtr]::Zero) {
               Write-Host "${label}: no main window within 120 s (first window: $firstText)."
             } else {
               Write-Host "${label}: first window $firstText, main window $([math]::Round($clock.Elapsed.TotalSeconds, 1)) s after the start: $($p.MainWindowTitle)"
-              $up = $true
+              $up = $clock.Elapsed.TotalSeconds
             }
             if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null }
             return $up
@@ -369,18 +374,25 @@ jobs:
           $window = 'src/InstallerClean/bin/Debug/net48/InstallerClean.exe'
           if (-not (Test-Path $window)) { throw "There is no $window to start." }
 
+          $null = Time-Scan 'warm-up' $cli
           $released = Join-Path $env:RUNNER_TEMP 'release-3.7.0'
           gh release download v3.7.0 --repo $env:GITHUB_REPOSITORY --pattern installerclean-cli.exe --pattern InstallerClean-portable.exe --dir $released
-          if ($LASTEXITCODE -ne 0) { throw "3.7.0's release did not download." }
-          Time-Scan '3.7.0' (Join-Path $released 'installerclean-cli.exe')
+          $haveRelease = $LASTEXITCODE -eq 0
+          if (-not $haveRelease) { "3.7.0's release did not download, so nothing below is compared with it." }
+          if ($haveRelease) { Time-Scan '3.7.0' (Join-Path $released 'installerclean-cli.exe') }
           Time-Scan 'this build' $cli
-          $null = Time-Window '3.7.0' (Join-Path $released 'InstallerClean-portable.exe')
+          $releasedUp = if ($haveRelease) { Time-Window '3.7.0' (Join-Path $released 'InstallerClean-portable.exe') } else { $null }
 
           $before = (Entries).Count
           $out = & $cli --version 2>&1
           "installerclean-cli --version exited $LASTEXITCODE and printed: $out"
           if ($LASTEXITCODE -ne 0) { $failed = $true }
-          if (-not (Time-Window 'this build' $window)) { $failed = $true }
+          $up = Time-Window 'this build' $window
+          if ($null -eq $up) { $failed = $true }
+          elseif ($null -ne $releasedUp -and $up -gt 1.5 * $releasedUp -and $up -gt $releasedUp + 5) {
+            "This build's main window came up $([math]::Round($up, 1)) s after its start, against 3.7.0's $([math]::Round($releasedUp, 1)) s."
+            $failed = $true
+          }
 
           $new = @(Entries | Select-Object -Skip $before)
           foreach ($line in $new) { "crash.log: $line" }
@@ -460,11 +472,16 @@ jobs:
             $full = (Resolve-Path $exe).Path
             "sha256 $exe = $((Get-FileHash -Algorithm SHA256 $full).Hash)"
             $name = [System.Reflection.AssemblyName]::GetAssemblyName($full)
-            $target = [System.Reflection.Assembly]::ReflectionOnlyLoadFrom($full).GetCustomAttributesData() |
-              Where-Object { $_.AttributeType.Name -eq 'TargetFrameworkAttribute' } |
-              ForEach-Object { $_.ConstructorArguments[0].Value }
-            "$exe is $($name.Version), target framework $target"
-            if ($target -notmatch 'v4\.8') { "  NOT v4.8"; $failed = $true }
+            # ILRepack keeps only the primary assembly's custom attributes, so the one
+            # TargetFrameworkAttribute left is the window's or the command line's, and its
+            # value string sits in the exe's metadata. The merged package assemblies
+            # (net462, netstandard) are dropped, so ".NETFramework,Version=v4.8" is that
+            # attribute and nothing else. A one-byte-per-char read finds it without loading
+            # the assembly, which PowerShell 7 cannot do for a .NET Framework exe.
+            $metadata = [System.Text.Encoding]::Latin1.GetString([System.IO.File]::ReadAllBytes($full))
+            $carries48 = $metadata.Contains('.NETFramework,Version=v4.8')
+            "$exe is $($name.Version), carries the 4.8 target-framework attribute: $carries48"
+            if (-not $carries48) { "  the merge dropped the 4.8 target-framework attribute"; $failed = $true }
           }
           # The command line is the one that starts without a window. A clean start
           # leaves no library-search line in the crash log.

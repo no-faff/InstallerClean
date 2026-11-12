@@ -99,6 +99,8 @@
     <EmbeddedResource Include="..\InstallerClean\AboutWindow.xaml" LogicalName="ThemeXaml.AboutWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\Controls\ScoopCommandBox.xaml" LogicalName="ThemeXaml.ScoopCommandBox.xaml" />
     <EmbeddedResource Include="..\InstallerClean\SplashWindow.xaml" LogicalName="ThemeXaml.SplashWindow.xaml" />
+    <!-- The report FixedReport builds, as .NET 10 writes it (Models/FixedReportBytesTests). -->
+    <EmbeddedResource Include="Models\FixedReport.net10.json" LogicalName="FixedReport.net10.json" />
   </ItemGroup>
 
   <ItemGroup>
