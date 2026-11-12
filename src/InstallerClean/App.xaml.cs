@@ -214,7 +214,11 @@ public partial class App : Application
         // somebody else wrote, which on .NET Framework the runtime reads. A config beside
         // the setup's copy is not refused. Refused here, in the language the user chose and
         // before anything scans, and read here rather than in a module initializer, which
-        // reaches System.IO and the registry.
+        // reaches System.IO and the registry. The replace request above runs first and
+        // reads no section of the config: it moves files, starts a process and writes to
+        // the Application log, and .NET Framework reads none of those from the config. A
+        // network request, a trace or a section of the app's own would, so none of them
+        // may join the replace without this check moving above it.
         if (PlantedConfig.RefusalMessage(Environment.ProcessPath, new RegistryReader()) is { } plantedConfig)
         {
             MessageDialog.Show(plantedConfig, Strings.Startup_ErrorTitle, MessageKind.Error);
