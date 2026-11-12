@@ -5,6 +5,10 @@
 // build with RS0030.
 M:Microsoft.Win32.RegistryKey.GetSubKeyNames;Use RegistryNames.SubKeysOf, which lists the key as .NET 10 does
 M:Microsoft.Win32.RegistryKey.GetValueNames;Use RegistryNames.ValuesOf, which lists the key as .NET 10 does
+M:Microsoft.Win32.RegistryKey.GetValue(System.String);Use RegistryData.ValueOf, which reads the value as .NET 10 does: in one call, and a number only at exactly 4 or 8 bytes
+M:Microsoft.Win32.RegistryKey.GetValue(System.String,System.Object);Use RegistryData.ValueOf, which reads the value as .NET 10 does: in one call, and a number only at exactly 4 or 8 bytes
+M:Microsoft.Win32.RegistryKey.GetValue(System.String,System.Object,Microsoft.Win32.RegistryValueOptions);Use RegistryData.ValueOf, which reads the value as .NET 10 does: in one call, and a number only at exactly 4 or 8 bytes
+M:Microsoft.Win32.Registry.GetValue(System.String,System.String,System.Object);Use RegistryData.ValueOf on an opened subkey, which reads the value as .NET 10 does
 M:System.IO.Path.Combine(System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does
 M:System.IO.Path.Combine(System.String,System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does
 M:System.IO.Path.Combine(System.String,System.String,System.String,System.String);Use PathText.Combine, which joins the parts as .NET 10 does

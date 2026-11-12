@@ -236,6 +236,7 @@ messages its exceptions carry.
 
 They are in these files in src/InstallerClean.Core/: Helpers/PathText.cs,
 Helpers/FullPaths.cs, Helpers/Win32Marshal.cs, Helpers/RegistryNames.cs,
+Helpers/RegistryData.cs,
 Helpers/CommandLineArguments.cs, Helpers/Durations.cs, and in Compatibility/,
 FrameworkFile.cs, FrameworkFileInfo.cs, FrameworkFileSystem.cs,
 FrameworkFileSystemEnumerable.cs, FrameworkFileSystemName.cs,

@@ -128,6 +128,23 @@ internal static class Advapi32
         IntPtr lpData,
         IntPtr lpcbData);
 
+    /// <summary>
+    /// Writes the type and the data of the value <paramref name="lpValueName"/> names,
+    /// the default value where it is null, into <paramref name="lpType"/> and
+    /// <paramref name="lpData"/>, and the data's length in bytes into
+    /// <paramref name="lpcbData"/>, which goes in as the buffer's size. Answers
+    /// ERROR_SUCCESS, ERROR_MORE_DATA where the data does not fit, with the length it
+    /// needs, ERROR_FILE_NOT_FOUND where there is no such value, or another Win32 error.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "RegQueryValueExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    public static extern int RegQueryValueEx(
+        Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey,
+        string? lpValueName,
+        IntPtr lpReserved,
+        out int lpType,
+        [Out] byte[] lpData,
+        ref int lpcbData);
+
     /// <summary>OWNER_SECURITY_INFORMATION: ask for the owner.</summary>
     public const uint OWNER_SECURITY_INFORMATION = 0x00000001;
 
