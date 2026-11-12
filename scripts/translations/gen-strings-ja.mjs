@@ -569,6 +569,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `ファイルを移動する前に停止しました: InstallerClean は、ほかの InstallerClean が動作していないことを確認できなくなりました。同じコマンドをもう一度実行してください。終了コード75 (一時的)。`,
   'Cli.UpdateNoAnswer': `1 分たっても応答がないため、応答できる人がいない場合と同じく、確認なしで InstallerClean を更新します。`,
   'Cli.ReportNoAnswer': `1 分たっても応答がありませんでした。`,
+  'Startup.PlantedConfigRefusal': `InstallerClean の隣に {0} というファイルがあり、InstallerClean にはそのようなファイルが付属していないため、起動できません。そのファイルを削除してから、InstallerClean をもう一度起動してください。\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

@@ -358,6 +358,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Si è verificato un errore imprevisto e InstallerClean verrà chiuso.<br><br>{0}<br><br>Dettagli salvati in:<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Si è verificato un errore imprevisto e InstallerClean verrà chiuso.<br><br>{0}<br><br>Non è stato possibile scrivere il file crash.log. |
 | Startup error | Errore in avvio |
+| InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean non si avvia perché accanto ad esso c'è un file chiamato {0}, e InstallerClean non ne include nessuno. Elimina quel file, poi apri di nuovo InstallerClean.<br><br>{1} |
 | Failed to start ({0}). Details written to:<br>{1} | Avvio non riuscito ({0}). Dettagli salvati in:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Avvio non riuscito ({0}). Non è stato possibile scrivere il file crash.log. |
 | Administrator rights needed | Servono i diritti di amministratore |

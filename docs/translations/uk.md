@@ -358,6 +358,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Сталася неочікувана помилка, і InstallerClean потрібно закрити.<br><br>{0}<br><br>Деталі записано до:<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Сталася неочікувана помилка, і InstallerClean потрібно закрити.<br><br>{0}<br><br>Не вдалося записати журнал збоїв. |
 | Startup error | Помилка запуску |
+| InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean не запуститься, тому що поруч із ним є файл з назвою {0}, а InstallerClean не постачається з таким файлом. Видаліть цей файл, а потім знову запустіть InstallerClean.<br><br>{1} |
 | Failed to start ({0}). Details written to:<br>{1} | Не вдалося запустити ({0}). Деталі записано до:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Не вдалося запустити ({0}). Не вдалося записати журнал збоїв. |
 | Administrator rights needed | Потрібні права адміністратора |

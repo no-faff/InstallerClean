@@ -358,6 +358,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Er is een onverwachte fout opgetreden en InstallerClean moet worden afgesloten.<br><br>{0}<br><br>Details weggeschreven naar:<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Er is een onverwachte fout opgetreden en InstallerClean moet worden afgesloten.<br><br>{0}<br><br>Het crashlog kon niet worden weggeschreven. |
 | Startup error | Opstartfout |
+| InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean start niet omdat er naast het programma een bestand met de naam {0} staat, en InstallerClean wordt niet met zo'n bestand geleverd. Verwijder dat bestand en open InstallerClean daarna opnieuw.<br><br>{1} |
 | Failed to start ({0}). Details written to:<br>{1} | Starten mislukt ({0}). Details weggeschreven naar:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Starten mislukt ({0}). Het crashlog kon niet worden weggeschreven. |
 | Administrator rights needed | Administratorrechten nodig |

@@ -668,6 +668,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `Dihentikan sebelum memindahkan file apa pun: InstallerClean tidak bisa lagi memastikan bahwa tidak ada InstallerClean lain yang sedang bekerja. Jalankan perintah yang sama lagi. Kode keluar 75 (sementara).`,
   'Cli.UpdateNoAnswer': `Tidak ada jawaban setelah satu menit, jadi InstallerClean memperbarui tanpa bertanya, seperti saat tidak ada orang yang dapat menjawab.`,
   'Cli.ReportNoAnswer': `Tidak ada jawaban setelah satu menit.`,
+  'Startup.PlantedConfigRefusal': `InstallerClean tidak akan dimulai karena ada file bernama {0} di sebelahnya, dan InstallerClean tidak menyertakan file seperti itu. Hapus file itu, lalu buka InstallerClean lagi.\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

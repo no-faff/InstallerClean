@@ -358,6 +358,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | 發生未預期的錯誤，InstallerClean 必須關閉。<br><br>{0}<br><br>詳細資料已寫入：<br>{1} |
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | 發生未預期的錯誤，InstallerClean 必須關閉。<br><br>{0}<br><br>無法寫入當機記錄檔。 |
 | Startup error | 啟動錯誤 |
+| InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean 無法啟動，因為它旁邊有一個名為 {0} 的檔案，而 InstallerClean 本身並不附帶這樣的檔案。請刪除該檔案，然後再次執行 InstallerClean。<br><br>{1} |
 | Failed to start ({0}). Details written to:<br>{1} | 無法啟動（{0}）。詳細資料已寫入：<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | 無法啟動（{0}）。無法寫入當機記錄檔。 |
 | Administrator rights needed | 需要系統管理員權限 |

@@ -570,6 +570,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `Detenido antes de mover ningún archivo: InstallerClean ya no podía tener la certeza de que ningún otro InstallerClean estuviera actuando. Vuelve a ejecutar el mismo comando. Código de salida 75 (transitorio).`,
   'Cli.UpdateNoAnswer': `Sin respuesta tras un minuto, así que InstallerClean se actualiza sin preguntar, como cuando no hay nadie para responder.`,
   'Cli.ReportNoAnswer': `Sin respuesta tras un minuto.`,
+  'Startup.PlantedConfigRefusal': `InstallerClean no se iniciará porque hay un archivo llamado {0} junto a él, y InstallerClean no incluye ninguno. Elimina ese archivo y vuelve a abrir InstallerClean.\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

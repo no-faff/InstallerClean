@@ -537,6 +537,7 @@ const MAP = {
   'UpdateNotice.DownloadNetFramework48': `Скачать .NET Framework 4.8 с сайта Microsoft`,
   'Automation.UpdateNotice.DownloadNetFramework48': `Скачать .NET Framework 4.8 с сайта Microsoft`,
   'UpdateNotice.CheckingDownload': `Проверка скачанного файла...`,
+  'Startup.PlantedConfigRefusal': `InstallerClean не запустится, потому что рядом с ним находится файл с именем {0}, а InstallerClean не поставляется с таким файлом. Удалите этот файл, а затем снова запустите InstallerClean.\n\n{1}`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT

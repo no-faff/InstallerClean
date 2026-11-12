@@ -8662,6 +8662,24 @@
     },
     "Cli.EventLogMoveDestinationTooLong": {
       "ja": "505457e2e53b7c48"
+    },
+    "Startup.PlantedConfigRefusal": {
+      "de": "7f585a29ff4b0eb0",
+      "es": "7f585a29ff4b0eb0",
+      "fr": "7f585a29ff4b0eb0",
+      "id": "7f585a29ff4b0eb0",
+      "it": "7f585a29ff4b0eb0",
+      "ja": "7f585a29ff4b0eb0",
+      "ko": "7f585a29ff4b0eb0",
+      "nl": "7f585a29ff4b0eb0",
+      "pl": "7f585a29ff4b0eb0",
+      "pt-BR": "7f585a29ff4b0eb0",
+      "ru": "7f585a29ff4b0eb0",
+      "tr": "7f585a29ff4b0eb0",
+      "uk": "7f585a29ff4b0eb0",
+      "vi": "7f585a29ff4b0eb0",
+      "zh-Hans": "7f585a29ff4b0eb0",
+      "zh-Hant": "7f585a29ff4b0eb0"
     }
   }
 }

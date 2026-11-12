@@ -661,6 +661,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `Angehalten, bevor eine Datei verschoben wurde: InstallerClean konnte nicht mehr sicher sein, dass keine andere InstallerClean-Instanz tätig war. Führe denselben Befehl erneut aus. Exit-Code 75 (vorübergehend).`,
   'Cli.UpdateNoAnswer': `Keine Antwort nach einer Minute, also aktualisiert sich InstallerClean ohne zu fragen, wie wenn niemand da ist, der antworten kann.`,
   'Cli.ReportNoAnswer': `Keine Antwort nach einer Minute.`,
+  'Startup.PlantedConfigRefusal': `InstallerClean startet nicht, weil neben dem Programm eine Datei namens {0} liegt und InstallerClean keine solche Datei mitliefert. Lösche diese Datei und öffne InstallerClean dann erneut.\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

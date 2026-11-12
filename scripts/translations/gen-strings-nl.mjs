@@ -623,6 +623,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `Gestopt voordat er een bestand is verplaatst: InstallerClean kon niet langer zeker zijn dat geen andere InstallerClean bezig was. Voer dezelfde opdracht opnieuw uit. Exit 75 (tijdelijk).`,
   'Cli.UpdateNoAnswer': `Na een minuut geen antwoord, dus InstallerClean werkt bij zonder te vragen, zoals wanneer er niemand is om te antwoorden.`,
   'Cli.ReportNoAnswer': `Na een minuut geen antwoord.`,
+  'Startup.PlantedConfigRefusal': `InstallerClean start niet omdat er naast het programma een bestand met de naam {0} staat, en InstallerClean wordt niet met zo'n bestand geleverd. Verwijder dat bestand en open InstallerClean daarna opnieuw.\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

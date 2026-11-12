@@ -556,6 +556,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `在移動任何檔案之前已停止：InstallerClean 已無法確定沒有其他 InstallerClean 正在執行操作。請再次執行同一命令。結束代碼 75（暫時性）。`,
   'Cli.UpdateNoAnswer': `一分鐘內沒有回答，因此 InstallerClean 會像無人可回答時一樣，不詢問直接更新。`,
   'Cli.ReportNoAnswer': `一分鐘內沒有回答。`,
+  'Startup.PlantedConfigRefusal': `InstallerClean 無法啟動，因為它旁邊有一個名為 {0} 的檔案，而 InstallerClean 本身並不附帶這樣的檔案。請刪除該檔案，然後再次執行 InstallerClean。\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

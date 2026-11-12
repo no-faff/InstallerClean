@@ -548,6 +548,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `在移动任何文件之前已停止：InstallerClean 已无法确定没有其他 InstallerClean 正在操作。请再次运行同一命令。退出代码 75（暂时性）。`,
   'Cli.UpdateNoAnswer': `一分钟内没有回答，因此 InstallerClean 会像无人可回答时一样，不询问直接更新。`,
   'Cli.ReportNoAnswer': `一分钟内没有回答。`,
+  'Startup.PlantedConfigRefusal': `InstallerClean 无法启动，因为它旁边有一个名为 {0} 的文件，而 InstallerClean 本身并不附带这样的文件。请删除该文件，然后再次运行 InstallerClean。\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

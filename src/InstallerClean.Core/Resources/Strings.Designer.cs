@@ -495,6 +495,7 @@ public static class Strings
     public static string Startup_ErrorTitle => Get("Startup.ErrorTitle");
     public static string Startup_FailedToStart => Get("Startup.FailedToStart");
     public static string Startup_FailedToStart_NoLog => Get("Startup.FailedToStart.NoLog");
+    public static string Startup_PlantedConfigRefusal => Get("Startup.PlantedConfigRefusal");
     public static string Startup_UnhandledBody => Get("Startup.UnhandledBody");
     public static string Startup_UnhandledBody_NoLog => Get("Startup.UnhandledBody.NoLog");
     public static string Startup_UnhandledTitle => Get("Startup.UnhandledTitle");

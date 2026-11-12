@@ -662,6 +662,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `Зупинено до переміщення будь-якого файлу: InstallerClean більше не міг бути певним, що жоден інший InstallerClean не виконує дій. Запустіть ту саму команду ще раз. Вихід 75 (тимчасовий).`,
   'Cli.UpdateNoAnswer': `Відповіді немає вже хвилину, тому InstallerClean оновлюється без запитань, як під час запуску, коли відповідати нікому.`,
   'Cli.ReportNoAnswer': `Відповіді немає вже хвилину.`,
+  'Startup.PlantedConfigRefusal': `InstallerClean не запуститься, тому що поруч із ним є файл з назвою {0}, а InstallerClean не постачається з таким файлом. Видаліть цей файл, а потім знову запустіть InstallerClean.\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

@@ -643,6 +643,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `Đã dừng trước khi di chuyển bất kỳ tệp nào: InstallerClean không còn chắc chắn được rằng không có InstallerClean nào khác đang hoạt động. Hãy chạy lại cùng lệnh đó. Mã thoát 75 (tạm thời).`,
   'Cli.UpdateNoAnswer': `Không có câu trả lời sau một phút, nên InstallerClean cập nhật mà không hỏi, như khi không có ai ở đó để trả lời.`,
   'Cli.ReportNoAnswer': `Không có câu trả lời sau một phút.`,
+  'Startup.PlantedConfigRefusal': `InstallerClean không khởi động được vì có một tệp tên {0} nằm cạnh nó, mà InstallerClean không đi kèm tệp nào như vậy. Hãy xóa tệp đó, rồi chạy lại InstallerClean.\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

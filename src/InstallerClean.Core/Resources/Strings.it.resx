@@ -1619,6 +1619,16 @@ Dettagli salvati in:
 
 Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Startup.ErrorTitle" xml:space="preserve"><value>Errore in avvio</value></data>
+  <!-- 0 = the config file's name (the exe's name followed by .config); 1 = its full
+       path, on its own line below the sentence. Shown by the window under
+       Startup.ErrorTitle and printed by the command line, both verbatim, when a
+       .exe.config sits beside a copy that did not ship one: the portable and the
+       command line carry no config, so one beside either of them is a file the copy
+       did not create (PlantedConfig). InstallerClean is the app name and is not
+       translated. -->
+  <data name="Startup.PlantedConfigRefusal" xml:space="preserve"><value>InstallerClean non si avvia perché accanto ad esso c'è un file chiamato {0}, e InstallerClean non ne include nessuno. Elimina quel file, poi apri di nuovo InstallerClean.
+
+{1}</value></data>
   <!-- 0 = exception type name (see Startup.UnhandledBody for why this
        is the type name and not the message), 1 = crash log path. -->
   <data name="Startup.FailedToStart" xml:space="preserve"><value>Avvio non riuscito ({0}). Dettagli salvati in:

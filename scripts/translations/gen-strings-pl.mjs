@@ -684,6 +684,7 @@ const MAP = {
   'Cli.CoverLostNoWorkMove': `Zatrzymano przed przeniesieniem jakiegokolwiek pliku: InstallerClean nie mógł już mieć pewności, że żaden inny InstallerClean nie działa. Uruchom to samo polecenie ponownie. Kod zakończenia 75 (stan przejściowy).`,
   'Cli.UpdateNoAnswer': `Brak odpowiedzi po minucie, więc InstallerClean aktualizuje się bez pytania, tak jak wtedy, gdy nie ma kto odpowiedzieć.`,
   'Cli.ReportNoAnswer': `Brak odpowiedzi po minucie.`,
+  'Startup.PlantedConfigRefusal': `InstallerClean nie uruchomi się, ponieważ obok niego znajduje się plik o nazwie {0}, a InstallerClean nie jest dostarczany z takim plikiem. Usuń ten plik, a następnie uruchom InstallerClean ponownie.\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

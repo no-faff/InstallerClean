@@ -1619,6 +1619,16 @@ InstallerClean 本來就是以系統管理員身分執行，所以再用這種�
 
 無法寫入當機記錄檔。</value></data>
   <data name="Startup.ErrorTitle" xml:space="preserve"><value>啟動錯誤</value></data>
+  <!-- 0 = the config file's name (the exe's name followed by .config); 1 = its full
+       path, on its own line below the sentence. Shown by the window under
+       Startup.ErrorTitle and printed by the command line, both verbatim, when a
+       .exe.config sits beside a copy that did not ship one: the portable and the
+       command line carry no config, so one beside either of them is a file the copy
+       did not create (PlantedConfig). InstallerClean is the app name and is not
+       translated. -->
+  <data name="Startup.PlantedConfigRefusal" xml:space="preserve"><value>InstallerClean 無法啟動，因為它旁邊有一個名為 {0} 的檔案，而 InstallerClean 本身並不附帶這樣的檔案。請刪除該檔案，然後再次執行 InstallerClean。
+
+{1}</value></data>
   <!-- 0 = exception type name (see Startup.UnhandledBody for why this
        is the type name and not the message), 1 = crash log path. -->
   <data name="Startup.FailedToStart" xml:space="preserve"><value>無法啟動（{0}）。詳細資料已寫入：

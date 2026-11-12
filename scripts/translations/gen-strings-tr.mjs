@@ -569,6 +569,7 @@ Ayrıntılar şuraya yazıldı:
   'Cli.CoverLostNoWorkMove': `Herhangi bir dosya taşınmadan önce durduruldu: InstallerClean, başka hiçbir InstallerClean'in işlem yapmadığından artık emin olamadı. Aynı komutu yeniden çalıştırın. Çıkış 75 (geçici).`,
   'Cli.UpdateNoAnswer': `Bir dakika içinde yanıt gelmedi, bu yüzden InstallerClean, yanıtlayacak kimse olmadığında yaptığı gibi sormadan güncelleniyor.`,
   'Cli.ReportNoAnswer': `Bir dakika içinde yanıt gelmedi.`,
+  'Startup.PlantedConfigRefusal': `InstallerClean başlamıyor çünkü yanında {0} adlı bir dosya var ve InstallerClean böyle bir dosyayla gelmez. Bu dosyayı silin, ardından InstallerClean'i yeniden çalıştırın.\n\n{1}`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

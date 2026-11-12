@@ -1,3 +1,7 @@
+using InstallerClean.Compatibility;
+using InstallerClean.Helpers;
+using InstallerClean.Resources;
+
 namespace InstallerClean.Services;
 
 /// <summary>
@@ -32,5 +36,22 @@ internal static class PlantedConfig
     {
         if (string.IsNullOrEmpty(configPath) || !configExists) return false;
         return !AppCopy.IsSetupFolder(exeFolder, setup);
+    }
+
+    /// <summary>
+    /// The message to show the user and then end the process, with the config file's name
+    /// and its full path filled in, or null where the copy may start. Each host calls this
+    /// from its start, never from a module initializer: it reads the config path the runtime
+    /// bound and whether the file is on disk, which reach System.IO and the registry. The
+    /// window shows it under <see cref="Strings"/>' <c>Startup.ErrorTitle</c> and the command
+    /// line prints it.
+    /// </summary>
+    internal static string? RefusalMessage(string? exePath, IRegistryReader registry)
+    {
+        var configPath = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
+        var exeFolder = string.IsNullOrEmpty(exePath) ? string.Empty : PathText.GetDirectoryName(exePath) ?? string.Empty;
+        var exists = !string.IsNullOrEmpty(configPath) && FrameworkFile.Exists(configPath);
+        if (!RefuseToStart(configPath, exists, exeFolder, AppCopy.ReadSetupRecord(registry))) return null;
+        return string.Format(Strings.Get("Startup.PlantedConfigRefusal"), PathText.GetFileName(configPath), configPath);
     }
 }

@@ -34,6 +34,16 @@ internal static class Program
     {
         InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
 
+        // The command line ships no .exe.config, so one beside it is a file it did not
+        // create, which on .NET Framework the runtime would read. Refuse before anything
+        // else runs, printing the message and ending; the setup's copy ships its own
+        // config and is not refused. Read here, never in a module initializer.
+        if (PlantedConfig.RefusalMessage(Environment.ProcessPath, new RegistryReader()) is { } plantedConfig)
+        {
+            Console.Error.WriteLine(plantedConfig);
+            return ExitError;
+        }
+
         // A newer version a copy downloaded, started to put itself at that copy's path once
         // the copy has ended, does that and nothing else, printing nothing: it runs with no
         // console of its own. Exit code 0 where the newer version is in place, 1 otherwise,
