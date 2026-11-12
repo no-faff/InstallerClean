@@ -246,8 +246,8 @@ FrameworkStringExtensions.cs, FrameworkCollectionExtensions.cs,
 FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
 ConfigureAwaitOptions.cs, TaskCompletionSource.cs, FrameworkTask.cs,
-FrameworkProcess.cs, FrameworkRuntimeInformation.cs and
-FrameworkCultureDisplayName.cs; and,
+FrameworkProcess.cs, FrameworkRuntimeInformation.cs,
+FrameworkCultureDisplayName.cs and WindowsIcu.cs; and,
 for the tests, src/InstallerClean.Tests/Compatibility/TestFramework.cs.
 
 Its licence, LICENSE.TXT in that repository at that tag:
