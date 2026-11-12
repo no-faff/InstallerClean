@@ -1,496 +1,307 @@
-# Fails (exit 1) where the shipped code can reach a Windows library by a search no resolver
-# of ours answers, read from the four single-file bundles build-and-test publishes.
+# Fails (exit 1) where a merged exe can load a library from anywhere but System32 or the
+# framework's own folders, read from the two exes build-and-test merges (publish/window and
+# publish/cli). Each exe is one assembly: ILRepack has folded Core and every package into
+# it, so its own metadata is the whole of the code that can ask Windows for a library.
 #
-# Core and the command line declare their P/Invokes in InstallerClean.Interop.Native, where
-# the resolver loads each library from System32. CoreLib's own ole32.dll and oleaut32.dll
-# imports are bound by the runtime's own search instead, which looks in the folder CoreLib was
-# loaded from before it looks in System32. So:
+# For each exe the step holds:
 #
-#  - A call from Core or the command line into a framework method that reaches one of those
-#    CoreLib imports fails, unless an entry below names that caller and that callee and says
-#    why the import is not reached at run time. Each hit prints one path to the import, and a
-#    listed callee whose reach in the set differs from the one its reason was read against
-#    fails, printing every member it now reaches.
-#    The window's InstallerClean.dll is held to CoreLib and the packages alone: WPF itself
-#    calls CoreLib's ole32 and oleaut32 imports at start-up.
-#  - CoreLib's imports of user32.dll, shell32.dll, crypt32.dll and normaliz.dll are bound by the
-#    runtime's own search too, which looks in the folder CoreLib was loaded from before System32.
-#    A call from Core or the command line to a framework method with a path of at most four
-#    members to one of them fails, the import counted as a member, and no entry below covers it.
-#    That is a framework method that calls the import or calls a method that does, or one more
-#    beyond that, such as Environment.UserInteractive calling user32's GetProcessWindowStation.
-#    A route of more members, through task, thread pool or stream code, is for the
-#    native-libraries job, which runs the builds and sees the look. So are CoreLib's imports of
-#    the libraries every process has loaded before its first line runs, such as kernel32.dll
-#    and ntdll.dll.
-#  - A P/Invoke outside InstallerClean.Interop.Native fails, and so does any NativeLibrary
-#    call other than SetDllImportResolver unless it is listed below.
-#  - The package assemblies each framework-dependent bundle carries are pinned by name with
-#    the libraries they import, and the self-contained bundle beside it must carry the same
-#    bytes.
-#  - A reference to System.Net.Quic from our code or a package fails.
+#  - The assembly carries DefaultDllImportSearchPaths(System32), so every import in the
+#    merged code searches System32 alone, and no declaration sets a search of its own.
+#  - Every P/Invoke is declared in InstallerClean.Interop.Native and names a library on the
+#    list below. A package that brings an import of its own, or a new library, fails.
+#  - The imports that load a library by name are the two listed, from the callers listed:
+#    SetDefaultDllDirectories, which only SystemLibraries.SearchSystem32For takes the address
+#    of, and LoadLibraryExW, whose every call passes LOAD_LIBRARY_SEARCH_SYSTEM32 and no other
+#    folder flag. A declaration of SetDllDirectory, AddDllDirectory, LoadLibrary, LdrLoadDll or
+#    any other way in fails.
+#  - No code calls Assembly.LoadFrom, LoadFile, UnsafeLoadFrom or LoadWithPartialName, Load
+#    by name or AssemblyName, Activator.CreateInstanceFrom, or an AppDomain method that
+#    loads from a file or a name, each of which can take an assembly from the exe's folder.
+#  - The exe references .NET Framework's own assemblies and nothing else. A reference to
+#    anything else is an assembly the merge left out, which the runtime would look for in the
+#    folder the exe runs from.
+#  - The merged module's static constructor, which runs before Main, makes as its first call
+#    one that reaches SystemLibraries.SearchSystem32For, the call that sets the process's
+#    library search to System32.
 #
-# The framework is read out of the bundles: a self-contained bundle carries its whole
-# framework, and a framework-dependent one is judged against its self-contained sibling's,
-# the framework the release is built with. A virtual or interface call is not followed to the
-# overrides it can reach (NativeImports.cs says why), so a route through one is for the
-# native-libraries job, which runs the builds and sees the look.
+# Every run also checks itself: an assembly built here with each of those faults, which must
+# report every one, and one built without them, which must report none. A missing exe, an
+# exe that reads no imports, or a control that reports nothing fails the step.
 #
-# Every run also checks itself: known members in and out of each framework set, among them one
-# at the depth limit and one beyond it, and a planted assembly built here holding one of each fault,
-# judged by the same code as ours against the command line's sets and the window's, every fault
-# of which must be reported. An entry or a
-# listed call that matches nothing fails, as stale.
+# What a started exe loads, and from where, is the native-libraries job's: it runs each exe
+# with Process Monitor recording and plants a file at every name the exe loads or looks for.
 #
-# Run from the repo root after the four publishes: pwsh scripts/check-native-imports.ps1
+# Run from the repo root after the two merged builds: pwsh scripts/check-native-imports.ps1
 param([string]$PublishRoot = 'publish')
 
 $ErrorActionPreference = 'Stop'
 Add-Type -Path (Join-Path $PSScriptRoot 'NativeImports.cs') -ReferencedAssemblies System.Reflection.Metadata, System.Collections,
-  System.Linq, System.Runtime, System.Collections.Immutable, System.IO.Compression, System.Security.Cryptography, System.Memory
+  System.Linq, System.Runtime, System.Collections.Immutable, System.Security.Cryptography, System.Memory
 
 $failures = [System.Collections.Generic.List[string]]::new()
 function Fail([string]$message) { $failures.Add($message); Write-Host "::error::$message" }
 
-# The .NET version the entries' source lines were read at.
-$citedVersion = '10.0.13'
+# DllImportSearchPath.System32, and the flags of LoadLibraryEx that choose a folder to search.
+$system32 = 0x800
+$libraryFolderFlags = 0x1F00
 
-# The CoreLib imports the runtime binds by its own search that are not reached through ole32 or
-# oleaut32, and the most members a path to one may have, the import counted, for a call to be
-# reported.
-$nearLibraries = [string[]]('user32.dll', 'shell32.dll', 'crypt32.dll', 'normaliz.dll')
-$nearDepth = 4
+$searchCall = 'InstallerClean.Interop.Native.SystemLibraries::SearchSystem32For(System.Reflection.Assembly)'
 
-$bundles = @(
-  [pscustomobject]@{ Label = 'command line'; Path = 'cli/installerclean-cli.exe'; Ours = @('InstallerClean.Core', 'installerclean-cli'); Sibling = $null }
-  [pscustomobject]@{ Label = 'command line, framework-dependent'; Path = 'cli-framework-dependent/installerclean-cli.exe'; Ours = @('InstallerClean.Core', 'installerclean-cli'); Sibling = 'command line' }
-  [pscustomobject]@{ Label = 'portable'; Path = 'self-contained/InstallerClean.exe'; Ours = @('InstallerClean.Core', 'InstallerClean'); Sibling = $null }
-  [pscustomobject]@{ Label = 'slim'; Path = 'framework-dependent/InstallerClean.exe'; Ours = @('InstallerClean.Core', 'InstallerClean'); Sibling = 'portable' }
+# The libraries the exes' own P/Invokes name.
+$libraries = 'advapi32.dll', 'dwmapi.dll', 'kernel32.dll', 'msi.dll', 'ntdll.dll', 'ole32.dll', 'oleaut32.dll', 'shell32.dll', 'user32.dll'
+
+# The imports that load a library by name or set where one is searched for, by entry point,
+# each with the members that may call it. SetDefaultDllDirectories is taken by address.
+$loaders = [ordered]@{
+  'SetDefaultDllDirectories' = @($searchCall)
+  'LoadLibraryExW' = @('InstallerClean.Compatibility.FrameworkCultureDisplayName+Icu::Load()')
+}
+$loaderPattern = '^(LoadLibrary|LoadPackagedLibrary|LdrLoadDll|SetDllDirectory|AddDllDirectory|RemoveDllDirectory|SetDefaultDllDirectories)'
+
+# Calls that take an assembly from a file or by a name the runtime searches the exe's folder for.
+$managedLoadPattern = '^(System\.Reflection\.Assembly::(LoadFrom|LoadFile|UnsafeLoadFrom|LoadWithPartialName)\(|' +
+  'System\.Reflection\.Assembly::Load\((String|System\.Reflection\.AssemblyName)|' +
+  'System\.Activator::CreateInstanceFrom\(|' +
+  'System\.AppDomain::(ExecuteAssembly|ExecuteAssemblyByName|CreateInstanceFrom|CreateInstanceFromAndUnwrap)\(|' +
+  'System\.AppDomain::Load\((String|System\.Reflection\.AssemblyName))'
+
+# The .NET Framework 4.8 assemblies each exe binds to.
+$frameworkReferences = 'mscorlib', 'netstandard', 'System', 'System.Core', 'System.Net.Http', 'System.Numerics', 'System.ValueTuple'
+$exes = @(
+  [pscustomobject]@{ Label = 'window'; Path = 'window/InstallerClean.exe'
+    References = $frameworkReferences + 'PresentationCore', 'PresentationFramework', 'System.ComponentModel.DataAnnotations', 'System.Xaml', 'UIAutomationProvider', 'UIAutomationTypes', 'WindowsBase' }
+  [pscustomobject]@{ Label = 'command line'; Path = 'cli/installerclean-cli.exe'; References = $frameworkReferences }
 )
-$ours = 'InstallerClean.Core', 'installerclean-cli', 'InstallerClean'
 
-# Each entry names the calls it covers, by caller and callee as this script keys them, the
-# reason the CoreLib imports the callee reaches are not reached at run time, and what the callee
-# reaches in the set when the reason was read: a count and a hash of the members. The step prints
-# the members whenever that changes, so a new route is read against the reason before it passes.
-$entries = @(
-  [pscustomobject]@{
-    Calls = @(, @('[InstallerClean.Core]InstallerClean.Services.ProcessStartRetry::Start(System.Diagnostics.ProcessStartInfo,System.Func`2<System.Exception,Boolean>,System.Action`1<System.TimeSpan>)', 'System.Diagnostics.Process::Start(System.Diagnostics.ProcessStartInfo)'))
-    Reason = 'StartWithCreateProcess reaches CoTaskMemAlloc only through SecureStringToGlobalAllocUnicode, called where ' +
-      'ProcessStartInfo.UserName is not empty and Password is set (Process.Windows.cs:527, :552-553). UserName defaults to empty ' +
-      '(ProcessStartInfo.cs:157-160) and no ProcessStartInfo the app passes to Process.Start sets UserName or Password. Read at .NET v10.0.13.'
-    Reach = @{ 'System.Diagnostics.Process::Start(System.Diagnostics.ProcessStartInfo)' = '10 members, e257c9f191611a3d' }
+# What an assembly is judged against: the libraries its imports may name, the assemblies it may
+# reference and the members that may call each loader.
+function New-Policy($references, $callers) {
+  [pscustomobject]@{ Libraries = $libraries; References = $references; Callers = $callers }
+}
+
+# Every fault the assembly shows against the policy, each as a sentence. Answers an empty list
+# for an assembly with none.
+function Get-Findings($assembly, $policy) {
+  $found = [System.Collections.Generic.List[string]]::new()
+
+  if ($null -eq $assembly.SearchPaths) { $found.Add("$($assembly.Name) carries no DefaultDllImportSearchPaths, so its imports search the folder it runs from first.") }
+  elseif ($assembly.SearchPaths -ne $system32) { $found.Add("$($assembly.Name) carries DefaultDllImportSearchPaths $($assembly.SearchPaths), where it should carry System32 ($system32).") }
+
+  foreach ($import in $assembly.Imports) {
+    $name = "$($import.Type) $($import.Library)!$($import.EntryPoint)"
+    if (($import.Type -split '\+')[0] -notmatch '^InstallerClean\.Interop\.Native\.[^.]+$') { $found.Add("P/Invoke outside InstallerClean.Interop.Native: $name.") }
+    if ($import.Library.ToLowerInvariant() -notin $policy.Libraries) { $found.Add("P/Invoke of a library not on the list: $name.") }
+    if ($null -ne $import.SearchPaths -and $import.SearchPaths -ne $system32) { $found.Add("P/Invoke with a library search of its own, $($import.SearchPaths): $name.") }
+    if ($import.EntryPoint -match $loaderPattern -and -not $loaders.Contains($import.EntryPoint)) { $found.Add("P/Invoke that loads a library or sets where one is searched for, not on the list: $name.") }
   }
-  [pscustomobject]@{
-    Calls = @(
-      @('InstallerClean.Services.UpdateCheckService::CreateShippingHandler()', 'System.Net.Http.HttpClientHandler::.ctor()'),
-      @('InstallerClean.Services.UpdateDownloadService::.ctor()', 'System.Net.Http.HttpClientHandler::.ctor()'),
-      @('InstallerClean.Services.ResultLogService::.cctor()', 'System.Net.Http.HttpClient::.ctor()'))
-    Reason = 'The constructor sets ClientCertificateOption.Manual (HttpClientHandler.cs:77), whose setter installs a certificate ' +
-      'selection callback calling CertificateHelper.GetEligibleClientCertificate with SslOptions.ClientCertificates (:275). That ' +
-      'returns null at once for a null or empty collection (CertificateHelper.cs:18-20), before the certificate reads that reach ' +
-      'FindOidInfo. The callback that reads the certificate store is installed only for ClientCertificateOption.Automatic (:282). ' +
-      'The app sets no client certificate and no ClientCertificateOptions. Read at .NET v10.0.13.'
-    Reach = @{
-      'System.Net.Http.HttpClientHandler::.ctor()' = '36 members, 7a4c4eac6f130118'
-      'System.Net.Http.HttpClient::.ctor()' = '37 members, bfcb3ce90bf62533'
+
+  foreach ($entry in $loaders.Keys) {
+    $declared = @($assembly.Imports | Where-Object { $_.EntryPoint -eq $entry })
+    if ($declared.Count -gt 1) { $found.Add("$entry is declared $($declared.Count) times.") }
+    foreach ($import in $declared) {
+      foreach ($call in @($assembly.Calls | Where-Object { $_.Callee -eq $import.Key })) {
+        if ($call.Caller -notin $policy.Callers[$entry]) { $found.Add("$($call.Caller) calls $entry, which only $($policy.Callers[$entry] -join ', ') may.") }
+        if ($entry -eq 'LoadLibraryExW') {
+          if ($null -eq $call.LastConstant) { $found.Add("$($call.Caller) calls LoadLibraryEx with flags that are not a constant.") }
+          elseif (($call.LastConstant -band $libraryFolderFlags) -ne $system32) { $found.Add("$($call.Caller) calls LoadLibraryEx with flags 0x$($call.LastConstant.ToString('X')), where the folder flags should be LOAD_LIBRARY_SEARCH_SYSTEM32 alone.") }
+        }
+      }
     }
   }
-  [pscustomobject]@{
-    Calls = @(, @('InstallerClean.Services.MsiFileInfoService::GetDigitalSignature(String)', 'System.Security.Cryptography.X509Certificates.X509Certificate::CreateFromSignedFile(String)'))
-    Reason = 'CreateFromSignedFile (X509Certificate.cs:240-243) takes a signed MSI or MSP through GetSignerInPKCS7Store ' +
-      '(CertificatePal.Windows.Import.cs:70-73). Only a file whose content is a PFX takes the PKCS#12 loader (:75-90), the one route ' +
-      'to Guid.NewGuid, and a PFX is not what Windows Installer keeps in its cache. Read at .NET v10.0.13.'
-    Reach = @{ 'System.Security.Cryptography.X509Certificates.X509Certificate::CreateFromSignedFile(String)' = '14 members, 832b37ef312d62bd' }
-  }
-)
 
-# The NativeLibrary calls Core may make, by caller and callee. SetDllImportResolver is printed
-# and not listed.
-$nativeLibraryCalls = @(
-  [pscustomobject]@{
-    Caller = '[InstallerClean.Core]InstallerClean.Interop.Native.SystemLibraries::LoadLibraryFromSystem32(String)'
-    Callees = @('System.Runtime.InteropServices.NativeLibrary::TryLoad(String,IntPtr&)', 'System.Runtime.InteropServices.NativeLibrary::TryGetExport(IntPtr,String,IntPtr&)')
-    Reason = 'loads kernel32.dll by its full path in Environment.SystemDirectory and takes LoadLibraryExW from it'
+  foreach ($call in @($assembly.Calls | Where-Object { $_.Callee -match $managedLoadPattern } | Sort-Object Caller, Callee -Unique)) {
+    $found.Add("$($call.Caller) calls $($call.Callee), which can load an assembly from the exe's own folder.")
   }
-)
 
-# The packages each framework-dependent bundle carries, with the libraries each imports, as a
-# Windows build carries them. The slim built on Windows carries no
-# System.Diagnostics.EventLog.Messages, which the desktop runtime supplies. That file carries no
-# version resource, and an SDK on Linux reads its version from the assembly instead, keeps the
-# package's copy and so builds a slim this list refuses.
-$packages = @{
-  'command line, framework-dependent' = [ordered]@{
-    'Microsoft.Extensions.DependencyInjection' = ''
-    'Microsoft.Extensions.DependencyInjection.Abstractions' = ''
-    'System.Diagnostics.EventLog' = 'advapi32.dll,kernel32.dll,wevtapi.dll'
-    'System.Diagnostics.EventLog.Messages' = ''
-    'System.IO.Abstractions' = ''
-    'TestableIO.System.IO.Abstractions' = ''
-    'TestableIO.System.IO.Abstractions.Wrappers' = ''
-    'Testably.Abstractions.FileSystem.Interface' = ''
+  foreach ($reference in $assembly.AssemblyReferences | Sort-Object -Unique) {
+    if ($reference -notin $policy.References) { $found.Add("$($assembly.Name) references $reference, which is not a .NET Framework assembly the exe is held to.") }
   }
-  'slim' = [ordered]@{
-    'CommunityToolkit.Mvvm' = ''
-    'Microsoft.Extensions.DependencyInjection' = ''
-    'Microsoft.Extensions.DependencyInjection.Abstractions' = ''
-    'System.IO.Abstractions' = ''
-    'TestableIO.System.IO.Abstractions' = ''
-    'TestableIO.System.IO.Abstractions.Wrappers' = ''
-    'Testably.Abstractions.FileSystem.Interface' = ''
+
+  $initializer = @($assembly.CallsOf('<Module>::.cctor()'))
+  if (-not $initializer.Count) { $found.Add("$($assembly.Name)'s module static constructor makes no call, so nothing sets the library search before Main.") }
+  elseif (-not $assembly.Reach($initializer[0].Callee, $searchCall)) {
+    $found.Add("$($assembly.Name)'s module static constructor makes as its first call $($initializer[0].Callee), which does not reach $searchCall.")
   }
+  $found
 }
-# The planted assembly: one of each fault, built here and judged as if it shipped.
-$fixtureSource = @'
+
+# The assemblies built here for the controls: one with none of the faults and one with all.
+$sources = @{
+  'good' = @'
 using System;
-using System.Net.Quic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
-namespace Planted;
+[assembly: DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
 
-public static partial class Faults
+namespace InstallerClean.Interop.Native
 {
-    public static Guid NewGuid() => Guid.NewGuid();
-    public static IntPtr Bstr(string value) => Marshal.StringToBSTR(value);
-    public static IntPtr Load() => NativeLibrary.Load("planted");
-    public static bool Quic() => QuicConnection.IsSupported;
-    public static object Kind(System.Diagnostics.Activity activity) => activity.Kind;
-    public static bool Interactive() => Environment.UserInteractive;
+    internal static class SystemLibraries
+    {
+        internal static void SearchSystem32For(Assembly exe) { }
+    }
 
-    [DllImport("planted", CharSet = CharSet.Unicode)]
-    internal static extern int Marshalled(string value);
+    internal static class Kernel32
+    {
+        [DllImport("kernel32.dll", EntryPoint = "SetDefaultDllDirectories", ExactSpelling = true)]
+        internal static extern bool SetDefaultDllDirectories(uint flags);
 
-    [LibraryImport("planted", StringMarshalling = StringMarshalling.Utf16)]
-    internal static partial int ReadName(out string name);
+        [DllImport("kernel32.dll", EntryPoint = "LoadLibraryExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        internal static extern IntPtr LoadLibraryEx(string name, IntPtr file, uint flags);
+    }
+}
+
+namespace Fixture
+{
+    internal static class Start
+    {
+        [ModuleInitializer]
+        internal static void Before() => InstallerClean.Interop.Native.SystemLibraries.SearchSystem32For(typeof(Start).Assembly);
+
+        internal static IntPtr Icu() => InstallerClean.Interop.Native.Kernel32.LoadLibraryEx("icu.dll", IntPtr.Zero, 0x800);
+
+        internal static Func<uint, bool> Set() => InstallerClean.Interop.Native.Kernel32.SetDefaultDllDirectories;
+    }
 }
 '@
-# The calls every set must report: two direct, one the LibraryImport generator writes, one
-# through a static constructor and one through the runtime's marshalling stub.
-$plantedNearCalls = , 'System.Environment::get_UserInteractive()'
-$plantedCalls = 'System.Guid::NewGuid()', 'System.Runtime.InteropServices.Marshal::StringToBSTR(String)',
-  'System.Runtime.InteropServices.Marshalling.Utf16StringMarshaller::Free(UInt16*)', 'System.Diagnostics.Activity::.cctor()',
-  'System.Runtime.InteropServices.Marshal::AllocCoTaskMem(Int32)'
-$fixtureFindings = [ordered]@{
-  'P/Invoke: Planted.Faults planted!ReadName' = $false
-  'P/Invoke: Planted.Faults planted!Marshalled' = $false
-  'NativeLibrary: System.Runtime.InteropServices.NativeLibrary::Load(String)' = $false
-  'reference: System.Net.Quic' = $false
-}
+  'faulty' = @'
+using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
+namespace Faulty
+{
+    internal static class Faults
+    {
+        [ModuleInitializer]
+        internal static void Before() => Console.Write(string.Empty);
+
+        [DllImport("planted.dll")]
+        internal static extern int Outside();
+
+        [DllImport("kernel32.dll", EntryPoint = "LoadLibraryW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        internal static extern IntPtr LoadLibrary(string name);
+
+        [DllImport("kernel32.dll", EntryPoint = "LoadLibraryExW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+        internal static extern IntPtr LoadLibraryEx(string name, IntPtr file, uint flags);
+
+        [DllImport("kernel32.dll", EntryPoint = "AddDllDirectory", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        internal static extern IntPtr AddDllDirectory(string folder);
+
+        internal static IntPtr WrongFlags(string name) => LoadLibraryEx(name, IntPtr.Zero, 0x200);
+
+        internal static IntPtr NotAConstant(string name, uint flags) => LoadLibraryEx(name, IntPtr.Zero, flags);
+
+        internal static IntPtr Unlisted(string name) => LoadLibraryEx(name, IntPtr.Zero, 0x800);
+
+        internal static Assembly FromFile(string path) => Assembly.LoadFrom(path);
+
+        internal static Assembly ByName(string name) => Assembly.Load(name);
+
+        internal static object Referenced() => new System.Xml.XmlDocument();
+    }
+}
+'@
+}
 $fixtureDir = Join-Path ([IO.Path]::GetTempPath()) ('planted-native-imports-' + [guid]::NewGuid().ToString('N'))
-New-Item -ItemType Directory -Path $fixtureDir | Out-Null
-Set-Content -Path (Join-Path $fixtureDir 'Planted.cs') -Value $fixtureSource
-Set-Content -Path (Join-Path $fixtureDir 'Planted.csproj') -Value @'
+$fixtures = @{}
+try {
+  foreach ($name in $sources.Keys) {
+    $dir = Join-Path $fixtureDir $name
+    New-Item -ItemType Directory -Path $dir | Out-Null
+    Set-Content -Path (Join-Path $dir "$name.cs") -Value $sources[$name]
+    Set-Content -Path (Join-Path $dir "$name.csproj") -Value @'
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <NoWarn>CA1416</NoWarn>
+    <NoWarn>CA1416;CS0618</NoWarn>
   </PropertyGroup>
 </Project>
 '@
-$build = dotnet build (Join-Path $fixtureDir 'Planted.csproj') -c Release --nologo -o (Join-Path $fixtureDir 'out') 2>&1
-if ($LASTEXITCODE -ne 0) { $build | Write-Host; throw 'The planted assembly did not build.' }
-$fixturePath = Join-Path $fixtureDir 'out/Planted.dll'
-if (-not (Test-Path -LiteralPath $fixturePath)) { throw "The planted assembly's build wrote no $fixturePath." }
-$fixture = [NativeImports.Assembly]::Open([IO.File]::ReadAllBytes($fixturePath), 'Planted.dll')
-Remove-Item -LiteralPath $fixtureDir -Recurse -Force
-
-# Read every bundle. One Assembly object per distinct set of bytes, shared by every bundle
-# that carries them.
-$bySha = @{}
-foreach ($bundle in $bundles) {
-  $path = Join-Path $PublishRoot $bundle.Path
-  if (-not (Test-Path -LiteralPath $path)) { throw "$path is not there; the four publishes come first." }
-  $bundle | Add-Member Assemblies @()
-  $bundle | Add-Member Others ([ordered]@{})
-  foreach ($entry in [NativeImports.Bundle]::Read((Resolve-Path -LiteralPath $path).Path)) {
-    if (-not [NativeImports.Assembly]::HasMetadata($entry.Bytes)) {
-      # Kind 1 is what the bundler records for a managed assembly, so one that will not read
-      # would leave every route through it out of the sets.
-      if ($entry.Kind -eq 1) { throw "The $($bundle.Label) bundle's $($entry.Path) is recorded as an assembly and carries no metadata this reader can read." }
-      if (-not $bundle.Others.Contains("kind $($entry.Kind)")) { $bundle.Others["kind $($entry.Kind)"] = [System.Collections.Generic.List[string]]::new() }
-      $bundle.Others["kind $($entry.Kind)"].Add($entry.Path)
-      continue
-    }
-    $sha = [NativeImports.Bundle]::Sha256($entry.Bytes)
-    if (-not $bySha.ContainsKey($sha)) { $bySha[$sha] = [NativeImports.Assembly]::Open($entry.Bytes, $entry.Path) }
-    $bundle.Assemblies += [pscustomobject]@{ Path = $entry.Path; Compressed = $entry.Compressed; Assembly = $bySha[$sha] }
+    $build = dotnet build (Join-Path $dir "$name.csproj") -c Release --nologo -o (Join-Path $dir 'out') 2>&1
+    if ($LASTEXITCODE -ne 0) { $build | Write-Host; throw "The $name assembly did not build." }
+    $path = Join-Path $dir "out/$name.dll"
+    if (-not (Test-Path -LiteralPath $path)) { throw "The $name assembly's build wrote no $path." }
+    $fixtures[$name] = [NativeImports.Assembly]::Open([IO.File]::ReadAllBytes($path), "$name.dll")
+    $fixtures[$name].ReadMethods()
   }
+}
+finally { Remove-Item -LiteralPath $fixtureDir -Recurse -Force -ErrorAction SilentlyContinue }
+
+# What each exe is judged against is what the controls are judged against too, apart from the
+# members that may call a loader, which name the fixtures' own.
+$fixturePolicy = [pscustomobject]@{
+  Libraries = $libraries
+  References = @('System.Runtime', 'System.Console', 'System.Runtime.InteropServices', 'System.Runtime.Loader', 'System.Collections')
+  Callers = @{ 'SetDefaultDllDirectories' = @('Fixture.Start::Set()'); 'LoadLibraryExW' = @('Fixture.Start::Icu()', 'Faulty.Faults::WrongFlags(String)', 'Faulty.Faults::NotAConstant(String,UInt32)') }
 }
 
-# The non-public type names of every assembly, by name, so a reference is keyed the way the
-# assembly it names keys its own definition.
-$nonPublic = [System.Collections.Generic.Dictionary[string, System.Collections.Generic.HashSet[string]]]::new()
-foreach ($a in @($bySha.Values) + $fixture) {
-  if (-not $nonPublic.ContainsKey($a.Name)) { $nonPublic[$a.Name] = [System.Collections.Generic.HashSet[string]]::new() }
-  $nonPublic[$a.Name].UnionWith($a.NonPublic)
-}
-foreach ($a in @($bySha.Values) + $fixture) { $a.ReadMethods($nonPublic) }
+Write-Host '== Control: an assembly with none of the faults'
+$clean = @(Get-Findings $fixtures['good'] $fixturePolicy)
+if ($clean) { foreach ($line in $clean) { Fail "The assembly built without faults was reported: $line" } }
+else { Write-Host '  reported nothing, as it should' }
 
-function Get-Bundle([string]$label) { $bundles | Where-Object Label -eq $label }
-function Get-CoreLib($bundle) { @($bundle.Assemblies | Where-Object { $_.Assembly.Name -eq 'System.Private.CoreLib' }) }
-
-# The first line: the .NET each bundle carries, and where it differs from the entries' sources.
-$versions = foreach ($bundle in $bundles) {
-  $corelib = Get-CoreLib $bundle
-  if ($bundle.Sibling) {
-    if ($corelib.Count) { throw "The $($bundle.Label) bundle carries a CoreLib, which a framework-dependent build does not." }
-    "$($bundle.Label): none carried, judged against the $($bundle.Sibling)'s"
-  }
-  else {
-    if ($corelib.Count -ne 1) { throw "The $($bundle.Label) bundle carries $($corelib.Count) copies of CoreLib where it should carry one." }
-    if (-not $corelib[0].Assembly.InformationalVersion) { throw "The $($bundle.Label) bundle's CoreLib carries no version." }
-    $bundle | Add-Member Version (($corelib[0].Assembly.InformationalVersion -split '[-+]')[0])
-    "$($bundle.Label): .NET $($bundle.Version) ($($corelib[0].Assembly.InformationalVersion))"
-  }
-}
-Write-Host ('.NET read from each bundle: ' + ($versions -join '; '))
-$carried = @($bundles | Where-Object Version | ForEach-Object Version | Sort-Object -Unique)
-if ($carried | Where-Object { $_ -ne $citedVersion }) {
-  Write-Host "The entries' source lines were read at .NET v$citedVersion; these bundles carry v$($carried -join ', v')."
-}
-
-foreach ($bundle in $bundles) {
-  Write-Host ''
-  Write-Host "== $($bundle.Label): $(Join-Path $PublishRoot $bundle.Path)"
-  foreach ($a in $bundle.Assemblies | Sort-Object Path) {
-    Write-Host "  $($a.Path)  $($a.Assembly.Sha256)$(if ($a.Compressed) { '  (compressed)' })"
-  }
-  foreach ($kind in $bundle.Others.Keys) { Write-Host "  without metadata, $kind`: $($bundle.Others[$kind] -join ', ')" }
-  foreach ($name in $bundle.Ours) {
-    $found = @($bundle.Assemblies | Where-Object { $_.Path -eq "$name.dll" })
-    if ($found.Count -ne 1) { throw "The $($bundle.Label) bundle carries $($found.Count) copies of $name.dll where it should carry one." }
-  }
-}
-
-# The assemblies a bundle is judged against: its own other than ours, and for a
-# framework-dependent bundle its sibling's too, where it carries none at that path.
-function Get-Framework($bundle) {
-  $own = @($bundle.Assemblies | Where-Object { $_.Assembly.Name -notin $ours })
-  if (-not $bundle.Sibling) { return $own }
-  $paths = [System.Collections.Generic.HashSet[string]]::new([string[]]@($own | ForEach-Object Path))
-  $own + @((Get-Bundle $bundle.Sibling).Assemblies | Where-Object { $_.Assembly.Name -notin $ours -and -not $paths.Contains($_.Path) })
-}
-
-# The window's set: CoreLib and the packages, which are what the slim carries other than ours.
-$packagePaths = @((Get-Bundle 'slim').Assemblies | Where-Object { $_.Path -notmatch '/' -and $_.Assembly.Name -notin $ours } | ForEach-Object Path)
-function Get-WindowSet($bundle) {
-  @(Get-Framework $bundle) | Where-Object { $_.Assembly.Name -eq 'System.Private.CoreLib' -or $_.Path -in $packagePaths }
-}
-
-$inClosure = 'System.Guid::NewGuid()', 'System.Runtime.InteropServices.Marshal::StringToBSTR(String)',
-  'System.Runtime.InteropServices.Marshal::FreeCoTaskMem(IntPtr)', 'System.Environment::GetFolderPath(System.Environment+SpecialFolder)',
-  'System.Runtime.InteropServices.Marshalling.Utf16StringMarshaller::Free(UInt16*)'
-$outOfClosure = 'System.Runtime.InteropServices.Marshal::ReadInt32(IntPtr)',
-  'System.Runtime.InteropServices.Marshalling.ArrayMarshaller`2+ManagedToUnmanagedIn::Free()'
-
-$closures = @{}
-function New-Closure([string]$name, $set) {
-  $closure = [NativeImports.Closure]::new([NativeImports.Assembly[]]@($set | ForEach-Object Assembly))
-  $corelib = @($set | Where-Object { $_.Assembly.Name -eq 'System.Private.CoreLib' })
-  if ($corelib.Count -ne 1) { throw "$name holds $($corelib.Count) copies of CoreLib where it should hold one." }
-  Write-Host "  $name`: $(@($set).Count) assemblies, $($closure.Sinks.Count) CoreLib imports of ole32 or oleaut32, $($closure.Members.Count) members reaching them"
-  if ($closure.Sinks.Count -eq 0) { Fail "$name finds no CoreLib import of ole32 or oleaut32." }
-  foreach ($key in $inClosure) {
-    if (-not $corelib[0].Assembly.Methods.Contains($key)) { Fail "$name`: CoreLib defines no $key, so the control cannot be read." }
-    elseif ($closure.Members.Contains($key)) { Write-Host "    control, in the set as it should be: $key" }
-    else { Fail "$name leaves out $key, which reaches an import." }
-  }
-  foreach ($key in $outOfClosure) {
-    if (-not $corelib[0].Assembly.Methods.Contains($key)) { Fail "$name`: CoreLib defines no $key, so the control cannot be read." }
-    elseif (-not $closure.Members.Contains($key)) { Write-Host "    control, out of the set as it should be: $key" }
-    else { Fail "$name holds $key, which reaches no import." }
-  }
-  $closures[$name] = $closure
-  $closure
-}
-
-# The framework methods with a path of at most $nearDepth members to a CoreLib import of
-# $nearLibraries. Reports the sinks and checks the set against members known to be in it, one at
-# the depth limit, and out of it, one a member beyond the limit and one that reaches no import.
-$nearInClosure = 'System.Environment::get_UserInteractive()', 'System.Environment::GetFolderPath(System.Environment+SpecialFolder)'
-$nearOutOfClosure = 'System.DateTime::ToFileTimeUtc()', 'System.Runtime.InteropServices.Marshal::ReadInt32(IntPtr)'
-$nearClosures = @{}
-function New-NearClosure([string]$name, $set) {
-  $closure = [NativeImports.Closure]::new([NativeImports.Assembly[]]@($set | ForEach-Object Assembly), $nearLibraries, $nearDepth)
-  $corelib = @($set | Where-Object { $_.Assembly.Name -eq 'System.Private.CoreLib' })
-  if ($corelib.Count -ne 1) { throw "$name holds $($corelib.Count) copies of CoreLib where it should hold one." }
-  Write-Host "  $name`: $($closure.Sinks.Count) CoreLib imports of $($nearLibraries -join ', '), $($closure.Members.Count) members within $nearDepth of them"
-  if ($closure.Sinks.Count -eq 0) { Fail "$name finds no CoreLib import of $($nearLibraries -join ', ')." }
-  foreach ($key in $nearInClosure) {
-    if (-not $corelib[0].Assembly.Methods.Contains($key)) { Fail "$name`: CoreLib defines no $key, so the control cannot be read." }
-    elseif ($closure.Members.Contains($key)) { Write-Host "    control, in the set as it should be: $key" }
-    else { Fail "$name leaves out $key, which has a path of $nearDepth members or fewer to an import." }
-  }
-  foreach ($key in $nearOutOfClosure) {
-    if (-not $corelib[0].Assembly.Methods.Contains($key)) { Fail "$name`: CoreLib defines no $key, so the control cannot be read." }
-    elseif (-not $closure.Members.Contains($key)) { Write-Host "    control, out of the set as it should be: $key" }
-    else { Fail "$name holds $key, which has no path of $nearDepth members or fewer to an import." }
-  }
-  $nearClosures[$name] = $closure
-  $closure
-}
-
-# What a listed callee reaches in the set, as a count and a hash of the sorted members, so a
-# change in its routes fails the step rather than passing under a reason written for others.
-function Get-Reach($closure, [string]$callee) {
-  $members = $closure.Reach($callee)
-  $hash = [NativeImports.Bundle]::Sha256([Text.Encoding]::UTF8.GetBytes($members -join "`n")).Substring(0, 16)
-  [pscustomobject]@{ Pin = "$($members.Count) members, $hash"; Members = $members }
-}
-
-$matched = @{}
-$reported = @{}
-function Test-Calls([string]$where, $assembly, $closure, $findings, [switch]$near) {
-  foreach ($call in $assembly.Calls) {
-    if (-not $closure.Members.Contains($call.Callee)) { continue }
-    if ($findings) { $findings["call: $($call.Callee)"] = $true; continue }
-    $id = "$($call.Caller) -> $($call.Callee)"
-    $entry = if ($near) { $null } else { $entries | Where-Object { $_.Calls | Where-Object { $_[0] -eq $call.Caller -and $_[1] -eq $call.Callee } } | Select-Object -First 1 }
-    if ($entry) { $matched[$id] = $true }
-    $seen = "$where|$id"
-    if ($reported.ContainsKey($seen)) { continue }
-    $reported[$seen] = $true
-    Write-Host "  $($assembly.Name): $($call.Caller)$(if ($call.Note) { " ($($call.Note))" })"
-    Write-Host ('    -> ' + $closure.Path($call.Callee).Replace("`n", "`n    "))
-    if (-not $entry) {
-      $imports = if ($near) { "a CoreLib import of $($nearLibraries -join ', ') through $nearDepth members or fewer" } else { 'a CoreLib import of ole32 or oleaut32' }
-      $remedy = if ($near) { ' Make the call through an import declared under InstallerClean.Interop.Native, which the resolver loads from System32.' } else { '' }
-      Fail "$where`: $($assembly.Name)'s $($call.Caller) calls $($call.Callee), which reaches $imports.$remedy"
-      continue
-    }
-    $reach = Get-Reach $closure $call.Callee
-    $pinned = if ($entry.Reach -and $entry.Reach.Contains($call.Callee)) { $entry.Reach[$call.Callee] } else { 'nothing' }
-    if ($pinned -ne $reach.Pin) {
-      Fail "$where`: $($call.Callee) reaches $($reach.Pin) in the set, where its entry was read against $pinned. Re-read the reason against these members: $($reach.Members -join '; ')"
-    }
-    else { Write-Host "    listed, reaching $($reach.Pin): $($entry.Reason)" }
-  }
-}
-
-Write-Host ''
-Write-Host "== Calls into framework code that reaches one of CoreLib's ole32 or oleaut32 imports, or within $nearDepth members of one of its $($nearLibraries -join ', ') imports"
-foreach ($bundle in $bundles) {
-  $note = if ($bundle.Sibling) { ", judged against the $($bundle.Sibling)'s framework" } else { '' }
-  Write-Host "$($bundle.Label)$note"
-  $framework = New-Closure "$($bundle.Label), framework" @(Get-Framework $bundle)
-  $nearFramework = New-NearClosure "$($bundle.Label), framework" @(Get-Framework $bundle)
-  foreach ($name in $bundle.Ours | Where-Object { $_ -ne 'InstallerClean' }) {
-    $assembly = ($bundle.Assemblies | Where-Object Path -eq "$name.dll").Assembly
-    Test-Calls $bundle.Label $assembly $framework
-    Test-Calls "$($bundle.Label), within $nearDepth members of an import" $assembly $nearFramework -near
-  }
-  if ($bundle.Ours -contains 'InstallerClean') {
-    $window = New-Closure "$($bundle.Label), CoreLib and the packages" @(Get-WindowSet $bundle)
-    $nearWindow = New-NearClosure "$($bundle.Label), CoreLib and the packages" @(Get-WindowSet $bundle)
-    $assembly = ($bundle.Assemblies | Where-Object Path -eq 'InstallerClean.dll').Assembly
-    Test-Calls $bundle.Label $assembly $window
-    Test-Calls "$($bundle.Label), within $nearDepth members of an import" $assembly $nearWindow -near
-  }
-}
-foreach ($entry in $entries) {
-  foreach ($pair in $entry.Calls) {
-    if (-not $matched.ContainsKey("$($pair[0]) -> $($pair[1])")) { Fail "The entry for $($pair[0]) -> $($pair[1]) matches no call in any bundle." }
-  }
-}
-
-# P/Invokes, NativeLibrary calls, calli and references, once for each distinct assembly of ours.
-function Test-Assembly($assembly, [string]$where, $findings) {
-  Write-Host "$($assembly.Name).dll $($assembly.Sha256), in $where"
-  $imports = @($assembly.Imports | Sort-Object Type, EntryPoint)
-  Write-Host "  P/Invokes: $($imports.Count)"
-  foreach ($import in $imports) {
-    $namespace = ($import.Type -split '\+')[0] -replace '\.[^.]+$', ''
-    Write-Host "    $($import.Type)  $($import.Library)!$($import.EntryPoint)"
-    if ($namespace -ne 'InstallerClean.Interop.Native') {
-      if ($findings) { $findings["P/Invoke: $($import.Type) $($import.Library)!$($import.EntryPoint)"] = $true }
-      else { Fail "$($assembly.Name) declares a P/Invoke outside InstallerClean.Interop.Native: $($import.Type) $($import.Library)!$($import.EntryPoint)." }
-    }
-  }
-  foreach ($call in $assembly.Calls | Where-Object { $_.Note -ne 'static constructor' -and $_.Callee.StartsWith('System.Runtime.InteropServices.NativeLibrary::') } | Sort-Object Caller, Callee -Unique) {
-    Write-Host "  NativeLibrary: $($call.Caller) -> $($call.Callee)"
-    if ($call.Callee.StartsWith('System.Runtime.InteropServices.NativeLibrary::SetDllImportResolver(')) { continue }
-    $listed = $nativeLibraryCalls | Where-Object { $_.Caller -eq $call.Caller -and $_.Callees -contains $call.Callee }
-    if ($listed) { $script:nativeMatched["$($call.Caller) -> $($call.Callee)"] = $true; Write-Host "    listed: $($listed.Reason)" }
-    elseif ($findings) { $findings["NativeLibrary: $($call.Callee)"] = $true }
-    else { Fail "$($assembly.Name)'s $($call.Caller) calls $($call.Callee), which loads a library no resolver is asked about." }
-  }
-  $generated = @($assembly.Callis.Keys | Where-Object { $_ -match '\]<[^>]+>F[0-9A-F]+__InterfaceImplementation::' })
-  Write-Host "  calli: $($generated.Count) methods of generated COM interface implementations"
-  foreach ($key in $assembly.Callis.Keys | Where-Object { $_ -notin $generated } | Sort-Object) { Write-Host "  calli: $key" }
-  if ($assembly.AssemblyReferences -contains 'System.Net.Quic') {
-    if ($findings) { $findings['reference: System.Net.Quic'] = $true }
-    else { Fail "$($assembly.Name) references System.Net.Quic." }
-  }
-}
-
-Write-Host ''
-Write-Host '== P/Invokes, NativeLibrary calls and calli in our assemblies'
-$nativeMatched = @{}
-foreach ($group in $bundles | ForEach-Object { $b = $_; $b.Assemblies | Where-Object { $_.Assembly.Name -in $ours -and $_.Path -notmatch '/' } | ForEach-Object { [pscustomobject]@{ Bundle = $b.Label; Assembly = $_.Assembly } } } | Group-Object { $_.Assembly.Sha256 }) {
-  Test-Assembly $group.Group[0].Assembly (($group.Group | ForEach-Object Bundle) -join ', ') $null
-}
-foreach ($listed in $nativeLibraryCalls) {
-  foreach ($callee in $listed.Callees) {
-    if (-not $nativeMatched.ContainsKey("$($listed.Caller) -> $callee")) { Fail "The listed NativeLibrary call $($listed.Caller) -> $callee matches no call." }
-  }
-}
-
-Write-Host ''
-Write-Host '== Packages'
-foreach ($fd in $bundles | Where-Object Sibling) {
-  $pinned = $packages[$fd.Label]
-  $sibling = Get-Bundle $fd.Sibling
-  $carried = @($fd.Assemblies | Where-Object { $_.Path -notmatch '/' -and $_.Assembly.Name -notin $ours })
-  Write-Host "$($fd.Label)"
-  foreach ($p in $carried | Sort-Object Path) {
-    $name = $p.Assembly.Name
-    $libraries = (@($p.Assembly.Imports | ForEach-Object { [NativeImports.Closure]::Library($_.Library) }) | Sort-Object -Unique) -join ','
-    Write-Host "  $name  imports: $(if ($libraries) { $libraries } else { 'none' })"
-    if (-not $pinned.Contains($name)) { Fail "The $($fd.Label) bundle carries $name, which is not on its package list." }
-    elseif ($pinned[$name] -ne $libraries) { Fail "$name in the $($fd.Label) bundle imports '$libraries' where its package list gives '$($pinned[$name])'." }
-    if ($p.Assembly.AssemblyReferences -contains 'System.Net.Quic') { Fail "$name references System.Net.Quic." }
-    $copy = @($sibling.Assemblies | Where-Object Path -eq $p.Path)
-    if ($copy.Count -ne 1) { Fail "The $($sibling.Label) bundle carries $($copy.Count) copies of $($p.Path) where it should carry one." }
-    elseif ($copy[0].Assembly.Sha256 -eq $p.Assembly.Sha256) { Write-Host "    the $($sibling.Label) carries the same bytes" }
-    else { Fail "The $($sibling.Label) bundle's $name differs from the $($fd.Label) bundle's." }
-  }
-  foreach ($name in $pinned.Keys) {
-    if (-not ($carried | Where-Object { $_.Assembly.Name -eq $name })) { Fail "The $($fd.Label) bundle does not carry $name, which its package list names." }
-  }
-}
-Write-Host ''
-Write-Host '== The planted assembly, judged as our code is'
-# Each set the planted calls are judged against, with the calls it must report. The window's
-# set holds CoreLib and the packages, so Activity's static constructor is not in it.
-$plantedSets = @(
-  [pscustomobject]@{ Name = 'command line, framework'; Expected = $plantedCalls }
-  [pscustomobject]@{ Name = 'command line, framework-dependent, framework'; Expected = $plantedCalls }
-  [pscustomobject]@{ Name = 'slim, CoreLib and the packages'; Expected = @($plantedCalls | Where-Object { $_ -ne 'System.Diagnostics.Activity::.cctor()' }) }
+Write-Host '== Control: an assembly with every fault'
+$faulty = @(Get-Findings $fixtures['faulty'] $fixturePolicy)
+$expected = @(
+  'carries no DefaultDllImportSearchPaths'
+  'P/Invoke outside InstallerClean.Interop.Native: Faulty.Faults planted.dll!Outside'
+  'P/Invoke outside InstallerClean.Interop.Native: Faulty.Faults kernel32.dll!LoadLibraryW'
+  'P/Invoke outside InstallerClean.Interop.Native: Faulty.Faults kernel32.dll!LoadLibraryExW'
+  'P/Invoke outside InstallerClean.Interop.Native: Faulty.Faults kernel32.dll!AddDllDirectory'
+  'P/Invoke of a library not on the list: Faulty.Faults planted.dll!Outside'
+  'P/Invoke with a library search of its own, 2: Faulty.Faults kernel32.dll!LoadLibraryExW'
+  'P/Invoke that loads a library or sets where one is searched for, not on the list: Faulty.Faults kernel32.dll!LoadLibraryW'
+  'P/Invoke that loads a library or sets where one is searched for, not on the list: Faulty.Faults kernel32.dll!AddDllDirectory'
+  'Faulty.Faults::WrongFlags(String) calls LoadLibraryEx with flags 0x200'
+  'Faulty.Faults::NotAConstant(String,UInt32) calls LoadLibraryEx with flags that are not a constant'
+  'Faulty.Faults::Unlisted(String) calls LoadLibraryExW, which only'
+  'Faulty.Faults::FromFile(String) calls System.Reflection.Assembly::LoadFrom(String)'
+  'Faulty.Faults::ByName(String) calls System.Reflection.Assembly::Load(String)'
+  'references System.Xml.ReaderWriter'
+  "module static constructor makes as its first call Faulty.Faults::Before(), which does not reach $searchCall"
 )
-foreach ($set in $plantedSets) {
-  $found = [ordered]@{}
-  Test-Calls $set.Name $fixture $closures[$set.Name] $found
-  foreach ($callee in $set.Expected) {
-    if ($found.Contains("call: $callee")) { Write-Host "  $($set.Name): reported, as it should be: $callee" }
-    else { Fail "$($set.Name): the planted call to $callee was not reported, so the check cannot be shown to find it." }
-  }
+foreach ($want in $expected) {
+  $hits = @($faulty | Where-Object { $_.Contains($want) })
+  if ($hits.Count) { Write-Host "  reported, as it should be: $($hits[0])" }
+  else { Fail "The assembly built with every fault did not report: $want" }
 }
-foreach ($set in $plantedSets) {
-  $found = [ordered]@{}
-  Test-Calls $set.Name $fixture $nearClosures[$set.Name] $found -near
-  foreach ($callee in $plantedNearCalls) {
-    if ($found.Contains("call: $callee")) { Write-Host "  $($set.Name), within $nearDepth members of an import: reported, as it should be: $callee" }
-    else { Fail "$($set.Name): the planted call to $callee was not reported within $nearDepth members of an import, so the check cannot be shown to find it." }
-  }
+foreach ($line in $faulty) {
+  if (-not @($expected | Where-Object { $line.Contains($_) })) { Fail "The assembly built with every fault reported something no fault accounts for: $line" }
 }
-Test-Assembly $fixture 'the planted assembly' $fixtureFindings
-foreach ($finding in $fixtureFindings.Keys) {
-  if ($fixtureFindings[$finding]) { Write-Host "  reported, as it should be: $finding" }
-  else { Fail "The planted assembly's $finding was not reported, so the check cannot be shown to find it." }
+
+foreach ($exe in $exes) {
+  Write-Host ''
+  $path = Join-Path $PublishRoot $exe.Path
+  if (-not (Test-Path -LiteralPath $path)) { throw "$path is not there; the two merged builds come first." }
+  Write-Host "== $($exe.Label): $path"
+  $assembly = [NativeImports.Assembly]::Open([IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $path).Path), $path)
+  $assembly.ReadMethods()
+  Write-Host "  $($assembly.Name) $($assembly.Version), $($assembly.Sha256)"
+  Write-Host "  library search: $($assembly.SearchPaths)"
+  Write-Host "  $($assembly.Imports.Count) P/Invokes, in $((@($assembly.Imports | ForEach-Object { ($_.Type -split '\+')[0] } | Sort-Object -Unique)).Count) types, naming $((@($assembly.Imports | ForEach-Object Library | Sort-Object -Unique)) -join ', ')"
+  Write-Host "  references: $((@($assembly.AssemblyReferences | Sort-Object -Unique)) -join ', ')"
+  # An exe that reads as having no imports, no calls or no initializer has been read wrongly,
+  # and every check above would pass over it.
+  if (-not $assembly.Imports.Count) { Fail "$path reads as holding no P/Invoke, so what it imports was not judged." }
+  if (-not $assembly.Calls.Count) { Fail "$path reads as making no call, so what it calls was not judged." }
+  # A listed caller that makes no call is a list gone stale, and a loader nothing calls leaves
+  # the checks on its callers with nothing to judge.
+  foreach ($entry in $loaders.Keys) {
+    $declared = @($assembly.Imports | Where-Object { $_.EntryPoint -eq $entry })
+    if (-not $declared) { Fail "$path declares no $entry, which the library search needs."; continue }
+    foreach ($caller in $loaders[$entry]) {
+      if (-not @($assembly.Calls | Where-Object { $_.Caller -eq $caller -and $_.Callee -eq $declared[0].Key })) { Fail "$caller is listed as calling $entry, and $path has no such call." }
+      else { Write-Host "  $entry called by $caller" }
+    }
+  }
+  $chain = $assembly.Reach('<Module>::.cctor()', $searchCall)
+  if ($chain) { Write-Host "  before Main: $($chain -join ' -> ')" }
+  foreach ($line in @(Get-Findings $assembly (New-Policy $exe.References $loaders))) { Fail "$($exe.Label): $line" }
 }
 
 Write-Host ''

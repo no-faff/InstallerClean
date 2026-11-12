@@ -170,11 +170,17 @@ SignedUninstallerDir={#UninstallerSignatureDir}
 #include "InstallerClean_Languages.iss"
 
 [Files]
-Source: "{#PublishDir}\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\window\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
+; The merged exe's .exe.config carries the supportedRuntime line that names .NET
+; Framework 4.8. The setup's copy in Program Files ships it; the portable and
+; command-line downloads ship no config, so a config beside either of them is a
+; file they did not create. A drive-by download cannot write this folder.
+Source: "{#PublishDir}\window\InstallerClean.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 ; CLI is a .NET console exe published from src/InstallerClean.Cli;
 ; ships alongside the GUI so PowerShell and cmd block on the process
 ; subsystem naturally.
 Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\cli\installerclean-cli.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 ; pad.xml's Distribution_Permissions requires the Apache 2.0 licence text to
 ; travel alongside any redistributed binary, so Setup installs it too.
 ; DestName gives the installed copy a .txt extension so a double-click opens it
@@ -296,6 +302,8 @@ begin
     1: Result := 'installerclean-cli.exe';
     2: Result := 'LICENSE.txt';
     3: Result := 'THIRD-PARTY-NOTICES.txt';
+    4: Result := 'InstallerClean.exe.config';
+    5: Result := 'installerclean-cli.exe.config';
   else
     Result := '';
   end;

@@ -16,9 +16,9 @@
 // version, and any other * is read as the character, so a looser pattern is a difference.
 //
 // The copies are also held to the folder each is copied from: the portable from the
-// self-contained publish, the slim from the framework-dependent one, the command line
-// from its own and the setup from the signed setup, so two names swapped between files
-// are a difference too.
+// merged window exe, the slim from that same exe signed under its own name in the
+// signing folder, the command line from its own publish and the setup from the signed
+// setup, so two names swapped between files are a difference too.
 //
 // Each of the four places has to name exactly the files the app downloads. A copy
 // installed on somebody's PC asks for one of these names under the tag of the version it
@@ -147,11 +147,13 @@ function releaseNames(workflow) {
   return { places, copies };
 }
 
-// The folder each kind's copy is made from, as a part of the source path.
+// The folder each kind's copy is made from, as a part of the source path. The
+// portable is the merged window exe; the slim is that same exe signed under its
+// own name, which sits in the signing folder rather than a publish one.
 const SOURCES = new Map([
   ['Setup', 'signed-setup'],
-  ['Portable', 'self-contained'],
-  ['Slim', 'framework-dependent'],
+  ['Portable', 'window'],
+  ['Slim', 'signed-executables'],
   ['CommandLineDownload', 'cli'],
 ]);
 
@@ -199,7 +201,7 @@ const controls = [
   [
     'the portable copied under a versioned name',
     appSource,
-    reline(/(Copy-Item\s+publish\/self-contained\/InstallerClean\.exe\s+)publish\/InstallerClean-portable\.exe/, '$1"publish/InstallerClean-$$version-portable.exe"'),
+    reline(/(Copy-Item\s+publish\/window\/InstallerClean\.exe\s+)publish\/InstallerClean-portable\.exe/, '$1"publish/InstallerClean-$$version-portable.exe"'),
   ],
   [
     'the portable versioned in the signature check',
@@ -223,9 +225,9 @@ const controls = [
     reline(/"publish\/InstallerClean-\$version-setup\.exe",\n/, "'publish/InstallerClean-$$version-setup.exe',\n"),
   ],
   [
-    'the portable and the slim copied from each other\'s folders',
+    'the portable copied from the slim\'s folder',
     appSource,
-    reline(/Copy-Item\s+publish\/self-contained\/InstallerClean\.exe(\s+)publish\/InstallerClean-portable\.exe/, 'Copy-Item publish/framework-dependent/InstallerClean.exe$1publish/InstallerClean-portable.exe'),
+    reline(/Copy-Item\s+publish\/window\/InstallerClean\.exe(\s+)publish\/InstallerClean-portable\.exe/, 'Copy-Item signing/signed-executables/InstallerClean-slim.exe$1publish/InstallerClean-portable.exe'),
   ],
   [
     'the app asking for a versioned portable',

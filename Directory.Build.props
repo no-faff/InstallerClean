@@ -65,6 +65,14 @@
          raised here, and nothing else in the build fails on a warning. -->
     <WarningsAsErrors>$(WarningsAsErrors);RS0030</WarningsAsErrors>
   </PropertyGroup>
+  <!-- The tool that merges each exe with the assemblies it references into one
+       file (the MergeToOneFile target in Directory.Build.targets). A build-time
+       tool: no assembly of it ships, and the package's props file gives its path
+       as the ILRepack property. Named in the two exes' lock files, so a locked
+       restore takes only the package those files record. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'InstallerClean' Or '$(MSBuildProjectName)' == 'InstallerClean.Cli'">
+    <PackageReference Include="ILRepack" Version="2.0.48" PrivateAssets="all" />
+  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <DebugType>embedded</DebugType>

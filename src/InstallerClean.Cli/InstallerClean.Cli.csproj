@@ -12,9 +12,6 @@
     <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- R2R off, matching InstallerClean.csproj. Same AV-signal-
-         stability rationale documented there. -->
-    <PublishReadyToRun>false</PublishReadyToRun>
     <RootNamespace>InstallerClean.Cli</RootNamespace>
     <AssemblyName>installerclean-cli</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -40,23 +37,6 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <NeutralLanguage>en-GB</NeutralLanguage>
-  </PropertyGroup>
-
-  <!-- A Release build runs no start-up hook: neither an assembly DOTNET_STARTUP_HOOKS
-       names nor one applied over the diagnostics channel is loaded before Main. A Debug
-       build keeps .NET's default. -->
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <StartupHookSupport>false</StartupHookSupport>
-  </PropertyGroup>
-
-  <!-- HttpClient's DiagnosticsHandler is left out of every handler chain. See the GUI csproj. -->
-  <PropertyGroup>
-    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
-  </PropertyGroup>
-
-  <!-- HttpClient never opens an HTTP/3 connection. See the GUI csproj. -->
-  <PropertyGroup>
-    <Http3Support>false</Http3Support>
   </PropertyGroup>
 
   <ItemGroup>

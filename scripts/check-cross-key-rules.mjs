@@ -421,6 +421,17 @@ const RAW_READ_ALLOWED = [
       + 'would answer for the sentences that linked on the day it was written. Every '
       + 'value it goes on to assert against is read through Strings.Get.',
   },
+  {
+    file: 'src/InstallerClean.Core/Resources/EmbeddedCultureResources.cs',
+    reason: 'The manager behind the doors, which names ResourceManager as its base '
+      + 'class. It hands its values only to Strings.Designer.cs, whose manager it is.',
+  },
+  {
+    file: 'src/InstallerClean.Tests/Resources/EmbeddedCultureResourcesTests.cs',
+    reason: 'Tests the manager itself: which resource set each culture reaches and '
+      + 'what it falls back to. Read through a door, a fallback and a missing key '
+      + 'would look alike, the door answering a missing key with the key.',
+  },
 ];
 
 // ---------------------------------------------------------------------------
