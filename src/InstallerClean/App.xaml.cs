@@ -183,7 +183,7 @@ public partial class App : Application
         // Windows set to a language the app does not ship, Automatic displays the
         // neutral en-GB text, and tagging that English prose Swedish would be a
         // fresh instance of the same fault. Active() walks the parent chain the
-        // satellite resolution walks and answers en-GB when nothing matches, so
+        // string lookup walks and answers en-GB when nothing matches, so
         // the value is always one of the languages the app ships: all ASCII, all
         // inside RFC 3066, so none of them can reach
         // XmlLanguage.GetLanguage's throw.

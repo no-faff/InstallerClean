@@ -29,7 +29,7 @@ public static class SupportedLanguages
     /// <summary>
     /// The supported-language name the app is actually displaying for
     /// <paramref name="uiCulture"/>: the first entry on the culture's parent
-    /// chain, the same chain satellite resolution probes (it-CH falls back to
+    /// chain, the same chain the string lookup walks (it-CH falls back to
     /// <c>"it"</c>; zh-CN to zh-Hans, so it maps to <c>"zh-Hans"</c>, and zh-TW
     /// to zh-Hant), else
     /// <see cref="Neutral"/>, which every culture without a satellite

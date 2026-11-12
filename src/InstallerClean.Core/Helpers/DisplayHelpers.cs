@@ -517,7 +517,7 @@ internal static class DisplayHelpers
     /// sentences and carries any disagreement into them.
     ///
     /// <see cref="SupportedLanguages.Active"/> walks the same parent chain the
-    /// ResourceManager probes, which is why it is the right answer and not merely a
+    /// ResourceManager walks, which is why it is the right answer and not merely a
     /// closer one, and it is the reason this is not simply the culture's own parent:
     /// zh-CN resolves through zh-Hans and zh-TW through zh-Hant, and both render Chinese.
     /// </summary>
