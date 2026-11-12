@@ -45,20 +45,32 @@ public class RegistryDataTests
     }
 
     [Fact]
-    public void Text_keeps_its_own_characters_and_a_list_its_empty_entries()
+    public void A_list_keeps_its_empty_entries()
     {
         WithKey(key =>
         {
-            // "ab" and an odd trailing byte: the last code unit takes a zero byte.
-            RawRegistryValue.Write(key, "odd", RawRegistryValue.REG_SZ, new byte[] { (byte)'a', 0, (byte)'b', 0, (byte)'c' });
             // a and its null, an empty entry's null, b and its null, then the list's own.
             RawRegistryValue.Write(key, "list", RawRegistryValue.REG_MULTI_SZ,
                 new byte[] { (byte)'a', 0, 0, 0, 0, 0, (byte)'b', 0, 0, 0, 0, 0 });
 
-            Assert.Equal("abc", RegistryData.ValueOf(key, "odd"));
             Assert.Equal(new[] { "a", "", "b" }, (string[])RegistryData.ValueOf(key, "list")!);
             Assert.Null(RegistryData.ValueOf(key, "missing"));
         });
+    }
+
+    // An odd length takes one zero byte on the end, as .NET 10 adds it: the last code
+    // unit is the odd byte and a zero above it, whatever the buffer held past the length.
+    [Fact]
+    public void Text_of_an_odd_length_ends_in_its_odd_byte_and_a_zero()
+    {
+        var value = RegistryData.Decode(buffer =>
+        {
+            var written = new byte[] { (byte)'a', 0, (byte)'b', 0, (byte)'c', 0xFF };
+            Buffer.BlockCopy(written, 0, buffer, 0, written.Length);
+            return (0, RawRegistryValue.REG_SZ, 5);
+        }, doNotExpand: true);
+
+        Assert.Equal("abc", value);
     }
 
     // A value rewritten longer between Windows giving its length and its data is read
