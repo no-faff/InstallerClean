@@ -1,4 +1,5 @@
 using System.Globalization;
+using InstallerClean.Compatibility;
 using InstallerClean.Resources;
 
 using InstallerClean.Helpers;
@@ -83,6 +84,6 @@ internal static class ConsoleQuestion
         return ConsoleAnswer.Other;
 
         static bool StartsWith(string answer, string letter) =>
-            letter.Length > 0 && answer.StartsWith(letter, StringComparison.CurrentCultureIgnoreCase);
+            letter.Length > 0 && FrameworkCollation.StartsWithIgnoringCase(answer, letter, CultureInfo.CurrentCulture);
     }
 }

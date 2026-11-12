@@ -98,4 +98,51 @@ public class FrameworkCollationTests
         Assert.EndsWith("&\uFF5A=\uFF3A&a=a", rules, StringComparison.Ordinal);
         Assert.Equal(FrameworkCollation.HalfFullLower.Length, FrameworkCollation.HalfFullHigher.Length);
     }
+
+    [Theory]
+    [InlineData("en-GB", "-yes", "y", false)]
+    [InlineData("en-GB", "'yes", "y", false)]
+    [InlineData("en-GB", "yes", "Y", true)]
+    [InlineData("en-GB", "Yes", "yes!", false)]
+    [InlineData("en-GB", "", "y", false)]
+    [InlineData("en-GB", "o\u0308k", "o", false)]
+    [InlineData("en-GB", "\u00ADyes", "y", true)]
+    [InlineData("en-GB", "\uFF59es", "y", false)]
+    [InlineData("en-GB", "y\u0301es", "y", false)]
+    [InlineData("de-DE", "Ja", "j", true)]
+    [InlineData("ru-RU", "\u0434\u0430", "\u0414", true)]
+    [InlineData("tr-TR", "\u0131lk", "I", true)]
+    [InlineData("tr-TR", "ilk", "\u0130", true)]
+    [InlineData("tr-TR", "Ilk", "i", false)]
+    [InlineData("fr-FR", "Oui", "o", true)]
+    [InlineData("en-GB", "\u0001y", "y", true)]
+    [InlineData("fr-FR", "\u0001y", "y", true)]
+    [InlineData("fr-FR", "-oui", "o", false)]
+    [InlineData("ja-JP", "\u30A2", "\u3042", false)]
+    public void An_answer_starts_with_a_letter_as_NET_10_matches_it(string culture, string answer, string letter, bool starts)
+    {
+        Assert.Equal(starts, FrameworkCollation.StartsWithIgnoringCase(answer, letter, CultureInfo.GetCultureInfo(culture)));
+    }
+
+    [Fact]
+    public void NLS_takes_a_hyphen_ahead_of_the_letter_as_starting_with_it_where_NET_10_does_not()
+    {
+        // The difference the port exists for: .NET Framework's own IsPrefix passes over the
+        // hyphen, so "-yes" would answer yes to the update question.
+        Assert.True(CultureInfo.GetCultureInfo("en-GB").CompareInfo.IsPrefix("-yes", "y", CompareOptions.IgnoreCase));
+        Assert.False(FrameworkCollation.StartsWithIgnoringCase("-yes", "y", CultureInfo.GetCultureInfo("en-GB")));
+    }
+
+    [Theory]
+    [InlineData("yes", "Y", true)]
+    [InlineData("Yes", "yes!", false)]
+    [InlineData("", "y", false)]
+    [InlineData("-y", "y", false)]
+    [InlineData("\u0001y", "y", null)]
+    [InlineData("y\u0301", "y", null)]
+    [InlineData("\u00E9", "e", null)]
+    public void Plain_ASCII_is_matched_by_letter_and_anything_near_another_character_goes_to_the_collator(string answer, string letter, bool? starts)
+    {
+        Assert.Equal(starts, FrameworkCollation.AsciiPrefixIgnoringCase(answer, letter));
+    }
 }

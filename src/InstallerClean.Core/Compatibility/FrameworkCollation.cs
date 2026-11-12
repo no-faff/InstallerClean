@@ -67,6 +67,81 @@ internal static unsafe class FrameworkCollation
     }
 
     /// <summary>
+    /// Whether <paramref name="source"/> starts with <paramref name="prefix"/> in
+    /// <paramref name="culture"/>, ignoring case, as .NET 10's
+    /// <c>string.StartsWith(string, StringComparison.CurrentCultureIgnoreCase)</c> answers on
+    /// Windows (<c>String.Comparison.cs</c>'s <c>StartsWith</c>, <c>CompareInfo.cs</c>'s
+    /// <c>IsPrefix</c>, <c>CompareInfo.Icu.cs</c>'s <c>IcuStartsWith</c> and
+    /// <c>StartsWithOrdinalIgnoreCaseHelper</c>, and <c>pal_collation.c</c>'s
+    /// <c>GlobalizationNative_StartsWith</c> and <c>SimpleAffix</c>): an empty prefix starts
+    /// everything; plain ASCII in an English or invariant culture compares by letter; anything
+    /// else walks the two strings' collation elements under the culture's IgnoreCase collator,
+    /// passing over the ignorable ones. Through NLS where Windows has no ICU.
+    /// </summary>
+    public static bool StartsWithIgnoringCase(string source, string prefix, CultureInfo culture) =>
+        StartsWithIgnoringCase(source, prefix, culture, Loaded.Value);
+
+    internal static bool StartsWithIgnoringCase(string source, string prefix, CultureInfo culture, Icu? icu)
+    {
+        if (ReferenceEquals(source, prefix) || prefix.Length == 0) return true;
+
+        if (icu?.Collator(culture.Name, CompareOptions.IgnoreCase) is not { } collator)
+        {
+            // NLS, as .NET 10 searches where Windows has no ICU: FindNLSStringEx with
+            // FIND_STARTSWITH and the flags Compare passes, which .NET Framework's IsPrefix
+            // passes too.
+#pragma warning disable RS0030
+            return culture.CompareInfo.IsPrefix(source, prefix, CompareOptions.IgnoreCase);
+#pragma warning restore RS0030
+        }
+
+        if (IsAsciiEqualityOrdinal(culture.Name) && AsciiPrefixIgnoringCase(source, prefix) is { } answer)
+            return answer;
+        return icu.StartsWith(collator, source, prefix);
+    }
+
+    // .NET 10's _isAsciiEqualityOrdinal: the invariant culture and English sort plain ASCII
+    // as its letters' order, case aside.
+    private static bool IsAsciiEqualityOrdinal(string sortName) =>
+        sortName.Length == 0
+        || (sortName.Length >= 2 && sortName[0] == 'e' && sortName[1] == 'n' && (sortName.Length == 2 || sortName[2] == '-'));
+
+    // A character ICU may weigh other than as its ASCII letter: a control character other
+    // than tab, vertical tab and form feed, or DEL (.NET 10's HighCharTable).
+    private static bool IsSpecialAscii(int c) =>
+        c < 0x80 && !(c == 0x09 || c == 0x0B || c == 0x0C || (c >= 0x20 && c <= 0x7E));
+
+    /// <summary>
+    /// <c>StartsWithOrdinalIgnoreCaseHelper</c>: the answer from comparing ASCII letters with
+    /// their case folded, or null where a character outside plain ASCII is near enough to
+    /// decide it, which the collator then answers.
+    /// </summary>
+    internal static bool? AsciiPrefixIgnoringCase(string source, string prefix)
+    {
+        var length = Math.Min(source.Length, prefix.Length);
+        var i = 0;
+        for (; i < length; i++)
+        {
+            int a = source[i];
+            int b = prefix[i];
+            if (a >= 0x80 || b >= 0x80 || IsSpecialAscii(a) || IsSpecialAscii(b)) return null;
+            if (a == b) continue;
+            if ((uint)(a - 'a') <= 'z' - 'a') a -= 0x20;
+            if ((uint)(b - 'a') <= 'z' - 'a') b -= 0x20;
+            if (a == b) continue;
+            if (i < source.Length - 1 && source[i + 1] >= 0x80) return null;
+            if (i < prefix.Length - 1 && prefix[i + 1] >= 0x80) return null;
+            return false;
+        }
+
+        if (source.Length < prefix.Length)
+            return prefix[i] >= 0x80 || IsSpecialAscii(prefix[i]) ? null : false;
+        if (source.Length > prefix.Length && (source[i] >= 0x80 || IsSpecialAscii(source[i])))
+            return null;
+        return true;
+    }
+
+    /// <summary>
     /// <paramref name="cultureName"/> as the locale name .NET 10 opens its collator for: an
     /// alternative sort after '_' written as ICU's collation keyword, the whole canonicalised
     /// by ICU, and ICU's '_' between the parts written as '-'.
@@ -190,9 +265,14 @@ internal static unsafe class FrameworkCollation
         private readonly delegate* unmanaged[Cdecl]<IntPtr, int*, char*> _getRules;
         private readonly delegate* unmanaged[Cdecl]<IntPtr, int, int, int*, void> _setAttribute;
         private readonly delegate* unmanaged[Cdecl]<IntPtr, char*, int, char*, int, int> _strcoll;
+        private readonly delegate* unmanaged[Cdecl]<IntPtr, char*, int, int*, IntPtr> _openElements;
+        private readonly delegate* unmanaged[Cdecl]<IntPtr, int*, int> _next;
+        private readonly delegate* unmanaged[Cdecl]<IntPtr, void> _closeElements;
+        private readonly delegate* unmanaged[Cdecl]<IntPtr, int> _getStrength;
         private readonly ConcurrentDictionary<(string Culture, CompareOptions Options), IntPtr> _collators = new();
 
-        private Icu(IntPtr canonicalize, IntPtr getLanguage, IntPtr open, IntPtr openRules, IntPtr getRules, IntPtr setAttribute, IntPtr strcoll)
+        private Icu(IntPtr canonicalize, IntPtr getLanguage, IntPtr open, IntPtr openRules, IntPtr getRules, IntPtr setAttribute, IntPtr strcoll,
+            IntPtr openElements, IntPtr next, IntPtr closeElements, IntPtr getStrength)
         {
             _canonicalize = (delegate* unmanaged[Cdecl]<byte*, byte*, int, int*, int>)canonicalize;
             _getLanguage = (delegate* unmanaged[Cdecl]<byte*, byte*, int, int*, int>)getLanguage;
@@ -201,6 +281,10 @@ internal static unsafe class FrameworkCollation
             _getRules = (delegate* unmanaged[Cdecl]<IntPtr, int*, char*>)getRules;
             _setAttribute = (delegate* unmanaged[Cdecl]<IntPtr, int, int, int*, void>)setAttribute;
             _strcoll = (delegate* unmanaged[Cdecl]<IntPtr, char*, int, char*, int, int>)strcoll;
+            _openElements = (delegate* unmanaged[Cdecl]<IntPtr, char*, int, int*, IntPtr>)openElements;
+            _next = (delegate* unmanaged[Cdecl]<IntPtr, int*, int>)next;
+            _closeElements = (delegate* unmanaged[Cdecl]<IntPtr, void>)closeElements;
+            _getStrength = (delegate* unmanaged[Cdecl]<IntPtr, int>)getStrength;
         }
 
         /// <summary>The functions from <paramref name="icu"/>, or null where one is missing.</summary>
@@ -213,10 +297,16 @@ internal static unsafe class FrameworkCollation
             var getRules = WindowsIcu.Export(icu.Internationalisation, "ucol_getRules");
             var setAttribute = WindowsIcu.Export(icu.Internationalisation, "ucol_setAttribute");
             var strcoll = WindowsIcu.Export(icu.Internationalisation, "ucol_strcoll");
+            var openElements = WindowsIcu.Export(icu.Internationalisation, "ucol_openElements");
+            var next = WindowsIcu.Export(icu.Internationalisation, "ucol_next");
+            var closeElements = WindowsIcu.Export(icu.Internationalisation, "ucol_closeElements");
+            var getStrength = WindowsIcu.Export(icu.Internationalisation, "ucol_getStrength");
             return canonicalize == IntPtr.Zero || getLanguage == IntPtr.Zero || open == IntPtr.Zero || openRules == IntPtr.Zero
                 || getRules == IntPtr.Zero || setAttribute == IntPtr.Zero || strcoll == IntPtr.Zero
+                || openElements == IntPtr.Zero || next == IntPtr.Zero || closeElements == IntPtr.Zero || getStrength == IntPtr.Zero
                 ? null
-                : new Icu(canonicalize, getLanguage, open, openRules, getRules, setAttribute, strcoll);
+                : new Icu(canonicalize, getLanguage, open, openRules, getRules, setAttribute, strcoll,
+                    openElements, next, closeElements, getStrength);
         }
 
         /// <summary>
@@ -236,6 +326,65 @@ internal static unsafe class FrameworkCollation
             fixed (char* a = first)
             fixed (char* b = second)
                 return _strcoll(collator, a, first.Length, b, second.Length);
+        }
+
+        /// <summary>
+        /// <c>SimpleAffix</c> searching forwards: whether <paramref name="source"/>'s
+        /// collation elements begin with <paramref name="prefix"/>'s, compared at the
+        /// collator's strength, an ignorable element on either side passed over. A
+        /// combining mark straight after the prefix ends it: "o" with a diaeresis does not
+        /// start with "o". False where ICU cannot walk either string.
+        /// </summary>
+        public bool StartsWith(IntPtr collator, string source, string prefix)
+        {
+            const int NullOrder = -1;
+            const int Ignorable = 0;
+            const int PrimaryMask = unchecked((int)0xFFFF0000);
+            const int SecondaryMask = 0x0000FF00;
+            const int TertiaryMask = 0x000000FF;
+
+            var status = 0;
+            fixed (char* p = prefix)
+            fixed (char* t = source)
+            {
+                var pattern = _openElements(collator, p, prefix.Length, &status);
+                if (status > 0) return false;
+                var text = _openElements(collator, t, source.Length, &status);
+                if (status > 0)
+                {
+                    _closeElements(pattern);
+                    return false;
+                }
+
+                var strength = _getStrength(collator);
+                var mask = strength == 0 ? PrimaryMask
+                    : strength == Secondary ? PrimaryMask | SecondaryMask
+                    : PrimaryMask | SecondaryMask | TertiaryMask;
+                try
+                {
+                    bool movePattern = true, moveText = true;
+                    int patternElement = Ignorable, textElement = Ignorable;
+                    while (true)
+                    {
+                        if (movePattern) patternElement = _next(pattern, &status);
+                        if (moveText) textElement = _next(text, &status);
+                        movePattern = true;
+                        moveText = true;
+
+                        if (patternElement == NullOrder)
+                            return textElement == NullOrder || textElement == Ignorable
+                                || (textElement & PrimaryMask) != 0 || (textElement & SecondaryMask) == 0;
+                        if (patternElement == Ignorable) moveText = false;
+                        else if (textElement == Ignorable) movePattern = false;
+                        else if ((patternElement & mask) != (textElement & mask)) return false;
+                    }
+                }
+                finally
+                {
+                    _closeElements(text);
+                    _closeElements(pattern);
+                }
+            }
         }
 
         // ucol_open for the locale, and for IgnoreCase a collator built from the locale
