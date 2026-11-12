@@ -1,3 +1,4 @@
+using System.Globalization;
 using InstallerClean.Helpers;
 
 namespace InstallerClean.Tests.Helpers;
@@ -65,6 +66,24 @@ public class Win32MarshalTests
 
         Assert.Equal(WindowsErrors.SystemMessage(code), exception.Message);
         Assert.Equal(unchecked((int)0x80070000 | code), exception.HResult);
+    }
+
+    // The text itself, as Windows gives it in English, which is what the CI runner is
+    // shown in, so the message is not only checked against the call that builds it.
+    // Elsewhere Windows is shown in English or the row has nothing to compare against.
+    [Theory]
+    [InlineData(87, "The parameter is incorrect.")]
+    [InlineData(80, "The file exists.")]
+    [InlineData(183, "Cannot create a file when that file already exists.")]
+    public void Any_other_number_carries_the_text_Windows_gives_in_English(int code, string text)
+    {
+        if (!string.Equals(CultureInfo.InstalledUICulture.TwoLetterISOLanguageName, "en", StringComparison.Ordinal)
+            && Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true")
+            return;
+
+        var exception = Assert.IsType<IOException>(Win32Marshal.GetExceptionForWin32Error(code));
+
+        Assert.Equal(text, exception.Message);
     }
 
     [Fact]
