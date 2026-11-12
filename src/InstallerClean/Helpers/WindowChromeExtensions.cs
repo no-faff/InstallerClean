@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Helpers;
@@ -16,9 +17,13 @@ internal static class WindowChromeExtensions
     ///
     /// A right click on the title bar opens the same menu, through
     /// <see cref="ShowSystemMenu"/> as well. The chrome opens it there itself, from its
-    /// own WM_NCRBUTTONUP handler, with .NET Framework's flags; a hook added once the
-    /// window has its handle runs ahead of the chrome's, which is added as the handle is
-    /// made, and takes the message.
+    /// own WM_NCRBUTTONUP handler, with .NET Framework's flags, and leaves the message
+    /// unhandled, so this hook must run ahead of the chrome's or the menu opens twice.
+    /// An HwndSource runs the hook added last first. The chrome adds its hook as the
+    /// window gets its handle, or at once where the window has one, so this hook is added
+    /// on a later dispatcher pass than that, whether this is called before or after
+    /// InitializeComponent. A window that replaces its WindowChrome after it has its
+    /// handle has the chrome's hook added again, ahead of this one; none does.
     /// </summary>
     public static void EnableAltSpaceSystemMenu(this Window window)
     {
@@ -35,11 +40,12 @@ internal static class WindowChromeExtensions
 
         HwndSourceHook titleBarRightClick = (IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
             OnTitleBarRightClick(window, hwnd, msg, wParam, lParam, ref handled);
-        if (PresentationSource.FromVisual(window) is HwndSource source)
-            source.AddHook(titleBarRightClick);
+        void AddAfterTheChrome() => window.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() =>
+            (PresentationSource.FromVisual(window) as HwndSource)?.AddHook(titleBarRightClick)));
+        if (PresentationSource.FromVisual(window) is not null)
+            AddAfterTheChrome();
         else
-            window.SourceInitialized += (_, _) =>
-                (PresentationSource.FromVisual(window) as HwndSource)?.AddHook(titleBarRightClick);
+            window.SourceInitialized += (_, _) => AddAfterTheChrome();
     }
 
     /// <summary>
