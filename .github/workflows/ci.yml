@@ -426,48 +426,59 @@ jobs:
       # .iss still compiles. Carrying no condition, all of them were skipped by a
       # red Test, which is how a reorder that put the language gates last still left
       # the .iss having never been compiled anywhere.
-      - name: Smoke-publish self-contained
+      # .NET Framework has no single-file publish, so each copy is one exe the
+      # OneFile merge makes (Directory.Build.targets): a Release build of the
+      # project with every assembly it references folded into the exe by ILRepack.
+      # The window merge writes publish/window/InstallerClean.exe and the command
+      # line's writes publish/cli/installerclean-cli.exe, each with its .exe.config
+      # beside it, which is the shape the release builds and the shape the setup
+      # embeds. There is one window exe: the portable and the slim download are
+      # that same file under two names, so no separate framework-dependent build.
+      - name: Merge the window into one file
         if: success() || failure()
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/self-contained
+        run: dotnet build src/InstallerClean/InstallerClean.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true
 
-      # PublishSelfContained=false is what disables the .NET 8+ rule
-      # "PublishSingleFile=true implies SelfContained=true". --self-contained false
-      # sets the other property and .NET 10 no longer takes it, so both are passed
-      # here: with the first alone, a publish comes out in the self-contained shape
-      # under a framework-dependent name, tens of times the size it should be. The
-      # flags below are the release script's own (dotnet/sdk#52070), which is what
-      # makes this a smoke test of the shape that ships rather than a second copy
-      # of the step above it.
-      - name: Smoke-publish framework-dependent
+      - name: Merge the command line into one file
         if: success() || failure()
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true -o publish/framework-dependent
+        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true
 
-      - name: Smoke-publish CLI framework-dependent
+      # The merge is the shipped shape, so these read it rather than the build
+      # output: each exe's sha256 for the record, the target-framework attribute
+      # ILRepack must keep (if it drops, 4.8 falls to its 4.0 compatibility
+      # defaults and 30 path and other switches flip), and a clean start with
+      # nothing in the crash log about the library search, which is the mark that
+      # the exe is the image Windows started (SystemLibraries.IsProcessImage).
+      - name: Check the merged exes carry 4.8 and start clean
         if: success() || failure()
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true -o publish/cli-framework-dependent
+        shell: pwsh
+        run: |
+          $log = Join-Path $env:LOCALAPPDATA 'InstallerClean\crash.log'
+          function SearchEntries { if (Test-Path $log) { @(Get-Content $log | Where-Object { $_ -match 'library search|SetDefaultDllDirectories|SystemLibraries' }) } else { @() } }
+          $failed = $false
+          foreach ($exe in 'publish/window/InstallerClean.exe', 'publish/cli/installerclean-cli.exe') {
+            if (-not (Test-Path $exe)) { throw "The merge wrote no $exe." }
+            $full = (Resolve-Path $exe).Path
+            "sha256 $exe = $((Get-FileHash -Algorithm SHA256 $full).Hash)"
+            $name = [System.Reflection.AssemblyName]::GetAssemblyName($full)
+            $target = [System.Reflection.Assembly]::ReflectionOnlyLoadFrom($full).GetCustomAttributesData() |
+              Where-Object { $_.AttributeType.Name -eq 'TargetFrameworkAttribute' } |
+              ForEach-Object { $_.ConstructorArguments[0].Value }
+            "$exe is $($name.Version), target framework $target"
+            if ($target -notmatch 'v4\.8') { "  NOT v4.8"; $failed = $true }
+          }
+          # The command line is the one that starts without a window. A clean start
+          # leaves no library-search line in the crash log.
+          $before = (SearchEntries).Count
+          $out = & 'publish/cli/installerclean-cli.exe' --version 2>&1
+          "installerclean-cli --version exited $LASTEXITCODE and printed: $out"
+          if ($LASTEXITCODE -ne 0) { $failed = $true }
+          $new = @(SearchEntries | Select-Object -Skip $before)
+          foreach ($line in $new) { "crash.log: $line" }
+          if ($new.Count -gt 0) { $failed = $true }
+          if ($failed) { throw "A merged exe is not v4.8, did not start, or wrote to the crash log about its library search." }
+          "Both merged exes carry 4.8, and the command line started clean."
 
-      # publish/cli is where installer/InstallerClean.iss reads the CLI from, so
-      # it holds the self-contained single-file build: that is the shape the
-      # release script puts there and the shape the shipped setup embeds. The
-      # framework-dependent publish above parks beside it and exercises the
-      # lighter build without deciding what the compile step below bundles.
-      #
-      # Compression ON is the default and the preferred shape: it roughly halves
-      # a download whose whole audience is people wary of what they are running,
-      # and size is the one thing a wary reader judges before opening anything.
-      # Dropping it is a FALLBACK, taken per release and only on evidence, when a
-      # scan flags the compressed build and the uncompressed build of the same
-      # source comes back clean. That fallback has fired once, for the 2.3.0
-      # standalone CLI, and it does not carry forward: each release starts from
-      # compressed and earns its way off. Whichever shape a release ships, this
-      # flag must match the release script's, because the README tells readers
-      # they can rebuild a tag and compare hashes and this file is the only
-      # public statement of how.
-      - name: Smoke-publish CLI self-contained
-        if: success() || failure()
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/cli
-
-      # Reads the four bundles above, framework included, and fails where our code
+      # Reads the merged exes and fails where our code
       # can reach a Windows library by a search no resolver of ours answers: a call
       # into framework code that ends at one of CoreLib's ole32 or oleaut32 imports,
       # a P/Invoke outside InstallerClean.Interop.Native, an unlisted NativeLibrary
@@ -479,20 +490,20 @@ jobs:
         shell: pwsh
         run: ./scripts/check-native-imports.ps1
 
-      # Here rather than with the other guards because it reads the three
-      # published files, which do not exist until the steps above have run. A
-      # satellite that never reaches an artefact leaves the source resx present
-      # and correct, so every guard that reads the tree passes and the window
-      # opens in English on a machine set to that language.
-      - name: Check the built artefacts carry every satellite assembly and ask for administrator
+      # Here rather than with the other guards because it reads the two merged
+      # exes, which do not exist until the steps above have run. A language that
+      # never reaches an exe leaves the source resx present and correct, so every
+      # guard that reads the tree passes and the window opens in English on a
+      # machine set to that language.
+      - name: Check the merged exes carry every language and ask for administrator
         if: success() || failure()
         run: node scripts/verify-shipped-artefacts.mjs
 
       # ISCC is the only thing that reads installer/*.iss, so a typo there shows
       # up nowhere else. Compiling the setup here finds it on the push that
-      # caused it rather than on the release machine. The self-contained GUI
-      # and CLI publishes above put the exes exactly where the [Files] section
-      # looks for them, in the shapes the release script builds, so this
+      # caused it rather than on the release machine. The window and CLI merges
+      # above put the exes and their .exe.config files exactly where the [Files]
+      # section looks for them, in the shape the release script builds, so this
       # compiles the real setup rather than a stub. Repointing either at a
       # different publish directory quietly turns it back into one.
       #
