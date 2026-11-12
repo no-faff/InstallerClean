@@ -10,6 +10,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using InstallerClean.Compatibility;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 using InstallerClean.Services;
@@ -1242,19 +1243,20 @@ public partial class MainWindow : Window
             // name and falls back to "item 12" and the checked state, which is
             // indistinguishable from the unnamed bug above. Appending the
             // culture's display name fixes that without touching the visible
-            // menu: it comes from ICU already translated into the running UI
-            // language, so an English UI hears "Russian", a French one "russe"
-            // and a Japanese one "ロシア語" - always a string the voice for that
-            // UI can pronounce, and never a resx key to keep in step.
-            var spokenName = new CultureInfo(culture).DisplayName;
+            // menu: FrameworkCultureDisplayName takes it from the ICU Windows ships,
+            // translated into the window's language, so an English UI hears "Russian",
+            // a French one "russe" and a Japanese one "ロシア語", and never a resx key
+            // to keep in step.
+            var spokenName = FrameworkCultureDisplayName.Of(new CultureInfo(culture), Localisation.UiCulture);
             AutomationProperties.SetName(item,
                 // Skip the suffix where it would repeat the endonym: exact for a
                 // language listed in its own UI ("日本語"), prefix for one whose
                 // display name only adds a region ("English (United Kingdom)").
                 // Case-insensitively, because several languages lowercase their
                 // own name where the endonym capitalises it, and "Français,
-                // français" is the same word twice.
-                spokenName.StartsWith(endonym, StringComparison.CurrentCultureIgnoreCase)
+                // français" is the same word twice. Ordinally, so the answer does not
+                // turn on the thread's culture or on the runtime.
+                spokenName.StartsWith(endonym, StringComparison.OrdinalIgnoreCase)
                     ? endonym
                     // A separator, not brackets: pt-BR's display name carries its
                     // own parenthetical, and nesting them reads badly aloud. It comes

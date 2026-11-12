@@ -387,3 +387,4 @@ M:System.String.LastIndexOf(System.String,System.Int32,System.Int32,System.Strin
 T:System.Globalization.CompareInfo;Not ported: on .NET Framework CompareInfo compares and searches by NLS rules where .NET 10 uses ICU, and its OrdinalIgnoreCase search reads ASCII text by culture rules
 P:System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;FrameworkRuntimeInformation.OSArchitecture, which asks IsWow64Process2 for the machine's own architecture as .NET 10 does
 M:System.Windows.SystemCommands.ShowSystemMenu(System.Windows.Window,System.Windows.Point);WindowChromeExtensions.ShowSystemMenu, which lets either mouse button choose an item as .NET 10 does where .NET Framework passes TPM_RETURNCMD alone
+P:System.Globalization.CultureInfo.DisplayName;FrameworkCultureDisplayName.Of, which names the culture in the UI culture's language from the ICU that Windows ships, as .NET 10 does, where .NET Framework names it in the display language Windows is set to

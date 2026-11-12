@@ -860,6 +860,39 @@ internal static class Kernel32
     public static extern IntPtr GetProcAddress(IntPtr hModule, byte[] lpProcName);
 
     /// <summary>
+    /// Loads the library <paramref name="lpLibFileName"/>, searching only where
+    /// <paramref name="dwFlags"/> names, and returns its handle, or <see cref="IntPtr.Zero"/>
+    /// where it is not there. A library loaded this way stays loaded for the life of the
+    /// process unless it is freed.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "LoadLibraryExW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr LoadLibraryEx(string lpLibFileName, IntPtr hFile, uint dwFlags);
+
+    /// <summary>LOAD_LIBRARY_SEARCH_SYSTEM32: the library is looked for in System32 alone.</summary>
+    public const uint LOAD_LIBRARY_SEARCH_SYSTEM32 = 0x00000800;
+
+    /// <summary>
+    /// Writes the locale's <paramref name="LCType"/> value, NUL-terminated, into
+    /// <paramref name="lpLCData"/> and returns the characters written with the NUL, or 0.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetLocaleInfoEx", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern int GetLocaleInfoEx(string lpLocaleName, uint LCType, [Out] char[] lpLCData, int cchData);
+
+    /// <summary>LOCALE_SLOCALIZEDDISPLAYNAME: the locale's full name in the display language Windows is set to.</summary>
+    public const uint LOCALE_SLOCALIZEDDISPLAYNAME = 0x00000002;
+
+    /// <summary>LOCALE_SLOCALIZEDLANGUAGENAME: the locale's language alone, in the display language Windows is set to.</summary>
+    public const uint LOCALE_SLOCALIZEDLANGUAGENAME = 0x0000006F;
+
+    /// <summary>The language identifier of the user's own display language.</summary>
+    [DllImport(Library, EntryPoint = "GetUserDefaultUILanguage", ExactSpelling = true)]
+    public static extern ushort GetUserDefaultUILanguage();
+
+    /// <summary>The user's default locale, the one the regional format set in Windows names, written NUL-terminated.</summary>
+    [DllImport(Library, EntryPoint = "GetUserDefaultLocaleName", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern int GetUserDefaultLocaleName([Out] char[] lpLocaleName, int cchLocaleName);
+
+    /// <summary>
     /// Ends the process <paramref name="hProcess"/> names at once, with
     /// <paramref name="uExitCode"/>. Given this process's own pseudo-handle it runs
     /// no more of its code: no finaliser, no exit handler and no DLL detach.

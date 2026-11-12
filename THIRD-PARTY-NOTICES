@@ -220,16 +220,17 @@ InstallerClean itself is under. Its full text is in LICENSE.
 .NET runtime
 -------------------------------------------------------------------------------
 
-Parts of the .NET runtime's class library, as it is at the v10.0.0 tag, are
-ported to .NET Framework 4.8 and compiled into InstallerClean.Core, which every
-download carries. They are how a path is read, joined and made full; how a file
-or folder is found, read, moved, deleted and listed, and a folder made; how a
-search pattern is matched; how a Windows error becomes an exception; how a
-registry key is listed; how a command line is quoted for a new process, and the
-exception a refused start carries; how the machine's architecture is read; the
-dictionary, sequence, string, stream, ASCII, Math, environment and timing
-members .NET Framework 4.8 lacks; and the text of the messages its exceptions
-carry.
+Parts of the .NET runtime's class library and of its native globalization
+library, as they are at the v10.0.0 tag, are ported to .NET Framework 4.8 and
+compiled into InstallerClean.Core, which every download carries. They are how a
+path is read, joined and made full; how a file or folder is found, read, moved,
+deleted and listed, and a folder made; how a search pattern is matched; how a
+Windows error becomes an exception; how a registry key is listed; how a command
+line is quoted for a new process, and the exception a refused start carries;
+how the machine's architecture is read; how a culture is named in the language
+of the window; the dictionary, sequence, string, stream, ASCII, Math,
+environment and timing members .NET Framework 4.8 lacks; and the text of the
+messages its exceptions carry.
 
   https://github.com/dotnet/runtime
 
@@ -244,7 +245,8 @@ FrameworkStringExtensions.cs, FrameworkCollectionExtensions.cs,
 FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
 ConfigureAwaitOptions.cs, TaskCompletionSource.cs, FrameworkTask.cs,
-FrameworkProcess.cs and FrameworkRuntimeInformation.cs; and,
+FrameworkProcess.cs, FrameworkRuntimeInformation.cs and
+FrameworkCultureDisplayName.cs; and,
 for the tests, src/InstallerClean.Tests/Compatibility/TestFramework.cs.
 
 Its licence, LICENSE.TXT in that repository at that tag:
