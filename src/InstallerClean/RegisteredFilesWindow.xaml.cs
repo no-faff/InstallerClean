@@ -120,12 +120,13 @@ public partial class RegisteredFilesWindow : Window
     /// <summary>
     /// Puts the view in the given order and repaints the indicators to match.
     /// The order the window opens in comes through here too, which is the point:
-    /// an arrow painted over the view model's pre-sort, with no SortDescription
-    /// behind it, would claim an order the list is not in. The pre-sort is
+    /// an arrow painted over the view model's pre-sort, with no sort of the
+    /// view's behind it, would claim an order the list is not in. The pre-sort is
     /// ordinal (<see cref="StringComparer.OrdinalIgnoreCase"/>), which orders by
     /// UTF-16 code unit and so files every accented or non-Latin product name
-    /// after Z; a SortDescription compares culture-aware, which interleaves them
-    /// with their base letters. On any machine holding a product name outside
+    /// after Z; the view's sort collates in the window's language
+    /// (<see cref="CollatedSort{T}"/>), which interleaves them with their base
+    /// letters. On any machine holding a product name outside
     /// plain ASCII the two orders differ, and the first click on Product name
     /// would then reorder the rows rather than reverse them.
     ///
@@ -133,42 +134,37 @@ public partial class RegisteredFilesWindow : Window
     /// is total: rows sharing a product name (one product code registered with
     /// several caches), a size or a patch count resolve the same way every time
     /// rather than however WPF's comparer happened to leave them.
-    ///
-    /// SortDescriptions and not a CustomSort comparer, for the reason set out on
-    /// OrphanedFilesWindow.SortByColumn: WPF caches the sort value per item for a
-    /// SortFieldComparer and for nothing else, so a typed comparer would be a
-    /// step backwards rather than forwards.
     /// </summary>
     private void ApplySort(string sortProperty, ListSortDirection direction, GridViewColumn column)
     {
-        // Deferred, so the descriptions below are one rebuild. Every
-        // SortDescriptions mutation raises a CollectionChanged that
-        // ListCollectionView turns into its own RefreshOrDefer, and Clear raises
-        // one even when the collection is already empty, so undeferred each Add
-        // would sort the whole list again.
-        var view = CollectionViewSource.GetDefaultView(ProductsList.ItemsSource);
-        using (view.DeferRefresh())
-        {
-            view.SortDescriptions.Clear();
-            // Rows with no product name to scan for go to the foot of the list,
-            // ahead of the key the user asked for and always ascending so they
-            // stay there in both directions. Only the product column, since the
-            // product name is the one key those rows do not have; sorting by
-            // file, size or patches ranks them on their own values like any
-            // other row.
-            if (sortProperty == nameof(ProductRow.ProductName))
-                view.SortDescriptions.Add(
-                    new SortDescription(nameof(ProductRow.HasNoNamedProduct), ListSortDirection.Ascending));
-            view.SortDescriptions.Add(new SortDescription(sortProperty, direction));
-            view.SortDescriptions.Add(
-                new SortDescription(nameof(ProductRow.FullPath), ListSortDirection.Ascending));
-        }
+        // Rows with no product name to scan for go to the foot of the list,
+        // ahead of the key the user asked for and always ascending so they stay
+        // there in both directions. Only the product column, since the product
+        // name is the one key those rows do not have; sorting by file, size or
+        // patches ranks them on their own values like any other row.
+        var keys = new List<(Func<ProductRow, object?>, ListSortDirection)>();
+        if (sortProperty == nameof(ProductRow.ProductName))
+            keys.Add((p => p.HasNoNamedProduct, ListSortDirection.Ascending));
+        keys.Add((SortKey(sortProperty), direction));
+        keys.Add((p => p.FullPath, ListSortDirection.Ascending));
+        var view = (ListCollectionView)CollectionViewSource.GetDefaultView(ProductsList.ItemsSource);
+        view.CustomSort = new CollatedSort<ProductRow>(view.Culture, [.. keys]);
 
         _lastSortProperty = sortProperty;
         _lastSortDirection = direction;
         _lastSortColumn = column;
         UpdateSortIndicators();
     }
+
+    /// <summary>The value of the column <paramref name="sortProperty"/> names, for a row.</summary>
+    private static Func<ProductRow, object?> SortKey(string sortProperty) => sortProperty switch
+    {
+        nameof(ProductRow.ProductName) => p => p.ProductName,
+        nameof(ProductRow.FileName) => p => p.FileName,
+        nameof(ProductRow.SizeBytes) => p => p.SizeBytes,
+        nameof(ProductRow.PatchCount) => p => p.PatchCount,
+        _ => throw new ArgumentException($"{sortProperty} is not a column the list sorts by.", nameof(sortProperty)),
+    };
 
     // Stable README anchor (an explicit <a id="recovery"> before the
     // recovery section of every README) the missing-file note links to. An

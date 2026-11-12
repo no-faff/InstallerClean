@@ -247,7 +247,9 @@ FrameworkEnumerable.cs, FrameworkEnvironment.cs, FrameworkMath.cs, Ascii.cs,
 FrameworkArgumentException.cs, FrameworkArgumentOutOfRangeException.cs,
 ConfigureAwaitOptions.cs, TaskCompletionSource.cs, FrameworkTask.cs,
 FrameworkProcess.cs, FrameworkRuntimeInformation.cs,
-FrameworkCultureDisplayName.cs, WindowsIcu.cs and FrameworkCollation.cs; and,
+FrameworkCultureDisplayName.cs, WindowsIcu.cs and FrameworkCollation.cs;
+in src/InstallerClean/Helpers/CollatedSort.cs, which also follows the list
+sort of WPF (https://github.com/dotnet/wpf, MIT, the same copyright); and,
 for the tests, src/InstallerClean.Tests/Compatibility/TestFramework.cs.
 
 Its licence, LICENSE.TXT in that repository at that tag:

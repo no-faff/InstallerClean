@@ -116,25 +116,11 @@ public partial class OrphanedFilesWindow : Window
     ///
     /// This list is as long as the cache folder, which can hold hundreds of
     /// thousands of files in <c>C:\Windows\Installer</c>, and the sort runs on
-    /// the UI thread. Keep the sort as a property name rather than a typed
-    /// comparer, for the reason below.
-    ///
-    /// A SortDescription costs one property read per ITEM, not one per
-    /// comparison. ListCollectionView.PrepareLocalArray sorts its local
-    /// ArrayList through MS.Internal.Data.DataExtensionMethods.Sort, which routes
-    /// a SortFieldComparer into SortFieldComparer.SortHelper; that wraps every
-    /// item in a CachedValueItem holding the resolved value, so the property path
-    /// is evaluated once per row and every comparison reads the cached value.
-    /// Any OTHER IComparer, which is what CustomSort takes, falls to the plain
-    /// ArrayList.Sort branch with no cache at all. So replacing this with a typed
-    /// comparer would trade one read per row for two reads per comparison, and
-    /// FileName is a PathText.GetFileName over the full path, which the comparer
-    /// would then run on every comparison rather than once per row.
-    ///
-    /// What is left after that is culture-aware collation, which costs the same
-    /// whichever mechanism asks for it and is the ordering the app wants (see
-    /// RegisteredFilesWindow.ApplySort on why ordinal is not an option). It is
-    /// the floor here, not an overhead to engineer away.
+    /// the UI thread. <see cref="CollatedSort{T}"/> reads each row's keys once,
+    /// so FileName, a PathText.GetFileName over the full path, is worked out once
+    /// per row; what is left is collating the names, which costs the same however
+    /// the sort asks for it and is the order the app wants (see
+    /// RegisteredFilesWindow.ApplySort on why ordinal is not an option).
     /// </summary>
     private bool SortByColumn(GridViewColumnHeader header)
     {
@@ -158,7 +144,7 @@ public partial class OrphanedFilesWindow : Window
     /// <summary>
     /// Puts the view in the given order and repaints the indicators to match.
     /// The order the window opens in comes through here too, so the arrow the
-    /// user sees always has a SortDescription behind it, and the first click on
+    /// user sees always has the view's own sort behind it, and the first click on
     /// the column the window opened sorted by reverses the rows.
     ///
     /// Every sort ends on the full path, which is unique per row, so the order
@@ -166,32 +152,33 @@ public partial class OrphanedFilesWindow : Window
     /// column takes exactly two values, so sorting by it puts every row into
     /// one of two ties, and without a tiebreaker Reason, File, Reason
     /// reshuffles rows inside a group for no reason a user can see.
-    /// RegisteredFilesWindow.ApplySort builds its descriptions the same way, and
-    /// SortByColumn above says why they are SortDescriptions rather than a
-    /// CustomSort comparer.
+    /// RegisteredFilesWindow.ApplySort builds its sort the same way.
+    ///
+    /// The names compare in the view's culture, which WPF takes from the list's
+    /// language, the window's language.
     /// </summary>
     private void ApplySort(string sortProperty, ListSortDirection direction, GridViewColumn column)
     {
-        // Deferred, so the pair below is one rebuild rather than two. Every
-        // SortDescriptions mutation raises a CollectionChanged that
-        // ListCollectionView turns into its own RefreshOrDefer, and Clear raises
-        // one even when the collection is already empty, so undeferred this
-        // rebuilds the view and resets the list once with no sort at all before
-        // rebuilding it again with the wanted one.
-        var view = CollectionViewSource.GetDefaultView(FilesList.ItemsSource);
-        using (view.DeferRefresh())
-        {
-            view.SortDescriptions.Clear();
-            view.SortDescriptions.Add(new SortDescription(sortProperty, direction));
-            view.SortDescriptions.Add(
-                new SortDescription(nameof(OrphanedFile.FullPath), ListSortDirection.Ascending));
-        }
+        var view = (ListCollectionView)CollectionViewSource.GetDefaultView(FilesList.ItemsSource);
+        view.CustomSort = new CollatedSort<OrphanedFile>(
+            view.Culture,
+            (SortKey(sortProperty), direction),
+            (f => f.FullPath, ListSortDirection.Ascending));
 
         _lastSortProperty = sortProperty;
         _lastSortDirection = direction;
         _lastSortColumn = column;
         UpdateSortIndicators();
     }
+
+    /// <summary>The value of the column <paramref name="sortProperty"/> names, for a row.</summary>
+    private static Func<OrphanedFile, object?> SortKey(string sortProperty) => sortProperty switch
+    {
+        nameof(OrphanedFile.FileName) => f => f.FileName,
+        nameof(OrphanedFile.Reason) => f => f.Reason,
+        nameof(OrphanedFile.SizeBytes) => f => f.SizeBytes,
+        _ => throw new ArgumentException($"{sortProperty} is not a column the list sorts by.", nameof(sortProperty)),
+    };
 
     private void UpdateSortIndicators()
     {
