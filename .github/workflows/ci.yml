@@ -1068,9 +1068,14 @@ jobs:
               Fail "$($run.Label) loaded $($load.Path) from $where, row $($load.Index), $(Get-When $load $read.Marker)."
             }
 
-            # The copy a replace started at the path is the exe started from its own
-            # folder, which the exe's own runs plant for.
-            if ($run.StartedCopy) { continue }
+            # The copy a replace started at the path is planted for as well, in the folder the
+            # replace puts the exe in, and judged against those plants in the second pass.
+            if ($run.StartedCopy) {
+              $starter = @($planned | Where-Object { $_.Label -eq $run.StartedBy.Label })
+              if ($starter.Count -ne 1) { Fail "$($run.Label) has $($starter.Count) runs planned for the replace that started it, where it has one." }
+              else { $starter[0].TargetPlants = @(Get-RunPlants $run $read) }
+              continue
+            }
             $plants = @(Get-RunPlants $run $read)
             # What an exe must load is among what is planted for it as a load, or the planting
             # would prove nothing about it.
@@ -1088,7 +1093,7 @@ jobs:
               else { $parent[0].ReplacePlants = $plants }
             }
             else {
-              $planned.Add([pscustomobject]@{ Label = $run.Label; BuildLabel = $run.Label; Plants = $plants; ReplacePlants = @() })
+              $planned.Add([pscustomobject]@{ Label = $run.Label; BuildLabel = $run.Label; Plants = $plants; ReplacePlants = @(); TargetPlants = @() })
             }
           }
 
@@ -1130,8 +1135,9 @@ jobs:
           $runs = foreach ($p in $planned) {
             $build = $builds | Where-Object Label -eq $p.BuildLabel
             if ($build.Replace) {
-              # The copy a replace started at the path is ended at once and not judged here.
-              Invoke-Replace $build $p.Label 'second' $p.Plants -replacePlants $p.ReplacePlants
+              # A window that puts itself in place starts the copy at the path, which runs among
+              # the plants put in the folder it is started in and is judged with them.
+              Invoke-Replace $build $p.Label 'second' $p.Plants -replacePlants $p.ReplacePlants -targetPlants $p.TargetPlants -JudgeCopy:(@($p.TargetPlants).Count -gt 0)
               continue
             }
             $folder = Get-RunFolder 'second' $p.Label

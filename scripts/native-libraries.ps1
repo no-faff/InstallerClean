@@ -523,6 +523,21 @@ function Get-ProtectedFolders {
     Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\') + '\' }
 }
 
+# The looks a started exe makes beside itself that are not planted for, each with its reason.
+# A look is matched by its path relative to the exe's folder, in lower case. Any other look is
+# planted, so a new one fails the second pass until it is judged and listed here.
+function Get-KnownLook($run, [string]$relative) {
+  # The .NET Framework reads <exe name>.ini beside a managed exe for its JIT debugging settings
+  # (GenerateTrackingInfo and AllowOptimize), which run no code.
+  $ini = [regex]::Escape([IO.Path]::GetFileNameWithoutExtension($run.Exe).ToLowerInvariant()) + '\.ini'
+  if ($relative -match "^$ini$") { return 'the .NET Framework''s debugging control file, which sets JIT optimisation and tracking and runs no code' }
+  # The runtime looks for a satellite resource assembly in a folder named for the culture beside
+  # the exe. A download cannot create that folder, so a file there is not one a download places.
+  if ($relative -match '^[a-z]{2,3}(-[a-z0-9]+)*\\installerclean\.resources(\\installerclean\.resources)?\.(dll|exe)$') {
+    return 'a satellite assembly in a culture folder beside the exe, which a download cannot create'
+  }
+}
+
 # The genuine files a first-pass run's looks and loads call for in its second-pass run. A
 # file is planted where the run looked for one beside its exe, or in the working folder it was
 # started in, whatever its name; those plants say Why 'looked', and the second pass has to
@@ -535,6 +550,8 @@ function Get-RunPlants($run, $read) {
   $plants = [System.Collections.Generic.List[object]]::new()
   $looks = @($read.Libraries | Where-Object { $_.Operation -ne 'Load Image' -and $_.Path -notmatch '[*?]' })
   foreach ($relative in ($looks | Where-Object Place -eq 'own' | ForEach-Object { $_.Relative.ToLowerInvariant() } | Sort-Object -Unique)) {
+    $known = Get-KnownLook $run $relative
+    if ($known) { Write-Host "  not planted: $relative, $known"; continue }
     $plant = Get-Plant (Split-Path $relative -Leaf) $read.Loads
     $plants.Add([pscustomobject]@{ Place = 'beside'; Path = $relative; Source = $plant.Source; Kind = $plant.Kind; Why = 'looked' })
   }
@@ -925,8 +942,10 @@ function Test-ImageNameControls {
   function Get-ControlRow([string]$operation, [string]$path, [string]$detail = '', [string]$result = 'NAME NOT FOUND') {
     [pscustomobject]@{ 'Time of Day' = '12:00:00.0000000 PM'; Operation = $operation; Result = $result; Path = $path; Detail = $detail }
   }
-  $planted = 'control.dll', 'control.ocx', 'controlsys.dll', 'helper.exe', 'system.io.compression.native', 'winspool.drv'
-  $looked = 'control.dll', 'CONTROL.OCX', 'winspool.drv', 'helper.exe', 'System.IO.Compression.Native',
+  $planted = 'control.dll', 'control.ocx', 'controlsys.dll', 'helper.exe', 'other.ini', 'system.io.compression.native', 'winspool.drv'
+  # control.ini and the satellite look are listed as known (Get-KnownLook), so they are not planted.
+  $looked = 'control.dll', 'CONTROL.OCX', 'winspool.drv', 'helper.exe', 'System.IO.Compression.Native', 'control.INI', 'other.ini',
+    'EN-US\InstallerClean.resources.dll',
     'control.pdb', 'control.dll.config', 'control.en', 'control.ENU', 'control.en-US',
     'control.exe', 'work'
   $looked = @($looked) + @(Get-ReplaceSuffixes | ForEach-Object { "control.exe$_" })
@@ -1417,7 +1436,7 @@ function Test-ReplaceEnd($end) {
   }
   # The names a replace leaves are judged above, so each fault is named once.
   $exeName = Split-Path $end.Target -Leaf
-  $allowed = @($exeName, 'control.txt', "$exeName.aside") + @($suffixes | ForEach-Object { "$exeName$_" })
+  $allowed = @($exeName, 'control.txt', "$exeName.aside") + @($suffixes | ForEach-Object { "$exeName$_" }) + @($end.PlantedNames | Where-Object { $_ })
   foreach ($stray in @(Get-ChildItem -LiteralPath $end.TargetFolder -Force | Where-Object Name -notin $allowed)) {
     Fail "$label left $($stray.FullName) in the folder it was put in."
   }
@@ -1467,9 +1486,7 @@ function Test-StartsReplace($run) { $run.Build.Replace -eq 'command' -and -not $
 # Reads the record $csv for $runs, and answers the record and the runs with, after each run
 # that starts a replace, the replace it started (Read-Record). A run Read-Record judged on
 # none of its rows is left out, the step having failed for it, and so is a replace of one.
-# Fails where a run that starts a replace started other than one, unless it is judged on
-# its loads alone and started none, which it says, so a replace never judged is never
-# silent.
+# Fails where a run that starts a replace started other than one.
 function Read-RecordWithReplaces([string]$csv, $runs) {
   $started = [System.Collections.Generic.List[object]]::new()
   $dropped = [System.Collections.Generic.HashSet[string]]::new()
@@ -1492,6 +1509,9 @@ function Read-RecordWithReplaces([string]$csv, $runs) {
 # $pass, and answers the replacer's run and, with -JudgeCopy, for a window build that put
 # itself in place, the run of the copy it started at the path. With -JudgeCopy that copy
 # runs for the build's own Wait before it is ended; without it, it is ended at once.
+# $targetPlants are put in the folder the exe is put into once the stand-in old copy there is
+# running, so the copy the replace starts there finds them beside it; they are judged against
+# that copy and against the replacer.
 # Each run's end is judged by Test-ReplaceEnd once every process has ended.
 # A build whose Replace is 'command' is started with /s /noupdate beside the three
 # switches, and the Ctrl+C event's switch naming an event made here, as the older copy
@@ -1503,7 +1523,7 @@ function Read-RecordWithReplaces([string]$csv, $runs) {
 # with it. That replace is judged as a run of its own once the record is read
 # (Read-RecordWithReplaces), against $replacePlants, which are put in the staging folder
 # beside $plants; the run carries both lists.
-function Invoke-Replace($build, [string]$label, [string]$pass, $plants, [switch]$JudgeCopy, $replacePlants = @()) {
+function Invoke-Replace($build, [string]$label, [string]$pass, $plants, [switch]$JudgeCopy, $replacePlants = @(), $targetPlants = @()) {
   $staging = New-StagingFolder
   # Read now: a window started at the path deletes the staged exe as it starts, and the
   # folder with it where nothing else is in it.
@@ -1535,6 +1555,8 @@ function Invoke-Replace($build, [string]$label, [string]$pass, $plants, [switch]
 
   $standIn = Start-Process -FilePath $target -ArgumentList '-NoProfile', '-NonInteractive', '-Command', 'Start-Sleep -Seconds 600' -WindowStyle Hidden -PassThru
   $null = $standIn.Handle
+  # Put in place once the stand-in is running, so the stand-in does not meet them as it starts.
+  $targetPlaced = @(Add-Plants $targetFolder $targetPlants)
   $signal = New-StartedEvent
   $event = $signal.Handle
   $contract = 'src/InstallerClean.Core/Helpers/HandOverContract.cs'
@@ -1576,7 +1598,7 @@ function Invoke-Replace($build, [string]$label, [string]$pass, $plants, [switch]
   $runs = @([pscustomobject]@{
     Label = $label; Build = $build; Folder = $staging; Exe = $stagedName; Id = $replacer.Id; Started = $begun; Ended = $ended
     Placed = $placed; Target = $target; WorkingFolder = $(if ($command) { $workingFolder } else { '' })
-    ReplacePlaced = $replacePlaced; SharedPlaced = $replacePlaced
+    ReplacePlaced = $replacePlaced; SharedPlaced = @($replacePlaced) + @($targetPlaced)
   })
   $copies = @(Get-Process -Name ([IO.Path]::GetFileNameWithoutExtension($exeName)) -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $target })
   if ($build.Replace -eq 'replaced' -and $build.StartsAtPath) {
@@ -1588,7 +1610,7 @@ function Invoke-Replace($build, [string]$label, [string]$pass, $plants, [switch]
         Write-Host "  ${label}: the copy started at the path is process $($copy.Id)"
         $runs += [pscustomobject]@{
           Label = "$label, the copy started at the path"; Build = $build.AtPath; Folder = $targetFolder; Exe = $exeName; Id = $copy.Id
-          Started = $begun; Ended = $null; StartedCopy = $true; StartedBy = $runs[0]
+          Started = $begun; Ended = $null; StartedCopy = $true; StartedBy = $runs[0]; Placed = $targetPlaced
         }
       }
     }
@@ -1604,6 +1626,7 @@ function Invoke-Replace($build, [string]$label, [string]$pass, $plants, [switch]
   foreach ($process in $left) { Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue }
   Test-ReplaceEnd ([pscustomobject]@{
     Label = $label; Mode = $build.Replace; BuildExe = $build.Exe; Target = $target; TargetFolder = $targetFolder; StagingAccess = $stagingAccess
+    PlantedNames = @($targetPlaced | ForEach-Object { (($_.Key -split '\|', 2)[1] -split '\\')[0] })
     EventSet = $eventSet; ExitCode = $replacer.ExitCode; Started = $begun; Ended = $ended; ReadEntries = ${function:Read-NothingAtPathEntries}
     StillRunning = $(if ($left) { $left[0].Path })
   })
