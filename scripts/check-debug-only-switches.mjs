@@ -146,6 +146,11 @@ const ALLOWED = [
     text: 'GetPath(folder, Shell32.SHGetKnownFolderPath, Ole32.CoTaskMemFree, Environment.GetEnvironmentVariable);',
     what: 'KnownFolders.GetPath, the variable .NET falls back to where Windows does not answer for a known folder',
   },
+  {
+    file: 'src/InstallerClean.Core/Compatibility/WindowsIcu.cs',
+    text: 'AsksForNls(Environment.GetEnvironmentVariable(UseNlsVariable)) ? null : Load());',
+    what: 'WindowsIcu, DOTNET_SYSTEM_GLOBALIZATION_USENLS, which .NET 10 reads to sort and name cultures through NLS rather than ICU',
+  },
 ];
 
 // What holds the word and names no environment variable, by its text with the spaces
