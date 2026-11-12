@@ -1,5 +1,4 @@
 using System.Collections;
-using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using InstallerClean.Compatibility;
@@ -7,7 +6,7 @@ using InstallerClean.Compatibility;
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// The order a list of <see cref="SortDescription"/>s gives a list view, as .NET 10's WPF
+/// The order a list of <c>SortDescription</c>s gives a list view, as .NET 10's WPF
 /// sorts by one (dotnet/wpf v10.0.0 <c>SortFieldComparer</c>, with the
 /// <c>System.Collections.Comparer</c> it makes for the view's culture): each key in turn,
 /// reversed where it is descending, until one differs. Two strings compare in the view's
@@ -31,11 +30,11 @@ internal sealed class CollatedSort<T> : IComparer where T : class
     /// The view's culture, which WPF takes from the list's language; null, as WPF reads a
     /// view with none, is the invariant culture.
     /// </param>
-    /// <param name="keys">Each key's value for a row, and its direction, first key first.</param>
-    public CollatedSort(CultureInfo? culture, params (Func<T, object?> Read, ListSortDirection Direction)[] keys)
+    /// <param name="keys">Each key's value for a row, and whether it sorts descending, first key first.</param>
+    public CollatedSort(CultureInfo? culture, params (Func<T, object?> Read, bool Descending)[] keys)
     {
         _collate = FrameworkCollation.For(culture ?? CultureInfo.InvariantCulture, CompareOptions.None);
-        _keys = Array.ConvertAll(keys, k => (k.Read, k.Direction == ListSortDirection.Descending));
+        _keys = keys;
     }
 
     public int Compare(object? x, object? y)

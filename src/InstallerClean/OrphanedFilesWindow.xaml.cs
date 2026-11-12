@@ -162,8 +162,8 @@ public partial class OrphanedFilesWindow : Window
         var view = (ListCollectionView)CollectionViewSource.GetDefaultView(FilesList.ItemsSource);
         view.CustomSort = new CollatedSort<OrphanedFile>(
             view.Culture,
-            (SortKey(sortProperty), direction),
-            (f => f.FullPath, ListSortDirection.Ascending));
+            (SortKey(sortProperty), direction == ListSortDirection.Descending),
+            (f => f.FullPath, false));
 
         _lastSortProperty = sortProperty;
         _lastSortDirection = direction;

@@ -142,11 +142,11 @@ public partial class RegisteredFilesWindow : Window
         // there in both directions. Only the product column, since the product
         // name is the one key those rows do not have; sorting by file, size or
         // patches ranks them on their own values like any other row.
-        var keys = new List<(Func<ProductRow, object?>, ListSortDirection)>();
+        var keys = new List<(Func<ProductRow, object?>, bool)>();
         if (sortProperty == nameof(ProductRow.ProductName))
-            keys.Add((p => p.HasNoNamedProduct, ListSortDirection.Ascending));
-        keys.Add((SortKey(sortProperty), direction));
-        keys.Add((p => p.FullPath, ListSortDirection.Ascending));
+            keys.Add((p => p.HasNoNamedProduct, false));
+        keys.Add((SortKey(sortProperty), direction == ListSortDirection.Descending));
+        keys.Add((p => p.FullPath, false));
         var view = (ListCollectionView)CollectionViewSource.GetDefaultView(ProductsList.ItemsSource);
         view.CustomSort = new CollatedSort<ProductRow>(view.Culture, [.. keys]);
 

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.ComponentModel;
 using System.Globalization;
 using InstallerClean.Helpers;
 
@@ -39,8 +38,8 @@ public class CollatedSortTests
     {
         var sort = new CollatedSort<Row>(
             CultureInfo.GetCultureInfo("en-GB"),
-            (r => r.Name, ListSortDirection.Ascending),
-            (r => r.Path, ListSortDirection.Ascending));
+            (r => r.Name, false),
+            (r => r.Path, false));
 
         var order = Sorted(sort,
             new Row("a)b", 1, "p3"), new Row("a_b", 1, "p2"), new Row("a_b", 1, "p1"), new Row("B", 1, "p4"));
@@ -53,8 +52,8 @@ public class CollatedSortTests
     {
         var sort = new CollatedSort<Row>(
             CultureInfo.GetCultureInfo("en-GB"),
-            (r => r.Size, ListSortDirection.Descending),
-            (r => r.Path, ListSortDirection.Ascending));
+            (r => r.Size, true),
+            (r => r.Path, false));
 
         var order = Sorted(sort, new Row("x", 1, "b"), new Row("x", 5, "c"), new Row("x", 1, "a"));
 
@@ -64,7 +63,7 @@ public class CollatedSortTests
     [Fact]
     public void A_missing_name_sorts_ahead_of_every_name()
     {
-        var sort = new CollatedSort<Row>(null, (r => r.Name, ListSortDirection.Ascending));
+        var sort = new CollatedSort<Row>(null, (r => r.Name, false));
 
         var order = Sorted(sort, new Row("a", 1, "named"), new Row(null, 1, "unnamed"));
 
@@ -75,7 +74,7 @@ public class CollatedSortTests
     public void Each_row_is_read_once_however_many_comparisons_it_takes_part_in()
     {
         var rows = Enumerable.Range(0, 200).Select(i => new Row((199 - i).ToString("D3"), 1, i.ToString())).ToArray();
-        var sort = new CollatedSort<Row>(CultureInfo.InvariantCulture, (r => r.Name, ListSortDirection.Ascending));
+        var sort = new CollatedSort<Row>(CultureInfo.InvariantCulture, (r => r.Name, false));
 
         Sorted(sort, rows);
 
@@ -90,7 +89,7 @@ public class CollatedSortTests
         // The rows are records, which compare by value, so a key kept for one row must not
         // be handed to an equal one.
         var reads = 0;
-        var sort = new CollatedSort<Item>(null, (i => ++reads, ListSortDirection.Ascending));
+        var sort = new CollatedSort<Item>(null, (i => ++reads, false));
         var first = new Item("same");
         var second = new Item("same");
 
