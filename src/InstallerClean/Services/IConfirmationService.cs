@@ -24,7 +24,12 @@ public interface IConfirmationService
     /// window to own the dialog.
     ///
     /// <paramref name="currentDestination"/> is whatever the Move box holds,
-    /// and the browser opens there when it names a folder that exists. Browse
+    /// and the browser opens there when it names a folder that exists. Whether it does is
+    /// worked out off the window's thread, within a short bound past which the browser
+    /// opens with no start folder, so the window goes on answering throughout.
+    /// <paramref name="stillWanted"/>, asked once the start folder is known, keeps the
+    /// browser shut and answers null where it says false, as it does where the window
+    /// has closed in the meantime. Browse
     /// is most often pressed to change a destination rather than to set the
     /// first one, so the browser starts at the path already on screen rather
     /// than one the user has to navigate back from.
@@ -34,5 +39,5 @@ public interface IConfirmationService
     /// path could only be exercised by opening a real folder browser, which
     /// a test run cannot answer.
     /// </summary>
-    string? AskForMoveDestination(string? currentDestination = null);
+    Task<string?> AskForMoveDestinationAsync(string? currentDestination = null, Func<bool>? stillWanted = null);
 }

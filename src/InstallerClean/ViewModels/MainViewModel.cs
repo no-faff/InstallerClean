@@ -100,6 +100,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // a Move or a Delete was already under way.
         Scan = new ScanViewModel(scanService, rebootService, dialogService,
             isExternallyBlocked: () => Cleanup?.IsOperationInFlight == true
+                || Cleanup?.IsChoosingDestination == true
                 || Completion?.IsComplete == true
                 || Chrome?.IsUpdating == true
                 || Chrome?.IsOfferingUpdate == true);
@@ -390,6 +391,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             e.PropertyName == nameof(ScanViewModel.IsScanInFlight) ||
             e.PropertyName == nameof(CleanupViewModel.IsOperating) ||
             e.PropertyName == nameof(CleanupViewModel.IsOperationInFlight) ||
+            e.PropertyName == nameof(CleanupViewModel.IsChoosingDestination) ||
             e.PropertyName == nameof(CompletionViewModel.IsComplete) ||
             e.PropertyName == nameof(ChromeViewModel.IsOfferingUpdate) ||
             e.PropertyName == nameof(ChromeViewModel.IsUpdating))

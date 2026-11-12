@@ -129,6 +129,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             if (!SetProperty(ref _isMoveOrDeleteRunning, value)) return;
             MoveAllCommand.NotifyCanExecuteChanged();
             DeleteAllCommand.NotifyCanExecuteChanged();
+            BrowseDestinationCommand.NotifyCanExecuteChanged();
         }
     }
     private bool _isMoveOrDeleteRunning;
@@ -152,7 +153,19 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(MoveAllCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteAllCommand))]
+    [NotifyCanExecuteChangedFor(nameof(BrowseDestinationCommand))]
     private bool _isOperationInFlight;
+
+    /// <summary>
+    /// True while Browse works out the folder its picker starts in, which can take up to
+    /// <see cref="ConfirmationService.StartFolderBound"/> where the box names a network
+    /// share that does not answer. Move, Delete and Scan are out of use while it is
+    /// true, so none starts on a destination the picker is about to change.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(MoveAllCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteAllCommand))]
+    private bool _isChoosingDestination;
     private string _operationProgress = string.Empty;
 
     /// <summary>
@@ -317,6 +330,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         {
             MoveAllCommand.NotifyCanExecuteChanged();
             DeleteAllCommand.NotifyCanExecuteChanged();
+            BrowseDestinationCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -624,12 +638,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // command runs; asking tries to take it back.
     private bool CanMove() =>
         !_scan.IsScanInFlight && !IsOperationInFlight && !IsMoveOrDeleteRunning
+        && !IsChoosingDestination
         && !_scan.HasPendingReboot
         && _scan.HasOrphans
         && !_instanceLockLost();
 
     private bool CanDelete() =>
         !_scan.IsScanInFlight && !IsOperationInFlight && !IsMoveOrDeleteRunning
+        && !IsChoosingDestination
         && !_scan.HasPendingReboot
         && _scan.HasOrphans
         && !_instanceLockLost();
@@ -644,12 +660,32 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         DeleteAllCommand.NotifyCanExecuteChanged();
     }
 
-    [RelayCommand]
-    private void BrowseDestination()
+    /// <summary>
+    /// Opens the folder picker at the folder the box names. The picker opens only where
+    /// the box still holds, trimmed, the text it held when Browse was pressed: text typed
+    /// while the start folder was being worked out stands, and no picker comes up over it.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanBrowse))]
+    private async Task BrowseDestinationAsync()
     {
-        var chosen = _confirmationService.AskForMoveDestination(MoveDestination);
+        var asked = MoveDestination?.Trim();
+        IsChoosingDestination = true;
+        string? chosen;
+        try
+        {
+            chosen = await _confirmationService.AskForMoveDestinationAsync(
+                MoveDestination, () => MoveDestination?.Trim() == asked);
+        }
+        finally
+        {
+            IsChoosingDestination = false;
+        }
         if (chosen is not null) MoveDestination = chosen;
     }
+
+    // A picker answer written while a Move or Delete runs would change the box under it.
+    private bool CanBrowse() =>
+        !_scan.IsScanInFlight && !IsOperationInFlight && !IsMoveOrDeleteRunning;
 
     /// <summary>
     /// The source a Cancel press cancels. A Move or Delete installs one as it starts
@@ -777,7 +813,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // touches nothing; the box is left as it was, empty.
         if (string.IsNullOrWhiteSpace(MoveDestination))
         {
-            var chosen = _confirmationService.AskForMoveDestination();
+            var chosen = await _confirmationService.AskForMoveDestinationAsync();
             if (chosen is null) return;
             MoveDestination = chosen;
         }

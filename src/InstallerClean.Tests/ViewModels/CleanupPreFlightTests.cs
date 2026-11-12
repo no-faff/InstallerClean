@@ -593,19 +593,72 @@ public class CleanupPreFlightTests : IDisposable
     }
 
     [Fact]
+    public async Task Move_Delete_and_Scan_wait_while_Browse_works_out_its_start_folder()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+        var answer = new TaskCompletionSource<string?>();
+        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>())
+            .Returns(answer.Task);
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+
+        var browse = vm.Cleanup.BrowseDestinationCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Cleanup.IsChoosingDestination);
+        Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+        Assert.False(vm.Scan.ScanCommand.CanExecute(null));
+
+        answer.SetResult(null);
+        await browse;
+
+        Assert.False(vm.Cleanup.IsChoosingDestination);
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+        Assert.True(vm.Scan.ScanCommand.CanExecute(null));
+        Assert.Equal(_destination, vm.Cleanup.MoveDestination);
+    }
+
+    [Fact]
+    public async Task Text_typed_while_Browse_works_out_its_start_folder_keeps_the_picker_shut()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = "  " + _destination;
+        Func<bool>? stillWanted = null;
+        var answer = new TaskCompletionSource<string?>();
+        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Do<Func<bool>?>(f => stillWanted = f))
+            .Returns(answer.Task);
+
+        var browse = vm.Cleanup.BrowseDestinationCommand.ExecuteAsync(null);
+
+        Assert.NotNull(stillWanted);
+        // The box is compared trimmed, so spaces round the same text still want the picker.
+        vm.Cleanup.MoveDestination = _destination + " ";
+        Assert.True(stillWanted!());
+        vm.Cleanup.MoveDestination = @"D:\Typed";
+        Assert.False(stillWanted());
+
+        answer.SetResult(null);
+        await browse;
+        Assert.Equal(@"D:\Typed", vm.Cleanup.MoveDestination);
+    }
+
+    [Fact]
     public async Task Browse_starts_at_the_folder_the_box_already_names()
     {
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = _destination;
 
-        vm.Cleanup.BrowseDestinationCommand.Execute(null);
+        await vm.Cleanup.BrowseDestinationCommand.ExecuteAsync(null);
 
         // Browse is pressed to CHANGE a destination more often than to set the
         // first one, so the browser opens where the box points rather than
         // making the user navigate back to a path already on screen. Whether
         // that path still exists is the service's call, not the view-model's.
-        _confirmationService.Received(1).AskForMoveDestination(_destination);
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(_destination, Arg.Any<Func<bool>?>());
     }
 
     [Fact]
@@ -1366,7 +1419,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task Move_with_no_destination_asks_for_one_and_moves_there()
     {
         var chosen = Path.Combine(Path.GetTempPath(), "ic-test-picked");
-        _confirmationService.AskForMoveDestination().Returns(chosen);
+        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>()).Returns(chosen);
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1375,7 +1428,7 @@ public class CleanupPreFlightTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        _confirmationService.Received(1).AskForMoveDestination();
+        _ = _confirmationService.Received(1).AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>());
         await _moveService.Received(1).MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), chosen, Arg.Any<UnderLeaseClaims>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -1387,7 +1440,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task Backing_out_of_the_destination_browser_moves_nothing()
     {
         // Null is the cancelled answer.
-        _confirmationService.AskForMoveDestination().Returns((string?)null);
+        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>()).Returns((string?)null);
 
         var vm = CreateViewModel();
         await vm.Scan.ScanWithProgressAsync(null);
@@ -1418,7 +1471,7 @@ public class CleanupPreFlightTests : IDisposable
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        _confirmationService.DidNotReceive().AskForMoveDestination();
+        _ = _confirmationService.DidNotReceive().AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>());
     }
 
     [Fact]
@@ -1578,7 +1631,7 @@ public class CleanupPreFlightTests : IDisposable
     public async Task A_close_while_the_destination_browser_is_up_starts_no_Move()
     {
         var vm = CreateViewModel();
-        _confirmationService.AskForMoveDestination().Returns(_ =>
+        _confirmationService.AskForMoveDestinationAsync(Arg.Any<string?>(), Arg.Any<Func<bool>?>()).Returns(_ =>
         {
             vm.Cleanup.RequestClose();
             return _destination;
