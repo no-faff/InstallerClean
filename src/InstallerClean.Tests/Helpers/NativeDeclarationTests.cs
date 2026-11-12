@@ -180,6 +180,7 @@ public class NativeDeclarationTests
         [typeof(Kernel32.FILE_DISPOSITION_INFO)] = 1,
         [typeof(Kernel32.STARTUPINFO)] = 104,
         [typeof(Kernel32.PROCESS_INFORMATION)] = 24,
+        [typeof(Kernel32.SYSTEM_INFO)] = 48,
         [typeof(Ntdll.UNICODE_STRING)] = 16,
         [typeof(Ntdll.OBJECT_ATTRIBUTES)] = 48,
         [typeof(Ntdll.IO_STATUS_BLOCK)] = 16,

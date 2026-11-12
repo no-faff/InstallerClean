@@ -1,8 +1,7 @@
-using InstallerClean.Compatibility;
 using System.Globalization;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using InstallerClean.Compatibility;
 using InstallerClean.Helpers;
 using InstallerClean.Services;
 

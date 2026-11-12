@@ -790,7 +790,8 @@ internal static class Kernel32
     /// <summary>
     /// Whether <paramref name="hProcess"/> runs under emulation, giving the machine type it
     /// runs as and the machine's own. Windows 10 version 1511 and later; earlier, the entry
-    /// point is not there.
+    /// point is not there and the call throws EntryPointNotFoundException, so
+    /// <see cref="GetProcAddress"/> is asked for it first.
     /// </summary>
     [DllImport(Library, EntryPoint = "IsWow64Process2", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -840,6 +841,23 @@ internal static class Kernel32
     /// </summary>
     [DllImport(Library, EntryPoint = "GetModuleHandleW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
     public static extern IntPtr GetModuleHandle(IntPtr lpModuleName);
+
+    /// <summary>
+    /// The handle of the loaded module named <paramref name="lpModuleName"/>, or
+    /// <see cref="IntPtr.Zero"/> where no module of that name is loaded. The handle is not
+    /// counted as a reference and needs no freeing.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetModuleHandleW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr GetModuleHandle(string lpModuleName);
+
+    /// <summary>
+    /// The address of the function <paramref name="lpProcName"/> names in the module
+    /// <paramref name="hModule"/>, or <see cref="IntPtr.Zero"/> where the module exports no
+    /// function of that name. The name is ANSI text, so it is passed as its ASCII bytes with
+    /// a zero byte after them, and never as a string, which this class passes as UTF-16.
+    /// </summary>
+    [DllImport(Library, EntryPoint = "GetProcAddress", ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, byte[] lpProcName);
 
     /// <summary>
     /// Ends the process <paramref name="hProcess"/> names at once, with
