@@ -132,9 +132,10 @@
 
     <!-- Focus ring for flat, rectangular controls: the checkbox row
          further down (whose focusable extent is the box plus its
-         label, a rectangle) and, through the app-default focus visual
-         near the end of this file, in-body Hyperlinks and anything
-         else with no override of its own. The pill visuals above sit
+         label, a rectangle), the in-body links (SubtleLink) and the
+         scrolling regions (BodyScrollRegion), each of which names it.
+         A focusable element whose style names no FocusVisualStyle gets
+         the Windows theme's ring rather than this one. The pill visuals above sit
          around rounded controls and paint a 16 to 22 px rounded ring,
          which outside a sharp-cornered edge traces a shape the control
          does not have. This one uses a 2px corner radius so the ring
@@ -886,6 +887,9 @@
          the focus to the next stop when a region that has it stops
          overflowing and the trigger takes its stop away. -->
     <Style x:Key="BodyScrollRegion" TargetType="ScrollViewer">
+        <!-- The app's flat ring, named here: neither the theme's ScrollViewer
+             style nor the stock default draws it. -->
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
         <Setter Property="a11y:FocusRing.KeepsInView" Value="True"/>
         <Setter Property="a11y:ScrollRegionFocus.PassesFocusOn" Value="True"/>
         <Style.Triggers>
@@ -906,6 +910,10 @@
          keyboard focus. -->
 
     <Style x:Key="SubtleLink" TargetType="Hyperlink">
+        <!-- The app's flat ring at the app's one focus weight, named here for
+             the reason BodyScrollRegion gives: a link drawn with a thinner or
+             dotted ring would look less focused than every other control. -->
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource Link.Rest}"/>
         <!-- Underlined at rest, not only on hover/focus. An in-sentence link
              set apart by its hue alone fails WCAG 1.4.1: the rest hue is
@@ -1236,17 +1244,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <!-- Default focus visual. Catches anything that takes focus but
-         has no FocusVisualStyle override (plain Buttons, Hyperlinks).
-         Pill buttons opt out via their own *FocusVisual styles above.
-         BasedOn the flat ring rather than carrying a template of its
-         own so the catch-all cannot drift from the app's one focus
-         weight (BorderThickness.Focus): a ring drawn thinner here
-         would make links look less focused than every other
-         control. -->
-    <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}"
-           BasedOn="{StaticResource FlatTextBoxFocusVisual}"/>
 
     <!-- Progress bar. Slim dark bar. Determinate uses PART_Indicator
          (WPF stock). Indeterminate has two presentations: an 80 px stripe
