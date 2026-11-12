@@ -34,9 +34,21 @@
        ILRepack runs on the dotnet host on every OS, so one engine does the merge
        wherever the build runs. /lib names the reference assemblies the build
        compiled against, which is where the tool resolves .NET Framework's own
-       types. /skipconfig leaves the unmerged build's .exe.config behind: its
-       binding redirects name assemblies that are now inside the exe.
-       /noRepackRes leaves out the tool's list of what it merged.
+       types. ILRepack writes a merged .exe.config beside the output, keeping the
+       build's supportedRuntime line and dropping the binding redirects, whose
+       assemblies are now inside the exe. /noRepackRes leaves out the tool's list
+       of what it merged.
+
+       The arguments go in a response file, one per line, rather than on the
+       command line: a /lib folder ends in a separator, which on Windows is a
+       backslash, and a backslash before the closing quote of a command-line
+       argument is read as a literal quote. A response file takes each line whole,
+       so no argument is quoted and none is split.
+
+       Inputs and Outputs skip the merge when the output is newer than the built
+       exe and every assembly it merges, so a rebuild that changed nothing does
+       not merge again, and two project instances with the same inputs do not both
+       write the output.
 
        Do not merge a Debug build: it compiles the Debug-only switches in. -->
   <PropertyGroup Condition="'$(OneFile)' == 'true' And '$(OneFileDir)' == ''">
@@ -45,7 +57,9 @@
   </PropertyGroup>
 
   <Target Name="MergeToOneFile" AfterTargets="Build"
-          Condition="'$(OneFile)' == 'true' And ('$(MSBuildProjectName)' == 'InstallerClean' Or '$(MSBuildProjectName)' == 'InstallerClean.Cli')">
+          Condition="'$(OneFile)' == 'true' And ('$(MSBuildProjectName)' == 'InstallerClean' Or '$(MSBuildProjectName)' == 'InstallerClean.Cli')"
+          Inputs="$(TargetPath);@(ReferenceCopyLocalPaths)"
+          Outputs="$([MSBuild]::EnsureTrailingSlash('$(OneFileDir)'))$(TargetFileName)">
     <ItemGroup>
       <_OneFileInput Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll'" />
       <_OneFileInCultureFolder Include="@(_OneFileInput)" Condition="'%(_OneFileInput.DestinationSubDirectory)' != ''" />
@@ -53,6 +67,7 @@
     </ItemGroup>
     <PropertyGroup>
       <_OneFileOut>$([MSBuild]::EnsureTrailingSlash('$(OneFileDir)'))$(TargetFileName)</_OneFileOut>
+      <_OneFileRsp>$(IntermediateOutputPath)onefile.rsp</_OneFileRsp>
     </PropertyGroup>
     <Error Condition="'$(Configuration)' != 'Release'"
            Text="OneFile merges a Release build only; this build's configuration is $(Configuration)." />
@@ -64,9 +79,17 @@
            Text="A referenced assembly is built into a folder of its own and would be left out of the one file: @(_OneFileInCultureFolder)" />
     <Error Condition="'@(_OneFileLibFolder)' == ''"
            Text="The build names no reference-assembly folder for the merge to resolve .NET Framework's types from." />
+    <ItemGroup>
+      <_OneFileArg Include="/noRepackRes" />
+      <_OneFileArg Include="/out:$(_OneFileOut)" />
+      <_OneFileArg Include="@(_OneFileLibFolder->'/lib:%(Identity)')" />
+      <_OneFileArg Include="$(TargetPath)" />
+      <_OneFileArg Include="@(_OneFileInput->'%(FullPath)')" />
+    </ItemGroup>
     <MakeDir Directories="$(OneFileDir)" />
     <Delete Files="$(_OneFileOut)" />
-    <Exec Command="dotnet &quot;$(ILRepack)&quot; /skipconfig /noRepackRes &quot;/out:$(_OneFileOut)&quot; @(_OneFileLibFolder->'&quot;/lib:%(FullPath)&quot;', ' ') &quot;$(TargetPath)&quot; @(_OneFileInput->'&quot;%(FullPath)&quot;', ' ')" />
+    <WriteLinesToFile File="$(_OneFileRsp)" Lines="@(_OneFileArg)" Overwrite="true" />
+    <Exec Command="dotnet &quot;$(ILRepack)&quot; &quot;@$(_OneFileRsp)&quot;" />
     <Error Condition="!Exists('$(_OneFileOut)')" Text="The merge wrote no $(_OneFileOut)." />
     <Message Importance="high" Text="$(TargetFileName) and @(_OneFileInput->Count()) assemblies -> $(_OneFileOut)" />
   </Target>

@@ -58,12 +58,18 @@ public class EmbeddedCultureResourcesTests
     [Fact]
     public void The_neutral_language_reads_the_neutral_strings_without_trying_parents()
     {
-        var neutral = Manager.GetResourceSet(CultureInfo.InvariantCulture, createIfNotExists: true, tryParents: false);
+        // en-GB is the neutral language, so its own resource set exists even with tryParents
+        // false, where a culture with no resource of its own reads null (see below), and it
+        // holds the neutral strings. A key read is identity object or not; the values are what
+        // a user sees, so the test is on those.
+        var neutral = Manager.GetResourceSet(
+            CultureInfo.InvariantCulture, createIfNotExists: true, tryParents: false)!;
         var named = Manager.GetResourceSet(
             CultureInfo.GetCultureInfo(SupportedLanguages.Neutral), createIfNotExists: true, tryParents: false);
 
-        Assert.NotNull(neutral);
-        Assert.Same(neutral, named);
+        Assert.NotNull(named);
+        var keys = neutral.Cast<System.Collections.DictionaryEntry>().Select(entry => (string)entry.Key);
+        Assert.All(keys, key => Assert.Equal(neutral.GetString(key), named!.GetString(key)));
     }
 
     [Fact]

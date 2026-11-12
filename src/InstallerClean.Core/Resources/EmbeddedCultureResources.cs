@@ -45,6 +45,13 @@ internal sealed class EmbeddedCultureResources : ResourceManager
             if (!name.StartsWith(prefix, StringComparison.Ordinal)) continue;
             if (!name.EndsWith(Extension, StringComparison.Ordinal)) continue;
             var culture = name.Substring(prefix.Length, name.Length - prefix.Length - Extension.Length);
+            if (string.Equals(culture, _neutralCulture, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new MissingManifestResourceException(
+                    $"The assembly {assembly.GetName().Name} holds {name}, a resource named for the neutral "
+                    + $"language {_neutralCulture}. The neutral strings are {_neutralName}, and a resource for the "
+                    + "neutral language would never be read. Remove it.");
+            }
             _nameByCulture[culture] = name;
         }
     }
