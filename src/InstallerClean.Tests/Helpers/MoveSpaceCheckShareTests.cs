@@ -26,14 +26,14 @@ public class MoveSpaceCheckShareTests
     }
 
     [Fact]
-    public void A_matching_serial_number_whose_folder_does_not_open_here_is_another_drive()
+    public void A_matching_serial_number_whose_folder_does_not_open_here_is_not_settled()
     {
         var reader = new Identities(FileIdentityRead.NamesNothing);
         reader.Reads(CacheRoot, serial: 7);
         reader.Reads(ThroughTheShare, serial: 7);
         var confirmedAgainst = new List<string>();
 
-        Assert.False(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
+        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
             ThroughTheShare, CacheRoot, reader, Share(local: (share, roots) => { confirmedAgainst.AddRange(roots); return null; })));
         Assert.Equal([CacheRoot], confirmedAgainst);
     }
@@ -120,15 +120,17 @@ public class MoveSpaceCheckShareTests
     }
 
     [Fact]
-    public void A_mapped_drive_is_confirmed_by_the_share_path_it_resolves_to()
+    public void A_share_is_confirmed_by_the_share_path_it_resolves_to()
     {
+        // As a drive mapped onto a share resolves to the share's own spelling.
+        const string alias = @"\\ic-alias\C$\ICProbe-moved";
         var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
-        reader.Reads(@"Z:\", serial: 7);
+        reader.Reads(@"\\ic-alias\C$\", serial: 7);
         var server = new List<string?>();
         var confirmed = new List<string>();
 
         Assert.True(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            @"Z:\ICProbe-moved", CacheRoot, reader,
+            alias, CacheRoot, reader,
             Share(
                 resolve: _ => ThroughTheShare,
                 names: name => { server.Add(name); return true; },

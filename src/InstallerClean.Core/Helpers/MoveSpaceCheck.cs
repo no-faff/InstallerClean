@@ -101,8 +101,9 @@ internal static class MoveSpaceCheck
     /// compared with the cache root's. A match counts only where the share's server is this
     /// PC by name and the same file id opens on the cache's volume as a folder ending in the
     /// share path's own folder names, as the destination gates confirm one
-    /// (<see cref="InstallerCacheHelpers.LocalPathOf"/>). A match on any other server, such
-    /// as another computer imaged from the same disk, answers null (<see cref="ConfirmedOnCacheVolume"/>).
+    /// (<see cref="InstallerCacheHelpers.LocalPathThroughThisPCsVolumes"/>). A match on any
+    /// other server, such as another computer imaged from the same disk, answers null
+    /// (<see cref="ConfirmedOnCacheVolume"/>).
     /// A share whose server does not answer the file-id question answers false, the answer a
     /// share has always had here. Any other failure to read either side, and anything
     /// thrown, answers null.
@@ -131,17 +132,18 @@ internal static class MoveSpaceCheck
         ShareReads? share = null)
     {
         if (string.IsNullOrWhiteSpace(destination)) return null;
+        var reads = share ?? ShareReads.Production;
 
         try
         {
             if (StorageHelpers.IsRemotePath(destination))
-                return ShareOnCacheVolume(destination, installerCacheRoot, identities, share ?? ShareReads.Production);
+                return ShareOnCacheVolume(destination, installerCacheRoot, identities, reads);
 
             var local = LocalVolumeMatch(destination, installerCacheRoot, out var destinationVolume);
             if (local != false || destinationVolume is null) return local;
 
             return StorageHelpers.GetDriveKind(destinationVolume) == DriveType.Network
-                ? ShareOnCacheVolume(destination, installerCacheRoot, identities, share ?? ShareReads.Production)
+                ? ShareOnCacheVolume(destination, installerCacheRoot, identities, reads)
                 : false;
         }
         catch
@@ -231,11 +233,11 @@ internal static class MoveSpaceCheck
     /// <summary>
     /// Whether <paramref name="destination"/>, its volume serial number matching the cache
     /// root's, is this PC's own share onto a folder of the cache's volume: true where the
-    /// share's server is this PC by name (<see cref="ThisPCName.Names"/>) and the folder's
-    /// local path is established as the destination gates establish it
-    /// (<see cref="InstallerCacheHelpers.LocalPathOf"/>), false where the server is this PC
-    /// and the local path is not established, and null where the destination does not
-    /// resolve to a share path or its server is not this PC by name.
+    /// share's server is this PC by name (<see cref="ThisPCName.Names"/>) and the folder's id
+    /// opens on the cache's volume as a folder ending in the share path's own folder names
+    /// (<see cref="InstallerCacheHelpers.LocalPathThroughThisPCsVolumes"/>), and null
+    /// otherwise: where the destination does not resolve to a share path, its server is not
+    /// this PC by name, or its local path is not established.
     ///
     /// A SERIAL NUMBER AND A FILE ID DO NOT TELL THIS PC FROM ANOTHER IMAGED FROM THE SAME
     /// DISK. Its volume carries the same serial number, its folders keep their ids and names,
@@ -248,7 +250,7 @@ internal static class MoveSpaceCheck
         var resolved = share.Resolve(destination);
         if (resolved is null || !share.NamesThisPC(ThisPCName.ServerOf(resolved))) return null;
 
-        return InstallerCacheHelpers.LocalPathOf(resolved, proven: true, [cacheRoot], share.LocalPathOf) is not null;
+        return share.LocalPathOf(resolved, [cacheRoot]) is not null ? true : null;
     }
 
     /// <summary>

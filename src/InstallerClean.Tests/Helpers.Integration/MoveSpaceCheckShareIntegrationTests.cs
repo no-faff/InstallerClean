@@ -42,4 +42,16 @@ public class MoveSpaceCheckShareIntegrationTests
         Assert.True(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination));
         Assert.Equal(MoveDestinationKinds.SameDrive, MoveDestinationClassifier.Classify(destination));
     }
+
+    [Fact]
+    public void The_production_reads_resolve_a_share_to_its_share_path_and_a_local_folder_to_nothing()
+    {
+        var throughTheShare = Path.Combine(CacheDriveShare(), $"ic-not-there-{Guid.NewGuid():N}");
+        var resolved = ShareReads.Production.Resolve(throughTheShare);
+
+        Assert.NotNull(resolved);
+        Assert.Equal("localhost", ThisPCName.ServerOf(resolved!), ignoreCase: true);
+        Assert.True(ShareReads.Production.NamesThisPC(ThisPCName.ServerOf(resolved!)));
+        Assert.Null(ShareReads.Production.Resolve(KnownFolders.GetPath(Environment.SpecialFolder.Windows)));
+    }
 }

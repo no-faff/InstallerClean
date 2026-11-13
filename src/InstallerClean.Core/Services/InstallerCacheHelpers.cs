@@ -175,7 +175,7 @@ internal static class InstallerCacheHelpers
     /// for a destination that does not resolve: refusing would leave a person with no
     /// destination they could use.
     /// </summary>
-    internal static string? LocalPathOf(
+    private static string? LocalPathOf(
         string resolvedInput, bool proven, IReadOnlyList<string> roots, LocalPathReader? localPathOf)
     {
         if (!proven || !IsUncPath(resolvedInput)) return null;

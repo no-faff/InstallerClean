@@ -9,9 +9,8 @@ public class ThisPCNameTests
     [InlineData("LOCALHOST")]
     [InlineData("localhost.")]
     [InlineData("127.0.0.1")]
-    [InlineData("127.1.2.3")]
-    [InlineData("::1")]
-    [InlineData("[::1]")]
+    [InlineData("--1.ipv6-literal.net")]
+    [InlineData("0--1.IPV6-LITERAL.NET")]
     public void A_loopback_name_is_this_PC(string server) => Assert.True(ThisPCName.Names(server));
 
     [Fact]
@@ -19,11 +18,15 @@ public class ThisPCNameTests
     {
         Assert.True(ThisPCName.Names(Environment.MachineName));
         Assert.True(ThisPCName.Names(Environment.MachineName.ToLowerInvariant()));
+        Assert.True(ThisPCName.Names(System.Net.Dns.GetHostName() + ".local"));
     }
 
     [Theory]
     [InlineData("ic-not-this-pc-0f3a")]
     [InlineData("192.0.2.1")]
+    [InlineData("127.0.0.2")]
+    [InlineData("2001-db8--1.ipv6-literal.net")]
+    [InlineData("ic-not-this-pc-0f3a.local")]
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
@@ -34,6 +37,7 @@ public class ThisPCNameTests
     [InlineData(@"\\otherpc\share", "otherpc")]
     [InlineData(@"//otherpc/share/x", "otherpc")]
     [InlineData(@"\\?\UNC\otherpc\share", null)]
+    [InlineData(@"\\.hostalias\share", ".hostalias")]
     [InlineData(@"\\.\C:\x", null)]
     [InlineData(@"C:\Windows", null)]
     [InlineData(@"\\", null)]
