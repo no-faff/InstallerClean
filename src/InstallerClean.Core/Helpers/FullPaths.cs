@@ -104,7 +104,7 @@ internal static class FullPaths
     }
 
     /// <summary>
-    /// <see cref="GetFullPath"/> without its short names expanded, so nothing is asked of the
+    /// <see cref="GetFullPath(string)"/> without its short names expanded, so nothing is asked of the
     /// folders the path names: the path's text as Windows reads it when it opens the path, its
     /// <c>.</c> and <c>..</c> taken out.
     /// </summary>
@@ -115,7 +115,7 @@ internal static class FullPaths
     /// full paths first and compared ignoring case: <c>.</c> where they are the same folder,
     /// and <paramref name="path"/>'s full path where the two have different roots. A trailing
     /// separator on <paramref name="path"/> is kept. The arguments are checked as
-    /// <see cref="GetFullPath"/> checks its own, <paramref name="relativeTo"/> first.
+    /// <see cref="GetFullPath(string)"/> checks its own, <paramref name="relativeTo"/> first.
     /// </summary>
     public static string GetRelativePath(string relativeTo, string path)
     {
