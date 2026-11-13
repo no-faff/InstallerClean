@@ -17,7 +17,11 @@
 //   a satellite has no row or a row has no satellite, so a new language is never
 //   left without a page or left out of --check.
 // It reads the English neutral Strings.resx and Strings.<code>.resx, pairs them by
-// key, and writes docs/translations/<code>.md (LF). The human-facing Cli.* keys are
+// key, and writes docs/translations/<code>.md (LF). Each plural override the
+// satellite carries (Key.One, .Few, .Many) gets a row of its own under the neutral
+// form it stands in for, so the forms a language shows at some counts are on its
+// page; the run refuses where the page would show fewer overrides than the satellite
+// declares. The human-facing Cli.* keys are
 // translated and shown in their own group; the machine-contract Cli.EventLog*
 // keys (bar Cli.EventLogUnavailable) stay English by contract, so they are skipped
 // here whether or not the satellite carries them (ja does). Only the machine set
@@ -32,6 +36,7 @@
 // quoting a string the app no longer has, on the very pages the project invites
 // native speakers to review.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { standsInFor } from './plural-overrides.mjs';
 import { supportedLanguages } from './supported-languages.mjs';
 
 const LANGS = {
@@ -169,6 +174,27 @@ const buildTable = (c) => {
   const target = parse(`${dir}/Strings.${c}.resx`);
   const buckets = GROUPS.map(() => []);
   for (const k of keys) buckets[groupOf(k)].push(k);
+  // Each override the satellite carries, under the neutral form it stands in for, in
+  // the order one, few, many. One whose form is not on this page has no row to sit
+  // under and is counted, so the run can refuse rather than leave it out.
+  const ORDER = { One: 0, Few: 1, Many: 2 };
+  const overridesOf = new Map();
+  let homeless = [];
+  for (const k of target.keys()) {
+    if (neutral.has(k)) continue;
+    const base = standsInFor(k, neutral);
+    if (base === null || isMachineCliKey(base)) continue;
+    if (!keys.includes(base)) { homeless.push(k); continue; }
+    if (!overridesOf.has(base)) overridesOf.set(base, []);
+    overridesOf.get(base).push(k);
+  }
+  for (const list of overridesOf.values())
+    list.sort((a, b) => ORDER[a.split('.').pop()] - ORDER[b.split('.').pop()]);
+  if (homeless.length) {
+    console.error(`gen-translation-table: REFUSING: ${c} carries override(s) for a form not on its page: ${homeless.join(', ')}`);
+    process.exit(2);
+  }
+  let overrideRows = 0;
 
   let missing = 0;
   let md = `# InstallerClean in ${lang.endo} (${lang.en})\n\n`;
@@ -178,6 +204,9 @@ const buildTable = (c) => {
   // machinery, and translating it is the natural mistake: it reads like a word.
   // Said here rather than only in the maintainer notes, because this page is
   // what the README invites people to work from.
+  // A plural override is a line too, shown in place of its base at the counts the
+  // language's grammar picks it for, so it gets a row of its own under that base.
+  if (overridesOf.size) md += `Where ${lang.en} needs a different form of a line for some counts, the form is in a row of its own directly under the line, marked _(one form)_, _(few form)_ or _(many form)_. The app shows it in place of that line at the counts it is written for.\n\n`;
   md += `\`{InstallerFolder}\` and the numbered slots (\`{0}\`, \`{1}\`) are filled in by the app when it runs, so keep them exactly as they are. \`{InstallerFolder}\` becomes the real installer folder on that machine, usually \`C:\\Windows\\Installer\`. Move them within the sentence if the grammar needs it; do not translate them.\n`;
 
   for (let i = 0; i < GROUPS.length; i++) {
@@ -191,13 +220,23 @@ const buildTable = (c) => {
       if (target.has(k)) tr = cell(target.get(k));
       else { tr = '_(missing)_'; missing++; }
       md += `| ${en} | ${tr} |\n`;
+      for (const o of overridesOf.get(k) ?? []) {
+        md += `| ${en}<br>_(${o.split('.').pop().toLowerCase()} form)_ | ${cell(target.get(o))} |\n`;
+        overrideRows++;
+      }
     }
+  }
+  const declaredOverrides = [...target.keys()].filter((k) => !neutral.has(k) && standsInFor(k, neutral) !== null && !isMachineCliKey(standsInFor(k, neutral))).length;
+  if (overrideRows !== declaredOverrides) {
+    console.error(`gen-translation-table: REFUSING: ${c} declares ${declaredOverrides} override(s) and its page shows ${overrideRows}`);
+    process.exit(2);
   }
 
   return {
     md: md.endsWith('\n') ? md : md + '\n',
     missing,
     groups: buckets.filter((b) => b.length).length,
+    overrideRows,
   };
 };
 
