@@ -12,11 +12,15 @@ internal static class Netapi32
 
     public const int NERR_Success = 0;
 
+    /// <summary><c>SHARE_INFO_1005</c>'s flags: the share is in a DFS namespace, or is its root.</summary>
+    public const uint SHI1005_FLAGS_DFS = 0x01;
+    public const uint SHI1005_FLAGS_DFS_ROOT = 0x02;
+
     /// <summary>
     /// Gets a share's information from the server service. Called with a null server name,
-    /// which is this PC, and level 2 (<see cref="SHARE_INFO_2"/>), which gives the share's
-    /// local path and needs administrator rights. The buffer it returns is freed with
-    /// <see cref="NetApiBufferFree"/>.
+    /// which is this PC, at level 1005, which gives the share's flags, and level 2
+    /// (<see cref="SHARE_INFO_2"/>), which gives its local path and needs administrator rights.
+    /// The buffer it returns is freed with <see cref="NetApiBufferFree"/>.
     /// </summary>
     [DllImport(Library, EntryPoint = "NetShareGetInfo", CharSet = CharSet.Unicode, ExactSpelling = true)]
     public static extern int NetShareGetInfo(string? servername, string netname, int level, out IntPtr bufptr);

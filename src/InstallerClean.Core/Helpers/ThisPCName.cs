@@ -62,7 +62,8 @@ internal static class ThisPCName
                     var address = unicast.Address;
                     if (address.AddressFamily == AddressFamily.InterNetwork)
                     {
-                        if (name == address.ToString()) return true;
+                        var bytes = address.GetAddressBytes();
+                        if (!(bytes[0] == 169 && bytes[1] == 254) && name == address.ToString()) return true;
                     }
                     else if (address.AddressFamily == AddressFamily.InterNetworkV6
                         && !address.IsIPv6LinkLocal && address.ScopeId == 0
@@ -82,10 +83,13 @@ internal static class ThisPCName
     /// <summary>
     /// The local path of <paramref name="share"/>, one of this PC's own shares, as this PC's
     /// server service records it (<c>C$</c> gives <c>C:\</c>); null where the service does not
-    /// know the share or will not say.
+    /// know the share or will not say, and for a DFS share, whose folders can send a path to
+    /// another server.
     /// </summary>
     internal static string? LocalPathOfShare(string share)
     {
+        if (!IsPlainShare(share)) return null;
+
         var buffer = IntPtr.Zero;
         try
         {
@@ -95,6 +99,27 @@ internal static class ThisPCName
             var info = (Netapi32.SHARE_INFO_2)Marshal.PtrToStructure(buffer, typeof(Netapi32.SHARE_INFO_2))!;
             var path = info.shi2_path == IntPtr.Zero ? null : Marshal.PtrToStringUni(info.shi2_path);
             return string.IsNullOrEmpty(path) ? null : path;
+        }
+        finally
+        {
+            if (buffer != IntPtr.Zero) Netapi32.NetApiBufferFree(buffer);
+        }
+    }
+
+    /// <summary>
+    /// Whether the server service says <paramref name="share"/> is neither a DFS namespace's
+    /// root nor in one; false where it will not say.
+    /// </summary>
+    private static bool IsPlainShare(string share)
+    {
+        var buffer = IntPtr.Zero;
+        try
+        {
+            if (Netapi32.NetShareGetInfo(null, share, 1005, out buffer) != Netapi32.NERR_Success || buffer == IntPtr.Zero)
+                return false;
+
+            var flags = (uint)Marshal.ReadInt32(buffer);
+            return (flags & (Netapi32.SHI1005_FLAGS_DFS | Netapi32.SHI1005_FLAGS_DFS_ROOT)) == 0;
         }
         finally
         {

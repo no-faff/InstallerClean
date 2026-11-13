@@ -201,15 +201,16 @@ internal static class MoveSpaceCheck
         string destination, string? installerCacheRoot, IFileIdentityReader? identities,
         ShareReads share)
     {
-        var sharePath = share.ToSharePath(destination);
+        // Windows takes a share path's ".." no higher than the share, and so does GetFullPath.
+        var sharePath = share.ToSharePath(destination) is { } spelled ? FullPaths.GetFullPath(spelled) : null;
         if (sharePath is not null
             && ThisPCName.TrySplit(sharePath, out var server, out var shareName, out var below)
             && share.NamesThisPC(server))
         {
             var local = share.ShareLocalPath(shareName);
             if (local is null) return null;
-            return LocalVolumeMatch(
-                below.Length == 0 ? local : PathText.Combine(local, below), installerCacheRoot, out _);
+            var onThisPC = OnShareFolder(local, below);
+            return onThisPC is null ? null : LocalVolumeMatch(onThisPC, installerCacheRoot, out _);
         }
 
         identities ??= Identities;
@@ -240,6 +241,19 @@ internal static class MoveSpaceCheck
                     return null;
             }
         }
+    }
+
+    /// <summary>
+    /// <paramref name="below"/>, the part of a share path below its share, put on the share's
+    /// local path <paramref name="shareFolder"/>; null where a part of it is <c>.</c> or
+    /// <c>..</c>, which would name a folder off the share's own.
+    /// </summary>
+    internal static string? OnShareFolder(string shareFolder, string below)
+    {
+        if (below.Length == 0) return shareFolder;
+        foreach (var part in below.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries))
+            if (part is "." or "..") return null;
+        return PathText.Combine(shareFolder, below);
     }
 
     /// <summary>
@@ -349,7 +363,7 @@ internal sealed record ShareReads(
 
     /// <summary>
     /// <paramref name="destination"/> as <c>\\server\share\...</c>: a share spelling as it is
-    /// written, with <c>\\?\UNC\</c> made <c>\\</c> and every separator a backslash, and any
+    /// written, with <c>\\?\UNC\</c> or <c>\\.\UNC\</c> made <c>\\</c> and every separator a backslash, and any
     /// other spelling as the kernel resolves it, where that is a share spelling.
     /// </summary>
     private static string? SharePathOf(string destination)
@@ -358,8 +372,9 @@ internal sealed record ShareReads(
         {
             var spelled = destination.Replace('/', '\\');
             return spelled.StartsWith(@"\\?\UNC\", StringComparison.OrdinalIgnoreCase)
-                ? @"\\" + spelled.Substring(8)
-                : spelled;
+                || spelled.StartsWith(@"\\.\UNC\", StringComparison.OrdinalIgnoreCase)
+                    ? @"\\" + spelled.Substring(8)
+                    : spelled;
         }
 
         return InstallerCacheHelpers.TryResolveFinalPath(destination, out var resolved)
