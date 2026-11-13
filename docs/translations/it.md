@@ -11,7 +11,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Italiano |
 | --- | --- |
 | InstallerClean | InstallerClean |
-| About | Info programma |
+| About | Informazioni |
 | Files left alone | File non toccati |
 | Unneeded files that are safe to delete | File non necessari, sicuri da eliminare |
 | The anonymous report | Il rapporto anonimo |
@@ -23,14 +23,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | PATCHES | PATCH |
 | PRODUCT DETAILS | DETTAGLI PRODOTTO |
-| BACKUP FOLDER | CARTELLA BACKUP |
+| BACKUP FOLDER | CARTELLA DI BACKUP |
 | SAY THANKS | PER RINGRAZIARMI |
 
 ## Buttons and actions
 
 | English | Italiano |
 | --- | --- |
-| _About | _Info programma |
+| _About | _Informazioni |
 | Copy | Copia |
 | Cut | Taglia |
 | Paste | Incolla |
@@ -40,7 +40,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Carry on _without it | Continua _senza attendere |
 | Check for _updates | Controlla _aggiornamenti |
 | _Close | _Chiudi |
-| _Close without tipping | _Chiudi senza fare uan donazione |
+| _Close without tipping | _Chiudi senza fare una donazione |
 | _Delete permanently | _Elimina definitivamente |
 | _Done | _OK |
 | Details | Dettagli |
@@ -121,9 +121,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Italiano |
 | --- | --- |
-| Any unneeded files below are safe to delete. | I qui file qui sotto possono eliminati in sicurezza. |
+| Any unneeded files below are safe to delete. | I file non necessari qui sotto possono essere eliminati in sicurezza. |
 | They sit in {InstallerFolder}. InstallerClean asks Windows about every installed program: a file is listed when no program claims it ({0}), or when a newer patch has replaced it and no program could roll back to it ({1}). | Si trovano in {InstallerFolder}. InstallerClean interroga Windows per ogni programma installato: un file compare nell'elenco quando nessun programma lo rivendica ({0}), oppure quando una patch più recente lo ha sostituito e nessun programma potrebbe tornare a esso ({1}). |
-| Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | Spostali in una cartella di backup a tua scelta, poi elimina quella cartella quando sei convinto che i programmi si aggiornino e si disinstallino ancora normalmente. Se ricpo i file in {InstallerFolder} ripristini tutto. Oppure eliminali definitivamente. |
+| Move them to a backup folder you choose, then delete that folder when you're satisfied your programs still update and uninstall as normal. Putting them back into {InstallerFolder} restores everything. Or delete them permanently now. | Spostali in una cartella di backup a tua scelta, poi elimina quella cartella quando sei convinto che i programmi si aggiornino e si disinstallino ancora normalmente. Se ricopi i file in {InstallerFolder} ripristini tutto. Oppure eliminali definitivamente adesso. |
 | Nothing scanned yet. | Ancora nessuna scansione. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Premi Ripeti scansione per cercare in {InstallerFolder} i file di installazione che nessun programma usa più. |
 | Nothing to show until the next scan. | Niente da mostrare fino alla prossima scansione. |
@@ -150,9 +150,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Italiano |
 | --- | --- |
-| Orphaned | orfano |
-| Superseded | sostituito |
-| Obsoleted | obsoleto |
+| Orphaned | Orfano |
+| Superseded | Sostituito |
+| Obsoleted | Obsoleto |
 
 ## Completion screen
 
@@ -161,7 +161,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Tutto pulito |
 | Nothing to clean up in {InstallerFolder} | Niente da eliminare in {InstallerFolder} |
 | Scanned {0} {1} in {2} | Analizzati {0} {1} in {2} |
-| Nothing offered on this PC | In questo PC nessun file da eliminare |
+| Nothing offered on this PC | Nessun file proposto su questo PC |
 | One file ({2}) was held back because Windows shows it was changed after InstallerClean started scanning. If a program was installing or updating, scan again once it has finished and InstallerClean will check it again. | Un file ({2}) è stato trattenuto perché Windows indica che è stato modificato dopo che InstallerClean ha iniziato la scansione. Se un programma si stava installando o aggiornando, ripeti la scansione quando ha finito e InstallerClean lo controllerà di nuovo. |
 | {0} {1} ({2}) were held back because Windows shows they were changed after InstallerClean started scanning. If a program was installing or updating, scan again once it has finished and InstallerClean will check them again. | {0} {1} ({2}) sono stati trattenuti perché Windows indica che sono stati modificati dopo che InstallerClean ha iniziato la scansione. Se un programma si stava installando o aggiornando, ripeti la scansione quando ha finito e InstallerClean li controllerà di nuovo. |
 | Delete that folder when you're satisfied all is well. | Elimina quella cartella quando sei convinto che vada tutto bene. |
@@ -190,7 +190,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Whether a Move went to the same drive, another drive, a removable drive or a network share | Se Sposta ha portato i file sulla stessa unità, su un'altra unità, su un'unità rimovibile o su una condivisione di rete |
 | How long the scan and the Move or Delete took | Quanto sono durati la scansione e Sposta o Elimina |
 | How many installer files there are of each kind, and how much space they take | Quanti file di installazione ci sono di ogni tipo e quanto spazio occupano |
-| How many files were left alone, and why | Quanti file sono non sono stati toccati e perché |
+| How many files were left alone, and why | Quanti file non sono stati toccati e perché |
 | How often InstallerClean waited for a slow drive or network share, and how many it stopped waiting for | Quante volte InstallerClean ha atteso un'unità o una condivisione di rete lenta e quante ha smesso di attendere |
 | How many programs and patches Windows has a record of | Di quanti programmi e patch Windows ha un record |
 | Whether Windows still makes old-style short file names | Se Windows crea ancora i nomi di file brevi vecchio stile |
@@ -204,9 +204,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Italiano |
 | --- | --- |
-| {0} file left alone | {0} file lasciato stare |
+| {0} file left alone | {0} file non toccato |
 | {0} files left alone | {0} file non toccati |
-| {0} unneeded file to clean up | {0} file non necessario da eliminare |
+| {0} unneeded file to clean up | {0} file non necessario che è possibile eliminare |
 | {0} unneeded files to clean up | {0} file non necessari che è possibile eliminare |
 | Windows has a record for {0} file that isn't in {InstallerFolder}: {1}. It causes no trouble day to day, but an update or uninstall of that program can fail. Open Details for what to do. | Windows ha un record per {0} file che non è in {InstallerFolder}: {1}. Nell'uso quotidiano non crea problemi, ma un aggiornamento o una disinstallazione di quel programma può fallire. Apri Dettagli per sapere cosa fare. |
 | Windows has records for {0} files that aren't in {InstallerFolder}: {1}. They cause no trouble day to day, but an update or uninstall of those programs can fail. Open Details for what to do. | Windows ha record per {0} file che non sono in {InstallerFolder}: {1}. Nell'uso quotidiano non creano problemi, ma un aggiornamento o una disinstallazione di quei programmi può fallire. Apri Dettagli per sapere cosa fare. |
@@ -229,7 +229,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This PC's clock went back or lost time while the scan was running, so InstallerClean held back the files in {InstallerFolder} that no installed program's records name, rather than offering them. Re-scan. | L'orologio di questo PC è tornato indietro o ha perso tempo durante la scansione, perciò InstallerClean ha trattenuto i file in {InstallerFolder} non nominati nei record di alcun programma installato, invece di proporli. Premi Ripeti scansione. |
 | {0} of {1} {2} | {0} di {1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} da eliminare ({2}) |
-| {0} file left alone ({1}) | {0} file lasciato stare ({1}) |
+| {0} file left alone ({1}) | {0} file non toccato ({1}) |
 | {0} files left alone ({1}) | {0} file non toccati ({1}) |
 | {0} missing | {0} mancante |
 | {0} missing | {0} mancanti |
@@ -396,7 +396,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | Chiudi |
 | Close window | Chiudi finestra |
 | Close result and return to main window | Chiudi finestra risultato e torna alla finestra principale |
-| Leave a star on github | Valuta il programma su Github |
+| Leave a star on github | Lascia una stella su github |
 | Minimise | Riduci a icona |
 | Delete permanently removes the unneeded files. Cancel closes without deleting. | Elimina definitivamente rimuove i file non necessari. Annulla chiude senza eliminare nulla. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 'Sposta' colloca i file non necessari nella cartella destinazione scelta. 'Annulla' li lascia dove sono. |
