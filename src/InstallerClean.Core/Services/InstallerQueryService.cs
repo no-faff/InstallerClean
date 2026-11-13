@@ -1081,7 +1081,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // here means the database is corrupt or inaccessible; silently
         // reporting "all clear" would be worse than failing.
         if (claimed.Count == 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
+            throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty, Strings.Error_NothingRemoved);
 
         var missed = LocateProductsTheEnumerationMissed(products, fallback.RegistryProductCodes, restarts, ct);
 
@@ -1116,6 +1116,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             listed.Add(new ListedInstallation(recoveredCode, recoveredSid, (int)recoveredContext,
                 SecondCopyNotRuledOut: instanceReading != InstanceReading.Ordinary));
+
+            FoldRecoveredPatchSet(recoveredCode, recoveredSid, recoveredContext, apiPatchSets, ct, abandonedLog);
         }
 
         WithholdOnRegistryPackageRecords(claimed, patchClaims, fallback.PackageRecords);
@@ -1163,7 +1165,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // a loss from two counts that can differ for innocent reasons, which is
         // sound enough to withhold on and not to refuse on.
         if (unreadableProducts > 0 && fallback.Failures > 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable);
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable, Strings.Error_NothingRemoved);
 
         // An enumeration that ends EARLY says nothing about itself: a
         // NoMoreItems at index 3 of 200 sets reachedEnd and leaves unreadableRows
@@ -1527,8 +1529,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// A LIST THAT DID NOT RUN TO ITS END CARRIES WHAT IT LISTED, and one Windows refused
     /// outright, or that never ended, carries nothing and does not refuse the scan. The
     /// offer rests on the judging pass, which reads each such installation's patch set as
-    /// the registry lists it in full; these pairings are what the check under the lease
-    /// re-reads in the window after it.
+    /// the registry lists it in full, and for a recovered installation as Windows
+    /// Installer lists it too (<see cref="FoldRecoveredPatchSet"/>); these pairings are
+    /// what the check under the lease re-reads in the window after it.
     /// </summary>
     private IReadOnlyList<PatchClaim> PairingsOfHoldersWithNoClaims(
         IReadOnlyList<PatchClaim> heldByName,
@@ -4046,6 +4049,61 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
+    /// Puts the patches Windows Installer lists for a recovered installation into
+    /// <paramref name="apiPatchSets"/>, as the product loop does for an enumerated one, so
+    /// a recovered product is judged on msi.dll's answers as well as the registry's
+    /// listing (<see cref="ProductVerdict"/> takes the worse of the two). A patch whose
+    /// Uninstallable answer is anything but "0" marks the product as holding a patch that
+    /// could be uninstalled, which holds its superseded patches.
+    ///
+    /// ONLY AN ANSWER COUNTS HERE. A walk Windows refuses, a list it ends short and an
+    /// Uninstallable it will not give add nothing, and the registry's reading of the
+    /// product stands as the verdict. That reading is the same record: msi.dll answers
+    /// Uninstallable from the Uninstallable value under the product's Patches subkey,
+    /// which <see cref="ReadProductPatchSet"/> reads. Do not turn a
+    /// refusal into Unestablished here: that would hold files on a question nobody answered.
+    ///
+    /// ITS WALKS HAVE A RESTART BUDGET OF THEIR OWN. The scan's keyed walks share one pause
+    /// budget (<see cref="WalkRestarts.KeyedPauseLimit"/>), and a walk here that spent it
+    /// would leave the walks after it, which can hold a file on a refusal, restarting
+    /// without a pause.
+    /// </summary>
+    private void FoldRecoveredPatchSet(
+        string productCode,
+        string? userSid,
+        MsiInstallContext context,
+        Dictionary<string, ProductPatchSet> apiPatchSets,
+        CancellationToken ct,
+        PerItemFailureLog failureLog)
+    {
+        var restarts = WalkRestarts.For(ct, WalkPause);
+        List<(string PatchCode, string? UserSid, MsiInstallContext Context)> patches;
+        try
+        {
+            (patches, _) = EnumeratePatches(productCode, userSid, context, restarts, ct, failureLog);
+        }
+        catch (Exception ex) when (ex is LocalisedAccessException or LocalisedInvalidOperationException)
+        {
+            return;
+        }
+
+        foreach (var (patchCode, patchSid, patchContext) in patches)
+        {
+            ct.ThrowIfCancellationRequested();
+            var uninstallable = GetPatchProperty(
+                _msi, patchCode, productCode, patchSid, patchContext, MsiInstallProperty.Uninstallable);
+            if (uninstallable.Unreadable || uninstallable.Value.Length == 0) continue;
+
+            var verdict = uninstallable.Value == "0"
+                ? ProductPatchSet.AllNonRemovable
+                : ProductPatchSet.RemovablePatchPresent;
+            apiPatchSets[productCode] = apiPatchSets.TryGetValue(productCode, out var seen)
+                ? Worse(seen, verdict)
+                : verdict;
+        }
+    }
+
+    /// <summary>
     /// One product's patch-set verdict, unioned across the sources that can see its
     /// patches. Every source can only ADD a patch to the set, so unioning costs reads
     /// and can only ever withhold more.
@@ -4054,8 +4112,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// ONE. The registry side is the product's own <c>Patches</c> key, listed by
     /// <see cref="RegistryNames.SubKeysOf"/> separately from Windows Installer's
     /// enumeration, so a fault in that enumeration does not reach it. The API side is
-    /// the same pairings the product loop already read, so it costs nothing and it catches a patch the registry's own key does
-    /// not list.
+    /// the same pairings the product loop already read, so it costs nothing and it
+    /// catches a patch the registry's own key does not list. A product the enumeration
+    /// missed and the recovery found has its API side from a walk of each recovered
+    /// installation's own patches (<see cref="FoldRecoveredPatchSet"/>).
     ///
     /// AN ABSENT REGISTRY ENTRY IS AN INABILITY AND AN ABSENT API ENTRY IS NOT, which
     /// looks inconsistent and is the point. The registry walk visits every product key
@@ -4951,7 +5011,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
 
             if (error == MsiError.AccessDenied)
-                return (results, unreadableRows, new LocalisedAccessException(Strings.Error_MsiAccessDenied), true);
+                return (results, unreadableRows, new LocalisedAccessException(Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved), true);
 
             lastError = error;
 
@@ -5000,7 +5060,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (unreadableRows > 0)
             return (results, unreadableRows, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiNonSuccess, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count))), true);
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)), Strings.Error_NothingRemoved), true);
 
         // Hitting the index cap is not a clean end: the enumeration ran out of
         // budget rather than reporting NoMoreItems, so everything past the cap
@@ -5015,7 +5075,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (!reachedEnd)
             return (results, unreadableRows, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiEnumerationNeverEnded, MaxProductIndex, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count))), false);
+                    results.Count, Helpers.DisplayHelpers.PluraliseProduct(results.Count)), Strings.Error_NothingRemoved), false);
 
         return (results, unreadableRows, null, false);
     }
@@ -5053,8 +5113,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// declines to assert a patch list Windows will not hand over, rather than
     /// losing the whole scan over it. The AccessDenied and never-ended-cap refusals
     /// below are a machine-level breakdown, and the product loop lets them refuse
-    /// the scan. <see cref="PairingsOfHoldersWithNoClaims"/> catches them, the
-    /// offer resting on what the judging pass has already read.
+    /// the scan. <see cref="PairingsOfHoldersWithNoClaims"/> and
+    /// <see cref="FoldRecoveredPatchSet"/> catch them, the offer resting on what the
+    /// judging pass has already read.
     ///
     /// A WALK THAT MEETS A ROW IT CANNOT READ IS MADE AGAIN FROM THE FIRST INDEX
     /// (<see cref="WalkRestarts.KeyedWalk"/>), whether it skipped the row, was abandoned
@@ -5154,7 +5215,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // returns Incomplete, where a break would return with the flag
                 // still false. The scan command's catch routes this to a dialog
                 // and to crash.log.
-                return (results, incomplete, null, new LocalisedAccessException(Strings.Error_MsiAccessDenied), true);
+                return (results, incomplete, null, new LocalisedAccessException(Strings.Error_MsiAccessDenied, Strings.Error_NothingRemoved), true);
 
             lastError = error;
 
@@ -5228,15 +5289,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (!reachedEnd)
             return (results, incomplete, null, new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, MaxPatchIndex, lastError,
-                    results.Count, Helpers.DisplayHelpers.PluralisePatch(results.Count))), false);
+                    results.Count, Helpers.DisplayHelpers.PluralisePatch(results.Count)), Strings.Error_NothingRemoved), false);
 
         return (results, incomplete, null, null, incomplete);
     }
 
     /// <summary>
     /// Records that one installation's patch enumeration was abandoned after a full run
-    /// of unreadable rows, in the product loop or while listing the patches of an
-    /// installation found holding a patch by name (<see cref="PairingsOfHoldersWithNoClaims"/>).
+    /// of unreadable rows, in the product loop, while listing the patches of an
+    /// installation found holding a patch by name (<see cref="PairingsOfHoldersWithNoClaims"/>),
+    /// or while listing a recovered installation's patches (<see cref="FoldRecoveredPatchSet"/>).
     /// Dev-facing crash-log breadcrumb only, deliberately not localised and never
     /// surfaced. Nothing the user sees and nothing the opt-in report carries says which
     /// product's patch list was abandoned, and diagnosing a superseded file held back

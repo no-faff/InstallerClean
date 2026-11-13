@@ -243,7 +243,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // reports the folder.
         if (cacheRoot.Proven && !SpellsTheSameFolder(walkedFolder, cacheRoot.Resolved))
             throw new LocalisedInvalidOperationException(string.Format(
-                Strings.Error_ScanInstallerFolderElsewhere, ShownAsAFolder(cacheRoot.Resolved)));
+                Strings.Error_ScanInstallerFolderElsewhere, ShownAsAFolder(cacheRoot.Resolved)), Strings.Error_NothingOfferedNothingRemoved);
 
         // Walk the disk BEFORE querying the API, and materialise the walk here
         // rather than leaving it lazy. A package cached after the walk finishes
@@ -921,7 +921,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var candidatesFromComparison = candidatesFromWalk;
 
         if (!cacheRoot.Proven && refusedCandidates > 0 && candidatesFromComparison == 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved, Strings.Error_NothingRemoved);
 
         // The registered rows this scan is keeping. A superseded patch that reached
         // the offer is not among them, having been left out at the loop above rather
@@ -1006,7 +1006,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         if (registered.Count > 0
             && registeredNamingFolder == 0
             && candidatesFromComparison > 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_ScanNoRegisteredFileInFolder);
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanNoRegisteredFileInFolder, Strings.Error_NothingOfferedNothingRemoved);
 
         // Correlation sanity gate. On any real machine some registered path
         // resolves to a file that is actually there. If next to none do, yet the
@@ -1089,7 +1089,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         if (presentRegistered <= 2
             && survivorsForBound * 20 < survivorsForBound + missingInFolder
             && candidatesFromComparison > 0)
-            throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed, Strings.Error_NothingOfferedNothingRemoved);
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             DisplayHelpers.FormatCount(removable.Count),
@@ -1877,6 +1877,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         new(cause is DirectoryNotFoundException
                 ? Strings.Error_ScanInstallerFolderNotFound
                 : Strings.Error_ScanInstallerFolderListFailed,
+            Strings.Error_NothingOfferedNothingRemoved,
             cause);
 
     private static bool IsCacheExtension(string extension) =>

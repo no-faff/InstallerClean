@@ -974,7 +974,7 @@ Om het terug te zetten heb je het installatieprogramma nodig van de versie die j
     <comment>Bullet 9 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>De versie van InstallerClean, hoe je het hebt gekregen (setup, portable, Scoop, het opdrachtregelprogramma op zichzelf, zelf gebouwd uit de broncode of onbekend), of het rapport door InstallerClean of door het opdrachtregelprogramma is verstuurd, en de taal waarin het werd weergegeven</value>
+    <value>De versie van InstallerClean, hoe je het hebt gekregen (setup, portable, Scoop, het opdrachtregelprogramma op zichzelf, zelf gebouwd uit de broncode of onbekend), of de uitvoering in InstallerClean of in het opdrachtregelprogramma plaatsvond, en de taal waarin het werd weergegeven</value>
     <comment>Bullet 10 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
@@ -1227,8 +1227,18 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        heading names none and has to stay true of all of them. -->
   <data name="Error.StoppedTitle" xml:space="preserve"><value>InstallerClean is gestopt</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan mislukt</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>De Windows Installer-records kwamen volledig leeg terug: geen enkel geïnstalleerd programma of geen enkele update maakt aanspraak op een installatiebestand in de cache. Dat komt op een werkende computer niet voor (zelfs een gloednieuwe Windows-installatie heeft er een paar), dus ofwel zijn de records beschadigd, ofwel konden ze niet worden gelezen, en een scan die dit antwoord zou geloven, zou elk bestand in {InstallerFolder} ten onrechte verweesd noemen. InstallerClean is in plaats daarvan gestopt. Er is niets verwijderd.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer weigerde InstallerClean te laten zien wat er geïnstalleerd is. InstallerClean draaide al als administrator, dus het nogmaals als administrator uitvoeren verandert niets. Zonder die lijst is er geen veilige manier om te bepalen welke bestanden in de cache nog nodig zijn, dus InstallerClean is gestopt. Er is niets verwijderd.</value></data>
+  <!-- The closing sentence after the message of a stop at a scan or at the check made
+       before a Move or Delete, joined to it as two sentences. Error.NothingRemoved follows
+       Error.InstallerDbEmpty, Error.MsiAccessDenied, Error.MsiNonSuccess,
+       Error.MsiEnumerationNeverEnded, Error.MsiPatchEnumerationNeverEnded,
+       Error.ScanRecordsUnreadable and Error.ScanCacheRootUnresolved. crash.log leaves it out. -->
+  <data name="Error.NothingRemoved" xml:space="preserve"><value>Er is niets verwijderd.</value></data>
+  <!-- As Error.NothingRemoved, after Error.ScanCorrelationFailed,
+       Error.ScanNoRegisteredFileInFolder, Error.ScanInstallerFolderElsewhere,
+       Error.ScanInstallerFolderNotFound and Error.ScanInstallerFolderListFailed. -->
+  <data name="Error.NothingOfferedNothingRemoved" xml:space="preserve"><value>Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>De Windows Installer-records kwamen volledig leeg terug: geen enkel geïnstalleerd programma of geen enkele update maakt aanspraak op een installatiebestand in de cache. Dat komt op een werkende computer niet voor (zelfs een gloednieuwe Windows-installatie heeft er een paar), dus ofwel zijn de records beschadigd, ofwel konden ze niet worden gelezen, en een scan die dit antwoord zou geloven, zou elk bestand in {InstallerFolder} ten onrechte verweesd noemen. InstallerClean is in plaats daarvan gestopt.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer weigerde InstallerClean te laten zien wat er geïnstalleerd is. InstallerClean draaide al als administrator, dus het nogmaals als administrator uitvoeren verandert niets. Zonder die lijst is er geen veilige manier om te bepalen welke bestanden in de cache nog nodig zijn, dus InstallerClean is gestopt.</value></data>
   <!-- 0 = the Win32 error code the unreadable entry came back with (kept
        in the message because a sysadmin reading the dialog may want to
        look it up; it is Success, 0, for an entry that came back as a
@@ -1241,7 +1251,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        situations with different answers, and this count is what tells
        them apart. Zero is a real value and reads correctly: "it read 0
        programs". -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer kon InstallerClean geen leesbare lijst van de geïnstalleerde programma's geven: het las {1} {2} en daarna kwam een vermelding onleesbaar terug (foutcode {0}). In plaats van met een half gelezen lijst te werken is InstallerClean gestopt. Er is niets verwijderd.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer kon InstallerClean geen leesbare lijst van de geïnstalleerde programma's geven: het las {1} {2} en daarna kwam een vermelding onleesbaar terug (foutcode {0}). In plaats van met een half gelezen lijst te werken is InstallerClean gestopt.</value></data>
   <!-- The index cap, which is a different condition from the unreadable
        entry above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -1253,7 +1263,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        reason: how far the enumeration got is the fact somebody helping needs,
        and it is as worth having when the budget runs out as when an
        unreadable entry stops the walk. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer heeft het einde van de lijst met geïnstalleerde programma's nooit gemeld: InstallerClean las {2} {3} en heeft het daarna na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd.</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer heeft het einde van de lijst met geïnstalleerde programma's nooit gemeld: InstallerClean las {2} {3} en heeft het daarna na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same four placeholders.
 
@@ -1261,7 +1271,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        walks one program's patches, so 2 counts patches read cleanly and 3 is
        the patch noun. Borrowing the sibling's noun would report a count of
        patches as a count of programs. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer heeft het einde van de patchlijst van een programma nooit gemeld: InstallerClean las {2} {3} en heeft het daarna na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd.</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer heeft het einde van de patchlijst van een programma nooit gemeld: InstallerClean las {2} {3} en heeft het daarna na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt.</value></data>
   <!-- Shown when what Windows still registers and what is in the cache folder
        cannot be reconciled: a sign the correlation broke, not a real list of
        removable files. "Nearly" and "almost" are what the gate actually
@@ -1276,7 +1286,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        (Error.ScanNoRegisteredFileInFolder) for the machine where no record names
        the folder at all. Deliberately does not offer anything for removal. No
        placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. Bijna niets waarnaar de records verwijzen staat daar werkelijk, en bijna niets van wat daar staat wordt door een record genoemd, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. Bijna niets waarnaar de records verwijzen staat daar werkelijk, en bijna niets van wat daar staat wordt door een record genoemd, waardoor er niets als overbodig kon worden aangemerkt.</value></data>
   <!-- Shown when not one Windows Installer record names a file sitting directly
        in the cache folder this scan walked, while that folder still holds files
        the scan would otherwise have offered. Its sibling above weighs how many
@@ -1288,7 +1298,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        are missing from the folder, which is false of this machine, so one string
        covering both would have to be rewritten in every language to stay true.
        Names the folder through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+  <data name="Error.ScanNoRegisteredFileInFolder" xml:space="preserve"><value>InstallerClean kon de Windows Installer-records niet koppelen aan de inhoud van {InstallerFolder}. De map bevat wel bestanden, maar geen enkel record verwijst naar iets daarin, waardoor er niets als overbodig kon worden aangemerkt.</value></data>
   <!-- Shown when the scan stops before its walk because Windows reports the
        Installer folder at a path other than its own, ignoring case: the folder,
        or a folder above it, is a junction or a directory symbolic link, and a
@@ -1296,13 +1306,13 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        reports and no cause for it, because more than one condition produces it.
        {0} is that path, a full folder path such as D:\Cache\Installer. Names the
        folder the app asked about through the {InstallerFolder} token. -->
-  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean kan {InstallerFolder} op deze pc niet scannen. Windows meldt die map als {0}, en InstallerClean scant alleen een Installer-map die Windows op zijn eigen pad meldt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+  <data name="Error.ScanInstallerFolderElsewhere" xml:space="preserve"><value>InstallerClean kan {InstallerFolder} op deze pc niet scannen. Windows meldt die map als {0}, en InstallerClean scant alleen een Installer-map die Windows op zijn eigen pad meldt.</value></data>
   <!-- Shown when the scan stops at its walk because Windows answered that the
        cache folder cannot be found when the app went to list it. Only that answer
        reaches this message; every other failure to list the folder gets
        Error.ScanInstallerFolderListFailed below. Names the folder through the
        {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows meldt dat {InstallerFolder} niet bestaat op deze pc, dus InstallerClean is gestopt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+  <data name="Error.ScanInstallerFolderNotFound" xml:space="preserve"><value>Windows meldt dat {InstallerFolder} niet bestaat op deze pc, dus InstallerClean is gestopt.</value></data>
   <!-- Shown when the scan stops at its walk because Windows returned an error while
        the app was listing the cache folder, whether when the folder was opened or
        part-way through it: a refusal or any other failed read. Windows answering
@@ -1310,7 +1320,7 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        instead. States no cause beyond that, because more than one condition
        produces it and naming one would be false of the others. Names the folder
        through the {InstallerFolder} token. No placeholders. -->
-  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows meldde een fout toen InstallerClean de bestanden in {InstallerFolder} probeerde op te sommen, dus het kon geen volledige lijst krijgen en is gestopt. Er is niets voor opruimen aangeboden en er is niets verwijderd.</value></data>
+  <data name="Error.ScanInstallerFolderListFailed" xml:space="preserve"><value>Windows meldde een fout toen InstallerClean de bestanden in {InstallerFolder} probeerde op te sommen, dus het kon geen volledige lijst krijgen en is gestopt.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -1319,14 +1329,14 @@ InstallerClean draaide al als administrator, dus opnieuw starten op die manier h
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean kon niet genoeg van de Windows Installer-records lezen om zeker te weten wat er nog nodig is: de lijst met geïnstalleerde programma's kwam onvolledig terug, en dezelfde records rechtstreeks uit het register lezen leverde ook fouten op. Een bestand kon er verweesd uitzien enkel doordat het record dat het benoemt een van de onleesbare was, dus InstallerClean is gestopt. Er is niets verwijderd.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean kon niet genoeg van de Windows Installer-records lezen om zeker te weten wat er nog nodig is: de lijst met geïnstalleerde programma's kwam onvolledig terug, en dezelfde records rechtstreeks uit het register lezen leverde ook fouten op. Een bestand kon er verweesd uitzien enkel doordat het record dat het benoemt een van de onleesbare was, dus InstallerClean is gestopt.</value></data>
   <!-- Shown when the kernel would not expand the cache folder's own path, so
        the containment guard had nothing proven to measure a candidate against
        and refused every one of them. Without it that scan reports "nothing to
        clean up", which is the one answer a user has no way to question. Names
        the folder through the {InstallerFolder} token like its two siblings
        above. No placeholders. -->
-  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean kreeg Windows niet zover het echte pad van {InstallerFolder} te bepalen, dus van geen enkel bestand kon worden aangetoond dat het erin staat en er is niets voor opruimen aangeboden. Deze scan vond niets omdat die controle mislukte, niet omdat de map schoon is. Er is niets verwijderd.</value></data>
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean kreeg Windows niet zover het echte pad van {InstallerFolder} te bepalen, dus van geen enkel bestand kon worden aangetoond dat het erin staat en er is niets voor opruimen aangeboden. Deze scan vond niets omdat die controle mislukte, niet omdat de map schoon is.</value></data>
   <!-- The next four keys are two PAIRS, one per action, for one condition: the
        Windows Installer lock could not be taken and nothing was shown to be
        holding it, so the batch was refused before it reached a file. The two
@@ -1553,8 +1563,8 @@ Details in {1}.</value></data>
     <comment>A third line on the card and in the notice, under UpdateNotice.Recommended, after the newer version downloaded but could not be put in place or started. Update now and the link show under it.</comment>
   </data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Kon GitHub niet bereiken. Controleer je internetverbinding en probeer het opnieuw.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub heeft een foutmelding teruggestuurd. Probeer het over een paar minuten opnieuw.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>In het antwoord van GitHub was geen release te herkennen. Probeer het later opnieuw, of open de releasepagina rechtstreeks.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>De updatecontrole kreeg een fout terug in plaats van de releasepagina van GitHub. Die kan van GitHub komen of van iets op je netwerk, zoals een proxy. Probeer het later opnieuw, of open de releasepagina in je browser.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>De updatecontrole kreeg een antwoord terug waarin geen release werd genoemd. Dat kan van GitHub komen of van iets op je netwerk, zoals een proxy of een inlogpagina. Probeer het later opnieuw, of open de releasepagina in je browser.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>De controle duurde te lang. Je verbinding met GitHub is mogelijk traag; probeer het opnieuw.</value></data>
   <!-- 0 = the crash log's full path. The pair below is the app's standard shape
        for a message that offers the log: the first is shown only where the write
@@ -2200,7 +2210,7 @@ Voer InstallerClean opnieuw uit als administrator.</value></data>
   <!-- After the answer was yes and the report did not go. 0 = the full path of last-run.json,
        where the report is kept. -->
   <data name="Cli.ReportCouldNotBeSent" xml:space="preserve"><value>Het rapport kon niet worden verstuurd. Het wordt bewaard in {0}.</value></data>
-  <!-- A later run at the console, before it sends a report an earlier run left waiting.
+  <!-- A later run that could ask the report question, before it sends a report an earlier run left waiting.
        Nothing is asked. InstallerClean's window also sends one without asking, at every
        start until a send is accepted. The line names no cause: more than one thing leaves a report waiting. -->
   <data name="Cli.ReportWaiting" xml:space="preserve"><value>Een rapport dat sinds een eerdere uitvoering wacht, wordt nu verstuurd.</value></data>
@@ -2277,10 +2287,12 @@ Voer InstallerClean opnieuw uit als administrator.</value></data>
        The command line cancels the run on Ctrl+C, Ctrl+Break, its console closing
        or Windows shutting down, or, where it is the newer version an update started,
        on the starting version's cancel, and the line names none of them. -->
-  <!-- 0 = mode arg. Audit entry for a cancellation that lands before any file is
-       processed (a cancel during the scan, or before the first delete or
-       move), so "each /s, /d or /m run writes one summary entry" holds for
-       every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a run cancelled before its scan, and for a /s
+       cancelled during it, so "each /s, /d or /m run writes one summary entry" holds
+       for every run, not only the ones that committed work. -->
+  <!-- 0 = mode arg. Audit entry for a /d or /m cancelled in its work with no file
+       deleted or moved: a cancel during the scan or the re-check, or after every file
+       it reached failed. -->
   <!-- 0 = mode arg, 1 = the version running, 2 = the newer version it started, 3 = what
        that newer version was started to run: the command as given, or /s after a yes at
        the console.
@@ -2429,11 +2441,11 @@ Voer InstallerClean opnieuw uit als administrator.</value></data>
        word, or not at all if it fits. -->
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli blokkeert de prompt tot het klaar is, zodat een script&#10;of geplande taak erop kan wachten.</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Die map geldt per gebruiker; geplande of SYSTEM-taken vereisen /m PAD.</value></data>
-  <!-- ONE value carrying FIVE printed lines, under the /m note. The &#10; is where the
+  <!-- ONE value carrying SEVEN printed lines, under the /m note. The &#10; is where the
        English breaks; a translation breaks within the 74-column cap where its own
        grammar allows, at a space or after punctuation and never inside a word.
        /noupdate is the switch as typed and stays as written. -->
-  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Voor het scannen controleert het of er een nieuwere versie van&#10;InstallerClean is. Start je het zelf, dan vraagt het eerst toestemming, en&#10;werkt het bij als niemand binnen een minuut antwoordt. Draait het&#10;zelfstandig, in een geplande taak of een script, dan werkt het bij zonder&#10;te vragen. Voeg /noupdate toe om de controle over te slaan.</value></data>
+  <data name="Cli.Help.UpdateNote" xml:space="preserve"><value>Voor het scannen controleert het of er een nieuwere versie van&#10;InstallerClean is, tenzij “Automatisch controleren op updates” is&#10;uitgeschakeld voor het account waaronder het draait. Als het&#10;consolevenster op het scherm staat en de invoer en uitvoer niet zijn&#10;omgeleid, vraagt het eerst toestemming, en werkt het bij als niemand&#10;binnen een minuut antwoordt. In alle andere gevallen, bijvoorbeeld een&#10;geplande taak die wordt uitgevoerd of er nu iemand is aangemeld of niet,&#10;werkt het bij zonder te vragen. Voeg /noupdate toe om de controle over te&#10;slaan.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Afsluitcodes:</value></data>
   <!-- 0 IS NOT A STATEMENT THAT WORK HAPPENED AND NOT A STATEMENT THAT NONE IS
        LEFT. Five runs exit 0: the help and version flags (/? and -v), which print

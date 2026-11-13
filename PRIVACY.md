@@ -12,7 +12,7 @@ There is never more than one report per PC, and it is from the first run. No lat
 
 **What it holds.** Numbers and fixed labels, and one random code:
 
-- InstallerClean's version, the language it was showing, how it was got (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the version of the report's format.
+- InstallerClean's version, the language it was showing, how it was got (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the version of the report's format.
 - Windows 10 or 11, whether it's x64, Arm or 32-bit Windows, and the language and Country or region Windows is set to.
 - Whether the run was a scan, a Move or a Delete, whether it finished, how long the scan and the Move or Delete took, how many files it moved or deleted, how many it couldn't, and how much space it freed. For a Move, whether the files went to the same drive, another drive, a removable drive or a network share.
 - How many installer files Windows has a record of, how many are missing, how many were no longer needed, and how much space they take.
@@ -41,7 +41,7 @@ Nothing in it names you, your PC, a file, a folder, a drive or a program.
 
 When you open InstallerClean, it asks GitHub whether there's a newer version. That's one request to github.com. If there is one, InstallerClean says so, and also reads update.json, a small file in that version's release on GitHub that says what each download needs, to tell whether this copy can install it. A copy installed by Scoop doesn't read update.json, because Scoop does its updating. With each request, GitHub sees your IP address, as any website does, and a line naming InstallerClean and its version. Nothing else is downloaded unless you click Update now, which downloads the newer version from its release on GitHub and installs it. Check for updates makes the same check, only when you click it.
 
-The command-line tool makes the same check before a scan, Move or Delete. Where someone is at the console to answer, it asks before it updates. Where nobody is, such as a scheduled task or a script, it updates without asking. Either way it downloads the newer version from GitHub, runs the command with it, and then puts the newer version in its own place.
+The command-line tool makes the same check before a scan, Move or Delete. Where its window is on screen and nothing is piped into or out of it, it asks before it updates, and updates if nobody answers within a minute. Anywhere else, such as a scheduled task set to run whether or not anyone is logged on, it updates without asking. Either way it downloads the newer version from GitHub, runs the command with it, and then puts the newer version in its own place.
 
 You can turn the check off in the About screen, which turns it off for InstallerClean and the command-line tool, for the Windows account that runs them. Adding `/noupdate` to a command skips it for that run.
 
@@ -51,7 +51,7 @@ To know a PC has had its first run, InstallerClean sets a value named `FirstRunR
 
 ## The command-line tool
 
-Where someone is at the console, it asks whether to send the same anonymous report as InstallerClean, once, after the PC's first finished run, and sends it only if the answer is yes. The question names the file the report is saved in, and typing `?` shows what the report holds and the report itself. If the report can't be sent, it is kept, and the next run at a console sends it without asking again. Where nobody is, such as a scheduled task or a script, it sends no report, and checks for updates as set out above. It writes one summary line per run to the Windows Application event log, with further lines for conditions it found on the PC and for each newer version it runs or can't run, and where one could not be put in its place. After a Move or Delete that moves or deletes files, or ends where how far it got isn't known, or when it asks to send the report, it sets the `FirstRunRecorded` value described above. The summary lines, the notices and the value stay on your PC.
+Where its window is on screen and nothing is piped into or out of it, it asks whether to send the same anonymous report as InstallerClean, once, after the PC's first finished run, and sends it only if the answer is yes. The question names the file the report is saved in, and typing `?` shows what the report holds and the report itself. If the report can't be sent, it is kept, and the next such run sends it without asking again. Anywhere else, such as a scheduled task set to run whether or not anyone is logged on, it sends no report, and checks for updates as set out above. It writes one summary line per run to the Windows Application event log, with further lines for conditions it found on the PC and for each newer version it runs or can't run, and where one could not be put in its place. After a Move or Delete that moves or deletes files, or ends where how far it got isn't known, or when it asks to send the report, it sets the `FirstRunRecorded` value described above. The summary lines, the notices and the value stay on your PC.
 
 ## The tip buttons
 

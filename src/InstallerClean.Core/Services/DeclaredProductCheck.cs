@@ -979,6 +979,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     ///   <c>InstallProperties</c> key (<see cref="InstallPropertiesKeyPath"/>) is absent or
     ///   records no cached package (<see cref="RecordsNoCachedPackage"/>), a key that will not
     ///   read answering false;
+    /// - <c>S-1-5-18</c> keeps no source list for its own per-user installation of the code
+    ///   (<see cref="SystemKeepsNoOwnPerUserList"/>), whose record the per-machine one shares;
     /// - where that key is there, its <c>InstallSource</c>, read through the API and from the key
     ///   alike (<see cref="InstallSourceOf"/>), is none or a web address, or names a folder shown
     ///   not to be the Installer folder itself, on a local drive as on any other root
@@ -1042,7 +1044,8 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
             return new NoPackageReading(NoPackageAnswer.RegistryDisagrees, answered);
 
         var key = registry.LocalMachineValues(properties, pass.CancellationToken);
-        if (!RecordsNoCachedPackage(key) || ValuesOf(registry, listKey, pass.CancellationToken).Presence != RegistryKeyPresence.Absent)
+        if (!RecordsNoCachedPackage(key) || ValuesOf(registry, listKey, pass.CancellationToken).Presence != RegistryKeyPresence.Absent
+            || !SystemKeepsNoOwnPerUserList(code, pass))
             return new NoPackageReading(NoPackageAnswer.RegistryDisagrees, answered);
 
         if (key.Presence == RegistryKeyPresence.Absent)
@@ -2020,6 +2023,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// first put to the Installer-folder test, and one that would be a file directly in the
     /// Installer folder keeps every copy.
     ///
+    /// A PER-MACHINE INSTALLATION'S SOURCES INCLUDE THE LISTS <c>S-1-5-18</c> KEEPS FOR ITS OWN
+    /// PER-USER INSTALLATION OF THE SAME CODE, where it has one, read once the per-machine list
+    /// is seen (<see cref="AddSystemsOwnPerUserSources"/>).
+    ///
     /// THE RUNNING ACCOUNT'S OWN PER-USER-UNMANAGED LIST IS COUNTED FOR THE PASS once it is
     /// read, by whether every package it names was read or left to be compared by name
     /// (<see cref="PassAnswers.OwnPerUserListRead"/>). A list stopped by the gates before the
@@ -2041,8 +2048,10 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
     /// where it is not shown to be on another volume than the Installer folder, one whose
     /// read has not answered within the time limit, and one under a drive, a share
     /// or any other root (<see cref="RootOf"/>) given up for the pass
-    /// (<see cref="ReadSourcePackage"/>). A source package that is not there is skipped,
-    /// being no file.
+    /// (<see cref="ReadSourcePackage"/>); and, for a per-machine installation, a list
+    /// <c>S-1-5-18</c> keeps for its own per-user installation of the code that does not
+    /// settle (<see cref="AddSystemsOwnPerUserSources"/>). A source package that is not there
+    /// is skipped, being no file.
     ///
     /// Where false is a package read refused for a root given up for the pass,
     /// <paramref name="givenUp"/> is that root (<see cref="ReadSourcePackage"/>); for every
@@ -2089,7 +2098,82 @@ public sealed class DeclaredProductCheck : IDeclaredProductCheck
         var seen = AddPackagesAtSources(
             code, sid, context, pass, namesAFileInInstallerFolder, _registry, opened, byName, out givenUp, out refusal);
         if (context == MsiInstallContext.UserUnmanaged) pass.OwnPerUserListRead(code, sid, seen);
+        if (seen && context == MsiInstallContext.Machine)
+            seen = AddSystemsOwnPerUserSources(
+                code, pass, namesAFileInInstallerFolder, opened, byName, out givenUp, out refusal);
         return seen;
+    }
+
+    /// <summary>
+    /// The account <c>S-1-5-18</c>'s own per-user places for a product's source list, unmanaged in
+    /// its hive and managed in HKLM: the places <see cref="SourceListPlaces"/> gives that account
+    /// other than the machine's.
+    /// </summary>
+    private static readonly (string? Sid, MsiInstallContext Context)[] SystemsOwnPerUserPlaces =
+        SourceListPlaces(DirectoryGuard.SystemSid).Where(place => place.Context != MsiInstallContext.Machine).ToArray();
+
+    /// <summary>
+    /// Whether neither of <c>S-1-5-18</c>'s own per-user places holds a source list for
+    /// <paramref name="code"/>, each read as <see cref="AddSystemsOwnPerUserSources"/> reads it. A
+    /// list there, one that will not read, and a hive that is not loaded each answer false.
+    /// </summary>
+    private bool SystemKeepsNoOwnPerUserList(string code, PassAnswers pass) =>
+        SystemsOwnPerUserPlaces.All(place => ReadListAt(code, place.Sid, place.Context, pass, out _) == ListReading.NotThere);
+
+    /// <summary>
+    /// Adds the packages named by the source lists the account <c>S-1-5-18</c> keeps for its own
+    /// per-user installation of <paramref name="code"/>, for a code installed per machine, read
+    /// from the registry alone (<see cref="ReadListAt"/>, <see cref="AddPackagesInFolders"/>), as
+    /// <see cref="AddRegistrySources"/> reads a product key no installation accounts for. True where
+    /// neither list is there, or every package they name was read or left to be compared by name.
+    ///
+    /// ONE CODE CAN BE INSTALLED PER MACHINE AND PER USER UNDER <c>S-1-5-18</c> AT ONCE. Where the
+    /// account installs it per user first and an administrator then installs it per machine, Windows
+    /// Installer keeps one <c>UserData\S-1-5-18</c> record for both, with one cached package, and
+    /// publishes each installation with its own source list. The enumeration lists the code per
+    /// machine only, and a per-machine listing accounts for that record
+    /// (<see cref="InstallerQueryService.UserDataAccount"/>), so the per-user list is read here. A
+    /// repair of the per-user installation opens what that list names, which can be a copy of the
+    /// package in the Installer folder.
+    ///
+    /// No API call is made for these places: the account's own reads do not tell its per-user
+    /// installation from its per-machine one.
+    ///
+    /// FALSE, WHICH KEEPS THE FILE AS EVERY OTHER SOURCE READ OF THE INSTALLATION DOES, where a list
+    /// will not read or its hive is not loaded (<see cref="SourceRefusal.WouldNotRead"/>), where it
+    /// holds a value in a form this check does not compare (<see cref="SourceRefusal.FormOther"/>),
+    /// and where a package it names does not settle (<see cref="SourceRefusal.PackageNotRuledOut"/>,
+    /// or <see cref="SourceRefusal.GivenUp"/> with <paramref name="givenUp"/> the root given up).
+    /// </summary>
+    private bool AddSystemsOwnPerUserSources(
+        string code,
+        PassAnswers pass,
+        Func<string, bool?> namesAFileInInstallerFolder,
+        List<FileIdentity> opened,
+        List<PackageByName> byName,
+        out string? givenUp,
+        out SourceRefusal refusal)
+    {
+        givenUp = null;
+        foreach (var (sid, context) in SystemsOwnPerUserPlaces)
+        {
+            var reading = ReadListAt(code, sid, context, pass, out var read);
+            if (reading == ListReading.NotThere) continue;
+            if (reading == ListReading.NotRead) return Refuse(SourceRefusal.WouldNotRead, out refusal);
+            if (read is not { } sources) return Refuse(SourceRefusal.FormOther, out refusal);
+
+            // The media search opens the file named by the package name on each drive it tries, so a
+            // list that searches media keeps every candidate whose name the package could be.
+            if (sources.MediaSearch) byName.Add(new PackageByName(null, sources.PackageName));
+
+            if (!AddPackagesInFolders(
+                    sources.Folders, sources.PackageName, pass, namesAFileInInstallerFolder, _registry!, opened, byName,
+                    out givenUp))
+                return Refuse(givenUp is null ? SourceRefusal.PackageNotRuledOut : SourceRefusal.GivenUp, out refusal);
+        }
+
+        refusal = SourceRefusal.None;
+        return true;
     }
 
     /// <summary>

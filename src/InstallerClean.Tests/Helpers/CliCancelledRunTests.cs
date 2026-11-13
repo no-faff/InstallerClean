@@ -141,6 +141,35 @@ public class CliCancelledRunTests
     }
 
     [Fact]
+    public async Task A_cancelled_delete_whose_every_file_failed_says_no_file_was_deleted_or_moved()
+    {
+        // Files were tried, so the entry cannot say no work was done. It says what is
+        // true of this run and of one cancelled in its scan alike: no file went.
+        using var cts = new CancellationTokenSource();
+        var delete = Substitute.For<IDeleteFilesService>();
+        delete.DeleteFilesAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<UnderLeaseClaims>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                cts.Cancel();
+                return new DeleteResult(0,
+                    new FileOperationError[] { new AccessDenied(File1), new AccessDenied(File2) },
+                    Cancelled: true);
+            });
+
+        EventLogRecorder.Clear();
+        var (exitCode, stdout) = await Run("/d", null, Services(delete: delete), cts.Token);
+
+        var noFileRemoved = MachineContract.English(
+            () => string.Format(Strings.Cli_EventLogCancelledNoFileRemoved, "/d"));
+        Assert.Equal(CliExitCode.Cancelled, exitCode);
+        Assert.Contains(Strings.Cli_Cancelled, stdout);
+        Assert.Equal(
+            [(CliEventClass.TransientSkip, noFileRemoved)],
+            EventLogRecorder.Entries.Where(CliRunFixtures.IsSummary).ToArray());
+    }
+
+    [Fact]
     public async Task A_move_that_was_not_cancelled_does_carry_the_keep_the_move_line()
     {
         // The control on the test above: the same run without the cancel prints the
@@ -189,16 +218,18 @@ public class CliCancelledRunTests
         // The command line cancels a run on either control key, its console
         // closing, Windows shutting down or, for the newer version an update
         // started, the starting version's cancel, and the handler does not tell
-        // them all apart, so neither line names one. Composed here exactly as the two write
-        // sites compose them, so a slot the value stopped spelling would throw here
+        // them all apart, so no line names one. Composed here exactly as the write sites
+        // compose them, so a slot the value stopped spelling would throw here
         // rather than in the Application channel.
         var partial = MachineContract.English(() => string.Format(
             Strings.Cli_EventLogCancelledPartial,
             "/m", 1, 2, DisplayHelpers.PluraliseFile(2)));
         var noWork = MachineContract.English(
-            () => string.Format(Strings.Cli_EventLogCancelledNoWork, "/d"));
+            () => string.Format(Strings.Cli_EventLogCancelledNoWork, "/s"));
+        var noFileRemoved = MachineContract.English(
+            () => string.Format(Strings.Cli_EventLogCancelledNoFileRemoved, "/d"));
 
-        foreach (var line in new[] { partial, noWork })
+        foreach (var line in new[] { partial, noWork, noFileRemoved })
         {
             Assert.DoesNotContain("Ctrl+", line, StringComparison.OrdinalIgnoreCase);
             // Beside the absence, so the absence is attributable: a line that had

@@ -4,6 +4,7 @@ using InstallerClean.Resources;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
 using NSubstitute;
+using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.ViewModels;
 
@@ -12,8 +13,9 @@ namespace InstallerClean.Tests.ViewModels;
 /// cause. Every such stop takes the same rung, so one stands for all of them here.
 ///
 /// The account of it is built in Core and arrives as the exception's message. It
-/// reaches a card, and a card lasts as long as the window does, so the same text
-/// goes to the crash log and a closing sentence says where. The two things this
+/// reaches a card, and a card lasts as long as the window does, so the same text,
+/// less the sentence saying what the stop left as it was, goes to the crash log and a
+/// sentence after it on the card says where. The two things this
 /// pins are that the account itself reaches the reader whole, and that the closing
 /// sentence never names a file unless one was written.
 /// </summary>
@@ -25,16 +27,19 @@ public class ScanViewModelStoppedScanTests
             Substitute.For<IDialogService>());
 
     private static Exception AScanThatStopped() =>
-        new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
+        new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty, Strings.Error_NothingRemoved);
+
+    /// <summary>The stop's message as every screen shows it, its closing sentence included.</summary>
+    private static readonly string Account = StopMessages.NothingRemoved(Strings.Error_InstallerDbEmpty);
 
     [Fact]
     public void A_scan_that_stops_reaches_the_reader_with_its_whole_account()
     {
         var failure = NewViewModel().DescribeScanFailure(AScanThatStopped());
 
-        // StartsWith rather than Equals: the closing sentence is appended after it,
-        // and this test is about the account arriving rather than about that.
-        Assert.StartsWith(Strings.Error_InstallerDbEmpty, failure.Message, StringComparison.Ordinal);
+        // StartsWith rather than Equals: the sentence naming the crash log is appended
+        // after it, and this test is about the account arriving rather than about that.
+        Assert.StartsWith(Account, failure.Message, StringComparison.Ordinal);
 
         // The rung matters as much as the text. Falling through to the generic arm
         // would replace this account with a type name, which is what that arm exists
@@ -65,7 +70,7 @@ public class ScanViewModelStoppedScanTests
         string alreadyThere = probe.Written ? File.ReadAllText(probe.Path) : string.Empty;
 
         var failure = NewViewModel().DescribeScanFailure(AScanThatStopped());
-        var added = failure.Message[Strings.Error_InstallerDbEmpty.Length..].Trim();
+        var added = failure.Message[Account.Length..].Trim();
 
         if (!probe.Written)
         {
@@ -87,6 +92,9 @@ public class ScanViewModelStoppedScanTests
             ? whole[alreadyThere.Length..]
             : whole;
         Assert.Contains(Strings.Error_InstallerDbEmpty, appended, StringComparison.Ordinal);
+        // Without its closing sentence, which says what the stop left as it was: the log
+        // also records the scan that runs after a Move or Delete, where that is not so.
+        Assert.DoesNotContain(Account, appended, StringComparison.Ordinal);
     }
 
     [Fact]
