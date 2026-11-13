@@ -4,15 +4,15 @@
 // picks up as a glob, so a new one is run by the release on the day it is
 // written and no list can fall out of step.
 //
-// The two held here read built files, so neither can be in that glob, which runs
+// The guards held here read built files, so none can be in that glob, which runs
 // before anything is built. Each is invoked by name after the publish steps
 // instead, and a line invoked by name is a line that can be deleted or renamed
 // away while everything stays green. This is what makes those invocations a rule
 // rather than a habit.
 //
-// verify-shipped-artefacts.mjs is run by both workflows. check-native-imports.ps1
-// reads the two merged exes build-and-test builds and is run by ci.yml alone: the
-// release builds the same projects with the same SDK and merges them the same way.
+// Each names the workflows that run it. check-native-imports.ps1 reads the two merged
+// exes build-and-test builds and is run by ci.yml alone: the release builds the same
+// projects with the same SDK and merges them the same way.
 //
 // THE INVOCATION HAS TO OPEN THE COMMAND, after the indent and an optional
 // "run:". A line carrying the name anywhere else is text about the guard rather
@@ -32,6 +32,10 @@ const GUARDS = [
   {
     command: './scripts/check-native-imports.ps1',
     workflows: ['.github/workflows/ci.yml'],
+  },
+  {
+    command: './scripts/check-one-file.ps1',
+    workflows: ['.github/workflows/ci.yml', '.github/workflows/release.yml'],
   },
 ];
 

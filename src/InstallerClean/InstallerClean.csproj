@@ -61,14 +61,6 @@
     <ProjectReference Include="..\InstallerClean.Core\InstallerClean.Core.csproj" />
   </ItemGroup>
 
-  <!-- Whether this build carries its own .NET runtime, written into the assembly so
-       the update from inside the app can tell the portable download, which does,
-       from the slim, which does not, and download the same kind again. The release
-       workflow sets SelfContained on both publishes. RunningCopy reads it. -->
-  <ItemGroup>
-    <AssemblyMetadata Include="InstallerClean.SelfContained" Value="$(SelfContained)" />
-  </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Fonts\Poppins-Regular.ttf" />
     <Resource Include="Fonts\Poppins-Medium.ttf" />

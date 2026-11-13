@@ -761,6 +761,14 @@ jobs:
         shell: pwsh
         run: ./scripts/check-native-imports.ps1
 
+      # A copy updates by replacing its own exe only where it is the whole app, which it
+      # decides from AppCopy being in the exe's own assembly. This reads that from each
+      # merged exe's metadata, and reads the exe each merge started from as its control.
+      - name: Check each merged exe is the whole app
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-one-file.ps1
+
       # Here rather than with the other guards because it reads the two merged
       # exes, which do not exist until the steps above have run. A language that
       # never reaches an exe leaves the source resx present and correct, so every

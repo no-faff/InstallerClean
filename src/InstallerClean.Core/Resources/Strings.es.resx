@@ -962,7 +962,7 @@ Para reponerlo, necesitas el instalador de la versión que ya tienes. Consíguel
     <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
-    <value>La versión de InstallerClean, cómo lo obtuviste (setup, portable, slim, Scoop, la herramienta de línea de comandos por sí sola, compilado desde el código fuente o desconocido), si el informe se envió desde InstallerClean o desde la herramienta de línea de comandos, y el idioma en que se mostraba</value>
+    <value>La versión de InstallerClean, cómo lo obtuviste (setup, portable, Scoop, la herramienta de línea de comandos por sí sola, compilado desde el código fuente o desconocido), si el informe se envió desde InstallerClean o desde la herramienta de línea de comandos, y el idioma en que se mostraba</value>
     <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">

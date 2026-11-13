@@ -305,9 +305,9 @@ public sealed record ResultLogEntry(
 /// </param>
 /// <param name="CopyKind">
 /// The kind of copy of the program that was running, as <see cref="AppCopyLabel.For"/>
-/// labels <see cref="AppCopyKind"/>: the setup's, the portable download, the slim
-/// download, the command line's own download, Scoop's, a build from source, or a copy on a
-/// PC whose setup record could not say. It names how the program came to be on the PC and
+/// labels <see cref="AppCopyKind"/>: the setup's, the portable download, the command
+/// line's own download, Scoop's, a build from source, or a copy on a PC whose setup record
+/// could not say. It names how the program came to be on the PC and
 /// nothing about the PC or its user.
 /// </param>
 public sealed record AppInfo(

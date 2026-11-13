@@ -195,7 +195,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | How many programs and patches Windows has a record of | Windows に登録情報がある、プログラムとパッチの数 |
 | Whether Windows still makes old-style short file names | Windows が今も旧式の短いファイル名を作成しているかどうか |
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows が 10 か 11 か、x64 か Arm か、そしてどの言語と国または地域に設定されているか |
-| InstallerClean's version, how you got it (setup, portable, slim, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | InstallerClean のバージョン、入手方法（setup、portable、slim、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、レポートを送ったのが InstallerClean かコマンドラインツールか、そして表示していた言語 |
+| InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、レポートを送ったのが InstallerClean かコマンドラインツールか、そして表示していた言語 |
 | Counts of anything that went wrong | うまくいかなかったことの件数 |
 | Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | これらはいずれも数値かラベルです。レポートには、あなた自身、あなたの PC、ファイル、プログラムを特定するものは一切含まれず、私があなたの IP アドレスを見ることもありません。 |
 | See exactly what's sent | 送信される内容をそのまま見る |

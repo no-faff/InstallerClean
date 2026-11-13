@@ -510,7 +510,7 @@ const MAP = {
   'Completion.ReportPanel.Records': `Windows に登録情報がある、プログラムとパッチの数`,
   'Completion.ReportPanel.ShortNames': `Windows が今も旧式の短いファイル名を作成しているかどうか`,
   'Completion.ReportPanel.Windows': `Windows が 10 か 11 か、x64 か Arm か、そしてどの言語と国または地域に設定されているか`,
-  'Completion.ReportPanel.AppVersion': `InstallerClean のバージョン、入手方法（setup、portable、slim、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、レポートを送ったのが InstallerClean かコマンドラインツールか、そして表示していた言語`,
+  'Completion.ReportPanel.AppVersion': `InstallerClean のバージョン、入手方法（setup、portable、Scoop、単体のコマンドラインツール、ソースからのビルド、不明のいずれか）、レポートを送ったのが InstallerClean かコマンドラインツールか、そして表示していた言語`,
   'Completion.ReportPanel.Errors': `うまくいかなかったことの件数`,
   'Completion.ReportPanel.Closing': `これらはいずれも数値かラベルです。レポートには、あなた自身、あなたの PC、ファイル、プログラムを特定するものは一切含まれず、私があなたの IP アドレスを見ることもありません。`,
   'Automation.ReportInfo': `レポートの内容`,

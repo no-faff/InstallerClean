@@ -94,7 +94,6 @@ public static class UpdateManifest
     {
         AppCopyKind.Setup => "setup",
         AppCopyKind.Portable => "portable",
-        AppCopyKind.Slim => "slim",
         AppCopyKind.CommandLineDownload => "cli",
         _ => null,
     };

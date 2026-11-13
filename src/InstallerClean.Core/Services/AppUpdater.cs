@@ -142,8 +142,8 @@ public sealed class PreparedUpdate
 
 /// <summary>
 /// The update from inside the app. The setup's copy downloads the newer setup and runs
-/// it; the portable, the slim and the command line's own download download the newer
-/// version of the same file. The window starts it to put itself at the running exe's path;
+/// it; the portable and the command line's own download download the newer version of
+/// the same file. The window starts it to put itself at the running exe's path;
 /// the command line runs its command with the newer command line from the staging folder
 /// (<see cref="PrepareStagedRunAsync"/>).
 /// Each download is saved in a staging folder only Administrators and SYSTEM can write to,
@@ -712,7 +712,7 @@ public sealed class AppUpdater : IAppUpdater
 
     /// <summary>
     /// Set to the full path of a newer copy of the kind this one replaces itself with (the
-    /// portable, the slim or the command line), a Debug build that replaces itself takes
+    /// portable or the command line), a Debug build that replaces itself takes
     /// that file as the body of its download, and then stages and swaps it in as it would
     /// any download, so an update to a build from this tree can be tried offline. A run from
     /// the staging folder takes it as the newer command line, the setup's copy included, which
