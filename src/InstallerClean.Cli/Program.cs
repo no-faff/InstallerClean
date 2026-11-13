@@ -43,7 +43,18 @@ internal static class Program
     public static int Main(string[] args)
     {
         InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
-        if (RefuseWithoutNetFramework48() is { } refused) return refused;
+        // A check that throws lets the run go on, as the window's does, where the run's own
+        // handlers catch what follows.
+        int? refused;
+        try
+        {
+            refused = RefuseWithoutNetFramework48();
+        }
+        catch (Exception)
+        {
+            refused = null;
+        }
+        if (refused is { } code) return code;
         return Start(args);
     }
 

@@ -117,15 +117,10 @@ internal sealed class ConsoleGuard(TextWriter inner) : TextWriter
 
     /// <summary>
     /// The characters a write of part of an array takes. A type of its own rather than a
-    /// tuple: the refusal on a PC without .NET Framework 4.8 writes through this class, and
-    /// .NET Framework 4.6.2 has no ValueTuple.
+    /// tuple: the refusal on a PC without .NET Framework 4.8 writes through this class
+    /// (<see cref="Services.NetFrameworkCheck"/>).
     /// </summary>
-    private readonly struct Chars(char[] buffer, int index, int count)
-    {
-        public char[] Buffer { get; } = buffer;
-        public int Index { get; } = index;
-        public int Count { get; } = count;
-    }
+    private readonly record struct Chars(char[] Buffer, int Index, int Count);
 
     /// <summary>
     /// Makes one write, with the line break a failure leaves owing ahead of it. Takes the

@@ -13,6 +13,12 @@ namespace InstallerClean.Services;
 /// its start: the command line before it reads its arguments, the window before
 /// Application's constructor. Below 4.8 each says what to install and ends. The setup's copy has its
 /// config, which names 4.8, and the setup refuses to install where 4.8 is missing.
+///
+/// EVERYTHING A COPY RUNS BEFORE THIS CHECK ANSWERS, this check and its message included, uses
+/// only what .NET Framework 4.6.2 has: no ValueTuple, no netstandard type, nothing added after
+/// 4.6.2. A method naming anything else fails to compile there, and the copy ends without
+/// the message. build-and-test's check-framework-references.ps1 walks that path in each
+/// merged exe and fails on anything 4.6.2, 4.7, 4.7.1 or 4.7.2 lacks.
 /// </remarks>
 internal static class NetFrameworkCheck
 {

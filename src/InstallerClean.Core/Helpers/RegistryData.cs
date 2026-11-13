@@ -69,7 +69,7 @@ internal static class RegistryData
     /// <summary>
     /// What one RegQueryValueEx call answers: its result, the value's type and the length
     /// written or needed. A type of its own rather than a tuple: the copy's .NET Framework
-    /// 4.8 check reads the registry through here, and .NET Framework 4.6.2 has no ValueTuple.
+    /// 4.8 check reads the registry through here (<see cref="Services.NetFrameworkCheck"/>).
     /// </summary>
     internal readonly record struct Answer(int Result, int Type, int Length);
 
