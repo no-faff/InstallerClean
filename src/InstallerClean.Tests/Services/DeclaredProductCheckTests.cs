@@ -4712,14 +4712,65 @@ public class DeclaredProductCheckTests
     private static readonly ListedInstallation[] ListedAAndB =
         [ListedPerMachine(ProductA), ListedPerMachine(ProductB)];
 
+    /// <summary>
+    /// <see cref="APatchOnlyAnUnnamedInstallationCanHold"/> with B holding the patch and
+    /// recording <paramref name="recordedByB"/> as its copy, and every file reader there:
+    /// <see cref="PatchCopy"/> and <see cref="RecordedPatch"/> on disk as two different
+    /// files that both declare patch Q.
+    /// </summary>
+    private static (ScriptedPackageIdentities Packages, ScriptedMsiProducts Msi,
+        ScriptedFileIdentities Files, MockFileSystem Disk) APatchAnUnnamedInstallationHolds(string recordedByB)
+    {
+        var (packages, msi) = APatchOnlyAnUnnamedInstallationCanHold();
+        packages.DeclaresPatch(RecordedPatch, PatchQ, ProductA);
+        msi.PatchState(PatchQ, ProductB, null, MsiInstallContext.Machine, "1");
+        msi.RecordsPatchPackage(PatchQ, ProductB, null, MsiInstallContext.Machine, recordedByB);
+
+        var files = new ScriptedFileIdentities();
+        files.Opens(PatchCopy, 1);
+        files.Opens(RecordedPatch, 2);
+
+        var disk = new MockFileSystem();
+        disk.AddFile(PatchCopy, new MockFileData(new byte[100]));
+        disk.AddFile(RecordedPatch, new MockFileData(new byte[100]));
+
+        return (packages, msi, files, disk);
+    }
+
     [Fact]
     public void A_listed_installation_the_patch_does_not_name_is_asked_and_its_registration_keeps_the_copy()
     {
-        var (packages, msi) = APatchOnlyAnUnnamedInstallationCanHold();
-        msi.PatchState(PatchQ, ProductB, null, MsiInstallContext.Machine, "1");
+        // B records a copy that is not on disk, so which copy B holds cannot be seen.
+        var f = APatchAnUnnamedInstallationHolds(@"C:\Windows\Installer\gone.msp");
 
-        var outcome = ScriptedCheck(msi, packages)
-            .Screen(new[] { Patch(PatchCopy) }, ListedAAndB, []).Outcomes[0];
+        var outcome = ScreenThePatchCopy(f, installations: ListedAAndB);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredPatchRegistered, outcome);
+        Assert.True(outcome.Withholds());
+        Assert.Contains((PatchQ, ProductB, (string?)null, MsiInstallContext.Machine), f.Msi.PatchStateReads);
+    }
+
+    [Fact]
+    public void A_listed_installation_the_patch_does_not_name_recording_another_copy_lets_the_copy_through()
+    {
+        var f = APatchAnUnnamedInstallationHolds(RecordedPatch);
+
+        var outcome = ScreenThePatchCopy(f, installations: ListedAAndB);
+
+        Assert.Equal(DeclaredProductOutcome.DeclaredPatchCachedAsAnotherFile, outcome);
+        Assert.False(outcome.Withholds());
+    }
+
+    [Fact]
+    public void A_listed_installation_the_patch_does_not_name_recording_this_copy_keeps_it_beside_the_listed_registration()
+    {
+        // The enumeration lists A holding the patch with RecordedPatch as its copy; B, which
+        // the Template does not name, records the candidate itself.
+        var f = APatchCopyBesideTheRecordedCopy();
+        f.Msi.PatchState(PatchQ, ProductB, null, MsiInstallContext.Machine, "1");
+        f.Msi.RecordsPatchPackage(PatchQ, ProductB, null, MsiInstallContext.Machine, PatchCopy);
+
+        var outcome = ScreenThePatchCopy(f, installations: ListedAAndB);
 
         Assert.Equal(DeclaredProductOutcome.DeclaredPatchRegistered, outcome);
         Assert.True(outcome.Withholds());
