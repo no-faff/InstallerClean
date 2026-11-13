@@ -1641,6 +1641,13 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <data name="Startup.PlantedConfigRefusal" xml:space="preserve"><value>InstallerClean startet nicht, weil neben dem Programm eine Datei namens {0} liegt und InstallerClean keine solche Datei mitliefert. Lösche diese Datei und öffne InstallerClean dann erneut.
 
 {1}</value></data>
+  <!-- Shown by the window in a message box and printed by the command line, which
+       then exits 1, on a PC running Windows older than Windows 10 version 1607:
+       Windows 7, 8.1, and Windows 10 versions 1507 and 1511. Checked before
+       Startup.NeedsNetFramework48. "InstallerClean", "Windows 10" and "Windows 11"
+       are names and are not translated; "version 1607" is how Microsoft names
+       that release of Windows 10. -->
+  <data name="Startup.NeedsWindows10Version1607" xml:space="preserve"><value>InstallerClean benötigt Windows 10 ab Version 1607 oder Windows 11.</value></data>
   <!-- Shown by the window in a plain message box titled Window.Main.Title, then the
        window closes, where the PC does not have .NET Framework 4.8 (NetFrameworkCheck).
        Below it, after a blank line, Cli.UpdateDownloadLink with

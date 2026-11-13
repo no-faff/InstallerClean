@@ -109,8 +109,8 @@ else if (accessors.length !== declared)
         'shape has changed and everything below is a report on a partial read.',
     );
 
-// Strings.FrameworkCheck, the third door, which serves the strings of the .NET Framework
-// 4.8 check without the installer-folder token. Its members are internal so the count
+// Strings.FrameworkCheck, the third door, which serves the strings of a copy's start checks
+// without the installer-folder token. Its members are internal so the count
 // above stays one of the Get accessors. Each names a key the resx defines, carries the
 // key's name, and falls back to the key as Get does:
 //     internal static string Window_Main_Title => Manager.GetString("Window.Main.Title", Localisation.UiCulture) ?? "Window.Main.Title";
@@ -137,7 +137,7 @@ const declaredInternal = (designer.match(/internal\s+static\s+string\b/g) || [])
 if (checkAccessors.length === 0)
     problems.push(
         'No Strings.FrameworkCheck members matched in Strings.Designer.cs. The generated ' +
-        'shape changed, or the door went, and the .NET Framework 4.8 check reads through it.',
+        'shape changed, or the door went, and a copy\'s start checks read through it.',
     );
 else if (doors !== 2 || checkAccessors.length + doors !== declaredInternal)
     problems.push(

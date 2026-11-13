@@ -19,8 +19,8 @@ using InstallerClean.Helpers;
 /// Get and Find are the routes from a resx value to a user and both spend
 /// the installer-folder token, which is what lets a string name the cache
 /// folder correctly on a machine whose Windows is not on C:. The third,
-/// FrameworkCheck below, serves only the strings of the .NET Framework 4.8
-/// check, none of which carries the token. scripts/check-cross-key-rules.mjs
+/// FrameworkCheck below, serves only the strings of a copy's start checks,
+/// none of which carries the token. scripts/check-cross-key-rules.mjs
 /// fails the build on a read anywhere else, and check-designer-parity.mjs
 /// on a fourth door here.
 /// </summary>
@@ -503,6 +503,7 @@ public static class Strings
     public static string Startup_FailedToStart => Get("Startup.FailedToStart");
     public static string Startup_FailedToStart_NoLog => Get("Startup.FailedToStart.NoLog");
     public static string Startup_NeedsNetFramework48 => Get("Startup.NeedsNetFramework48");
+    public static string Startup_NeedsWindows10Version1607 => Get("Startup.NeedsWindows10Version1607");
     public static string Startup_PlantedConfigRefusal => Get("Startup.PlantedConfigRefusal");
     public static string Startup_UnhandledBody => Get("Startup.UnhandledBody");
     public static string Startup_UnhandledBody_NoLog => Get("Startup.UnhandledBody.NoLog");
@@ -613,9 +614,10 @@ public static class Strings
     public static string Window_Report_Unreadable => Get("Window.Report.Unreadable");
 
     /// <summary>
-    /// The door for the strings a copy shows from its .NET Framework 4.8 check,
-    /// which runs before anything else and on any .NET Framework 4.x. It reads
-    /// the value as Get does and substitutes no installer-folder token:
+    /// The door for the strings a copy shows from its start checks, for Windows
+    /// 10 version 1607 and for .NET Framework 4.8, which run before anything else
+    /// and on any .NET Framework 4.x. It reads the value as Get does and
+    /// substitutes no installer-folder token:
     /// resolving the folder reaches the folder-identity code the scan uses,
     /// which needs more than .NET Framework 4.0 has. None of these keys
     /// carries the token in any language, which StringsFrameworkCheckTests
@@ -626,6 +628,7 @@ public static class Strings
         internal static string Cli_NeedsNetFramework48 => Manager.GetString("Cli.NeedsNetFramework48", Localisation.UiCulture) ?? "Cli.NeedsNetFramework48";
         internal static string Cli_UpdateDownloadLink => Manager.GetString("Cli.UpdateDownloadLink", Localisation.UiCulture) ?? "Cli.UpdateDownloadLink";
         internal static string Startup_NeedsNetFramework48 => Manager.GetString("Startup.NeedsNetFramework48", Localisation.UiCulture) ?? "Startup.NeedsNetFramework48";
+        internal static string Startup_NeedsWindows10Version1607 => Manager.GetString("Startup.NeedsWindows10Version1607", Localisation.UiCulture) ?? "Startup.NeedsWindows10Version1607";
         internal static string UpdateNotice_DownloadNetFramework48 => Manager.GetString("UpdateNotice.DownloadNetFramework48", Localisation.UiCulture) ?? "UpdateNotice.DownloadNetFramework48";
         internal static string Window_Main_Title => Manager.GetString("Window.Main.Title", Localisation.UiCulture) ?? "Window.Main.Title";
     }

@@ -361,6 +361,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | 發生未預期的錯誤，InstallerClean 必須關閉。<br><br>{0}<br><br>無法寫入當機記錄檔。 |
 | Startup error | 啟動錯誤 |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean 無法啟動，因為它旁邊有一個名為 {0} 的檔案，而 InstallerClean 本身並不附帶這樣的檔案。請刪除該檔案，然後再次執行 InstallerClean。<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean 需要 Windows 10 版本 1607 或更新版本，或 Windows 11。 |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean 需要 .NET Framework 4.8。請從 Microsoft 安裝，重新啟動電腦，然後再次開啟 InstallerClean。 |
 | Failed to start ({0}). Details written to:<br>{1} | 無法啟動（{0}）。詳細資料已寫入：<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | 無法啟動（{0}）。無法寫入當機記錄檔。 |

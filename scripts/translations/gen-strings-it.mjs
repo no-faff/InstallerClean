@@ -576,6 +576,7 @@ const MAP = {
   'About.Link.Notices': `Avvisi di terze parti`,
   'Automation.About.Notices.HelpText': `Mostra le licenze di caratteri, icone e codice inclusi in InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices    Mostra gli avvisi di terze parti`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean richiede Windows 10 versione 1607 o successiva, oppure Windows 11.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

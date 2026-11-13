@@ -358,8 +358,9 @@ for (const [value, oneSentence, stopped] of [
 // a screen reader. A satellite-only plural override has no typed accessor, and
 // Strings.Find is its door.
 //
-// The third door is Strings.FrameworkCheck, which serves only the strings of the
-// .NET Framework 4.8 check, the first thing a copy runs, on any .NET Framework 4.x.
+// The third door is Strings.FrameworkCheck, which serves only the strings of a copy's
+// start checks, for Windows 10 version 1607 and for .NET Framework 4.8, the first
+// thing a copy runs, on any .NET Framework 4.x.
 // Resolving the folder reaches code that needs more than 4.0 has, so this door
 // substitutes no token, and none of its keys may carry one in any language (rule
 // 8a below; StringsFrameworkCheckTests reads the same through the door itself).

@@ -1641,6 +1641,13 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
   <data name="Startup.PlantedConfigRefusal" xml:space="preserve"><value>InstallerClean 옆에 {0} 파일이 있는데 InstallerClean에는 그런 파일이 포함되어 있지 않아서 시작할 수 없습니다. 그 파일을 삭제한 다음 InstallerClean을 다시 실행하세요.
 
 {1}</value></data>
+  <!-- Shown by the window in a message box and printed by the command line, which
+       then exits 1, on a PC running Windows older than Windows 10 version 1607:
+       Windows 7, 8.1, and Windows 10 versions 1507 and 1511. Checked before
+       Startup.NeedsNetFramework48. "InstallerClean", "Windows 10" and "Windows 11"
+       are names and are not translated; "version 1607" is how Microsoft names
+       that release of Windows 10. -->
+  <data name="Startup.NeedsWindows10Version1607" xml:space="preserve"><value>InstallerClean에는 Windows 10 버전 1607 이상 또는 Windows 11이 필요합니다.</value></data>
   <!-- Shown by the window in a plain message box titled Window.Main.Title, then the
        window closes, where the PC does not have .NET Framework 4.8 (NetFrameworkCheck).
        Below it, after a blank line, Cli.UpdateDownloadLink with

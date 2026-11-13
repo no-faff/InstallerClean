@@ -1641,6 +1641,13 @@ Le crash.log n'a pas pu être écrit.</value></data>
   <data name="Startup.PlantedConfigRefusal" xml:space="preserve"><value>InstallerClean ne démarrera pas car un fichier nommé {0} se trouve à côté du programme, et InstallerClean n'en fournit aucun. Supprimez ce fichier, puis rouvrez InstallerClean.
 
 {1}</value></data>
+  <!-- Shown by the window in a message box and printed by the command line, which
+       then exits 1, on a PC running Windows older than Windows 10 version 1607:
+       Windows 7, 8.1, and Windows 10 versions 1507 and 1511. Checked before
+       Startup.NeedsNetFramework48. "InstallerClean", "Windows 10" and "Windows 11"
+       are names and are not translated; "version 1607" is how Microsoft names
+       that release of Windows 10. -->
+  <data name="Startup.NeedsWindows10Version1607" xml:space="preserve"><value>InstallerClean nécessite Windows 10 version 1607 ou ultérieure, ou Windows 11.</value></data>
   <!-- Shown by the window in a plain message box titled Window.Main.Title, then the
        window closes, where the PC does not have .NET Framework 4.8 (NetFrameworkCheck).
        Below it, after a blank line, Cli.UpdateDownloadLink with

@@ -8788,6 +8788,24 @@
       "vi": "6153ff99b0f56f5b",
       "zh-Hans": "6153ff99b0f56f5b",
       "zh-Hant": "6153ff99b0f56f5b"
+    },
+    "Startup.NeedsWindows10Version1607": {
+      "de": "b9db52ccac530663",
+      "es": "b9db52ccac530663",
+      "fr": "b9db52ccac530663",
+      "id": "b9db52ccac530663",
+      "it": "b9db52ccac530663",
+      "ja": "b9db52ccac530663",
+      "ko": "b9db52ccac530663",
+      "nl": "b9db52ccac530663",
+      "pl": "b9db52ccac530663",
+      "pt-BR": "b9db52ccac530663",
+      "ru": "b9db52ccac530663",
+      "tr": "b9db52ccac530663",
+      "uk": "b9db52ccac530663",
+      "vi": "b9db52ccac530663",
+      "zh-Hans": "b9db52ccac530663",
+      "zh-Hant": "b9db52ccac530663"
     }
   }
 }

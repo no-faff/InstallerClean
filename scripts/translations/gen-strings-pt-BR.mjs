@@ -655,6 +655,7 @@ const MAP = {
   'About.Link.Notices': `Avisos de terceiros`,
   'Automation.About.Notices.HelpText': `Mostra as licenças das fontes, dos ícones e do código que o InstallerClean inclui.`,
   'Cli.Help.Notices': `  installerclean-cli --notices   Mostra os avisos de terceiros`,
+  'Startup.NeedsWindows10Version1607': `O InstallerClean precisa do Windows 10 versão 1607 ou posterior, ou do Windows 11.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.

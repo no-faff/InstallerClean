@@ -39,8 +39,8 @@ const HEAD = [
   "/// Get and Find are the routes from a resx value to a user and both spend",
   "/// the installer-folder token, which is what lets a string name the cache",
   "/// folder correctly on a machine whose Windows is not on C:. The third,",
-  "/// FrameworkCheck below, serves only the strings of the .NET Framework 4.8",
-  "/// check, none of which carries the token. scripts/check-cross-key-rules.mjs",
+  "/// FrameworkCheck below, serves only the strings of a copy's start checks,",
+  "/// none of which carries the token. scripts/check-cross-key-rules.mjs",
   "/// fails the build on a read anywhere else, and check-designer-parity.mjs",
   "/// on a fourth door here.",
   "/// </summary>",
@@ -90,13 +90,15 @@ export const designerKeys = (resx) =>
   [...new Set([...resx.matchAll(/<data name="([A-Za-z][A-Za-z0-9._]+)/g)].map((m) => m[1]))]
     .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
-// The strings a copy shows from its .NET Framework 4.8 check, which Strings.FrameworkCheck
-// serves without substituting the installer-folder token. None of them may carry it, in any
-// language (StringsFrameworkCheckTests). Written in this order.
+// The strings a copy shows from its start checks, for Windows 10 version 1607 and for .NET
+// Framework 4.8, which Strings.FrameworkCheck serves without substituting the installer-folder
+// token. None of them may carry it, in any language (StringsFrameworkCheckTests). Written in
+// this order.
 export const CHECK_KEYS = [
   'Cli.NeedsNetFramework48',
   'Cli.UpdateDownloadLink',
   'Startup.NeedsNetFramework48',
+  'Startup.NeedsWindows10Version1607',
   'UpdateNotice.DownloadNetFramework48',
   'Window.Main.Title',
 ];
@@ -104,9 +106,10 @@ export const CHECK_KEYS = [
 const FRAMEWORK_CHECK_HEAD = [
   "",
   "    /// <summary>",
-  "    /// The door for the strings a copy shows from its .NET Framework 4.8 check,",
-  "    /// which runs before anything else and on any .NET Framework 4.x. It reads",
-  "    /// the value as Get does and substitutes no installer-folder token:",
+  "    /// The door for the strings a copy shows from its start checks, for Windows",
+  "    /// 10 version 1607 and for .NET Framework 4.8, which run before anything else",
+  "    /// and on any .NET Framework 4.x. It reads the value as Get does and",
+  "    /// substitutes no installer-folder token:",
   "    /// resolving the folder reaches the folder-identity code the scan uses,",
   "    /// which needs more than .NET Framework 4.0 has. None of these keys",
   "    /// carries the token in any language, which StringsFrameworkCheckTests",

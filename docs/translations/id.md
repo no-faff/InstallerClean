@@ -361,6 +361,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Terjadi kesalahan tak terduga dan InstallerClean perlu ditutup.<br><br>{0}<br><br>Log kerusakan tidak bisa ditulis. |
 | Startup error | Kesalahan saat memulai |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean tidak akan dimulai karena ada file bernama {0} di sebelahnya, dan InstallerClean tidak menyertakan file seperti itu. Hapus file itu, lalu buka InstallerClean lagi.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean memerlukan Windows 10 versi 1607 atau yang lebih baru, atau Windows 11. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean memerlukan .NET Framework 4.8. Pasang dari Microsoft, mulai ulang PC, lalu buka InstallerClean lagi. |
 | Failed to start ({0}). Details written to:<br>{1} | Gagal memulai ({0}). Detail ditulis ke:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Gagal memulai ({0}). Log kerusakan tidak bisa ditulis. |

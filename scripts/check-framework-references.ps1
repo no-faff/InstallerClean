@@ -8,11 +8,12 @@
 #  - Every .NET Framework type and member the exe references resolves in 4.8, through the
 #    assembly its reference names and that assembly's forwarders (FrameworkReferences.cs).
 #    What the exe references that 4.6.2 lacks is printed for the record.
-#  - The exe reaches its .NET Framework 4.8 check and its message on 4.0, 4.5, 4.5.1, 4.5.2,
-#    4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 and 4.7.2: nothing the runtime compiles or loads before the
-#    check has answered is missing from any of them. The command line's check is
-#    Program.RefuseWithoutNetFramework48, which Main calls; the window's is
-#    App.EndWithoutNetFramework48, which App's static constructor calls first. Each check is
+#  - The exe reaches its start checks, for Windows 10 version 1607 and .NET Framework 4.8,
+#    and their messages on 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 and 4.7.2:
+#    nothing the runtime compiles or loads before the checks have answered is missing from
+#    any of them. The command line's checks are Program.RefuseOnAPcThatCannotRunIt, which
+#    Main calls; the window's are App.EndOnAPcThatCannotRunIt, which App's static constructor
+#    calls first. Each check is
 #    followed, and what runs after it (Program.Start, App.OnStartup and the rest of App's
 #    static constructor) is not. Each missing member is printed once, with the chain it was
 #    first met on and every method of the app's own through which the walk reaches it.
@@ -370,10 +371,10 @@ namespace Fixture
   else { Write-Host '  the one without reported nothing, as it should' }
 
   $exes = @(
-    [pscustomobject]@{ Label = 'window'; Path = 'window/InstallerClean.exe'; Project = 'src/InstallerClean'; CheckCall = 'InstallerClean.App::EndWithoutNetFramework48'
-      Check = 'InstallerClean.App::EndWithoutNetFramework48'; Start = 'InstallerClean.App::OnStartup'; Initializer = 'InstallerClean.ProcessDefaults::SetBeforeMain' }
-    [pscustomobject]@{ Label = 'command line'; Path = 'cli/installerclean-cli.exe'; Project = 'src/InstallerClean.Cli'; CheckCall = 'InstallerClean.Cli.Program::RefuseWithoutNetFramework48'
-      Check = 'InstallerClean.Cli.Program::RefuseWithoutNetFramework48'; Start = 'InstallerClean.Cli.Program::Start'; Initializer = 'InstallerClean.Cli.LibrarySearch::SetBeforeMain' }
+    [pscustomobject]@{ Label = 'window'; Path = 'window/InstallerClean.exe'; Project = 'src/InstallerClean'; CheckCall = 'InstallerClean.App::EndOnAPcThatCannotRunIt'
+      Check = 'InstallerClean.App::EndOnAPcThatCannotRunIt'; Start = 'InstallerClean.App::OnStartup'; Initializer = 'InstallerClean.ProcessDefaults::SetBeforeMain' }
+    [pscustomobject]@{ Label = 'command line'; Path = 'cli/installerclean-cli.exe'; Project = 'src/InstallerClean.Cli'; CheckCall = 'InstallerClean.Cli.Program::RefuseOnAPcThatCannotRunIt'
+      Check = 'InstallerClean.Cli.Program::RefuseOnAPcThatCannotRunIt'; Start = 'InstallerClean.Cli.Program::Start'; Initializer = 'InstallerClean.Cli.LibrarySearch::SetBeforeMain' }
   )
   foreach ($entry in $exes) {
     Write-Host ''

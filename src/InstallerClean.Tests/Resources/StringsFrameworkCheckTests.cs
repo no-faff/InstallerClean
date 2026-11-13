@@ -6,7 +6,7 @@ using InstallerClean.Resources;
 namespace InstallerClean.Tests.Resources;
 
 /// <summary>
-/// Strings.FrameworkCheck, the door for the strings of the .NET Framework 4.8 check, hands
+/// Strings.FrameworkCheck, the door for the strings of a copy's start checks, hands
 /// its values over without substituting the installer-folder token, so none of the keys it
 /// serves may carry the token in any language.
 /// </summary>

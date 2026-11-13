@@ -363,6 +363,7 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Er is een onverwachte fout opgetreden en InstallerClean moet worden afgesloten.<br><br>{0}<br><br>Het crashlog kon niet worden weggeschreven. |
 | Startup error | Opstartfout |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean start niet omdat er naast het programma een bestand met de naam {0} staat, en InstallerClean wordt niet met zo'n bestand geleverd. Verwijder dat bestand en open InstallerClean daarna opnieuw.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean heeft Windows 10 versie 1607 of nieuwer, of Windows 11 nodig. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean heeft .NET Framework 4.8 nodig. Installeer het van Microsoft, herstart de pc en open InstallerClean daarna opnieuw. |
 | Failed to start ({0}). Details written to:<br>{1} | Starten mislukt ({0}). Details weggeschreven naar:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Starten mislukt ({0}). Het crashlog kon niet worden weggeschreven. |

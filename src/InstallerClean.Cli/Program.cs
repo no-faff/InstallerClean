@@ -32,13 +32,14 @@ internal static class Program
     private const int ExitCancelled = CliExitCode.Cancelled;
 
     /// <remarks>
-    /// On a PC without .NET Framework 4.8 the command line says what to install and ends,
+    /// On a PC older than Windows 10 version 1607 the command line says which Windows it
+    /// needs, and on a PC without .NET Framework 4.8 it says what to install, and ends,
     /// before it reads its arguments. The download carries no config naming the runtime, so
     /// .NET Framework starts it on any 4.x. The runtime compiles a method whole the first
     /// time it runs, and a member the PC's .NET Framework lacks fails that compile, so Main
-    /// names only the check, the crash log's write of what the module initializer kept and
+    /// names only the checks, the crash log's write of what the module initializer kept and
     /// <see cref="Start"/>, each in a method of its own that is never compiled into Main:
-    /// nothing the last two name is compiled before the check has run.
+    /// nothing the last two name is compiled before the checks have run.
     /// </remarks>
     public static int Main(string[] args)
     {
@@ -47,7 +48,7 @@ internal static class Program
         int? refused;
         try
         {
-            refused = RefuseWithoutNetFramework48();
+            refused = RefuseOnAPcThatCannotRunIt();
         }
         catch (Exception)
         {
@@ -59,12 +60,13 @@ internal static class Program
     }
 
     /// <summary>
-    /// The exit code of the refusal where the PC does not have .NET Framework 4.8, having
-    /// printed it, or null where it does.
+    /// The exit code of the refusal where the PC runs Windows older than Windows 10 version
+    /// 1607, or does not have .NET Framework 4.8, having printed it, or null where it can run
+    /// the copy. Windows is checked first, as 1507 and 1511 cannot take .NET Framework 4.8.
     /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static int? RefuseWithoutNetFramework48() =>
-        NetFrameworkCheck.RefusalMessage(commandLine: true) is { } message
+    private static int? RefuseOnAPcThatCannotRunIt() =>
+        (WindowsVersionCheck.RefusalMessage() ?? NetFrameworkCheck.RefusalMessage(commandLine: true)) is { } message
             ? RefuseWithoutRecording(message)
             : null;
 
@@ -210,8 +212,9 @@ internal static class Program
     }
 
     /// <summary>
-    /// <see cref="Refuse"/> for the refusal on a PC without .NET Framework 4.8, where a write
-    /// that fails loses its text and is not recorded in crash.log. Recording it asks the crash
+    /// <see cref="Refuse"/> for the refusals on a PC older than Windows 10 version 1607 or
+    /// without .NET Framework 4.8, where a write that fails loses its text and is not recorded
+    /// in crash.log. Recording it asks the crash
     /// log for its folder, which can move an earlier version's folder into place and runs
     /// code needing more than the .NET Framework NetFrameworkCheck's remarks name, on a PC
     /// that cannot run the app. The window records nothing where its message cannot be shown

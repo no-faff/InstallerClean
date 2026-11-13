@@ -251,7 +251,7 @@ InstallerClean is unsigned. Here's what you can check before you run it:
 
 **Why does Windows say "Unknown publisher"?** InstallerClean isn't code-signed, and Windows marks files downloaded from the internet, so on first run SmartScreen usually shows "Windows protected your PC" with the publisher listed as unknown. A paid signing certificate costs money every year and I'd rather keep the app free than pay for one, so I applied to SignPath Foundation, who sign open source software for nothing, and InstallerClean has been accepted (see [Code signing policy](#code-signing-policy)). The certificate hasn't been issued yet so, for now, click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
 
-**Does it work on Windows 7 or 8?** No. It needs Windows 10 version 1607 or later, or Windows 11. The setup refuses to install on anything older.
+**Does it work on Windows 7 or 8?** No. It needs Windows 10 version 1607 or later, or Windows 11. The setup refuses to install on anything older, and the portable and the command line say so and stop.
 
 ## Command line
 

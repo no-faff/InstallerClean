@@ -11,16 +11,17 @@ namespace InstallerClean.Services;
 /// Framework starts them on whatever 4.x the PC has. Each reads the Release value .NET
 /// Framework 4.8 writes, the value <see cref="UpdateManifest.HasNetFramework48"/> reads, at
 /// its start: the command line before it reads its arguments, the window before
-/// Application's constructor. Below 4.8 each says what to install and ends. The setup's copy has its
-/// config, which names 4.8, and the setup refuses to install where 4.8 is missing.
+/// Application's constructor, each after <see cref="WindowsVersionCheck"/>. Below 4.8 each
+/// says what to install and ends. The setup's copy has its config, which names 4.8, and the
+/// setup refuses to install where 4.8 is missing.
 ///
-/// EVERYTHING A COPY RUNS BEFORE THIS CHECK ANSWERS, this check and its message included, uses
-/// only what .NET Framework 4.0 has: no ValueTuple, no netstandard type, no AppContext, no
-/// TypeInfo, nothing added after 4.0. Windows 8 ships 4.5, Windows 8.1 ships 4.5.1 and Windows
-/// 10 1507 ships 4.6, Windows 7 has whichever 4.x was installed on it, and the portable and
-/// the command line check no Windows version of their own. A method naming anything else
-/// fails to compile there, and the copy ends without the message. So the check's strings
-/// come through Strings.FrameworkCheck, and the command line's refusal records nothing in
+/// EVERYTHING A COPY RUNS BEFORE ITS START CHECKS ANSWER, these checks and their messages
+/// included, uses only what .NET Framework 4.0 has: no ValueTuple, no netstandard type, no
+/// AppContext, no TypeInfo, nothing added after 4.0. Windows 8 ships 4.5, Windows 8.1 ships
+/// 4.5.1 and Windows 10 1507 ships 4.6, Windows 7 has whichever 4.x was installed on it, and
+/// the Windows check that refuses them runs on that .NET Framework. A method naming anything
+/// else fails to compile there, and the copy ends without a message. So the checks' strings
+/// come through Strings.FrameworkCheck, and the command line's refusals record nothing in
 /// crash.log. build-and-test's check-framework-references.ps1 walks that path in each merged
 /// exe and fails on anything 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1, 4.6.2, 4.7, 4.7.1 or 4.7.2
 /// lacks.

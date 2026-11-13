@@ -1641,6 +1641,13 @@ Log kerusakan tidak bisa ditulis.</value></data>
   <data name="Startup.PlantedConfigRefusal" xml:space="preserve"><value>InstallerClean tidak akan dimulai karena ada file bernama {0} di sebelahnya, dan InstallerClean tidak menyertakan file seperti itu. Hapus file itu, lalu buka InstallerClean lagi.
 
 {1}</value></data>
+  <!-- Shown by the window in a message box and printed by the command line, which
+       then exits 1, on a PC running Windows older than Windows 10 version 1607:
+       Windows 7, 8.1, and Windows 10 versions 1507 and 1511. Checked before
+       Startup.NeedsNetFramework48. "InstallerClean", "Windows 10" and "Windows 11"
+       are names and are not translated; "version 1607" is how Microsoft names
+       that release of Windows 10. -->
+  <data name="Startup.NeedsWindows10Version1607" xml:space="preserve"><value>InstallerClean memerlukan Windows 10 versi 1607 atau yang lebih baru, atau Windows 11.</value></data>
   <!-- Shown by the window in a plain message box titled Window.Main.Title, then the
        window closes, where the PC does not have .NET Framework 4.8 (NetFrameworkCheck).
        Below it, after a blank line, Cli.UpdateDownloadLink with
