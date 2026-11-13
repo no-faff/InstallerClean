@@ -1261,7 +1261,10 @@ public class FileSystemScanServiceTests
         // Only root-level files are candidates. A registered LocalPackage path
         // never sits in a subdirectory, so the API can say nothing about a file
         // there. That puts a payload .msp under $PatchCache$ (the patch engine's
-        // baseline copy) and every other subfolder file out of scope.
+        // baseline copy) and every other subfolder file out of scope: neither
+        // offered nor counted as left alone. The containment check would keep a
+        // subfolder file off the offer on its own, so the count is what shows the
+        // walk never reached it.
         var fs = new MockFileSystem(new Dictionary<string, MockFileData>
         {
             [@"C:\Windows\Installer\bbb.msi"] = new("x"),                                     // root: a candidate
@@ -1273,6 +1276,9 @@ public class FileSystemScanServiceTests
 
         var result = await svc.ScanAsync();
 
+        Assert.Equal(0, result.WithheldCount);
+        Assert.Empty(result.WithheldFiles ?? Array.Empty<OrphanedFile>());
+        Assert.Equal(0, result.LeftAloneCount);
         Assert.Single(result.RemovableFiles);
         Assert.Equal(@"C:\Windows\Installer\bbb.msi", result.RemovableFiles[0].FullPath);
     }
