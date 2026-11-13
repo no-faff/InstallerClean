@@ -413,10 +413,13 @@ jobs:
           "UI culture: $(if ($ui.Name) { $ui.Name } else { 'invariant' })"
 
       # The normal console verbosity prints each test with its outcome, and each
-      # skipped test with the reason it gives, which the default leaves out.
+      # skipped test with the reason it gives, which the default leaves out. A test
+      # still running after five minutes, where the slowest takes seconds, ends the
+      # run and is named as the test that was running, so a hang fails the step
+      # rather than holding it; no dump is taken, the name being what is wanted.
       - name: Test
         if: success() || failure()
-        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal"
+        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal" --blame-hang-timeout 5m --blame-hang-dump-type none
 
       # A build reports a broken reference in a documentation comment only when
       # it writes the documentation file, which no project here asks for. This
