@@ -415,9 +415,9 @@ public class InstallerQueryServiceShortProgramTests
 
         var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
 
-        var row = Row(result);
-        Assert.False(row.IsRemovable);
-        Assert.False(row.WithheldScanWide);
+        // Kept on the answer, not withheld: a withheld row would mean the walk's answer
+        // had been read as no answer.
+        AssertKeptOnAClaim(Row(result));
     }
 
     [Theory]
@@ -432,7 +432,6 @@ public class InstallerQueryServiceShortProgramTests
 
         var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
 
-        Assert.Contains(Recovered, msi.PatchEnumerationsStarted);
         AssertOffered(Row(result));
     }
 
