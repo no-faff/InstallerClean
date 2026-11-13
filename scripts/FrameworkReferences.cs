@@ -474,9 +474,13 @@ namespace FrameworkReferences
         readonly MetadataReader _md;
         readonly ReferenceSet[] _sets;
         readonly string _checkCall;
+        // The method whose calls are followed up to the check: the entry point, or the static
+        // constructor of the entry point's type where that names the check.
+        MethodDefinitionHandle _checkFrom;
 
         // How a method is compiled: in full, it runs and so can everything it reaches; as the
-        // entry point, it runs up to the check; inlined, it is compiled into a method that
+        // entry point, or the static constructor the check is called from, it runs up to the
+        // check; inlined, it is compiled into a method that
         // names it, so the types and members it names are resolved, and it runs later or never.
         public const int Inlined = 0, Entry = 1, Full = 2;
 
@@ -502,9 +506,12 @@ namespace FrameworkReferences
         }
 
         // Walks the exe from its module initializer and entry point. Where checkCall names a
-        // method (Type::Name), the entry point's calls up to and including it are followed in
-        // full and the rest only compiled with it; where it is null or empty, none is followed,
-        // and the check is reached through a static constructor.
+        // method (Type::Name), the calls up to and including it are followed in full and the
+        // rest only compiled with them: the calls of the entry point type's static constructor
+        // where that names the check, which then runs before the entry point does, so none of
+        // the entry point's calls is followed; otherwise the entry point's, after that static
+        // constructor has been followed in full. Where checkCall is null or empty, every static
+        // constructor is followed in full and none of the entry point's calls.
         public static Walk Run(Exe exe, ReferenceSet[] sets, string checkCall)
         {
             var w = new Walk(exe, sets, checkCall);
@@ -513,10 +520,32 @@ namespace FrameworkReferences
                     foreach (var mh in w._md.GetTypeDefinition(th).GetMethods())
                         if (w._md.GetString(w._md.GetMethodDefinition(mh).Name) == ".cctor") w.Follow(mh, "the module initializer");
             var entry = exe.EntryPoint;
-            w.Initialize(w._md.GetMethodDefinition(entry).GetDeclaringType(), "the entry point's type");
+            var entryType = w._md.GetMethodDefinition(entry).GetDeclaringType();
+            w._checkFrom = entry;
+            if (w._checkCall != null && w.StaticConstructorNamingCheck(entryType) is { } cctor)
+            {
+                w._checkFrom = cctor;
+                w._initialized.Add(entryType);
+                w.Load(entryType, "the entry point's type");
+                w.Compile(cctor, Entry, via: "the entry point's type");
+            }
+            else w.Initialize(entryType, "the entry point's type");
             w.Compile(entry, Entry, via: "the entry point");
             w.Drain();
             return w;
+        }
+
+        // The type's static constructor, where its body names the check.
+        MethodDefinitionHandle? StaticConstructorNamingCheck(TypeDefinitionHandle t)
+        {
+            foreach (var mh in _md.GetTypeDefinition(t).GetMethods())
+            {
+                var m = _md.GetMethodDefinition(mh);
+                if (_md.GetString(m.Name) != ".cctor" || m.RelativeVirtualAddress == 0) continue;
+                foreach (var (_, token) in NativeImports.IL.Tokens(_exe.Pe.GetMethodBody(m.RelativeVirtualAddress).GetILBytes()))
+                    if (Names(MetadataTokens.EntityHandle(token)) == _checkCall) return mh;
+            }
+            return null;
         }
 
         public bool IsFollowed(MethodDefinitionHandle h) => Compiled.TryGetValue(h, out var mode) && mode == Full;
@@ -577,10 +606,10 @@ namespace FrameworkReferences
                 NeedShape(s => _md.GetStandaloneSignature(body.LocalSignature).DecodeLocalSignature(s, null), name);
             foreach (var region in body.ExceptionRegions)
                 if (!region.CatchType.IsNil) NeedType(region.CatchType, name);
-            // The entry point follows its calls up to the check; every other method followed
-            // in full follows all of them.
+            // The method the check is called from follows its calls up to the check; every
+            // other method followed in full follows all of them.
             bool follow = mode == Full;
-            bool upToCheck = mode == Entry && _checkCall != null;
+            bool upToCheck = mode == Entry && _checkCall != null && h == _checkFrom;
             byte[] il;
             try { il = body.GetILBytes(); }
             catch (Exception e) { throw new InvalidDataException($"{_exe.Name}: {name} cannot be read: {e.Message}", e); }
