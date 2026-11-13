@@ -2514,3 +2514,96 @@ jobs:
             fi
           done
           exit $failed
+
+      # A net40 harness loads the merged command line under the same prefix and, for each
+      # type on its refusal path, runs the static constructor and compiles every method,
+      # then makes the refusal's own calls, printing each failure whole. Where a leg does not
+      # refuse, this names the member the PC's .NET Framework lacks.
+      - name: Compile and call the refusal path one member at a time
+        if: ${{ !cancelled() }}
+        env:
+          WINEPREFIX: ${{ runner.temp }}/prefix
+          WINEDEBUG: -all
+          LANG: en_US.UTF-8
+        run: |
+          probe="$RUNNER_TEMP/refusal-probe"
+          mkdir -p "$probe"
+          cat > "$probe/RefusalProbe.csproj" <<'XML'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net40</TargetFramework>
+              <PlatformTarget>x64</PlatformTarget>
+              <LangVersion>latest</LangVersion>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+            </ItemGroup>
+          </Project>
+          XML
+          cat > "$probe/Program.cs" <<'CS'
+          using System;
+          using System.Reflection;
+          using System.Runtime.CompilerServices;
+
+          static class Program
+          {
+              const BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static
+                  | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+              static int Main(string[] args)
+              {
+                  Console.WriteLine("Runtime " + Environment.Version);
+                  var exe = Assembly.LoadFrom(args[0]);
+                  string[] types =
+                  {
+                      "InstallerClean.Services.StartChecks",
+                      "InstallerClean.Services.WindowsVersionCheck",
+                      "InstallerClean.Services.NetFrameworkCheck",
+                      "InstallerClean.Services.RegistryReader",
+                      "InstallerClean.Helpers.RegistryData",
+                      "InstallerClean.Resources.Strings+FrameworkCheck",
+                  };
+                  foreach (var name in types)
+                  {
+                      var type = exe.GetType(name, false);
+                      if (type == null) { Console.WriteLine("no type " + name); continue; }
+                      Try(name + " static constructor", () => RuntimeHelpers.RunClassConstructor(type.TypeHandle));
+                      foreach (var method in type.GetMethods(All))
+                          if (!method.ContainsGenericParameters)
+                              Try(name + "." + method.Name, () => RuntimeHelpers.PrepareMethod(method.MethodHandle));
+                  }
+                  var program = exe.GetType("InstallerClean.Cli.Program", true);
+                  foreach (var name in new[] { "RefuseOnAPcThatCannotRunIt", "RefuseWithoutRecording", "TrySetUtf8Output", "RestoreOutputEncoding" })
+                      foreach (var method in program.GetMethods(All))
+                          if (method.Name == name)
+                              Try("Program." + name + " compiled", () => RuntimeHelpers.PrepareMethod(method.MethodHandle));
+                  var checks = exe.GetType("InstallerClean.Services.StartChecks", true);
+                  object refusal = null;
+                  Try("StartChecks.OfThisPc", () => refusal = checks.GetMethod("OfThisPc", All).Invoke(null, null));
+                  Console.WriteLine("  answered " + refusal);
+                  if (refusal != null)
+                      Try("StartChecks.Message", () => Console.WriteLine("  " + checks.GetMethod("Message", All).Invoke(null, new[] { refusal, (object)true })));
+                  Try("Program.RefuseOnAPcThatCannotRunIt", () => Console.WriteLine("  answered " + program.GetMethod("RefuseOnAPcThatCannotRunIt", All).Invoke(null, null)));
+                  return 0;
+              }
+
+              static void Try(string what, Action action)
+              {
+                  try { action(); }
+                  catch (Exception ex)
+                  {
+                      var inner = ex is TargetInvocationException && ex.InnerException != null ? ex.InnerException : ex;
+                      Console.WriteLine("FAILED " + what + ":");
+                      Console.WriteLine(inner);
+                  }
+              }
+          }
+          CS
+          dotnet build "$probe/RefusalProbe.csproj" -c Release --nologo -o "$probe/out"
+          for version in win10 win7; do
+            winetricks -q "$version" > /dev/null
+            wineserver -w
+            echo "== The refusal path under Wine as $version with ${{ matrix.framework }}"
+            timeout -k 10 180 xvfb-run -a wine "$probe/out/RefusalProbe.exe" "$(winepath -w publish/cli/installerclean-cli.exe)" || echo "exit code $?"
+          done
