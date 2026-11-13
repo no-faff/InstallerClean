@@ -788,15 +788,6 @@ jobs:
         shell: pwsh
         run: ./scripts/check-report-bytes.ps1
 
-      # The merged command line's own UpdateDownloadService, on this runner's .NET Framework,
-      # downloading the v3.7.0 release's command line from GitHub as an update does.
-      - name: Check the merged command line downloads a release exe
-        if: success() || failure()
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: ./scripts/check-update-download.ps1
-
       # Each copy carries THIRD-PARTY-NOTICES as a resource, which the window shows and the
       # command line prints. This reads that resource out of each merged exe against the file,
       # and each merge's input list against the file's table of merged packages, so a package
@@ -1052,6 +1043,32 @@ jobs:
   # therefore restores clean on Windows and fails NU1004 on Linux, so the job
   # above cannot see that gap and this restore is the one that can.
   #
+  # The merged command line's own UpdateDownloadService, on the runner's .NET Framework,
+  # downloading the v3.7.0 release's command line from GitHub as an update does. A job of
+  # its own, as the one check that needs github.com to answer, so build-and-test answers for
+  # the code alone; the script tries a failed request three times before it fails.
+  update-download:
+    name: Update download (Windows)
+    runs-on: windows-2025
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Merge the command line into one file
+        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true --nologo
+
+      - name: Check the merged command line downloads a release exe
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/check-update-download.ps1
+
   # A separate job rather than a step, because the one above is pinned to
   # windows-2025 and this has to run somewhere else. It reads the same locks
   # from the same checkout and writes nothing.

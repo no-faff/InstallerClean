@@ -109,3 +109,7 @@ static class Program
 } finally {
   Remove-Item -LiteralPath $work -Recurse -Force -ErrorAction SilentlyContinue
 }
+
+# The control's own exit code is the last one the script saw, and the runner ends a pwsh
+# step with that code, so a check that passes says so explicitly.
+exit 0
