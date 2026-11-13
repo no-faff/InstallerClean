@@ -80,10 +80,29 @@ public class MoveSpaceCheckShareTests
         Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(ThroughTheShare, CacheRoot, reader));
     }
 
-    [Fact]
-    public void A_share_with_nothing_there_up_to_its_root_is_not_settled() =>
-        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
-            ThroughTheShare, CacheRoot, WithRoot(new Identities(FileIdentityRead.NamesNothing))));
+    [Theory]
+    [InlineData(@"\\localhost\C$\ICProbe-moved", @"\\localhost\C$\")]
+    [InlineData(@"\\?\UNC\localhost\C$\ICProbe-moved", @"\\?\UNC\localhost\C$\")]
+    public void A_share_with_nothing_there_up_to_its_root_is_not_settled(string destination, string shareRoot)
+    {
+        var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
+
+        Assert.Null(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(destination, CacheRoot, reader));
+        Assert.Equal([CacheRoot, destination, shareRoot], reader.Asked);
+    }
+
+    [Theory]
+    [InlineData(@"\\localhost\C$")]
+    [InlineData(@"\\localhost\C$\")]
+    public void A_share_root_given_as_the_destination_is_read_with_its_separator(string destination)
+    {
+        var reader = WithRoot(new Identities(FileIdentityRead.NamesNothing));
+        reader.Reads(@"\\localhost\C$\", serial: 7);
+
+        Assert.True(MoveSpaceCheck.ResolveIsOnInstallerCacheDrive(
+            destination, CacheRoot, reader, (_, _) => @"C:\"));
+        Assert.Equal([CacheRoot, @"\\localhost\C$\"], reader.Asked);
+    }
 
     [Fact]
     public void A_Move_through_a_share_on_the_cache_volume_still_copies_and_is_still_measured()

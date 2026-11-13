@@ -189,7 +189,9 @@ internal static class MoveSpaceCheck
     /// cache root's volume, by the serial number in its file id, confirmed by its local path:
     /// true or false where both were read, false where the destination's folder gives no file
     /// id or its id does not open there as the same folder, and null where either side would
-    /// not read. A folder that is not there yet is passed over for its parent.
+    /// not read, nothing is there up to the share's root, or the destination does not resolve.
+    /// A folder that is not there yet is passed over for its parent, and the walk ends at the
+    /// root.
     /// </summary>
     private static bool? ShareOnCacheVolume(
         string destination, string? installerCacheRoot, IFileIdentityReader? identities,
@@ -200,35 +202,61 @@ internal static class MoveSpaceCheck
         if (identities.ReadOutcome(cacheRoot, out var root) != FileIdentityRead.Read)
             return null;
 
-        string? folder = PathText.TrimEndingDirectorySeparator(destination);
-        while (!string.IsNullOrEmpty(folder))
+        var folder = SpelledToOpen(PathText.TrimEndingDirectorySeparator(destination));
+        while (true)
         {
             switch (identities.ReadOutcome(folder, out var reached))
             {
                 case FileIdentityRead.Read:
-                    return reached.VolumeSerialNumber == root.VolumeSerialNumber
-                        && (localPathOf ?? InstallerCacheHelpers.LocalPathThroughThisPCsVolumes)(destination, [cacheRoot])
-                            is not null;
+                    if (reached.VolumeSerialNumber != root.VolumeSerialNumber) return false;
+                    return ConfirmedOnCacheVolume(destination, cacheRoot, localPathOf);
                 case FileIdentityRead.IdentityUnavailable:
                     return false;
                 case FileIdentityRead.NamesNothing:
+                    if (IsRootAlone(folder)) return null;
                     var parent = PathText.GetDirectoryName(folder);
-                    if (parent is null || parent.Equals(folder, StringComparison.OrdinalIgnoreCase)) return null;
-
-                    // A volume or share root is asked with its trailing separator, the
-                    // spelling that opens a share's root as a folder.
-                    var parentRoot = PathText.GetPathRoot(parent);
-                    if (parentRoot is not null
-                        && parent.TrimEnd('\\', '/').Equals(parentRoot.TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase))
-                        parent = parentRoot.TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
-                    folder = parent;
+                    if (parent is null) return null;
+                    folder = SpelledToOpen(parent);
                     break;
                 default:
                     return null;
             }
         }
-        return null;
     }
+
+    /// <summary>
+    /// Whether <paramref name="destination"/>, its volume serial number matching the cache
+    /// root's, reaches a folder on the cache's volume, asked as the destination gates ask it:
+    /// of the kernel's resolution of the destination, so a drive mapped onto a share is
+    /// compared by the folder names below the share's own root. Null where the destination
+    /// does not resolve.
+    /// </summary>
+    private static bool? ConfirmedOnCacheVolume(
+        string destination, string cacheRoot, LocalPathReader? localPathOf)
+    {
+        if (localPathOf is not null) return localPathOf(destination, [cacheRoot]) is not null;
+
+        if (!InstallerCacheHelpers.TryResolveFinalPath(destination, out var resolved)) return null;
+        return InstallerCacheHelpers.LocalPathThroughThisPCsVolumes(resolved, [cacheRoot]) is not null;
+    }
+
+    /// <summary>Whether <paramref name="path"/> is a volume or share root and nothing below it.</summary>
+    private static bool IsRootAlone(string path)
+    {
+        var root = PathText.GetPathRoot(path);
+        return !string.IsNullOrEmpty(root)
+            && path.TrimEnd('\\', '/').Equals(root.TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// <paramref name="folder"/> as it is opened: a volume or share root with its trailing
+    /// separator, the spelling that opens a share's root as a folder, and any other folder as
+    /// it is.
+    /// </summary>
+    private static string SpelledToOpen(string folder) =>
+        IsRootAlone(folder)
+            ? PathText.GetPathRoot(folder)!.TrimEnd('\\', '/') + Path.DirectorySeparatorChar
+            : folder;
 
     /// <summary>The reader <see cref="ShareOnCacheVolume"/> uses in production.</summary>
     private static readonly IFileIdentityReader Identities = new FileIdentityReader();
