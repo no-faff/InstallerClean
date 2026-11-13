@@ -44,8 +44,8 @@ public partial class App : Application
     /// .NET Framework lacks fails that compile, so the checks run first, in a method of their
     /// own, ahead of Application's constructor and every method the window's start compiles.
     /// The two calls after it are never compiled into this method, so nothing they name is
-    /// compiled before the checks have answered. The message is in the language Windows
-    /// displays: the language picked in the app is read later.
+    /// compiled before the checks have answered. The message is in the language picked in the
+    /// app, where one is, and otherwise in the language Windows displays.
     /// </remarks>
     static App()
     {
@@ -64,13 +64,22 @@ public partial class App : Application
     {
         // A throw out of a type initializer reaches no handler the app has set, so a check or
         // a box that fails lets the start go on, where the app's own handlers catch what follows.
-        string? message;
         try
         {
-            message = WindowsVersionCheck.RefusalMessage()
-                ?? NetFrameworkCheck.RefusalMessage(commandLine: false);
-            if (message is null) return;
-            MessageBox.Show(message, Strings.FrameworkCheck.Window_Main_Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            var refusal = StartChecks.OfThisPc();
+            if (refusal == StartRefusal.None) return;
+            // In the language picked in the app where one is, as the window would have been. A
+            // pick that cannot be read or set leaves the message in the language Windows displays.
+            try
+            {
+                if (PickedLanguageAtStart.Read() is { } picked)
+                    Localisation.SetPickedLanguage(picked);
+            }
+            catch (Exception)
+            {
+            }
+            MessageBox.Show(StartChecks.Message(refusal, commandLine: false), Strings.FrameworkCheck.Window_Main_Title,
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch (Exception)
         {

@@ -28,34 +28,34 @@ namespace InstallerClean.Services;
 /// </remarks>
 internal static class NetFrameworkCheck
 {
+    /// <summary>The Release value .NET Framework 4.8 writes, as this PC holds it.</summary>
+    internal static RegistryDwordRead ReleaseOfThisPc() =>
+        RegistryReader.LocalMachineDword(UpdateManifest.NetFrameworkKeyPath, UpdateManifest.NetFrameworkReleaseValueName);
+
     /// <summary>
-    /// The message to show the user before the copy ends, or null where the PC has .NET
-    /// Framework 4.8. The command line prints its sentence, which asks the user to run
-    /// InstallerClean again, and on the next line the link's name and Microsoft's address
-    /// (<c>Cli.UpdateDownloadLink</c>). The window's sentence asks the user to open it
-    /// again, and after a blank line comes the link's name and, on a line of its own, the
-    /// address.
+    /// Whether the Release value <paramref name="release"/> says the PC does not have .NET
+    /// Framework 4.8.
     /// </summary>
     /// <remarks>
     /// Only a Release value read below 4.8's, or no value at all, refuses: a value that could
     /// not be read or is not a number says nothing about the PC, and the copy starts.
     /// </remarks>
-    internal static string? RefusalMessage(bool commandLine) =>
-        RefusalMessage(RegistryReader.LocalMachineDword(
-            UpdateManifest.NetFrameworkKeyPath, UpdateManifest.NetFrameworkReleaseValueName), commandLine);
+    internal static bool Refuses(RegistryDwordRead release) => release.State switch
+    {
+        RegistryDwordState.Read => release.Value < UpdateManifest.NetFramework48Release,
+        RegistryDwordState.Absent => true,
+        _ => false,
+    };
 
     /// <summary>
-    /// <see cref="RefusalMessage(bool)"/> for the Release value <paramref name="release"/>.
+    /// The message to show the user before the copy ends, in the language the strings are read
+    /// in. The command line prints its sentence, which asks the user to run InstallerClean
+    /// again, and on the next line the link's name and Microsoft's address
+    /// (<c>Cli.UpdateDownloadLink</c>). The window's sentence asks the user to open it again,
+    /// and after a blank line comes the link's name and, on a line of its own, the address.
     /// </summary>
-    internal static string? RefusalMessage(RegistryDwordRead release, bool commandLine)
+    internal static string Message(bool commandLine)
     {
-        var below48 = release.State switch
-        {
-            RegistryDwordState.Read => release.Value < UpdateManifest.NetFramework48Release,
-            RegistryDwordState.Absent => true,
-            _ => false,
-        };
-        if (!below48) return null;
         var url = UpdateManifest.NetFramework48DownloadUrl;
         if (commandLine)
             return Strings.FrameworkCheck.Cli_NeedsNetFramework48 + Environment.NewLine

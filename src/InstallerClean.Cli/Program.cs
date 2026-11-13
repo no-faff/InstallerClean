@@ -62,12 +62,12 @@ internal static class Program
     /// <summary>
     /// The exit code of the refusal where the PC runs Windows older than Windows 10 version
     /// 1607, or does not have .NET Framework 4.8, having printed it, or null where it can run
-    /// the copy. Windows is checked first, as 1507 and 1511 cannot take .NET Framework 4.8.
+    /// the copy. The message is in the language Windows displays, as the whole command line is.
     /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int? RefuseOnAPcThatCannotRunIt() =>
-        (WindowsVersionCheck.RefusalMessage() ?? NetFrameworkCheck.RefusalMessage(commandLine: true)) is { } message
-            ? RefuseWithoutRecording(message)
+        StartChecks.OfThisPc() is var refusal && refusal != StartRefusal.None
+            ? RefuseWithoutRecording(StartChecks.Message(refusal, commandLine: true))
             : null;
 
     /// <summary>The run, on a PC that has .NET Framework 4.8.</summary>
@@ -518,7 +518,7 @@ internal static class Program
 
         // Runs once, on the thread that brings the cancel: a thread-pool thread for Ctrl+C,
         // which the runtime queues there while the console's control-handler thread waits;
-        // Windows' own handler thread for a console being closed; the thread CancelKey.Watch
+        // the handler thread Windows starts for a console being closed; the thread CancelKey.Watch
         // starts for the event the version that started this one sets; or, where the cancel
         // came before the registration, this one. Nothing in here may throw: on any of the
         // first three, Main's try/catch does not cover it, so an escape is unhandled, a

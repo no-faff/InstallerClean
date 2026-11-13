@@ -18,7 +18,7 @@ public static class LanguagePreference
     {
         if (string.IsNullOrWhiteSpace(setting))
             return null;
-        if (!SupportedLanguages.CultureNames.Contains(setting, StringComparer.OrdinalIgnoreCase))
+        if (!SupportedLanguages.Ships(setting!))
             return null;
         return CultureInfo.GetCultureInfo(setting);
     }

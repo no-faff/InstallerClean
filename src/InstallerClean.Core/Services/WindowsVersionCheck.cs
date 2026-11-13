@@ -18,7 +18,8 @@ namespace InstallerClean.Services;
 /// refused here as the setup refuses them.
 ///
 /// The build is the CurrentBuild value Windows keeps under
-/// HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion, a string such as "7601" or "14393".
+/// HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion, a string such as "7601" or "14393",
+/// or CurrentBuildNumber beside it where CurrentBuild does not read as a number.
 /// A program's compatibility settings change what the version APIs report to it and leave
 /// this value alone. Everything here runs before the .NET Framework 4.8 check, so it is held
 /// to what <see cref="NetFrameworkCheck"/>'s remarks set out: only what .NET Framework 4.0
@@ -31,33 +32,34 @@ internal static class WindowsVersionCheck
 
     internal const string CurrentVersionKeyPath = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
     internal const string CurrentBuildValueName = "CurrentBuild";
+    internal const string CurrentBuildNumberValueName = "CurrentBuildNumber";
 
     /// <summary>
-    /// The message to show the user before the copy ends, or null where the PC runs Windows
-    /// 10 version 1607 or later. Both copies show the same sentence.
-    /// </summary>
-    internal static string? RefusalMessage() => RefusalMessage(CurrentBuild());
-
-    /// <summary>
-    /// <see cref="RefusalMessage()"/> for the CurrentBuild value <paramref name="currentBuild"/>,
-    /// null where it could not be read.
+    /// Whether the CurrentBuild value <paramref name="currentBuild"/>, null where it could not
+    /// be read, says the PC runs Windows older than Windows 10 version 1607.
     /// </summary>
     /// <remarks>
     /// Only a build read as a whole number below <see cref="MinimumBuild"/> refuses. A value
     /// that could not be read, is missing or is not a number says nothing about the PC, and
     /// the copy starts.
     /// </remarks>
-    internal static string? RefusalMessage(string? currentBuild) =>
+    internal static bool Refuses(string? currentBuild) =>
         int.TryParse(currentBuild, NumberStyles.None, CultureInfo.InvariantCulture, out var build)
-            && build < MinimumBuild
-            ? Strings.FrameworkCheck.Startup_NeedsWindows10Version1607
-            : null;
+            && build < MinimumBuild;
 
     /// <summary>
-    /// The CurrentBuild value as the string it is, or null where the key or the value is
-    /// missing, the value is not a string, or the read fails.
+    /// The message to show the user before the copy ends, in the language the strings are read
+    /// in. Both copies show the same sentence.
     /// </summary>
-    private static string? CurrentBuild()
+    internal static string Message => Strings.FrameworkCheck.Startup_NeedsWindows10Version1607;
+
+    /// <summary>
+    /// The CurrentBuild value as the string it is, or where that is not a whole number the
+    /// CurrentBuildNumber value beside it, which Windows writes with the same build. Null where
+    /// the key is missing or the read fails, and whatever CurrentBuildNumber holds where
+    /// CurrentBuild does not read.
+    /// </summary>
+    internal static string? CurrentBuildOfThisPc()
     {
         // Any failure here answers null, so the copy goes on to the .NET Framework 4.8 check
         // rather than past it.
@@ -65,7 +67,11 @@ internal static class WindowsVersionCheck
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             using var key = hive.OpenSubKey(CurrentVersionKeyPath);
-            return key is null ? null : RegistryData.ValueOf(key, CurrentBuildValueName, doNotExpand: true) as string;
+            if (key is null) return null;
+            var build = RegistryData.ValueOf(key, CurrentBuildValueName, doNotExpand: true) as string;
+            return int.TryParse(build, NumberStyles.None, CultureInfo.InvariantCulture, out _)
+                ? build
+                : RegistryData.ValueOf(key, CurrentBuildNumberValueName, doNotExpand: true) as string;
         }
         catch (Exception)
         {
