@@ -2359,3 +2359,98 @@ jobs:
           path: publish/cli
           if-no-files-found: error
           retention-days: 30
+
+  # The merged command line run under Wine with .NET Framework 4.0 and with 4.6.2 installed
+  # in place of Wine's own runtime, each prefix set first to Windows 10 and then to
+  # Windows 7. Under Windows 10 the copy has to end with exit code 1 and the sentence saying
+  # it needs .NET Framework 4.8 on the error stream; under Windows 7, with exit code 1 and
+  # the sentence saying it needs Windows 10 version 1607 or later. Both sentences are read
+  # from Strings.resx, the English the copy prints where Windows displays a language it has
+  # no translation for. The 4.0 prefix also shows that the merged exe loads at all there,
+  # before any of its methods runs, which check-framework-references.ps1 does not read.
+  #
+  # Wine is not Windows: what it answers for the registry and the loader is its own, so a
+  # result here is a Wine run and is never read as Windows evidence. The legs install
+  # .NET Framework from Microsoft through winetricks, which can fail for reasons of its
+  # own, so each leg records its result and fails nothing else.
+  wine:
+    name: The start checks under Wine (${{ matrix.framework }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [dotnet40, dotnet462]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Merge the command line into one file
+        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -p:RestoreLockedMode=true -p:OneFile=true -p:EnableWindowsTargeting=true --nologo
+
+      - name: Install Wine and winetricks
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wine64 wine32:i386 winetricks xvfb xauth cabextract
+          wine --version
+
+      - name: Install ${{ matrix.framework }} into a 64-bit prefix
+        env:
+          WINEPREFIX: ${{ runner.temp }}/prefix
+          WINEARCH: win64
+          WINEDEBUG: -all
+        run: |
+          xvfb-run -a wineboot --init
+          xvfb-run -a winetricks -q --unattended ${{ matrix.framework }}
+          wineserver -w
+
+      - name: Run the command line under Windows 10 and under Windows 7
+        env:
+          WINEPREFIX: ${{ runner.temp }}/prefix
+          WINEDEBUG: -all
+          LANG: en_US.UTF-8
+        run: |
+          set -u
+          value() {
+            python3 - "$1" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          root = ET.parse('src/InstallerClean.Core/Resources/Strings.resx').getroot()
+          hits = [d.find('value').text for d in root.iter('data') if d.get('name') == sys.argv[1]]
+          if len(hits) != 1: sys.exit(f'Strings.resx holds {len(hits)} values named {sys.argv[1]}')
+          print(hits[0])
+          PY
+          }
+          needs48=$(value Cli.NeedsNetFramework48)
+          needs1607=$(value Startup.NeedsWindows10Version1607)
+          [ -n "$needs48" ] && [ -n "$needs1607" ] || { echo "::error::Strings.resx gave no text to expect."; exit 1; }
+
+          failed=0
+          for pair in "win10|$needs48" "win7|$needs1607"; do
+            version=${pair%%|*}
+            expected=${pair#*|}
+            winetricks -q "$version" > /dev/null
+            wineserver -w
+            set +e
+            xvfb-run -a wine publish/cli/installerclean-cli.exe /s /noupdate > out.txt 2> err.txt
+            code=$?
+            set -e
+            echo "== Wine as $version with ${{ matrix.framework }}: exit code $code"
+            echo "-- stdout"; cat out.txt
+            echo "-- stderr"; cat err.txt
+            if [ "$code" -ne 1 ]; then
+              echo "::warning::Wine run, $version with ${{ matrix.framework }}: exit code $code, where 1 was expected."
+              failed=1
+            fi
+            if ! grep -qF -- "$expected" err.txt; then
+              echo "::warning::Wine run, $version with ${{ matrix.framework }}: the error stream does not carry \"$expected\"."
+              failed=1
+            fi
+          done
+          exit $failed
