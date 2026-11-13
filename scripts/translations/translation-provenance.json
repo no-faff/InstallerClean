@@ -7203,22 +7203,22 @@
       "zh-Hant": "d593da3c26426b54"
     },
     "Completion.ReportPanel.Closing": {
-      "de": "e8a5495f546f01bb",
-      "es": "e8a5495f546f01bb",
-      "fr": "e8a5495f546f01bb",
-      "id": "e8a5495f546f01bb",
-      "it": "e8a5495f546f01bb",
-      "ja": "e8a5495f546f01bb",
-      "ko": "e8a5495f546f01bb",
-      "nl": "e8a5495f546f01bb",
-      "pl": "e8a5495f546f01bb",
-      "pt-BR": "e8a5495f546f01bb",
-      "ru": "e8a5495f546f01bb",
-      "tr": "e8a5495f546f01bb",
-      "uk": "e8a5495f546f01bb",
-      "vi": "e8a5495f546f01bb",
-      "zh-Hans": "e8a5495f546f01bb",
-      "zh-Hant": "e8a5495f546f01bb"
+      "de": "317e3de03a1c760e",
+      "es": "317e3de03a1c760e",
+      "fr": "317e3de03a1c760e",
+      "id": "317e3de03a1c760e",
+      "it": "317e3de03a1c760e",
+      "ja": "317e3de03a1c760e",
+      "ko": "317e3de03a1c760e",
+      "nl": "317e3de03a1c760e",
+      "pl": "317e3de03a1c760e",
+      "pt-BR": "317e3de03a1c760e",
+      "ru": "317e3de03a1c760e",
+      "tr": "317e3de03a1c760e",
+      "uk": "317e3de03a1c760e",
+      "vi": "317e3de03a1c760e",
+      "zh-Hans": "317e3de03a1c760e",
+      "zh-Hant": "317e3de03a1c760e"
     },
     "Automation.ReportInfo": {
       "de": "d8c200aa93ea07f2",
@@ -8788,6 +8788,24 @@
       "vi": "6153ff99b0f56f5b",
       "zh-Hans": "6153ff99b0f56f5b",
       "zh-Hant": "6153ff99b0f56f5b"
+    },
+    "Completion.ReportPanel.ReportId": {
+      "de": "5c98e1c14707892e",
+      "es": "5c98e1c14707892e",
+      "fr": "5c98e1c14707892e",
+      "id": "5c98e1c14707892e",
+      "it": "5c98e1c14707892e",
+      "ja": "5c98e1c14707892e",
+      "ko": "5c98e1c14707892e",
+      "nl": "5c98e1c14707892e",
+      "pl": "5c98e1c14707892e",
+      "pt-BR": "5c98e1c14707892e",
+      "ru": "5c98e1c14707892e",
+      "tr": "5c98e1c14707892e",
+      "uk": "5c98e1c14707892e",
+      "vi": "5c98e1c14707892e",
+      "zh-Hans": "5c98e1c14707892e",
+      "zh-Hant": "5c98e1c14707892e"
     }
   }
 }

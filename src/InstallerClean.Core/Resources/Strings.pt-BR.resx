@@ -939,51 +939,55 @@ Para recolocá-lo, você precisa do instalador da versão que já tem. Consiga-o
   </data>
   <data name="Completion.ReportPanel.Freed" xml:space="preserve">
     <value>Quanto espaço foi liberado e quantos arquivos foram movidos ou excluídos</value>
-    <comment>Bullet 1 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 1 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Destination" xml:space="preserve">
     <value>Se Mover levou os arquivos para a mesma unidade, outra unidade, uma unidade removível ou um compartilhamento de rede</value>
-    <comment>Bullet 2 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 2 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Durations" xml:space="preserve">
     <value>Quanto tempo levaram a análise e Mover ou Excluir</value>
-    <comment>Bullet 3 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 3 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.InstallerFiles" xml:space="preserve">
     <value>Quantos arquivos de instalação há de cada tipo e quanto espaço ocupam</value>
-    <comment>Bullet 4 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 4 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.LeftAlone" xml:space="preserve">
     <value>Quantos arquivos foram deixados de lado e por quê</value>
-    <comment>Bullet 5 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 5 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Waits" xml:space="preserve">
     <value>Quantas vezes o InstallerClean esperou por uma unidade ou um compartilhamento de rede lentos, e por quantos parou de esperar</value>
-    <comment>Bullet 6 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 6 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Records" xml:space="preserve">
     <value>De quantos programas e patches o Windows tem registro</value>
-    <comment>Bullet 7 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 7 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.ShortNames" xml:space="preserve">
     <value>Se o Windows ainda cria nomes de arquivo curtos no estilo antigo</value>
-    <comment>Bullet 8 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 8 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Windows" xml:space="preserve">
     <value>Se o Windows é 10 ou 11 e x64 ou Arm, e em que idioma e país ou região está configurado</value>
-    <comment>Bullet 9 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 9 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.AppVersion" xml:space="preserve">
     <value>A versão do InstallerClean, como você o obteve (setup, portable, Scoop, a ferramenta de linha de comando sozinha, compilado a partir do código-fonte ou desconhecido), se o relatório foi enviado pelo InstallerClean ou pela ferramenta de linha de comando, e o idioma em que ele estava sendo exibido</value>
-    <comment>Bullet 10 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 10 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
   </data>
   <data name="Completion.ReportPanel.Errors" xml:space="preserve">
     <value>Contagens de qualquer coisa que tenha dado errado</value>
-    <comment>Bullet 11 of eleven in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+    <comment>Bullet 11 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list.</comment>
+  </data>
+  <data name="Completion.ReportPanel.ReportId" xml:space="preserve">
+    <value>Um código aleatório criado para este relatório, para que ele seja contado só uma vez se for enviado mais de uma vez</value>
+    <comment>Bullet 12 of twelve in the panel opened from the small &quot;i&quot; beside Completion.SendReport, each naming one kind of thing the report carries. A fragment with no full stop, like the others in the list. The code is made at random when the report is made, and every copy of the report sent again carries the same code, so the receiver keeps one copy.</comment>
   </data>
   <data name="Completion.ReportPanel.Closing" xml:space="preserve">
-    <value>Cada um desses itens é um número ou um rótulo. Nada no relatório identifica você, seu PC, seus arquivos ou seus programas, e eu nunca vejo seu endereço IP.</value>
-    <comment>The closing line of the panel opened from the small &quot;i&quot; beside Completion.SendReport, under the eleven bullets. &quot;I&quot; is the app's author.</comment>
+    <value>Tirando esse código, cada um desses itens é um número ou um rótulo. Nada no relatório identifica você, seu PC, seus arquivos ou seus programas, e eu nunca vejo seu endereço IP.</value>
+    <comment>The closing line of the panel opened from the small &quot;i&quot; beside Completion.SendReport, under the twelve bullets. &quot;That code&quot; is the random code Completion.ReportPanel.ReportId names. &quot;I&quot; is the app's author.</comment>
   </data>
   <data name="Completion.ReportPanel.SeeReport" xml:space="preserve">
     <value>Ver exatamente o que é enviado</value>

@@ -204,7 +204,8 @@ Where Ukrainian needs a different form of a line for some counts, the form is in
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Яка версія Windows, 10 чи 11, x64 чи Arm, і які в ній встановлено мову та країну або регіон |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | Версія InstallerClean, спосіб її отримання (setup, portable, Scoop, окрема програма командного рядка, збірка з вихідного коду або невідомо), звідки надіслано звіт (з InstallerClean чи з програми командного рядка) і мова, якою він відображався |
 | Counts of anything that went wrong | Лічильники всього, що пішло не так |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Кожен із цих пунктів — це число або мітка. Ніщо у звіті не вказує на вас, ваш ПК, ваші файли чи програми, і я ніколи не бачу вашу IP-адресу. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Випадковий код, створений для цього звіту, щоб його враховували лише один раз, якщо його надіслано кілька разів |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Окрім цього коду, кожен із цих пунктів — це число або мітка. Ніщо у звіті не вказує на вас, ваш ПК, ваші файли чи програми, і я ніколи не бачу вашу IP-адресу. |
 | See exactly what's sent | Переглянути, що саме надсилається |
 
 ## Summaries and counts

@@ -15,17 +15,26 @@ namespace InstallerClean.Models;
 /// with its report box ticked.
 ///
 /// Schema is intentionally narrow. Every field is either categorical
-/// or a count; no file paths, no usernames, no machine identifiers,
-/// no time-of-day, nothing that could correlate two runs from the
-/// same machine.
+/// or a count, apart from <see cref="ReportId"/>; no file paths, no usernames,
+/// no machine identifiers, no time-of-day, nothing that could correlate two runs
+/// from the same machine.
 /// </summary>
+/// <param name="ReportId">
+/// A random GUID made when the report is made, so the receiver keeps one copy of a
+/// report sent more than once. The window and the command line send the report again
+/// from a later start whenever they did not see it accepted, and the server may have
+/// stored it already. Every send reads <c>last-run.json</c>, so every copy carries the
+/// same id. It is made from nothing on the PC and is written nowhere but the report.
+/// Last in the record, so it is the report's last key.
+/// </param>
 public sealed record ResultLogEntry(
     int SchemaVersion,
     AppInfo App,
     string Os,
     MachineInfo Machine,
     ScanInfo Scan,
-    OperationInfo Operation)
+    OperationInfo Operation,
+    string ReportId)
 {
     /// <summary>
     /// Schema 2 separates <see cref="ScanInfo.ObsoletedCount"/>
@@ -164,9 +173,11 @@ public sealed record ResultLogEntry(
     /// files a key held back (<see cref="ScanInfo.UnlistedKeysWithInstallPropertiesCount"/> to
     /// <see cref="ScanInfo.SupersededHeldForUnlistedKeyCount"/>).
     ///
-    /// SCHEMA 12 ADDS ONE KEY UNDER <c>scan</c> AND TAKES NONE AWAY: the product keys without an
-    /// <c>InstallProperties</c> key one of whose source lists did not read
-    /// (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>).
+    /// SCHEMA 12 ADDS ONE KEY UNDER <c>scan</c> AND ONE AT THE TOP LEVEL, AND TAKES NONE AWAY:
+    /// the product keys without an <c>InstallProperties</c> key one of whose source lists did
+    /// not read (<see cref="ScanInfo.UnlistedKeysWithoutInstallPropertiesListUnreadCount"/>), and
+    /// <c>reportId</c>, last (<see cref="ReportId"/>). A new top-level key, so the receiver
+    /// deploys before a release sends it.
     ///
     /// A receiver that does not recognise a version stores the report under a
     /// lenient v&lt;n&gt;-unknown/ prefix rather than rejecting it, so a bump
@@ -193,7 +204,8 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.ScanOnly());
+            OperationInfo.ScanOnly(),
+            NewReportId());
 
     public static ResultLogEntry ForMove(
         ScanResult scan,
@@ -212,7 +224,8 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.FromMove(move, bytesFreed, operationDurationMs, moveDestinationKind, check));
+            OperationInfo.FromMove(move, bytesFreed, operationDurationMs, moveDestinationKind, check),
+            NewReportId());
 
     public static ResultLogEntry ForDelete(
         ScanResult scan,
@@ -230,7 +243,14 @@ public sealed record ResultLogEntry(
             ResolveOs(),
             MachineInfo.From(scan),
             ScanInfo.From(scan, scanDurationMs),
-            OperationInfo.FromDelete(delete, bytesFreed, operationDurationMs, check));
+            OperationInfo.FromDelete(delete, bytesFreed, operationDurationMs, check),
+            NewReportId());
+
+    /// <summary>
+    /// A new random GUID in its 36-character form, lower case, which is how both
+    /// runtimes write one.
+    /// </summary>
+    internal static string NewReportId() => Guid.NewGuid().ToString("D");
 
     private static string ResolveOs()
     {

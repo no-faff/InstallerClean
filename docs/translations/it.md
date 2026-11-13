@@ -201,7 +201,8 @@ Where Italian needs a different form of a line for some counts, the form is in a
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Se Windows è 10 o 11 e x64 o Arm, e in quale lingua e con quale paese o area geografica è impostato |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the report was sent from InstallerClean or the command-line tool, and the language it was showing | La versione di InstallerClean, come l'hai ottenuto (setup, portable, Scoop, lo strumento da riga di comando da solo, compilato dal codice sorgente, o sconosciuto), se il rapporto è stato inviato da InstallerClean o dallo strumento da riga di comando, e la lingua in cui era visualizzato |
 | Counts of anything that went wrong | Il conteggio di qualsiasi cosa sia andata storta |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Ognuno di questi è un numero o un'etichetta. Niente nel rapporto indica te, il tuo PC, i tuoi file o i tuoi programmi, e non vedo mai il tuo indirizzo IP. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Un codice casuale creato per questo rapporto, in modo che venga contato una sola volta se viene inviato più di una volta |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | A parte quel codice, ognuno di questi è un numero o un'etichetta. Niente nel rapporto indica te, il tuo PC, i tuoi file o i tuoi programmi, e non vedo mai il tuo indirizzo IP. |
 | See exactly what's sent | Vedi esattamente cosa viene inviato |
 
 ## Summaries and counts

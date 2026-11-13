@@ -374,6 +374,7 @@ public static class Strings
     public static string Completion_ReportPanel_Intro => Get("Completion.ReportPanel.Intro");
     public static string Completion_ReportPanel_LeftAlone => Get("Completion.ReportPanel.LeftAlone");
     public static string Completion_ReportPanel_Records => Get("Completion.ReportPanel.Records");
+    public static string Completion_ReportPanel_ReportId => Get("Completion.ReportPanel.ReportId");
     public static string Completion_ReportPanel_SeeReport => Get("Completion.ReportPanel.SeeReport");
     public static string Completion_ReportPanel_ShortNames => Get("Completion.ReportPanel.ShortNames");
     public static string Completion_ReportPanel_Waits => Get("Completion.ReportPanel.Waits");
