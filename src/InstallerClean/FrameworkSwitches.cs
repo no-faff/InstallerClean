@@ -25,6 +25,7 @@ internal static class FrameworkSwitches
     internal const string SelectorUpdatesSelectionPropertiesWhenDisconnected =
         "Switch.System.Windows.Controls.SelectorUpdatesSelectionPropertiesWhenDisconnected";
 
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
     internal static void Pin()
     {
         // In WPF .4 and .5 are read only by the accessibility check. .4 is false so the column

@@ -36,13 +36,12 @@ internal static class Program
     /// before it reads its arguments. The download carries no config naming the runtime, so
     /// .NET Framework starts it on any 4.x. The runtime compiles a method whole the first
     /// time it runs, and a member the PC's .NET Framework lacks fails that compile, so Main
-    /// names only the check and <see cref="Start"/>, each in a method of its own that is
-    /// never compiled into Main: nothing <see cref="Start"/> names is compiled before the
-    /// check has run.
+    /// names only the check, the crash log's write of what the module initializer kept and
+    /// <see cref="Start"/>, each in a method of its own that is never compiled into Main:
+    /// nothing the last two name is compiled before the check has run.
     /// </remarks>
     public static int Main(string[] args)
     {
-        InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
         // A check that throws lets the run go on, as the window's does, where the run's own
         // handlers catch what follows.
         int? refused;
@@ -55,6 +54,7 @@ internal static class Program
             refused = null;
         }
         if (refused is { } code) return code;
+        InstallerClean.Interop.Native.SystemLibraries.WriteWhatTheInitializerKept();
         return Start(args);
     }
 
@@ -64,7 +64,7 @@ internal static class Program
     /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static int? RefuseWithoutNetFramework48() =>
-        NetFrameworkCheck.RefusalMessage(new RegistryReader(), commandLine: true) is { } message
+        NetFrameworkCheck.RefusalMessage(commandLine: true) is { } message
             ? Refuse(message)
             : null;
 
@@ -235,8 +235,20 @@ internal static class Program
     /// ended (<see cref="StagedRun.StartReplace(ReplaceRequest, string)"/>), so a test of a run standing for a copy
     /// starts nothing.
     /// </summary>
-    internal static Action<ReplaceRequest> StartReplace { get; set; } =
-        request => StagedRun.StartReplace(request, Environment.ProcessPath ?? string.Empty);
+    /// <remarks>
+    /// Program's type initializer runs before Main's .NET Framework 4.8 check, so it holds no
+    /// delegate to the replace: the default is made where the property is read.
+    /// </remarks>
+    internal static Action<ReplaceRequest> StartReplace
+    {
+        get => s_startReplace ?? StartReplaceOfThisCopy;
+        set => s_startReplace = value;
+    }
+
+    private static Action<ReplaceRequest>? s_startReplace;
+
+    private static void StartReplaceOfThisCopy(ReplaceRequest request) =>
+        StagedRun.StartReplace(request, Environment.ProcessPath ?? string.Empty);
 
     /// <summary>
     /// Whether this run ends while the newer version it started may still be running in this

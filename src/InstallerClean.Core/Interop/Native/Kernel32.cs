@@ -674,7 +674,7 @@ internal static class Kernel32
         /// </summary>
         public static SECURITY_ATTRIBUTES With(IntPtr securityDescriptor) => new()
         {
-            nLength = (uint)Marshal.SizeOf<SECURITY_ATTRIBUTES>(),
+            nLength = (uint)Marshal.SizeOf(typeof(SECURITY_ATTRIBUTES)),
             lpSecurityDescriptor = securityDescriptor,
             bInheritHandle = 0,
         };
