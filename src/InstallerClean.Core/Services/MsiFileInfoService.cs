@@ -100,26 +100,16 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             // CreateFromSignedFile is the BCL's managed Authenticode
             // cert-extraction entry point: it wraps Win32
             // CryptQueryObject + CryptMsgGetParam + a cert-store
-            // lookup for the signer. .NET 10 marked the
-            // X509Certificate constructors and Import methods obsolete
-            // (SYSLIB0057) in favour of X509CertificateLoader, which
-            // has no Authenticode entry point. The only managed-free
-            // alternative is direct P/Invoke into CryptQueryObject,
-            // which is a substantial amount of interop for a
-            // descriptive-only metadata field. The suppression is
-            // deliberate; the API still works in .NET 10, and the
-            // catch below degrades to an empty signing-cert field
-            // rather than a crash if the API is removed in a later
-            // runtime.
+            // lookup for the signer. A file with no signature, or one
+            // it cannot read, throws, and the catch below leaves the
+            // signing-cert field empty.
             //
             // Both certs are explicitly disposed: CreateFromSignedFile
             // returns a fresh cert handle, and the X509Certificate2
             // constructor duplicates that handle into a new instance,
             // so without the inner Dispose the original handle leaks
             // until finalisation.
-#pragma warning disable SYSLIB0057
             using var inner = X509Certificate.CreateFromSignedFile(filePath);
-#pragma warning restore SYSLIB0057
             using var cert = new X509Certificate2(inner);
             // Format() respects RFC-4514 escapes; a naive String.Split(',')
             // would corrupt subjects like CN="Acme, Inc.", O=Acme.

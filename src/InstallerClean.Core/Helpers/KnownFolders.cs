@@ -44,8 +44,9 @@ internal static class KnownFolders
     internal static string GetPath(
         Environment.SpecialFolder folder, Query query, Action<IntPtr> free, Func<string, string?> variable)
     {
-        // Two variables rather than a tuple: crash.log's folder is read through here on the path
-        // a copy runs before its .NET Framework 4.8 check (NetFrameworkCheck).
+        // Two variables rather than a tuple: the window's start message reads the language picked
+        // in the app through here (PickedLanguageAtStart), on a PC whose .NET Framework may be
+        // older than 4.7, which brought ValueTuple.
         Guid folderId;
         string fallbackVariable;
         switch (folder)

@@ -654,6 +654,7 @@ const MAP = {
   'About.Link.Notices': `타사 고지 사항`,
   'Automation.About.Notices.HelpText': `InstallerClean에 포함된 글꼴, 아이콘, 코드의 라이선스를 표시합니다.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  타사 고지 사항 출력`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean에는 Windows 10 버전 1607 이상 또는 Windows 11이 필요합니다.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

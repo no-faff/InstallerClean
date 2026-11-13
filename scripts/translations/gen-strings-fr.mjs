@@ -661,6 +661,7 @@ const MAP = {
   'About.Link.Notices': `Avis de tiers`,
   'Automation.About.Notices.HelpText': `Affiche les licences des polices, des icônes et du code inclus dans InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Affiche les avis de tiers`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean nécessite Windows 10 version 1607 ou ultérieure, ou Windows 11.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

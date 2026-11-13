@@ -678,6 +678,7 @@ const MAP = {
   'About.Link.Notices': `Pemberitahuan pihak ketiga`,
   'Automation.About.Notices.HelpText': `Menampilkan lisensi font, ikon, dan kode yang disertakan dalam InstallerClean.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Cetak pemberitahuan pihak ketiga`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean memerlukan Windows 10 versi 1607 atau yang lebih baru, atau Windows 11.`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

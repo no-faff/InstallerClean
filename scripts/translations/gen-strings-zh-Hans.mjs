@@ -558,6 +558,7 @@ const MAP = {
   'About.Link.Notices': `第三方声明`,
   'Automation.About.Notices.HelpText': `显示 InstallerClean 所含字体、图标和代码的许可证。`,
   'Cli.Help.Notices': `  installerclean-cli --notices  显示第三方声明`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean 需要 Windows 10 版本 1607 或更高版本，或 Windows 11。`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

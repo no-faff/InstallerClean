@@ -20,11 +20,34 @@ public static class SupportedLanguages
     /// <summary>The neutral resx culture, displayed for any culture without a satellite.</summary>
     public const string Neutral = "en-GB";
 
-    public static readonly IReadOnlyList<string> CultureNames = new[]
+    public static IReadOnlyList<string> CultureNames => Shipped.CultureNames;
+
+    /// <summary>
+    /// Whether <paramref name="name"/> is one of <see cref="CultureNames"/>, in any case.
+    /// </summary>
+    /// <remarks>
+    /// A copy's start message reads the picked language through this, so it names nothing
+    /// .NET Framework 4.0 lacks: IReadOnlyList is from 4.5, so the list itself is held as an
+    /// array in <see cref="Shipped"/>.
+    /// </remarks>
+    internal static bool Ships(string name)
     {
-        Neutral, "zh-Hans", "ru", "es", "ja", "pt-BR", "pl", "tr",
-        "ko", "fr", "it", "de", "id", "vi", "uk", "nl", "zh-Hant",
-    };
+        foreach (var culture in Shipped.CultureNames)
+        {
+            if (string.Equals(culture, name, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
+    }
+
+    private static class Shipped
+    {
+        internal static readonly string[] CultureNames = new[]
+        {
+            Neutral, "zh-Hans", "ru", "es", "ja", "pt-BR", "pl", "tr",
+            "ko", "fr", "it", "de", "id", "vi", "uk", "nl", "zh-Hant",
+        };
+    }
 
     /// <summary>
     /// The supported-language name the app is actually displaying for
