@@ -16,6 +16,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | Tệp không cần thiết, có thể xóa an toàn |
 | The anonymous report | Báo cáo ẩn danh |
 | InstallerClean couldn't read the report. | InstallerClean không đọc được báo cáo. |
+| Third-party notices | Thông báo của bên thứ ba |
 
 ## Section headings
 
@@ -59,6 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | Hướng dẫn và câu hỏi thường gặp |
 | Report a problem | Báo cáo vấn đề |
+| Third-party notices | Thông báo của bên thứ ba |
 | Check for updates automatically | Tự động kiểm tra cập nhật |
 
 ## Field labels
@@ -407,6 +409,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | Kiểm tra trang phát hành của github xem có phiên bản mới hơn không. |
 | Opens the readme on github in your browser. | Mở readme trên github trong trình duyệt của bạn. |
 | Opens the issue tracker on github.com in your browser. | Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | Hiển thị giấy phép của phông chữ, biểu tượng và mã có trong InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó. |
 | Download it from github | Tải về từ github |
 | Download .NET Framework 4.8 from Microsoft | Tải .NET Framework 4.8 về từ Microsoft |
@@ -575,6 +578,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Cách dùng: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help        Hiển thị trợ giúp (cũng nhận /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version     In ra phiên bản (cũng nhận -v) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices     In ra thông báo của bên thứ ba |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s            Chỉ quét - liệt kê tệp không cần |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d            Xóa vĩnh viễn tệp không cần thiết |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m            Chuyển tới thư mục sao lưu |

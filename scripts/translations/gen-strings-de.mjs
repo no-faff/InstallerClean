@@ -664,6 +664,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean startet nicht, weil neben dem Programm eine Datei namens {0} liegt und InstallerClean keine solche Datei mitliefert. Lösche diese Datei und öffne InstallerClean dann erneut.\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean benötigt .NET Framework 4.8. Installiere es von Microsoft, starte den PC neu und öffne InstallerClean dann erneut.`,
   'Cli.NeedsNetFramework48': `InstallerClean benötigt .NET Framework 4.8. Installiere es von Microsoft, starte den PC neu und führe InstallerClean dann erneut aus.`,
+  'Window.Notices.Title': `Hinweise zu Drittanbietern`,
+  'About.Link.Notices': `Hinweise zu Drittanbietern`,
+  'Automation.About.Notices.HelpText': `Zeigt die Lizenzen der Schriften, Symbole und des Codes, die InstallerClean enthält.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  Die Hinweise zu Drittanbietern ausgeben`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

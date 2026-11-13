@@ -665,6 +665,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean не запуститься, тому що поруч із ним є файл з назвою {0}, а InstallerClean не постачається з таким файлом. Видаліть цей файл, а потім знову запустіть InstallerClean.\n\n{1}`,
   'Startup.NeedsNetFramework48': `Для InstallerClean потрібен .NET Framework 4.8. Встановіть його з сайту Microsoft, перезавантажте комп'ютер, а потім знову відкрийте InstallerClean.`,
   'Cli.NeedsNetFramework48': `Для InstallerClean потрібен .NET Framework 4.8. Встановіть його з сайту Microsoft, перезавантажте комп'ютер, а потім знову запустіть InstallerClean.`,
+  'Window.Notices.Title': `Повідомлення третіх сторін`,
+  'About.Link.Notices': `Повідомлення третіх сторін`,
+  'Automation.About.Notices.HelpText': `Показує ліцензії шрифтів, значків і коду, що входять до InstallerClean.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  Вивести повідомлення третіх сторін`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

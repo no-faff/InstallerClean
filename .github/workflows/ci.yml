@@ -413,10 +413,13 @@ jobs:
           "UI culture: $(if ($ui.Name) { $ui.Name } else { 'invariant' })"
 
       # The normal console verbosity prints each test with its outcome, and each
-      # skipped test with the reason it gives, which the default leaves out.
+      # skipped test with the reason it gives, which the default leaves out. A test
+      # still running after five minutes, where the slowest takes seconds, ends the
+      # run and is named as the test that was running, so a hang fails the step
+      # rather than holding it; no dump is taken, the name being what is wanted.
       - name: Test
         if: success() || failure()
-        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal"
+        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true --logger "console;verbosity=normal" --blame-hang-timeout 5m --blame-hang-dump-type none
 
       # A build reports a broken reference in a documentation comment only when
       # it writes the documentation file, which no project here asks for. This
@@ -768,6 +771,15 @@ jobs:
         if: success() || failure()
         shell: pwsh
         run: ./scripts/check-one-file.ps1
+
+      # Each copy carries THIRD-PARTY-NOTICES as a resource, which the window shows and the
+      # command line prints. This reads that resource out of each merged exe against the file,
+      # and each merge's input list against the file's table of merged packages, so a package
+      # added to either exe is named there before it ships.
+      - name: Check each merged exe carries the notices of what it merges
+        if: success() || failure()
+        shell: pwsh
+        run: ./scripts/check-notices.ps1
 
       # Reads each merged exe's own metadata against Microsoft's reference assemblies for .NET
       # Framework 4.6 to 4.8, downloaded from nuget.org and checked against their pinned
