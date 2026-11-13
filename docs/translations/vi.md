@@ -199,7 +199,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Windows là bản 10 hay 11, x64 hay Arm, và đang đặt ngôn ngữ cùng quốc gia hoặc khu vực nào |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | Phiên bản InstallerClean, cách bạn có được nó (setup, portable, Scoop, công cụ dòng lệnh dùng riêng, tự biên dịch từ mã nguồn, hoặc không rõ), lần chạy là trong InstallerClean hay trong công cụ dòng lệnh, và ngôn ngữ nó đang hiển thị |
 | Counts of anything that went wrong | Số lần xảy ra bất kỳ sự cố nào |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Mỗi mục này là một con số hoặc một nhãn. Không có gì trong báo cáo nêu tên bạn, máy tính, tệp hay chương trình của bạn, và tôi không bao giờ thấy địa chỉ IP của bạn. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Một mã ngẫu nhiên được tạo cho báo cáo này, để báo cáo chỉ được tính một lần nếu được gửi nhiều lần |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Ngoài mã đó, mỗi mục này là một con số hoặc một nhãn. Không có gì trong báo cáo nêu tên bạn, máy tính, tệp hay chương trình của bạn, và tôi không bao giờ thấy địa chỉ IP của bạn. |
 | See exactly what's sent | Xem chính xác những gì được gửi |
 
 ## Summaries and counts

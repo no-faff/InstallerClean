@@ -10,7 +10,7 @@ When InstallerClean's first run on a PC finishes, its result screen has a box, "
 
 There is never more than one report per PC, and it is from the first run. No later run writes or sends another, from any Windows account. If the report can't be sent, because there's no network for example, InstallerClean keeps it and tries again each time you open it until it goes.
 
-**What it holds.** Numbers and fixed labels only:
+**What it holds.** Numbers and fixed labels, and one random code:
 
 - InstallerClean's version, the language it was showing, how it was got (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the version of the report's format.
 - Windows 10 or 11, whether it's x64, Arm or 32-bit Windows, and the language and Country or region Windows is set to.
@@ -21,6 +21,7 @@ There is never more than one report per PC, and it is from the first run. No lat
 - How often it had to wait for a slow drive or network share, and how many it gave up on.
 - Whether Windows still makes old-style short file names, and how many file names are too long to be one.
 - Counts of anything that went wrong, by kind.
+- A random code made for this report, so that it's only counted once if it's sent more than once. It's made from nothing on your PC, and nothing else InstallerClean saves or sends carries it.
 
 Nothing in it names you, your PC, a file, a folder, a drive or a program.
 

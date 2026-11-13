@@ -201,7 +201,8 @@ Where Dutch needs a different form of a line for some counts, the form is in a r
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Of Windows 10 of 11 is en x64 of Arm, en op welke taal en welk land of welke regio het is ingesteld |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | De versie van InstallerClean, hoe je het hebt gekregen (setup, portable, Scoop, het opdrachtregelprogramma op zichzelf, zelf gebouwd uit de broncode of onbekend), of de uitvoering in InstallerClean of in het opdrachtregelprogramma plaatsvond, en de taal waarin het werd weergegeven |
 | Counts of anything that went wrong | Tellingen van alles wat er misging |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Dit zijn allemaal getallen of labels. Niets in het rapport noemt jou, je pc, je bestanden of je programma's, en ik zie je IP-adres nooit. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Een willekeurige code die voor dit rapport wordt gemaakt, zodat het maar één keer wordt geteld als het vaker wordt verzonden |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Op die code na zijn dit allemaal getallen of labels. Niets in het rapport noemt jou, je pc, je bestanden of je programma's, en ik zie je IP-adres nooit. |
 | See exactly what's sent | Precies zien wat er wordt verstuurd |
 
 ## Summaries and counts

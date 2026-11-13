@@ -2316,7 +2316,8 @@ jobs:
           'Every check passed.'
 
   # 3.7.0's command line, from its release, and this build's merged command line scan the
-  # same runner, and the job fails where they do not offer and hold the same files
+  # same runner, and the job fails where they do not offer and hold the same files, but for a
+  # test file whose row names the difference and its reason
   # (scripts/scan-comparison/compare-scans.ps1 says what else fails it and how it checks
   # itself). It compares twice: on the runner's Installer folder as the image leaves it, and
   # again once set-up-scenarios.ps1 has installed test programs and patches and put files of

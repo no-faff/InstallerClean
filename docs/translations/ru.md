@@ -204,7 +204,8 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | Whether Windows is 10 or 11 and x64 or Arm, and which language and country or region it's set to | Какая версия Windows, 10 или 11, x64 или Arm, и какие в ней заданы язык и страна или регион |
 | InstallerClean's version, how you got it (setup, portable, Scoop, the command-line tool on its own, built from source, or not known), whether the run was in InstallerClean or the command-line tool, and the language it was showing | Версия InstallerClean, способ её получения (setup, portable, Scoop, отдельная программа командной строки, сборка из исходного кода или неизвестно), где выполнялся запуск (в InstallerClean или в программе командной строки) и язык, на котором отображался интерфейс |
 | Counts of anything that went wrong | Счётчики всего, что пошло не так |
-| Each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Каждый из этих пунктов — число или метка. Ничто в отчёте не указывает на вас, ваш ПК, ваши файлы или программы, и я никогда не вижу ваш IP-адрес. |
+| A random code made for this report, so that it's only counted once if it's sent more than once | Случайный код, созданный для этого отчёта, чтобы он учитывался только один раз, если будет отправлен несколько раз |
+| Apart from that code, each of these is a number or a label. Nothing in the report names you, your PC, your files or your programs, and I never see your IP address. | Кроме этого кода, каждый из этих пунктов — число или метка. Ничто в отчёте не указывает на вас, ваш ПК, ваши файлы или программы, и я никогда не вижу ваш IP-адрес. |
 | See exactly what's sent | Посмотреть, что именно отправляется |
 
 ## Summaries and counts
