@@ -414,7 +414,8 @@ public class InstallerQueryServiceShortProgramTests
     /// Access refused at the first row or after <see cref="Superseded"/>, or a list that
     /// never ends, which in the product walk would refuse the scan. Here the scan stands,
     /// and the program's pairings for the check under the lease are the rows Windows
-    /// returned before it stopped, each once.
+    /// returned before it stopped, each once. The program's own key lists every row Windows
+    /// returns, so the superseded patch stays offered and the program is asked about it.
     /// </summary>
     [Theory]
     [InlineData(0u, new string[0])]
@@ -427,8 +428,9 @@ public class InstallerQueryServiceShortProgramTests
         if (refusedAt == uint.MaxValue) msi.NeverEndPatchesFor = Recovered;
         else msi.PatchRowResult[(Recovered, refusedAt)] = AccessDenied;
 
-        var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
+        var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, [Superseded, OtherPatch, EndlessPatch]));
 
+        AssertOffered(Row(result));
         Assert.Contains(Recovered, msi.PatchEnumerationsStarted);
         Assert.Single(result.PairingsHeldByName, p => p.ProductCode == Recovered);
         Assert.Equal(carried, result.PairingsOfHoldersWithNoClaims.Select(p => p.PatchCode));
