@@ -4,9 +4,10 @@
 // and for check-designer-parity.mjs, which compares the committed file with it.
 //
 // designerFor(resx) returns the whole file: the fixed head below, then one accessor
-// for every key the resx defines, in ordinal order of the key, then the closing
-// brace. Ordinal, so the file is the same whichever machine and locale build it. The
-// accessor is the key with each dot made an underscore, reading the key through Get.
+// for every key the resx defines, in ordinal order of the key, then the nested class
+// FrameworkCheck with a member for each of CHECK_KEYS, then the closing brace.
+// Ordinal, so the file is the same whichever machine and locale build it. An accessor
+// is the key with each dot made an underscore, reading the key through Get.
 //
 // Run from the repo root to write the file: node scripts/strings-designer.mjs
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -35,10 +36,13 @@ const HEAD = [
   "/// Strongly-typed accessor over Strings.resx. C# code paths use these",
   "/// properties for compile-time safety; XAML uses {loc:Translate Key}",
   "/// (see TranslateExtension) which resolves the same keys at runtime.",
-  "/// Get and Find are the only two routes from a resx value to a user and",
-  "/// both spend the installer-folder token, which is what lets a string",
-  "/// name the cache folder correctly on a machine whose Windows is not on",
-  "/// C:. scripts/check-cross-key-rules.mjs fails the build on a third.",
+  "/// Get and Find are the routes from a resx value to a user and both spend",
+  "/// the installer-folder token, which is what lets a string name the cache",
+  "/// folder correctly on a machine whose Windows is not on C:. The third,",
+  "/// FrameworkCheck below, serves only the strings of a copy's start checks,",
+  "/// none of which carries the token. scripts/check-cross-key-rules.mjs",
+  "/// fails the build on a read anywhere else, and check-designer-parity.mjs",
+  "/// on a fourth door here.",
   "/// </summary>",
   "[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"InstallerClean.ResxGen\", \"1.0.0.0\")]",
   "public static class Strings",
@@ -86,13 +90,54 @@ export const designerKeys = (resx) =>
   [...new Set([...resx.matchAll(/<data name="([A-Za-z][A-Za-z0-9._]+)/g)].map((m) => m[1]))]
     .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
-export const designerFor = (resx) =>
-  [
+// The strings a copy shows from its start checks, for Windows 10 version 1607 and for .NET
+// Framework 4.8, which Strings.FrameworkCheck serves without substituting the installer-folder
+// token. None of them may carry it, in any language (StringsFrameworkCheckTests). Written in
+// this order.
+export const CHECK_KEYS = [
+  'Cli.NeedsNetFramework48',
+  'Cli.UpdateDownloadLink',
+  'Startup.NeedsNetFramework48',
+  'Startup.NeedsWindows10Version1607',
+  'UpdateNotice.DownloadNetFramework48',
+  'Window.Main.Title',
+];
+
+const FRAMEWORK_CHECK_HEAD = [
+  "",
+  "    /// <summary>",
+  "    /// The door for the strings a copy shows from its start checks, for Windows",
+  "    /// 10 version 1607 and for .NET Framework 4.8, which run before anything else",
+  "    /// and on any .NET Framework 4.x. It reads the value through",
+  "    /// StartCheckResources, which uses no ResourceManager, and substitutes no",
+  "    /// installer-folder token:",
+  "    /// resolving the folder reaches the folder-identity code the scan uses,",
+  "    /// which needs more than .NET Framework 4.0 has. None of these keys",
+  "    /// carries the token in any language, which StringsFrameworkCheckTests",
+  "    /// holds.",
+  "    /// </summary>",
+  "    internal static class FrameworkCheck",
+  "    {",
+];
+
+// Throws where CHECK_KEYS names a key the resx does not define, so neither the file
+// nor the check is built against a door reading nothing.
+export const designerFor = (resx) => {
+  const keys = designerKeys(resx);
+  const missing = CHECK_KEYS.filter((key) => !keys.includes(key));
+  if (missing.length > 0)
+    throw new Error(`strings-designer.mjs: CHECK_KEYS names ${missing.join(', ')}, which Strings.resx does not define`);
+  return [
     ...HEAD,
-    ...designerKeys(resx).map((key) => `    public static string ${key.replaceAll('.', '_')} => Get("${key}");`),
+    ...keys.map((key) => `    public static string ${key.replaceAll('.', '_')} => Get("${key}");`),
+    ...FRAMEWORK_CHECK_HEAD,
+    ...CHECK_KEYS.map((key) =>
+      `        internal static string ${key.replaceAll('.', '_')} => StartCheckResources.GetString("${key}", Localisation.UiCulture) ?? "${key}";`),
+    '    }',
     '}',
     '',
   ].join('\n');
+};
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const text = designerFor(readFileSync(RESX, 'utf8'));

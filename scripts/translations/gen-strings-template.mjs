@@ -715,6 +715,7 @@ const MAP = {
   'About.Link.Notices': `Third-party notices`,
   'Automation.About.Notices.HelpText': `Shows the licences of the fonts, icons and code InstallerClean includes.`,
   'Cli.Help.Notices': `  installerclean-cli --notices  Print the third-party notices`,
+  'Startup.NeedsWindows10Version1607': `InstallerClean needs Windows 10 version 1607 or later, or Windows 11.`,
   'Error.NothingRemoved': `Nothing has been removed.`,
   'Error.NothingOfferedNothingRemoved': `Nothing has been offered and nothing has been removed.`,
 };

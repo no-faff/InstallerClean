@@ -16,10 +16,13 @@ using InstallerClean.Helpers;
 /// Strongly-typed accessor over Strings.resx. C# code paths use these
 /// properties for compile-time safety; XAML uses {loc:Translate Key}
 /// (see TranslateExtension) which resolves the same keys at runtime.
-/// Get and Find are the only two routes from a resx value to a user and
-/// both spend the installer-folder token, which is what lets a string
-/// name the cache folder correctly on a machine whose Windows is not on
-/// C:. scripts/check-cross-key-rules.mjs fails the build on a third.
+/// Get and Find are the routes from a resx value to a user and both spend
+/// the installer-folder token, which is what lets a string name the cache
+/// folder correctly on a machine whose Windows is not on C:. The third,
+/// FrameworkCheck below, serves only the strings of a copy's start checks,
+/// none of which carries the token. scripts/check-cross-key-rules.mjs
+/// fails the build on a read anywhere else, and check-designer-parity.mjs
+/// on a fourth door here.
 /// </summary>
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("InstallerClean.ResxGen", "1.0.0.0")]
 public static class Strings
@@ -504,6 +507,7 @@ public static class Strings
     public static string Startup_FailedToStart => Get("Startup.FailedToStart");
     public static string Startup_FailedToStart_NoLog => Get("Startup.FailedToStart.NoLog");
     public static string Startup_NeedsNetFramework48 => Get("Startup.NeedsNetFramework48");
+    public static string Startup_NeedsWindows10Version1607 => Get("Startup.NeedsWindows10Version1607");
     public static string Startup_PlantedConfigRefusal => Get("Startup.PlantedConfigRefusal");
     public static string Startup_UnhandledBody => Get("Startup.UnhandledBody");
     public static string Startup_UnhandledBody_NoLog => Get("Startup.UnhandledBody.NoLog");
@@ -612,4 +616,25 @@ public static class Strings
     public static string Window_Registered_Title => Get("Window.Registered.Title");
     public static string Window_Report_Title => Get("Window.Report.Title");
     public static string Window_Report_Unreadable => Get("Window.Report.Unreadable");
+
+    /// <summary>
+    /// The door for the strings a copy shows from its start checks, for Windows
+    /// 10 version 1607 and for .NET Framework 4.8, which run before anything else
+    /// and on any .NET Framework 4.x. It reads the value through
+    /// StartCheckResources, which uses no ResourceManager, and substitutes no
+    /// installer-folder token:
+    /// resolving the folder reaches the folder-identity code the scan uses,
+    /// which needs more than .NET Framework 4.0 has. None of these keys
+    /// carries the token in any language, which StringsFrameworkCheckTests
+    /// holds.
+    /// </summary>
+    internal static class FrameworkCheck
+    {
+        internal static string Cli_NeedsNetFramework48 => StartCheckResources.GetString("Cli.NeedsNetFramework48", Localisation.UiCulture) ?? "Cli.NeedsNetFramework48";
+        internal static string Cli_UpdateDownloadLink => StartCheckResources.GetString("Cli.UpdateDownloadLink", Localisation.UiCulture) ?? "Cli.UpdateDownloadLink";
+        internal static string Startup_NeedsNetFramework48 => StartCheckResources.GetString("Startup.NeedsNetFramework48", Localisation.UiCulture) ?? "Startup.NeedsNetFramework48";
+        internal static string Startup_NeedsWindows10Version1607 => StartCheckResources.GetString("Startup.NeedsWindows10Version1607", Localisation.UiCulture) ?? "Startup.NeedsWindows10Version1607";
+        internal static string UpdateNotice_DownloadNetFramework48 => StartCheckResources.GetString("UpdateNotice.DownloadNetFramework48", Localisation.UiCulture) ?? "UpdateNotice.DownloadNetFramework48";
+        internal static string Window_Main_Title => StartCheckResources.GetString("Window.Main.Title", Localisation.UiCulture) ?? "Window.Main.Title";
+    }
 }

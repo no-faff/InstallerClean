@@ -374,6 +374,7 @@ Where Russian needs a different form of a line for some counts, the form is in a
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Произошла непредвиденная ошибка, и InstallerClean необходимо закрыть.<br><br>{0}<br><br>Не удалось записать журнал сбоев. |
 | Startup error | Ошибка запуска |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean не запустится, потому что рядом с ним находится файл с именем {0}, а InstallerClean не поставляется с таким файлом. Удалите этот файл, а затем снова запустите InstallerClean.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | Для InstallerClean нужна Windows 10 версии 1607 или новее либо Windows 11. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | Для InstallerClean нужен .NET Framework 4.8. Установите его с сайта Microsoft, перезагрузите компьютер, а затем снова откройте InstallerClean. |
 | Failed to start ({0}). Details written to:<br>{1} | Не удалось запустить ({0}). Подробности записаны в:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Не удалось запустить ({0}). Не удалось записать журнал сбоев. |

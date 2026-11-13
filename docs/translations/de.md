@@ -366,6 +366,7 @@ Where German needs a different form of a line for some counts, the form is in a 
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Ein unerwarteter Fehler ist aufgetreten und InstallerClean muss geschlossen werden.<br><br>{0}<br><br>Das Absturzprotokoll konnte nicht geschrieben werden. |
 | Startup error | Startfehler |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean startet nicht, weil neben dem Programm eine Datei namens {0} liegt und InstallerClean keine solche Datei mitliefert. Lösche diese Datei und öffne InstallerClean dann erneut.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean benötigt Windows 10 ab Version 1607 oder Windows 11. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean benötigt .NET Framework 4.8. Installiere es von Microsoft, starte den PC neu und öffne InstallerClean dann erneut. |
 | Failed to start ({0}). Details written to:<br>{1} | Start fehlgeschlagen ({0}). Details gespeichert unter:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Start fehlgeschlagen ({0}). Das Absturzprotokoll konnte nicht geschrieben werden. |

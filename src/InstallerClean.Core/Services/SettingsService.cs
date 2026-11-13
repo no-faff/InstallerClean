@@ -12,7 +12,7 @@ public sealed class SettingsService : ISettingsService
     // and could OOM the elevated WPF process before MainWindow opens;
     // the cap turns oversize into a clean InvalidDataException that
     // the catch block routes to the .bad-rename recovery path.
-    private const int MaxReadBytes = 64 * 1024;
+    internal const int MaxReadBytes = 64 * 1024;
 
     // Internal for the config-pin test in SettingsServiceConfigTests.
     internal static readonly JsonSerializerOptions JsonOptions = new()

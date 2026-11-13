@@ -364,6 +364,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | 예기치 않은 오류가 발생하여 InstallerClean을 닫아야 합니다.<br><br>{0}<br><br>크래시 로그를 기록할 수 없었습니다. |
 | Startup error | 시작 오류 |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean 옆에 {0} 파일이 있는데 InstallerClean에는 그런 파일이 포함되어 있지 않아서 시작할 수 없습니다. 그 파일을 삭제한 다음 InstallerClean을 다시 실행하세요.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean에는 Windows 10 버전 1607 이상 또는 Windows 11이 필요합니다. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean에는 .NET Framework 4.8이 필요합니다. Microsoft에서 설치하고 PC를 다시 시작한 다음 InstallerClean을 다시 여세요. |
 | Failed to start ({0}). Details written to:<br>{1} | 시작하지 못했습니다 ({0}). 자세한 내용을 기록한 위치:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | 시작하지 못했습니다 ({0}). 크래시 로그를 기록할 수 없었습니다. |

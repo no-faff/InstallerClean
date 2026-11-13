@@ -364,6 +364,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | 予期しないエラーが発生し、InstallerClean を終了する必要があります。<br><br>{0}<br><br>クラッシュログを書き込めませんでした。 |
 | Startup error | 起動エラー |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean の隣に {0} というファイルがあり、InstallerClean にはそのようなファイルが付属していないため、起動できません。そのファイルを削除してから、InstallerClean をもう一度起動してください。<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean には Windows 10 バージョン 1607 以降、または Windows 11 が必要です。 |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean には .NET Framework 4.8 が必要です。Microsoft からインストールして PC を再起動し、InstallerClean をもう一度開いてください。 |
 | Failed to start ({0}). Details written to:<br>{1} | 起動に失敗しました ({0})。詳細は以下に書き込まれました：<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | 起動に失敗しました ({0})。クラッシュログを書き込めませんでした。 |

@@ -373,6 +373,7 @@ Where Polish needs a different form of a line for some counts, the form is in a 
 | An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Wystąpił nieoczekiwany błąd i InstallerClean musi się zamknąć.<br><br>{0}<br><br>Nie udało się zapisać dziennika awarii. |
 | Startup error | Błąd uruchamiania |
 | InstallerClean won't start because there is a file called {0} beside it, and InstallerClean doesn't come with one. Delete that file, then open InstallerClean again.<br><br>{1} | InstallerClean nie uruchomi się, ponieważ obok niego znajduje się plik o nazwie {0}, a InstallerClean nie jest dostarczany z takim plikiem. Usuń ten plik, a następnie uruchom InstallerClean ponownie.<br><br>{1} |
+| InstallerClean needs Windows 10 version 1607 or later, or Windows 11. | InstallerClean wymaga systemu Windows 10 w wersji 1607 lub nowszej albo systemu Windows 11. |
 | InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again. | InstallerClean wymaga .NET Framework 4.8. Zainstaluj go ze strony Microsoftu, uruchom ponownie komputer, a potem znów otwórz InstallerClean. |
 | Failed to start ({0}). Details written to:<br>{1} | Nie udało się uruchomić ({0}). Szczegóły zapisano w:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Nie udało się uruchomić ({0}). Nie udało się zapisać dziennika awarii. |

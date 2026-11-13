@@ -164,13 +164,9 @@ public static class CrashLog
             var entry = $"---- {stamp} ----{Environment.NewLine}{TextOf(ex)}{Environment.NewLine}{Environment.NewLine}";
             // The BOM goes in with the header, on a fresh file only: written
             // again on an append it would sit in the log body as a stray
-            // U+FEFF. Arrays rather than spans: a copy's start check can write here, and that
-            // path keeps to the .NET Framework NetFrameworkCheck's remarks name.
-            var bom = writeHeader ? Encoding.UTF8.GetPreamble() : new byte[0];
-            var text = Encoding.UTF8.GetBytes(header + entry);
-            var payload = new byte[bom.Length + text.Length];
-            Buffer.BlockCopy(bom, 0, payload, 0, bom.Length);
-            Buffer.BlockCopy(text, 0, payload, bom.Length, text.Length);
+            // U+FEFF.
+            ReadOnlySpan<byte> bom = writeHeader ? Encoding.UTF8.GetPreamble() : default;
+            byte[] payload = [.. bom, .. Encoding.UTF8.GetBytes(header + entry)];
             fs.Write(payload, 0, payload.Length);
             return new CrashLogEntry(path, true);
         }
