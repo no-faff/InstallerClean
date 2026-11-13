@@ -54,19 +54,45 @@ internal static class NetFrameworkCheck
     /// (<c>Cli.UpdateDownloadLink</c>). The window's sentence asks the user to open it again,
     /// and after a blank line comes the link's name and, on a line of its own, the address.
     /// </summary>
-    internal static string Message(bool commandLine)
+    internal static string Message(bool commandLine) =>
+        Compose(commandLine,
+            commandLine ? Strings.FrameworkCheck.Cli_NeedsNetFramework48 : Strings.FrameworkCheck.Startup_NeedsNetFramework48,
+            Strings.FrameworkCheck.Cli_UpdateDownloadLink, Strings.FrameworkCheck.UpdateNotice_DownloadNetFramework48);
+
+    /// <summary>
+    /// <see cref="Message"/> in English from <see cref="NeutralText"/>, for a start whose check
+    /// failed to load what it needs, where the strings themselves cannot be trusted to read.
+    /// </summary>
+    internal static string EnglishMessage(bool commandLine) =>
+        Compose(commandLine,
+            commandLine ? NeutralText.CliNeedsNetFramework48 : NeutralText.StartupNeedsNetFramework48,
+            NeutralText.CliUpdateDownloadLink, NeutralText.UpdateNoticeDownloadNetFramework48);
+
+    static string Compose(bool commandLine, string sentence, string linkLine, string linkName)
     {
         var url = UpdateManifest.NetFramework48DownloadUrl;
         if (commandLine)
-            return Strings.FrameworkCheck.Cli_NeedsNetFramework48 + Environment.NewLine
-                + string.Format(Strings.FrameworkCheck.Cli_UpdateDownloadLink,
-                    Strings.FrameworkCheck.UpdateNotice_DownloadNetFramework48, url);
+            return sentence + Environment.NewLine + string.Format(linkLine, linkName, url);
 
         // The link line in the language's own punctuation with no address in it, which then
         // stands on its own line. Every language's link line ends with the address.
-        var name = string.Format(Strings.FrameworkCheck.Cli_UpdateDownloadLink,
-            Strings.FrameworkCheck.UpdateNotice_DownloadNetFramework48, "").TrimEnd(null);
-        return Strings.FrameworkCheck.Startup_NeedsNetFramework48 + Environment.NewLine
-            + Environment.NewLine + name + Environment.NewLine + url;
+        var name = string.Format(linkLine, linkName, "").TrimEnd(null);
+        return sentence + Environment.NewLine + Environment.NewLine + name + Environment.NewLine + url;
+    }
+
+    /// <summary>
+    /// The neutral values in Strings.resx of the keys the message is built from, as constants.
+    /// NeutralTextTests holds each equal to the resx, so a change to the English there fails
+    /// the build until these change with it.
+    /// </summary>
+    internal static class NeutralText
+    {
+        internal const string CliNeedsNetFramework48 =
+            "InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then run InstallerClean again.";
+        internal const string StartupNeedsNetFramework48 =
+            "InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again.";
+        internal const string CliUpdateDownloadLink = "{0}: {1}";
+        internal const string UpdateNoticeDownloadNetFramework48 = "Download .NET Framework 4.8 from Microsoft";
+        internal const string WindowMainTitle = "InstallerClean";
     }
 }

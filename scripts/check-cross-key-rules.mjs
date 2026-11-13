@@ -402,6 +402,18 @@ const RAW_READ_ALLOWED = [
       + 'through Find or Get.',
   },
   {
+    file: 'src/InstallerClean.Tests/Resources/StartCheckResourcesTests.cs',
+    reason: 'Holds StartCheckResources, which reads the embedded resources without the '
+      + 'manager, to the manager\'s own answer for every key at named cultures. The '
+      + 'expectation has to be the manager\'s raw value, and the set has to be listed.',
+  },
+  {
+    file: 'src/InstallerClean.Tests/Services/NeutralTextTests.cs',
+    reason: 'Holds each English constant a start shows when its check fails to load '
+      + 'to the neutral value in Strings.resx, which is the raw value at the invariant '
+      + 'culture rather than what a door answers at the UI culture.',
+  },
+  {
     file: 'src/InstallerClean.Tests/Helpers/LocalisationOverrideTests.cs',
     reason: 'Reads one key at a named culture to prove an explicit language pick '
       + 'drives the typed accessor. The expectation has to come from the satellite '

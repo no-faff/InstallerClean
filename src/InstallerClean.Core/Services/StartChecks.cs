@@ -32,6 +32,18 @@ internal static class StartChecks
         : StartRefusal.None;
 
     /// <summary>
+    /// Whether <paramref name="exception"/>, thrown out of the start checks, is one the runtime
+    /// raises where the PC's .NET Framework lacks a type, a member or an assembly the checks
+    /// need. A copy built for .NET Framework 4.8 meets none of them on 4.8, so the start ends
+    /// on one with the .NET Framework 4.8 message in English (NetFrameworkCheck.EnglishMessage),
+    /// and goes on after any other exception, so that a fault in a check never stops a PC
+    /// that can run the copy.
+    /// </summary>
+    internal static bool IsLoadFailure(Exception exception) =>
+        exception is TypeLoadException or MissingMethodException or MissingFieldException
+            or TypeInitializationException or FileLoadException or FileNotFoundException;
+
+    /// <summary>
     /// The message for <paramref name="refusal"/>, which is not <see cref="StartRefusal.None"/>,
     /// in the language the strings are read in.
     /// </summary>

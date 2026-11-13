@@ -63,7 +63,8 @@ public partial class App : Application
     private static void EndOnAPcThatCannotRunIt()
     {
         // A throw out of a type initializer reaches no handler the app has set, so a check or
-        // a box that fails lets the start go on, where the app's own handlers catch what follows.
+        // a box that fails lets the start go on, where the app's own handlers catch what
+        // follows, unless it failed to load what it needs (StartChecks.IsLoadFailure).
         try
         {
             var refusal = StartChecks.OfThisPc();
@@ -80,6 +81,20 @@ public partial class App : Application
             }
             MessageBox.Show(StartChecks.Message(refusal, commandLine: false), Strings.FrameworkCheck.Window_Main_Title,
                 MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        catch (Exception ex) when (StartChecks.IsLoadFailure(ex))
+        {
+            // The PC's .NET Framework is older than 4.8, where the strings cannot be trusted
+            // to read, so the message is in English. The start ends whether or not the box
+            // shows.
+            try
+            {
+                MessageBox.Show(NetFrameworkCheck.EnglishMessage(commandLine: false),
+                    NetFrameworkCheck.NeutralText.WindowMainTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception)
+            {
+            }
         }
         catch (Exception)
         {

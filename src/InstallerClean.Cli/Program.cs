@@ -37,18 +37,25 @@ internal static class Program
     /// before it reads its arguments. The download carries no config naming the runtime, so
     /// .NET Framework starts it on any 4.x. The runtime compiles a method whole the first
     /// time it runs, and a member the PC's .NET Framework lacks fails that compile, so Main
-    /// names only the checks, the crash log's write of what the module initializer kept and
+    /// names only the checks, their refusal in English where a check fails to load what it
+    /// needs, the crash log's write of what the module initializer kept and
     /// <see cref="Start"/>, each in a method of its own that is never compiled into Main:
     /// nothing the last two name is compiled before the checks have run.
     /// </remarks>
     public static int Main(string[] args)
     {
-        // A check that throws lets the run go on, as the window's does, where the run's own
-        // handlers catch what follows.
+        // A check that fails to load what it needs is on a PC whose .NET Framework is older
+        // than 4.8, which ends the run with the message in English, the strings being
+        // unreadable there. A check that throws anything else lets the run go on, as the
+        // window's does, where the run's own handlers catch what follows.
         int? refused;
         try
         {
             refused = RefuseOnAPcThatCannotRunIt();
+        }
+        catch (Exception ex) when (StartChecks.IsLoadFailure(ex))
+        {
+            refused = RefuseWithoutRecording(NetFrameworkCheck.EnglishMessage(commandLine: true));
         }
         catch (Exception)
         {
