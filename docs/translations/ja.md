@@ -16,6 +16,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | 削除しても安全な不要ファイル |
 | The anonymous report | 匿名レポート |
 | InstallerClean couldn't read the report. | InstallerClean はレポートを読み取れませんでした。 |
+| Third-party notices | サードパーティ通知 |
 
 ## Section headings
 
@@ -59,6 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | ガイドとよくある質問 |
 | Report a problem | 問題を報告 |
+| Third-party notices | サードパーティ通知 |
 | Check for updates automatically | 更新を自動的に確認する |
 
 ## Field labels
@@ -407,6 +409,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | github のリリースページで新しいバージョンがあるかどうかを確認します。 |
 | Opens the readme on github in your browser. | ブラウザで github の readme を開きます。 |
 | Opens the issue tracker on github.com in your browser. | ブラウザで github.com の Issue トラッカーを開きます。 |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | InstallerClean に含まれるフォント、アイコン、コードのライセンスを表示します。 |
 | If ticked, InstallerClean checks github for a newer version when you run it. | チェックを入れると、InstallerClean は起動時に github で新しいバージョンを確認します。 |
 | Download it from github | github からダウンロード |
 | Download .NET Framework 4.8 from Microsoft | Microsoft から .NET Framework 4.8 をダウンロード |
@@ -575,6 +578,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | 使用方法： |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     このヘルプを表示 (/?、-hも受け付けます) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  バージョンを表示 (-vも受け付けます) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  サードパーティ通知を表示 |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         スキャンのみ - 不要ファイルを一覧 |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         不要ファイルを完全に削除 |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         保存済みのバックアップフォルダーへ移動 |

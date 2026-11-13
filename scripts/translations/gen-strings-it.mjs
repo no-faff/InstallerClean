@@ -572,6 +572,10 @@ const MAP = {
   'Startup.PlantedConfigRefusal': `InstallerClean non si avvia perché accanto ad esso c'è un file chiamato {0}, e InstallerClean non ne include nessuno. Elimina quel file, poi apri di nuovo InstallerClean.\n\n{1}`,
   'Startup.NeedsNetFramework48': `InstallerClean richiede .NET Framework 4.8. Installalo dal sito di Microsoft, riavvia il PC, poi apri di nuovo InstallerClean.`,
   'Cli.NeedsNetFramework48': `InstallerClean richiede .NET Framework 4.8. Installalo dal sito di Microsoft, riavvia il PC, poi esegui di nuovo InstallerClean.`,
+  'Window.Notices.Title': `Avvisi di terze parti`,
+  'About.Link.Notices': `Avvisi di terze parti`,
+  'Automation.About.Notices.HelpText': `Mostra le licenze di caratteri, icone e codice inclusi in InstallerClean.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices    Mostra gli avvisi di terze parti`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

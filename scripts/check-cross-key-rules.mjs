@@ -129,6 +129,7 @@ const ELABORATES_A_LABEL_IN_CODE = [
 // until the control is classified again.
 const NAME_IS_THE_LABEL = new Set([
   'Window.Report.Title',
+  'Window.Notices.Title',
 ]);
 
 // Nothing visible to agree with: an icon-only button, a scroll region, a

@@ -43,6 +43,14 @@ public class CliContractTests
         Assert.Equal(CliCommand.Version, CliContract.ParseArguments([flag]).Command);
     }
 
+    [Theory]
+    [InlineData("--notices")]
+    [InlineData("--NOTICES")]
+    public void ParseArguments_notices_flag_is_notices(string flag)
+    {
+        Assert.Equal(CliCommand.Notices, CliContract.ParseArguments([flag]).Command);
+    }
+
     [Fact]
     public void ParseArguments_slash_s_is_scan_only()
     {

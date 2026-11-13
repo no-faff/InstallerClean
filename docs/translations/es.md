@@ -18,6 +18,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | Unneeded files that are safe to delete | Archivos innecesarios que puedes eliminar sin riesgo |
 | The anonymous report | El informe anónimo |
 | InstallerClean couldn't read the report. | InstallerClean no pudo leer el informe. |
+| Third-party notices | Avisos de terceros |
 
 ## Section headings
 
@@ -61,6 +62,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | --- | --- |
 | Guide and FAQ | Guía y preguntas frecuentes |
 | Report a problem | Informar de un problema |
+| Third-party notices | Avisos de terceros |
 | Check for updates automatically | Buscar actualizaciones automáticamente |
 
 ## Field labels
@@ -409,6 +411,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | Checks github's releases page for a newer version. | Consulta la página de versiones de github en busca de una versión más reciente. |
 | Opens the readme on github in your browser. | Abre el readme en github en tu navegador. |
 | Opens the issue tracker on github.com in your browser. | Abre el rastreador de problemas (Issues) en github.com en tu navegador. |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | Muestra las licencias de las fuentes, los iconos y el código que incluye InstallerClean. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Si está marcada, InstallerClean busca en github una versión más reciente cuando lo ejecutas. |
 | Download it from github | Descárgalo de github |
 | Download .NET Framework 4.8 from Microsoft | Descarga .NET Framework 4.8 de Microsoft |
@@ -582,6 +585,7 @@ Where Spanish needs a different form of a line for some counts, the form is in a
 | Usage: | Uso: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Muestra esta ayuda (acepta también /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Muestra la versión (acepta también -v) |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  Muestra los avisos de terceros |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Solo analizar - lista los innecesarios |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Elimina definitivamente los innecesarios |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Mueve a la carpeta de copia de seguridad |

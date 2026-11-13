@@ -710,6 +710,10 @@ const MAP = {
   'Cli.ReportNoAnswer': `No answer after a minute.`,
   'Startup.NeedsNetFramework48': `InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then open InstallerClean again.`,
   'Cli.NeedsNetFramework48': `InstallerClean needs .NET Framework 4.8. Install it from Microsoft, restart the PC, then run InstallerClean again.`,
+  'Window.Notices.Title': `Third-party notices`,
+  'About.Link.Notices': `Third-party notices`,
+  'Automation.About.Notices.HelpText': `Shows the licences of the fonts, icons and code InstallerClean includes.`,
+  'Cli.Help.Notices': `  installerclean-cli --notices  Print the third-party notices`,
 };
 
 // PARSE CONTROL. About the READING and not about the content, and it exits 2,

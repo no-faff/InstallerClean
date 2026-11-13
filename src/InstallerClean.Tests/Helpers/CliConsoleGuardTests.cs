@@ -406,7 +406,8 @@ public class CliConsoleGuardTests
     [Theory]
     [InlineData("--version")]
     [InlineData("--help")]
-    public void A_help_or_version_request_whose_output_fails_exits_1_and_writes_no_entry(string arg)
+    [InlineData("--notices")]
+    public void A_help_version_or_notices_request_whose_output_fails_exits_1_and_writes_no_entry(string arg)
     {
         // Through Main, which puts the output behind the guard. A failed write that got past
         // the guard would reach Main's catch-all, which writes a HardError entry.
@@ -432,7 +433,8 @@ public class CliConsoleGuardTests
     [Theory]
     [InlineData("--version")]
     [InlineData("--help")]
-    public void A_help_or_version_request_whose_output_is_written_exits_0(string arg)
+    [InlineData("--notices")]
+    public void A_help_version_or_notices_request_whose_output_is_written_exits_0(string arg)
     {
         var console = new StringWriter();
         var original = Console.Out;

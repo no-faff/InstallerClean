@@ -61,6 +61,7 @@ public static class Strings
 
     public static string About_AutoUpdateCheck => Get("About.AutoUpdateCheck");
     public static string About_Link_Guide => Get("About.Link.Guide");
+    public static string About_Link_Notices => Get("About.Link.Notices");
     public static string About_Link_ReportProblem => Get("About.Link.ReportProblem");
     public static string Action_About => Get("Action.About");
     public static string Action_BackupFolderPlaceholder => Get("Action.BackupFolderPlaceholder");
@@ -85,6 +86,7 @@ public static class Strings
     public static string Action_SelectAll => Get("Action.SelectAll");
     public static string Action_StopWaiting => Get("Action.StopWaiting");
     public static string Automation_About_Guide_HelpText => Get("Automation.About.Guide.HelpText");
+    public static string Automation_About_Notices_HelpText => Get("Automation.About.Notices.HelpText");
     public static string Automation_About_ReportProblem_HelpText => Get("Automation.About.ReportProblem.HelpText");
     public static string Automation_AutoUpdateCheck_HelpText => Get("Automation.AutoUpdateCheck.HelpText");
     public static string Automation_BackupFolder => Get("Automation.BackupFolder");
@@ -265,6 +267,7 @@ public static class Strings
     public static string Cli_Help_MovePath => Get("Cli.Help.MovePath");
     public static string Cli_Help_MoveScheduledNote => Get("Cli.Help.MoveScheduledNote");
     public static string Cli_Help_NoteLine1 => Get("Cli.Help.NoteLine1");
+    public static string Cli_Help_Notices => Get("Cli.Help.Notices");
     public static string Cli_Help_ScanOnly => Get("Cli.Help.ScanOnly");
     public static string Cli_Help_Summary => Get("Cli.Help.Summary");
     public static string Cli_Help_UpdateNote => Get("Cli.Help.UpdateNote");
@@ -600,6 +603,7 @@ public static class Strings
     public static string Version_Display => Get("Version.Display");
     public static string Window_About_Title => Get("Window.About.Title");
     public static string Window_Main_Title => Get("Window.Main.Title");
+    public static string Window_Notices_Title => Get("Window.Notices.Title");
     public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
     public static string Window_Registered_Title => Get("Window.Registered.Title");
     public static string Window_Report_Title => Get("Window.Report.Title");

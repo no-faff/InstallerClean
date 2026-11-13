@@ -94,6 +94,10 @@
     <value>InstallerClean n'a pas pu lire le rapport.</value>
     <comment>Shown in the window headed Window.Report.Title, in place of the report, where the file holding it cannot be read when the window opens.</comment>
   </data>
+  <data name="Window.Notices.Title" xml:space="preserve">
+    <value>Avis de tiers</value>
+    <comment>The heading of the window About.Link.Notices opens, which shows the notices and licences of the other people's work inside InstallerClean: fonts, icons and code libraries. Also the window's spoken title and the screen-reader name of the box holding the text. The text itself is not translated: licences are kept in the words they were written in.</comment>
+  </data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Patches" xml:space="preserve"><value>CORRECTIFS</value></data>
@@ -233,6 +237,10 @@
     <value>Signaler un problème</value>
     <comment>About-window link to the GitHub issue tracker.</comment>
   </data>
+  <data name="About.Link.Notices" xml:space="preserve">
+    <value>Avis de tiers</value>
+    <comment>About-window link that opens a window showing the notices and licences of the other people's work inside InstallerClean (Window.Notices.Title).</comment>
+  </data>
   <data name="About.AutoUpdateCheck" xml:space="preserve">
     <value>Rechercher des mises à jour automatiquement</value>
     <comment>Checkbox label in the About window.</comment>
@@ -321,6 +329,10 @@
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
     <value>Ouvre le suivi des problèmes (Issues) sur github.com dans votre navigateur.</value>
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
+  </data>
+  <data name="Automation.About.Notices.HelpText" xml:space="preserve">
+    <value>Affiche les licences des polices, des icônes et du code inclus dans InstallerClean.</value>
+    <comment>Screen-reader help on the About window's "Third-party notices" link, which opens a window inside the app rather than a page in the browser.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
     <value>Si la case est cochée, InstallerClean recherche une version plus récente sur github à son lancement.</value>
@@ -2402,6 +2414,7 @@ Relancez InstallerClean en tant qu'administrateur.</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Utilisation :</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Affiche cette aide (accepte aussi /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Affiche la version (accepte aussi -v)</value></data>
+  <data name="Cli.Help.Notices" xml:space="preserve"><value>  installerclean-cli --notices  Affiche les avis de tiers</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Analyse seule - liste les inutiles</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Supprime définitivement les inutiles</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Déplace vers le dossier enregistré</value></data>

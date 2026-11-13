@@ -16,6 +16,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Unneeded files that are safe to delete | 不需要的文件，可安全删除 |
 | The anonymous report | 匿名报告 |
 | InstallerClean couldn't read the report. | InstallerClean 无法读取该报告。 |
+| Third-party notices | 第三方声明 |
 
 ## Section headings
 
@@ -59,6 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | 指南和常见问题 |
 | Report a problem | 报告问题 |
+| Third-party notices | 第三方声明 |
 | Check for updates automatically | 自动检查更新 |
 
 ## Field labels
@@ -407,6 +409,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | 在 github 的发布页面上检查是否有较新版本。 |
 | Opens the readme on github in your browser. | 在浏览器中打开 github 上的 readme。 |
 | Opens the issue tracker on github.com in your browser. | 在浏览器中打开 github.com 上的问题追踪页面（Issues）。 |
+| Shows the licences of the fonts, icons and code InstallerClean includes. | 显示 InstallerClean 所含字体、图标和代码的许可证。 |
 | If ticked, InstallerClean checks github for a newer version when you run it. | 勾选后，InstallerClean 运行时会在 github 上检查是否有较新版本。 |
 | Download it from github | 从 github 下载 |
 | Download .NET Framework 4.8 from Microsoft | 从 Microsoft 下载 .NET Framework 4.8 |
@@ -575,6 +578,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | 用法： |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     显示此帮助（也接受 /?、-h） |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  显示版本号（也接受 -v） |
+|   installerclean-cli --notices  Print the third-party notices |   installerclean-cli --notices  显示第三方声明 |
 |   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         仅扫描 - 列出不需要的文件 |
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         永久删除不需要的文件 |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         移动到已保存的备份文件夹 |
