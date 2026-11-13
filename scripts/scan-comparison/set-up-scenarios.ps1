@@ -9,8 +9,7 @@
 #    serves two programs. Patch P2 updates A to 1.0.2 and supersedes P1 there, while P1 stays
 #    the current patch on B.
 #  - U, per user, installed by the account the job runs as.
-#  - S, per user, installed by SYSTEM from a scheduled task, a program no other account's
-#    view of Windows Installer lists.
+#  - S, a per-user package installed by SYSTEM from a scheduled task.
 #  - C, per machine, installed and removed, its cached copy kept and put back under the name
 #    Windows gave it, so the folder holds a file whose program has gone.
 #  - Files no program or patch registered: D, a program never installed; a second copy of A
@@ -59,50 +58,36 @@ function Invoke-Msiexec([string]$what, [string[]]$msiArgs) {
     if ($p.ExitCode -ne 0) { throw "msiexec, $what, exited $($p.ExitCode); its log is $log." }
 }
 
-# Windows Installer's automation object answers through IDispatch, so its parameterised
-# properties are read through InvokeMember.
-$wi = New-Object -ComObject WindowsInstaller.Installer
-function Com([object]$on, [string]$name, [System.Reflection.BindingFlags]$kind, [object[]]$with) {
-    [System.__ComObject].InvokeMember($name, $kind, $null, $on, $with)
-}
-$get = [System.Reflection.BindingFlags]::GetProperty
-$call = [System.Reflection.BindingFlags]::InvokeMethod
-
-# The members of one of Windows Installer's collections, read by Count and Item.
-function Members([object]$collection) {
-    $count = Com $collection 'Count' $get @()
-    for ($i = 0; $i -lt $count; $i++) { , (Com $collection 'Item' $get @($i)) }
-}
-
-# The cached package of a product in any account or the machine (MSIINSTALLCONTEXT_ALL), or
-# null where Windows Installer lists none.
-function ProductPackage([string]$code) {
-    foreach ($product in @(Members (Com $wi 'ProductsEx' $get @($code, 's-1-1-0', 7)))) {
-        return (Com $product 'InstallProperty' $get @('LocalPackage'))
+# The cached file Windows Installer records for a product or a patch, read with
+# MsiGetProductInfoEx and MsiGetPatchInfoEx. An empty user SID passes null, which names the
+# account the job runs as for a per-user context and is what a machine context requires.
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
+public static class ScenarioMsi {
+    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
+    static extern uint MsiGetProductInfoExW(string product, string sid, int context, string property, StringBuilder value, ref uint length);
+    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
+    static extern uint MsiGetPatchInfoExW(string patch, string product, string sid, int context, string property, StringBuilder value, ref uint length);
+    public static string Product(string product, string sid, int context, string property) {
+        var value = new StringBuilder(1024); uint length = 1024;
+        uint rc = MsiGetProductInfoExW(product, sid.Length == 0 ? null : sid, context, property, value, ref length);
+        return rc == 0 ? value.ToString() : null;
     }
-    return $null
-}
-
-# The patch object for a patch applied to a product, in any account or the machine and in any
-# state, or null.
-function FindPatch([string]$productCode, [string]$patchCode) {
-    foreach ($patch in @(Members (Com $wi 'PatchesEx' $get @($productCode, 's-1-1-0', 7, 15)))) {
-        if ((Com $patch 'PatchCode' $get @()) -eq $patchCode) { return $patch }
+    public static string Patch(string patch, string product, string sid, int context, string property) {
+        var value = new StringBuilder(1024); uint length = 1024;
+        uint rc = MsiGetPatchInfoExW(patch, product, sid.Length == 0 ? null : sid, context, property, value, ref length);
+        return rc == 0 ? value.ToString() : null;
     }
-    return $null
 }
+"@
+$machine = 4
+$userUnmanaged = 2
 
-function PatchPackage([string]$productCode, [string]$patchCode) {
-    $patch = FindPatch $productCode $patchCode
-    if ($patch) { return (Com $patch 'PatchProperty' $get @('LocalPackage')) }
-    return $null
-}
-
-function PatchState([string]$productCode, [string]$patchCode) {
-    $patch = FindPatch $productCode $patchCode
-    if ($patch) { return (Com $patch 'State' $get @()) }
-    return $null
-}
+function ProductPackage([string]$code, [string]$sid, [int]$context) { [ScenarioMsi]::Product($code, $sid, $context, 'LocalPackage') }
+function PatchPackage([string]$productCode, [string]$patchCode) { [ScenarioMsi]::Patch($patchCode, $productCode, '', $machine, 'LocalPackage') }
+function PatchState([string]$productCode, [string]$patchCode) { [ScenarioMsi]::Patch($patchCode, $productCode, '', $machine, 'State') }
 
 function Record([string]$path, [string]$what) {
     if (-not $path) { throw "Windows Installer lists no cached file for $what." }
@@ -193,17 +178,22 @@ if (-not $ended) { throw "The install of S for SYSTEM had not ended after 300 s.
 if ($sResult -ne 0) { throw "The install of S for SYSTEM exited $sResult; its log is $sLog." }
 
 "What each test file in the Installer folder is"
-Record (ProductPackage $products.A.Code) 'A, installed per machine, patched by P1 and P2'
-Record (ProductPackage $products.B.Code) 'B, installed per machine, patched by P1'
-Record (ProductPackage $products.U.Code) 'U, installed per user by the account the job runs as'
-Record (ProductPackage $products.S.Code) 'S, installed per user by SYSTEM'
+Record (ProductPackage $products.A.Code '' $machine) 'A, installed per machine, patched by P1 and P2'
+Record (ProductPackage $products.B.Code '' $machine) 'B, installed per machine, patched by P1'
+Record (ProductPackage $products.U.Code '' $userUnmanaged) 'U, installed per user by the account the job runs as'
+# Windows Installer may record a per-user install by SYSTEM in SYSTEM's own per-user context or
+# in the machine context; the line says which one answered.
+$sPackage = ProductPackage $products.S.Code 'S-1-5-18' $userUnmanaged
+$sWhere = 'in SYSTEM''s per-user context'
+if (-not $sPackage) { $sPackage = ProductPackage $products.S.Code '' $machine; $sWhere = 'in the machine context' }
+Record $sPackage "S, a per-user package installed by SYSTEM, recorded $sWhere"
 $p1 = PatchPackage $products.A.Code $patches.P1.Code
 if ($p1 -ne (PatchPackage $products.B.Code $patches.P1.Code)) { throw "P1 is not one cached file for A and B." }
 "  P1's state on A is $(PatchState $products.A.Code $patches.P1.Code) and on B is $(PatchState $products.B.Code $patches.P1.Code) (1 applied, 2 superseded)"
 Record $p1 'P1, applied to A and B, superseded on A by P2 and current on B'
 Record (PatchPackage $products.A.Code $patches.P2.Code) 'P2, applied to A, superseding P1 there'
 
-$cPackage = ProductPackage $products.C.Code
+$cPackage = ProductPackage $products.C.Code '' $machine
 if (-not $cPackage) { throw "Windows Installer lists no cached file for C." }
 $cKept = Join-Path $build 'C-cached-copy.msi'
 Copy-Item -LiteralPath $cPackage -Destination $cKept
