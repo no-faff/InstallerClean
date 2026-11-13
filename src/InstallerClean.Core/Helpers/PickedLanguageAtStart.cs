@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using InstallerClean.Services;
 
 namespace InstallerClean.Helpers;
 
@@ -13,15 +14,12 @@ namespace InstallerClean.Helpers;
 /// far. So this reads settings.json itself and takes the <c>language</c> value as the app
 /// writes it, then checks it with <see cref="LanguagePreference.Resolve"/> as the window does.
 /// It reads the file in <c>%LOCALAPPDATA%\InstallerClean</c>, or where there is none there,
-/// the one in <c>%LOCALAPPDATA%\NoFaff\InstallerClean</c>, where earlier versions keep it,
-/// which is the file <see cref="AppDataFolder"/> would settle on. It moves and writes
-/// nothing. Everything here is held to what <c>NetFrameworkCheck</c>'s remarks set out.
+/// the one in <c>%LOCALAPPDATA%\NoFaff\InstallerClean</c>, where earlier versions keep it:
+/// the file <see cref="AppDataFolder"/> settles on wherever it can move the earlier folder's
+/// files across. It moves and writes nothing. Everything here is held to what <c>NetFrameworkCheck</c>'s remarks set out.
 /// </remarks>
 internal static class PickedLanguageAtStart
 {
-    // SettingsService's cap.
-    private const int MaxReadBytes = 64 * 1024;
-
     // A "language" key and its string value. Inside a JSON string a quote is escaped, so the
     // key's quotes match only a key. A culture name holds no quote or backslash.
     private const string LanguageValue = "\"language\"\\s*:\\s*\"([^\"\\\\]{1,32})\"";
@@ -38,9 +36,9 @@ internal static class PickedLanguageAtStart
             var localAppData = KnownFolders.GetPath(Environment.SpecialFolder.LocalApplicationData);
             if (string.IsNullOrEmpty(localAppData)) return null;
             var root = localAppData.TrimEnd('\\');
-            return FromSettings(
-                SettingsText(root + @"\InstallerClean\settings.json")
-                ?? SettingsText(root + @"\NoFaff\InstallerClean\settings.json"));
+            var current = root + @"\" + AppDataFolder.FolderName;
+            var earlier = root + @"\" + AppDataFolder.EarlierParentName + @"\" + AppDataFolder.FolderName;
+            return FromSettings(SettingsText(current + @"\settings.json") ?? SettingsText(earlier + @"\settings.json"));
         }
         catch (Exception)
         {
@@ -76,7 +74,7 @@ internal static class PickedLanguageAtStart
         }
         using (stream)
         {
-            if (stream.Length > MaxReadBytes) return string.Empty;
+            if (stream.Length > SettingsService.MaxReadBytes) return string.Empty;
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }

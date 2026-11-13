@@ -7,7 +7,9 @@ namespace InstallerClean.Helpers;
 /// Substitutes the real installer cache folder into any resx value that names
 /// it. A string writes <c>{InstallerFolder}</c> and every consumer, C# and XAML
 /// alike, receives the resolved path, because the substitution happens in
-/// <c>Strings.Get</c>, the one door every resource lookup comes through.
+/// <c>Strings.Get</c> and <c>Strings.Find</c>, the doors every resource lookup
+/// comes through but those of <c>Strings.FrameworkCheck</c>, whose strings carry
+/// no token.
 /// </summary>
 /// <remarks>
 /// The folder is <c>%SystemRoot%\Installer</c>, resolved once for the whole app
