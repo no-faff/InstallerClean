@@ -792,6 +792,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // name, which is the limit of the whole scan and not of this rule.
         var instanceProducts = 0;
         var instanceTypeUnreadable = 0;
+        var recoveredPatchSetUnestablished = 0;
 
         // Every installation this enumeration established, for
         // InstallerQueryResult.Installations: each row the product walk listed, in walk
@@ -1117,8 +1118,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
             listed.Add(new ListedInstallation(recoveredCode, recoveredSid, (int)recoveredContext,
                 SecondCopyNotRuledOut: instanceReading != InstanceReading.Ordinary));
 
-            FoldRecoveredPatchSet(recoveredCode, recoveredSid, recoveredContext, apiPatchSets,
-                fallback, ct, abandonedLog);
+            if (FoldRecoveredPatchSet(recoveredCode, recoveredSid, recoveredContext, apiPatchSets,
+                    fallback, ct, abandonedLog))
+                recoveredPatchSetUnestablished++;
         }
 
         WithholdOnRegistryPackageRecords(claimed, patchClaims, fallback.PackageRecords);
@@ -1351,7 +1353,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             fallback.Failures,
             unsettledEnumeratedProducts,
             missed.RecoveredOfEnumerated,
-            unattributedPatchFiles);
+            unattributedPatchFiles,
+            recoveredPatchSetUnestablished);
 
         // LIVE, AND ON NO ACCOUNT TO BE DELETED AS DEAD MACHINERY. A superseded row
         // on a machine whose patch sets read clean arrives here still carrying
@@ -4072,8 +4075,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// budget (<see cref="WalkRestarts.KeyedPauseLimit"/>), and a walk here that spent it
     /// would leave the walks after it, which can hold a file on a refusal, restarting
     /// without a pause.
+    ///
+    /// True where it marked the product Unestablished, which
+    /// <see cref="EnumerationCensus.RecoveredPatchSetUnestablishedCount"/> counts.
     /// </summary>
-    private void FoldRecoveredPatchSet(
+    private bool FoldRecoveredPatchSet(
         string productCode,
         string? userSid,
         MsiInstallContext context,
@@ -4082,10 +4088,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct,
         PerItemFailureLog failureLog)
     {
-        void Fold(ProductPatchSet verdict) =>
+        var unestablished = false;
+        void Fold(ProductPatchSet verdict)
+        {
+            unestablished |= verdict == ProductPatchSet.Unestablished;
             apiPatchSets[productCode] = apiPatchSets.TryGetValue(productCode, out var seen)
                 ? Worse(seen, verdict)
                 : verdict;
+        }
 
         var walk = WalkPatchList(productCode, userSid, context, WalkRestarts.For(ct, WalkPause), ct, failureLog);
         // Each row once: a list that never ended can return the same row up to the index cap.
@@ -4126,6 +4136,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 ? ProductPatchSet.AllNonRemovable
                 : ProductPatchSet.RemovablePatchPresent);
         }
+
+        return unestablished;
     }
 
     /// <summary>

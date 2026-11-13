@@ -478,6 +478,7 @@ public class InstallerQueryServiceShortProgramTests
             keyListsPatches ? [Superseded, OtherPatch] : null));
 
         AssertOffered(Row(result));
+        Assert.Equal(0, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
     /// <summary>
@@ -493,6 +494,7 @@ public class InstallerQueryServiceShortProgramTests
         var result = await Scan(msi, Fallback(registryCodes: [Listed, Short, Recovered]));
 
         AssertOfferedOrWithheld(Row(result), withheld: true);
+        Assert.Equal(1, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
     /// <summary>
@@ -512,6 +514,7 @@ public class InstallerQueryServiceShortProgramTests
         var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, listing));
 
         AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
     /// <summary>
@@ -539,6 +542,7 @@ public class InstallerQueryServiceShortProgramTests
         var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, listing));
 
         AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
     /// <summary>
@@ -564,6 +568,7 @@ public class InstallerQueryServiceShortProgramTests
         var result = await Scan(msi, RecoveredProgramsKey(MachineAccount, listing));
 
         AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
     /// <summary>
@@ -583,6 +588,7 @@ public class InstallerQueryServiceShortProgramTests
         var result = await Scan(msi, RecoveredProgramsKey(OwnerAccount, listing));
 
         AssertOfferedOrWithheld(Row(result), withheld);
+        Assert.Equal(withheld ? 1 : 0, result.Census.RecoveredPatchSetUnestablishedCount);
     }
 
     [Theory]
