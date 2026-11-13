@@ -167,18 +167,30 @@ public class FrameworkStreamsTests
     [Fact]
     public async Task A_response_body_read_the_server_stops_answering_ends_when_its_token_is_cancelled()
     {
-        await WithinServerBound(async () =>
+        await WithinServerBound(async step =>
         {
             using var server = StallingServer.Start(bodyLength: 1_000_000, sent: 4);
             using var client = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+            step.To("the request");
             using var response = await client.GetAsync(server.Address, HttpCompletionOption.ResponseHeadersRead);
+            server.ReleaseBody();
+            step.To("the response stream");
             using var body = await response.Content.ReadAsStreamAsync(CancellationToken.None);
             var buffer = new byte[4096];
             var got = 0;
+            step.To("the first four bytes");
+            step.Server = server;
             while (got < 4)
-                got += await body.ReadAsync(buffer.AsMemory(got), CancellationToken.None);
+            {
+                var pending = body.ReadAsync(buffer, got, buffer.Length - got, CancellationToken.None);
+                step.Watch(pending);
+                var read4 = await pending;
+                Assert.True(read4 > 0, "The body ended before its first four bytes.");
+                got += read4;
+            }
             using var stall = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
 
+            step.To("the cancelled read");
             var read = body.ReadAsync(buffer, stall.Token).AsTask();
             var finished = await Task.WhenAny(read, Task.Delay(TimeSpan.FromSeconds(10)));
 
@@ -186,6 +198,7 @@ public class FrameworkStreamsTests
             var thrown = await Assert.ThrowsAsync<TaskCanceledException>(() => read);
             Assert.Equal(stall.Token, thrown.CancellationToken);
             Assert.Equal("The operation was canceled.", thrown.Message);
+            step.To("the disposes of the body, the response, the client and the server");
         });
     }
 
@@ -471,12 +484,54 @@ public class FrameworkStreamsTests
     /// </summary>
     private static readonly TimeSpan ServerBound = TimeSpan.FromSeconds(30);
 
-    private static async Task WithinServerBound(Func<Task> test)
+    private static Task WithinServerBound(Func<Task> test) => WithinServerBound(_ => test());
+
+    /// <summary>
+    /// <see cref="WithinServerBound(Func{Task})"/> for a test that names each wait as it
+    /// reaches it, so a test held past the bound says which wait held it.
+    /// </summary>
+    private static async Task WithinServerBound(Func<Step, Task> test)
     {
-        var run = Task.Run(test);
+        var step = new Step();
+        var run = Task.Run(() => test(step));
         var finished = await Task.WhenAny(run, Task.Delay(ServerBound));
-        Assert.True(finished == run, $"The test had not finished after {ServerBound.TotalSeconds} s.");
+        Assert.True(finished == run,
+            $"The test had not finished after {ServerBound.TotalSeconds} s, waiting on {step.Reached}"
+            + (step.Server is { } server ? $", the server having {server.Reached}." : ".") + step.Sample);
         await run;
+    }
+
+    /// <summary>The wait a test under <see cref="ServerBound"/> last reached.</summary>
+    private sealed class Step
+    {
+        private string _reached = "the start";
+
+        public string Reached => Volatile.Read(ref _reached);
+
+        public void To(string wait) => Volatile.Write(ref _reached, wait);
+
+        /// <summary>The server the test talks to, once it has one to report on.</summary>
+        public StallingServer? Server { get; set; }
+
+        private string _sample = "";
+
+        /// <summary>What a watch found when its read had not finished.</summary>
+        public string Sample => Volatile.Read(ref _sample);
+
+        /// <summary>
+        /// Ten seconds on, on a thread of its own so a starved pool cannot hold it, records
+        /// the read's status and the pool's free threads if the read has not finished.
+        /// </summary>
+        public void Watch(Task read) =>
+            new Thread(() =>
+            {
+                if (read.Wait(10_000)) return;
+                ThreadPool.GetAvailableThreads(out var workers, out var ports);
+                ThreadPool.GetMaxThreads(out var maxWorkers, out var maxPorts);
+                Volatile.Write(ref _sample,
+                    $" After 10 s the read was {read.Status}, with {workers} of {maxWorkers} worker threads"
+                    + $" and {ports} of {maxPorts} completion threads free.");
+            }) { IsBackground = true }.Start();
     }
 
     /// <summary>
@@ -484,50 +539,82 @@ public class FrameworkStreamsTests
     /// <c>bodyLength</c> bytes by its Content-Length, of which it sends the first
     /// <c>sent</c> ("MZab" and on) and then stops, holding the connection open.
     /// </summary>
+    /// <remarks>
+    /// It runs on a thread of its own with blocking calls, so what it sends never waits on a
+    /// thread-pool thread, and <see cref="Reached"/> says how far it got. A whole body goes
+    /// out in one write with the head. A body cut short goes out after the head only once
+    /// the test calls <see cref="ReleaseBody"/>.
+    /// </remarks>
     private sealed class StallingServer : IDisposable
     {
         private readonly TcpListener _listener;
-        private readonly CancellationTokenSource _stop = new();
+        private readonly ManualResetEventSlim _stop = new();
+        private readonly ManualResetEventSlim _bodyReleased = new();
+        private string _reached = "not accepted";
 
         private StallingServer(TcpListener listener) => _listener = listener;
 
         public Uri Address => new($"http://127.0.0.1:{((IPEndPoint)_listener.LocalEndpoint).Port}/");
+
+        /// <summary>Lets a body cut short go out; the server holds it until this is called.</summary>
+        public void ReleaseBody() => _bodyReleased.Set();
+
+        /// <summary>How far the server has got with its one request.</summary>
+        public string Reached => Volatile.Read(ref _reached);
 
         public static StallingServer Start(int bodyLength, int sent)
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
             listener.Start();
             var server = new StallingServer(listener);
-            _ = Task.Run(() => server.Serve(bodyLength, sent));
+            new Thread(() => server.Serve(bodyLength, sent)) { IsBackground = true, Name = "StallingServer" }.Start();
             return server;
         }
 
-        private async Task Serve(int bodyLength, int sent)
+        private void Serve(int bodyLength, int sent)
         {
             try
             {
-                using var client = await _listener.AcceptTcpClientAsync();
+                using var client = _listener.AcceptTcpClient();
+                client.NoDelay = true;
                 using var connection = client.GetStream();
+                Volatile.Write(ref _reached, "accepted");
                 var request = new byte[4096];
-                _ = await connection.ReadAsync(request, 0, request.Length);
+                _ = connection.Read(request, 0, request.Length);
                 var head = Encoding.ASCII.GetBytes(
                     $"HTTP/1.1 200 OK\r\nContent-Length: {bodyLength}\r\nContent-Type: application/octet-stream\r\n\r\n");
-                await connection.WriteAsync(head, 0, head.Length);
                 var body = Encoding.ASCII.GetBytes("MZab".PadRight(sent, 'c').Substring(0, sent));
-                await connection.WriteAsync(body, 0, body.Length);
-                await connection.FlushAsync();
-                await FrameworkTask.Delay(Timeout.Infinite, _stop.Token);
+                if (sent < bodyLength)
+                {
+                    // A body cut short goes out once the client has its response, so its
+                    // bytes reach the client as a read of their own and not beside the head.
+                    connection.Write(head, 0, head.Length);
+                    connection.Flush();
+                    Volatile.Write(ref _reached, "sent the head");
+                    WaitHandle.WaitAny([_bodyReleased.WaitHandle, _stop.WaitHandle]);
+                    if (_stop.IsSet) return;
+                    connection.Write(body, 0, body.Length);
+                }
+                else
+                {
+                    var answer = new byte[head.Length + body.Length];
+                    head.CopyTo(answer, 0);
+                    body.CopyTo(answer, head.Length);
+                    connection.Write(answer, 0, answer.Length);
+                }
+                connection.Flush();
+                Volatile.Write(ref _reached, $"sent the head and {sent} bytes");
+                _stop.Wait();
             }
-            catch (Exception ex) when (ex is OperationCanceledException or IOException or ObjectDisposedException or SocketException)
+            catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException or InvalidOperationException)
             {
             }
         }
 
         public void Dispose()
         {
-            _stop.Cancel();
+            _stop.Set();
             _listener.Stop();
-            _stop.Dispose();
         }
     }
 }

@@ -163,11 +163,11 @@ public class MoveSpaceCheckMountPointTests(ITestOutputHelper output)
     [MountedVolumeFact]
     public void Row11_the_command_line_refuses_a_move_too_big_for_the_mounted_volume()
     {
-        // The command line's overload, which measures through the walk itself. The
+        // The command line's route, which measures through the walk itself. The
         // size is past the mounted volume's figure by more than it can drift.
         var size = MountedFreeBytes + 2 * FreeSpaceTolerance;
-        var got = MoveSpaceCheck.RefusalFreeSpace(UnderMount, size);
-        Row(11, $"RefusalFreeSpace({UnderMount}, {size})", $"refused, returning {AboutMountedFree}", got);
+        var got = MoveSpaceCheck.MeasuredRefusalFreeSpace(UnderMount, size);
+        Row(11, $"MeasuredRefusalFreeSpace({UnderMount}, {size})", $"refused, returning {AboutMountedFree}", got);
         Assert.True(IsMountedFree(got));
     }
 
@@ -177,8 +177,8 @@ public class MoveSpaceCheckMountPointTests(ITestOutputHelper output)
         // The measurement is read for itself as well, so the allowance is shown to be
         // one made against the mounted volume's figure.
         var measured = MoveSpaceCheck.AvailableFreeSpaceForDestination(UnderMount);
-        var got = MoveSpaceCheck.RefusalFreeSpace(UnderMount, 1);
-        Row(12, $"RefusalFreeSpace({UnderMount}, 1), measuring {measured}",
+        var got = MoveSpaceCheck.MeasuredRefusalFreeSpace(UnderMount, 1);
+        Row(12, $"MeasuredRefusalFreeSpace({UnderMount}, 1), measuring {measured}",
             $"null, measuring {AboutMountedFree}", got);
         Assert.True(IsMountedFree(measured));
         Assert.Null(got);
@@ -191,8 +191,8 @@ public class MoveSpaceCheckMountPointTests(ITestOutputHelper output)
         // same-volume answer can allow it, and the command line's call, which
         // measures for itself, asked for more room than any volume has.
         var got = MoveSpaceCheck.RefusalFreeSpace(BesideDestination, long.MaxValue, 0);
-        var gotMeasuring = MoveSpaceCheck.RefusalFreeSpace(BesideDestination, long.MaxValue);
-        Row(13, $"RefusalFreeSpace({BesideDestination}, {long.MaxValue}, 0) and RefusalFreeSpace({BesideDestination}, {long.MaxValue})",
+        var gotMeasuring = MoveSpaceCheck.MeasuredRefusalFreeSpace(BesideDestination, long.MaxValue);
+        Row(13, $"RefusalFreeSpace({BesideDestination}, {long.MaxValue}, 0) and MeasuredRefusalFreeSpace({BesideDestination}, {long.MaxValue})",
             "null and null", $"{got?.ToString() ?? "null"} and {gotMeasuring?.ToString() ?? "null"}");
         Assert.Null(got);
         Assert.Null(gotMeasuring);

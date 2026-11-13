@@ -579,13 +579,20 @@ public class DeleteFilesServiceUnitTests
             new PatchClaim(a, "{AAAA0000-0000-0000-0000-000000000001}",
                 "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
         };
+        // The siblings half is a list of its own, so each half is pinned to its own.
+        var siblings = new[]
+        {
+            new PatchClaim(a.Replace("a.msp", "b.msp"), "{AAAA0000-0000-0000-0000-000000000002}",
+                "{1111FFFF-0000-0000-0000-000000000001}", null, 4),
+        };
         var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
         var reverifier = new FakeReclaimingReverifier(Array.Empty<string>(), mutex);
         var svc = new DeleteFilesService(fs, mutex, null, reverifier);
 
-        await svc.DeleteFilesAsync(new[] { a }, new UnderLeaseClaims(claims, claims));
+        await svc.DeleteFilesAsync(new[] { a }, new UnderLeaseClaims(claims, siblings));
 
         Assert.Equal(claims, reverifier.ClaimsSeen);
+        Assert.Equal(siblings, reverifier.SiblingsSeen);
     }
 
     [Fact]

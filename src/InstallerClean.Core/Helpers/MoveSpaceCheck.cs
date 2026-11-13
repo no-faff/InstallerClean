@@ -32,7 +32,7 @@ internal static class MoveSpaceCheck
     /// that the space does not come back until the folder goes, the Move button's
     /// tooltip, the completion screen's restore line, the destination's kind in the
     /// result log and the opt-in report, and
-    /// <see cref="RefusalFreeSpace(string, long, long?)"/>, which skips the
+    /// <see cref="RefusalFreeSpace(string, long, long?, string?)"/>, which skips the
     /// free-space check for a move that needs no room. A true given for a
     /// destination on another volume would skip the measurement on a move that
     /// copies; a false given for one on the cache's volume would run the check on a
@@ -67,7 +67,7 @@ internal static class MoveSpaceCheck
     ///
     /// Anything it cannot resolve is not the same volume, and for the decision
     /// this method owns that is the safe way round:
-    /// <see cref="RefusalFreeSpace(string, long, long?)"/> consults the
+    /// <see cref="RefusalFreeSpace(string, long, long?, string?)"/> consults the
     /// measurement instead of skipping it, so a move that really copies is
     /// measured whichever side of the comparison declined to answer.
     ///
@@ -164,21 +164,29 @@ internal static class MoveSpaceCheck
     /// destination (a share whose caller lacks query rights) has established
     /// nothing, and the same rule covers it: no claim rather than a wrong one.
     /// </remarks>
-    internal static long? RefusalFreeSpace(string destination, long totalBytes, long? availableFreeSpace)
+    /// <param name="installerCacheRoot">
+    /// Test-only, null in production: as <see cref="IsOnInstallerCacheDrive"/>'s.
+    /// </param>
+    internal static long? RefusalFreeSpace(
+        string destination, long totalBytes, long? availableFreeSpace, string? installerCacheRoot = null)
     {
-        if (IsOnInstallerCacheDrive(destination)) return null;
+        if (IsOnInstallerCacheDrive(destination, installerCacheRoot)) return null;
         if (availableFreeSpace is not long free) return null;
         return free < totalBytes ? free : null;
     }
 
     /// <summary>
-    /// <see cref="RefusalFreeSpace(string, long, long?)"/> for a caller that has
-    /// not measured the destination itself, which is the command line: its
+    /// <see cref="RefusalFreeSpace(string, long, long?, string?)"/> for a caller that
+    /// has not measured the destination itself, which is the command line: its
     /// destination is validated before the scan and created by
     /// <c>MoveFilesService</c>, so nothing on the way has had reason to ask.
     /// </summary>
-    internal static long? RefusalFreeSpace(string destination, long totalBytes) =>
-        RefusalFreeSpace(destination, totalBytes, AvailableFreeSpaceForDestination(destination));
+    /// <param name="installerCacheRoot">
+    /// Test-only, null in production: as <see cref="IsOnInstallerCacheDrive"/>'s.
+    /// </param>
+    internal static long? MeasuredRefusalFreeSpace(
+        string destination, long totalBytes, string? installerCacheRoot = null) =>
+        RefusalFreeSpace(destination, totalBytes, AvailableFreeSpaceForDestination(destination), installerCacheRoot);
 
     /// <summary>
     /// The free space at <paramref name="destination"/>, or at the nearest
