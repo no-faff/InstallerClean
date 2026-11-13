@@ -57,7 +57,7 @@ The app reads the folder and the Windows records; it does not change your instal
 
 A separate console executable, installerclean-cli.exe, ships in the setup build and as a standalone download, for scheduled tasks and unattended use, with its own exit codes and Windows event-log entries for scripting.
 
-Seventeen languages across the app, the installer and the command-line tool. Setup and portable builds are both self-contained and need no .NET runtime installed.
+Seventeen languages across the app, the installer and the command-line tool. Runs on .NET Framework 4.8, in Windows 10 since 1903; on older PCs it links to the download.
 
 Inspired by PatchCleaner, which does a similar job but is closed source and hasn't been updated since March 2016.</Char_Desc_2000>
     </English>
