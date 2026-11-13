@@ -1690,14 +1690,19 @@ public class FileSystemScanServiceTests
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
-        var fakeFiles = Array.Empty<string>();
+        // The file is on disk, so the row reaches the branch that offers a registered
+        // row, and only its IsRemovable keeps it off the offer.
+        var fs = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            [@"C:\Windows\Installer\fallback.msi"] = new("x"),
+        });
 
-        var svc = new FileSystemScanService(mockQuery, fakeFiles);
+        var svc = new FileSystemScanService(mockQuery, fs);
         var result = await svc.ScanAsync();
 
         // Fallback entries (PatchState=0, IsRemovable=false) stay in registered, not removable
         Assert.Empty(result.RemovableFiles);
-        Assert.Single(result.RegisteredPackages);
+        Assert.Equal(@"C:\Windows\Installer\fallback.msi", Assert.Single(result.RegisteredPackages).LocalPackagePath);
     }
 
     [Fact]

@@ -1161,9 +1161,12 @@ public class DeclaredProductCheckUnlistedKeyTests
     [Fact]
     public void A_key_with_no_InstallProperties_keeps_the_package_at_a_local_folder_on_its_list_by_identity()
     {
+        // The package's name opens nothing in the Installer folder, so the identity read
+        // of the package on the list is the only thing that can keep First.
         var pc = new Pc();
-        pc.HasList(HiveList(System, KeyCode), SetupName, Folder);
-        pc.Files.Opens(Folder + SetupName, 1);
+        pc.HasList(HiveList(System, KeyCode), SetupName, Setup);
+        pc.Files.Opens(SetupPackage, 1);
+        pc.Files.Answers(Folder + SetupName, FileIdentityRead.NamesNothing);
 
         Assert.Equal(
             [DeclaredProductOutcome.Unestablished, LetThrough],
