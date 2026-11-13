@@ -119,6 +119,28 @@ public class InstallerQueryServiceShortProgramTests
         AssertCounted(result, unsettled);
     }
 
+    /// <summary>
+    /// The patch list stops at its first row, which will not read, so it returns no patch
+    /// and is then abandoned. An empty listing under the program's own account says the
+    /// program holds no patch where Windows has just met one, and does not answer for it.
+    /// </summary>
+    [Theory]
+    [InlineData(new[] { OtherPatch }, 0)]
+    [InlineData(new string[0], 1)]
+    [InlineData(null, 1)]
+    public async Task A_patch_list_that_came_back_short_before_naming_any_patch_holds_every_superseded_patch_unless_its_own_listing_names_one(
+        string[]? listing, int unsettled)
+    {
+        var msi = Machine();
+        msi.PatchRowsFailFrom[Short] = 0;
+
+        var result = await Scan(msi, Fallback(listings: listing is null
+            ? new()
+            : new() { [new AccountCode(MachineAccount, Short)] = listing }));
+
+        AssertCounted(result, unsettled);
+    }
+
     [Theory]
     [InlineData(null, MsiInstallContext.Machine, MachineAccount)]
     [InlineData(OtherAccount, MsiInstallContext.Machine, null)]

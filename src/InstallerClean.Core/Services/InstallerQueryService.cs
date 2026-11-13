@@ -1587,9 +1587,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Whether the registry holds, under the installation's own account subtree, what
     /// each of its failed reads would have returned: a package record for the product
     /// where its <c>LocalPackage</c> read failed; where its patch enumeration came back
-    /// short, a <c>Patches</c> key whose listing was established and names every patch
-    /// the enumeration did return; and a package record for each patch whose
-    /// <c>LocalPackage</c> read failed.
+    /// short, a <c>Patches</c> key whose listing was established, names every patch the
+    /// enumeration did return and names at least one; and a package record for each patch
+    /// whose <c>LocalPackage</c> read failed.
     ///
     /// WHERE IT DOES, WHAT THE INSTALLATION LOST IS ON RECORD. Windows Installer finds a
     /// cached package through the path recorded for it, and the fallback reads and claims
@@ -1602,7 +1602,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
     ///
     /// A LISTING THAT LEAVES OUT A PATCH THE ENUMERATION RETURNED IS NOT THE WHOLE
     /// REGISTRATION, and nor is a product key with no <c>Patches</c> key, which says the
-    /// installation holds no patch where Windows has just returned one. Either answers no.
+    /// installation holds no patch where Windows has just returned one. Nor is an empty
+    /// listing: an enumeration comes back short only after rows it could not read, each a
+    /// patch the installation holds, so a listing naming none says less than Windows did.
+    /// Each answers no.
     ///
     /// WHERE IT DOES NOT, THE LOST CLAIM COULD NAME ANY FILE, and nothing in this scan
     /// says which. A record or a listing under ANOTHER account does not answer for this
@@ -1622,11 +1625,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
             && !HoldsPackageRecord(fallback.PackageRecords, account, isPatch: false, installation.ProductCode))
             return false;
 
-        if (installation.PatchListShort
-            && !NamesEvery(
-                OwnListing(fallback.PatchListings, account, installation.ProductCode),
-                installation.PatchCodesListed))
-            return false;
+        if (installation.PatchListShort)
+        {
+            var listed = OwnListing(fallback.PatchListings, account, installation.ProductCode);
+            if (!NamesEvery(listed, installation.PatchCodesListed) || listed!.Count == 0) return false;
+        }
 
         foreach (var (patchCode, patchSid, patchContext) in installation.LostPatchRecords)
         {
